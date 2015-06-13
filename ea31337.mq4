@@ -26,8 +26,8 @@ enum ENUM_STRATEGY_TYPE {
   FRACTALS_ON_SELL,
   DEMARKER_ON_BUY,
   DEMARKER_ON_SELL,
-  IWPR_ON_BUY,
-  IWPR_ON_SELL,
+  WPR_ON_BUY,
+  WPR_ON_SELL,
   ALLIGATOR_ON_BUY,
   ALLIGATOR_ON_SELL,
   BBANDS_ON_BUY,
@@ -51,8 +51,8 @@ enum ENUM_ACTION_TYPE {
   ACTION_CLOSE_ALL_ORDER_BUY,
   ACTION_CLOSE_ALL_ORDER_SELL,
   ACTION_CLOSE_ALL_ORDERS,
-  ACTION_RISK_REDUCE,
-  ACTION_RISK_INCREASE,
+  // ACTION_RISK_REDUCE,
+  // ACTION_RISK_INCREASE,
   ACTION_ORDER_STOPS_DECREASE,
   ACTION_ORDER_PROFIT_DECREASE,
   FINAL_ACTION_TYPE_ENTRY // Should be the last one. Used to calculate number of enum items.
@@ -61,35 +61,28 @@ enum ENUM_ACTION_TYPE {
 // User parameters.
 extern string ____EA_Parameters__ = "-----------------------------------------";
 extern double EATrailingStop = 20;
-extern int EATrailingStopMethod = 4; // TrailingStop method. Set 0 to disable. Range: 0-7. Suggested value: 1 or 4
+extern int EATrailingStopMethod = 5; // TrailingStop method. Set 0 to disable. Range: 0-7. Suggested value: 1 or 4
 extern bool EATrailingStopOneWay = TRUE; // Change trailing stop towards one direction only. Suggested value: TRUE
 extern double EATrailingProfit = 20;
-extern int EATrailingProfitMethod = 4; // Trailing Profit method. Set 0 to disable. Range: 0-7. Suggested value: 0 or 4.
+extern int EATrailingProfitMethod = 1; // Trailing Profit method. Set 0 to disable. Range: 0-7. Suggested value: 0 or 4.
 extern bool EATrailingProfitOneWay = TRUE; // Change trailing profit take towards one direction only. Suggested value: TRUE
+
 // extern double EAMinChangeOrders = 5; // Minimum change in pips between placed orders.
 // extern double EADelayBetweenOrders = 0; // Minimum delay in seconds between placed orders. FIXME: Fix relative delay in backtesting.
 extern bool EACloseOnMarketChange = FALSE; // Close orders on market change.
 extern bool EAMinimalizeLosses = FALSE; // Set stop loss to zero, once the order is profitable.
-extern double RiskRatio = 1.0; // Suggested value: 1.0. Do not change unless testing.
 extern int EAOrderPriceSlippage = 5; // Maximum price slippage for buy or sell orders.
 extern int EAManualGMToffset = 0;
 
-extern string __EA_Order_Parameters__ = "-- Orders/Profit/Loss settings (set 0 for auto) --";
+extern string __EA_Order_Parameters__ = "-- Profit/Loss settings (set 0 for auto) --";
 extern double EALotSize = 0; // Default lot size. Set 0 for auto.
 extern int EAMaxOrders = 0; // Maximum orders. Set 0 for auto.
 extern int EAMaxOrdersPerType = 2; // Maximum orders per strategy type. Set 0 for unlimited.
 extern double EATakeProfit = 0.0;
 extern double EAStopLoss = 0.0;
+extern double RiskRatio = 0; // Suggested value: 1.0. Do not change unless testing.
 
-extern string ____EA_Conditions__ = "-- Execute actions on certain conditions (set 0 to none) --"; // See: ENUM_ACTION_TYPE
-extern int ActionOnDoubledEquity  = ACTION_CLOSE_ORDER_PROFIT; // Execute action when account equity doubled balance.
-extern int ActionOnTwoThirdEquity = ACTION_RISK_REDUCE; // Execute action when account has 2/3 of equity.
-extern int ActionOnHalfEquity     = ACTION_CLOSE_ALL_ORDER_LOSS; // Execute action when account has half equity.
-extern int ActionOnOneThirdEquity = ACTION_CLOSE_ALL_ORDER_LOSS; // Execute action when account has 1/3 of equity.
-extern int ActionOnMarginCall     = ACTION_NONE; // Execute action on margin call.
-// extern int ActionOnLowBalance     = ACTION_NONE; // Execute action on low balance.
-
-extern string ____MA_Parameters__ = "-----------------------------------------";
+extern string ____MA_Parameters__ = "-- Settings for the Moving Average indicator --";
 extern bool MA_Enabled = TRUE; // Enable MA-based strategy.
 extern ENUM_TIMEFRAMES MA_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int MAAvgPeriodFast = 10; // Suggested value: 5
@@ -103,7 +96,7 @@ extern int MAShiftFar = 6; // Extra shift.
 extern ENUM_MA_METHOD MAMethod = MODE_EMA; // MA method (See: ENUM_MA_METHOD). Range: 0-3
 extern ENUM_APPLIED_PRICE MAAppliedPrice = PRICE_CLOSE; // MA applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 
-extern string ____MACD_Parameters__ = "-----------------------------------------";
+extern string ____MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --";
 extern bool MACD_Enabled = TRUE; // Enable MACD-based strategy.
 extern ENUM_TIMEFRAMES MACD_Timeframe = PERIOD_M5; // Timeframe (0 means the current chart).
 extern double MACD_OpenLevel  = 2;
@@ -112,50 +105,62 @@ extern ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_HIGH; // MACD applied price
 extern int MACD_Shift = 1; // Past MACD value in number of bars. Shift relative to the current bar the given amount of periods ago. Suggested value: 1
 extern int MACD_ShiftExtra = 2; // Extra MACD past value in number of bars.
 
-extern string ____Fractals_Parameters__ = "-----------------------------------------";
+extern string ____Fractals_Parameters__ = "-- Settings for the Fractals indicator --";
 extern bool Fractals_Enabled = TRUE; // Enable Fractals-based strategy.
 extern ENUM_TIMEFRAMES Fractals_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int Fractals_MaxPeriods = 6; // Suggested range: 2-5, Suggested value: 4
 
-extern string ____Alligator_Parameters__ = "-----------------------------------------";
+extern string ____Alligator_Parameters__ = "-- Settings for the Alligator indicator --";
 extern bool Alligator_Enabled = TRUE; // Enable Alligator-based strategy.
 extern ENUM_TIMEFRAMES Alligator_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern double Alligator_Ratio = 0.5; // Suggested to not change. Suggested range: 0.0-5.0
 
-extern string ____DeMarker_Parameters__ = "-----------------------------------------";
+extern string ____DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --";
 extern bool DeMarker_Enabled = TRUE; // Enable DeMarker-based strategy.
 extern ENUM_TIMEFRAMES DeMarker_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int DeMarker_Period = 9; // Suggested range: 6-12. Suggested value: 9
 extern int DeMarker_MaxPeriods = 2; // Suggested range: 2-5
 extern double DeMarker_Shift = 0.2; // Valid range: 0.0-0.4. Suggested value: 0.2
 
-extern string ____WPR_Parameters__ = "-- Settings for Larry Williams' Percent Range indicator --";
+extern string ____WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --";
 extern bool WPR_Enabled = TRUE; // Enable WPR-based strategy.
 extern ENUM_TIMEFRAMES WPR_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int WPR_period = 8;
 extern int WPR_MaxPeriods = 6; // Suggested range: 2-10. Suggested value: 6
 extern int WPR_Shift = 0; // Suggested range: 0.0-0.5. Suggested value: 0.4.
 
-extern string ____BBands_Parameters__ = "-- Settings for the Bollinger Bands® indicator --";
-extern bool BBands_Enabled = FALSE; // Enable BBands-based strategy.
-extern ENUM_APPLIED_PRICE BBands_Applied_Price = PRICE_HIGH; // Bands applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
-extern ENUM_TIMEFRAMES BBands_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int BBands_Shift = 0; // The indicator shift relative to the chart.
-
 extern string ____RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --";
 extern bool RSI_Enabled = FALSE; // Enable RSI-based strategy.
 extern ENUM_TIMEFRAMES RSI_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
+extern int RSI_Period = 14; // Averaging period to calculate the main line.
 extern ENUM_APPLIED_PRICE RSI_Applied_Price = PRICE_HIGH; // RSI applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
-extern double RSI_Shift = 0; // The indicator shift relative to the chart.
+extern double RSI_MaxPeriods = 3; // Maximum bar periods to calculate its value.
 
-extern string ____Debug_Parameters__ = "-----------------------------------------";
+extern string ____BBands_Parameters__ = "-- Settings for the Bollinger Bands® indicator --";
+extern bool BBands_Enabled = FALSE; // Enable BBands-based strategy.
+extern ENUM_TIMEFRAMES BBands_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
+extern int BBands_Period = 20; // Averaging period to calculate the main line.
+extern ENUM_APPLIED_PRICE BBands_Applied_Price = PRICE_HIGH; // Bands applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
+extern int BBands_Deviation = 2; // Number of standard deviations from the main line.
+extern int BBands_MaxPeriods = 3; // Maximum bar periods to calculate its value.
+extern int BBands_Shift = 0; // The indicator shift relative to the chart.
+
+extern string ____EA_Conditions__ = "-- Execute actions on certain conditions (set 0 to none) --"; // See: ENUM_ACTION_TYPE
+extern int ActionOnDoubledEquity  = ACTION_CLOSE_ORDER_PROFIT; // Execute action when account equity doubled balance.
+extern int ActionOnTwoThirdEquity = ACTION_CLOSE_ORDER_LOSS; // Execute action when account has 2/3 of equity.
+extern int ActionOnHalfEquity     = ACTION_CLOSE_ALL_ORDER_LOSS; // Execute action when account has half equity.
+extern int ActionOnOneThirdEquity = ACTION_CLOSE_ALL_ORDER_LOSS; // Execute action when account has 1/3 of equity.
+extern int ActionOnMarginCall     = ACTION_NONE; // Execute action on margin call.
+// extern int ActionOnLowBalance     = ACTION_NONE; // Execute action on low balance.
+
+extern string ____Debug_Parameters__ = "-- Settings for log & messages --";
 extern bool PrintLogOnChart = TRUE;
 extern bool VerboseErrors = TRUE; // Show errors.
 extern bool VerboseInfo = TRUE;   // Show info messages.
 extern bool VerboseDebug = TRUE;  // Show debug messages.
 extern bool VerboseTrace = FALSE;  // Even more debugging.
 
-extern string ____UX_Parameters__ = "-----------------------------------------";
+extern string ____UX_Parameters__ = "-- Settings for User Interface & Experience --";
 extern bool SendEmail = FALSE;
 extern bool SoundAlert = FALSE;
 extern string SoundFileAtOpen = "alert.wav";
@@ -166,7 +171,7 @@ extern color ColorSell = Red;
 extern string ____Other_Parameters__ = "-----------------------------------------";
 extern int MagicNumber = 31337; // To help identify its own orders. It can vary in additional range: +20, see: ENUM_ORDER_TYPE.
 extern bool TradeMicroLots = TRUE;
-extern bool MaxTries = 3; // Number of maximum attempts to execute the order.
+extern bool MaxTries = 5; // Number of maximum attempts to execute the order.
 //extern int TrailingStopDelay = 0; // How often trailing stop should be updated (in seconds). FIXME: Fix relative delay in backtesting.
 // extern int JobProcessDelay = 1; // How often job list should be processed (in seconds).
 
@@ -207,6 +212,7 @@ bool session_active = FALSE;
 // EA variables.
 string EA_Name = "31337";
 bool ea_active = FALSE;
+double risk_ratio;
 double order_slippage; // Price slippage.
 int err_code; // Error code.
 string last_err;
@@ -220,7 +226,8 @@ int total_orders = 0; // Number of total orders currently open.
 // Indicator variables.
 double MA_Fast[3], MA_Medium[3], MA_Slow[3];
 double MACD[3], MACDSignal[3];
-double RSI[], BBands[];
+double RSI[];
+double BBands_main[], BBands_upper[], BBands_lower[];
 double Alligator[3];
 double DeMarker[], WPR[];
 double Fractals_lower, Fractals_upper;
@@ -277,6 +284,10 @@ int OnInit() {
    GMT_Offset = EAManualGMToffset;
    ArrayResize(DeMarker, DeMarker_MaxPeriods + 1);
    ArrayResize(WPR, WPR_MaxPeriods + 1);
+   ArrayResize(RSI, RSI_MaxPeriods + 1);
+   ArrayResize(BBands_main, BBands_MaxPeriods + 1);
+   ArrayResize(BBands_upper, BBands_MaxPeriods + 1);
+   ArrayResize(BBands_lower, BBands_MaxPeriods + 1);
    ArrayFill(todo_queue, 0, ArraySize(todo_queue), 0); // Reset queue list.
 
    if (IsTesting()) {
@@ -356,26 +367,26 @@ void Trade() {
    if (MA_Enabled) {
       if (MAFastOnBuy()) {
        if (EACloseOnMarketChange) CloseOrdersByType(MA_FAST_ON_SELL);
-       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MA_FAST_ON_BUY, "iMAFastOnBuy()");
+       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MA_FAST_ON_BUY, "MAFastOnBuy()");
       } else if (MAFastOnSell()) {
        if (EACloseOnMarketChange) CloseOrdersByType(MA_FAST_ON_BUY);
-       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MA_FAST_ON_SELL, "iMAFastOnSell()");
+       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MA_FAST_ON_SELL, "MAFastOnSell()");
       }
 
       if (MAMediumOnBuy()) {
        if (EACloseOnMarketChange) CloseOrdersByType(MA_MEDIUM_ON_SELL);
-       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MA_MEDIUM_ON_BUY, "iMAMediumOnBuy()");
+       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MA_MEDIUM_ON_BUY, "MAMediumOnBuy()");
       } else if (MAMediumOnSell()) {
        if (EACloseOnMarketChange) CloseOrdersByType(MA_MEDIUM_ON_BUY);
-       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MA_MEDIUM_ON_SELL, "iMAMediumOnSell()");
+       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MA_MEDIUM_ON_SELL, "MAMediumOnSell()");
       }
 
       if (MASlowOnBuy()) {
        if (EACloseOnMarketChange) CloseOrdersByType(MA_LARGE_ON_SELL);
-       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MA_LARGE_ON_BUY, "iMASlowOnBuy()");
+       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MA_LARGE_ON_BUY, "MASlowOnBuy()");
       } else if (MASlowOnSell()) {
        if (EACloseOnMarketChange) CloseOrdersByType(MA_LARGE_ON_BUY);
-       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MA_LARGE_ON_SELL, "iMASlowOnSell()");
+       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MA_LARGE_ON_SELL, "MASlowOnSell()");
       }
    }
 
@@ -419,12 +430,12 @@ void Trade() {
       }
    }
 
-   if (IWPROnBuy()) {
-     if (EACloseOnMarketChange) CloseOrdersByType(IWPR_ON_SELL);
-     order_placed = ExecuteOrder(OP_BUY, GetLotSize(), IWPR_ON_BUY, "IWPROnBuy()");
-   } else if (IWPROnSell()) {
-     if (EACloseOnMarketChange) CloseOrdersByType(IWPR_ON_BUY);
-     order_placed = ExecuteOrder(OP_SELL, GetLotSize(), IWPR_ON_SELL, "IWPROnSell()");
+   if (WPROnBuy()) {
+     if (EACloseOnMarketChange) CloseOrdersByType(WPR_ON_SELL);
+     order_placed = ExecuteOrder(OP_BUY, GetLotSize(), WPR_ON_BUY, "WPROnBuy()");
+   } else if (WPROnSell()) {
+     if (EACloseOnMarketChange) CloseOrdersByType(WPR_ON_BUY);
+     order_placed = ExecuteOrder(OP_SELL, GetLotSize(), WPR_ON_SELL, "WPROnSell()");
    }
 
    if (GetTotalOrders() > 0) {
@@ -472,7 +483,9 @@ void CheckAccount() {
 bool UpdateIndicators() {
    if (VerboseTrace) Print("Calling: UpdateIndicators()");
 
-   // Update Moving Averages.
+   int i;
+
+   // Update Moving Averages indicator values.
    MA_Fast[0] = iMA(NULL, MA_Timeframe, MAAvgPeriodFast, MAShift, MAMethod, MAAppliedPrice, 0); // Current
    MA_Fast[1] = iMA(NULL, MA_Timeframe, MAAvgPeriodFast, MAShift, MAMethod, MAAppliedPrice, MAShiftFast); // Previous
    MA_Fast[2] = iMA(NULL, MA_Timeframe, MAAvgPeriodFast, MAShift, MAMethod, MAAppliedPrice, MAShiftFast + MAShiftFar);
@@ -489,7 +502,7 @@ bool UpdateIndicators() {
    if (VerboseTrace) { Print("MA_Slow: ", GetArrayValues(MA_Slow)); }
    if (VerboseDebug && IsVisualMode()) DrawMA();
 
-   // Update MACD.
+   // Update MACD indicator values.
    MACD[0] = iMACD(NULL, MACD_Timeframe, 12, 26, 9, MACD_Applied_Price, MODE_MAIN, 0); // Current
    MACD[1] = iMACD(NULL, MACD_Timeframe, 12, 26, 9, MACD_Applied_Price, MODE_MAIN, MACD_Shift); // Previous
    MACD[2] = iMACD(NULL, MACD_Timeframe, 12, 26, 9, MACD_Applied_Price, MODE_MAIN, MACD_Shift + MACD_ShiftExtra);
@@ -498,25 +511,39 @@ bool UpdateIndicators() {
    MACDSignal[2] = iMACD(NULL, MACD_Timeframe, 12, 26, 9, MACD_Applied_Price, MODE_SIGNAL, MACD_Shift + MACD_ShiftExtra);
    if (VerboseTrace) { Print("MACD: ", GetArrayValues(MACD), "; Signal: ", GetArrayValues(MACDSignal)); }
 
-   // Update Alligator.
+   // Update RSI indicator values.
+   for (i = 0; i <= RSI_MaxPeriods; i++) {
+      RSI[i] = iRSI(NULL, RSI_Timeframe, RSI_Period, RSI_Applied_Price, i);
+   }
+   if (VerboseTrace) { Print("RSI: ", GetArrayValues(RSI)); }
+
+   // Update the Bollinger Bands.
+   for (i = 0; i <= BBands_MaxPeriods; i++) {
+      BBands_main[i] = iBands(NULL, BBands_Timeframe, BBands_Period, BBands_Deviation, BBands_Shift, BBands_Applied_Price, MODE_MAIN, i);
+      BBands_upper[i] = iBands(NULL, BBands_Timeframe, BBands_Period, BBands_Deviation, BBands_Shift, BBands_Applied_Price, MODE_UPPER, i);
+      BBands_lower[i] = iBands(NULL, BBands_Timeframe, BBands_Period, BBands_Deviation, BBands_Shift, BBands_Applied_Price, MODE_LOWER, i);
+   }
+   if (VerboseTrace) { Print("Bands: Main: " + GetArrayValues(BBands_main) + "; Upper: " + GetArrayValues(BBands_upper) + "; Lower: " + GetArrayValues(BBands_lower)); }
+
+   // Update Alligator indicator values.
    Alligator[0] = iCustom(NULL, Alligator_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 0, 0);
    Alligator[1] = iCustom(NULL, Alligator_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 1, 0);
    Alligator[2] = iCustom(NULL, Alligator_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 2, 0);
    if (VerboseTrace) { Print("Alligator: ", GetArrayValues(Alligator)); }
 
-   // Update DeMarker.
-   for (int i = 0; i <= DeMarker_MaxPeriods; i++) {
+   // Update DeMarker indicator values.
+   for (i = 0; i <= DeMarker_MaxPeriods; i++) {
       DeMarker[i] = iDeMarker(NULL, DeMarker_Timeframe, DeMarker_Period, i);
    }
    if (VerboseTrace) { Print("DeMarker: ", GetArrayValues(DeMarker)); }
 
-   // Update iWPR.
+   // Update the Larry Williams' Percent Range indicator values.
    for (i = 0; i <= WPR_MaxPeriods; i++) {
      WPR[i] = (-iWPR(NULL, WPR_Timeframe, WPR_period, i + 1)) / 100.0;
    }
    if (VerboseTrace) { Print("iWPR: ", GetArrayValues(WPR)); }
 
-   // Update Fractals.
+   // Update Fractals indicator values.
    double ifractal;
    Fractals_lower = 0;
    Fractals_upper = 0;
@@ -613,11 +640,11 @@ bool DeMarkerOnBuy() {
   return (HighestValue(DeMarker) > (0.5 + DeMarker_Shift));
 }
 
-bool IWPROnSell() {
+bool WPROnSell() {
   return (LowestValue(WPR) <= (0.5 - WPR_Shift));
 }
 
-bool IWPROnBuy() {
+bool WPROnBuy() {
   return (HighestValue(WPR) >= (0.5 + WPR_Shift));
 }
 
@@ -796,22 +823,16 @@ bool EACloseOrder(int ticket_no, string reason, bool retry = TRUE) {
 
 // Validate value for trailing stop.
 bool ValidTrailingStop(double trail_stop, int cmd, bool existing = FALSE) {
-  if (VerboseTrace && cmd == OP_BUY) Print("ValidTrailingStop(OP_BUY): ", Bid - trail_stop, " > ", NormalizeDouble(GetMinStopLevel(), PipPrecision));
-  if (VerboseTrace && cmd == OP_SELL) Print("ValidTrailingStop(OP_SELL): ", trail_stop - Ask, " > ", NormalizeDouble(GetMinStopLevel(), PipPrecision));
-  double delta = GetMarketMinGap() * Point + GetMarketSpread(); // Delta price.
-  double price = If(existing, OrderOpenPrice(), If(cmd == OP_BUY, Bid, Ask));
-  //if (VerboseTrace) Print("ValidTrailingStop(" + cmd + "): Delta: ", DoubleToStr(delta, PipPrecision));
-  if (cmd == OP_BUY && VerboseTrace) Print("ValidTrailingStop(" + cmd + "): ", trail_stop, " > ", Bid - delta);
-  if (cmd == OP_SELL && VerboseTrace) Print("ValidTrailingStop(" + cmd + "): ", trail_stop, " > ", Ask - delta);
-  return (
-    trail_stop == 0 ||
-    (cmd == OP_BUY  && price - trail_stop > delta) ||
-    (cmd == OP_SELL && trail_stop - price > delta)
-  );
   // OP_BUY: if(Bid-OrderOpenPrice()>Point*TrailingStop)      | Bid-Point*TrailingStop
   // OP_SELL: if((OrderOpenPrice()-Ask)>(Point*TrailingStop)) | Ask+Point*TrailingStop
   // trail_stop > OrderStopLoss()
   // trail_stop < OrderStopLoss()
+  double delta = GetMarketMinGap() * Point + GetMarketSpread(); // Delta price.
+  double price = If(existing, OrderOpenPrice(), If(cmd == OP_BUY, Bid, Ask));
+  bool valid = trail_stop == 0 || (cmd == OP_BUY  && price - trail_stop > delta) || (cmd == OP_SELL && trail_stop - price > delta);
+  if (!valid && VerboseDebug && cmd == OP_BUY) Print("ValidTrailingStop(OP_BUY): #" + If(existing, OrderTicket(), 0) + ":", price - trail_stop, " > ", DoubleToStr(delta, PipPrecision));
+  if (!valid && VerboseDebug && cmd == OP_SELL) Print("ValidTrailingStop(OP_SELL): #" + If(existing, OrderTicket(), 0) + ":", trail_stop - price, " > ", DoubleToStr(delta, PipPrecision));
+  return valid;
 }
 
 // Validate value for profit take.
@@ -821,11 +842,10 @@ bool ValidProfitTake(double profit_take, int cmd, bool existing = FALSE) {
   //if (VerboseTrace) Print("ValidProfitTake(" + cmd + "): Delta: ", DoubleToStr(delta, PipPrecision));
   double delta = GetMarketMinGap() * Point + GetMarketSpread(); // Delta price.
   double price = If(existing, OrderOpenPrice(), If(cmd == OP_BUY, Bid, Ask));
-  return (
-    profit_take == 0 ||
-    (cmd ==  OP_BUY && profit_take - price > delta) ||
-    (cmd == OP_SELL && price - profit_take  > delta)
-  );
+  bool valid = profit_take == 0 || (cmd ==  OP_BUY && profit_take - price > delta) || (cmd == OP_SELL && price - profit_take  > delta);
+  if (!valid && VerboseDebug && cmd == OP_BUY) Print("ValidTrailingStop(OP_BUY): #" + If(existing, OrderTicket(), 0) + ":", profit_take - price, " > ", DoubleToStr(delta, PipPrecision));
+  if (!valid && VerboseDebug && cmd == OP_SELL) Print("ValidTrailingStop(OP_SELL): #" + If(existing, OrderTicket(), 0) + ":", price - profit_take, " > ", DoubleToStr(delta, PipPrecision));
+  return valid;
 }
 
 void UpdateTrailingStops() {
@@ -884,7 +904,7 @@ void UpdateTrailingStops() {
 }
 
 // Get new trailing stop.
-// Note: Suggested methods: 1 & 4.
+// Note: Suggested methods: 1 & 4, 5.
 // Params:
 //   bool existing: TRUE if the calculation is for particular existing order
 double GetTrailingStop(int method, int cmd, double previous, bool existing = FALSE) {
@@ -898,46 +918,47 @@ double GetTrailingStop(int method, int cmd, double previous, bool existing = FAL
        if (cmd == OP_BUY) trail_stop = Bid - EATrailingStop * PipSize - delta;
        if (cmd == OP_SELL) trail_stop = Ask + EATrailingStop * PipSize + delta;
        break;
-     case 2: // iMA Small (Current) + trailing stop
+     case 2: // iMA Small (Current) - trailing stop
        trail_stop = MA_Fast[0] - EATrailingStop * OpTypeValue(cmd) * PipSize - delta;
        break;
-     case 3: // iMA Small (Previous) + trailing stop
+     case 3: // iMA Small (Previous) - trailing stop
        trail_stop = MA_Fast[1] - EATrailingStop * OpTypeValue(cmd) * PipSize - delta;
        break;
-     case 4: // iMA Small (Far) + trailing stop.
+     case 4: // iMA Small (Far) - trailing stop. Optimize together with: MAShiftFar.
        trail_stop = MA_Fast[2] - EATrailingStop * OpTypeValue(cmd) * PipSize - delta;
        break;
-     case 5: // iMA Medium (Current) + trailing stop
+     case 5: // iMA Medium (Current) - trailing stop
        trail_stop = MA_Medium[0] - EATrailingStop * OpTypeValue(cmd) * PipSize - delta;
        break;
-     case 6: // iMA Medium (Previous) + trailing stop
+     case 6: // iMA Medium (Previous) - trailing stop
        trail_stop = MA_Medium[1] - EATrailingStop * OpTypeValue(cmd) * PipSize - delta;
        break;
-     case 7: // iMA Medium (Far) + trailing stop
+     case 7: // iMA Medium (Far) - trailing stop. Optimize together with: MAShiftFar.
        trail_stop = MA_Medium[2] - EATrailingStop * OpTypeValue(cmd) * PipSize - delta;
        break;
-     case 8: // iMA Slow (Current) + trailing stop
+     case 8: // iMA Slow (Current) - trailing stop
        trail_stop = MA_Slow[0] - EATrailingStop * OpTypeValue(cmd) * PipSize - delta;
        break;
-     case 9: // iMA Slow (Previous) + trailing stop
+     case 9: // iMA Slow (Previous) - trailing stop
        trail_stop = MA_Slow[1] - EATrailingStop * OpTypeValue(cmd) * PipSize - delta;
        break;
-     case 10: // iMA Slow (Far) + trailing stop
+     case 10: // iMA Slow (Far) - trailing stop. Optimize together with: MAShiftFar.
        trail_stop = MA_Slow[2] - EATrailingStop * OpTypeValue(cmd) * PipSize - delta;
        break;
      default:
        if (VerboseDebug) Print("Error in GetTrailingStop(): Unknown trailing stop method: ", method);
    }
-   if (EATrailingStopOneWay) {
-     if (cmd == OP_SELL)     trail_stop = If(trail_stop < previous, trail_stop, previous);
-     else if (cmd == OP_BUY) trail_stop = If(trail_stop > previous, trail_stop, previous);
-   }
 
    if (!ValidTrailingStop(trail_stop, cmd, existing)) {
      if (VerboseTrace)
-       Print("GetTrailingStop(", method, "): Error: Invalid Trailing Stop: ", trail_stop, "; Previous: ", previous, "; ", GetOrderTextDetails());
-     // Fallback to standard one.
+       Print("Error in GetTrailingStop(", method, "): #" + If(existing, OrderTicket(), 0) + ": Invalid Trailing Stop: ", trail_stop, "; Previous: ", previous, "; ", GetOrderTextDetails());
+     // If value is invalid, fallback to standard one.
      trail_stop = If(cmd == OP_BUY, Bid - EATrailingStop * PipSize - delta, Ask + EATrailingStop * PipSize + delta);
+   }
+
+   if (EATrailingStopOneWay) { // If TRUE, move trailing stop only one direction.
+     if (cmd == OP_SELL)     trail_stop = If(trail_stop < previous, trail_stop, previous);
+     else if (cmd == OP_BUY) trail_stop = If(trail_stop > previous, trail_stop, previous);
    }
 
    // if (VerboseTrace && trail_stop != OrderStopLoss()) Print("GetTrailingStop(", method, "): New Trailing Stop: ", trail_stop, "; Previous: ", previous, "; ", GetOrderTextDetails());
@@ -967,7 +988,7 @@ double GetTrailingProfit(int method, int cmd, double previous, bool existing = F
      case 3: // iMA Small (Previous) + trailing profit.
        profit_take = MA_Fast[1] + EATrailingProfit * OpTypeValue(cmd) * PipSize + delta;
        break;
-     case 4: // iMA Small (Far) + trailing profit. P.S. The most optimal so far.
+     case 4: // iMA Small (Far) + trailing profit. Optimize together with: MAShiftFar.
        profit_take = MA_Fast[2] + EATrailingProfit * OpTypeValue(cmd) * PipSize + delta;
        break;
      case 5: // iMA Medium (Current) + trailing profit
@@ -976,7 +997,7 @@ double GetTrailingProfit(int method, int cmd, double previous, bool existing = F
      case 6: // iMA Medium (Previous) + trailing profit
        profit_take = MA_Medium[1] + EATrailingProfit * OpTypeValue(cmd) * PipSize + delta;
        break;
-     case 7: // iMA Medium (Far) + trailing profit
+     case 7: // iMA Medium (Far) + trailing profit. Optimize together with: MAShiftFar.
        profit_take = MA_Medium[2] + EATrailingProfit * OpTypeValue(cmd) * PipSize + delta;
        break;
      case 8: // iMA Slow (Current) + trailing profit
@@ -985,21 +1006,23 @@ double GetTrailingProfit(int method, int cmd, double previous, bool existing = F
      case 9: // iMA Slow (Previous) + trailing profit
        profit_take = MA_Slow[1] + EATrailingProfit * OpTypeValue(cmd) * PipSize + delta;
        break;
-     case 10: // iMA Slow (Far) + trailing profit
+     case 10: // iMA Slow (Far) + trailing profit. Optimize together with: MAShiftFar.
        profit_take = MA_Slow[2] + EATrailingProfit * OpTypeValue(cmd) * PipSize + delta;
        break;
      default:
        if (VerboseDebug) Print("Error in GetTrailingStop(): Unknown trailing stop method: ", method);
    }
-   if (EATrailingProfitOneWay) {
-     if (cmd == OP_SELL)     profit_take = If(profit_take < previous, profit_take, previous);
-     else if (cmd == OP_BUY) profit_take = If(profit_take > previous, profit_take, previous);
-   }
+
    if (!ValidProfitTake(profit_take, cmd)) {
      if (VerboseTrace)
-       Print("GetTrailingProfit(", method, "): Error: Invalid Profit Take: ", profit_take, "; Previous: ", previous, "; ", GetOrderTextDetails());
-     // Fallback to standard one.
+       Print("Error in GetTrailingProfit(", method, "): #" + If(existing, OrderTicket(), 0) + ": Invalid Profit Take: ", profit_take, "; Previous: ", previous, "; ", GetOrderTextDetails());
+     // If value is invalid, fallback to standard one.
      profit_take = If(cmd == OP_BUY, Bid + EATrailingStop * PipSize + delta, Ask - EATrailingStop * PipSize - delta);
+   }
+
+   if (EATrailingProfitOneWay) { // If TRUE, move profit take only one direction.
+     if (cmd == OP_SELL)     profit_take = If(profit_take < previous, profit_take, previous);
+     else if (cmd == OP_BUY) profit_take = If(profit_take > previous, profit_take, previous);
    }
 
    // if (VerboseTrace && profit_take != previous) Print("GetProfitStop(", method, "): New Profit Stop: ", profit_take, "; Old: ", previous, "; ", GetOrderTextDetails());
@@ -1203,12 +1226,6 @@ bool TradeAllowed() {
 // Check if EA parameters are valid.
 bool ValidSettings() {
   string err;
-  if (RiskRatio < 0.0) {
-    err = "Error: RiskRatio is less than 0.";
-    if (VerboseInfo) Print(err);
-    if (PrintLogOnChart) Comment(err);
-    return (FALSE);
-  }
   if (EALotSize < 0.0) {
     err = "Error: LotSize is less than 0.";
     if (VerboseInfo) Print(err);
@@ -1322,7 +1339,7 @@ int GetMaxOrdersAuto() {
   double leverage = AccountLeverage();
   double one_lot  = MarketInfo(Symbol(), MODE_MARGINREQUIRED);// Price of 1 lot
   double margin_risk = 0.5; // Percent of free margin to use (50%).
-  return (free * margin_risk / one_lot * (100 / leverage) / GetLotSize()) * RiskRatio;
+  return (free * margin_risk / one_lot * (100 / leverage) / GetLotSize()) * GetRiskRatio();
 }
 
 // Calculate number of maximum of orders allowed to open.
@@ -1344,7 +1361,7 @@ double GetAutoLotSize() {
   double one_lot   = MarketInfo(Symbol(), MODE_MARGINREQUIRED); // Free margin required to open 1 lot for buying.
   double margin_risk = 0.01; // Percent of free margin to use per order (1%).
   double avail_lots = free / one_lot * (100 / leverage);
-  return MathMin(MathMax(avail_lots * min_lot * margin_risk * RiskRatio, min_lot), max_lot);
+  return MathMin(MathMax(avail_lots * min_lot * margin_risk * GetRiskRatio(), min_lot), max_lot);
 }
 
 // Return current lot size to trade.
@@ -1353,6 +1370,17 @@ double GetLotSize() {
   return If(EALotSize == 0, GetAutoLotSize(), MathMax(EALotSize, min_lot));
 }
 
+// Calculate auto risk ratio value;
+double GetAutoRiskRatio() {
+  double equity = AccountEquity();
+  double balance = AccountBalance();
+  return MathMin(equity / balance, 2);
+}
+
+// Return risk ratio value;
+double GetRiskRatio() {
+  return If(RiskRatio == 0, GetAutoRiskRatio(), RiskRatio);
+}
 
 string GetDailyReport() {
   return GetAccountTextDetails() + "\n" + GetOrdersStats();
@@ -1374,9 +1402,9 @@ void DisplayInfoOnChart() {
    + "ACCOUNT INFORMATION:\n"
    + "Server Time: " + TimeToStr(TimeCurrent(), TIME_SECONDS) + "\n"
    + "Acc Number: " + AccountNumber(), "Acc Name: " + AccountName() + "; Broker: " + AccountCompany() + "\n"
-   + "Equity: " + DoubleToStr(AccountEquity(), 0) + AccountCurrency() + "; Balance: " + DoubleToStr(AccountBalance(), 0) + AccountCurrency() + "; Leverage: " + DoubleToStr(AccountLeverage(), 0)  + "\n"
+   + "Equity: " + DoubleToStr(AccountEquity(), 0) + AccountCurrency() + "; Balance: " + DoubleToStr(AccountBalance(), 0) + AccountCurrency() + "; Leverage: 1:" + DoubleToStr(AccountLeverage(), 0)  + "\n"
    + "Used Margin: " + DoubleToStr(AccountMargin(), 0)  + AccountCurrency() + "; Free: " + DoubleToStr(AccountFreeMargin(), 0) + AccountCurrency() + "; " + stop_out_level + "\n"
-   + "Lot size: " + DoubleToStr(GetLotSize(), volume_precision) + "; Max orders: " + If(EAMaxOrders == 0, GetMaxOrdersAuto(), EAMaxOrders) + "\n"
+   + "Lot size: " + DoubleToStr(GetLotSize(), volume_precision) + "; Max orders: " + If(EAMaxOrders == 0, GetMaxOrdersAuto(), EAMaxOrders) + "; Risk ratio: " + DoubleToStr(GetRiskRatio(), 1) + "\n"
    + total_orders_text + "\n"
    + GetOrdersStats() + "\n"
    + "Last error: " + last_err + "\n"
@@ -1427,19 +1455,23 @@ string GetOrdersStats() {
   int macd_orders = open_orders[MACD_ON_BUY] + open_orders[MACD_ON_SELL];
   int fractals_orders = open_orders[FRACTALS_ON_BUY] + open_orders[FRACTALS_ON_SELL];
   int demarker_orders = open_orders[DEMARKER_ON_BUY] + open_orders[DEMARKER_ON_SELL];
-  int iwpr_orders = open_orders[IWPR_ON_BUY] + open_orders[IWPR_ON_SELL];
+  int iwpr_orders = open_orders[WPR_ON_BUY] + open_orders[WPR_ON_SELL];
   int alligator_orders = open_orders[ALLIGATOR_ON_BUY] + open_orders[ALLIGATOR_ON_SELL];
   int bbands_orders = open_orders[BBANDS_ON_BUY] + open_orders[BBANDS_ON_SELL];
   int rsi_orders = open_orders[RSI_ON_BUY] + open_orders[RSI_ON_SELL];
   string orders_per_type = "Stats: ";
-  if (MA_Enabled) orders_per_type += "MA: " + MathFloor(100 / total_orders * ma_orders) + "%, ";
-  if (MACD_Enabled) orders_per_type += "MACD: " + MathFloor(100 / total_orders * macd_orders) + "%, ";
-  if (Fractals_Enabled) orders_per_type += "Fractals: " + MathFloor(100 / total_orders * fractals_orders) + "%, ";
-  if (DeMarker_Enabled) orders_per_type += "DeMarker: " + MathFloor(100 / total_orders * demarker_orders) + "%\n";
-  if (WPR_Enabled) orders_per_type += "IWPR: " + MathFloor(100 / total_orders * iwpr_orders) + "%, ";
-  if (Alligator_Enabled) orders_per_type += "Alligator: " + MathFloor(100 / total_orders * alligator_orders) + "%, ";
-  if (BBands_Enabled) orders_per_type += "Bands: " + MathFloor(100 / total_orders * bbands_orders) + "%, ";
-  if (RSI_Enabled) orders_per_type += "RSI: " + MathFloor(100 / total_orders * rsi_orders) + "%, ";
+  if (total_orders > 0) {
+     if (MA_Enabled && ma_orders > 0) orders_per_type += "MA: " + MathFloor(100 / total_orders * ma_orders) + "%, ";
+     if (MACD_Enabled && macd_orders > 0) orders_per_type += "MACD: " + MathFloor(100 / total_orders * macd_orders) + "%, ";
+     if (Fractals_Enabled && fractals_orders > 0) orders_per_type += "Fractals: " + MathFloor(100 / total_orders * fractals_orders) + "%, ";
+     if (DeMarker_Enabled && demarker_orders > 0) orders_per_type += "DeMarker: " + MathFloor(100 / total_orders * demarker_orders) + "%\n";
+     if (WPR_Enabled && iwpr_orders > 0) orders_per_type += "IWPR: " + MathFloor(100 / total_orders * iwpr_orders) + "%, ";
+     if (Alligator_Enabled && alligator_orders > 0) orders_per_type += "Alligator: " + MathFloor(100 / total_orders * alligator_orders) + "%, ";
+     if (BBands_Enabled && bbands_orders > 0) orders_per_type += "Bands: " + MathFloor(100 / total_orders * bbands_orders) + "%, ";
+     if (RSI_Enabled && rsi_orders > 0) orders_per_type += "RSI: " + MathFloor(100 / total_orders * rsi_orders) + "%, ";
+  } else {
+    orders_per_type += "No orders open yet.";
+  }
   return orders_per_type;
 }
 string GetAccountTextDetails() {
@@ -1486,24 +1518,6 @@ string _OrderType_str(int _OrderType) {
 /* END: CONVERTING FUNCTIONS */
 
 /* BEGIN: ACTION FUNCTIONS */
-
-// Execute action to reduce risk.
-bool ActionRiskReduce() {
-  double old_ratio = RiskRatio;
-  RiskRatio = 0.5;
-  if (VerboseInfo)
-    Print("ActionRiskReduce(): Reducing risk ratio from " + old_ratio + " to " + RiskRatio);
-  return (TRUE);
-}
-
-// Execute action to increase risk.
-bool ActionRiskIncrease() {
-  double old_ratio = RiskRatio;
-  RiskRatio = RiskRatio * 2;
-  if (VerboseInfo)
-    Print("ActionRiskIncrease(): Increasing risk ratio from " + old_ratio + " to " + RiskRatio);
-  return (TRUE);
-}
 
 // Execute action to close most profitable order.
 bool ActionCloseMostProfitableOrder(){
@@ -1674,12 +1688,14 @@ bool ActionExecute(int action_id, string reason) {
     case ACTION_CLOSE_ALL_ORDERS:
       result = ActionCloseAllOrders();
       break;
+      /*
     case ACTION_RISK_REDUCE:
       result = ActionRiskReduce();
       break;
     case ACTION_RISK_INCREASE:
       result = ActionRiskIncrease();
       break;
+      */
     case ACTION_ORDER_STOPS_DECREASE:
       // result = TightenStops();
       break;
@@ -1705,7 +1721,7 @@ bool TaskAddOrderOpen(int cmd, int volume, int order_type, string order_comment)
   if (job_id >= 0) {
     todo_queue[job_id][0] = key;
     todo_queue[job_id][1] = TASK_ORDER_OPEN;
-    todo_queue[job_id][2] = 5; // Set number of retries.
+    todo_queue[job_id][2] = MaxTries; // Set number of retries.
     todo_queue[job_id][3] = cmd;
     todo_queue[job_id][4] = volume;
     todo_queue[job_id][5] = order_type;
@@ -1723,7 +1739,7 @@ bool TaskAddCloseOrder(int ticket_no, int reason = 0) {
   if (job_id >= 0) {
     todo_queue[job_id][0] = ticket_no;
     todo_queue[job_id][1] = TASK_ORDER_CLOSE;
-    todo_queue[job_id][2] = 5; // Set number of retries.
+    todo_queue[job_id][2] = MaxTries; // Set number of retries.
     todo_queue[job_id][3] = reason;
     // if (VerboseTrace) Print("TaskAddCloseOrder(): Allocated task (id: ", job_id, ") for ticket: ", todo_queue[job_id][0], ".");
     return TRUE;
