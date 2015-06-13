@@ -910,13 +910,13 @@ void UpdateTrailingStops() {
 double GetTrailingStop(int method, int cmd, double previous, bool existing = FALSE) {
    double trail_stop = 0;
    double delta = GetMarketMinGap() * Point + GetMarketSpread(); // Delta price.
+   double default_trail = If(cmd == OP_BUY, Bid - EATrailingStop * PipSize - delta, Ask + EATrailingStop * PipSize + delta);
    switch (method) {
      case 0: // None
        trail_stop = previous;
        break;
      case 1: // Dynamic fixed.
-       if (cmd == OP_BUY) trail_stop = Bid - EATrailingStop * PipSize - delta;
-       if (cmd == OP_SELL) trail_stop = Ask + EATrailingStop * PipSize + delta;
+       trail_stop = default_trail;
        break;
      case 2: // iMA Small (Current) - trailing stop
        trail_stop = MA_Fast[0] - EATrailingStop * OpTypeValue(cmd) * PipSize - delta;
@@ -953,10 +953,11 @@ double GetTrailingStop(int method, int cmd, double previous, bool existing = FAL
      if (VerboseTrace)
        Print("Error in GetTrailingStop(", method, "): #" + If(existing, OrderTicket(), 0) + ": Invalid Trailing Stop: ", trail_stop, "; Previous: ", previous, "; ", GetOrderTextDetails());
      // If value is invalid, fallback to standard one.
-     trail_stop = If(cmd == OP_BUY, Bid - EATrailingStop * PipSize - delta, Ask + EATrailingStop * PipSize + delta);
+     trail_stop = default_trail;
    }
 
    if (EATrailingStopOneWay) { // If TRUE, move trailing stop only one direction.
+     if (previous == 0) previous = default_trail;
      if (cmd == OP_SELL)     trail_stop = If(trail_stop < previous, trail_stop, previous);
      else if (cmd == OP_BUY) trail_stop = If(trail_stop > previous, trail_stop, previous);
    }
@@ -974,13 +975,13 @@ double GetTrailingStop(int method, int cmd, double previous, bool existing = FAL
 double GetTrailingProfit(int method, int cmd, double previous, bool existing = FALSE) {
    double profit_take = 0;
    double delta = GetMarketMinGap() * Point + GetMarketSpread(); // Delta price.
+   double default_trail = If(cmd == OP_BUY, Bid + EATrailingProfit * PipSize + delta, Ask - EATrailingProfit * PipSize - delta);
    switch (method) {
      case 0: // None
        profit_take = previous;
        break;
      case 1: // Dynamic fixed.
-       if (cmd == OP_BUY) profit_take = Bid + EATrailingProfit * PipSize + delta;
-       if (cmd == OP_SELL) profit_take = Ask - EATrailingProfit * PipSize - delta;
+       profit_take = default_trail;
        break;
      case 2: // iMA Small (Current) + trailing profit
        profit_take = MA_Fast[0] + EATrailingProfit * OpTypeValue(cmd) * PipSize + delta;
@@ -1017,10 +1018,11 @@ double GetTrailingProfit(int method, int cmd, double previous, bool existing = F
      if (VerboseTrace)
        Print("Error in GetTrailingProfit(", method, "): #" + If(existing, OrderTicket(), 0) + ": Invalid Profit Take: ", profit_take, "; Previous: ", previous, "; ", GetOrderTextDetails());
      // If value is invalid, fallback to standard one.
-     profit_take = If(cmd == OP_BUY, Bid + EATrailingStop * PipSize + delta, Ask - EATrailingStop * PipSize - delta);
+     profit_take = default_trail;
    }
 
    if (EATrailingProfitOneWay) { // If TRUE, move profit take only one direction.
+     if (previous == 0) previous = default_trail;
      if (cmd == OP_SELL)     profit_take = If(profit_take < previous, profit_take, previous);
      else if (cmd == OP_BUY) profit_take = If(profit_take > previous, profit_take, previous);
    }
@@ -1262,20 +1264,6 @@ double GetMinStopLevel() {
   return MarketInfo(Symbol(), MODE_STOPLEVEL) * Point;
 }
 
-/*
-double GetLotSize() {
-   double curr_lot_size;
-   if (FapTurbo_Lots > 0.0) curr_lot_size = FapCalculateLots(FapTurbo_Lots, 0, "");
-   else {
-      curr_lot_size = NormalizeDouble(MathFloor(AccountFreeMargin() * default_fap_lot_size / 100.0 / market_marginrequired) * market_lotstep, volume_precision);
-      if (curr_lot_size < market_minlot) curr_lot_size = market_minlot;
-      if (curr_lot_size > market_maxlot) curr_lot_size = market_maxlot;
-   }
-   if (curr_lot_size > FapTurbo_MaxLots) curr_lot_size = FapTurbo_MaxLots;
-   return (curr_lot_size);
-}
-*/
-
 // Current market spread value in pips.
 //
 // Note: Using Mode_SPREAD can return 20 on EURUSD (IBFX), but zero on some other pairs, so using Ask - Bid instead.
@@ -1311,6 +1299,7 @@ double NormalizeLots(double lots, bool ceiling = FALSE, string pair = "") {
    return (lotsize);
 }
 
+/*
 double NormalizeLots2(double lots, string pair=""){
     // See: http://forum.mql4.com/47988
     if (pair == "") pair = Symbol();
@@ -1320,6 +1309,7 @@ double NormalizeLots2(double lots, string pair=""){
     if (lots < minLot) lots = 0;    // or minLot
     return(lots);
 }
+*/
 
 double NormalizePrice(double p, string pair=""){
    // See: http://forum.mql4.com/47988
@@ -1392,10 +1382,6 @@ void DisplayInfoOnChart() {
   // Prepare text for Stop Out.
   string stop_out_level = "Stop Out: " + AccountStopoutLevel();
   if (AccountStopoutMode() == 0) stop_out_level += "%"; else stop_out_level += AccountCurrency();
-  // Prepare text for Total Orders.
-  string total_orders_text = "Open Orders: " + total_orders + " [" + DoubleToStr(CalculateOpenLots(), 2) + " lots]";
-  total_orders_text += " (other: " + GetTotalOrders(FALSE) + ")";
-  total_orders_text += "; ratio: " + CalculateOrderTypeRatio();
   // Print actual info.
   Comment(""
    + "------------------------------------------------\n"
@@ -1405,7 +1391,6 @@ void DisplayInfoOnChart() {
    + "Equity: " + DoubleToStr(AccountEquity(), 0) + AccountCurrency() + "; Balance: " + DoubleToStr(AccountBalance(), 0) + AccountCurrency() + "; Leverage: 1:" + DoubleToStr(AccountLeverage(), 0)  + "\n"
    + "Used Margin: " + DoubleToStr(AccountMargin(), 0)  + AccountCurrency() + "; Free: " + DoubleToStr(AccountFreeMargin(), 0) + AccountCurrency() + "; " + stop_out_level + "\n"
    + "Lot size: " + DoubleToStr(GetLotSize(), volume_precision) + "; Max orders: " + If(EAMaxOrders == 0, GetMaxOrdersAuto(), EAMaxOrders) + "; Risk ratio: " + DoubleToStr(GetRiskRatio(), 1) + "\n"
-   + total_orders_text + "\n"
    + GetOrdersStats() + "\n"
    + "Last error: " + last_err + "\n"
    + "------------------------------------------------\n"
@@ -1449,6 +1434,10 @@ string GetOrderTextDetails() {
 
 // Get order statistics in percentage for each strategy.
 string GetOrdersStats() {
+  // Prepare text for Total Orders.
+  string total_orders_text = "Open Orders: " + total_orders + " [" + DoubleToStr(CalculateOpenLots(), 2) + " lots]";
+  total_orders_text += " (other: " + GetTotalOrders(FALSE) + ")";
+  total_orders_text += "; ratio: " + CalculateOrderTypeRatio();
   // Prepare data about open orders per strategy type.
   string open_orders_per_type = "Orders Per Type: ";
   int ma_orders = open_orders[MA_FAST_ON_BUY] + open_orders[MA_FAST_ON_SELL] + open_orders[MA_MEDIUM_ON_BUY] + open_orders[MA_MEDIUM_ON_SELL] + open_orders[MA_LARGE_ON_BUY] + open_orders[MA_LARGE_ON_SELL];
@@ -1472,7 +1461,7 @@ string GetOrdersStats() {
   } else {
     orders_per_type += "No orders open yet.";
   }
-  return orders_per_type;
+  return orders_per_type + "\n" + total_orders_text;
 }
 string GetAccountTextDetails() {
    return StringConcatenate("Account Details: ",
@@ -1480,7 +1469,8 @@ string GetAccountTextDetails() {
       "Account Balance: ", DoubleToStr(AccountBalance(), 2), " ", AccountCurrency(), "; ",
       "Account Equity: ", DoubleToStr(AccountEquity(), 2), " ", AccountCurrency(), "; ",
       "Free Margin: ", DoubleToStr(AccountFreeMargin(), 2), " ", AccountCurrency(), "; ",
-      "No of Orders: ", GetTotalOrders(), " (BUY/SELL ratio: ", CalculateOrderTypeRatio(), "); "
+      "No of Orders: ", GetTotalOrders(), " (BUY/SELL ratio: ", CalculateOrderTypeRatio(), "); ",
+      "Risk Ratio: ", DoubleToStr(GetRiskRatio(), 1)
    );
 }
 
@@ -1504,15 +1494,15 @@ string GetSummaryText() {
 
 // Returns OrderType as a text.
 string _OrderType_str(int _OrderType) {
-    switch ( _OrderType ) {
-        case OP_BUY:          return("Buy");
-        case OP_SELL:         return("Sell");
-        case OP_BUYLIMIT:     return("BuyLimit");
-        case OP_BUYSTOP:      return("BuyStop");
-        case OP_SELLLIMIT:    return("SellLimit");
-        case OP_SELLSTOP:     return("SellStop");
-        default:              return("UnknownOrderType");
-    }
+  switch ( _OrderType ) {
+    case OP_BUY:          return("Buy");
+    case OP_SELL:         return("Sell");
+    case OP_BUYLIMIT:     return("BuyLimit");
+    case OP_BUYSTOP:      return("BuyStop");
+    case OP_SELLLIMIT:    return("SellLimit");
+    case OP_SELLSTOP:     return("SellStop");
+    default:              return("UnknownOrderType");
+  }
 }
 
 /* END: CONVERTING FUNCTIONS */
