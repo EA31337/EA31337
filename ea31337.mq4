@@ -134,17 +134,19 @@ extern bool WPR_Enabled = TRUE; // Enable WPR-based strategy.
 extern ENUM_TIMEFRAMES WPR_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int WPR_period = 8;
 extern int WPR_MaxPeriods = 6; // Suggested range: 2-10. Suggested value: 6
-extern double WPR_Shift = 0.4; // Suggested range: 0.0-0.5. Suggested value: 0.4.
+extern int WPR_Shift = 0; // Suggested range: 0.0-0.5. Suggested value: 0.4.
 
 extern string ____BBands_Parameters__ = "-- Settings for the Bollinger Bands® indicator --";
 extern bool BBands_Enabled = FALSE; // Enable BBands-based strategy.
+extern ENUM_APPLIED_PRICE BBands_Applied_Price = PRICE_HIGH; // Bands applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern ENUM_TIMEFRAMES BBands_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
+extern int BBands_Shift = 0; // The indicator shift relative to the chart.
 
 extern string ____RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --";
 extern bool RSI_Enabled = FALSE; // Enable RSI-based strategy.
 extern ENUM_TIMEFRAMES RSI_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern ENUM_APPLIED_PRICE RSI_Applied_Price = PRICE_HIGH; // RSI applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
-extern double RSI_Shift = 0.0; // Index of the value taken from the indicator buffer.
+extern double RSI_Shift = 0; // The indicator shift relative to the chart.
 
 extern string ____Debug_Parameters__ = "-----------------------------------------";
 extern bool PrintLogOnChart = TRUE;
@@ -217,9 +219,10 @@ int total_orders = 0; // Number of total orders currently open.
 
 // Indicator variables.
 double MA_Fast[3], MA_Medium[3], MA_Slow[3];
+double MACD[3], MACDSignal[3];
+double RSI[], BBands[];
 double Alligator[3];
 double DeMarker[], WPR[];
-double MACD[3], MACDSignal[3];
 double Fractals_lower, Fractals_upper;
 
 //+------------------------------------------------------------------+
@@ -469,36 +472,6 @@ void CheckAccount() {
 bool UpdateIndicators() {
    if (VerboseTrace) Print("Calling: UpdateIndicators()");
 
-   // Update Alligator.
-   Alligator[0] = iCustom(NULL, Alligator_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 0, 0);
-   Alligator[1] = iCustom(NULL, Alligator_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 1, 0);
-   Alligator[2] = iCustom(NULL, Alligator_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 2, 0);
-   if (VerboseTrace) { Print("Alligator: ", GetArrayValues(Alligator)); }
-
-   // Update Fractals.
-   double ifractal;
-   Fractals_lower = 0;
-   Fractals_upper = 0;
-   for (int i = 0; i <= Fractals_MaxPeriods; i++) {
-      ifractal = iFractals(NULL, Fractals_Timeframe, MODE_LOWER, i);
-      if (ifractal != 0.0) Fractals_lower = ifractal;
-      ifractal = iFractals(NULL, Fractals_Timeframe, MODE_UPPER, i);
-      if (ifractal != 0.0) Fractals_upper = ifractal;
-   }
-   if (VerboseTrace) { Print("Fractals_lower: ", Fractals_lower, ", Fractals_upper:", Fractals_upper); }
-
-   // Update DeMarker.
-   for (i = 0; i <= DeMarker_MaxPeriods; i++) {
-      DeMarker[i] = iDeMarker(NULL, DeMarker_Timeframe, DeMarker_Period, i);
-   }
-   if (VerboseTrace) { Print("DeMarker: ", GetArrayValues(DeMarker)); }
-
-   // Update iWPR.
-   for (i = 0; i <= WPR_MaxPeriods; i++) {
-     WPR[i] = (-iWPR(NULL, WPR_Timeframe, WPR_period, i + 1)) / 100.0;
-   }
-   if (VerboseTrace) { Print("iWPR: ", GetArrayValues(WPR)); }
-
    // Update Moving Averages.
    MA_Fast[0] = iMA(NULL, MA_Timeframe, MAAvgPeriodFast, MAShift, MAMethod, MAAppliedPrice, 0); // Current
    MA_Fast[1] = iMA(NULL, MA_Timeframe, MAAvgPeriodFast, MAShift, MAMethod, MAAppliedPrice, MAShiftFast); // Previous
@@ -524,6 +497,36 @@ bool UpdateIndicators() {
    MACDSignal[1] = iMACD(NULL, MACD_Timeframe, 12, 26, 9, MACD_Applied_Price, MODE_SIGNAL, MACD_Shift);
    MACDSignal[2] = iMACD(NULL, MACD_Timeframe, 12, 26, 9, MACD_Applied_Price, MODE_SIGNAL, MACD_Shift + MACD_ShiftExtra);
    if (VerboseTrace) { Print("MACD: ", GetArrayValues(MACD), "; Signal: ", GetArrayValues(MACDSignal)); }
+
+   // Update Alligator.
+   Alligator[0] = iCustom(NULL, Alligator_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 0, 0);
+   Alligator[1] = iCustom(NULL, Alligator_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 1, 0);
+   Alligator[2] = iCustom(NULL, Alligator_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 2, 0);
+   if (VerboseTrace) { Print("Alligator: ", GetArrayValues(Alligator)); }
+
+   // Update DeMarker.
+   for (int i = 0; i <= DeMarker_MaxPeriods; i++) {
+      DeMarker[i] = iDeMarker(NULL, DeMarker_Timeframe, DeMarker_Period, i);
+   }
+   if (VerboseTrace) { Print("DeMarker: ", GetArrayValues(DeMarker)); }
+
+   // Update iWPR.
+   for (i = 0; i <= WPR_MaxPeriods; i++) {
+     WPR[i] = (-iWPR(NULL, WPR_Timeframe, WPR_period, i + 1)) / 100.0;
+   }
+   if (VerboseTrace) { Print("iWPR: ", GetArrayValues(WPR)); }
+
+   // Update Fractals.
+   double ifractal;
+   Fractals_lower = 0;
+   Fractals_upper = 0;
+   for (i = 0; i <= Fractals_MaxPeriods; i++) {
+      ifractal = iFractals(NULL, Fractals_Timeframe, MODE_LOWER, i);
+      if (ifractal != 0.0) Fractals_lower = ifractal;
+      ifractal = iFractals(NULL, Fractals_Timeframe, MODE_UPPER, i);
+      if (ifractal != 0.0) Fractals_upper = ifractal;
+   }
+   if (VerboseTrace) { Print("Fractals_lower: ", Fractals_lower, ", Fractals_upper:", Fractals_upper); }
 
    return (TRUE);
 }
