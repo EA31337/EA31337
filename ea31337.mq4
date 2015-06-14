@@ -61,11 +61,11 @@ enum ENUM_ACTION_TYPE {
 // User parameters.
 extern string ____EA_Parameters__ = "-----------------------------------------";
 extern double EATrailingStop = 20;
-extern int EATrailingStopMethod = 5; // TrailingStop method. Set 0 to disable. Range: 0-7. Suggested value: 1 or 4
+extern int EATrailingStopMethod = 1; // TrailingStop method. Set 0 to disable. Range: 0-7. Suggested value: 1.
 extern bool EATrailingStopOneWay = TRUE; // Change trailing stop towards one direction only. Suggested value: TRUE
 extern double EATrailingProfit = 20;
-extern int EATrailingProfitMethod = 1; // Trailing Profit method. Set 0 to disable. Range: 0-7. Suggested value: 0 or 4.
-extern bool EATrailingProfitOneWay = TRUE; // Change trailing profit take towards one direction only. Suggested value: TRUE
+extern int EATrailingProfitMethod = 10; // Trailing Profit method. Set 0 to disable. Range: 0-7. Suggested value: 0, 1 or 10.
+extern bool EATrailingProfitOneWay = TRUE; // Change trailing profit take towards one direction only.
 
 // extern double EAMinChangeOrders = 5; // Minimum change in pips between placed orders.
 // extern double EADelayBetweenOrders = 0; // Minimum delay in seconds between placed orders. FIXME: Fix relative delay in backtesting.
@@ -830,8 +830,8 @@ bool ValidTrailingStop(double trail_stop, int cmd, bool existing = FALSE) {
   double delta = GetMarketMinGap() * Point + GetMarketSpread(); // Delta price.
   double price = If(existing, OrderOpenPrice(), If(cmd == OP_BUY, Bid, Ask));
   bool valid = trail_stop == 0 || (cmd == OP_BUY  && price - trail_stop > delta) || (cmd == OP_SELL && trail_stop - price > delta);
-  if (!valid && VerboseDebug && cmd == OP_BUY) Print("ValidTrailingStop(OP_BUY): #" + If(existing, OrderTicket(), 0) + ":", price - trail_stop, " > ", DoubleToStr(delta, PipPrecision));
-  if (!valid && VerboseDebug && cmd == OP_SELL) Print("ValidTrailingStop(OP_SELL): #" + If(existing, OrderTicket(), 0) + ":", trail_stop - price, " > ", DoubleToStr(delta, PipPrecision));
+  if (!valid && VerboseTrace && cmd == OP_BUY) Print("ValidTrailingStop(OP_BUY): #" + If(existing, OrderTicket(), 0) + ":", price - trail_stop, " > ", DoubleToStr(delta, PipPrecision));
+  if (!valid && VerboseTrace && cmd == OP_SELL) Print("ValidTrailingStop(OP_SELL): #" + If(existing, OrderTicket(), 0) + ":", trail_stop - price, " > ", DoubleToStr(delta, PipPrecision));
   return valid;
 }
 
@@ -843,8 +843,8 @@ bool ValidProfitTake(double profit_take, int cmd, bool existing = FALSE) {
   double delta = GetMarketMinGap() * Point + GetMarketSpread(); // Delta price.
   double price = If(existing, OrderOpenPrice(), If(cmd == OP_BUY, Bid, Ask));
   bool valid = profit_take == 0 || (cmd ==  OP_BUY && profit_take - price > delta) || (cmd == OP_SELL && price - profit_take  > delta);
-  if (!valid && VerboseDebug && cmd == OP_BUY) Print("ValidTrailingStop(OP_BUY): #" + If(existing, OrderTicket(), 0) + ":", profit_take - price, " > ", DoubleToStr(delta, PipPrecision));
-  if (!valid && VerboseDebug && cmd == OP_SELL) Print("ValidTrailingStop(OP_SELL): #" + If(existing, OrderTicket(), 0) + ":", price - profit_take, " > ", DoubleToStr(delta, PipPrecision));
+  if (!valid && VerboseTrace && cmd == OP_BUY) Print("ValidTrailingStop(OP_BUY): #" + If(existing, OrderTicket(), 0) + ":", profit_take - price, " > ", DoubleToStr(delta, PipPrecision));
+  if (!valid && VerboseTrace && cmd == OP_SELL) Print("ValidTrailingStop(OP_SELL): #" + If(existing, OrderTicket(), 0) + ":", price - profit_take, " > ", DoubleToStr(delta, PipPrecision));
   return valid;
 }
 
