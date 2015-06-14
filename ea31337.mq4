@@ -1,9 +1,11 @@
 //+------------------------------------------------------------------+
-//|                                                  EA31337 v0.1    |
+//|                                                       EA31337    |
 //+------------------------------------------------------------------+
-#property description "EA31337 v0.1"
+#property description "EA31337"
 #property copyright   "kenorb"
 //#property link        "http://www.example.com"
+#property version   "100.000"
+//#property strict
 
 #include <stderror.mqh>
 
@@ -98,9 +100,12 @@ extern ENUM_APPLIED_PRICE MA_Applied_Price = PRICE_WEIGHTED; // MA applied price
 extern string ____MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --";
 extern bool MACD_Enabled = TRUE; // Enable MACD-based strategy.
 extern ENUM_TIMEFRAMES MACD_Timeframe = PERIOD_M5; // Timeframe (0 means the current chart).
+extern int MACD_Fast_Period = 12; // Fast EMA averaging period.
+extern int MACD_Slow_Period = 42; // Slow EMA averaging period.
+extern int MACD_Signal_Period = 9; // Signal line averaging period.
 extern double MACD_OpenLevel  = 2;
 //extern double MACD_CloseLevel = 2; // Set 0 to disable.
-extern ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_HIGH; // MACD applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
+extern ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_LOW; // MACD applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern int MACD_Shift = 1; // Past MACD value in number of bars. Shift relative to the current bar the given amount of periods ago. Suggested value: 1
 extern int MACD_ShiftFar = 2; // Additional MACD far value in number of bars.
 
@@ -232,10 +237,25 @@ double DeMarker[], WPR[];
 double Fractals_lower, Fractals_upper;
 
 //+------------------------------------------------------------------+
-//|                                                                  |
+//| Expert tick function                                             |
 //+------------------------------------------------------------------+
+void OnTick() {
+  int curr_time = TimeCurrent() - GMT_Offset;
+  if (ea_active && TradeAllowed() && Volume[0] > 1) {
+    UpdateIndicators();
+    Trade();
+    if (GetTotalOrders() > 0) {
+      UpdateTrailingStops();
+      CheckAccount();
+      TaskProcessList();
+    }
+    if (PrintLogOnChart) DisplayInfoOnChart();
+  }
+} // end: OnTick()
 
-// Event Handling Function: Indicator initialization function.
+//+------------------------------------------------------------------+
+//| Expert initialization function                                   |
+//+------------------------------------------------------------------+
 int OnInit() {
    if (VerboseInfo) Print("EA initializing...");
    string err;
@@ -258,6 +278,8 @@ int OnInit() {
 
    // Initial checks.
    if (IsDemo()) account_type = "Demo"; else account_type = "Live";
+
+   // TODO: IsDllsAllowed(), IsLibrariesAllowed()
 
    if (Digits < 4) {
       PipSize = 0.01;
@@ -315,19 +337,9 @@ int OnInit() {
    return (INIT_SUCCEEDED);
 }
 
-void OnTick() {
-  int curr_time = TimeCurrent() - GMT_Offset;
-  if (ea_active && TradeAllowed() && Volume[0] > 1) {
-    Trade();
-    if (PrintLogOnChart) DisplayInfoOnChart();
-  } else if (GetTotalOrders() > 0) {
-    UpdateIndicators();
-    UpdateTrailingStops();
-    TaskProcessList();
-  }
-} // end: OnTick()
-
-// The Deinit event handler.
+//+------------------------------------------------------------------+
+//| Expert deinitialization function                                 |
+//+------------------------------------------------------------------+
 void OnDeinit(const int reason) {
   ea_active = TRUE;
   if (VerboseInfo) {
@@ -445,12 +457,6 @@ void Trade() {
      order_placed = ExecuteOrder(OP_SELL, GetLotSize(), WPR_ON_SELL, "WPROnSell()");
    }
 
-   if (GetTotalOrders() > 0) {
-     CheckAccount();
-     UpdateTrailingStops();
-     TaskProcessList();
-   }
-
    // Print daily report at end of each day.
    int curr_day = - TimeDay(3600 * GMT_Offset);
    if (day_of_month != curr_day) {
@@ -521,12 +527,12 @@ bool UpdateIndicators() {
 
   if (MACD_Enabled) {
     // Update MACD indicator values.
-    MACD[0] = iMACD(NULL, MACD_Timeframe, 12, 26, 9, MACD_Applied_Price, MODE_MAIN, 0); // Current
-    MACD[1] = iMACD(NULL, MACD_Timeframe, 12, 26, 9, MACD_Applied_Price, MODE_MAIN, 1 + MACD_Shift); // Previous
-    MACD[2] = iMACD(NULL, MACD_Timeframe, 12, 26, 9, MACD_Applied_Price, MODE_MAIN, 2 + MACD_ShiftFar);
-    MACDSignal[0] = iMACD(NULL, MACD_Timeframe, 12, 26, 9, MACD_Applied_Price, MODE_SIGNAL, 0);
-    MACDSignal[1] = iMACD(NULL, MACD_Timeframe, 12, 26, 9, MACD_Applied_Price, MODE_SIGNAL, 1 + MACD_Shift);
-    MACDSignal[2] = iMACD(NULL, MACD_Timeframe, 12, 26, 9, MACD_Applied_Price, MODE_SIGNAL, 2 + MACD_ShiftFar);
+    MACD[0] = iMACD(NULL, MACD_Timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN, 0); // Current
+    MACD[1] = iMACD(NULL, MACD_Timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN, 1 + MACD_Shift); // Previous
+    MACD[2] = iMACD(NULL, MACD_Timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN, 2 + MACD_ShiftFar);
+    MACDSignal[0] = iMACD(NULL, MACD_Timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, 0);
+    MACDSignal[1] = iMACD(NULL, MACD_Timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, 1 + MACD_Shift);
+    MACDSignal[2] = iMACD(NULL, MACD_Timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, 2 + MACD_ShiftFar);
     if (VerboseTrace) { Print("MACD: ", GetArrayValues(MACD), "; Signal: ", GetArrayValues(MACDSignal)); }
   }
 
@@ -1220,8 +1226,19 @@ bool TradeAllowed() {
     last_err = err;
     return (FALSE);
   }
+  if (IsTradeContextBusy()) {
+    err = "Error: Trade context is temporary busy.";
+    if (VerboseErrors && err != last_err) Print(err);
+    if (PrintLogOnChart && err != last_err) Comment(err);
+    last_err = err;
+    return (FALSE);
+  }
+  // Check if the EA is allowed to trade and trading context is not busy, otherwise returns false.
+  // OrderSend(), OrderClose(), OrderCloseBy(), OrderModify(), OrderDelete() trading functions
+  //   changing the state of a trading account can be called only if trading by Expert Advisors
+  //   is allowed (the "Allow live trading" checkbox is enabled in the Expert Advisor or script properties).
   if (!IsTradeAllowed()) {
-    err = "Trade is not allowed!";
+    err = "Trade is not allowed at the moment!";
     if (VerboseErrors && err != last_err) Print(err);
     if (PrintLogOnChart && err != last_err) Comment(err);
     last_err = err;
@@ -1233,13 +1250,6 @@ bool TradeAllowed() {
     if (PrintLogOnChart && err != last_err) Comment(err);
     last_err = err;
     Sleep(10000);
-    return (FALSE);
-  }
-  if (IsTradeContextBusy()) {
-    err = "Error: Trade context is temporary busy.";
-    if (VerboseErrors && err != last_err) Print(err);
-    if (PrintLogOnChart && err != last_err) Comment(err);
-    last_err = err;
     return (FALSE);
   }
   if (IsStopped()) {
@@ -1424,6 +1434,8 @@ void DisplayInfoOnChart() {
   // Prepare text for Stop Out.
   string stop_out_level = "Stop Out: " + AccountStopoutLevel();
   if (AccountStopoutMode() == 0) stop_out_level += "%"; else stop_out_level += AccountCurrency();
+  // Prepare text to display max orders.
+  string max_orders = "Max orders: " + GetMaxOrders() + " (Per type: " + GetMaxOrdersPerType();
   // Print actual info.
   Comment(""
    + "------------------------------------------------\n"
@@ -1432,7 +1444,7 @@ void DisplayInfoOnChart() {
    + "Acc Number: " + AccountNumber(), "Acc Name: " + AccountName() + "; Broker: " + AccountCompany() + "\n"
    + "Equity: " + DoubleToStr(AccountEquity(), 0) + AccountCurrency() + "; Balance: " + DoubleToStr(AccountBalance(), 0) + AccountCurrency() + "; Leverage: 1:" + DoubleToStr(AccountLeverage(), 0)  + "\n"
    + "Used Margin: " + DoubleToStr(AccountMargin(), 0)  + AccountCurrency() + "; Free: " + DoubleToStr(AccountFreeMargin(), 0) + AccountCurrency() + "; " + stop_out_level + "\n"
-   + "Lot size: " + DoubleToStr(GetLotSize(), volume_precision) + "; Max orders: " + If(EAMaxOrders == 0, GetMaxOrdersAuto(), EAMaxOrders) + "; Risk ratio: " + DoubleToStr(GetRiskRatio(), 1) + "\n"
+   + "Lot size: " + DoubleToStr(GetLotSize(), volume_precision) + "; " + text_max_orders + "; Risk ratio: " + DoubleToStr(GetRiskRatio(), 1) + "\n"
    + GetOrdersStats() + "\n"
    + "Last error: " + last_err + "\n"
    + "------------------------------------------------\n"
@@ -1962,9 +1974,10 @@ string GetErrorText(int code) {
       case  145: text = "Modification denied because order too close to market."; break;
       case  146: text = "Trade context is busy."; break;
       case  147: text = "Expirations are denied by broker."; break;
-      // ERR_TRADE_TOO_MANY_ORDERS
-      // On some trade servers, the total amount of open and pending orders can be limited. If this limit has been exceeded, no new position will be opened
-      case  148: text = "Amount of open and pending orders has reached the limit."; break;
+      // ERR_TRADE_TOO_MANY_ORDERS: On some trade servers, the total amount of open and pending orders can be limited. If this limit has been exceeded, no new position will be opened
+      case  148: text = "Amount of open and pending orders has reached the limit set by the broker"; break; // ERR_TRADE_TOO_MANY_ORDERS
+      case  149: text = "An attempt to open an order opposite to the existing one when hedging is disabled"; break; // ERR_TRADE_HEDGE_PROHIBITED
+      case  150: text = "An attempt to close an order contravening the FIFO rule."; break; // ERR_TRADE_PROHIBITED_BY_FIFO
       case 4000: text = "No error (never generated code)."; break;
       case 4001: text = "Wrong function pointer."; break;
       case 4002: text = "Array index is out of range."; break;
@@ -2181,18 +2194,16 @@ void CalculateSummary(double initial_deposit)
    drawdown=maxpeak-minpeak;
    if(maxpeak != 0.0) {
       drawdownpercent=drawdown/maxpeak*100.0;
-      if(RelDrawdownPercent<drawdownpercent)
-        {
+      if(RelDrawdownPercent<drawdownpercent) {
          RelDrawdownPercent=drawdownpercent;
          RelDrawdown=drawdown;
-        }
-     }
-   if(MaxDrawdown<drawdown)
-     {
-      MaxDrawdown=drawdown;
-      if(maxpeak!=0) MaxDrawdownPercent=MaxDrawdown/maxpeak*100.0;
-      else MaxDrawdownPercent=100.0;
-     }
+      }
+   }
+   if(MaxDrawdown<drawdown) {
+    MaxDrawdown=drawdown;
+    if(maxpeak!=0) MaxDrawdownPercent=MaxDrawdown/maxpeak*100.0;
+    else MaxDrawdownPercent=100.0;
+   }
 //---- consider last trade
    if(prevprofit!=EMPTY_VALUE)
      {
@@ -2362,6 +2373,7 @@ void WriteReport(string report_name) {
 //----
    FileClose(handle);
   }
-//+------------------------------------------------------------------+
 
 /* END: SUMMARY REPORT */
+
+//+------------------------------------------------------------------+
