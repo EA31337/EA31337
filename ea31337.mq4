@@ -4,7 +4,7 @@
 #property description "EA31337"
 #property copyright   "kenorb"
 //#property link        "http://www.example.com"
-#property version   "100.000"
+#property version   "100.001"
 //#property strict
 
 #include <stderror.mqh>
@@ -99,20 +99,20 @@ extern ENUM_APPLIED_PRICE MA_Applied_Price = PRICE_WEIGHTED; // MA applied price
 
 extern string ____MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --";
 extern bool MACD_Enabled = TRUE; // Enable MACD-based strategy.
-extern ENUM_TIMEFRAMES MACD_Timeframe = PERIOD_M5; // Timeframe (0 means the current chart).
+extern ENUM_TIMEFRAMES MACD_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int MACD_Fast_Period = 12; // Fast EMA averaging period.
 extern int MACD_Slow_Period = 42; // Slow EMA averaging period.
 extern int MACD_Signal_Period = 9; // Signal line averaging period.
-extern double MACD_OpenLevel  = 2;
+extern double MACD_OpenLevel  = 1.8;
 //extern double MACD_CloseLevel = 2; // Set 0 to disable.
-extern ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_LOW; // MACD applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
-extern int MACD_Shift = 1; // Past MACD value in number of bars. Shift relative to the current bar the given amount of periods ago. Suggested value: 1
-extern int MACD_ShiftFar = 2; // Additional MACD far value in number of bars.
+extern ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_OPEN; // MACD applied price (See: ENUM_APPLIED_PRICE). Range: 0-6. Suggested values: PRICE_OPEN, PRICE_TYPICAL.
+extern int MACD_Shift = 5; // Past MACD value in number of bars. Shift relative to the current bar the given amount of periods ago. Suggested value: 1
+extern int MACD_ShiftFar = 2; // Additional MACD far value in number of bars relatively to MACD_Shift.
 
 extern string ____Fractals_Parameters__ = "-- Settings for the Fractals indicator --";
 extern bool Fractals_Enabled = TRUE; // Enable Fractals-based strategy.
 extern ENUM_TIMEFRAMES Fractals_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int Fractals_MaxPeriods = 6; // Suggested range: 2-5, Suggested value: 4
+extern int Fractals_MaxPeriods = 1; // Suggested range: 1-5, Suggested value: 1
 
 extern string ____Alligator_Parameters__ = "-- Settings for the Alligator indicator --";
 extern bool Alligator_Enabled = TRUE; // Enable Alligator-based strategy.
@@ -554,6 +554,7 @@ bool UpdateIndicators() {
     if (VerboseTrace) { Print("Bands: Main: " + GetArrayValues(BBands_main) + "; Upper: " + GetArrayValues(BBands_upper) + "; Lower: " + GetArrayValues(BBands_lower)); }
   }
 
+  // TODO: http://docs.mql4.com/indicators/ialligator
   if (Alligator_Enabled) {
     // Update Alligator indicator values.
     Alligator[0] = iCustom(NULL, Alligator_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 0, 0);
@@ -561,6 +562,7 @@ bool UpdateIndicators() {
     Alligator[2] = iCustom(NULL, Alligator_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 2, 0);
     if (VerboseTrace) { Print("Alligator: ", GetArrayValues(Alligator)); }
   }
+  // TODO: iAlligator() and iGator() indicators (http://docs.mql4.com/constants/indicatorconstants/lines).
 
   if (DeMarker_Enabled) {
     // Update DeMarker indicator values.
@@ -580,6 +582,7 @@ bool UpdateIndicators() {
 
   if (Fractals_Enabled) {
     // Update Fractals indicator values.
+    // FIXME: Logic needs to be improved, as we're repeating the same orders for higher MaxPeriod values which results in lower performance.
     double ifractal;
     Fractals_lower = 0;
     Fractals_upper = 0;
@@ -589,7 +592,7 @@ bool UpdateIndicators() {
       ifractal = iFractals(NULL, Fractals_Timeframe, MODE_UPPER, i);
       if (ifractal != 0.0) Fractals_upper = ifractal;
     }
-    if (VerboseTrace) { Print("Fractals_lower: ", Fractals_lower, ", Fractals_upper:", Fractals_upper); }
+    if (VerboseTrace && Fractals_lower != 0.0 && Fractals_upper != 0.0) { Print("Fractals_lower: ", Fractals_lower, ", Fractals_upper:", Fractals_upper); }
   }
 
   return (TRUE);
@@ -1259,13 +1262,6 @@ bool TradeAllowed() {
     last_err = err;
     return (FALSE);
   }
-  if (!IsTradingDay(TimeCurrent())) {
-    err = "Not a trading day.";
-    if (VerboseInfo && err != last_err) Print(err);
-    if (PrintLogOnChart && err != last_err) Comment(err);
-    last_err = err;
-    return (FALSE);
-  }
   if (!IsTesting() && !MarketInfo(Symbol(), MODE_TRADEALLOWED)) {
     err = "Trade is not allowed. Market is closed.";
     if (VerboseInfo && err != last_err) Print(err);
@@ -1294,13 +1290,6 @@ bool CheckFreeMargin(int op_type, double size_of_lot) {
    double margin = AccountFreeMarginCheck(Symbol(), op_type, size_of_lot);
    if (GetLastError() == 134 /* NOT_ENOUGH_MONEY */) margin_ok = FALSE;
    return (margin_ok);
-}
-
-bool IsTradingDay(int time) {
-   int day_of_year = TimeDayOfYear(time);
-   int day_of_week = TimeDayOfWeek(time);
-   // if (VerboseTrace) Print("IsTradingDay(): Day of week: " + day_of_week + "; Day of year: " + day_of_year);
-   return (day_of_week > 0 && day_of_week < 6 && day_of_year > 1 && day_of_year < 365);
 }
 
 double GetOrderProfit() {
@@ -1435,13 +1424,13 @@ void DisplayInfoOnChart() {
   string stop_out_level = "Stop Out: " + AccountStopoutLevel();
   if (AccountStopoutMode() == 0) stop_out_level += "%"; else stop_out_level += AccountCurrency();
   // Prepare text to display max orders.
-  string max_orders = "Max orders: " + GetMaxOrders() + " (Per type: " + GetMaxOrdersPerType();
+  string text_max_orders = "Max orders: " + GetMaxOrders() + " (Per type: " + GetMaxOrdersPerType() + ")";
   // Print actual info.
   Comment(""
    + "------------------------------------------------\n"
    + "ACCOUNT INFORMATION:\n"
    + "Server Time: " + TimeToStr(TimeCurrent(), TIME_SECONDS) + "\n"
-   + "Acc Number: " + AccountNumber(), "Acc Name: " + AccountName() + "; Broker: " + AccountCompany() + "\n"
+   + "Acc Number: " + AccountNumber(), "; Acc Name: " + AccountName() + "; Broker: " + AccountCompany() + "\n"
    + "Equity: " + DoubleToStr(AccountEquity(), 0) + AccountCurrency() + "; Balance: " + DoubleToStr(AccountBalance(), 0) + AccountCurrency() + "; Leverage: 1:" + DoubleToStr(AccountLeverage(), 0)  + "\n"
    + "Used Margin: " + DoubleToStr(AccountMargin(), 0)  + AccountCurrency() + "; Free: " + DoubleToStr(AccountFreeMargin(), 0) + AccountCurrency() + "; " + stop_out_level + "\n"
    + "Lot size: " + DoubleToStr(GetLotSize(), volume_precision) + "; " + text_max_orders + "; Risk ratio: " + DoubleToStr(GetRiskRatio(), 1) + "\n"
