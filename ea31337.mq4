@@ -236,6 +236,25 @@ double Alligator[3];
 double DeMarker[], WPR[];
 double Fractals_lower, Fractals_upper;
 
+/* TODO:
+ *   - add RSA strategy,
+ *   - add RSI strategy,
+ *   - add SAR strategy (the Parabolic Stop and Reverse system) (http://docs.mql4.com/indicators/isar),
+ *   - add the Average Directional Movement Index indicator (iADX) (http://docs.mql4.com/indicators/iadx),
+ *   - add the Stochastic Oscillator (http://docs.mql4.com/indicators/istochastic),
+ *   - add the Standard Deviation indicator (iStdDev) (http://docs.mql4.com/indicators/istddev),
+ *   - add the Money Flow Index (http://docs.mql4.com/indicators/imfi),
+ *   - the Ichimoku Kinko Hyo indicator?
+ *   - daily higher highs and lower lows,
+ *   - add breakage strategy (Envelopes/Bands?) with Order,
+ *   - add the On Balance Volume indicator (iOBV) (http://docs.mql4.com/indicators/iobv),
+ *   - add the Average True Range indicator (iATR) (http://docs.mql4.com/indicators/iatr),
+ *   - add the Envelopes indicator,
+ *   - add the Force Index indicator (iForce) (http://docs.mql4.com/indicators/iforce),
+ *   - add the Moving Average of Oscillator indicator (iOsMA) (http://docs.mql4.com/indicators/iosma),
+ *   - BearsPower, BullsPower
+ */
+
 //+------------------------------------------------------------------+
 //| Expert tick function                                             |
 //+------------------------------------------------------------------+
@@ -342,8 +361,9 @@ int OnInit() {
 //+------------------------------------------------------------------+
 void OnDeinit(const int reason) {
   ea_active = TRUE;
+  if (VerboseDebug) Print("Calling " + __FUNCTION__);
   if (VerboseInfo) {
-    Print("EA deinitializing, exit code: ", reason);
+    Print("EA deinitializing, exit code: ", reason, ", reason: " + getUninitReasonText(reason));
     Print(GetSummaryText());
   }
 
@@ -361,27 +381,27 @@ void OnDeinit(const int reason) {
 // The init event handler for tester.
 // FIXME: Doesn't seems to work.
 void OnTesterInit() {
-  if (VerboseDebug) Print("Calling OnTesterInit().");
+  if (VerboseDebug) Print("Calling " + __FUNCTION__);
 }
 
 // The init event handler for tester.
 // FIXME: Doesn't seems to work.
 void OnTesterDeinit() {
-  if (VerboseDebug) Print("Calling OnTesterDeinit().");
+  if (VerboseDebug) Print("Calling " + __FUNCTION__);
 }
 
 // The Start event handler, which is automatically generated only for running scripts.
 // FIXME: Doesn't seems to be called, however MT4 doesn't want to execute EA without it.
 void start() {
-  if (VerboseTrace) Print("Calling start().");
+  if (VerboseTrace) Print("Calling " + __FUNCTION__);
    // Print market info.
 }
 
 void Trade() {
-   bool order_placed;
-   // vdigits = MarketInfo(Symbol(), MODE_DIGITS);
-   // if (VerboseTrace) Print("Calling: Trade()");
-   UpdateIndicators();
+  bool order_placed;
+  // if (VerboseTrace) Print("Calling " + __FUNCTION__);
+  // vdigits = MarketInfo(Symbol(), MODE_DIGITS);
+  UpdateIndicators();
 
    if (MA_Enabled) {
       if (MAFastOnBuy()) {
@@ -471,7 +491,7 @@ void CheckAccount() {
   // Check timing from last time.
   int bar_time = iTime(NULL, PERIOD_M1, 0);
   if (bar_time == last_acc_check) return; else last_acc_check = bar_time;
-  if (VerboseTrace) Print("Calling: CheckAccount()");
+  if (VerboseTrace) Print("Calling " + __FUNCTION__);
 
   if (AccountEquity() > AccountBalance() * 2) {
     if (VerboseInfo) Print(GetAccountTextDetails());
@@ -502,7 +522,7 @@ bool UpdateIndicators() {
   } else {
     last_indicators_update = bar_time;
   }
-  if (VerboseTrace) Print("Calling: UpdateIndicators()");
+  if (VerboseTrace) Print("Calling " + __FUNCTION__);
 
   int i;
 
@@ -2030,6 +2050,29 @@ string GetErrorText(int code) {
       default:  text = "Unknown error.";
    }
    return (text);
+}
+
+// Get text description based on the uninitialization reason code.
+string getUninitReasonText(int reasonCode) {
+   string text="";
+   switch(reasonCode) {
+      case REASON_ACCOUNT:
+         text="Account was changed."; break;
+      case REASON_CHARTCHANGE:
+         text="Symbol or timeframe was changed."; break;
+      case REASON_CHARTCLOSE:
+         text="Chart was closed."; break;
+      case REASON_PARAMETERS:
+         text="Input-parameter was changed."; break;
+      case REASON_RECOMPILE:
+         text="Program "+__FILE__+" was recompiled."; break;
+      case REASON_REMOVE:
+         text="Program "+__FILE__+" was removed from chart."; break;
+      case REASON_TEMPLATE:
+         text="New template was applied to chart."; break;
+      default:text="Unknown reason.";
+     }
+   return text;
 }
 
 /* END: ERROR HANDLING FUNCTIONS */
