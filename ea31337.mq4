@@ -3,8 +3,8 @@
 //+------------------------------------------------------------------+
 #property description "EA31337"
 #property copyright   "kenorb"
-//#property link        "http://www.example.com"
-#property version   "100.002"
+#property link        "http://www.mql4.com"
+#property version   "100.003"
 //#property strict
 
 #include <stderror.mqh>
@@ -30,8 +30,10 @@ enum ENUM_STRATEGY_TYPE {
   DEMARKER_ON_SELL,
   WPR_ON_BUY,
   WPR_ON_SELL,
-  ALLIGATOR_ON_BUY,
-  ALLIGATOR_ON_SELL,
+  ALLIGATOR1_ON_BUY,
+  ALLIGATOR1_ON_SELL,
+  ALLIGATOR2_ON_BUY,
+  ALLIGATOR2_ON_SELL,
   BBANDS_ON_BUY,
   BBANDS_ON_SELL,
   RSI_ON_BUY,
@@ -115,21 +117,26 @@ extern bool Fractals_Enabled = TRUE; // Enable Fractals-based strategy.
 extern ENUM_TIMEFRAMES Fractals_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int Fractals_MaxPeriods = 1; // Suggested range: 1-5, Suggested value: 1
 
-extern string ____Alligator_Parameters__ = "-- Settings for the Alligator indicator --";
-extern bool Alligator_Enabled = TRUE; // Enable Alligator-based strategy.
-extern ENUM_TIMEFRAMES Alligator_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 // iCustom(NULL, Alligator_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 0, 0);
-extern bool Alligator_Custom = TRUE; // Enable custom Alligator strategy.
-extern int Alligator_Jaw_Period = 13;
-extern int Alligator_Jaw_Shift = 0;
-extern int Alligator_Teeth_Period = 8;
-extern int Alligator_Teeth_Shift = 0;
-extern int Alligator_Lips_Period = 5;
-extern int Alligator_Lips_Shift = 0;
-extern ENUM_MA_METHOD Alligator_MA_Method = MODE_EMA; // MA method (See: ENUM_MA_METHOD).
-extern ENUM_APPLIED_PRICE Alligator_Applied_Price = PRICE_LOW;
-extern int Alligator_Shift = 0;
-extern double Alligator_Ratio = 0.5; // Suggested to not change. Suggested range: 0.0-5.0
+extern string ____Alligator_1_Parameters__ = "-- Settings for the Alligator 1 indicator --";
+extern bool Alligator1_Enabled = TRUE; // Enable Alligator custom-based strategy.
+extern ENUM_TIMEFRAMES Alligator1_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
+extern double Alligator1_Ratio = 0.5; // Suggested to not change. Suggested range: 0.0-5.0
+extern int Alligator1_Shift = 0;
+
+extern string ____Alligator_2_Parameters__ = "-- Settings for the Alligator 2 indicator --";
+extern bool Alligator2_Enabled = FALSE; // Enable Alligator-based strategy.
+extern ENUM_TIMEFRAMES Alligator2_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
+extern int Alligator2_Jaw_Period = 13; // Blue line averaging period (Alligator's Jaw).
+extern int Alligator2_Jaw_Shift = 8; // Blue line shift relative to the chart.
+extern int Alligator2_Teeth_Period = 8; // Red line averaging period (Alligator's Teeth).
+extern int Alligator2_Teeth_Shift = 5; // Red line shift relative to the chart.
+extern int Alligator2_Lips_Period = 5; // Green line averaging period (Alligator's Lips).
+extern int Alligator2_Lips_Shift = 3; // Green line shift relative to the chart.
+extern ENUM_MA_METHOD Alligator2_MA_Method = MODE_SMMA; // MA method (See: ENUM_MA_METHOD).
+extern ENUM_APPLIED_PRICE Alligator2_Applied_Price = PRICE_MEDIAN; // Applied price. It can be any of ENUM_APPLIED_PRICE enumeration values.
+extern double Alligator2_Ratio = 0.5; // Suggested to not change. Suggested range: 0.0-5.0
+extern int Alligator2_Shift = 0;
 
 extern string ____DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --";
 extern bool DeMarker_Enabled = TRUE; // Enable DeMarker-based strategy.
@@ -192,10 +199,10 @@ extern bool MaxTries = 5; // Number of maximum attempts to execute the order.
 // extern int JobProcessDelay = 1; // How often job list should be processed (in seconds).
 
 // ENUM_MA_METHOD values:
-//   0: MODE_SMA
-//   1: MODE_EMA
-//   2: MODE_SMMA
-//   3: MODE_LWMA
+//   0: MODE_SMA (Simple averaging)
+//   1: MODE_EMA (Exponential averaging)
+//   2: MODE_SMMA (Smoothed averaging)
+//   3: MODE_LWMA (Linear-weighted averaging)
 
 // ENUM_APPLIED_PRICE values:
 //   0: PRICE_CLOSE (Close price)
@@ -244,7 +251,7 @@ double MA_Fast[3], MA_Medium[3], MA_Slow[3];
 double MACD[3], MACDSignal[3];
 double RSI[];
 double BBands_main[], BBands_upper[], BBands_lower[];
-double Alligator[3];
+double Alligator1[3], Alligator2[3];
 double DeMarker, WPR;
 double Fractals_lower, Fractals_upper;
 
@@ -259,6 +266,8 @@ double Fractals_lower, Fractals_upper;
  *   - the Ichimoku Kinko Hyo indicator?
  *   - daily higher highs and lower lows,
  *   - add breakage strategy (Envelopes/Bands?) with Order,
+ *   - optimize iAlligator() indicators (http://docs.mql4.com/constants/indicatorconstants/lines).
+ *   - check on iGator() indicator.
  *   - add the On Balance Volume indicator (iOBV) (http://docs.mql4.com/indicators/iobv),
  *   - add the Average True Range indicator (iATR) (http://docs.mql4.com/indicators/iatr),
  *   - add the Envelopes indicator,
@@ -459,13 +468,23 @@ void Trade() {
       }
    }
 
-   if (Alligator_Enabled) {
-      if (AlligatorOnBuy()) {
-        if (EACloseOnMarketChange) CloseOrdersByType(ALLIGATOR_ON_SELL);
-        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), ALLIGATOR_ON_BUY, "AlligatorOnBuy()");
-      } else if (AlligatorOnSell()) {
-        if (EACloseOnMarketChange) CloseOrdersByType(ALLIGATOR_ON_BUY);
-        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), ALLIGATOR_ON_SELL, "AlligatorOnSell()");
+   if (Alligator1_Enabled) {
+      if (Alligator1OnBuy()) {
+        if (EACloseOnMarketChange) CloseOrdersByType(ALLIGATOR1_ON_SELL);
+        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), ALLIGATOR1_ON_BUY, "Alligator1OnBuy()");
+      } else if (Alligator1OnSell()) {
+        if (EACloseOnMarketChange) CloseOrdersByType(ALLIGATOR1_ON_BUY);
+        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), ALLIGATOR1_ON_SELL, "Alligator1OnSell()");
+      }
+   }
+
+   if (Alligator2_Enabled) {
+      if (Alligator2OnBuy()) {
+        if (EACloseOnMarketChange) CloseOrdersByType(ALLIGATOR2_ON_SELL);
+        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), ALLIGATOR2_ON_BUY, "Alligator2OnBuy()");
+      } else if (Alligator2OnSell()) {
+        if (EACloseOnMarketChange) CloseOrdersByType(ALLIGATOR2_ON_BUY);
+        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), ALLIGATOR2_ON_SELL, "Alligator2OnSell()");
       }
    }
 
@@ -586,21 +605,21 @@ bool UpdateIndicators() {
     if (VerboseTrace) Print("Bands: Main: " + GetArrayValues(BBands_main) + "; Upper: " + GetArrayValues(BBands_upper) + "; Lower: " + GetArrayValues(BBands_lower));
   }
 
-  // TODO: http://docs.mql4.com/indicators/ialligator
-  if (Alligator_Enabled) {
+  if (Alligator1_Enabled) {
     // Update Alligator indicator values.
-    if (Alligator_Custom) {
-      Alligator[0] = iCustom(NULL, Alligator_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 0, 0);
-      Alligator[1] = iCustom(NULL, Alligator_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 1, 0);
-      Alligator[2] = iCustom(NULL, Alligator_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 2, 0);
-    } else {
-      Alligator[0] = iAlligator(NULL, Alligator_Timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, 0, Alligator_Shift);
-      Alligator[1] = iAlligator(NULL, Alligator_Timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, 1, Alligator_Shift);
-      Alligator[2] = iAlligator(NULL, Alligator_Timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, 2, Alligator_Shift);
-    }
-    if (VerboseTrace) Print("Alligator: ", GetArrayValues(Alligator));
+    Alligator1[0] = iCustom(NULL, Alligator1_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 0, 0);
+    Alligator1[1] = iCustom(NULL, Alligator1_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 1, 0);
+    Alligator1[2] = iCustom(NULL, Alligator1_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 2, 0);
+    if (VerboseTrace) Print("Alligator1: ", GetArrayValues(Alligator1));
   }
-  // TODO: iAlligator() and iGator() indicators (http://docs.mql4.com/constants/indicatorconstants/lines).
+
+  if (Alligator2_Enabled) {
+    // Update Alligator indicator values.
+    Alligator2[0] = iAlligator(NULL, Alligator2_Timeframe, Alligator2_Jaw_Period, Alligator2_Jaw_Shift, Alligator2_Teeth_Period, Alligator2_Teeth_Shift, Alligator2_Lips_Period, Alligator2_Lips_Shift, Alligator2_MA_Method, Alligator2_Applied_Price, 0, Alligator2_Shift);
+    Alligator2[1] = iAlligator(NULL, Alligator2_Timeframe, Alligator2_Jaw_Period, Alligator2_Jaw_Shift, Alligator2_Teeth_Period, Alligator2_Teeth_Shift, Alligator2_Lips_Period, Alligator2_Lips_Shift, Alligator2_MA_Method, Alligator2_Applied_Price, 1, Alligator2_Shift);
+    Alligator2[2] = iAlligator(NULL, Alligator2_Timeframe, Alligator2_Jaw_Period, Alligator2_Jaw_Shift, Alligator2_Teeth_Period, Alligator2_Teeth_Shift, Alligator2_Lips_Period, Alligator2_Lips_Shift, Alligator2_MA_Method, Alligator2_Applied_Price, 2, Alligator2_Shift);
+    if (VerboseTrace) Print("Alligator2: ", GetArrayValues(Alligator2));
+  }
 
   if (DeMarker_Enabled) {
     // Update DeMarker indicator values.
@@ -678,21 +697,39 @@ bool MACDOnSell() {
   );
 }
 
-bool AlligatorOnBuy() {
+bool Alligator1OnBuy() {
   // if (VerboseTrace) Print("AlligatorOnBuy(): ", NormalizeDouble(Alligator[2] - Alligator[1], PipPrecision), ",", NormalizeDouble(Alligator[1] - Alligator[0], PipPrecision), ",", NormalizeDouble(Alligator[2] - Alligator[0], PipPrecision), " >= ", NormalizeDouble(Alligator_Ratio * PipSize, PipPrecision));
    return (
-      Alligator[2] - Alligator[1] >= Alligator_Ratio * PipSize &&
-      Alligator[1] - Alligator[0] >= Alligator_Ratio * PipSize &&
-      Alligator[2] - Alligator[0] >= Alligator_Ratio * PipSize
+      Alligator1[2] - Alligator1[1] >= Alligator1_Ratio * PipSize &&
+      Alligator1[1] - Alligator1[0] >= Alligator1_Ratio * PipSize &&
+      Alligator1[2] - Alligator1[0] >= Alligator1_Ratio * PipSize
    );
 }
 
-bool AlligatorOnSell() {
+bool Alligator1OnSell() {
   // if (VerboseTrace) Print("AlligatorOnSell(): ", NormalizeDouble(Alligator[1] - Alligator[2], PipPrecision), ",", NormalizeDouble(Alligator[0] - Alligator[1], PipPrecision), ",", NormalizeDouble(Alligator[0] - Alligator[2], PipPrecision), " >= ", NormalizeDouble(Alligator_Ratio * PipSize, PipPrecision));
    return (
-      Alligator[1] - Alligator[2] >= Alligator_Ratio * PipSize &&
-      Alligator[0] - Alligator[1] >= Alligator_Ratio * PipSize &&
-      Alligator[0] - Alligator[2] >= Alligator_Ratio * PipSize
+      Alligator1[1] - Alligator1[2] >= Alligator1_Ratio * PipSize &&
+      Alligator1[0] - Alligator1[1] >= Alligator1_Ratio * PipSize &&
+      Alligator1[0] - Alligator1[2] >= Alligator1_Ratio * PipSize
+   );
+}
+
+bool Alligator2OnBuy() {
+  // if (VerboseTrace) Print("AlligatorOnBuy(): ", NormalizeDouble(Alligator[2] - Alligator[1], PipPrecision), ",", NormalizeDouble(Alligator[1] - Alligator[0], PipPrecision), ",", NormalizeDouble(Alligator[2] - Alligator[0], PipPrecision), " >= ", NormalizeDouble(Alligator_Ratio * PipSize, PipPrecision));
+   return (
+      Alligator2[2] - Alligator2[1] >= Alligator2_Ratio * PipSize &&
+      Alligator2[1] - Alligator2[0] >= Alligator2_Ratio * PipSize &&
+      Alligator2[2] - Alligator2[0] >= Alligator2_Ratio * PipSize
+   );
+}
+
+bool Alligator2OnSell() {
+  // if (VerboseTrace) Print("AlligatorOnSell(): ", NormalizeDouble(Alligator[1] - Alligator[2], PipPrecision), ",", NormalizeDouble(Alligator[0] - Alligator[1], PipPrecision), ",", NormalizeDouble(Alligator[0] - Alligator[2], PipPrecision), " >= ", NormalizeDouble(Alligator_Ratio * PipSize, PipPrecision));
+   return (
+      Alligator2[1] - Alligator2[2] >= Alligator2_Ratio * PipSize &&
+      Alligator2[0] - Alligator2[1] >= Alligator2_Ratio * PipSize &&
+      Alligator2[0] - Alligator2[2] >= Alligator2_Ratio * PipSize
    );
 }
 
@@ -1522,7 +1559,8 @@ string GetOrdersStats() {
   int fractals_orders = open_orders[FRACTALS_ON_BUY] + open_orders[FRACTALS_ON_SELL];
   int demarker_orders = open_orders[DEMARKER_ON_BUY] + open_orders[DEMARKER_ON_SELL];
   int iwpr_orders = open_orders[WPR_ON_BUY] + open_orders[WPR_ON_SELL];
-  int alligator_orders = open_orders[ALLIGATOR_ON_BUY] + open_orders[ALLIGATOR_ON_SELL];
+  int alligator1_orders = open_orders[ALLIGATOR1_ON_BUY] + open_orders[ALLIGATOR2_ON_SELL];
+  int alligator2_orders = open_orders[ALLIGATOR1_ON_BUY] + open_orders[ALLIGATOR2_ON_SELL];
   int bbands_orders = open_orders[BBANDS_ON_BUY] + open_orders[BBANDS_ON_SELL];
   int rsi_orders = open_orders[RSI_ON_BUY] + open_orders[RSI_ON_SELL];
   string orders_per_type = "Stats: ";
@@ -1532,7 +1570,8 @@ string GetOrdersStats() {
      if (Fractals_Enabled && fractals_orders > 0) orders_per_type += "Fractals: " + MathFloor(100 / total_orders * fractals_orders) + "%, ";
      if (DeMarker_Enabled && demarker_orders > 0) orders_per_type += "DeMarker: " + MathFloor(100 / total_orders * demarker_orders) + "%\n";
      if (WPR_Enabled && iwpr_orders > 0) orders_per_type += "WPR: " + MathFloor(100 / total_orders * iwpr_orders) + "%, ";
-     if (Alligator_Enabled && alligator_orders > 0) orders_per_type += "Alligator: " + MathFloor(100 / total_orders * alligator_orders) + "%, ";
+     if (Alligator1_Enabled && alligator1_orders > 0) orders_per_type += "Alligator1: " + MathFloor(100 / total_orders * alligator1_orders) + "%, ";
+     if (Alligator2_Enabled && alligator2_orders > 0) orders_per_type += "Alligator2: " + MathFloor(100 / total_orders * alligator2_orders) + "%, ";
      if (BBands_Enabled && bbands_orders > 0) orders_per_type += "Bands: " + MathFloor(100 / total_orders * bbands_orders) + "%, ";
      if (RSI_Enabled && rsi_orders > 0) orders_per_type += "RSI: " + MathFloor(100 / total_orders * rsi_orders) + "%, ";
   } else {
