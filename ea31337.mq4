@@ -4,7 +4,7 @@
 #property description "EA31337"
 #property copyright   "kenorb"
 //#property link        "http://www.example.com"
-#property version   "100.001"
+#property version   "100.002"
 //#property strict
 
 #include <stderror.mqh>
@@ -62,11 +62,12 @@ enum ENUM_ACTION_TYPE {
 
 // User parameters.
 extern string ____EA_Parameters__ = "-----------------------------------------";
-extern double EATrailingStop = 20;
+extern double EATrailingStop = 15;
 extern int EATrailingStopMethod = 4; // TrailingStop method. Set 0 to disable. Range: 0-10. Suggested value: 1 or 4.
-extern bool EATrailingStopOneWay = FALSE; // Change trailing stop towards one direction only. Suggested value: TRUE
+extern bool EATrailingStopOneWay = TRUE; // Change trailing stop towards one direction only. Suggested value: TRUE
+
 extern double EATrailingProfit = 20;
-extern int EATrailingProfitMethod = 10; // Trailing Profit method. Set 0 to disable. Range: 0-10. Suggested value: 0, 1 or 10.
+extern int EATrailingProfitMethod = 3; // Trailing Profit method. Set 0 to disable. Range: 0-10. Suggested value: 0, 1, 4 or 10.
 extern bool EATrailingProfitOneWay = TRUE; // Change trailing profit take towards one direction only.
 
 // extern double EAMinChangeOrders = 5; // Minimum change in pips between placed orders.
@@ -79,7 +80,7 @@ extern int EAManualGMToffset = 0;
 extern string __EA_Order_Parameters__ = "-- Profit/Loss settings (set 0 for auto) --";
 extern double EALotSize = 0; // Default lot size. Set 0 for auto.
 extern int EAMaxOrders = 0; // Maximum orders. Set 0 for auto.
-extern int EAMaxOrdersPerType = 2; // Maximum orders per strategy type. Set 0 for unlimited.
+extern int EAMaxOrdersPerType = 0; // Maximum orders per strategy type. Set 0 for unlimited.
 extern double EATakeProfit = 0.0;
 extern double EAStopLoss = 0.0;
 extern double RiskRatio = 0; // Suggested value: 1.0. Do not change unless testing.
@@ -117,21 +118,32 @@ extern int Fractals_MaxPeriods = 1; // Suggested range: 1-5, Suggested value: 1
 extern string ____Alligator_Parameters__ = "-- Settings for the Alligator indicator --";
 extern bool Alligator_Enabled = TRUE; // Enable Alligator-based strategy.
 extern ENUM_TIMEFRAMES Alligator_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
+// iCustom(NULL, Alligator_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 0, 0);
+extern bool Alligator_Custom = TRUE; // Enable custom Alligator strategy.
+extern int Alligator_Jaw_Period = 13;
+extern int Alligator_Jaw_Shift = 0;
+extern int Alligator_Teeth_Period = 8;
+extern int Alligator_Teeth_Shift = 0;
+extern int Alligator_Lips_Period = 5;
+extern int Alligator_Lips_Shift = 0;
+extern ENUM_MA_METHOD Alligator_MA_Method = MODE_EMA; // MA method (See: ENUM_MA_METHOD).
+extern ENUM_APPLIED_PRICE Alligator_Applied_Price = PRICE_LOW;
+extern int Alligator_Shift = 0;
 extern double Alligator_Ratio = 0.5; // Suggested to not change. Suggested range: 0.0-5.0
 
 extern string ____DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --";
 extern bool DeMarker_Enabled = TRUE; // Enable DeMarker-based strategy.
 extern ENUM_TIMEFRAMES DeMarker_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int DeMarker_Period = 9; // Suggested range: 6-12. Suggested value: 9
-extern int DeMarker_MaxPeriods = 2; // Suggested range: 2-5
-extern double DeMarker_Shift = 0.2; // Valid range: 0.0-0.4. Suggested value: 0.2
+extern int DeMarker_Period = 18; // Suggested range: 16-20.
+extern int DeMarker_Shift = 0; // Shift relative to the current bar the given amount of periods ago. Suggested value: 0.
+extern double DeMarker_Filter = 0.0; // Valid range: 0.0-0.4. Suggested value: 0.0.
 
 extern string ____WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --";
 extern bool WPR_Enabled = TRUE; // Enable WPR-based strategy.
 extern ENUM_TIMEFRAMES WPR_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int WPR_period = 8;
-extern int WPR_MaxPeriods = 6; // Suggested range: 2-10. Suggested value: 6
-extern int WPR_Shift = 0; // Suggested range: 0.0-0.5. Suggested value: 0.4.
+extern int WPR_Period = 12; // Suggested value: 12.
+extern int WPR_Shift = 1; // Shift relative to the current bar the given amount of periods ago. Suggested value: 1.
+extern int WPR_Filter = 0.0; // Suggested range: 0.0-0.5. Suggested value: 0.4.
 
 extern string ____RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --";
 extern bool RSI_Enabled = FALSE; // Enable RSI-based strategy.
@@ -233,7 +245,7 @@ double MACD[3], MACDSignal[3];
 double RSI[];
 double BBands_main[], BBands_upper[], BBands_lower[];
 double Alligator[3];
-double DeMarker[], WPR[];
+double DeMarker, WPR;
 double Fractals_lower, Fractals_upper;
 
 /* TODO:
@@ -322,8 +334,6 @@ int OnInit() {
    if (market_marginrequired == 0) market_marginrequired = 10; // FIX for 'zero divide' bug when MODE_MARGINREQUIRED is zero
    order_slippage = EAOrderPriceSlippage * MathPow(10, Digits - PipPrecision);
    GMT_Offset = EAManualGMToffset;
-   ArrayResize(DeMarker, DeMarker_MaxPeriods + 1);
-   ArrayResize(WPR, WPR_MaxPeriods + 1);
    ArrayResize(RSI, RSI_MaxPeriods + 1);
    ArrayResize(BBands_main, BBands_MaxPeriods + 1);
    ArrayResize(BBands_upper, BBands_MaxPeriods + 1);
@@ -363,7 +373,7 @@ void OnDeinit(const int reason) {
   ea_active = TRUE;
   if (VerboseDebug) Print("Calling " + __FUNCTION__);
   if (VerboseInfo) {
-    Print("EA deinitializing, exit code: ", reason, ", reason: " + getUninitReasonText(reason));
+    Print("EA deinitializing, reason: " + getUninitReasonText(reason) + "(code: " + reason + ")");
     Print(GetSummaryText());
   }
 
@@ -469,12 +479,14 @@ void Trade() {
       }
    }
 
-   if (WPROnBuy()) {
-     if (EACloseOnMarketChange) CloseOrdersByType(WPR_ON_SELL);
-     order_placed = ExecuteOrder(OP_BUY, GetLotSize(), WPR_ON_BUY, "WPROnBuy()");
-   } else if (WPROnSell()) {
-     if (EACloseOnMarketChange) CloseOrdersByType(WPR_ON_BUY);
-     order_placed = ExecuteOrder(OP_SELL, GetLotSize(), WPR_ON_SELL, "WPROnSell()");
+   if (WPR_Enabled) {
+     if (WPROnBuy()) {
+       if (EACloseOnMarketChange) CloseOrdersByType(WPR_ON_SELL);
+       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), WPR_ON_BUY, "WPROnBuy()");
+     } else if (WPROnSell()) {
+       if (EACloseOnMarketChange) CloseOrdersByType(WPR_ON_BUY);
+       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), WPR_ON_SELL, "WPROnSell()");
+     }
    }
 
    // Print daily report at end of each day.
@@ -553,7 +565,7 @@ bool UpdateIndicators() {
     MACDSignal[0] = iMACD(NULL, MACD_Timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, 0);
     MACDSignal[1] = iMACD(NULL, MACD_Timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, 1 + MACD_Shift);
     MACDSignal[2] = iMACD(NULL, MACD_Timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, 2 + MACD_ShiftFar);
-    if (VerboseTrace) { Print("MACD: ", GetArrayValues(MACD), "; Signal: ", GetArrayValues(MACDSignal)); }
+    if (VerboseTrace) Print("MACD: ", GetArrayValues(MACD), "; Signal: ", GetArrayValues(MACDSignal));
   }
 
   if (RSI_Enabled) {
@@ -571,33 +583,35 @@ bool UpdateIndicators() {
       BBands_upper[i] = iBands(NULL, BBands_Timeframe, BBands_Period, BBands_Deviation, BBands_Shift, BBands_Applied_Price, MODE_UPPER, i);
       BBands_lower[i] = iBands(NULL, BBands_Timeframe, BBands_Period, BBands_Deviation, BBands_Shift, BBands_Applied_Price, MODE_LOWER, i);
     }
-    if (VerboseTrace) { Print("Bands: Main: " + GetArrayValues(BBands_main) + "; Upper: " + GetArrayValues(BBands_upper) + "; Lower: " + GetArrayValues(BBands_lower)); }
+    if (VerboseTrace) Print("Bands: Main: " + GetArrayValues(BBands_main) + "; Upper: " + GetArrayValues(BBands_upper) + "; Lower: " + GetArrayValues(BBands_lower));
   }
 
   // TODO: http://docs.mql4.com/indicators/ialligator
   if (Alligator_Enabled) {
     // Update Alligator indicator values.
-    Alligator[0] = iCustom(NULL, Alligator_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 0, 0);
-    Alligator[1] = iCustom(NULL, Alligator_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 1, 0);
-    Alligator[2] = iCustom(NULL, Alligator_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 2, 0);
-    if (VerboseTrace) { Print("Alligator: ", GetArrayValues(Alligator)); }
+    if (Alligator_Custom) {
+      Alligator[0] = iCustom(NULL, Alligator_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 0, 0);
+      Alligator[1] = iCustom(NULL, Alligator_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 1, 0);
+      Alligator[2] = iCustom(NULL, Alligator_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 2, 0);
+    } else {
+      Alligator[0] = iAlligator(NULL, Alligator_Timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, 0, Alligator_Shift);
+      Alligator[1] = iAlligator(NULL, Alligator_Timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, 1, Alligator_Shift);
+      Alligator[2] = iAlligator(NULL, Alligator_Timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, 2, Alligator_Shift);
+    }
+    if (VerboseTrace) Print("Alligator: ", GetArrayValues(Alligator));
   }
   // TODO: iAlligator() and iGator() indicators (http://docs.mql4.com/constants/indicatorconstants/lines).
 
   if (DeMarker_Enabled) {
     // Update DeMarker indicator values.
-    for (i = 0; i <= DeMarker_MaxPeriods; i++) {
-      DeMarker[i] = iDeMarker(NULL, DeMarker_Timeframe, DeMarker_Period, i);
-    }
-    if (VerboseTrace) { Print("DeMarker: ", GetArrayValues(DeMarker)); }
+    DeMarker = iDeMarker(NULL, DeMarker_Timeframe, DeMarker_Period, DeMarker_Shift);
+    if (VerboseTrace) Print("DeMarker: ", DeMarker);
   }
 
   if (WPR_Enabled) {
     // Update the Larry Williams' Percent Range indicator values.
-    for (i = 0; i <= WPR_MaxPeriods; i++) {
-     WPR[i] = (-iWPR(NULL, WPR_Timeframe, WPR_period, i + 1)) / 100.0;
-    }
-    if (VerboseTrace) { Print("iWPR: ", GetArrayValues(WPR)); }
+    WPR = (-iWPR(NULL, WPR_Timeframe, WPR_Period, WPR_Shift)) / 100.0;
+    if (VerboseTrace) Print("WPR: ", WPR);
   }
 
   if (Fractals_Enabled) {
@@ -612,7 +626,7 @@ bool UpdateIndicators() {
       ifractal = iFractals(NULL, Fractals_Timeframe, MODE_UPPER, i);
       if (ifractal != 0.0) Fractals_upper = ifractal;
     }
-    if (VerboseTrace && Fractals_lower != 0.0 && Fractals_upper != 0.0) { Print("Fractals_lower: ", Fractals_lower, ", Fractals_upper:", Fractals_upper); }
+    if (VerboseTrace && Fractals_lower != 0.0 && Fractals_upper != 0.0) Print("Fractals_lower: ", Fractals_lower, ", Fractals_upper:", Fractals_upper);
   }
 
   return (TRUE);
@@ -691,21 +705,21 @@ bool FractalsOnSell() {
 }
 
 bool DeMarkerOnSell() {
-  // if (VerboseTrace) { Print("DeMarkerOnSell(): ", LowestValue(DeMarker), " < ", (0.5 - DeMarker_Shift)); }
-  return (LowestValue(DeMarker) < (0.5 - DeMarker_Shift));
+  // if (VerboseTrace) { Print("DeMarkerOnSell(): ", LowestValue(DeMarker), " < ", (0.5 - DeMarker_Filter)); }
+  return (DeMarker < (0.5 - DeMarker_Filter));
 }
 
 bool DeMarkerOnBuy() {
-  // if (VerboseTrace) { Print("DeMarkerOnBuy(): ", LowestValue(DeMarker), " > ", (0.5 + DeMarker_Shift)); }
-  return (HighestValue(DeMarker) > (0.5 + DeMarker_Shift));
+  // if (VerboseTrace) { Print("DeMarkerOnBuy(): ", LowestValue(DeMarker), " > ", (0.5 + DeMarker_Filter)); }
+  return (DeMarker > (0.5 + DeMarker_Filter));
 }
 
 bool WPROnSell() {
-  return (LowestValue(WPR) <= (0.5 - WPR_Shift));
+  return (WPR <= (0.5 - WPR_Filter));
 }
 
 bool WPROnBuy() {
-  return (HighestValue(WPR) >= (0.5 + WPR_Shift));
+  return (WPR >= (0.5 + WPR_Filter));
 }
 
 double LowestValue(double& arr[]) {
@@ -1026,7 +1040,7 @@ double GetTrailingStop(int method, int cmd, double previous, bool existing = FAL
      //trail_stop = default_trail;
    }
 
-   if (EATrailingStopOneWay) { // If TRUE, move trailing stop only one direction.
+   if (EATrailingStopOneWay && method > 0) { // If TRUE, move trailing stop only one direction.
      if (previous == 0) previous = default_trail;
      if (cmd == OP_SELL)     trail_stop = If(trail_stop < previous, trail_stop, previous);
      else if (cmd == OP_BUY) trail_stop = If(trail_stop > previous, trail_stop, previous);
@@ -1092,8 +1106,8 @@ double GetTrailingProfit(int method, int cmd, double previous, bool existing = F
      //profit_take = default_trail;
    }
 
-   if (EATrailingProfitOneWay) { // If TRUE, move profit take only one direction.
-     if (previous == 0) previous = default_trail;
+   if (EATrailingProfitOneWay && method > 0) { // If TRUE, move profit take only one direction.
+     if (previous == 0 && method > 0) previous = default_trail;
      if (cmd == OP_SELL)     profit_take = If(profit_take < previous, profit_take, previous);
      else if (cmd == OP_BUY) profit_take = If(profit_take > previous, profit_take, previous);
    }
@@ -1517,7 +1531,7 @@ string GetOrdersStats() {
      if (MACD_Enabled && macd_orders > 0) orders_per_type += "MACD: " + MathFloor(100 / total_orders * macd_orders) + "%, ";
      if (Fractals_Enabled && fractals_orders > 0) orders_per_type += "Fractals: " + MathFloor(100 / total_orders * fractals_orders) + "%, ";
      if (DeMarker_Enabled && demarker_orders > 0) orders_per_type += "DeMarker: " + MathFloor(100 / total_orders * demarker_orders) + "%\n";
-     if (WPR_Enabled && iwpr_orders > 0) orders_per_type += "IWPR: " + MathFloor(100 / total_orders * iwpr_orders) + "%, ";
+     if (WPR_Enabled && iwpr_orders > 0) orders_per_type += "WPR: " + MathFloor(100 / total_orders * iwpr_orders) + "%, ";
      if (Alligator_Enabled && alligator_orders > 0) orders_per_type += "Alligator: " + MathFloor(100 / total_orders * alligator_orders) + "%, ";
      if (BBands_Enabled && bbands_orders > 0) orders_per_type += "Bands: " + MathFloor(100 / total_orders * bbands_orders) + "%, ";
      if (RSI_Enabled && rsi_orders > 0) orders_per_type += "RSI: " + MathFloor(100 / total_orders * rsi_orders) + "%, ";
