@@ -4,7 +4,7 @@
 #property description "EA31337"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "100.005"
+#property version   "100.006"
 //#property strict
 
 #include <stderror.mqh>
@@ -34,8 +34,8 @@ enum ENUM_STRATEGY_TYPE {
   ALLIGATOR1_ON_SELL,
   ALLIGATOR2_ON_BUY,
   ALLIGATOR2_ON_SELL,
-  BBANDS_ON_BUY,
-  BBANDS_ON_SELL,
+  BANDS_ON_BUY,
+  BANDS_ON_SELL,
   RSI_ON_BUY,
   RSI_ON_SELL,
   FINAL_STRATEGY_TYPE_ENTRY // Should be the last one. Used to calculate the number of enum items.
@@ -113,6 +113,8 @@ extern double MACD_OpenLevel  = 2.5;
 extern ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_CLOSE; // MACD applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern int MACD_Shift = 5; // Past MACD value in number of bars. Shift relative to the current bar the given amount of periods ago. Suggested value: 1
 extern int MACD_ShiftFar = 2; // Additional MACD far value in number of bars relatively to MACD_Shift.
+extern int MACD_TrailingStopMethod = 5; // Trailing Stop method for MACD. Range: 0-10. Set 0 to default.
+extern int MACD_TrailingProfitMethod = 4; // Trailing Profit method for MACD. Range: 0-10. Set 0 to default.
 
 extern string ____Fractals_Parameters__ = "-- Settings for the Fractals indicator --";
 extern bool Fractals_Enabled = TRUE; // Enable Fractals-based strategy.
@@ -149,6 +151,8 @@ extern ENUM_MA_METHOD Alligator2_MA_Method = MODE_SMMA; // MA method (See: ENUM_
 extern ENUM_APPLIED_PRICE Alligator2_Applied_Price = PRICE_MEDIAN; // Applied price. It can be any of ENUM_APPLIED_PRICE enumeration values.
 extern double Alligator2_OpenLevel = 0.5; // Suggested to not change. Suggested range: 0.0-5.0
 extern int Alligator2_Shift = 0;
+extern int Alligator2_TrailingStopMethod = 9; // Trailing Stop method for Alligator1. Range: 0-10. Set 0 to default.
+extern int Alligator2_TrailingProfitMethod = 1; // Trailing Profit method for Alligator1. Range: 0-10. Set 0 to default.
 
 extern string ____DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --";
 extern bool DeMarker_Enabled = TRUE; // Enable DeMarker-based strategy.
@@ -162,9 +166,11 @@ extern int DeMarker_TrailingProfitMethod = 1; // Trailing Profit method for DeMa
 extern string ____WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --";
 extern bool WPR_Enabled = TRUE; // Enable WPR-based strategy.
 extern ENUM_TIMEFRAMES WPR_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int WPR_Period = 12; // Suggested value: 12.
+extern int WPR_Period = 14; // Suggested value: 12.
 extern int WPR_Shift = 1; // Shift relative to the current bar the given amount of periods ago. Suggested value: 1.
-extern int WPR_OpenLevel = 0.0; // Suggested range: 0.0-0.5. Suggested value: 0.0.
+extern int WPR_Filter = 0.0; // Suggested range: 0.0-0.5. Suggested value: 0.0.
+extern int WPR_TrailingStopMethod = 6; // Trailing Stop method for WPR. Range: 0-10. Set 0 to default.
+extern int WPR_TrailingProfitMethod = 6; // Trailing Profit method for WPR. Range: 0-10. Set 0 to default.
 
 extern string ____RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --";
 extern bool RSI_Enabled = FALSE; // Enable RSI-based strategy.
@@ -172,15 +178,19 @@ extern ENUM_TIMEFRAMES RSI_Timeframe = PERIOD_M1; // Timeframe (0 means the curr
 extern int RSI_Period = 14; // Averaging period to calculate the main line.
 extern ENUM_APPLIED_PRICE RSI_Applied_Price = PRICE_HIGH; // RSI applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern double RSI_MaxPeriods = 3; // Maximum bar periods to calculate its value.
+extern int RSI_TrailingStopMethod = 9; // Trailing Stop method for RSI. Range: 0-10. Set 0 to default.
+extern int RSI_TrailingProfitMethod = 1; // Trailing Profit method for RSI. Range: 0-10. Set 0 to default.
 
-extern string ____BBands_Parameters__ = "-- Settings for the Bollinger BandsÂ® indicator --";
-extern bool BBands_Enabled = FALSE; // Enable BBands-based strategy.
-extern ENUM_TIMEFRAMES BBands_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int BBands_Period = 20; // Averaging period to calculate the main line.
-extern ENUM_APPLIED_PRICE BBands_Applied_Price = PRICE_HIGH; // Bands applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
-extern int BBands_Deviation = 2; // Number of standard deviations from the main line.
-extern int BBands_MaxPeriods = 3; // Maximum bar periods to calculate its value.
-extern int BBands_Shift = 0; // The indicator shift relative to the chart.
+extern string ____Bands_Parameters__ = "-- Settings for the Bollinger Bands® indicator --";
+extern bool Bands_Enabled = FALSE; // Enable BBands-based strategy.
+extern ENUM_TIMEFRAMES Bands_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
+extern int Bands_Period = 20; // Averaging period to calculate the main line.
+extern ENUM_APPLIED_PRICE Bands_Applied_Price = PRICE_HIGH; // Bands applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
+extern int Bands_Deviation = 2; // Number of standard deviations from the main line.
+extern int Bands_MaxPeriods = 3; // Maximum bar periods to calculate its value.
+extern int Bands_Shift = 0; // The indicator shift relative to the chart.
+extern int Bands_TrailingStopMethod = 9; // Trailing Stop method for Bands. Range: 0-10. Set 0 to default.
+extern int Bands_TrailingProfitMethod = 1; // Trailing Profit method for Bands. Range: 0-10. Set 0 to default.
 
 extern string ____EA_Conditions__ = "-- Execute actions on certain conditions (set 0 to none) --"; // See: ENUM_ACTION_TYPE
 extern int ActionOnDoubledEquity  = ACTION_CLOSE_ORDER_PROFIT; // Execute action when account equity doubled balance.
@@ -266,7 +276,7 @@ int total_orders = 0; // Number of total orders currently open.
 double MA_Fast[3], MA_Medium[3], MA_Slow[3];
 double MACD[3], MACDSignal[3];
 double RSI[];
-double BBands_main[], BBands_upper[], BBands_lower[];
+double Bands_main[], Bands_upper[], Bands_lower[];
 double Alligator1[3], Alligator2[3];
 double DeMarker, WPR;
 double Fractals_lower, Fractals_upper;
@@ -373,9 +383,9 @@ int OnInit() {
    order_slippage = EAOrderPriceSlippage * MathPow(10, Digits - pip_precision);
    GMT_Offset = EAManualGMToffset;
    ArrayResize(RSI, RSI_MaxPeriods + 1);
-   ArrayResize(BBands_main, BBands_MaxPeriods + 1);
-   ArrayResize(BBands_upper, BBands_MaxPeriods + 1);
-   ArrayResize(BBands_lower, BBands_MaxPeriods + 1);
+   ArrayResize(Bands_main, Bands_MaxPeriods + 1);
+   ArrayResize(Bands_upper, Bands_MaxPeriods + 1);
+   ArrayResize(Bands_lower, Bands_MaxPeriods + 1);
    ArrayFill(todo_queue, 0, ArraySize(todo_queue), 0); // Reset queue list.
 
    if (IsTesting()) {
@@ -627,14 +637,14 @@ bool UpdateIndicators() {
     if (VerboseTrace) { Print("RSI: ", GetArrayValues(RSI)); }
   }
 
-  if (BBands_Enabled) {
+  if (Bands_Enabled) {
     // Update the Bollinger Bands.
-    for (i = 0; i <= BBands_MaxPeriods; i++) {
-      BBands_main[i] = iBands(NULL, BBands_Timeframe, BBands_Period, BBands_Deviation, BBands_Shift, BBands_Applied_Price, MODE_MAIN, i);
-      BBands_upper[i] = iBands(NULL, BBands_Timeframe, BBands_Period, BBands_Deviation, BBands_Shift, BBands_Applied_Price, MODE_UPPER, i);
-      BBands_lower[i] = iBands(NULL, BBands_Timeframe, BBands_Period, BBands_Deviation, BBands_Shift, BBands_Applied_Price, MODE_LOWER, i);
+    for (i = 0; i <= Bands_MaxPeriods; i++) {
+      Bands_main[i] = iBands(NULL, Bands_Timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_MAIN, i);
+      Bands_upper[i] = iBands(NULL, Bands_Timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_UPPER, i);
+      Bands_lower[i] = iBands(NULL, Bands_Timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_LOWER, i);
     }
-    if (VerboseTrace) Print("Bands: Main: " + GetArrayValues(BBands_main) + "; Upper: " + GetArrayValues(BBands_upper) + "; Lower: " + GetArrayValues(BBands_lower));
+    if (VerboseTrace) Print("Bands: Main: " + GetArrayValues(Bands_main) + "; Upper: " + GetArrayValues(Bands_upper) + "; Lower: " + GetArrayValues(Bands_lower));
   }
 
   if (Alligator1_Enabled) {
@@ -784,11 +794,11 @@ bool DeMarkerOnBuy() {
 }
 
 bool WPROnSell() {
-  return (WPR <= (0.5 - WPR_OpenLevel));
+  return (WPR <= (0.5 - WPR_Filter));
 }
 
 bool WPROnBuy() {
-  return (WPR >= (0.5 + WPR_OpenLevel));
+  return (WPR >= (0.5 + WPR_Filter));
 }
 
 double LowestValue(double& arr[]) {
@@ -1091,23 +1101,7 @@ double GetTrailingStop(int cmd, double previous, int order_type = -1, bool exist
    double trail_stop = 0;
    double delta = market_stoplevel * Point + GetMarketSpread(); // Delta price.
    double default_trail = If(cmd == OP_BUY, Bid - TrailingStop * pip_size - delta, Ask + TrailingStop * pip_size + delta);
-   int method = 0;
-   switch (order_type) {
-     case FRACTALS_ON_BUY:
-     case FRACTALS_ON_SELL:
-       method = If(Fractals_TrailingStopMethod > 0, Fractals_TrailingStopMethod, TrailingStopMethod);
-       break;
-     case ALLIGATOR1_ON_BUY:
-     case ALLIGATOR1_ON_SELL:
-       method = If(Alligator1_TrailingStopMethod > 0, Alligator1_TrailingStopMethod, TrailingStopMethod);
-       break;
-     case DEMARKER_ON_BUY:
-     case DEMARKER_ON_SELL:
-       method = If(DeMarker_TrailingStopMethod > 0, DeMarker_TrailingStopMethod, TrailingStopMethod);
-       break;
-     default:
-       method = TrailingStopMethod;
-   }
+   int method = GetTrailingMethod(order_type, -1);
    switch (method) {
      case 0: // None
        trail_stop = previous;
@@ -1174,23 +1168,7 @@ double GetTrailingProfit(int cmd, double previous, int order_type = -1, bool exi
    double profit_take = 0;
    double delta = market_stoplevel * Point + GetMarketSpread(); // Delta price.
    double default_trail = If(cmd == OP_BUY, Bid + TrailingProfit * pip_size + delta, Ask - TrailingProfit * pip_size - delta);
-   int method = 0;
-   switch (order_type) {
-     case FRACTALS_ON_BUY:
-     case FRACTALS_ON_SELL:
-       method = If(Fractals_TrailingProfitMethod > 0, Fractals_TrailingProfitMethod, TrailingProfitMethod);
-       break;
-     case ALLIGATOR1_ON_BUY:
-     case ALLIGATOR1_ON_SELL:
-       method = If(Alligator1_TrailingProfitMethod > 0, Alligator1_TrailingProfitMethod, TrailingProfitMethod);
-       break;
-     case DEMARKER_ON_BUY:
-     case DEMARKER_ON_SELL:
-       method = If(DeMarker_TrailingProfitMethod > 0, DeMarker_TrailingProfitMethod, TrailingStopMethod);
-       break;
-     default:
-       method = TrailingProfitMethod;
-   }
+   int method = GetTrailingMethod(order_type, 1);
    switch (method) {
      case 0: // None
        profit_take = previous;
@@ -1246,6 +1224,56 @@ double GetTrailingProfit(int cmd, double previous, int order_type = -1, bool exi
    // if (VerboseTrace && profit_take != previous) Print("GetProfitStop(", method, "): New Profit Stop: ", profit_take, "; Old: ", previous, "; ", GetOrderTextDetails());
    if (VerboseDebug && IsVisualMode()) ShowLine("take_profit_" + OrderTicket(), profit_take, Gold);
    return profit_take;
+}
+
+// Get trailing method based on the strategy type.
+int GetTrailingMethod(int order_type, int stop_or_profit) {
+  int stop_method = 0, profit_method = 0;
+  switch (order_type) {
+    case MACD_ON_BUY:
+    case MACD_ON_SELL:
+      if (MACD_TrailingStopMethod > 0)   stop_method   = MACD_TrailingStopMethod;
+      if (MACD_TrailingProfitMethod > 0) profit_method = MACD_TrailingProfitMethod;
+      break;
+    case FRACTALS_ON_BUY:
+    case FRACTALS_ON_SELL:
+      if (Fractals_TrailingStopMethod > 0)   stop_method   = Fractals_TrailingStopMethod;
+      if (Fractals_TrailingProfitMethod > 0) profit_method = Fractals_TrailingProfitMethod;
+      break;
+    case ALLIGATOR1_ON_BUY:
+    case ALLIGATOR1_ON_SELL:
+      if (Alligator1_TrailingStopMethod > 0)   stop_method   = Alligator1_TrailingStopMethod;
+      if (Alligator1_TrailingProfitMethod > 0) profit_method = Alligator1_TrailingProfitMethod;
+      break;
+    case ALLIGATOR2_ON_BUY:
+    case ALLIGATOR2_ON_SELL:
+      if (Alligator2_TrailingStopMethod > 0)   stop_method   = Alligator2_TrailingStopMethod;
+      if (Alligator2_TrailingProfitMethod > 0) profit_method = Alligator2_TrailingProfitMethod;
+      break;
+    case DEMARKER_ON_BUY:
+    case DEMARKER_ON_SELL:
+      if (DeMarker_TrailingStopMethod > 0)   stop_method   = DeMarker_TrailingStopMethod;
+      if (DeMarker_TrailingProfitMethod > 0) profit_method = DeMarker_TrailingProfitMethod;
+      break;
+    case WPR_ON_BUY:
+    case WPR_ON_SELL:
+      if (WPR_TrailingStopMethod > 0)   stop_method   = WPR_TrailingStopMethod;
+      if (WPR_TrailingProfitMethod > 0) profit_method = WPR_TrailingProfitMethod;
+      break;
+    case BANDS_ON_BUY:
+    case BANDS_ON_SELL:
+      if (Bands_TrailingStopMethod > 0)   stop_method   = Bands_TrailingStopMethod;
+      if (Bands_TrailingProfitMethod > 0) profit_method = Bands_TrailingProfitMethod;
+      break;
+    case RSI_ON_BUY:
+    case RSI_ON_SELL:
+      if (RSI_TrailingStopMethod > 0)   stop_method   = RSI_TrailingStopMethod;
+      if (RSI_TrailingProfitMethod > 0) profit_method = RSI_TrailingProfitMethod;
+      break;
+    default:
+      if (VerboseDebug) Print(__FUNCTION__ + "(): Unknown order type: " + order_type);
+  }
+  return If(stop_or_profit > 1, profit_method, stop_method);
 }
 
 void ShowLine(string name, double price, int colour = Yellow) {
@@ -1665,7 +1693,7 @@ string GetOrdersStats() {
   int iwpr_orders = open_orders[WPR_ON_BUY] + open_orders[WPR_ON_SELL];
   int alligator1_orders = open_orders[ALLIGATOR1_ON_BUY] + open_orders[ALLIGATOR2_ON_SELL];
   int alligator2_orders = open_orders[ALLIGATOR1_ON_BUY] + open_orders[ALLIGATOR2_ON_SELL];
-  int bbands_orders = open_orders[BBANDS_ON_BUY] + open_orders[BBANDS_ON_SELL];
+  int bbands_orders = open_orders[BANDS_ON_BUY] + open_orders[BANDS_ON_SELL];
   int rsi_orders = open_orders[RSI_ON_BUY] + open_orders[RSI_ON_SELL];
   string orders_per_type = "Stats: ";
   if (total_orders > 0) {
@@ -1676,7 +1704,7 @@ string GetOrdersStats() {
      if (WPR_Enabled && iwpr_orders > 0) orders_per_type += "WPR: " + MathFloor(100 / total_orders * iwpr_orders) + "%, ";
      if (Alligator1_Enabled && alligator1_orders > 0) orders_per_type += "Alligator1: " + MathFloor(100 / total_orders * alligator1_orders) + "%, ";
      if (Alligator2_Enabled && alligator2_orders > 0) orders_per_type += "Alligator2: " + MathFloor(100 / total_orders * alligator2_orders) + "%, ";
-     if (BBands_Enabled && bbands_orders > 0) orders_per_type += "Bands: " + MathFloor(100 / total_orders * bbands_orders) + "%, ";
+     if (Bands_Enabled && bbands_orders > 0) orders_per_type += "Bands: " + MathFloor(100 / total_orders * bbands_orders) + "%, ";
      if (RSI_Enabled && rsi_orders > 0) orders_per_type += "RSI: " + MathFloor(100 / total_orders * rsi_orders) + "%, ";
   } else {
     orders_per_type += "No orders open yet.";
