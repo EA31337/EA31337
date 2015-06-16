@@ -153,9 +153,11 @@ extern int Alligator2_Shift = 0;
 extern string ____DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --";
 extern bool DeMarker_Enabled = TRUE; // Enable DeMarker-based strategy.
 extern ENUM_TIMEFRAMES DeMarker_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int DeMarker_Period = 18; // Suggested range: 16-20.
+extern int DeMarker_Period = 12; // Suggested range: 10-20.
 extern int DeMarker_Shift = 0; // Shift relative to the current bar the given amount of periods ago. Suggested value: 0.
 extern double DeMarker_Filter = 0.0; // Valid range: 0.0-0.4. Suggested value: 0.0.
+extern int DeMarker_TrailingStopMethod = 9; // Trailing Stop method for DeMarker. Range: 0-10. Set 0 to default.
+extern int DeMarker_TrailingProfitMethod = 1; // Trailing Profit method for DeMarker. Range: 0-10. Set 0 to default.
 
 extern string ____WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --";
 extern bool WPR_Enabled = TRUE; // Enable WPR-based strategy.
@@ -287,7 +289,8 @@ double Fractals_lower, Fractals_upper;
  *   - add the Envelopes indicator,
  *   - add the Force Index indicator (iForce) (http://docs.mql4.com/indicators/iforce),
  *   - add the Moving Average of Oscillator indicator (iOsMA) (http://docs.mql4.com/indicators/iosma),
- *   - BearsPower, BullsPower
+ *   - BearsPower, BullsPower,
+ *   - combined strategies doesn't add up (e.g. 2015.01.10-2015.04.28 test: Fractals+Alligator = 978+1241 != 1909)
  */
 
 /*
@@ -1098,6 +1101,10 @@ double GetTrailingStop(int cmd, double previous, int order_type = -1, bool exist
      case ALLIGATOR1_ON_SELL:
        method = If(Alligator1_TrailingStopMethod > 0, Alligator1_TrailingStopMethod, TrailingStopMethod);
        break;
+     case DEMARKER_ON_BUY:
+     case DEMARKER_ON_SELL:
+       method = If(DeMarker_TrailingStopMethod > 0, DeMarker_TrailingStopMethod, TrailingStopMethod);
+       break;
      default:
        method = TrailingStopMethod;
    }
@@ -1176,6 +1183,10 @@ double GetTrailingProfit(int cmd, double previous, int order_type = -1, bool exi
      case ALLIGATOR1_ON_BUY:
      case ALLIGATOR1_ON_SELL:
        method = If(Alligator1_TrailingProfitMethod > 0, Alligator1_TrailingProfitMethod, TrailingProfitMethod);
+       break;
+     case DEMARKER_ON_BUY:
+     case DEMARKER_ON_SELL:
+       method = If(DeMarker_TrailingProfitMethod > 0, DeMarker_TrailingProfitMethod, TrailingStopMethod);
        break;
      default:
        method = TrailingProfitMethod;
