@@ -4,7 +4,7 @@
 #property description "EA31337"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "100.003"
+#property version   "100.004"
 //#property strict
 
 #include <stderror.mqh>
@@ -71,6 +71,7 @@ extern bool EATrailingStopOneWay = TRUE; // Change trailing stop towards one dir
 extern double EATrailingProfit = 20;
 extern int EATrailingProfitMethod = 3; // Trailing Profit method. Set 0 to disable. Range: 0-10. Suggested value: 0, 1, 4 or 10.
 extern bool EATrailingProfitOneWay = TRUE; // Change trailing profit take towards one direction only.
+extern int EADelayBetweenTrades = 0; // Delay in bars between the placed orders. Set 0 for no limits.
 
 // extern double EAMinChangeOrders = 5; // Minimum change in pips between placed orders.
 // extern double EADelayBetweenOrders = 0; // Minimum delay in seconds between placed orders. FIXME: Fix relative delay in backtesting.
@@ -115,19 +116,25 @@ extern int MACD_ShiftFar = 2; // Additional MACD far value in number of bars rel
 extern string ____Fractals_Parameters__ = "-- Settings for the Fractals indicator --";
 extern bool Fractals_Enabled = TRUE; // Enable Fractals-based strategy.
 extern ENUM_TIMEFRAMES Fractals_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int Fractals_MaxPeriods = 1; // Suggested range: 1-5, Suggested value: 1
+extern int Fractals_MaxPeriods = 3; // Suggested range: 1-5, Suggested value: 3
+extern int Fractals_Shift = 0; // Shift relative to the chart. Suggested value: 0.
 
-// iCustom(NULL, Alligator_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 0, 0);
 extern string ____Alligator_1_Parameters__ = "-- Settings for the Alligator 1 indicator --";
 extern bool Alligator1_Enabled = TRUE; // Enable Alligator custom-based strategy.
 extern ENUM_TIMEFRAMES Alligator1_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern double Alligator1_Ratio = 0.5; // Suggested to not change. Suggested range: 0.0-5.0
+extern int Alligator1_Jaw_Period = 13; // Blue line averaging period (Alligator's Jaw).
+extern int Alligator1_Jaw_Shift = 8; // Blue line shift relative to the chart.
+extern int Alligator1_Teeth_Period = 8; // Red line averaging period (Alligator's Teeth).
+extern int Alligator1_Teeth_Shift = 5; // Red line shift relative to the chart.
+extern int Alligator1_Lips_Period = 5; // Green line averaging period (Alligator's Lips).
+extern int Alligator1_Lips_Shift = 3; // Green line shift relative to the chart.
+extern double Alligator1_OpenLevel = 0.5; // Suggested to not change. Suggested range: 0.0-5.0
 extern int Alligator1_Shift = 0;
 
 extern string ____Alligator_2_Parameters__ = "-- Settings for the Alligator 2 indicator --";
 extern bool Alligator2_Enabled = FALSE; // Enable Alligator-based strategy.
 extern ENUM_TIMEFRAMES Alligator2_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int Alligator2_Jaw_Period = 13; // Blue line averaging period (Alligator's Jaw).
+extern int Alligator2_Jaw_Period = 15; // Blue line averaging period (Alligator's Jaw).
 extern int Alligator2_Jaw_Shift = 8; // Blue line shift relative to the chart.
 extern int Alligator2_Teeth_Period = 8; // Red line averaging period (Alligator's Teeth).
 extern int Alligator2_Teeth_Shift = 5; // Red line shift relative to the chart.
@@ -135,7 +142,7 @@ extern int Alligator2_Lips_Period = 5; // Green line averaging period (Alligator
 extern int Alligator2_Lips_Shift = 3; // Green line shift relative to the chart.
 extern ENUM_MA_METHOD Alligator2_MA_Method = MODE_SMMA; // MA method (See: ENUM_MA_METHOD).
 extern ENUM_APPLIED_PRICE Alligator2_Applied_Price = PRICE_MEDIAN; // Applied price. It can be any of ENUM_APPLIED_PRICE enumeration values.
-extern double Alligator2_Ratio = 0.5; // Suggested to not change. Suggested range: 0.0-5.0
+extern double Alligator2_OpenLevel = 0.5; // Suggested to not change. Suggested range: 0.0-5.0
 extern int Alligator2_Shift = 0;
 
 extern string ____DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --";
@@ -150,7 +157,7 @@ extern bool WPR_Enabled = TRUE; // Enable WPR-based strategy.
 extern ENUM_TIMEFRAMES WPR_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int WPR_Period = 12; // Suggested value: 12.
 extern int WPR_Shift = 1; // Shift relative to the current bar the given amount of periods ago. Suggested value: 1.
-extern int WPR_Filter = 0.0; // Suggested range: 0.0-0.5. Suggested value: 0.4.
+extern int WPR_OpenLevel = 0.0; // Suggested range: 0.0-0.5. Suggested value: 0.0.
 
 extern string ____RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --";
 extern bool RSI_Enabled = FALSE; // Enable RSI-based strategy.
@@ -607,9 +614,9 @@ bool UpdateIndicators() {
 
   if (Alligator1_Enabled) {
     // Update Alligator indicator values.
-    Alligator1[0] = iCustom(NULL, Alligator1_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 0, 0);
-    Alligator1[1] = iCustom(NULL, Alligator1_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 1, 0);
-    Alligator1[2] = iCustom(NULL, Alligator1_Timeframe, "Alligator", 13, 8, 8, 5, 5, 3, 2, 0);
+    Alligator1[0] = iCustom(NULL, Alligator1_Timeframe, "Alligator", Alligator1_Jaw_Period, Alligator1_Jaw_Shift, Alligator1_Teeth_Period, Alligator1_Teeth_Shift, Alligator1_Lips_Period, Alligator1_Lips_Shift, 0, 0);
+    Alligator1[1] = iCustom(NULL, Alligator1_Timeframe, "Alligator", Alligator1_Jaw_Period, Alligator1_Jaw_Shift, Alligator1_Teeth_Period, Alligator1_Teeth_Shift, Alligator1_Lips_Period, Alligator1_Lips_Shift, 1, 0);
+    Alligator1[2] = iCustom(NULL, Alligator1_Timeframe, "Alligator", Alligator1_Jaw_Period, Alligator1_Jaw_Shift, Alligator1_Teeth_Period, Alligator1_Teeth_Shift, Alligator1_Lips_Period, Alligator1_Lips_Shift, 2, 0);
     if (VerboseTrace) Print("Alligator1: ", GetArrayValues(Alligator1));
   }
 
@@ -640,9 +647,9 @@ bool UpdateIndicators() {
     Fractals_lower = 0;
     Fractals_upper = 0;
     for (i = 0; i <= Fractals_MaxPeriods; i++) {
-      ifractal = iFractals(NULL, Fractals_Timeframe, MODE_LOWER, i);
+      ifractal = iFractals(NULL, Fractals_Timeframe, MODE_LOWER, i + Fractals_Shift);
       if (ifractal != 0.0) Fractals_lower = ifractal;
-      ifractal = iFractals(NULL, Fractals_Timeframe, MODE_UPPER, i);
+      ifractal = iFractals(NULL, Fractals_Timeframe, MODE_UPPER, i + Fractals_Shift);
       if (ifractal != 0.0) Fractals_upper = ifractal;
     }
     if (VerboseTrace && Fractals_lower != 0.0 && Fractals_upper != 0.0) Print("Fractals_lower: ", Fractals_lower, ", Fractals_upper:", Fractals_upper);
@@ -700,36 +707,36 @@ bool MACDOnSell() {
 bool Alligator1OnBuy() {
   // if (VerboseTrace) Print("AlligatorOnBuy(): ", NormalizeDouble(Alligator[2] - Alligator[1], PipPrecision), ",", NormalizeDouble(Alligator[1] - Alligator[0], PipPrecision), ",", NormalizeDouble(Alligator[2] - Alligator[0], PipPrecision), " >= ", NormalizeDouble(Alligator_Ratio * PipSize, PipPrecision));
    return (
-      Alligator1[2] - Alligator1[1] >= Alligator1_Ratio * PipSize &&
-      Alligator1[1] - Alligator1[0] >= Alligator1_Ratio * PipSize &&
-      Alligator1[2] - Alligator1[0] >= Alligator1_Ratio * PipSize
+      Alligator1[2] - Alligator1[1] >= Alligator1_OpenLevel * PipSize &&
+      Alligator1[1] - Alligator1[0] >= Alligator1_OpenLevel * PipSize &&
+      Alligator1[2] - Alligator1[0] >= Alligator1_OpenLevel * PipSize
    );
 }
 
 bool Alligator1OnSell() {
   // if (VerboseTrace) Print("AlligatorOnSell(): ", NormalizeDouble(Alligator[1] - Alligator[2], PipPrecision), ",", NormalizeDouble(Alligator[0] - Alligator[1], PipPrecision), ",", NormalizeDouble(Alligator[0] - Alligator[2], PipPrecision), " >= ", NormalizeDouble(Alligator_Ratio * PipSize, PipPrecision));
    return (
-      Alligator1[1] - Alligator1[2] >= Alligator1_Ratio * PipSize &&
-      Alligator1[0] - Alligator1[1] >= Alligator1_Ratio * PipSize &&
-      Alligator1[0] - Alligator1[2] >= Alligator1_Ratio * PipSize
+      Alligator1[1] - Alligator1[2] >= Alligator1_OpenLevel * PipSize &&
+      Alligator1[0] - Alligator1[1] >= Alligator1_OpenLevel * PipSize &&
+      Alligator1[0] - Alligator1[2] >= Alligator1_OpenLevel * PipSize
    );
 }
 
 bool Alligator2OnBuy() {
   // if (VerboseTrace) Print("AlligatorOnBuy(): ", NormalizeDouble(Alligator[2] - Alligator[1], PipPrecision), ",", NormalizeDouble(Alligator[1] - Alligator[0], PipPrecision), ",", NormalizeDouble(Alligator[2] - Alligator[0], PipPrecision), " >= ", NormalizeDouble(Alligator_Ratio * PipSize, PipPrecision));
    return (
-      Alligator2[2] - Alligator2[1] >= Alligator2_Ratio * PipSize &&
-      Alligator2[1] - Alligator2[0] >= Alligator2_Ratio * PipSize &&
-      Alligator2[2] - Alligator2[0] >= Alligator2_Ratio * PipSize
+      Alligator2[2] - Alligator2[1] >= Alligator2_OpenLevel * PipSize &&
+      Alligator2[1] - Alligator2[0] >= Alligator2_OpenLevel * PipSize &&
+      Alligator2[2] - Alligator2[0] >= Alligator2_OpenLevel * PipSize
    );
 }
 
 bool Alligator2OnSell() {
   // if (VerboseTrace) Print("AlligatorOnSell(): ", NormalizeDouble(Alligator[1] - Alligator[2], PipPrecision), ",", NormalizeDouble(Alligator[0] - Alligator[1], PipPrecision), ",", NormalizeDouble(Alligator[0] - Alligator[2], PipPrecision), " >= ", NormalizeDouble(Alligator_Ratio * PipSize, PipPrecision));
    return (
-      Alligator2[1] - Alligator2[2] >= Alligator2_Ratio * PipSize &&
-      Alligator2[0] - Alligator2[1] >= Alligator2_Ratio * PipSize &&
-      Alligator2[0] - Alligator2[2] >= Alligator2_Ratio * PipSize
+      Alligator2[1] - Alligator2[2] >= Alligator2_OpenLevel * PipSize &&
+      Alligator2[0] - Alligator2[1] >= Alligator2_OpenLevel * PipSize &&
+      Alligator2[0] - Alligator2[2] >= Alligator2_OpenLevel * PipSize
    );
 }
 
@@ -752,11 +759,11 @@ bool DeMarkerOnBuy() {
 }
 
 bool WPROnSell() {
-  return (WPR <= (0.5 - WPR_Filter));
+  return (WPR <= (0.5 - WPR_OpenLevel));
 }
 
 bool WPROnBuy() {
-  return (WPR >= (0.5 + WPR_Filter));
+  return (WPR >= (0.5 + WPR_OpenLevel));
 }
 
 double LowestValue(double& arr[]) {
@@ -785,7 +792,8 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
    volume = NormalizeLots(volume);
 
    // Check if bar time has been changed since last time.
-   if (last_order_time == iTime(NULL, PERIOD_M1, 0)) {
+   if (last_order_time == iTime(NULL, PERIOD_M1, 0) && EADelayBetweenTrades > 0) {
+     // FIXME
      return (FALSE);
    }
 
@@ -1436,12 +1444,13 @@ double NormalizePrice(double p, string pair=""){
 }
 
 // Calculate number of order allowed given risk ratio.
+// Note: Optimal minimum should be 5, otherwise trading with this kind of EA doesn't make any sense.
 int GetMaxOrdersAuto() {
   double free     = AccountFreeMargin();
   double leverage = AccountLeverage();
   double one_lot  = MarketInfo(Symbol(), MODE_MARGINREQUIRED);// Price of 1 lot
   double margin_risk = 0.5; // Percent of free margin to use (50%).
-  return (free * margin_risk / one_lot * (100 / leverage) / GetLotSize()) * GetRiskRatio();
+  return MathMax((free * margin_risk / one_lot * (100 / leverage) / GetLotSize()) * GetRiskRatio(), 5);
 }
 
 // Calculate number of maximum of orders allowed to open.
