@@ -221,7 +221,7 @@ extern bool MaxTries = 5; // Number of maximum attempts to execute the order.
 //   6: PRICE_WEIGHTED (Average price, (high + low + close + close)/4
 
 // Market/session variables.
-double PipSize;
+double pip_size;
 double market_maxlot;
 double market_minlot;
 double market_lotstep;
@@ -232,7 +232,7 @@ int gmt_offset = 0;
 // Account variables.
 string account_type;
 double acc_leverage;
-int PipPrecision;
+int pip_precision;
 int volume_precision;
 
 // State variables.
@@ -283,6 +283,15 @@ double Fractals_lower, Fractals_upper;
  *   - BearsPower, BullsPower
  */
 
+/*
+ * Predefined constants:
+ *   Ask - The latest known seller's price (ask price) of the current symbol.
+ *   Bid - The latest known buyer's price (offer price, bid price) of the current symbol.
+ *   Point - The current symbol point value in the quote currency.
+ *   Digits - Number of digits after decimal point for the current symbol prices.
+ *   Bars - Number of bars in the current chart.
+ */
+
 //+------------------------------------------------------------------+
 //| Expert tick function                                             |
 //+------------------------------------------------------------------+
@@ -328,15 +337,15 @@ int OnInit() {
 
    // TODO: IsDllsAllowed(), IsLibrariesAllowed()
 
-   if (Digits < 4) {
-      PipSize = 0.01;
-      PipPrecision = 2;
-   } else {
-      PipSize = 0.0001;
-      PipPrecision = 4;
-   }
-   if (PipPrecision == 0 && VerboseErrors) Print("Warning: The pip precision is 0!");
-   if (TradeMicroLots) volume_precision = 2; else volume_precision = 1;
+  // Calculate pip size and precision.
+  if (Digits < 4) {
+    pip_size = 0.01;
+    pip_precision = 2;
+  } else {
+    pip_size = 0.0001;
+    pip_precision = 4;
+  }
+  if (TradeMicroLots) volume_precision = 2; else volume_precision = 1;
 
    // Initialize startup variables.
    session_initiated = FALSE;
@@ -348,7 +357,7 @@ int OnInit() {
    // market_stoplevel = MarketInfo(Symbol(), MODE_STOPLEVEL);
 
    if (market_marginrequired == 0) market_marginrequired = 10; // FIX for 'zero divide' bug when MODE_MARGINREQUIRED is zero
-   order_slippage = EAOrderPriceSlippage * MathPow(10, Digits - PipPrecision);
+   order_slippage = EAOrderPriceSlippage * MathPow(10, Digits - pip_precision);
    GMT_Offset = EAManualGMToffset;
    ArrayResize(RSI, RSI_MaxPeriods + 1);
    ArrayResize(BBands_main, BBands_MaxPeriods + 1);
@@ -370,10 +379,12 @@ int OnInit() {
    }
 
    if (VerboseInfo) {
-      Print("MarketInfo: Symbol: ", Symbol(), ", MINLOT=" + market_minlot + "MAXLOT=" + market_maxlot +  ", LOTSTEP=" + market_lotstep, ", MODE_MARGINREQUIRED=" + market_marginrequired, ", MODE_STOPLEVEL", market_stoplevel);
-      Print("AccountInfo: AccountLeverage: ", acc_leverage, ", PipSize = ", PipSize);
-      Print(GetAccountTextDetails());
-      Print("EA limits: Lot size:", GetLotSize(), "; Max orders: ", GetMaxOrders(), "; Max orders per type: ", GetMaxOrdersPerType());
+     Print(__FUNCTION__, "(): Predefined variables: Bars = ", Bars, ", Ask = ", Ask, ", Bid = ", Bid, ", Digits = ", Digits, ", Point = ", DoubleToStr(Point, Digits));
+     Print(__FUNCTION__, "(): Market info: Symbol: ", Symbol(), ", MINLOT=" + market_minlot + ", MAXLOT=" + market_maxlot +  ", LOTSTEP=" + market_lotstep, ", MODE_MARGINREQUIRED=" + market_marginrequired, ", MODE_STOPLEVEL=", market_stoplevel);
+     Print(__FUNCTION__, "(): Account info: AccountLeverage: ", acc_leverage);
+     Print(__FUNCTION__, "(): Broker info: ", AccountCompany(), ", pip size = ", pip_size, ", points per pip = ", GetPointsPerPip(), ", pip precision = ", pip_precision, ", volume precision = ", volume_precision);
+     Print(__FUNCTION__, "(): EA info: Lot size = ", GetLotSize(), "; Max orders = ", GetMaxOrders(), "; Max orders per type = ", GetMaxOrdersPerType());
+     Print(__FUNCTION__, "(): ", GetAccountTextDetails());
    }
 
    session_active = TRUE;
@@ -389,7 +400,7 @@ void OnDeinit(const int reason) {
   ea_active = TRUE;
   if (VerboseDebug) Print("Calling " + __FUNCTION__);
   if (VerboseInfo) {
-    Print("EA deinitializing, reason: " + getUninitReasonText(reason) + "(code: " + reason + ")");
+    Print("EA deinitializing, reason: " + getUninitReasonText(reason) + " (code: " + reason + ")"); // Also: _UninitReason.
     Print(GetSummaryText());
   }
 
@@ -705,38 +716,38 @@ bool MACDOnSell() {
 }
 
 bool Alligator1OnBuy() {
-  // if (VerboseTrace) Print("AlligatorOnBuy(): ", NormalizeDouble(Alligator[2] - Alligator[1], PipPrecision), ",", NormalizeDouble(Alligator[1] - Alligator[0], PipPrecision), ",", NormalizeDouble(Alligator[2] - Alligator[0], PipPrecision), " >= ", NormalizeDouble(Alligator_Ratio * PipSize, PipPrecision));
+  // if (VerboseTrace) Print("AlligatorOnBuy(): ", NormalizeDouble(Alligator[2] - Alligator[1], pip_precision), ",", NormalizeDouble(Alligator[1] - Alligator[0], pip_precision), ",", NormalizeDouble(Alligator[2] - Alligator[0], pip_precision), " >= ", NormalizeDouble(Alligator_Ratio * pip_size, pip_precision));
    return (
-      Alligator1[2] - Alligator1[1] >= Alligator1_OpenLevel * PipSize &&
-      Alligator1[1] - Alligator1[0] >= Alligator1_OpenLevel * PipSize &&
-      Alligator1[2] - Alligator1[0] >= Alligator1_OpenLevel * PipSize
+      Alligator1[2] - Alligator1[1] >= Alligator1_OpenLevel * pip_size &&
+      Alligator1[1] - Alligator1[0] >= Alligator1_OpenLevel * pip_size &&
+      Alligator1[2] - Alligator1[0] >= Alligator1_OpenLevel * pip_size
    );
 }
 
 bool Alligator1OnSell() {
-  // if (VerboseTrace) Print("AlligatorOnSell(): ", NormalizeDouble(Alligator[1] - Alligator[2], PipPrecision), ",", NormalizeDouble(Alligator[0] - Alligator[1], PipPrecision), ",", NormalizeDouble(Alligator[0] - Alligator[2], PipPrecision), " >= ", NormalizeDouble(Alligator_Ratio * PipSize, PipPrecision));
+  // if (VerboseTrace) Print("AlligatorOnSell(): ", NormalizeDouble(Alligator[1] - Alligator[2], pip_precision), ",", NormalizeDouble(Alligator[0] - Alligator[1], pip_precision), ",", NormalizeDouble(Alligator[0] - Alligator[2], pip_precision), " >= ", NormalizeDouble(Alligator_Ratio * pip_size, pip_precision));
    return (
-      Alligator1[1] - Alligator1[2] >= Alligator1_OpenLevel * PipSize &&
-      Alligator1[0] - Alligator1[1] >= Alligator1_OpenLevel * PipSize &&
-      Alligator1[0] - Alligator1[2] >= Alligator1_OpenLevel * PipSize
+      Alligator1[1] - Alligator1[2] >= Alligator1_OpenLevel * pip_size &&
+      Alligator1[0] - Alligator1[1] >= Alligator1_OpenLevel * pip_size &&
+      Alligator1[0] - Alligator1[2] >= Alligator1_OpenLevel * pip_size
    );
 }
 
 bool Alligator2OnBuy() {
-  // if (VerboseTrace) Print("AlligatorOnBuy(): ", NormalizeDouble(Alligator[2] - Alligator[1], PipPrecision), ",", NormalizeDouble(Alligator[1] - Alligator[0], PipPrecision), ",", NormalizeDouble(Alligator[2] - Alligator[0], PipPrecision), " >= ", NormalizeDouble(Alligator_Ratio * PipSize, PipPrecision));
+  // if (VerboseTrace) Print("AlligatorOnBuy(): ", NormalizeDouble(Alligator[2] - Alligator[1], pip_precision), ",", NormalizeDouble(Alligator[1] - Alligator[0], pip_precision), ",", NormalizeDouble(Alligator[2] - Alligator[0], pip_precision), " >= ", NormalizeDouble(Alligator_Ratio * pip_size, pip_precision));
    return (
-      Alligator2[2] - Alligator2[1] >= Alligator2_OpenLevel * PipSize &&
-      Alligator2[1] - Alligator2[0] >= Alligator2_OpenLevel * PipSize &&
-      Alligator2[2] - Alligator2[0] >= Alligator2_OpenLevel * PipSize
+      Alligator2[2] - Alligator2[1] >= Alligator2_OpenLevel * pip_size &&
+      Alligator2[1] - Alligator2[0] >= Alligator2_OpenLevel * pip_size &&
+      Alligator2[2] - Alligator2[0] >= Alligator2_OpenLevel * pip_size
    );
 }
 
 bool Alligator2OnSell() {
-  // if (VerboseTrace) Print("AlligatorOnSell(): ", NormalizeDouble(Alligator[1] - Alligator[2], PipPrecision), ",", NormalizeDouble(Alligator[0] - Alligator[1], PipPrecision), ",", NormalizeDouble(Alligator[0] - Alligator[2], PipPrecision), " >= ", NormalizeDouble(Alligator_Ratio * PipSize, PipPrecision));
+  // if (VerboseTrace) Print("AlligatorOnSell(): ", NormalizeDouble(Alligator[1] - Alligator[2], pip_precision), ",", NormalizeDouble(Alligator[0] - Alligator[1], pip_precision), ",", NormalizeDouble(Alligator[0] - Alligator[2], pip_precision), " >= ", NormalizeDouble(Alligator_Ratio * pip_size, pip_precision));
    return (
-      Alligator2[1] - Alligator2[2] >= Alligator2_OpenLevel * PipSize &&
-      Alligator2[0] - Alligator2[1] >= Alligator2_OpenLevel * PipSize &&
-      Alligator2[0] - Alligator2[2] >= Alligator2_OpenLevel * PipSize
+      Alligator2[1] - Alligator2[2] >= Alligator2_OpenLevel * pip_size &&
+      Alligator2[0] - Alligator2[1] >= Alligator2_OpenLevel * pip_size &&
+      Alligator2[0] - Alligator2[2] >= Alligator2_OpenLevel * pip_size
    );
 }
 
@@ -829,12 +840,12 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
    // Calculate take profit and stop loss.
    RefreshRates();
    double stoploss = 0, takeprofit = 0;
-   if (EAStopLoss > 0.0) stoploss = GetClosePrice(cmd) - (EAStopLoss + EATrailingStop) * PipSize * OpTypeValue(cmd);
+   if (EAStopLoss > 0.0) stoploss = GetClosePrice(cmd) - (EAStopLoss + EATrailingStop) * pip_size * OpTypeValue(cmd);
    else stoploss = GetTrailingStop(EATrailingStopMethod, cmd, 0);
-   if (EATakeProfit > 0.0) takeprofit = order_price + (EATakeProfit + EATrailingProfit) * PipSize * OpTypeValue(cmd);
+   if (EATakeProfit > 0.0) takeprofit = order_price + (EATakeProfit + EATrailingProfit) * pip_size * OpTypeValue(cmd);
    else takeprofit = GetTrailingProfit(EATrailingProfitMethod, cmd, 0);
 
-   order_ticket = OrderSend(Symbol(), cmd, volume, order_price, EAOrderPriceSlippage, stoploss, takeprofit, order_comment, MagicNumber + order_type, 0, If(cmd == OP_BUY, ColorBuy, ColorSell));
+   order_ticket = OrderSend(Symbol(), cmd, volume, order_price, order_slippage, stoploss, takeprofit, order_comment, MagicNumber + order_type, 0, If(cmd == OP_BUY, ColorBuy, ColorSell));
    if (order_ticket >= 0) {
       if (!OrderSelect(order_ticket, SELECT_BY_TICKET) && VerboseErrors) {
         Print("Error in ExecuteOrder(): OrderSelect() error = ", ErrorDescription(GetLastError()));
@@ -852,8 +863,8 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
       if (SendEmail) EASendEmail();
 
       /*
-      if ((EATakeProfit * PipSize > GetMinStopLevel() || EATakeProfit == 0.0) &&
-         (EAStopLoss * PipSize > GetMinStopLevel() || EAStopLoss == 0.0)) {
+      if ((EATakeProfit * pip_size > GetMinStopLevel() || EATakeProfit == 0.0) &&
+         (EAStopLoss * pip_size > GetMinStopLevel() || EAStopLoss == 0.0)) {
             result = OrderModify(order_ticket, order_price, stoploss, takeprofit, 0, Red);
             if (!result && VerboseErrors) {
               Print("Error in ExecuteOrder(): OrderModify() error = ", ErrorDescription(GetLastError()));
@@ -867,7 +878,7 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
      err_code = GetLastError();
      if (VerboseErrors) Print("Error in ExecuteOrder(): OrderSend(): error = ", ErrorDescription(err_code));
      if (VerboseDebug) {
-       Print("ExecuteOrder(): OrderSend(", Symbol(), ", ",  _OrderType_str(cmd), ", ", volume, ", ", order_price, ", ", EAOrderPriceSlippage, ", ", stoploss, ", ", takeprofit, ", ", order_comment, ", ", MagicNumber + order_type, ", 0, ", If(cmd == OP_BUY, ColorBuy, ColorSell), "); ", GetAccountTextDetails());
+       Print("ExecuteOrder(): OrderSend(", Symbol(), ", ",  _OrderType_str(cmd), ", ", volume, ", ", order_price, ", ", order_slippage, ", ", stoploss, ", ", takeprofit, ", ", order_comment, ", ", MagicNumber + order_type, ", 0, ", If(cmd == OP_BUY, ColorBuy, ColorSell), "); ", GetAccountTextDetails());
      }
      // if (err_code != 136 /* OFF_QUOTES */) break;
      if (retry) TaskAddOrderOpen(cmd, volume, order_type, order_comment); // Will re-try again.
@@ -881,7 +892,7 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
 
    if (cmd == OP_BUY) new_price = Ask; else new_price = Bid;
 
-   if (NormalizeDouble(MathAbs((new_price - order_price) / PipSize), 0) > max_change) {
+   if (NormalizeDouble(MathAbs((new_price - order_price) / pip_size), 0) > max_change) {
      if (VerboseDebug) {
        Print("Price changed, not executing order: ", cmd);
      }
@@ -951,26 +962,26 @@ bool ValidTrailingStop(double trail_stop, int cmd, bool existing = FALSE) {
   bool valid = trail_stop == 0 || (cmd == OP_BUY  && price - trail_stop > delta) || (cmd == OP_SELL && trail_stop - price > delta);
   if (!valid && VerboseTrace) {
     if (cmd == OP_BUY)
-      Print("ValidTrailingStop(OP_BUY): #" + If(existing, OrderTicket(), 0) + ": ", price, " - ", trail_stop, " = ", price - trail_stop, " > ", DoubleToStr(delta, PipPrecision));
+      Print("ValidTrailingStop(OP_BUY): #" + If(existing, OrderTicket(), 0) + ": ", price, " - ", trail_stop, " = ", price - trail_stop, " > ", DoubleToStr(delta, pip_precision));
     if (cmd == OP_SELL)
-      Print("ValidTrailingStop(OP_SELL): #" + If(existing, OrderTicket(), 0) + ": ", trail_stop, " - ", price, " = ", trail_stop - price, " > ", DoubleToStr(delta, PipPrecision));
+      Print("ValidTrailingStop(OP_SELL): #" + If(existing, OrderTicket(), 0) + ": ", trail_stop, " - ", price, " = ", trail_stop - price, " > ", DoubleToStr(delta, pip_precision));
   }
   return valid;
 }
 
 // Validate value for profit take.
 bool ValidProfitTake(double profit_take, int cmd, bool existing = FALSE) {
-  //if (VerboseTrace && cmd ==  OP_BUY) Print("ValidProfitTake(OP_BUY): ", profit_take - Bid, " > ", NormalizeDouble(GetMinStopLevel(), PipPrecision));
-  //if (VerboseTrace && cmd ==  OP_SELL) Print("ValidProfitTake(OP_SELL): ", Ask - profit_take, " > ", NormalizeDouble(GetMinStopLevel(), PipPrecision));
-  //if (VerboseTrace) Print("ValidProfitTake(" + cmd + "): Delta: ", DoubleToStr(delta, PipPrecision));
+  //if (VerboseTrace && cmd ==  OP_BUY) Print("ValidProfitTake(OP_BUY): ", profit_take - Bid, " > ", NormalizeDouble(GetMinStopLevel(), pip_precision));
+  //if (VerboseTrace && cmd ==  OP_SELL) Print("ValidProfitTake(OP_SELL): ", Ask - profit_take, " > ", NormalizeDouble(GetMinStopLevel(), pip_precision));
+  //if (VerboseTrace) Print("ValidProfitTake(" + cmd + "): Delta: ", DoubleToStr(delta, pip_precision));
   double delta = GetMarketMinGap() * Point + GetMarketSpread(); // Delta price.
   double price = If(existing, OrderOpenPrice(), If(cmd == OP_BUY, Bid, Ask));
   bool valid = profit_take == 0 || (cmd ==  OP_BUY && profit_take - price > delta) || (cmd == OP_SELL && price - profit_take  > delta);
   if (!valid && VerboseTrace) {
     if (cmd == OP_BUY)
-      Print("ValidProfitTake(OP_BUY): #" + If(existing, OrderTicket(), 0) + ": ", profit_take, " - ", price, " = ", profit_take - price, " > ", DoubleToStr(delta, PipPrecision));
+      Print("ValidProfitTake(OP_BUY): #" + If(existing, OrderTicket(), 0) + ": ", profit_take, " - ", price, " = ", profit_take - price, " > ", DoubleToStr(delta, pip_precision));
     if (cmd == OP_SELL)
-      Print("ValidProfitTake(OP_SELL): #" + If(existing, OrderTicket(), 0) + ": ", price, " - ", profit_take, " = ", price - profit_take, " > ", DoubleToStr(delta, PipPrecision));
+      Print("ValidProfitTake(OP_SELL): #" + If(existing, OrderTicket(), 0) + ": ", price, " - ", profit_take, " = ", price - profit_take, " > ", DoubleToStr(delta, pip_precision));
   }
   return valid;
 }
@@ -1000,8 +1011,9 @@ void UpdateTrailingStops() {
    for (int i = 0; i < OrdersTotal(); i++) {
      if (!OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) continue;
       if (OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
-        // order_stop_loss = NormalizeDouble(If(OpTypeValue(OrderType()) > 0 || OrderStopLoss() != 0.0, OrderStopLoss(), 999999), PipPrecision);
+        // order_stop_loss = NormalizeDouble(If(OpTypeValue(OrderType()) > 0 || OrderStopLoss() != 0.0, OrderStopLoss(), 999999), pip_precision);
 
+        // FIXME
         if (EAMinimalizeLosses && GetOrderProfit() > GetMinStopLevel()) {
           if ((OrderType() == OP_BUY && OrderStopLoss() < Bid) ||
              (OrderType() == OP_SELL && OrderStopLoss() > Ask)) {
@@ -1038,7 +1050,7 @@ void UpdateTrailingStops() {
 double GetTrailingStop(int method, int cmd, double previous, bool existing = FALSE) {
    double trail_stop = 0;
    double delta = GetMarketMinGap() * Point + GetMarketSpread(); // Delta price.
-   double default_trail = If(cmd == OP_BUY, Bid - EATrailingStop * PipSize - delta, Ask + EATrailingStop * PipSize + delta);
+   double default_trail = If(cmd == OP_BUY, Bid - EATrailingStop * pip_size - delta, Ask + EATrailingStop * pip_size + delta);
    switch (method) {
      case 0: // None
        trail_stop = previous;
@@ -1047,31 +1059,31 @@ double GetTrailingStop(int method, int cmd, double previous, bool existing = FAL
        trail_stop = default_trail;
        break;
      case 2: // iMA Small (Current) - trailing stop
-       trail_stop = MA_Fast[0] - EATrailingStop * OpTypeValue(cmd) * PipSize - delta;
+       trail_stop = MA_Fast[0] - EATrailingStop * OpTypeValue(cmd) * pip_size - delta;
        break;
      case 3: // iMA Small (Previous) - trailing stop
-       trail_stop = MA_Fast[1] - EATrailingStop * OpTypeValue(cmd) * PipSize - delta;
+       trail_stop = MA_Fast[1] - EATrailingStop * OpTypeValue(cmd) * pip_size - delta;
        break;
      case 4: // iMA Small (Far) - trailing stop. Optimize together with: MA_Shift_Far.
-       trail_stop = MA_Fast[2] - EATrailingStop * OpTypeValue(cmd) * PipSize - delta;
+       trail_stop = MA_Fast[2] - EATrailingStop * OpTypeValue(cmd) * pip_size - delta;
        break;
      case 5: // iMA Medium (Current) - trailing stop
-       trail_stop = MA_Medium[0] - EATrailingStop * OpTypeValue(cmd) * PipSize - delta;
+       trail_stop = MA_Medium[0] - EATrailingStop * OpTypeValue(cmd) * pip_size - delta;
        break;
      case 6: // iMA Medium (Previous) - trailing stop
-       trail_stop = MA_Medium[1] - EATrailingStop * OpTypeValue(cmd) * PipSize - delta;
+       trail_stop = MA_Medium[1] - EATrailingStop * OpTypeValue(cmd) * pip_size - delta;
        break;
      case 7: // iMA Medium (Far) - trailing stop. Optimize together with: MA_Shift_Far.
-       trail_stop = MA_Medium[2] - EATrailingStop * OpTypeValue(cmd) * PipSize - delta;
+       trail_stop = MA_Medium[2] - EATrailingStop * OpTypeValue(cmd) * pip_size - delta;
        break;
      case 8: // iMA Slow (Current) - trailing stop
-       trail_stop = MA_Slow[0] - EATrailingStop * OpTypeValue(cmd) * PipSize - delta;
+       trail_stop = MA_Slow[0] - EATrailingStop * OpTypeValue(cmd) * pip_size - delta;
        break;
      case 9: // iMA Slow (Previous) - trailing stop
-       trail_stop = MA_Slow[1] - EATrailingStop * OpTypeValue(cmd) * PipSize - delta;
+       trail_stop = MA_Slow[1] - EATrailingStop * OpTypeValue(cmd) * pip_size - delta;
        break;
      case 10: // iMA Slow (Far) - trailing stop. Optimize together with: MA_Shift_Far.
-       trail_stop = MA_Slow[2] - EATrailingStop * OpTypeValue(cmd) * PipSize - delta;
+       trail_stop = MA_Slow[2] - EATrailingStop * OpTypeValue(cmd) * pip_size - delta;
        break;
      default:
        if (VerboseDebug) Print("Error in GetTrailingStop(): Unknown trailing stop method: ", method);
@@ -1080,7 +1092,7 @@ double GetTrailingStop(int method, int cmd, double previous, bool existing = FAL
    if (!ValidTrailingStop(trail_stop, cmd, existing)) {
      if (previous == 0) previous = default_trail;
      if (VerboseTrace)
-       Print("Error in GetTrailingStop(", method, "): #" + If(existing, OrderTicket(), 0) + ": Invalid Trailing Stop: ", trail_stop, "; Previous: ", previous, "; ", GetOrderTextDetails(), "; delta: ", DoubleToStr(delta, PipPrecision));
+       Print("Error in GetTrailingStop(", method, "): #" + If(existing, OrderTicket(), 0) + ": Invalid Trailing Stop: ", trail_stop, "; Previous: ", previous, "; ", GetOrderTextDetails(), "; delta: ", DoubleToStr(delta, pip_precision));
      // If value is invalid, fallback to standard one.
      //trail_stop = default_trail;
    }
@@ -1104,7 +1116,7 @@ double GetTrailingStop(int method, int cmd, double previous, bool existing = FAL
 double GetTrailingProfit(int method, int cmd, double previous, bool existing = FALSE) {
    double profit_take = 0;
    double delta = GetMarketMinGap() * Point + GetMarketSpread(); // Delta price.
-   double default_trail = If(cmd == OP_BUY, Bid + EATrailingProfit * PipSize + delta, Ask - EATrailingProfit * PipSize - delta);
+   double default_trail = If(cmd == OP_BUY, Bid + EATrailingProfit * pip_size + delta, Ask - EATrailingProfit * pip_size - delta);
    switch (method) {
      case 0: // None
        profit_take = previous;
@@ -1113,31 +1125,31 @@ double GetTrailingProfit(int method, int cmd, double previous, bool existing = F
        profit_take = default_trail;
        break;
      case 2: // iMA Small (Current) + trailing profit
-       profit_take = MA_Fast[0] + EATrailingProfit * OpTypeValue(cmd) * PipSize + delta;
+       profit_take = MA_Fast[0] + EATrailingProfit * OpTypeValue(cmd) * pip_size + delta;
        break;
      case 3: // iMA Small (Previous) + trailing profit.
-       profit_take = MA_Fast[1] + EATrailingProfit * OpTypeValue(cmd) * PipSize + delta;
+       profit_take = MA_Fast[1] + EATrailingProfit * OpTypeValue(cmd) * pip_size + delta;
        break;
      case 4: // iMA Small (Far) + trailing profit. Optimize together with: MA_Shift_Far.
-       profit_take = MA_Fast[2] + EATrailingProfit * OpTypeValue(cmd) * PipSize + delta;
+       profit_take = MA_Fast[2] + EATrailingProfit * OpTypeValue(cmd) * pip_size + delta;
        break;
      case 5: // iMA Medium (Current) + trailing profit
-       profit_take = MA_Medium[0] + EATrailingProfit * OpTypeValue(cmd) * PipSize + delta;
+       profit_take = MA_Medium[0] + EATrailingProfit * OpTypeValue(cmd) * pip_size + delta;
        break;
      case 6: // iMA Medium (Previous) + trailing profit
-       profit_take = MA_Medium[1] + EATrailingProfit * OpTypeValue(cmd) * PipSize + delta;
+       profit_take = MA_Medium[1] + EATrailingProfit * OpTypeValue(cmd) * pip_size + delta;
        break;
      case 7: // iMA Medium (Far) + trailing profit. Optimize together with: MA_Shift_Far.
-       profit_take = MA_Medium[2] + EATrailingProfit * OpTypeValue(cmd) * PipSize + delta;
+       profit_take = MA_Medium[2] + EATrailingProfit * OpTypeValue(cmd) * pip_size + delta;
        break;
      case 8: // iMA Slow (Current) + trailing profit
-       profit_take = MA_Slow[0] + EATrailingProfit * OpTypeValue(cmd) * PipSize + delta;
+       profit_take = MA_Slow[0] + EATrailingProfit * OpTypeValue(cmd) * pip_size + delta;
        break;
      case 9: // iMA Slow (Previous) + trailing profit
-       profit_take = MA_Slow[1] + EATrailingProfit * OpTypeValue(cmd) * PipSize + delta;
+       profit_take = MA_Slow[1] + EATrailingProfit * OpTypeValue(cmd) * pip_size + delta;
        break;
      case 10: // iMA Slow (Far) + trailing profit. Optimize together with: MA_Shift_Far.
-       profit_take = MA_Slow[2] + EATrailingProfit * OpTypeValue(cmd) * PipSize + delta;
+       profit_take = MA_Slow[2] + EATrailingProfit * OpTypeValue(cmd) * pip_size + delta;
        break;
      default:
        if (VerboseDebug) Print("Error in GetTrailingStop(): Unknown trailing stop method: ", method);
@@ -1146,7 +1158,7 @@ double GetTrailingProfit(int method, int cmd, double previous, bool existing = F
    if (!ValidProfitTake(profit_take, cmd)) {
      if (previous == 0) previous = default_trail;
      if (VerboseTrace)
-       Print("Error in GetTrailingProfit(", method, "): #" + If(existing, OrderTicket(), 0) + ": Invalid Profit Take: ", profit_take, "; Previous: ", previous, "; ", GetOrderTextDetails(), "; delta: ", DoubleToStr(delta, PipPrecision));
+       Print("Error in GetTrailingProfit(", method, "): #" + If(existing, OrderTicket(), 0) + ": Invalid Profit Take: ", profit_take, "; Previous: ", previous, "; ", GetOrderTextDetails(), "; delta: ", DoubleToStr(delta, pip_precision));
      // If value is invalid, fallback to standard one.
      //profit_take = default_trail;
    }
@@ -1389,7 +1401,7 @@ double GetMinStopLevel() {
 // Note: Using Mode_SPREAD can return 20 on EURUSD (IBFX), but zero on some other pairs, so using Ask - Bid instead.
 // See: http://forum.mql4.com/42285
 double GetMarketSpread() {
-  // return MarketInfo(Symbol(), MODE_SPREAD) / MathPow(10, Digits - PipPrecision);
+  // return MarketInfo(Symbol(), MODE_SPREAD) / MathPow(10, Digits - pip_precision);
   return Ask - Bid;
 }
 
@@ -1443,12 +1455,33 @@ double NormalizePrice(double p, string pair=""){
    return( MathRound(p/ts) * ts );
 }
 
+// Calculate number of points per pip.
+// To be used to replace Point for trade parameters calculations.
+// See: http://forum.mql4.com/30672
+// FIXME: Not foolproof, there are Symbols with 1 or 2 (gold) or other numbers of digits.
+double GetPointsPerPip() {
+  int d = Digits;
+  switch(d) {
+    case 2:
+    case 4:
+      d = Point;
+      break;
+    case 3:
+    case 5:
+      if (Point > 0) d = Point*10;
+      else d = 10;
+      break;
+    default: if (VerboseDebug) Print(__FUNCTION__ + "(): Unrecognised number of digits to calculate points per pip: ", d);
+  }
+  return d;
+}
+
 // Calculate number of order allowed given risk ratio.
 // Note: Optimal minimum should be 5, otherwise trading with this kind of EA doesn't make any sense.
 int GetMaxOrdersAuto() {
   double free     = AccountFreeMargin();
   double leverage = AccountLeverage();
-  double one_lot  = MarketInfo(Symbol(), MODE_MARGINREQUIRED);// Price of 1 lot
+  double one_lot  = MathMin(MarketInfo(Symbol(), MODE_MARGINREQUIRED), 10); // Price of 1 lot (minimum 10, to make sure we won't divide by zero).
   double margin_risk = 0.5; // Percent of free margin to use (50%).
   return MathMax((free * margin_risk / one_lot * (100 / leverage) / GetLotSize()) * GetRiskRatio(), 5);
 }
@@ -1518,7 +1551,7 @@ void DisplayInfoOnChart() {
    + "Last error: " + last_err + "\n"
    + "------------------------------------------------\n"
    + "MARKET INFORMATION:\n"
-   + "Spread: " + DoubleToStr(GetMarketSpread(), Digits - PipPrecision) + "\n"
+   + "Spread: " + DoubleToStr(GetMarketSpread(), Digits - pip_precision) + "\n"
    // + "Mini lot: " + MarketInfo(Symbol(), MODE_MINLOT) + "\n"
    + "------------------------------------------------\n"
   );
