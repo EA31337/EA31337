@@ -4,7 +4,7 @@
 #property description "EA31337"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "100.004"
+#property version   "100.005"
 //#property strict
 
 #include <stderror.mqh>
@@ -64,21 +64,22 @@ enum ENUM_ACTION_TYPE {
 
 // User parameters.
 extern string ____EA_Parameters__ = "-----------------------------------------";
-extern double EATrailingStop = 15;
-extern int EATrailingStopMethod = 4; // TrailingStop method. Set 0 to disable. Range: 0-10. Suggested value: 1 or 4.
-extern bool EATrailingStopOneWay = TRUE; // Change trailing stop towards one direction only. Suggested value: TRUE
-
-extern double EATrailingProfit = 20;
-extern int EATrailingProfitMethod = 3; // Trailing Profit method. Set 0 to disable. Range: 0-10. Suggested value: 0, 1, 4 or 10.
-extern bool EATrailingProfitOneWay = TRUE; // Change trailing profit take towards one direction only.
-extern int EADelayBetweenTrades = 0; // Delay in bars between the placed orders. Set 0 for no limits.
+//extern int EADelayBetweenTrades = 0; // Delay in bars between the placed orders. Set 0 for no limits.
 
 // extern double EAMinChangeOrders = 5; // Minimum change in pips between placed orders.
 // extern double EADelayBetweenOrders = 0; // Minimum delay in seconds between placed orders. FIXME: Fix relative delay in backtesting.
 extern bool EACloseOnMarketChange = FALSE; // Close orders on market change.
 extern bool EAMinimalizeLosses = FALSE; // Set stop loss to zero, once the order is profitable.
 extern int EAOrderPriceSlippage = 5; // Maximum price slippage for buy or sell orders.
-extern int EAManualGMToffset = 0;
+extern int EAMinPipGap = 40; // Minimum gap in pips between trades of the same strategy.
+
+extern string __EA_Trailing_Parameters__ = "-- Settings for trailing stops --";
+extern int TrailingStop = 15;
+extern int TrailingStopMethod = 4; // TrailingStop method. Set 0 to disable. Range: 0-10. Suggested value: 1 or 4.
+extern bool TrailingStopOneWay = TRUE; // Change trailing stop towards one direction only. Suggested value: TRUE
+extern int TrailingProfit = 20;
+extern int TrailingProfitMethod = 3; // Trailing Profit method. Set 0 to disable. Range: 0-10. Suggested value: 0, 1, 4 or 10.
+extern bool TrailingProfitOneWay = TRUE; // Change trailing profit take towards one direction only.
 
 extern string __EA_Order_Parameters__ = "-- Profit/Loss settings (set 0 for auto) --";
 extern double EALotSize = 0; // Default lot size. Set 0 for auto.
@@ -93,7 +94,7 @@ extern bool MA_Enabled = TRUE; // Enable MA-based strategy.
 extern ENUM_TIMEFRAMES MA_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int MA_Period_Fast = 5; // Suggested value: 5
 extern int MA_Period_Medium = 25; // Suggested value: 25
-extern int MA_Period_Slow = 50; // Suggested value: 50
+extern int MA_Period_Slow = 60; // Suggested value: 60
 extern int MA_Shift_Fast = 0; // Index of the value taken from the indicator buffer. Shift relative to the previous bar (+1).
 extern int MA_Shift_Medium = 1; // Index of the value taken from the indicator buffer. Shift relative to the previous bar (+1).
 extern int MA_Shift_Slow = 2; // Index of the value taken from the indicator buffer. Shift relative to the previous bar (+1).
@@ -104,20 +105,22 @@ extern ENUM_APPLIED_PRICE MA_Applied_Price = PRICE_WEIGHTED; // MA applied price
 extern string ____MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --";
 extern bool MACD_Enabled = TRUE; // Enable MACD-based strategy.
 extern ENUM_TIMEFRAMES MACD_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int MACD_Fast_Period = 12; // Fast EMA averaging period.
-extern int MACD_Slow_Period = 42; // Slow EMA averaging period.
-extern int MACD_Signal_Period = 9; // Signal line averaging period.
-extern double MACD_OpenLevel  = 1.8;
+extern int MACD_Fast_Period = 8; // Fast EMA averaging period.
+extern int MACD_Slow_Period = 50; // Slow EMA averaging period.
+extern int MACD_Signal_Period = 11; // Signal line averaging period.
+extern double MACD_OpenLevel  = 2.5;
 //extern double MACD_CloseLevel = 2; // Set 0 to disable.
-extern ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_OPEN; // MACD applied price (See: ENUM_APPLIED_PRICE). Range: 0-6. Suggested values: PRICE_OPEN, PRICE_TYPICAL.
+extern ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_CLOSE; // MACD applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern int MACD_Shift = 5; // Past MACD value in number of bars. Shift relative to the current bar the given amount of periods ago. Suggested value: 1
 extern int MACD_ShiftFar = 2; // Additional MACD far value in number of bars relatively to MACD_Shift.
 
 extern string ____Fractals_Parameters__ = "-- Settings for the Fractals indicator --";
 extern bool Fractals_Enabled = TRUE; // Enable Fractals-based strategy.
 extern ENUM_TIMEFRAMES Fractals_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int Fractals_MaxPeriods = 3; // Suggested range: 1-5, Suggested value: 3
-extern int Fractals_Shift = 0; // Shift relative to the chart. Suggested value: 0.
+extern int Fractals_MaxPeriods = 2; // Suggested range: 1-5, Suggested value: 3
+extern int Fractals_Shift = 2; // Shift relative to the chart. Suggested value: 0.
+extern int Fractals_TrailingStopMethod = 5; // Trailing Stop method for Fractals. Range: 0-10. Set 0 to default.
+extern int Fractals_TrailingProfitMethod = 4; // Trailing Profit method for Fractals. Range: 0-10. Set 0 to default.
 
 extern string ____Alligator_1_Parameters__ = "-- Settings for the Alligator 1 indicator --";
 extern bool Alligator1_Enabled = TRUE; // Enable Alligator custom-based strategy.
@@ -201,6 +204,7 @@ extern color ColorSell = Red;
 extern string ____Other_Parameters__ = "-----------------------------------------";
 extern int MagicNumber = 31337; // To help identify its own orders. It can vary in additional range: +20, see: ENUM_ORDER_TYPE.
 extern bool TradeMicroLots = TRUE;
+extern int EAManualGMToffset = 0;
 extern bool MaxTries = 5; // Number of maximum attempts to execute the order.
 //extern int TrailingStopDelay = 0; // How often trailing stop should be updated (in seconds). FIXME: Fix relative delay in backtesting.
 // extern int JobProcessDelay = 1; // How often job list should be processed (in seconds).
@@ -227,6 +231,7 @@ double market_minlot;
 double market_lotstep;
 double market_marginrequired;
 double market_stoplevel;
+int pts_per_pip; // Number points per pip.
 int gmt_offset = 0;
 
 // Account variables.
@@ -338,6 +343,7 @@ int OnInit() {
    // TODO: IsDllsAllowed(), IsLibrariesAllowed()
 
   // Calculate pip size and precision.
+  pts_per_pip = GetPointsPerPip();
   if (Digits < 4) {
     pip_size = 0.01;
     pip_precision = 2;
@@ -350,11 +356,13 @@ int OnInit() {
    // Initialize startup variables.
    session_initiated = FALSE;
 
-   // market_maxlot = MarketInfo(Symbol(), MODE_MAXLOT);
-   // market_minlot = MarketInfo(Symbol(), MODE_MINLOT);
-   // market_lotstep = MarketInfo(Symbol(), MODE_LOTSTEP);
-   // market_marginrequired = MarketInfo(Symbol(), MODE_MARGINREQUIRED) * market_lotstep;
-   // market_stoplevel = MarketInfo(Symbol(), MODE_STOPLEVEL);
+   market_minlot = MarketInfo(Symbol(), MODE_MINLOT);
+   if (market_minlot == 0.0) market_minlot = 0.1;
+   market_maxlot = MarketInfo(Symbol(), MODE_MAXLOT);
+   if (market_maxlot == 0.0) market_maxlot = 100;
+   market_lotstep = MarketInfo(Symbol(), MODE_LOTSTEP);
+   market_marginrequired = MarketInfo(Symbol(), MODE_MARGINREQUIRED) * market_lotstep;
+   market_stoplevel = MarketInfo(Symbol(), MODE_STOPLEVEL);
 
    if (market_marginrequired == 0) market_marginrequired = 10; // FIX for 'zero divide' bug when MODE_MARGINREQUIRED is zero
    order_slippage = EAOrderPriceSlippage * MathPow(10, Digits - pip_precision);
@@ -382,7 +390,7 @@ int OnInit() {
      Print(__FUNCTION__, "(): Predefined variables: Bars = ", Bars, ", Ask = ", Ask, ", Bid = ", Bid, ", Digits = ", Digits, ", Point = ", DoubleToStr(Point, Digits));
      Print(__FUNCTION__, "(): Market info: Symbol: ", Symbol(), ", MINLOT=" + market_minlot + ", MAXLOT=" + market_maxlot +  ", LOTSTEP=" + market_lotstep, ", MODE_MARGINREQUIRED=" + market_marginrequired, ", MODE_STOPLEVEL=", market_stoplevel);
      Print(__FUNCTION__, "(): Account info: AccountLeverage: ", acc_leverage);
-     Print(__FUNCTION__, "(): Broker info: ", AccountCompany(), ", pip size = ", pip_size, ", points per pip = ", GetPointsPerPip(), ", pip precision = ", pip_precision, ", volume precision = ", volume_precision);
+     Print(__FUNCTION__, "(): Broker info: ", AccountCompany(), ", pip size = ", pip_size, ", points per pip = ", pts_per_pip, ", pip precision = ", pip_precision, ", volume precision = ", volume_precision);
      Print(__FUNCTION__, "(): EA info: Lot size = ", GetLotSize(), "; Max orders = ", GetMaxOrders(), "; Max orders per type = ", GetMaxOrdersPerType());
      Print(__FUNCTION__, "(): ", GetAccountTextDetails());
    }
@@ -566,16 +574,17 @@ void CheckAccount() {
 bool UpdateIndicators() {
   // Check if bar time has been changed since last check.
   int bar_time = iTime(NULL, PERIOD_M1, 0);
+  /*
   if ((IsTesting() || IsOptimization()) && bar_time == last_indicators_update) {
     return (FALSE);
   } else {
     last_indicators_update = bar_time;
-  }
+  }*/
   if (VerboseTrace) Print("Calling " + __FUNCTION__);
 
   int i;
 
-  if (MA_Enabled || EATrailingStopMethod > 1 || EATrailingProfitMethod > 1) {
+  if (MA_Enabled || TrailingStopMethod > 1 || TrailingProfitMethod > 1) {
     // Update Moving Averages indicator values.
     MA_Fast[0] = iMA(NULL, MA_Timeframe, MA_Period_Fast, 0, MA_Method, MA_Applied_Price, 0); // Current
     MA_Fast[1] = iMA(NULL, MA_Timeframe, MA_Period_Fast, 0, MA_Method, MA_Applied_Price, 1 + MA_Shift_Fast); // Previous
@@ -659,11 +668,11 @@ bool UpdateIndicators() {
     Fractals_upper = 0;
     for (i = 0; i <= Fractals_MaxPeriods; i++) {
       ifractal = iFractals(NULL, Fractals_Timeframe, MODE_LOWER, i + Fractals_Shift);
-      if (ifractal != 0.0) Fractals_lower = ifractal;
+      if (ifractal > 0) Fractals_lower = ifractal;
       ifractal = iFractals(NULL, Fractals_Timeframe, MODE_UPPER, i + Fractals_Shift);
-      if (ifractal != 0.0) Fractals_upper = ifractal;
+      if (ifractal > 0) Fractals_upper = ifractal;
     }
-    if (VerboseTrace && Fractals_lower != 0.0 && Fractals_upper != 0.0) Print("Fractals_lower: ", Fractals_lower, ", Fractals_upper:", Fractals_upper);
+    if (VerboseTrace && (Fractals_lower != 0.0 || Fractals_upper != 0.0)) Print("Fractals_lower: ", Fractals_lower, ", Fractals_upper:", Fractals_upper);
   }
 
   return (TRUE);
@@ -752,11 +761,11 @@ bool Alligator2OnSell() {
 }
 
 bool FractalsOnBuy() {
-  return (Fractals_lower != 0.0);
+  return (Fractals_lower > 0.0);
 }
 
 bool FractalsOnSell() {
-  return (Fractals_upper != 0.0);
+  return (Fractals_upper > 0.0);
 }
 
 bool DeMarkerOnSell() {
@@ -803,23 +812,24 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
    volume = NormalizeLots(volume);
 
    // Check if bar time has been changed since last time.
+   /*
    if (last_order_time == iTime(NULL, PERIOD_M1, 0) && EADelayBetweenTrades > 0) {
      // FIXME
      return (FALSE);
-   }
+   }*/
 
    // Print current market information.
    if (VerboseTrace) Print(GetMarketTextDetails());
 
    // Check the limits.
    if (GetTotalOrders() >= GetMaxOrders()) {
-     err = "Error in ExecuteOrder(): Maximum open and pending orders reached the limit (EAMaxOrders).";
+     err = __FUNCTION__ + "(): Maximum open and pending orders reached the limit (EAMaxOrders).";
      if (VerboseErrors && err != last_err) Print(last_err);
      last_err = err;
      return (FALSE);
    }
    if (GetTotalOrdersByType(order_type) >= GetMaxOrdersPerType()) {
-     err = "Error in ExecuteOrder(): Maximum open and pending orders per type reached the limit (EAMaxOrdersPerType).";
+     err = __FUNCTION__ + "(): Maximum open and pending orders per type reached the limit (EAMaxOrdersPerType).";
      if (VerboseErrors && err != last_err) Print(last_err);
      last_err = err;
      return (FALSE);
@@ -831,19 +841,24 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
      return (FALSE);
    }*/
    if (!CheckFreeMargin(cmd, volume)) {
-     last_err = StringConcatenate("No money to open more orders.", GetAccountTextDetails());
+     last_err = __FUNCTION__ + "(): No money to open more orders.";
      if (PrintLogOnChart) Comment(last_err);
      if (VerboseErrors) Print(last_err);
+     return (FALSE);
+   }
+   if (!CheckMinPipGap(order_type)) {
+     last_err = __FUNCTION__ + "(): Not executing order, because of the minimum gap.";
+     if (VerboseDebug) Print(last_err);
      return (FALSE);
    }
 
    // Calculate take profit and stop loss.
    RefreshRates();
    double stoploss = 0, takeprofit = 0;
-   if (EAStopLoss > 0.0) stoploss = GetClosePrice(cmd) - (EAStopLoss + EATrailingStop) * pip_size * OpTypeValue(cmd);
-   else stoploss = GetTrailingStop(EATrailingStopMethod, cmd, 0);
-   if (EATakeProfit > 0.0) takeprofit = order_price + (EATakeProfit + EATrailingProfit) * pip_size * OpTypeValue(cmd);
-   else takeprofit = GetTrailingProfit(EATrailingProfitMethod, cmd, 0);
+   if (EAStopLoss > 0.0) stoploss = GetClosePrice(cmd) - (EAStopLoss + TrailingStop) * pip_size * OpTypeValue(cmd);
+   else stoploss = GetTrailingStop(cmd, 0, order_type);
+   if (EATakeProfit > 0.0) takeprofit = order_price + (EATakeProfit + TrailingProfit) * pip_size * OpTypeValue(cmd);
+   else takeprofit = GetTrailingProfit(cmd, 0, order_type);
 
    order_ticket = OrderSend(Symbol(), cmd, volume, order_price, order_slippage, stoploss, takeprofit, order_comment, MagicNumber + order_type, 0, If(cmd == OP_BUY, ColorBuy, ColorSell));
    if (order_ticket >= 0) {
@@ -934,7 +949,25 @@ int CloseOrdersByType(int order_type) {
    return (orders_total);
 }
 
-
+// Check if order match has minimum gap in pips configured by EAMinPipGap parameter.
+int CheckMinPipGap(int order_type) {
+  int min_gap = TRUE, diff;
+  for (int order = 0; order < OrdersTotal(); order++) {
+    if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
+       if (OrderMagicNumber() == MagicNumber+order_type && OrderSymbol() == Symbol()) {
+         diff = MathAbs((OrderOpenPrice() - GetOpenPrice()) / pip_size);
+         if (VerboseTrace) Print("Ticket: ", OrderTicket(), ", Order: ", OrderType(), ", Gap: ", diff);
+         if (diff < EAMinPipGap) {
+           return FALSE;
+         }
+       }
+    } else {
+      if (VerboseDebug)
+        Print("Error in CheckMinPipGap(" + order_type + "): Order: " + order + "; Message: ", GetErrorText(err_code));
+    }
+  }
+  return min_gap;
+}
 bool EACloseOrder(int ticket_no, string reason, bool retry = TRUE) {
   bool result;
   if (ticket_no > 0) result = OrderSelect(ticket_no, SELECT_BY_TICKET);
@@ -957,7 +990,7 @@ bool ValidTrailingStop(double trail_stop, int cmd, bool existing = FALSE) {
   // OP_SELL: if((OrderOpenPrice()-Ask)>(Point*TrailingStop)) | Ask+Point*TrailingStop
   // trail_stop > OrderStopLoss()
   // trail_stop < OrderStopLoss()
-  double delta = GetMarketMinGap() * Point + GetMarketSpread(); // Delta price.
+  double delta = market_stoplevel * Point + GetMarketSpread(); // Delta price.
   double price = If(existing, OrderOpenPrice(), If(cmd == OP_BUY, Bid, Ask));
   bool valid = trail_stop == 0 || (cmd == OP_BUY  && price - trail_stop > delta) || (cmd == OP_SELL && trail_stop - price > delta);
   if (!valid && VerboseTrace) {
@@ -974,7 +1007,7 @@ bool ValidProfitTake(double profit_take, int cmd, bool existing = FALSE) {
   //if (VerboseTrace && cmd ==  OP_BUY) Print("ValidProfitTake(OP_BUY): ", profit_take - Bid, " > ", NormalizeDouble(GetMinStopLevel(), pip_precision));
   //if (VerboseTrace && cmd ==  OP_SELL) Print("ValidProfitTake(OP_SELL): ", Ask - profit_take, " > ", NormalizeDouble(GetMinStopLevel(), pip_precision));
   //if (VerboseTrace) Print("ValidProfitTake(" + cmd + "): Delta: ", DoubleToStr(delta, pip_precision));
-  double delta = GetMarketMinGap() * Point + GetMarketSpread(); // Delta price.
+  double delta = market_stoplevel * Point + GetMarketSpread(); // Delta price.
   double price = If(existing, OrderOpenPrice(), If(cmd == OP_BUY, Bid, Ask));
   bool valid = profit_take == 0 || (cmd ==  OP_BUY && profit_take - price > delta) || (cmd == OP_SELL && price - profit_take  > delta);
   if (!valid && VerboseTrace) {
@@ -989,6 +1022,7 @@ bool ValidProfitTake(double profit_take, int cmd, bool existing = FALSE) {
 void UpdateTrailingStops() {
    bool result; // Check result of executed orders.
    double new_trailing_stop, new_profit_take;
+   int order_type;
    // double order_stop_loss;
    // double order_trail_stop_loss;
    // double order_take_profit;
@@ -1011,6 +1045,7 @@ void UpdateTrailingStops() {
    for (int i = 0; i < OrdersTotal(); i++) {
      if (!OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) continue;
       if (OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
+        order_type = OrderMagicNumber() - MagicNumber;
         // order_stop_loss = NormalizeDouble(If(OpTypeValue(OrderType()) > 0 || OrderStopLoss() != 0.0, OrderStopLoss(), 999999), pip_precision);
 
         // FIXME
@@ -1023,8 +1058,8 @@ void UpdateTrailingStops() {
           }
         }
 
-        new_trailing_stop = GetTrailingStop(EATrailingStopMethod, OrderType(), OrderStopLoss());
-        new_profit_take = GetTrailingProfit(EATrailingProfitMethod, OrderType(), OrderTakeProfit());
+        new_trailing_stop = GetTrailingStop(OrderType(), OrderStopLoss(), order_type, TRUE);
+        new_profit_take = GetTrailingProfit(OrderType(), OrderTakeProfit(), order_type, TRUE);
         if (new_trailing_stop != OrderStopLoss() || OrderTakeProfit() != new_profit_take) { // Perform update on change only.
            result = OrderModify(OrderTicket(), OrderOpenPrice(), new_trailing_stop, new_profit_take, 0, GetOrderColor());
            if (!result) {
@@ -1047,10 +1082,19 @@ void UpdateTrailingStops() {
 // Note: Suggested methods: 1 & 4, 5.
 // Params:
 //   bool existing: TRUE if the calculation is for particular existing order
-double GetTrailingStop(int method, int cmd, double previous, bool existing = FALSE) {
+double GetTrailingStop(int cmd, double previous, int order_type = -1, bool existing = FALSE) {
    double trail_stop = 0;
-   double delta = GetMarketMinGap() * Point + GetMarketSpread(); // Delta price.
-   double default_trail = If(cmd == OP_BUY, Bid - EATrailingStop * pip_size - delta, Ask + EATrailingStop * pip_size + delta);
+   double delta = market_stoplevel * Point + GetMarketSpread(); // Delta price.
+   double default_trail = If(cmd == OP_BUY, Bid - TrailingStop * pip_size - delta, Ask + TrailingStop * pip_size + delta);
+   int method = 0;
+   switch (order_type) {
+     case FRACTALS_ON_BUY:
+     case FRACTALS_ON_SELL:
+       method = If(Fractals_TrailingStopMethod > 0, Fractals_TrailingStopMethod, TrailingStopMethod);
+       break;
+     default:
+       method = TrailingStopMethod;
+   }
    switch (method) {
      case 0: // None
        trail_stop = previous;
@@ -1059,31 +1103,31 @@ double GetTrailingStop(int method, int cmd, double previous, bool existing = FAL
        trail_stop = default_trail;
        break;
      case 2: // iMA Small (Current) - trailing stop
-       trail_stop = MA_Fast[0] - EATrailingStop * OpTypeValue(cmd) * pip_size - delta;
+       trail_stop = MA_Fast[0] - TrailingStop * OpTypeValue(cmd) * pip_size - delta;
        break;
      case 3: // iMA Small (Previous) - trailing stop
-       trail_stop = MA_Fast[1] - EATrailingStop * OpTypeValue(cmd) * pip_size - delta;
+       trail_stop = MA_Fast[1] - TrailingStop * OpTypeValue(cmd) * pip_size - delta;
        break;
      case 4: // iMA Small (Far) - trailing stop. Optimize together with: MA_Shift_Far.
-       trail_stop = MA_Fast[2] - EATrailingStop * OpTypeValue(cmd) * pip_size - delta;
+       trail_stop = MA_Fast[2] - TrailingStop * OpTypeValue(cmd) * pip_size - delta;
        break;
      case 5: // iMA Medium (Current) - trailing stop
-       trail_stop = MA_Medium[0] - EATrailingStop * OpTypeValue(cmd) * pip_size - delta;
+       trail_stop = MA_Medium[0] - TrailingStop * OpTypeValue(cmd) * pip_size - delta;
        break;
      case 6: // iMA Medium (Previous) - trailing stop
-       trail_stop = MA_Medium[1] - EATrailingStop * OpTypeValue(cmd) * pip_size - delta;
+       trail_stop = MA_Medium[1] - TrailingStop * OpTypeValue(cmd) * pip_size - delta;
        break;
      case 7: // iMA Medium (Far) - trailing stop. Optimize together with: MA_Shift_Far.
-       trail_stop = MA_Medium[2] - EATrailingStop * OpTypeValue(cmd) * pip_size - delta;
+       trail_stop = MA_Medium[2] - TrailingStop * OpTypeValue(cmd) * pip_size - delta;
        break;
      case 8: // iMA Slow (Current) - trailing stop
-       trail_stop = MA_Slow[0] - EATrailingStop * OpTypeValue(cmd) * pip_size - delta;
+       trail_stop = MA_Slow[0] - TrailingStop * OpTypeValue(cmd) * pip_size - delta;
        break;
      case 9: // iMA Slow (Previous) - trailing stop
-       trail_stop = MA_Slow[1] - EATrailingStop * OpTypeValue(cmd) * pip_size - delta;
+       trail_stop = MA_Slow[1] - TrailingStop * OpTypeValue(cmd) * pip_size - delta;
        break;
      case 10: // iMA Slow (Far) - trailing stop. Optimize together with: MA_Shift_Far.
-       trail_stop = MA_Slow[2] - EATrailingStop * OpTypeValue(cmd) * pip_size - delta;
+       trail_stop = MA_Slow[2] - TrailingStop * OpTypeValue(cmd) * pip_size - delta;
        break;
      default:
        if (VerboseDebug) Print("Error in GetTrailingStop(): Unknown trailing stop method: ", method);
@@ -1092,18 +1136,18 @@ double GetTrailingStop(int method, int cmd, double previous, bool existing = FAL
    if (!ValidTrailingStop(trail_stop, cmd, existing)) {
      if (previous == 0) previous = default_trail;
      if (VerboseTrace)
-       Print("Error in GetTrailingStop(", method, "): #" + If(existing, OrderTicket(), 0) + ": Invalid Trailing Stop: ", trail_stop, "; Previous: ", previous, "; ", GetOrderTextDetails(), "; delta: ", DoubleToStr(delta, pip_precision));
+       Print("Error in GetTrailingStop(): #" + If(existing, OrderTicket(), 0) + ": Invalid Trailing Stop: ", trail_stop, "; Previous: ", previous, "; ", GetOrderTextDetails(), "; delta: ", DoubleToStr(delta, pip_precision));
      // If value is invalid, fallback to standard one.
      //trail_stop = default_trail;
    }
 
-   if (EATrailingStopOneWay && method > 0) { // If TRUE, move trailing stop only one direction.
+   if (TrailingStopOneWay && method > 0) { // If TRUE, move trailing stop only one direction.
      if (previous == 0) previous = default_trail;
      if (cmd == OP_SELL)     trail_stop = If(trail_stop < previous, trail_stop, previous);
      else if (cmd == OP_BUY) trail_stop = If(trail_stop > previous, trail_stop, previous);
    }
 
-   // if (VerboseTrace && trail_stop != OrderStopLoss()) Print("GetTrailingStop(", method, "): New Trailing Stop: ", trail_stop, "; Previous: ", previous, "; ", GetOrderTextDetails());
+   // if (VerboseTrace && trail_stop != OrderStopLoss()) Print("GetTrailingStop(): New Trailing Stop: ", trail_stop, "; Previous: ", previous, "; ", GetOrderTextDetails());
    if (VerboseDebug && IsVisualMode()) ShowLine("trail_stop_" + OrderTicket(), trail_stop, Orange);
    return trail_stop;
 }
@@ -1113,10 +1157,19 @@ double GetTrailingStop(int method, int cmd, double previous, bool existing = FAL
 // Note: Suggested methods: 1 & 4.
 // Params:
 //   bool existing: TRUE if the calculation is for particular existing order
-double GetTrailingProfit(int method, int cmd, double previous, bool existing = FALSE) {
+double GetTrailingProfit(int cmd, double previous, int order_type = -1, bool existing = FALSE) {
    double profit_take = 0;
-   double delta = GetMarketMinGap() * Point + GetMarketSpread(); // Delta price.
-   double default_trail = If(cmd == OP_BUY, Bid + EATrailingProfit * pip_size + delta, Ask - EATrailingProfit * pip_size - delta);
+   double delta = market_stoplevel * Point + GetMarketSpread(); // Delta price.
+   double default_trail = If(cmd == OP_BUY, Bid + TrailingProfit * pip_size + delta, Ask - TrailingProfit * pip_size - delta);
+   int method = 0;
+   switch (order_type) {
+     case FRACTALS_ON_BUY:
+     case FRACTALS_ON_SELL:
+       method = If(Fractals_TrailingProfitMethod > 0, Fractals_TrailingProfitMethod, TrailingProfitMethod);
+       break;
+     default:
+       method = TrailingProfitMethod;
+   }
    switch (method) {
      case 0: // None
        profit_take = previous;
@@ -1125,31 +1178,31 @@ double GetTrailingProfit(int method, int cmd, double previous, bool existing = F
        profit_take = default_trail;
        break;
      case 2: // iMA Small (Current) + trailing profit
-       profit_take = MA_Fast[0] + EATrailingProfit * OpTypeValue(cmd) * pip_size + delta;
+       profit_take = MA_Fast[0] + TrailingProfit * OpTypeValue(cmd) * pip_size + delta;
        break;
      case 3: // iMA Small (Previous) + trailing profit.
-       profit_take = MA_Fast[1] + EATrailingProfit * OpTypeValue(cmd) * pip_size + delta;
+       profit_take = MA_Fast[1] + TrailingProfit * OpTypeValue(cmd) * pip_size + delta;
        break;
      case 4: // iMA Small (Far) + trailing profit. Optimize together with: MA_Shift_Far.
-       profit_take = MA_Fast[2] + EATrailingProfit * OpTypeValue(cmd) * pip_size + delta;
+       profit_take = MA_Fast[2] + TrailingProfit * OpTypeValue(cmd) * pip_size + delta;
        break;
      case 5: // iMA Medium (Current) + trailing profit
-       profit_take = MA_Medium[0] + EATrailingProfit * OpTypeValue(cmd) * pip_size + delta;
+       profit_take = MA_Medium[0] + TrailingProfit * OpTypeValue(cmd) * pip_size + delta;
        break;
      case 6: // iMA Medium (Previous) + trailing profit
-       profit_take = MA_Medium[1] + EATrailingProfit * OpTypeValue(cmd) * pip_size + delta;
+       profit_take = MA_Medium[1] + TrailingProfit * OpTypeValue(cmd) * pip_size + delta;
        break;
      case 7: // iMA Medium (Far) + trailing profit. Optimize together with: MA_Shift_Far.
-       profit_take = MA_Medium[2] + EATrailingProfit * OpTypeValue(cmd) * pip_size + delta;
+       profit_take = MA_Medium[2] + TrailingProfit * OpTypeValue(cmd) * pip_size + delta;
        break;
      case 8: // iMA Slow (Current) + trailing profit
-       profit_take = MA_Slow[0] + EATrailingProfit * OpTypeValue(cmd) * pip_size + delta;
+       profit_take = MA_Slow[0] + TrailingProfit * OpTypeValue(cmd) * pip_size + delta;
        break;
      case 9: // iMA Slow (Previous) + trailing profit
-       profit_take = MA_Slow[1] + EATrailingProfit * OpTypeValue(cmd) * pip_size + delta;
+       profit_take = MA_Slow[1] + TrailingProfit * OpTypeValue(cmd) * pip_size + delta;
        break;
      case 10: // iMA Slow (Far) + trailing profit. Optimize together with: MA_Shift_Far.
-       profit_take = MA_Slow[2] + EATrailingProfit * OpTypeValue(cmd) * pip_size + delta;
+       profit_take = MA_Slow[2] + TrailingProfit * OpTypeValue(cmd) * pip_size + delta;
        break;
      default:
        if (VerboseDebug) Print("Error in GetTrailingStop(): Unknown trailing stop method: ", method);
@@ -1163,7 +1216,7 @@ double GetTrailingProfit(int method, int cmd, double previous, bool existing = F
      //profit_take = default_trail;
    }
 
-   if (EATrailingProfitOneWay && method > 0) { // If TRUE, move profit take only one direction.
+   if (TrailingProfitOneWay && method > 0) { // If TRUE, move profit take only one direction.
      if (previous == 0 && method > 0) previous = default_trail;
      if (cmd == OP_SELL)     profit_take = If(profit_take < previous, profit_take, previous);
      else if (cmd == OP_BUY) profit_take = If(profit_take > previous, profit_take, previous);
@@ -1181,14 +1234,16 @@ void ShowLine(string name, double price, int colour = Yellow) {
 }
 
 // Get current open price depending on the operation type.
-double GetOpenPrice(int op_type) {
-   // op_type: SELL = -1, BUY = 1
-   return (If(OpTypeValue(op_type)> 0, Ask, Bid));
+// op_type: SELL = -1, BUY = 1
+double GetOpenPrice(int op_type = 0) {
+   if (op_type == 0) op_type = OrderType();
+   return (If(OpTypeValue(op_type) > 0, Ask, Bid));
 }
 
 // Get current close price depending on the operation type.
-double GetClosePrice(int op_type) {
-   // op_type: SELL = -1, BUY = 1
+// op_type: SELL = -1, BUY = 1
+double GetClosePrice(int op_type = 0) {
+   if (op_type == 0) op_type = OrderType();
    return (If(OpTypeValue(op_type) > 0, Bid, Ask));
 }
 
@@ -1393,7 +1448,7 @@ double GetOrderColor() {
 
 // Get minimal permissible StopLoss/TakeProfit value in points.
 double GetMinStopLevel() {
-  return MarketInfo(Symbol(), MODE_STOPLEVEL) * Point;
+  return market_stoplevel * Point;
 }
 
 // Current market spread value in pips.
@@ -1405,29 +1460,17 @@ double GetMarketSpread() {
   return Ask - Bid;
 }
 
-// Get current market stop level in points.
-double GetMarketMinGap() {
-  return MarketInfo(Symbol(),MODE_STOPLEVEL);  // Unit is in points.
-}
-
 double NormalizeLots(double lots, bool ceiling = FALSE, string pair = "") {
    double lotsize;
    double precision;
-   if (pair == "" || pair == "0") pair = Symbol();
-   double lotstep = MarketInfo(pair, MODE_LOTSTEP);
-   double  minlot = MarketInfo(pair, MODE_MINLOT);
-   double  maxlot = MarketInfo(pair, MODE_MAXLOT);
-   if (minlot == 0.0) minlot = 0.1;
-   if (maxlot == 0.0) maxlot = 100;
-
-   if (lotstep > 0.0) precision = 1 / lotstep;
-   else precision = 1 / minlot;
+   if (market_lotstep > 0.0) precision = 1 / market_lotstep;
+   else precision = 1 / market_minlot;
 
    if (ceiling) lotsize = MathCeil(lots * precision) / precision;
    else lotsize = MathFloor(lots * precision) / precision;
 
-   if (lotsize < minlot) lotsize = minlot;
-   if (lotsize > maxlot) lotsize = maxlot;
+   if (lotsize < market_minlot) lotsize = market_minlot;
+   if (lotsize > market_maxlot) lotsize = market_maxlot;
    return (lotsize);
 }
 
@@ -1459,6 +1502,7 @@ double NormalizePrice(double p, string pair=""){
 // To be used to replace Point for trade parameters calculations.
 // See: http://forum.mql4.com/30672
 // FIXME: Not foolproof, there are Symbols with 1 or 2 (gold) or other numbers of digits.
+// FIXME: Probably broken, needs re-write.
 double GetPointsPerPip() {
   int d = Digits;
   switch(d) {
@@ -1500,12 +1544,9 @@ int GetMaxOrdersPerType() {
 double GetAutoLotSize() {
   double free      = AccountFreeMargin();
   double leverage  = AccountLeverage();
-  double min_lot   = MarketInfo(Symbol(), MODE_MINLOT);
-  double max_lot   = MarketInfo(Symbol(), MODE_MAXLOT);
-  double one_lot   = MarketInfo(Symbol(), MODE_MARGINREQUIRED); // Free margin required to open 1 lot for buying.
   double margin_risk = 0.01; // Percent of free margin to use per order (1%).
-  double avail_lots = free / one_lot * (100 / leverage);
-  return MathMin(MathMax(avail_lots * min_lot * margin_risk * GetRiskRatio(), min_lot), max_lot);
+  double avail_lots = free / market_marginrequired * (100 / leverage);
+  return MathMin(MathMax(avail_lots * market_minlot * margin_risk * GetRiskRatio(), market_minlot), market_maxlot);
 }
 
 // Return current lot size to trade.
