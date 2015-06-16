@@ -4,7 +4,7 @@
 #property description "EA31337"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "100.006"
+#property version   "100.007"
 //#property strict
 
 #include <stderror.mqh>
@@ -105,16 +105,16 @@ extern ENUM_APPLIED_PRICE MA_Applied_Price = PRICE_WEIGHTED; // MA applied price
 extern string ____MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --";
 extern bool MACD_Enabled = TRUE; // Enable MACD-based strategy.
 extern ENUM_TIMEFRAMES MACD_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int MACD_Fast_Period = 8; // Fast EMA averaging period.
+extern int MACD_Fast_Period = 5; // Fast EMA averaging period.
 extern int MACD_Slow_Period = 50; // Slow EMA averaging period.
 extern int MACD_Signal_Period = 11; // Signal line averaging period.
-extern double MACD_OpenLevel  = 2.5;
+extern double MACD_OpenLevel  = 1.5;
 //extern double MACD_CloseLevel = 2; // Set 0 to disable.
 extern ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_CLOSE; // MACD applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern int MACD_Shift = 5; // Past MACD value in number of bars. Shift relative to the current bar the given amount of periods ago. Suggested value: 1
 extern int MACD_ShiftFar = 2; // Additional MACD far value in number of bars relatively to MACD_Shift.
-extern int MACD_TrailingStopMethod = 5; // Trailing Stop method for MACD. Range: 0-10. Set 0 to default.
-extern int MACD_TrailingProfitMethod = 4; // Trailing Profit method for MACD. Range: 0-10. Set 0 to default.
+extern int MACD_TrailingStopMethod = 8; // Trailing Stop method for MACD. Range: 0-10. Set 0 to default.
+extern int MACD_TrailingProfitMethod = 3; // Trailing Profit method for MACD. Range: 0-10. Set 0 to default.
 
 extern string ____Fractals_Parameters__ = "-- Settings for the Fractals indicator --";
 extern bool Fractals_Enabled = TRUE; // Enable Fractals-based strategy.
@@ -1693,7 +1693,7 @@ string GetOrdersStats() {
   int iwpr_orders = open_orders[WPR_ON_BUY] + open_orders[WPR_ON_SELL];
   int alligator1_orders = open_orders[ALLIGATOR1_ON_BUY] + open_orders[ALLIGATOR2_ON_SELL];
   int alligator2_orders = open_orders[ALLIGATOR1_ON_BUY] + open_orders[ALLIGATOR2_ON_SELL];
-  int bbands_orders = open_orders[BANDS_ON_BUY] + open_orders[BANDS_ON_SELL];
+  int bands_orders = open_orders[BANDS_ON_BUY] + open_orders[BANDS_ON_SELL];
   int rsi_orders = open_orders[RSI_ON_BUY] + open_orders[RSI_ON_SELL];
   string orders_per_type = "Stats: ";
   if (total_orders > 0) {
@@ -1704,7 +1704,7 @@ string GetOrdersStats() {
      if (WPR_Enabled && iwpr_orders > 0) orders_per_type += "WPR: " + MathFloor(100 / total_orders * iwpr_orders) + "%, ";
      if (Alligator1_Enabled && alligator1_orders > 0) orders_per_type += "Alligator1: " + MathFloor(100 / total_orders * alligator1_orders) + "%, ";
      if (Alligator2_Enabled && alligator2_orders > 0) orders_per_type += "Alligator2: " + MathFloor(100 / total_orders * alligator2_orders) + "%, ";
-     if (Bands_Enabled && bbands_orders > 0) orders_per_type += "Bands: " + MathFloor(100 / total_orders * bbands_orders) + "%, ";
+     if (Bands_Enabled && bands_orders > 0) orders_per_type += "Bands: " + MathFloor(100 / total_orders * bands_orders) + "%, ";
      if (RSI_Enabled && rsi_orders > 0) orders_per_type += "RSI: " + MathFloor(100 / total_orders * rsi_orders) + "%, ";
   } else {
     orders_per_type += "No orders open yet.";
