@@ -133,6 +133,8 @@ extern int Alligator1_Lips_Period = 5; // Green line averaging period (Alligator
 extern int Alligator1_Lips_Shift = 3; // Green line shift relative to the chart.
 extern double Alligator1_OpenLevel = 0.5; // Suggested to not change. Suggested range: 0.0-5.0
 extern int Alligator1_Shift = 0;
+extern int Alligator1_TrailingStopMethod = 9; // Trailing Stop method for Alligator1. Range: 0-10. Set 0 to default.
+extern int Alligator1_TrailingProfitMethod = 1; // Trailing Profit method for Alligator1. Range: 0-10. Set 0 to default.
 
 extern string ____Alligator_2_Parameters__ = "-- Settings for the Alligator 2 indicator --";
 extern bool Alligator2_Enabled = FALSE; // Enable Alligator-based strategy.
@@ -574,12 +576,12 @@ void CheckAccount() {
 bool UpdateIndicators() {
   // Check if bar time has been changed since last check.
   int bar_time = iTime(NULL, PERIOD_M1, 0);
-  /*
+
   if ((IsTesting() || IsOptimization()) && bar_time == last_indicators_update) {
     return (FALSE);
   } else {
     last_indicators_update = bar_time;
-  }*/
+  }
   if (VerboseTrace) Print("Calling " + __FUNCTION__);
 
   int i;
@@ -1092,6 +1094,10 @@ double GetTrailingStop(int cmd, double previous, int order_type = -1, bool exist
      case FRACTALS_ON_SELL:
        method = If(Fractals_TrailingStopMethod > 0, Fractals_TrailingStopMethod, TrailingStopMethod);
        break;
+     case ALLIGATOR1_ON_BUY:
+     case ALLIGATOR1_ON_SELL:
+       method = If(Alligator1_TrailingStopMethod > 0, Alligator1_TrailingStopMethod, TrailingStopMethod);
+       break;
      default:
        method = TrailingStopMethod;
    }
@@ -1166,6 +1172,10 @@ double GetTrailingProfit(int cmd, double previous, int order_type = -1, bool exi
      case FRACTALS_ON_BUY:
      case FRACTALS_ON_SELL:
        method = If(Fractals_TrailingProfitMethod > 0, Fractals_TrailingProfitMethod, TrailingProfitMethod);
+       break;
+     case ALLIGATOR1_ON_BUY:
+     case ALLIGATOR1_ON_SELL:
+       method = If(Alligator1_TrailingProfitMethod > 0, Alligator1_TrailingProfitMethod, TrailingProfitMethod);
        break;
      default:
        method = TrailingProfitMethod;
