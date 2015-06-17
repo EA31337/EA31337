@@ -4,7 +4,7 @@
 #property description "EA31337"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "100.008"
+#property version   "100.009"
 //#property strict
 
 #include <stderror.mqh>
@@ -244,7 +244,7 @@ double market_maxlot;
 double market_minlot;
 double market_lotstep;
 double market_marginrequired;
-double market_stoplevel;
+double market_stoplevel; // Market stop level in points.
 int pts_per_pip; // Number points per pip.
 int gmt_offset = 0;
 
@@ -378,8 +378,8 @@ int OnInit() {
    market_lotstep = MarketInfo(Symbol(), MODE_LOTSTEP);
    market_marginrequired = MarketInfo(Symbol(), MODE_MARGINREQUIRED) * market_lotstep;
    if (market_marginrequired == 0) market_marginrequired = 10; // FIX for 'zero divide' bug when MODE_MARGINREQUIRED is zero
-   market_stoplevel = MarketInfo(Symbol(), MODE_STOPLEVEL);
-   max_order_slippage = MaxOrderPriceSlippage * MathPow(10, Digits - pip_precision); // Maximum price slippage for buy or sell orders (in points).
+   market_stoplevel = MarketInfo(Symbol(), MODE_STOPLEVEL); // Market stop level in points.
+   max_order_slippage = MaxOrderPriceSlippage * MathPow(10, Digits - pip_precision); // Maximum price slippage for buy or sell orders (converted into points).
 
    GMT_Offset = EAManualGMToffset;
    ArrayResize(RSI, RSI_MaxPeriods + 1);
@@ -403,7 +403,7 @@ int OnInit() {
 
    if (VerboseInfo) {
      Print(__FUNCTION__, "(): Predefined variables: Bars = ", Bars, ", Ask = ", Ask, ", Bid = ", Bid, ", Digits = ", Digits, ", Point = ", DoubleToStr(Point, Digits));
-     Print(__FUNCTION__, "(): Market info: Symbol: ", Symbol(), ", MINLOT=" + market_minlot + ", MAXLOT=" + market_maxlot +  ", LOTSTEP=" + market_lotstep, ", MODE_MARGINREQUIRED=" + market_marginrequired, ", MODE_STOPLEVEL=", market_stoplevel);
+     Print(__FUNCTION__, "(): Market info: Symbol: ", Symbol(), ", min lot = " + market_minlot + ", max lot = " + market_maxlot +  ", lot step = " + market_lotstep, ", margin required = " + market_marginrequired, ", stop level = ", market_stoplevel);
      Print(__FUNCTION__, "(): Account info: AccountLeverage: ", acc_leverage);
      Print(__FUNCTION__, "(): Broker info: ", AccountCompany(), ", pip size = ", pip_size, ", points per pip = ", pts_per_pip, ", pip precision = ", pip_precision, ", volume precision = ", volume_precision);
      Print(__FUNCTION__, "(): EA info: Lot size = ", GetLotSize(), "; Max orders = ", GetMaxOrders(), "; Max orders per type = ", GetMaxOrdersPerType());
@@ -680,9 +680,9 @@ bool UpdateIndicators() {
     Fractals_upper = 0;
     for (i = 0; i <= Fractals_MaxPeriods; i++) {
       ifractal = iFractals(NULL, Fractals_Timeframe, MODE_LOWER, i + Fractals_Shift);
-      if (ifractal > 0) Fractals_lower = ifractal;
+      if (ifractal != 0) Fractals_lower = ifractal;
       ifractal = iFractals(NULL, Fractals_Timeframe, MODE_UPPER, i + Fractals_Shift);
-      if (ifractal > 0) Fractals_upper = ifractal;
+      if (ifractal != 0) Fractals_upper = ifractal;
     }
     if (VerboseTrace && (Fractals_lower != 0.0 || Fractals_upper != 0.0)) Print("Fractals_lower: ", Fractals_lower, ", Fractals_upper:", Fractals_upper);
   }
@@ -773,11 +773,11 @@ bool Alligator2OnSell() {
 }
 
 bool FractalsOnBuy() {
-  return (Fractals_lower > 0.0);
+  return (Fractals_lower != 0.0);
 }
 
 bool FractalsOnSell() {
-  return (Fractals_upper > 0.0);
+  return (Fractals_upper != 0.0);
 }
 
 bool DeMarkerOnSell() {
@@ -806,12 +806,13 @@ double HighestValue(double& arr[]) {
    return (arr[ArrayMaximum(arr)]);
 }
 
+// Return array values separated by delimiter.
 string GetArrayValues(double& arr[], string sep = ", ") {
   string result = "";
   for (int i = 0; i < ArraySize(arr); i++) {
     result = result + i + ":" + arr[i] + sep;
   }
-  return result;
+  return StringSubstr(result, 0, StringLen(result) - StringLen(sep)); // Return text without last separator.
 }
 
 int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = "", bool retry = TRUE) {
@@ -843,26 +844,19 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
      last_err = err;
      return (FALSE);
    }
-   /* else if (EAMaxOrders == 0 && GetTotalOrders() >= GetMaxOrdersAuto()) {
-     err = "Error in ExecuteOrder(): Maximum open and pending orders reached the auto-limit (EAMaxOrders).";
-     if (VerboseErrors && err != last_err) Print(last_err + "Auto-Limit: " + GetMaxOrdersAuto());
-     last_err = err;
-     return (FALSE);
-   }*/
    if (!CheckFreeMargin(cmd, volume)) {
      last_err = __FUNCTION__ + "(): No money to open more orders.";
-     if (PrintLogOnChart) Comment(last_err);
-     if (VerboseErrors) Print(last_err);
+     if (PrintLogOnChart && err != last_err) Comment(last_err);
+     if (VerboseErrors && err != last_err) Print(last_err);
      return (FALSE);
    }
    if (!CheckMinPipGap(order_type)) {
-     last_err = __FUNCTION__ + "(): Not executing order, because of the minimum gap.";
-     if (VerboseTrace) Print(last_err);
+     last_err = __FUNCTION__ + "(): Error: Not executing order, because the gap is too small "+ "(order type = " + order_type + ") [EAMinPipGap].";
+     if (VerboseTrace && err != last_err) Print(last_err);
      return (FALSE);
    }
 
    // Calculate take profit and stop loss.
-   RefreshRates();
    if (VerboseDebug) Print(__FUNCTION__ + "(): " + GetMarketTextDetails()); // Print current market information before placing the order.
    double stoploss = 0, takeprofit = 0;
    if (EAStopLoss > 0.0) stoploss = GetClosePrice(cmd) - (EAStopLoss + TrailingStop) * pip_size * OpTypeValue(cmd);
@@ -870,8 +864,9 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
    if (EATakeProfit > 0.0) takeprofit = order_price + (EATakeProfit + TrailingProfit) * pip_size * OpTypeValue(cmd);
    else takeprofit = GetTrailingProfit(cmd, 0, order_type);
 
-   order_ticket = OrderSend(Symbol(), cmd, volume, order_price, max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + order_type, 0, If(cmd == OP_BUY, ColorBuy, ColorSell));
+   order_ticket = OrderSend(Symbol(), cmd, volume, order_price, max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + order_type, 0, GetOrderColor());
    if (order_ticket >= 0) {
+      if (VerboseTrace) Print(__FUNCTION__, "(): OrderSend(", Symbol(), ", ",  _OrderType_str(cmd), ", ", volume, ", ", order_price, ", ", max_order_slippage, ", ", stoploss, ", ", takeprofit, ", ", order_comment, ", ", MagicNumber + order_type, ", 0, ", GetOrderColor(), ");");
       if (!OrderSelect(order_ticket, SELECT_BY_TICKET) && VerboseErrors) {
         Print(__FUNCTION__ + "(): OrderSelect() error = ", ErrorDescription(GetLastError()));
         if (retry) TaskAddOrderOpen(cmd, volume, order_type, order_comment); // Will re-try again.
@@ -890,10 +885,10 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
       /*
       if ((EATakeProfit * pip_size > GetMinStopLevel() || EATakeProfit == 0.0) &&
          (EAStopLoss * pip_size > GetMinStopLevel() || EAStopLoss == 0.0)) {
-            result = OrderModify(order_ticket, order_price, stoploss, takeprofit, 0, Red);
+            result = OrderModify(order_ticket, order_price, stoploss, takeprofit, 0, ColorSell);
             if (!result && VerboseErrors) {
               Print("Error in ExecuteOrder(): OrderModify() error = ", ErrorDescription(GetLastError()));
-              if (VerboseDebug) Print("ExecuteOrder(): OrderModify(", order_ticket, ", ", order_price, ", ", stoploss, ", ", takeprofit, ", ", 0, ", ", Red, ")");
+              if (VerboseDebug) Print("ExecuteOrder(): OrderModify(", order_ticket, ", ", order_price, ", ", stoploss, ", ", takeprofit, ", ", 0, ", ", ColorSell, ")");
             }
          }
       */
@@ -903,7 +898,7 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
      err_code = GetLastError();
      if (VerboseErrors) Print(__FUNCTION__, "(): OrderSend(): error = ", ErrorDescription(err_code));
      if (VerboseDebug) {
-       Print("ExecuteOrder(): OrderSend(", Symbol(), ", ",  _OrderType_str(cmd), ", ", volume, ", ", order_price, ", ", max_order_slippage, ", ", stoploss, ", ", takeprofit, ", ", order_comment, ", ", MagicNumber + order_type, ", 0, ", If(cmd == OP_BUY, ColorBuy, ColorSell), "); ", GetAccountTextDetails());
+       Print("ExecuteOrder(): OrderSend(", Symbol(), ", ",  _OrderType_str(cmd), ", ", volume, ", ", order_price, ", ", max_order_slippage, ", ", stoploss, ", ", takeprofit, ", ", order_comment, ", ", MagicNumber + order_type, ", 0, ", GetOrderColor(), "); ", GetAccountTextDetails());
      }
      // if (err_code != 136 /* OFF_QUOTES */) break;
      if (retry) TaskAddOrderOpen(cmd, volume, order_type, order_comment); // Will re-try again.
@@ -960,24 +955,24 @@ int CloseOrdersByType(int order_type) {
 }
 
 // Check if order match has minimum gap in pips configured by EAMinPipGap parameter.
-int CheckMinPipGap(int order_type) {
-  int min_gap = TRUE, diff;
+bool CheckMinPipGap(int order_type) {
+  int diff;
   for (int order = 0; order < OrdersTotal(); order++) {
     if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
        if (OrderMagicNumber() == MagicNumber+order_type && OrderSymbol() == Symbol()) {
          diff = MathAbs((OrderOpenPrice() - GetOpenPrice()) / pip_size);
-         if (VerboseTrace) Print("Ticket: ", OrderTicket(), ", Order: ", OrderType(), ", Gap: ", diff);
+         // if (VerboseTrace) Print("Ticket: ", OrderTicket(), ", Order: ", OrderType(), ", Gap: ", diff);
          if (diff < EAMinPipGap) {
            return FALSE;
          }
        }
-    } else {
-      if (VerboseDebug)
-        Print("Error in CheckMinPipGap(" + order_type + "): Order: " + order + "; Message: ", GetErrorText(err_code));
+    } else if (VerboseDebug) {
+        Print(__FUNCTION__ + "(): Error: Order type = " + order_type + ", pos: " + order + ", message: ", GetErrorText(err_code));
     }
   }
-  return min_gap;
+  return TRUE;
 }
+
 bool EACloseOrder(int ticket_no, string reason, bool retry = TRUE) {
   bool result;
   if (ticket_no > 0) result = OrderSelect(ticket_no, SELECT_BY_TICKET);
@@ -1000,14 +995,14 @@ bool ValidTrailingStop(double trail_stop, int cmd, bool existing = FALSE) {
   // OP_SELL: if((OrderOpenPrice()-Ask)>(Point*TrailingStop)) | Ask+Point*TrailingStop
   // trail_stop > OrderStopLoss()
   // trail_stop < OrderStopLoss()
-  double delta = market_stoplevel * Point + GetMarketSpread(); // Delta price.
-  double price = If(existing, OrderOpenPrice(), If(cmd == OP_BUY, Bid, Ask));
+  double delta = GetMarketGap(); // Calculate minimum market gap.
+  double price = GetOpenPrice();
   bool valid = trail_stop == 0 || (cmd == OP_BUY  && price - trail_stop > delta) || (cmd == OP_SELL && trail_stop - price > delta);
   if (!valid && VerboseTrace) {
     if (cmd == OP_BUY)
-      Print("ValidTrailingStop(OP_BUY): #" + If(existing, OrderTicket(), 0) + ": ", price, " - ", trail_stop, " = ", price - trail_stop, " > ", DoubleToStr(delta, pip_precision));
+      Print(__FUNCTION__ + "(OP_BUY): Error: #" + If(existing, OrderTicket(), 0) + ": ", DoubleToStr(price, Digits), " - ", DoubleToStr(trail_stop, Digits), " = ", DoubleToStr(price - trail_stop, pip_precision), " >! ", DoubleToStr(delta, pip_precision));
     if (cmd == OP_SELL)
-      Print("ValidTrailingStop(OP_SELL): #" + If(existing, OrderTicket(), 0) + ": ", trail_stop, " - ", price, " = ", trail_stop - price, " > ", DoubleToStr(delta, pip_precision));
+      Print(__FUNCTION__ + "(OP_SELL): Error: #" + If(existing, OrderTicket(), 0) + ": ", DoubleToStr(trail_stop, Digits), " - ", DoubleToStr(price, Digits), " = ", DoubleToStr(trail_stop - price, pip_precision), " >! ", DoubleToStr(delta, pip_precision));
   }
   return valid;
 }
@@ -1017,14 +1012,14 @@ bool ValidProfitTake(double profit_take, int cmd, bool existing = FALSE) {
   //if (VerboseTrace && cmd ==  OP_BUY) Print("ValidProfitTake(OP_BUY): ", profit_take - Bid, " > ", NormalizeDouble(GetMinStopLevel(), pip_precision));
   //if (VerboseTrace && cmd ==  OP_SELL) Print("ValidProfitTake(OP_SELL): ", Ask - profit_take, " > ", NormalizeDouble(GetMinStopLevel(), pip_precision));
   //if (VerboseTrace) Print("ValidProfitTake(" + cmd + "): Delta: ", DoubleToStr(delta, pip_precision));
-  double delta = market_stoplevel * Point + GetMarketSpread(); // Delta price.
-  double price = If(existing, OrderOpenPrice(), If(cmd == OP_BUY, Bid, Ask));
-  bool valid = profit_take == 0 || (cmd ==  OP_BUY && profit_take - price > delta) || (cmd == OP_SELL && price - profit_take  > delta);
+  double delta = GetMarketGap(); // Calculate minimum market gap.
+  double price = GetOpenPrice();
+  bool valid = profit_take == 0 || (cmd ==  OP_BUY && profit_take - price > delta) || (cmd == OP_SELL && price - profit_take > delta);
   if (!valid && VerboseTrace) {
     if (cmd == OP_BUY)
-      Print("ValidProfitTake(OP_BUY): #" + If(existing, OrderTicket(), 0) + ": ", profit_take, " - ", price, " = ", profit_take - price, " > ", DoubleToStr(delta, pip_precision));
+      Print(__FUNCTION__ + "(OP_BUY): Error: #" + If(existing, OrderTicket(), 0) + ": ", DoubleToStr(profit_take, Digits), " - ", DoubleToStr(price, Digits), " = ", DoubleToStr(profit_take - price, pip_precision), " >! ", DoubleToStr(delta, pip_precision));
     if (cmd == OP_SELL)
-      Print("ValidProfitTake(OP_SELL): #" + If(existing, OrderTicket(), 0) + ": ", price, " - ", profit_take, " = ", price - profit_take, " > ", DoubleToStr(delta, pip_precision));
+      Print(__FUNCTION__ + "(OP_SELL): Error: #" + If(existing, OrderTicket(), 0) + ": ", DoubleToStr(price, Digits), " - ", DoubleToStr(profit_take, Digits), " = ", DoubleToStr(price - profit_take, pip_precision), " >! ", DoubleToStr(delta, pip_precision));
   }
   return valid;
 }
@@ -1063,8 +1058,13 @@ void UpdateTrailingStops() {
           if ((OrderType() == OP_BUY && OrderStopLoss() < Bid) ||
              (OrderType() == OP_SELL && OrderStopLoss() > Ask)) {
             result = OrderModify(OrderTicket(), OrderOpenPrice(), OrderOpenPrice() - OrderCommission() * Point, OrderTakeProfit(), 0, GetOrderColor());
-            if (!result && err_code > 1) Print("Error in UpdateTrailingStops(): OrderModify(): EAMinimalizeLosses: ", ErrorDescription(err_code));
-            if (VerboseTrace) Print(__FUNCTION__ + "(): EAMinimalizeLosses: ", GetOrderTextDetails());
+            if (!result && err_code > 1) {
+             if (VerboseErrors) Print(__FUNCTION__, "(): Error: OrderModify(): [EAMinimalizeLosses] ", ErrorDescription(err_code));
+               if (VerboseDebug)
+                 Print(__FUNCTION__ + "(): Error: OrderModify(", OrderTicket(), ", ", OrderOpenPrice(), ", ", OrderOpenPrice() - OrderCommission() * Point, ", ", OrderTakeProfit(), ", ", 0, ", ", GetOrderColor(), "); ", "Ask/Bid: ", Ask, "/", Bid);
+            } else {
+              if (VerboseTrace) Print(__FUNCTION__ + "(): EAMinimalizeLosses: ", GetOrderTextDetails());
+            }
           }
         }
 
@@ -1074,10 +1074,10 @@ void UpdateTrailingStops() {
            result = OrderModify(OrderTicket(), OrderOpenPrice(), new_trailing_stop, new_profit_take, 0, GetOrderColor());
            if (!result) {
              err_code = GetLastError();
-             if (VerboseErrors && err_code > 1) {
-               Print("OrderModify: ", ErrorDescription(err_code));
+             if (err_code > 1) {
+               if (VerboseErrors) Print(__FUNCTION__, "(): Error: OrderModify(): ", ErrorDescription(err_code));
                if (VerboseDebug)
-                 Print(__FUNCTION__ + "(): Error: OrderModify(", OrderTicket(), ", ", OrderOpenPrice(), ", ", new_trailing_stop, ", ", new_profit_take, ", ", 0, ", ", GetOrderColor(), ")");
+                 Print(__FUNCTION__ + "(): Error: OrderModify(", OrderTicket(), ", ", OrderOpenPrice(), ", ", new_trailing_stop, ", ", new_profit_take, ", ", 0, ", ", GetOrderColor(), "); ", "Ask/Bid: ", Ask, "/", Bid);
              }
            } else {
              // if (VerboseTrace) Print("UpdateTrailingStops(): OrderModify(): ", GetOrderTextDetails());
@@ -1094,7 +1094,7 @@ void UpdateTrailingStops() {
 //   bool existing: TRUE if the calculation is for particular existing order
 double GetTrailingStop(int cmd, double previous, int order_type = -1, bool existing = FALSE) {
    double trail_stop = 0;
-   double delta = market_stoplevel * Point + GetMarketSpread(); // Delta price.
+   double delta = GetMarketGap();
    double default_trail = If(cmd == OP_BUY, Bid - TrailingStop * pip_size - delta, Ask + TrailingStop * pip_size + delta);
    int method = GetTrailingMethod(order_type, -1);
    switch (method) {
@@ -1136,11 +1136,11 @@ double GetTrailingStop(int cmd, double previous, int order_type = -1, bool exist
    }
 
    if (!ValidTrailingStop(trail_stop, cmd, existing)) {
-     if (previous == 0) previous = default_trail;
+     if (existing && previous == 0) previous = default_trail;
      if (VerboseTrace)
-       Print(__FUNCTION__ + "(): Error: method = " + method + ", ticket = #" + If(existing, OrderTicket(), 0) + ": Invalid Trailing Stop: ", trail_stop, "; Previous: ", previous, "; ", GetOrderTextDetails(), "; delta: ", DoubleToStr(delta, pip_precision));
-     // If value is invalid, fallback to standard one.
-     //trail_stop = default_trail;
+       Print(__FUNCTION__ + "(): Error: method = " + method + ", ticket = #" + If(existing, OrderTicket(), 0) + ": Invalid Trailing Stop: ", trail_stop, ", previous: ", previous, "; ", GetOrderTextDetails(), ", delta: ", DoubleToStr(delta, pip_precision));
+     // If value is invalid, fallback to the previous one.
+     return previous;
    }
 
    if (TrailingStopOneWay && method > 0) { // If TRUE, move trailing stop only one direction.
@@ -1151,9 +1151,8 @@ double GetTrailingStop(int cmd, double previous, int order_type = -1, bool exist
 
    // if (VerboseTrace && trail_stop != OrderStopLoss()) Print("GetTrailingStop(): New Trailing Stop: ", trail_stop, "; Previous: ", previous, "; ", GetOrderTextDetails());
    if (VerboseDebug && IsVisualMode()) ShowLine("trail_stop_" + OrderTicket(), trail_stop, Orange);
-   return trail_stop;
+   return NormalizeDouble(trail_stop, Digits);
 }
-
 
 // Get new trailing profit take.
 // Note: Suggested methods: 1 & 4.
@@ -1161,7 +1160,7 @@ double GetTrailingStop(int cmd, double previous, int order_type = -1, bool exist
 //   bool existing: TRUE if the calculation is for particular existing order
 double GetTrailingProfit(int cmd, double previous, int order_type = -1, bool existing = FALSE) {
    double profit_take = 0;
-   double delta = market_stoplevel * Point + GetMarketSpread(); // Delta price.
+   double delta = GetMarketGap();
    double default_trail = If(cmd == OP_BUY, Bid + TrailingProfit * pip_size + delta, Ask - TrailingProfit * pip_size - delta);
    int method = GetTrailingMethod(order_type, 1);
    switch (method) {
@@ -1203,11 +1202,11 @@ double GetTrailingProfit(int cmd, double previous, int order_type = -1, bool exi
    }
 
    if (!ValidProfitTake(profit_take, cmd)) {
-     if (previous == 0) previous = default_trail;
+     if (existing && previous == 0) previous = default_trail;
      if (VerboseTrace)
-       Print(__FUNCTION__ + "(): Error: method = " + method + ", ticket = #" + If(existing, OrderTicket(), 0) + ": Invalid Profit Take: ", profit_take, "; Previous: ", previous, "; ", GetOrderTextDetails(), "; delta: ", DoubleToStr(delta, pip_precision));
-     // If value is invalid, fallback to standard one.
-     //profit_take = default_trail;
+       Print(__FUNCTION__ + "(): Error: method = " + method + ", ticket = #" + If(existing, OrderTicket(), 0) + ": Invalid Profit Take: ", profit_take, ", previous: ", previous, "; ", GetOrderTextDetails(), ", delta: ", DoubleToStr(delta, pip_precision));
+     // If value is invalid, fallback to previous one.
+     return previous;
    }
 
    if (TrailingProfitOneWay && method > 0) { // If TRUE, move profit take only one direction.
@@ -1218,7 +1217,7 @@ double GetTrailingProfit(int cmd, double previous, int order_type = -1, bool exi
 
    // if (VerboseTrace && profit_take != previous) Print("GetProfitStop(", method, "): New Profit Stop: ", profit_take, "; Old: ", previous, "; ", GetOrderTextDetails());
    if (VerboseDebug && IsVisualMode()) ShowLine("take_profit_" + OrderTicket(), profit_take, Gold);
-   return profit_take;
+   return NormalizeDouble(profit_take, Digits);
 }
 
 // Get trailing method based on the strategy type.
@@ -1520,6 +1519,11 @@ double GetMarketSpread(bool in_points = FALSE) {
   return If(in_points, (Ask - Bid) * MathPow(10, Digits), (Ask - Bid));
 }
 
+// Get current minimum marker gap (in points).
+double GetMarketGap(bool in_points = FALSE) {
+  return If(in_points, market_stoplevel + GetMarketSpread(TRUE), (market_stoplevel + GetMarketSpread(TRUE)) * Point);
+}
+
 double NormalizeLots(double lots, bool ceiling = FALSE, string pair = "") {
    double lotsize;
    double precision;
@@ -1652,7 +1656,7 @@ void DisplayInfoOnChart() {
    + "Last error: " + last_err + "\n"
    + "------------------------------------------------\n"
    + "MARKET INFORMATION:\n"
-   + "Spread: " + GetMarketSpread(TRUE) + "\n"
+   + "Spread: " + GetMarketSpread(TRUE) + "; Gap: " + GetMarketGap(TRUE) + "\n"
    // + "Mini lot: " + MarketInfo(Symbol(), MODE_MINLOT) + "\n"
    + "------------------------------------------------\n"
   );
