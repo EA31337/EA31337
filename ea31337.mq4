@@ -4,7 +4,7 @@
 #property description "EA31337"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "100.010"
+#property version   "100.011"
 //#property strict
 
 #include <stderror.mqh>
@@ -80,7 +80,7 @@ extern bool TrailingStopOneWay = TRUE; // Change trailing stop towards one direc
 extern int TrailingProfit = 20;
 extern int TrailingProfitMethod = 3; // Trailing Profit method. Set 0 to disable. Range: 0-10. Suggested value: 0, 1, 4 or 10.
 extern bool TrailingProfitOneWay = TRUE; // Change trailing profit take towards one direction only.
-extern double TrailingStopAddPerMinute = 0.5; // Decrease trailing stop (in pips) per each bar. Set 0 to disable. 
+extern double TrailingStopAddPerMinute = 0.0; // Decrease trailing stop (in pips) per each bar. Set 0 to disable. Suggested value: 0.
 
 extern string __EA_Order_Parameters__ = "-- Profit/Loss settings (set 0 for auto) --";
 extern double EALotSize = 0; // Default lot size. Set 0 for auto.
@@ -93,29 +93,38 @@ extern double RiskRatio = 0; // Suggested value: 1.0. Do not change unless testi
 extern string ____MA_Parameters__ = "-- Settings for the Moving Average indicator --";
 extern bool MA_Enabled = TRUE; // Enable MA-based strategy.
 extern ENUM_TIMEFRAMES MA_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int MA_Period_Fast = 5; // Suggested value: 5
-extern int MA_Period_Medium = 25; // Suggested value: 25
+extern int MA_Period_Fast = 10; // Suggested value: 5
+extern int MA_Period_Medium = 30; // Suggested value: 25
 extern int MA_Period_Slow = 60; // Suggested value: 60
 extern int MA_Shift_Fast = 0; // Index of the value taken from the indicator buffer. Shift relative to the previous bar (+1).
 extern int MA_Shift_Medium = 1; // Index of the value taken from the indicator buffer. Shift relative to the previous bar (+1).
-extern int MA_Shift_Slow = 2; // Index of the value taken from the indicator buffer. Shift relative to the previous bar (+1).
-extern int MA_Shift_Far = 7; // Far shift. Shift relative to the 2 previous bars (+2).
+extern int MA_Shift_Slow = 4; // Index of the value taken from the indicator buffer. Shift relative to the previous bar (+1).
+extern int MA_Shift_Far = 9; // Far shift. Shift relative to the 2 previous bars (+2).
 extern ENUM_MA_METHOD MA_Method = MODE_EMA; // MA method (See: ENUM_MA_METHOD). Range: 0-3. Suggested value: MODE_EMA.
 extern ENUM_APPLIED_PRICE MA_Applied_Price = PRICE_WEIGHTED; // MA applied price (See: ENUM_APPLIED_PRICE). Range: 0-6. Suggested values: PRICE_OPEN, PRICE_TYPICAL, PRICE_WEIGHTED.
+extern int MA_TrailingStopMethod = 1; // Trailing Stop method for MA. Range: 0-10. Set 0 to default.
+extern int MA_TrailingProfitMethod = 4; // Trailing Profit method for MA. Range: 0-10. Set 0 to default.
+/* MA Optimization log (1000,0.1,ts:15,tp:20,gap:10)
+ *   2015.01.02-2015.06.20: 3k trades, 66% dd, 1.06 profit factor (+92%)
+ *   2014.01.02-2014.12.20: 4,6k trades, 57% dd, 1.03 profit factor (+68%)
+ */
 
 extern string ____MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --";
 extern bool MACD_Enabled = TRUE; // Enable MACD-based strategy.
 extern ENUM_TIMEFRAMES MACD_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int MACD_Fast_Period = 5; // Fast EMA averaging period.
-extern int MACD_Slow_Period = 50; // Slow EMA averaging period.
+extern int MACD_Slow_Period = 60; // Slow EMA averaging period.
 extern int MACD_Signal_Period = 11; // Signal line averaging period.
 extern double MACD_OpenLevel  = 1.5;
 //extern double MACD_CloseLevel = 2; // Set 0 to disable.
 extern ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_CLOSE; // MACD applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern int MACD_Shift = 5; // Past MACD value in number of bars. Shift relative to the current bar the given amount of periods ago. Suggested value: 1
 extern int MACD_ShiftFar = 2; // Additional MACD far value in number of bars relatively to MACD_Shift.
-extern int MACD_TrailingStopMethod = 8; // Trailing Stop method for MACD. Range: 0-10. Set 0 to default.
-extern int MACD_TrailingProfitMethod = 3; // Trailing Profit method for MACD. Range: 0-10. Set 0 to default.
+extern int MACD_TrailingStopMethod = 4; // Trailing Stop method for MACD. Range: 0-10. Set 0 to default.
+extern int MACD_TrailingProfitMethod = 4; // Trailing Profit method for MACD. Range: 0-10. Set 0 to default.
+/* MACD Optimization log (1000,0.1,ts:15,tp:20,gap:10)
+ *   2015.01.02-2015.06.20: 1,9k trades, 35% dd, 1.12 profit factor (+99%)
+ */
 
 extern string ____Fractals_Parameters__ = "-- Settings for the Fractals indicator --";
 extern bool Fractals_Enabled = TRUE; // Enable Fractals-based strategy.
@@ -164,7 +173,7 @@ extern double DeMarker_Filter = 0.0; // Valid range: 0.0-0.4. Suggested value: 0
 extern int DeMarker_TrailingStopMethod = 1; // Trailing Stop method for DeMarker. Range: 0-10. Set 0 to default.
 extern int DeMarker_TrailingProfitMethod = 1; // Trailing Profit method for DeMarker. Range: 0-10. Set 0 to default.
 /* DeMarker Optimization log (1000,0.1,ts:15,tp:20,gap:10)
- *   2015.01.02-2015.06.20: 9k trades, 80% dd, 1.01 profit factor (57%)
+ *   2015.01.02-2015.06.20: 9k trades, 80% dd, 1.01 profit factor (+57%)
  */
 
 extern string ____WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --";
@@ -176,7 +185,7 @@ extern double WPR_Filter = 0.17; // Suggested range: 0.0-0.5. Suggested range: 0
 extern int WPR_TrailingStopMethod = 1; // Trailing Stop method for WPR. Range: 0-10. Set 0 to default.
 extern int WPR_TrailingProfitMethod = 6; // Trailing Profit method for WPR. Range: 0-10. Set 0 to default.
 /* WPR Optimization log (1000,0.1,ts:15,tp:20,gap:10)
- *   2015.01.02-2015.06.20: 10k trades, 50% dd, 1.04 profit factor (140%)
+ *   2015.01.02-2015.06.20: 10k trades, 50% dd, 1.04 profit factor (+140%)
  */
 
 extern string ____RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --";
@@ -1240,6 +1249,15 @@ double GetTrailingProfit(int cmd, double previous, int order_type = -1, bool exi
 int GetTrailingMethod(int order_type, int stop_or_profit) {
   int stop_method = TrailingStopMethod, profit_method = TrailingProfitMethod;
   switch (order_type) {
+    case MA_FAST_ON_BUY:
+    case MA_FAST_ON_SELL:
+    case MA_MEDIUM_ON_BUY:
+    case MA_MEDIUM_ON_SELL:
+    case MA_LARGE_ON_BUY:
+    case MA_LARGE_ON_SELL:
+      if (MA_TrailingStopMethod > 0)   stop_method   = MA_TrailingStopMethod;
+      if (MA_TrailingProfitMethod > 0) profit_method = MA_TrailingProfitMethod;
+      break;
     case MACD_ON_BUY:
     case MACD_ON_SELL:
       if (MACD_TrailingStopMethod > 0)   stop_method   = MACD_TrailingStopMethod;
@@ -1279,13 +1297,6 @@ int GetTrailingMethod(int order_type, int stop_or_profit) {
     case RSI_ON_SELL:
       if (RSI_TrailingStopMethod > 0)   stop_method   = RSI_TrailingStopMethod;
       if (RSI_TrailingProfitMethod > 0) profit_method = RSI_TrailingProfitMethod;
-      break;
-    case MA_FAST_ON_BUY:
-    case MA_FAST_ON_SELL:
-    case MA_MEDIUM_ON_BUY:
-    case MA_MEDIUM_ON_SELL:
-    case MA_LARGE_ON_BUY:
-    case MA_LARGE_ON_SELL:
       break;
     default:
       if (VerboseTrace) Print(__FUNCTION__ + "(): Unknown order type: " + order_type);
