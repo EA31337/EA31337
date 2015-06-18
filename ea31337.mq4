@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.013"
+#property version   "1.014"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -1217,7 +1217,6 @@ void UpdateTrailingStops() {
              // if (VerboseTrace) Print("UpdateTrailingStops(): OrderModify(): ", GetOrderTextDetails());
            }
         }
-
      }
   }
 }
@@ -1654,6 +1653,7 @@ double GetOrderProfit() {
   return OrderProfit() - OrderCommission();
 }
 
+// Get color of the order.
 double GetOrderColor() {
   return If(OpTypeValue(OrderType()) > 0, ColorBuy, ColorSell);
 }
@@ -1750,6 +1750,21 @@ int GetMaxOrdersPerType() {
   return If(EAMaxOrdersPerType > 0, EAMaxOrdersPerType, MathMax(MathFloor(GetMaxOrders() / FINAL_STRATEGY_TYPE_ENTRY), 1));
 }
 
+// Get number of active strategies.
+int GetNoOfStrategies() {
+  return (
+    6 * MA_Enabled
+    + 2 * MACD_Enabled
+    + 2 * Fractals_Enabled
+    + 2 * Alligator1_Enabled
+    + 2 * Alligator2_Enabled
+    + 2 * DeMarker_Enabled
+    + 2 * WPR_Enabled
+    + 2 * RSI_Enabled
+    + 2 * Bands_Enabled
+  );
+}
+
 // Calculate size of the lot based on the free margin and account leverage automatically.
 double GetAutoLotSize() {
   double free      = AccountFreeMargin();
@@ -1769,7 +1784,10 @@ double GetLotSize() {
 double GetAutoRiskRatio() {
   double equity = AccountEquity();
   double balance = AccountBalance();
-  return MathMin(equity / balance, 1.0);
+  double high_risk = 0.0;
+  if (MathMin(equity, balance) < 2000) high_risk += 0.1 * GetNoOfStrategies() / 2; // Calculate additional risk.
+  // last_msg = "High risk: " + high_risk + " => " + MathMin(equity / balance - high_risk, 1.0);
+  return MathMin(equity / balance - high_risk, 1.0);
 }
 
 // Return risk ratio value;
