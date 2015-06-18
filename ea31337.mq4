@@ -2,9 +2,11 @@
 //|                                                       EA31337    |
 //+------------------------------------------------------------------+
 #property description "EA31337"
+#property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "100.011"
+#property version   "1.012"
+// #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
 #include <stderror.mqh>
@@ -96,6 +98,7 @@ extern ENUM_TIMEFRAMES MA_Timeframe = PERIOD_M1; // Timeframe (0 means the curre
 extern int MA_Period_Fast = 10; // Suggested value: 5
 extern int MA_Period_Medium = 30; // Suggested value: 25
 extern int MA_Period_Slow = 60; // Suggested value: 60
+// extern double MA_Period_Ratio = 2; // Testing
 extern int MA_Shift_Fast = 0; // Index of the value taken from the indicator buffer. Shift relative to the previous bar (+1).
 extern int MA_Shift_Medium = 1; // Index of the value taken from the indicator buffer. Shift relative to the previous bar (+1).
 extern int MA_Shift_Slow = 4; // Index of the value taken from the indicator buffer. Shift relative to the previous bar (+1).
@@ -239,20 +242,37 @@ extern bool MaxTries = 5; // Number of maximum attempts to execute the order.
 //extern int TrailingStopDelay = 0; // How often trailing stop should be updated (in seconds). FIXME: Fix relative delay in backtesting.
 // extern int JobProcessDelay = 1; // How often job list should be processed (in seconds).
 
-// ENUM_MA_METHOD values:
-//   0: MODE_SMA (Simple averaging)
-//   1: MODE_EMA (Exponential averaging)
-//   2: MODE_SMMA (Smoothed averaging)
-//   3: MODE_LWMA (Linear-weighted averaging)
+/*
+ * Default enumerations:
+ *
+ * ENUM_MA_METHOD values:
+ *   0: MODE_SMA (Simple averaging)
+ *   1: MODE_EMA (Exponential averaging)
+ *   2: MODE_SMMA (Smoothed averaging)
+ *   3: MODE_LWMA (Linear-weighted averaging)
+ *
+ * ENUM_APPLIED_PRICE values:
+ *   0: PRICE_CLOSE (Close price)
+ *   1: PRICE_OPEN (Open price)
+ *   2: PRICE_HIGH (The maximum price for the period)
+ *   3: PRICE_LOW (The minimum price for the period)
+ *   4: PRICE_MEDIAN (Median price, (high + low)/2
+ *   5: PRICE_TYPICAL (Typical price, (high + low + close)/3
+ *   6: PRICE_WEIGHTED (Average price, (high + low + close + close)/4
+ *
+ * Trade operation:
+ *   0: OP_BUY (Buy operation)
+ *   1: OP_SELL (Sell operation)
+ *   2: OP_BUYLIMIT (Buy limit pending order)
+ *   3: OP_SELLLIMIT (Sell limit pending order)
+ *   4: OP_BUYSTOP (Buy stop pending order)
+ *   5: OP_SELLSTOP (Sell stop pending order)
+ */
 
-// ENUM_APPLIED_PRICE values:
-//   0: PRICE_CLOSE (Close price)
-//   1: PRICE_OPEN (Open price)
-//   2: PRICE_HIGH (The maximum price for the period)
-//   3: PRICE_LOW (The minimum price for the period)
-//   4: PRICE_MEDIAN (Median price, (high + low)/2
-//   5: PRICE_TYPICAL (Typical price, (high + low + close)/3
-//   6: PRICE_WEIGHTED (Average price, (high + low + close + close)/4
+/*
+ * Notes:
+ *   - __MQL4__  macro is defined when compiling *.mq4 file, __MQL5__ macro is defined when compiling *.mq5 one.
+ */
 
 // Market/session variables.
 double pip_size;
@@ -374,7 +394,6 @@ int OnInit() {
    // TODO: IsDllsAllowed(), IsLibrariesAllowed()
 
   // Calculate pip size and precision.
-  pts_per_pip = GetPointsPerPip();
   if (Digits < 4) {
     pip_size = 0.01;
     pip_precision = 2;
@@ -382,6 +401,7 @@ int OnInit() {
     pip_size = 0.0001;
     pip_precision = 4;
   }
+  pts_per_pip = GetPointsPerPip();
   if (TradeMicroLots) volume_precision = 2; else volume_precision = 1;
 
    // Initialize startup variables.
@@ -411,13 +431,14 @@ int OnInit() {
      if (market_stoplevel == 0) market_stoplevel = 30; // When testing, we need to simulate real MODE_STOPLEVEL = 30 (as it's in real account), in demo it's 0.
      if (IsOptimization()) {
        VerboseErrors = FALSE;
-       VerboseInfo = FALSE;
-       VerboseDebug = FALSE;
-       VerboseTrace = FALSE;
+       VerboseInfo   = FALSE;
+       VerboseDebug  = FALSE;
+       VerboseTrace  = FALSE;
     }
    }
 
    if (VerboseInfo) {
+     // Print(__FUNCTION__, "(): ", description, " v", version, " by ", copyright, " (", link, ")");
      Print(__FUNCTION__, "(): Predefined variables: Bars = ", Bars, ", Ask = ", Ask, ", Bid = ", Bid, ", Digits = ", Digits, ", Point = ", DoubleToStr(Point, Digits));
      Print(__FUNCTION__, "(): Market info: Symbol: ", Symbol(), ", min lot = " + market_minlot + ", max lot = " + market_maxlot +  ", lot step = " + market_lotstep, ", margin required = " + market_marginrequired, ", stop level = ", market_stoplevel);
      Print(__FUNCTION__, "(): Account info: AccountLeverage: ", acc_leverage);
@@ -450,8 +471,10 @@ void OnDeinit(const int reason) {
       string filename = TimeToStr(TimeCurrent(), TIME_DATE|TIME_MINUTES);
       WriteReport(filename + "_31337_Report.txt");
   }
+  // #ifdef _DEBUG
   // DEBUG("n=" + n + " : " +  DoubleToStrMorePrecision(val,19) );
   // DEBUG("CLOSEDEBUGFILE");
+  // #endif
 }
 
 // The init event handler for tester.
@@ -629,6 +652,13 @@ bool UpdateIndicators() {
   MA_Slow[0] = iMA(NULL, MA_Timeframe, MA_Period_Slow, 0, MA_Method, MA_Applied_Price, 0); // Current
   MA_Slow[1] = iMA(NULL, MA_Timeframe, MA_Period_Slow, 0, MA_Method, MA_Applied_Price, 1 + MA_Shift_Slow); // Previous
   MA_Slow[2] = iMA(NULL, MA_Timeframe, MA_Period_Slow, 0, MA_Method, MA_Applied_Price, 2 + MA_Shift_Far);
+  
+  // MA_Fast[0] = iMA(NULL, MA_Timeframe, MA_Period_Medium / MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 0); // Current
+  // MA_Fast[1] = iMA(NULL, MA_Timeframe, MA_Period_Medium / MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 1 + MA_Shift_Fast); // Previous
+  // MA_Fast[2] = iMA(NULL, MA_Timeframe, MA_Period_Medium / MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 2 + MA_Shift_Far);
+  // MA_Slow[0] = iMA(NULL, MA_Timeframe, MA_Period_Medium * MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 0); // Current
+  // MA_Slow[1] = iMA(NULL, MA_Timeframe, MA_Period_Medium * MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 1 + MA_Shift_Slow); // Previous
+  // MA_Slow[2] = iMA(NULL, MA_Timeframe, MA_Period_Medium * MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 2 + MA_Shift_Far);
   if (VerboseTrace) text += "MA: MA_Fast: " + GetArrayValues(MA_Fast) + "; MA_Medium: " + GetArrayValues(MA_Medium) + "; MA_Slow: " + GetArrayValues(MA_Slow) + "; ";
   if (VerboseDebug && IsVisualMode()) DrawMA();
 
@@ -879,9 +909,9 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
    // Calculate take profit and stop loss.
    if (VerboseDebug) Print(__FUNCTION__ + "(): " + GetMarketTextDetails()); // Print current market information before placing the order.
    double stoploss = 0, takeprofit = 0;
-   if (EAStopLoss > 0.0) stoploss = GetClosePrice(cmd) - (EAStopLoss + TrailingStop) * pip_size * OpTypeValue(cmd);
+   if (EAStopLoss > 0.0) stoploss = NormalizeDouble(GetClosePrice(cmd) - (EAStopLoss + TrailingStop) * pip_size * OpTypeValue(cmd), Digits);
    else stoploss = GetTrailingStop(cmd, 0, order_type);
-   if (EATakeProfit > 0.0) takeprofit = order_price + (EATakeProfit + TrailingProfit) * pip_size * OpTypeValue(cmd);
+   if (EATakeProfit > 0.0) takeprofit = NormalizeDouble(order_price + (EATakeProfit + TrailingProfit) * pip_size * OpTypeValue(cmd), Digits);
    else takeprofit = GetTrailingProfit(cmd, 0, order_type);
 
    order_ticket = OrderSend(Symbol(), cmd, volume, order_price, max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + order_type, 0, GetOrderColor());
@@ -1312,16 +1342,16 @@ void ShowLine(string name, double price, int colour = Yellow) {
 
 // Get current open price depending on the operation type.
 // op_type: SELL = -1, BUY = 1
-double GetOpenPrice(int op_type = 0) {
-   if (op_type == 0) op_type = OrderType();
-   return (If(OpTypeValue(op_type) > 0, Ask, Bid));
+double GetOpenPrice(int op_type = -2) {
+   if (op_type == -2) op_type = OrderType();
+   return NormalizeDouble(If(OpTypeValue(op_type) > 0, Ask, Bid), Digits);
 }
 
 // Get current close price depending on the operation type.
 // op_type: SELL = -1, BUY = 1
-double GetClosePrice(int op_type = 0) {
-   if (op_type == 0) op_type = OrderType();
-   return (If(OpTypeValue(op_type) > 0, Bid, Ask));
+double GetClosePrice(int op_type = -2) {
+   if (op_type == -2) op_type = OrderType();
+   return NormalizeDouble(If(OpTypeValue(op_type) > 0, Bid, Ask), Digits);
 }
 
 int OpTypeValue(int op_type) {
@@ -1592,23 +1622,8 @@ double NormalizePrice(double p, string pair=""){
 // Calculate number of points per pip.
 // To be used to replace Point for trade parameters calculations.
 // See: http://forum.mql4.com/30672
-// FIXME: Not foolproof, there are Symbols with 1 or 2 (gold) or other numbers of digits.
-// FIXME: Probably broken, needs re-write.
 double GetPointsPerPip() {
-  int d = Digits;
-  switch(d) {
-    case 2:
-    case 4:
-      d = Point;
-      break;
-    case 3:
-    case 5:
-      if (Point > 0) d = Point*10;
-      else d = 10;
-      break;
-    default: if (VerboseDebug) Print(__FUNCTION__ + "(): Unrecognised number of digits to calculate points per pip: ", d);
-  }
-  return d;
+  return MathPow(10, Digits - pip_precision);
 }
 
 // Calculate number of order allowed given risk ratio.
@@ -1659,7 +1674,7 @@ double GetRiskRatio() {
 }
 
 string GetDailyReport() {
-  return GetAccountTextDetails() + GetOrdersStats();
+  return GetAccountTextDetails() + "; " + GetOrdersStats();
 }
 
 /* BEGIN: DISPLAYING FUNCTIONS */
@@ -1752,7 +1767,7 @@ string GetOrdersStats(bool nl = FALSE) {
   } else {
     orders_per_type += "No orders open yet.";
   }
-  return orders_per_type + IfTxt(nl, "\n", "") + total_orders_text;
+  return orders_per_type + IfTxt(nl, "\n", "; ") + total_orders_text;
 }
 string GetAccountTextDetails() {
    return StringConcatenate("Account Details: ",
@@ -2087,7 +2102,7 @@ bool TaskRun(int job_id) {
        double volume = todo_queue[job_id][4];
        int order_type = todo_queue[job_id][5];
        string order_comment = todo_queue[job_id][6];
-       ExecuteOrder(cmd, volume, order_type, order_comment = "", FALSE);
+       ExecuteOrder(cmd, volume, order_type, order_comment, FALSE);
       break;
     case TASK_ORDER_CLOSE:
         string reason = todo_queue[job_id][3];
@@ -2202,6 +2217,14 @@ string GetErrorText(int code) {
       case  133: text = "Trade is disabled."; break;
       case  134: text = "Not enough money."; break;
       case  135: text = "Price changed."; break;
+      // --
+      // ERR_OFF_QUOTES
+      //   1.	Off Quotes may be a technical issue.
+      //   2.	Off Quotes may be due to unsupported orders.
+      //      - Trying to partially close a position. For example, attempting to close 0.10 (10k) of a 20k position.
+      //      - Placing a micro lot trade. For example, attempting to place a 0.01 (1k) volume trade.
+      //      - Placing a trade that is not in increments of 0.10 (10k) volume. For example, attempting to place a 0.77 (77k) trade.
+      //      - Adding a stop or limit to a market order before the order executes. For example, setting an EA to place a 0.1 volume (10k) buy market order with a stop loss of 50 pips.
       case  136: text = "Off quotes."; break;
       case  137: text = "Broker is busy (never returned error)."; break;
       case  138: text = "Requote."; break;
@@ -2603,8 +2626,7 @@ void WriteReport(string report_name) {
    FileWrite(handle,"Total net profit          ",SummaryProfit);
    FileWrite(handle,"Gross profit              ",GrossProfit);
    FileWrite(handle,"Gross loss                ",GrossLoss);
-   if(GrossLoss>0.0)
-      FileWrite(handle,"Profit factor             ",ProfitFactor);
+   if (GrossLoss > 0.0) FileWrite(handle,"Profit factor             ",ProfitFactor);
    FileWrite(handle,"Expected payoff           ",ExpectedPayoff);
    FileWrite(handle,"Absolute drawdown         ",AbsoluteDrawdown);
    FileWrite(handle,"Maximal drawdown          ",MaxDrawdown,StringConcatenate("(",MaxDrawdownPercent,"%)"));
