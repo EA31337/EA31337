@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.016"
+#property version   "1.017"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -79,7 +79,7 @@ extern string ____EA_Parameters__ = "-----------------------------------------";
 
 // extern double EAMinChangeOrders = 5; // Minimum change in pips between placed orders.
 // extern double EADelayBetweenOrders = 0; // Minimum delay in seconds between placed orders. FIXME: Fix relative delay in backtesting.
-extern bool EACloseOnMarketChange = FALSE; // Close orders on market change.
+extern bool EACloseOnMarketChange = FALSE; // Close opposite orders on market change.
 extern bool EAMinimalizeLosses = FALSE; // Set stop loss to zero, once the order is profitable.
 extern int EAMinPipGap = 10; // Minimum gap in pips between trades of the same strategy.
 extern int MaxOrderPriceSlippage = 5; // Maximum price slippage for buy or sell orders (in pips).
@@ -164,6 +164,7 @@ extern bool Fractals_Enabled = TRUE; // Enable Fractals-based strategy.
 extern ENUM_TIMEFRAMES Fractals_Timeframe = PERIOD_M5; // Timeframe (0 means the current chart).
 extern int Fractals_MaxPeriods = 2; // Suggested range: 1-5, Suggested value: 3
 extern int Fractals_Shift = 4; // Shift relative to the chart. Suggested value: 0.
+extern bool Fractals_CloseOnChange = FALSE; // Close opposite orders on market change.
 extern int Fractals_TrailingStopMethod = 6; // Trailing Stop method for Fractals. Range: 0-10. Set 0 to default.
 extern int Fractals_TrailingProfitMethod = 4; // Trailing Profit method for Fractals. Range: 0-10. Set 0 to default.
 /* Fractals Optimization log (1000,auto,ts:15,tp:20,gap:10)
@@ -178,11 +179,12 @@ extern int RSI_Period = 14; // Averaging period to calculate the main line.
 extern ENUM_APPLIED_PRICE RSI_Applied_Price = PRICE_MEDIAN; // RSI applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern int RSI_OpenLevel = 20;
 extern int RSI_Shift = 1;
+extern bool RSI_CloseOnChange = TRUE; // Close opposite orders on market change.
 extern int RSI_TrailingStopMethod = 6; // Trailing Stop method for RSI. Range: 0-10. Set 0 to default.
 extern int RSI_TrailingProfitMethod = 4; // Trailing Profit method for RSI. Range: 0-10. Set 0 to default.
 /* RSI Optimization log (1000,auto,ts:15,tp:20,gap:10)
- *   2015.01.05-2015.06.20: 2k trades, 22% dd, 1.17 profit factor (+116%)
- *   2014.01.05-2014.12.20: 3k trades, 55% dd, 1.00 profit factor (+0.5%)
+ *   2015.01.05-2015.06.20: 2,7k trades, 20% dd, 1.20 profit factor (+164%)
+ *   FIXME: 2014.01.05-2014.12.20: 3,8k trades, 41% dd, 1.00 profit factor (+4%)
  */
 
 extern string ____Bands_Parameters__ = "-- Settings for the Bollinger Bands® indicator --";
@@ -518,20 +520,6 @@ void start() {
   if (VerboseInfo) Print(GetMarketTextDetails());
 }
 
-int OnCalculate(const int rates_total,
-                const int prev_calculated,
-                const datetime &time[],
-                const double &open[],
-                const double &high[],
-                const double &low[],
-                const double &close[],
-                const long &tick_volume[],
-                const long &volume[],
-                const int &spread[])
-  {
-  if (VerboseTrace) Print("Calling " + __FUNCTION__ + "()");
-}
-
 void Trade() {
   bool order_placed;
   // if (VerboseTrace) Print("Calling " + __FUNCTION__ + "()");
@@ -586,10 +574,10 @@ void Trade() {
    if (RSI_Enabled) {
       if (RSIOnBuy(RSI_OpenLevel)) {
         order_placed = ExecuteOrder(OP_BUY, GetLotSize(), RSI_ON_BUY, "RSIOnBuy");
-        if (EACloseOnMarketChange) CloseOrdersByType(RSI_ON_SELL);
+        if (RSI_CloseOnChange) CloseOrdersByType(RSI_ON_SELL);
       } else if (RSIOnSell(RSI_OpenLevel)) {
         order_placed = ExecuteOrder(OP_SELL, GetLotSize(), RSI_ON_SELL, "RSIOnSell");
-        if (EACloseOnMarketChange) CloseOrdersByType(RSI_ON_BUY);
+        if (RSI_CloseOnChange) CloseOrdersByType(RSI_ON_BUY);
       }
    }
 
@@ -616,10 +604,10 @@ void Trade() {
    if (Fractals_Enabled) {
       if (FractalsOnBuy()) {
        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), FRACTALS_ON_BUY, "FractalsOnBuy");
-       if (EACloseOnMarketChange) CloseOrdersByType(FRACTALS_ON_SELL);
+       if (Fractals_CloseOnChange) CloseOrdersByType(FRACTALS_ON_SELL);
       } else if (FractalsOnSell()) {
        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), FRACTALS_ON_SELL, "FractalsOnSell");
-       if (EACloseOnMarketChange) CloseOrdersByType(FRACTALS_ON_BUY);
+       if (Fractals_CloseOnChange) CloseOrdersByType(FRACTALS_ON_BUY);
       }
    }
 
