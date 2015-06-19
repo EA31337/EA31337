@@ -26,20 +26,20 @@ enum ENUM_STRATEGY_TYPE {
   MA_LARGE_ON_SELL,
   MACD_ON_BUY,
   MACD_ON_SELL,
-  FRACTALS_ON_BUY,
-  FRACTALS_ON_SELL,
-  DEMARKER_ON_BUY,
-  DEMARKER_ON_SELL,
-  WPR_ON_BUY,
-  WPR_ON_SELL,
   ALLIGATOR1_ON_BUY,
   ALLIGATOR1_ON_SELL,
   ALLIGATOR2_ON_BUY,
   ALLIGATOR2_ON_SELL,
-  BANDS_ON_BUY,
-  BANDS_ON_SELL,
   RSI_ON_BUY,
   RSI_ON_SELL,
+  BANDS_ON_BUY,
+  BANDS_ON_SELL,
+  WPR_ON_BUY,
+  WPR_ON_SELL,
+  DEMARKER_ON_BUY,
+  DEMARKER_ON_SELL,
+  FRACTALS_ON_BUY,
+  FRACTALS_ON_SELL,
   FINAL_STRATEGY_TYPE_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };
 
@@ -141,18 +141,6 @@ extern int MACD_TrailingProfitMethod = 4; // Trailing Profit method for MACD. Ra
  *   2015.01.02-2015.06.20: 1,9k trades, 35% dd, 1.12 profit factor (+100%)
  */
 
-extern string ____Fractals_Parameters__ = "-- Settings for the Fractals indicator --";
-extern bool Fractals_Enabled = TRUE; // Enable Fractals-based strategy.
-extern ENUM_TIMEFRAMES Fractals_Timeframe = PERIOD_M5; // Timeframe (0 means the current chart).
-extern int Fractals_MaxPeriods = 2; // Suggested range: 1-5, Suggested value: 3
-extern int Fractals_Shift = 4; // Shift relative to the chart. Suggested value: 0.
-extern int Fractals_TrailingStopMethod = 6; // Trailing Stop method for Fractals. Range: 0-10. Set 0 to default.
-extern int Fractals_TrailingProfitMethod = 4; // Trailing Profit method for Fractals. Range: 0-10. Set 0 to default.
-/* Fractals Optimization log (1000,auto,ts:15,tp:20,gap:10)
- *   2015.01.02-2015.06.20: 7k trades, 50-70% dd, 1.03 profit factor (+94%)
- *   2014.01.02-2014.12.20: fail
- */
-
 extern string ____Alligator_1_Parameters__ = "-- Settings for the Alligator 1 indicator --";
 extern bool Alligator1_Enabled = TRUE; // Enable Alligator custom-based strategy.
 extern ENUM_TIMEFRAMES Alligator1_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
@@ -171,6 +159,18 @@ extern int Alligator1_TrailingProfitMethod = 4; // Trailing Profit method for Al
 /* Alligator1 Optimization log (1000,auto,ts:15,tp:20,gap:10)
  *   2015.01.02-2015.06.20: 3,8k trades, 50% dd, 1.06 profit factor (+105%)
  *   2014.01.02-2014.12.20: 3,9k trades, 66% dd, 1.01 profit factor (+12%)
+ */
+
+extern string ____Fractals_Parameters__ = "-- Settings for the Fractals indicator --";
+extern bool Fractals_Enabled = TRUE; // Enable Fractals-based strategy.
+extern ENUM_TIMEFRAMES Fractals_Timeframe = PERIOD_M5; // Timeframe (0 means the current chart).
+extern int Fractals_MaxPeriods = 2; // Suggested range: 1-5, Suggested value: 3
+extern int Fractals_Shift = 4; // Shift relative to the chart. Suggested value: 0.
+extern int Fractals_TrailingStopMethod = 6; // Trailing Stop method for Fractals. Range: 0-10. Set 0 to default.
+extern int Fractals_TrailingProfitMethod = 4; // Trailing Profit method for Fractals. Range: 0-10. Set 0 to default.
+/* Fractals Optimization log (1000,auto,ts:15,tp:20,gap:10)
+ *   2015.01.02-2015.06.20: 7k trades, 50-70% dd, 1.03 profit factor (+94%)
+ *   2014.01.02-2014.12.20: fail
  */
 
 extern string ____Alligator_2_Parameters__ = "-- Settings for the Alligator 2 indicator --";
@@ -192,30 +192,6 @@ extern int Alligator2_TrailingProfitMethod = 1; // Trailing Profit method for Al
  *   2015.01.02-2015.06.20:
  */
 
-extern string ____DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --";
-extern bool DeMarker_Enabled = TRUE; // Enable DeMarker-based strategy.
-extern ENUM_TIMEFRAMES DeMarker_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int DeMarker_Period = 110; // Suggested value: 110.
-extern int DeMarker_Shift = 8; // Shift relative to the current bar the given amount of periods ago. Suggested value: 4.
-extern double DeMarker_Filter = 0.0; // Valid range: 0.0-0.4. Suggested value: 0.0.
-extern int DeMarker_TrailingStopMethod = 1; // Trailing Stop method for DeMarker. Range: 0-10. Set 0 to default.
-extern int DeMarker_TrailingProfitMethod = 4; // Trailing Profit method for DeMarker. Range: 0-10. Set 0 to default.
-/* DeMarker Optimization log (1000,auto,ts:15,tp:20,gap:10)
- *   2015.01.02-2015.06.20: 7k trades, 63% dd, 1.06 profit factor (+204%)
- */
-
-extern string ____WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --";
-extern bool WPR_Enabled = TRUE; // Enable WPR-based strategy.
-extern ENUM_TIMEFRAMES WPR_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int WPR_Period = 50; // Suggested value: 50.
-extern int WPR_Shift = 1; // Shift relative to the current bar the given amount of periods ago. Suggested value: 1.
-extern double WPR_Filter = 0.17; // Suggested range: 0.0-0.5. Suggested range: 0.1-0.2.
-extern int WPR_TrailingStopMethod = 6; // Trailing Stop method for WPR. Range: 0-10. Set 0 to default.
-extern int WPR_TrailingProfitMethod = 6; // Trailing Profit method for WPR. Range: 0-10. Set 0 to default.
-/* WPR Optimization log (1000,auto,ts:15,tp:20,gap:10)
- *   2015.01.02-2015.06.20: 8,3k trades, 40% dd, 1.07 profit factor (+218%)
- */
-
 extern string ____RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --";
 extern bool RSI_Enabled = FALSE; // Enable RSI-based strategy.
 extern ENUM_TIMEFRAMES RSI_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
@@ -235,6 +211,31 @@ extern int Bands_MaxPeriods = 3; // Maximum bar periods to calculate its value.
 extern int Bands_Shift = 0; // The indicator shift relative to the chart.
 extern int Bands_TrailingStopMethod = 9; // Trailing Stop method for Bands. Range: 0-10. Set 0 to default.
 extern int Bands_TrailingProfitMethod = 1; // Trailing Profit method for Bands. Range: 0-10. Set 0 to default.
+
+extern string ____WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --";
+extern bool WPR_Enabled = TRUE; // Enable WPR-based strategy.
+extern ENUM_TIMEFRAMES WPR_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
+extern int WPR_Period = 50; // Suggested value: 50.
+extern int WPR_Shift = 1; // Shift relative to the current bar the given amount of periods ago. Suggested value: 1.
+extern double WPR_Filter = 0.17; // Suggested range: 0.0-0.5. Suggested range: 0.1-0.2.
+extern int WPR_TrailingStopMethod = 6; // Trailing Stop method for WPR. Range: 0-10. Set 0 to default.
+extern int WPR_TrailingProfitMethod = 6; // Trailing Profit method for WPR. Range: 0-10. Set 0 to default.
+/* WPR Optimization log (1000,auto,ts:15,tp:20,gap:10)
+ *   2015.01.02-2015.06.20: 8,3k trades, 40% dd, 1.07 profit factor (+218%)
+ */
+
+
+extern string ____DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --";
+extern bool DeMarker_Enabled = TRUE; // Enable DeMarker-based strategy.
+extern ENUM_TIMEFRAMES DeMarker_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
+extern int DeMarker_Period = 110; // Suggested value: 110.
+extern int DeMarker_Shift = 8; // Shift relative to the current bar the given amount of periods ago. Suggested value: 4.
+extern double DeMarker_Filter = 0.0; // Valid range: 0.0-0.4. Suggested value: 0.0.
+extern int DeMarker_TrailingStopMethod = 1; // Trailing Stop method for DeMarker. Range: 0-10. Set 0 to default.
+extern int DeMarker_TrailingProfitMethod = 4; // Trailing Profit method for DeMarker. Range: 0-10. Set 0 to default.
+/* DeMarker Optimization log (1000,auto,ts:15,tp:20,gap:10)
+ *   2015.01.02-2015.06.20: 7k trades, 63% dd, 1.06 profit factor (+204%)
+ */
 
 /*
  * Summary optimization log
@@ -583,16 +584,6 @@ void Trade() {
       }
    }
 
-   if (Fractals_Enabled) {
-      if (FractalsOnBuy()) {
-       if (EACloseOnMarketChange) CloseOrdersByType(FRACTALS_ON_SELL);
-       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), FRACTALS_ON_BUY, "FractalsOnBuy()");
-      } else if (FractalsOnSell()) {
-       if (EACloseOnMarketChange) CloseOrdersByType(FRACTALS_ON_BUY);
-       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), FRACTALS_ON_SELL, "FractalsOnSell()");
-      }
-   }
-
    if (Alligator1_Enabled) {
       if (Alligator1OnBuy()) {
         if (EACloseOnMarketChange) CloseOrdersByType(ALLIGATOR1_ON_SELL);
@@ -632,6 +623,17 @@ void Trade() {
        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), WPR_ON_SELL, "WPROnSell()");
      }
    }
+
+   if (Fractals_Enabled) {
+      if (FractalsOnBuy()) {
+       if (EACloseOnMarketChange) CloseOrdersByType(FRACTALS_ON_SELL);
+       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), FRACTALS_ON_BUY, "FractalsOnBuy()");
+      } else if (FractalsOnSell()) {
+       if (EACloseOnMarketChange) CloseOrdersByType(FRACTALS_ON_BUY);
+       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), FRACTALS_ON_SELL, "FractalsOnSell()");
+      }
+   }
+
 }
 
 // Check our account if certain conditions are met.
@@ -745,6 +747,22 @@ bool UpdateIndicators() {
     if (VerboseTrace) text += "MACD: " + GetArrayValues(MACD) + "; Signal: " + GetArrayValues(MACDSignal) + "; ";
   }
 
+  if (Alligator1_Enabled) {
+    // Update Alligator indicator values.
+    Alligator1[0] = iMA(NULL, Alligator1_Timeframe, Alligator1_Jaw_Period,   Alligator1_Jaw_Shift,   Alligator1_MA_Method, Alligator1_Applied_Price, Alligator1_Shift);
+    Alligator1[1] = iMA(NULL, Alligator1_Timeframe, Alligator1_Teeth_Period, Alligator1_Teeth_Shift, Alligator1_MA_Method, Alligator1_Applied_Price, Alligator1_Shift);
+    Alligator1[2] = iMA(NULL, Alligator1_Timeframe, Alligator1_Lips_Period,  Alligator1_Lips_Shift,  Alligator1_MA_Method, Alligator1_Applied_Price, Alligator1_Shift);
+    if (VerboseTrace) text += "Alligator1: " + GetArrayValues(Alligator1) + "; ";
+  }
+
+  if (Alligator2_Enabled) {
+    // Update Alligator indicator values.
+    Alligator2[0] = iAlligator(NULL, Alligator2_Timeframe, Alligator2_Jaw_Period, Alligator2_Jaw_Shift, Alligator2_Teeth_Period, Alligator2_Teeth_Shift, Alligator2_Lips_Period, Alligator2_Lips_Shift, Alligator2_MA_Method, Alligator2_Applied_Price, 0, Alligator2_Shift);
+    Alligator2[1] = iAlligator(NULL, Alligator2_Timeframe, Alligator2_Jaw_Period, Alligator2_Jaw_Shift, Alligator2_Teeth_Period, Alligator2_Teeth_Shift, Alligator2_Lips_Period, Alligator2_Lips_Shift, Alligator2_MA_Method, Alligator2_Applied_Price, 1, Alligator2_Shift);
+    Alligator2[2] = iAlligator(NULL, Alligator2_Timeframe, Alligator2_Jaw_Period, Alligator2_Jaw_Shift, Alligator2_Teeth_Period, Alligator2_Teeth_Shift, Alligator2_Lips_Period, Alligator2_Lips_Shift, Alligator2_MA_Method, Alligator2_Applied_Price, 2, Alligator2_Shift);
+    if (VerboseTrace) text += "Alligator2: " + GetArrayValues(Alligator2) + "; ";
+  }
+
   if (RSI_Enabled) {
     // Update RSI indicator values.
     for (i = 0; i <= RSI_MaxPeriods; i++) {
@@ -763,20 +781,10 @@ bool UpdateIndicators() {
     if (VerboseTrace) text += "Bands: Main: " + GetArrayValues(Bands_main) + "; Upper: " + GetArrayValues(Bands_upper) + "; Lower: " + GetArrayValues(Bands_lower) + "; ";
   }
 
-  if (Alligator1_Enabled) {
-    // Update Alligator indicator values.
-    Alligator1[0] = iMA(NULL, Alligator1_Timeframe, Alligator1_Jaw_Period,   Alligator1_Jaw_Shift,   Alligator1_MA_Method, Alligator1_Applied_Price, Alligator1_Shift);
-    Alligator1[1] = iMA(NULL, Alligator1_Timeframe, Alligator1_Teeth_Period, Alligator1_Teeth_Shift, Alligator1_MA_Method, Alligator1_Applied_Price, Alligator1_Shift);
-    Alligator1[2] = iMA(NULL, Alligator1_Timeframe, Alligator1_Lips_Period,  Alligator1_Lips_Shift,  Alligator1_MA_Method, Alligator1_Applied_Price, Alligator1_Shift);
-    if (VerboseTrace) text += "Alligator1: " + GetArrayValues(Alligator1) + "; ";
-  }
-
-  if (Alligator2_Enabled) {
-    // Update Alligator indicator values.
-    Alligator2[0] = iAlligator(NULL, Alligator2_Timeframe, Alligator2_Jaw_Period, Alligator2_Jaw_Shift, Alligator2_Teeth_Period, Alligator2_Teeth_Shift, Alligator2_Lips_Period, Alligator2_Lips_Shift, Alligator2_MA_Method, Alligator2_Applied_Price, 0, Alligator2_Shift);
-    Alligator2[1] = iAlligator(NULL, Alligator2_Timeframe, Alligator2_Jaw_Period, Alligator2_Jaw_Shift, Alligator2_Teeth_Period, Alligator2_Teeth_Shift, Alligator2_Lips_Period, Alligator2_Lips_Shift, Alligator2_MA_Method, Alligator2_Applied_Price, 1, Alligator2_Shift);
-    Alligator2[2] = iAlligator(NULL, Alligator2_Timeframe, Alligator2_Jaw_Period, Alligator2_Jaw_Shift, Alligator2_Teeth_Period, Alligator2_Teeth_Shift, Alligator2_Lips_Period, Alligator2_Lips_Shift, Alligator2_MA_Method, Alligator2_Applied_Price, 2, Alligator2_Shift);
-    if (VerboseTrace) text += "Alligator2: " + GetArrayValues(Alligator2) + "; ";
+  if (WPR_Enabled) {
+    // Update the Larry Williams' Percent Range indicator values.
+    WPR = (-iWPR(NULL, WPR_Timeframe, WPR_Period, WPR_Shift)) / 100.0;
+    if (VerboseTrace) text += "WPR: " + WPR + "; ";
   }
 
   if (DeMarker_Enabled) {
@@ -785,11 +793,6 @@ bool UpdateIndicators() {
     if (VerboseTrace) text += "DeMarker: " + DeMarker + "; ";
   }
 
-  if (WPR_Enabled) {
-    // Update the Larry Williams' Percent Range indicator values.
-    WPR = (-iWPR(NULL, WPR_Timeframe, WPR_Period, WPR_Shift)) / 100.0;
-    if (VerboseTrace) text += "WPR: " + WPR + "; ";
-  }
 
   if (Fractals_Enabled) {
     // Update Fractals indicator values.
@@ -808,143 +811,6 @@ bool UpdateIndicators() {
 
   if (VerboseTrace) Print(text);
   return (TRUE);
-}
-
-// Update statistics.
-bool UpdateStats() {
-  CheckStats(ValueToPips(MathMax(MathAbs(Ask - LastAsk), MathAbs(Bid - LastBid))),  MAX_TICK);
-  LastAsk = Ask; LastBid = Bid;
-  // Check if bar time has been changed since last check.
-  int bar_time = iTime(NULL, PERIOD_M1, 0);
-  if (bar_time == last_indicators_update) return (FALSE); else last_stats_update = bar_time;
-  CheckStats(Low[0],  MAX_LOW);
-  CheckStats(High[0], MAX_HIGH);
-  return (TRUE);
-}
-
-// Trading Signal: when MA1 is crossing MA2, it triggers a trading signal.
-bool MAFastOnBuy() {
-  bool state = (MA_Fast[0]>MA_Medium[0] && MA_Fast[1]<MA_Medium[1]);
-  // if (VerboseTrace) Print("MAFastOnBuy(): cond:", state, " - ", NormalizeDouble(MA_Fast[0], Digits), " > ", NormalizeDouble(MA_Medium[0], Digits), " && ", NormalizeDouble(MA_Fast[1], Digits), " < ", NormalizeDouble(MA_Medium[1], Digits));
-  return (MA_Fast[0]>MA_Medium[0] && MA_Fast[1]<MA_Medium[1] && MA_Fast[2]<MA_Medium[2]);
-}
-
-// // Trading Signal: when MA1 is crossing MA2, it triggers a trading signal.
-bool MAFastOnSell() {
-  bool state = (MA_Fast[0]<MA_Medium[0] && MA_Fast[1]>MA_Medium[1]);
-  // if (VerboseTrace) Print("MAFastOnSell(): cond:", state, " - ", NormalizeDouble(MA_Fast[0], Digits), " < ", NormalizeDouble(MA_Medium[0], Digits), " && ", NormalizeDouble(MA_Fast[1], Digits), " > ", NormalizeDouble(MA_Medium[1], Digits));
-  return (MA_Fast[0]<MA_Medium[0] && MA_Fast[1]>MA_Medium[1] && MA_Fast[2]>MA_Medium[2]);
-}
-
-bool MAMediumOnBuy() {
-  return (MA_Fast[0]>MA_Slow[0] && MA_Fast[1]<MA_Slow[1] && MA_Fast[2]<MA_Slow[2]);
-}
-
-bool MAMediumOnSell() {
-  return (MA_Fast[0]<MA_Slow[0] && MA_Fast[1]>MA_Slow[1] && MA_Fast[2]>MA_Slow[2]);
-}
-
-bool MASlowOnBuy() {
-  return (MA_Medium[0]>MA_Slow[0] && MA_Medium[1]<MA_Slow[1] && MA_Medium[2]<MA_Slow[2]);
-}
-
-bool MASlowOnSell() {
-  return (MA_Medium[0]<MA_Slow[0] && MA_Medium[1]>MA_Slow[1] && MA_Medium[2]>MA_Slow[2]);
-}
-
-bool MACDOnBuy() {
-  // Check for long position (BUY) possibility.
-  return (
-    MACD[0] < 0 && MACD[0] > MACDSignal[0] && MACD[1] < MACDSignal[1] &&
-    MathAbs(MACD[0]) > (MACD_OpenLevel*Point) && MA_Medium[0] > MA_Medium[1]
-  );
-}
-
-bool MACDOnSell() {
-  // Check for short position (SELL) possibility.
-  return (
-    MACD[0] > 0 && MACD[0] < MACDSignal[0] && MACD[1] > MACDSignal[1] &&
-    MACD[0] > (MACD_OpenLevel*Point) && MA_Medium[0] < MA_Medium[1]
-  );
-}
-
-bool Alligator1OnBuy() {
-  // if (VerboseTrace) Print("AlligatorOnBuy(): ", NormalizeDouble(Alligator[2] - Alligator[1], pip_precision), ",", NormalizeDouble(Alligator[1] - Alligator[0], pip_precision), ",", NormalizeDouble(Alligator[2] - Alligator[0], pip_precision), " >= ", NormalizeDouble(Alligator_Ratio * pip_size, pip_precision));
-   return (
-      Alligator1[2] - Alligator1[1] >= Alligator1_OpenLevel * pip_size &&
-      Alligator1[1] - Alligator1[0] >= Alligator1_OpenLevel * pip_size &&
-      Alligator1[2] - Alligator1[0] >= Alligator1_OpenLevel * pip_size
-   );
-}
-
-bool Alligator1OnSell() {
-  // if (VerboseTrace) Print("AlligatorOnSell(): ", NormalizeDouble(Alligator[1] - Alligator[2], pip_precision), ",", NormalizeDouble(Alligator[0] - Alligator[1], pip_precision), ",", NormalizeDouble(Alligator[0] - Alligator[2], pip_precision), " >= ", NormalizeDouble(Alligator_Ratio * pip_size, pip_precision));
-   return (
-      Alligator1[1] - Alligator1[2] >= Alligator1_OpenLevel * pip_size &&
-      Alligator1[0] - Alligator1[1] >= Alligator1_OpenLevel * pip_size &&
-      Alligator1[0] - Alligator1[2] >= Alligator1_OpenLevel * pip_size
-   );
-}
-
-bool Alligator2OnBuy() {
-  // if (VerboseTrace) Print("AlligatorOnBuy(): ", NormalizeDouble(Alligator[2] - Alligator[1], pip_precision), ",", NormalizeDouble(Alligator[1] - Alligator[0], pip_precision), ",", NormalizeDouble(Alligator[2] - Alligator[0], pip_precision), " >= ", NormalizeDouble(Alligator_Ratio * pip_size, pip_precision));
-   return (
-      Alligator2[2] - Alligator2[1] >= Alligator2_OpenLevel * pip_size &&
-      Alligator2[1] - Alligator2[0] >= Alligator2_OpenLevel * pip_size &&
-      Alligator2[2] - Alligator2[0] >= Alligator2_OpenLevel * pip_size
-   );
-}
-
-bool Alligator2OnSell() {
-  // if (VerboseTrace) Print("AlligatorOnSell(): ", NormalizeDouble(Alligator[1] - Alligator[2], pip_precision), ",", NormalizeDouble(Alligator[0] - Alligator[1], pip_precision), ",", NormalizeDouble(Alligator[0] - Alligator[2], pip_precision), " >= ", NormalizeDouble(Alligator_Ratio * pip_size, pip_precision));
-   return (
-      Alligator2[1] - Alligator2[2] >= Alligator2_OpenLevel * pip_size &&
-      Alligator2[0] - Alligator2[1] >= Alligator2_OpenLevel * pip_size &&
-      Alligator2[0] - Alligator2[2] >= Alligator2_OpenLevel * pip_size
-   );
-}
-
-bool FractalsOnBuy() {
-  return (Fractals_lower != 0.0);
-}
-
-bool FractalsOnSell() {
-  return (Fractals_upper != 0.0);
-}
-
-bool DeMarkerOnSell() {
-  // if (VerboseTrace) { Print("DeMarkerOnSell(): ", LowestValue(DeMarker), " < ", (0.5 - DeMarker_Filter)); }
-  return (DeMarker < (0.5 - DeMarker_Filter));
-}
-
-bool DeMarkerOnBuy() {
-  // if (VerboseTrace) { Print("DeMarkerOnBuy(): ", LowestValue(DeMarker), " > ", (0.5 + DeMarker_Filter)); }
-  return (DeMarker > (0.5 + DeMarker_Filter));
-}
-
-bool WPROnSell() {
-  return (WPR <= (0.5 - WPR_Filter));
-}
-
-bool WPROnBuy() {
-  return (WPR >= (0.5 + WPR_Filter));
-}
-
-double LowestValue(double& arr[]) {
-  return (arr[ArrayMinimum(arr)]);
-}
-
-double HighestValue(double& arr[]) {
-   return (arr[ArrayMaximum(arr)]);
-}
-
-// Return array values separated by delimiter.
-string GetArrayValues(double& arr[], string sep = ", ") {
-  string result = "";
-  for (int i = 0; i < ArraySize(arr); i++) {
-    result = result + i + ":" + arr[i] + sep;
-  }
-  return StringSubstr(result, 0, StringLen(result) - StringLen(sep)); // Return text without last separator.
 }
 
 int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = "", bool retry = TRUE) {
@@ -1060,6 +926,22 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
    return (result);
 }
 
+bool EACloseOrder(int ticket_no, string reason, bool retry = TRUE) {
+  bool result;
+  if (ticket_no > 0) result = OrderSelect(ticket_no, SELECT_BY_TICKET);
+  else ticket_no = OrderTicket();
+  result = OrderClose(ticket_no, OrderLots(), GetClosePrice(OrderType()), max_order_slippage, GetOrderColor());
+  // if (VerboseTrace) Print("CloseOrder request. Reason: " + reason + "; Result=" + result + " @ " + TimeCurrent() + "(" + TimeToStr(TimeCurrent()) + "), ticket# " + ticket_no);
+  if (result) {
+    if (VerboseDebug) Print(__FUNCTION__, "(): Closed order " + ticket_no + " with profit " + GetOrderProfit() + ", reason: " + reason + "; " + GetOrderTextDetails());
+  } else {
+    err_code = GetLastError();
+    Print(__FUNCTION__, "(): Error: Ticket: ", ticket_no, "; Error: ", GetErrorText(err_code));
+    if (retry) TaskAddCloseOrder(ticket_no); // Add task to re-try.
+  } // end-if: !result
+  return result;
+}
+
 // Close order by type of strategy used. See: ENUM_STRATEGY_TYPE.
 int CloseOrdersByType(int order_type) {
    int orders_total, order_failed;
@@ -1088,6 +970,146 @@ int CloseOrdersByType(int order_type) {
    return (orders_total);
 }
 
+
+// Update statistics.
+bool UpdateStats() {
+  CheckStats(ValueToPips(MathMax(MathAbs(Ask - LastAsk), MathAbs(Bid - LastBid))),  MAX_TICK);
+  LastAsk = Ask; LastBid = Bid;
+  // Check if bar time has been changed since last check.
+  int bar_time = iTime(NULL, PERIOD_M1, 0);
+  if (bar_time == last_indicators_update) return (FALSE); else last_stats_update = bar_time;
+  CheckStats(Low[0],  MAX_LOW);
+  CheckStats(High[0], MAX_HIGH);
+  return (TRUE);
+}
+
+// Trading Signal: when MA1 is crossing MA2, it triggers a trading signal.
+bool MAFastOnBuy() {
+  bool state = (MA_Fast[0] > MA_Medium[0] && MA_Fast[1] < MA_Medium[1]);
+  // if (VerboseTrace) Print("MAFastOnBuy(): cond:", state, " - ", NormalizeDouble(MA_Fast[0], Digits), " > ", NormalizeDouble(MA_Medium[0], Digits), " && ", NormalizeDouble(MA_Fast[1], Digits), " < ", NormalizeDouble(MA_Medium[1], Digits));
+  return (MA_Fast[0] > MA_Medium[0] && MA_Fast[1] < MA_Medium[1] && MA_Fast[2] < MA_Medium[2]);
+}
+
+// // Trading Signal: when MA1 is crossing MA2, it triggers a trading signal.
+bool MAFastOnSell() {
+  bool state = (MA_Fast[0] < MA_Medium[0] && MA_Fast[1] > MA_Medium[1]);
+  // if (VerboseTrace) Print("MAFastOnSell(): cond:", state, " - ", NormalizeDouble(MA_Fast[0], Digits), " < ", NormalizeDouble(MA_Medium[0], Digits), " && ", NormalizeDouble(MA_Fast[1], Digits), " > ", NormalizeDouble(MA_Medium[1], Digits));
+  return (MA_Fast[0] < MA_Medium[0] && MA_Fast[1] > MA_Medium[1] && MA_Fast[2] > MA_Medium[2]);
+}
+
+bool MAMediumOnBuy() {
+  return (MA_Fast[0] > MA_Slow[0] && MA_Fast[1] < MA_Slow[1] && MA_Fast[2] < MA_Slow[2]);
+}
+
+bool MAMediumOnSell() {
+  return (MA_Fast[0] < MA_Slow[0] && MA_Fast[1] > MA_Slow[1] && MA_Fast[2] > MA_Slow[2]);
+}
+
+bool MASlowOnBuy() {
+  return (MA_Medium[0] > MA_Slow[0] && MA_Medium[1 ] <MA_Slow[1] && MA_Medium[2] < MA_Slow[2]);
+}
+
+bool MASlowOnSell() {
+  return (MA_Medium[0] < MA_Slow[0] && MA_Medium[1] > MA_Slow[1] && MA_Medium[2] > MA_Slow[2]);
+}
+
+bool MACDOnBuy() {
+  // Check for long position (BUY) possibility.
+  return (
+    MACD[0] < 0 && MACD[0] > MACDSignal[0] && MACD[1] < MACDSignal[1] &&
+    MathAbs(MACD[0]) > (MACD_OpenLevel*Point) && MA_Medium[0] > MA_Medium[1]
+  );
+}
+
+bool MACDOnSell() {
+  // Check for short position (SELL) possibility.
+  return (
+    MACD[0] > 0 && MACD[0] < MACDSignal[0] && MACD[1] > MACDSignal[1] &&
+    MACD[0] > (MACD_OpenLevel*Point) && MA_Medium[0] < MA_Medium[1]
+  );
+}
+
+bool Alligator1OnBuy() {
+  // if (VerboseTrace) Print("AlligatorOnBuy(): ", NormalizeDouble(Alligator[2] - Alligator[1], pip_precision), ",", NormalizeDouble(Alligator[1] - Alligator[0], pip_precision), ",", NormalizeDouble(Alligator[2] - Alligator[0], pip_precision), " >= ", NormalizeDouble(Alligator_Ratio * pip_size, pip_precision));
+   return (
+      Alligator1[2] - Alligator1[1] >= Alligator1_OpenLevel * pip_size &&
+      Alligator1[1] - Alligator1[0] >= Alligator1_OpenLevel * pip_size &&
+      Alligator1[2] - Alligator1[0] >= Alligator1_OpenLevel * pip_size
+   );
+}
+
+bool Alligator1OnSell() {
+  // if (VerboseTrace) Print("AlligatorOnSell(): ", NormalizeDouble(Alligator[1] - Alligator[2], pip_precision), ",", NormalizeDouble(Alligator[0] - Alligator[1], pip_precision), ",", NormalizeDouble(Alligator[0] - Alligator[2], pip_precision), " >= ", NormalizeDouble(Alligator_Ratio * pip_size, pip_precision));
+   return (
+      Alligator1[1] - Alligator1[2] >= Alligator1_OpenLevel * pip_size &&
+      Alligator1[0] - Alligator1[1] >= Alligator1_OpenLevel * pip_size &&
+      Alligator1[0] - Alligator1[2] >= Alligator1_OpenLevel * pip_size
+   );
+}
+
+bool Alligator2OnBuy() {
+  // if (VerboseTrace) Print("AlligatorOnBuy(): ", NormalizeDouble(Alligator[2] - Alligator[1], pip_precision), ",", NormalizeDouble(Alligator[1] - Alligator[0], pip_precision), ",", NormalizeDouble(Alligator[2] - Alligator[0], pip_precision), " >= ", NormalizeDouble(Alligator_Ratio * pip_size, pip_precision));
+   return (
+      Alligator2[2] - Alligator2[1] >= Alligator2_OpenLevel * pip_size &&
+      Alligator2[1] - Alligator2[0] >= Alligator2_OpenLevel * pip_size &&
+      Alligator2[2] - Alligator2[0] >= Alligator2_OpenLevel * pip_size
+   );
+}
+
+bool Alligator2OnSell() {
+  // if (VerboseTrace) Print("AlligatorOnSell(): ", NormalizeDouble(Alligator[1] - Alligator[2], pip_precision), ",", NormalizeDouble(Alligator[0] - Alligator[1], pip_precision), ",", NormalizeDouble(Alligator[0] - Alligator[2], pip_precision), " >= ", NormalizeDouble(Alligator_Ratio * pip_size, pip_precision));
+   return (
+      Alligator2[1] - Alligator2[2] >= Alligator2_OpenLevel * pip_size &&
+      Alligator2[0] - Alligator2[1] >= Alligator2_OpenLevel * pip_size &&
+      Alligator2[0] - Alligator2[2] >= Alligator2_OpenLevel * pip_size
+   );
+}
+
+bool WPROnSell() {
+  return (WPR <= (0.5 - WPR_Filter));
+}
+
+bool WPROnBuy() {
+  return (WPR >= (0.5 + WPR_Filter));
+}
+
+bool DeMarkerOnSell() {
+  // if (VerboseTrace) { Print("DeMarkerOnSell(): ", LowestValue(DeMarker), " < ", (0.5 - DeMarker_Filter)); }
+  return (DeMarker < (0.5 - DeMarker_Filter));
+}
+
+bool DeMarkerOnBuy() {
+  // if (VerboseTrace) { Print("DeMarkerOnBuy(): ", LowestValue(DeMarker), " > ", (0.5 + DeMarker_Filter)); }
+  return (DeMarker > (0.5 + DeMarker_Filter));
+}
+
+// Check if Fractals indicator is on buy.
+bool FractalsOnBuy() {
+  return (Fractals_lower != 0.0);
+}
+
+// Check if Fractals indicator is on sell.
+bool FractalsOnSell() {
+  return (Fractals_upper != 0.0);
+}
+
+double LowestValue(double& arr[]) {
+  return (arr[ArrayMinimum(arr)]);
+}
+
+double HighestValue(double& arr[]) {
+   return (arr[ArrayMaximum(arr)]);
+}
+
+// Return array values separated by delimiter.
+string GetArrayValues(double& arr[], string sep = ", ") {
+  string result = "";
+  for (int i = 0; i < ArraySize(arr); i++) {
+    result = result + i + ":" + arr[i] + sep;
+  }
+  return StringSubstr(result, 0, StringLen(result) - StringLen(sep)); // Return text without last separator.
+}
+
 // Check if order match has minimum gap in pips configured by EAMinPipGap parameter.
 bool CheckMinPipGap(int order_type) {
   int diff;
@@ -1105,22 +1127,6 @@ bool CheckMinPipGap(int order_type) {
     }
   }
   return TRUE;
-}
-
-bool EACloseOrder(int ticket_no, string reason, bool retry = TRUE) {
-  bool result;
-  if (ticket_no > 0) result = OrderSelect(ticket_no, SELECT_BY_TICKET);
-  else ticket_no = OrderTicket();
-  result = OrderClose(ticket_no, OrderLots(), GetClosePrice(OrderType()), max_order_slippage, GetOrderColor());
-  // if (VerboseTrace) Print("CloseOrder request. Reason: " + reason + "; Result=" + result + " @ " + TimeCurrent() + "(" + TimeToStr(TimeCurrent()) + "), ticket# " + ticket_no);
-  if (result) {
-    if (VerboseDebug) Print(__FUNCTION__, "(): Closed order " + ticket_no + " with profit " + GetOrderProfit() + ", reason: " + reason + "; " + GetOrderTextDetails());
-  } else {
-    err_code = GetLastError();
-    Print(__FUNCTION__, "(): Error: Ticket: ", ticket_no, "; Error: ", GetErrorText(err_code));
-    if (retry) TaskAddCloseOrder(ticket_no); // Add task to re-try.
-  } // end-if: !result
-  return result;
 }
 
 // Validate value for trailing stop.
@@ -1376,11 +1382,6 @@ int GetTrailingMethod(int order_type, int stop_or_profit) {
       if (MACD_TrailingStopMethod > 0)   stop_method   = MACD_TrailingStopMethod;
       if (MACD_TrailingProfitMethod > 0) profit_method = MACD_TrailingProfitMethod;
       break;
-    case FRACTALS_ON_BUY:
-    case FRACTALS_ON_SELL:
-      if (Fractals_TrailingStopMethod > 0)   stop_method   = Fractals_TrailingStopMethod;
-      if (Fractals_TrailingProfitMethod > 0) profit_method = Fractals_TrailingProfitMethod;
-      break;
     case ALLIGATOR1_ON_BUY:
     case ALLIGATOR1_ON_SELL:
       if (Alligator1_TrailingStopMethod > 0)   stop_method   = Alligator1_TrailingStopMethod;
@@ -1390,6 +1391,16 @@ int GetTrailingMethod(int order_type, int stop_or_profit) {
     case ALLIGATOR2_ON_SELL:
       if (Alligator2_TrailingStopMethod > 0)   stop_method   = Alligator2_TrailingStopMethod;
       if (Alligator2_TrailingProfitMethod > 0) profit_method = Alligator2_TrailingProfitMethod;
+      break;
+    case RSI_ON_BUY:
+    case RSI_ON_SELL:
+      if (RSI_TrailingStopMethod > 0)   stop_method   = RSI_TrailingStopMethod;
+      if (RSI_TrailingProfitMethod > 0) profit_method = RSI_TrailingProfitMethod;
+      break;
+    case BANDS_ON_BUY:
+    case BANDS_ON_SELL:
+      if (Bands_TrailingStopMethod > 0)   stop_method   = Bands_TrailingStopMethod;
+      if (Bands_TrailingProfitMethod > 0) profit_method = Bands_TrailingProfitMethod;
       break;
     case DEMARKER_ON_BUY:
     case DEMARKER_ON_SELL:
@@ -1401,15 +1412,10 @@ int GetTrailingMethod(int order_type, int stop_or_profit) {
       if (WPR_TrailingStopMethod > 0)   stop_method   = WPR_TrailingStopMethod;
       if (WPR_TrailingProfitMethod > 0) profit_method = WPR_TrailingProfitMethod;
       break;
-    case BANDS_ON_BUY:
-    case BANDS_ON_SELL:
-      if (Bands_TrailingStopMethod > 0)   stop_method   = Bands_TrailingStopMethod;
-      if (Bands_TrailingProfitMethod > 0) profit_method = Bands_TrailingProfitMethod;
-      break;
-    case RSI_ON_BUY:
-    case RSI_ON_SELL:
-      if (RSI_TrailingStopMethod > 0)   stop_method   = RSI_TrailingStopMethod;
-      if (RSI_TrailingProfitMethod > 0) profit_method = RSI_TrailingProfitMethod;
+    case FRACTALS_ON_BUY:
+    case FRACTALS_ON_SELL:
+      if (Fractals_TrailingStopMethod > 0)   stop_method   = Fractals_TrailingStopMethod;
+      if (Fractals_TrailingProfitMethod > 0) profit_method = Fractals_TrailingProfitMethod;
       break;
     default:
       if (VerboseTrace) Print(__FUNCTION__ + "(): Unknown order type: " + order_type);
@@ -1786,7 +1792,6 @@ double GetAutoRiskRatio() {
   double balance = AccountBalance();
   double high_risk = 0.0;
   if (MathMin(equity, balance) < 2000) high_risk += 0.1 * GetNoOfStrategies() / 2; // Calculate additional risk.
-  // last_msg = "High risk: " + high_risk + " => " + MathMin(equity / balance - high_risk, 1.0);
   return MathMin(equity / balance - high_risk, 1.0);
 }
 
@@ -1795,6 +1800,7 @@ double GetRiskRatio() {
   return If(RiskRatio == 0, GetAutoRiskRatio(), RiskRatio);
 }
 
+/* BEGIN: DISPLAYING FUNCTIONS */
 string GetDailyReport() {
   string output = "Daily max: ";
   output += "Low: "    + daily[MAX_LOW] + "; ";
@@ -1830,8 +1836,6 @@ string GetMonthlyReport() {
   output += "Profit: " + monthly[MAX_PROFIT] + "; ";
   return output;
 }
-
-/* BEGIN: DISPLAYING FUNCTIONS */
 
 void DisplayInfoOnChart() {
   // Prepare text for Stop Out.
