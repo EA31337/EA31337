@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.014"
+#property version   "1.015"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -185,7 +185,7 @@ extern int Alligator2_Lips_Shift = 3; // Green line shift relative to the chart.
 extern ENUM_MA_METHOD Alligator2_MA_Method = MODE_SMMA; // MA method (See: ENUM_MA_METHOD).
 extern ENUM_APPLIED_PRICE Alligator2_Applied_Price = PRICE_MEDIAN; // Applied price. It can be any of ENUM_APPLIED_PRICE enumeration values.
 extern double Alligator2_OpenLevel = 0.5; // Suggested to not change. Suggested range: 0.0-5.0
-extern int Alligator2_Shift = 0;
+extern int Alligator2_Shift = 0; // The indicator shift relative to the chart.
 extern int Alligator2_TrailingStopMethod = 9; // Trailing Stop method for Alligator1. Range: 0-10. Set 0 to default.
 extern int Alligator2_TrailingProfitMethod = 1; // Trailing Profit method for Alligator1. Range: 0-10. Set 0 to default.
 /* Alligator1 Optimization log (1000,auto,ts:15,tp:20,gap:10)
@@ -193,13 +193,17 @@ extern int Alligator2_TrailingProfitMethod = 1; // Trailing Profit method for Al
  */
 
 extern string ____RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --";
-extern bool RSI_Enabled = FALSE; // Enable RSI-based strategy.
+extern bool RSI_Enabled = TRUE; // Enable RSI-based strategy.
 extern ENUM_TIMEFRAMES RSI_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int RSI_Period = 14; // Averaging period to calculate the main line.
-extern ENUM_APPLIED_PRICE RSI_Applied_Price = PRICE_HIGH; // RSI applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
-extern double RSI_MaxPeriods = 3; // Maximum bar periods to calculate its value.
-extern int RSI_TrailingStopMethod = 9; // Trailing Stop method for RSI. Range: 0-10. Set 0 to default.
-extern int RSI_TrailingProfitMethod = 1; // Trailing Profit method for RSI. Range: 0-10. Set 0 to default.
+extern ENUM_APPLIED_PRICE RSI_Applied_Price = PRICE_MEDIAN; // RSI applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
+extern int RSI_OpenLevel = 20;
+extern int RSI_Shift = 1;
+extern int RSI_TrailingStopMethod = 6; // Trailing Stop method for RSI. Range: 0-10. Set 0 to default.
+extern int RSI_TrailingProfitMethod = 4; // Trailing Profit method for RSI. Range: 0-10. Set 0 to default.
+/* RSI Optimization log (1000,auto,ts:15,tp:20,gap:10)
+ *   2015.01.05-2015.06.20: 2k trades, 22% dd, 1.17 profit factor (+116%)
+ */
 
 extern string ____Bands_Parameters__ = "-- Settings for the Bollinger Bands® indicator --";
 extern bool Bands_Enabled = FALSE; // Enable BBands-based strategy.
@@ -223,7 +227,6 @@ extern int WPR_TrailingProfitMethod = 6; // Trailing Profit method for WPR. Rang
 /* WPR Optimization log (1000,auto,ts:15,tp:20,gap:10)
  *   2015.01.02-2015.06.20: 8,3k trades, 40% dd, 1.07 profit factor (+218%)
  */
-
 
 extern string ____DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --";
 extern bool DeMarker_Enabled = TRUE; // Enable DeMarker-based strategy.
@@ -322,14 +325,12 @@ double market_minlot;
 double market_lotstep;
 double market_marginrequired;
 double market_stoplevel; // Market stop level in points.
+int pip_precision, volume_precision;
 int pts_per_pip; // Number points per pip.
 int gmt_offset = 0;
 
 // Account variables.
 string account_type;
-double acc_leverage;
-int pip_precision;
-int volume_precision;
 
 // State variables.
 bool session_initiated;
@@ -354,7 +355,7 @@ double daily[FINAL_VALUE_TYPE_ENTRY], weekly[FINAL_VALUE_TYPE_ENTRY], monthly[FI
 // Indicator variables.
 double MA_Fast[3], MA_Medium[3], MA_Slow[3];
 double MACD[3], MACDSignal[3];
-double RSI[];
+double RSI[3];
 double Bands_main[], Bands_upper[], Bands_lower[];
 double Alligator1[3], Alligator2[3];
 double DeMarker, WPR;
@@ -437,16 +438,11 @@ int OnInit() {
 
    // TODO: IsDllsAllowed(), IsLibrariesAllowed()
 
-  // Calculate pip size and precision.
-  if (Digits < 4) {
-    pip_size = 0.01;
-    pip_precision = 2;
-  } else {
-    pip_size = 0.0001;
-    pip_precision = 4;
-  }
+  // Calculate pip/volume size and precision.
+  pip_size = GetPipSize();
+  pip_precision = GetPipPrecision();
   pts_per_pip = GetPointsPerPip();
-  if (TradeMicroLots) volume_precision = 2; else volume_precision = 1;
+  volume_precision = GetVolumePrecision();
 
    // Initialize startup variables.
    session_initiated = FALSE;
@@ -462,7 +458,6 @@ int OnInit() {
    max_order_slippage = MaxOrderPriceSlippage * MathPow(10, Digits - pip_precision); // Maximum price slippage for buy or sell orders (converted into points).
 
    GMT_Offset = EAManualGMToffset;
-   ArrayResize(RSI, RSI_MaxPeriods + 1);
    ArrayResize(Bands_main, Bands_MaxPeriods + 1);
    ArrayResize(Bands_upper, Bands_MaxPeriods + 1);
    ArrayResize(Bands_lower, Bands_MaxPeriods + 1);
@@ -488,7 +483,7 @@ int OnInit() {
      // Print(__FUNCTION__, "(): ", description, " v", version, " by ", copyright, " (", link, ")");
      Print(__FUNCTION__, "(): Predefined variables: Bars = ", Bars, ", Ask = ", Ask, ", Bid = ", Bid, ", Digits = ", Digits, ", Point = ", DoubleToStr(Point, Digits));
      Print(__FUNCTION__, "(): Market info: Symbol: ", Symbol(), ", min lot = " + market_minlot + ", max lot = " + market_maxlot +  ", lot step = " + market_lotstep, ", margin required = " + market_marginrequired, ", stop level = ", market_stoplevel);
-     Print(__FUNCTION__, "(): Account info: AccountLeverage: ", acc_leverage);
+     Print(__FUNCTION__, "(): Account info: AccountLeverage: ", AccountLeverage());
      Print(__FUNCTION__, "(): Broker info: ", AccountCompany(), ", pip size = ", pip_size, ", points per pip = ", pts_per_pip, ", pip precision = ", pip_precision, ", volume precision = ", volume_precision);
      Print(__FUNCTION__, "(): EA info: Lot size = ", GetLotSize(), "; Max orders = ", GetMaxOrders(), "; Max orders per type = ", GetMaxOrdersPerType());
      Print(__FUNCTION__, "(): ", GetAccountTextDetails());
@@ -540,7 +535,7 @@ void OnTesterDeinit() {
 // FIXME: Doesn't seems to be called, however MT4 doesn't want to execute EA without it.
 void start() {
   if (VerboseTrace) Print("Calling " + __FUNCTION__ + "()");
-   // Print market info.
+  if (VerboseInfo) Print(GetMarketTextDetails());
 }
 
 void Trade() {
@@ -551,86 +546,96 @@ void Trade() {
    if (MA_Enabled) {
       if (MAFastOnBuy()) {
        if (EACloseOnMarketChange) CloseOrdersByType(MA_FAST_ON_SELL);
-       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MA_FAST_ON_BUY, "MAFastOnBuy()");
+       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MA_FAST_ON_BUY, "MAFastOnBuy");
       } else if (MAFastOnSell()) {
        if (EACloseOnMarketChange) CloseOrdersByType(MA_FAST_ON_BUY);
-       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MA_FAST_ON_SELL, "MAFastOnSell()");
+       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MA_FAST_ON_SELL, "MAFastOnSell");
       }
 
       if (MAMediumOnBuy()) {
        if (EACloseOnMarketChange) CloseOrdersByType(MA_MEDIUM_ON_SELL);
-       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MA_MEDIUM_ON_BUY, "MAMediumOnBuy()");
+       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MA_MEDIUM_ON_BUY, "MAMediumOnBuy");
       } else if (MAMediumOnSell()) {
        if (EACloseOnMarketChange) CloseOrdersByType(MA_MEDIUM_ON_BUY);
-       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MA_MEDIUM_ON_SELL, "MAMediumOnSell()");
+       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MA_MEDIUM_ON_SELL, "MAMediumOnSell");
       }
 
       if (MASlowOnBuy()) {
        if (EACloseOnMarketChange) CloseOrdersByType(MA_LARGE_ON_SELL);
-       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MA_LARGE_ON_BUY, "MASlowOnBuy()");
+       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MA_LARGE_ON_BUY, "MASlowOnBuy");
       } else if (MASlowOnSell()) {
        if (EACloseOnMarketChange) CloseOrdersByType(MA_LARGE_ON_BUY);
-       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MA_LARGE_ON_SELL, "MASlowOnSell()");
+       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MA_LARGE_ON_SELL, "MASlowOnSell");
       }
    }
 
    if (MACD_Enabled) {
       if (MACDOnBuy()) {
        if (EACloseOnMarketChange) CloseOrdersByType(MACD_ON_SELL);
-       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MACD_ON_BUY, "MACDOnBuy()");
+       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MACD_ON_BUY, "MACDOnBuy");
       } else if (MACDOnSell()) {
        if (EACloseOnMarketChange) CloseOrdersByType(MACD_ON_BUY);
-       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MACD_ON_SELL, "MACDOnSell()");
+       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MACD_ON_SELL, "MACDOnSell");
       }
    }
 
    if (Alligator1_Enabled) {
       if (Alligator1OnBuy()) {
         if (EACloseOnMarketChange) CloseOrdersByType(ALLIGATOR1_ON_SELL);
-        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), ALLIGATOR1_ON_BUY, "Alligator1OnBuy()");
+        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), ALLIGATOR1_ON_BUY, "Alligator1OnBuy");
       } else if (Alligator1OnSell()) {
         if (EACloseOnMarketChange) CloseOrdersByType(ALLIGATOR1_ON_BUY);
-        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), ALLIGATOR1_ON_SELL, "Alligator1OnSell()");
+        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), ALLIGATOR1_ON_SELL, "Alligator1OnSell");
       }
    }
 
    if (Alligator2_Enabled) {
       if (Alligator2OnBuy()) {
         if (EACloseOnMarketChange) CloseOrdersByType(ALLIGATOR2_ON_SELL);
-        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), ALLIGATOR2_ON_BUY, "Alligator2OnBuy()");
+        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), ALLIGATOR2_ON_BUY, "Alligator2OnBuy");
       } else if (Alligator2OnSell()) {
         if (EACloseOnMarketChange) CloseOrdersByType(ALLIGATOR2_ON_BUY);
-        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), ALLIGATOR2_ON_SELL, "Alligator2OnSell()");
+        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), ALLIGATOR2_ON_SELL, "Alligator2OnSell");
+      }
+   }
+
+   if (RSI_Enabled) {
+      if (RSIOnBuy(RSI_OpenLevel)) {
+        if (EACloseOnMarketChange) CloseOrdersByType(RSI_ON_SELL);
+        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), RSI_ON_BUY, "RSIOnBuy");
+      } else if (RSIOnSell(RSI_OpenLevel)) {
+        if (EACloseOnMarketChange) CloseOrdersByType(RSI_ON_BUY);
+        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), RSI_ON_SELL, "RSIOnSell");
       }
    }
 
    if (DeMarker_Enabled) {
       if (DeMarkerOnBuy()) {
         if (EACloseOnMarketChange) CloseOrdersByType(DEMARKER_ON_SELL);
-        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), DEMARKER_ON_BUY, "DeMarkerOnBuy()");
+        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), DEMARKER_ON_BUY, "DeMarkerOnBuy");
       } else if (DeMarkerOnSell()) {
         if (EACloseOnMarketChange) CloseOrdersByType(DEMARKER_ON_BUY);
-        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), DEMARKER_ON_SELL, "DeMarkerOnSell()");
+        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), DEMARKER_ON_SELL, "DeMarkerOnSell");
       }
    }
 
    if (WPR_Enabled) {
      if (WPROnBuy()) {
        if (EACloseOnMarketChange) CloseOrdersByType(WPR_ON_SELL);
-       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), WPR_ON_BUY, "WPROnBuy()");
+       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), WPR_ON_BUY, "WPROnBuy");
      } else if (WPROnSell()) {
        if (EACloseOnMarketChange) CloseOrdersByType(WPR_ON_BUY);
-       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), WPR_ON_SELL, "WPROnSell()");
+       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), WPR_ON_SELL, "WPROnSell");
      }
    }
 
    if (Fractals_Enabled) {
       if (FractalsOnBuy()) {
        if (EACloseOnMarketChange) CloseOrdersByType(FRACTALS_ON_SELL);
-       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), FRACTALS_ON_BUY, "FractalsOnBuy()");
+       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), FRACTALS_ON_BUY, "FractalsOnBuy");
       } else if (FractalsOnSell()) {
        if (EACloseOnMarketChange) CloseOrdersByType(FRACTALS_ON_BUY);
-       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), FRACTALS_ON_SELL, "FractalsOnSell()");
+       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), FRACTALS_ON_SELL, "FractalsOnSell");
       }
    }
 
@@ -765,8 +770,8 @@ bool UpdateIndicators() {
 
   if (RSI_Enabled) {
     // Update RSI indicator values.
-    for (i = 0; i <= RSI_MaxPeriods; i++) {
-      RSI[i] = iRSI(NULL, RSI_Timeframe, RSI_Period, RSI_Applied_Price, i);
+    for (i = 0; i < 3; i++) {
+      RSI[i] = iRSI(NULL, RSI_Timeframe, RSI_Period, RSI_Applied_Price, i + RSI_Shift);
     }
     if (VerboseTrace) text += "RSI: " + GetArrayValues(RSI) + "; ";
   }
@@ -864,7 +869,7 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
    if (EATakeProfit > 0.0) takeprofit = NormalizeDouble(order_price + (EATakeProfit + TrailingProfit) * pip_size * OpTypeValue(cmd), Digits);
    else takeprofit = GetTrailingProfit(cmd, 0, order_type);
 
-   order_ticket = OrderSend(Symbol(), cmd, volume, order_price, max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + order_type, 0, GetOrderColor());
+   order_ticket = OrderSend(Symbol(), cmd, volume, order_price, max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + order_type, 0, GetOrderColor(cmd));
    if (order_ticket >= 0) {
       if (VerboseTrace) Print(__FUNCTION__, "(): Success: OrderSend(", Symbol(), ", ",  _OrderType_str(cmd), ", ", volume, ", ", order_price, ", ", max_order_slippage, ", ", stoploss, ", ", takeprofit, ", ", order_comment, ", ", MagicNumber + order_type, ", 0, ", GetOrderColor(), ");");
       if (!OrderSelect(order_ticket, SELECT_BY_TICKET) && VerboseErrors) {
@@ -1065,22 +1070,32 @@ bool Alligator2OnSell() {
    );
 }
 
-bool WPROnSell() {
-  return (WPR <= (0.5 - WPR_Filter));
+// Check if RSI is on buy.
+bool RSIOnBuy(int open_level = 20) {
+  return (RSI[0] < (50 - open_level) && RSI[0] > RSI[1]);
+}
+
+// Check if RSI is on sell.
+bool RSIOnSell(int open_level = 20) {
+  return (RSI[0] > (50 + open_level) && RSI[0] < RSI[1]);
 }
 
 bool WPROnBuy() {
   return (WPR >= (0.5 + WPR_Filter));
 }
 
-bool DeMarkerOnSell() {
-  // if (VerboseTrace) { Print("DeMarkerOnSell(): ", LowestValue(DeMarker), " < ", (0.5 - DeMarker_Filter)); }
-  return (DeMarker < (0.5 - DeMarker_Filter));
+bool WPROnSell() {
+  return (WPR <= (0.5 - WPR_Filter));
 }
 
 bool DeMarkerOnBuy() {
   // if (VerboseTrace) { Print("DeMarkerOnBuy(): ", LowestValue(DeMarker), " > ", (0.5 + DeMarker_Filter)); }
   return (DeMarker > (0.5 + DeMarker_Filter));
+}
+
+bool DeMarkerOnSell() {
+  // if (VerboseTrace) { Print("DeMarkerOnSell(): ", LowestValue(DeMarker), " < ", (0.5 - DeMarker_Filter)); }
+  return (DeMarker < (0.5 - DeMarker_Filter));
 }
 
 // Check if Fractals indicator is on buy.
@@ -1660,13 +1675,45 @@ double GetOrderProfit() {
 }
 
 // Get color of the order.
-double GetOrderColor() {
-  return If(OpTypeValue(OrderType()) > 0, ColorBuy, ColorSell);
+double GetOrderColor(int cmd = -1) {
+  if (cmd == -1) cmd = OrderType();
+  return If(OpTypeValue(cmd) > 0, ColorBuy, ColorSell);
 }
 
 // Get minimal permissible StopLoss/TakeProfit value in points.
 double GetMinStopLevel() {
   return market_stoplevel * Point;
+}
+
+// Calculate pip size.
+double GetPipSize() {
+  if (Digits < 4) {
+    return 0.01;
+  } else {
+    return 0.0001;
+  }
+}
+
+// Calculate pip precision.
+double GetPipPrecision() {
+  if (Digits < 4) {
+    return 2;
+  } else {
+    return 4;
+  }
+}
+
+// Calculate volume precision.
+double GetVolumePrecision() {
+  if (TradeMicroLots) return 2;
+  else return 1;
+}
+
+// Calculate number of points per pip.
+// To be used to replace Point for trade parameters calculations.
+// See: http://forum.mql4.com/30672
+double GetPointsPerPip() {
+  return MathPow(10, Digits - GetPipPrecision());
 }
 
 // Current market spread value in pips.
@@ -1727,13 +1774,6 @@ double NormalizePrice(double p, string pair=""){
    if (pair == "") pair = Symbol();
    double ts = MarketInfo(pair, MODE_TICKSIZE);
    return( MathRound(p/ts) * ts );
-}
-
-// Calculate number of points per pip.
-// To be used to replace Point for trade parameters calculations.
-// See: http://forum.mql4.com/30672
-double GetPointsPerPip() {
-  return MathPow(10, Digits - pip_precision);
 }
 
 // Calculate number of order allowed given risk ratio.
