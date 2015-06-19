@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.017"
+#property version   "1.018"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -142,21 +142,21 @@ extern int MACD_TrailingProfitMethod = 4; // Trailing Profit method for MACD. Ra
 extern string ____Alligator_Parameters__ = "-- Settings for the Alligator 1 indicator --";
 extern bool Alligator_Enabled = TRUE; // Enable Alligator custom-based strategy.
 extern ENUM_TIMEFRAMES Alligator_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int Alligator_Jaw_Period = 100; // Blue line averaging period (Alligator's Jaw).
-extern int Alligator_Jaw_Shift = 11; // Blue line shift relative to the chart.
-extern int Alligator_Teeth_Period = 30; // Red line averaging period (Alligator's Teeth).
-extern int Alligator_Teeth_Shift = 8; // Red line shift relative to the chart.
-extern int Alligator_Lips_Period = 10; // Green line averaging period (Alligator's Lips).
-extern int Alligator_Lips_Shift = 5; // Green line shift relative to the chart.
+extern int Alligator_Jaw_Period = 25; // Blue line averaging period (Alligator's Jaw).
+extern int Alligator_Jaw_Shift = 10; // Blue line shift relative to the chart.
+extern int Alligator_Teeth_Period = 20; // Red line averaging period (Alligator's Teeth).
+extern int Alligator_Teeth_Shift = 5; // Red line shift relative to the chart.
+extern int Alligator_Lips_Period = 5; // Green line averaging period (Alligator's Lips).
+extern int Alligator_Lips_Shift = 3; // Green line shift relative to the chart.
 extern ENUM_MA_METHOD Alligator_MA_Method = MODE_SMMA; // MA method (See: ENUM_MA_METHOD).
 extern ENUM_APPLIED_PRICE Alligator_Applied_Price = PRICE_MEDIAN; // Applied price. It can be any of ENUM_APPLIED_PRICE enumeration values.
 extern int Alligator_Shift = 0;
-extern double Alligator_OpenLevel = 0.5; // Suggested to not change. Suggested range: 0.0-5.0
+// extern double Alligator_OpenLevel = 0.5; // Suggested to not change. Suggested range: 0.0-5.0
+extern bool Alligator_CloseOnChange = TRUE; // Close opposite orders on market change.
 extern int Alligator_TrailingStopMethod = 1; // Trailing Stop method for Alligator. Range: 0-10. Set 0 to default.
 extern int Alligator_TrailingProfitMethod = 4; // Trailing Profit method for Alligator. Range: 0-10. Set 0 to default.
 /* Alligator Optimization log (1000,auto,ts:15,tp:20,gap:10)
- *   2015.01.05-2015.06.20: 4,7k trades, 54% dd, 1.05 profit factor (+124%)
- *   2014.01.05-2014.12.20: fail
+ *   2015.03.05-2015.04.25: 2,3k trades, 42% dd, 1.10 profit factor (+88%)
  */
 
 extern string ____Fractals_Parameters__ = "-- Settings for the Fractals indicator --";
@@ -339,7 +339,7 @@ double MA_Fast[3], MA_Medium[3], MA_Slow[3];
 double MACD[3], MACDSignal[3];
 double RSI[3];
 double Bands_main[], Bands_upper[], Bands_lower[];
-double Alligator[3];
+double Alligator[2][3];
 double DeMarker, WPR;
 double Fractals_lower, Fractals_upper;
 
@@ -564,10 +564,10 @@ void Trade() {
    if (Alligator_Enabled) {
       if (AlligatorOnBuy()) {
         order_placed = ExecuteOrder(OP_BUY, GetLotSize(), ALLIGATOR_ON_BUY, "AlligatorOnBuy");
-        if (EACloseOnMarketChange) CloseOrdersByType(ALLIGATOR_ON_SELL);
+        if (Alligator_CloseOnChange) CloseOrdersByType(ALLIGATOR_ON_SELL);
       } else if (AlligatorOnSell()) {
         order_placed = ExecuteOrder(OP_SELL, GetLotSize(), ALLIGATOR_ON_SELL, "AlligatorOnSell");
-        if (EACloseOnMarketChange) CloseOrdersByType(ALLIGATOR_ON_BUY);
+        if (Alligator_CloseOnChange) CloseOrdersByType(ALLIGATOR_ON_BUY);
       }
    }
 
@@ -726,15 +726,19 @@ bool UpdateIndicators() {
 
   if (Alligator_Enabled) {
     // Update Alligator indicator values.
-    Alligator[0] = iMA(NULL, Alligator_Timeframe, Alligator_Jaw_Period,   Alligator_Jaw_Shift,   Alligator_MA_Method, Alligator_Applied_Price, Alligator_Shift);
-    Alligator[1] = iMA(NULL, Alligator_Timeframe, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_MA_Method, Alligator_Applied_Price, Alligator_Shift);
-    Alligator[2] = iMA(NULL, Alligator_Timeframe, Alligator_Lips_Period,  Alligator_Lips_Shift,  Alligator_MA_Method, Alligator_Applied_Price, Alligator_Shift);
+    // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
+    Alligator[0][0] = iMA(NULL, Alligator_Timeframe, Alligator_Jaw_Period,   Alligator_Jaw_Shift,   Alligator_MA_Method, Alligator_Applied_Price, Alligator_Shift);
+    Alligator[0][1] = iMA(NULL, Alligator_Timeframe, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_MA_Method, Alligator_Applied_Price, Alligator_Shift);
+    Alligator[0][2] = iMA(NULL, Alligator_Timeframe, Alligator_Lips_Period,  Alligator_Lips_Shift,  Alligator_MA_Method, Alligator_Applied_Price, Alligator_Shift);
+    Alligator[1][0] = iMA(NULL, Alligator_Timeframe, Alligator_Jaw_Period,   Alligator_Jaw_Shift,   Alligator_MA_Method, Alligator_Applied_Price, 1 + Alligator_Shift);
+    Alligator[1][1] = iMA(NULL, Alligator_Timeframe, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_MA_Method, Alligator_Applied_Price, 1 + Alligator_Shift);
+    Alligator[1][2] = iMA(NULL, Alligator_Timeframe, Alligator_Lips_Period,  Alligator_Lips_Shift,  Alligator_MA_Method, Alligator_Applied_Price, 1 + Alligator_Shift);
     /* Which is equivalent to:
-    Alligator[0] = iAlligator(NULL, Alligator_Timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
-    Alligator[1] = iAlligator(NULL, Alligator_Timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
-    Alligator[2] = iAlligator(NULL, Alligator_Timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
+    Alligator[0][0] = iAlligator(NULL, Alligator_Timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
+    Alligator[0][1] = iAlligator(NULL, Alligator_Timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
+    Alligator[0][2] = iAlligator(NULL, Alligator_Timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
      */
-    if (VerboseTrace) text += "Alligator: " + GetArrayValues(Alligator) + "; ";
+    // if (VerboseTrace) text += "Alligator: " + GetArrayValues(Alligator[0]) + GetArrayValues(Alligator[1]) + "; ";
   }
 
   if (RSI_Enabled) {
@@ -1004,21 +1008,19 @@ bool MACDOnSell() {
 }
 
 bool AlligatorOnBuy() {
-  // if (VerboseTrace) Print("AlligatorOnBuy(): ", NormalizeDouble(Alligator[2] - Alligator[1], pip_precision), ",", NormalizeDouble(Alligator[1] - Alligator[0], pip_precision), ",", NormalizeDouble(Alligator[2] - Alligator[0], pip_precision), " >= ", NormalizeDouble(Alligator_Ratio * pip_size, pip_precision));
-   return (
-      Alligator[2] - Alligator[1] >= Alligator_OpenLevel * pip_size &&
-      Alligator[1] - Alligator[0] >= Alligator_OpenLevel * pip_size &&
-      Alligator[2] - Alligator[0] >= Alligator_OpenLevel * pip_size
-   );
+  return (
+    Alligator[0][2] > Alligator[0][1] && Alligator[0][1] > Alligator[0][0] && // Check if all lines are going up ...
+    (Alligator[0][2] - Alligator[0][1]) > (Alligator[0][1] - Alligator[0][0]) && // ... and space between lips and teeth is bigger than between jaw and teeth ...
+    Alligator[0][2] > Alligator[1][2] // ... and make sure that lips increased since the last bar
+  );
 }
 
 bool AlligatorOnSell() {
-  // if (VerboseTrace) Print("AlligatorOnSell(): ", NormalizeDouble(Alligator[1] - Alligator[2], pip_precision), ",", NormalizeDouble(Alligator[0] - Alligator[1], pip_precision), ",", NormalizeDouble(Alligator[0] - Alligator[2], pip_precision), " >= ", NormalizeDouble(Alligator_Ratio * pip_size, pip_precision));
-   return (
-      Alligator[1] - Alligator[2] >= Alligator_OpenLevel * pip_size &&
-      Alligator[0] - Alligator[1] >= Alligator_OpenLevel * pip_size &&
-      Alligator[0] - Alligator[2] >= Alligator_OpenLevel * pip_size
-   );
+  return (
+    Alligator[0][2] < Alligator[0][1] && Alligator[0][1] < Alligator[0][0] && // Check if all lines are going down...
+    (Alligator[0][2] - Alligator[0][1]) < (Alligator[0][1] - Alligator[0][0]) && // ... and space between lips and teeth is bigger than between jaw and teeth ...
+    Alligator[0][2] < Alligator[1][2] // ... and make sure that lips decreased since the last bar
+  );
 }
 
 // Check if RSI is on buy.
