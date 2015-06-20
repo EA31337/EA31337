@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.020"
+#property version   "1.021"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -193,17 +193,19 @@ extern int SAR_TrailingProfitMethod = 4; // Trailing Profit method for SAR. Rang
  */
 
 extern string ____Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --";
-extern bool Bands_Enabled = FALSE; // Enable Bands-based strategy.
+extern bool Bands_Enabled = TRUE; // Enable Bands-based strategy.
 extern ENUM_TIMEFRAMES Bands_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int Bands_Period = 20; // Averaging period to calculate the main line.
-extern ENUM_APPLIED_PRICE Bands_Applied_Price = PRICE_HIGH; // Bands applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
+extern ENUM_APPLIED_PRICE Bands_Applied_Price = PRICE_OPEN; // Bands applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern int Bands_Deviation = 2; // Number of standard deviations from the main line.
-extern int Bands_MaxPeriods = 3; // Maximum bar periods to calculate its value.
 extern int Bands_Shift = 0; // The indicator shift relative to the chart.
 extern int Bands_Shift_Far = 0; // The indicator shift relative to the chart.
 extern bool Bands_CloseOnChange = FALSE; // Close opposite orders on market change.
 extern int Bands_TrailingStopMethod = 9; // Trailing Stop method for Bands. Range: 0-10. Set 0 to default.
 extern int Bands_TrailingProfitMethod = 1; // Trailing Profit method for Bands. Range: 0-10. Set 0 to default.
+/* Bands Optimization log (1000,auto,ts:15,tp:20,gap:10)
+ *   2015.01.05-2015.06.20: 4,5k trades, 25% dd, 1.10 profit factor (+209%)
+ */
 
 extern string ____Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --";
 extern bool Envelopes_Enabled = FALSE; // Enable Envelopes-based strategy.
@@ -1177,10 +1179,10 @@ bool SAROnSell() {
  */
 bool BandsOnBuy() {
   return (
-    Low[0] < Bands[0][2] // price value was lower than lower band (or: iClose)
-    // && iLow[1] > Bands[0][2] // previous price value was not lower than lower band (or: iClose)
-    // && iLow[2] > Bands[0][2] // previous price value was not lower than lower band (or: iClose)
-    && Bands[0][0] > Bands[2][0] // and trend is upwards
+    Low[0] < Bands[0][2] // price value was lower than lower band // 2091
+    && Bands[0][0] < Bands[1][0] // and trend is downwards
+    && Bands[0][1] < Bands[1][1] // and the upper bands are contracting
+    // && Bands[0][2] < Bands[1][2] // and the lower bands are contracting
   );
 }
 
@@ -1190,10 +1192,10 @@ bool BandsOnBuy() {
  */
 bool BandsOnSell() {
   return (
-    High[0] > Bands[0][1] // price value was higher than upper band (or: iClose)
-    // && iHigh[1] < Bands[0][1] // previous price value was not higher than upper band (or: iClose)
-    // && iHigh[2] < Bands[0][1] // previous price value was not higher than upper band (or: iClose)
-    && Bands[0][0] < Bands[2][0] // and trend is downwards
+    High[0] > Bands[0][1] // price value was higher than upper band // 2091
+    && Bands[0][0] > Bands[1][0] // and trend is upwards
+    && Bands[0][1] > Bands[1][1] // and the upper bands are expanding
+    // && Bands[0][2] > Bands[1][2] // and the lower bands are expanding
   );
 }
 
@@ -1462,20 +1464,29 @@ double GetTrailingStop(int cmd, double previous, int order_type = -1, bool exist
      case 8: // MA Slow (Current) - trailing stop
        trail_stop = MA_Slow[0] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
        break;
-     case 9: // Lowest value of MA Fast.
-       trail_stop = LowestValue(MA_Fast) - delta;
+     case 9: // Lowest/highest value of MA Fast.
+       trail_stop = If(cmd == OP_BUY, LowestValue(MA_Fast) - delta, HighestValue(MA_Fast) + delta);
        break;
-     case 10: // Lowest value of MA Medium.
-       trail_stop = LowestValue(MA_Medium) - delta;
+     case 10: // Lowest/highest value of MA Medium.
+       trail_stop = If(cmd == OP_BUY, LowestValue(MA_Medium) - delta, HighestValue(MA_Medium) + delta);
        break;
-     case 11: // Lowest value of all MAs.
-       trail_stop = MathMin(MathMin(LowestValue(MA_Fast), LowestValue(MA_Medium)), LowestValue(MA_Slow)) - delta;
+     case 11: // Lowest/highest value of all MAs.
+       trail_stop = If(cmd == OP_BUY,
+                       MathMin(MathMin(LowestValue(MA_Fast), LowestValue(MA_Medium)), LowestValue(MA_Slow)) - delta,
+                       MathMax(MathMax(LowestValue(MA_Fast), LowestValue(MA_Medium)), LowestValue(MA_Slow)) + delta
+                      );
        break;
      case 12: // Last SAR value.
        trail_stop = SAR[0];
        break;
-     case 13: // Lowest SAR value.
+     case 13: // Lowest/highest SAR value.
        trail_stop = If(cmd == OP_BUY, LowestValue(SAR), HighestValue(SAR));
+       break;
+     case 14: // Last Bands value.
+       trail_stop = If(cmd == OP_BUY, Bands[0][2], Bands[0][1]);
+       break;
+     case 15: // Lowest/highest Bands value.
+       trail_stop = If(cmd == OP_BUY, MathMin(MathMin(Bands[0][2], Bands[1][2]), Bands[2][2]), MathMax(MathMax(Bands[0][1], Bands[1][1]), Bands[2][1]));
        break;
      default:
        if (VerboseDebug) Print("Error in GetTrailingStop(): Unknown trailing stop method: ", method);
