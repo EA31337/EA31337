@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.019"
+#property version   "1.020"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -93,7 +93,7 @@ extern int TrailingStop = 15;
 extern int TrailingStopMethod = 4; // TrailingStop method. Set 0 to disable. Range: 0-10. Suggested value: 1 or 4.
 extern bool TrailingStopOneWay = TRUE; // Change trailing stop towards one direction only. Suggested value: TRUE
 extern int TrailingProfit = 20;
-extern int TrailingProfitMethod = 3; // Trailing Profit method. Set 0 to disable. Range: 0-10. Suggested value: 0, 1, 4 or 10.
+extern int TrailingProfitMethod = 0; // Trailing Profit method. Set 0 to disable. Range: 0-10. Suggested value: 0, 1, 4 or 10.
 extern bool TrailingProfitOneWay = TRUE; // Change trailing profit take towards one direction only.
 extern double TrailingStopAddPerMinute = 0.0; // Decrease trailing stop (in pips) per each bar. Set 0 to disable. Suggested value: 0.
 
@@ -164,19 +164,6 @@ extern int Alligator_TrailingProfitMethod = 4; // Trailing Profit method for All
  *   2015.03.05-2015.06.20: 1,6k trades, 13% dd, 1.21 profit factor (+97%)
  */
 
-extern string ____Fractals_Parameters__ = "-- Settings for the Fractals indicator --";
-extern bool Fractals_Enabled = TRUE; // Enable Fractals-based strategy.
-extern ENUM_TIMEFRAMES Fractals_Timeframe = PERIOD_M5; // Timeframe (0 means the current chart).
-extern int Fractals_MaxPeriods = 2; // Suggested range: 1-5, Suggested value: 3
-extern int Fractals_Shift = 4; // Shift relative to the chart. Suggested value: 0.
-extern bool Fractals_CloseOnChange = FALSE; // Close opposite orders on market change.
-extern int Fractals_TrailingStopMethod = 6; // Trailing Stop method for Fractals. Range: 0-10. Set 0 to default.
-extern int Fractals_TrailingProfitMethod = 4; // Trailing Profit method for Fractals. Range: 0-10. Set 0 to default.
-/* Fractals Optimization log (1000,auto,ts:15,tp:20,gap:10)
- *   2015.01.02-2015.06.20: 7k trades, 50-70% dd, 1.03 profit factor (+94%)
- *   2014.01.02-2014.12.20: fail
- */
-
 extern string ____RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --";
 extern bool RSI_Enabled = TRUE; // Enable RSI-based strategy.
 extern ENUM_TIMEFRAMES RSI_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
@@ -189,19 +176,21 @@ extern int RSI_TrailingStopMethod = 6; // Trailing Stop method for RSI. Range: 0
 extern int RSI_TrailingProfitMethod = 4; // Trailing Profit method for RSI. Range: 0-10. Set 0 to default.
 /* RSI Optimization log (1000,auto,ts:15,tp:20,gap:10)
  *   2015.01.05-2015.06.20: 2,7k trades, 20% dd, 1.20 profit factor (+164%)
- *   FIXME: 2014.01.05-2014.12.20: 3,8k trades, 41% dd, 1.00 profit factor (+4%)
  */
 
 extern string ____SAR_Parameters__ = "-- Settings for the the Parabolic Stop and Reverse system indicator --";
-extern bool SAR_Enabled = FALSE; // Enable SAR-based strategy.
+extern bool SAR_Enabled = TRUE; // Enable SAR-based strategy.
 extern ENUM_TIMEFRAMES SAR_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern double SAR_Step = 0.02; // Stop increment, usually 0.02.
+extern double SAR_Step = 0.03; // Stop increment, usually 0.02.
 extern double SAR_Maximum_Stop = 0.2; // Maximum stop value, usually 0.2.
-extern int SAR_Shift = 1; // Shift relative to the chart.
-extern int SAR_Shift_Far = 1; // Shift relative to the chart.
+extern int SAR_Shift = 0; // Shift relative to the chart.
+// extern int SAR_Shift_Far = 0; // Shift relative to the chart.
 extern bool SAR_CloseOnChange = FALSE; // Close opposite orders on market change.
-extern int SAR_TrailingStopMethod = 6; // Trailing Stop method for SAR. Range: 0-10. Set 0 to default.
+extern int SAR_TrailingStopMethod = 12; // Trailing Stop method for SAR. Range: 0-10. Set 0 to default.
 extern int SAR_TrailingProfitMethod = 4; // Trailing Profit method for SAR. Range: 0-10. Set 0 to default.
+/* SAR Optimization log (1000,auto,ts:15,tp:20,gap:10)
+ *   2015.01.05-2015.06.20: 11k trades, 18% dd, 1.13 profit factor (+266%)
+ */
 
 extern string ____Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --";
 extern bool Bands_Enabled = FALSE; // Enable Bands-based strategy.
@@ -254,6 +243,19 @@ extern int DeMarker_TrailingProfitMethod = 4; // Trailing Profit method for DeMa
  *   2015.01.02-2015.06.20: 7k trades, 63% dd, 1.06 profit factor (+204%)
  */
 
+extern string ____Fractals_Parameters__ = "-- Settings for the Fractals indicator --";
+extern bool Fractals_Enabled = TRUE; // Enable Fractals-based strategy.
+extern ENUM_TIMEFRAMES Fractals_Timeframe = PERIOD_M5; // Timeframe (0 means the current chart).
+extern int Fractals_MaxPeriods = 2; // Suggested range: 1-5, Suggested value: 3
+extern int Fractals_Shift = 4; // Shift relative to the chart. Suggested value: 0.
+extern bool Fractals_CloseOnChange = FALSE; // Close opposite orders on market change.
+extern int Fractals_TrailingStopMethod = 6; // Trailing Stop method for Fractals. Range: 0-10. Set 0 to default.
+extern int Fractals_TrailingProfitMethod = 4; // Trailing Profit method for Fractals. Range: 0-10. Set 0 to default.
+/* Fractals Optimization log (1000,auto,ts:15,tp:20,gap:10)
+ *   2015.01.02-2015.06.20: 7k trades, 50-70% dd, 1.03 profit factor (+94%)
+ *   2014.01.02-2014.12.20: fail
+ */
+
 /*
  * Summary optimization log
  * Separated test (1000,auto,ts:15,tp:20,gap:10,unlimited) [2015.01.02-2015.06.20 based on MT4 FXCM backtest data]:
@@ -263,10 +265,12 @@ extern int DeMarker_TrailingProfitMethod = 4; // Trailing Profit method for DeMa
  *   Alligator:  profit: 1200, trades:  4797, profit factor: 1.05, expected payoff: 0.25, drawdown: 57%,    +120%
  *   DeMarker:   profit: 2041, trades:  6982, profit factor: 1.06, expected payoff: 0.29, drawdown: 63%,    +204%
  *   WPR:        profit: 2182, trades:  8335, profit factor: 1.07, expected payoff: 0.26, drawdown: 41%,    +218%
- * All together (auto,ts:15,tp:20,gap:10,unlimited) [2015.01.10-2015.06.20 based on MT4 FXCM backtest data]:
+ * Mixed (auto,ts:15,tp:20,gap:10,unlimited) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data]:
  *   MA+MACD+Fractals+Alligator+DeMarker+WPR:
  *         1000: profit: 7555, trades: 31228, profit factor: 1.05, expected payoff: 0.24, drawdown: 29/79%, +755%
  *        10000: profit: 8586, trades: 31290, profit factor: 1.06, expected payoff: 0.27, drawdown: 22%,     +85%
+ *   Alligator+RSI+SAR:
+ *         1000: profit: 5302, trades: 15703, profit factor: 1.16, expected payoff: 0.34, drawdown: 17%,    +530%
  */
 
 extern string ____EA_Conditions__ = "-- Execute actions on certain conditions (set 0 to none) --"; // See: ENUM_ACTION_TYPE
@@ -614,7 +618,7 @@ void Trade() {
         order_placed = ExecuteOrder(OP_BUY, GetLotSize(), SAR_ON_BUY, "SAROnBuy");
         if (SAR_CloseOnChange) CloseOrdersByType(SAR_ON_SELL);
       } else if (SAROnSell()) {
-        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), RSI_ON_SELL, "SAROnSell");
+        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), SAR_ON_SELL, "SAROnSell");
         if (SAR_CloseOnChange) CloseOrdersByType(SAR_ON_BUY);
       }
    }
@@ -624,7 +628,7 @@ void Trade() {
         order_placed = ExecuteOrder(OP_BUY, GetLotSize(), BANDS_ON_BUY, "BandsOnBuy");
         if (Bands_CloseOnChange) CloseOrdersByType(BANDS_ON_SELL);
       } else if (BandsOnSell()) {
-        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), RSI_ON_SELL, "BandsOnSell");
+        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), BANDS_ON_SELL, "BandsOnSell");
         if (Bands_CloseOnChange) CloseOrdersByType(BANDS_ON_BUY);
       }
    }
@@ -808,9 +812,9 @@ bool UpdateIndicators() {
 
   if (SAR_Enabled) {
     // Update SAR indicator values.
-    SAR[0] = iSAR(NULL, SAR_Timeframe, SAR_Step, SAR_Maximum_Stop, 0 + SAR_Shift);
-    SAR[1] = iSAR(NULL, SAR_Timeframe, SAR_Step, SAR_Maximum_Stop, 1 + SAR_Shift);
-    SAR[2] = iSAR(NULL, SAR_Timeframe, SAR_Step, SAR_Maximum_Stop, 2 + SAR_Shift + SAR_Shift_Far);
+    for (i = 0; i < 3; i++) {
+      SAR[i] = iSAR(NULL, SAR_Timeframe, SAR_Step, SAR_Maximum_Stop, i + SAR_Shift);
+    }
     if (VerboseTrace) text += "SAR: " + GetArrayValues(SAR) + "; ";
   }
 
@@ -1148,7 +1152,11 @@ bool RSIOnSell(int open_level = 20) {
  *
  */
 bool SAROnBuy() {
-  return SAR[0] > Close[0];
+  return (
+    SAR[0] < Close[0] // check if SAR step is below the close price
+    && SAR[0] < SAR[1] // and current SAR is lower than the previous one
+    && SAR[1] < SAR[2] // and previous SAR is lower from the one before as well
+  );
 }
 
 /*
@@ -1156,7 +1164,11 @@ bool SAROnBuy() {
  *
  */
 bool SAROnSell() {
-  return SAR[0] < Close[0];
+  return (
+    SAR[0] > Close[0] // check if SAR step is above the close price
+    && SAR[0] > SAR[1] // and current SAR is higher than the previous one
+    && SAR[1] > SAR[2] // and previous SAR is higher from the one before as well
+  );
 }
 
 /*
@@ -1429,32 +1441,41 @@ double GetTrailingStop(int cmd, double previous, int order_type = -1, bool exist
      case 1: // Dynamic fixed.
        trail_stop = default_trail;
        break;
-     case 2: // iMA Small (Current) - trailing stop
+     case 2: // MA Small (Current) - trailing stop
        trail_stop = MA_Fast[0] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
        break;
-     case 3: // iMA Small (Previous) - trailing stop
+     case 3: // MA Small (Previous) - trailing stop
        trail_stop = MA_Fast[1] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
        break;
-     case 4: // iMA Small (Far) - trailing stop. Optimize together with: MA_Shift_Far.
+     case 4: // MA Small (Far) - trailing stop. Optimize together with: MA_Shift_Far.
        trail_stop = MA_Fast[2] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
        break;
-     case 5: // iMA Medium (Current) - trailing stop
+     case 5: // MA Medium (Current) - trailing stop
        trail_stop = MA_Medium[0] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
        break;
-     case 6: // iMA Medium (Previous) - trailing stop
+     case 6: // MA Medium (Previous) - trailing stop
        trail_stop = MA_Medium[1] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
        break;
-     case 7: // iMA Medium (Far) - trailing stop. Optimize together with: MA_Shift_Far.
+     case 7: // MA Medium (Far) - trailing stop. Optimize together with: MA_Shift_Far.
        trail_stop = MA_Medium[2] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
        break;
-     case 8: // iMA Slow (Current) - trailing stop
+     case 8: // MA Slow (Current) - trailing stop
        trail_stop = MA_Slow[0] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
        break;
-     case 9: // iMA Slow (Previous) - trailing stop
-       trail_stop = MA_Slow[1] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
+     case 9: // Lowest value of MA Fast.
+       trail_stop = LowestValue(MA_Fast) - delta;
        break;
-     case 10: // iMA Slow (Far) - trailing stop. Optimize together with: MA_Shift_Far.
-       trail_stop = MA_Slow[2] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
+     case 10: // Lowest value of MA Medium.
+       trail_stop = LowestValue(MA_Medium) - delta;
+       break;
+     case 11: // Lowest value of all MAs.
+       trail_stop = MathMin(MathMin(LowestValue(MA_Fast), LowestValue(MA_Medium)), LowestValue(MA_Slow)) - delta;
+       break;
+     case 12: // Last SAR value.
+       trail_stop = SAR[0];
+       break;
+     case 13: // Lowest SAR value.
+       trail_stop = If(cmd == OP_BUY, LowestValue(SAR), HighestValue(SAR));
        break;
      default:
        if (VerboseDebug) Print("Error in GetTrailingStop(): Unknown trailing stop method: ", method);
@@ -1971,12 +1992,14 @@ int GetNoOfStrategies() {
   return (
     6 * MA_Enabled
     + 2 * MACD_Enabled
-    + 2 * Fractals_Enabled
     + 2 * Alligator_Enabled
+    + 2 * RSI_Enabled
+    + 2 * SAR_Enabled
+    + 2 * Bands_Enabled
+    + 2 * Envelopes_Enabled
     + 2 * DeMarker_Enabled
     + 2 * WPR_Enabled
-    + 2 * RSI_Enabled
-    + 2 * Bands_Enabled
+    + 2 * Fractals_Enabled
   );
 }
 
