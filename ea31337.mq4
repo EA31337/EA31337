@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.021"
+#property version   "1.022"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -201,10 +201,10 @@ extern int Bands_Deviation = 2; // Number of standard deviations from the main l
 extern int Bands_Shift = 0; // The indicator shift relative to the chart.
 extern int Bands_Shift_Far = 0; // The indicator shift relative to the chart.
 extern bool Bands_CloseOnChange = FALSE; // Close opposite orders on market change.
-extern int Bands_TrailingStopMethod = 9; // Trailing Stop method for Bands. Range: 0-10. Set 0 to default.
+extern int Bands_TrailingStopMethod = 11; // Trailing Stop method for Bands. Range: 0-10. Set 0 to default.
 extern int Bands_TrailingProfitMethod = 1; // Trailing Profit method for Bands. Range: 0-10. Set 0 to default.
 /* Bands Optimization log (1000,auto,ts:15,tp:20,gap:10)
- *   2015.01.05-2015.06.20: 4,5k trades, 25% dd, 1.10 profit factor (+209%)
+ *   2015.01.05-2015.06.20: 36,6k trades, 40% dd, 1.07 profit factor (+930%)
  */
 
 extern string ____Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --";
@@ -1548,11 +1548,29 @@ double GetTrailingProfit(int cmd, double previous, int order_type = -1, bool exi
      case 8: // iMA Slow (Current) + trailing profit
        profit_take = MA_Slow[0] + TrailingProfit * OpTypeValue(cmd) * pip_size + delta;
        break;
-     case 9: // iMA Slow (Previous) + trailing profit
-       profit_take = MA_Slow[1] + TrailingProfit * OpTypeValue(cmd) * pip_size + delta;
+     case 9: // Lowest/highest value of MA Fast.
+       profit_take = If(cmd == OP_SELL, LowestValue(MA_Fast) - delta, HighestValue(MA_Fast) + delta);
        break;
-     case 10: // iMA Slow (Far) + trailing profit. Optimize together with: MA_Shift_Far.
-       profit_take = MA_Slow[2] + TrailingProfit * OpTypeValue(cmd) * pip_size + delta;
+     case 10: // Lowest/highest value of MA Medium.
+       profit_take = If(cmd == OP_SELL, LowestValue(MA_Medium) - delta, HighestValue(MA_Medium) + delta);
+       break;
+     case 11: // Lowest/highest value of all MAs.
+       profit_take = If(cmd == OP_SELL,
+                       MathMin(MathMin(LowestValue(MA_Fast), LowestValue(MA_Medium)), LowestValue(MA_Slow)) - delta,
+                       MathMax(MathMax(LowestValue(MA_Fast), LowestValue(MA_Medium)), LowestValue(MA_Slow)) + delta
+                      );
+       break;
+     case 12: // Last SAR value.
+       profit_take = SAR[0];
+       break;
+     case 13: // Lowest/highest SAR value.
+       profit_take = If(cmd == OP_SELL, LowestValue(SAR), HighestValue(SAR));
+       break;
+     case 14: // Last Bands value.
+       profit_take = If(cmd == OP_SELL, Bands[0][2], Bands[0][1]);
+       break;
+     case 15: // Lowest/highest Bands value.
+       profit_take = If(cmd == OP_SELL, MathMin(MathMin(Bands[0][2], Bands[1][2]), Bands[2][2]), MathMax(MathMax(Bands[0][1], Bands[1][1]), Bands[2][1]));
        break;
      default:
        if (VerboseDebug) Print(__FUNCTION__ + "(): Error: Unknown trailing stop method: ", method);
@@ -1638,7 +1656,7 @@ int GetTrailingMethod(int order_type, int stop_or_profit) {
     default:
       if (VerboseTrace) Print(__FUNCTION__ + "(): Unknown order type: " + order_type);
   }
-  return If(stop_or_profit > 1, profit_method, stop_method);
+  return If(stop_or_profit > 0, profit_method, stop_method);
 }
 
 void ShowLine(string name, double price, int colour = Yellow) {
