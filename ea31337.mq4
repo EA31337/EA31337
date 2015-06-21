@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.022"
+#property version   "1.023"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -14,10 +14,12 @@
 #include <stdlib.mqh> // Used for: ErrorDescription(), RGB(), CompareDoubles(), DoubleToStrMorePrecision(), IntegerToHexString()
 // #include "debug.mqh"
 
-// EA constants.
+/* EA constants */
+
+// Define type of strategies.
 enum ENUM_STRATEGY_TYPE {
   // Type of strategy being used (used for strategy identification, new strategies append to the end, but in general - do not change!).
-  UNKNOWN,
+  CUSTOM,
   MA_FAST_ON_BUY,
   MA_FAST_ON_SELL,
   MA_MEDIUM_ON_BUY,
@@ -45,11 +47,13 @@ enum ENUM_STRATEGY_TYPE {
   FINAL_STRATEGY_TYPE_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };
 
+// Define type of tasks.
 enum ENUM_TASK_TYPE {
   TASK_ORDER_OPEN,
   TASK_ORDER_CLOSE,
 };
 
+// Define type of actions which can be executed.
 enum ENUM_ACTION_TYPE {
   ACTION_NONE,
   ACTION_CLOSE_ORDER_PROFIT,
@@ -66,6 +70,7 @@ enum ENUM_ACTION_TYPE {
   FINAL_ACTION_TYPE_ENTRY // Should be the last one. Used to calculate number of enum items.
 };
 
+// Define type of values in order to store.
 enum ENUM_VALUE_TYPE {
   MAX_LOW,
   MAX_HIGH,
@@ -75,6 +80,30 @@ enum ENUM_VALUE_TYPE {
   MAX_LOSS,
   MAX_PROFIT,
   FINAL_VALUE_TYPE_ENTRY // Should be the last one. Used to calculate the number of enum items.
+};
+
+// Define type of trailing types.
+enum ENUM_TRAIL_TYPE {
+  /*  0 */ T_NONE,
+  /*  1 */ T_FIXED,
+  /*  2 */ T_MA_F_PREV,
+  /*  3 */ T_MA_F_FAR,
+  /*  4 */ T_MA_F_LOW,
+  /*  5 */ T_MA_F_TRAIL,
+  /*  6 */ T_MA_F_FAR_TRAIL,
+  /*  7 */ T_MA_M,
+  /*  8 */ T_MA_M_FAR,
+  /*  9 */ T_MA_M_LOW,
+  /* 10 */ T_MA_M_TRAIL,
+  /* 11 */ T_MA_M_FAR_TRAIL,
+  /* 12 */ T_MA_S,
+  /* 13 */ T_MA_S_FAR,
+  /* 14 */ T_MA_S_TRAIL,
+  /* 15 */ T_MA_LOWEST,
+  /* 16 */ T_SAR,
+  /* 17 */ T_SAR_LOW,
+  /* 18 */ T_BANDS,
+  /* 19 */ T_BANDS_LOW
 };
 
 // User parameters.
@@ -90,7 +119,7 @@ extern int MaxOrderPriceSlippage = 5; // Maximum price slippage for buy or sell 
 
 extern string __EA_Trailing_Parameters__ = "-- Settings for trailing stops --";
 extern int TrailingStop = 15;
-extern int TrailingStopMethod = 4; // TrailingStop method. Set 0 to disable. Range: 0-10. Suggested value: 1 or 4.
+extern ENUM_TRAIL_TYPE TrailingStopMethod = 4; // TrailingStop method. Set 0 to disable. Range: 0-10. Suggested value: 1 or 4.
 extern bool TrailingStopOneWay = TRUE; // Change trailing stop towards one direction only. Suggested value: TRUE
 extern int TrailingProfit = 20;
 extern int TrailingProfitMethod = 0; // Trailing Profit method. Set 0 to disable. Range: 0-10. Suggested value: 0, 1, 4 or 10.
@@ -119,7 +148,7 @@ extern int MA_Shift_Slow = 4; // Index of the value taken from the indicator buf
 extern int MA_Shift_Far = 9; // Far shift. Shift relative to the 2 previous bars (+2).
 extern ENUM_MA_METHOD MA_Method = MODE_EMA; // MA method (See: ENUM_MA_METHOD). Range: 0-3. Suggested value: MODE_EMA.
 extern ENUM_APPLIED_PRICE MA_Applied_Price = PRICE_WEIGHTED; // MA applied price (See: ENUM_APPLIED_PRICE). Range: 0-6. Suggested values: PRICE_OPEN, PRICE_TYPICAL, PRICE_WEIGHTED.
-extern int MA_TrailingStopMethod = 1; // Trailing Stop method for MA. Range: 0-10. Set 0 to default.
+extern ENUM_TRAIL_TYPE MA_TrailingStopMethod = T_FIXED; // Trailing Stop method for MA. Set 0 to default. See: ENUM_TRAIL_TYPE.
 extern int MA_TrailingProfitMethod = 4; // Trailing Profit method for MA. Range: 0-10. Set 0 to default.
 /* MA Optimization log (1000,0.1,ts:15,tp:20,gap:10)
  *   2015.01.02-2015.06.20: 3k trades, 66% dd, 1.06 profit factor (+92%)
@@ -137,7 +166,7 @@ extern double MACD_OpenLevel  = 1.5;
 extern ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_CLOSE; // MACD applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern int MACD_Shift = 5; // Past MACD value in number of bars. Shift relative to the current bar the given amount of periods ago. Suggested value: 1
 extern int MACD_ShiftFar = 2; // Additional MACD far value in number of bars relatively to MACD_Shift.
-extern int MACD_TrailingStopMethod = 4; // Trailing Stop method for MACD. Range: 0-10. Set 0 to default.
+extern ENUM_TRAIL_TYPE MACD_TrailingStopMethod = T_MA_F_FAR; // Trailing Stop method for MACD. Set 0 to default. See: ENUM_TRAIL_TYPE.
 extern int MACD_TrailingProfitMethod = 4; // Trailing Profit method for MACD. Range: 0-10. Set 0 to default.
 /* MACD Optimization log (1000,0.1,ts:15,tp:20,gap:10)
  *   2015.01.02-2015.06.20: 1,9k trades, 35% dd, 1.12 profit factor (+100%)
@@ -158,7 +187,7 @@ extern int Alligator_Shift = 1; // The indicator shift relative to the chart.
 extern int Alligator_Shift_Far = 1; // The indicator shift relative to the chart.
 extern double Alligator_OpenLevel = 0.01; // Minimum open level between moving averages to raise the singal.
 extern bool Alligator_CloseOnChange = TRUE; // Close opposite orders on market change.
-extern int Alligator_TrailingStopMethod = 4; // Trailing Stop method for Alligator. Range: 0-10. Set 0 to default.
+extern ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = T_MA_F_FAR; // Trailing Stop method for Alligator. Set 0 to default. See: ENUM_TRAIL_TYPE.
 extern int Alligator_TrailingProfitMethod = 4; // Trailing Profit method for Alligator. Range: 0-10. Set 0 to default.
 /* Alligator Optimization log (1000,auto,ts:15,tp:20,gap:10)
  *   2015.03.05-2015.06.20: 1,6k trades, 13% dd, 1.21 profit factor (+97%)
@@ -172,7 +201,7 @@ extern ENUM_APPLIED_PRICE RSI_Applied_Price = PRICE_MEDIAN; // RSI applied price
 extern int RSI_OpenLevel = 20;
 extern int RSI_Shift = 1; // Shift relative to the chart.
 extern bool RSI_CloseOnChange = TRUE; // Close opposite orders on market change.
-extern int RSI_TrailingStopMethod = 6; // Trailing Stop method for RSI. Range: 0-10. Set 0 to default.
+extern ENUM_TRAIL_TYPE RSI_TrailingStopMethod = T_MA_M_FAR; // Trailing Stop method for RSI. Set 0 to default. See: ENUM_TRAIL_TYPE.
 extern int RSI_TrailingProfitMethod = 4; // Trailing Profit method for RSI. Range: 0-10. Set 0 to default.
 /* RSI Optimization log (1000,auto,ts:15,tp:20,gap:10)
  *   2015.01.05-2015.06.20: 2,7k trades, 20% dd, 1.20 profit factor (+164%)
@@ -186,7 +215,7 @@ extern double SAR_Maximum_Stop = 0.2; // Maximum stop value, usually 0.2.
 extern int SAR_Shift = 0; // Shift relative to the chart.
 // extern int SAR_Shift_Far = 0; // Shift relative to the chart.
 extern bool SAR_CloseOnChange = FALSE; // Close opposite orders on market change.
-extern int SAR_TrailingStopMethod = 12; // Trailing Stop method for SAR. Range: 0-10. Set 0 to default.
+extern ENUM_TRAIL_TYPE SAR_TrailingStopMethod = T_SAR_LOW; // Trailing Stop method for SAR. Set 0 to default. See: ENUM_TRAIL_TYPE.
 extern int SAR_TrailingProfitMethod = 4; // Trailing Profit method for SAR. Range: 0-10. Set 0 to default.
 /* SAR Optimization log (1000,auto,ts:15,tp:20,gap:10)
  *   2015.01.05-2015.06.20: 11k trades, 18% dd, 1.13 profit factor (+266%)
@@ -196,15 +225,15 @@ extern string ____Bands_Parameters__ = "-- Settings for the Bollinger Bands indi
 extern bool Bands_Enabled = TRUE; // Enable Bands-based strategy.
 extern ENUM_TIMEFRAMES Bands_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int Bands_Period = 20; // Averaging period to calculate the main line.
-extern ENUM_APPLIED_PRICE Bands_Applied_Price = PRICE_OPEN; // Bands applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
-extern int Bands_Deviation = 2; // Number of standard deviations from the main line.
+extern ENUM_APPLIED_PRICE Bands_Applied_Price = PRICE_TYPICAL; // Bands applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
+extern double Bands_Deviation = 2.2; // Number of standard deviations from the main line.
 extern int Bands_Shift = 0; // The indicator shift relative to the chart.
 extern int Bands_Shift_Far = 0; // The indicator shift relative to the chart.
 extern bool Bands_CloseOnChange = FALSE; // Close opposite orders on market change.
-extern int Bands_TrailingStopMethod = 11; // Trailing Stop method for Bands. Range: 0-10. Set 0 to default.
+extern ENUM_TRAIL_TYPE Bands_TrailingStopMethod = T_MA_S_TRAIL; // Trailing Stop method for Bands. Set 0 to default. See: ENUM_TRAIL_TYPE.
 extern int Bands_TrailingProfitMethod = 1; // Trailing Profit method for Bands. Range: 0-10. Set 0 to default.
 /* Bands Optimization log (1000,auto,ts:15,tp:20,gap:10)
- *   2015.01.05-2015.06.20: 36,6k trades, 40% dd, 1.07 profit factor (+930%)
+ *   2015.01.05-2015.06.20: 4,4k trades, 38% dd, 1.19 profit factor (+322%)
  */
 
 extern string ____Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --";
@@ -214,11 +243,11 @@ extern int Envelopes_MA_Period = 20; // Averaging period to calculate the main l
 extern ENUM_MA_METHOD Envelopes_MA_Method = MODE_SMA; // MA method (See: ENUM_MA_METHOD).
 extern int Envelopes_MA_Shift = 0; // The indicator shift relative to the chart.
 extern ENUM_APPLIED_PRICE Envelopes_Applied_Price = PRICE_CLOSE; // Applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
-extern int Envelopes_Deviation = 2; // Percent deviation from the main line.
+extern double Envelopes_Deviation = 2; // Percent deviation from the main line.
 // extern int Envelopes_Shift_Far = 0; // The indicator shift relative to the chart.
 extern int Envelopes_Shift = 0; // The indicator shift relative to the chart.
 extern bool Envelopes_CloseOnChange = FALSE; // Close opposite orders on market change.
-extern int Envelopes_TrailingStopMethod = 1; // Trailing Stop method for Bands. Range: 0-10. Set 0 to default.
+extern ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = 1; // Trailing Stop method for Bands. Set 0 to default. See: ENUM_TRAIL_TYPE.
 extern int Envelopes_TrailingProfitMethod = 4; // Trailing Profit method for Bands. Range: 0-10. Set 0 to default.
 
 extern string ____WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --";
@@ -227,7 +256,7 @@ extern ENUM_TIMEFRAMES WPR_Timeframe = PERIOD_M1; // Timeframe (0 means the curr
 extern int WPR_Period = 50; // Suggested value: 50.
 extern int WPR_Shift = 1; // Shift relative to the current bar the given amount of periods ago. Suggested value: 1.
 extern double WPR_OpenLevel = 0.17; // Suggested range: 0.0-0.5. Suggested range: 0.1-0.2.
-extern int WPR_TrailingStopMethod = 6; // Trailing Stop method for WPR. Range: 0-10. Set 0 to default.
+extern ENUM_TRAIL_TYPE WPR_TrailingStopMethod = 6; // Trailing Stop method for WPR. Set 0 to default. See: ENUM_TRAIL_TYPE.
 extern int WPR_TrailingProfitMethod = 6; // Trailing Profit method for WPR. Range: 0-10. Set 0 to default.
 /* WPR Optimization log (1000,auto,ts:15,tp:20,gap:10)
  *   2015.01.02-2015.06.20: 8,3k trades, 40% dd, 1.07 profit factor (+218%)
@@ -239,7 +268,7 @@ extern ENUM_TIMEFRAMES DeMarker_Timeframe = PERIOD_M1; // Timeframe (0 means the
 extern int DeMarker_Period = 110; // Suggested value: 110.
 extern int DeMarker_Shift = 8; // Shift relative to the current bar the given amount of periods ago. Suggested value: 4.
 extern double DeMarker_OpenLevel = 0.0; // Valid range: 0.0-0.4. Suggested value: 0.0.
-extern int DeMarker_TrailingStopMethod = 1; // Trailing Stop method for DeMarker. Range: 0-10. Set 0 to default.
+extern ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = T_FIXED; // Trailing Stop method for DeMarker. Set 0 to default. See: ENUM_TRAIL_TYPE.
 extern int DeMarker_TrailingProfitMethod = 4; // Trailing Profit method for DeMarker. Range: 0-10. Set 0 to default.
 /* DeMarker Optimization log (1000,auto,ts:15,tp:20,gap:10)
  *   2015.01.02-2015.06.20: 7k trades, 63% dd, 1.06 profit factor (+204%)
@@ -251,7 +280,7 @@ extern ENUM_TIMEFRAMES Fractals_Timeframe = PERIOD_M5; // Timeframe (0 means the
 extern int Fractals_MaxPeriods = 2; // Suggested range: 1-5, Suggested value: 3
 extern int Fractals_Shift = 4; // Shift relative to the chart. Suggested value: 0.
 extern bool Fractals_CloseOnChange = FALSE; // Close opposite orders on market change.
-extern int Fractals_TrailingStopMethod = 6; // Trailing Stop method for Fractals. Range: 0-10. Set 0 to default.
+extern ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = T_MA_M_FAR; // Trailing Stop method for Fractals. Set 0 to default. See: ENUM_TRAIL_TYPE.
 extern int Fractals_TrailingProfitMethod = 4; // Trailing Profit method for Fractals. Range: 0-10. Set 0 to default.
 /* Fractals Optimization log (1000,auto,ts:15,tp:20,gap:10)
  *   2015.01.02-2015.06.20: 7k trades, 50-70% dd, 1.03 profit factor (+94%)
@@ -812,15 +841,15 @@ bool UpdateIndicators() {
     if (VerboseTrace) text += "RSI: " + GetArrayValues(RSI) + "; ";
   }
 
-  if (SAR_Enabled) {
+  // if (SAR_Enabled) {
     // Update SAR indicator values.
     for (i = 0; i < 3; i++) {
       SAR[i] = iSAR(NULL, SAR_Timeframe, SAR_Step, SAR_Maximum_Stop, i + SAR_Shift);
     }
     if (VerboseTrace) text += "SAR: " + GetArrayValues(SAR) + "; ";
-  }
+  // }
 
-  if (Bands_Enabled) {
+  // if (Bands_Enabled) {
     // Update the Bollinger Bands indicator values.
     for (i = 0; i < 3; i++) {
       Bands[i][0] = iBands(NULL, Bands_Timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_MAIN, i + Bands_Shift);
@@ -828,7 +857,7 @@ bool UpdateIndicators() {
       Bands[i][2] = iBands(NULL, Bands_Timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_LOWER, i + Bands_Shift);
     }
     // if (VerboseTrace) text += "Bands: " + GetArrayValues(Bands) + "; ";
-  }
+  // }
 
   if (Envelopes_Enabled) {
     // Update the Envelopes indicator values.
@@ -1436,56 +1465,70 @@ double GetTrailingStop(int cmd, double previous, int order_type = -1, bool exist
    }
    double default_trail = If(cmd == OP_BUY, Bid - (TrailingStop + extra_trail) * pip_size - delta, Ask + (TrailingStop + extra_trail) * pip_size + delta);
    int method = GetTrailingMethod(order_type, -1);
+
    switch (method) {
-     case 0: // None
+     case T_NONE: // None
        trail_stop = previous;
        break;
-     case 1: // Dynamic fixed.
+     case T_FIXED: // Dynamic fixed.
        trail_stop = default_trail;
        break;
-     case 2: // MA Small (Current) - trailing stop
-       trail_stop = MA_Fast[0] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
+     case T_MA_F_PREV: // MA Small (Previous)
+       trail_stop = MA_Fast[1] - delta;
        break;
-     case 3: // MA Small (Previous) - trailing stop
-       trail_stop = MA_Fast[1] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
+     case T_MA_F_FAR: // MA Small (Far) - trailing stop. Optimize together with: MA_Shift_Far.
+       trail_stop = MA_Fast[2] - delta;
        break;
-     case 4: // MA Small (Far) - trailing stop. Optimize together with: MA_Shift_Far.
-       trail_stop = MA_Fast[2] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
-       break;
-     case 5: // MA Medium (Current) - trailing stop
-       trail_stop = MA_Medium[0] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
-       break;
-     case 6: // MA Medium (Previous) - trailing stop
-       trail_stop = MA_Medium[1] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
-       break;
-     case 7: // MA Medium (Far) - trailing stop. Optimize together with: MA_Shift_Far.
-       trail_stop = MA_Medium[2] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
-       break;
-     case 8: // MA Slow (Current) - trailing stop
-       trail_stop = MA_Slow[0] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
-       break;
-     case 9: // Lowest/highest value of MA Fast.
+     case T_MA_F_LOW: // Lowest/highest value of MA Fast.
        trail_stop = If(cmd == OP_BUY, LowestValue(MA_Fast) - delta, HighestValue(MA_Fast) + delta);
        break;
-     case 10: // Lowest/highest value of MA Medium.
+     case T_MA_F_TRAIL: // MA Small (Current) - trailing stop
+       trail_stop = MA_Fast[0] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
+       break;
+     case T_MA_F_FAR_TRAIL: // MA Small (Far) - trailing stop
+       trail_stop = MA_Fast[2] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
+       break;
+     case T_MA_M: // MA Medium (Current)
+       trail_stop = MA_Medium[0] - delta;
+       break;
+     case T_MA_M_FAR: // MA Medium (Far)
+       trail_stop = MA_Medium[2] - delta;
+       break;
+     case T_MA_M_LOW: // Lowest/highest value of MA Medium.
        trail_stop = If(cmd == OP_BUY, LowestValue(MA_Medium) - delta, HighestValue(MA_Medium) + delta);
        break;
-     case 11: // Lowest/highest value of all MAs.
+     case T_MA_M_TRAIL: // MA Small (Current) - trailing stop
+       trail_stop = MA_Medium[0] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
+       break;
+     case T_MA_M_FAR_TRAIL: // MA Small (Far) - trailing stop
+       trail_stop = MA_Medium[2] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
+       break;
+     case T_MA_S: // MA Slow (Current)
+       trail_stop = MA_Slow[0] - delta;
+       break;
+     case T_MA_S_FAR: // MA Slow (Far)
+       trail_stop = MA_Slow[2] - delta;
+       break;
+     case T_MA_S_TRAIL: // MA Slow (Current) - trailing stop
+       trail_stop = MA_Slow[0] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
+       break;
+     case T_MA_LOWEST: // Lowest/highest value of all MAs.
        trail_stop = If(cmd == OP_BUY,
                        MathMin(MathMin(LowestValue(MA_Fast), LowestValue(MA_Medium)), LowestValue(MA_Slow)) - delta,
                        MathMax(MathMax(LowestValue(MA_Fast), LowestValue(MA_Medium)), LowestValue(MA_Slow)) + delta
                       );
        break;
-     case 12: // Last SAR value.
+     case T_SAR: // Current SAR value.
        trail_stop = SAR[0];
+       last_msg = "SAR: " + SAR[0];
        break;
-     case 13: // Lowest/highest SAR value.
+     case T_SAR_LOW: // Lowest/highest SAR value.
        trail_stop = If(cmd == OP_BUY, LowestValue(SAR), HighestValue(SAR));
        break;
-     case 14: // Last Bands value.
+     case T_BANDS: // Current Bands value.
        trail_stop = If(cmd == OP_BUY, Bands[0][2], Bands[0][1]);
        break;
-     case 15: // Lowest/highest Bands value.
+     case T_BANDS_LOW: // Lowest/highest Bands value.
        trail_stop = If(cmd == OP_BUY, MathMin(MathMin(Bands[0][2], Bands[1][2]), Bands[2][2]), MathMax(MathMax(Bands[0][1], Bands[1][1]), Bands[2][1]));
        break;
      default:
