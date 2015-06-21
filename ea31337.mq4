@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.023"
+#property version   "1.024"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -119,10 +119,10 @@ extern int MaxOrderPriceSlippage = 5; // Maximum price slippage for buy or sell 
 
 extern string __EA_Trailing_Parameters__ = "-- Settings for trailing stops --";
 extern int TrailingStop = 15;
-extern ENUM_TRAIL_TYPE TrailingStopMethod = 4; // TrailingStop method. Set 0 to disable. Range: 0-10. Suggested value: 1 or 4.
+extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 4; // TrailingStop method. Set 0 to disable. Range: 0-10. Suggested value: 1 or 4.
 extern bool TrailingStopOneWay = TRUE; // Change trailing stop towards one direction only. Suggested value: TRUE
 extern int TrailingProfit = 20;
-extern int TrailingProfitMethod = 0; // Trailing Profit method. Set 0 to disable. Range: 0-10. Suggested value: 0, 1, 4 or 10.
+extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 0; // Trailing Profit method. Set 0 to disable. Range: 0-10. Suggested value: 0, 1, 4 or 10.
 extern bool TrailingProfitOneWay = TRUE; // Change trailing profit take towards one direction only.
 extern double TrailingStopAddPerMinute = 0.0; // Decrease trailing stop (in pips) per each bar. Set 0 to disable. Suggested value: 0.
 
@@ -149,8 +149,8 @@ extern int MA_Shift_Far = 9; // Far shift. Shift relative to the 2 previous bars
 extern ENUM_MA_METHOD MA_Method = MODE_EMA; // MA method (See: ENUM_MA_METHOD). Range: 0-3. Suggested value: MODE_EMA.
 extern ENUM_APPLIED_PRICE MA_Applied_Price = PRICE_WEIGHTED; // MA applied price (See: ENUM_APPLIED_PRICE). Range: 0-6. Suggested values: PRICE_OPEN, PRICE_TYPICAL, PRICE_WEIGHTED.
 extern ENUM_TRAIL_TYPE MA_TrailingStopMethod = T_FIXED; // Trailing Stop method for MA. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern int MA_TrailingProfitMethod = 4; // Trailing Profit method for MA. Range: 0-10. Set 0 to default.
-/* MA Optimization log (1000,0.1,ts:15,tp:20,gap:10)
+extern ENUM_TRAIL_TYPE MA_TrailingProfitMethod = 4; // Trailing Profit method for MA. Range: 0-10. Set 0 to default.
+/* MA backtest log (1000,0.1,ts:15,tp:20,gap:10)
  *   2015.01.02-2015.06.20: 3k trades, 66% dd, 1.06 profit factor (+92%)
  *   2014.01.02-2014.12.20: 4,6k trades, 57% dd, 1.03 profit factor (+68%)
  */
@@ -167,8 +167,8 @@ extern ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_CLOSE; // MACD applied pric
 extern int MACD_Shift = 5; // Past MACD value in number of bars. Shift relative to the current bar the given amount of periods ago. Suggested value: 1
 extern int MACD_ShiftFar = 2; // Additional MACD far value in number of bars relatively to MACD_Shift.
 extern ENUM_TRAIL_TYPE MACD_TrailingStopMethod = T_MA_F_FAR; // Trailing Stop method for MACD. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern int MACD_TrailingProfitMethod = 4; // Trailing Profit method for MACD. Range: 0-10. Set 0 to default.
-/* MACD Optimization log (1000,0.1,ts:15,tp:20,gap:10)
+extern ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = 4; // Trailing Profit method for MACD. Range: 0-10. Set 0 to default.
+/* MACD backtest log (1000,0.1,ts:15,tp:20,gap:10)
  *   2015.01.02-2015.06.20: 1,9k trades, 35% dd, 1.12 profit factor (+100%)
  */
 
@@ -188,8 +188,8 @@ extern int Alligator_Shift_Far = 1; // The indicator shift relative to the chart
 extern double Alligator_OpenLevel = 0.01; // Minimum open level between moving averages to raise the singal.
 extern bool Alligator_CloseOnChange = TRUE; // Close opposite orders on market change.
 extern ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = T_MA_F_FAR; // Trailing Stop method for Alligator. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern int Alligator_TrailingProfitMethod = 4; // Trailing Profit method for Alligator. Range: 0-10. Set 0 to default.
-/* Alligator Optimization log (1000,auto,ts:15,tp:20,gap:10)
+extern ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = 4; // Trailing Profit method for Alligator. Range: 0-10. Set 0 to default.
+/* Alligator backtest log (1000,auto,ts:15,tp:20,gap:10)
  *   2015.03.05-2015.06.20: 1,6k trades, 13% dd, 1.21 profit factor (+97%)
  */
 
@@ -202,8 +202,8 @@ extern int RSI_OpenLevel = 20;
 extern int RSI_Shift = 1; // Shift relative to the chart.
 extern bool RSI_CloseOnChange = TRUE; // Close opposite orders on market change.
 extern ENUM_TRAIL_TYPE RSI_TrailingStopMethod = T_MA_M_FAR; // Trailing Stop method for RSI. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern int RSI_TrailingProfitMethod = 4; // Trailing Profit method for RSI. Range: 0-10. Set 0 to default.
-/* RSI Optimization log (1000,auto,ts:15,tp:20,gap:10)
+extern ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = 4; // Trailing Profit method for RSI. Range: 0-10. Set 0 to default.
+/* RSI backtest log (1000,auto,ts:15,tp:20,gap:10)
  *   2015.01.05-2015.06.20: 2,7k trades, 20% dd, 1.20 profit factor (+164%)
  */
 
@@ -216,8 +216,8 @@ extern int SAR_Shift = 0; // Shift relative to the chart.
 // extern int SAR_Shift_Far = 0; // Shift relative to the chart.
 extern bool SAR_CloseOnChange = FALSE; // Close opposite orders on market change.
 extern ENUM_TRAIL_TYPE SAR_TrailingStopMethod = T_SAR_LOW; // Trailing Stop method for SAR. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern int SAR_TrailingProfitMethod = 4; // Trailing Profit method for SAR. Range: 0-10. Set 0 to default.
-/* SAR Optimization log (1000,auto,ts:15,tp:20,gap:10)
+extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = 4; // Trailing Profit method for SAR. Range: 0-10. Set 0 to default.
+/* SAR backtest log (1000,auto,ts:15,tp:20,gap:10)
  *   2015.01.05-2015.06.20: 11k trades, 18% dd, 1.13 profit factor (+266%)
  */
 
@@ -230,10 +230,11 @@ extern double Bands_Deviation = 2.2; // Number of standard deviations from the m
 extern int Bands_Shift = 0; // The indicator shift relative to the chart.
 extern int Bands_Shift_Far = 0; // The indicator shift relative to the chart.
 extern bool Bands_CloseOnChange = FALSE; // Close opposite orders on market change.
-extern ENUM_TRAIL_TYPE Bands_TrailingStopMethod = T_MA_S_TRAIL; // Trailing Stop method for Bands. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern int Bands_TrailingProfitMethod = 1; // Trailing Profit method for Bands. Range: 0-10. Set 0 to default.
-/* Bands Optimization log (1000,auto,ts:15,tp:20,gap:10)
- *   2015.01.05-2015.06.20: 4,4k trades, 38% dd, 1.19 profit factor (+322%)
+extern ENUM_TRAIL_TYPE Bands_TrailingStopMethod = T_MA_S; // Trailing Stop method for Bands. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = 1; // Trailing Profit method for Bands. Range: 0-10. Set 0 to default.
+/* Bands backtest log (1000,auto,ts:15,tp:20,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data]:
+ *   1	3223.81	4428	1.19	0.73	440.70	38.28%	0.00000000	Bands_CloseOnChange=0
+ *   2	2614.77	5704	1.17	0.46	339.16	26.64%	0.00000000	Bands_CloseOnChange=1
  */
 
 extern string ____Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --";
@@ -248,7 +249,7 @@ extern double Envelopes_Deviation = 2; // Percent deviation from the main line.
 extern int Envelopes_Shift = 0; // The indicator shift relative to the chart.
 extern bool Envelopes_CloseOnChange = FALSE; // Close opposite orders on market change.
 extern ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = 1; // Trailing Stop method for Bands. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern int Envelopes_TrailingProfitMethod = 4; // Trailing Profit method for Bands. Range: 0-10. Set 0 to default.
+extern ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = 4; // Trailing Profit method for Bands. Range: 0-10. Set 0 to default.
 
 extern string ____WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --";
 extern bool WPR_Enabled = TRUE; // Enable WPR-based strategy.
@@ -257,7 +258,7 @@ extern int WPR_Period = 50; // Suggested value: 50.
 extern int WPR_Shift = 1; // Shift relative to the current bar the given amount of periods ago. Suggested value: 1.
 extern double WPR_OpenLevel = 0.17; // Suggested range: 0.0-0.5. Suggested range: 0.1-0.2.
 extern ENUM_TRAIL_TYPE WPR_TrailingStopMethod = 6; // Trailing Stop method for WPR. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern int WPR_TrailingProfitMethod = 6; // Trailing Profit method for WPR. Range: 0-10. Set 0 to default.
+extern ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = 6; // Trailing Profit method for WPR. Range: 0-10. Set 0 to default.
 /* WPR Optimization log (1000,auto,ts:15,tp:20,gap:10)
  *   2015.01.02-2015.06.20: 8,3k trades, 40% dd, 1.07 profit factor (+218%)
  */
@@ -269,8 +270,8 @@ extern int DeMarker_Period = 110; // Suggested value: 110.
 extern int DeMarker_Shift = 8; // Shift relative to the current bar the given amount of periods ago. Suggested value: 4.
 extern double DeMarker_OpenLevel = 0.0; // Valid range: 0.0-0.4. Suggested value: 0.0.
 extern ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = T_FIXED; // Trailing Stop method for DeMarker. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern int DeMarker_TrailingProfitMethod = 4; // Trailing Profit method for DeMarker. Range: 0-10. Set 0 to default.
-/* DeMarker Optimization log (1000,auto,ts:15,tp:20,gap:10)
+extern ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = 4; // Trailing Profit method for DeMarker. Range: 0-10. Set 0 to default.
+/* DeMarker backtest log (1000,auto,ts:15,tp:20,gap:10)
  *   2015.01.02-2015.06.20: 7k trades, 63% dd, 1.06 profit factor (+204%)
  */
 
@@ -281,14 +282,14 @@ extern int Fractals_MaxPeriods = 2; // Suggested range: 1-5, Suggested value: 3
 extern int Fractals_Shift = 4; // Shift relative to the chart. Suggested value: 0.
 extern bool Fractals_CloseOnChange = FALSE; // Close opposite orders on market change.
 extern ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = T_MA_M_FAR; // Trailing Stop method for Fractals. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern int Fractals_TrailingProfitMethod = 4; // Trailing Profit method for Fractals. Range: 0-10. Set 0 to default.
-/* Fractals Optimization log (1000,auto,ts:15,tp:20,gap:10)
+extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = 4; // Trailing Profit method for Fractals. Range: 0-10. Set 0 to default.
+/* Fractals backtest log (1000,auto,ts:15,tp:20,gap:10)
  *   2015.01.02-2015.06.20: 7k trades, 50-70% dd, 1.03 profit factor (+94%)
  *   2014.01.02-2014.12.20: fail
  */
 
 /*
- * Summary optimization log
+ * Summary backtest log
  * Separated test (1000,auto,ts:15,tp:20,gap:10,unlimited) [2015.01.02-2015.06.20 based on MT4 FXCM backtest data]:
  *   MA:         profit:  922, trades:  3130, profit factor: 1.06, expected payoff: 0.29, drawdown: 67%,     +92%
  *   MACD:       profit: 1000, trades:  1909, profit factor: 1.12, expected payoff: 0.52, drawdown: 36%,    +100%
@@ -949,9 +950,9 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
    if (VerboseDebug) Print(__FUNCTION__ + "(): " + GetMarketTextDetails()); // Print current market information before placing the order.
    double stoploss = 0, takeprofit = 0;
    if (EAStopLoss > 0.0) stoploss = NormalizeDouble(GetClosePrice(cmd) - (EAStopLoss + TrailingStop) * pip_size * OpTypeValue(cmd), Digits);
-   else stoploss = GetTrailingStop(cmd, 0, order_type);
+   else stoploss   = GetTrailingValue(cmd, -1, order_type);
    if (EATakeProfit > 0.0) takeprofit = NormalizeDouble(order_price + (EATakeProfit + TrailingProfit) * pip_size * OpTypeValue(cmd), Digits);
-   else takeprofit = GetTrailingProfit(cmd, 0, order_type);
+   else takeprofit = GetTrailingValue(cmd, +1, order_type);
 
    order_ticket = OrderSend(Symbol(), cmd, volume, order_price, max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + order_type, 0, GetOrderColor(cmd));
    if (order_ticket >= 0) {
@@ -1364,37 +1365,15 @@ bool CheckMinPipGap(int strategy_type) {
 }
 
 // Validate value for trailing stop.
-bool ValidTrailingStop(double trail_stop, int cmd, bool existing = FALSE) {
-  // OP_BUY: if(Bid-OrderOpenPrice()>Point*TrailingStop)      | Bid-Point*TrailingStop
-  // OP_SELL: if((OrderOpenPrice()-Ask)>(Point*TrailingStop)) | Ask+Point*TrailingStop
-  // trail_stop > OrderStopLoss()
-  // trail_stop < OrderStopLoss()
+bool ValidTrailingValue(double value, int cmd, int loss_or_profit = -1, bool existing = FALSE) {
   double delta = GetMarketGap(); // Calculate minimum market gap.
   double price = GetOpenPrice();
-  bool valid = trail_stop == 0 || (cmd == OP_BUY  && price - trail_stop > delta) || (cmd == OP_SELL && trail_stop - price > delta);
-  if (!valid && VerboseTrace) {
-    if (cmd == OP_BUY)
-      Print(__FUNCTION__ + "(OP_BUY): Error: #" + If(existing, OrderTicket(), 0) + ": ", DoubleToStr(price, Digits), " - ", DoubleToStr(trail_stop, Digits), " = ", DoubleToStr(price - trail_stop, pip_precision), " >! ", DoubleToStr(delta, pip_precision));
-    if (cmd == OP_SELL)
-      Print(__FUNCTION__ + "(OP_SELL): Error: #" + If(existing, OrderTicket(), 0) + ": ", DoubleToStr(trail_stop, Digits), " - ", DoubleToStr(price, Digits), " = ", DoubleToStr(trail_stop - price, pip_precision), " >! ", DoubleToStr(delta, pip_precision));
-  }
-  return valid;
-}
-
-// Validate value for profit take.
-bool ValidProfitTake(double profit_take, int cmd, bool existing = FALSE) {
-  //if (VerboseTrace && cmd ==  OP_BUY) Print("ValidProfitTake(OP_BUY): ", profit_take - Bid, " > ", NormalizeDouble(GetMinStopLevel(), pip_precision));
-  //if (VerboseTrace && cmd ==  OP_SELL) Print("ValidProfitTake(OP_SELL): ", Ask - profit_take, " > ", NormalizeDouble(GetMinStopLevel(), pip_precision));
-  //if (VerboseTrace) Print("ValidProfitTake(" + cmd + "): Delta: ", DoubleToStr(delta, pip_precision));
-  double delta = GetMarketGap(); // Calculate minimum market gap.
-  double price = GetOpenPrice();
-  bool valid = profit_take == 0 || (cmd ==  OP_BUY && profit_take - price > delta) || (cmd == OP_SELL && price - profit_take > delta);
-  if (!valid && VerboseTrace) {
-    if (cmd == OP_BUY)
-      Print(__FUNCTION__ + "(OP_BUY): Error: #" + If(existing, OrderTicket(), 0) + ": ", DoubleToStr(profit_take, Digits), " - ", DoubleToStr(price, Digits), " = ", DoubleToStr(profit_take - price, pip_precision), " >! ", DoubleToStr(delta, pip_precision));
-    if (cmd == OP_SELL)
-      Print(__FUNCTION__ + "(OP_SELL): Error: #" + If(existing, OrderTicket(), 0) + ": ", DoubleToStr(price, Digits), " - ", DoubleToStr(profit_take, Digits), " = ", DoubleToStr(price - profit_take, pip_precision), " >! ", DoubleToStr(delta, pip_precision));
-  }
+  bool valid = (value == 0
+       || (cmd == OP_BUY  && loss_or_profit < 0 && price - value > delta)
+       || (cmd == OP_BUY  && loss_or_profit > 0 && value - price > delta)
+       || (cmd == OP_SELL && loss_or_profit < 0 && value - price > delta)
+       || (cmd == OP_SELL && loss_or_profit > 0 && price - value > delta)
+       );
   return valid;
 }
 
@@ -1432,8 +1411,8 @@ void UpdateTrailingStops() {
           }
         }
 
-        new_trailing_stop = GetTrailingStop(OrderType(), OrderStopLoss(), order_type, TRUE);
-        new_profit_take = GetTrailingProfit(OrderType(), OrderTakeProfit(), order_type, TRUE);
+        new_trailing_stop = GetTrailingValue(OrderType(), -1, order_type, OrderStopLoss(), TRUE);
+        new_profit_take   = GetTrailingValue(OrderType(), +1, order_type, OrderTakeProfit(), TRUE);
         if (new_trailing_stop != OrderStopLoss() || new_profit_take != OrderTakeProfit()) { // Perform update on change only.
            result = OrderModify(OrderTicket(), OrderOpenPrice(), new_trailing_stop, new_profit_take, 0, GetOrderColor());
            if (!result) {
@@ -1451,11 +1430,23 @@ void UpdateTrailingStops() {
   }
 }
 
-// Get new trailing stop.
-// Params:
-//   bool existing: TRUE if the calculation is for particular existing order
-double GetTrailingStop(int cmd, double previous, int order_type = -1, bool existing = FALSE) {
-   double trail_stop = 0;
+/*
+ * Calculate the new trailing stop. If calculation fails, use the previous one.
+ *
+ * @params:
+ *   cmd (int)
+ *    Command for trade operation.
+ *   loss_or_profit (int)
+ *    Set -1 to calculate trailing stop or +1 for profit take.
+ *   order_type (int)
+ *    Value of strategy type. See: ENUM_STRATEGY_TYPE
+ *   previous (double)
+ *    Previous trailing value.
+ *   existing (bool)
+ *    Set to TRUE if the calculation is for particular existing order, so additional local variables are available.
+ */
+double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = -1, double previous = 0, bool existing = FALSE) {
+   double new_value = 0;
    double delta = GetMarketGap();
    int extra_trail = 0;
    if (existing && TrailingStopAddPerMinute > 0 && OrderOpenTime() > 0) {
@@ -1463,184 +1454,108 @@ double GetTrailingStop(int cmd, double previous, int order_type = -1, bool exist
      extra_trail =+ min_elapsed * TrailingStopAddPerMinute;
      // if (VerboseDebug) last_msg = "Extra trail: " + extra_trail;
    }
-   double default_trail = If(cmd == OP_BUY, Bid - (TrailingStop + extra_trail) * pip_size - delta, Ask + (TrailingStop + extra_trail) * pip_size + delta);
-   int method = GetTrailingMethod(order_type, -1);
+   int factor = If(OpTypeValue(cmd) == loss_or_profit, +1, -1);
+   double trail = (TrailingStop + extra_trail) * pip_size;
+   double default_trail = If(cmd == OP_BUY, Bid, Ask) + trail * factor;
+   int method = GetTrailingMethod(order_type, loss_or_profit);
+
+   last_msg = "Factor: " + factor + ", default trail: " + default_trail;
 
    switch (method) {
      case T_NONE: // None
-       trail_stop = previous;
+       new_value = previous;
        break;
      case T_FIXED: // Dynamic fixed.
-       trail_stop = default_trail;
+       new_value = default_trail;
        break;
      case T_MA_F_PREV: // MA Small (Previous)
-       trail_stop = MA_Fast[1] - delta;
+       new_value = MA_Fast[1];
        break;
      case T_MA_F_FAR: // MA Small (Far) - trailing stop. Optimize together with: MA_Shift_Far.
-       trail_stop = MA_Fast[2] - delta;
+       new_value = MA_Fast[2];
        break;
      case T_MA_F_LOW: // Lowest/highest value of MA Fast.
-       trail_stop = If(cmd == OP_BUY, LowestValue(MA_Fast) - delta, HighestValue(MA_Fast) + delta);
+       new_value = If(OpTypeValue(cmd) == loss_or_profit, HighestValue(MA_Fast), LowestValue(MA_Fast));
        break;
      case T_MA_F_TRAIL: // MA Small (Current) - trailing stop
-       trail_stop = MA_Fast[0] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
+       new_value = MA_Fast[0] + trail * factor;
        break;
      case T_MA_F_FAR_TRAIL: // MA Small (Far) - trailing stop
-       trail_stop = MA_Fast[2] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
+       new_value = MA_Fast[2] + trail * factor;
        break;
      case T_MA_M: // MA Medium (Current)
-       trail_stop = MA_Medium[0] - delta;
+       new_value = MA_Medium[0];
        break;
      case T_MA_M_FAR: // MA Medium (Far)
-       trail_stop = MA_Medium[2] - delta;
+       new_value = MA_Medium[2];
        break;
      case T_MA_M_LOW: // Lowest/highest value of MA Medium.
-       trail_stop = If(cmd == OP_BUY, LowestValue(MA_Medium) - delta, HighestValue(MA_Medium) + delta);
+       new_value = If(OpTypeValue(cmd) == loss_or_profit, HighestValue(MA_Medium), LowestValue(MA_Medium));
        break;
      case T_MA_M_TRAIL: // MA Small (Current) - trailing stop
-       trail_stop = MA_Medium[0] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
+       new_value = MA_Medium[0] + trail * factor;
        break;
      case T_MA_M_FAR_TRAIL: // MA Small (Far) - trailing stop
-       trail_stop = MA_Medium[2] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
+       new_value = MA_Medium[2] + trail * factor;
        break;
      case T_MA_S: // MA Slow (Current)
-       trail_stop = MA_Slow[0] - delta;
+       new_value = MA_Slow[0];
        break;
      case T_MA_S_FAR: // MA Slow (Far)
-       trail_stop = MA_Slow[2] - delta;
+       new_value = MA_Slow[2];
        break;
      case T_MA_S_TRAIL: // MA Slow (Current) - trailing stop
-       trail_stop = MA_Slow[0] - (TrailingStop + extra_trail) * OpTypeValue(cmd) * pip_size - delta;
+       new_value = MA_Slow[0] + trail * factor;
        break;
      case T_MA_LOWEST: // Lowest/highest value of all MAs.
-       trail_stop = If(cmd == OP_BUY,
-                       MathMin(MathMin(LowestValue(MA_Fast), LowestValue(MA_Medium)), LowestValue(MA_Slow)) - delta,
-                       MathMax(MathMax(LowestValue(MA_Fast), LowestValue(MA_Medium)), LowestValue(MA_Slow)) + delta
+       new_value = If(OpTypeValue(cmd) == loss_or_profit,
+                       MathMax(MathMax(LowestValue(MA_Fast), LowestValue(MA_Medium)), LowestValue(MA_Slow)),
+                       MathMin(MathMin(LowestValue(MA_Fast), LowestValue(MA_Medium)), LowestValue(MA_Slow))
                       );
        break;
      case T_SAR: // Current SAR value.
-       trail_stop = SAR[0];
-       last_msg = "SAR: " + SAR[0];
+       new_value = SAR[0];
        break;
      case T_SAR_LOW: // Lowest/highest SAR value.
-       trail_stop = If(cmd == OP_BUY, LowestValue(SAR), HighestValue(SAR));
+       new_value = If(OpTypeValue(cmd) == loss_or_profit, HighestValue(SAR), LowestValue(SAR));
        break;
      case T_BANDS: // Current Bands value.
-       trail_stop = If(cmd == OP_BUY, Bands[0][2], Bands[0][1]);
+       new_value = If(OpTypeValue(cmd) == loss_or_profit, Bands[0][1], Bands[0][2]);
        break;
      case T_BANDS_LOW: // Lowest/highest Bands value.
-       trail_stop = If(cmd == OP_BUY, MathMin(MathMin(Bands[0][2], Bands[1][2]), Bands[2][2]), MathMax(MathMax(Bands[0][1], Bands[1][1]), Bands[2][1]));
-       break;
-     default:
-       if (VerboseDebug) Print("Error in GetTrailingStop(): Unknown trailing stop method: ", method);
-   }
-
-   if (!ValidTrailingStop(trail_stop, cmd, existing)) {
-     if (existing && previous == 0) previous = default_trail;
-     if (VerboseTrace)
-       Print(__FUNCTION__ + "(): Error: method = " + method + ", ticket = #" + If(existing, OrderTicket(), 0) + ": Invalid Trailing Stop: ", trail_stop, ", previous: ", previous, "; ", GetOrderTextDetails(), ", delta: ", DoubleToStr(delta, pip_precision));
-     // If value is invalid, fallback to the previous one.
-     return previous;
-   }
-
-   if (TrailingStopOneWay && method > 0) { // If TRUE, move trailing stop only one direction.
-     if (previous == 0) previous = default_trail;
-     if (cmd == OP_SELL)     trail_stop = If(trail_stop < previous, trail_stop, previous);
-     else if (cmd == OP_BUY) trail_stop = If(trail_stop > previous, trail_stop, previous);
-   }
-
-   // if (VerboseTrace && trail_stop != OrderStopLoss()) Print("GetTrailingStop(): New Trailing Stop: ", trail_stop, "; Previous: ", previous, "; ", GetOrderTextDetails());
-   if (VerboseDebug && IsVisualMode()) ShowLine("trail_stop_" + OrderTicket(), trail_stop, Orange);
-   return NormalizeDouble(trail_stop, Digits);
-}
-
-// Get new trailing profit take.
-// Note: Suggested methods: 1 & 4.
-// Params:
-//   bool existing: TRUE if the calculation is for particular existing order
-double GetTrailingProfit(int cmd, double previous, int order_type = -1, bool existing = FALSE) {
-   double profit_take = 0;
-   double delta = GetMarketGap();
-   double default_trail = If(cmd == OP_BUY, Bid + TrailingProfit * pip_size + delta, Ask - TrailingProfit * pip_size - delta);
-   int method = GetTrailingMethod(order_type, 1);
-   switch (method) {
-     case 0: // None
-       profit_take = previous;
-       break;
-     case 1: // Dynamic fixed.
-       profit_take = default_trail;
-       break;
-     case 2: // iMA Small (Current) + trailing profit
-       profit_take = MA_Fast[0] + TrailingProfit * OpTypeValue(cmd) * pip_size + delta;
-       break;
-     case 3: // iMA Small (Previous) + trailing profit.
-       profit_take = MA_Fast[1] + TrailingProfit * OpTypeValue(cmd) * pip_size + delta;
-       break;
-     case 4: // iMA Small (Far) + trailing profit. Optimize together with: MA_Shift_Far.
-       profit_take = MA_Fast[2] + TrailingProfit * OpTypeValue(cmd) * pip_size + delta;
-       break;
-     case 5: // iMA Medium (Current) + trailing profit
-       profit_take = MA_Medium[0] + TrailingProfit * OpTypeValue(cmd) * pip_size + delta;
-       break;
-     case 6: // iMA Medium (Previous) + trailing profit
-       profit_take = MA_Medium[1] + TrailingProfit * OpTypeValue(cmd) * pip_size + delta;
-       break;
-     case 7: // iMA Medium (Far) + trailing profit. Optimize together with: MA_Shift_Far.
-       profit_take = MA_Medium[2] + TrailingProfit * OpTypeValue(cmd) * pip_size + delta;
-       break;
-     case 8: // iMA Slow (Current) + trailing profit
-       profit_take = MA_Slow[0] + TrailingProfit * OpTypeValue(cmd) * pip_size + delta;
-       break;
-     case 9: // Lowest/highest value of MA Fast.
-       profit_take = If(cmd == OP_SELL, LowestValue(MA_Fast) - delta, HighestValue(MA_Fast) + delta);
-       break;
-     case 10: // Lowest/highest value of MA Medium.
-       profit_take = If(cmd == OP_SELL, LowestValue(MA_Medium) - delta, HighestValue(MA_Medium) + delta);
-       break;
-     case 11: // Lowest/highest value of all MAs.
-       profit_take = If(cmd == OP_SELL,
-                       MathMin(MathMin(LowestValue(MA_Fast), LowestValue(MA_Medium)), LowestValue(MA_Slow)) - delta,
-                       MathMax(MathMax(LowestValue(MA_Fast), LowestValue(MA_Medium)), LowestValue(MA_Slow)) + delta
-                      );
-       break;
-     case 12: // Last SAR value.
-       profit_take = SAR[0];
-       break;
-     case 13: // Lowest/highest SAR value.
-       profit_take = If(cmd == OP_SELL, LowestValue(SAR), HighestValue(SAR));
-       break;
-     case 14: // Last Bands value.
-       profit_take = If(cmd == OP_SELL, Bands[0][2], Bands[0][1]);
-       break;
-     case 15: // Lowest/highest Bands value.
-       profit_take = If(cmd == OP_SELL, MathMin(MathMin(Bands[0][2], Bands[1][2]), Bands[2][2]), MathMax(MathMax(Bands[0][1], Bands[1][1]), Bands[2][1]));
+       new_value = If(OpTypeValue(cmd) == loss_or_profit, MathMax(MathMax(Bands[0][1], Bands[1][1]), Bands[2][1]), MathMin(MathMin(Bands[0][2], Bands[1][2]), Bands[2][2]));
        break;
      default:
        if (VerboseDebug) Print(__FUNCTION__ + "(): Error: Unknown trailing stop method: ", method);
    }
 
-   if (!ValidProfitTake(profit_take, cmd)) {
-     if (existing && previous == 0) previous = default_trail;
+   new_value += delta * factor;
+
+   if (!ValidTrailingValue(new_value, cmd, loss_or_profit, existing)) {
+     if (existing && previous == 0 && loss_or_profit == -1) previous = default_trail;
      if (VerboseTrace)
-       Print(__FUNCTION__ + "(): Error: method = " + method + ", ticket = #" + If(existing, OrderTicket(), 0) + ": Invalid Profit Take: ", profit_take, ", previous: ", previous, "; ", GetOrderTextDetails(), ", delta: ", DoubleToStr(delta, pip_precision));
-     // If value is invalid, fallback to previous one.
+       Print(__FUNCTION__ + "(): Error: method = " + method + ", ticket = #" + If(existing, OrderTicket(), 0) + ": Invalid Trailing Value: ", new_value, ", previous: ", previous, "; ", GetOrderTextDetails(), ", delta: ", DoubleToStr(delta, pip_precision));
+     // If value is invalid, fallback to the previous one.
      return previous;
    }
 
-   if (TrailingProfitOneWay && method > 0) { // If TRUE, move profit take only one direction.
+   if (TrailingStopOneWay && loss_or_profit < 0 && method > 0) { // If TRUE, move trailing stop only one direction.
      if (previous == 0 && method > 0) previous = default_trail;
-     if (cmd == OP_SELL)     profit_take = If(profit_take < previous, profit_take, previous);
-     else if (cmd == OP_BUY) profit_take = If(profit_take > previous, profit_take, previous);
+     if (OpTypeValue(cmd) == loss_or_profit) new_value = If(new_value < previous, new_value, previous);
+     else new_value = If(new_value > previous, new_value, previous);
+   }
+   if (TrailingProfitOneWay && loss_or_profit > 0 && method > 0) { // If TRUE, move profit take only one direction.
+     if (OpTypeValue(cmd) == loss_or_profit) new_value = If(new_value > previous, new_value, previous);
+     else new_value = If(new_value < previous, new_value, previous);
    }
 
-   // if (VerboseTrace && profit_take != previous) Print("GetProfitStop(", method, "): New Profit Stop: ", profit_take, "; Old: ", previous, "; ", GetOrderTextDetails());
-   if (VerboseDebug && IsVisualMode()) ShowLine("take_profit_" + OrderTicket(), profit_take, Gold);
-   return NormalizeDouble(profit_take, Digits);
+   // if (VerboseDebug && IsVisualMode()) ShowLine("trail_stop_" + OrderTicket(), new_value, GetOrderColor());
+   return NormalizeDouble(new_value, Digits);
 }
 
 // Get trailing method based on the strategy type.
 int GetTrailingMethod(int order_type, int stop_or_profit) {
-  int stop_method = TrailingStopMethod, profit_method = TrailingProfitMethod;
+  int stop_method = DefaultTrailingStopMethod, profit_method = DefaultTrailingProfitMethod;
   switch (order_type) {
     case MA_FAST_ON_BUY:
     case MA_FAST_ON_SELL:
