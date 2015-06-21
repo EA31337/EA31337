@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.024"
+#property version   "1.025"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -24,8 +24,8 @@ enum ENUM_STRATEGY_TYPE {
   MA_FAST_ON_SELL,
   MA_MEDIUM_ON_BUY,
   MA_MEDIUM_ON_SELL,
-  MA_LARGE_ON_BUY,
-  MA_LARGE_ON_SELL,
+  MA_SLOW_ON_BUY,
+  MA_SLOW_ON_SELL,
   MACD_ON_BUY,
   MACD_ON_SELL,
   ALLIGATOR_ON_BUY,
@@ -119,10 +119,10 @@ extern int MaxOrderPriceSlippage = 5; // Maximum price slippage for buy or sell 
 
 extern string __EA_Trailing_Parameters__ = "-- Settings for trailing stops --";
 extern int TrailingStop = 15;
-extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 4; // TrailingStop method. Set 0 to disable. Range: 0-10. Suggested value: 1 or 4.
+extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = T_FIXED; // TrailingStop method. Set 0 to disable. See: ENUM_TRAIL_TYPE.
 extern bool TrailingStopOneWay = TRUE; // Change trailing stop towards one direction only. Suggested value: TRUE
 extern int TrailingProfit = 20;
-extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 0; // Trailing Profit method. Set 0 to disable. Range: 0-10. Suggested value: 0, 1, 4 or 10.
+extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 0; // Trailing Profit method. Set 0 to disable. See: ENUM_TRAIL_TYPE.
 extern bool TrailingProfitOneWay = TRUE; // Change trailing profit take towards one direction only.
 extern double TrailingStopAddPerMinute = 0.0; // Decrease trailing stop (in pips) per each bar. Set 0 to disable. Suggested value: 0.
 
@@ -148,11 +148,13 @@ extern int MA_Shift_Slow = 4; // Index of the value taken from the indicator buf
 extern int MA_Shift_Far = 9; // Far shift. Shift relative to the 2 previous bars (+2).
 extern ENUM_MA_METHOD MA_Method = MODE_EMA; // MA method (See: ENUM_MA_METHOD). Range: 0-3. Suggested value: MODE_EMA.
 extern ENUM_APPLIED_PRICE MA_Applied_Price = PRICE_WEIGHTED; // MA applied price (See: ENUM_APPLIED_PRICE). Range: 0-6. Suggested values: PRICE_OPEN, PRICE_TYPICAL, PRICE_WEIGHTED.
-extern ENUM_TRAIL_TYPE MA_TrailingStopMethod = T_FIXED; // Trailing Stop method for MA. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE MA_TrailingProfitMethod = 4; // Trailing Profit method for MA. Range: 0-10. Set 0 to default.
-/* MA backtest log (1000,0.1,ts:15,tp:20,gap:10)
- *   2015.01.02-2015.06.20: 3k trades, 66% dd, 1.06 profit factor (+92%)
- *   2014.01.02-2014.12.20: 4,6k trades, 57% dd, 1.03 profit factor (+68%)
+extern bool MA_F_CloseOnChange = FALSE; // Close opposite orders on market change.
+extern bool MA_M_CloseOnChange = FALSE; // Close opposite orders on market change.
+extern bool MA_S_CloseOnChange = FALSE; // Close opposite orders on market change.
+extern ENUM_TRAIL_TYPE MA_TrailingStopMethod = T_MA_F_FAR_TRAIL; // Trailing Stop method for MA. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE MA_TrailingProfitMethod = T_FIXED; // Trailing Profit method for MA. Set 0 to default. See: ENUM_TRAIL_TYPE.
+/* MA backtest log (£1000,0.1,ts:15,tp:20,gap:10) [2015.02.05-2015.06.20 based on MT4 FXCM backtest data]:
+ *   2	£1203.90	2465	1.09	0.49	557.75	35.61%	0.00000000
  */
 
 extern string ____MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --";
@@ -166,10 +168,12 @@ extern double MACD_OpenLevel  = 1.5;
 extern ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_CLOSE; // MACD applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern int MACD_Shift = 5; // Past MACD value in number of bars. Shift relative to the current bar the given amount of periods ago. Suggested value: 1
 extern int MACD_ShiftFar = 2; // Additional MACD far value in number of bars relatively to MACD_Shift.
-extern ENUM_TRAIL_TYPE MACD_TrailingStopMethod = T_MA_F_FAR; // Trailing Stop method for MACD. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = 4; // Trailing Profit method for MACD. Range: 0-10. Set 0 to default.
-/* MACD backtest log (1000,0.1,ts:15,tp:20,gap:10)
- *   2015.01.02-2015.06.20: 1,9k trades, 35% dd, 1.12 profit factor (+100%)
+extern bool MACD_CloseOnChange = FALSE; // Close opposite orders on market change.
+extern ENUM_TRAIL_TYPE MACD_TrailingStopMethod = T_BANDS_LOW; // Trailing Stop method for MACD. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = T_MA_F_FAR_TRAIL; // Trailing Profit method for MACD. Set 0 to default. See: ENUM_TRAIL_TYPE.
+/* MACD backtest log (£1000,0.1,ts:15,tp:20,gap:10) [2015.02.05-2015.06.20 based on MT4 FXCM backtest data]:
+ *   £826.64	2041	1.13	0.41	234.19	12.36%
+ *   £832.50	2383	1.17	0.35	267.09	14.78%	0.00000000	MACD_TrailingStopMethod=T_MA_S_FAR
  */
 
 extern string ____Alligator_Parameters__ = "-- Settings for the Alligator 1 indicator --";
@@ -187,10 +191,11 @@ extern int Alligator_Shift = 1; // The indicator shift relative to the chart.
 extern int Alligator_Shift_Far = 1; // The indicator shift relative to the chart.
 extern double Alligator_OpenLevel = 0.01; // Minimum open level between moving averages to raise the singal.
 extern bool Alligator_CloseOnChange = TRUE; // Close opposite orders on market change.
-extern ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = T_MA_F_FAR; // Trailing Stop method for Alligator. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = 4; // Trailing Profit method for Alligator. Range: 0-10. Set 0 to default.
-/* Alligator backtest log (1000,auto,ts:15,tp:20,gap:10)
- *   2015.03.05-2015.06.20: 1,6k trades, 13% dd, 1.21 profit factor (+97%)
+extern ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = T_MA_S; // Trailing Stop method for Alligator. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = T_MA_F_FAR_TRAIL; // Trailing Profit method for Alligator. Set 0 to default. See: ENUM_TRAIL_TYPE.
+/* Alligator backtest log (£1000,auto,ts:15,tp:20,gap:10) [2015.02.05-2015.06.20 based on MT4 FXCM backtest data]:
+ *   6	£939.44	1427	1.31	0.66	149.45	10.00%	0.00000000	Alligator_TrailingProfitMethod=6
+ *   Old: 2015.03.05-2015.06.20: 1,6k trades, 13% dd, 1.21 profit factor (+97%)
  */
 
 extern string ____RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --";
@@ -201,10 +206,11 @@ extern ENUM_APPLIED_PRICE RSI_Applied_Price = PRICE_MEDIAN; // RSI applied price
 extern int RSI_OpenLevel = 20;
 extern int RSI_Shift = 1; // Shift relative to the chart.
 extern bool RSI_CloseOnChange = TRUE; // Close opposite orders on market change.
-extern ENUM_TRAIL_TYPE RSI_TrailingStopMethod = T_MA_M_FAR; // Trailing Stop method for RSI. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = 4; // Trailing Profit method for RSI. Range: 0-10. Set 0 to default.
-/* RSI backtest log (1000,auto,ts:15,tp:20,gap:10)
- *   2015.01.05-2015.06.20: 2,7k trades, 20% dd, 1.20 profit factor (+164%)
+extern ENUM_TRAIL_TYPE RSI_TrailingStopMethod = T_MA_S_TRAIL; // Trailing Stop method for RSI. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = T_MA_F_TRAIL; // Trailing Profit method for RSI. Set 0 to default. See: ENUM_TRAIL_TYPE.
+/* RSI backtest log (£1000,auto,ts:15,tp:20,gap:10) [2015.02.05-2015.06.20 based on MT4 FXCM backtest data]:
+ *   5	£1553.80	2054	1.24	0.76	283.49	14.09%	0.00000000
+ *   Old: 2015.01.05-2015.06.20: 2,7k trades, 20% dd, 1.20 profit factor (+164%)
  */
 
 extern string ____SAR_Parameters__ = "-- Settings for the the Parabolic Stop and Reverse system indicator --";
@@ -216,9 +222,10 @@ extern int SAR_Shift = 0; // Shift relative to the chart.
 // extern int SAR_Shift_Far = 0; // Shift relative to the chart.
 extern bool SAR_CloseOnChange = FALSE; // Close opposite orders on market change.
 extern ENUM_TRAIL_TYPE SAR_TrailingStopMethod = T_SAR_LOW; // Trailing Stop method for SAR. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = 4; // Trailing Profit method for SAR. Range: 0-10. Set 0 to default.
-/* SAR backtest log (1000,auto,ts:15,tp:20,gap:10)
- *   2015.01.05-2015.06.20: 11k trades, 18% dd, 1.13 profit factor (+266%)
+extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = T_FIXED; // Trailing Profit method for SAR. Set 0 to default. See: ENUM_TRAIL_TYPE.
+/* SAR backtest log (£1000,auto,ts:15,tp:20,gap:10) [2015.02.05-2015.06.20 based on MT4 FXCM backtest data]:
+ *   £2351.86	8867	1.16	0.27	307.54	23.57%	0.00000000	SAR_CloseOnChange=0
+ *   Old: 2015.01.05-2015.06.20: 11k trades, 18% dd, 1.13 profit factor (+266%)
  */
 
 extern string ____Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --";
@@ -231,10 +238,10 @@ extern int Bands_Shift = 0; // The indicator shift relative to the chart.
 extern int Bands_Shift_Far = 0; // The indicator shift relative to the chart.
 extern bool Bands_CloseOnChange = FALSE; // Close opposite orders on market change.
 extern ENUM_TRAIL_TYPE Bands_TrailingStopMethod = T_MA_S; // Trailing Stop method for Bands. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = 1; // Trailing Profit method for Bands. Range: 0-10. Set 0 to default.
-/* Bands backtest log (1000,auto,ts:15,tp:20,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data]:
- *   1	3223.81	4428	1.19	0.73	440.70	38.28%	0.00000000	Bands_CloseOnChange=0
- *   2	2614.77	5704	1.17	0.46	339.16	26.64%	0.00000000	Bands_CloseOnChange=1
+extern ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = T_MA_F_FAR_TRAIL; // Trailing Profit method for Bands. Set 0 to default. See: ENUM_TRAIL_TYPE.
+/* Bands backtest log (£1000,auto,ts:15,tp:20,gap:10) [2015.02.05-2015.06.20 based on MT4 FXCM backtest data]:
+ *   1	£3682.41	5496	1.23	0.67	457.29	18.50%	0.00000000	Bands_CloseOnChange=0 Bands_TrailingProfitMethod=T_FIXED
+ *   2	£3544.21	5498	1.22	0.64	415.88	17.80%	0.00000000	Bands_CloseOnChange=0 Bands_TrailingProfitMethod=T_MA_F_FAR_TRAIL
  */
 
 extern string ____Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --";
@@ -249,7 +256,7 @@ extern double Envelopes_Deviation = 2; // Percent deviation from the main line.
 extern int Envelopes_Shift = 0; // The indicator shift relative to the chart.
 extern bool Envelopes_CloseOnChange = FALSE; // Close opposite orders on market change.
 extern ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = 1; // Trailing Stop method for Bands. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = 4; // Trailing Profit method for Bands. Range: 0-10. Set 0 to default.
+extern ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = 4; // Trailing Profit method for Bands. Set 0 to default. See: ENUM_TRAIL_TYPE.
 
 extern string ____WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --";
 extern bool WPR_Enabled = TRUE; // Enable WPR-based strategy.
@@ -257,10 +264,12 @@ extern ENUM_TIMEFRAMES WPR_Timeframe = PERIOD_M1; // Timeframe (0 means the curr
 extern int WPR_Period = 50; // Suggested value: 50.
 extern int WPR_Shift = 1; // Shift relative to the current bar the given amount of periods ago. Suggested value: 1.
 extern double WPR_OpenLevel = 0.17; // Suggested range: 0.0-0.5. Suggested range: 0.1-0.2.
-extern ENUM_TRAIL_TYPE WPR_TrailingStopMethod = 6; // Trailing Stop method for WPR. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = 6; // Trailing Profit method for WPR. Range: 0-10. Set 0 to default.
-/* WPR Optimization log (1000,auto,ts:15,tp:20,gap:10)
- *   2015.01.02-2015.06.20: 8,3k trades, 40% dd, 1.07 profit factor (+218%)
+extern bool WPR_CloseOnChange = FALSE; // Close opposite orders on market change.
+extern ENUM_TRAIL_TYPE WPR_TrailingStopMethod = T_MA_S_FAR; // Trailing Stop method for WPR. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = T_BANDS; // Trailing Profit method for WPR. Set 0 to default. See: ENUM_TRAIL_TYPE.
+/* WPR backtest log (£1000,auto,ts:15,tp:20,gap:10) [2015.02.05-2015.06.20 based on MT4 FXCM backtest data]:
+ *   £2963.80	6693	1.13	0.44	447.42	25.39%
+ *   £2814.16	6751	1.13	0.42	447.42	22.82%
  */
 
 extern string ____DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --";
@@ -269,10 +278,12 @@ extern ENUM_TIMEFRAMES DeMarker_Timeframe = PERIOD_M1; // Timeframe (0 means the
 extern int DeMarker_Period = 110; // Suggested value: 110.
 extern int DeMarker_Shift = 8; // Shift relative to the current bar the given amount of periods ago. Suggested value: 4.
 extern double DeMarker_OpenLevel = 0.0; // Valid range: 0.0-0.4. Suggested value: 0.0.
-extern ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = T_FIXED; // Trailing Stop method for DeMarker. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = 4; // Trailing Profit method for DeMarker. Range: 0-10. Set 0 to default.
-/* DeMarker backtest log (1000,auto,ts:15,tp:20,gap:10)
- *   2015.01.02-2015.06.20: 7k trades, 63% dd, 1.06 profit factor (+204%)
+extern bool DeMarker_CloseOnChange = FALSE; // Close opposite orders on market change.
+extern ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = T_MA_F_FAR; // Trailing Stop method for DeMarker. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = T_MA_F_FAR_TRAIL; // Trailing Profit method for DeMarker. Set 0 to default. See: ENUM_TRAIL_TYPE.
+/* DeMarker backtest log (£1000,auto,ts:15,tp:20,gap:10) [2015.02.05-2015.06.20 based on MT4 FXCM backtest data]:
+ * 	 £3422.29	9272	1.13	0.37	2348.51	52.54%	0.00000000	DeMarker_TrailingProfitMethod=T_FIXED
+ *   £2473.93	9554	1.09	0.26	1448.54	57.50%	0.00000000	DeMarker_TrailingProfitMethod=T_MA_F_FAR_TRAIL
  */
 
 extern string ____Fractals_Parameters__ = "-- Settings for the Fractals indicator --";
@@ -282,27 +293,30 @@ extern int Fractals_MaxPeriods = 2; // Suggested range: 1-5, Suggested value: 3
 extern int Fractals_Shift = 4; // Shift relative to the chart. Suggested value: 0.
 extern bool Fractals_CloseOnChange = FALSE; // Close opposite orders on market change.
 extern ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = T_MA_M_FAR; // Trailing Stop method for Fractals. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = 4; // Trailing Profit method for Fractals. Range: 0-10. Set 0 to default.
-/* Fractals backtest log (1000,auto,ts:15,tp:20,gap:10)
- *   2015.01.02-2015.06.20: 7k trades, 50-70% dd, 1.03 profit factor (+94%)
- *   2014.01.02-2014.12.20: fail
+extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_FIXED; // Trailing Profit method for Fractals. Set 0 to default. See: ENUM_TRAIL_TYPE.
+/* Fractals backtest log (£1000,auto,ts:15,tp:20,gap:10) [2015.02.05-2015.06.20 based on MT4 FXCM backtest data]:
+ *   2401.84	8066	1.10	0.30	1456.74	45.72%	0.00000000	Fractals_TrailingStopMethod=T_MA_M_FAR
+ *   2189.92	7884	1.09	0.28	1407.66	48.64%	0.00000000	Fractals_TrailingStopMethod=T_MA_S
  */
 
 /*
  * Summary backtest log
- * Separated test (1000,auto,ts:15,tp:20,gap:10,unlimited) [2015.01.02-2015.06.20 based on MT4 FXCM backtest data]:
- *   MA:         profit:  922, trades:  3130, profit factor: 1.06, expected payoff: 0.29, drawdown: 67%,     +92%
- *   MACD:       profit: 1000, trades:  1909, profit factor: 1.12, expected payoff: 0.52, drawdown: 36%,    +100%
- *   Fractals:   profit:  941, trades:  7040, profit factor: 1.03, expected payoff: 0.13, drawdown: 73%,     +94%
- *   Alligator:  profit: 1200, trades:  4797, profit factor: 1.05, expected payoff: 0.25, drawdown: 57%,    +120%
- *   DeMarker:   profit: 2041, trades:  6982, profit factor: 1.06, expected payoff: 0.29, drawdown: 63%,    +204%
- *   WPR:        profit: 2182, trades:  8335, profit factor: 1.07, expected payoff: 0.26, drawdown: 41%,    +218%
+ * All [2015.01.05-2015.06.20 based on MT4 FXCM backtest data]:
+ *   £17793.02	57001	1.11	0.31	1127.11	69.61%
+ *   [2015.02.05-2015.06.20] £14507.95	39224	1.13	0.37	963.47	30.80%
+ * Separated tests (1000,auto,ts:15,tp:20,gap:10,unlimited) [2015.01.02-2015.06.20 based on MT4 FXCM backtest data]:
+ *   Old: MA:         profit:  922, trades:  3130, profit factor: 1.06, expected payoff: 0.29, drawdown: 67%,     +92%
+ *   Old: MACD:       profit: 1000, trades:  1909, profit factor: 1.12, expected payoff: 0.52, drawdown: 36%,    +100%
+ *   Old: Fractals:   profit:  941, trades:  7040, profit factor: 1.03, expected payoff: 0.13, drawdown: 73%,     +94%
+ *   Old: Alligator:  profit: 1200, trades:  4797, profit factor: 1.05, expected payoff: 0.25, drawdown: 57%,    +120%
+ *   Old: DeMarker:   profit: 2041, trades:  6982, profit factor: 1.06, expected payoff: 0.29, drawdown: 63%,    +204%
+ *   Old: WPR:        profit: 2182, trades:  8335, profit factor: 1.07, expected payoff: 0.26, drawdown: 41%,    +218%
  * Mixed (auto,ts:15,tp:20,gap:10,unlimited) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data]:
  *   MA+MACD+Fractals+Alligator+DeMarker+WPR:
- *         1000: profit: 7555, trades: 31228, profit factor: 1.05, expected payoff: 0.24, drawdown: 29/79%, +755%
- *        10000: profit: 8586, trades: 31290, profit factor: 1.06, expected payoff: 0.27, drawdown: 22%,     +85%
+ *         1000: Old: profit: 7555, trades: 31228, profit factor: 1.05, expected payoff: 0.24, drawdown: 29/79%, +755%
+ *        10000: Old: profit: 8586, trades: 31290, profit factor: 1.06, expected payoff: 0.27, drawdown: 22%,     +85%
  *   Alligator+RSI+SAR:
- *         1000: profit: 5302, trades: 15703, profit factor: 1.16, expected payoff: 0.34, drawdown: 17%,    +530%
+ *         1000: Old: profit: 5302, trades: 15703, profit factor: 1.16, expected payoff: 0.34, drawdown: 17%,    +530%
  */
 
 extern string ____EA_Conditions__ = "-- Execute actions on certain conditions (set 0 to none) --"; // See: ENUM_ACTION_TYPE
@@ -592,26 +606,26 @@ void Trade() {
    if (MA_Enabled) {
       if (MAFastOnBuy()) {
        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MA_FAST_ON_BUY, "MAFastOnBuy");
-       if (EACloseOnMarketChange) CloseOrdersByType(MA_FAST_ON_SELL);
+       if (MA_F_CloseOnChange) CloseOrdersByType(MA_FAST_ON_SELL);
       } else if (MAFastOnSell()) {
        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MA_FAST_ON_SELL, "MAFastOnSell");
-       if (EACloseOnMarketChange) CloseOrdersByType(MA_FAST_ON_BUY);
+       if (MA_F_CloseOnChange) CloseOrdersByType(MA_FAST_ON_BUY);
       }
 
       if (MAMediumOnBuy()) {
        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MA_MEDIUM_ON_BUY, "MAMediumOnBuy");
-       if (EACloseOnMarketChange) CloseOrdersByType(MA_MEDIUM_ON_SELL);
+       if (MA_M_CloseOnChange) CloseOrdersByType(MA_MEDIUM_ON_SELL);
       } else if (MAMediumOnSell()) {
        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MA_MEDIUM_ON_SELL, "MAMediumOnSell");
-       if (EACloseOnMarketChange) CloseOrdersByType(MA_MEDIUM_ON_BUY);
+       if (MA_M_CloseOnChange) CloseOrdersByType(MA_MEDIUM_ON_BUY);
       }
 
       if (MASlowOnBuy()) {
-       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MA_LARGE_ON_BUY, "MASlowOnBuy");
-       if (EACloseOnMarketChange) CloseOrdersByType(MA_LARGE_ON_SELL);
+       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MA_SLOW_ON_BUY, "MASlowOnBuy");
+       if (MA_S_CloseOnChange) CloseOrdersByType(MA_SLOW_ON_SELL);
       } else if (MASlowOnSell()) {
-       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MA_LARGE_ON_SELL, "MASlowOnSell");
-       if (EACloseOnMarketChange) CloseOrdersByType(MA_LARGE_ON_BUY);
+       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MA_SLOW_ON_SELL, "MASlowOnSell");
+       if (MA_S_CloseOnChange) CloseOrdersByType(MA_SLOW_ON_BUY);
       }
    }
 
@@ -678,20 +692,20 @@ void Trade() {
    if (DeMarker_Enabled) {
       if (DeMarkerOnBuy(DeMarker_OpenLevel)) {
         order_placed = ExecuteOrder(OP_BUY, GetLotSize(), DEMARKER_ON_BUY, "DeMarkerOnBuy");
-        if (EACloseOnMarketChange) CloseOrdersByType(DEMARKER_ON_SELL);
+        if (DeMarker_CloseOnChange) CloseOrdersByType(DEMARKER_ON_SELL);
       } else if (DeMarkerOnSell(DeMarker_OpenLevel)) {
         order_placed = ExecuteOrder(OP_SELL, GetLotSize(), DEMARKER_ON_SELL, "DeMarkerOnSell");
-        if (EACloseOnMarketChange) CloseOrdersByType(DEMARKER_ON_BUY);
+        if (DeMarker_CloseOnChange) CloseOrdersByType(DEMARKER_ON_BUY);
       }
    }
 
    if (WPR_Enabled) {
      if (WPROnBuy(WPR_OpenLevel)) {
        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), WPR_ON_BUY, "WPROnBuy");
-       if (EACloseOnMarketChange) CloseOrdersByType(WPR_ON_SELL);
+       if (WPR_CloseOnChange) CloseOrdersByType(WPR_ON_SELL);
      } else if (WPROnSell(WPR_OpenLevel)) {
        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), WPR_ON_SELL, "WPROnSell");
-       if (EACloseOnMarketChange) CloseOrdersByType(WPR_ON_BUY);
+       if (WPR_CloseOnChange) CloseOrdersByType(WPR_ON_BUY);
      }
    }
 
@@ -1459,8 +1473,6 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = -1, d
    double default_trail = If(cmd == OP_BUY, Bid, Ask) + trail * factor;
    int method = GetTrailingMethod(order_type, loss_or_profit);
 
-   last_msg = "Factor: " + factor + ", default trail: " + default_trail;
-
    switch (method) {
      case T_NONE: // None
        new_value = previous;
@@ -1561,8 +1573,8 @@ int GetTrailingMethod(int order_type, int stop_or_profit) {
     case MA_FAST_ON_SELL:
     case MA_MEDIUM_ON_BUY:
     case MA_MEDIUM_ON_SELL:
-    case MA_LARGE_ON_BUY:
-    case MA_LARGE_ON_SELL:
+    case MA_SLOW_ON_BUY:
+    case MA_SLOW_ON_SELL:
       if (MA_TrailingStopMethod > 0)   stop_method   = MA_TrailingStopMethod;
       if (MA_TrailingProfitMethod > 0) profit_method = MA_TrailingProfitMethod;
       break;
@@ -2011,6 +2023,7 @@ double GetAutoRiskRatio() {
   double balance = AccountBalance();
   double high_risk = 0.0;
   if (MathMin(equity, balance) < 2000) high_risk += 0.1 * GetNoOfStrategies() / 2; // Calculate additional risk.
+  high_risk = MathMax(MathMin(high_risk, 0.8), 0.2); // Limit high risk between 0.2 and 0.8.
   return MathMin(equity / balance - high_risk, 1.0);
 }
 
@@ -2154,7 +2167,7 @@ string GetOrdersStats(string sep = "\n") {
   total_orders_text += "; ratio: " + CalculateOrderTypeRatio();
   // Prepare data about open orders per strategy type.
   string open_orders_per_type = "Orders Per Type: ";
-  int ma_orders = open_orders[MA_FAST_ON_BUY] + open_orders[MA_FAST_ON_SELL] + open_orders[MA_MEDIUM_ON_BUY] + open_orders[MA_MEDIUM_ON_SELL] + open_orders[MA_LARGE_ON_BUY] + open_orders[MA_LARGE_ON_SELL];
+  int ma_orders = open_orders[MA_FAST_ON_BUY] + open_orders[MA_FAST_ON_SELL] + open_orders[MA_MEDIUM_ON_BUY] + open_orders[MA_MEDIUM_ON_SELL] + open_orders[MA_SLOW_ON_BUY] + open_orders[MA_SLOW_ON_SELL];
   int macd_orders = open_orders[MACD_ON_BUY] + open_orders[MACD_ON_SELL];
   int fractals_orders = open_orders[FRACTALS_ON_BUY] + open_orders[FRACTALS_ON_SELL];
   int demarker_orders = open_orders[DEMARKER_ON_BUY] + open_orders[DEMARKER_ON_SELL];
