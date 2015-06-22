@@ -55,18 +55,16 @@ enum ENUM_TASK_TYPE {
 
 // Define type of actions which can be executed.
 enum ENUM_ACTION_TYPE {
-  ACTION_NONE,
-  ACTION_CLOSE_ORDER_PROFIT,
-  ACTION_CLOSE_ORDER_LOSS,
-  ACTION_CLOSE_ALL_ORDER_PROFIT,
-  ACTION_CLOSE_ALL_ORDER_LOSS,
-  ACTION_CLOSE_ALL_ORDER_BUY,
-  ACTION_CLOSE_ALL_ORDER_SELL,
-  ACTION_CLOSE_ALL_ORDERS,
-  // ACTION_RISK_REDUCE,
-  // ACTION_RISK_INCREASE,
-  ACTION_ORDER_STOPS_DECREASE,
-  ACTION_ORDER_PROFIT_DECREASE,
+  /*  0 */ A_NONE,
+  /*  1 */ A_CLOSE_ORDER_PROFIT,
+  /*  2 */ A_CLOSE_ORDER_LOSS,
+  /*  3 */ A_CLOSE_ALL_ORDER_PROFIT,
+  /*  4 */ A_CLOSE_ALL_ORDER_LOSS,
+  /*  5 */ A_CLOSE_ALL_ORDER_BUY,
+  /*  6 */ A_CLOSE_ALL_ORDER_SELL,
+  /*  7 */ A_CLOSE_ALL_ORDERS,
+  /*  8 */ A_ORDER_STOPS_DECREASE,
+  /*  9 */ A_ORDER_PROFIT_DECREASE,
   FINAL_ACTION_TYPE_ENTRY // Should be the last one. Used to calculate number of enum items.
 };
 
@@ -320,12 +318,13 @@ extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_FIXED; // Trailing Prof
  */
 
 extern string ____EA_Conditions__ = "-- Execute actions on certain conditions (set 0 to none) --"; // See: ENUM_ACTION_TYPE
-extern int ActionOnDoubledEquity  = ACTION_CLOSE_ORDER_PROFIT; // Execute action when account equity doubled balance.
-extern int ActionOnTwoThirdEquity = ACTION_CLOSE_ORDER_LOSS; // Execute action when account has 2/3 of equity.
-extern int ActionOnHalfEquity     = ACTION_CLOSE_ALL_ORDER_LOSS; // Execute action when account has half equity.
-extern int ActionOnOneThirdEquity = ACTION_CLOSE_ALL_ORDER_LOSS; // Execute action when account has 1/3 of equity.
-extern int ActionOnMarginCall     = ACTION_NONE; // Execute action on margin call.
-// extern int ActionOnLowBalance     = ACTION_NONE; // Execute action on low balance.
+extern ENUM_ACTION_TYPE ActionOnDoubledEquity      = A_CLOSE_ALL_ORDER_PROFIT; // Execute action when account equity doubled the balance.
+extern ENUM_ACTION_TYPE ActionOn10pcEquityHigh     = A_CLOSE_ORDER_PROFIT; // Execute action when account equity is 10% higher than the balance.
+extern ENUM_ACTION_TYPE ActionOnTwoThirdEquity     = A_CLOSE_ORDER_LOSS; // Execute action when account equity has 2/3 of the balance.
+extern ENUM_ACTION_TYPE ActionOnHalfEquity         = A_CLOSE_ALL_ORDER_LOSS; // Execute action when account equity is half of the balance.
+extern ENUM_ACTION_TYPE ActionOnOneThirdEquity     = A_CLOSE_ALL_ORDER_LOSS; // Execute action when account equity is 1/3 of the balance.
+extern ENUM_ACTION_TYPE ActionOnMarginCall         = A_NONE; // Execute action on margin call.
+// extern int ActionOnLowBalance      = A_NONE; // Execute action on low balance.
 
 extern string ____Debug_Parameters__ = "-- Settings for log & messages --";
 extern bool PrintLogOnChart = TRUE;
@@ -346,7 +345,9 @@ extern string ____Other_Parameters__ = "----------------------------------------
 extern int MagicNumber = 31337; // To help identify its own orders. It can vary in additional range: +20, see: ENUM_ORDER_TYPE.
 extern bool TradeMicroLots = TRUE;
 extern int EAManualGMToffset = 0;
-extern bool MaxTries = 5; // Number of maximum attempts to execute the order.
+extern double MinPipChangeToTrade = 0.7; // Minimum pip change to trade before the bar change.
+extern int MinVolumeToTrade = 1; // Minimum volume to trade.
+extern int MaxTries = 5; // Number of maximum attempts to execute the order.
 //extern int TrailingStopDelay = 0; // How often trailing stop should be updated (in seconds). FIXME: Fix relative delay in backtesting.
 // extern int JobProcessDelay = 1; // How often job list should be processed (in seconds).
 
@@ -408,7 +409,10 @@ double max_order_slippage; // Maximum price slippage for buy or sell orders (in 
 double LastAsk, LastBid; // Keep the last ask and bid price.
 int err_code; // Error code.
 string last_err, last_msg;
-int last_trail_update = 0, last_order_time = 0, last_acc_check = 0, last_indicators_update = 0, last_stats_update = 0;
+double last_tick_change; // Last tick change in pips.
+int last_bar_time; // Last bar time (to check if bar has been changed since last time).
+int last_order_time = 0, last_action_time = 0;
+// int last_trail_update = 0, last_indicators_update = 0, last_stats_update = 0;
 int day_of_month; // Used to print daily reports.
 int GMT_Offset;
 int todo_queue[100][8], last_queue_process = 0;
@@ -459,8 +463,22 @@ double Fractals_lower, Fractals_upper;
 //| Expert tick function                                             |
 //+------------------------------------------------------------------+
 void OnTick() {
-  int curr_time = TimeCurrent() - GMT_Offset;
-  if (TradeAllowed() && Volume[0] > 1) {
+  //int curr_time = TimeCurrent() - GMT_Offset;
+
+  // Check the last tick change.
+  last_tick_change = MathMax(GetPipDiff(Ask, LastAsk), GetPipDiff(Bid, LastBid));
+  // if (VerboseDebug && last_tick_change > 1) Print("Tick change: " + tick_change + "; Ask" + Ask + ", Bid: " + Bid, ", LastAsk: " + LastAsk + ", LastBid: " + LastBid);
+  LastAsk = Ask; LastBid = Bid;
+
+  // Check if we should pass the tick.
+  int bar_time = iTime(NULL, PERIOD_M1, 0);
+  if (bar_time == last_bar_time || last_tick_change < MinPipChangeToTrade) {
+    return;
+  } else {
+    last_bar_time = bar_time;
+  }
+
+  if (Volume[0] > MinVolumeToTrade && TradeAllowed()) {
     UpdateIndicators();
     Trade();
     if (GetTotalOrders() > 0) {
@@ -726,28 +744,34 @@ void CheckAccount() {
 
   // if (VerboseTrace) Print("Calling " + __FUNCTION__ + "()");
 
-  // Check timing from last time.
   int bar_time = iTime(NULL, PERIOD_M1, 0);
-  if (bar_time == last_acc_check) return; else last_acc_check = bar_time;
+  if (bar_time == last_action_time) {
+    // return; // If action was already executed in the same bar, do not check again.
+  }
 
   if (AccountEquity() > AccountBalance() * 2) {
     if (VerboseInfo) Print(GetAccountTextDetails());
-    ActionExecute(ActionOnDoubledEquity, "account equity doubled");
+    ActionExecute(ActionOnDoubledEquity, "Account equity doubled the balance" + " [" + AccountEquity() + "/" + AccountBalance() + "]");
+  }
+
+  if (AccountEquity() > AccountBalance() + AccountBalance()/100*10) {
+    if (VerboseInfo) Print(GetAccountTextDetails());
+    ActionExecute(ActionOn10pcEquityHigh, "Account equity is 10% higher than the balance" + " [" + AccountEquity() + "/" + AccountBalance() + "]");
   }
 
   if (AccountEquity() < AccountBalance() * 2/3 ) {
     if (VerboseInfo) Print(GetAccountTextDetails());
-    ActionExecute(ActionOnTwoThirdEquity, "account equity is two thirds of the balance");
+    ActionExecute(ActionOnTwoThirdEquity, "Account equity is only two thirds of the balance" + " [" + AccountEquity() + "/" + AccountBalance() + "]");
   }
 
   if (AccountEquity() < AccountBalance() / 2) {
     if (VerboseInfo) Print(GetAccountTextDetails());
-    ActionExecute(ActionOnHalfEquity, "account equity is less than half of the balance");
+    ActionExecute(ActionOnHalfEquity, "Account equity is less than half of the balance!" + " [" + AccountEquity() + "/" + AccountBalance() + "]");
   }
 
   if (AccountEquity() < AccountBalance() / 3) {
     if (VerboseInfo) Print(GetAccountTextDetails());
-    ActionExecute(ActionOnOneThirdEquity, "account equity is less than one third of the balance");
+    ActionExecute(ActionOnOneThirdEquity, "Account equity is less than one third of the balance!" + " [" + AccountEquity() + "/" + AccountBalance() + "]");
   }
 
   if (VerboseInfo && !IsOptimization()) {
@@ -785,13 +809,14 @@ void CheckAccount() {
 }
 
 bool UpdateIndicators() {
+/*
   // Check if bar time has been changed since last check.
   int bar_time = iTime(NULL, PERIOD_M1, 0);
   if (bar_time == last_indicators_update) {
     return (FALSE);
   } else {
     last_indicators_update = bar_time;
-  }
+  }*/
 
   int i;
   string text = __FUNCTION__ + "(): ";
@@ -978,8 +1003,8 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
       }
 
       result = TRUE;
-      last_order_time = iTime(NULL, PERIOD_M1, 0); // Set last execution bar time.
-      last_trail_update = 0; // Set to 0, so trailing stops can be updated faster.
+      // last_order_time = iTime(NULL, PERIOD_M1, 0); // Set last execution bar time.
+      // last_trail_update = 0; // Set to 0, so trailing stops can be updated faster.
       order_price = OrderOpenPrice();
       if (VerboseInfo) OrderPrint();
       if (VerboseDebug) { Print(__FUNCTION__ + "(): " + GetOrderTextDetails() + GetAccountTextDetails()); }
@@ -1077,11 +1102,9 @@ int CloseOrdersByType(int order_type) {
 
 // Update statistics.
 bool UpdateStats() {
-  CheckStats(ValueToPips(MathMax(MathAbs(Ask - LastAsk), MathAbs(Bid - LastBid))),  MAX_TICK);
-  LastAsk = Ask; LastBid = Bid;
   // Check if bar time has been changed since last check.
-  int bar_time = iTime(NULL, PERIOD_M1, 0);
-  if (bar_time == last_indicators_update) return (FALSE); else last_stats_update = bar_time;
+  // int bar_time = iTime(NULL, PERIOD_M1, 0);
+  CheckStats(last_tick_change, MAX_TICK);
   CheckStats(Low[0],  MAX_LOW);
   CheckStats(High[0], MAX_HIGH);
   return (TRUE);
@@ -1397,12 +1420,13 @@ void UpdateTrailingStops() {
    int order_type;
 
    // Check if bar time has been changed since last time.
+   /*
    int bar_time = iTime(NULL, PERIOD_M1, 0);
    if (bar_time == last_trail_update) {
      return;
    } else {
      last_trail_update = bar_time;
-   }
+   }*/
 
    for (int i = 0; i < OrdersTotal(); i++) {
      if (!OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) continue;
@@ -1906,6 +1930,11 @@ double GetPointsPerPip() {
   return MathPow(10, Digits - GetPipPrecision());
 }
 
+// Get the difference between two price values (in pips).
+double GetPipDiff(double price1, double price2) {
+  return MathAbs(price1 - price2) * MathPow(10, Digits) / GetPointsPerPip();
+}
+
 // Current market spread value in pips.
 //
 // Note: Using Mode_SPREAD can return 20 on EURUSD (IBFX), but zero on some other pairs, so using Ask - Bid instead.
@@ -1921,11 +1950,6 @@ double GetMarketSpread(bool in_points = FALSE) {
 // Get current minimum marker gap (in points).
 double GetMarketGap(bool in_points = FALSE) {
   return If(in_points, market_stoplevel + GetMarketSpread(TRUE), (market_stoplevel + GetMarketSpread(TRUE)) * Point);
-}
-
-// Convert value to pips.
-double ValueToPips(double value) {
-  return value * MathPow(10, Digits - pip_precision);
 }
 
 double NormalizeLots(double lots, bool ceiling = FALSE, string pair = "") {
@@ -2251,7 +2275,7 @@ bool ActionCloseMostProfitableOrder(){
   }
 
   if (selected_ticket > 0) {
-    return TaskAddCloseOrder(selected_ticket, ACTION_CLOSE_ORDER_LOSS);
+    return TaskAddCloseOrder(selected_ticket, A_CLOSE_ORDER_LOSS);
   } else if (VerboseDebug) {
     Print("ActionCloseMostProfitableOrder(): Can't find any profitable order as requested.");
   }
@@ -2273,7 +2297,7 @@ bool ActionCloseMostUnprofitableOrder(){
   }
 
   if (selected_ticket > 0) {
-    return TaskAddCloseOrder(selected_ticket, ACTION_CLOSE_ORDER_PROFIT);
+    return TaskAddCloseOrder(selected_ticket, A_CLOSE_ORDER_PROFIT);
   } else if (VerboseDebug) {
     Print("ActionCloseMostUnprofitableOrder(): Can't find any unprofitable order as requested.");
   }
@@ -2288,7 +2312,7 @@ bool ActionCloseAllProfitableOrders(){
     if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
        ticket_profit = GetOrderProfit();
        if (ticket_profit > 0) {
-         TaskAddCloseOrder(OrderTicket(), ACTION_CLOSE_ALL_ORDER_PROFIT);
+         TaskAddCloseOrder(OrderTicket(), A_CLOSE_ALL_ORDER_PROFIT);
          selected_orders++;
          total_profit += ticket_profit;
      }
@@ -2308,7 +2332,7 @@ bool ActionCloseAllUnprofitableOrders(){
     if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
        ticket_profit = GetOrderProfit();
        if (ticket_profit < 0) {
-         TaskAddCloseOrder(OrderTicket(), ACTION_CLOSE_ALL_ORDER_LOSS);
+         TaskAddCloseOrder(OrderTicket(), A_CLOSE_ALL_ORDER_LOSS);
          selected_orders++;
          total_profit += ticket_profit;
      }
@@ -2327,7 +2351,7 @@ bool ActionCloseAllOrdersByType(int cmd){
   for (int order = 0; order < OrdersTotal(); order++) {
     if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
        if (OrderType() == cmd) {
-         TaskAddCloseOrder(OrderTicket(), If(cmd == OP_BUY, ACTION_CLOSE_ALL_ORDER_BUY, ACTION_CLOSE_ALL_ORDER_SELL));
+         TaskAddCloseOrder(OrderTicket(), If(cmd == OP_BUY, A_CLOSE_ALL_ORDER_BUY, A_CLOSE_ALL_ORDER_SELL));
          selected_orders++;
          total_profit += ticket_profit;
      }
@@ -2359,7 +2383,7 @@ int ActionCloseAllOrders(bool only_ours = TRUE) {
    for (int order = 0; order < total; order++) {
       if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && OrderTicket() > 0) {
          if (only_ours && !CheckOurMagicNumber()) continue;
-         TaskAddCloseOrder(OrderTicket(), ACTION_CLOSE_ALL_ORDERS); // Add task to re-try.
+         TaskAddCloseOrder(OrderTicket(), A_CLOSE_ALL_ORDERS); // Add task to re-try.
          processed++;
       } else {
         if (VerboseDebug)
@@ -2379,44 +2403,44 @@ bool ActionExecute(int action_id, string reason) {
   bool result = FALSE;
   if (VerboseDebug) Print("ExecuteAction(): Action id: " + action_id + "; reason: " + reason);
   switch (action_id) {
-    case ACTION_NONE:
+    case A_NONE:
       result = TRUE;
       if (VerboseDebug) Print("ExecuteAction(): No action taken. Action call reason: " + reason);
       // Nothing.
       break;
-    case ACTION_CLOSE_ORDER_PROFIT:
+    case A_CLOSE_ORDER_PROFIT:
       result = ActionCloseMostProfitableOrder();
       break;
-    case ACTION_CLOSE_ORDER_LOSS:
+    case A_CLOSE_ORDER_LOSS:
       result = ActionCloseMostUnprofitableOrder();
       break;
-    case ACTION_CLOSE_ALL_ORDER_PROFIT:
+    case A_CLOSE_ALL_ORDER_PROFIT:
       result = ActionCloseAllProfitableOrders();
       break;
-    case ACTION_CLOSE_ALL_ORDER_LOSS:
+    case A_CLOSE_ALL_ORDER_LOSS:
       result = ActionCloseAllUnprofitableOrders();
       break;
-    case ACTION_CLOSE_ALL_ORDER_BUY:
+    case A_CLOSE_ALL_ORDER_BUY:
       result = ActionCloseAllOrdersByType(OP_BUY);
       break;
-    case ACTION_CLOSE_ALL_ORDER_SELL:
+    case A_CLOSE_ALL_ORDER_SELL:
       result = ActionCloseAllOrdersByType(OP_SELL);
       break;
-    case ACTION_CLOSE_ALL_ORDERS:
+    case A_CLOSE_ALL_ORDERS:
       result = ActionCloseAllOrders();
       break;
       /*
-    case ACTION_RISK_REDUCE:
+    case A_RISK_REDUCE:
       result = ActionRiskReduce();
       break;
-    case ACTION_RISK_INCREASE:
+    case A_RISK_INCREASE:
       result = ActionRiskIncrease();
       break;
       */
-    case ACTION_ORDER_STOPS_DECREASE:
+    case A_ORDER_STOPS_DECREASE:
       // result = TightenStops();
       break;
-    case ACTION_ORDER_PROFIT_DECREASE:
+    case A_ORDER_PROFIT_DECREASE:
       // result = TightenProfits();
       break;
     default:
@@ -2424,6 +2448,10 @@ bool ActionExecute(int action_id, string reason) {
   }
   TaskProcessList(TRUE); // Process task list immediately after action has been taken.
   if (VerboseInfo) Print(GetAccountTextDetails() + GetOrdersStats());
+  if (result) {
+    last_action_time = iTime(NULL, PERIOD_M1, 0); // Set last execution bar time.
+    last_msg = __FUNCTION__ + ": " + reason;
+  }
   return result;
 }
 
