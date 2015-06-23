@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.027"
+#property version   "1.028"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -20,30 +20,18 @@
 enum ENUM_STRATEGY_TYPE {
   // Type of strategy being used (used for strategy identification, new strategies append to the end, but in general - do not change!).
   CUSTOM,
-  MA_FAST_ON_BUY,
-  MA_FAST_ON_SELL,
-  MA_MEDIUM_ON_BUY,
-  MA_MEDIUM_ON_SELL,
-  MA_SLOW_ON_BUY,
-  MA_SLOW_ON_SELL,
-  MACD_ON_BUY,
-  MACD_ON_SELL,
-  ALLIGATOR_ON_BUY,
-  ALLIGATOR_ON_SELL,
-  RSI_ON_BUY,
-  RSI_ON_SELL,
-  SAR_ON_BUY,
-  SAR_ON_SELL,
-  BANDS_ON_BUY,
-  BANDS_ON_SELL,
-  ENVELOPES_ON_BUY,
-  ENVELOPES_ON_SELL,
-  WPR_ON_BUY,
-  WPR_ON_SELL,
-  DEMARKER_ON_BUY,
-  DEMARKER_ON_SELL,
-  FRACTALS_ON_BUY,
-  FRACTALS_ON_SELL,
+  MA_FAST,
+  MA_MEDIUM,
+  MA_SLOW,
+  MACD,
+  ALLIGATOR,
+  RSI,
+  SAR,
+  BANDS,
+  ENVELOPES,
+  WPR,
+  DEMARKER,
+  FRACTALS,
   FINAL_STRATEGY_TYPE_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };
 
@@ -424,14 +412,14 @@ int total_orders = 0; // Number of total orders currently open.
 double daily[FINAL_VALUE_TYPE_ENTRY], weekly[FINAL_VALUE_TYPE_ENTRY], monthly[FINAL_VALUE_TYPE_ENTRY];
 
 // Indicator variables.
-double MA_Fast[3], MA_Medium[3], MA_Slow[3];
-double MACD[3], MACDSignal[3];
-double RSI[3];
-double SAR[3]; int SAR_week[7][2];
-double Bands[3][3], Envelopes[3][3];
-double Alligator[3][3];
-double DeMarker[2], WPR[2];
-double Fractals_lower, Fractals_upper;
+double ma_fast[3], ma_medium[3], ma_slow[3];
+double macd[3], macd_signal[3];
+double rsi[3];
+double sar[3]; int sar_week[7][2];
+double bands[3][3], envelopes[3][3];
+double alligator[3][3];
+double demarker[2], wpr[2];
+double fractals_lower, fractals_upper;
 
 /* TODO:
  *   - multiply successful strategy direction,
@@ -648,117 +636,117 @@ void Trade() {
 
    if (MA_Enabled) {
       if (MA_Fast_On_Buy()) {
-       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MA_FAST_ON_BUY, "MAFastOnBuy");
-       if (MA_F_CloseOnChange) CloseOrdersByType(MA_FAST_ON_SELL);
+       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MA_FAST, "MA Fast");
+       if (MA_F_CloseOnChange) CloseOrdersByType(OP_SELL, MA_FAST, "closing MA Fast on market change");
       } else if (MA_Fast_On_Sell()) {
-       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MA_FAST_ON_SELL, "MAFastOnSell");
-       if (MA_F_CloseOnChange) CloseOrdersByType(MA_FAST_ON_BUY);
+       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MA_FAST, "MA Fast");
+       if (MA_F_CloseOnChange) CloseOrdersByType(OP_BUY, MA_FAST, "closing MA Fast on market change");
       }
 
       if (MA_Medium_On_Buy()) {
-       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MA_MEDIUM_ON_BUY, "MAMediumOnBuy");
-       if (MA_M_CloseOnChange) CloseOrdersByType(MA_MEDIUM_ON_SELL);
+       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MA_MEDIUM, "MA Medium");
+       if (MA_M_CloseOnChange) CloseOrdersByType(OP_SELL, MA_MEDIUM, "closing MA Medium on market change");
       } else if (MA_Medium_On_Sell()) {
-       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MA_MEDIUM_ON_SELL, "MAMediumOnSell");
-       if (MA_M_CloseOnChange) CloseOrdersByType(MA_MEDIUM_ON_BUY);
+       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MA_MEDIUM, "MA Medium");
+       if (MA_M_CloseOnChange) CloseOrdersByType(OP_BUY, MA_MEDIUM, "closing MA Medium on market change");
       }
 
       if (MA_Slow_On_Buy()) {
-       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MA_SLOW_ON_BUY, "MASlowOnBuy");
-       if (MA_S_CloseOnChange) CloseOrdersByType(MA_SLOW_ON_SELL);
+       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MA_SLOW, "MASlowOnBuy");
+       if (MA_S_CloseOnChange) CloseOrdersByType(OP_SELL, MA_SLOW, "closing MA Slow on market change");
       } else if (MA_Slow_On_Sell()) {
-       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MA_SLOW_ON_SELL, "MASlowOnSell");
-       if (MA_S_CloseOnChange) CloseOrdersByType(MA_SLOW_ON_BUY);
+       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MA_SLOW, "MASlowOnSell");
+       if (MA_S_CloseOnChange) CloseOrdersByType(OP_BUY, MA_SLOW, "closing MA Slow on market change");
       }
    }
 
    if (MACD_Enabled) {
       if (MACD_On_Buy()) {
-       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MACD_ON_BUY, "MACDOnBuy");
-       if (EACloseOnMarketChange) CloseOrdersByType(MACD_ON_SELL);
+       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), MACD, "MACDOnBuy");
+       if (EACloseOnMarketChange) CloseOrdersByType(OP_SELL, MACD, "closing MACD on market change");
       } else if (MACD_On_Sell()) {
-       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MACD_ON_SELL, "MACDOnSell");
-       if (EACloseOnMarketChange) CloseOrdersByType(MACD_ON_BUY);
+       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), MACD, "MACDOnSell");
+       if (EACloseOnMarketChange) CloseOrdersByType(OP_BUY, MACD, "closing MACD on market change");
       }
    }
 
    if (Alligator_Enabled) {
       if (Alligator_On_Buy(Alligator_OpenLevel * pip_size)) {
-        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), ALLIGATOR_ON_BUY, "AlligatorOnBuy");
-        if (Alligator_CloseOnChange) CloseOrdersByType(ALLIGATOR_ON_SELL);
+        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), ALLIGATOR, "AlligatorOnBuy");
+        if (Alligator_CloseOnChange) CloseOrdersByType(OP_SELL, ALLIGATOR, "closing Alligator on market change");
       } else if (Alligator_On_Sell(Alligator_OpenLevel * pip_size)) {
-        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), ALLIGATOR_ON_SELL, "AlligatorOnSell");
-        if (Alligator_CloseOnChange) CloseOrdersByType(ALLIGATOR_ON_BUY);
+        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), ALLIGATOR, "AlligatorOnSell");
+        if (Alligator_CloseOnChange) CloseOrdersByType(OP_BUY, ALLIGATOR, "closing Alligator on market change");
       }
    }
 
    if (RSI_Enabled) {
       if (RSI_On_Buy(RSI_OpenMethod, RSI_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), RSI_ON_BUY, "RSI");
-        if (RSI_CloseOnChange) CloseOrdersByType(RSI_ON_SELL);
+        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), RSI, "RSI");
+        if (RSI_CloseOnChange) CloseOrdersByType(OP_SELL, RSI, "closing RSI on market change");
       } else if (RSI_On_Sell(RSI_OpenMethod, RSI_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), RSI_ON_SELL, "RSI");
-        if (RSI_CloseOnChange) CloseOrdersByType(RSI_ON_BUY);
+        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), RSI, "RSI");
+        if (RSI_CloseOnChange) CloseOrdersByType(OP_BUY, RSI, "closing RSI on market change");
       }
    }
 
    if (SAR_Enabled) {
       if (SAR_On_Buy(SAR_OpenMethod)) {
-        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), SAR_ON_BUY, "SAR");
-        if (SAR_CloseOnChange) CloseOrdersByType(SAR_ON_SELL);
+        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), SAR, "SAR");
+        if (SAR_CloseOnChange) CloseOrdersByType(OP_SELL, SAR, "closing SAR on market change");
       } else if (SAR_On_Sell(SAR_OpenMethod)) {
-        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), SAR_ON_SELL, "SAR");
-        if (SAR_CloseOnChange) CloseOrdersByType(SAR_ON_BUY);
+        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), SAR, "SAR");
+        if (SAR_CloseOnChange) CloseOrdersByType(OP_BUY, SAR, "closing SAR on market change");
       }
    }
 
    if (Bands_Enabled) {
       if (Bands_On_Buy(Bands_OpenMethod)) {
-        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), BANDS_ON_BUY, "Bands");
-        if (Bands_CloseOnChange) CloseOrdersByType(BANDS_ON_SELL);
+        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), BANDS, "Bands");
+        if (Bands_CloseOnChange) CloseOrdersByType(OP_SELL, BANDS, "closing Bands on market change");
       } else if (Bands_On_Sell(Bands_OpenMethod)) {
-        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), BANDS_ON_SELL, "Bands");
-        if (Bands_CloseOnChange) CloseOrdersByType(BANDS_ON_BUY);
+        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), BANDS, "Bands");
+        if (Bands_CloseOnChange) CloseOrdersByType(OP_BUY, BANDS, "closing Bands on market change");
       }
    }
 
    if (Envelopes_Enabled) {
       if (Envelopes_On_Buy()) {
-        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), ENVELOPES_ON_BUY, "Envelopes");
-        if (Envelopes_CloseOnChange) CloseOrdersByType(ENVELOPES_ON_SELL);
+        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), ENVELOPES, "Envelopes");
+        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_SELL, ENVELOPES, "closing Envelopes on market change");
       } else if (Envelopes_On_Sell()) {
-        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), ENVELOPES_ON_SELL, "Envelopes");
-        if (Envelopes_CloseOnChange) CloseOrdersByType(ENVELOPES_ON_BUY);
+        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), ENVELOPES, "Envelopes");
+        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_BUY, ENVELOPES, "closing Envelopes on market change");
       }
    }
 
    if (DeMarker_Enabled) {
       if (DeMarker_On_Buy(DeMarker_OpenMethod, DeMarker_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), DEMARKER_ON_BUY, "DeMarker" + DeMarker[0]);
-        if (DeMarker_CloseOnChange) CloseOrdersByType(DEMARKER_ON_SELL);
+        order_placed = ExecuteOrder(OP_BUY, GetLotSize(), DEMARKER, "DeMarker" + demarker[0]);
+        if (DeMarker_CloseOnChange) CloseOrdersByType(OP_SELL, DEMARKER, "closing DeMarker on market change");
       } else if (DeMarker_On_Sell(DeMarker_OpenMethod, DeMarker_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), DEMARKER_ON_SELL, "DeMarker" + DeMarker[0]);
-        if (DeMarker_CloseOnChange) CloseOrdersByType(DEMARKER_ON_BUY);
+        order_placed = ExecuteOrder(OP_SELL, GetLotSize(), DEMARKER, "DeMarker" + demarker[0]);
+        if (DeMarker_CloseOnChange) CloseOrdersByType(OP_BUY, DEMARKER, "closing DeMarker on market change");
       }
    }
 
    if (WPR_Enabled) {
      if (WPR_On_Buy(WPR_OpenMethod, WPR_OpenLevel)) {
-       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), WPR_ON_BUY, "WPR:" + WPR[0]);
-       if (WPR_CloseOnChange) CloseOrdersByType(WPR_ON_SELL);
+       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), WPR, "WPR:" + wpr[0]);
+       if (WPR_CloseOnChange) CloseOrdersByType(OP_SELL, WPR, "closing WPR on market change");
      } else if (WPR_On_Sell(WPR_OpenMethod, WPR_OpenLevel)) {
-       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), WPR_ON_SELL, "WPR:" + WPR[0]);
-       if (WPR_CloseOnChange) CloseOrdersByType(WPR_ON_BUY);
+       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), WPR, "WPR:" + wpr[0]);
+       if (WPR_CloseOnChange) CloseOrdersByType(OP_BUY, WPR, "closing WPR on market change");
      }
    }
 
    if (Fractals_Enabled) {
       if (Fractals_On_Buy()) {
-       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), FRACTALS_ON_BUY, "Fractals");
-       if (Fractals_CloseOnChange) CloseOrdersByType(FRACTALS_ON_SELL);
+       order_placed = ExecuteOrder(OP_BUY, GetLotSize(), FRACTALS, "Fractals");
+       if (Fractals_CloseOnChange) CloseOrdersByType(OP_SELL, FRACTALS, "closing Fractals on market change");
       } else if (Fractals_On_Sell()) {
-       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), FRACTALS_ON_SELL, "Fractals");
-       if (Fractals_CloseOnChange) CloseOrdersByType(FRACTALS_ON_BUY);
+       order_placed = ExecuteOrder(OP_SELL, GetLotSize(), FRACTALS, "Fractals");
+       if (Fractals_CloseOnChange) CloseOrdersByType(OP_BUY, FRACTALS, "closing Fractals on market change");
       }
    }
 
@@ -829,127 +817,127 @@ bool UpdateIndicators() {
   // Update Moving Averages indicator values.
   // Note: We don't limit MA calculation with MA_Enabled, because this indicator is used for trailing stop calculation.
   // Calculate MA Fast.
-  MA_Fast[0] = iMA(NULL, MA_Timeframe, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, 0); // Current
-  MA_Fast[1] = iMA(NULL, MA_Timeframe, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, 1 + MA_Shift_Fast); // Previous
-  MA_Fast[2] = iMA(NULL, MA_Timeframe, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, 2 + MA_Shift_Far);
+  ma_fast[0] = iMA(NULL, MA_Timeframe, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, 0); // Current
+  ma_fast[1] = iMA(NULL, MA_Timeframe, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, 1 + MA_Shift_Fast); // Previous
+  ma_fast[2] = iMA(NULL, MA_Timeframe, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, 2 + MA_Shift_Far);
   // Calculate MA Medium.
-  MA_Medium[0] = iMA(NULL, MA_Timeframe, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, 0); // Current
-  MA_Medium[1] = iMA(NULL, MA_Timeframe, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, 1 + MA_Shift_Medium); // Previous
-  MA_Medium[2] = iMA(NULL, MA_Timeframe, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, 2 + MA_Shift_Far);
+  ma_medium[0] = iMA(NULL, MA_Timeframe, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, 0); // Current
+  ma_medium[1] = iMA(NULL, MA_Timeframe, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, 1 + MA_Shift_Medium); // Previous
+  ma_medium[2] = iMA(NULL, MA_Timeframe, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, 2 + MA_Shift_Far);
   // Calculate Ma Slow.
-  MA_Slow[0] = iMA(NULL, MA_Timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, 0); // Current
-  MA_Slow[1] = iMA(NULL, MA_Timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, 1 + MA_Shift_Slow); // Previous
-  MA_Slow[2] = iMA(NULL, MA_Timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, 2 + MA_Shift_Far);
+  ma_slow[0] = iMA(NULL, MA_Timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, 0); // Current
+  ma_slow[1] = iMA(NULL, MA_Timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, 1 + MA_Shift_Slow); // Previous
+  ma_slow[2] = iMA(NULL, MA_Timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, 2 + MA_Shift_Far);
 
   // TODO: testing
-  // MA_Fast[0] = iMA(NULL, MA_Timeframe, MA_Period_Medium / MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 0); // Current
-  // MA_Fast[1] = iMA(NULL, MA_Timeframe, MA_Period_Medium / MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 1 + MA_Shift_Fast); // Previous
-  // MA_Fast[2] = iMA(NULL, MA_Timeframe, MA_Period_Medium / MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 2 + MA_Shift_Far);
-  // MA_Slow[0] = iMA(NULL, MA_Timeframe, MA_Period_Medium * MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 0); // Current
-  // MA_Slow[1] = iMA(NULL, MA_Timeframe, MA_Period_Medium * MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 1 + MA_Shift_Slow); // Previous
-  // MA_Slow[2] = iMA(NULL, MA_Timeframe, MA_Period_Medium * MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 2 + MA_Shift_Far);
-  if (VerboseTrace) text += "MA: MA_Fast: " + GetArrayValues(MA_Fast) + "; MA_Medium: " + GetArrayValues(MA_Medium) + "; MA_Slow: " + GetArrayValues(MA_Slow) + "; ";
+  // ma_fast[0] = iMA(NULL, MA_Timeframe, MA_Period_Medium / MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 0); // Current
+  // ma_fast[1] = iMA(NULL, MA_Timeframe, MA_Period_Medium / MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 1 + MA_Shift_Fast); // Previous
+  // ma_fast[2] = iMA(NULL, MA_Timeframe, MA_Period_Medium / MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 2 + MA_Shift_Far);
+  // ma_slow[0] = iMA(NULL, MA_Timeframe, MA_Period_Medium * MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 0); // Current
+  // ma_slow[1] = iMA(NULL, MA_Timeframe, MA_Period_Medium * MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 1 + MA_Shift_Slow); // Previous
+  // ma_slow[2] = iMA(NULL, MA_Timeframe, MA_Period_Medium * MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 2 + MA_Shift_Far);
+  if (VerboseTrace) text += "MA: MA_Fast: " + GetArrayValues(ma_fast) + "; MA_Medium: " + GetArrayValues(ma_medium) + "; MA_Slow: " + GetArrayValues(ma_slow) + "; ";
   if (VerboseDebug && IsVisualMode()) DrawMA();
 
   if (MACD_Enabled) {
     // Update MACD indicator values.
-    MACD[0] = iMACD(NULL, MACD_Timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN, 0); // Current
-    MACD[1] = iMACD(NULL, MACD_Timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN, 1 + MACD_Shift); // Previous
-    MACD[2] = iMACD(NULL, MACD_Timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN, 2 + MACD_ShiftFar);
-    MACDSignal[0] = iMACD(NULL, MACD_Timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, 0);
-    MACDSignal[1] = iMACD(NULL, MACD_Timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, 1 + MACD_Shift);
-    MACDSignal[2] = iMACD(NULL, MACD_Timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, 2 + MACD_ShiftFar);
-    if (VerboseTrace) text += "MACD: " + GetArrayValues(MACD) + "; Signal: " + GetArrayValues(MACDSignal) + "; ";
+    macd[0] = iMACD(NULL, MACD_Timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN, 0); // Current
+    macd[1] = iMACD(NULL, MACD_Timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN, 1 + MACD_Shift); // Previous
+    macd[2] = iMACD(NULL, MACD_Timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN, 2 + MACD_ShiftFar);
+    macd_signal[0] = iMACD(NULL, MACD_Timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, 0);
+    macd_signal[1] = iMACD(NULL, MACD_Timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, 1 + MACD_Shift);
+    macd_signal[2] = iMACD(NULL, MACD_Timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, 2 + MACD_ShiftFar);
+    if (VerboseTrace) text += "MACD: " + GetArrayValues(macd) + "; Signal: " + GetArrayValues(macd_signal) + "; ";
   }
 
   if (Alligator_Enabled) {
     // Update Alligator indicator values.
     // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
     for (i = 0; i < 3; i++) {
-      Alligator[i][0] = iMA(NULL, Alligator_Timeframe, Alligator_Jaw_Period,   Alligator_Jaw_Shift,   Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
-      Alligator[i][1] = iMA(NULL, Alligator_Timeframe, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
-      Alligator[i][2] = iMA(NULL, Alligator_Timeframe, Alligator_Lips_Period,  Alligator_Lips_Shift,  Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift_Far);
+      alligator[i][0] = iMA(NULL, Alligator_Timeframe, Alligator_Jaw_Period,   Alligator_Jaw_Shift,   Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
+      alligator[i][1] = iMA(NULL, Alligator_Timeframe, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
+      alligator[i][2] = iMA(NULL, Alligator_Timeframe, Alligator_Lips_Period,  Alligator_Lips_Shift,  Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift_Far);
     }
     /* Which is equivalent to:
-    Alligator[0][0] = iAlligator(NULL, Alligator_Timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
-    Alligator[0][1] = iAlligator(NULL, Alligator_Timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
-    Alligator[0][2] = iAlligator(NULL, Alligator_Timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
+    alligator[0][0] = iAlligator(NULL, Alligator_Timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
+    alligator[0][1] = iAlligator(NULL, Alligator_Timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
+    alligator[0][2] = iAlligator(NULL, Alligator_Timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
      */
-    // if (VerboseTrace) text += "Alligator: " + GetArrayValues(Alligator[0]) + GetArrayValues(Alligator[1]) + "; ";
+    // if (VerboseTrace) text += "Alligator: " + GetArrayValues(alligator[0]) + GetArrayValues(alligator[1]) + "; ";
   }
 
   if (RSI_Enabled) {
     // Update RSI indicator values.
     for (i = 0; i < 3; i++) {
-      RSI[i] = iRSI(NULL, RSI_Timeframe, RSI_Period, RSI_Applied_Price, i + RSI_Shift);
+      rsi[i] = iRSI(NULL, RSI_Timeframe, RSI_Period, RSI_Applied_Price, i + RSI_Shift);
     }
-    if (VerboseTrace) text += "RSI: " + GetArrayValues(RSI) + "; ";
+    if (VerboseTrace) text += "RSI: " + GetArrayValues(rsi) + "; ";
   }
 
   // if (SAR_Enabled) {
     // Update SAR indicator values.
     for (i = 0; i < 3; i++) {
-      SAR[i] = iSAR(NULL, SAR_Timeframe, SAR_Step, SAR_Maximum_Stop, i + SAR_Shift);
+      sar[i] = iSAR(NULL, SAR_Timeframe, SAR_Step, SAR_Maximum_Stop, i + SAR_Shift);
     }
-    if (SAR[0] < Open[0]) SAR_week[day_of_week][OP_BUY]++;
-    if (SAR[0] > Open[0]) SAR_week[day_of_week][OP_SELL]++;
-    if (VerboseTrace) text += "SAR: " + GetArrayValues(SAR) + "; ";
+    if (sar[0] < Open[0]) sar_week[day_of_week][OP_BUY]++;
+    if (sar[0] > Open[0]) sar_week[day_of_week][OP_SELL]++;
+    if (VerboseTrace) text += "SAR: " + GetArrayValues(sar) + "; ";
   // }
 
   // if (Bands_Enabled) {
     // Update the Bollinger Bands indicator values.
     for (i = 0; i < 3; i++) {
-      Bands[i][0] = iBands(NULL, Bands_Timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_MAIN, i + Bands_Shift);
-      Bands[i][1] = iBands(NULL, Bands_Timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_UPPER, i + Bands_Shift);
-      Bands[i][2] = iBands(NULL, Bands_Timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_LOWER, i + Bands_Shift);
+      bands[i][0] = iBands(NULL, Bands_Timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_MAIN, i + Bands_Shift);
+      bands[i][1] = iBands(NULL, Bands_Timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_UPPER, i + Bands_Shift);
+      bands[i][2] = iBands(NULL, Bands_Timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_LOWER, i + Bands_Shift);
     }
-    // if (VerboseTrace) text += "Bands: " + GetArrayValues(Bands) + "; ";
+    // if (VerboseTrace) text += "Bands: " + GetArrayValues(bands) + "; ";
   // }
 
   if (Envelopes_Enabled) {
     // Update the Envelopes indicator values.
     for (i = 0; i < 3; i++) {
-      Envelopes[i][0] = iEnvelopes(NULL, Envelopes_Timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation, MODE_MAIN, i + Envelopes_Shift);
-      Envelopes[i][1] = iEnvelopes(NULL, Envelopes_Timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation, MODE_UPPER, i + Envelopes_Shift);
-      Envelopes[i][2] = iEnvelopes(NULL, Envelopes_Timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation, MODE_LOWER, i + Envelopes_Shift);
+      envelopes[i][0] = iEnvelopes(NULL, Envelopes_Timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation, MODE_MAIN, i + Envelopes_Shift);
+      envelopes[i][1] = iEnvelopes(NULL, Envelopes_Timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation, MODE_UPPER, i + Envelopes_Shift);
+      envelopes[i][2] = iEnvelopes(NULL, Envelopes_Timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation, MODE_LOWER, i + Envelopes_Shift);
     }
-    // if (VerboseTrace) text += "Envelopes: " + GetArrayValues(Envelopes) + "; ";
+    // if (VerboseTrace) text += "Envelopes: " + GetArrayValues(envelopes) + "; ";
   }
 
   if (WPR_Enabled) {
     // Update the Larry Williams' Percent Range indicator values.
-    WPR[0] = (-iWPR(NULL, WPR_Timeframe, WPR_Period, 0 + WPR_Shift)) / 100.0;
-    WPR[1] = (-iWPR(NULL, WPR_Timeframe, WPR_Period, 1 + WPR_Shift)) / 100.0;
-    if (VerboseTrace) text += "WPR: " + GetArrayValues(WPR) + "; ";
+    wpr[0] = (-iWPR(NULL, WPR_Timeframe, WPR_Period, 0 + WPR_Shift)) / 100.0;
+    wpr[1] = (-iWPR(NULL, WPR_Timeframe, WPR_Period, 1 + WPR_Shift)) / 100.0;
+    if (VerboseTrace) text += "WPR: " + GetArrayValues(wpr) + "; ";
   }
 
   if (DeMarker_Enabled) {
     // Update DeMarker indicator values.
-    DeMarker[0] = iDeMarker(NULL, DeMarker_Timeframe, DeMarker_Period, 0 + DeMarker_Shift);
-    DeMarker[1] = iDeMarker(NULL, DeMarker_Timeframe, DeMarker_Period, 1 + DeMarker_Shift);
-    if (VerboseTrace) text += "DeMarker: " + GetArrayValues(DeMarker) + "; ";
+    demarker[0] = iDeMarker(NULL, DeMarker_Timeframe, DeMarker_Period, 0 + DeMarker_Shift);
+    demarker[1] = iDeMarker(NULL, DeMarker_Timeframe, DeMarker_Period, 1 + DeMarker_Shift);
+    if (VerboseTrace) text += "DeMarker: " + GetArrayValues(demarker) + "; ";
   }
 
   if (Fractals_Enabled) {
     // Update Fractals indicator values.
     // FIXME: Logic needs to be improved, as we're repeating the same orders for higher MaxPeriod values which results in lower performance.
     double ifractal;
-    Fractals_lower = 0;
-    Fractals_upper = 0;
+    fractals_lower = 0;
+    fractals_upper = 0;
     for (i = 0; i <= Fractals_MaxPeriods; i++) {
       ifractal = iFractals(NULL, Fractals_Timeframe, MODE_LOWER, i + Fractals_Shift);
-      if (ifractal != 0) Fractals_lower = ifractal;
+      if (ifractal != 0) fractals_lower = ifractal;
       ifractal = iFractals(NULL, Fractals_Timeframe, MODE_UPPER, i + Fractals_Shift);
-      if (ifractal != 0) Fractals_upper = ifractal;
+      if (ifractal != 0) fractals_upper = ifractal;
     }
-    if (VerboseTrace) text += "Fractals_lower: " + Fractals_lower + ", Fractals_upper: " + Fractals_upper + "; ";
+    if (VerboseTrace) text += "Fractals_lower: " + fractals_lower + ", Fractals_upper: " + fractals_upper + "; ";
   }
 
   if (VerboseTrace) Print(text);
   return (TRUE);
 }
 
-int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = "", bool retry = TRUE) {
+int ExecuteOrder(int cmd, double volume, int order_type = CUSTOM, string order_comment = "", bool retry = TRUE) {
    bool result = FALSE;
    string err;
    int order_ticket;
@@ -1078,15 +1066,21 @@ bool EACloseOrder(int ticket_no, string reason, bool retry = TRUE) {
   return result;
 }
 
-// Close order by type of strategy used. See: ENUM_STRATEGY_TYPE.
-int CloseOrdersByType(int order_type) {
+/*
+ * Close order by type of order and strategy used. See: ENUM_STRATEGY_TYPE.
+ *
+ * @param
+ *   cmd (int) - trade operation command to close (OP_SELL/OP_BUY)
+ *   strategy_type (int) - strategy type, see ENUM_STRATEGY_TYPE
+ */
+int CloseOrdersByType(int cmd, int strategy_type, string reason = "") {
    int orders_total, order_failed;
    double profit_total;
    RefreshRates();
    for (int order = 0; order < OrdersTotal(); order++) {
       if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
-         if (OrderMagicNumber() == MagicNumber+order_type && OrderSymbol() == Symbol()) {
-           if (EACloseOrder(0, "closing on market change [type=" + order_type + "]")) {
+         if (OrderMagicNumber() == MagicNumber+strategy_type && OrderSymbol() == Symbol() && OrderType() == cmd) {
+           if (EACloseOrder(0, reason)) {
               orders_total++;
               profit_total += GetOrderProfit();
            } else {
@@ -1095,13 +1089,13 @@ int CloseOrdersByType(int order_type) {
          }
       } else {
         if (VerboseDebug)
-          Print("Error in CloseOrdersByType(" + order_type + "): Order: " + order + "; Message: ", GetErrorText(err_code));
+          Print(__FUNCTION__ + "(" + cmd + ", " + strategy_type + "): Error: Order: " + order + "; Message: ", GetErrorText(err_code));
         // TaskAddCloseOrder(OrderTicket(), reason); // Add task to re-try.
       }
    }
    if (orders_total > 0 && VerboseInfo) {
      // FIXME: EnumToString(order_type) doesn't work here.
-     Print("Closed ", orders_total, " orders (", order_type, ") on market change with total profit of : ", profit_total, " pips (", order_failed, " failed)");
+     Print("Closed ", orders_total, " orders (", cmd, ", ", strategy_type, ") on market change with total profit of : ", profit_total, " pips (", order_failed, " failed)");
    }
    return (orders_total);
 }
@@ -1119,32 +1113,32 @@ bool UpdateStats() {
 
 // Trading Signal: when MA1 is crossing MA2, it triggers a trading signal.
 bool MA_Fast_On_Buy() {
-  bool state = (MA_Fast[0] > MA_Medium[0] && MA_Fast[1] < MA_Medium[1]);
-  // if (VerboseTrace) Print("MAFast_On_Buy(): cond:", state, " - ", NormalizeDouble(MA_Fast[0], Digits), " > ", NormalizeDouble(MA_Medium[0], Digits), " && ", NormalizeDouble(MA_Fast[1], Digits), " < ", NormalizeDouble(MA_Medium[1], Digits));
-  return (MA_Fast[0] > MA_Medium[0] && MA_Fast[1] < MA_Medium[1] && MA_Fast[2] < MA_Medium[2]);
+  bool state = (ma_fast[0] > ma_medium[0] && ma_fast[1] < ma_medium[1]);
+  // if (VerboseTrace) Print("MAFast_On_Buy(): cond:", state, " - ", NormalizeDouble(ma_fast[0], Digits), " > ", NormalizeDouble(ma_medium[0], Digits), " && ", NormalizeDouble(ma_fast[1], Digits), " < ", NormalizeDouble(ma_medium[1], Digits));
+  return (ma_fast[0] > ma_medium[0] && ma_fast[1] < ma_medium[1] && ma_fast[2] < ma_medium[2]);
 }
 
 // // Trading Signal: when MA1 is crossing MA2, it triggers a trading signal.
 bool MA_Fast_On_Sell() {
-  bool state = (MA_Fast[0] < MA_Medium[0] && MA_Fast[1] > MA_Medium[1]);
-  // if (VerboseTrace) Print("MAFast_On_Sell(): cond:", state, " - ", NormalizeDouble(MA_Fast[0], Digits), " < ", NormalizeDouble(MA_Medium[0], Digits), " && ", NormalizeDouble(MA_Fast[1], Digits), " > ", NormalizeDouble(MA_Medium[1], Digits));
-  return (MA_Fast[0] < MA_Medium[0] && MA_Fast[1] > MA_Medium[1] && MA_Fast[2] > MA_Medium[2]);
+  bool state = (ma_fast[0] < ma_medium[0] && ma_fast[1] > ma_medium[1]);
+  // if (VerboseTrace) Print("MAFast_On_Sell(): cond:", state, " - ", NormalizeDouble(ma_fast[0], Digits), " < ", NormalizeDouble(ma_medium[0], Digits), " && ", NormalizeDouble(ma_fast[1], Digits), " > ", NormalizeDouble(ma_medium[1], Digits));
+  return (ma_fast[0] < ma_medium[0] && ma_fast[1] > ma_medium[1] && ma_fast[2] > ma_medium[2]);
 }
 
 bool MA_Medium_On_Buy() {
-  return (MA_Fast[0] > MA_Slow[0] && MA_Fast[1] < MA_Slow[1] && MA_Fast[2] < MA_Slow[2]);
+  return (ma_fast[0] > ma_slow[0] && ma_fast[1] < ma_slow[1] && ma_fast[2] < ma_slow[2]);
 }
 
 bool MA_Medium_On_Sell() {
-  return (MA_Fast[0] < MA_Slow[0] && MA_Fast[1] > MA_Slow[1] && MA_Fast[2] > MA_Slow[2]);
+  return (ma_fast[0] < ma_slow[0] && ma_fast[1] > ma_slow[1] && ma_fast[2] > ma_slow[2]);
 }
 
 bool MA_Slow_On_Buy() {
-  return (MA_Medium[0] > MA_Slow[0] && MA_Medium[1 ] <MA_Slow[1] && MA_Medium[2] < MA_Slow[2]);
+  return (ma_medium[0] > ma_slow[0] && ma_medium[1 ] <ma_slow[1] && ma_medium[2] < ma_slow[2]);
 }
 
 bool MA_Slow_On_Sell() {
-  return (MA_Medium[0] < MA_Slow[0] && MA_Medium[1] > MA_Slow[1] && MA_Medium[2] > MA_Slow[2]);
+  return (ma_medium[0] < ma_slow[0] && ma_medium[1] > ma_slow[1] && ma_medium[2] > ma_slow[2]);
 }
 
 /*
@@ -1156,8 +1150,8 @@ bool MA_Slow_On_Sell() {
 bool MACD_On_Buy(int open_method = 0) {
   // Check for long position (BUY) possibility.
   return (
-    MACD[0] < 0 && MACD[0] > MACDSignal[0] && MACD[1] < MACDSignal[1] &&
-    MathAbs(MACD[0]) > (MACD_OpenLevel*Point) && MA_Medium[0] > MA_Medium[1]
+    macd[0] < 0 && macd[0] > macd_signal[0] && macd[1] < macd_signal[1] &&
+    MathAbs(macd[0]) > (MACD_OpenLevel*Point) && ma_medium[0] > ma_medium[1]
   );
 }
 
@@ -1170,8 +1164,8 @@ bool MACD_On_Buy(int open_method = 0) {
 bool MACD_On_Sell(int open_method = 0) {
   // Check for short position (SELL) possibility.
   return (
-    MACD[0] > 0 && MACD[0] < MACDSignal[0] && MACD[1] > MACDSignal[1] &&
-    MACD[0] > (MACD_OpenLevel*Point) && MA_Medium[0] < MA_Medium[1]
+    macd[0] > 0 && macd[0] < macd_signal[0] && macd[1] > macd_signal[1] &&
+    macd[0] > (MACD_OpenLevel*Point) && ma_medium[0] < ma_medium[1]
   );
 }
 
@@ -1184,13 +1178,13 @@ bool MACD_On_Sell(int open_method = 0) {
 bool Alligator_On_Buy(double min_gap = 0) {
   // [x][0] - The Blue line (Alligator's Jaw), [x][1] - The Red Line (Alligator's Teeth), [x][2] - The Green Line (Alligator's Lips)
   return (
-    Alligator[0][2] > Alligator[0][1] + min_gap && // Check if Lips are above Teeth ...
-    Alligator[0][2] > Alligator[0][0] + min_gap && // ... Lips are above Jaw ...
-    Alligator[0][1] > Alligator[0][0] + min_gap && // ... Teeth are above Jaw ...
-    Alligator[1][2] > Alligator[1][1] && // Check if previos Lips were above Teeth as well ...
-    Alligator[1][2] > Alligator[1][0] && // ... and previous Lips were above Jaw ...
-    Alligator[1][1] > Alligator[1][0] && // ... and previous Teeth were above Jaw ...
-    Alligator[0][2] > Alligator[1][2] // Make sure that lips increased since last bar.
+    alligator[0][2] > alligator[0][1] + min_gap && // Check if Lips are above Teeth ...
+    alligator[0][2] > alligator[0][0] + min_gap && // ... Lips are above Jaw ...
+    alligator[0][1] > alligator[0][0] + min_gap && // ... Teeth are above Jaw ...
+    alligator[1][2] > alligator[1][1] && // Check if previos Lips were above Teeth as well ...
+    alligator[1][2] > alligator[1][0] && // ... and previous Lips were above Jaw ...
+    alligator[1][1] > alligator[1][0] && // ... and previous Teeth were above Jaw ...
+    alligator[0][2] > alligator[1][2] // Make sure that lips increased since last bar.
     // TODO: Alligator_Shift_Far
   );
 }
@@ -1204,13 +1198,13 @@ bool Alligator_On_Buy(double min_gap = 0) {
 bool Alligator_On_Sell(double min_gap = 0) {
   // [x][0] - The Blue line (Alligator's Jaw), [x][1] - The Red Line (Alligator's Teeth), [x][2] - The Green Line (Alligator's Lips)
   return (
-    Alligator[0][2] + min_gap < Alligator[0][1] && // Check if Lips are below Teeth and ...
-    Alligator[0][2] + min_gap < Alligator[0][0] && // ... Lips are below Jaw and ...
-    Alligator[0][1] + min_gap < Alligator[0][0] && // ... Teeth are below Jaw ...
-    Alligator[1][2] < Alligator[1][1] && // Check if previous Lips were below Teeth as well and ...
-    Alligator[1][2] < Alligator[1][0] && // ... and previous Lips were below Jaw and ...
-    Alligator[1][1] < Alligator[1][0] && // ... and previous Teeth were below Jaw ...
-    Alligator[0][2] < Alligator[1][2] // ... and make sure that lips decreased since last bar.
+    alligator[0][2] + min_gap < alligator[0][1] && // Check if Lips are below Teeth and ...
+    alligator[0][2] + min_gap < alligator[0][0] && // ... Lips are below Jaw and ...
+    alligator[0][1] + min_gap < alligator[0][0] && // ... Teeth are below Jaw ...
+    alligator[1][2] < alligator[1][1] && // Check if previous Lips were below Teeth as well and ...
+    alligator[1][2] < alligator[1][0] && // ... and previous Lips were below Jaw and ...
+    alligator[1][1] < alligator[1][0] && // ... and previous Teeth were below Jaw ...
+    alligator[0][2] < alligator[1][2] // ... and make sure that lips decreased since last bar.
     // TODO: Alligator_Shift_Far
   );
 }
@@ -1224,9 +1218,9 @@ bool Alligator_On_Sell(double min_gap = 0) {
  */
 bool RSI_On_Buy(int open_method = 0, int open_level = 20) {
   switch (open_method) {
-    case 0: return RSI[0] < (50 - open_level);
-    case 1: return (RSI[0] < (50 - open_level) && RSI[0] > RSI[1]);
-    case 2: return (RSI[0] < (50 - open_level) && RSI[0] < RSI[1]);
+    case 0: return rsi[0] < (50 - open_level);
+    case 1: return (rsi[0] < (50 - open_level) && rsi[0] > rsi[1]);
+    case 2: return (rsi[0] < (50 - open_level) && rsi[0] < rsi[1]);
   }
   return FALSE;
 }
@@ -1240,9 +1234,9 @@ bool RSI_On_Buy(int open_method = 0, int open_level = 20) {
  */
 bool RSI_On_Sell(int open_method = 0, int open_level = 20) {
   switch (open_method) {
-    case 0: return RSI[0] > (50 + open_level);
-    case 1: return (RSI[0] > (50 + open_level) && RSI[0] < RSI[1]);
-    case 2: return (RSI[0] > (50 + open_level) && RSI[0] > RSI[1]);
+    case 0: return rsi[0] > (50 + open_level);
+    case 1: return (rsi[0] > (50 + open_level) && rsi[0] < rsi[1]);
+    case 2: return (rsi[0] > (50 + open_level) && rsi[0] > rsi[1]);
   }
   return FALSE;
 }
@@ -1254,28 +1248,28 @@ bool RSI_On_Sell(int open_method = 0, int open_level = 20) {
  *   open_method (int) - open method to use
  */
 bool SAR_On_Buy(int open_method = 0) {
-  // last_msg = "SAR Buy: " + SAR[0] + " < " + Close[0];
+  // last_msg = "SAR Buy: " + sar[0] + " < " + Close[0];
   switch (open_method) {
-    /* -472 */ case 0: return SAR[0] > Open[1];
-    /* -347 */ case 1: return SAR[0] > Open[1] && SAR[1] < Open[0]; // if the value of the previous SAR dot is higher than the open price of the previous bar AND the value of the current SAR dot is lower than the open price of the current bar
-    case 2: return SAR[0] > Close[0] && SAR[1] < Open[1]; // SAR changed from above to below of candles
-    case 3: return SAR[0] < Bid;
-    case 4: return SAR[0] > SAR[1]; // ... and current SAR is lower than the previous one
-    case 5: return SAR[0] > SAR[1] && SAR[2] > SAR[0]; // .. and previous SAR is lower from the one before
-    case 6: return SAR[0] - SAR[1] > SAR[1] - SAR[2];
-    case 7: return SAR[0] - SAR[1] < SAR[1] - SAR[2];
-    case 8: return SAR[0] > Close[0];
-    case 9: return SAR[0] < Close[0] && SAR[0] < SAR[1]; // ... and current SAR is lower than the previous one
-    case 10: return SAR[0] < Close[0] && SAR[0] < SAR[1] && SAR[1] < SAR[2]; // .. and previous SAR is lower from the one before
-    case 11: return SAR[0] < Close[0] && SAR[0] < SAR[1] && SAR[1] < SAR[2]; // .. and previous SAR is lower from the one before
-    case 12: return SAR[0] < Close[0] && SAR[0] < SAR[1] && SAR[1] < SAR[2]; // .. and previous SAR is lower from the one before
-    case 13: return SAR[0] > SAR[1]; // check if SAR step is below the close price
-    case 14: return SAR[0] < Close[0]; // check if SAR step is below the close price
-    case 15: return SAR[0] < Close[0] && SAR[0] < SAR[1]; // ... and current SAR is lower than the previous one
-    case 16: return SAR[0] < Close[0] && SAR[0] < SAR[1] && SAR[1] < SAR[2]; // .. and previous SAR is lower from the one before
-    case 17: return SAR[0] > SAR[1];
-    case 18: return SAR[0] > SAR[1] && SAR[1] > SAR[2];
-    case 19: return SAR[0] - SAR[1] > SAR[1] - SAR[2];
+    /* -472 */ case 0: return sar[0] > Open[1];
+    /* -347 */ case 1: return sar[0] > Open[1] && sar[1] < Open[0]; // if the value of the previous SAR dot is higher than the open price of the previous bar AND the value of the current SAR dot is lower than the open price of the current bar
+    case 2: return sar[0] > Close[0] && sar[1] < Open[1]; // SAR changed from above to below of candles
+    case 3: return sar[0] < Bid;
+    case 4: return sar[0] > sar[1]; // ... and current SAR is lower than the previous one
+    case 5: return sar[0] > sar[1] && sar[2] > sar[0]; // .. and previous SAR is lower from the one before
+    case 6: return sar[0] - sar[1] > sar[1] - sar[2];
+    case 7: return sar[0] - sar[1] < sar[1] - sar[2];
+    case 8: return sar[0] > Close[0];
+    case 9: return sar[0] < Close[0] && sar[0] < sar[1]; // ... and current SAR is lower than the previous one
+    case 10: return sar[0] < Close[0] && sar[0] < sar[1] && sar[1] < sar[2]; // .. and previous SAR is lower from the one before
+    case 11: return sar[0] < Close[0] && sar[0] < sar[1] && sar[1] < sar[2]; // .. and previous SAR is lower from the one before
+    case 12: return sar[0] < Close[0] && sar[0] < sar[1] && sar[1] < sar[2]; // .. and previous SAR is lower from the one before
+    case 13: return sar[0] > sar[1]; // check if SAR step is below the close price
+    case 14: return sar[0] < Close[0]; // check if SAR step is below the close price
+    case 15: return sar[0] < Close[0] && sar[0] < sar[1]; // ... and current SAR is lower than the previous one
+    case 16: return sar[0] < Close[0] && sar[0] < sar[1] && sar[1] < sar[2]; // .. and previous SAR is lower from the one before
+    case 17: return sar[0] > sar[1];
+    case 18: return sar[0] > sar[1] && sar[1] > sar[2];
+    case 19: return sar[0] - sar[1] > sar[1] - sar[2];
    }
   return FALSE;
 }
@@ -1287,29 +1281,29 @@ bool SAR_On_Buy(int open_method = 0) {
  *   open_method (int) - open method to use
  */
 bool SAR_On_Sell(int open_method = 0) {
-  // last_msg = "SAR Sell: " + SAR[0] + " > " + Close[0];
+  // last_msg = "SAR Sell: " + sar[0] + " > " + Close[0];
   // iClose(NULL,0,0), iOpen(NULL,0,1)
   switch (open_method) {
-    /* -472 */ case 0: return SAR[0] < Open[1];
-    /* -347 */ case 1: return SAR[0] < Open[1] && SAR[1] > Open[0]; // // if the value of the previous SAR dot is lower than the open price of the previous bar AND the value of the current SAR dot is higher than the open price of the current bar
-    case 2: return SAR[0] < Close[0] && SAR[1] > Open[1]; // SAR changed from below to above of candles
-    case 3: return SAR[0] > Ask;
-    case 4: return SAR[0] < SAR[1]; // ... and current SAR is lower than the previous one
-    case 5: return SAR[0] < SAR[1] && SAR[2] < SAR[0]; // .. and previous SAR is higher from the one before
-    case 6: return SAR[1] - SAR[0] > SAR[2] - SAR[1];
-    case 7: return SAR[1] - SAR[0] < SAR[2] - SAR[1];
-    case 8: return SAR[0] < Close[0];
-    case 9: return SAR[0] < Close[0] && SAR[0] < SAR[1]; // ... and current SAR is lower than the previous one
-    case 10: return SAR[0] < Close[0] && SAR[0] < SAR[1] && SAR[1] < SAR[2]; // .. and previous SAR is lower from the one before
-    case 11: return SAR[0] < Close[0] && SAR[0] > SAR[1] && SAR[1] > SAR[2]; // .. and previous SAR is higher from the one before
-    case 12: return SAR[0] < Close[0] && SAR[0] > SAR[1] && SAR[1] > SAR[2]; // .. and previous SAR is higher from the one before
-    case 13: return SAR[0] < SAR[1]; // check if SAR step is above the close price
-    case 14: return SAR[0] > Close[0]; // check if SAR step is below the close price
-    case 15: return SAR[0] < Close[0] && SAR[0] > SAR[1]; // ... and current SAR is lower than the previous one
-    case 16: return SAR[0] < Close[0] && SAR[0] > SAR[1] && SAR[1] > SAR[2]; // .. and previous SAR is higher from the one before
-    case 17: return SAR[0] < SAR[1];
-    case 18: return SAR[0] < SAR[1] && SAR[1] < SAR[2];
-    case 19: return SAR[0] - SAR[1] > SAR[1] - SAR[2];
+    /* -472 */ case 0: return sar[0] < Open[1];
+    /* -347 */ case 1: return sar[0] < Open[1] && sar[1] > Open[0]; // // if the value of the previous SAR dot is lower than the open price of the previous bar AND the value of the current SAR dot is higher than the open price of the current bar
+    case 2: return sar[0] < Close[0] && sar[1] > Open[1]; // SAR changed from below to above of candles
+    case 3: return sar[0] > Ask;
+    case 4: return sar[0] < sar[1]; // ... and current SAR is lower than the previous one
+    case 5: return sar[0] < sar[1] && sar[2] < sar[0]; // .. and previous SAR is higher from the one before
+    case 6: return sar[1] - sar[0] > sar[2] - sar[1];
+    case 7: return sar[1] - sar[0] < sar[2] - sar[1];
+    case 8: return sar[0] < Close[0];
+    case 9: return sar[0] < Close[0] && sar[0] < sar[1]; // ... and current SAR is lower than the previous one
+    case 10: return sar[0] < Close[0] && sar[0] < sar[1] && sar[1] < sar[2]; // .. and previous SAR is lower from the one before
+    case 11: return sar[0] < Close[0] && sar[0] > sar[1] && sar[1] > sar[2]; // .. and previous SAR is higher from the one before
+    case 12: return sar[0] < Close[0] && sar[0] > sar[1] && sar[1] > sar[2]; // .. and previous SAR is higher from the one before
+    case 13: return sar[0] < sar[1]; // check if SAR step is above the close price
+    case 14: return sar[0] > Close[0]; // check if SAR step is below the close price
+    case 15: return sar[0] < Close[0] && sar[0] > sar[1]; // ... and current SAR is lower than the previous one
+    case 16: return sar[0] < Close[0] && sar[0] > sar[1] && sar[1] > sar[2]; // .. and previous SAR is higher from the one before
+    case 17: return sar[0] < sar[1];
+    case 18: return sar[0] < sar[1] && sar[1] < sar[2];
+    case 19: return sar[0] - sar[1] > sar[1] - sar[2];
    }
   return FALSE;
 }
@@ -1322,13 +1316,13 @@ bool SAR_On_Sell(int open_method = 0) {
  */
 bool Bands_On_Buy(int open_method = 0) {
   switch (open_method) {
-    case 0: return Low[0] < Bands[0][2]; // price value was lower than the lower band
-    case 1: return Low[0] < Bands[0][2] && Bands[0][0] < Bands[1][0]; // ... and trend is downwards
-    case 2: return Low[0] < Bands[0][2] && Bands[0][0] > Bands[1][0] && Bands[0][1] < Bands[1][1]; // .. and the lower bands are contracting
-    case 3: return Low[0] < Bands[0][2] && Bands[0][0] > Bands[1][0] && Bands[0][2] > Bands[1][2]; // .. and the upper bands are expanding
-    case 4: return Close[0] < Bands[0][2]; // closed price value was higher than the upper band
-    case 5: return Close[0] < Bands[0][2] && Bands[0][0] < Bands[1][0]; // ... and trend is downwards
-    case 6: return Close[0] > Bands[0][2] && Low[1] < Bands[1][2]; // price closed within the bands, but previous lowest price was lower than the lower band
+    case 0: return Low[0] < bands[0][2]; // price value was lower than the lower band
+    case 1: return Low[0] < bands[0][2] && bands[0][0] < bands[1][0]; // ... and trend is downwards
+    case 2: return Low[0] < bands[0][2] && bands[0][0] > bands[1][0] && bands[0][1] < bands[1][1]; // .. and the lower bands are contracting
+    case 3: return Low[0] < bands[0][2] && bands[0][0] > bands[1][0] && bands[0][2] > bands[1][2]; // .. and the upper bands are expanding
+    case 4: return Close[0] < bands[0][2]; // closed price value was higher than the upper band
+    case 5: return Close[0] < bands[0][2] && bands[0][0] < bands[1][0]; // ... and trend is downwards
+    case 6: return Close[0] > bands[0][2] && Low[1] < bands[1][2]; // price closed within the bands, but previous lowest price was lower than the lower band
   }
   return FALSE;
 }
@@ -1341,13 +1335,13 @@ bool Bands_On_Buy(int open_method = 0) {
  */
 bool Bands_On_Sell(int open_method = 0) {
   switch (open_method) {
-    case 0: return High[0] > Bands[0][1]; // price value was higher than the upper band
-    case 1: return High[0] > Bands[0][1] && Bands[0][0] > Bands[1][0]; // ... and trend is upwards
-    case 2: return High[0] > Bands[0][1] && Bands[0][0] > Bands[1][0] && Bands[0][1] > Bands[1][1]; // .. and the lower bands are expanding
-    case 3: return High[0] > Bands[0][1] && Bands[0][0] > Bands[1][0] && Bands[0][2] < Bands[1][2]; // .. and the upper bands are contracting
-    case 4: return Close[0] > Bands[0][1]; // closed price value was higher than the upper band
-    case 5: return Close[0] > Bands[0][1] && Bands[0][0] > Bands[1][0]; // ... and trend is upwards
-    case 6: return Close[0] < Bands[0][1] && High[1] > Bands[1][1]; // price closed within the bands, but previous highest price was higher than the upper band
+    case 0: return High[0] > bands[0][1]; // price value was higher than the upper band
+    case 1: return High[0] > bands[0][1] && bands[0][0] > bands[1][0]; // ... and trend is upwards
+    case 2: return High[0] > bands[0][1] && bands[0][0] > bands[1][0] && bands[0][1] > bands[1][1]; // .. and the lower bands are expanding
+    case 3: return High[0] > bands[0][1] && bands[0][0] > bands[1][0] && bands[0][2] < bands[1][2]; // .. and the upper bands are contracting
+    case 4: return Close[0] > bands[0][1]; // closed price value was higher than the upper band
+    case 5: return Close[0] > bands[0][1] && bands[0][0] > bands[1][0]; // ... and trend is upwards
+    case 6: return Close[0] < bands[0][1] && High[1] > bands[1][1]; // price closed within the bands, but previous highest price was higher than the upper band
   }
   return FALSE;
 }
@@ -1358,10 +1352,10 @@ bool Bands_On_Sell(int open_method = 0) {
  */
 bool Envelopes_On_Buy() {
   return (
-    Low[0] < Envelopes[0][2] // price value was lower than lower band (or: iClose)
-    // && iLow[1] > Bands[0][2] // previous price value was not lower than lower band (or: iClose)
-    // && iLow[2] > Bands[0][2] // previous price value was not lower than lower band (or: iClose)
-    && Envelopes[0][0] > Envelopes[2][0] // and trend is upwards
+    Low[0] < envelopes[0][2] // price value was lower than lower band (or: iClose)
+    // && iLow[1] > bands[0][2] // previous price value was not lower than lower band (or: iClose)
+    // && iLow[2] > bands[0][2] // previous price value was not lower than lower band (or: iClose)
+    && envelopes[0][0] > envelopes[2][0] // and trend is upwards
   );
 }
 
@@ -1371,10 +1365,10 @@ bool Envelopes_On_Buy() {
  */
 bool Envelopes_On_Sell() {
   return (
-    High[0] > Envelopes[0][1] // price value was higher than upper band (or: iClose)
-    // && iHigh[1] < Bands[0][1] // previous price value was not higher than upper band (or: iClose)
-    // && iHigh[2] < Bands[0][1] // previous price value was not higher than upper band (or: iClose)
-    && Envelopes[0][0] < Envelopes[2][0] // and trend is downwards
+    High[0] > envelopes[0][1] // price value was higher than upper band (or: iClose)
+    // && iHigh[1] < bands[0][1] // previous price value was not higher than upper band (or: iClose)
+    // && iHigh[2] < bands[0][1] // previous price value was not higher than upper band (or: iClose)
+    && envelopes[0][0] < envelopes[2][0] // and trend is downwards
   );
 }
 
@@ -1387,10 +1381,10 @@ bool Envelopes_On_Sell() {
  */
 bool WPR_On_Buy(int open_method = 0, double open_level = 0.0) {
   switch (open_method) {
-    case 0: return (WPR[0] > (0.5 + open_level));
-    case 1: return (WPR[0] > (0.5 + open_level) && WPR[0] < WPR[1]);
-    case 2: return (WPR[0] > (0.5 + open_level) && WPR[0] > WPR[1]);
-    case 3: return (WPR[0] < (0.5 + open_level) && WPR[1] > (0.5 + open_level));
+    case 0: return (wpr[0] > (0.5 + open_level));
+    case 1: return (wpr[0] > (0.5 + open_level) && wpr[0] < wpr[1]);
+    case 2: return (wpr[0] > (0.5 + open_level) && wpr[0] > wpr[1]);
+    case 3: return (wpr[0] < (0.5 + open_level) && wpr[1] > (0.5 + open_level));
   }
   return FALSE;
 }
@@ -1404,10 +1398,10 @@ bool WPR_On_Buy(int open_method = 0, double open_level = 0.0) {
  */
 bool WPR_On_Sell(int open_method = 0, double open_level = 0.0) {
   switch (open_method) {
-    case 0: return (WPR[0] < (0.5 - open_level));
-    case 1: return (WPR[0] < (0.5 - open_level) && WPR[0] > WPR[1]);
-    case 2: return (WPR[0] < (0.5 - open_level) && WPR[0] < WPR[1]);
-    case 3: return (WPR[0] > (0.5 - open_level) && WPR[1] < (0.5 - open_level));
+    case 0: return (wpr[0] < (0.5 - open_level));
+    case 1: return (wpr[0] < (0.5 - open_level) && wpr[0] > wpr[1]);
+    case 2: return (wpr[0] < (0.5 - open_level) && wpr[0] < wpr[1]);
+    case 3: return (wpr[0] > (0.5 - open_level) && wpr[1] < (0.5 - open_level));
   }
   return FALSE;
 }
@@ -1422,10 +1416,10 @@ bool WPR_On_Sell(int open_method = 0, double open_level = 0.0) {
 bool DeMarker_On_Buy(int open_method = 0, double open_level = 0.0) {
   // if (VerboseTrace) { Print("DeMarker_On_Buy(): ", LowestValue(DeMarker), " > ", (0.5 + DeMarker_Filter)); }
   switch (open_method) {
-    case 0: return (DeMarker[0] < (0.5 - open_level));
-    case 1: return (DeMarker[0] < (0.5 - open_level) && DeMarker[0] > DeMarker[1]);
-    case 2: return (DeMarker[0] < (0.5 - open_level) && DeMarker[0] < DeMarker[1]);
-    case 3: return (DeMarker[0] > (0.5 - open_level) && DeMarker[1] < (0.5 - open_level));
+    case 0: return (demarker[0] < (0.5 - open_level));
+    case 1: return (demarker[0] < (0.5 - open_level) && demarker[0] > demarker[1]);
+    case 2: return (demarker[0] < (0.5 - open_level) && demarker[0] < demarker[1]);
+    case 3: return (demarker[0] > (0.5 - open_level) && demarker[1] < (0.5 - open_level));
   }
   return FALSE;
 }
@@ -1440,10 +1434,10 @@ bool DeMarker_On_Buy(int open_method = 0, double open_level = 0.0) {
 bool DeMarker_On_Sell(int open_method = 0, double open_level = 0.0) {
   // if (VerboseTrace) { Print("DeMarker_On_Sell(): ", LowestValue(DeMarker), " < ", (0.5 - DeMarker_Filter)); }
   switch (open_method) {
-    case 0: return (DeMarker[0] > (0.5 + open_level));
-    case 1: return (DeMarker[0] > (0.5 + open_level) && DeMarker[0] < DeMarker[1]);
-    case 2: return (DeMarker[0] > (0.5 + open_level) && DeMarker[0] > DeMarker[1]);
-    case 3: return (DeMarker[0] < (0.5 + open_level) && DeMarker[1] > (0.5 + open_level));
+    case 0: return (demarker[0] > (0.5 + open_level));
+    case 1: return (demarker[0] > (0.5 + open_level) && demarker[0] < demarker[1]);
+    case 2: return (demarker[0] > (0.5 + open_level) && demarker[0] > demarker[1]);
+    case 3: return (demarker[0] < (0.5 + open_level) && demarker[1] > (0.5 + open_level));
   }
   return FALSE;
 }
@@ -1452,14 +1446,14 @@ bool DeMarker_On_Sell(int open_method = 0, double open_level = 0.0) {
  * Check if Fractals indicator is on buy.
  */
 bool Fractals_On_Buy() {
-  return (Fractals_lower != 0.0);
+  return (fractals_lower != 0.0);
 }
 
 /*
  * Check if Fractals indicator is on sell.
  */
 bool Fractals_On_Sell() {
-  return (Fractals_upper != 0.0);
+  return (fractals_upper != 0.0);
 }
 
 /*
@@ -1619,61 +1613,61 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = -1, d
        new_value = default_trail;
        break;
      case T_MA_F_PREV: // MA Small (Previous)
-       new_value = MA_Fast[1];
+       new_value = ma_fast[1];
        break;
      case T_MA_F_FAR: // MA Small (Far) - trailing stop. Optimize together with: MA_Shift_Far.
-       new_value = MA_Fast[2];
+       new_value = ma_fast[2];
        break;
      case T_MA_F_LOW: // Lowest/highest value of MA Fast.
-       new_value = If(OpTypeValue(cmd) == loss_or_profit, HighestValue(MA_Fast), LowestValue(MA_Fast));
+       new_value = If(OpTypeValue(cmd) == loss_or_profit, HighestValue(ma_fast), LowestValue(ma_fast));
        break;
      case T_MA_F_TRAIL: // MA Small (Current) - trailing stop
-       new_value = MA_Fast[0] + trail * factor;
+       new_value = ma_fast[0] + trail * factor;
        break;
      case T_MA_F_FAR_TRAIL: // MA Small (Far) - trailing stop
-       new_value = MA_Fast[2] + trail * factor;
+       new_value = ma_fast[2] + trail * factor;
        break;
      case T_MA_M: // MA Medium (Current)
-       new_value = MA_Medium[0];
+       new_value = ma_medium[0];
        break;
      case T_MA_M_FAR: // MA Medium (Far)
-       new_value = MA_Medium[2];
+       new_value = ma_medium[2];
        break;
      case T_MA_M_LOW: // Lowest/highest value of MA Medium.
-       new_value = If(OpTypeValue(cmd) == loss_or_profit, HighestValue(MA_Medium), LowestValue(MA_Medium));
+       new_value = If(OpTypeValue(cmd) == loss_or_profit, HighestValue(ma_medium), LowestValue(ma_medium));
        break;
      case T_MA_M_TRAIL: // MA Small (Current) - trailing stop
-       new_value = MA_Medium[0] + trail * factor;
+       new_value = ma_medium[0] + trail * factor;
        break;
      case T_MA_M_FAR_TRAIL: // MA Small (Far) - trailing stop
-       new_value = MA_Medium[2] + trail * factor;
+       new_value = ma_medium[2] + trail * factor;
        break;
      case T_MA_S: // MA Slow (Current)
-       new_value = MA_Slow[0];
+       new_value = ma_slow[0];
        break;
      case T_MA_S_FAR: // MA Slow (Far)
-       new_value = MA_Slow[2];
+       new_value = ma_slow[2];
        break;
      case T_MA_S_TRAIL: // MA Slow (Current) - trailing stop
-       new_value = MA_Slow[0] + trail * factor;
+       new_value = ma_slow[0] + trail * factor;
        break;
      case T_MA_LOWEST: // Lowest/highest value of all MAs.
        new_value = If(OpTypeValue(cmd) == loss_or_profit,
-                       MathMax(MathMax(LowestValue(MA_Fast), LowestValue(MA_Medium)), LowestValue(MA_Slow)),
-                       MathMin(MathMin(LowestValue(MA_Fast), LowestValue(MA_Medium)), LowestValue(MA_Slow))
+                       MathMax(MathMax(LowestValue(ma_fast), LowestValue(ma_medium)), LowestValue(ma_slow)),
+                       MathMin(MathMin(LowestValue(ma_fast), LowestValue(ma_medium)), LowestValue(ma_slow))
                       );
        break;
      case T_SAR: // Current SAR value.
-       new_value = SAR[0];
+       new_value = sar[0];
        break;
      case T_SAR_LOW: // Lowest/highest SAR value.
-       new_value = If(OpTypeValue(cmd) == loss_or_profit, HighestValue(SAR), LowestValue(SAR));
+       new_value = If(OpTypeValue(cmd) == loss_or_profit, HighestValue(sar), LowestValue(sar));
        break;
      case T_BANDS: // Current Bands value.
-       new_value = If(OpTypeValue(cmd) == loss_or_profit, Bands[0][1], Bands[0][2]);
+       new_value = If(OpTypeValue(cmd) == loss_or_profit, bands[0][1], bands[0][2]);
        break;
      case T_BANDS_LOW: // Lowest/highest Bands value.
-       new_value = If(OpTypeValue(cmd) == loss_or_profit, MathMax(MathMax(Bands[0][1], Bands[1][1]), Bands[2][1]), MathMin(MathMin(Bands[0][2], Bands[1][2]), Bands[2][2]));
+       new_value = If(OpTypeValue(cmd) == loss_or_profit, MathMax(MathMax(bands[0][1], bands[1][1]), bands[2][1]), MathMin(MathMin(bands[0][2], bands[1][2]), bands[2][2]));
        break;
      default:
        if (VerboseDebug) Print(__FUNCTION__ + "(): Error: Unknown trailing stop method: ", method);
@@ -1707,57 +1701,45 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = -1, d
 int GetTrailingMethod(int order_type, int stop_or_profit) {
   int stop_method = DefaultTrailingStopMethod, profit_method = DefaultTrailingProfitMethod;
   switch (order_type) {
-    case MA_FAST_ON_BUY:
-    case MA_FAST_ON_SELL:
-    case MA_MEDIUM_ON_BUY:
-    case MA_MEDIUM_ON_SELL:
-    case MA_SLOW_ON_BUY:
-    case MA_SLOW_ON_SELL:
+    case MA_FAST:
+    case MA_MEDIUM:
+    case MA_SLOW:
       if (MA_TrailingStopMethod > 0)   stop_method   = MA_TrailingStopMethod;
       if (MA_TrailingProfitMethod > 0) profit_method = MA_TrailingProfitMethod;
       break;
-    case MACD_ON_BUY:
-    case MACD_ON_SELL:
+    case MACD:
       if (MACD_TrailingStopMethod > 0)   stop_method   = MACD_TrailingStopMethod;
       if (MACD_TrailingProfitMethod > 0) profit_method = MACD_TrailingProfitMethod;
       break;
-    case ALLIGATOR_ON_BUY:
-    case ALLIGATOR_ON_SELL:
+    case ALLIGATOR:
       if (Alligator_TrailingStopMethod > 0)   stop_method   = Alligator_TrailingStopMethod;
       if (Alligator_TrailingProfitMethod > 0) profit_method = Alligator_TrailingProfitMethod;
       break;
-    case RSI_ON_BUY:
-    case RSI_ON_SELL:
+    case RSI:
       if (RSI_TrailingStopMethod > 0)   stop_method   = RSI_TrailingStopMethod;
       if (RSI_TrailingProfitMethod > 0) profit_method = RSI_TrailingProfitMethod;
       break;
-    case SAR_ON_BUY:
-    case SAR_ON_SELL:
+    case SAR:
       if (SAR_TrailingStopMethod > 0)   stop_method   = SAR_TrailingStopMethod;
       if (SAR_TrailingProfitMethod > 0) profit_method = SAR_TrailingProfitMethod;
       break;
-    case BANDS_ON_BUY:
-    case BANDS_ON_SELL:
+    case BANDS:
       if (Bands_TrailingStopMethod > 0)   stop_method   = Bands_TrailingStopMethod;
       if (Bands_TrailingProfitMethod > 0) profit_method = Bands_TrailingProfitMethod;
       break;
-    case ENVELOPES_ON_BUY:
-    case ENVELOPES_ON_SELL:
+    case ENVELOPES:
       if (Envelopes_TrailingStopMethod > 0)   stop_method   = Envelopes_TrailingStopMethod;
       if (Envelopes_TrailingProfitMethod > 0) profit_method = Envelopes_TrailingProfitMethod;
       break;
-    case DEMARKER_ON_BUY:
-    case DEMARKER_ON_SELL:
+    case DEMARKER:
       if (DeMarker_TrailingStopMethod > 0)   stop_method   = DeMarker_TrailingStopMethod;
       if (DeMarker_TrailingProfitMethod > 0) profit_method = DeMarker_TrailingProfitMethod;
       break;
-    case WPR_ON_BUY:
-    case WPR_ON_SELL:
+    case WPR:
       if (WPR_TrailingStopMethod > 0)   stop_method   = WPR_TrailingStopMethod;
       if (WPR_TrailingProfitMethod > 0) profit_method = WPR_TrailingProfitMethod;
       break;
-    case FRACTALS_ON_BUY:
-    case FRACTALS_ON_SELL:
+    case FRACTALS:
       if (Fractals_TrailingStopMethod > 0)   stop_method   = Fractals_TrailingStopMethod;
       if (Fractals_TrailingProfitMethod > 0) profit_method = Fractals_TrailingProfitMethod;
       break;
@@ -2134,16 +2116,16 @@ int GetMaxOrdersPerType() {
 // Get number of active strategies.
 int GetNoOfStrategies() {
   return (
-    6 * MA_Enabled
-    + 2 * MACD_Enabled
-    + 2 * Alligator_Enabled
-    + 2 * RSI_Enabled
-    + 2 * SAR_Enabled
-    + 2 * Bands_Enabled
-    + 2 * Envelopes_Enabled
-    + 2 * DeMarker_Enabled
-    + 2 * WPR_Enabled
-    + 2 * Fractals_Enabled
+    3 * MA_Enabled
+    + MACD_Enabled
+    + Alligator_Enabled
+    + RSI_Enabled
+    + SAR_Enabled
+    + Bands_Enabled
+    + Envelopes_Enabled
+    + DeMarker_Enabled
+    + WPR_Enabled
+    + Fractals_Enabled
   );
 }
 
@@ -2167,7 +2149,7 @@ double GetAutoRiskRatio() {
   double equity = AccountEquity();
   double balance = AccountBalance();
   double high_risk = 0.0;
-  if (MathMin(equity, balance) < 2000) high_risk += 0.1 * GetNoOfStrategies() / 2; // Calculate additional risk.
+  if (MathMin(equity, balance) < 2000) high_risk += 0.1 * GetNoOfStrategies(); // Calculate additional risk.
   high_risk = MathMax(MathMin(high_risk, 0.8), 0.2); // Limit high risk between 0.2 and 0.8.
   return MathMin(equity / balance - high_risk, 1.0);
 }
@@ -2212,7 +2194,7 @@ void StartNewWeek() {
   if (VerboseInfo) Print(GetWeeklyReport()); // Print weekly report at end of each week.
 
   // Reset variables.
-  ArrayFill(SAR_week, 0, ArraySize(SAR_week), 0); // Reset queue list.
+  ArrayFill(sar_week, 0, ArraySize(sar_week), 0); // Reset queue list.
 }
 
 /*
@@ -2369,14 +2351,14 @@ string GetOrdersStats(string sep = "\n") {
   total_orders_text += "; ratio: " + CalculateOrderTypeRatio();
   // Prepare data about open orders per strategy type.
   string open_orders_per_type = "Orders Per Type: ";
-  int ma_orders = open_orders[MA_FAST_ON_BUY] + open_orders[MA_FAST_ON_SELL] + open_orders[MA_MEDIUM_ON_BUY] + open_orders[MA_MEDIUM_ON_SELL] + open_orders[MA_SLOW_ON_BUY] + open_orders[MA_SLOW_ON_SELL];
-  int macd_orders = open_orders[MACD_ON_BUY] + open_orders[MACD_ON_SELL];
-  int fractals_orders = open_orders[FRACTALS_ON_BUY] + open_orders[FRACTALS_ON_SELL];
-  int demarker_orders = open_orders[DEMARKER_ON_BUY] + open_orders[DEMARKER_ON_SELL];
-  int iwpr_orders = open_orders[WPR_ON_BUY] + open_orders[WPR_ON_SELL];
-  int alligator_orders = open_orders[ALLIGATOR_ON_BUY] + open_orders[ALLIGATOR_ON_SELL];
-  int bands_orders = open_orders[BANDS_ON_BUY] + open_orders[BANDS_ON_SELL];
-  int rsi_orders = open_orders[RSI_ON_BUY] + open_orders[RSI_ON_SELL];
+  int ma_orders = open_orders[MA_FAST] + open_orders[MA_MEDIUM] + open_orders[MA_SLOW];
+  int macd_orders = open_orders[MACD];
+  int fractals_orders = open_orders[FRACTALS];
+  int demarker_orders = open_orders[DEMARKER];
+  int iwpr_orders = open_orders[WPR];
+  int alligator_orders = open_orders[ALLIGATOR];
+  int bands_orders = open_orders[BANDS];
+  int rsi_orders = open_orders[RSI];
   string orders_per_type = "Stats: ";
   if (total_orders > 0) {
      if (MA_Enabled && ma_orders > 0) orders_per_type += "MA: " + MathFloor(100 / total_orders * ma_orders) + "%, ";
