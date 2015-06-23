@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.026"
+#property version   "1.027"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -158,42 +158,43 @@ extern ENUM_TRAIL_TYPE MA_TrailingProfitMethod = T_FIXED; // Trailing Profit met
 extern string ____MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --";
 extern bool MACD_Enabled = TRUE; // Enable MACD-based strategy.
 extern ENUM_TIMEFRAMES MACD_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int MACD_Fast_Period = 7; // Fast EMA averaging period.
+extern int MACD_Fast_Period = 9; // Fast EMA averaging period.
 extern int MACD_Slow_Period = 35; // Slow EMA averaging period.
 extern int MACD_Signal_Period = 15; // Signal line averaging period.
 extern double MACD_OpenLevel  = 1.0;
 //extern double MACD_CloseLevel = 2; // Set 0 to disable.
-extern ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_TYPICAL; // MACD applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
+extern ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_OPEN; // MACD applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern int MACD_Shift = 2; // Past MACD value in number of bars. Shift relative to the current bar the given amount of periods ago. Suggested value: 1
 extern int MACD_ShiftFar = 2; // Additional MACD far value in number of bars relatively to MACD_Shift.
 extern bool MACD_CloseOnChange = TRUE; // Close opposite orders on market change.
 extern ENUM_TRAIL_TYPE MACD_TrailingStopMethod = T_MA_S; // Trailing Stop method for MACD. Set 0 to default. See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = T_MA_M_TRAIL; // Trailing Profit method for MACD. Set 0 to default. See: ENUM_TRAIL_TYPE.
 /* MACD backtest log (£1000,0.1,ts:15,tp:20,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data]:
- *   £381.17	879	1.18	0.43	151.48	11.03%
- *   TODO: More tests.
+ *   £680.17	 920	1.32	0.74	84.54	6.35%	0.00000000	MACD_Fast_Period=9 	MACD_Slow_Period=35 	MACD_Signal_Period=15 	MACD_Shift=2
+ *   £659.15	1083	1.27	0.61	97.61	6.87%	0.00000000	MACD_Fast_Period=7 	MACD_Slow_Period=60 	MACD_Signal_Period=17 	MACD_Shift=2
+ *   £654.99	1049	1.27	0.62	85.50	6.14%	0.00000000	MACD_Fast_Period=7 	MACD_Slow_Period=55 	MACD_Signal_Period=17 	MACD_Shift=2
+ *   £653.68	1104	1.26	0.59	99.72	6.10%	0.00000000	MACD_Fast_Period=9 	MACD_Slow_Period=50 	MACD_Signal_Period=15 	MACD_Shift=2
  */
 
-extern string ____Alligator_Parameters__ = "-- Settings for the Alligator 1 indicator --";
+extern string ____Alligator_Parameters__ = "-- Settings for the Alligator indicator --";
 extern bool Alligator_Enabled = TRUE; // Enable Alligator custom-based strategy.
 extern ENUM_TIMEFRAMES Alligator_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int Alligator_Jaw_Period = 11; // Blue line averaging period (Alligator's Jaw).
-extern int Alligator_Jaw_Shift = 1; // Blue line shift relative to the chart.
-extern int Alligator_Teeth_Period = 8; // Red line averaging period (Alligator's Teeth).
+extern int Alligator_Jaw_Period = 12; // Blue line averaging period (Alligator's Jaw).
+extern int Alligator_Jaw_Shift = 0; // Blue line shift relative to the chart.
+extern int Alligator_Teeth_Period = 10; // Red line averaging period (Alligator's Teeth).
 extern int Alligator_Teeth_Shift = 4; // Red line shift relative to the chart.
-extern int Alligator_Lips_Period = 4; // Green line averaging period (Alligator's Lips).
+extern int Alligator_Lips_Period = 5; // Green line averaging period (Alligator's Lips).
 extern int Alligator_Lips_Shift = 2; // Green line shift relative to the chart.
-extern ENUM_MA_METHOD Alligator_MA_Method = MODE_SMA; // MA method (See: ENUM_MA_METHOD).
-extern ENUM_APPLIED_PRICE Alligator_Applied_Price = PRICE_MEDIAN; // Applied price. It can be any of ENUM_APPLIED_PRICE enumeration values.
+extern ENUM_MA_METHOD Alligator_MA_Method = MODE_EMA; // MA method (See: ENUM_MA_METHOD).
+extern ENUM_APPLIED_PRICE Alligator_Applied_Price = PRICE_HIGH; // Applied price. It can be any of ENUM_APPLIED_PRICE enumeration values.
 extern int Alligator_Shift = 0; // The indicator shift relative to the chart.
 extern int Alligator_Shift_Far = 1; // The indicator shift relative to the chart.
 extern double Alligator_OpenLevel = 0.01; // Minimum open level between moving averages to raise the singal.
 extern bool Alligator_CloseOnChange = TRUE; // Close opposite orders on market change.
 extern ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = T_MA_S; // Trailing Stop method for Alligator. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = T_MA_F_PREV; // Trailing Profit method for Alligator. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = T_MA_F_FAR_TRAIL; // Trailing Profit method for Alligator. Set 0 to default. See: ENUM_TRAIL_TYPE.
 /* Alligator backtest log (£1000,auto,ts:15,tp:20,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data]:
- *   £505.24	456	1.43	1.11	93.22	6.21%
- *   TODO: More tests.
+ *   £684.36	1203	1.23	0.57	163.90	16.02%	0.00000000	Alligator_MA_Method=1 	Alligator_Applied_Price=2
  */
 
 extern string ____RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --";
@@ -208,7 +209,7 @@ extern bool RSI_CloseOnChange = TRUE; // Close opposite orders on market change.
 extern ENUM_TRAIL_TYPE RSI_TrailingStopMethod = T_MA_M_FAR_TRAIL; // Trailing Stop method for RSI. Set 0 to default. See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = T_MA_F_TRAIL; // Trailing Profit method for RSI. Set 0 to default. See: ENUM_TRAIL_TYPE.
 /* RSI backtest log (£1000,auto,ts:15,tp:20,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data]:
- *   7	1834.21	2125	1.26	0.86	275.90	11.69%
+ *   £1834.21	2125	1.26	0.86	275.90	11.69%
  */
 
 extern string ____SAR_Parameters__ = "-- Settings for the the Parabolic Stop and Reverse system indicator --";
@@ -294,8 +295,8 @@ extern bool Fractals_CloseOnChange = TRUE; // Close opposite orders on market ch
 extern ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = T_MA_M_TRAIL; // Trailing Stop method for Fractals. Set 0 to default. See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_FIXED; // Trailing Profit method for Fractals. Set 0 to default. See: ENUM_TRAIL_TYPE.
 /* Fractals backtest log (£1000,auto,ts:15,tp:20,gap:10) [2015.02.05-2015.06.20 based on MT4 FXCM backtest data]:
- *   2401.84	8066	1.10	0.30	1456.74	45.72%	0.00000000	Fractals_TrailingStopMethod=T_MA_M_FAR
- *   2189.92	7884	1.09	0.28	1407.66	48.64%	0.00000000	Fractals_TrailingStopMethod=T_MA_S
+ *   £2401.84	8066	1.10	0.30	1456.74	45.72%	0.00000000	Fractals_TrailingStopMethod=T_MA_M_FAR
+ *   £2189.92	7884	1.09	0.28	1407.66	48.64%	0.00000000	Fractals_TrailingStopMethod=T_MA_S
  */
 
 /*
@@ -401,6 +402,10 @@ string account_type;
 bool session_initiated;
 bool session_active = FALSE;
 
+// Time-based variables.
+int bar_time, last_bar_time; // Bar time, current and last one to check if bar has been changed since the last time.
+int day_of_week, day_of_month, day_of_year;
+
 // EA variables.
 string EA_Name = "31337";
 bool ea_active = FALSE;
@@ -410,10 +415,8 @@ double LastAsk, LastBid; // Keep the last ask and bid price.
 int err_code; // Error code.
 string last_err, last_msg;
 double last_tick_change; // Last tick change in pips.
-int last_bar_time; // Last bar time (to check if bar has been changed since last time).
 int last_order_time = 0, last_action_time = 0;
 // int last_trail_update = 0, last_indicators_update = 0, last_stats_update = 0;
-int day_of_month; // Used to print daily reports.
 int GMT_Offset;
 int todo_queue[100][8], last_queue_process = 0;
 int open_orders[FINAL_STRATEGY_TYPE_ENTRY], closed_orders[FINAL_STRATEGY_TYPE_ENTRY];
@@ -423,7 +426,8 @@ double daily[FINAL_VALUE_TYPE_ENTRY], weekly[FINAL_VALUE_TYPE_ENTRY], monthly[FI
 // Indicator variables.
 double MA_Fast[3], MA_Medium[3], MA_Slow[3];
 double MACD[3], MACDSignal[3];
-double RSI[3], SAR[3];
+double RSI[3];
+double SAR[3]; int SAR_week[7][2];
 double Bands[3][3], Envelopes[3][3];
 double Alligator[3][3];
 double DeMarker[2], WPR[2];
@@ -450,7 +454,8 @@ double Fractals_lower, Fractals_upper;
  *   - check risky dates and times,
  *   - check for risky patterns,
  *   - double volume of white listed orders,
- *   - add conditional actions
+ *   - add conditional actions,
+ *   - add SAR counting,
  */
 
 /*
@@ -474,7 +479,7 @@ void OnTick() {
   LastAsk = Ask; LastBid = Bid;
 
   // Check if we should pass the tick.
-  int bar_time = iTime(NULL, PERIOD_M1, 0);
+  bar_time = iTime(NULL, PERIOD_M1, 0);
   if (bar_time == last_bar_time || last_tick_change < MinPipChangeToTrade) {
     return;
   } else {
@@ -482,6 +487,7 @@ void OnTick() {
   }
 
   if (TradeAllowed()) {
+    UpdateVariables();
     UpdateIndicators();
     Trade();
     if (GetTotalOrders() > 0) {
@@ -490,6 +496,9 @@ void OnTick() {
       TaskProcessList();
     }
     UpdateStats();
+    if (day_of_week != DayOfWeek()) {
+      StartNewDay();
+    }
     if (PrintLogOnChart) DisplayInfoOnChart();
   }
 } // end: OnTick()
@@ -522,14 +531,19 @@ int OnInit() {
 
    // TODO: IsDllsAllowed(), IsLibrariesAllowed()
 
+  // Initialize startup variables.
+
   // Calculate pip/volume size and precision.
   pip_size = GetPipSize();
   pip_precision = GetPipPrecision();
   pts_per_pip = GetPointsPerPip();
   volume_precision = GetVolumePrecision();
 
-   // Initialize startup variables.
-   session_initiated = FALSE;
+  // Check time of the week, month and year based on the trading bars.
+  bar_time = iTime(NULL, PERIOD_M1, 0);
+  day_of_week = DayOfWeek(); // The zero-based day of week (0 means Sunday,1,2,3,4,5,6) of the specified date. At the testing, the last known server time is modelled.
+  day_of_month = Day(); // The day of month (1 - 31) of the specified date. At the testing, the last known server time is modelled.
+  day_of_year = DayOfYear(); // Day (1 means 1 January,..,365(6) does 31 December) of year. At the testing, the last known server time is modelled.
 
    market_minlot = MarketInfo(Symbol(), MODE_MINLOT);
    if (market_minlot == 0.0) market_minlot = 0.1;
@@ -568,6 +582,7 @@ int OnInit() {
      Print(__FUNCTION__, "(): Account info: AccountLeverage: ", AccountLeverage());
      Print(__FUNCTION__, "(): Broker info: ", AccountCompany(), ", pip size = ", pip_size, ", points per pip = ", pts_per_pip, ", pip precision = ", pip_precision, ", volume precision = ", volume_precision);
      Print(__FUNCTION__, "(): EA info: Lot size = ", GetLotSize(), "; Max orders = ", GetMaxOrders(), "; Max orders per type = ", GetMaxOrdersPerType());
+     Print(__FUNCTION__, "(): Time: Day of week = ", day_of_week, ", day of month = ", day_of_month, "; day of year = ", day_of_year);
      Print(__FUNCTION__, "(): ", GetAccountTextDetails());
    }
 
@@ -618,6 +633,12 @@ void OnTesterDeinit() {
 void start() {
   if (VerboseTrace) Print("Calling " + __FUNCTION__ + "()");
   if (VerboseInfo) Print(GetMarketTextDetails());
+}
+
+/*
+ * Update global variables.
+ */
+void UpdateVariables() {
 }
 
 void Trade() {
@@ -748,7 +769,6 @@ void CheckAccount() {
 
   // if (VerboseTrace) Print("Calling " + __FUNCTION__ + "()");
 
-  int bar_time = iTime(NULL, PERIOD_M1, 0);
   if (bar_time == last_action_time) {
     // return; // If action was already executed in the same bar, do not check again.
   }
@@ -778,6 +798,7 @@ void CheckAccount() {
     ActionExecute(ActionOnOneThirdEquity, "Account equity is less than one third of the balance!" + " [" + AccountEquity() + "/" + AccountBalance() + "]");
   }
 
+/*
   if (VerboseInfo && !IsOptimization()) {
     // Print daily report at end of each day.
     if (TimeDay(iTime(NULL, PERIOD_M1, 0)) != TimeDay(iTime(NULL, PERIOD_M1, 1))) {
@@ -789,26 +810,6 @@ void CheckAccount() {
     if (TimeDay(iTime(NULL, PERIOD_M1, 0)) < TimeDay(iTime(NULL, PERIOD_M1, 1))) {
       if (VerboseInfo) Print("Monthly stats: ", GetMonthlyReport());
     }
-  }
-
-  /*
-  if (TimeDayOfYear
-  int curr_day = - iTime(NULL, PERIOD_D1, 0);
-  if (day_of_month != curr_day) {
-    if (VerboseInfo) Print(GetDailyReport());
-    day_of_month = curr_day;
-  }
-  // Print weekly report at end of each day.
-  int curr_day_of_week = - iTime(NULL, PERIOD_W1, 0);
-  if (day_of_month != curr_day_of_week) {
-    if (VerboseInfo) Print(GetWeeklyReport());
-    day_of_month = curr_day_of_week;
-  }
-  // Print weekly report at end of each day.
-  int curr_day_of_month = - iTime(NULL, PERIOD_MN1, 0);
-  if (day_of_month != curr_day_of_month) {
-    if (VerboseInfo) Print(GetMonthlyReport());
-    day_of_month = curr_day_of_month;
   }*/
 }
 
@@ -890,6 +891,8 @@ bool UpdateIndicators() {
     for (i = 0; i < 3; i++) {
       SAR[i] = iSAR(NULL, SAR_Timeframe, SAR_Step, SAR_Maximum_Stop, i + SAR_Shift);
     }
+    if (SAR[0] < Open[0]) SAR_week[day_of_week][OP_BUY]++;
+    if (SAR[0] > Open[0]) SAR_week[day_of_week][OP_SELL]++;
     if (VerboseTrace) text += "SAR: " + GetArrayValues(SAR) + "; ";
   // }
 
@@ -2174,7 +2177,64 @@ double GetRiskRatio() {
   return If(RiskRatio == 0, GetAutoRiskRatio(), RiskRatio);
 }
 
+/* BEGIN: PERIODIC FUNCTIONS */
+
+/*
+ * Executed for every new day.
+ */
+void StartNewDay() {
+  if (VerboseInfo) Print("== New day (day of month: " + Day() + "; day of year: " + DayOfYear() + ") ==");
+
+  // Print daily report at end of each day.
+  if (VerboseInfo) Print(GetDailyReport());
+
+  // Check if day started another week.
+  if (DayOfWeek() < day_of_week) {
+    StartNewWeek();
+  }
+  if (Day() < day_of_month) {
+    StartNewMonth();
+  }
+  if (DayOfYear() < day_of_year) {
+    StartNewYear();
+  }
+  // Store new data.
+  day_of_week = DayOfWeek(); // The zero-based day of week (0 means Sunday,1,2,3,4,5,6) of the specified date. At the testing, the last known server time is modelled.
+  day_of_month = Day(); // The day of month (1 - 31) of the specified date. At the testing, the last known server time is modelled.
+  day_of_year = DayOfYear(); // Day (1 means 1 January,..,365(6) does 31 December) of year. At the testing, the last known server time is modelled.
+}
+
+/*
+ * Executed for every new week.
+ */
+void StartNewWeek() {
+  if (VerboseInfo) Print("== New week ==");
+  if (VerboseInfo) Print(GetWeeklyReport()); // Print weekly report at end of each week.
+
+  // Reset variables.
+  ArrayFill(SAR_week, 0, ArraySize(SAR_week), 0); // Reset queue list.
+}
+
+/*
+ * Executed for every new month.
+ */
+void StartNewMonth() {
+  if (VerboseInfo) Print("== New month ==");
+  if (VerboseInfo) Print(GetMonthlyReport()); // Print monthly report at end of each month.
+}
+
+/*
+ * Executed for every new year.
+ */
+void StartNewYear() {
+  if (VerboseInfo) Print("== New year ==");
+  // if (VerboseInfo) Print(GetYearlyReport()); // Print monthly report at end of each year.
+}
+
+/* END: PERIODIC FUNCTIONS */
+
 /* BEGIN: DISPLAYING FUNCTIONS */
+
 string GetDailyReport() {
   string output = "Daily max: ";
   output += "Low: "    + daily[MAX_LOW] + "; ";
@@ -2691,7 +2751,6 @@ bool TaskProcessList(bool force = FALSE) {
    int no_elem = 8;
 
    // Check if bar time has been changed since last time.
-   int bar_time = iTime(NULL, PERIOD_M1, 0);
    if (bar_time == last_queue_process && !force) {
      // if (VerboseTrace) Print("TaskProcessList(): Not executed. Bar time: " + bar_time + " == " + last_queue_process);
      return (FALSE); // Do not process job list more often than per each minute bar.
