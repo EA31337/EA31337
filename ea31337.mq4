@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.030"
+#property version   "1.031"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -65,21 +65,6 @@ enum ENUM_TASK_TYPE {
   TASK_ORDER_CLOSE,
 };
 
-// Define type of actions which can be executed.
-enum ENUM_ACTION_TYPE {
-  /*  0 */ A_NONE,                   // None
-  /*  1 */ A_CLOSE_ORDER_PROFIT,     // Close order profit
-  /*  2 */ A_CLOSE_ORDER_LOSS,       // Close order loss
-  /*  3 */ A_CLOSE_ALL_ORDER_PROFIT, // Close all profit
-  /*  4 */ A_CLOSE_ALL_ORDER_LOSS,   // Close all loss
-  /*  5 */ A_CLOSE_ALL_ORDER_BUY,    // Close all buy
-  /*  6 */ A_CLOSE_ALL_ORDER_SELL,   // Close all sell
-  /*  7 */ A_CLOSE_ALL_ORDERS,       // Close all
-  /*  8 */ A_ORDER_STOPS_DECREASE,   // Decrease loss stops
-  /*  9 */ A_ORDER_PROFIT_DECREASE,  // Decrease profit stops
-  FINAL_ACTION_TYPE_ENTRY            // Not in use
-};
-
 // Define type of values in order to store.
 enum ENUM_VALUE_TYPE {
   MAX_LOW,
@@ -126,7 +111,18 @@ enum ENUM_PERIOD_TYPE {
   H4  = 5, // 4 hours
   D1  = 6, // daily
   W1  = 7, // weekly
-  MN1 = 8  // monthly
+  MN1 = 8, // monthly
+  FINAL_PERIOD_TYPE_ENTRY = 9  // Should be the last one. Used to calculate the number of enum items.
+};
+
+
+// Define type of tasks.
+enum ENUM_STAT_PERIOD_TYPE {
+  DAILY  = 0,  // Daily
+  WEEKLY  = 1, // Weekly
+  MONTHLY = 2, // Monthly
+  YEARLY = 3,  // Yearly
+  FINAL_STAT_PERIOD_TYPE_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };
 
 // Define indicator constants.
@@ -261,14 +257,15 @@ extern double SAR_Maximum_Stop = 0.2; // Maximum stop value, usually 0.2.
 extern int SAR_Shift = 0; // Shift relative to the chart.
 // extern int SAR_Shift_Far = 0; // Shift relative to the chart.
 extern int SAR1_OpenMethod = 0; // Valid range: 0-16.
-extern int SAR5_OpenMethod = 14; // Valid range: 0-16.
-extern int SAR15_OpenMethod = 7; // Valid range: 0-16.
-extern int SAR30_OpenMethod = 6; // Valid range: 0-16.
+extern int SAR5_OpenMethod = 3; // Valid range: 0-16.
+extern int SAR15_OpenMethod = 5; // Valid range: 0-16.
+extern int SAR30_OpenMethod = 3; // Valid range: 0-16.
 extern bool SAR_CloseOnChange = FALSE; // Close opposite orders on market change.
-extern ENUM_TRAIL_TYPE SAR_TrailingStopMethod = T_MA_M_FAR_TRAIL; // Trailing Stop method for SAR. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = T_MA_LOWEST; // Trailing Profit method for SAR. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE SAR_TrailingStopMethod = T_MA_S_FAR; // Trailing Stop method for SAR. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = T_MA_S; // Trailing Profit method for SAR. Set 0 to default. See: ENUM_TRAIL_TYPE.
 /* SAR backtest log (£1000,auto,ts:25,tp:25,gap:10) [2015.02.05-2015.06.20 based on MT4 FXCM backtest data]:
- *   £12723.26	11094	1.18	1.15	4759.57	33.60%
+ *   Curr: £10178.84	11635	1.16	0.87	2402.48	24.21%
+ *   Prev: £12723.26	11094	1.18	1.15	4759.57	33.60%
  */
 
 extern string ____Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --";
@@ -379,13 +376,92 @@ extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_MA_F_TRAIL; // Trailing
  *         1000: Old: profit: 5302, trades: 15703, profit factor: 1.16, expected payoff: 0.34, drawdown: 17%,    +530%
  */
 
-extern string ____EA_Conditions__ = "-- Execute actions on certain conditions (set 0 to none) --"; // See: ENUM_ACTION_TYPE
+// Define account conditions.
+enum ENUM_ACC_CONDITION {
+  C_ACC_NONE,         // None (inactive)
+  C_EQUITY_50PC_HIGH, // Equity 50% high
+  C_EQUITY_20PC_HIGH, // Equity 20% high
+  C_EQUITY_10PC_HIGH, // Equity 10% high
+  C_EQUITY_10PC_LOW,  // Equity 10% low
+  C_EQUITY_20PC_LOW,  // Equity 20% low
+  C_EQUITY_50PC_LOW   // Equity 50% low
+};
+
+// Define market conditions.
+enum ENUM_MARKET_CONDITION {
+  C_MARKET_NONE       = 0, // None (false).
+  C_MA1_FAST_SLOW_OPP = 1, // MA1 Fast&Slow opposite
+  C_MA1_MED_SLOW_OPP  = 2, // MA1 Med&Slow opposite
+  C_MA5_FAST_SLOW_OPP = 3, // MA5 Fast&Slow opposite
+  C_MA5_MED_SLOW_OPP  = 4, // MA5 Med&Slow opposite
+  C_MARKET_TRUE       = 5  // Always true
+};
+
+// Define type of actions which can be executed.
+enum ENUM_ACTION_TYPE {
+  A_NONE                   =  0, // None
+  A_CLOSE_ORDER_PROFIT     =  1, // Close order profit
+  A_CLOSE_ORDER_LOSS       =  2, // Close order loss
+  A_CLOSE_ALL_ORDER_PROFIT =  3, // Close all profit
+  A_CLOSE_ALL_ORDER_LOSS   =  4, // Close all loss
+  A_CLOSE_ALL_ORDER_BUY    =  5, // Close all buy
+  A_CLOSE_ALL_ORDER_SELL   =  6, // Close all sell
+  A_CLOSE_ALL_ORDERS       =  7, // Close all!
+  A_ORDER_STOPS_DECREASE   =  8, // Decrease loss stops
+  A_ORDER_PROFIT_DECREASE  =  9, // Decrease profit stops
+  FINAL_ACTION_TYPE_ENTRY  = 10  // (None)
+};
+
+extern string ____EA_Conditions__ = "-- Account conditions --"; // See: ENUM_ACTION_TYPE
+extern bool Account_Conditions_Enabled = TRUE; // Enable account conditions.
+extern ENUM_ACC_CONDITION Account_Condition_1      = C_EQUITY_50PC_LOW;
+extern ENUM_MARKET_CONDITION Market_Condition_1    = C_MARKET_TRUE;
+extern ENUM_ACTION_TYPE Action_On_Condition_1      = A_CLOSE_ALL_ORDER_LOSS;
+
+extern ENUM_ACC_CONDITION Account_Condition_2      = C_EQUITY_20PC_LOW;
+extern ENUM_MARKET_CONDITION Market_Condition_2    = C_MARKET_NONE;
+extern ENUM_ACTION_TYPE Action_On_Condition_2      = A_NONE;
+
+extern ENUM_ACC_CONDITION Account_Condition_3      = C_EQUITY_10PC_LOW;
+extern ENUM_MARKET_CONDITION Market_Condition_3    = C_MARKET_NONE;
+extern ENUM_ACTION_TYPE Action_On_Condition_3      = A_NONE;
+
+extern ENUM_ACC_CONDITION Account_Condition_4      = C_EQUITY_10PC_HIGH;
+extern ENUM_MARKET_CONDITION Market_Condition_4    = C_MARKET_TRUE;
+extern ENUM_ACTION_TYPE Action_On_Condition_4      = A_CLOSE_ORDER_PROFIT;
+
+extern ENUM_ACC_CONDITION Account_Condition_5      = C_EQUITY_20PC_HIGH;
+extern ENUM_MARKET_CONDITION Market_Condition_5    = C_MARKET_TRUE;
+extern ENUM_ACTION_TYPE Action_On_Condition_5      = A_NONE;
+
+extern ENUM_ACC_CONDITION Account_Condition_6      = C_EQUITY_50PC_HIGH;
+extern ENUM_MARKET_CONDITION Market_Condition_6    = C_MA1_FAST_SLOW_OPP;
+extern ENUM_ACTION_TYPE Action_On_Condition_6      = A_CLOSE_ALL_ORDER_PROFIT;
+
+extern ENUM_ACC_CONDITION Account_Condition_7      = C_ACC_NONE;
+extern ENUM_MARKET_CONDITION Market_Condition_7    = C_MARKET_NONE;
+extern ENUM_ACTION_TYPE Action_On_Condition_7      = A_NONE;
+
+extern ENUM_ACC_CONDITION Account_Condition_8      = C_ACC_NONE;
+extern ENUM_MARKET_CONDITION Market_Condition_8    = C_MARKET_NONE;
+extern ENUM_ACTION_TYPE Action_On_Condition_8      = A_NONE;
+
+extern ENUM_ACC_CONDITION Account_Condition_9      = C_ACC_NONE;
+extern ENUM_MARKET_CONDITION Market_Condition_9    = C_MARKET_NONE;
+extern ENUM_ACTION_TYPE Action_On_Condition_9      = A_NONE;
+
+extern ENUM_ACC_CONDITION Account_Condition_10     = C_ACC_NONE;
+extern ENUM_MARKET_CONDITION Market_Condition_10   = C_MARKET_NONE;
+extern ENUM_ACTION_TYPE Action_On_Condition_10     = A_NONE;
+
+/*
 extern ENUM_ACTION_TYPE ActionOnDoubledEquity      = A_CLOSE_ALL_ORDER_PROFIT; // Execute action when account equity doubled the balance.
 extern ENUM_ACTION_TYPE ActionOn10pcEquityHigh     = A_CLOSE_ORDER_PROFIT; // Execute action when account equity is 10% higher than the balance.
 extern ENUM_ACTION_TYPE ActionOnTwoThirdEquity     = A_CLOSE_ORDER_LOSS; // Execute action when account equity has 2/3 of the balance.
 extern ENUM_ACTION_TYPE ActionOnHalfEquity         = A_CLOSE_ALL_ORDER_LOSS; // Execute action when account equity is half of the balance.
 extern ENUM_ACTION_TYPE ActionOnOneThirdEquity     = A_CLOSE_ALL_ORDER_LOSS; // Execute action when account equity is 1/3 of the balance.
 extern ENUM_ACTION_TYPE ActionOnMarginCall         = A_NONE; // Execute action on margin call.
+*/
 // extern int ActionOnLowBalance      = A_NONE; // Execute action on low balance.
 
 extern string ____Debug_Parameters__ = "-- Settings for log & messages --";
@@ -471,6 +547,7 @@ int day_of_week, day_of_month, day_of_year;
 // Strategy variables.
 int info[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_INFO_ENTRY];
 int open_orders[FINAL_STRATEGY_TYPE_ENTRY], closed_orders[FINAL_STRATEGY_TYPE_ENTRY];
+int signals[FINAL_STAT_PERIOD_TYPE_ENTRY][FINAL_STRATEGY_TYPE_ENTRY][MN1][2]; // Count signals to buy and sell per period and strategy.
 
 // EA variables.
 string EA_Name = "31337";
@@ -487,6 +564,9 @@ int GMT_Offset;
 int todo_queue[100][8], last_queue_process = 0;
 int total_orders = 0; // Number of total orders currently open.
 double daily[FINAL_VALUE_TYPE_ENTRY], weekly[FINAL_VALUE_TYPE_ENTRY], monthly[FINAL_VALUE_TYPE_ENTRY];
+
+// Condition and actions.
+int acc_conditions[10][3], market_conditions[10][3];
 
 // Indicator variables.
 double ma_fast[H1][3], ma_medium[H1][3], ma_slow[H1][3];
@@ -521,6 +601,7 @@ double fractals[H1][3];
  *   - double volume of white listed orders,
  *   - add conditional actions,
  *   - add SAR counting,
+ *   - implement condition to close all strategy orders, buy/sell, most profitable order, when to trade, skip the day or week, etc.
  */
 
 /*
@@ -531,6 +612,8 @@ double fractals[H1][3];
  *   Digits - Number of digits after decimal point for the current symbol prices.
  *   Bars - Number of bars in the current chart.
  */
+
+
 
 //+------------------------------------------------------------------+
 //| Expert tick function                                             |
@@ -560,7 +643,7 @@ void OnTick() {
     Trade();
     if (GetTotalOrders() > 0) {
       UpdateTrailingStops();
-      CheckAccount();
+      CheckAccountConditions();
       TaskProcessList();
     }
     UpdateStats();
@@ -599,6 +682,7 @@ int OnInit() {
    // TODO: IsDllsAllowed(), IsLibrariesAllowed()
 
   InitializeVariables();
+  InitializeConditions();
 
    if (IsTesting()) {
      SendEmail = FALSE;
@@ -886,54 +970,7 @@ void Trade() {
 
 }
 
-// Check our account if certain conditions are met.
-void CheckAccount() {
 
-  // if (VerboseTrace) Print("Calling " + __FUNCTION__ + "()");
-
-  if (bar_time == last_action_time) {
-    // return; // If action was already executed in the same bar, do not check again.
-  }
-
-  if (AccountEquity() > AccountBalance() * 2) {
-    if (VerboseInfo) Print(GetAccountTextDetails());
-    ActionExecute(ActionOnDoubledEquity, "Account equity doubled the balance" + " [" + AccountEquity() + "/" + AccountBalance() + "]");
-  }
-
-  if (AccountEquity() > AccountBalance() + AccountBalance()/100*10) {
-    if (VerboseInfo) Print(GetAccountTextDetails());
-    ActionExecute(ActionOn10pcEquityHigh, "Account equity is 10% higher than the balance" + " [" + AccountEquity() + "/" + AccountBalance() + "]");
-  }
-
-  if (AccountEquity() < AccountBalance() * 2/3 ) {
-    if (VerboseInfo) Print(GetAccountTextDetails());
-    ActionExecute(ActionOnTwoThirdEquity, "Account equity is only two thirds of the balance" + " [" + AccountEquity() + "/" + AccountBalance() + "]");
-  }
-
-  if (AccountEquity() < AccountBalance() / 2) {
-    if (VerboseInfo) Print(GetAccountTextDetails());
-    ActionExecute(ActionOnHalfEquity, "Account equity is less than half of the balance!" + " [" + AccountEquity() + "/" + AccountBalance() + "]");
-  }
-
-  if (AccountEquity() < AccountBalance() / 3) {
-    if (VerboseInfo) Print(GetAccountTextDetails());
-    ActionExecute(ActionOnOneThirdEquity, "Account equity is less than one third of the balance!" + " [" + AccountEquity() + "/" + AccountBalance() + "]");
-  }
-
-/*
-  if (VerboseInfo && !IsOptimization()) {
-    // Print daily report at end of each day.
-    if (TimeDay(iTime(NULL, PERIOD_M1, 0)) != TimeDay(iTime(NULL, PERIOD_M1, 1))) {
-      if (VerboseInfo) Print("Daily stats: ", GetDailyReport());
-    }
-    if (TimeDayOfWeek(iTime(NULL, PERIOD_M1, 0)) < TimeDayOfWeek(iTime(NULL, PERIOD_M1, 1))) {
-      if (VerboseInfo) Print("Weekly stats: ", GetWeeklyReport());
-    }
-    if (TimeDay(iTime(NULL, PERIOD_M1, 0)) < TimeDay(iTime(NULL, PERIOD_M1, 1))) {
-      if (VerboseInfo) Print("Monthly stats: ", GetMonthlyReport());
-    }
-  }*/
-}
 
 // TODO: Convert this function in more flexible way by breaking down each indicator individually.
 bool UpdateIndicators(int timeframe = PERIOD_M1) {
@@ -1077,7 +1114,6 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
     fractals[period][MODE_LOWER] = iFractals(NULL, timeframe, MODE_LOWER, i + fractal_shift);
     fractals[period][MODE_UPPER] = iFractals(NULL, timeframe, MODE_UPPER, i + fractal_shift);
     // text += "fractals: "  + fractals_lower[M5]  + ", Fractals5_upper: " + fractals_upper[M5] + "; ";
-    last_msg = text;
   }
 
   if (VerboseTrace) Print(text);
@@ -1404,25 +1440,28 @@ bool RSI_On_Sell(int period = M1, int open_method = 0, int open_level = 20) {
 bool SAR_On_Buy(int period = M1, int open_method = 0) {
   bool result = FALSE;
   switch (open_method) {
-    case  0: result = sar[period][0] > Open[1]; break;
-    case  1: result = sar[period][0] > Open[1] && sar[period][1] < Open[0]; break; // if the value of the previous SAR dot is higher than the open price of the previous bar AND the value of the current SAR dot is lower than the open price of the current bar
-    case  2: result = sar[period][0] > Close[0] && sar[period][1] < Open[1]; break; // SAR changed from above to below of candles
-    case  3: result = sar[period][0] < Bid; break;
-    case  4: result = sar[period][0] > sar[period][1]; break; // ... and current SAR is lower than the previous one
-    case  5: result = sar[period][0] > sar[period][1] && sar[period][2] > sar[period][0]; break; // .. and previous SAR is lower from the one before
-    case  6: result = sar[period][0] - sar[period][1] > sar[period][1] - sar[period][2]; break;
-    case  7: result = sar[period][0] - sar[period][1] < sar[period][1] - sar[period][2]; break;
-    case  8: result = sar[period][0] > Close[0]; break;
-    case  9: result = sar[period][0] < Close[0] && sar[period][0] < sar[period][1]; break; // ... and current SAR is lower than the previous one
-    case 10: result = sar[period][0] < Close[0] && sar[period][0] < sar[period][1] && sar[period][1] < sar[period][2]; break; // .. and previous SAR is lower from the one before
-    case 11: result = sar[period][0] < Close[0] && sar[period][0] < sar[period][1] && sar[period][1] < sar[period][2]; break; // .. and previous SAR is lower from the one before
-    case 12: result = sar[period][0] > sar[period][1]; break; // check if SAR step is below the close price
-    case 13: result = sar[period][0] < Close[0]; break; // check if SAR step is below the close price
-    case 14: result = sar[period][0] < Close[0] && sar[period][0] < sar[period][1]; break; // ... and current SAR is lower than the previous one
-    case 15: result = sar[period][0] > sar[period][1]; break;
-    case 16: result = sar[period][0] > sar[period][1] && sar[period][1] > sar[period][2]; break;
+    case  0: result = sar[period][0] > Ask; break;
+    case  1: result = sar[period][0] > Open[0]; break;
+    case  2: result = sar[period][0] > Close[0]; break;
+    case  3: result = sar[period][0] < Ask && sar[period][0] < sar[period][1]; break; // ... and current SAR is lower than the previous one
+    case  4: result = sar[period][0] - sar[period][1] < sar[period][1] - sar[period][2]; break;
+    case  5: result = MathAbs(sar[period][1] - sar[period][0]) > MathAbs(sar[period][2] - sar[period][1]); break;
+    case  6: result = sar[period][CURR] > sar[period][PREV] && sar[period][PREV] < sar[period][FAR]; break; // .. and previous SAR is lower from the one before
+    case  7: result = sar[period][0] < Close[0] && sar[period][0] < sar[period][1] && sar[period][1] < sar[period][2]; break;
+    case  8: result = sar[period][0] > Open[0] && ma_medium[period][CURR] > ma_medium[period][PREV]; break;
+    case  9: result = sar[period][0] > Open[0] && ma_slow[period][CURR] > ma_slow[period][PREV]; break;
+    case 10: result = sar[period][CURR] > sar[period][PREV] && sar[period][PREV] < sar[period][FAR] && ma_slow[period][CURR] > ma_slow[period][PREV]; break;
+    case 11: result = sar[period][CURR] > sar[period][PREV] && sar[period][PREV] < sar[period][FAR] && ma_fast[period][CURR] > ma_fast[period][PREV]; break;
+    case 12: result = sar[period][0] > Open[0] && ma_slow[period][CURR] > ma_slow[period][PREV]; break;
+    case 13: result = sar[period][0] > Open[0] && sar[period][1] < Close[1]; break; // SAR changed from above to below of candles
+    case 14: result = sar[period][0] < Open[0] && sar[period][0] < sar[period][1]; break;
+    case 15: result = sar[period][0] < Close[0] && sar[period][0] < sar[period][1] && sar[period][1] < sar[period][2]; break;
   }
-  if (result) sar_week[period][day_of_week][OP_BUY]++;
+  if (result) {
+    // FIXME: Convert into more flexible way.
+    signals[DAILY][SAR1][period][OP_BUY]++; signals[WEEKLY][SAR1][period][OP_BUY]++;
+    signals[MONTHLY][SAR1][period][OP_BUY]++; signals[YEARLY][SAR1][period][OP_BUY]++;
+  }
   return result;
 }
 
@@ -1436,25 +1475,28 @@ bool SAR_On_Buy(int period = M1, int open_method = 0) {
 bool SAR_On_Sell(int period = M1, int open_method = 0) {
   bool result = FALSE;
   switch (open_method) {
-    case  0: result = sar[period][0] < Open[1]; break;
-    case  1: result = sar[period][0] < Open[1] && sar[period][1] > Open[0]; break; // // if the value of the previous SAR dot is lower than the open price of the previous bar AND the value of the current SAR dot is higher than the open price of the current bar
-    case  2: result = sar[period][0] < Close[0] && sar[period][1] > Open[1]; break; // SAR changed from below to above of candles
-    case  3: result = sar[period][0] > Ask; break;
-    case  4: result = sar[period][0] < sar[period][1]; break; // ... and current SAR is lower than the previous one
-    case  5: result = sar[period][0] < sar[period][1] && sar[period][2] < sar[period][0]; break; // .. and previous SAR is higher from the one before
-    case  6: result = sar[period][1] - sar[period][0] > sar[period][2] - sar[period][1]; break;
-    case  7: result = sar[period][1] - sar[period][0] < sar[period][2] - sar[period][1]; break;
-    case  8: result = sar[period][0] < Close[0]; break;
-    case  9: result = sar[period][0] < Close[0] && sar[period][0] < sar[period][1]; break; // ... and current SAR is lower than the previous one
-    case 10: result = sar[period][0] < Close[0] && sar[period][0] < sar[period][1] && sar[period][1] < sar[period][2]; break; // .. and previous SAR is lower from the one before
-    case 11: result = sar[period][0] < Close[0] && sar[period][0] > sar[period][1] && sar[period][1] > sar[period][2]; break; // .. and previous SAR is higher from the one before
-    case 12: result = sar[period][0] < sar[period][1]; break; // check if SAR step is above the close price
-    case 13: result = sar[period][0] > Close[0]; break; // check if SAR step is below the close price
-    case 14: result = sar[period][0] < Close[0] && sar[period][0] > sar[period][1]; break; // ... and current SAR is lower than the previous one
-    case 15: result = sar[period][0] < sar[period][1]; break;
-    case 16: result = sar[period][0] < sar[period][1] && sar[period][1] < sar[period][2]; break;
+    case  0: result = sar[period][0] < Bid; break;
+    case  1: result = sar[period][0] < Open[0]; break;
+    case  2: result = sar[period][0] < Close[0]; break;
+    case  3: result = sar[period][0] < Bid && sar[period][0] > sar[period][1]; break; // ... and current SAR is lower than the previous one
+    case  4: result = sar[period][1] - sar[period][0] < sar[period][2] - sar[period][1]; break;
+    case  5: result = MathAbs(sar[period][1] - sar[period][0]) < MathAbs(sar[period][2] - sar[period][1]); break;
+    case  6: result = sar[period][CURR] < sar[period][PREV] && sar[period][PREV] > sar[period][FAR]; break; // .. and previous SAR is higher from the one before
+    case  7: result = sar[period][0] > Close[0] && sar[period][0] > sar[period][1] && sar[period][1] > sar[period][2]; break;
+    case  8: result = sar[period][0] < Open[0] && ma_medium[period][CURR] < ma_medium[period][PREV]; break;
+    case  9: result = sar[period][0] < Open[0] && ma_slow[period][CURR] < ma_slow[period][PREV]; break;
+    case 10: result = sar[period][CURR] < sar[period][PREV] && sar[period][PREV] > sar[period][FAR] && ma_slow[period][CURR] < ma_slow[period][PREV]; break;
+    case 11: result = sar[period][CURR] < sar[period][PREV] && sar[period][PREV] > sar[period][FAR] && ma_fast[period][CURR] < ma_fast[period][PREV]; break;
+    case 12: result = sar[period][0] < Open[0] && ma_slow[period][CURR] < ma_slow[period][PREV]; break;
+    case 13: result = sar[period][0] < Open[0] && sar[period][1] > Close[1]; break; // SAR changed from below to above of candles
+    case 14: result = sar[period][0] < Open[0] && sar[period][0] > sar[period][1]; break;
+    case 15: result = sar[period][0] < Close[0] && sar[period][0] > sar[period][1] && sar[period][1] > sar[period][2]; break;
   }
-  if (result) sar_week[period][day_of_week][OP_SELL]++;
+  if (result) {
+    // FIXME: Convert into more flexible way.
+    signals[DAILY][SAR1][period][OP_SELL]++; signals[WEEKLY][SAR1][period][OP_SELL]++;
+    signals[MONTHLY][SAR1][period][OP_SELL]++; signals[YEARLY][SAR1][period][OP_SELL]++;
+  }
   return result;
 }
 
@@ -2392,6 +2434,11 @@ void StartNewDay() {
   day_of_week = DayOfWeek(); // The zero-based day of week (0 means Sunday,1,2,3,4,5,6) of the specified date. At the testing, the last known server time is modelled.
   day_of_month = Day(); // The day of month (1 - 31) of the specified date. At the testing, the last known server time is modelled.
   day_of_year = DayOfYear(); // Day (1 means 1 January,..,365(6) does 31 December) of year. At the testing, the last known server time is modelled.
+  // Reset variables.
+  for (int i = 0; i < FINAL_PERIOD_TYPE_ENTRY; i++) {
+    signals[DAILY][SAR1][i][OP_BUY] = 0;
+    signals[DAILY][SAR1][i][OP_SELL] = 0;
+  }
 }
 
 /*
@@ -2402,7 +2449,10 @@ void StartNewWeek() {
   if (VerboseInfo) Print(GetWeeklyReport()); // Print weekly report at end of each week.
 
   // Reset variables.
-  ArrayFill(sar_week, 0, ArraySize(sar_week), 0); // Reset queue list.
+  for (int i = 0; i < FINAL_PERIOD_TYPE_ENTRY; i++) {
+    signals[WEEKLY][SAR1][i][OP_BUY] = 0;
+    signals[WEEKLY][SAR1][i][OP_SELL] = 0;
+  }
 }
 
 /*
@@ -2411,6 +2461,12 @@ void StartNewWeek() {
 void StartNewMonth() {
   if (VerboseInfo) Print("== New month ==");
   if (VerboseInfo) Print(GetMonthlyReport()); // Print monthly report at end of each month.
+
+  // Reset variables.
+  for (int i = 0; i < FINAL_PERIOD_TYPE_ENTRY; i++) {
+    signals[MONTHLY][SAR1][i][OP_BUY] = 0;
+    signals[MONTHLY][SAR1][i][OP_SELL] = 0;
+  }
 }
 
 /*
@@ -2419,6 +2475,12 @@ void StartNewMonth() {
 void StartNewYear() {
   if (VerboseInfo) Print("== New year ==");
   // if (VerboseInfo) Print(GetYearlyReport()); // Print monthly report at end of each year.
+
+  // Reset variables.
+  for (int i = 0; i < FINAL_PERIOD_TYPE_ENTRY; i++) {
+    signals[YEARLY][SAR1][i][OP_BUY] = 0;
+    signals[YEARLY][SAR1][i][OP_SELL] = 0;
+  }
 }
 
 /* END: PERIODIC FUNCTIONS */
@@ -2518,6 +2580,121 @@ void UpdateVariables() {
 }
 
 /* END: VARIABLE FUNCTIONS */
+
+/* BEGIN: CONDITION FUNCTIONS */
+
+/*
+ * Initialize user defined conditions.
+ */
+void InitializeConditions() {
+  acc_conditions[0][0] = Account_Condition_1;
+  acc_conditions[0][1] = Market_Condition_1;
+  acc_conditions[0][2] = Action_On_Condition_1;
+  acc_conditions[1][0] = Account_Condition_2;
+  acc_conditions[1][1] = Market_Condition_2;
+  acc_conditions[1][2] = Action_On_Condition_2;
+  acc_conditions[2][0] = Account_Condition_3;
+  acc_conditions[2][1] = Market_Condition_3;
+  acc_conditions[2][2] = Action_On_Condition_3;
+  acc_conditions[3][0] = Account_Condition_4;
+  acc_conditions[3][1] = Market_Condition_4;
+  acc_conditions[3][2] = Action_On_Condition_4;
+  acc_conditions[4][0] = Account_Condition_5;
+  acc_conditions[4][1] = Market_Condition_5;
+  acc_conditions[4][2] = Action_On_Condition_5;
+  acc_conditions[5][0] = Account_Condition_6;
+  acc_conditions[5][1] = Market_Condition_6;
+  acc_conditions[5][2] = Action_On_Condition_6;
+  acc_conditions[6][0] = Account_Condition_7;
+  acc_conditions[6][1] = Market_Condition_7;
+  acc_conditions[6][2] = Action_On_Condition_7;
+  acc_conditions[7][0] = Account_Condition_8;
+  acc_conditions[7][1] = Market_Condition_8;
+  acc_conditions[7][2] = Action_On_Condition_8;
+  acc_conditions[8][0] = Account_Condition_9;
+  acc_conditions[8][1] = Market_Condition_9;
+  acc_conditions[8][2] = Action_On_Condition_9;
+  acc_conditions[9][0] = Account_Condition_10;
+  acc_conditions[9][1] = Market_Condition_10;
+  acc_conditions[9][2] = Action_On_Condition_10;
+}
+
+/*
+ * Check account condition.
+ */
+bool AccountCondition(int condition = C_ACC_NONE) {
+  switch(condition) {
+    case C_EQUITY_50PC_HIGH: // Equity 50% high
+      return AccountEquity() > AccountBalance() * 2;
+    case C_EQUITY_20PC_HIGH: // Equity 20% high
+      return AccountEquity() > AccountBalance()/100 * 120;
+    case C_EQUITY_10PC_HIGH: // Equity 10% high
+      return AccountEquity() > AccountBalance()/100 * 110;
+    case C_EQUITY_10PC_LOW:  // Equity 10% low
+      return AccountEquity() < AccountBalance()/100 * 90;
+    case C_EQUITY_20PC_LOW:  // Equity 20% low
+      return AccountEquity() < AccountBalance()/100 * 80;
+    case C_EQUITY_50PC_LOW:  // Equity 50% low
+      return AccountEquity() <= AccountBalance() / 2;
+    default:
+    case C_ACC_NONE:
+      return FALSE;
+  }
+  return FALSE;
+}
+
+/*
+ * Check market condition.
+ */
+bool MarketCondition(int condition = C_MARKET_NONE) {
+  switch(condition) {
+    case C_MA1_FAST_SLOW_OPP: // MA Fast and Slow M1 are in opposite directions.
+      return
+        (ma_fast[M1][CURR] > ma_fast[M1][PREV] && ma_slow[M1][CURR] < ma_slow[M1][PREV]) ||
+        (ma_fast[M1][CURR] < ma_fast[M1][PREV] && ma_slow[M1][CURR] > ma_slow[M1][PREV]);
+    case C_MA1_MED_SLOW_OPP: // MA Medium and Slow M1 are in opposite directions.
+      return
+        (ma_medium[M1][CURR] > ma_medium[M1][PREV] && ma_slow[M1][CURR] < ma_slow[M1][PREV]) ||
+        (ma_medium[M1][CURR] < ma_medium[M1][PREV] && ma_slow[M1][CURR] > ma_slow[M1][PREV]);
+    case C_MA5_FAST_SLOW_OPP: // MA Fast and Slow M5 are in opposite directions.
+      return
+        (ma_fast[M5][CURR] > ma_fast[M5][PREV] && ma_slow[M5][CURR] < ma_slow[M5][PREV]) ||
+        (ma_fast[M5][CURR] < ma_fast[M5][PREV] && ma_slow[M5][CURR] > ma_slow[M5][PREV]);
+    case C_MA5_MED_SLOW_OPP: // MA Medium and Slow M5 are in opposite directions.
+      return
+        (ma_medium[M5][CURR] > ma_medium[M5][PREV] && ma_slow[M5][CURR] < ma_slow[M5][PREV]) ||
+        (ma_medium[M5][CURR] < ma_medium[M5][PREV] && ma_slow[M5][CURR] > ma_slow[M5][PREV]);
+    case C_MARKET_TRUE:
+    Print(__FUNCTION__ + AccountEquity() * 2 > AccountBalance());
+      return TRUE;
+    case C_MARKET_NONE:
+    default:
+      return FALSE;
+  }
+  return FALSE;
+}
+
+// Check our account if certain conditions are met.
+void CheckAccountConditions() {
+
+  // if (VerboseTrace) Print("Calling " + __FUNCTION__ + "()");
+
+  if (!Account_Conditions_Enabled) return;
+
+  if (bar_time == last_action_time) {
+    // return; // If action was already executed in the same bar, do not check again.
+  }
+
+  string reason;
+  for (int i = 0; i < ArrayRange(acc_conditions, 0); i++) {
+    if (AccountCondition(acc_conditions[i][0]) && MarketCondition(acc_conditions[i][1])) {
+  // Print("condition: " + i + ", " + AccountCondition(acc_conditions[i][0]) + ", " + MarketCondition(acc_conditions[i][1]));
+      reason = "Account condition: " + (i+1) + ", Market condition: " + acc_conditions[i][1] + ", Action: " + acc_conditions[i][2] + " [" + AccountEquity() + "/" + AccountBalance() + "]";
+      ActionExecute(acc_conditions[i][2], reason);
+    }
+  } // end: for
+
+}
 
 /* BEGIN: DISPLAYING FUNCTIONS */
 
@@ -2726,6 +2903,7 @@ string _OrderType_str(int _OrderType) {
 
 // Execute action to close most profitable order.
 bool ActionCloseMostProfitableOrder(){
+  bool result = FALSE;
   int selected_ticket = 0;
   double ticket_profit = 0;
   for (int order = 0; order < OrdersTotal(); order++) {
@@ -2739,9 +2917,9 @@ bool ActionCloseMostProfitableOrder(){
   }
 
   if (selected_ticket > 0) {
-    return TaskAddCloseOrder(selected_ticket, A_CLOSE_ORDER_LOSS);
+    return TaskAddCloseOrder(selected_ticket, A_CLOSE_ORDER_PROFIT);
   } else if (VerboseDebug) {
-    Print("ActionCloseMostProfitableOrder(): Can't find any profitable order as requested.");
+    Print(__FUNCTION__ + "(): Can't find any profitable order as requested.");
   }
   return (FALSE);
 }
@@ -2761,42 +2939,44 @@ bool ActionCloseMostUnprofitableOrder(){
   }
 
   if (selected_ticket > 0) {
-    return TaskAddCloseOrder(selected_ticket, A_CLOSE_ORDER_PROFIT);
+    return TaskAddCloseOrder(selected_ticket, A_CLOSE_ORDER_LOSS);
   } else if (VerboseDebug) {
-    Print("ActionCloseMostUnprofitableOrder(): Can't find any unprofitable order as requested.");
+    Print(__FUNCTION__ + "(): Can't find any unprofitable order as requested.");
   }
   return (FALSE);
 }
 
 // Execute action to close all profitable orders.
 bool ActionCloseAllProfitableOrders(){
+  bool result = FALSE;
   int selected_orders;
   double ticket_profit = 0, total_profit = 0;
   for (int order = 0; order < OrdersTotal(); order++) {
     if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
        ticket_profit = GetOrderProfit();
        if (ticket_profit > 0) {
-         TaskAddCloseOrder(OrderTicket(), A_CLOSE_ALL_ORDER_PROFIT);
+         result = TaskAddCloseOrder(OrderTicket(), A_CLOSE_ALL_ORDER_PROFIT);
          selected_orders++;
          total_profit += ticket_profit;
      }
   }
 
   if (selected_orders > 0 && VerboseInfo) {
-    Print("ActionCloseAllProfitableOrders(): Queued " + selected_orders + " orders to close with expected profit of " + total_profit + " pips.");
+    Print(__FUNCTION__ + "(): Queued " + selected_orders + " orders to close with expected profit of " + total_profit + " pips.");
   }
-  return (FALSE);
+  return (result);
 }
 
 // Execute action to close all unprofitable orders.
 bool ActionCloseAllUnprofitableOrders(){
+  bool result = FALSE;
   int selected_orders;
   double ticket_profit = 0, total_profit = 0;
   for (int order = 0; order < OrdersTotal(); order++) {
     if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
        ticket_profit = GetOrderProfit();
        if (ticket_profit < 0) {
-         TaskAddCloseOrder(OrderTicket(), A_CLOSE_ALL_ORDER_LOSS);
+         result = TaskAddCloseOrder(OrderTicket(), A_CLOSE_ALL_ORDER_LOSS);
          selected_orders++;
          total_profit += ticket_profit;
      }
@@ -2805,7 +2985,7 @@ bool ActionCloseAllUnprofitableOrders(){
   if (selected_orders > 0 && VerboseInfo) {
     Print("ActionCloseAllUnprofitableOrders(): Queued " + selected_orders + " orders to close with expected loss of " + total_profit + " pips.");
   }
-  return (FALSE);
+  return (result);
 }
 
 // Execute action to close all orders by specified type.
@@ -2865,32 +3045,31 @@ int ActionCloseAllOrders(bool only_ours = TRUE) {
 // Note: Executing this can be potentially dangerous for the account if not used wisely.
 bool ActionExecute(int action_id, string reason) {
   bool result = FALSE;
-  if (VerboseDebug) Print("ExecuteAction(): Action id: " + action_id + "; reason: " + reason);
   switch (action_id) {
     case A_NONE:
       result = TRUE;
-      if (VerboseDebug) Print("ExecuteAction(): No action taken. Action call reason: " + reason);
+      if (VerboseTrace) Print("ExecuteAction(): No action taken. Action call reason: " + reason);
       // Nothing.
       break;
-    case A_CLOSE_ORDER_PROFIT:
+    case A_CLOSE_ORDER_PROFIT: /* 1 */
       result = ActionCloseMostProfitableOrder();
       break;
-    case A_CLOSE_ORDER_LOSS:
+    case A_CLOSE_ORDER_LOSS: /* 2 */
       result = ActionCloseMostUnprofitableOrder();
       break;
-    case A_CLOSE_ALL_ORDER_PROFIT:
+    case A_CLOSE_ALL_ORDER_PROFIT: /* 3 */
       result = ActionCloseAllProfitableOrders();
       break;
-    case A_CLOSE_ALL_ORDER_LOSS:
+    case A_CLOSE_ALL_ORDER_LOSS: /* 4 */
       result = ActionCloseAllUnprofitableOrders();
       break;
-    case A_CLOSE_ALL_ORDER_BUY:
+    case A_CLOSE_ALL_ORDER_BUY: /* 5 */
       result = ActionCloseAllOrdersByType(OP_BUY);
       break;
-    case A_CLOSE_ALL_ORDER_SELL:
+    case A_CLOSE_ALL_ORDER_SELL: /* 6 */
       result = ActionCloseAllOrdersByType(OP_SELL);
       break;
-    case A_CLOSE_ALL_ORDERS:
+    case A_CLOSE_ALL_ORDERS: /* 7 */
       result = ActionCloseAllOrders();
       break;
       /*
@@ -2913,8 +3092,11 @@ bool ActionExecute(int action_id, string reason) {
   TaskProcessList(TRUE); // Process task list immediately after action has been taken.
   if (VerboseInfo) Print(GetAccountTextDetails() + GetOrdersStats());
   if (result) {
+    if (VerboseDebug && action_id != A_NONE) Print(__FUNCTION__ + "(): Action id: " + action_id + "; reason: " + reason);
     last_action_time = iTime(NULL, PERIOD_M1, 0); // Set last execution bar time.
     last_msg = __FUNCTION__ + ": " + reason;
+  } else {
+    if (VerboseDebug) Print(__FUNCTION__ + "(): Failed to execute action id: " + action_id + "; reason: " + reason);
   }
   return result;
 }
