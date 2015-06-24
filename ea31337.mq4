@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.031"
+#property version   "1.032"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -74,6 +74,8 @@ enum ENUM_VALUE_TYPE {
   MAX_TICK,
   MAX_LOSS,
   MAX_PROFIT,
+  MAX_BALANCE,
+  MAX_EQUITY,
   FINAL_VALUE_TYPE_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };
 
@@ -1288,9 +1290,11 @@ int CloseOrdersByType(int cmd, int strategy_type, string reason = "") {
 bool UpdateStats() {
   // Check if bar time has been changed since last check.
   // int bar_time = iTime(NULL, PERIOD_M1, 0);
-  CheckStats(last_tick_change, NormalizeDouble(MAX_TICK, 1));
+  CheckStats(last_tick_change, MAX_TICK);
   CheckStats(Low[0],  MAX_LOW);
   CheckStats(High[0], MAX_HIGH);
+  CheckStats(AccountBalance(), MAX_BALANCE);
+  CheckStats(AccountEquity(), MAX_EQUITY);
   return (TRUE);
 }
 
@@ -2439,6 +2443,7 @@ void StartNewDay() {
     signals[DAILY][SAR1][i][OP_BUY] = 0;
     signals[DAILY][SAR1][i][OP_SELL] = 0;
   }
+  ArrayFill(daily, 0, ArraySize(daily), 0);
 }
 
 /*
@@ -2453,6 +2458,8 @@ void StartNewWeek() {
     signals[WEEKLY][SAR1][i][OP_BUY] = 0;
     signals[WEEKLY][SAR1][i][OP_SELL] = 0;
   }
+
+  ArrayFill(weekly, 0, ArraySize(weekly), 0);
 }
 
 /*
@@ -2467,6 +2474,7 @@ void StartNewMonth() {
     signals[MONTHLY][SAR1][i][OP_BUY] = 0;
     signals[MONTHLY][SAR1][i][OP_SELL] = 0;
   }
+  ArrayFill(monthly, 0, ArraySize(monthly), 0);
 }
 
 /*
@@ -2516,6 +2524,7 @@ void InitializeVariables() {
   if (market_marginrequired == 0) market_marginrequired = 10; // FIX for 'zero divide' bug when MODE_MARGINREQUIRED is zero
   market_stoplevel = MarketInfo(Symbol(), MODE_STOPLEVEL); // Market stop level in points.
   max_order_slippage = MaxOrderPriceSlippage * MathPow(10, Digits - pip_precision); // Maximum price slippage for buy or sell orders (converted into points).
+  LastAsk = Ask; LastBid = Bid;
 
   GMT_Offset = EAManualGMToffset;
   ArrayInitialize(todo_queue, 0); // Reset queue list.
@@ -2700,12 +2709,15 @@ void CheckAccountConditions() {
 
 string GetDailyReport() {
   string output = "Daily max: ";
-  output += "Low: "    + daily[MAX_LOW] + "; ";
-  output += "High: "   + daily[MAX_HIGH] + "; ";
-  output += "Drop: "   + daily[MAX_DROP] + "; ";
-  output += "Spread: " + daily[MAX_SPREAD] + "; ";
-  output += "Loss: "   + daily[MAX_LOSS] + "; ";
-  output += "Profit: " + daily[MAX_PROFIT] + "; ";
+  // output += "Low: "     + daily[MAX_LOW] + "; ";
+  // output += "High: "    + daily[MAX_HIGH] + "; ";
+  output += "Tick: "    + daily[MAX_TICK] + "; ";
+  // output += "Drop: "    + daily[MAX_DROP] + "; ";
+  output += "Spread: "  + daily[MAX_SPREAD] + "; ";
+  // output += "Loss: "    + daily[MAX_LOSS] + "; ";
+  // output += "Profit: "  + daily[MAX_PROFIT] + "; ";
+  output += "Equity: "  + daily[MAX_EQUITY] + "; ";
+  output += "Balance: " + daily[MAX_BALANCE] + "; ";
   //output += GetAccountTextDetails() + "; " + GetOrdersStats();
   return output;
 }
@@ -2713,24 +2725,31 @@ string GetDailyReport() {
 string GetWeeklyReport() {
   string output = "Weekly max: ";
   // output =+ GetAccountTextDetails() + "; " + GetOrdersStats();
-  output += "Low: "    + weekly[MAX_LOW] + "; ";
-  output += "High: "   + weekly[MAX_HIGH] + "; ";
-  output += "Drop: "   + weekly[MAX_DROP] + "; ";
-  output += "Spread: " + weekly[MAX_SPREAD] + "; ";
-  output += "Loss: "   + weekly[MAX_LOSS] + "; ";
-  output += "Profit: " + weekly[MAX_PROFIT] + "; ";
+  // output += "Low: "     + weekly[MAX_LOW] + "; ";
+  // output += "High: "    + weekly[MAX_HIGH] + "; ";
+  output += "Tick: "    + weekly[MAX_TICK] + "; ";
+  // output += "Drop: "    + weekly[MAX_DROP] + "; ";
+  output += "Spread: "  + weekly[MAX_SPREAD] + "; ";
+  // output += "Loss: "    + weekly[MAX_LOSS] + "; ";
+  // output += "Profit: "  + weekly[MAX_PROFIT] + "; ";
+  output += "Equity: "  + weekly[MAX_EQUITY] + "; ";
+  output += "Balance: " + weekly[MAX_BALANCE] + "; ";
   return output;
 }
 
 string GetMonthlyReport() {
   string output = "Monthly max: ";
   // output =+ GetAccountTextDetails() + "; " + GetOrdersStats();
-  output += "Low: "    + monthly[MAX_LOW] + "; ";
-  output += "High: "   + monthly[MAX_HIGH] + "; ";
-  output += "Drop: "   + monthly[MAX_DROP] + "; ";
-  output += "Spread: " + monthly[MAX_SPREAD] + "; ";
-  output += "Loss: "   + monthly[MAX_LOSS] + "; ";
-  output += "Profit: " + monthly[MAX_PROFIT] + "; ";
+  // output += "Low: "     + monthly[MAX_LOW] + "; ";
+  // output += "High: "    + monthly[MAX_HIGH] + "; ";
+  output += "Tick: "    + monthly[MAX_TICK] + "; ";
+  // output += "Drop: "    + monthly[MAX_DROP] + "; ";
+  output += "Spread: "  + monthly[MAX_SPREAD] + "; ";
+  // output += "Loss: "    + monthly[MAX_LOSS] + "; ";
+  // output += "Profit: "  + monthly[MAX_PROFIT] + "; ";
+  output += "Equity: "  + monthly[MAX_EQUITY] + "; ";
+  output += "Balance: " + monthly[MAX_BALANCE] + "; ";
+
   return output;
 }
 
@@ -2742,30 +2761,6 @@ void DisplayInfoOnChart() {
   string text_max_orders = "Max orders: " + GetMaxOrders() + " (Per type: " + GetMaxOrdersPerType() + ")";
   // Prepare text to display spread.
   string text_spread = "Spread: " + DoubleToStr(GetMarketSpread(TRUE) / pts_per_pip, Digits - pip_precision) + " / Gap: " + DoubleToStr(GetMarketGap(TRUE) / pts_per_pip, Digits - pip_precision);
-  // Prepare text to display daily info.
-  string text_daily = "Daily max: ";
-  text_daily += "Low: "    + daily[MAX_LOW] + "; ";
-  text_daily += "High: "   + daily[MAX_HIGH] + "; ";
-  text_daily += "Drop: "   + daily[MAX_DROP] + "; ";
-  text_daily += "Spread: " + daily[MAX_SPREAD] + "; ";
-  text_daily += "Loss: "   + daily[MAX_LOSS] + "; ";
-  text_daily += "Profit: " + daily[MAX_PROFIT] + "; ";
-  // Prepare text to display weekly info.
-  string text_weekly = "Weekly max: ";
-  text_weekly += "Low: "    + weekly[MAX_LOW] + "; ";
-  text_weekly += "High: "   + weekly[MAX_HIGH] + "; ";
-  text_weekly += "Drop: "   + weekly[MAX_DROP] + "; ";
-  text_weekly += "Spread: " + weekly[MAX_SPREAD] + "; ";
-  text_weekly += "Loss: "   + weekly[MAX_LOSS] + "; ";
-  text_weekly += "Profit: " + weekly[MAX_PROFIT] + "; ";
-  // Prepare text to display monthly info.
-  string text_monthly = "Monthly max: ";
-  text_monthly += "Low: "    + monthly[MAX_LOW] + "; ";
-  text_monthly += "High: "   + monthly[MAX_HIGH] + "; ";
-  text_monthly += "Drop: "   + monthly[MAX_DROP] + "; ";
-  text_monthly += "Spread: " + monthly[MAX_SPREAD] + "; ";
-  text_monthly += "Loss: "   + monthly[MAX_LOSS] + "; ";
-  text_monthly += "Profit: " + monthly[MAX_PROFIT] + "; ";
   // Print actual info.
   string indent = "";
   indent = "                      "; // if (total_orders > 5)?
