@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.032"
+#property version   "1.033"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -54,8 +54,10 @@ enum ENUM_STRATEGY_INFO {
   TOTAL_ORDERS,
   TOTAL_ORDERS_LOSS,
   TOTAL_ORDERS_PROFIT,
-  TOTAL_PIP_LOSS,
-  TOTAL_PIP_PROFIT,
+  DAILY_PROFIT,
+  WEEKLY_PROFIT,
+  MONTHLY_PROFIT,
+  TOTAL_PROFIT,
   FINAL_STRATEGY_INFO_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };
 
@@ -63,6 +65,7 @@ enum ENUM_STRATEGY_INFO {
 enum ENUM_TASK_TYPE {
   TASK_ORDER_OPEN,
   TASK_ORDER_CLOSE,
+  TASK_CALC_STATS,
 };
 
 // Define type of values in order to store.
@@ -434,11 +437,11 @@ extern ENUM_ACTION_TYPE Action_On_Condition_4      = A_CLOSE_ORDER_PROFIT;
 
 extern ENUM_ACC_CONDITION Account_Condition_5      = C_EQUITY_20PC_HIGH;
 extern ENUM_MARKET_CONDITION Market_Condition_5    = C_MARKET_TRUE;
-extern ENUM_ACTION_TYPE Action_On_Condition_5      = A_NONE;
+extern ENUM_ACTION_TYPE Action_On_Condition_5      = A_CLOSE_ALL_ORDERS;
 
 extern ENUM_ACC_CONDITION Account_Condition_6      = C_EQUITY_50PC_HIGH;
 extern ENUM_MARKET_CONDITION Market_Condition_6    = C_MA1_FAST_SLOW_OPP;
-extern ENUM_ACTION_TYPE Action_On_Condition_6      = A_CLOSE_ALL_ORDER_PROFIT;
+extern ENUM_ACTION_TYPE Action_On_Condition_6      = A_CLOSE_ALL_ORDERS;
 
 extern ENUM_ACC_CONDITION Account_Condition_7      = C_ACC_NONE;
 extern ENUM_MARKET_CONDITION Market_Condition_7    = C_MARKET_NONE;
@@ -544,12 +547,14 @@ bool session_active = FALSE;
 
 // Time-based variables.
 int bar_time, last_bar_time; // Bar time, current and last one to check if bar has been changed since the last time.
-int day_of_week, day_of_month, day_of_year;
+int hour_of_day, day_of_week, day_of_month, day_of_year;
 
 // Strategy variables.
 int info[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_INFO_ENTRY];
 int open_orders[FINAL_STRATEGY_TYPE_ENTRY], closed_orders[FINAL_STRATEGY_TYPE_ENTRY];
 int signals[FINAL_STAT_PERIOD_TYPE_ENTRY][FINAL_STRATEGY_TYPE_ENTRY][MN1][2]; // Count signals to buy and sell per period and strategy.
+int tickets[200]; // List of tickets to process.
+string name[FINAL_STRATEGY_TYPE_ENTRY];
 
 // EA variables.
 string EA_Name = "31337";
@@ -561,6 +566,7 @@ int err_code; // Error code.
 string last_err, last_msg;
 double last_tick_change; // Last tick change in pips.
 int last_order_time = 0, last_action_time = 0;
+int last_history_check = 0; // Last ticket position processed.
 // int last_trail_update = 0, last_indicators_update = 0, last_stats_update = 0;
 int GMT_Offset;
 int todo_queue[100][8], last_queue_process = 0;
@@ -649,8 +655,8 @@ void OnTick() {
       TaskProcessList();
     }
     UpdateStats();
-    if (day_of_week != DayOfWeek()) {
-      StartNewDay();
+    if (hour_of_day != Hour()) {
+      StartNewHour();
     }
     if (PrintLogOnChart) DisplayInfoOnChart();
   }
@@ -685,6 +691,7 @@ int OnInit() {
 
   InitializeVariables();
   InitializeConditions();
+  CheckHistory();
 
    if (IsTesting()) {
      SendEmail = FALSE;
@@ -707,7 +714,7 @@ int OnInit() {
      Print(__FUNCTION__, "(): Account info: type: ", account_type, ", leverage: ", AccountLeverage());
      Print(__FUNCTION__, "(): Broker info: ", AccountCompany(), ", pip size = ", pip_size, ", points per pip = ", pts_per_pip, ", pip precision = ", pip_precision, ", volume precision = ", volume_precision);
      Print(__FUNCTION__, "(): EA info: Lot size = ", GetLotSize(), "; Max orders = ", GetMaxOrders(), "; Max orders per type = ", GetMaxOrdersPerType());
-     Print(__FUNCTION__, "(): Time: Day of week = ", day_of_week, ", day of month = ", day_of_month, "; day of year = ", day_of_year);
+     Print(__FUNCTION__, "(): Time: Hour of day = " + hour_of_day + ", Day of week = ", day_of_week, ", day of month = ", day_of_month, "; day of year = ", day_of_year);
      Print(__FUNCTION__, "(): ", GetAccountTextDetails());
    }
 
@@ -1183,6 +1190,7 @@ int ExecuteOrder(int cmd, double volume, int order_type = CUSTOM, string order_c
       }
 
       result = TRUE;
+      // TicketAdd(order_ticket);
       // last_order_time = iTime(NULL, PERIOD_M1, 0); // Set last execution bar time.
       // last_trail_update = 0; // Set to 0, so trailing stops can be updated faster.
       order_price = OrderOpenPrice();
@@ -1235,13 +1243,14 @@ int ExecuteOrder(int cmd, double volume, int order_type = CUSTOM, string order_c
    return (result);
 }
 
-bool EACloseOrder(int ticket_no, string reason, bool retry = TRUE) {
+bool CloseOrder(int ticket_no, string reason, bool retry = TRUE) {
   bool result;
   if (ticket_no > 0) result = OrderSelect(ticket_no, SELECT_BY_TICKET);
   else ticket_no = OrderTicket();
   result = OrderClose(ticket_no, OrderLots(), GetClosePrice(OrderType()), max_order_slippage, GetOrderColor());
   // if (VerboseTrace) Print("CloseOrder request. Reason: " + reason + "; Result=" + result + " @ " + TimeCurrent() + "(" + TimeToStr(TimeCurrent()) + "), ticket# " + ticket_no);
   if (result) {
+    TaskAddCalcStats(ticket_no);
     if (VerboseDebug) Print(__FUNCTION__, "(): Closed order " + ticket_no + " with profit " + GetOrderProfit() + ", reason: " + reason + "; " + GetOrderTextDetails());
   } else {
     err_code = GetLastError();
@@ -1249,6 +1258,39 @@ bool EACloseOrder(int ticket_no, string reason, bool retry = TRUE) {
     if (retry) TaskAddCloseOrder(ticket_no); // Add task to re-try.
   } // end-if: !result
   return result;
+}
+
+/*
+ * Re-calculate statistics based on the order.
+ */
+bool OrderCalc(int ticket_no = 0) {
+  // OrderClosePrice(), OrderCloseTime(), OrderComment(), OrderCommission(), OrderExpiration(), OrderLots(), OrderOpenPrice(), OrderOpenTime(), OrderPrint(), OrderProfit(), OrderStopLoss(), OrderSwap(), OrderSymbol(), OrderTakeProfit(), OrderTicket(), OrderType()
+  if (!CheckOurMagicNumber()) {
+    return FALSE;
+  }
+  if (ticket_no == 0) ticket_no = OrderTicket();
+  int strategy_type = OrderMagicNumber() - MagicNumber;
+  datetime close_time = OrderCloseTime();
+  double profit = GetOrderProfit();
+  info[strategy_type][TOTAL_ORDERS]++;
+  if (profit > 0) {
+    info[strategy_type][TOTAL_ORDERS_PROFIT]++;
+  } else {
+    info[strategy_type][TOTAL_ORDERS_LOSS]++;
+  }
+  info[strategy_type][TOTAL_PROFIT]   += profit;
+
+  if (TimeDayOfYear(close_time) == DayOfYear()) {
+    info[strategy_type][DAILY_PROFIT]   += profit;
+  }
+  if (TimeDayOfWeek(close_time) <= DayOfWeek()) {
+    info[strategy_type][WEEKLY_PROFIT]  += profit;
+  }
+  if (TimeDay(close_time) <= Day()) {
+    info[strategy_type][MONTHLY_PROFIT] += profit;
+  }
+  //TicketRemove(ticket_no);
+  return TRUE;
 }
 
 /*
@@ -1265,7 +1307,7 @@ int CloseOrdersByType(int cmd, int strategy_type, string reason = "") {
    for (int order = 0; order < OrdersTotal(); order++) {
       if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
          if (OrderMagicNumber() == MagicNumber+strategy_type && OrderSymbol() == Symbol() && OrderType() == cmd) {
-           if (EACloseOrder(0, reason)) {
+           if (CloseOrder(0, reason)) {
               orders_total++;
               profit_total += GetOrderProfit();
            } else {
@@ -1677,20 +1719,6 @@ bool Fractals_On_Sell(int period = M1) {
 }
 
 /*
- * Find lower value within the array.
- */
-double LowestValue(double& arr[]) {
-  return (arr[ArrayMinimum(arr)]);
-}
-
-/*
- * Find higher value within the array.
- */
-double HighestValue(double& arr[]) {
-   return (arr[ArrayMaximum(arr)]);
-}
-
-/*
  * Return plain text of array values separated by the delimiter.
  *
  * @param
@@ -2003,10 +2031,10 @@ int GetTrailingMethod(int order_type, int stop_or_profit) {
   return If(stop_or_profit > 0, profit_method, stop_method);
 }
 
-void ShowLine(string name, double price, int colour = Yellow) {
-    ObjectCreate(ChartID(), name, OBJ_HLINE, 0, Time[0], price, 0, 0);
-    ObjectSet(name, OBJPROP_COLOR, colour);
-    ObjectMove(name, 0, Time[0], price);
+void ShowLine(string oname, double price, int colour = Yellow) {
+    ObjectCreate(ChartID(), oname, OBJ_HLINE, 0, Time[0], price, 0, 0);
+    ObjectSet(oname, OBJPROP_COLOR, colour);
+    ObjectMove(oname, 0, Time[0], price);
 }
 
 // Get current open price depending on the operation type.
@@ -2241,8 +2269,11 @@ void CheckStats(double value, int type, bool max = TRUE) {
   }
 }
 
+/*
+ * Get order profit.
+ */
 double GetOrderProfit() {
-  return OrderProfit() - OrderCommission();
+  return OrderProfit() - OrderCommission() - OrderSwap();
 }
 
 // Get color of the order.
@@ -2416,6 +2447,18 @@ double GetRiskRatio() {
 /* BEGIN: PERIODIC FUNCTIONS */
 
 /*
+ * Executed for every hour.
+ */
+void StartNewHour() {
+  hour_of_day = Hour(); // Save the new hour.
+  if (VerboseDebug) Print("== New hour: " + hour_of_day);
+  if (day_of_week != DayOfWeek()) { // Check if new day has been started.
+    StartNewDay();
+  }
+  CheckHistory();
+}
+
+/*
  * Executed for every new day.
  */
 void StartNewDay() {
@@ -2438,12 +2481,27 @@ void StartNewDay() {
   day_of_week = DayOfWeek(); // The zero-based day of week (0 means Sunday,1,2,3,4,5,6) of the specified date. At the testing, the last known server time is modelled.
   day_of_month = Day(); // The day of month (1 - 31) of the specified date. At the testing, the last known server time is modelled.
   day_of_year = DayOfYear(); // Day (1 means 1 January,..,365(6) does 31 December) of year. At the testing, the last known server time is modelled.
-  // Reset variables.
+  // Print and reset variables.
+  string sar_stats = "Daily SAR stats: ";
   for (int i = 0; i < FINAL_PERIOD_TYPE_ENTRY; i++) {
-    signals[DAILY][SAR1][i][OP_BUY] = 0;
-    signals[DAILY][SAR1][i][OP_SELL] = 0;
+    sar_stats += "Period: " + i + ", Buy: " + signals[DAILY][SAR1][i][OP_BUY] + " / " + "Sell: " + signals[DAILY][SAR1][i][OP_SELL] + "; ";
+    // sar_stats += "Buy M5: " + signals[DAILY][SAR5][i][OP_BUY] + " / " + "Sell M5: " + signals[DAILY][SAR5][i][OP_SELL] + "; ";
+    // sar_stats += "Buy M15: " + signals[DAILY][SAR15][i][OP_BUY] + " / " + "Sell M15: " + signals[DAILY][SAR15][i][OP_SELL] + "; ";
+    // sar_stats += "Buy M30: " + signals[DAILY][SAR30][i][OP_BUY] + " / " + "Sell M30: " + signals[DAILY][SAR30][i][OP_SELL] + "; ";
+    signals[DAILY][SAR1][i][OP_BUY] = 0;  signals[DAILY][SAR1][i][OP_SELL]  = 0;
+    // signals[DAILY][SAR5][i][OP_BUY] = 0;  signals[DAILY][SAR5][i][OP_SELL]  = 0;
+    // signals[DAILY][SAR15][i][OP_BUY] = 0; signals[DAILY][SAR15][i][OP_SELL] = 0;
+    // signals[DAILY][SAR30][i][OP_BUY] = 0; signals[DAILY][SAR30][i][OP_SELL] = 0;
   }
+  if (VerboseInfo) Print(sar_stats);
   ArrayFill(daily, 0, ArraySize(daily), 0);
+  // Print and reset strategy stats.
+  string strategy_stats = "Daily strategy stats: ";
+  for (int j = 0; j < FINAL_STRATEGY_TYPE_ENTRY; j++) {
+    if (info[j][DAILY_PROFIT] != 0) strategy_stats += name[j] + ": " + info[j][DAILY_PROFIT] + "pips; ";
+    info[j][DAILY_PROFIT]  = 0;
+  }
+  if (VerboseInfo) Print(strategy_stats);
 }
 
 /*
@@ -2454,12 +2512,28 @@ void StartNewWeek() {
   if (VerboseInfo) Print(GetWeeklyReport()); // Print weekly report at end of each week.
 
   // Reset variables.
+  string sar_stats = "Weekly SAR stats: ";
   for (int i = 0; i < FINAL_PERIOD_TYPE_ENTRY; i++) {
-    signals[WEEKLY][SAR1][i][OP_BUY] = 0;
-    signals[WEEKLY][SAR1][i][OP_SELL] = 0;
+    sar_stats += "Period: " + i + ", Buy: " + signals[WEEKLY][SAR1][i][OP_BUY] + " / " + "Sell: " + signals[WEEKLY][SAR1][i][OP_SELL] + "; ";
+    //sar_stats += "Buy M1: " + signals[WEEKLY][SAR1][i][OP_BUY] + " / " + "Sell M1: " + signals[WEEKLY][SAR1][i][OP_SELL] + "; ";
+    //sar_stats += "Buy M5: " + signals[WEEKLY][SAR5][i][OP_BUY] + " / " + "Sell M5: " + signals[WEEKLY][SAR5][i][OP_SELL] + "; ";
+    //sar_stats += "Buy M15: " + signals[WEEKLY][SAR15][i][OP_BUY] + " / " + "Sell M15: " + signals[WEEKLY][SAR15][i][OP_SELL] + "; ";
+    //sar_stats += "Buy M30: " + signals[WEEKLY][SAR30][i][OP_BUY] + " / " + "Sell M30: " + signals[WEEKLY][SAR30][i][OP_SELL] + "; ";
+    signals[WEEKLY][SAR1][i][OP_BUY]  = 0; signals[WEEKLY][SAR1][i][OP_SELL]  = 0;
+    // signals[WEEKLY][SAR5][i][OP_BUY]  = 0; signals[WEEKLY][SAR5][i][OP_SELL]  = 0;
+    // signals[WEEKLY][SAR15][i][OP_BUY] = 0; signals[WEEKLY][SAR15][i][OP_SELL] = 0;
+    // signals[WEEKLY][SAR30][i][OP_BUY] = 0; signals[WEEKLY][SAR30][i][OP_SELL] = 0;
   }
+  if (VerboseInfo) Print(sar_stats);
 
   ArrayFill(weekly, 0, ArraySize(weekly), 0);
+  // Reset strategy stats.
+  string strategy_stats = "Weekly strategy stats: ";
+  for (int j = 0; j < FINAL_STRATEGY_TYPE_ENTRY; j++) {
+    if (info[j][WEEKLY_PROFIT] != 0) strategy_stats += name[j] + ": " + info[j][WEEKLY_PROFIT] + "pips; ";
+    info[j][WEEKLY_PROFIT] = 0;
+  }
+  if (VerboseInfo) Print(strategy_stats);
 }
 
 /*
@@ -2470,11 +2544,28 @@ void StartNewMonth() {
   if (VerboseInfo) Print(GetMonthlyReport()); // Print monthly report at end of each month.
 
   // Reset variables.
+  string sar_stats = "Monthly SAR stats: ";
   for (int i = 0; i < FINAL_PERIOD_TYPE_ENTRY; i++) {
-    signals[MONTHLY][SAR1][i][OP_BUY] = 0;
-    signals[MONTHLY][SAR1][i][OP_SELL] = 0;
+    sar_stats += "Period: " + i + ", Buy: " + signals[MONTHLY][SAR1][i][OP_BUY] + " / " + "Sell: " + signals[MONTHLY][SAR1][i][OP_SELL] + "; ";
+    // sar_stats += "Buy M1: " + signals[MONTHLY][SAR1][i][OP_BUY] + " / " + "Sell M1: " + signals[MONTHLY][SAR1][i][OP_SELL] + "; ";
+    // sar_stats += "Buy M5: " + signals[MONTHLY][SAR5][i][OP_BUY] + " / " + "Sell M5: " + signals[MONTHLY][SAR5][i][OP_SELL] + "; ";
+    // sar_stats += "Buy M15: " + signals[MONTHLY][SAR15][i][OP_BUY] + " / " + "Sell M15: " + signals[MONTHLY][SAR15][i][OP_SELL] + "; ";
+    // sar_stats += "Buy M30: " + signals[MONTHLY][SAR30][i][OP_BUY] + " / " + "Sell M30: " + signals[MONTHLY][SAR30][i][OP_SELL] + "; ";
+    signals[MONTHLY][SAR1][i][OP_BUY]  = 0; signals[MONTHLY][SAR1][i][OP_SELL]  = 0;
+    // signals[MONTHLY][SAR5][i][OP_BUY]  = 0; signals[MONTHLY][SAR5][i][OP_SELL]  = 0;
+    // signals[MONTHLY][SAR15][i][OP_BUY] = 0; signals[MONTHLY][SAR15][i][OP_SELL] = 0;
+    // signals[MONTHLY][SAR30][i][OP_BUY] = 0; signals[MONTHLY][SAR30][i][OP_SELL] = 0;
   }
+  if (VerboseInfo) Print(sar_stats);
+
   ArrayFill(monthly, 0, ArraySize(monthly), 0);
+  // Reset strategy stats.
+  string strategy_stats = "Monthly strategy stats: ";
+  for (int j = 0; j < FINAL_STRATEGY_TYPE_ENTRY; j++) {
+    if (info[j][MONTHLY_PROFIT] != 0) strategy_stats += name[j] + ": " + info[j][MONTHLY_PROFIT] + " pips; ";
+    info[j][MONTHLY_PROFIT] = MathMin(0, info[j][WEEKLY_PROFIT]);
+  }
+  if (VerboseInfo) Print(strategy_stats);
 }
 
 /*
@@ -2511,6 +2602,7 @@ void InitializeVariables() {
 
   // Check time of the week, month and year based on the trading bars.
   bar_time = iTime(NULL, PERIOD_M1, 0);
+  hour_of_day = Hour(); // The hour (0,1,2,..23) of the last known server time by the moment of the program start.
   day_of_week = DayOfWeek(); // The zero-based day of week (0 means Sunday,1,2,3,4,5,6) of the specified date. At the testing, the last known server time is modelled.
   day_of_month = Day(); // The day of month (1 - 31) of the specified date. At the testing, the last known server time is modelled.
   day_of_year = DayOfYear(); // Day (1 means 1 January,..,365(6) does 31 December) of year. At the testing, the last known server time is modelled.
@@ -2531,53 +2623,98 @@ void InitializeVariables() {
   ArrayInitialize(daily,   0); // Reset daily stats.
   ArrayInitialize(weekly,  0); // Reset weekly stats.
   ArrayInitialize(monthly, 0); // Reset monthly stats.
+  ArrayInitialize(tickets, 0); // Reset ticket list.
 
   // Initialize strategies.
   ArrayInitialize(info, 0); // Reset strategy info.
+
+  name[CUSTOM]              = "Custom";
+
+  name[MA_FAST]             = "MA Fast M1";
   info[MA_FAST][ACTIVE]     = MA_Enabled;
   info[MA_FAST][PERIOD]     = M1;
+
+  name[MA_MEDIUM]           = "MA Medium M1";
   info[MA_MEDIUM][ACTIVE]   = MA_Enabled;
   info[MA_MEDIUM][PERIOD]   = M1;
+
+  name[MA_SLOW]             = "MA Slow M1";
   info[MA_SLOW][ACTIVE]     = MA_Enabled;
   info[MA_SLOW][PERIOD]     = M1;
+
+  name[MACD]                = "MACD M1";
   info[MACD][ACTIVE]        = MACD_Enabled;
   info[MACD][PERIOD]        = M1;
+
+  name[ALLIGATOR]           = "Alligator M1";
   info[ALLIGATOR][ACTIVE]   = Alligator_Enabled;
   info[ALLIGATOR][PERIOD]   = M1;
+
+  name[RSI]                 = "RSI M1";
   info[RSI][ACTIVE]         = RSI_Enabled;
   info[RSI][PERIOD]         = M1;
+
+  name[SAR1]                = "SAR M1";
   info[SAR1][ACTIVE]        = SAR1_Enabled;
   info[SAR1][PERIOD]        = M1;
   info[SAR1][OPEN_METHOD]   = SAR1_OpenMethod;
+
+  name[SAR5]                = "SAR M5";
   info[SAR5][ACTIVE]        = SAR5_Enabled;
   info[SAR5][PERIOD]        = M5;
   info[SAR5][OPEN_METHOD]   = SAR5_OpenMethod;
+
+  name[SAR15]               = "SAR M15";
   info[SAR15][ACTIVE]       = SAR15_Enabled;
   info[SAR15][PERIOD]       = M15;
   info[SAR15][OPEN_METHOD]  = SAR15_OpenMethod;
+
+  name[SAR30]               = "SAR M30";
   info[SAR30][ACTIVE]       = SAR30_Enabled;
   info[SAR30][PERIOD]       = M30;
   info[SAR30][OPEN_METHOD]  = SAR30_OpenMethod;
+
+  name[BANDS]               = "Bands M1";
   info[BANDS][ACTIVE]       = Bands_Enabled;
   info[BANDS][PERIOD]       = M1;
+
+  name[ENVELOPES1]          = "Envelopes M1";
   info[ENVELOPES1][ACTIVE]  = Envelopes1_Enabled;
   info[ENVELOPES1][PERIOD]  = M1;
+
+  name[ENVELOPES5]          = "Envelopes M5";
   info[ENVELOPES5][ACTIVE]  = Envelopes5_Enabled;
   info[ENVELOPES5][PERIOD]  = M5;
+
+  name[ENVELOPES15]         = "Envelopes M15";
   info[ENVELOPES15][ACTIVE] = Envelopes15_Enabled;
   info[ENVELOPES15][PERIOD] = M15;
+
+  name[ENVELOPES30]         = "Envelopes M30";
   info[ENVELOPES30][ACTIVE] = Envelopes30_Enabled;
   info[ENVELOPES30][PERIOD] = M30;
+
+  name[WPR]                 = "WPR";
   info[WPR][ACTIVE]         = WPR_Enabled;
   info[WPR][PERIOD]         = M1;
+
+  name[DEMARKER]            = "WPR M1";
   info[DEMARKER][ACTIVE]    = DeMarker_Enabled;
   info[DEMARKER][PERIOD]    = M1;
+
+  name[FRACTALS1]           = "Fractals M1";
   info[FRACTALS1][ACTIVE]   = Fractals1_Enabled;
   info[FRACTALS1][PERIOD]   = M1;
+
+  name[FRACTALS5]           = "Fractals M5";
   info[FRACTALS5][ACTIVE]   = Fractals5_Enabled;
   info[FRACTALS5][PERIOD]   = M5;
+
+  name[FRACTALS15]          = "Fractals M15";
   info[FRACTALS15][ACTIVE]  = Fractals15_Enabled;
   info[FRACTALS15][PERIOD]  = M15;
+
+  name[FRACTALS30]          = "Fractals M30";
   info[FRACTALS30][ACTIVE]  = Fractals30_Enabled;
   info[FRACTALS30][PERIOD]  = M30;
 }
@@ -2691,7 +2828,7 @@ void CheckAccountConditions() {
   if (!Account_Conditions_Enabled) return;
 
   if (bar_time == last_action_time) {
-    // return; // If action was already executed in the same bar, do not check again.
+    return; // If action was already executed in the same bar, do not check again.
   }
 
   string reason;
@@ -2709,6 +2846,7 @@ void CheckAccountConditions() {
 
 string GetDailyReport() {
   string output = "Daily max: ";
+  int key;
   // output += "Low: "     + daily[MAX_LOW] + "; ";
   // output += "High: "    + daily[MAX_HIGH] + "; ";
   output += "Tick: "    + daily[MAX_TICK] + "; ";
@@ -2719,11 +2857,18 @@ string GetDailyReport() {
   output += "Equity: "  + daily[MAX_EQUITY] + "; ";
   output += "Balance: " + daily[MAX_BALANCE] + "; ";
   //output += GetAccountTextDetails() + "; " + GetOrdersStats();
+
+  key = GetArrKey1ByHighestKey2Value(info, DAILY_PROFIT);
+  if (key >= 0) output += "Best: " + name[key] + " (" + info[key][DAILY_PROFIT] + "p); ";
+  key = GetArrKey1ByLowestKey2Value(info, DAILY_PROFIT);
+  if (key >= 0) output += "Worse: " + name[key] + " (" + info[key][DAILY_PROFIT] + "p); ";
+
   return output;
 }
 
 string GetWeeklyReport() {
   string output = "Weekly max: ";
+  int key;
   // output =+ GetAccountTextDetails() + "; " + GetOrdersStats();
   // output += "Low: "     + weekly[MAX_LOW] + "; ";
   // output += "High: "    + weekly[MAX_HIGH] + "; ";
@@ -2734,11 +2879,18 @@ string GetWeeklyReport() {
   // output += "Profit: "  + weekly[MAX_PROFIT] + "; ";
   output += "Equity: "  + weekly[MAX_EQUITY] + "; ";
   output += "Balance: " + weekly[MAX_BALANCE] + "; ";
+
+  key = GetArrKey1ByHighestKey2Value(info, WEEKLY_PROFIT);
+  if (key >= 0) output += "Best: " + name[key] + " (" + info[key][WEEKLY_PROFIT] + "p); ";
+  key = GetArrKey1ByLowestKey2Value(info, WEEKLY_PROFIT);
+  if (key >= 0) output += "Worse: " + name[key] + " (" + info[key][WEEKLY_PROFIT] + "p); ";
+
   return output;
 }
 
 string GetMonthlyReport() {
   string output = "Monthly max: ";
+  int key;
   // output =+ GetAccountTextDetails() + "; " + GetOrdersStats();
   // output += "Low: "     + monthly[MAX_LOW] + "; ";
   // output += "High: "    + monthly[MAX_HIGH] + "; ";
@@ -2749,6 +2901,11 @@ string GetMonthlyReport() {
   // output += "Profit: "  + monthly[MAX_PROFIT] + "; ";
   output += "Equity: "  + monthly[MAX_EQUITY] + "; ";
   output += "Balance: " + monthly[MAX_BALANCE] + "; ";
+
+  key = GetArrKey1ByHighestKey2Value(info, MONTHLY_PROFIT);
+  if (key >= 0) output += "Best: " + name[key] + " (" + info[key][MONTHLY_PROFIT] + "p); ";
+  key = GetArrKey1ByLowestKey2Value(info, MONTHLY_PROFIT);
+  if (key >= 0) output += "Worse: " + name[key] + " (" + info[key][MONTHLY_PROFIT] + "p); ";
 
   return output;
 }
@@ -2893,6 +3050,81 @@ string _OrderType_str(int _OrderType) {
 }
 
 /* END: CONVERTING FUNCTIONS */
+
+/* BEGIN: ARRAY FUNCTIONS */
+
+/*
+ * Find lower value within the array.
+ */
+double LowestValue(double& arr[]) {
+  return (arr[ArrayMinimum(arr)]);
+}
+
+/*
+ * Find higher value within the array.
+ */
+double HighestValue(double& arr[]) {
+   return (arr[ArrayMaximum(arr)]);
+}
+
+int HighestValueByKey(double& arr[][], int key) {
+  double highest = 0;
+  for (int i = 0; i < ArrayRange(arr, 1); i++) {
+    if (arr[key][i] > highest) {
+      highest = arr[key][i];
+    }
+  }
+  return highest;
+}
+
+int LowestValueByKey(double& arr[][], int key) {
+  double lowest = 0;
+  for (int i = 0; i < ArrayRange(arr, 1); i++) {
+    if (arr[key][i] < lowest) {
+      lowest = arr[key][i];
+    }
+  }
+  return lowest;
+}
+
+/*
+int GetLowestArrDoubleValue(double& arr[][], int key) {
+  double lowest = -1;
+  for (int i = 0; i < ArrayRange(arr, 0); i++) {
+    for (int j = 0; j < ArrayRange(arr, 1); j++) {
+      if (arr[i][j] < lowest) {
+        lowest = arr[i][j];
+      }
+    }
+  }
+  return lowest;
+}*/
+
+int GetArrKey1ByHighestKey2Value(int& arr[][], int key2) {
+  int key1 = -1;
+  int highest = 0;
+  for (int i = 0; i < ArrayRange(arr, 0); i++) {
+      if (arr[i][key2] > highest) {
+        highest = arr[i][key2];
+        key1 = i;
+      }
+  }
+  return key1;
+}
+
+int GetArrKey1ByLowestKey2Value(int& arr[][], int key2) {
+  int key1 = -1;
+  int lowest = 0;
+  for (int i = 0; i < ArrayRange(arr, 0); i++) {
+      if (arr[i][key2] < lowest) {
+        lowest = arr[i][key2];
+        key1 = i;
+      }
+  }
+  return key1;
+}
+
+/* END: ARRAY FUNCTIONS */
 
 /* BEGIN: ACTION FUNCTIONS */
 
@@ -3088,7 +3320,7 @@ bool ActionExecute(int action_id, string reason) {
   if (VerboseInfo) Print(GetAccountTextDetails() + GetOrdersStats());
   if (result) {
     if (VerboseDebug && action_id != A_NONE) Print(__FUNCTION__ + "(): Action id: " + action_id + "; reason: " + reason);
-    last_action_time = iTime(NULL, PERIOD_M1, 0); // Set last execution bar time.
+    last_action_time = last_bar_time; // Set last execution bar time.
     last_msg = __FUNCTION__ + ": " + reason;
   } else {
     if (VerboseDebug) Print(__FUNCTION__ + "(): Failed to execute action id: " + action_id + "; reason: " + reason);
@@ -3097,6 +3329,65 @@ bool ActionExecute(int action_id, string reason) {
 }
 
 /* END: ACTION FUNCTIONS */
+
+/* BEGIN: TICKET LIST/HISTORY CHECK FUNCTIONS */
+
+/*
+ * Add ticket to list for further processing.
+ */
+bool TicketAdd(int ticket_no) {
+  int i, slot = -1;
+  int size = ArraySize(tickets);
+  // Check if ticket is already in the list and at the same time find the empty slot.
+  for (i = 0; i < size; i++) {
+    if (tickets[i] == ticket_no) {
+      return (TRUE); // Ticket already in the list.
+    } else if (slot < 0 && tickets[i] == 0) {
+      slot = i;
+    }
+  }
+  // Resize array if slot has not been allocated.
+  if (slot < 0) {
+    if (size < 1000) { // Set array hard limit to prevent memory leak.
+      ArrayResize(tickets, size + 10);
+      // ArrayFill(tickets, size - 1, ArraySize(tickets) - size - 1, 0);
+      if (VerboseDebug) Print(__FUNCTION__ + "(): Couldn't allocate Ticket slot, re-sizing the array. New size: ",  (size + 1), ", Old size: ", size);
+      slot = size;
+    }
+    return (FALSE); // Array exceeded hard limit, probably because of some memory leak.
+  }
+
+  tickets[slot] = ticket_no;
+  return (TRUE);
+}
+
+/*
+ * Remove ticket from the list after it has been processed.
+ */
+bool TicketRemove(int ticket_no) {
+  for (int i = 0; i < ArraySize(tickets); i++) {
+    if (tickets[i] == ticket_no) {
+      tickets[i] = 0; // Remove the ticket number from the array slot.
+      return (TRUE); // Ticket has been removed successfully.
+    }
+  }
+  return (FALSE);
+}
+
+/*
+ * Process order history.
+ */
+void CheckHistory() {
+  for(int pos = last_history_check; pos < HistoryTotal(); pos++) {
+    if (!OrderSelect(pos, SELECT_BY_POS, MODE_HISTORY)) continue;
+    if (OrderCloseTime() > last_history_check && CheckOurMagicNumber()) {
+      OrderCalc();
+    }
+  }
+  last_history_check = pos;
+}
+
+/* END: TICKET LIST/HISTORY CHECK FUNCTIONS */
 
 /* BEGIN: TASK FUNCTIONS */
 
@@ -3112,7 +3403,7 @@ bool TaskAddOrderOpen(int cmd, int volume, int order_type, string order_comment)
     todo_queue[job_id][4] = volume;
     todo_queue[job_id][5] = order_type;
     todo_queue[job_id][6] = order_comment;
-    // Print("TaskAddOrderOpen(): Added task (", job_id, ") for ticket: ", todo_queue[job_id][0], ", type: ", todo_queue[job_id][1], " (", todo_queue[job_id][3], ").");
+    // Print(__FUNCTION__ + "(): Added task (", job_id, ") for ticket: ", todo_queue[job_id][0], ", type: ", todo_queue[job_id][1], " (", todo_queue[job_id][3], ").");
     return TRUE;
   } else {
     return FALSE; // Job not allocated.
@@ -3130,7 +3421,25 @@ bool TaskAddCloseOrder(int ticket_no, int reason = 0) {
     // if (VerboseTrace) Print("TaskAddCloseOrder(): Allocated task (id: ", job_id, ") for ticket: ", todo_queue[job_id][0], ".");
     return TRUE;
   } else {
-    if (VerboseTrace) Print("TaskAddCloseOrder(): Failed to allocate close task for ticket: " + ticket_no);
+    if (VerboseTrace) Print(__FUNCTION__ + "(): Failed to allocate close task for ticket: " + ticket_no);
+    return FALSE; // Job is not allocated.
+  }
+}
+
+/*
+ * Add new task to recalculate loss/profit.
+ */
+bool TaskAddCalcStats(int ticket_no, int order_type = -1) {
+  int job_id = TaskFindEmptySlot(ticket_no);
+  if (job_id >= 0) {
+    todo_queue[job_id][0] = ticket_no;
+    todo_queue[job_id][1] = TASK_CALC_STATS;
+    todo_queue[job_id][2] = MaxTries; // Set number of retries.
+    todo_queue[job_id][3] = order_type;
+    // if (VerboseTrace) Print(__FUNCTION__ + "(): Allocated task (id: ", job_id, ") for ticket: ", todo_queue[job_id][0], ".");
+    return TRUE;
+  } else {
+    if (VerboseTrace) Print(__FUNCTION__ + "(): Failed to allocate task for ticket: " + ticket_no);
     return FALSE; // Job is not allocated.
   }
 }
@@ -3139,7 +3448,7 @@ bool TaskAddCloseOrder(int ticket_no, int reason = 0) {
 bool TaskRemove(int job_id) {
   todo_queue[job_id][0] = 0;
   todo_queue[job_id][2] = 0;
-  // if (VerboseTrace) Print("TaskRemove(): Task removed for id: " + job_id);
+  // if (VerboseTrace) Print(__FUNCTION__ + "(): Task removed for id: " + job_id);
   return TRUE;
 }
 
@@ -3147,7 +3456,7 @@ bool TaskRemove(int job_id) {
 bool TaskExistByKey(int key) {
   for (int job_id = 0; job_id < ArrayRange(todo_queue, 0); job_id++) {
     if (todo_queue[job_id][0] == key) {
-      // if (VerboseTrace) Print("TaskExistByKey(): Task already allocated for key: " + key);
+      // if (VerboseTrace) Print(__FUNCTION__ + "(): Task already allocated for key: " + key);
       return (TRUE);
       break;
     }
@@ -3160,9 +3469,9 @@ int TaskFindEmptySlot(int key) {
   int taken = 0;
   if (!TaskExistByKey(key)) {
     for (int job_id = 0; job_id < ArrayRange(todo_queue, 0); job_id++) {
-      if (VerboseTrace) Print("TaskFindEmptySlot(): job_id = " + job_id + "; key: " + todo_queue[job_id][0]);
+      if (VerboseTrace) Print(__FUNCTION__ + "(): job_id = " + job_id + "; key: " + todo_queue[job_id][0]);
       if (todo_queue[job_id][0] <= 0) { // Find empty slot.
-        // if (VerboseTrace) Print("TaskFindEmptySlot(): Found empty slot at: " + job_id);
+        // if (VerboseTrace) Print(__FUNCTION__ + "(): Found empty slot at: " + job_id);
         return job_id;
       } else taken++;
     }
@@ -3170,10 +3479,12 @@ int TaskFindEmptySlot(int key) {
     int size = ArrayRange(todo_queue, 0);
     if (size < 1000) { // Set array hard limit.
       ArrayResize(todo_queue, size + 1);
-      if (VerboseDebug) Print("TaskFindEmptySlot(): Couldn't allocate Task slot, re-sizing array. New size: ",  (size + 1), ", Old size: ", size);
+      if (VerboseDebug) Print(__FUNCTION__ + "(): Couldn't allocate Task slot, re-sizing array. New size: ",  (size + 1), ", Old size: ", size);
       return size;
+    } else {
+      // Array exceeded hard limit, probably because of some memory leak.
+      if (VerboseDebug) Print(__FUNCTION__ + "(): Couldn't allocate task slot, all are taken (" + taken + "). Size: " + size);
     }
-    if (VerboseDebug) Print("TaskFindEmptySlot(): Couldn't allocate task slot, all are taken (" + taken + "). Size: " + size);
   }
   return -1;
 }
@@ -3184,7 +3495,7 @@ bool TaskRun(int job_id) {
   int key = todo_queue[job_id][0];
   int task_type = todo_queue[job_id][1];
   int retries = todo_queue[job_id][2];
-  // if (VerboseTrace) Print("TaskRun(): Job id: " + job_id + "; Task type: " + task_type);
+  // if (VerboseTrace) Print(__FUNCTION__ + "(): Job id: " + job_id + "; Task type: " + task_type);
 
   switch (task_type) {
     case TASK_ORDER_OPEN:
@@ -3197,13 +3508,19 @@ bool TaskRun(int job_id) {
     case TASK_ORDER_CLOSE:
         string reason = todo_queue[job_id][3];
         if (OrderSelect(key, SELECT_BY_TICKET)) {
-          if (EACloseOrder(key, "TaskRun(): " + reason, FALSE))
+          if (CloseOrder(key, "TaskRun(): " + reason, FALSE))
             result = TaskRemove(job_id);
         }
-
+      break;
+    case TASK_CALC_STATS:
+        if (OrderSelect(key, SELECT_BY_TICKET, MODE_HISTORY)) {
+          OrderCalc(key);
+        } else {
+          if (VerboseDebug) Print(__FUNCTION__ + "(): Access to history failed with error: (" + GetLastError() + ").");
+        }
       break;
     default:
-      if (VerboseDebug) Print("TaskRun(): Unknown task: ", task_type);
+      if (VerboseDebug) Print(__FUNCTION__ + "(): Unknown task: ", task_type);
   };
   return result;
 }
@@ -3462,18 +3779,18 @@ void CalculateSummary(double initial_deposit)
    int    sequence=0, profitseqs=0, lossseqs=0;
    double sequential=0.0, prevprofit=EMPTY_VALUE, drawdownpercent, drawdown;
    double maxpeak=initial_deposit, minpeak=initial_deposit, balance=initial_deposit;
-   int    trades_total=HistoryTotal();
+   int    trades_total = HistoryTotal();
 //---- initialize summaries
    InitializeSummaries(initial_deposit);
 //----
    for(int i=0; i<trades_total; i++) {
-      if(!OrderSelect(i,SELECT_BY_POS,MODE_HISTORY)) continue;
+      if (!OrderSelect(i,SELECT_BY_POS,MODE_HISTORY)) continue;
       int type=OrderType();
       //---- initial balance not considered
-      if(i==0 && type==OP_BALANCE) continue;
+      if (i == 0 && type == OP_BALANCE) continue;
       //---- calculate profit
-      double profit=OrderProfit()+OrderCommission()+OrderSwap();
-      balance+=profit;
+      double profit = OrderProfit() + OrderCommission() + OrderSwap();
+      balance += profit;
       //---- drawdown check
       if(maxpeak<balance) {
          drawdown=maxpeak-minpeak;
