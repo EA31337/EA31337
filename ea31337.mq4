@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.035"
+#property version   "1.036"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -20,9 +20,10 @@
 enum ENUM_STRATEGY_TYPE {
   // Type of strategy being used (used for strategy identification, new strategies append to the end, but in general - do not change!).
   CUSTOM,
-  MA_FAST,
-  MA_MEDIUM,
-  MA_SLOW,
+  MA1,
+  MA5,
+  MA15,
+  MA30,
   MACD,
   ALLIGATOR,
   RSI,
@@ -55,7 +56,7 @@ enum ENUM_STRATEGY_INFO {
   OPEN_ORDERS,
   TOTAL_ORDERS,
   TOTAL_ORDERS_LOSS,
-  TOTAL_ORDERS_PROFIT,
+  TOTAL_ORDERS_WON,
   DAILY_PROFIT,
   WEEKLY_PROFIT,
   MONTHLY_PROFIT,
@@ -171,36 +172,35 @@ extern bool DynamicallyDisableWorseStrategy = TRUE; // Disable worse strategy ev
 extern double BestStrategyMultiplierFactor = 2; // Increase lot size for the best daily strategy.
 
 extern string ____MA_Parameters__ = "-- Settings for the Moving Average indicator --";
-extern bool MA_Enabled = TRUE; // Enable MA-based strategy.
+extern bool MA1_Enabled  = TRUE; // Enable MA-based strategy.
+extern bool MA5_Enabled  = TRUE; // Enable MA-based strategy.
+extern bool MA15_Enabled = TRUE; // Enable MA-based strategy.
+extern bool MA30_Enabled = TRUE; // Enable MA-based strategy.
 extern ENUM_TIMEFRAMES MA_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int MA_Period_Fast = 10; // Suggested value: 5
-extern int MA_Period_Medium = 25; // Suggested value: 25
+extern int MA_Period_Medium = 20; // Suggested value: 25
 extern int MA_Period_Slow = 50; // Suggested value: 60
 // extern double MA_Period_Ratio = 2; // Testing
 extern int MA_Shift = 0;
 extern int MA_Shift_Fast = 0; // Index of the value taken from the indicator buffer. Shift relative to the previous bar (+1).
-extern int MA_Shift_Medium = 1; // Index of the value taken from the indicator buffer. Shift relative to the previous bar (+1).
+extern int MA_Shift_Medium = 2; // Index of the value taken from the indicator buffer. Shift relative to the previous bar (+1).
 extern int MA_Shift_Slow = 4; // Index of the value taken from the indicator buffer. Shift relative to the previous bar (+1).
-extern int MA_Shift_Far = 9; // Far shift. Shift relative to the 2 previous bars (+2).
+extern int MA_Shift_Far = 4; // Far shift. Shift relative to the 2 previous bars (+2).
 extern ENUM_MA_METHOD MA_Method = MODE_LWMA; // MA method (See: ENUM_MA_METHOD). Range: 0-3. Suggested value: MODE_EMA.
 extern ENUM_APPLIED_PRICE MA_Applied_Price = PRICE_CLOSE; // MA applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
-extern bool MA_F_CloseOnChange = FALSE; // Close opposite orders on market change.
-extern bool MA_M_CloseOnChange = FALSE; // Close opposite orders on market change.
-extern bool MA_S_CloseOnChange = FALSE; // Close opposite orders on market change.
-extern ENUM_TRAIL_TYPE MA_TrailingStopMethod = T_SAR; // Trailing Stop method for MA. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern bool MA1_CloseOnChange = TRUE; // Close opposite orders on market change.
+extern bool MA5_CloseOnChange = TRUE; // Close opposite orders on market change.
+extern bool MA15_CloseOnChange = TRUE; // Close opposite orders on market change.
+extern bool MA30_CloseOnChange = TRUE; // Close opposite orders on market change.
+extern double MA_OpenLevel  = 1.0; // Minimum open level between moving averages to raise the signal.
+extern int MA1_OpenMethod = 4;
+extern int MA5_OpenMethod = 11;
+extern int MA15_OpenMethod = 5;
+extern int MA30_OpenMethod = 5;
+extern ENUM_TRAIL_TYPE MA_TrailingStopMethod = T_BANDS_LOW; // Trailing Stop method for MA. Set 0 to default. See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE MA_TrailingProfitMethod = T_BANDS; // Trailing Profit method for MA. Set 0 to default. See: ENUM_TRAIL_TYPE.
-/* MA backtest log (£1000,0.1,ts:25,tp:20,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
- *   £1878.42	2314	1.12	0.81	1603.48	42.98%	0.00000000	MA_Method=3 	MA_Applied_Price=0
- *   £1752.02	2302	1.11	0.76	1921.99	52.99%	0.00000000	MA_Method=3 	MA_Applied_Price=4
- *   £1465.80	2350	1.09	0.62	1470.68	52.26%	0.00000000	MA_Method=3 	MA_Applied_Price=1
- *   £1383.24	2299	1.09	0.60	1529.30	51.16%	0.00000000	MA_Method=3 	MA_Applied_Price=6
- *   £1206.95	2327	1.07	0.52	1408.09	49.19%	0.00000000	MA_Method=3 	MA_Applied_Price=2
- *   £1841.99	2409	1.11	0.76	1749.31	46.27%	0.00000000	MA_Period_Fast=10 	MA_Period_Medium=25 	MA_Period_Slow=50 	MA_Shift_Slow=6
- *   £1755.27	2322	1.11	0.76	1730.70	44.74%	0.00000000	MA_Period_Fast=10 	MA_Period_Medium=25 	MA_Period_Slow=50 	MA_Shift_Slow=2
- *   £1638.05	2353	1.10	0.70	1861.27	52.11%	0.00000000	MA_Period_Fast=10 	MA_Period_Medium=25 	MA_Period_Slow=60 	MA_Shift_Slow=6
- *   £1618.34	2270	1.10	0.71	1792.47	49.47%	0.00000000	MA_Period_Fast=10 	MA_Period_Medium=25 	MA_Period_Slow=60 	MA_Shift_Slow=4
- *   £1465.80	2350	1.09	0.62	1470.68	52.26%	0.00000000	MA_Period_Fast=10 	MA_Period_Medium=25 	MA_Period_Slow=50 	MA_Shift_Slow=4
- *   £1314.69	2258	1.08	0.58	1926.61	53.89%	0.00000000	MA_Period_Fast=10 	MA_Period_Medium=25 	MA_Period_Slow=60 	MA_Shift_Slow=2
+/* MA backtest log (£1000,0.1,ts:25,tp:25,gap:10,spread:3) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
+ *   £4115.82	1904	1.32	2.16	1142.71	30.11%
  */
 
 extern string ____MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --";
@@ -234,7 +234,7 @@ extern ENUM_MA_METHOD Alligator_MA_Method = MODE_EMA; // MA method (See: ENUM_MA
 extern ENUM_APPLIED_PRICE Alligator_Applied_Price = PRICE_HIGH; // Applied price. It can be any of ENUM_APPLIED_PRICE enumeration values.
 extern int Alligator_Shift = 0; // The indicator shift relative to the chart.
 extern int Alligator_Shift_Far = 1; // The indicator shift relative to the chart.
-extern double Alligator_OpenLevel = 0.01; // Minimum open level between moving averages to raise the singal.
+extern double Alligator_OpenLevel = 0.01; // Minimum open level between moving averages to raise the signal.
 extern bool Alligator_CloseOnChange = TRUE; // Close opposite orders on market change.
 extern ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = T_MA_F_FAR; // Trailing Stop method for Alligator. Set 0 to default. See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = T_MA_F_FAR_TRAIL; // Trailing Profit method for Alligator. Set 0 to default. See: ENUM_TRAIL_TYPE.
@@ -369,10 +369,11 @@ extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_MA_F_TRAIL; // Trailing
  * Summary backtest log
  * All [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
  *  (£1000,auto,ts:25,tp:25,gap:10,spread:3)
- *   £24184.97	38605	1.12	0.63	4134.27	27.99%	0.00000000	BestStrategyMultiplierFactor=2
- *   £21472.76	38658	1.13	0.56	3409.54	25.62%	0.00000000	BestStrategyMultiplierFactor=1
- *   £22798.95	41273	1.13	0.55	3384.65	24.77%	0.00000000	DynamicallyDisableWorseStrategy=0
- *   £21472.76	38658	1.13	0.56	3409.54	25.62%	0.00000000	DynamicallyDisableWorseStrategy=1
+ *   £20971.05	38227	1.12	0.55	4005.46	35.82%
+ *   Old: £24184.97	38605	1.12	0.63	4134.27	27.99%	0.00000000	BestStrategyMultiplierFactor=2
+ *   Old: £21472.76	38658	1.13	0.56	3409.54	25.62%	0.00000000	BestStrategyMultiplierFactor=1
+ *   Old: £22798.95	41273	1.13	0.55	3384.65	24.77%	0.00000000	DynamicallyDisableWorseStrategy=0
+ *   Old: £21472.76	38658	1.13	0.56	3409.54	25.62%	0.00000000	DynamicallyDisableWorseStrategy=1
  *   Old: £29408.26	40723	1.14	0.72	6231.99	23.80%
  *   Old: £17022.25	27393	1.14	0.62	1562.87	19.89% [without SAR]
  *
@@ -485,6 +486,7 @@ extern bool VerboseErrors = TRUE; // Show errors.
 extern bool VerboseInfo = TRUE;   // Show info messages.
 extern bool VerboseDebug = TRUE;  // Show debug messages.
 extern bool VerboseTrace = FALSE;  // Even more debugging.
+extern bool WriteReport = TRUE;  // Write report into the file on exit.
 
 extern string ____UX_Parameters__ = "-- Settings for User Interface & Experience --";
 extern bool SendEmail = FALSE;
@@ -747,7 +749,7 @@ void OnDeinit(const int reason) {
     Print(GetSummaryText());
   }
 
-   if (!IsOptimization()) {
+   if (WriteReport && !IsOptimization()) {
       double ExtInitialDeposit;
       if (!IsTesting()) ExtInitialDeposit = CalculateInitialDeposit();
       CalculateSummary(ExtInitialDeposit);
@@ -785,33 +787,43 @@ void Trade() {
   // vdigits = MarketInfo(Symbol(), MODE_DIGITS);
 
    double lot_size = GetLotSize();
-   if (info[MA_FAST][ACTIVE]) {
-      if (MA_Fast_On_Buy()) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[MA_FAST][FACTOR], MA_FAST, "MA Fast");
-       if (MA_F_CloseOnChange) CloseOrdersByType(OP_SELL, MA_FAST, "closing MA Fast on market change");
-      } else if (MA_Fast_On_Sell()) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[MA_FAST][FACTOR], MA_FAST, "MA Fast");
-       if (MA_F_CloseOnChange) CloseOrdersByType(OP_BUY, MA_FAST, "closing MA Fast on market change");
+   if (info[MA1][ACTIVE]) {
+      if (MA_On_Buy(info[MA1][PERIOD], info[MA1][OPEN_METHOD], MA_OpenLevel)) {
+       order_placed = ExecuteOrder(OP_BUY, lot_size * info[MA1][FACTOR], MA1, name[MA1]);
+       if (MA1_CloseOnChange) CloseOrdersByType(OP_SELL, MA1, "closing MA M1 on market change");
+      } else if (MA_On_Sell(info[MA1][PERIOD], info[MA1][OPEN_METHOD], MA_OpenLevel)) {
+       order_placed = ExecuteOrder(OP_SELL, lot_size * info[MA1][FACTOR], MA1, name[MA1]);
+       if (MA1_CloseOnChange) CloseOrdersByType(OP_BUY, MA1, "closing MA M1 on market change");
       }
    }
 
-   if (info[MA_MEDIUM][ACTIVE]) {
-      if (MA_Medium_On_Buy()) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[MA_MEDIUM][FACTOR], MA_MEDIUM, "MA Medium");
-       if (MA_M_CloseOnChange) CloseOrdersByType(OP_SELL, MA_MEDIUM, "closing MA Medium on market change");
-      } else if (MA_Medium_On_Sell()) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[MA_MEDIUM][FACTOR], MA_MEDIUM, "MA Medium");
-       if (MA_M_CloseOnChange) CloseOrdersByType(OP_BUY, MA_MEDIUM, "closing MA Medium on market change");
+   if (info[MA5][ACTIVE]) {
+      if (MA_On_Buy(info[MA5][PERIOD], info[MA5][OPEN_METHOD], MA_OpenLevel)) {
+       order_placed = ExecuteOrder(OP_BUY, lot_size * info[MA5][FACTOR], MA5, name[MA5]);
+       if (MA5_CloseOnChange) CloseOrdersByType(OP_SELL, MA5, "closing MA M5 on market change");
+      } else if (MA_On_Sell(info[MA5][PERIOD], info[MA5][OPEN_METHOD], MA_OpenLevel)) {
+       order_placed = ExecuteOrder(OP_SELL, lot_size * info[MA5][FACTOR], MA5, name[MA5]);
+       if (MA5_CloseOnChange) CloseOrdersByType(OP_BUY, MA5, "closing MA M5 on market change");
       }
    }
 
-   if (info[MA_SLOW][ACTIVE]) {
-      if (MA_Slow_On_Buy()) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[MA_SLOW][FACTOR], MA_SLOW, "MASlowOnBuy");
-       if (MA_S_CloseOnChange) CloseOrdersByType(OP_SELL, MA_SLOW, "closing MA Slow on market change");
-      } else if (MA_Slow_On_Sell()) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[MA_SLOW][FACTOR], MA_SLOW, "MASlowOnSell");
-       if (MA_S_CloseOnChange) CloseOrdersByType(OP_BUY, MA_SLOW, "closing MA Slow on market change");
+   if (info[MA15][ACTIVE]) {
+      if (MA_On_Buy(info[MA15][PERIOD], info[MA15][OPEN_METHOD], MA_OpenLevel)) {
+       order_placed = ExecuteOrder(OP_BUY, lot_size * info[MA15][FACTOR], MA15, name[MA15]);
+       if (MA15_CloseOnChange) CloseOrdersByType(OP_SELL, MA15, "closing MA M15 on market change");
+      } else if (MA_On_Sell(info[MA15][PERIOD], info[MA15][OPEN_METHOD], MA_OpenLevel)) {
+       order_placed = ExecuteOrder(OP_SELL, lot_size * info[MA15][FACTOR], MA15, name[MA15]);
+       if (MA15_CloseOnChange) CloseOrdersByType(OP_BUY, MA15, "closing MA M15 on market change");
+      }
+   }
+
+   if (info[MA30][ACTIVE]) {
+      if (MA_On_Buy(info[MA30][PERIOD], info[MA30][OPEN_METHOD], MA_OpenLevel)) {
+       order_placed = ExecuteOrder(OP_BUY, lot_size * info[MA30][FACTOR], MA30, name[MA30]);
+       if (MA30_CloseOnChange) CloseOrdersByType(OP_SELL, MA30, "closing MA M30 on market change");
+      } else if (MA_On_Sell(info[MA30][PERIOD], info[MA30][OPEN_METHOD], MA_OpenLevel)) {
+       order_placed = ExecuteOrder(OP_SELL, lot_size * info[MA30][FACTOR], MA30, name[MA30]);
+       if (MA30_CloseOnChange) CloseOrdersByType(OP_BUY, MA30, "closing MA M30 on market change");
       }
    }
 
@@ -1286,7 +1298,7 @@ bool OrderCalc(int ticket_no = 0) {
   double profit = GetOrderProfit();
   info[strategy_type][TOTAL_ORDERS]++;
   if (profit > 0) {
-    info[strategy_type][TOTAL_ORDERS_PROFIT]++;
+    info[strategy_type][TOTAL_ORDERS_WON]++;
   } else {
     info[strategy_type][TOTAL_ORDERS_LOSS]++;
   }
@@ -1352,34 +1364,66 @@ bool UpdateStats() {
   return (TRUE);
 }
 
-// Trading Signal: when MA1 is crossing MA2, it triggers a trading signal.
-bool MA_Fast_On_Buy(int period = M1) {
-  bool state = (ma_fast[period][0] > ma_medium[period][0] && ma_fast[period][1] < ma_medium[period][1]);
-  // if (VerboseTrace) Print("MAFast_On_Buy(): cond:", state, " - ", NormalizeDouble(ma_fast[period][0], Digits), " > ", NormalizeDouble(ma_medium[period][0], Digits), " && ", NormalizeDouble(ma_fast[period][1], Digits), " < ", NormalizeDouble(ma_medium[period][1], Digits));
-  return (ma_fast[period][0] > ma_medium[period][0] && ma_fast[period][1] < ma_medium[period][1] && ma_fast[period][2] < ma_medium[period][2]);
+/*
+ * Check if MA indicator is on buy.
+ *
+ * @param
+ *   period (int) - period to check for
+ *   open_method (int) - open method to use
+ *   open_level - open level to consider the signal
+ */
+bool MA_On_Buy(int period = M1, int open_method = 0, int open_level = 0.0) {
+  double gap = open_level * pip_size;
+  switch (open_method) {
+    case 0: return ma_fast[period][CURR] > ma_medium[period][CURR] + gap && ma_medium[period][CURR] > ma_slow[period][CURR];
+    case 1: return ma_fast[period][CURR] > ma_medium[period][CURR] + gap && ma_medium[period][CURR] > ma_slow[period][CURR] && ma_slow[period][CURR] > ma_slow[period][FAR];
+    case 2: return ma_fast[period][CURR] > ma_medium[period][CURR] + gap && ma_medium[period][CURR] > ma_slow[period][CURR] && ma_fast[period][CURR] > ma_fast[period][PREV];
+    case 3: return ma_fast[period][CURR] > ma_medium[period][CURR] + gap && ma_fast[period][CURR] > ma_slow[period][CURR] &&
+                   ma_fast[period][PREV] < ma_medium[period][PREV] && ma_fast[period][PREV] < ma_slow[period][PREV]; // MA Fast crossed both MA Medium and Slow.
+    case 4: return ma_fast[period][CURR] > ma_medium[period][CURR] + gap && ma_medium[period][CURR] > ma_slow[period][CURR] &&
+                   ma_fast[period][PREV] < ma_medium[period][PREV]; // MA Fast crossed MA Medium.
+    case 5: return ma_fast[period][CURR] > ma_medium[period][CURR] + gap && ma_medium[period][CURR] > ma_slow[period][CURR] &&
+                   ma_fast[period][FAR] < ma_medium[period][FAR]; // MA Fast crossed MA Medium.
+    case 6: return ma_fast[period][CURR] > ma_medium[period][CURR] + gap && ma_medium[period][PREV] > ma_slow[period][PREV];
+    case 7: return ma_fast[period][CURR] > ma_medium[period][CURR] + gap && ma_medium[period][CURR] > ma_slow[period][CURR] && ma_slow[period][CURR] > ma_slow[period][PREV];
+    case 8: return (ma_fast[period][CURR] > ma_medium[period][CURR] + gap && ma_fast[period][PREV] < ma_medium[period][PREV] && ma_fast[period][FAR] < ma_medium[period][FAR]);
+    case 9: return (ma_fast[period][CURR] > ma_slow[period][CURR] + gap && ma_fast[period][PREV] < ma_slow[period][PREV] && ma_fast[period][FAR] < ma_slow[period][FAR]);
+    case 10: return (ma_medium[period][CURR] > ma_slow[period][CURR] + gap && ma_medium[period][PREV] <ma_slow[period][PREV] && ma_medium[period][FAR] < ma_slow[period][FAR]);
+    case 11: return ma_fast[period][CURR] > ma_medium[period][CURR] + gap && ma_medium[period][CURR] > ma_slow[period][CURR] &&
+                   ma_medium[period][PREV] < ma_slow[period][PREV]; // MA Medium crossed MA Slow.
+  }
+  return FALSE;
 }
 
-// // Trading Signal: when MA1 is crossing MA2, it triggers a trading signal.
-bool MA_Fast_On_Sell(int period = M1) {
-  bool state = (ma_fast[period][0] < ma_medium[period][0] && ma_fast[period][1] > ma_medium[period][1]);
-  // if (VerboseTrace) Print("MAFast_On_Sell(): cond:", state, " - ", NormalizeDouble(ma_fast[period][0], Digits), " < ", NormalizeDouble(ma_medium[period][0], Digits), " && ", NormalizeDouble(ma_fast[period][1], Digits), " > ", NormalizeDouble(ma_medium[period][1], Digits));
-  return (ma_fast[period][0] < ma_medium[period][0] && ma_fast[period][1] > ma_medium[period][1] && ma_fast[period][2] > ma_medium[period][2]);
-}
-
-bool MA_Medium_On_Buy(int period = M1) {
-  return (ma_fast[period][0] > ma_slow[period][0] && ma_fast[period][1] < ma_slow[period][1] && ma_fast[period][2] < ma_slow[period][2]);
-}
-
-bool MA_Medium_On_Sell(int period = M1) {
-  return (ma_fast[period][0] < ma_slow[period][0] && ma_fast[period][1] > ma_slow[period][1] && ma_fast[period][2] > ma_slow[period][2]);
-}
-
-bool MA_Slow_On_Buy(int period = M1) {
-  return (ma_medium[period][0] > ma_slow[period][0] && ma_medium[period][1] <ma_slow[period][1] && ma_medium[period][2] < ma_slow[period][2]);
-}
-
-bool MA_Slow_On_Sell(int period = M1) {
-  return (ma_medium[period][0] < ma_slow[period][0] && ma_medium[period][1] > ma_slow[period][1] && ma_medium[period][2] > ma_slow[period][2]);
+/*
+ * Check if MA indicator is on buy.
+ *
+ * @param
+ *   period (int) - period to check for
+ *   open_method (int) - open method to use
+ *   open_level - open level to consider the signal
+ */
+bool MA_On_Sell(int period = M1, int open_method = 0, int open_level = 0.0) {
+  double gap = open_level * pip_size;
+  switch (open_method) {
+    case 0: return ma_fast[period][CURR] + gap < ma_medium[period][CURR] && ma_medium[period][CURR] < ma_slow[period][CURR];
+    case 1: return ma_fast[period][CURR] + gap < ma_medium[period][CURR] && ma_medium[period][CURR] < ma_slow[period][CURR] && ma_slow[period][CURR] < ma_slow[period][FAR];
+    case 2: return ma_fast[period][CURR] + gap < ma_medium[period][CURR] && ma_medium[period][CURR] < ma_slow[period][CURR]  && ma_fast[period][CURR] < ma_fast[period][PREV];
+    case 3: return ma_fast[period][CURR] + gap < ma_medium[period][CURR] && ma_fast[period][CURR] < ma_slow[period][CURR] &&
+                   ma_fast[period][PREV] > ma_medium[period][PREV] && ma_fast[period][PREV] > ma_slow[period][PREV]; // MA Fast crossed both MA Medium and Slow.
+    case 4: return ma_fast[period][CURR] + gap < ma_medium[period][CURR] && ma_medium[period][CURR] < ma_slow[period][CURR] &&
+                   ma_fast[period][PREV] > ma_medium[period][PREV]; // MA Fast crossed MA Medium.
+    case 5: return ma_fast[period][CURR] + gap < ma_medium[period][CURR] && ma_medium[period][CURR] < ma_slow[period][CURR] &&
+                   ma_fast[period][FAR] > ma_medium[period][FAR]; // MA Fast crossed MA Medium.
+    case 6: return ma_fast[period][CURR] + gap < ma_medium[period][CURR] && ma_medium[period][PREV] < ma_slow[period][PREV];
+    case 7: return ma_fast[period][CURR] + gap < ma_medium[period][CURR] && ma_medium[period][CURR] < ma_slow[period][CURR] && ma_slow[period][CURR] < ma_slow[period][PREV];
+    case 8: return (ma_fast[period][CURR] + gap < ma_medium[period][CURR] && ma_fast[period][PREV] > ma_medium[period][PREV] && ma_fast[period][FAR] > ma_medium[period][FAR]);
+    case 9: return (ma_fast[period][CURR] + gap < ma_slow[period][CURR] && ma_fast[period][PREV] > ma_slow[period][PREV] && ma_fast[period][FAR] > ma_slow[period][FAR]);
+    case 10: return (ma_medium[period][0] + gap < ma_slow[period][CURR] && ma_medium[period][PREV] > ma_slow[period][PREV] && ma_medium[period][FAR] > ma_slow[period][FAR]);
+    case 11: return ma_fast[period][CURR] + gap < ma_medium[period][CURR] && ma_medium[period][CURR] < ma_slow[period][CURR] &&
+                   ma_medium[period][PREV] > ma_slow[period][PREV]; // MA Medium crossed MA Slow.
+  }
+  return FALSE;
 }
 
 /*
@@ -1986,9 +2030,10 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
 int GetTrailingMethod(int order_type, int stop_or_profit) {
   int stop_method = DefaultTrailingStopMethod, profit_method = DefaultTrailingProfitMethod;
   switch (order_type) {
-    case MA_FAST:
-    case MA_MEDIUM:
-    case MA_SLOW:
+    case MA1:
+    case MA5:
+    case MA15:
+    case MA30:
       if (MA_TrailingStopMethod > 0)   stop_method   = MA_TrailingStopMethod;
       if (MA_TrailingProfitMethod > 0) profit_method = MA_TrailingProfitMethod;
       break;
@@ -2413,7 +2458,7 @@ int GetMaxOrdersPerType() {
 // Get number of active strategies.
 int GetNoOfStrategies() {
   return (
-    3 * MA_Enabled
+    + MA1_Enabled + MA5_Enabled + MA15_Enabled + MA30_Enabled
     + MACD_Enabled
     + Alligator_Enabled
     + RSI_Enabled
@@ -2474,7 +2519,7 @@ void StartNewHour() {
   // Disable worse daily strategy.
   if (DynamicallyDisableWorseStrategy) {
     int new_worse_strategy = GetArrKey1ByLowestKey2Value(info, DAILY_PROFIT); // Check for worse daily profit.
-    if (info[new_worse_strategy][DAILY_PROFIT] < 0 && new_worse_strategy != worse_strategy) { // Check if it's different than the previous one.
+    if (info[new_worse_strategy][ACTIVE] && info[new_worse_strategy][DAILY_PROFIT] < 0 && new_worse_strategy != worse_strategy) { // Check if it's different than the previous one.
       if (worse_strategy != EMPTY) {
         info[worse_strategy][ACTIVE] = TRUE; // Re-enable previous one.
         if (VerboseDebug) Print(__FUNCTION__ + "(): Re-enabling strategy: " + worse_strategy);
@@ -2488,7 +2533,7 @@ void StartNewHour() {
   // Apply multiply factor for the best strategy.
   if (BestStrategyMultiplierFactor >= 1.0) {
     int new_best_strategy = GetArrKey1ByHighestKey2Value(info, DAILY_PROFIT); // Check for worse daily profit.
-    if (info[new_best_strategy][DAILY_PROFIT] > 0 && new_best_strategy != best_strategy) { // Check if it's different than the previous one.
+    if (info[new_best_strategy][ACTIVE] && info[new_best_strategy][DAILY_PROFIT] > 0 && new_best_strategy != best_strategy) { // Check if it's different than the previous one.
       if (best_strategy != EMPTY) {
         info[best_strategy][FACTOR] = 1.0; // Set previous strategy multiplier factor to default.
         if (VerboseDebug) Print(__FUNCTION__ + "(): Setting previous strategy multiplier factor to default for strategy: " + best_strategy);
@@ -2675,20 +2720,29 @@ void InitializeVariables() {
 
   name[CUSTOM]              = "Custom";
 
-  name[MA_FAST]             = "MA Fast M1";
-  info[MA_FAST][ACTIVE]     = MA_Enabled;
-  info[MA_FAST][PERIOD]     = M1;
-  info[MA_FAST][FACTOR]     = 1.0;
+  name[MA1]              = "MA M1";
+  info[MA1][ACTIVE]      = MA1_Enabled;
+  info[MA1][PERIOD]      = M1;
+  info[MA1][OPEN_METHOD] = MA1_OpenMethod;
+  info[MA1][FACTOR]      = 1.0;
 
-  name[MA_MEDIUM]           = "MA Medium M1";
-  info[MA_MEDIUM][ACTIVE]   = MA_Enabled;
-  info[MA_MEDIUM][PERIOD]   = M1;
-  info[MA_MEDIUM][FACTOR]   = 1.0;
+  name[MA5]              = "MA M5";
+  info[MA5][ACTIVE]      = MA5_Enabled;
+  info[MA5][PERIOD]      = M5;
+  info[MA5][OPEN_METHOD] = MA5_OpenMethod;
+  info[MA5][FACTOR]      = 1.0;
 
-  name[MA_SLOW]             = "MA Slow M1";
-  info[MA_SLOW][ACTIVE]     = MA_Enabled;
-  info[MA_SLOW][PERIOD]     = M1;
-  info[MA_SLOW][FACTOR]     = 1.0;
+  name[MA15]              = "MA M15";
+  info[MA15][ACTIVE]      = MA15_Enabled;
+  info[MA15][PERIOD]      = M15;
+  info[MA15][OPEN_METHOD] = MA15_OpenMethod;
+  info[MA15][FACTOR]      = 1.0;
+
+  name[MA30]              = "MA M30";
+  info[MA30][ACTIVE]      = MA30_Enabled;
+  info[MA30][PERIOD]      = M30;
+  info[MA30][OPEN_METHOD] = MA30_OpenMethod;
+  info[MA30][FACTOR]      = 1.0;
 
   name[MACD]                = "MACD M1";
   info[MACD][ACTIVE]        = MACD_Enabled;
@@ -2759,7 +2813,7 @@ void InitializeVariables() {
   info[WPR][PERIOD]         = M1;
   info[WPR][FACTOR]         = 1.0;
 
-  name[DEMARKER]            = "WPR M1";
+  name[DEMARKER]            = "DeMarker";
   info[DEMARKER][ACTIVE]    = DeMarker_Enabled;
   info[DEMARKER][PERIOD]    = M1;
   info[DEMARKER][FACTOR]    = 1.0;
@@ -2976,6 +3030,26 @@ string GetMonthlyReport() {
   return output;
 }
 
+/*
+ * Get strategy report based on the total orders.
+ */
+string GetStrategyReport(string sep = "\n") {
+  string output = "Strategy stats: " + sep;
+  double pc_loss = 0, pc_won = 0;
+  for (int i = 0; i < FINAL_STRATEGY_TYPE_ENTRY; i++) {
+    if (info[i][TOTAL_ORDERS] > 0) {
+      output += name[i] + ": ";
+      output += "Total net profit: " + info[i][TOTAL_PROFIT] + " pips, ";
+      pc_loss = (100 / NormalizeDouble(info[i][TOTAL_ORDERS], 2)) * info[i][TOTAL_ORDERS_LOSS];
+      pc_won  = (100 / NormalizeDouble(info[i][TOTAL_ORDERS], 2)) * info[i][TOTAL_ORDERS_WON];
+      Print(name[i], ": ", pc_won, ", ", pc_loss);
+      output += "Total orders: " + info[i][TOTAL_ORDERS] + " (Won: " + DoubleToStr(pc_won, 1) + "% [" + info[i][TOTAL_ORDERS_WON] + "] | Loss: " + DoubleToStr(pc_loss, 1) + "% [" + info[i][TOTAL_ORDERS_LOSS] + "]); ";
+      output += sep;
+    }
+  }
+  return output;
+}
+
 void DisplayInfoOnChart() {
   // Prepare text for Stop Out.
   string stop_out_level = "Stop Out: " + AccountStopoutLevel();
@@ -3050,7 +3124,6 @@ string GetOrdersStats(string sep = "\n") {
   total_orders_text += "; ratio: " + CalculateOrderTypeRatio();
   // Prepare data about open orders per strategy type.
   string open_orders_per_type = "Orders Per Type: ";
-  int ma_orders = open_orders[MA_FAST] + open_orders[MA_MEDIUM] + open_orders[MA_SLOW];
   int macd_orders = open_orders[MACD];
   int fractals_orders = open_orders[FRACTALS5] + open_orders[FRACTALS15] + open_orders[FRACTALS30];
   int demarker_orders = open_orders[DEMARKER];
@@ -3060,7 +3133,10 @@ string GetOrdersStats(string sep = "\n") {
   int rsi_orders = open_orders[RSI];
   string orders_per_type = "Stats: ";
   if (total_orders > 0) {
-     if (MA_Enabled && ma_orders > 0) orders_per_type += "MA: " + MathFloor(100 / total_orders * ma_orders) + "%, ";
+     if (MA1_Enabled && open_orders[MA1] > 0) orders_per_type += name[MA1] + ": " + MathFloor(100 / total_orders * open_orders[MA1]) + "%, ";
+     if (MA5_Enabled && open_orders[MA5] > 0) orders_per_type += name[MA5] + ": " + MathFloor(100 / total_orders * open_orders[MA5]) + "%, ";
+     if (MA15_Enabled && open_orders[MA15] > 0) orders_per_type += name[MA15] + ": " + MathFloor(100 / total_orders * open_orders[MA15]) + "%, ";
+     if (MA30_Enabled && open_orders[MA30] > 0) orders_per_type += name[MA30] + ": " + MathFloor(100 / total_orders * open_orders[MA30]) + "%, ";
      if (MACD_Enabled && macd_orders > 0) orders_per_type += "MACD: " + MathFloor(100 / total_orders * macd_orders) + "%, ";
      if ((Fractals5_Enabled || Fractals15_Enabled || Fractals30_Enabled) && fractals_orders > 0) orders_per_type += "Fractals: " + MathFloor(100 / total_orders * fractals_orders) + "%, ";
      if (DeMarker_Enabled && demarker_orders > 0) orders_per_type += "DeMarker: " + MathFloor(100 / total_orders * demarker_orders) + "%";
@@ -4124,6 +4200,7 @@ void WriteReport(string report_name) {
    FileWrite(handle,"Maximum consecutive losses (loss in money)",ConLossTrades1,StringConcatenate("(",-ConLoss1,")"));
    FileWrite(handle,"Maximal consecutive profit (count of wins)",ConProfit2,StringConcatenate("(",ConProfitTrades2,")"));
    FileWrite(handle,"Maximal consecutive loss (count of losses)",-ConLoss2,StringConcatenate("(",ConLossTrades2,")"));
+   FileWrite(handle, GetStrategyReport());
 //----
    FileClose(handle);
   }
