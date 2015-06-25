@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.033"
+#property version   "1.034"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -163,6 +163,9 @@ extern int EAMaxOrdersPerType = 0; // Maximum orders per strategy type. Set 0 fo
 extern double EATakeProfit = 0.0;
 extern double EAStopLoss = 0.0;
 extern double RiskRatio = 0; // Suggested value: 1.0. Do not change unless testing.
+
+extern string __Strategy_Parameters__ = "-- Strategy settings --";
+extern bool DynamicallyDisableWorseStrategy = TRUE; // Disable worse strategy every hour. Useful for low-balance accounts or non-profitable periods.
 
 extern string ____MA_Parameters__ = "-- Settings for the Moving Average indicator --";
 extern bool MA_Enabled = TRUE; // Enable MA-based strategy.
@@ -362,9 +365,11 @@ extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_MA_F_TRAIL; // Trailing
 /*
  * Summary backtest log
  * All [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
- *  (£1000,auto,ts:25,tp:25,gap:10)
- *   £29408.26	40723	1.14	0.72	6231.99	23.80%
- *   £17022.25	27393	1.14	0.62	1562.87	19.89% [without SAR]
+ *  (£1000,auto,ts:25,tp:25,gap:10,spread:3)
+ *   £22798.95	41273	1.13	0.55	3384.65	24.77%	0.00000000	DynamicallyDisableWorseStrategy=0
+ *   £21472.76	38658	1.13	0.56	3409.54	25.62%	0.00000000	DynamicallyDisableWorseStrategy=1
+ *   Old: £29408.26	40723	1.14	0.72	6231.99	23.80%
+ *   Old: £17022.25	27393	1.14	0.62	1562.87	19.89% [without SAR]
  *
  * Separated tests (1000,auto,ts:15,tp:20,gap:10,unlimited) [2015.01.02-2015.06.20 based on MT4 FXCM backtest data]:
  *   Old: MA:         profit:  922, trades:  3130, profit factor: 1.06, expected payoff: 0.29, drawdown: 67%,     +92%
@@ -555,6 +560,7 @@ int open_orders[FINAL_STRATEGY_TYPE_ENTRY], closed_orders[FINAL_STRATEGY_TYPE_EN
 int signals[FINAL_STAT_PERIOD_TYPE_ENTRY][FINAL_STRATEGY_TYPE_ENTRY][MN1][2]; // Count signals to buy and sell per period and strategy.
 int tickets[200]; // List of tickets to process.
 string name[FINAL_STRATEGY_TYPE_ENTRY];
+int worse_strategy = EMPTY;
 
 // EA variables.
 string EA_Name = "31337";
@@ -1839,7 +1845,7 @@ void UpdateTrailingStops() {
  *   existing (bool)
  *    Set to TRUE if the calculation is for particular existing order, so additional local variables are available.
  */
-double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = -1, double previous = 0, bool existing = FALSE) {
+double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY, double previous = 0, bool existing = FALSE) {
    double new_value = 0;
    double delta = GetMarketGap();
    int extra_trail = 0;
@@ -2452,10 +2458,29 @@ double GetRiskRatio() {
 void StartNewHour() {
   hour_of_day = Hour(); // Save the new hour.
   if (VerboseDebug) Print("== New hour: " + hour_of_day);
+
   if (day_of_week != DayOfWeek()) { // Check if new day has been started.
     StartNewDay();
   }
-  CheckHistory();
+
+  CheckHistory(); // Process closed orders.
+
+  // Disable worse daily strategy.
+  if (DynamicallyDisableWorseStrategy) {
+    int new_worse_strategy = GetArrKey1ByLowestKey2Value(info, DAILY_PROFIT); // Check for worse daily profit.
+    if (info[new_worse_strategy][DAILY_PROFIT] < 0 && new_worse_strategy != worse_strategy) { // Check if it's different than the previous one.
+      if (worse_strategy != EMPTY) {
+        info[worse_strategy][ACTIVE] = TRUE; // Re-enable previous one.
+        if (VerboseDebug) Print(__FUNCTION__ + "(): Re-enabling strategy: " + worse_strategy);
+      }
+      worse_strategy = new_worse_strategy; // Assign the new worse strategy.
+      info[worse_strategy][ACTIVE] = FALSE; // Disable the new worse strategy.
+      if (VerboseDebug) Print(__FUNCTION__ + "(): Disabling worse strategy: " + worse_strategy);
+    }
+  }
+
+  // Reset variables.
+  last_msg = ""; last_err = "";
 }
 
 /*
@@ -3101,7 +3126,7 @@ int GetLowestArrDoubleValue(double& arr[][], int key) {
 }*/
 
 int GetArrKey1ByHighestKey2Value(int& arr[][], int key2) {
-  int key1 = -1;
+  int key1 = EMPTY;
   int highest = 0;
   for (int i = 0; i < ArrayRange(arr, 0); i++) {
       if (arr[i][key2] > highest) {
@@ -3113,7 +3138,7 @@ int GetArrKey1ByHighestKey2Value(int& arr[][], int key2) {
 }
 
 int GetArrKey1ByLowestKey2Value(int& arr[][], int key2) {
-  int key1 = -1;
+  int key1 = EMPTY;
   int lowest = 0;
   for (int i = 0; i < ArrayRange(arr, 0); i++) {
       if (arr[i][key2] < lowest) {
@@ -3336,7 +3361,7 @@ bool ActionExecute(int action_id, string reason) {
  * Add ticket to list for further processing.
  */
 bool TicketAdd(int ticket_no) {
-  int i, slot = -1;
+  int i, slot = EMPTY;
   int size = ArraySize(tickets);
   // Check if ticket is already in the list and at the same time find the empty slot.
   for (i = 0; i < size; i++) {
@@ -3347,7 +3372,7 @@ bool TicketAdd(int ticket_no) {
     }
   }
   // Resize array if slot has not been allocated.
-  if (slot < 0) {
+  if (slot == EMPTY) {
     if (size < 1000) { // Set array hard limit to prevent memory leak.
       ArrayResize(tickets, size + 10);
       // ArrayFill(tickets, size - 1, ArraySize(tickets) - size - 1, 0);
@@ -3429,7 +3454,7 @@ bool TaskAddCloseOrder(int ticket_no, int reason = 0) {
 /*
  * Add new task to recalculate loss/profit.
  */
-bool TaskAddCalcStats(int ticket_no, int order_type = -1) {
+bool TaskAddCalcStats(int ticket_no, int order_type = EMPTY) {
   int job_id = TaskFindEmptySlot(ticket_no);
   if (job_id >= 0) {
     todo_queue[job_id][0] = ticket_no;
@@ -3486,7 +3511,7 @@ int TaskFindEmptySlot(int key) {
       if (VerboseDebug) Print(__FUNCTION__ + "(): Couldn't allocate task slot, all are taken (" + taken + "). Size: " + size);
     }
   }
-  return -1;
+  return EMPTY;
 }
 
 // Run specific task.
