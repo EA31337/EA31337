@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.037"
+#property version   "1.038"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -167,9 +167,13 @@ extern double EATakeProfit = 0.0;
 extern double EAStopLoss = 0.0;
 extern double RiskRatio = 0; // Suggested value: 1.0. Do not change unless testing.
 
-extern string __Strategy_Parameters__ = "-- Strategy settings --";
-extern bool DynamicallyDisableWorseStrategy = TRUE; // Disable worse strategy every hour. Useful for low-balance accounts or non-profitable periods.
-extern double BestStrategyMultiplierFactor = 2; // Increase lot size for the best daily strategy.
+extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting (set 1.0 to default) --";
+extern double BestDailyStrategyMultiplierFactor    = 2; // Increase lot size for the best daily strategy.
+extern double BestWeeklyStrategyMultiplierFactor   = 2; // Increase lot size for the best weekly strategy.
+extern double BestMonthlyStrategyMultiplierFactor  = 1; // Increase lot size for the best monthly strategy.
+extern double WorseDailyStrategyDividerFactor      = 0; // Check for the worse daily strategy each hour. Useful for low-balance accounts or non-profitable periods.
+extern double WorseWeeklyStrategyDividerFactor     = 0; // Check for the worse weekly strategy each hour. Useful for low-balance accounts or non-profitable periods.
+extern double WorseMonthlyStrategyDividerFactor    = 1; // Check for the worse monthly strategy each hour. Useful for low-balance accounts or non-profitable periods.
 
 extern string ____MA_Parameters__ = "-- Settings for the Moving Average indicator --";
 extern bool MA1_Enabled  = TRUE; // Enable MA-based strategy.
@@ -369,7 +373,8 @@ extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_MA_F_TRAIL; // Trailing
  * Summary backtest log
  * All [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
  *  (£1000,auto,ts:25,tp:25,gap:10,spread:3)
- *   £20971.05	38227	1.12	0.55	4005.46	35.82%
+ *   £24353.94	36134	1.13	0.67	3696.73	39.27%
+ *   Old: £20971.05	38227	1.12	0.55	4005.46	35.82%
  *   Old: £24184.97	38605	1.12	0.63	4134.27	27.99%	0.00000000	BestStrategyMultiplierFactor=2
  *   Old: £21472.76	38658	1.13	0.56	3409.54	25.62%	0.00000000	BestStrategyMultiplierFactor=1
  *   Old: £22798.95	41273	1.13	0.55	3384.65	24.77%	0.00000000	DynamicallyDisableWorseStrategy=0
@@ -567,7 +572,7 @@ int open_orders[FINAL_STRATEGY_TYPE_ENTRY], closed_orders[FINAL_STRATEGY_TYPE_EN
 int signals[FINAL_STAT_PERIOD_TYPE_ENTRY][FINAL_STRATEGY_TYPE_ENTRY][MN1][2]; // Count signals to buy and sell per period and strategy.
 int tickets[200]; // List of tickets to process.
 string name[FINAL_STRATEGY_TYPE_ENTRY];
-int worse_strategy = EMPTY, best_strategy = EMPTY;
+int worse_strategy[FINAL_STAT_PERIOD_TYPE_ENTRY], best_strategy[FINAL_STAT_PERIOD_TYPE_ENTRY];
 
 // EA variables.
 string EA_Name = "31337";
@@ -729,7 +734,7 @@ int OnInit() {
      Print(__FUNCTION__, "(): Market info: Symbol: ", Symbol(), ", min lot = " + market_minlot + ", max lot = " + market_maxlot +  ", lot step = " + market_lotstep, ", margin required = " + market_marginrequired, ", stop level = ", market_stoplevel, ", last volume: ", Volume[0]);
      Print(__FUNCTION__, "(): Account info: type: ", account_type, ", leverage: ", AccountLeverage());
      Print(__FUNCTION__, "(): Broker info: ", AccountCompany(), ", pip size = ", pip_size, ", points per pip = ", pts_per_pip, ", pip precision = ", pip_precision, ", volume precision = ", volume_precision);
-     Print(__FUNCTION__, "(): EA info: Lot size = ", GetLotSize(), "; Max orders = ", GetMaxOrders(), "; Max orders per type = ", GetMaxOrdersPerType());
+     Print(__FUNCTION__, "(): EA info: Lot size = ", GetLotSize(), "; Max orders = ", GetMaxOrders(), "; Max orders per type = ", GetMaxOrdersPerType(), "; No of strategies = ", GetNoOfStrategies(), " of ", FINAL_STRATEGY_TYPE_ENTRY);
      Print(__FUNCTION__, "(): Time: Hour of day = " + hour_of_day + ", Day of week = ", day_of_week, ", day of month = ", day_of_month, "; day of year = ", day_of_year);
      Print(__FUNCTION__, "(): ", GetAccountTextDetails());
    }
@@ -1157,20 +1162,29 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
   return (TRUE);
 }
 
+/*
+ * Execute trade order.
+ */
 int ExecuteOrder(int cmd, double volume, int order_type = CUSTOM, string order_comment = "", bool retry = TRUE) {
    bool result = FALSE;
    string err;
    int order_ticket;
    // int min_stop_level;
    double max_change = 1;
-   volume = NormalizeLots(volume);
 
-   // Check if bar time has been changed since last time.
-   /*
-   if (last_order_time == iTime(NULL, PERIOD_M1, 0) && EADelayBetweenTrades > 0) {
-     // FIXME
+   // Check the limits.
+   if (volume == 0) {
+     err = __FUNCTION__ + "(): Lot size for strategy " + order_type + " is 0.";
+     if (VerboseTrace && err != last_err) Print(err);
+     last_err = err;
      return (FALSE);
-   }*/
+   }
+   if (GetTotalOrders() >= GetMaxOrders()) {
+     err = __FUNCTION__ + "(): Maximum open and pending orders reached the limit (EAMaxOrders).";
+     if (VerboseErrors && err != last_err) Print(err);
+     last_err = err;
+     return (FALSE);
+   }
 
    // Check the limits.
    if (GetTotalOrders() >= GetMaxOrders()) {
@@ -1200,6 +1214,7 @@ int ExecuteOrder(int cmd, double volume, int order_type = CUSTOM, string order_c
    }
 
    // Calculate take profit and stop loss.
+   volume = NormalizeLots(volume);
    RefreshRates();
    if (VerboseDebug) Print(__FUNCTION__ + "(): " + GetMarketTextDetails()); // Print current market information before placing the order.
    double order_price = GetOpenPrice(cmd);
@@ -1871,6 +1886,7 @@ void UpdateTrailingStops() {
 
         new_trailing_stop = NormalizeDouble(GetTrailingValue(OrderType(), -1, order_type, OrderStopLoss(), TRUE), Digits);
         new_profit_take   = NormalizeDouble(GetTrailingValue(OrderType(), +1, order_type, OrderTakeProfit(), TRUE), Digits);
+        //if (MathAbs(OrderStopLoss() - new_trailing_stop) >= pip_size || MathAbs(OrderTakeProfit() - new_profit_take) >= pip_size) { // Perform update on pip change.
         if (new_trailing_stop != OrderStopLoss() || new_profit_take != OrderTakeProfit()) { // Perform update on change only.
            result = OrderModify(OrderTicket(), OrderOpenPrice(), new_trailing_stop, new_profit_take, 0, GetOrderColor());
            if (!result) {
@@ -2529,33 +2545,13 @@ void StartNewHour() {
 
   CheckHistory(); // Process closed orders.
 
-  // Disable worse daily strategy.
-  if (DynamicallyDisableWorseStrategy) {
-    int new_worse_strategy = GetArrKey1ByLowestKey2Value(info, DAILY_PROFIT); // Check for worse daily profit.
-    if (info[new_worse_strategy][ACTIVE] && info[new_worse_strategy][DAILY_PROFIT] < 0 && new_worse_strategy != worse_strategy) { // Check if it's different than the previous one.
-      if (worse_strategy != EMPTY) {
-        info[worse_strategy][ACTIVE] = TRUE; // Re-enable previous one.
-        if (VerboseDebug) Print(__FUNCTION__ + "(): Re-enabling strategy: " + worse_strategy);
-      }
-      worse_strategy = new_worse_strategy; // Assign the new worse strategy.
-      info[worse_strategy][ACTIVE] = FALSE; // Disable the new worse strategy.
-      if (VerboseDebug) Print(__FUNCTION__ + "(): Disabling worse strategy: " + worse_strategy);
-    }
-  }
-
-  // Apply multiply factor for the best strategy.
-  if (BestStrategyMultiplierFactor >= 1.0) {
-    int new_best_strategy = GetArrKey1ByHighestKey2Value(info, DAILY_PROFIT); // Check for worse daily profit.
-    if (info[new_best_strategy][ACTIVE] && info[new_best_strategy][DAILY_PROFIT] > 0 && new_best_strategy != best_strategy) { // Check if it's different than the previous one.
-      if (best_strategy != EMPTY) {
-        info[best_strategy][FACTOR] = 1.0; // Set previous strategy multiplier factor to default.
-        if (VerboseDebug) Print(__FUNCTION__ + "(): Setting previous strategy multiplier factor to default for strategy: " + best_strategy);
-      }
-      best_strategy = new_best_strategy; // Assign the new worse strategy.
-      info[best_strategy][FACTOR] = BestStrategyMultiplierFactor; // Apply multiplier factor for the new strategy.
-      if (VerboseDebug) Print(__FUNCTION__ + "(): Setting multiplier factor to " + BestStrategyMultiplierFactor + " for strategy: " + best_strategy);
-    }
-  }
+  // Apply strategy boosting.
+  ApplyStrategyMultiplierFactor(DAILY, -1, WorseDailyStrategyDividerFactor);
+  ApplyStrategyMultiplierFactor(WEEKLY, -1, WorseWeeklyStrategyDividerFactor);
+  ApplyStrategyMultiplierFactor(MONTHLY, -1, WorseMonthlyStrategyDividerFactor);
+  ApplyStrategyMultiplierFactor(DAILY, 1, BestDailyStrategyMultiplierFactor);
+  ApplyStrategyMultiplierFactor(WEEKLY, 1, BestWeeklyStrategyMultiplierFactor);
+  ApplyStrategyMultiplierFactor(MONTHLY, 1, BestMonthlyStrategyMultiplierFactor);
 
   // Reset variables.
   last_msg = ""; last_err = "";
@@ -2569,6 +2565,7 @@ void StartNewDay() {
 
   // Print daily report at end of each day.
   if (VerboseInfo) Print(GetDailyReport());
+
 
   // Check if day started another week.
   if (DayOfWeek() < day_of_week) {
@@ -2613,6 +2610,7 @@ void StartNewDay() {
 void StartNewWeek() {
   if (VerboseInfo) Print("== New week ==");
   if (VerboseInfo) Print(GetWeeklyReport()); // Print weekly report at end of each week.
+
 
   // Reset variables.
   string sar_stats = "Weekly SAR stats: ";
@@ -2727,6 +2725,9 @@ void InitializeVariables() {
   ArrayInitialize(weekly,  0); // Reset weekly stats.
   ArrayInitialize(monthly, 0); // Reset monthly stats.
   ArrayInitialize(tickets, 0); // Reset ticket list.
+  ArrayInitialize(worse_strategy, EMPTY);
+  ArrayInitialize(best_strategy, EMPTY);
+
 
   // Initialize strategies.
   ArrayInitialize(info, 0); // Reset strategy info.
@@ -2975,6 +2976,63 @@ void CheckAccountConditions() {
 
 }
 
+/*
+ * Get default multiplier lot factor.
+ */
+double GetDefaultLotFactor() {
+  return 1.0;
+}
+
+/* BEGIN: STRATEGY FUNCTIONS */
+
+/*
+ * Apply strategy multiplier factor based on the strategy profit or loss.
+ */
+void ApplyStrategyMultiplierFactor(int period = DAILY, int loss_or_profit = 0, double factor = 1.0) {
+  if (GetNoOfStrategies() <= 1 || factor == 1.0) return;
+  int key = If(period == MONTHLY, MONTHLY_PROFIT, If(period == WEEKLY, WEEKLY_PROFIT, DAILY_PROFIT));
+  string period_name = IfTxt(period == MONTHLY, "montly", IfTxt(period == WEEKLY, "weekly", "daily"));
+  int new_strategy = If(loss_or_profit > 0, GetArrKey1ByHighestKey2Value(info, key), GetArrKey1ByLowestKey2Value(info, key));
+  if (new_strategy == EMPTY) return;
+  int previous = If(loss_or_profit > 0, best_strategy[period], worse_strategy[period]);
+  double new_factor = 1.0;
+  if (loss_or_profit > 0) { // Best strategy.
+    if (info[new_strategy][ACTIVE] && info[new_strategy][key] > 10 && new_strategy != previous) { // Check if it's different than the previous one.
+      if (previous != EMPTY) {
+        if (!info[previous][ACTIVE]) info[previous][ACTIVE] = TRUE;
+        info[previous][FACTOR] = GetDefaultLotFactor(); // Set previous strategy multiplier factor to default.
+        if (VerboseDebug) Print(__FUNCTION__ + "(): Setting multiplier factor to default for strategy: " + previous);
+      }
+      best_strategy[period] = new_strategy; // Assign the new worse strategy.
+      info[new_strategy][ACTIVE] = TRUE;
+      new_factor = GetDefaultLotFactor() * factor;
+      info[new_strategy][FACTOR] = new_factor; // Apply multiplier factor for the new strategy.
+      if (VerboseDebug) Print(__FUNCTION__ + "(): Setting multiplier factor to " + new_factor + " for strategy: " + new_strategy + " (period: " + period_name + ")");
+    }
+  } else { // Worse strategy.
+    if (info[new_strategy][ACTIVE] && info[new_strategy][key] < 10 && new_strategy != previous) { // Check if it's different than the previous one.
+      if (previous != EMPTY) {
+        if (!info[previous][ACTIVE]) info[previous][ACTIVE] = TRUE;
+        info[previous][FACTOR] = GetDefaultLotFactor(); // Set previous strategy multiplier factor to default.
+        if (VerboseDebug) Print(__FUNCTION__ + "(): Setting multiplier factor to default for strategy: " + previous + " to default.");
+      }
+      worse_strategy[period] = new_strategy; // Assign the new worse strategy.
+      if (factor > 0) {
+        new_factor = NormalizeDouble(GetDefaultLotFactor() / factor, Digits);
+        info[new_strategy][ACTIVE] = TRUE;
+        info[new_strategy][FACTOR] = new_factor; // Apply multiplier factor for the new strategy.
+        if (VerboseDebug) Print(__FUNCTION__ + "(): Setting multiplier factor to " + new_factor + " for strategy: " + new_strategy + " (period: " + period_name + ")");
+      } else {
+        info[new_strategy][ACTIVE] = FALSE;
+        //info[new_strategy][FACTOR] = GetDefaultLotFactor();
+        if (VerboseDebug) Print(__FUNCTION__ + "(): Disabling strategy: " + new_strategy);
+      }
+    }
+  }
+}
+
+/* END: STRATEGY FUNCTIONS */
+
 /* BEGIN: DISPLAYING FUNCTIONS */
 
 string GetDailyReport() {
@@ -3055,7 +3113,6 @@ string GetStrategyReport(string sep = "\n") {
       output += "Total net profit: " + info[i][TOTAL_PROFIT] + " pips, ";
       pc_loss = (100 / NormalizeDouble(info[i][TOTAL_ORDERS], 2)) * info[i][TOTAL_ORDERS_LOSS];
       pc_won  = (100 / NormalizeDouble(info[i][TOTAL_ORDERS], 2)) * info[i][TOTAL_ORDERS_WON];
-      Print(name[i], ": ", pc_won, ", ", pc_loss);
       output += "Total orders: " + info[i][TOTAL_ORDERS] + " (Won: " + DoubleToStr(pc_won, 1) + "% [" + info[i][TOTAL_ORDERS_WON] + "] | Loss: " + DoubleToStr(pc_loss, 1) + "% [" + info[i][TOTAL_ORDERS_LOSS] + "]); ";
       output += sep;
     }
