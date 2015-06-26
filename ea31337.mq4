@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.038"
+#property version   "1.039"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -24,7 +24,10 @@ enum ENUM_STRATEGY_TYPE {
   MA5,
   MA15,
   MA30,
-  MACD,
+  MACD1,
+  MACD5,
+  MACD15,
+  MACD30,
   ALLIGATOR,
   RSI,
   SAR1,
@@ -208,21 +211,28 @@ extern ENUM_TRAIL_TYPE MA_TrailingProfitMethod = T_BANDS; // Trailing Profit met
  */
 
 extern string ____MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --";
-extern bool MACD_Enabled = TRUE; // Enable MACD-based strategy.
+extern bool MACD1_Enabled = TRUE; // Enable MACD-based strategy.
+extern bool MACD5_Enabled = TRUE; // Enable MACD-based strategy.
+extern bool MACD15_Enabled = TRUE; // Enable MACD-based strategy.
+extern bool MACD30_Enabled = TRUE; // Enable MACD-based strategy.
 extern ENUM_TIMEFRAMES MACD_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int MACD_Fast_Period = 7; // Fast EMA averaging period.
-extern int MACD_Slow_Period = 40; // Slow EMA averaging period.
-extern int MACD_Signal_Period = 7; // Signal line averaging period.
+extern int MACD_Fast_Period = 14; // Fast EMA averaging period.
+extern int MACD_Slow_Period = 24; // Slow EMA averaging period.
+extern int MACD_Signal_Period = 9; // Signal line averaging period.
 extern double MACD_OpenLevel  = 1.0;
+extern int MACD1_OpenMethod = 21;
+extern int MACD5_OpenMethod = 2;
+extern int MACD15_OpenMethod = 1;
+extern int MACD30_OpenMethod = 22;
 //extern double MACD_CloseLevel = 2; // Set 0 to disable.
-extern ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_OPEN; // MACD applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
-extern int MACD_Shift = 4; // Past MACD value in number of bars. Shift relative to the current bar the given amount of periods ago. Suggested value: 1
-extern int MACD_ShiftFar = 2; // Additional MACD far value in number of bars relatively to MACD_Shift.
+extern ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_WEIGHTED; // MACD applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
+extern int MACD_Shift = 2; // Past MACD value in number of bars. Shift relative to the current bar the given amount of periods ago. Suggested value: 1
+extern int MACD_ShiftFar = 0; // Additional MACD far value in number of bars relatively to MACD_Shift.
 extern bool MACD_CloseOnChange = TRUE; // Close opposite orders on market change.
-extern ENUM_TRAIL_TYPE MACD_TrailingStopMethod = T_MA_S_TRAIL; // Trailing Stop method for MACD. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = T_SAR_LOW; // Trailing Profit method for MACD. Set 0 to default. See: ENUM_TRAIL_TYPE.
-/* MACD backtest log (£1000,0.1,ts:25,tp:20,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
- *   £1265.63	675	1.24	1.88	365.49	22.80%
+extern ENUM_TRAIL_TYPE MACD_TrailingStopMethod = T_BANDS; // Trailing Stop method for MACD. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = T_SAR; // Trailing Profit method for MACD. Set 0 to default. See: ENUM_TRAIL_TYPE.
+/* MACD backtest log (£1000,0.1,ts:25,tp:20,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 3, 7,6mln ticks, quality 25%]:
+ *   £4919.95	8380	1.11	0.59	3071.96	24.86%
  */
 
 extern string ____Alligator_Parameters__ = "-- Settings for the Alligator indicator --";
@@ -371,9 +381,10 @@ extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_MA_F_TRAIL; // Trailing
 
 /*
  * Summary backtest log
- * All [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
- *  (£1000,auto,ts:25,tp:25,gap:10,spread:3)
- *   £24353.94	36134	1.13	0.67	3696.73	39.27%
+ * All [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 3, 7,6mln ticks, quality 25%]:
+ *  (£1000,auto,ts:25,tp:25,gap:10)
+ *   £28802.15	43226	1.13	0.67	6183.14	31.62%
+ *   Old: £24353.94	36134	1.13	0.67	3696.73	39.27%
  *   Old: £20971.05	38227	1.12	0.55	4005.46	35.82%
  *   Old: £24184.97	38605	1.12	0.63	4134.27	27.99%	0.00000000	BestStrategyMultiplierFactor=2
  *   Old: £21472.76	38658	1.13	0.56	3409.54	25.62%	0.00000000	BestStrategyMultiplierFactor=1
@@ -609,8 +620,6 @@ double fractals[H1][3];
 
 /* TODO:
  *   - multiply successful strategy direction,
- *   - add RSI strategy (http://docs.mql4.com/indicators/irsi),
- *   - add SAR strategy (the Parabolic Stop and Reverse system) (http://docs.mql4.com/indicators/isar),
  *   - add the Average Directional Movement Index indicator (iADX) (http://docs.mql4.com/indicators/iadx),
  *   - add the Stochastic Oscillator (http://docs.mql4.com/indicators/istochastic),
  *   - add On Balance Volume (iOBV) (http://docs.mql4.com/indicators/iobv),
@@ -621,16 +630,14 @@ double fractals[H1][3];
  *   - add breakage strategy (Envelopes/Bands?) with Order,
  *   - add the On Balance Volume indicator (iOBV) (http://docs.mql4.com/indicators/iobv),
  *   - add the Average True Range indicator (iATR) (http://docs.mql4.com/indicators/iatr),
- *   - add the Envelopes indicator,
  *   - add the Force Index indicator (iForce) (http://docs.mql4.com/indicators/iforce),
  *   - add the Moving Average of Oscillator indicator (iOsMA) (http://docs.mql4.com/indicators/iosma),
  *   - BearsPower, BullsPower,
  *   - check risky dates and times,
  *   - check for risky patterns,
- *   - double volume of white listed orders,
  *   - add conditional actions,
- *   - add SAR counting,
  *   - implement condition to close all strategy orders, buy/sell, most profitable order, when to trade, skip the day or week, etc.
+ *   - take profit on abnormal spikes,
  */
 
 /*
@@ -641,8 +648,6 @@ double fractals[H1][3];
  *   Digits - Number of digits after decimal point for the current symbol prices.
  *   Bars - Number of bars in the current chart.
  */
-
-
 
 //+------------------------------------------------------------------+
 //| Expert tick function                                             |
@@ -679,8 +684,9 @@ void OnTick() {
     if (hour_of_day != Hour()) {
       StartNewHour();
     }
-    if (PrintLogOnChart) DisplayInfoOnChart();
   }
+  if (PrintLogOnChart) DisplayInfoOnChart();
+
 } // end: OnTick()
 
 //+------------------------------------------------------------------+
@@ -836,13 +842,43 @@ void Trade() {
       }
    }
 
-   if (info[MACD][ACTIVE]) {
-      if (MACD_On_Buy()) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[MACD][FACTOR], MACD, "MACDOnBuy");
-       if (EACloseOnMarketChange) CloseOrdersByType(OP_SELL, MACD, "closing MACD on market change");
-      } else if (MACD_On_Sell()) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[MACD][FACTOR], MACD, "MACDOnSell");
-       if (EACloseOnMarketChange) CloseOrdersByType(OP_BUY, MACD, "closing MACD on market change");
+   if (info[MACD1][ACTIVE]) {
+      if (MACD_On_Buy(info[MACD1][PERIOD], info[MACD1][OPEN_METHOD])) {
+       order_placed = ExecuteOrder(OP_BUY, lot_size * info[MACD1][FACTOR], MACD1, name[MACD1]);
+       if (MACD_CloseOnChange) CloseOrdersByType(OP_SELL, MACD1, "closing on market change: " + name[MACD1]);
+      } else if (MACD_On_Sell(info[MACD1][PERIOD], info[MACD1][OPEN_METHOD])) {
+       order_placed = ExecuteOrder(OP_SELL, lot_size * info[MACD1][FACTOR], MACD1, name[MACD1]);
+       if (MACD_CloseOnChange) CloseOrdersByType(OP_BUY, MACD1, "closing on market change: " + name[MACD1]);
+      }
+   }
+
+   if (info[MACD5][ACTIVE]) {
+      if (MACD_On_Buy(info[MACD5][PERIOD], info[MACD5][OPEN_METHOD])) {
+       order_placed = ExecuteOrder(OP_BUY, lot_size * info[MACD5][FACTOR], MACD5, name[MACD5]);
+       if (MACD_CloseOnChange) CloseOrdersByType(OP_SELL, MACD5, "closing on market change: " + name[MACD5]);
+      } else if (MACD_On_Sell(info[MACD5][PERIOD], info[MACD5][OPEN_METHOD])) {
+       order_placed = ExecuteOrder(OP_SELL, lot_size * info[MACD5][FACTOR], MACD5, name[MACD5]);
+       if (MACD_CloseOnChange) CloseOrdersByType(OP_BUY, MACD5, "closing on market change: " + name[MACD5]);
+      }
+   }
+
+   if (info[MACD15][ACTIVE]) {
+      if (MACD_On_Buy(info[MACD15][PERIOD], info[MACD15][OPEN_METHOD])) {
+       order_placed = ExecuteOrder(OP_BUY, lot_size * info[MACD15][FACTOR], MACD15, name[MACD15]);
+       if (MACD_CloseOnChange) CloseOrdersByType(OP_SELL, MACD15, "closing on market change: " + name[MACD15]);
+      } else if (MACD_On_Sell(info[MACD15][PERIOD], info[MACD15][OPEN_METHOD])) {
+       order_placed = ExecuteOrder(OP_SELL, lot_size * info[MACD15][FACTOR], MACD15, name[MACD15]);
+       if (MACD_CloseOnChange) CloseOrdersByType(OP_BUY, MACD15, "closing on market change: " + name[MACD15]);
+      }
+   }
+
+   if (info[MACD30][ACTIVE]) {
+      if (MACD_On_Buy(info[MACD30][PERIOD], info[MACD30][OPEN_METHOD])) {
+       order_placed = ExecuteOrder(OP_BUY, lot_size * info[MACD30][FACTOR], MACD30, name[MACD30]);
+       if (MACD_CloseOnChange) CloseOrdersByType(OP_SELL, MACD30, "closing on market change: " + name[MACD30]);
+      } else if (MACD_On_Sell(info[MACD30][PERIOD], info[MACD30][OPEN_METHOD])) {
+       order_placed = ExecuteOrder(OP_SELL, lot_size * info[MACD30][FACTOR], MACD30, name[MACD30]);
+       if (MACD_CloseOnChange) CloseOrdersByType(OP_BUY, MACD30, "closing on market change: " + name[MACD30]);
       }
    }
 
@@ -1073,7 +1109,7 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
   // if (VerboseTrace) text += "MA: MA_Fast: " + GetArrayValues(ma_fast[M1]) + "; MA_Medium: " + GetArrayValues(ma_medium[M1]) + "; MA_Slow: " + GetArrayValues(ma_slow[M1]) + "; ";
   if (VerboseDebug && IsVisualMode()) DrawMA();
 
-  if (MACD_Enabled) {
+  //if (MACD_Enabled) {
     // Update MACD indicator values.
     macd[period][CURR] = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN, 0); // Current
     macd[period][PREV] = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN, 1 + MACD_Shift); // Previous
@@ -1082,7 +1118,7 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
     macd_signal[period][PREV] = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, 1 + MACD_Shift);
     macd_signal[period][FAR]  = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, 2 + MACD_ShiftFar);
     // if (VerboseTrace) text += "MACD: " + GetArrayValues(macd[M1]) + "; Signal: " + GetArrayValues(macd_signal[M1]) + "; ";
-  }
+  //}
 
   if (Alligator_Enabled) {
     // Update Alligator indicator values.
@@ -1323,13 +1359,13 @@ bool OrderCalc(int ticket_no = 0) {
   } else {
     info[strategy_type][TOTAL_ORDERS_LOSS]++;
   }
-  info[strategy_type][TOTAL_PROFIT]   += profit;
+  info[strategy_type][TOTAL_PROFIT] += profit;
 
   if (TimeDayOfYear(close_time) == DayOfYear()) {
-    info[strategy_type][DAILY_PROFIT]   += profit;
+    info[strategy_type][DAILY_PROFIT] += profit;
   }
   if (TimeDayOfWeek(close_time) <= DayOfWeek()) {
-    info[strategy_type][WEEKLY_PROFIT]  += profit;
+    info[strategy_type][WEEKLY_PROFIT] += profit;
   }
   if (TimeDay(close_time) <= Day()) {
     info[strategy_type][MONTHLY_PROFIT] += profit;
@@ -1393,9 +1429,9 @@ bool UpdateStats() {
  * @param
  *   period (int) - period to check for
  *   open_method (int) - open method to use
- *   open_level - open level to consider the signal
+ *   open_level (double) - open level to consider the signal
  */
-bool MA_On_Buy(int period = M1, int open_method = 0, int open_level = 0.0) {
+bool MA_On_Buy(int period = M1, int open_method = 0, double open_level = 0.0) {
   double gap = open_level * pip_size;
   switch (open_method) {
     case 0: return ma_fast[period][CURR] > ma_medium[period][CURR] + gap && ma_medium[period][CURR] > ma_slow[period][CURR];
@@ -1424,9 +1460,9 @@ bool MA_On_Buy(int period = M1, int open_method = 0, int open_level = 0.0) {
  * @param
  *   period (int) - period to check for
  *   open_method (int) - open method to use
- *   open_level - open level to consider the signal
+ *   open_level (double) - open level to consider the signal
  */
-bool MA_On_Sell(int period = M1, int open_method = 0, int open_level = 0.0) {
+bool MA_On_Sell(int period = M1, int open_method = 0, double open_level = 0.0) {
   double gap = open_level * pip_size;
   switch (open_method) {
     case 0: return ma_fast[period][CURR] + gap < ma_medium[period][CURR] && ma_medium[period][CURR] < ma_slow[period][CURR];
@@ -1452,31 +1488,45 @@ bool MA_On_Sell(int period = M1, int open_method = 0, int open_level = 0.0) {
 /*
  * Check if MACD indicator is on buy.
  *
+ * To calculate the maximum open method, check the Least Common Multiple (LCM) for MathMod numbers.
+ *
  * @param
  *   period (int) - period to check for
  *   open_method (int) - open method to use
+ *   open_level (double) - open level to consider the signal
  */
-bool MACD_On_Buy(int period = M1, int open_method = 0) {
-  // Check for long position (BUY) possibility.
-  return (
-    macd[period][0] < 0 && macd[period][0] > macd_signal[period][0] && macd[period][1] < macd_signal[period][1] &&
-    MathAbs(macd[period][0]) > (MACD_OpenLevel*Point) && ma_medium[period][0] > ma_medium[period][1]
-  );
+bool MACD_On_Buy(int period = M1, int open_method = 0, double open_level = 0.0) {
+  double gap = open_level * pip_size;
+  bool result = macd[period][CURR] > macd_signal[period][CURR];
+  if (MathMod(open_method,  2) == 0) result = result && macd[period][PREV] < macd_signal[period][PREV];
+  if (MathMod(open_method,  3) == 0) result = result && macd[period][CURR] < 0;
+  if (MathMod(open_method,  5) == 0) result = result && ma_medium[period][CURR] > ma_medium[period][PREV];
+  if (MathMod(open_method,  7) == 0) result = result && MathAbs(macd[period][CURR]) > gap;
+  if (MathMod(open_method, 11) == 0) result = result && ma_fast[period][CURR] > ma_fast[period][PREV];
+  // The LCM is: 2310.
+  return result;
 }
 
 /*
  * Check if MACD indicator is on sell.
  *
+ * To calculate the maximum open method, check the Least Common Multiple (LCM) for MathMod numbers.
+ *
  * @param
  *   period (int) - period to check for
  *   open_method (int) - open method to use
+ *   open_level (double) - open level to consider the signal
  */
-bool MACD_On_Sell(int period = M1, int open_method = 0) {
-  // Check for short position (SELL) possibility.
-  return (
-    macd[period][0] > 0 && macd[period][0] < macd_signal[period][0] && macd[period][1] > macd_signal[period][1] &&
-    macd[period][0] > (MACD_OpenLevel*Point) && ma_medium[period][0] < ma_medium[period][1]
-  );
+bool MACD_On_Sell(int period = M1, int open_method = 0, double open_level = 0.0) {
+  double gap = open_level * pip_size;
+  bool result = macd[period][CURR] < macd_signal[period][CURR];
+  if (MathMod(open_method,  2) == 0) result = result && macd[period][PREV] > macd_signal[period][PREV];
+  if (MathMod(open_method,  3) == 0) result = result && macd[period][CURR] > 0;
+  if (MathMod(open_method,  5) == 0) result = result && ma_medium[period][CURR] < ma_medium[period][PREV];
+  if (MathMod(open_method,  7) == 0) result = result && MathAbs(macd[period][CURR]) < gap;
+  if (MathMod(open_method, 11) == 0) result = result && ma_fast[period][CURR] < ma_fast[period][PREV];
+  // The LCM is: 2310.
+  return result;
 }
 
 /*
@@ -2061,7 +2111,10 @@ int GetTrailingMethod(int order_type, int stop_or_profit) {
       if (MA_TrailingStopMethod > 0)   stop_method   = MA_TrailingStopMethod;
       if (MA_TrailingProfitMethod > 0) profit_method = MA_TrailingProfitMethod;
       break;
-    case MACD:
+    case MACD1:
+    case MACD5:
+    case MACD15:
+    case MACD30:
       if (MACD_TrailingStopMethod > 0)   stop_method   = MACD_TrailingStopMethod;
       if (MACD_TrailingProfitMethod > 0) profit_method = MACD_TrailingProfitMethod;
       break;
@@ -2234,8 +2287,8 @@ double CalculateOpenLots() {
 }
 
 // For given magic number, check if it is ours.
-bool CheckOurMagicNumber(int magic_number = 0) {
-  if (magic_number == 0) magic_number = OrderMagicNumber();
+bool CheckOurMagicNumber(int magic_number = EMPTY) {
+  if (magic_number == EMPTY) magic_number = OrderMagicNumber();
   return (magic_number >= MagicNumber && magic_number < MagicNumber + FINAL_STRATEGY_TYPE_ENTRY);
 }
 
@@ -2253,21 +2306,21 @@ bool TradeAllowed() {
   if (Bars < 100) {
     err = "Bars less than 100, not trading...";
     if (VerboseTrace && err != last_err) Print(err);
-    if (PrintLogOnChart && err != last_err) Comment(err);
+    //if (PrintLogOnChart && err != last_err) Comment(err);
     last_err = err;
     return (FALSE);
   }
   if (!IsTesting() && Volume[0] < MinVolumeToTrade) {
     err = "Volume too low to trade.";
     if (VerboseTrace && err != last_err) Print(err);
-    if (PrintLogOnChart && err != last_err) Comment(err);
+    //if (PrintLogOnChart && err != last_err) Comment(err);
     last_err = err;
     return (FALSE);
   }
   if (IsTradeContextBusy()) {
     err = "Error: Trade context is temporary busy.";
     if (VerboseErrors && err != last_err) Print(err);
-    if (PrintLogOnChart && err != last_err) Comment(err);
+    //if (PrintLogOnChart && err != last_err) Comment(err);
     last_err = err;
     return (FALSE);
   }
@@ -2278,7 +2331,7 @@ bool TradeAllowed() {
   if (!IsTradeAllowed()) {
     err = "Trade is not allowed at the moment!";
     if (VerboseErrors && err != last_err) Print(err);
-    if (PrintLogOnChart && err != last_err) Comment(err);
+    //if (PrintLogOnChart && err != last_err) Comment(err);
     last_err = err;
     ea_active = FALSE;
     return (FALSE);
@@ -2288,13 +2341,14 @@ bool TradeAllowed() {
     if (VerboseErrors && err != last_err) Print(err);
     if (PrintLogOnChart && err != last_err) Comment(err);
     last_err = err;
+    if (PrintLogOnChart) DisplayInfoOnChart();
     Sleep(10000);
     return (FALSE);
   }
   if (IsStopped()) {
     err = "Error: Terminal is stopping!";
     if (VerboseErrors && err != last_err) Print(err);
-    if (PrintLogOnChart && err != last_err) Comment(err);
+    //if (PrintLogOnChart && err != last_err) Comment(err);
     last_err = err;
     ea_active = FALSE;
     return (FALSE);
@@ -2302,14 +2356,14 @@ bool TradeAllowed() {
   if (!IsTesting() && !MarketInfo(Symbol(), MODE_TRADEALLOWED)) {
     err = "Trade is not allowed. Market is closed.";
     if (VerboseInfo && err != last_err) Print(err);
-    if (PrintLogOnChart && err != last_err) Comment(err);
+    //if (PrintLogOnChart && err != last_err) Comment(err);
     last_err = err;
     ea_active = FALSE;
     return (FALSE);
   }
   if (!session_active) {
     err = "Error: Session is not active!";
-    if (VerboseErrors && err != last_err) Print(err);
+    //if (VerboseErrors && err != last_err) Print(err);
     last_err = err;
     ea_active = FALSE;
     return (FALSE);
@@ -2488,7 +2542,7 @@ int GetMaxOrdersPerType() {
 int GetNoOfStrategies() {
   return (
     + MA1_Enabled + MA5_Enabled + MA15_Enabled + MA30_Enabled
-    + MACD_Enabled
+    + MACD1_Enabled + MACD5_Enabled + MACD15_Enabled + MACD30_Enabled
     + Alligator_Enabled
     + RSI_Enabled
     + SAR1_Enabled + SAR5_Enabled + SAR15_Enabled + SAR30_Enabled
@@ -2758,10 +2812,29 @@ void InitializeVariables() {
   info[MA30][OPEN_METHOD] = MA30_OpenMethod;
   info[MA30][FACTOR]      = 1.0;
 
-  name[MACD]                = "MACD M1";
-  info[MACD][ACTIVE]        = MACD_Enabled;
-  info[MACD][PERIOD]        = M1;
-  info[MACD][FACTOR]        = 1.0;
+  name[MACD1]                = "MACD M1";
+  info[MACD1][ACTIVE]        = MACD1_Enabled;
+  info[MACD1][PERIOD]        = M1;
+  info[MACD1][OPEN_METHOD]   = MACD1_OpenMethod;
+  info[MACD1][FACTOR]        = 1.0;
+
+  name[MACD5]                = "MACD M5";
+  info[MACD5][ACTIVE]        = MACD5_Enabled;
+  info[MACD5][PERIOD]        = M5;
+  info[MACD5][OPEN_METHOD]   = MACD5_OpenMethod;
+  info[MACD5][FACTOR]        = 1.0;
+
+  name[MACD15]                = "MACD M15";
+  info[MACD15][ACTIVE]        = MACD15_Enabled;
+  info[MACD15][PERIOD]        = M15;
+  info[MACD15][OPEN_METHOD]   = MACD15_OpenMethod;
+  info[MACD15][FACTOR]        = 1.0;
+
+  name[MACD30]                = "MACD M30";
+  info[MACD30][ACTIVE]        = MACD30_Enabled;
+  info[MACD30][PERIOD]        = M30;
+  info[MACD30][OPEN_METHOD]   = MACD30_OpenMethod;
+  info[MACD30][FACTOR]        = 1.0;
 
   name[ALLIGATOR]           = "Alligator M1";
   info[ALLIGATOR][ACTIVE]   = Alligator_Enabled;
@@ -3134,7 +3207,7 @@ void DisplayInfoOnChart() {
   Comment(""
    + indent + "------------------------------------------------\n"
    + indent + "| ACCOUNT INFORMATION:\n"
-   + indent + "| Server Time: " + TimeToStr(TimeCurrent(), TIME_SECONDS) + "\n"
+   + indent + "| Server Time: " + TimeToStr(TimeCurrent(), TIME_SECONDS) + " (Status: " + IfTxt(ea_active, "ACTIVE", "NOT ACTIVE") + ")\n"
    + indent + "| Acc Number: " + AccountNumber(), "; Acc Name: " + AccountName() + "; Broker: " + AccountCompany() + "\n"
    + indent + "| Equity: " + DoubleToStr(AccountEquity(), 0) + AccountCurrency() + "; Balance: " + DoubleToStr(AccountBalance(), 0) + AccountCurrency() + "; Leverage: 1:" + DoubleToStr(AccountLeverage(), 0)  + "\n"
    + indent + "| Used Margin: " + DoubleToStr(AccountMargin(), 0)  + AccountCurrency() + "; Free: " + DoubleToStr(AccountFreeMargin(), 0) + AccountCurrency() + "; " + stop_out_level + "\n"
@@ -3194,7 +3267,6 @@ string GetOrdersStats(string sep = "\n") {
   total_orders_text += "; ratio: " + CalculateOrderTypeRatio();
   // Prepare data about open orders per strategy type.
   string open_orders_per_type = "Orders Per Type: ";
-  int macd_orders = open_orders[MACD];
   int fractals_orders = open_orders[FRACTALS5] + open_orders[FRACTALS15] + open_orders[FRACTALS30];
   int demarker_orders = open_orders[DEMARKER];
   int iwpr_orders = open_orders[WPR];
@@ -3207,7 +3279,10 @@ string GetOrdersStats(string sep = "\n") {
      if (MA5_Enabled && open_orders[MA5] > 0) orders_per_type += name[MA5] + ": " + MathFloor(100 / total_orders * open_orders[MA5]) + "%, ";
      if (MA15_Enabled && open_orders[MA15] > 0) orders_per_type += name[MA15] + ": " + MathFloor(100 / total_orders * open_orders[MA15]) + "%, ";
      if (MA30_Enabled && open_orders[MA30] > 0) orders_per_type += name[MA30] + ": " + MathFloor(100 / total_orders * open_orders[MA30]) + "%, ";
-     if (MACD_Enabled && macd_orders > 0) orders_per_type += "MACD: " + MathFloor(100 / total_orders * macd_orders) + "%, ";
+     if (MACD1_Enabled && open_orders[MACD1] > 0) orders_per_type += name[MACD1] + ": " + MathFloor(100 / total_orders * open_orders[MACD1]) + "%, ";
+     if (MACD5_Enabled && open_orders[MACD5] > 0) orders_per_type += name[MACD5] + ": " + MathFloor(100 / total_orders * open_orders[MACD5]) + "%, ";
+     if (MACD15_Enabled && open_orders[MACD15] > 0) orders_per_type += name[MACD15] + ": " + MathFloor(100 / total_orders * open_orders[MACD15]) + "%, ";
+     if (MACD30_Enabled && open_orders[MACD30] > 0) orders_per_type += name[MACD30] + ": " + MathFloor(100 / total_orders * open_orders[MACD30]) + "%, ";
      if ((Fractals5_Enabled || Fractals15_Enabled || Fractals30_Enabled) && fractals_orders > 0) orders_per_type += "Fractals: " + MathFloor(100 / total_orders * fractals_orders) + "%, ";
      if (DeMarker_Enabled && demarker_orders > 0) orders_per_type += "DeMarker: " + MathFloor(100 / total_orders * demarker_orders) + "%";
      if (WPR_Enabled && iwpr_orders > 0) orders_per_type += "WPR: " + MathFloor(100 / total_orders * iwpr_orders) + "%, ";
@@ -4246,42 +4321,39 @@ void ReportAdd(string msg) {
 /*
  * Write report into file.
  */
-void WriteReport(string report_name) {
+string GenerateReport() {
   string output = "";
-  int handle = FileOpen(report_name, FILE_CSV|FILE_WRITE, '\t');
-  if (handle < 1) return;
-
-  output += "Initial deposit           " + InitialDeposit + "\n";
-  output += "Total net profit          " + SummaryProfit + "\n";
-  output += "Gross profit              " + GrossProfit + "\n";
-  output += "Gross loss                " + GrossLoss + "\n";
+  output += "Initial deposit:                            " + InitialDeposit + "\n";
+  output += "Total net profit:                           " + SummaryProfit + "\n";
+  output += "Gross profit:                               " + GrossProfit + "\n";
+  output += "Gross loss:                                 " + GrossLoss + "\n";
   if (GrossLoss > 0.0)
-  output += "Profit factor             " + ProfitFactor + "\n";
-  output += "Expected payoff           " + ExpectedPayoff + "\n";
-  output += "Absolute drawdown         " + AbsoluteDrawdown + "\n";
-  output += "Maximal drawdown          " + MaxDrawdown + StringConcatenate("(",MaxDrawdownPercent,"%)") + "\n";
-  output += "Relative drawdown         " + StringConcatenate(RelDrawdownPercent,"%") + StringConcatenate("(",RelDrawdown,")") + "\n";
-  output += "Trades total                 " + SummaryTrades + "\n";
+  output += "Profit factor:                              " + ProfitFactor + "\n";
+  output += "Expected payoff:                            " + ExpectedPayoff + "\n";
+  output += "Absolute drawdown:                          " + AbsoluteDrawdown + "\n";
+  output += "Maximal drawdown:                           " + MaxDrawdown + StringConcatenate("(",MaxDrawdownPercent,"%)") + "\n";
+  output += "Relative drawdown:                          " + StringConcatenate(RelDrawdownPercent,"%") + StringConcatenate("(",RelDrawdown,")") + "\n";
+  output += "Trades total                                " + SummaryTrades + "\n";
   if(ShortTrades>0)
-  output += "Short positions(won %)    " + ShortTrades + StringConcatenate("(",100.0*WinShortTrades/ShortTrades,"%)") + "\n";
+  output += "Short positions(won %):                     " + ShortTrades + StringConcatenate("(",100.0*WinShortTrades/ShortTrades,"%)") + "\n";
   if(LongTrades>0)
-  output += "Long positions(won %)     " + LongTrades + StringConcatenate("(",100.0*WinLongTrades/LongTrades,"%)") + "\n";
+  output += "Long positions(won %):                      " + LongTrades + StringConcatenate("(",100.0*WinLongTrades/LongTrades,"%)") + "\n";
   if(ProfitTrades>0)
-  output += "Profit trades (% of total)" + ProfitTrades + StringConcatenate("(",100.0*ProfitTrades/SummaryTrades,"%)") + "\n";
+  output += "Profit trades (% of total):                 " + ProfitTrades + StringConcatenate("(",100.0*ProfitTrades/SummaryTrades,"%)") + "\n";
   if(LossTrades>0)
-  output += "Loss trades (% of total)  " + LossTrades + StringConcatenate("(",100.0*LossTrades/SummaryTrades,"%)") + "\n";
-  output += "Largest profit trade      " + MaxProfit + "\n";
-  output += "Largest loss trade        " + -MinProfit + "\n";
+  output += "Loss trades (% of total):                   " + LossTrades + StringConcatenate("(",100.0*LossTrades/SummaryTrades,"%)") + "\n";
+  output += "Largest profit trade:                       " + MaxProfit + "\n";
+  output += "Largest loss trade:                         " + -MinProfit + "\n";
   if(ProfitTrades>0)
-  output += "Average profit trade      " + GrossProfit/ProfitTrades + "\n";
+  output += "Average profit trade:                       " + GrossProfit/ProfitTrades + "\n";
   if(LossTrades>0)
-  output += "Average loss trade        " + -GrossLoss/LossTrades + "\n";
-  output += "Average consecutive wins  " + AvgConWinners + "\n";
-  output += "Average consecutive losses" + AvgConLosers + "\n";
-  output += "Maximum consecutive wins (profit in money)" + ConProfitTrades1 + StringConcatenate("(", ConProfit1, ")") + "\n";
-  output += "Maximum consecutive losses (loss in money)" + ConLossTrades1 + StringConcatenate("(", -ConLoss1, ")") + "\n";
-  output += "Maximal consecutive profit (count of wins)" + ConProfit2 + StringConcatenate("(", ConProfitTrades2, ")") + "\n";
-  output += "Maximal consecutive loss (count of losses)" + -ConLoss2 + StringConcatenate("(", ConLossTrades2, ")") + "\n";
+  output += "Average loss trade:                         " + -GrossLoss/LossTrades + "\n";
+  output += "Average consecutive wins:                   " + AvgConWinners + "\n";
+  output += "Average consecutive losses:                 " + AvgConLosers + "\n";
+  output += "Maximum consecutive wins (profit in money): " + ConProfitTrades1 + StringConcatenate(" (", ConProfit1, ")") + "\n";
+  output += "Maximum consecutive losses (loss in money): " + ConLossTrades1 + StringConcatenate(" (", -ConLoss1, ")") + "\n";
+  output += "Maximal consecutive profit (count of wins): " + ConProfit2 + StringConcatenate(" (", ConProfitTrades2, ")") + "\n";
+  output += "Maximal consecutive loss (count of losses): " + -ConLoss2 + StringConcatenate(" (", ConLossTrades2, ")") + "\n";
   output += GetStrategyReport();
 
   // Write report log.
@@ -4289,7 +4361,18 @@ void WriteReport(string report_name) {
   for (int i = 0; i < ArraySize(log); i++)
    output += log[i] + "\n";
 
-  FileWrite(handle, output);
+  if (VerboseDebug) Print(output);
+  return output;
+}
+
+/*
+ * Write report into file.
+ */
+void WriteReport(string report_name) {
+  int handle = FileOpen(report_name, FILE_CSV|FILE_WRITE, '\t');
+  if (handle < 1) return;
+
+  FileWrite(handle, GenerateReport());
   FileClose(handle);
 }
 
