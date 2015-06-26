@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.036"
+#property version   "1.037"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -586,6 +586,9 @@ int todo_queue[100][8], last_queue_process = 0;
 int total_orders = 0; // Number of total orders currently open.
 double daily[FINAL_VALUE_TYPE_ENTRY], weekly[FINAL_VALUE_TYPE_ENTRY], monthly[FINAL_VALUE_TYPE_ENTRY];
 
+// Used for writing the report file.
+string log[];
+
 // Condition and actions.
 int acc_conditions[10][3], market_conditions[10][3];
 
@@ -753,8 +756,9 @@ void OnDeinit(const int reason) {
       double ExtInitialDeposit;
       if (!IsTesting()) ExtInitialDeposit = CalculateInitialDeposit();
       CalculateSummary(ExtInitialDeposit);
-      string filename = TimeToStr(TimeCurrent(), TIME_DATE|TIME_MINUTES);
-      WriteReport(filename + "_31337_Report.txt");
+      string filename = TimeToStr(TimeCurrent(), TIME_DATE|TIME_MINUTES) + "_31337_Report.txt";
+      WriteReport(filename);
+      Print("Saved report as: " + filename);
   }
   // #ifdef _DEBUG
   // DEBUG("n=" + n + " : " +  DoubleToStrMorePrecision(val,19) );
@@ -1159,7 +1163,6 @@ int ExecuteOrder(int cmd, double volume, int order_type = CUSTOM, string order_c
    int order_ticket;
    // int min_stop_level;
    double max_change = 1;
-   double order_price = GetOpenPrice(cmd);
    volume = NormalizeLots(volume);
 
    // Check if bar time has been changed since last time.
@@ -1197,14 +1200,16 @@ int ExecuteOrder(int cmd, double volume, int order_type = CUSTOM, string order_c
    }
 
    // Calculate take profit and stop loss.
+   RefreshRates();
    if (VerboseDebug) Print(__FUNCTION__ + "(): " + GetMarketTextDetails()); // Print current market information before placing the order.
+   double order_price = GetOpenPrice(cmd);
    double stoploss = 0, takeprofit = 0;
    if (EAStopLoss > 0.0) stoploss = NormalizeDouble(GetClosePrice(cmd) - (EAStopLoss + TrailingStop) * pip_size * OpTypeValue(cmd), Digits);
    else stoploss   = GetTrailingValue(cmd, -1, order_type);
    if (EATakeProfit > 0.0) takeprofit = NormalizeDouble(order_price + (EATakeProfit + TrailingProfit) * pip_size * OpTypeValue(cmd), Digits);
    else takeprofit = GetTrailingValue(cmd, +1, order_type);
 
-   order_ticket = OrderSend(Symbol(), cmd, volume, order_price, max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + order_type, 0, GetOrderColor(cmd));
+   order_ticket = OrderSend(Symbol(), cmd, volume, NormalizeDouble(order_price, Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + order_type, 0, GetOrderColor(cmd));
    if (order_ticket >= 0) {
       if (VerboseTrace) Print(__FUNCTION__, "(): Success: OrderSend(", Symbol(), ", ",  _OrderType_str(cmd), ", ", volume, ", ", order_price, ", ", max_order_slippage, ", ", stoploss, ", ", takeprofit, ", ", order_comment, ", ", MagicNumber + order_type, ", 0, ", GetOrderColor(), ");");
       if (!OrderSelect(order_ticket, SELECT_BY_TICKET) && VerboseErrors) {
@@ -1239,7 +1244,8 @@ int ExecuteOrder(int cmd, double volume, int order_type = CUSTOM, string order_c
      err_code = GetLastError();
      if (VerboseErrors) Print(__FUNCTION__, "(): OrderSend(): error = ", ErrorDescription(err_code));
      if (VerboseDebug) {
-       Print(__FUNCTION__ + "(): Error: OrderSend(", Symbol(), ", ",  _OrderType_str(cmd), ", ", volume, ", ", order_price, ", ", max_order_slippage, ", ", stoploss, ", ", takeprofit, ", ", order_comment, ", ", MagicNumber + order_type, ", 0, ", GetOrderColor(), "); ", GetAccountTextDetails());
+       Print(__FUNCTION__ + "(): Error: OrderSend(", Symbol(), ", ",  _OrderType_str(cmd), ", ", volume, ", ", order_price, ", ", max_order_slippage, ", ", stoploss, ", ", takeprofit, ", ", order_comment, ", ", MagicNumber + order_type, ", 0, ", GetOrderColor(), "); ", "Ask/Bid: ", Ask, "/", Bid);
+       Print(__FUNCTION__ + "(): " + GetAccountTextDetails());
      }
      // if (err_code != 136 /* OFF_QUOTES */) break;
      if (retry) TaskAddOrderOpen(cmd, volume, order_type, order_comment); // Will re-try again.
@@ -1361,6 +1367,8 @@ bool UpdateStats() {
   CheckStats(High[0], MAX_HIGH);
   CheckStats(AccountBalance(), MAX_BALANCE);
   CheckStats(AccountEquity(), MAX_EQUITY);
+  if (last_tick_change > 5) Print(__FUNCTION__ + "(): Big drop of " + last_tick_change + " pips detected.");
+  if (last_tick_change > 10 && WriteReport) ReportAdd(__FUNCTION__ + "(): Big drop of " + last_tick_change + " pips detected.");
   return (TRUE);
 }
 
@@ -1861,8 +1869,8 @@ void UpdateTrailingStops() {
           }
         }
 
-        new_trailing_stop = GetTrailingValue(OrderType(), -1, order_type, OrderStopLoss(), TRUE);
-        new_profit_take   = GetTrailingValue(OrderType(), +1, order_type, OrderTakeProfit(), TRUE);
+        new_trailing_stop = NormalizeDouble(GetTrailingValue(OrderType(), -1, order_type, OrderStopLoss(), TRUE), Digits);
+        new_profit_take   = NormalizeDouble(GetTrailingValue(OrderType(), +1, order_type, OrderTakeProfit(), TRUE), Digits);
         if (new_trailing_stop != OrderStopLoss() || new_profit_take != OrderTakeProfit()) { // Perform update on change only.
            result = OrderModify(OrderTicket(), OrderOpenPrice(), new_trailing_stop, new_profit_take, 0, GetOrderColor());
            if (!result) {
@@ -2096,16 +2104,16 @@ void ShowLine(string oname, double price, int colour = Yellow) {
 
 // Get current open price depending on the operation type.
 // op_type: SELL = -1, BUY = 1
-double GetOpenPrice(int op_type = -2) {
-   if (op_type == -2) op_type = OrderType();
-   return NormalizeDouble(If(OpTypeValue(op_type) > 0, Ask, Bid), Digits);
+double GetOpenPrice(int op_type = EMPTY_VALUE) {
+   if (op_type == EMPTY_VALUE) op_type = OrderType();
+   return If(OpTypeValue(op_type) > 0, Ask, Bid);
 }
 
 // Get current close price depending on the operation type.
 // op_type: SELL = -1, BUY = 1
-double GetClosePrice(int op_type = -2) {
-   if (op_type == -2) op_type = OrderType();
-   return NormalizeDouble(If(OpTypeValue(op_type) > 0, Bid, Ask), Digits);
+double GetClosePrice(int op_type = EMPTY_VALUE) {
+   if (op_type == EMPTY_VALUE) op_type = OrderType();
+   return If(OpTypeValue(op_type) > 0, Bid, Ask);
 }
 
 int OpTypeValue(int op_type) {
@@ -2373,6 +2381,11 @@ double GetVolumePrecision() {
 // See: http://forum.mql4.com/30672
 double GetPointsPerPip() {
   return MathPow(10, Digits - GetPipPrecision());
+}
+
+// Convert value into pips.
+double ValueToPips(double value) {
+  return value * MathPow(10, Digits) / GetPointsPerPip();
 }
 
 // Get the difference between two price values (in pips).
@@ -3165,7 +3178,7 @@ string GetMarketTextDetails() {
      "Symbol: ", Symbol(), "; ",
      "Ask: ", DoubleToStr(Ask, Digits), "; ",
      "Bid: ", DoubleToStr(Bid, Digits), "; ",
-     "Spread: ", GetMarketSpread(TRUE), "; "
+     "Spread: ", GetMarketSpread(TRUE), " points = ", ValueToPips(GetMarketSpread()), " pips; "
    );
 }
 
@@ -3743,8 +3756,8 @@ string GetErrorText(int code) {
    string text;
 
    switch (code) {
-      case 0: text = "No error returned."; break;
-      case 1: text = "No error returned, but the result is unknown."; break;
+      case   0: text = "No error returned."; break;
+      case   1: text = "No error returned, but the result is unknown."; break;
       case   2: text = "Common error."; break;
       case   3: text = "Invalid trade parameters."; break;
       case   4: text = "Trade server is busy."; break;
@@ -4162,48 +4175,66 @@ double CalculateInitialDeposit()
      }
 //----
    return(initial_deposit);
-  }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+}
+
+/*
+ * Add message into the report file.
+ */
+void ReportAdd(string msg) {
+  int last = ArraySize(log);
+  ArrayResize(log, last + 1);
+  log[last] = TimeToStr(TimeCurrent(),TIME_DATE|TIME_SECONDS) + ": " + msg;
+}
+
+/*
+ * Write report into file.
+ */
 void WriteReport(string report_name) {
-   int handle = FileOpen(report_name,FILE_CSV|FILE_WRITE,'\t');
-   if (handle<1) return;
-//----
-   FileWrite(handle,"Initial deposit           ",InitialDeposit);
-   FileWrite(handle,"Total net profit          ",SummaryProfit);
-   FileWrite(handle,"Gross profit              ",GrossProfit);
-   FileWrite(handle,"Gross loss                ",GrossLoss);
-   if (GrossLoss > 0.0) FileWrite(handle,"Profit factor             ",ProfitFactor);
-   FileWrite(handle,"Expected payoff           ",ExpectedPayoff);
-   FileWrite(handle,"Absolute drawdown         ",AbsoluteDrawdown);
-   FileWrite(handle,"Maximal drawdown          ",MaxDrawdown,StringConcatenate("(",MaxDrawdownPercent,"%)"));
-   FileWrite(handle,"Relative drawdown         ",StringConcatenate(RelDrawdownPercent,"%"),StringConcatenate("(",RelDrawdown,")"));
-   FileWrite(handle,"Trades total                 ",SummaryTrades);
-   if(ShortTrades>0)
-      FileWrite(handle,"Short positions(won %)    ",ShortTrades,StringConcatenate("(",100.0*WinShortTrades/ShortTrades,"%)"));
-   if(LongTrades>0)
-      FileWrite(handle,"Long positions(won %)     ",LongTrades,StringConcatenate("(",100.0*WinLongTrades/LongTrades,"%)"));
-   if(ProfitTrades>0)
-      FileWrite(handle,"Profit trades (% of total)",ProfitTrades,StringConcatenate("(",100.0*ProfitTrades/SummaryTrades,"%)"));
-   if(LossTrades>0)
-      FileWrite(handle,"Loss trades (% of total)  ",LossTrades,StringConcatenate("(",100.0*LossTrades/SummaryTrades,"%)"));
-   FileWrite(handle,"Largest profit trade      ",MaxProfit);
-   FileWrite(handle,"Largest loss trade        ",-MinProfit);
-   if(ProfitTrades>0)
-      FileWrite(handle,"Average profit trade      ",GrossProfit/ProfitTrades);
-   if(LossTrades>0)
-      FileWrite(handle,"Average loss trade        ",-GrossLoss/LossTrades);
-   FileWrite(handle,"Average consecutive wins  ",AvgConWinners);
-   FileWrite(handle,"Average consecutive losses",AvgConLosers);
-   FileWrite(handle,"Maximum consecutive wins (profit in money)",ConProfitTrades1,StringConcatenate("(",ConProfit1,")"));
-   FileWrite(handle,"Maximum consecutive losses (loss in money)",ConLossTrades1,StringConcatenate("(",-ConLoss1,")"));
-   FileWrite(handle,"Maximal consecutive profit (count of wins)",ConProfit2,StringConcatenate("(",ConProfitTrades2,")"));
-   FileWrite(handle,"Maximal consecutive loss (count of losses)",-ConLoss2,StringConcatenate("(",ConLossTrades2,")"));
-   FileWrite(handle, GetStrategyReport());
-//----
-   FileClose(handle);
-  }
+  string output = "";
+  int handle = FileOpen(report_name, FILE_CSV|FILE_WRITE, '\t');
+  if (handle < 1) return;
+
+  output += "Initial deposit           " + InitialDeposit + "\n";
+  output += "Total net profit          " + SummaryProfit + "\n";
+  output += "Gross profit              " + GrossProfit + "\n";
+  output += "Gross loss                " + GrossLoss + "\n";
+  if (GrossLoss > 0.0)
+  output += "Profit factor             " + ProfitFactor + "\n";
+  output += "Expected payoff           " + ExpectedPayoff + "\n";
+  output += "Absolute drawdown         " + AbsoluteDrawdown + "\n";
+  output += "Maximal drawdown          " + MaxDrawdown + StringConcatenate("(",MaxDrawdownPercent,"%)") + "\n";
+  output += "Relative drawdown         " + StringConcatenate(RelDrawdownPercent,"%") + StringConcatenate("(",RelDrawdown,")") + "\n";
+  output += "Trades total                 " + SummaryTrades + "\n";
+  if(ShortTrades>0)
+  output += "Short positions(won %)    " + ShortTrades + StringConcatenate("(",100.0*WinShortTrades/ShortTrades,"%)") + "\n";
+  if(LongTrades>0)
+  output += "Long positions(won %)     " + LongTrades + StringConcatenate("(",100.0*WinLongTrades/LongTrades,"%)") + "\n";
+  if(ProfitTrades>0)
+  output += "Profit trades (% of total)" + ProfitTrades + StringConcatenate("(",100.0*ProfitTrades/SummaryTrades,"%)") + "\n";
+  if(LossTrades>0)
+  output += "Loss trades (% of total)  " + LossTrades + StringConcatenate("(",100.0*LossTrades/SummaryTrades,"%)") + "\n";
+  output += "Largest profit trade      " + MaxProfit + "\n";
+  output += "Largest loss trade        " + -MinProfit + "\n";
+  if(ProfitTrades>0)
+  output += "Average profit trade      " + GrossProfit/ProfitTrades + "\n";
+  if(LossTrades>0)
+  output += "Average loss trade        " + -GrossLoss/LossTrades + "\n";
+  output += "Average consecutive wins  " + AvgConWinners + "\n";
+  output += "Average consecutive losses" + AvgConLosers + "\n";
+  output += "Maximum consecutive wins (profit in money)" + ConProfitTrades1 + StringConcatenate("(", ConProfit1, ")") + "\n";
+  output += "Maximum consecutive losses (loss in money)" + ConLossTrades1 + StringConcatenate("(", -ConLoss1, ")") + "\n";
+  output += "Maximal consecutive profit (count of wins)" + ConProfit2 + StringConcatenate("(", ConProfitTrades2, ")") + "\n";
+  output += "Maximal consecutive loss (count of losses)" + -ConLoss2 + StringConcatenate("(", ConLossTrades2, ")") + "\n";
+  output += GetStrategyReport();
+
+  // Write report log.
+  if (ArraySize(log) > 0) output += "Report log:\n";
+  for (int i = 0; i < ArraySize(log); i++)
+   output += log[i] + "\n";
+
+  FileWrite(handle, output);
+  FileClose(handle);
+}
 
 /* END: SUMMARY REPORT */
 
