@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.039"
+#property version   "1.040"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -34,7 +34,10 @@ enum ENUM_STRATEGY_TYPE {
   SAR5,
   SAR15,
   SAR30,
-  BANDS,
+  BANDS1,
+  BANDS5,
+  BANDS15,
+  BANDS30,
   ENVELOPES1,
   ENVELOPES5,
   ENVELOPES15,
@@ -294,19 +297,35 @@ extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = T_MA_S; // Trailing Profit met
  */
 
 extern string ____Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --";
-extern bool Bands_Enabled = TRUE; // Enable Bands-based strategy.
-extern ENUM_TIMEFRAMES Bands_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
+extern bool Bands1_Enabled = TRUE; // Enable Bands-based strategy.
+extern bool Bands5_Enabled = TRUE; // Enable Bands-based strategy.
+extern bool Bands15_Enabled = TRUE; // Enable Bands-based strategy.
+extern bool Bands30_Enabled = TRUE; // Enable Bands-based strategy.
+//extern ENUM_TIMEFRAMES Bands_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int Bands_Period = 26; // Averaging period to calculate the main line.
-extern ENUM_APPLIED_PRICE Bands_Applied_Price = PRICE_OPEN; // Bands applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
+extern ENUM_APPLIED_PRICE Bands_Applied_Price = PRICE_MEDIAN; // Bands applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern double Bands_Deviation = 2.1; // Number of standard deviations from the main line.
 extern int Bands_Shift = 0; // The indicator shift relative to the chart.
 extern int Bands_Shift_Far = 0; // The indicator shift relative to the chart.
-extern int Bands_OpenMethod = 1; // Valid range: 0-6. Suggested value: 1.
+extern int Bands1_OpenMethod = 5; // Valid range: 0-256.
+extern int Bands5_OpenMethod = 0; // Valid range: 0-256.
+extern int Bands15_OpenMethod = 32; // Valid range: 0-256.
+extern int Bands30_OpenMethod = 32; // Valid range: 0-256.
 extern bool Bands_CloseOnChange = TRUE; // Close opposite orders on market change.
-extern ENUM_TRAIL_TYPE Bands_TrailingStopMethod = T_MA_F_TRAIL; // Trailing Stop method for Bands. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = T_BANDS_LOW; // Trailing Profit method for Bands. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE Bands_TrailingStopMethod = T_BANDS; // Trailing Stop method for Bands. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = T_FIXED; // Trailing Profit method for Bands. Set 0 to default. See: ENUM_TRAIL_TYPE.
 /* Bands backtest log (£1000,auto,ts:25,tp:20,gap:10,sp:2) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
- *   £2673.08	3343	1.19	0.80	528.53	30.51%
+ *   £3571.10	9348	1.12	0.38	906.02	29.81%	0.00000000	Bands_Applied_Price=4
+ *   £3486.94	9071	1.12	0.38	872.10	26.54%	0.00000000	Bands_Applied_Price=5
+ *   £2920.32	7993	1.11	0.37	702.23	27.68%
+ *   £2920.32	7993	1.11	0.37	702.23	27.68%	0.00000000	Bands_Applied_Price=1
+ *   £2301.27	7529	1.10	0.31	817.18	22.33%	0.00000000	Bands_Applied_Price=5
+ *   £2238.14	6337	1.12	0.35	624.48	18.43%	0.00000000	Bands_Applied_Price=0
+ *   Old: £2673.08	3343	1.19	0.80	528.53	30.51%
+ *   £375.63	187	1.33	2.01	265.13	20.27%	0.00000000	Bands30_OpenMethod=40
+ *   £335.59	86	1.65	3.90	173.35	12.08%	0.00000000	Bands30_OpenMethod=33
+ *   £276.67	263	1.19	1.05	228.32	19.10%	0.00000000	Bands30_OpenMethod=32
+ *   £264.90	24	2.61	11.04	90.53	6.96%	0.00000000	Bands30_OpenMethod=35
  */
 
 extern string ____Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --";
@@ -942,13 +961,43 @@ void Trade() {
       }
    }
 
-   if (info[BANDS][ACTIVE]) {
-      if (Bands_On_Buy(info[BANDS][PERIOD], Bands_OpenMethod)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[BANDS][FACTOR], BANDS, "Bands");
-        if (Bands_CloseOnChange) CloseOrdersByType(OP_SELL, BANDS, "closing Bands on market change");
-      } else if (Bands_On_Sell(info[BANDS][PERIOD], Bands_OpenMethod)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[BANDS][FACTOR], BANDS, "Bands");
-        if (Bands_CloseOnChange) CloseOrdersByType(OP_BUY, BANDS, "closing Bands on market change");
+   if (info[BANDS1][ACTIVE]) {
+      if (Bands_On_Buy(info[BANDS1][PERIOD], info[BANDS1][OPEN_METHOD])) {
+        order_placed = ExecuteOrder(OP_BUY, lot_size * info[BANDS1][FACTOR], BANDS1, "Bands");
+        if (Bands_CloseOnChange) CloseOrdersByType(OP_SELL, BANDS1, "closing on market change: " + name[BANDS1]);
+      } else if (Bands_On_Sell(info[BANDS1][PERIOD], info[BANDS1][OPEN_METHOD])) {
+        order_placed = ExecuteOrder(OP_SELL, lot_size * info[BANDS1][FACTOR], BANDS1, "Bands");
+        if (Bands_CloseOnChange) CloseOrdersByType(OP_BUY, BANDS1, "closing on market change: " + name[BANDS1]);
+      }
+   }
+
+   if (info[BANDS5][ACTIVE]) {
+      if (Bands_On_Buy(info[BANDS5][PERIOD], info[BANDS5][OPEN_METHOD])) {
+        order_placed = ExecuteOrder(OP_BUY, lot_size * info[BANDS5][FACTOR], BANDS5, "Bands");
+        if (Bands_CloseOnChange) CloseOrdersByType(OP_SELL, BANDS5, "closing on market change: " + name[BANDS5]);
+      } else if (Bands_On_Sell(info[BANDS5][PERIOD], info[BANDS5][OPEN_METHOD])) {
+        order_placed = ExecuteOrder(OP_SELL, lot_size * info[BANDS5][FACTOR], BANDS5, "Bands");
+        if (Bands_CloseOnChange) CloseOrdersByType(OP_BUY, BANDS5, "closing on market change: " + name[BANDS5]);
+      }
+   }
+
+   if (info[BANDS15][ACTIVE]) {
+      if (Bands_On_Buy(info[BANDS15][PERIOD], info[BANDS15][OPEN_METHOD])) {
+        order_placed = ExecuteOrder(OP_BUY, lot_size * info[BANDS15][FACTOR], BANDS15, "Bands");
+        if (Bands_CloseOnChange) CloseOrdersByType(OP_SELL, BANDS15, "closing on market change: " + name[BANDS15]);
+      } else if (Bands_On_Sell(info[BANDS15][PERIOD], info[BANDS15][OPEN_METHOD])) {
+        order_placed = ExecuteOrder(OP_SELL, lot_size * info[BANDS15][FACTOR], BANDS15, "Bands");
+        if (Bands_CloseOnChange) CloseOrdersByType(OP_BUY, BANDS15, "closing on market change: " + name[BANDS15]);
+      }
+   }
+
+   if (info[BANDS30][ACTIVE]) {
+      if (Bands_On_Buy(info[BANDS30][PERIOD], info[BANDS30][OPEN_METHOD])) {
+        order_placed = ExecuteOrder(OP_BUY, lot_size * info[BANDS30][FACTOR], BANDS30, "Bands");
+        if (Bands_CloseOnChange) CloseOrdersByType(OP_SELL, BANDS30, "closing on market change: " + name[BANDS30]);
+      } else if (Bands_On_Sell(info[BANDS30][PERIOD], info[BANDS30][OPEN_METHOD])) {
+        order_placed = ExecuteOrder(OP_SELL, lot_size * info[BANDS30][FACTOR], BANDS30, "Bands");
+        if (Bands_CloseOnChange) CloseOrdersByType(OP_BUY, BANDS30, "closing on market change: " + name[BANDS30]);
       }
    }
 
@@ -1061,23 +1110,27 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
     last_indicators_update = bar_time;
   }*/
 
-  int period = M1, fractal_shift = 0;
+  int period = M1, fractal_shift = 0, bands_period = Bands_Period;
   switch (timeframe) {
     case PERIOD_M1:
       period = M1;
       fractal_shift = Fractals1_Shift;
+      bands_period = info[BANDS1][MA_PERIOD];
       break;
     case PERIOD_M5:
       period = M5;
       fractal_shift = Fractals5_Shift;
+      bands_period = info[BANDS5][MA_PERIOD];
       break;
     case PERIOD_M15:
       period = M15;
       fractal_shift = Fractals15_Shift;
+      bands_period = info[BANDS15][MA_PERIOD];
       break;
     case PERIOD_M30:
       period = M30;
       fractal_shift = Fractals30_Shift;
+      bands_period = info[BANDS30][MA_PERIOD];
       break;
   }
 
@@ -1155,9 +1208,9 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
   // if (Bands_Enabled) {
     // Update the Bollinger Bands indicator values.
     for (i = 0; i < 3; i++) {
-      bands[period][i][MODE_MAIN]  = iBands(NULL, timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_MAIN,  i + Bands_Shift);
-      bands[period][i][MODE_UPPER] = iBands(NULL, timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_UPPER, i + Bands_Shift);
-      bands[period][i][MODE_LOWER] = iBands(NULL, timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_LOWER, i + Bands_Shift);
+      bands[period][i][MODE_MAIN]  = iBands(NULL, timeframe, bands_period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_MAIN,  i + Bands_Shift);
+      bands[period][i][MODE_UPPER] = iBands(NULL, timeframe, bands_period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_UPPER, i + Bands_Shift);
+      bands[period][i][MODE_LOWER] = iBands(NULL, timeframe, bands_period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_LOWER, i + Bands_Shift);
     }
     // if (VerboseTrace) text += "Bands: " + GetArrayValues(bands) + "; ";
   // }
@@ -1683,16 +1736,16 @@ bool SAR_On_Sell(int period = M1, int open_method = 0) {
  *   open_method (int) - open method to use
  */
 bool Bands_On_Buy(int period = M1, int open_method = 0) {
-  switch (open_method) {
-    case 0: return Low[CURR]  < bands[period][CURR][MODE_LOWER]; // price value was lower than the lower band
-    case 1: return Low[CURR]  < bands[period][CURR][MODE_LOWER] && bands[period][CURR][MODE_MAIN] < bands[period][PREV][MODE_MAIN]; // ... and trend is downwards
-    case 2: return Low[CURR]  < bands[period][CURR][MODE_LOWER] && bands[period][CURR][MODE_MAIN] > bands[period][PREV][MODE_MAIN] && bands[period][CURR][MODE_UPPER] < bands[period][PREV][MODE_UPPER]; // .. and the lower bands are contracting
-    case 3: return Low[CURR]  < bands[period][CURR][MODE_LOWER] && bands[period][CURR][MODE_MAIN] > bands[period][PREV][MODE_MAIN] && bands[period][CURR][MODE_LOWER] > bands[period][PREV][MODE_LOWER]; // .. and the upper bands are expanding
-    case 4: return Close[CURR] < bands[period][CURR][MODE_LOWER]; // closed price value was higher than the upper band
-    case 5: return Close[CURR] < bands[period][CURR][MODE_LOWER] && bands[period][CURR][MODE_MAIN] < bands[period][PREV][MODE_MAIN]; // ... and trend is downwards
-    case 6: return Close[CURR] > bands[period][CURR][MODE_LOWER] && Low[PREV] < bands[period][CURR][MODE_LOWER]; // price closed within the bands, but previous lowest price was lower than the lower band
-  }
-  return FALSE;
+  bool result = Low[CURR] < bands[period][CURR][MODE_LOWER] || Low[PREV] < bands[period][PREV][MODE_LOWER]; // price value was lower than the lower band
+  if ((open_method &   1) != 0) result = result && Close[PREV] < bands[period][CURR][MODE_LOWER];
+  if ((open_method &   2) != 0) result = result && Close[CURR] > bands[period][CURR][MODE_LOWER];
+  if ((open_method &   4) != 0) result = result && (bands[period][CURR][MODE_MAIN] <= bands[period][PREV][MODE_MAIN] && bands[period][PREV][MODE_MAIN] <= bands[period][FAR][MODE_MAIN]);
+  if ((open_method &   8) != 0) result = result && bands[period][CURR][MODE_MAIN] >= bands[period][PREV][MODE_MAIN];
+  if ((open_method &  16) != 0) result = result && (bands[period][CURR][MODE_UPPER] >= bands[period][PREV][MODE_UPPER] || bands[period][CURR][MODE_LOWER] <= bands[period][PREV][MODE_LOWER]);
+  if ((open_method &  32) != 0) result = result && (bands[period][CURR][MODE_UPPER] <= bands[period][PREV][MODE_UPPER] || bands[period][CURR][MODE_LOWER] >= bands[period][PREV][MODE_LOWER]);
+  if ((open_method &  64) != 0) result = result && Ask > bands[period][CURR][MODE_LOWER];
+  if ((open_method & 128) != 0) result = result && Ask < bands[period][CURR][MODE_MAIN];
+  return result;
 }
 
 /*
@@ -1703,16 +1756,16 @@ bool Bands_On_Buy(int period = M1, int open_method = 0) {
  *   open_method (int) - open method to use
  */
 bool Bands_On_Sell(int period = M1, int open_method = 0) {
-  switch (open_method) {
-    case 0: return High[CURR]  > bands[period][CURR][MODE_UPPER]; // price value was higher than the upper band
-    case 1: return High[CURR]  > bands[period][CURR][MODE_UPPER] && bands[period][CURR][MODE_MAIN] > bands[period][PREV][MODE_MAIN]; // ... and trend is upwards
-    case 2: return High[CURR]  > bands[period][CURR][MODE_UPPER] && bands[period][CURR][MODE_MAIN] > bands[period][PREV][MODE_MAIN] && bands[period][CURR][MODE_UPPER] > bands[period][PREV][MODE_UPPER]; // .. and the lower bands are expanding
-    case 3: return High[CURR]  > bands[period][CURR][MODE_UPPER] && bands[period][CURR][MODE_MAIN] > bands[period][PREV][MODE_MAIN] && bands[period][CURR][MODE_LOWER] < bands[period][PREV][MODE_LOWER]; // .. and the upper bands are contracting
-    case 4: return Close[CURR] > bands[period][CURR][MODE_UPPER]; // closed price value was higher than the upper band
-    case 5: return Close[CURR] > bands[period][CURR][MODE_UPPER] && bands[period][CURR][MODE_MAIN] > bands[period][PREV][MODE_MAIN]; // ... and trend is upwards
-    case 6: return Close[CURR] < bands[period][CURR][MODE_UPPER] && High[PREV] > bands[period][CURR][MODE_UPPER]; // price closed within the bands, but previous highest price was higher than the upper band
-  }
-  return FALSE;
+  bool result = High[CURR]  > bands[period][CURR][MODE_UPPER] || High[PREV] > bands[period][PREV][MODE_UPPER]; // price value was higher than the upper band
+  if ((open_method &   1) != 0) result = result && Close[PREV] > bands[period][CURR][MODE_UPPER];
+  if ((open_method &   2) != 0) result = result && Close[CURR] < bands[period][CURR][MODE_UPPER];
+  if ((open_method &   4) != 0) result = result && (bands[period][CURR][MODE_MAIN] >= bands[period][PREV][MODE_MAIN] && bands[period][PREV][MODE_MAIN] >= bands[period][FAR][MODE_MAIN]);
+  if ((open_method &   8) != 0) result = result && bands[period][CURR][MODE_MAIN] <= bands[period][PREV][MODE_MAIN];
+  if ((open_method &  16) != 0) result = result && (bands[period][CURR][MODE_UPPER] >= bands[period][PREV][MODE_UPPER] || bands[period][CURR][MODE_LOWER] <= bands[period][PREV][MODE_LOWER]);
+  if ((open_method &  32) != 0) result = result && (bands[period][CURR][MODE_UPPER] <= bands[period][PREV][MODE_UPPER] || bands[period][CURR][MODE_LOWER] >= bands[period][PREV][MODE_LOWER]);
+  if ((open_method &  64) != 0) result = result && Ask < bands[period][CURR][MODE_UPPER];
+  if ((open_method & 128) != 0) result = result && Ask > bands[period][CURR][MODE_MAIN];
+  return result;
 }
 
 /*
@@ -2133,7 +2186,10 @@ int GetTrailingMethod(int order_type, int stop_or_profit) {
       if (SAR_TrailingStopMethod > 0)   stop_method   = SAR_TrailingStopMethod;
       if (SAR_TrailingProfitMethod > 0) profit_method = SAR_TrailingProfitMethod;
       break;
-    case BANDS:
+    case BANDS1:
+    case BANDS5:
+    case BANDS15:
+    case BANDS30:
       if (Bands_TrailingStopMethod > 0)   stop_method   = Bands_TrailingStopMethod;
       if (Bands_TrailingProfitMethod > 0) profit_method = Bands_TrailingProfitMethod;
       break;
@@ -2546,7 +2602,7 @@ int GetNoOfStrategies() {
     + Alligator_Enabled
     + RSI_Enabled
     + SAR1_Enabled + SAR5_Enabled + SAR15_Enabled + SAR30_Enabled
-    + Bands_Enabled
+    + Bands1_Enabled + Bands5_Enabled + Bands15_Enabled + Bands30_Enabled
     + Envelopes1_Enabled + Envelopes5_Enabled + Envelopes15_Enabled + Envelopes30_Enabled
     + DeMarker_Enabled
     + WPR_Enabled
@@ -2870,10 +2926,33 @@ void InitializeVariables() {
   info[SAR30][OPEN_METHOD]  = SAR30_OpenMethod;
   info[SAR30][FACTOR]       = 1.0;
 
-  name[BANDS]               = "Bands M1";
-  info[BANDS][ACTIVE]       = Bands_Enabled;
-  info[BANDS][PERIOD]       = M1;
-  info[BANDS][FACTOR]       = 1.0;
+  name[BANDS1]               = "Bands M1";
+  info[BANDS1][ACTIVE]       = Bands1_Enabled;
+  info[BANDS1][PERIOD]       = M1;
+  info[BANDS1][OPEN_METHOD]  = Bands1_OpenMethod;
+  info[BANDS1][MA_PERIOD]    = Bands_Period;
+  info[BANDS1][FACTOR]       = 1.0;
+
+  name[BANDS5]               = "Bands M5";
+  info[BANDS5][ACTIVE]       = Bands5_Enabled;
+  info[BANDS5][PERIOD]       = M5;
+  info[BANDS5][OPEN_METHOD]  = Bands5_OpenMethod;
+  info[BANDS5][MA_PERIOD]    = Bands_Period;
+  info[BANDS5][FACTOR]       = 1.0;
+
+  name[BANDS15]               = "Bands M15";
+  info[BANDS15][ACTIVE]       = Bands15_Enabled;
+  info[BANDS15][PERIOD]       = M15;
+  info[BANDS15][OPEN_METHOD]  = Bands15_OpenMethod;
+  info[BANDS15][MA_PERIOD]    = Bands_Period;
+  info[BANDS15][FACTOR]       = 1.0;
+
+  name[BANDS30]               = "Bands M30";
+  info[BANDS30][ACTIVE]       = Bands30_Enabled;
+  info[BANDS30][PERIOD]       = M30;
+  info[BANDS30][OPEN_METHOD]  = Bands30_OpenMethod;
+  info[BANDS30][MA_PERIOD]    = Bands_Period;
+  info[BANDS30][FACTOR]       = 1.0;
 
   name[ENVELOPES1]          = "Envelopes M1";
   info[ENVELOPES1][ACTIVE]  = Envelopes1_Enabled;
@@ -3271,7 +3350,6 @@ string GetOrdersStats(string sep = "\n") {
   int demarker_orders = open_orders[DEMARKER];
   int iwpr_orders = open_orders[WPR];
   int alligator_orders = open_orders[ALLIGATOR];
-  int bands_orders = open_orders[BANDS];
   int rsi_orders = open_orders[RSI];
   string orders_per_type = "Stats: ";
   if (total_orders > 0) {
@@ -3287,7 +3365,10 @@ string GetOrdersStats(string sep = "\n") {
      if (DeMarker_Enabled && demarker_orders > 0) orders_per_type += "DeMarker: " + MathFloor(100 / total_orders * demarker_orders) + "%";
      if (WPR_Enabled && iwpr_orders > 0) orders_per_type += "WPR: " + MathFloor(100 / total_orders * iwpr_orders) + "%, ";
      if (Alligator_Enabled && alligator_orders > 0) orders_per_type += "Alligator: " + MathFloor(100 / total_orders * alligator_orders) + "%, ";
-     if (Bands_Enabled && bands_orders > 0) orders_per_type += "Bands: " + MathFloor(100 / total_orders * bands_orders) + "%, ";
+     if (Bands1_Enabled && open_orders[BANDS1] > 0) orders_per_type += name[BANDS1] + ": " + MathFloor(100 / total_orders * open_orders[BANDS1]) + "%, ";
+     if (Bands5_Enabled && open_orders[BANDS5] > 0) orders_per_type += name[BANDS5] + ": " + MathFloor(100 / total_orders * open_orders[BANDS5]) + "%, ";
+     if (Bands15_Enabled && open_orders[BANDS15] > 0) orders_per_type += name[BANDS15] + ": " + MathFloor(100 / total_orders * open_orders[BANDS15]) + "%, ";
+     if (Bands30_Enabled && open_orders[BANDS30] > 0) orders_per_type += name[BANDS30] + ": " + MathFloor(100 / total_orders * open_orders[BANDS30]) + "%, ";
      if (RSI_Enabled && rsi_orders > 0) orders_per_type += "RSI: " + MathFloor(100 / total_orders * rsi_orders) + "%, ";
   } else {
     orders_per_type += "No orders open yet.";
