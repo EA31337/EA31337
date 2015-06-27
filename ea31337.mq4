@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.041"
+#property version   "1.042"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -29,7 +29,10 @@ enum ENUM_STRATEGY_TYPE {
   MACD15,
   MACD30,
   ALLIGATOR,
-  RSI,
+  RSI1,
+  RSI5,
+  RSI15,
+  RSI30,
   SAR1,
   SAR5,
   SAR15,
@@ -260,18 +263,32 @@ extern ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = T_MA_F_FAR_TRAIL; // Tra
  */
 
 extern string ____RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --";
-extern bool RSI_Enabled = TRUE; // Enable RSI-based strategy.
-extern ENUM_TIMEFRAMES RSI_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int RSI_Period = 18; // Averaging period to calculate the main line.
-extern ENUM_APPLIED_PRICE RSI_Applied_Price = PRICE_WEIGHTED; // RSI applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
-extern int RSI_OpenMethod = 0; // Valid range: 0-2. Suggested value: 0.
+extern bool RSI1_Enabled = TRUE; // Enable RSI-based strategy.
+extern bool RSI5_Enabled = TRUE; // Enable RSI-based strategy.
+extern bool RSI15_Enabled = TRUE; // Enable RSI-based strategy.
+extern bool RSI30_Enabled = TRUE; // Enable RSI-based strategy.
+// extern ENUM_TIMEFRAMES RSI_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
+extern int RSI_Period = 18; // Averaging period for calculation.
+extern ENUM_APPLIED_PRICE RSI_Applied_Price = PRICE_OPEN; // RSI applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
+extern int RSI1_OpenMethod  = 6; // Valid range: 0-63.
+extern int RSI5_OpenMethod  = 7; // Valid range: 0-63.
+extern int RSI15_OpenMethod = 7; // Valid range: 0-63.
+extern int RSI30_OpenMethod = 5; // Valid range: 0-63.
 extern int RSI_OpenLevel = 20;
 extern int RSI_Shift = 0; // Shift relative to the chart.
 extern bool RSI_CloseOnChange = TRUE; // Close opposite orders on market change.
-extern ENUM_TRAIL_TYPE RSI_TrailingStopMethod = T_MA_M_FAR; // Trailing Stop method for RSI. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = T_MA_M_FAR; // Trailing Profit method for RSI. Set 0 to default. See: ENUM_TRAIL_TYPE.
-/* RSI backtest log (£1000,auto,ts:25,tp:20,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
- *   £1850.02	1971	1.21	0.94	295.21	15.61%
+extern ENUM_TRAIL_TYPE RSI_TrailingStopMethod = T_MA_S_TRAIL; // Trailing Stop method for RSI. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = T_BANDS_LOW; // Trailing Profit method for RSI. Set 0 to default. See: ENUM_TRAIL_TYPE.
+/* RSI backtest log (auto,ts:25,tp:25,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
+ * Deposit: £1000 (factor = 1.0)
+ *   £3198.64	2028	1.27	1.58	1029.53	41.52%
+ *   RSI M1: Total net profit: 20100 pips, Total orders: 1997 (Won: 67.8% [1353] | Loss: 32.2% [644]);
+ *   RSI M5: Total net profit: 3940 pips, Total orders: 509 (Won: 50.3% [256] | Loss: 49.7% [253]);
+ *   RSI M15: Total net profit: 5547 pips, Total orders: 349 (Won: 55.3% [193] | Loss: 44.7% [156]);
+ *   RSI M30: Total net profit: 2310 pips, Total orders: 330 (Won: 46.4% [153] | Loss: 53.6% [177]);
+ * Deposit: £10000 (factor = 1.0)
+ *   £4479.40	2024	1.37	2.21	1029.53	7.50%
+ *
  */
 
 extern string ____SAR_Parameters__ = "-- Settings for the the Parabolic Stop and Reverse system indicator --";
@@ -284,22 +301,27 @@ extern double SAR_Step = 0.02; // Stop increment, usually 0.02.
 extern double SAR_Maximum_Stop = 0.2; // Maximum stop value, usually 0.2.
 extern int SAR_Shift = 0; // Shift relative to the chart.
 // extern int SAR_Shift_Far = 0; // Shift relative to the chart.
-extern int SAR1_OpenMethod = 17; // Valid range: 0-63.
-extern int SAR5_OpenMethod = 2; // Valid range: 0-63.
-extern int SAR15_OpenMethod = 9; // Valid range: 0-63.
-extern int SAR30_OpenMethod = 0; // Valid range: 0-63.
-extern double SAR_OpenLevel = 1.0; // Open gap level to raise the signal (in pips).
+extern int SAR1_OpenMethod = 25; // Valid range: 0-127.
+extern int SAR5_OpenMethod = 18; // Valid range: 0-127.
+extern int SAR15_OpenMethod = 8; // Valid range: 0-127.
+extern int SAR30_OpenMethod = 24; // Valid range: 0-127.
+extern double SAR_OpenLevel = 0.0; // Open gap level to raise the signal (in pips).
 extern bool SAR_CloseOnChange = FALSE; // Close opposite orders on market change.
 extern ENUM_TRAIL_TYPE SAR_TrailingStopMethod = T_BANDS_LOW; // Trailing Stop method for SAR. Set 0 to default. See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = T_SAR; // Trailing Profit method for SAR. Set 0 to default. See: ENUM_TRAIL_TYPE.
-/* SAR backtest log (£1000,auto,ts:25,tp:25,gap:10) [2015.02.05-2015.06.20 based on MT4 FXCM backtest data]:
- *   £5230.82	3951	1.16	1.32	2330.28	57.89%
- *   SAR M1: Total net profit: 280 pips, Total orders: 569 (Won: 39.5% [225] | Loss: 60.5% [344]);
- *   SAR M5: Total net profit: 780 pips, Total orders: 1103 (Won: 36.2% [399] | Loss: 63.8% [704]);
- *   SAR M15: Total net profit: 820 pips, Total orders: 397 (Won: 36.0% [143] | Loss: 64.0% [254]);
- *   SAR M30: Total net profit: 2301 pips, Total orders: 1867 (Won: 29.6% [552] | Loss: 70.4% [1315]);
- *   Old: £10178.84	11635	1.16	0.87	2402.48	24.21%
- *   Old: £12723.26	11094	1.18	1.15	4759.57	33.60%
+/*
+ * SAR backtest log (£1000,auto,ts:25,tp:25,gap:10) [2015.02.05-2015.06.20 based on MT4 FXCM backtest data]:
+ *   £4680.80	3148	1.23	1.49	1055.15	24.92% (factor=1.0)
+ *   SAR M1: Total net profit: 69 pips, Total orders: 1076 (Won: 38.6% [415] | Loss: 61.4% [661]);
+ *   SAR M5: Total net profit: 809 pips, Total orders: 898 (Won: 38.1% [342] | Loss: 61.9% [556]);
+ *   SAR M15: Total net profit: 620 pips, Total orders: 745 (Won: 30.7% [229] | Loss: 69.3% [516]);
+ *   SAR M30: Total net profit: 1732 pips, Total orders: 419 (Won: 29.8% [125] | Loss: 70.2% [294]);
+ * SAR backtest log (£10000,auto,ts:25,tp:25,gap:10) [2015.02.05-2015.06.20 based on MT4 FXCM backtest data]:
+ *   £5553.89	3147	1.27	1.76	1055.15	7.42%
+ *   SAR M1: Total net profit: 73 pips, Total orders: 1076 (Won: 38.6% [415] | Loss: 61.4% [661]);
+ *   SAR M5: Total net profit: 390 pips, Total orders: 896 (Won: 37.9% [340] | Loss: 62.1% [556]);
+ *   SAR M15: Total net profit: 1258 pips, Total orders: 744 (Won: 30.5% [227] | Loss: 69.5% [517]);
+ *   SAR M30: Total net profit: 2399 pips, Total orders: 419 (Won: 29.8% [125] | Loss: 70.2% [294]);
  */
 
 extern string ____Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --";
@@ -321,17 +343,13 @@ extern bool Bands_CloseOnChange = TRUE; // Close opposite orders on market chang
 extern ENUM_TRAIL_TYPE Bands_TrailingStopMethod = T_BANDS; // Trailing Stop method for Bands. Set 0 to default. See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = T_FIXED; // Trailing Profit method for Bands. Set 0 to default. See: ENUM_TRAIL_TYPE.
 /* Bands backtest log (£1000,auto,ts:25,tp:20,gap:10,sp:2) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
- *   £3571.10	9348	1.12	0.38	906.02	29.81%	0.00000000	Bands_Applied_Price=4
- *   £3486.94	9071	1.12	0.38	872.10	26.54%	0.00000000	Bands_Applied_Price=5
- *   £2920.32	7993	1.11	0.37	702.23	27.68%
- *   £2920.32	7993	1.11	0.37	702.23	27.68%	0.00000000	Bands_Applied_Price=1
- *   £2301.27	7529	1.10	0.31	817.18	22.33%	0.00000000	Bands_Applied_Price=5
- *   £2238.14	6337	1.12	0.35	624.48	18.43%	0.00000000	Bands_Applied_Price=0
- *   Old: £2673.08	3343	1.19	0.80	528.53	30.51%
- *   £375.63	187	1.33	2.01	265.13	20.27%	0.00000000	Bands30_OpenMethod=40
- *   £335.59	86	1.65	3.90	173.35	12.08%	0.00000000	Bands30_OpenMethod=33
- *   £276.67	263	1.19	1.05	228.32	19.10%	0.00000000	Bands30_OpenMethod=32
- *   £264.90	24	2.61	11.04	90.53	6.96%	0.00000000	Bands30_OpenMethod=35
+ *   £2344.03	7593	1.09	0.31	667.89	33.63% (factor=1.0)
+ *   £3571.10	9348	1.12	0.38	906.02	29.81%	0.00000000	Bands_Applied_Price=4 (with boosting)
+ *   £3486.94	9071	1.12	0.38	872.10	26.54%	0.00000000	Bands_Applied_Price=5 (with boosting)
+ *   Bands M1: Total net profit: 42112 pips, Total orders: 6598 (Won: 70.0% [4617] | Loss: 30.0% [1981]);
+ *   Bands M5: Total net profit: 59605 pips, Total orders: 7579 (Won: 67.3% [5099] | Loss: 32.7% [2480]);
+ *   Bands M15: Total net profit: 16168 pips, Total orders: 1505 (Won: 56.6% [852] | Loss: 43.4% [653]);
+ *   Bands M30: Total net profit: 8098 pips, Total orders: 800 (Won: 49.4% [395] | Loss: 50.6% [405]);
  */
 
 extern string ____Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --";
@@ -408,34 +426,40 @@ extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_MA_F_TRAIL; // Trailing
  * Summary backtest log
  * All [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 3, 7,6mln ticks, quality 25%]:
  *  (£1000,auto,ts:25,tp:25,gap:10)
- *   £18728.27	39745	1.10	0.47	4324.31	43.67%
+ * Deposit: £1000 (factor = auto)
+ *   £23053.06	39727	1.13	0.58	3197.04	29.82%
 
     Strategy stats:
     MA M1: Total net profit: 19 pips, Total orders: 6 (Won: 50.0% [3] | Loss: 50.0% [3]);
-    MA M5: Total net profit: 1778 pips, Total orders: 1539 (Won: 43.9% [676] | Loss: 56.1% [863]);
-    MA M15: Total net profit: 1198 pips, Total orders: 731 (Won: 40.8% [298] | Loss: 59.2% [433]);
-    MA M30: Total net profit: 2620 pips, Total orders: 565 (Won: 51.0% [288] | Loss: 49.0% [277]);
-    MACD M1: Total net profit: -3 pips, Total orders: 2291 (Won: 46.4% [1063] | Loss: 53.6% [1228]);
-    MACD M5: Total net profit: 9445 pips, Total orders: 7818 (Won: 41.7% [3259] | Loss: 58.3% [4559]);
-    MACD M15: Total net profit: 10690 pips, Total orders: 6940 (Won: 38.8% [2696] | Loss: 61.2% [4244]);
-    MACD M30: Total net profit: 19594 pips, Total orders: 2476 (Won: 51.1% [1265] | Loss: 48.9% [1211]);
-    Alligator M1: Total net profit: 3191 pips, Total orders: 2061 (Won: 59.4% [1224] | Loss: 40.6% [837]);
-    RSI M1: Total net profit: 12479 pips, Total orders: 2904 (Won: 67.3% [1955] | Loss: 32.7% [949]);
-    SAR M1: Total net profit: 165 pips, Total orders: 558 (Won: 38.9% [217] | Loss: 61.1% [341]);
-    SAR M5: Total net profit: 815 pips, Total orders: 1006 (Won: 37.3% [375] | Loss: 62.7% [631]);
-    SAR M15: Total net profit: 927 pips, Total orders: 385 (Won: 33.2% [128] | Loss: 66.8% [257]);
-    SAR M30: Total net profit: -690 pips, Total orders: 1274 (Won: 26.1% [332] | Loss: 73.9% [942]);
-    Bands M1: Total net profit: 47666 pips, Total orders: 6531 (Won: 70.0% [4574] | Loss: 30.0% [1957]);
-    Bands M5: Total net profit: 80515 pips, Total orders: 7472 (Won: 67.1% [5010] | Loss: 32.9% [2462]);
-    Bands M15: Total net profit: 15860 pips, Total orders: 1480 (Won: 56.3% [833] | Loss: 43.7% [647]);
-    Bands M30: Total net profit: 6692 pips, Total orders: 770 (Won: 48.1% [370] | Loss: 51.9% [400]);
-    Envelopes M1: Total net profit: 47838 pips, Total orders: 6767 (Won: 64.7% [4375] | Loss: 35.3% [2392]);
-    WPR: Total net profit: 349 pips, Total orders: 4907 (Won: 48.9% [2398] | Loss: 51.1% [2509]);
-    DeMarker: Total net profit: -28 pips, Total orders: 2695 (Won: 41.7% [1124] | Loss: 58.3% [1571]);
-    Fractals M5: Total net profit: 18631 pips, Total orders: 18305 (Won: 53.0% [9710] | Loss: 47.0% [8595]);
-    Fractals M15: Total net profit: 25437 pips, Total orders: 10448 (Won: 54.3% [5678] | Loss: 45.7% [4770]);
-    Fractals M30: Total net profit: 12077 pips, Total orders: 6173 (Won: 49.6% [3063] | Loss: 50.4% [3110]);
+    MA M5: Total net profit: 2249 pips, Total orders: 1567 (Won: 44.7% [701] | Loss: 55.3% [866]);
+    MA M15: Total net profit: 1894 pips, Total orders: 763 (Won: 42.2% [322] | Loss: 57.8% [441]);
+    MA M30: Total net profit: 2892 pips, Total orders: 546 (Won: 49.5% [270] | Loss: 50.5% [276]);
+    MACD M1: Total net profit: -3 pips, Total orders: 2304 (Won: 46.3% [1067] | Loss: 53.7% [1237]);
+    MACD M5: Total net profit: 12978 pips, Total orders: 7278 (Won: 43.3% [3153] | Loss: 56.7% [4125]);
+    MACD M15: Total net profit: 5112 pips, Total orders: 5260 (Won: 38.4% [2020] | Loss: 61.6% [3240]);
+    MACD M30: Total net profit: 30770 pips, Total orders: 2517 (Won: 54.5% [1371] | Loss: 45.5% [1146]);
+    Alligator M1: Total net profit: 3258 pips, Total orders: 2062 (Won: 59.4% [1225] | Loss: 40.6% [837]);
+    RSI M1: Total net profit: 6459 pips, Total orders: 1656 (Won: 63.3% [1048] | Loss: 36.7% [608]);
+    RSI M5: Total net profit: 82 pips, Total orders: 624 (Won: 50.8% [317] | Loss: 49.2% [307]);
+    RSI M15: Total net profit: 349 pips, Total orders: 447 (Won: 46.1% [206] | Loss: 53.9% [241]);
+    RSI M30: Total net profit: 908 pips, Total orders: 398 (Won: 39.9% [159] | Loss: 60.1% [239]);
+    SAR M1: Total net profit: 69 pips, Total orders: 1067 (Won: 38.4% [410] | Loss: 61.6% [657]);
+    SAR M5: Total net profit: 613 pips, Total orders: 870 (Won: 38.2% [332] | Loss: 61.8% [538]);
+    SAR M15: Total net profit: 599 pips, Total orders: 734 (Won: 30.8% [226] | Loss: 69.2% [508]);
+    SAR M30: Total net profit: 1743 pips, Total orders: 409 (Won: 30.8% [126] | Loss: 69.2% [283]);
+    Bands M1: Total net profit: 52053 pips, Total orders: 6507 (Won: 70.0% [4556] | Loss: 30.0% [1951]);
+    Bands M5: Total net profit: 80663 pips, Total orders: 7464 (Won: 67.2% [5015] | Loss: 32.8% [2449]);
+    Bands M15: Total net profit: 17013 pips, Total orders: 1487 (Won: 56.9% [846] | Loss: 43.1% [641]);
+    Bands M30: Total net profit: 7611 pips, Total orders: 786 (Won: 48.7% [383] | Loss: 51.3% [403]);
+    Envelopes M1: Total net profit: 50077 pips, Total orders: 6788 (Won: 64.7% [4390] | Loss: 35.3% [2398]);
+    WPR: Total net profit: 336 pips, Total orders: 4851 (Won: 48.8% [2366] | Loss: 51.2% [2485]);
+    DeMarker: Total net profit: 17 pips, Total orders: 2733 (Won: 41.9% [1144] | Loss: 58.1% [1589]);
+    Fractals M5: Total net profit: 19966 pips, Total orders: 17641 (Won: 53.4% [9425] | Loss: 46.6% [8216]);
+    Fractals M15: Total net profit: 27540 pips, Total orders: 9996 (Won: 54.5% [5450] | Loss: 45.5% [4546]);
+    Fractals M30: Total net profit: 17215 pips, Total orders: 6199 (Won: 51.5% [3192] | Loss: 48.5% [3007]);
 
+
+ *   Prev:£18728.27	39745	1.10	0.47	4324.31	43.67%
  *   Prev:£28802.15	43226	1.13	0.67	6183.14	31.62%
  *   Old: £24353.94	36134	1.13	0.67	3696.73	39.27%
  *   Old: £20971.05	38227	1.12	0.55	4005.46	35.82%
@@ -945,13 +969,43 @@ void Trade() {
       }
    }
 
-   if (info[RSI][ACTIVE]) {
-      if (RSI_On_Buy(info[RSI][PERIOD], RSI_OpenMethod, RSI_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[RSI][FACTOR], RSI, "RSI");
-        if (RSI_CloseOnChange) CloseOrdersByType(OP_SELL, RSI, "closing RSI on market change");
-      } else if (RSI_On_Sell(info[RSI][PERIOD], RSI_OpenMethod, RSI_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[RSI][FACTOR], RSI, "RSI");
-        if (RSI_CloseOnChange) CloseOrdersByType(OP_BUY, RSI, "closing RSI on market change");
+   if (info[RSI1][ACTIVE]) {
+      if (RSI_On_Buy(info[RSI1][PERIOD], info[RSI1][OPEN_METHOD], RSI_OpenLevel)) {
+        order_placed = ExecuteOrder(OP_BUY, lot_size * info[RSI1][FACTOR], RSI1, "RSI1");
+        if (RSI_CloseOnChange) CloseOrdersByType(OP_SELL, RSI1, "closing on market change: " + name[RSI1]);
+      } else if (RSI_On_Sell(info[RSI1][PERIOD], info[RSI1][OPEN_METHOD], RSI_OpenLevel)) {
+        order_placed = ExecuteOrder(OP_SELL, lot_size * info[RSI1][FACTOR], RSI1, "RSI1");
+        if (RSI_CloseOnChange) CloseOrdersByType(OP_BUY, RSI1, "closing on market change: " + name[RSI1]);
+      }
+   }
+
+   if (info[RSI5][ACTIVE]) {
+      if (RSI_On_Buy(info[RSI5][PERIOD], info[RSI5][OPEN_METHOD], RSI_OpenLevel)) {
+        order_placed = ExecuteOrder(OP_BUY, lot_size * info[RSI5][FACTOR], RSI5, "RSI5");
+        if (RSI_CloseOnChange) CloseOrdersByType(OP_SELL, RSI5, "closing on market change: " + name[RSI5]);
+      } else if (RSI_On_Sell(info[RSI5][PERIOD], info[RSI5][OPEN_METHOD], RSI_OpenLevel)) {
+        order_placed = ExecuteOrder(OP_SELL, lot_size * info[RSI5][FACTOR], RSI5, "RSI5");
+        if (RSI_CloseOnChange) CloseOrdersByType(OP_BUY, RSI5, "closing on market change: " + name[RSI5]);
+      }
+   }
+
+   if (info[RSI15][ACTIVE]) {
+      if (RSI_On_Buy(info[RSI15][PERIOD], info[RSI15][OPEN_METHOD], RSI_OpenLevel)) {
+        order_placed = ExecuteOrder(OP_BUY, lot_size * info[RSI15][FACTOR], RSI15, "RSI15");
+        if (RSI_CloseOnChange) CloseOrdersByType(OP_SELL, RSI15, "closing on market change: " + name[RSI15]);
+      } else if (RSI_On_Sell(info[RSI15][PERIOD], info[RSI15][OPEN_METHOD], RSI_OpenLevel)) {
+        order_placed = ExecuteOrder(OP_SELL, lot_size * info[RSI15][FACTOR], RSI15, "RSI15");
+        if (RSI_CloseOnChange) CloseOrdersByType(OP_BUY, RSI15, "closing on market change: " + name[RSI15]);
+      }
+   }
+
+   if (info[RSI30][ACTIVE]) {
+      if (RSI_On_Buy(info[RSI30][PERIOD], info[RSI30][OPEN_METHOD], RSI_OpenLevel)) {
+        order_placed = ExecuteOrder(OP_BUY, lot_size * info[RSI30][FACTOR], RSI30, "RSI30");
+        if (RSI_CloseOnChange) CloseOrdersByType(OP_SELL, RSI30, "closing on market change: " + name[RSI30]);
+      } else if (RSI_On_Sell(info[RSI30][PERIOD], info[RSI30][OPEN_METHOD], RSI_OpenLevel)) {
+        order_placed = ExecuteOrder(OP_SELL, lot_size * info[RSI30][FACTOR], RSI30, "RSI30");
+        if (RSI_CloseOnChange) CloseOrdersByType(OP_BUY, RSI30, "closing on market change: " + name[RSI30]);
       }
    }
 
@@ -1223,13 +1277,13 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
     // if (VerboseTrace) text += "Alligator: " + GetArrayValues(alligator[0]) + GetArrayValues(alligator[1]) + "; ";
   }
 
-  if (RSI_Enabled) {
+  // if (RSI_Enabled) {
     // Update RSI indicator values.
     for (i = 0; i < 3; i++) {
       rsi[period][i] = iRSI(NULL, timeframe, RSI_Period, RSI_Applied_Price, i + RSI_Shift);
     }
     // if (VerboseTrace) text += "RSI: " + GetArrayValues(rsi[M1]) + "; ";
-  }
+  // }
 
   // if (SAR_Enabled) {
     // Update SAR indicator values.
@@ -1663,16 +1717,18 @@ bool Alligator_On_Sell(int period = M1, double min_gap = 0) {
  *
  * @param
  *   period (int) - period to check for
- *   open_method (int) - open method to use
+ *   open_method (int) - open method to use by using bitwise AND operation
  *   open_level - open level to consider the signal
  */
 bool RSI_On_Buy(int period = M1, int open_method = 0, int open_level = 20) {
-  switch (open_method) {
-    case 0: return rsi[period][0] < (50 - open_level);
-    case 1: return (rsi[period][0] < (50 - open_level) && rsi[period][0] > rsi[period][1]);
-    case 2: return (rsi[period][0] < (50 - open_level) && rsi[period][0] < rsi[period][1]);
-  }
-  return FALSE;
+  bool result = rsi[period][CURR] <= (50 - open_level);
+  if ((open_method &   1) != 0) result = result && rsi[period][CURR] < rsi[period][PREV];
+  if ((open_method &   2) != 0) result = result && rsi[period][PREV] < rsi[period][FAR];
+  if ((open_method &   4) != 0) result = result && rsi[period][PREV] < (50 - open_level);
+  if ((open_method &   8) != 0) result = result && rsi[period][FAR]  < (50 - open_level);
+  if ((open_method &  16) != 0) result = result && rsi[period][CURR] - rsi[period][PREV] > rsi[period][PREV] - rsi[period][FAR];
+  if ((open_method &  32) != 0) result = result && Open[CURR] > Close[PREV];
+  return result;
 }
 
 /*
@@ -1680,16 +1736,18 @@ bool RSI_On_Buy(int period = M1, int open_method = 0, int open_level = 20) {
  *
  * @param
  *   period (int) - period to check for
- *   open_method (int) - open method to use
+ *   open_method (int) - open method to use by using bitwise AND operation
  *   open_level - open level to consider the signal
  */
 bool RSI_On_Sell(int period = M1, int open_method = 0, int open_level = 20) {
-  switch (open_method) {
-    case 0: return rsi[period][0] > (50 + open_level);
-    case 1: return (rsi[period][0] > (50 + open_level) && rsi[period][0] < rsi[period][1]);
-    case 2: return (rsi[period][0] > (50 + open_level) && rsi[period][0] > rsi[period][1]);
-  }
-  return FALSE;
+  bool result = rsi[period][CURR] >= (50 + open_level);
+  if ((open_method &   1) != 0) result = result && rsi[period][CURR] > rsi[period][PREV];
+  if ((open_method &   2) != 0) result = result && rsi[period][PREV] > rsi[period][FAR];
+  if ((open_method &   4) != 0) result = result && rsi[period][PREV] > (50 - open_level);
+  if ((open_method &   8) != 0) result = result && rsi[period][FAR]  > (50 - open_level);
+  if ((open_method &  16) != 0) result = result && rsi[period][PREV] - rsi[period][CURR] > rsi[period][FAR] - rsi[period][PREV];
+  if ((open_method &  32) != 0) result = result && Open[CURR] < Close[PREV];
+  return result;
 }
 
 /*
@@ -1702,13 +1760,14 @@ bool RSI_On_Sell(int period = M1, int open_method = 0, int open_level = 20) {
  */
 bool SAR_On_Buy(int period = M1, int open_method = 0, double open_level = 0) {
   double gap = open_level * pip_size;
-  bool result = sar[period][CURR] + gap < Ask || sar[period][PREV] + gap < Ask;
+  bool result = sar[period][CURR] + gap < Open[0] || sar[period][PREV] + gap < Open[1];
   if ((open_method &   1) != 0) result = result && sar[period][PREV] - gap > Ask;
   if ((open_method &   2) != 0) result = result && sar[period][CURR] < sar[period][PREV];
   if ((open_method &   4) != 0) result = result && sar[period][CURR] - sar[period][PREV] <= sar[period][PREV] - sar[period][FAR];
   if ((open_method &   8) != 0) result = result && sar[period][FAR] > Ask;
   if ((open_method &  16) != 0) result = result && Close[CURR] > Close[PREV];
   if ((open_method &  32) != 0) result = result && sar[period][PREV] > Close[PREV];
+  if ((open_method &  64) != 0) result = result && sar[period][PREV] > Open[1];
 
   if (result) {
     // FIXME: Convert into more flexible way.
@@ -1728,13 +1787,14 @@ bool SAR_On_Buy(int period = M1, int open_method = 0, double open_level = 0) {
  */
 bool SAR_On_Sell(int period = M1, int open_method = 0, double open_level = 0) {
   double gap = open_level * pip_size;
-  bool result = sar[period][CURR] - gap > Ask || sar[period][PREV] - gap > Ask;
+  bool result = sar[period][CURR] - gap > Open[0] || sar[period][PREV] - gap > Open[1];
   if ((open_method &   1) != 0) result = result && sar[period][PREV] + gap < Ask;
   if ((open_method &   2) != 0) result = result && sar[period][CURR] > sar[period][PREV];
   if ((open_method &   4) != 0) result = result && sar[period][PREV] - sar[period][CURR] <= sar[period][FAR] - sar[period][PREV];
   if ((open_method &   8) != 0) result = result && sar[period][FAR] < Ask;
   if ((open_method &  16) != 0) result = result && Close[CURR] < Close[PREV];
   if ((open_method &  32) != 0) result = result && sar[period][PREV] < Close[PREV];
+  if ((open_method &  64) != 0) result = result && sar[period][PREV] < Open[1];
 
   if (result) {
     // FIXME: Convert into more flexible way.
@@ -2191,7 +2251,10 @@ int GetTrailingMethod(int order_type, int stop_or_profit) {
       if (Alligator_TrailingStopMethod > 0)   stop_method   = Alligator_TrailingStopMethod;
       if (Alligator_TrailingProfitMethod > 0) profit_method = Alligator_TrailingProfitMethod;
       break;
-    case RSI:
+    case RSI1:
+    case RSI5:
+    case RSI15:
+    case RSI30:
       if (RSI_TrailingStopMethod > 0)   stop_method   = RSI_TrailingStopMethod;
       if (RSI_TrailingProfitMethod > 0) profit_method = RSI_TrailingProfitMethod;
       break;
@@ -2616,7 +2679,7 @@ int GetNoOfStrategies() {
     + MA1_Enabled + MA5_Enabled + MA15_Enabled + MA30_Enabled
     + MACD1_Enabled + MACD5_Enabled + MACD15_Enabled + MACD30_Enabled
     + Alligator_Enabled
-    + RSI_Enabled
+    + RSI1_Enabled + RSI5_Enabled + RSI15_Enabled + RSI30_Enabled
     + SAR1_Enabled + SAR5_Enabled + SAR15_Enabled + SAR30_Enabled
     + Bands1_Enabled + Bands5_Enabled + Bands15_Enabled + Bands30_Enabled
     + Envelopes1_Enabled + Envelopes5_Enabled + Envelopes15_Enabled + Envelopes30_Enabled
@@ -2913,10 +2976,29 @@ void InitializeVariables() {
   info[ALLIGATOR][PERIOD]   = M1;
   info[ALLIGATOR][FACTOR]   = 1.0;
 
-  name[RSI]                 = "RSI M1";
-  info[RSI][ACTIVE]         = RSI_Enabled;
-  info[RSI][PERIOD]         = M1;
-  info[RSI][FACTOR]         = 1.0;
+  name[RSI1]                = "RSI M1";
+  info[RSI1][ACTIVE]        = RSI1_Enabled;
+  info[RSI1][PERIOD]        = M1;
+  info[RSI1][OPEN_METHOD]   = RSI1_OpenMethod;
+  info[RSI1][FACTOR]        = 1.0;
+
+  name[RSI5]                = "RSI M5";
+  info[RSI5][ACTIVE]        = RSI5_Enabled;
+  info[RSI5][PERIOD]        = M5;
+  info[RSI5][OPEN_METHOD]   = RSI5_OpenMethod;
+  info[RSI5][FACTOR]        = 1.0;
+
+  name[RSI15]               = "RSI M15";
+  info[RSI15][ACTIVE]       = RSI15_Enabled;
+  info[RSI15][PERIOD]       = M15;
+  info[RSI15][OPEN_METHOD]  = RSI15_OpenMethod;
+  info[RSI15][FACTOR]       = 1.0;
+
+  name[RSI30]               = "RSI M30";
+  info[RSI30][ACTIVE]       = RSI30_Enabled;
+  info[RSI30][PERIOD]       = M30;
+  info[RSI30][OPEN_METHOD]  = RSI30_OpenMethod;
+  info[RSI30][FACTOR]       = 1.0;
 
   name[SAR1]                = "SAR M1";
   info[SAR1][ACTIVE]        = SAR1_Enabled;
@@ -3366,7 +3448,6 @@ string GetOrdersStats(string sep = "\n") {
   int demarker_orders = open_orders[DEMARKER];
   int iwpr_orders = open_orders[WPR];
   int alligator_orders = open_orders[ALLIGATOR];
-  int rsi_orders = open_orders[RSI];
   string orders_per_type = "Stats: ";
   if (total_orders > 0) {
      if (MA1_Enabled && open_orders[MA1] > 0) orders_per_type += name[MA1] + ": " + MathFloor(100 / total_orders * open_orders[MA1]) + "%, ";
@@ -3377,15 +3458,22 @@ string GetOrdersStats(string sep = "\n") {
      if (MACD5_Enabled && open_orders[MACD5] > 0) orders_per_type += name[MACD5] + ": " + MathFloor(100 / total_orders * open_orders[MACD5]) + "%, ";
      if (MACD15_Enabled && open_orders[MACD15] > 0) orders_per_type += name[MACD15] + ": " + MathFloor(100 / total_orders * open_orders[MACD15]) + "%, ";
      if (MACD30_Enabled && open_orders[MACD30] > 0) orders_per_type += name[MACD30] + ": " + MathFloor(100 / total_orders * open_orders[MACD30]) + "%, ";
+     if (Alligator_Enabled && alligator_orders > 0) orders_per_type += "Alligator: " + MathFloor(100 / total_orders * alligator_orders) + "%, ";
+     if (RSI1_Enabled && open_orders[RSI1] > 0) orders_per_type += name[RSI1] + ": " + MathFloor(100 / total_orders * open_orders[RSI1]) + "%, ";
+     if (RSI5_Enabled && open_orders[RSI5] > 0) orders_per_type += name[RSI5] + ": " + MathFloor(100 / total_orders * open_orders[RSI5]) + "%, ";
+     if (RSI15_Enabled && open_orders[RSI15] > 0) orders_per_type += name[RSI15] + ": " + MathFloor(100 / total_orders * open_orders[RSI15]) + "%, ";
+     if (RSI30_Enabled && open_orders[RSI30] > 0) orders_per_type += name[RSI30] + ": " + MathFloor(100 / total_orders * open_orders[RSI30]) + "%, ";
+     if (SAR1_Enabled && open_orders[SAR1] > 0) orders_per_type += name[SAR1] + ": " + MathFloor(100 / total_orders * open_orders[SAR1]) + "%, ";
+     if (SAR5_Enabled && open_orders[SAR5] > 0) orders_per_type += name[SAR5] + ": " + MathFloor(100 / total_orders * open_orders[SAR5]) + "%, ";
+     if (SAR15_Enabled && open_orders[SAR15] > 0) orders_per_type += name[SAR15] + ": " + MathFloor(100 / total_orders * open_orders[SAR15]) + "%, ";
+     if (SAR30_Enabled && open_orders[SAR30] > 0) orders_per_type += name[SAR30] + ": " + MathFloor(100 / total_orders * open_orders[SAR30]) + "%, ";
      if ((Fractals5_Enabled || Fractals15_Enabled || Fractals30_Enabled) && fractals_orders > 0) orders_per_type += "Fractals: " + MathFloor(100 / total_orders * fractals_orders) + "%, ";
      if (DeMarker_Enabled && demarker_orders > 0) orders_per_type += "DeMarker: " + MathFloor(100 / total_orders * demarker_orders) + "%";
      if (WPR_Enabled && iwpr_orders > 0) orders_per_type += "WPR: " + MathFloor(100 / total_orders * iwpr_orders) + "%, ";
-     if (Alligator_Enabled && alligator_orders > 0) orders_per_type += "Alligator: " + MathFloor(100 / total_orders * alligator_orders) + "%, ";
      if (Bands1_Enabled && open_orders[BANDS1] > 0) orders_per_type += name[BANDS1] + ": " + MathFloor(100 / total_orders * open_orders[BANDS1]) + "%, ";
      if (Bands5_Enabled && open_orders[BANDS5] > 0) orders_per_type += name[BANDS5] + ": " + MathFloor(100 / total_orders * open_orders[BANDS5]) + "%, ";
      if (Bands15_Enabled && open_orders[BANDS15] > 0) orders_per_type += name[BANDS15] + ": " + MathFloor(100 / total_orders * open_orders[BANDS15]) + "%, ";
      if (Bands30_Enabled && open_orders[BANDS30] > 0) orders_per_type += name[BANDS30] + ": " + MathFloor(100 / total_orders * open_orders[BANDS30]) + "%, ";
-     if (RSI_Enabled && rsi_orders > 0) orders_per_type += "RSI: " + MathFloor(100 / total_orders * rsi_orders) + "%, ";
   } else {
     orders_per_type += "No orders open yet.";
   }
