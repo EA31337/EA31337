@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.040"
+#property version   "1.041"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -284,16 +284,22 @@ extern double SAR_Step = 0.02; // Stop increment, usually 0.02.
 extern double SAR_Maximum_Stop = 0.2; // Maximum stop value, usually 0.2.
 extern int SAR_Shift = 0; // Shift relative to the chart.
 // extern int SAR_Shift_Far = 0; // Shift relative to the chart.
-extern int SAR1_OpenMethod = 0; // Valid range: 0-16.
-extern int SAR5_OpenMethod = 3; // Valid range: 0-16.
-extern int SAR15_OpenMethod = 5; // Valid range: 0-16.
-extern int SAR30_OpenMethod = 3; // Valid range: 0-16.
+extern int SAR1_OpenMethod = 17; // Valid range: 0-63.
+extern int SAR5_OpenMethod = 2; // Valid range: 0-63.
+extern int SAR15_OpenMethod = 9; // Valid range: 0-63.
+extern int SAR30_OpenMethod = 0; // Valid range: 0-63.
+extern double SAR_OpenLevel = 1.0; // Open gap level to raise the signal (in pips).
 extern bool SAR_CloseOnChange = FALSE; // Close opposite orders on market change.
-extern ENUM_TRAIL_TYPE SAR_TrailingStopMethod = T_MA_S_FAR; // Trailing Stop method for SAR. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = T_MA_S; // Trailing Profit method for SAR. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE SAR_TrailingStopMethod = T_BANDS_LOW; // Trailing Stop method for SAR. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = T_SAR; // Trailing Profit method for SAR. Set 0 to default. See: ENUM_TRAIL_TYPE.
 /* SAR backtest log (£1000,auto,ts:25,tp:25,gap:10) [2015.02.05-2015.06.20 based on MT4 FXCM backtest data]:
- *   Curr: £10178.84	11635	1.16	0.87	2402.48	24.21%
- *   Prev: £12723.26	11094	1.18	1.15	4759.57	33.60%
+ *   £5230.82	3951	1.16	1.32	2330.28	57.89%
+ *   SAR M1: Total net profit: 280 pips, Total orders: 569 (Won: 39.5% [225] | Loss: 60.5% [344]);
+ *   SAR M5: Total net profit: 780 pips, Total orders: 1103 (Won: 36.2% [399] | Loss: 63.8% [704]);
+ *   SAR M15: Total net profit: 820 pips, Total orders: 397 (Won: 36.0% [143] | Loss: 64.0% [254]);
+ *   SAR M30: Total net profit: 2301 pips, Total orders: 1867 (Won: 29.6% [552] | Loss: 70.4% [1315]);
+ *   Old: £10178.84	11635	1.16	0.87	2402.48	24.21%
+ *   Old: £12723.26	11094	1.18	1.15	4759.57	33.60%
  */
 
 extern string ____Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --";
@@ -402,7 +408,35 @@ extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_MA_F_TRAIL; // Trailing
  * Summary backtest log
  * All [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 3, 7,6mln ticks, quality 25%]:
  *  (£1000,auto,ts:25,tp:25,gap:10)
- *   £28802.15	43226	1.13	0.67	6183.14	31.62%
+ *   £18728.27	39745	1.10	0.47	4324.31	43.67%
+
+    Strategy stats:
+    MA M1: Total net profit: 19 pips, Total orders: 6 (Won: 50.0% [3] | Loss: 50.0% [3]);
+    MA M5: Total net profit: 1778 pips, Total orders: 1539 (Won: 43.9% [676] | Loss: 56.1% [863]);
+    MA M15: Total net profit: 1198 pips, Total orders: 731 (Won: 40.8% [298] | Loss: 59.2% [433]);
+    MA M30: Total net profit: 2620 pips, Total orders: 565 (Won: 51.0% [288] | Loss: 49.0% [277]);
+    MACD M1: Total net profit: -3 pips, Total orders: 2291 (Won: 46.4% [1063] | Loss: 53.6% [1228]);
+    MACD M5: Total net profit: 9445 pips, Total orders: 7818 (Won: 41.7% [3259] | Loss: 58.3% [4559]);
+    MACD M15: Total net profit: 10690 pips, Total orders: 6940 (Won: 38.8% [2696] | Loss: 61.2% [4244]);
+    MACD M30: Total net profit: 19594 pips, Total orders: 2476 (Won: 51.1% [1265] | Loss: 48.9% [1211]);
+    Alligator M1: Total net profit: 3191 pips, Total orders: 2061 (Won: 59.4% [1224] | Loss: 40.6% [837]);
+    RSI M1: Total net profit: 12479 pips, Total orders: 2904 (Won: 67.3% [1955] | Loss: 32.7% [949]);
+    SAR M1: Total net profit: 165 pips, Total orders: 558 (Won: 38.9% [217] | Loss: 61.1% [341]);
+    SAR M5: Total net profit: 815 pips, Total orders: 1006 (Won: 37.3% [375] | Loss: 62.7% [631]);
+    SAR M15: Total net profit: 927 pips, Total orders: 385 (Won: 33.2% [128] | Loss: 66.8% [257]);
+    SAR M30: Total net profit: -690 pips, Total orders: 1274 (Won: 26.1% [332] | Loss: 73.9% [942]);
+    Bands M1: Total net profit: 47666 pips, Total orders: 6531 (Won: 70.0% [4574] | Loss: 30.0% [1957]);
+    Bands M5: Total net profit: 80515 pips, Total orders: 7472 (Won: 67.1% [5010] | Loss: 32.9% [2462]);
+    Bands M15: Total net profit: 15860 pips, Total orders: 1480 (Won: 56.3% [833] | Loss: 43.7% [647]);
+    Bands M30: Total net profit: 6692 pips, Total orders: 770 (Won: 48.1% [370] | Loss: 51.9% [400]);
+    Envelopes M1: Total net profit: 47838 pips, Total orders: 6767 (Won: 64.7% [4375] | Loss: 35.3% [2392]);
+    WPR: Total net profit: 349 pips, Total orders: 4907 (Won: 48.9% [2398] | Loss: 51.1% [2509]);
+    DeMarker: Total net profit: -28 pips, Total orders: 2695 (Won: 41.7% [1124] | Loss: 58.3% [1571]);
+    Fractals M5: Total net profit: 18631 pips, Total orders: 18305 (Won: 53.0% [9710] | Loss: 47.0% [8595]);
+    Fractals M15: Total net profit: 25437 pips, Total orders: 10448 (Won: 54.3% [5678] | Loss: 45.7% [4770]);
+    Fractals M30: Total net profit: 12077 pips, Total orders: 6173 (Won: 49.6% [3063] | Loss: 50.4% [3110]);
+
+ *   Prev:£28802.15	43226	1.13	0.67	6183.14	31.62%
  *   Old: £24353.94	36134	1.13	0.67	3696.73	39.27%
  *   Old: £20971.05	38227	1.12	0.55	4005.46	35.82%
  *   Old: £24184.97	38605	1.12	0.63	4134.27	27.99%	0.00000000	BestStrategyMultiplierFactor=2
@@ -922,40 +956,40 @@ void Trade() {
    }
 
    if (info[SAR1][ACTIVE]) {
-      if (SAR_On_Buy(info[SAR1][PERIOD], info[SAR1][OPEN_METHOD])) {
+      if (SAR_On_Buy(info[SAR1][PERIOD], info[SAR1][OPEN_METHOD], SAR_OpenLevel)) {
         order_placed = ExecuteOrder(OP_BUY, lot_size * info[SAR1][FACTOR], SAR1, "SAR M1");
         if (SAR_CloseOnChange) CloseOrdersByType(OP_SELL, SAR1, "closing SAR M1 on market change");
-      } else if (SAR_On_Sell(info[SAR1][PERIOD], info[SAR1][OPEN_METHOD])) {
+      } else if (SAR_On_Sell(info[SAR1][PERIOD], info[SAR1][OPEN_METHOD], SAR_OpenLevel)) {
         order_placed = ExecuteOrder(OP_SELL, lot_size * info[SAR1][FACTOR], SAR1, "SAR M1");
         if (SAR_CloseOnChange) CloseOrdersByType(OP_BUY, SAR1, "closing SAR M1 on market change");
       }
    }
 
    if (info[SAR5][ACTIVE]) {
-      if (SAR_On_Buy(info[SAR5][PERIOD], info[SAR5][OPEN_METHOD])) {
+      if (SAR_On_Buy(info[SAR5][PERIOD], info[SAR5][OPEN_METHOD], SAR_OpenLevel)) {
         order_placed = ExecuteOrder(OP_BUY, lot_size * info[SAR5][FACTOR], SAR5, "SAR M5");
         if (SAR_CloseOnChange) CloseOrdersByType(OP_SELL, SAR5, "closing SAR M5 on market change");
-      } else if (SAR_On_Sell(info[SAR5][PERIOD], info[SAR5][OPEN_METHOD])) {
+      } else if (SAR_On_Sell(info[SAR5][PERIOD], info[SAR5][OPEN_METHOD], SAR_OpenLevel)) {
         order_placed = ExecuteOrder(OP_SELL, lot_size * info[SAR5][FACTOR], SAR5, "SAR M5");
         if (SAR_CloseOnChange) CloseOrdersByType(OP_BUY, SAR5, "closing SAR M5 on market change");
       }
    }
 
    if (info[SAR15][ACTIVE]) {
-      if (SAR_On_Buy(info[SAR15][PERIOD], info[SAR15][OPEN_METHOD])) {
+      if (SAR_On_Buy(info[SAR15][PERIOD], info[SAR15][OPEN_METHOD], SAR_OpenLevel)) {
         order_placed = ExecuteOrder(OP_BUY, lot_size * info[SAR15][FACTOR], SAR15, "SAR M15");
         if (SAR_CloseOnChange) CloseOrdersByType(OP_SELL, SAR15, "closing SAR M15 on market change");
-      } else if (SAR_On_Sell(info[SAR15][PERIOD], info[SAR15][OPEN_METHOD])) {
+      } else if (SAR_On_Sell(info[SAR15][PERIOD], info[SAR15][OPEN_METHOD], SAR_OpenLevel)) {
         order_placed = ExecuteOrder(OP_SELL, lot_size * info[SAR15][FACTOR], SAR15, "SAR M15");
         if (SAR_CloseOnChange) CloseOrdersByType(OP_BUY, SAR15, "closing SAR M15 on market change");
       }
    }
 
    if (info[SAR30][ACTIVE]) {
-      if (SAR_On_Buy(info[SAR30][PERIOD], info[SAR30][OPEN_METHOD])) {
+      if (SAR_On_Buy(info[SAR30][PERIOD], info[SAR30][OPEN_METHOD], SAR_OpenLevel)) {
         order_placed = ExecuteOrder(OP_BUY, lot_size * info[SAR30][FACTOR], SAR30, "SAR M30");
         if (SAR_CloseOnChange) CloseOrdersByType(OP_SELL, SAR30, "closing SAR M30 on market change");
-      } else if (SAR_On_Sell(info[SAR30][PERIOD], info[SAR30][OPEN_METHOD])) {
+      } else if (SAR_On_Sell(info[SAR30][PERIOD], info[SAR30][OPEN_METHOD], SAR_OpenLevel)) {
         order_placed = ExecuteOrder(OP_SELL, lot_size * info[SAR30][FACTOR], SAR30, "SAR M30");
         if (SAR_CloseOnChange) CloseOrdersByType(OP_BUY, SAR30, "closing SAR M30 on market change");
       }
@@ -1663,28 +1697,19 @@ bool RSI_On_Sell(int period = M1, int open_method = 0, int open_level = 20) {
  *
  * @param
  *   period (int) - period to check for
- *   open_method (int) - open method to use
+ *   open_method (int) - open method to use by using bitwise AND operation
+ *   open_level (double) - open level to consider the signal (in pips)
  */
-bool SAR_On_Buy(int period = M1, int open_method = 0) {
-  bool result = FALSE;
-  switch (open_method) {
-    case  0: result = sar[period][0] > Ask; break;
-    case  1: result = sar[period][0] > Open[0]; break;
-    case  2: result = sar[period][0] > Close[0]; break;
-    case  3: result = sar[period][0] < Ask && sar[period][0] < sar[period][1]; break; // ... and current SAR is lower than the previous one
-    case  4: result = sar[period][0] - sar[period][1] < sar[period][1] - sar[period][2]; break;
-    case  5: result = MathAbs(sar[period][1] - sar[period][0]) > MathAbs(sar[period][2] - sar[period][1]); break;
-    case  6: result = sar[period][CURR] > sar[period][PREV] && sar[period][PREV] < sar[period][FAR]; break; // .. and previous SAR is lower from the one before
-    case  7: result = sar[period][0] < Close[0] && sar[period][0] < sar[period][1] && sar[period][1] < sar[period][2]; break;
-    case  8: result = sar[period][0] > Open[0] && ma_medium[period][CURR] > ma_medium[period][PREV]; break;
-    case  9: result = sar[period][0] > Open[0] && ma_slow[period][CURR] > ma_slow[period][PREV]; break;
-    case 10: result = sar[period][CURR] > sar[period][PREV] && sar[period][PREV] < sar[period][FAR] && ma_slow[period][CURR] > ma_slow[period][PREV]; break;
-    case 11: result = sar[period][CURR] > sar[period][PREV] && sar[period][PREV] < sar[period][FAR] && ma_fast[period][CURR] > ma_fast[period][PREV]; break;
-    case 12: result = sar[period][0] > Open[0] && ma_slow[period][CURR] > ma_slow[period][PREV]; break;
-    case 13: result = sar[period][0] > Open[0] && sar[period][1] < Close[1]; break; // SAR changed from above to below of candles
-    case 14: result = sar[period][0] < Open[0] && sar[period][0] < sar[period][1]; break;
-    case 15: result = sar[period][0] < Close[0] && sar[period][0] < sar[period][1] && sar[period][1] < sar[period][2]; break;
-  }
+bool SAR_On_Buy(int period = M1, int open_method = 0, double open_level = 0) {
+  double gap = open_level * pip_size;
+  bool result = sar[period][CURR] + gap < Ask || sar[period][PREV] + gap < Ask;
+  if ((open_method &   1) != 0) result = result && sar[period][PREV] - gap > Ask;
+  if ((open_method &   2) != 0) result = result && sar[period][CURR] < sar[period][PREV];
+  if ((open_method &   4) != 0) result = result && sar[period][CURR] - sar[period][PREV] <= sar[period][PREV] - sar[period][FAR];
+  if ((open_method &   8) != 0) result = result && sar[period][FAR] > Ask;
+  if ((open_method &  16) != 0) result = result && Close[CURR] > Close[PREV];
+  if ((open_method &  32) != 0) result = result && sar[period][PREV] > Close[PREV];
+
   if (result) {
     // FIXME: Convert into more flexible way.
     signals[DAILY][SAR1][period][OP_BUY]++; signals[WEEKLY][SAR1][period][OP_BUY]++;
@@ -1698,28 +1723,19 @@ bool SAR_On_Buy(int period = M1, int open_method = 0) {
  *
  * @param
  *   period (int) - period to check for
- *   open_method (int) - open method to use
+ *   open_method (int) - open method to use by using bitwise AND operation
+ *   open_level (double) - open level to consider the signal (in pips)
  */
-bool SAR_On_Sell(int period = M1, int open_method = 0) {
-  bool result = FALSE;
-  switch (open_method) {
-    case  0: result = sar[period][0] < Bid; break;
-    case  1: result = sar[period][0] < Open[0]; break;
-    case  2: result = sar[period][0] < Close[0]; break;
-    case  3: result = sar[period][0] < Bid && sar[period][0] > sar[period][1]; break; // ... and current SAR is lower than the previous one
-    case  4: result = sar[period][1] - sar[period][0] < sar[period][2] - sar[period][1]; break;
-    case  5: result = MathAbs(sar[period][1] - sar[period][0]) < MathAbs(sar[period][2] - sar[period][1]); break;
-    case  6: result = sar[period][CURR] < sar[period][PREV] && sar[period][PREV] > sar[period][FAR]; break; // .. and previous SAR is higher from the one before
-    case  7: result = sar[period][0] > Close[0] && sar[period][0] > sar[period][1] && sar[period][1] > sar[period][2]; break;
-    case  8: result = sar[period][0] < Open[0] && ma_medium[period][CURR] < ma_medium[period][PREV]; break;
-    case  9: result = sar[period][0] < Open[0] && ma_slow[period][CURR] < ma_slow[period][PREV]; break;
-    case 10: result = sar[period][CURR] < sar[period][PREV] && sar[period][PREV] > sar[period][FAR] && ma_slow[period][CURR] < ma_slow[period][PREV]; break;
-    case 11: result = sar[period][CURR] < sar[period][PREV] && sar[period][PREV] > sar[period][FAR] && ma_fast[period][CURR] < ma_fast[period][PREV]; break;
-    case 12: result = sar[period][0] < Open[0] && ma_slow[period][CURR] < ma_slow[period][PREV]; break;
-    case 13: result = sar[period][0] < Open[0] && sar[period][1] > Close[1]; break; // SAR changed from below to above of candles
-    case 14: result = sar[period][0] < Open[0] && sar[period][0] > sar[period][1]; break;
-    case 15: result = sar[period][0] < Close[0] && sar[period][0] > sar[period][1] && sar[period][1] > sar[period][2]; break;
-  }
+bool SAR_On_Sell(int period = M1, int open_method = 0, double open_level = 0) {
+  double gap = open_level * pip_size;
+  bool result = sar[period][CURR] - gap > Ask || sar[period][PREV] - gap > Ask;
+  if ((open_method &   1) != 0) result = result && sar[period][PREV] + gap < Ask;
+  if ((open_method &   2) != 0) result = result && sar[period][CURR] > sar[period][PREV];
+  if ((open_method &   4) != 0) result = result && sar[period][PREV] - sar[period][CURR] <= sar[period][FAR] - sar[period][PREV];
+  if ((open_method &   8) != 0) result = result && sar[period][FAR] < Ask;
+  if ((open_method &  16) != 0) result = result && Close[CURR] < Close[PREV];
+  if ((open_method &  32) != 0) result = result && sar[period][PREV] < Close[PREV];
+
   if (result) {
     // FIXME: Convert into more flexible way.
     signals[DAILY][SAR1][period][OP_SELL]++; signals[WEEKLY][SAR1][period][OP_SELL]++;
@@ -1733,7 +1749,7 @@ bool SAR_On_Sell(int period = M1, int open_method = 0) {
  *
  * @param
  *   period (int) - period to check for
- *   open_method (int) - open method to use
+ *   open_method (int) - open method to use by using bitwise AND operation
  */
 bool Bands_On_Buy(int period = M1, int open_method = 0) {
   bool result = Low[CURR] < bands[period][CURR][MODE_LOWER] || Low[PREV] < bands[period][PREV][MODE_LOWER]; // price value was lower than the lower band
@@ -1753,7 +1769,7 @@ bool Bands_On_Buy(int period = M1, int open_method = 0) {
  *
  * @param
  *   period (int) - period to check for
- *   open_method (int) - open method to use
+ *   open_method (int) - open method to use by using bitwise AND operation
  */
 bool Bands_On_Sell(int period = M1, int open_method = 0) {
   bool result = High[CURR]  > bands[period][CURR][MODE_UPPER] || High[PREV] > bands[period][PREV][MODE_UPPER]; // price value was higher than the upper band
