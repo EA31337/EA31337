@@ -2256,7 +2256,7 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
        if (VerboseDebug) Print(__FUNCTION__ + "(): Error: Unknown trailing stop method: ", method);
    }
 
-   new_value += delta * factor;
+   if (new_value > 0) new_value += delta * factor;
 
    if (!ValidTrailingValue(new_value, cmd, loss_or_profit, existing)) {
      if (existing && previous == 0 && loss_or_profit == -1) previous = default_trail;
