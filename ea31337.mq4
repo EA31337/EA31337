@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.042"
+#property version   "1.043"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -58,9 +58,9 @@ enum ENUM_STRATEGY_TYPE {
 // Define type of strategy information entry.
 enum ENUM_STRATEGY_INFO {
   ACTIVE,
-  PERIOD,
+  TIMEFRAME,
   OPEN_METHOD,
-  MA_PERIOD,
+  CUSTOM_PERIOD,
   FACTOR, // Multiply lot factor.
   OPEN_ORDERS,
   TOTAL_ORDERS,
@@ -135,10 +135,10 @@ enum ENUM_PERIOD_TYPE {
 
 // Define type of tasks.
 enum ENUM_STAT_PERIOD_TYPE {
-  DAILY  = 0,  // Daily
+  DAILY   = 0,  // Daily
   WEEKLY  = 1, // Weekly
   MONTHLY = 2, // Monthly
-  YEARLY = 3,  // Yearly
+  YEARLY  = 3,  // Yearly
   FINAL_STAT_PERIOD_TYPE_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };
 
@@ -279,6 +279,16 @@ extern int RSI_Shift = 0; // Shift relative to the chart.
 extern bool RSI_CloseOnChange = TRUE; // Close opposite orders on market change.
 extern ENUM_TRAIL_TYPE RSI_TrailingStopMethod = T_MA_S_TRAIL; // Trailing Stop method for RSI. Set 0 to default. See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = T_BANDS_LOW; // Trailing Profit method for RSI. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern bool RSI_DynamicPeriod = FALSE;
+int RSI1_IncreasePeriod_MinDiff = 27;
+int RSI1_DecreasePeriod_MaxDiff = 61;
+int RSI5_IncreasePeriod_MinDiff = 20;
+int RSI5_DecreasePeriod_MaxDiff = 68;
+int RSI15_IncreasePeriod_MinDiff = 18;
+int RSI15_DecreasePeriod_MaxDiff = 58;
+int RSI30_IncreasePeriod_MinDiff = 26;
+int RSI30_DecreasePeriod_MaxDiff = 60;
+
 /* RSI backtest log (auto,ts:25,tp:25,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
  * Deposit: £1000 (factor = 1.0)
  *   £3198.64	2028	1.27	1.58	1029.53	41.52%
@@ -288,7 +298,9 @@ extern ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = T_BANDS_LOW; // Trailing Profi
  *   RSI M30: Total net profit: 2310 pips, Total orders: 330 (Won: 46.4% [153] | Loss: 53.6% [177]);
  * Deposit: £10000 (factor = 1.0)
  *   £4479.40	2024	1.37	2.21	1029.53	7.50%
- *
+ * Deposit: £10000 (factor = 1.0) && RSI_DynamicPeriod
+ *  £3380.43	2142	1.31	1.58	541.01	5.12%	0.00000000	RSI_DynamicPeriod=1
+ *  £3060.19	1307	1.44	2.34	549.59	4.66%	0.00000000	RSI_DynamicPeriod=0
  */
 
 extern string ____SAR_Parameters__ = "-- Settings for the the Parabolic Stop and Reverse system indicator --";
@@ -688,7 +700,7 @@ int acc_conditions[10][3], market_conditions[10][3];
 // Indicator variables.
 double ma_fast[H1][3], ma_medium[H1][3], ma_slow[H1][3];
 double macd[H1][3], macd_signal[H1][3];
-double rsi[H1][3];
+double rsi[H1][3], rsi_stats[H1][3];
 double sar[H1][3]; int sar_week[H1][7][2];
 double bands[H1][3][3], envelopes[H1][3][3];
 double alligator[H1][3][3];
@@ -777,13 +789,13 @@ int OnInit() {
       if (!ValidSettings()) {
          err = "Error: EA parameters are not valid, please correct them.";
          Comment(err);
-         if (VerboseErrors) Print(err);
+         if (VerboseErrors) Print(__FUNCTION__ + "():" + err);
          return (INIT_PARAMETERS_INCORRECT); // Incorrect set of input parameters.
       }
       if (!IsTesting() && StringLen(AccountName()) <= 1) {
          err = "Error: EA requires on-line Terminal.";
          Comment(err);
-         if (VerboseErrors) Print(err);
+         if (VerboseErrors) Print(__FUNCTION__ + "():" + err);
          return (INIT_FAILED);
        }
        session_initiated = TRUE;
@@ -836,7 +848,7 @@ void OnDeinit(const int reason) {
   ea_active = TRUE;
   if (VerboseDebug) Print("Calling " + __FUNCTION__ + "()");
   if (VerboseInfo) {
-    Print("EA deinitializing, reason: " + getUninitReasonText(reason) + " (code: " + reason + ")"); // Also: _UninitReason.
+    Print(__FUNCTION__ + "():" + "EA deinitializing, reason: " + getUninitReasonText(reason) + " (code: " + reason + ")"); // Also: _UninitReason.
     Print(GetSummaryText());
   }
 
@@ -846,7 +858,7 @@ void OnDeinit(const int reason) {
       CalculateSummary(ExtInitialDeposit);
       string filename = TimeToStr(TimeCurrent(), TIME_DATE|TIME_MINUTES) + "_31337_Report.txt";
       WriteReport(filename);
-      Print("Saved report as: " + filename);
+      Print(__FUNCTION__ + "(): Saved report as: " + filename);
   }
   // #ifdef _DEBUG
   // DEBUG("n=" + n + " : " +  DoubleToStrMorePrecision(val,19) );
@@ -880,304 +892,304 @@ void Trade() {
 
    double lot_size = GetLotSize();
    if (info[MA1][ACTIVE]) {
-      if (MA_On_Buy(info[MA1][PERIOD], info[MA1][OPEN_METHOD], MA_OpenLevel)) {
+      if (MA_On_Buy(info[MA1][TIMEFRAME], info[MA1][OPEN_METHOD], MA_OpenLevel)) {
        order_placed = ExecuteOrder(OP_BUY, lot_size * info[MA1][FACTOR], MA1, name[MA1]);
        if (MA1_CloseOnChange) CloseOrdersByType(OP_SELL, MA1, "closing MA M1 on market change");
-      } else if (MA_On_Sell(info[MA1][PERIOD], info[MA1][OPEN_METHOD], MA_OpenLevel)) {
+      } else if (MA_On_Sell(info[MA1][TIMEFRAME], info[MA1][OPEN_METHOD], MA_OpenLevel)) {
        order_placed = ExecuteOrder(OP_SELL, lot_size * info[MA1][FACTOR], MA1, name[MA1]);
        if (MA1_CloseOnChange) CloseOrdersByType(OP_BUY, MA1, "closing MA M1 on market change");
       }
    }
 
    if (info[MA5][ACTIVE]) {
-      if (MA_On_Buy(info[MA5][PERIOD], info[MA5][OPEN_METHOD], MA_OpenLevel)) {
+      if (MA_On_Buy(info[MA5][TIMEFRAME], info[MA5][OPEN_METHOD], MA_OpenLevel)) {
        order_placed = ExecuteOrder(OP_BUY, lot_size * info[MA5][FACTOR], MA5, name[MA5]);
        if (MA5_CloseOnChange) CloseOrdersByType(OP_SELL, MA5, "closing MA M5 on market change");
-      } else if (MA_On_Sell(info[MA5][PERIOD], info[MA5][OPEN_METHOD], MA_OpenLevel)) {
+      } else if (MA_On_Sell(info[MA5][TIMEFRAME], info[MA5][OPEN_METHOD], MA_OpenLevel)) {
        order_placed = ExecuteOrder(OP_SELL, lot_size * info[MA5][FACTOR], MA5, name[MA5]);
        if (MA5_CloseOnChange) CloseOrdersByType(OP_BUY, MA5, "closing MA M5 on market change");
       }
    }
 
    if (info[MA15][ACTIVE]) {
-      if (MA_On_Buy(info[MA15][PERIOD], info[MA15][OPEN_METHOD], MA_OpenLevel)) {
+      if (MA_On_Buy(info[MA15][TIMEFRAME], info[MA15][OPEN_METHOD], MA_OpenLevel)) {
        order_placed = ExecuteOrder(OP_BUY, lot_size * info[MA15][FACTOR], MA15, name[MA15]);
        if (MA15_CloseOnChange) CloseOrdersByType(OP_SELL, MA15, "closing MA M15 on market change");
-      } else if (MA_On_Sell(info[MA15][PERIOD], info[MA15][OPEN_METHOD], MA_OpenLevel)) {
+      } else if (MA_On_Sell(info[MA15][TIMEFRAME], info[MA15][OPEN_METHOD], MA_OpenLevel)) {
        order_placed = ExecuteOrder(OP_SELL, lot_size * info[MA15][FACTOR], MA15, name[MA15]);
        if (MA15_CloseOnChange) CloseOrdersByType(OP_BUY, MA15, "closing MA M15 on market change");
       }
    }
 
    if (info[MA30][ACTIVE]) {
-      if (MA_On_Buy(info[MA30][PERIOD], info[MA30][OPEN_METHOD], MA_OpenLevel)) {
+      if (MA_On_Buy(info[MA30][TIMEFRAME], info[MA30][OPEN_METHOD], MA_OpenLevel)) {
        order_placed = ExecuteOrder(OP_BUY, lot_size * info[MA30][FACTOR], MA30, name[MA30]);
        if (MA30_CloseOnChange) CloseOrdersByType(OP_SELL, MA30, "closing MA M30 on market change");
-      } else if (MA_On_Sell(info[MA30][PERIOD], info[MA30][OPEN_METHOD], MA_OpenLevel)) {
+      } else if (MA_On_Sell(info[MA30][TIMEFRAME], info[MA30][OPEN_METHOD], MA_OpenLevel)) {
        order_placed = ExecuteOrder(OP_SELL, lot_size * info[MA30][FACTOR], MA30, name[MA30]);
        if (MA30_CloseOnChange) CloseOrdersByType(OP_BUY, MA30, "closing MA M30 on market change");
       }
    }
 
    if (info[MACD1][ACTIVE]) {
-      if (MACD_On_Buy(info[MACD1][PERIOD], info[MACD1][OPEN_METHOD])) {
+      if (MACD_On_Buy(info[MACD1][TIMEFRAME], info[MACD1][OPEN_METHOD])) {
        order_placed = ExecuteOrder(OP_BUY, lot_size * info[MACD1][FACTOR], MACD1, name[MACD1]);
        if (MACD_CloseOnChange) CloseOrdersByType(OP_SELL, MACD1, "closing on market change: " + name[MACD1]);
-      } else if (MACD_On_Sell(info[MACD1][PERIOD], info[MACD1][OPEN_METHOD])) {
+      } else if (MACD_On_Sell(info[MACD1][TIMEFRAME], info[MACD1][OPEN_METHOD])) {
        order_placed = ExecuteOrder(OP_SELL, lot_size * info[MACD1][FACTOR], MACD1, name[MACD1]);
        if (MACD_CloseOnChange) CloseOrdersByType(OP_BUY, MACD1, "closing on market change: " + name[MACD1]);
       }
    }
 
    if (info[MACD5][ACTIVE]) {
-      if (MACD_On_Buy(info[MACD5][PERIOD], info[MACD5][OPEN_METHOD])) {
+      if (MACD_On_Buy(info[MACD5][TIMEFRAME], info[MACD5][OPEN_METHOD])) {
        order_placed = ExecuteOrder(OP_BUY, lot_size * info[MACD5][FACTOR], MACD5, name[MACD5]);
        if (MACD_CloseOnChange) CloseOrdersByType(OP_SELL, MACD5, "closing on market change: " + name[MACD5]);
-      } else if (MACD_On_Sell(info[MACD5][PERIOD], info[MACD5][OPEN_METHOD])) {
+      } else if (MACD_On_Sell(info[MACD5][TIMEFRAME], info[MACD5][OPEN_METHOD])) {
        order_placed = ExecuteOrder(OP_SELL, lot_size * info[MACD5][FACTOR], MACD5, name[MACD5]);
        if (MACD_CloseOnChange) CloseOrdersByType(OP_BUY, MACD5, "closing on market change: " + name[MACD5]);
       }
    }
 
    if (info[MACD15][ACTIVE]) {
-      if (MACD_On_Buy(info[MACD15][PERIOD], info[MACD15][OPEN_METHOD])) {
+      if (MACD_On_Buy(info[MACD15][TIMEFRAME], info[MACD15][OPEN_METHOD])) {
        order_placed = ExecuteOrder(OP_BUY, lot_size * info[MACD15][FACTOR], MACD15, name[MACD15]);
        if (MACD_CloseOnChange) CloseOrdersByType(OP_SELL, MACD15, "closing on market change: " + name[MACD15]);
-      } else if (MACD_On_Sell(info[MACD15][PERIOD], info[MACD15][OPEN_METHOD])) {
+      } else if (MACD_On_Sell(info[MACD15][TIMEFRAME], info[MACD15][OPEN_METHOD])) {
        order_placed = ExecuteOrder(OP_SELL, lot_size * info[MACD15][FACTOR], MACD15, name[MACD15]);
        if (MACD_CloseOnChange) CloseOrdersByType(OP_BUY, MACD15, "closing on market change: " + name[MACD15]);
       }
    }
 
    if (info[MACD30][ACTIVE]) {
-      if (MACD_On_Buy(info[MACD30][PERIOD], info[MACD30][OPEN_METHOD])) {
+      if (MACD_On_Buy(info[MACD30][TIMEFRAME], info[MACD30][OPEN_METHOD])) {
        order_placed = ExecuteOrder(OP_BUY, lot_size * info[MACD30][FACTOR], MACD30, name[MACD30]);
        if (MACD_CloseOnChange) CloseOrdersByType(OP_SELL, MACD30, "closing on market change: " + name[MACD30]);
-      } else if (MACD_On_Sell(info[MACD30][PERIOD], info[MACD30][OPEN_METHOD])) {
+      } else if (MACD_On_Sell(info[MACD30][TIMEFRAME], info[MACD30][OPEN_METHOD])) {
        order_placed = ExecuteOrder(OP_SELL, lot_size * info[MACD30][FACTOR], MACD30, name[MACD30]);
        if (MACD_CloseOnChange) CloseOrdersByType(OP_BUY, MACD30, "closing on market change: " + name[MACD30]);
       }
    }
 
    if (info[ALLIGATOR][ACTIVE]) {
-      if (Alligator_On_Buy(info[ALLIGATOR][PERIOD], Alligator_OpenLevel * pip_size)) {
+      if (Alligator_On_Buy(info[ALLIGATOR][TIMEFRAME], Alligator_OpenLevel * pip_size)) {
         order_placed = ExecuteOrder(OP_BUY, lot_size * info[ALLIGATOR][FACTOR], ALLIGATOR, "AlligatorOnBuy");
         if (Alligator_CloseOnChange) CloseOrdersByType(OP_SELL, ALLIGATOR, "closing Alligator on market change");
-      } else if (Alligator_On_Sell(info[ALLIGATOR][PERIOD], Alligator_OpenLevel * pip_size)) {
+      } else if (Alligator_On_Sell(info[ALLIGATOR][TIMEFRAME], Alligator_OpenLevel * pip_size)) {
         order_placed = ExecuteOrder(OP_SELL, lot_size * info[ALLIGATOR][FACTOR], ALLIGATOR, "AlligatorOnSell");
         if (Alligator_CloseOnChange) CloseOrdersByType(OP_BUY, ALLIGATOR, "closing Alligator on market change");
       }
    }
 
    if (info[RSI1][ACTIVE]) {
-      if (RSI_On_Buy(info[RSI1][PERIOD], info[RSI1][OPEN_METHOD], RSI_OpenLevel)) {
+      if (RSI_On_Buy(info[RSI1][TIMEFRAME], info[RSI1][OPEN_METHOD], RSI_OpenLevel)) {
         order_placed = ExecuteOrder(OP_BUY, lot_size * info[RSI1][FACTOR], RSI1, "RSI1");
         if (RSI_CloseOnChange) CloseOrdersByType(OP_SELL, RSI1, "closing on market change: " + name[RSI1]);
-      } else if (RSI_On_Sell(info[RSI1][PERIOD], info[RSI1][OPEN_METHOD], RSI_OpenLevel)) {
+      } else if (RSI_On_Sell(info[RSI1][TIMEFRAME], info[RSI1][OPEN_METHOD], RSI_OpenLevel)) {
         order_placed = ExecuteOrder(OP_SELL, lot_size * info[RSI1][FACTOR], RSI1, "RSI1");
         if (RSI_CloseOnChange) CloseOrdersByType(OP_BUY, RSI1, "closing on market change: " + name[RSI1]);
       }
    }
 
    if (info[RSI5][ACTIVE]) {
-      if (RSI_On_Buy(info[RSI5][PERIOD], info[RSI5][OPEN_METHOD], RSI_OpenLevel)) {
+      if (RSI_On_Buy(info[RSI5][TIMEFRAME], info[RSI5][OPEN_METHOD], RSI_OpenLevel)) {
         order_placed = ExecuteOrder(OP_BUY, lot_size * info[RSI5][FACTOR], RSI5, "RSI5");
         if (RSI_CloseOnChange) CloseOrdersByType(OP_SELL, RSI5, "closing on market change: " + name[RSI5]);
-      } else if (RSI_On_Sell(info[RSI5][PERIOD], info[RSI5][OPEN_METHOD], RSI_OpenLevel)) {
+      } else if (RSI_On_Sell(info[RSI5][TIMEFRAME], info[RSI5][OPEN_METHOD], RSI_OpenLevel)) {
         order_placed = ExecuteOrder(OP_SELL, lot_size * info[RSI5][FACTOR], RSI5, "RSI5");
         if (RSI_CloseOnChange) CloseOrdersByType(OP_BUY, RSI5, "closing on market change: " + name[RSI5]);
       }
    }
 
    if (info[RSI15][ACTIVE]) {
-      if (RSI_On_Buy(info[RSI15][PERIOD], info[RSI15][OPEN_METHOD], RSI_OpenLevel)) {
+      if (RSI_On_Buy(info[RSI15][TIMEFRAME], info[RSI15][OPEN_METHOD], RSI_OpenLevel)) {
         order_placed = ExecuteOrder(OP_BUY, lot_size * info[RSI15][FACTOR], RSI15, "RSI15");
         if (RSI_CloseOnChange) CloseOrdersByType(OP_SELL, RSI15, "closing on market change: " + name[RSI15]);
-      } else if (RSI_On_Sell(info[RSI15][PERIOD], info[RSI15][OPEN_METHOD], RSI_OpenLevel)) {
+      } else if (RSI_On_Sell(info[RSI15][TIMEFRAME], info[RSI15][OPEN_METHOD], RSI_OpenLevel)) {
         order_placed = ExecuteOrder(OP_SELL, lot_size * info[RSI15][FACTOR], RSI15, "RSI15");
         if (RSI_CloseOnChange) CloseOrdersByType(OP_BUY, RSI15, "closing on market change: " + name[RSI15]);
       }
    }
 
    if (info[RSI30][ACTIVE]) {
-      if (RSI_On_Buy(info[RSI30][PERIOD], info[RSI30][OPEN_METHOD], RSI_OpenLevel)) {
+      if (RSI_On_Buy(info[RSI30][TIMEFRAME], info[RSI30][OPEN_METHOD], RSI_OpenLevel)) {
         order_placed = ExecuteOrder(OP_BUY, lot_size * info[RSI30][FACTOR], RSI30, "RSI30");
         if (RSI_CloseOnChange) CloseOrdersByType(OP_SELL, RSI30, "closing on market change: " + name[RSI30]);
-      } else if (RSI_On_Sell(info[RSI30][PERIOD], info[RSI30][OPEN_METHOD], RSI_OpenLevel)) {
+      } else if (RSI_On_Sell(info[RSI30][TIMEFRAME], info[RSI30][OPEN_METHOD], RSI_OpenLevel)) {
         order_placed = ExecuteOrder(OP_SELL, lot_size * info[RSI30][FACTOR], RSI30, "RSI30");
         if (RSI_CloseOnChange) CloseOrdersByType(OP_BUY, RSI30, "closing on market change: " + name[RSI30]);
       }
    }
 
    if (info[SAR1][ACTIVE]) {
-      if (SAR_On_Buy(info[SAR1][PERIOD], info[SAR1][OPEN_METHOD], SAR_OpenLevel)) {
+      if (SAR_On_Buy(info[SAR1][TIMEFRAME], info[SAR1][OPEN_METHOD], SAR_OpenLevel)) {
         order_placed = ExecuteOrder(OP_BUY, lot_size * info[SAR1][FACTOR], SAR1, "SAR M1");
         if (SAR_CloseOnChange) CloseOrdersByType(OP_SELL, SAR1, "closing SAR M1 on market change");
-      } else if (SAR_On_Sell(info[SAR1][PERIOD], info[SAR1][OPEN_METHOD], SAR_OpenLevel)) {
+      } else if (SAR_On_Sell(info[SAR1][TIMEFRAME], info[SAR1][OPEN_METHOD], SAR_OpenLevel)) {
         order_placed = ExecuteOrder(OP_SELL, lot_size * info[SAR1][FACTOR], SAR1, "SAR M1");
         if (SAR_CloseOnChange) CloseOrdersByType(OP_BUY, SAR1, "closing SAR M1 on market change");
       }
    }
 
    if (info[SAR5][ACTIVE]) {
-      if (SAR_On_Buy(info[SAR5][PERIOD], info[SAR5][OPEN_METHOD], SAR_OpenLevel)) {
+      if (SAR_On_Buy(info[SAR5][TIMEFRAME], info[SAR5][OPEN_METHOD], SAR_OpenLevel)) {
         order_placed = ExecuteOrder(OP_BUY, lot_size * info[SAR5][FACTOR], SAR5, "SAR M5");
         if (SAR_CloseOnChange) CloseOrdersByType(OP_SELL, SAR5, "closing SAR M5 on market change");
-      } else if (SAR_On_Sell(info[SAR5][PERIOD], info[SAR5][OPEN_METHOD], SAR_OpenLevel)) {
+      } else if (SAR_On_Sell(info[SAR5][TIMEFRAME], info[SAR5][OPEN_METHOD], SAR_OpenLevel)) {
         order_placed = ExecuteOrder(OP_SELL, lot_size * info[SAR5][FACTOR], SAR5, "SAR M5");
         if (SAR_CloseOnChange) CloseOrdersByType(OP_BUY, SAR5, "closing SAR M5 on market change");
       }
    }
 
    if (info[SAR15][ACTIVE]) {
-      if (SAR_On_Buy(info[SAR15][PERIOD], info[SAR15][OPEN_METHOD], SAR_OpenLevel)) {
+      if (SAR_On_Buy(info[SAR15][TIMEFRAME], info[SAR15][OPEN_METHOD], SAR_OpenLevel)) {
         order_placed = ExecuteOrder(OP_BUY, lot_size * info[SAR15][FACTOR], SAR15, "SAR M15");
         if (SAR_CloseOnChange) CloseOrdersByType(OP_SELL, SAR15, "closing SAR M15 on market change");
-      } else if (SAR_On_Sell(info[SAR15][PERIOD], info[SAR15][OPEN_METHOD], SAR_OpenLevel)) {
+      } else if (SAR_On_Sell(info[SAR15][TIMEFRAME], info[SAR15][OPEN_METHOD], SAR_OpenLevel)) {
         order_placed = ExecuteOrder(OP_SELL, lot_size * info[SAR15][FACTOR], SAR15, "SAR M15");
         if (SAR_CloseOnChange) CloseOrdersByType(OP_BUY, SAR15, "closing SAR M15 on market change");
       }
    }
 
    if (info[SAR30][ACTIVE]) {
-      if (SAR_On_Buy(info[SAR30][PERIOD], info[SAR30][OPEN_METHOD], SAR_OpenLevel)) {
+      if (SAR_On_Buy(info[SAR30][TIMEFRAME], info[SAR30][OPEN_METHOD], SAR_OpenLevel)) {
         order_placed = ExecuteOrder(OP_BUY, lot_size * info[SAR30][FACTOR], SAR30, "SAR M30");
         if (SAR_CloseOnChange) CloseOrdersByType(OP_SELL, SAR30, "closing SAR M30 on market change");
-      } else if (SAR_On_Sell(info[SAR30][PERIOD], info[SAR30][OPEN_METHOD], SAR_OpenLevel)) {
+      } else if (SAR_On_Sell(info[SAR30][TIMEFRAME], info[SAR30][OPEN_METHOD], SAR_OpenLevel)) {
         order_placed = ExecuteOrder(OP_SELL, lot_size * info[SAR30][FACTOR], SAR30, "SAR M30");
         if (SAR_CloseOnChange) CloseOrdersByType(OP_BUY, SAR30, "closing SAR M30 on market change");
       }
    }
 
    if (info[BANDS1][ACTIVE]) {
-      if (Bands_On_Buy(info[BANDS1][PERIOD], info[BANDS1][OPEN_METHOD])) {
+      if (Bands_On_Buy(info[BANDS1][TIMEFRAME], info[BANDS1][OPEN_METHOD])) {
         order_placed = ExecuteOrder(OP_BUY, lot_size * info[BANDS1][FACTOR], BANDS1, "Bands");
         if (Bands_CloseOnChange) CloseOrdersByType(OP_SELL, BANDS1, "closing on market change: " + name[BANDS1]);
-      } else if (Bands_On_Sell(info[BANDS1][PERIOD], info[BANDS1][OPEN_METHOD])) {
+      } else if (Bands_On_Sell(info[BANDS1][TIMEFRAME], info[BANDS1][OPEN_METHOD])) {
         order_placed = ExecuteOrder(OP_SELL, lot_size * info[BANDS1][FACTOR], BANDS1, "Bands");
         if (Bands_CloseOnChange) CloseOrdersByType(OP_BUY, BANDS1, "closing on market change: " + name[BANDS1]);
       }
    }
 
    if (info[BANDS5][ACTIVE]) {
-      if (Bands_On_Buy(info[BANDS5][PERIOD], info[BANDS5][OPEN_METHOD])) {
+      if (Bands_On_Buy(info[BANDS5][TIMEFRAME], info[BANDS5][OPEN_METHOD])) {
         order_placed = ExecuteOrder(OP_BUY, lot_size * info[BANDS5][FACTOR], BANDS5, "Bands");
         if (Bands_CloseOnChange) CloseOrdersByType(OP_SELL, BANDS5, "closing on market change: " + name[BANDS5]);
-      } else if (Bands_On_Sell(info[BANDS5][PERIOD], info[BANDS5][OPEN_METHOD])) {
+      } else if (Bands_On_Sell(info[BANDS5][TIMEFRAME], info[BANDS5][OPEN_METHOD])) {
         order_placed = ExecuteOrder(OP_SELL, lot_size * info[BANDS5][FACTOR], BANDS5, "Bands");
         if (Bands_CloseOnChange) CloseOrdersByType(OP_BUY, BANDS5, "closing on market change: " + name[BANDS5]);
       }
    }
 
    if (info[BANDS15][ACTIVE]) {
-      if (Bands_On_Buy(info[BANDS15][PERIOD], info[BANDS15][OPEN_METHOD])) {
+      if (Bands_On_Buy(info[BANDS15][TIMEFRAME], info[BANDS15][OPEN_METHOD])) {
         order_placed = ExecuteOrder(OP_BUY, lot_size * info[BANDS15][FACTOR], BANDS15, "Bands");
         if (Bands_CloseOnChange) CloseOrdersByType(OP_SELL, BANDS15, "closing on market change: " + name[BANDS15]);
-      } else if (Bands_On_Sell(info[BANDS15][PERIOD], info[BANDS15][OPEN_METHOD])) {
+      } else if (Bands_On_Sell(info[BANDS15][TIMEFRAME], info[BANDS15][OPEN_METHOD])) {
         order_placed = ExecuteOrder(OP_SELL, lot_size * info[BANDS15][FACTOR], BANDS15, "Bands");
         if (Bands_CloseOnChange) CloseOrdersByType(OP_BUY, BANDS15, "closing on market change: " + name[BANDS15]);
       }
    }
 
    if (info[BANDS30][ACTIVE]) {
-      if (Bands_On_Buy(info[BANDS30][PERIOD], info[BANDS30][OPEN_METHOD])) {
+      if (Bands_On_Buy(info[BANDS30][TIMEFRAME], info[BANDS30][OPEN_METHOD])) {
         order_placed = ExecuteOrder(OP_BUY, lot_size * info[BANDS30][FACTOR], BANDS30, "Bands");
         if (Bands_CloseOnChange) CloseOrdersByType(OP_SELL, BANDS30, "closing on market change: " + name[BANDS30]);
-      } else if (Bands_On_Sell(info[BANDS30][PERIOD], info[BANDS30][OPEN_METHOD])) {
+      } else if (Bands_On_Sell(info[BANDS30][TIMEFRAME], info[BANDS30][OPEN_METHOD])) {
         order_placed = ExecuteOrder(OP_SELL, lot_size * info[BANDS30][FACTOR], BANDS30, "Bands");
         if (Bands_CloseOnChange) CloseOrdersByType(OP_BUY, BANDS30, "closing on market change: " + name[BANDS30]);
       }
    }
 
    if (info[ENVELOPES1][ACTIVE]) {
-      if (Envelopes_On_Buy(info[ENVELOPES1][PERIOD], Envelopes_OpenMethod)) {
+      if (Envelopes_On_Buy(info[ENVELOPES1][TIMEFRAME], Envelopes_OpenMethod)) {
         order_placed = ExecuteOrder(OP_BUY, lot_size * info[ENVELOPES1][FACTOR], ENVELOPES1, "Envelopes");
         if (Envelopes_CloseOnChange) CloseOrdersByType(OP_SELL, ENVELOPES1, "closing Envelopes M1 on market change");
-      } else if (Envelopes_On_Sell(info[ENVELOPES1][PERIOD], Envelopes_OpenMethod)) {
+      } else if (Envelopes_On_Sell(info[ENVELOPES1][TIMEFRAME], Envelopes_OpenMethod)) {
         order_placed = ExecuteOrder(OP_SELL, lot_size * info[ENVELOPES1][FACTOR], ENVELOPES1, "Envelopes");
         if (Envelopes_CloseOnChange) CloseOrdersByType(OP_BUY, ENVELOPES1, "closing Envelopes M1 on market change");
       }
    }
    if (info[ENVELOPES5][ACTIVE]) {
-      if (Envelopes_On_Buy(info[ENVELOPES5][PERIOD], Envelopes_OpenMethod)) {
+      if (Envelopes_On_Buy(info[ENVELOPES5][TIMEFRAME], Envelopes_OpenMethod)) {
         order_placed = ExecuteOrder(OP_BUY, lot_size * info[ENVELOPES5][FACTOR], ENVELOPES5, "Envelopes");
         if (Envelopes_CloseOnChange) CloseOrdersByType(OP_SELL, ENVELOPES5, "closing Envelopes M5 on market change");
-      } else if (Envelopes_On_Sell(info[ENVELOPES5][PERIOD], Envelopes_OpenMethod)) {
+      } else if (Envelopes_On_Sell(info[ENVELOPES5][TIMEFRAME], Envelopes_OpenMethod)) {
         order_placed = ExecuteOrder(OP_SELL, lot_size * info[ENVELOPES5][FACTOR], ENVELOPES5, "Envelopes");
         if (Envelopes_CloseOnChange) CloseOrdersByType(OP_BUY, ENVELOPES5, "closing Envelopes M5 on market change");
       }
    }
    if (info[ENVELOPES15][ACTIVE]) {
-      if (Envelopes_On_Buy(info[ENVELOPES15][PERIOD], Envelopes_OpenMethod)) {
+      if (Envelopes_On_Buy(info[ENVELOPES15][TIMEFRAME], Envelopes_OpenMethod)) {
         order_placed = ExecuteOrder(OP_BUY, lot_size * info[ENVELOPES15][FACTOR], ENVELOPES15, "Envelopes");
         if (Envelopes_CloseOnChange) CloseOrdersByType(OP_SELL, ENVELOPES15, "closing Envelopes M15 on market change");
-      } else if (Envelopes_On_Sell(info[ENVELOPES15][PERIOD], Envelopes_OpenMethod)) {
+      } else if (Envelopes_On_Sell(info[ENVELOPES15][TIMEFRAME], Envelopes_OpenMethod)) {
         order_placed = ExecuteOrder(OP_SELL, lot_size * info[ENVELOPES15][FACTOR], ENVELOPES15, "Envelopes");
         if (Envelopes_CloseOnChange) CloseOrdersByType(OP_BUY, ENVELOPES15, "closing Envelopes M15 on market change");
       }
    }
    if (info[ENVELOPES30][ACTIVE]) {
-      if (Envelopes_On_Buy(info[ENVELOPES30][PERIOD], Envelopes_OpenMethod)) {
+      if (Envelopes_On_Buy(info[ENVELOPES30][TIMEFRAME], Envelopes_OpenMethod)) {
         order_placed = ExecuteOrder(OP_BUY, lot_size * info[ENVELOPES30][FACTOR], ENVELOPES30, "Envelopes");
         if (Envelopes_CloseOnChange) CloseOrdersByType(OP_SELL, ENVELOPES30, "closing Envelopes M30 on market change");
-      } else if (Envelopes_On_Sell(info[ENVELOPES30][PERIOD], Envelopes_OpenMethod)) {
+      } else if (Envelopes_On_Sell(info[ENVELOPES30][TIMEFRAME], Envelopes_OpenMethod)) {
         order_placed = ExecuteOrder(OP_SELL, lot_size * info[ENVELOPES30][FACTOR], ENVELOPES30, "Envelopes");
         if (Envelopes_CloseOnChange) CloseOrdersByType(OP_BUY, ENVELOPES30, "closing Envelopes M30 on market change");
       }
    }
 
    if (info[DEMARKER][ACTIVE]) {
-      if (DeMarker_On_Buy(info[DEMARKER][PERIOD], DeMarker_OpenMethod, DeMarker_OpenLevel)) {
+      if (DeMarker_On_Buy(info[DEMARKER][TIMEFRAME], DeMarker_OpenMethod, DeMarker_OpenLevel)) {
         order_placed = ExecuteOrder(OP_BUY, lot_size * info[DEMARKER][FACTOR], DEMARKER, "DeMarker" + demarker[M1][0]);
         if (DeMarker_CloseOnChange) CloseOrdersByType(OP_SELL, DEMARKER, "closing DeMarker on market change");
-      } else if (DeMarker_On_Sell(info[DEMARKER][PERIOD], DeMarker_OpenMethod, DeMarker_OpenLevel)) {
+      } else if (DeMarker_On_Sell(info[DEMARKER][TIMEFRAME], DeMarker_OpenMethod, DeMarker_OpenLevel)) {
         order_placed = ExecuteOrder(OP_SELL, lot_size * info[DEMARKER][FACTOR], DEMARKER, "DeMarker" + demarker[M1][0]);
         if (DeMarker_CloseOnChange) CloseOrdersByType(OP_BUY, DEMARKER, "closing DeMarker on market change");
       }
    }
 
    if (info[WPR][ACTIVE]) {
-     if (WPR_On_Buy(info[WPR][PERIOD], WPR_OpenMethod, WPR_OpenLevel)) {
+     if (WPR_On_Buy(info[WPR][TIMEFRAME], WPR_OpenMethod, WPR_OpenLevel)) {
        order_placed = ExecuteOrder(OP_BUY, lot_size * info[WPR][FACTOR], WPR, "WPR:" + wpr[M1][0]);
        if (WPR_CloseOnChange) CloseOrdersByType(OP_SELL, WPR, "closing WPR on market change");
-     } else if (WPR_On_Sell(info[WPR][PERIOD], WPR_OpenMethod, WPR_OpenLevel)) {
+     } else if (WPR_On_Sell(info[WPR][TIMEFRAME], WPR_OpenMethod, WPR_OpenLevel)) {
        order_placed = ExecuteOrder(OP_SELL, lot_size * info[WPR][FACTOR], WPR, "WPR:" + wpr[M1][0]);
        if (WPR_CloseOnChange) CloseOrdersByType(OP_BUY, WPR, "closing WPR on market change");
      }
    }
 
    if (info[FRACTALS1][ACTIVE]) {
-      if (Fractals_On_Buy(info[FRACTALS1][PERIOD])) {
+      if (Fractals_On_Buy(info[FRACTALS1][TIMEFRAME])) {
        order_placed = ExecuteOrder(OP_BUY, lot_size * info[FRACTALS1][FACTOR], FRACTALS1, "Fractals M5");
        if (Fractals_CloseOnChange) CloseOrdersByType(OP_SELL, FRACTALS1, "closing Fractals M5 on market change");
-      } else if (Fractals_On_Sell(info[FRACTALS1][PERIOD])) {
+      } else if (Fractals_On_Sell(info[FRACTALS1][TIMEFRAME])) {
        order_placed = ExecuteOrder(OP_SELL, lot_size * info[FRACTALS1][FACTOR], FRACTALS1, "Fractals M5");
        if (Fractals_CloseOnChange) CloseOrdersByType(OP_BUY, FRACTALS1, "closing Fractals M5 on market change");
       }
    }
    if (info[FRACTALS5][ACTIVE]) {
-      if (Fractals_On_Buy(info[FRACTALS5][PERIOD])) {
+      if (Fractals_On_Buy(info[FRACTALS5][TIMEFRAME])) {
        order_placed = ExecuteOrder(OP_BUY, lot_size * info[FRACTALS5][FACTOR], FRACTALS5, "Fractals M5");
        if (Fractals_CloseOnChange) CloseOrdersByType(OP_SELL, FRACTALS5, "closing Fractals M5 on market change");
-      } else if (Fractals_On_Sell(info[FRACTALS5][PERIOD])) {
+      } else if (Fractals_On_Sell(info[FRACTALS5][TIMEFRAME])) {
        order_placed = ExecuteOrder(OP_SELL, lot_size * info[FRACTALS5][FACTOR], FRACTALS5, "Fractals M5");
        if (Fractals_CloseOnChange) CloseOrdersByType(OP_BUY, FRACTALS5, "closing Fractals M5 on market change");
       }
    }
    if (info[FRACTALS15][ACTIVE]) {
-      if (Fractals_On_Buy(info[FRACTALS15][PERIOD])) {
+      if (Fractals_On_Buy(info[FRACTALS15][TIMEFRAME])) {
        order_placed = ExecuteOrder(OP_BUY, lot_size * info[FRACTALS15][FACTOR], FRACTALS15, "Fractals M15");
        if (Fractals_CloseOnChange) CloseOrdersByType(OP_SELL, FRACTALS15, "closing Fractals M15 on market change");
-      } else if (Fractals_On_Sell(info[FRACTALS15][PERIOD])) {
+      } else if (Fractals_On_Sell(info[FRACTALS15][TIMEFRAME])) {
        order_placed = ExecuteOrder(OP_SELL, lot_size * info[FRACTALS15][FACTOR], FRACTALS15, "Fractals M15");
        if (Fractals_CloseOnChange) CloseOrdersByType(OP_BUY, FRACTALS15, "closing Fractals M15 on market change");
       }
    }
    if (info[FRACTALS30][ACTIVE]) {
-      if (Fractals_On_Buy(info[FRACTALS30][PERIOD])) {
+      if (Fractals_On_Buy(info[FRACTALS30][TIMEFRAME])) {
        order_placed = ExecuteOrder(OP_BUY, lot_size * info[FRACTALS30][FACTOR], FRACTALS30, "Fractals M30");
        if (Fractals_CloseOnChange) CloseOrdersByType(OP_SELL, FRACTALS30, "closing Fractals M30 on market change");
-      } else if (Fractals_On_Sell(info[FRACTALS30][PERIOD])) {
+      } else if (Fractals_On_Sell(info[FRACTALS30][TIMEFRAME])) {
        order_placed = ExecuteOrder(OP_SELL, lot_size * info[FRACTALS30][FACTOR], FRACTALS30, "Fractals M30");
        if (Fractals_CloseOnChange) CloseOrdersByType(OP_BUY, FRACTALS30, "closing Fractals M30 on market change");
       }
@@ -1198,27 +1210,31 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
     last_indicators_update = bar_time;
   }*/
 
-  int period = M1, fractal_shift = 0, bands_period = Bands_Period;
+  int period = M1, fractal_shift = 0, bands_period = Bands_Period, rsi_period = RSI_Period;
   switch (timeframe) {
     case PERIOD_M1:
       period = M1;
       fractal_shift = Fractals1_Shift;
-      bands_period = info[BANDS1][MA_PERIOD];
+      bands_period = info[BANDS1][CUSTOM_PERIOD];
+      rsi_period = info[RSI1][CUSTOM_PERIOD];
       break;
     case PERIOD_M5:
       period = M5;
       fractal_shift = Fractals5_Shift;
-      bands_period = info[BANDS5][MA_PERIOD];
+      bands_period = info[BANDS5][CUSTOM_PERIOD];
+      rsi_period = info[RSI5][CUSTOM_PERIOD];
       break;
     case PERIOD_M15:
       period = M15;
       fractal_shift = Fractals15_Shift;
-      bands_period = info[BANDS15][MA_PERIOD];
+      bands_period = info[BANDS15][CUSTOM_PERIOD];
+      rsi_period = info[RSI15][CUSTOM_PERIOD];
       break;
     case PERIOD_M30:
       period = M30;
       fractal_shift = Fractals30_Shift;
-      bands_period = info[BANDS30][MA_PERIOD];
+      bands_period = info[BANDS30][CUSTOM_PERIOD];
+      rsi_period = info[RSI30][CUSTOM_PERIOD];
       break;
   }
 
@@ -1280,8 +1296,11 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
   // if (RSI_Enabled) {
     // Update RSI indicator values.
     for (i = 0; i < 3; i++) {
-      rsi[period][i] = iRSI(NULL, timeframe, RSI_Period, RSI_Applied_Price, i + RSI_Shift);
+      rsi[period][i] = iRSI(NULL, timeframe, rsi_period, RSI_Applied_Price, i + RSI_Shift);
+      if (rsi[period][i] > rsi_stats[period][MODE_UPPER]) rsi_stats[period][MODE_UPPER] = rsi[period][i]; // Calculate maximum value.
+      if (rsi[period][i] < rsi_stats[period][MODE_LOWER] || rsi_stats[period][MODE_LOWER] == 0) rsi_stats[period][MODE_LOWER] = rsi[period][i]; // Calculate minimum value.
     }
+    rsi_stats[period][0] = If(rsi_stats[period][0] > 0, (rsi_stats[period][0] + rsi[period][0] + rsi[period][1] + rsi[period][2]) / 4, (rsi[period][0] + rsi[period][1] + rsi[period][2]) / 3); // Calculate average value.
     // if (VerboseTrace) text += "RSI: " + GetArrayValues(rsi[M1]) + "; ";
   // }
 
@@ -1335,7 +1354,7 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
     // text += "fractals: "  + fractals_lower[M5]  + ", Fractals5_upper: " + fractals_upper[M5] + "; ";
   }
 
-  if (VerboseTrace) Print(text);
+  if (VerboseTrace) Print(__FUNCTION__ + "():" + text);
   return (TRUE);
 }
 
@@ -1352,13 +1371,13 @@ int ExecuteOrder(int cmd, double volume, int order_type = CUSTOM, string order_c
    // Check the limits.
    if (volume == 0) {
      err = __FUNCTION__ + "(): Lot size for strategy " + order_type + " is 0.";
-     if (VerboseTrace && err != last_err) Print(err);
+     if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "():" + err);
      last_err = err;
      return (FALSE);
    }
    if (GetTotalOrders() >= GetMaxOrders()) {
      err = __FUNCTION__ + "(): Maximum open and pending orders reached the limit (EAMaxOrders).";
-     if (VerboseErrors && err != last_err) Print(err);
+     if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "():" + err);
      last_err = err;
      return (FALSE);
    }
@@ -1366,26 +1385,26 @@ int ExecuteOrder(int cmd, double volume, int order_type = CUSTOM, string order_c
    // Check the limits.
    if (GetTotalOrders() >= GetMaxOrders()) {
      err = __FUNCTION__ + "(): Maximum open and pending orders reached the limit (EAMaxOrders).";
-     if (VerboseErrors && err != last_err) Print(err);
+     if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "():" + err);
      last_err = err;
      return (FALSE);
    }
    if (GetTotalOrdersByType(order_type) >= GetMaxOrdersPerType()) {
      err = __FUNCTION__ + "(): Maximum open and pending orders per type reached the limit (EAMaxOrdersPerType).";
-     if (VerboseErrors && err != last_err) Print(err);
+     if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "():" + err);
      last_err = err;
      return (FALSE);
    }
    if (!CheckFreeMargin(cmd, volume)) {
      err = __FUNCTION__ + "(): No money to open more orders.";
-     if (PrintLogOnChart && err != last_err) Comment(last_err);
-     if (VerboseErrors && err != last_err) Print(err);
+     if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + last_err);
+     if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "():" + err);
      last_err = err;
      return (FALSE);
    }
    if (!CheckMinPipGap(order_type)) {
      err = __FUNCTION__ + "(): Error: Not executing order, because the gap is too small [MinPipGap].";
-     if (VerboseTrace && err != last_err) Print(err + " (order type = " + order_type + ")");
+     if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "():" + err + " (order type = " + order_type + ")");
      last_err = err;
      return (FALSE);
    }
@@ -1425,8 +1444,8 @@ int ExecuteOrder(int cmd, double volume, int order_type = CUSTOM, string order_c
          (EAStopLoss * pip_size > GetMinStopLevel() || EAStopLoss == 0.0)) {
             result = OrderModify(order_ticket, order_price, stoploss, takeprofit, 0, ColorSell);
             if (!result && VerboseErrors) {
-              Print("Error in ExecuteOrder(): OrderModify() error = ", ErrorDescription(GetLastError()));
-              if (VerboseDebug) Print("ExecuteOrder(): OrderModify(", order_ticket, ", ", order_price, ", ", stoploss, ", ", takeprofit, ", ", 0, ", ", ColorSell, ")");
+              Print(__FUNCTION__ + "(): Error: OrderModify() error = ", ErrorDescription(GetLastError()));
+              if (VerboseDebug) Print(__FUNCTION__ + "():" + " Error: OrderModify(", order_ticket, ", ", order_price, ", ", stoploss, ", ", takeprofit, ", ", 0, ", ", ColorSell, ")");
             }
          }
       */
@@ -1470,7 +1489,7 @@ bool CloseOrder(int ticket_no, string reason, bool retry = TRUE) {
   if (ticket_no > 0) result = OrderSelect(ticket_no, SELECT_BY_TICKET);
   else ticket_no = OrderTicket();
   result = OrderClose(ticket_no, OrderLots(), GetClosePrice(OrderType()), max_order_slippage, GetOrderColor());
-  // if (VerboseTrace) Print("CloseOrder request. Reason: " + reason + "; Result=" + result + " @ " + TimeCurrent() + "(" + TimeToStr(TimeCurrent()) + "), ticket# " + ticket_no);
+  // if (VerboseTrace) Print(__FUNCTION__ + "(): CloseOrder request. Reason: " + reason + "; Result=" + result + " @ " + TimeCurrent() + "(" + TimeToStr(TimeCurrent()) + "), ticket# " + ticket_no);
   if (result) {
     TaskAddCalcStats(ticket_no);
     if (VerboseDebug) Print(__FUNCTION__, "(): Closed order " + ticket_no + " with profit " + GetOrderProfit() + ", reason: " + reason + "; " + GetOrderTextDetails());
@@ -1544,7 +1563,7 @@ int CloseOrdersByType(int cmd, int strategy_type, string reason = "") {
    }
    if (orders_total > 0 && VerboseInfo) {
      // FIXME: EnumToString(order_type) doesn't work here.
-     Print("Closed ", orders_total, " orders (", cmd, ", ", strategy_type, ") on market change with total profit of : ", profit_total, " pips (", order_failed, " failed)");
+     Print(__FUNCTION__ + "():" + "Closed ", orders_total, " orders (", cmd, ", ", strategy_type, ") on market change with total profit of : ", profit_total, " pips (", order_failed, " failed)");
    }
    return (orders_total);
 }
@@ -1743,8 +1762,8 @@ bool RSI_On_Sell(int period = M1, int open_method = 0, int open_level = 20) {
   bool result = rsi[period][CURR] >= (50 + open_level);
   if ((open_method &   1) != 0) result = result && rsi[period][CURR] > rsi[period][PREV];
   if ((open_method &   2) != 0) result = result && rsi[period][PREV] > rsi[period][FAR];
-  if ((open_method &   4) != 0) result = result && rsi[period][PREV] > (50 - open_level);
-  if ((open_method &   8) != 0) result = result && rsi[period][FAR]  > (50 - open_level);
+  if ((open_method &   4) != 0) result = result && rsi[period][PREV] > (50 + open_level);
+  if ((open_method &   8) != 0) result = result && rsi[period][FAR]  > (50 + open_level);
   if ((open_method &  16) != 0) result = result && rsi[period][PREV] - rsi[period][CURR] > rsi[period][FAR] - rsi[period][PREV];
   if ((open_method &  32) != 0) result = result && Open[CURR] < Close[PREV];
   return result;
@@ -2111,7 +2130,7 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
    double trail = (TrailingStop + extra_trail) * pip_size;
    double default_trail = If(cmd == OP_BUY, Bid, Ask) + trail * factor;
    int method = GetTrailingMethod(order_type, loss_or_profit);
-   int period = If(order_type >= 0, info[order_type][PERIOD], M1);
+   int period = If(order_type >= 0, info[order_type][TIMEFRAME], M1);
 
    switch (method) {
      case T_NONE: // None
@@ -2434,28 +2453,28 @@ bool TradeAllowed() {
   /*
   if (last_order_time == iTime(NULL, PERIOD_M1, 0)) {
     err = StringConcatenate("Not trading at the moment, as we already placed order on: ", TimeToStr(last_order_time));
-    if (VerboseTrace && err != last_err) Print(err);
+    if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "():" + err);
     last_err = err;
     return (FALSE);
   }*/
   if (Bars < 100) {
     err = "Bars less than 100, not trading...";
-    if (VerboseTrace && err != last_err) Print(err);
-    //if (PrintLogOnChart && err != last_err) Comment(err);
+    if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "():" + err);
+    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + err);
     last_err = err;
     return (FALSE);
   }
   if (!IsTesting() && Volume[0] < MinVolumeToTrade) {
     err = "Volume too low to trade.";
-    if (VerboseTrace && err != last_err) Print(err);
-    //if (PrintLogOnChart && err != last_err) Comment(err);
+    if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "():" + err);
+    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + err);
     last_err = err;
     return (FALSE);
   }
   if (IsTradeContextBusy()) {
     err = "Error: Trade context is temporary busy.";
-    if (VerboseErrors && err != last_err) Print(err);
-    //if (PrintLogOnChart && err != last_err) Comment(err);
+    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "():" + err);
+    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + err);
     last_err = err;
     return (FALSE);
   }
@@ -2465,16 +2484,16 @@ bool TradeAllowed() {
   //   is allowed (the "Allow live trading" checkbox is enabled in the Expert Advisor or script properties).
   if (!IsTradeAllowed()) {
     err = "Trade is not allowed at the moment!";
-    if (VerboseErrors && err != last_err) Print(err);
-    //if (PrintLogOnChart && err != last_err) Comment(err);
+    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "():" + err);
+    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + err);
     last_err = err;
     ea_active = FALSE;
     return (FALSE);
   }
   if (!IsConnected()) {
     err = "Error: Terminal is not connected!";
-    if (VerboseErrors && err != last_err) Print(err);
-    if (PrintLogOnChart && err != last_err) Comment(err);
+    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "():" + err);
+    if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + err);
     last_err = err;
     if (PrintLogOnChart) DisplayInfoOnChart();
     Sleep(10000);
@@ -2482,23 +2501,23 @@ bool TradeAllowed() {
   }
   if (IsStopped()) {
     err = "Error: Terminal is stopping!";
-    if (VerboseErrors && err != last_err) Print(err);
-    //if (PrintLogOnChart && err != last_err) Comment(err);
+    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "():" + err);
+    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + err);
     last_err = err;
     ea_active = FALSE;
     return (FALSE);
   }
   if (!IsTesting() && !MarketInfo(Symbol(), MODE_TRADEALLOWED)) {
     err = "Trade is not allowed. Market is closed.";
-    if (VerboseInfo && err != last_err) Print(err);
-    //if (PrintLogOnChart && err != last_err) Comment(err);
+    if (VerboseInfo && err != last_err) Print(__FUNCTION__ + "():" + err);
+    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + err);
     last_err = err;
     ea_active = FALSE;
     return (FALSE);
   }
   if (!session_active) {
     err = "Error: Session is not active!";
-    //if (VerboseErrors && err != last_err) Print(err);
+    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "():" + err);
     last_err = err;
     ea_active = FALSE;
     return (FALSE);
@@ -2513,7 +2532,7 @@ bool ValidSettings() {
   string err;
   if (EALotSize < 0.0) {
     err = "Error: LotSize is less than 0.";
-    if (VerboseInfo) Print(err);
+    if (VerboseInfo) Print(__FUNCTION__ + "():" + err);
     if (PrintLogOnChart) Comment(err);
     return (FALSE);
   }
@@ -2742,6 +2761,9 @@ void StartNewHour() {
   ApplyStrategyMultiplierFactor(WEEKLY, 1, BestWeeklyStrategyMultiplierFactor);
   ApplyStrategyMultiplierFactor(MONTHLY, 1, BestMonthlyStrategyMultiplierFactor);
 
+  // Check if RSI period needs re-calculation.
+  if (RSI_DynamicPeriod) RSI_CheckPeriod();
+
   // Reset variables.
   last_msg = ""; last_err = "";
 }
@@ -2766,6 +2788,7 @@ void StartNewDay() {
   if (DayOfYear() < day_of_year) {
     StartNewYear();
   }
+
   // Store new data.
   day_of_week = DayOfWeek(); // The zero-based day of week (0 means Sunday,1,2,3,4,5,6) of the specified date. At the testing, the last known server time is modelled.
   day_of_month = Day(); // The day of month (1 - 31) of the specified date. At the testing, the last known server time is modelled.
@@ -2925,182 +2948,186 @@ void InitializeVariables() {
 
   name[MA1]              = "MA M1";
   info[MA1][ACTIVE]      = MA1_Enabled;
-  info[MA1][PERIOD]      = M1;
+  info[MA1][TIMEFRAME]   = M1;
   info[MA1][OPEN_METHOD] = MA1_OpenMethod;
   info[MA1][FACTOR]      = 1.0;
 
   name[MA5]              = "MA M5";
   info[MA5][ACTIVE]      = MA5_Enabled;
-  info[MA5][PERIOD]      = M5;
+  info[MA5][TIMEFRAME]   = M5;
   info[MA5][OPEN_METHOD] = MA5_OpenMethod;
   info[MA5][FACTOR]      = 1.0;
 
   name[MA15]              = "MA M15";
   info[MA15][ACTIVE]      = MA15_Enabled;
-  info[MA15][PERIOD]      = M15;
+  info[MA15][TIMEFRAME]   = M15;
   info[MA15][OPEN_METHOD] = MA15_OpenMethod;
   info[MA15][FACTOR]      = 1.0;
 
   name[MA30]              = "MA M30";
   info[MA30][ACTIVE]      = MA30_Enabled;
-  info[MA30][PERIOD]      = M30;
+  info[MA30][TIMEFRAME]   = M30;
   info[MA30][OPEN_METHOD] = MA30_OpenMethod;
   info[MA30][FACTOR]      = 1.0;
 
   name[MACD1]                = "MACD M1";
   info[MACD1][ACTIVE]        = MACD1_Enabled;
-  info[MACD1][PERIOD]        = M1;
+  info[MACD1][TIMEFRAME]     = M1;
   info[MACD1][OPEN_METHOD]   = MACD1_OpenMethod;
   info[MACD1][FACTOR]        = 1.0;
 
   name[MACD5]                = "MACD M5";
   info[MACD5][ACTIVE]        = MACD5_Enabled;
-  info[MACD5][PERIOD]        = M5;
+  info[MACD5][TIMEFRAME]     = M5;
   info[MACD5][OPEN_METHOD]   = MACD5_OpenMethod;
   info[MACD5][FACTOR]        = 1.0;
 
   name[MACD15]                = "MACD M15";
   info[MACD15][ACTIVE]        = MACD15_Enabled;
-  info[MACD15][PERIOD]        = M15;
+  info[MACD15][TIMEFRAME]     = M15;
   info[MACD15][OPEN_METHOD]   = MACD15_OpenMethod;
   info[MACD15][FACTOR]        = 1.0;
 
   name[MACD30]                = "MACD M30";
   info[MACD30][ACTIVE]        = MACD30_Enabled;
-  info[MACD30][PERIOD]        = M30;
+  info[MACD30][TIMEFRAME]     = M30;
   info[MACD30][OPEN_METHOD]   = MACD30_OpenMethod;
   info[MACD30][FACTOR]        = 1.0;
 
   name[ALLIGATOR]           = "Alligator M1";
   info[ALLIGATOR][ACTIVE]   = Alligator_Enabled;
-  info[ALLIGATOR][PERIOD]   = M1;
+  info[ALLIGATOR][TIMEFRAME]= M1;
   info[ALLIGATOR][FACTOR]   = 1.0;
 
   name[RSI1]                = "RSI M1";
   info[RSI1][ACTIVE]        = RSI1_Enabled;
-  info[RSI1][PERIOD]        = M1;
+  info[RSI1][TIMEFRAME]     = M1;
   info[RSI1][OPEN_METHOD]   = RSI1_OpenMethod;
+  info[RSI1][CUSTOM_PERIOD] = RSI_Period;
   info[RSI1][FACTOR]        = 1.0;
 
   name[RSI5]                = "RSI M5";
   info[RSI5][ACTIVE]        = RSI5_Enabled;
-  info[RSI5][PERIOD]        = M5;
+  info[RSI5][TIMEFRAME]     = M5;
   info[RSI5][OPEN_METHOD]   = RSI5_OpenMethod;
+  info[RSI5][CUSTOM_PERIOD] = RSI_Period;
   info[RSI5][FACTOR]        = 1.0;
 
-  name[RSI15]               = "RSI M15";
-  info[RSI15][ACTIVE]       = RSI15_Enabled;
-  info[RSI15][PERIOD]       = M15;
-  info[RSI15][OPEN_METHOD]  = RSI15_OpenMethod;
-  info[RSI15][FACTOR]       = 1.0;
+  name[RSI15]                = "RSI M15";
+  info[RSI15][ACTIVE]        = RSI15_Enabled;
+  info[RSI15][TIMEFRAME]     = M15;
+  info[RSI15][OPEN_METHOD]   = RSI15_OpenMethod;
+  info[RSI15][CUSTOM_PERIOD] = RSI_Period;
+  info[RSI15][FACTOR]        = 1.0;
 
-  name[RSI30]               = "RSI M30";
-  info[RSI30][ACTIVE]       = RSI30_Enabled;
-  info[RSI30][PERIOD]       = M30;
-  info[RSI30][OPEN_METHOD]  = RSI30_OpenMethod;
-  info[RSI30][FACTOR]       = 1.0;
+  name[RSI30]                = "RSI M30";
+  info[RSI30][ACTIVE]        = RSI30_Enabled;
+  info[RSI30][TIMEFRAME]     = M30;
+  info[RSI30][OPEN_METHOD]   = RSI30_OpenMethod;
+  info[RSI30][CUSTOM_PERIOD] = RSI_Period;
+  info[RSI30][FACTOR]        = 1.0;
 
   name[SAR1]                = "SAR M1";
   info[SAR1][ACTIVE]        = SAR1_Enabled;
-  info[SAR1][PERIOD]        = M1;
+  info[SAR1][TIMEFRAME]     = M1;
   info[SAR1][OPEN_METHOD]   = SAR1_OpenMethod;
   info[SAR1][FACTOR]        = 1.0;
 
   name[SAR5]                = "SAR M5";
   info[SAR5][ACTIVE]        = SAR5_Enabled;
-  info[SAR5][PERIOD]        = M5;
+  info[SAR5][TIMEFRAME]     = M5;
   info[SAR5][OPEN_METHOD]   = SAR5_OpenMethod;
   info[SAR5][FACTOR]        = 1.0;
 
   name[SAR15]               = "SAR M15";
   info[SAR15][ACTIVE]       = SAR15_Enabled;
-  info[SAR15][PERIOD]       = M15;
+  info[SAR15][TIMEFRAME]    = M15;
   info[SAR15][OPEN_METHOD]  = SAR15_OpenMethod;
   info[SAR15][FACTOR]       = 1.0;
 
   name[SAR30]               = "SAR M30";
   info[SAR30][ACTIVE]       = SAR30_Enabled;
-  info[SAR30][PERIOD]       = M30;
+  info[SAR30][TIMEFRAME]    = M30;
   info[SAR30][OPEN_METHOD]  = SAR30_OpenMethod;
   info[SAR30][FACTOR]       = 1.0;
 
-  name[BANDS1]               = "Bands M1";
-  info[BANDS1][ACTIVE]       = Bands1_Enabled;
-  info[BANDS1][PERIOD]       = M1;
-  info[BANDS1][OPEN_METHOD]  = Bands1_OpenMethod;
-  info[BANDS1][MA_PERIOD]    = Bands_Period;
-  info[BANDS1][FACTOR]       = 1.0;
+  name[BANDS1]                = "Bands M1";
+  info[BANDS1][ACTIVE]        = Bands1_Enabled;
+  info[BANDS1][TIMEFRAME]     = M1;
+  info[BANDS1][OPEN_METHOD]   = Bands1_OpenMethod;
+  info[BANDS1][CUSTOM_PERIOD] = Bands_Period;
+  info[BANDS1][FACTOR]        = 1.0;
 
-  name[BANDS5]               = "Bands M5";
-  info[BANDS5][ACTIVE]       = Bands5_Enabled;
-  info[BANDS5][PERIOD]       = M5;
-  info[BANDS5][OPEN_METHOD]  = Bands5_OpenMethod;
-  info[BANDS5][MA_PERIOD]    = Bands_Period;
-  info[BANDS5][FACTOR]       = 1.0;
+  name[BANDS5]                = "Bands M5";
+  info[BANDS5][ACTIVE]        = Bands5_Enabled;
+  info[BANDS5][TIMEFRAME]     = M5;
+  info[BANDS5][OPEN_METHOD]   = Bands5_OpenMethod;
+  info[BANDS5][CUSTOM_PERIOD] = Bands_Period;
+  info[BANDS5][FACTOR]        = 1.0;
 
-  name[BANDS15]               = "Bands M15";
-  info[BANDS15][ACTIVE]       = Bands15_Enabled;
-  info[BANDS15][PERIOD]       = M15;
-  info[BANDS15][OPEN_METHOD]  = Bands15_OpenMethod;
-  info[BANDS15][MA_PERIOD]    = Bands_Period;
-  info[BANDS15][FACTOR]       = 1.0;
+  name[BANDS15]                = "Bands M15";
+  info[BANDS15][ACTIVE]        = Bands15_Enabled;
+  info[BANDS15][TIMEFRAME]     = M15;
+  info[BANDS15][OPEN_METHOD]   = Bands15_OpenMethod;
+  info[BANDS15][CUSTOM_PERIOD] = Bands_Period;
+  info[BANDS15][FACTOR]        = 1.0;
 
-  name[BANDS30]               = "Bands M30";
-  info[BANDS30][ACTIVE]       = Bands30_Enabled;
-  info[BANDS30][PERIOD]       = M30;
-  info[BANDS30][OPEN_METHOD]  = Bands30_OpenMethod;
-  info[BANDS30][MA_PERIOD]    = Bands_Period;
-  info[BANDS30][FACTOR]       = 1.0;
+  name[BANDS30]                = "Bands M30";
+  info[BANDS30][ACTIVE]        = Bands30_Enabled;
+  info[BANDS30][TIMEFRAME]     = M30;
+  info[BANDS30][OPEN_METHOD]   = Bands30_OpenMethod;
+  info[BANDS30][CUSTOM_PERIOD] = Bands_Period;
+  info[BANDS30][FACTOR]        = 1.0;
 
-  name[ENVELOPES1]          = "Envelopes M1";
-  info[ENVELOPES1][ACTIVE]  = Envelopes1_Enabled;
-  info[ENVELOPES1][PERIOD]  = M1;
-  info[ENVELOPES1][FACTOR]  = 1.0;
+  name[ENVELOPES1]            = "Envelopes M1";
+  info[ENVELOPES1][ACTIVE]    = Envelopes1_Enabled;
+  info[ENVELOPES1][TIMEFRAME] = M1;
+  info[ENVELOPES1][FACTOR]    = 1.0;
 
-  name[ENVELOPES5]          = "Envelopes M5";
-  info[ENVELOPES5][ACTIVE]  = Envelopes5_Enabled;
-  info[ENVELOPES5][PERIOD]  = M5;
-  info[ENVELOPES5][FACTOR]  = 1.0;
+  name[ENVELOPES5]            = "Envelopes M5";
+  info[ENVELOPES5][ACTIVE]    = Envelopes5_Enabled;
+  info[ENVELOPES5][TIMEFRAME] = M5;
+  info[ENVELOPES5][FACTOR]    = 1.0;
 
-  name[ENVELOPES15]         = "Envelopes M15";
-  info[ENVELOPES15][ACTIVE] = Envelopes15_Enabled;
-  info[ENVELOPES15][PERIOD] = M15;
-  info[ENVELOPES15][FACTOR]  = 1.0;
+  name[ENVELOPES15]            = "Envelopes M15";
+  info[ENVELOPES15][ACTIVE]    = Envelopes15_Enabled;
+  info[ENVELOPES15][TIMEFRAME] = M15;
+  info[ENVELOPES15][FACTOR]    = 1.0;
 
-  name[ENVELOPES30]         = "Envelopes M30";
-  info[ENVELOPES30][ACTIVE] = Envelopes30_Enabled;
-  info[ENVELOPES30][PERIOD] = M30;
-  info[ENVELOPES30][FACTOR] = 1.0;
+  name[ENVELOPES30]            = "Envelopes M30";
+  info[ENVELOPES30][ACTIVE]    = Envelopes30_Enabled;
+  info[ENVELOPES30][TIMEFRAME] = M30;
+  info[ENVELOPES30][FACTOR]    = 1.0;
 
-  name[WPR]                 = "WPR";
-  info[WPR][ACTIVE]         = WPR_Enabled;
-  info[WPR][PERIOD]         = M1;
-  info[WPR][FACTOR]         = 1.0;
+  name[WPR]                  = "WPR";
+  info[WPR][ACTIVE]          = WPR_Enabled;
+  info[WPR][TIMEFRAME]       = M1;
+  info[WPR][FACTOR]          = 1.0;
 
-  name[DEMARKER]            = "DeMarker";
-  info[DEMARKER][ACTIVE]    = DeMarker_Enabled;
-  info[DEMARKER][PERIOD]    = M1;
-  info[DEMARKER][FACTOR]    = 1.0;
+  name[DEMARKER]             = "DeMarker";
+  info[DEMARKER][ACTIVE]     = DeMarker_Enabled;
+  info[DEMARKER][TIMEFRAME]  = M1;
+  info[DEMARKER][FACTOR]     = 1.0;
 
-  name[FRACTALS1]           = "Fractals M1";
-  info[FRACTALS1][ACTIVE]   = Fractals1_Enabled;
-  info[FRACTALS1][PERIOD]   = M1;
-  info[FRACTALS1][FACTOR]   = 1.0;
+  name[FRACTALS1]            = "Fractals M1";
+  info[FRACTALS1][ACTIVE]    = Fractals1_Enabled;
+  info[FRACTALS1][TIMEFRAME] = M1;
+  info[FRACTALS1][FACTOR]    = 1.0;
 
-  name[FRACTALS5]           = "Fractals M5";
-  info[FRACTALS5][ACTIVE]   = Fractals5_Enabled;
-  info[FRACTALS5][PERIOD]   = M5;
-  info[FRACTALS5][FACTOR]   = 1.0;
+  name[FRACTALS5]            = "Fractals M5";
+  info[FRACTALS5][ACTIVE]    = Fractals5_Enabled;
+  info[FRACTALS5][TIMEFRAME] = M5;
+  info[FRACTALS5][FACTOR]    = 1.0;
 
-  name[FRACTALS15]          = "Fractals M15";
-  info[FRACTALS15][ACTIVE]  = Fractals15_Enabled;
-  info[FRACTALS15][PERIOD]  = M15;
-  info[FRACTALS15][FACTOR]  = 1.0;
+  name[FRACTALS15]            = "Fractals M15";
+  info[FRACTALS15][ACTIVE]    = Fractals15_Enabled;
+  info[FRACTALS15][TIMEFRAME] = M15;
+  info[FRACTALS15][FACTOR]    = 1.0;
 
-  name[FRACTALS30]          = "Fractals M30";
-  info[FRACTALS30][ACTIVE]  = Fractals30_Enabled;
-  info[FRACTALS30][PERIOD]  = M30;
-  info[FRACTALS30][FACTOR]  = 1.0;
+  name[FRACTALS30]            = "Fractals M30";
+  info[FRACTALS30][ACTIVE]    = Fractals30_Enabled;
+  info[FRACTALS30][TIMEFRAME] = M30;
+  info[FRACTALS30][FACTOR]    = 1.0;
 }
 
 /*
@@ -3279,6 +3306,97 @@ void ApplyStrategyMultiplierFactor(int period = DAILY, int loss_or_profit = 0, d
       }
     }
   }
+}
+
+/*
+ * Check if RSI period needs any change.
+ *
+ * FIXME: Doesn't improve much.
+ */
+void RSI_CheckPeriod() {
+
+  int period;
+  // 1 minute period.
+  period = M1;
+  if (rsi_stats[period][MODE_UPPER] - rsi_stats[period][MODE_LOWER] < RSI1_IncreasePeriod_MinDiff) {
+    info[RSI1][CUSTOM_PERIOD] = MathMin(info[RSI1][CUSTOM_PERIOD] + 1, RSI_Period * 2);
+    if (VerboseDebug) PrintFormat("Increased " + name[RSI1] + " period to %d", info[RSI1][CUSTOM_PERIOD]);
+    // Reset stats.
+    rsi_stats[period][MODE_UPPER] = 0;
+    rsi_stats[period][MODE_LOWER] = 0;
+  } else if (rsi_stats[period][MODE_UPPER] - rsi_stats[period][MODE_LOWER] > RSI1_DecreasePeriod_MaxDiff) {
+    info[RSI1][CUSTOM_PERIOD] = MathMax(info[RSI1][CUSTOM_PERIOD] - 1, RSI_Period / 2);
+    if (VerboseDebug) PrintFormat("Decreased " + name[RSI1] + " period to %d", info[RSI1][CUSTOM_PERIOD]);
+    // Reset stats.
+    rsi_stats[period][MODE_UPPER] = 0;
+    rsi_stats[period][MODE_LOWER] = 0;
+  }
+  // 5 minute period.
+  period = M5;
+  if (rsi_stats[period][MODE_UPPER] - rsi_stats[period][MODE_LOWER] < RSI5_IncreasePeriod_MinDiff) {
+    info[RSI5][CUSTOM_PERIOD] = MathMin(info[RSI5][CUSTOM_PERIOD] + 1, RSI_Period * 2);
+    if (VerboseDebug) PrintFormat("Increased " + name[RSI5] + " period to %d", info[RSI1][CUSTOM_PERIOD]);
+    // Reset stats.
+    rsi_stats[period][MODE_UPPER] = 0;
+    rsi_stats[period][MODE_LOWER] = 0;
+  } else if (rsi_stats[period][MODE_UPPER] - rsi_stats[period][MODE_LOWER] > RSI5_DecreasePeriod_MaxDiff) {
+    info[RSI5][CUSTOM_PERIOD] = MathMax(info[RSI5][CUSTOM_PERIOD] - 1, RSI_Period / 2);
+    if (VerboseDebug) PrintFormat("Decreased " + name[RSI5] + " period to %d", info[RSI1][CUSTOM_PERIOD]);
+    // Reset stats.
+    rsi_stats[period][MODE_UPPER] = 0;
+    rsi_stats[period][MODE_LOWER] = 0;
+  }
+  // 15 minute period.
+
+  period = M15;
+  if (rsi_stats[period][MODE_UPPER] - rsi_stats[period][MODE_LOWER] < RSI15_IncreasePeriod_MinDiff) {
+    info[RSI15][CUSTOM_PERIOD] = MathMin(info[RSI15][CUSTOM_PERIOD] + 1, RSI_Period * 2);
+    if (VerboseDebug) PrintFormat("Increased " + name[RSI15] + " period to %d", info[RSI15][CUSTOM_PERIOD]);
+    // Reset stats.
+    rsi_stats[period][MODE_UPPER] = 0;
+    rsi_stats[period][MODE_LOWER] = 0;
+  } else if (rsi_stats[period][MODE_UPPER] - rsi_stats[period][MODE_LOWER] > RSI15_DecreasePeriod_MaxDiff) {
+    info[RSI15][CUSTOM_PERIOD] = MathMax(info[RSI15][CUSTOM_PERIOD] - 1, RSI_Period / 2);
+    if (VerboseDebug) PrintFormat("Decreased " + name[RSI15] + " period to %d", info[RSI15][CUSTOM_PERIOD]);
+    // Reset stats.
+    rsi_stats[period][MODE_UPPER] = 0;
+    rsi_stats[period][MODE_LOWER] = 0;
+  }
+  /*
+  Print(__FUNCTION__ + "(): M1: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][MODE_LOWER] + ", Max: " + rsi_stats[period][MODE_UPPER] + ", Diff: " + ( rsi_stats[period][MODE_UPPER] - rsi_stats[period][MODE_LOWER] ));
+  period = M5;
+  Print(__FUNCTION__ + "(): M5: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][MODE_LOWER] + ", Max: " + rsi_stats[period][MODE_UPPER] + ", Diff: " + ( rsi_stats[period][MODE_UPPER] - rsi_stats[period][MODE_LOWER] ));
+  period = M15;
+  Print(__FUNCTION__ + "(): M15: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][MODE_LOWER] + ", Max: " + rsi_stats[period][MODE_UPPER] + ", Diff: " + ( rsi_stats[period][MODE_UPPER] - rsi_stats[period][MODE_LOWER] ));
+  period = M30;
+  Print(__FUNCTION__ + "(): M30: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][MODE_LOWER] + ", Max: " + rsi_stats[period][MODE_UPPER] + ", Diff: " + ( rsi_stats[period][MODE_UPPER] - rsi_stats[period][MODE_LOWER] ));
+  */
+}
+
+// FIXME: Doesn't improve anything.
+bool RSI_IncreasePeriod(int period = M1, int condition = 0) {
+  bool result = condition > 0;
+  if ((condition &   1) != 0) result = result && (rsi_stats[period][MODE_UPPER] > 50 + RSI_OpenLevel + RSI_OpenLevel / 2 && rsi_stats[period][MODE_LOWER] < 50 - RSI_OpenLevel - RSI_OpenLevel / 2);
+  if ((condition &   2) != 0) result = result && (rsi_stats[period][MODE_UPPER] > 50 + RSI_OpenLevel + RSI_OpenLevel / 2 || rsi_stats[period][MODE_LOWER] < 50 - RSI_OpenLevel - RSI_OpenLevel / 2);
+  if ((condition &   4) != 0) result = result && (rsi_stats[period][0] < 50 + RSI_OpenLevel + RSI_OpenLevel / 3 && rsi_stats[period][0] > 50 - RSI_OpenLevel - RSI_OpenLevel / 3);
+  // if ((condition &   4) != 0) result = result || rsi_stats[period][0] < 50 + RSI_OpenLevel;
+  if ((condition &   8) != 0) result = result && rsi_stats[period][MODE_UPPER] - rsi_stats[period][MODE_LOWER] < 50;
+  // if ((condition &  16) != 0) result = result && rsi[period][CURR] - rsi[period][PREV] > rsi[period][PREV] - rsi[period][FAR];
+  // if ((condition &  32) != 0) result = result && Open[CURR] > Close[PREV];
+  return result;
+}
+
+// FIXME: Doesn't improve anything.
+bool RSI_DecreasePeriod(int period = M1, int condition = 0) {
+  bool result = condition > 0;
+  if ((condition &   1) != 0) result = result && (rsi_stats[period][MODE_UPPER] <= 50 + RSI_OpenLevel && rsi_stats[period][MODE_LOWER] >= 50 - RSI_OpenLevel);
+  if ((condition &   2) != 0) result = result && (rsi_stats[period][MODE_UPPER] <= 50 + RSI_OpenLevel || rsi_stats[period][MODE_LOWER] >= 50 - RSI_OpenLevel);
+  // if ((condition &   4) != 0) result = result && (rsi_stats[period][0] > 50 + RSI_OpenLevel / 3 || rsi_stats[period][0] < 50 - RSI_OpenLevel / 3);
+  // if ((condition &   4) != 0) result = result && rsi_stats[period][MODE_UPPER] > 50 + (RSI_OpenLevel / 3);
+  // if ((condition &   8) != 0) result = result && && rsi_stats[period][MODE_UPPER] < 50 - (RSI_OpenLevel / 3);
+  // if ((condition &  16) != 0) result = result && rsi[period][CURR] - rsi[period][PREV] > rsi[period][PREV] - rsi[period][FAR];
+  // if ((condition &  32) != 0) result = result && Open[CURR] > Close[PREV];
+  return result;
 }
 
 /* END: STRATEGY FUNCTIONS */
@@ -3682,7 +3800,7 @@ bool ActionCloseAllUnprofitableOrders(){
   }
 
   if (selected_orders > 0 && VerboseInfo) {
-    Print("ActionCloseAllUnprofitableOrders(): Queued " + selected_orders + " orders to close with expected loss of " + total_profit + " pips.");
+    Print(__FUNCTION__ + "(): Queued " + selected_orders + " orders to close with expected loss of " + total_profit + " pips.");
   }
   return (result);
 }
@@ -3701,7 +3819,7 @@ bool ActionCloseAllOrdersByType(int cmd){
   }
 
   if (selected_orders > 0 && VerboseInfo) {
-    Print("ActionCloseAllOrdersByType(" + _OrderType_str(cmd) + "): Queued " + selected_orders + " orders to close with expected profit of " + total_profit + " pips.");
+    Print(__FUNCTION__ + "(" + _OrderType_str(cmd) + "): Queued " + selected_orders + " orders to close with expected profit of " + total_profit + " pips.");
   }
   return (FALSE);
 }
@@ -3730,12 +3848,12 @@ int ActionCloseAllOrders(bool only_ours = TRUE) {
          processed++;
       } else {
         if (VerboseDebug)
-         Print("Error in CloseAllOrders(): Order Pos: " + order + "; Message: ", GetErrorText(GetLastError()));
+         Print(__FUNCTION__ + "(): Error: Order Pos: " + order + "; Message: ", GetErrorText(GetLastError()));
       }
    }
 
    if (processed > 0 && VerboseInfo) {
-     Print("CloseAllOrders(): Queued " + processed + " orders out of " + total + " for closure.");
+     Print(__FUNCTION__ + "(): Queued " + processed + " orders out of " + total + " for closure.");
    }
    return (processed > 0);
 }
@@ -3747,7 +3865,7 @@ bool ActionExecute(int action_id, string reason) {
   switch (action_id) {
     case A_NONE:
       result = TRUE;
-      if (VerboseTrace) Print("ExecuteAction(): No action taken. Action call reason: " + reason);
+      if (VerboseTrace) Print(__FUNCTION__ + "(): No action taken. Action call reason: " + reason);
       // Nothing.
       break;
     case A_CLOSE_ORDER_PROFIT: /* 1 */
@@ -3786,10 +3904,10 @@ bool ActionExecute(int action_id, string reason) {
       // result = TightenProfits();
       break;
     default:
-      if (VerboseDebug) Print("Unknown action id: ", action_id);
+      if (VerboseDebug) Print(__FUNCTION__ + "(): Unknown action id: ", action_id);
   }
   TaskProcessList(TRUE); // Process task list immediately after action has been taken.
-  if (VerboseInfo) Print(GetAccountTextDetails() + GetOrdersStats());
+  if (VerboseInfo) Print(__FUNCTION__ + "(): " + GetAccountTextDetails() + GetOrdersStats());
   if (result) {
     if (VerboseDebug && action_id != A_NONE) Print(__FUNCTION__ + "(): Action id: " + action_id + "; reason: " + reason);
     last_action_time = last_bar_time; // Set last execution bar time.
@@ -4255,7 +4373,7 @@ void CalculateSummary(double initial_deposit)
 //---- initialize summaries
    InitializeSummaries(initial_deposit);
 //----
-   for(int i=0; i<trades_total; i++) {
+   for (int i = 0; i < trades_total; i++) {
       if (!OrderSelect(i,SELECT_BY_POS,MODE_HISTORY)) continue;
       int type=OrderType();
       //---- initial balance not considered
@@ -4291,8 +4409,7 @@ void CalculateSummary(double initial_deposit)
       SummaryTrades++;
       if (type == OP_BUY) LongTrades++;
       else             ShortTrades++;
-      //---- loss trades
-      if(profit<0) {
+      if(profit<0) { //---- loss trades
          LossTrades++;
          GrossLoss+=profit;
          if(MinProfit>profit) MinProfit=profit;
@@ -4316,10 +4433,7 @@ void CalculateSummary(double initial_deposit)
             sequence=0;
             sequential=0.0;
            }
-        }
-      //---- profit trades (profit>=0)
-      else
-        {
+        } else { //---- profit trades (profit>=0)
          ProfitTrades++;
          if(type==OP_BUY)  WinLongTrades++;
          if(type==OP_SELL) WinShortTrades++;
@@ -4348,22 +4462,21 @@ void CalculateSummary(double initial_deposit)
         }
       sequence++;
       sequential+=profit;
-      //----
       prevprofit=profit;
      }
 //---- final drawdown check
-   drawdown=maxpeak-minpeak;
-   if(maxpeak != 0.0) {
-      drawdownpercent=drawdown/maxpeak*100.0;
-      if(RelDrawdownPercent<drawdownpercent) {
-         RelDrawdownPercent=drawdownpercent;
-         RelDrawdown=drawdown;
+   drawdown = maxpeak - minpeak;
+   if (maxpeak != 0.0) {
+      drawdownpercent = drawdown / maxpeak * 100.0;
+      if (RelDrawdownPercent < drawdownpercent) {
+         RelDrawdownPercent = drawdownpercent;
+         RelDrawdown = drawdown;
       }
    }
-   if(MaxDrawdown<drawdown) {
-    MaxDrawdown=drawdown;
-    if(maxpeak!=0) MaxDrawdownPercent=MaxDrawdown/maxpeak*100.0;
-    else MaxDrawdownPercent=100.0;
+   if (MaxDrawdown < drawdown) {
+    MaxDrawdown = drawdown;
+    if (maxpeak != 0) MaxDrawdownPercent = MaxDrawdown / maxpeak * 100.0;
+    else MaxDrawdownPercent = 100.0;
    }
 //---- consider last trade
    if(prevprofit!=EMPTY_VALUE)
@@ -4428,7 +4541,7 @@ void CalculateSummary(double initial_deposit)
       ExpectedPayoff=profitkoef*avgprofit-losskoef*avgloss;
      }
 //---- absolute drawdown
-   AbsoluteDrawdown=initial_deposit-MaxLoss;
+   AbsoluteDrawdown = initial_deposit - MaxLoss;
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -4508,6 +4621,8 @@ void ReportAdd(string msg) {
  */
 string GenerateReport() {
   string output = "";
+  int i;
+  if (InitialDeposit > 0)
   output += "Initial deposit:                            " + InitialDeposit + "\n";
   output += "Total net profit:                           " + SummaryProfit + "\n";
   output += "Gross profit:                               " + GrossProfit + "\n";
@@ -4516,8 +4631,8 @@ string GenerateReport() {
   output += "Profit factor:                              " + ProfitFactor + "\n";
   output += "Expected payoff:                            " + ExpectedPayoff + "\n";
   output += "Absolute drawdown:                          " + AbsoluteDrawdown + "\n";
-  output += "Maximal drawdown:                           " + MaxDrawdown + StringConcatenate("(",MaxDrawdownPercent,"%)") + "\n";
-  output += "Relative drawdown:                          " + StringConcatenate(RelDrawdownPercent,"%") + StringConcatenate("(",RelDrawdown,")") + "\n";
+  output += StringFormat("Maximal drawdown:                           %.1f (%.1f%%)\n", MaxDrawdown, MaxDrawdownPercent);
+  output += StringFormat("Relative drawdown:                          (%.1f%%) %.1f\n", RelDrawdownPercent, RelDrawdown);
   output += "Trades total                                " + SummaryTrades + "\n";
   if(ShortTrades>0)
   output += "Short positions(won %):                     " + ShortTrades + StringConcatenate("(",100.0*WinShortTrades/ShortTrades,"%)") + "\n";
@@ -4543,10 +4658,16 @@ string GenerateReport() {
 
   // Write report log.
   if (ArraySize(log) > 0) output += "Report log:\n";
-  for (int i = 0; i < ArraySize(log); i++)
+  for (i = 0; i < ArraySize(log); i++)
    output += log[i] + "\n";
 
-  if (VerboseDebug) Print(output);
+  if (VerboseDebug) {
+    string result[];
+    ushort sep = StringGetCharacter("\n", 0);
+    for (i = 0; i < StringSplit(output, sep, result); i++) {
+      Print(result[i]);
+    }
+  }
   return output;
 }
 
