@@ -180,12 +180,12 @@ extern double EAStopLoss = 0.0;
 extern double RiskRatio = 0; // Suggested value: 1.0. Do not change unless testing.
 
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting (set 1.0 to default) --";
-extern double BestDailyStrategyMultiplierFactor    = 2; // Increase lot size for the best daily strategy.
-extern double BestWeeklyStrategyMultiplierFactor   = 2; // Increase lot size for the best weekly strategy.
-extern double BestMonthlyStrategyMultiplierFactor  = 1; // Increase lot size for the best monthly strategy.
-extern double WorseDailyStrategyDividerFactor      = 0; // Check for the worse daily strategy each hour. Useful for low-balance accounts or non-profitable periods.
-extern double WorseWeeklyStrategyDividerFactor     = 0; // Check for the worse weekly strategy each hour. Useful for low-balance accounts or non-profitable periods.
-extern double WorseMonthlyStrategyDividerFactor    = 1; // Check for the worse monthly strategy each hour. Useful for low-balance accounts or non-profitable periods.
+extern double BestDailyStrategyMultiplierFactor    = 1; // Increase lot size for the best daily strategy.
+extern double BestWeeklyStrategyMultiplierFactor   = 1; // Increase lot size for the best weekly strategy.
+extern double BestMonthlyStrategyMultiplierFactor  = 2; // Increase lot size for the best monthly strategy.
+extern double WorseDailyStrategyDividerFactor      = 1; // Check for the worse daily strategy each hour. Useful for low-balance accounts or non-profitable periods.
+extern double WorseWeeklyStrategyDividerFactor     = 2; // Check for the worse weekly strategy each hour. Useful for low-balance accounts or non-profitable periods.
+extern double WorseMonthlyStrategyDividerFactor    = 2; // Check for the worse monthly strategy each hour. Useful for low-balance accounts or non-profitable periods.
 
 extern string ____MA_Parameters__ = "-- Settings for the Moving Average indicator --";
 extern bool MA1_Enabled  = TRUE; // Enable MA-based strategy.
@@ -451,7 +451,8 @@ extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_MA_F_TRAIL; // Trailing
  * Summary backtest log
  * All [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 3, 7,6mln ticks, quality 25%]:
  * Deposit: £1000 (factor = auto)
- *   £38161.75	41182	1.14	0.93	6686.84	23.33% (deposit: £1000, default settings)
+ *   £47031.51	42533	1.15	1.11	4641.58	21.02% (deposit: £1000, default settings)
+ *   £38161.75	41182	1.14	0.93	6686.84	23.33% (deposit: £1000, default settings, previous)
  *   £59168.88	41285	1.12	1.43	12750.98	24.11% (deposit: £10000, default settings)
  *   £890286.13	41405	1.12	21.50	162767.50	24.41% (deposit: £100000, default settings)
 
