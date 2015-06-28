@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.044"
+#property version   "1.045"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -273,10 +273,10 @@ extern bool RSI30_Enabled = TRUE; // Enable RSI-based strategy.
 // extern ENUM_TIMEFRAMES RSI_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int RSI_Period = 18; // Averaging period for calculation.
 extern ENUM_APPLIED_PRICE RSI_Applied_Price = PRICE_OPEN; // RSI applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
-extern int RSI1_OpenMethod  = 6; // Valid range: 0-63.
-extern int RSI5_OpenMethod  = 7; // Valid range: 0-63.
-extern int RSI15_OpenMethod = 7; // Valid range: 0-63.
-extern int RSI30_OpenMethod = 5; // Valid range: 0-63.
+extern int RSI1_OpenMethod  = 0; // Valid range: 0-127.
+extern int RSI5_OpenMethod  = 5; // Valid range: 0-127.
+extern int RSI15_OpenMethod = 1; // Valid range: 0-127.
+extern int RSI30_OpenMethod = 5; // Valid range: 0-127.
 extern int RSI_OpenLevel = 20;
 extern int RSI_Shift = 0; // Shift relative to the chart.
 extern bool RSI_CloseOnChange = TRUE; // Close opposite orders on market change.
@@ -292,15 +292,16 @@ int RSI15_DecreasePeriod_MaxDiff = 58;
 int RSI30_IncreasePeriod_MinDiff = 26;
 int RSI30_DecreasePeriod_MaxDiff = 60;
 
-/* RSI backtest log (auto,ts:25,tp:25,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
- * Deposit: £1000 (factor = 1.0)
- *   £3198.64	2028	1.27	1.58	1029.53	41.52%
- *   RSI M1: Total net profit: 20100 pips, Total orders: 1997 (Won: 67.8% [1353] | Loss: 32.2% [644]);
- *   RSI M5: Total net profit: 3940 pips, Total orders: 509 (Won: 50.3% [256] | Loss: 49.7% [253]);
- *   RSI M15: Total net profit: 5547 pips, Total orders: 349 (Won: 55.3% [193] | Loss: 44.7% [156]);
- *   RSI M30: Total net profit: 2310 pips, Total orders: 330 (Won: 46.4% [153] | Loss: 53.6% [177]);
- * Deposit: £10000 (factor = 1.0)
- *   £4479.40	2024	1.37	2.21	1029.53	7.50%
+/*
+ * RSI backtest log (auto,ts:25,tp:25,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
+ *   £3367.78	2298	1.24	1.47	1032.39	42.64%	0.00000000	RSI_CloseOnChange=0 (deposit: £1000, boosting factor 1.0)
+ *   £3249.67	2338	1.24	1.39	1025.47	44.49%	0.00000000	RSI_CloseOnChange=1 (deposit: £1000, boosting factor 1.0)
+ *   £4551.26	2331	1.34	1.95	1030.22	9.06% RSI_TrailingProfitMethod=1 (deposit: £10000, boosting factor 1.0)
+ *   Strategy stats:
+ *    RSI M1: Total net profit: 23205 pips, Total orders: 2726 (Won: 68.6% [1871] | Loss: 31.4% [855]);
+ *    RSI M5: Total net profit: 2257 pips, Total orders: 391 (Won: 48.1% [188] | Loss: 51.9% [203]);
+ *    RSI M15: Total net profit: 4970 pips, Total orders: 496 (Won: 52.2% [259] | Loss: 47.8% [237]);
+ *    RSI M30: Total net profit: 2533 pips, Total orders: 272 (Won: 48.5% [132] | Loss: 51.5% [140]);
  * Deposit: £10000 (factor = 1.0) && RSI_DynamicPeriod
  *  £3380.43	2142	1.31	1.58	541.01	5.12%	0.00000000	RSI_DynamicPeriod=1
  *  £3060.19	1307	1.44	2.34	549.59	4.66%	0.00000000	RSI_DynamicPeriod=0
@@ -449,64 +450,46 @@ extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_MA_F_TRAIL; // Trailing
 /*
  * Summary backtest log
  * All [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 3, 7,6mln ticks, quality 25%]:
- *  (£1000,auto,ts:25,tp:25,gap:10)
  * Deposit: £1000 (factor = auto)
- *   £23053.06	39727	1.13	0.58	3197.04	29.82%
+ *   £38161.75	41182	1.14	0.93	6686.84	23.33% (deposit: £1000, default settings)
+ *   £59168.88	41285	1.12	1.43	12750.98	24.11% (deposit: £10000, default settings)
+ *   £890286.13	41405	1.12	21.50	162767.50	24.41% (deposit: £100000, default settings)
 
-    Strategy stats:
-    MA M1: Total net profit: 19 pips, Total orders: 6 (Won: 50.0% [3] | Loss: 50.0% [3]);
-    MA M5: Total net profit: 2249 pips, Total orders: 1567 (Won: 44.7% [701] | Loss: 55.3% [866]);
-    MA M15: Total net profit: 1894 pips, Total orders: 763 (Won: 42.2% [322] | Loss: 57.8% [441]);
-    MA M30: Total net profit: 2892 pips, Total orders: 546 (Won: 49.5% [270] | Loss: 50.5% [276]);
-    MACD M1: Total net profit: -3 pips, Total orders: 2304 (Won: 46.3% [1067] | Loss: 53.7% [1237]);
-    MACD M5: Total net profit: 12978 pips, Total orders: 7278 (Won: 43.3% [3153] | Loss: 56.7% [4125]);
-    MACD M15: Total net profit: 5112 pips, Total orders: 5260 (Won: 38.4% [2020] | Loss: 61.6% [3240]);
-    MACD M30: Total net profit: 30770 pips, Total orders: 2517 (Won: 54.5% [1371] | Loss: 45.5% [1146]);
-    Alligator M1: Total net profit: 3258 pips, Total orders: 2062 (Won: 59.4% [1225] | Loss: 40.6% [837]);
-    RSI M1: Total net profit: 6459 pips, Total orders: 1656 (Won: 63.3% [1048] | Loss: 36.7% [608]);
-    RSI M5: Total net profit: 82 pips, Total orders: 624 (Won: 50.8% [317] | Loss: 49.2% [307]);
-    RSI M15: Total net profit: 349 pips, Total orders: 447 (Won: 46.1% [206] | Loss: 53.9% [241]);
-    RSI M30: Total net profit: 908 pips, Total orders: 398 (Won: 39.9% [159] | Loss: 60.1% [239]);
-    SAR M1: Total net profit: 69 pips, Total orders: 1067 (Won: 38.4% [410] | Loss: 61.6% [657]);
-    SAR M5: Total net profit: 613 pips, Total orders: 870 (Won: 38.2% [332] | Loss: 61.8% [538]);
-    SAR M15: Total net profit: 599 pips, Total orders: 734 (Won: 30.8% [226] | Loss: 69.2% [508]);
-    SAR M30: Total net profit: 1743 pips, Total orders: 409 (Won: 30.8% [126] | Loss: 69.2% [283]);
-    Bands M1: Total net profit: 52053 pips, Total orders: 6507 (Won: 70.0% [4556] | Loss: 30.0% [1951]);
-    Bands M5: Total net profit: 80663 pips, Total orders: 7464 (Won: 67.2% [5015] | Loss: 32.8% [2449]);
-    Bands M15: Total net profit: 17013 pips, Total orders: 1487 (Won: 56.9% [846] | Loss: 43.1% [641]);
-    Bands M30: Total net profit: 7611 pips, Total orders: 786 (Won: 48.7% [383] | Loss: 51.3% [403]);
-    Envelopes M1: Total net profit: 50077 pips, Total orders: 6788 (Won: 64.7% [4390] | Loss: 35.3% [2398]);
-    WPR: Total net profit: 336 pips, Total orders: 4851 (Won: 48.8% [2366] | Loss: 51.2% [2485]);
-    DeMarker: Total net profit: 17 pips, Total orders: 2733 (Won: 41.9% [1144] | Loss: 58.1% [1589]);
-    Fractals M5: Total net profit: 19966 pips, Total orders: 17641 (Won: 53.4% [9425] | Loss: 46.6% [8216]);
-    Fractals M15: Total net profit: 27540 pips, Total orders: 9996 (Won: 54.5% [5450] | Loss: 45.5% [4546]);
-    Fractals M30: Total net profit: 17215 pips, Total orders: 6199 (Won: 51.5% [3192] | Loss: 48.5% [3007]);
+    Strategy stats (deposit £1000, boosting factor: auto):
+    MA M1: Total net profit: 40 pips, Total orders: 6 (Won: 50.0% [3] | Loss: 50.0% [3]);
+    MA M5: Total net profit: 3704 pips, Total orders: 1590 (Won: 45.2% [718] | Loss: 54.8% [872]);
+    MA M15: Total net profit: 2591 pips, Total orders: 759 (Won: 43.1% [327] | Loss: 56.9% [432]);
+    MA M30: Total net profit: 4619 pips, Total orders: 566 (Won: 50.7% [287] | Loss: 49.3% [279]);
+    MACD M1: Total net profit: 60 pips, Total orders: 2303 (Won: 46.2% [1065] | Loss: 53.8% [1238]);
+    MACD M5: Total net profit: 21294 pips, Total orders: 7170 (Won: 43.8% [3138] | Loss: 56.2% [4032]);
+    MACD M15: Total net profit: 17636 pips, Total orders: 5742 (Won: 38.4% [2203] | Loss: 61.6% [3539]);
+    MACD M30: Total net profit: 41872 pips, Total orders: 2556 (Won: 55.4% [1416] | Loss: 44.6% [1140]);
+    Alligator M1: Total net profit: 4859 pips, Total orders: 2049 (Won: 59.4% [1218] | Loss: 40.6% [831]);
+    RSI M1: Total net profit: 34246 pips, Total orders: 2730 (Won: 68.9% [1882] | Loss: 31.1% [848]);
+    RSI M5: Total net profit: 3320 pips, Total orders: 396 (Won: 48.7% [193] | Loss: 51.3% [203]);
+    RSI M15: Total net profit: 6354 pips, Total orders: 479 (Won: 51.6% [247] | Loss: 48.4% [232]);
+    RSI M30: Total net profit: 3038 pips, Total orders: 265 (Won: 47.9% [127] | Loss: 52.1% [138]);
+    SAR M1: Total net profit: 24 pips, Total orders: 1069 (Won: 38.4% [411] | Loss: 61.6% [658]);
+    SAR M5: Total net profit: 810 pips, Total orders: 882 (Won: 38.1% [336] | Loss: 61.9% [546]);
+    SAR M15: Total net profit: 1095 pips, Total orders: 740 (Won: 30.9% [229] | Loss: 69.1% [511]);
+    SAR M30: Total net profit: 2409 pips, Total orders: 417 (Won: 30.2% [126] | Loss: 69.8% [291]);
+    Bands M1: Total net profit: 71216 pips, Total orders: 6533 (Won: 69.9% [4566] | Loss: 30.1% [1967]);
+    Bands M5: Total net profit: 102590 pips, Total orders: 7519 (Won: 67.1% [5047] | Loss: 32.9% [2472]);
+    Bands M15: Total net profit: 23894 pips, Total orders: 1507 (Won: 56.4% [850] | Loss: 43.6% [657]);
+    Bands M30: Total net profit: 13022 pips, Total orders: 787 (Won: 48.7% [383] | Loss: 51.3% [404]);
+    Envelopes M1: Total net profit: 66360 pips, Total orders: 6777 (Won: 64.6% [4376] | Loss: 35.4% [2401]);
+    DeMarker: Total net profit: 23 pips, Total orders: 2694 (Won: 41.9% [1128] | Loss: 58.1% [1566]);
+    WPR M1: Total net profit: 129327 pips, Total orders: 11554 (Won: 79.8% [9220] | Loss: 20.2% [2334]);
+    WPR M5: Total net profit: 81002 pips, Total orders: 5584 (Won: 75.3% [4207] | Loss: 24.7% [1377]);
+    WPR M15: Total net profit: 468 pips, Total orders: 1023 (Won: 36.2% [370] | Loss: 63.8% [653]);
+    WPR M30: Total net profit: -81 pips, Total orders: 764 (Won: 39.5% [302] | Loss: 60.5% [462]);
+    Fractals M5: Total net profit: 28446 pips, Total orders: 17368 (Won: 52.7% [9153] | Loss: 47.3% [8215]);
+    Fractals M15: Total net profit: 37676 pips, Total orders: 10161 (Won: 54.9% [5583] | Loss: 45.1% [4578]);
+    Fractals M30: Total net profit: 24116 pips, Total orders: 6058 (Won: 51.3% [3107] | Loss: 48.7% [2951]);
 
-
- *   Prev:£18728.27	39745	1.10	0.47	4324.31	43.67%
- *   Prev:£28802.15	43226	1.13	0.67	6183.14	31.62%
- *   Old: £24353.94	36134	1.13	0.67	3696.73	39.27%
- *   Old: £20971.05	38227	1.12	0.55	4005.46	35.82%
- *   Old: £24184.97	38605	1.12	0.63	4134.27	27.99%	0.00000000	BestStrategyMultiplierFactor=2
- *   Old: £21472.76	38658	1.13	0.56	3409.54	25.62%	0.00000000	BestStrategyMultiplierFactor=1
- *   Old: £22798.95	41273	1.13	0.55	3384.65	24.77%	0.00000000	DynamicallyDisableWorseStrategy=0
- *   Old: £21472.76	38658	1.13	0.56	3409.54	25.62%	0.00000000	DynamicallyDisableWorseStrategy=1
+ *   Prev: £23053.06	39727	1.13	0.58	3197.04	29.82%
  *   Old: £29408.26	40723	1.14	0.72	6231.99	23.80%
  *   Old: £17022.25	27393	1.14	0.62	1562.87	19.89% [without SAR]
- *
- * Separated tests (1000,auto,ts:15,tp:20,gap:10,unlimited) [2015.01.02-2015.06.20 based on MT4 FXCM backtest data]:
- *   Old: MA:         profit:  922, trades:  3130, profit factor: 1.06, expected payoff: 0.29, drawdown: 67%,     +92%
- *   Old: MACD:       profit: 1000, trades:  1909, profit factor: 1.12, expected payoff: 0.52, drawdown: 36%,    +100%
- *   Old: Fractals:   profit:  941, trades:  7040, profit factor: 1.03, expected payoff: 0.13, drawdown: 73%,     +94%
- *   Old: Alligator:  profit: 1200, trades:  4797, profit factor: 1.05, expected payoff: 0.25, drawdown: 57%,    +120%
- *   Old: DeMarker:   profit: 2041, trades:  6982, profit factor: 1.06, expected payoff: 0.29, drawdown: 63%,    +204%
- *   Old: WPR:        profit: 2182, trades:  8335, profit factor: 1.07, expected payoff: 0.26, drawdown: 41%,    +218%
- * Mixed (auto,ts:15,tp:20,gap:10,unlimited) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data]:
- *   MA+MACD+Fractals+Alligator+DeMarker+WPR:
- *         1000: Old: profit: 7555, trades: 31228, profit factor: 1.05, expected payoff: 0.24, drawdown: 29/79%, +755%
- *        10000: Old: profit: 8586, trades: 31290, profit factor: 1.06, expected payoff: 0.27, drawdown: 22%,     +85%
- *   Alligator+RSI+SAR:
- *         1000: Old: profit: 5302, trades: 15703, profit factor: 1.16, expected payoff: 0.34, drawdown: 17%,    +530%
  */
 
 // Define account conditions.
@@ -1790,6 +1773,7 @@ bool RSI_On_Buy(int period = M1, int open_method = 0, int open_level = 20) {
   if ((open_method &   8) != 0) result = result && rsi[period][FAR]  < (50 - open_level);
   if ((open_method &  16) != 0) result = result && rsi[period][CURR] - rsi[period][PREV] > rsi[period][PREV] - rsi[period][FAR];
   if ((open_method &  32) != 0) result = result && Open[CURR] > Close[PREV];
+  if ((open_method &  64) != 0) result = result && rsi[period][FAR] > 50;
   return result;
 }
 
@@ -1809,6 +1793,7 @@ bool RSI_On_Sell(int period = M1, int open_method = 0, int open_level = 20) {
   if ((open_method &   8) != 0) result = result && rsi[period][FAR]  > (50 + open_level);
   if ((open_method &  16) != 0) result = result && rsi[period][PREV] - rsi[period][CURR] > rsi[period][FAR] - rsi[period][PREV];
   if ((open_method &  32) != 0) result = result && Open[CURR] < Close[PREV];
+  if ((open_method &  64) != 0) result = result && rsi[period][FAR] < 50;
   return result;
 }
 
