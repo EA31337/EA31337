@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.043"
+#property version   "1.044"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -46,8 +46,11 @@ enum ENUM_STRATEGY_TYPE {
   ENVELOPES15,
   ENVELOPES30,
   ENVELOPES60,
-  WPR,
   DEMARKER,
+  WPR1,
+  WPR5,
+  WPR15,
+  WPR30,
   FRACTALS1,
   FRACTALS5,
   FRACTALS15,
@@ -388,20 +391,29 @@ extern ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = T_SAR; // Trailing Profi
  */
 
 extern string ____WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --";
-extern bool WPR_Enabled = TRUE; // Enable WPR-based strategy.
+extern bool WPR1_Enabled = TRUE; // Enable WPR-based strategy.
+extern bool WPR5_Enabled = TRUE; // Enable WPR-based strategy.
+extern bool WPR15_Enabled = TRUE; // Enable WPR-based strategy.
+extern bool WPR30_Enabled = TRUE; // Enable WPR-based strategy.
 // extern ENUM_TIMEFRAMES WPR_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int WPR_Period = 21; // Suggested value: 22.
 extern int WPR_Shift = 0; // Shift relative to the current bar the given amount of periods ago. Suggested value: 1.
-extern int WPR_OpenMethod = 0; // Valid range: 0-3. Suggested value: 0.
-extern double WPR_OpenLevel = 0.3; // Suggested range: 0.0-0.5. Suggested range: 0.1-0.2.
-extern bool WPR_CloseOnChange = FALSE; // Close opposite orders on market change.
-extern ENUM_TRAIL_TYPE WPR_TrailingStopMethod = T_MA_F_FAR; // Trailing Stop method for WPR. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = T_MA_M_FAR_TRAIL; // Trailing Profit method for WPR. Set 0 to default. See: ENUM_TRAIL_TYPE.
-/* WPR backtest log (£1000,auto,ts:25,tp:20,gap:10,sp:2) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
- *   £2130.07	4651	1.13	0.46	400.33	23.18%	0.00000000	WPR_Period=20
- *   £2159.93	4646	1.13	0.46	394.12	22.54%	0.00000000	WPR_Period=21
- *   £2768.81	2012	1.16	1.38	671.87	25.71%	0.00000000	WPR_TrailingStopMethod=17 	WPR_TrailingProfitMethod=1
- *   £2456.55	5882	1.15	0.42	231.15	12.78%	0.00000000	WPR_TrailingStopMethod=18 	WPR_TrailingProfitMethod=19
+extern int WPR1_OpenMethod = 36; // Valid range: 0-127.
+extern int WPR5_OpenMethod = 64; // Valid range: 0-127.
+extern int WPR15_OpenMethod = 8; // Valid range: 0-127.
+extern int WPR30_OpenMethod = 8; // Valid range: 0-127.
+extern int WPR_OpenLevel = 30; // Suggested range: 25-35.
+extern bool WPR_CloseOnChange = TRUE; // Close opposite orders on market change.
+extern ENUM_TRAIL_TYPE WPR_TrailingStopMethod = T_MA_M_FAR_TRAIL; // Trailing Stop method for WPR. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = T_FIXED; // Trailing Profit method for WPR. Set 0 to default. See: ENUM_TRAIL_TYPE.
+/* WPR backtest log (auto,ts:25,tp:20,gap:10,sp:2) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
+ *   £6463.30	6828	1.20	0.95	1070.11	31.72% (deposit: £1000, boosting = 1.0)
+ *   £7188.33	6828	1.22	1.05	1070.11	6.75% (deposit: £10000, boosting = 1.0)
+ *  Strategy stats (deposit: £1000):
+ *  WPR M1: Total net profit: 72739 pips, Total orders: 11943 (Won: 80.2% [9583] | Loss: 19.8% [2360]);
+ *  WPR M5: Total net profit: 52232 pips, Total orders: 5750 (Won: 75.9% [4363] | Loss: 24.1% [1387]);
+ *  WPR M15: Total net profit: 1147 pips, Total orders: 1038 (Won: 36.3% [377] | Loss: 63.7% [661]);
+ *  WPR M30: Total net profit: 1078 pips, Total orders: 834 (Won: 40.4% [337] | Loss: 59.6% [497]);
  */
 
 extern string ____DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --";
@@ -1148,13 +1160,43 @@ void Trade() {
       }
    }
 
-   if (info[WPR][ACTIVE]) {
-     if (WPR_On_Buy(info[WPR][TIMEFRAME], WPR_OpenMethod, WPR_OpenLevel)) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[WPR][FACTOR], WPR, "WPR:" + wpr[M1][0]);
-       if (WPR_CloseOnChange) CloseOrdersByType(OP_SELL, WPR, "closing WPR on market change");
-     } else if (WPR_On_Sell(info[WPR][TIMEFRAME], WPR_OpenMethod, WPR_OpenLevel)) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[WPR][FACTOR], WPR, "WPR:" + wpr[M1][0]);
-       if (WPR_CloseOnChange) CloseOrdersByType(OP_BUY, WPR, "closing WPR on market change");
+   if (info[WPR1][ACTIVE]) {
+     if (WPR_On_Buy(info[WPR1][TIMEFRAME], info[WPR1][OPEN_METHOD], WPR_OpenLevel)) {
+       order_placed = ExecuteOrder(OP_BUY, lot_size * info[WPR1][FACTOR], WPR1, name[WPR1]);
+       if (WPR_CloseOnChange) CloseOrdersByType(OP_SELL, WPR1, "closing on market change: " + name[WPR1]);
+     } else if (WPR_On_Sell(info[WPR1][TIMEFRAME], info[WPR1][OPEN_METHOD], WPR_OpenLevel)) {
+       order_placed = ExecuteOrder(OP_SELL, lot_size * info[WPR1][FACTOR], WPR1, name[WPR1]);
+       if (WPR_CloseOnChange) CloseOrdersByType(OP_BUY, WPR1, "closing on market change: " + name[WPR1]);
+     }
+   }
+
+   if (info[WPR5][ACTIVE]) {
+     if (WPR_On_Buy(info[WPR5][TIMEFRAME], info[WPR5][OPEN_METHOD], WPR_OpenLevel)) {
+       order_placed = ExecuteOrder(OP_BUY, lot_size * info[WPR5][FACTOR], WPR5, name[WPR5]);
+       if (WPR_CloseOnChange) CloseOrdersByType(OP_SELL, WPR5, "closing on market change: " + name[WPR5]);
+     } else if (WPR_On_Sell(info[WPR5][TIMEFRAME], info[WPR5][OPEN_METHOD], WPR_OpenLevel)) {
+       order_placed = ExecuteOrder(OP_SELL, lot_size * info[WPR5][FACTOR], WPR5, name[WPR5]);
+       if (WPR_CloseOnChange) CloseOrdersByType(OP_BUY, WPR5, "closing on market change: " + name[WPR5]);
+     }
+   }
+
+   if (info[WPR15][ACTIVE]) {
+     if (WPR_On_Buy(info[WPR15][TIMEFRAME], info[WPR15][OPEN_METHOD], WPR_OpenLevel)) {
+       order_placed = ExecuteOrder(OP_BUY, lot_size * info[WPR15][FACTOR], WPR15, name[WPR15]);
+       if (WPR_CloseOnChange) CloseOrdersByType(OP_SELL, WPR15, "closing on market change: " + name[WPR15]);
+     } else if (WPR_On_Sell(info[WPR15][TIMEFRAME], info[WPR15][OPEN_METHOD], WPR_OpenLevel)) {
+       order_placed = ExecuteOrder(OP_SELL, lot_size * info[WPR15][FACTOR], WPR15, name[WPR15]);
+       if (WPR_CloseOnChange) CloseOrdersByType(OP_BUY, WPR15, "closing on market change: " + name[WPR15]);
+     }
+   }
+
+   if (info[WPR30][ACTIVE]) {
+     if (WPR_On_Buy(info[WPR30][TIMEFRAME], info[WPR30][OPEN_METHOD], WPR_OpenLevel)) {
+       order_placed = ExecuteOrder(OP_BUY, lot_size * info[WPR30][FACTOR], WPR30, name[WPR30]);
+       if (WPR_CloseOnChange) CloseOrdersByType(OP_SELL, WPR30, "closing on market change: " + name[WPR30]);
+     } else if (WPR_On_Sell(info[WPR30][TIMEFRAME], info[WPR30][OPEN_METHOD], WPR_OpenLevel)) {
+       order_placed = ExecuteOrder(OP_SELL, lot_size * info[WPR30][FACTOR], WPR30, name[WPR30]);
+       if (WPR_CloseOnChange) CloseOrdersByType(OP_BUY, WPR30, "closing on market change: " + name[WPR30]);
      }
    }
 
@@ -1333,12 +1375,13 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
     // if (VerboseTrace) text += "Envelopes: " + GetArrayValues(envelopes) + "; ";
   //}
 
-  if (WPR_Enabled) {
+  // if (WPR_Enabled) {
     // Update the Larry Williams' Percent Range indicator values.
-    wpr[period][CURR] = (-iWPR(NULL, timeframe, WPR_Period, 0 + WPR_Shift)) / 100.0;
-    wpr[period][PREV] = (-iWPR(NULL, timeframe, WPR_Period, 1 + WPR_Shift)) / 100.0;
+    wpr[period][CURR] = -iWPR(NULL, timeframe, WPR_Period, 0 + WPR_Shift);
+    wpr[period][PREV] = -iWPR(NULL, timeframe, WPR_Period, 1 + WPR_Shift);
+    wpr[period][FAR]  = -iWPR(NULL, timeframe, WPR_Period, 2 + WPR_Shift);
     // if (VerboseTrace) text += "WPR: " + GetArrayValues(wpr[M1]) + "; ";
-  }
+  // }
 
   if (DeMarker_Enabled) {
     // Update DeMarker indicator values.
@@ -1908,17 +1951,19 @@ bool Envelopes_On_Sell(int period = M1, int open_method = 0) {
  *
  * @param
  *   period (int) - period to check for
- *   open_method (int) - open method to use
+ *   open_method (int) - open method to use by using bitwise AND operation
  *   open_level (double) - open level to consider the signal
  */
-bool WPR_On_Buy(int period = M1, int open_method = 0, double open_level = 0.0) {
-  switch (open_method) {
-    case 0: return (wpr[period][CURR] > (0.5 + open_level));
-    case 1: return (wpr[period][CURR] > (0.5 + open_level) && wpr[period][CURR] < wpr[period][PREV]);
-    case 2: return (wpr[period][CURR] > (0.5 + open_level) && wpr[period][CURR] > wpr[period][PREV]);
-    case 3: return (wpr[period][CURR] < (0.5 + open_level) && wpr[period][PREV] > (0.5 + open_level));
-  }
-  return FALSE;
+bool WPR_On_Buy(int period = M1, int open_method = 0, int open_level = 30) {
+  bool result = wpr[period][CURR] > 50 + open_level;
+  if ((open_method &   1) != 0) result = result && wpr[period][CURR] < wpr[period][PREV];
+  if ((open_method &   2) != 0) result = result && wpr[period][PREV] < wpr[period][FAR];
+  if ((open_method &   4) != 0) result = result && wpr[period][PREV] > 50 + open_level;
+  if ((open_method &   8) != 0) result = result && wpr[period][FAR]  > 50 + open_level;
+  if ((open_method &  16) != 0) result = result && Open[CURR] > Close[PREV];
+  if ((open_method &  32) != 0) result = result && wpr[period][PREV] - wpr[period][CURR] > wpr[period][FAR] - wpr[period][PREV];
+  if ((open_method &  64) != 0) result = result && wpr[period][PREV] > 50 + open_level + open_level / 2;
+  return result;
 }
 
 /*
@@ -1926,17 +1971,19 @@ bool WPR_On_Buy(int period = M1, int open_method = 0, double open_level = 0.0) {
  *
  * @param
  *   period (int) - period to check for
- *   open_method (int) - open method to use
- *   open_level (double) - open level to consider the signal
+ *   open_method (int) - open method to use by using bitwise AND operation
+ *   open_level (int) - open level to consider the signal
  */
-bool WPR_On_Sell(int period = M1, int open_method = 0, double open_level = 0.0) {
-  switch (open_method) {
-    case 0: return (wpr[period][CURR] < (0.5 - open_level));
-    case 1: return (wpr[period][CURR] < (0.5 - open_level) && wpr[period][CURR] > wpr[period][PREV]);
-    case 2: return (wpr[period][CURR] < (0.5 - open_level) && wpr[period][CURR] < wpr[period][PREV]);
-    case 3: return (wpr[period][CURR] > (0.5 - open_level) && wpr[period][PREV] < (0.5 - open_level));
-  }
-  return FALSE;
+bool WPR_On_Sell(int period = M1, int open_method = 0, int open_level = 30) {
+  bool result = wpr[period][CURR] < 50 - open_level;
+  if ((open_method &   1) != 0) result = result && wpr[period][CURR] > wpr[period][PREV];
+  if ((open_method &   2) != 0) result = result && wpr[period][PREV] > wpr[period][FAR];
+  if ((open_method &   4) != 0) result = result && wpr[period][PREV] < 50 - open_level;
+  if ((open_method &   8) != 0) result = result && wpr[period][FAR]  < 50 - open_level;
+  if ((open_method &  16) != 0) result = result && Open[CURR] < Close[PREV];
+  if ((open_method &  32) != 0) result = result && wpr[period][CURR] - wpr[period][PREV] > wpr[period][PREV] - wpr[period][FAR];
+  if ((open_method &  64) != 0) result = result && wpr[period][PREV] > 50 - open_level - open_level / 2;
+  return result;
 }
 
 /*
@@ -2302,7 +2349,10 @@ int GetTrailingMethod(int order_type, int stop_or_profit) {
       if (DeMarker_TrailingStopMethod > 0)   stop_method   = DeMarker_TrailingStopMethod;
       if (DeMarker_TrailingProfitMethod > 0) profit_method = DeMarker_TrailingProfitMethod;
       break;
-    case WPR:
+    case WPR1:
+    case WPR5:
+    case WPR15:
+    case WPR30:
       if (WPR_TrailingStopMethod > 0)   stop_method   = WPR_TrailingStopMethod;
       if (WPR_TrailingProfitMethod > 0) profit_method = WPR_TrailingProfitMethod;
       break;
@@ -2703,7 +2753,7 @@ int GetNoOfStrategies() {
     + Bands1_Enabled + Bands5_Enabled + Bands15_Enabled + Bands30_Enabled
     + Envelopes1_Enabled + Envelopes5_Enabled + Envelopes15_Enabled + Envelopes30_Enabled
     + DeMarker_Enabled
-    + WPR_Enabled
+    + WPR1_Enabled + WPR5_Enabled + WPR15_Enabled + WPR30_Enabled
     + Fractals5_Enabled + Fractals15_Enabled + Fractals30_Enabled
   );
 }
@@ -3099,10 +3149,29 @@ void InitializeVariables() {
   info[ENVELOPES30][TIMEFRAME] = M30;
   info[ENVELOPES30][FACTOR]    = 1.0;
 
-  name[WPR]                  = "WPR";
-  info[WPR][ACTIVE]          = WPR_Enabled;
-  info[WPR][TIMEFRAME]       = M1;
-  info[WPR][FACTOR]          = 1.0;
+  name[WPR1]                  = "WPR M1";
+  info[WPR1][ACTIVE]          = WPR1_Enabled;
+  info[WPR1][TIMEFRAME]       = M1;
+  info[WPR1][OPEN_METHOD]     = WPR1_OpenMethod;
+  info[WPR1][FACTOR]          = 1.0;
+
+  name[WPR5]                  = "WPR M5";
+  info[WPR5][ACTIVE]          = WPR5_Enabled;
+  info[WPR5][TIMEFRAME]       = M5;
+  info[WPR5][OPEN_METHOD]     = WPR5_OpenMethod;
+  info[WPR5][FACTOR]          = 1.0;
+
+  name[WPR15]                  = "WPR M15";
+  info[WPR15][ACTIVE]          = WPR15_Enabled;
+  info[WPR15][TIMEFRAME]       = M15;
+  info[WPR15][OPEN_METHOD]     = WPR15_OpenMethod;
+  info[WPR15][FACTOR]          = 1.0;
+
+  name[WPR30]                  = "WPR M30";
+  info[WPR30][ACTIVE]          = WPR30_Enabled;
+  info[WPR30][TIMEFRAME]       = M30;
+  info[WPR30][OPEN_METHOD]     = WPR30_OpenMethod;
+  info[WPR30][FACTOR]          = 1.0;
 
   name[DEMARKER]             = "DeMarker";
   info[DEMARKER][ACTIVE]     = DeMarker_Enabled;
@@ -3561,37 +3630,13 @@ string GetOrdersStats(string sep = "\n") {
   total_orders_text += " (other: " + GetTotalOrders(FALSE) + ")";
   total_orders_text += "; ratio: " + CalculateOrderTypeRatio();
   // Prepare data about open orders per strategy type.
-  string open_orders_per_type = "Orders Per Type: ";
-  int fractals_orders = open_orders[FRACTALS5] + open_orders[FRACTALS15] + open_orders[FRACTALS30];
-  int demarker_orders = open_orders[DEMARKER];
-  int iwpr_orders = open_orders[WPR];
-  int alligator_orders = open_orders[ALLIGATOR];
-  string orders_per_type = "Stats: ";
+  string orders_per_type = "Stats: "; // Display open orders per type.
   if (total_orders > 0) {
-     if (MA1_Enabled && open_orders[MA1] > 0) orders_per_type += name[MA1] + ": " + MathFloor(100 / total_orders * open_orders[MA1]) + "%, ";
-     if (MA5_Enabled && open_orders[MA5] > 0) orders_per_type += name[MA5] + ": " + MathFloor(100 / total_orders * open_orders[MA5]) + "%, ";
-     if (MA15_Enabled && open_orders[MA15] > 0) orders_per_type += name[MA15] + ": " + MathFloor(100 / total_orders * open_orders[MA15]) + "%, ";
-     if (MA30_Enabled && open_orders[MA30] > 0) orders_per_type += name[MA30] + ": " + MathFloor(100 / total_orders * open_orders[MA30]) + "%, ";
-     if (MACD1_Enabled && open_orders[MACD1] > 0) orders_per_type += name[MACD1] + ": " + MathFloor(100 / total_orders * open_orders[MACD1]) + "%, ";
-     if (MACD5_Enabled && open_orders[MACD5] > 0) orders_per_type += name[MACD5] + ": " + MathFloor(100 / total_orders * open_orders[MACD5]) + "%, ";
-     if (MACD15_Enabled && open_orders[MACD15] > 0) orders_per_type += name[MACD15] + ": " + MathFloor(100 / total_orders * open_orders[MACD15]) + "%, ";
-     if (MACD30_Enabled && open_orders[MACD30] > 0) orders_per_type += name[MACD30] + ": " + MathFloor(100 / total_orders * open_orders[MACD30]) + "%, ";
-     if (Alligator_Enabled && alligator_orders > 0) orders_per_type += "Alligator: " + MathFloor(100 / total_orders * alligator_orders) + "%, ";
-     if (RSI1_Enabled && open_orders[RSI1] > 0) orders_per_type += name[RSI1] + ": " + MathFloor(100 / total_orders * open_orders[RSI1]) + "%, ";
-     if (RSI5_Enabled && open_orders[RSI5] > 0) orders_per_type += name[RSI5] + ": " + MathFloor(100 / total_orders * open_orders[RSI5]) + "%, ";
-     if (RSI15_Enabled && open_orders[RSI15] > 0) orders_per_type += name[RSI15] + ": " + MathFloor(100 / total_orders * open_orders[RSI15]) + "%, ";
-     if (RSI30_Enabled && open_orders[RSI30] > 0) orders_per_type += name[RSI30] + ": " + MathFloor(100 / total_orders * open_orders[RSI30]) + "%, ";
-     if (SAR1_Enabled && open_orders[SAR1] > 0) orders_per_type += name[SAR1] + ": " + MathFloor(100 / total_orders * open_orders[SAR1]) + "%, ";
-     if (SAR5_Enabled && open_orders[SAR5] > 0) orders_per_type += name[SAR5] + ": " + MathFloor(100 / total_orders * open_orders[SAR5]) + "%, ";
-     if (SAR15_Enabled && open_orders[SAR15] > 0) orders_per_type += name[SAR15] + ": " + MathFloor(100 / total_orders * open_orders[SAR15]) + "%, ";
-     if (SAR30_Enabled && open_orders[SAR30] > 0) orders_per_type += name[SAR30] + ": " + MathFloor(100 / total_orders * open_orders[SAR30]) + "%, ";
-     if ((Fractals5_Enabled || Fractals15_Enabled || Fractals30_Enabled) && fractals_orders > 0) orders_per_type += "Fractals: " + MathFloor(100 / total_orders * fractals_orders) + "%, ";
-     if (DeMarker_Enabled && demarker_orders > 0) orders_per_type += "DeMarker: " + MathFloor(100 / total_orders * demarker_orders) + "%";
-     if (WPR_Enabled && iwpr_orders > 0) orders_per_type += "WPR: " + MathFloor(100 / total_orders * iwpr_orders) + "%, ";
-     if (Bands1_Enabled && open_orders[BANDS1] > 0) orders_per_type += name[BANDS1] + ": " + MathFloor(100 / total_orders * open_orders[BANDS1]) + "%, ";
-     if (Bands5_Enabled && open_orders[BANDS5] > 0) orders_per_type += name[BANDS5] + ": " + MathFloor(100 / total_orders * open_orders[BANDS5]) + "%, ";
-     if (Bands15_Enabled && open_orders[BANDS15] > 0) orders_per_type += name[BANDS15] + ": " + MathFloor(100 / total_orders * open_orders[BANDS15]) + "%, ";
-     if (Bands30_Enabled && open_orders[BANDS30] > 0) orders_per_type += name[BANDS30] + ": " + MathFloor(100 / total_orders * open_orders[BANDS30]) + "%, ";
+    for (int i = 0; i < FINAL_STRATEGY_TYPE_ENTRY; i++) {
+      if (open_orders[i] > 0) {
+        orders_per_type += name[i] + ": " + MathFloor(100 / total_orders * open_orders[i]) + "%, ";
+      }
+    }
   } else {
     orders_per_type += "No orders open yet.";
   }
@@ -4628,9 +4673,9 @@ string GenerateReport() {
   output += "Gross profit:                               " + GrossProfit + "\n";
   output += "Gross loss:                                 " + GrossLoss + "\n";
   if (GrossLoss > 0.0)
-  output += "Profit factor:                              " + ProfitFactor + "\n";
-  output += "Expected payoff:                            " + ExpectedPayoff + "\n";
-  output += "Absolute drawdown:                          " + AbsoluteDrawdown + "\n";
+  output += StringFormat("Profit factor:                              %.1f\n", ProfitFactor);
+  output += StringFormat("Expected payoff:                            %.1f\n", ExpectedPayoff);
+  output += StringFormat("Absolute drawdown:                          %.2f\n", AbsoluteDrawdown);
   output += StringFormat("Maximal drawdown:                           %.1f (%.1f%%)\n", MaxDrawdown, MaxDrawdownPercent);
   output += StringFormat("Relative drawdown:                          (%.1f%%) %.1f\n", RelDrawdownPercent, RelDrawdown);
   output += "Trades total                                " + SummaryTrades + "\n";
