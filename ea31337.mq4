@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.046"
+#property version   "1.047"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -182,7 +182,7 @@ extern int MaxOrdersPerType = 0; // Maximum orders per strategy type. Set 0 for 
 extern double EATakeProfit = 0.0;
 extern double EAStopLoss = 0.0;
 extern double RiskRatio = 0; // Suggested value: 1.0. Do not change unless testing.
-extern int MinimumIntervalSec = 15; // Minimum interval between subsequent trade signals. Suggested value: 60.
+extern int MinimumIntervalSec = 0; // Minimum interval between subsequent trade signals. Suggested value: 0 or 60.
 
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting (set 1.0 to default) --";
 extern double BestDailyStrategyMultiplierFactor    = 1; // Increase lot size for the best daily strategy.
@@ -278,10 +278,10 @@ extern bool RSI30_Enabled = TRUE; // Enable RSI-based strategy.
 // extern ENUM_TIMEFRAMES RSI_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int RSI_Period = 18; // Averaging period for calculation.
 extern ENUM_APPLIED_PRICE RSI_Applied_Price = PRICE_OPEN; // RSI applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
-extern int RSI1_OpenMethod  = 0; // Valid range: 0-127.
-extern int RSI5_OpenMethod  = 5; // Valid range: 0-127.
-extern int RSI15_OpenMethod = 1; // Valid range: 0-127.
-extern int RSI30_OpenMethod = 5; // Valid range: 0-127.
+extern int RSI1_OpenMethod  = 0; // Valid range: 0-255.
+extern int RSI5_OpenMethod  = 5; // Valid range: 0-255.
+extern int RSI15_OpenMethod = 1; // Valid range: 0-255.
+extern int RSI30_OpenMethod = 5; // Valid range: 0-255.
 extern int RSI_OpenLevel = 20;
 extern int RSI_Shift = 0; // Shift relative to the chart.
 extern bool RSI_CloseOnChange = TRUE; // Close opposite orders on market change.
@@ -452,19 +452,26 @@ extern ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = T_BANDS; // Trailing Prof
  */
 
 extern string ____Fractals_Parameters__ = "-- Settings for the Fractals indicator --";
-extern bool Fractals1_Enabled = FALSE; // Enable Fractals-based strategy.
-extern bool Fractals5_Enabled = TRUE; // Enable Fractals-based strategy.
+extern bool Fractals1_Enabled  = TRUE; // Enable Fractals-based strategy.
+extern bool Fractals5_Enabled  = TRUE; // Enable Fractals-based strategy.
 extern bool Fractals15_Enabled = TRUE; // Enable Fractals-based strategy.
 extern bool Fractals30_Enabled = TRUE; // Enable Fractals-based strategy.
-extern int Fractals1_Shift = 0; // Shift relative to the chart. Suggested value: 0.
-extern int Fractals5_Shift = 2; // Shift relative to the chart. Suggested value: 0.
-extern int Fractals15_Shift = 3; // Shift relative to the chart. Suggested value: 0.
-extern int Fractals30_Shift = 0; // Shift relative to the chart. Suggested value: 0.
+extern int Fractals1_OpenMethod = 40; // Valid range: 0-63.
+extern int Fractals5_OpenMethod = 42; // Valid range: 0-63.
+extern int Fractals15_OpenMethod = 34; // Valid range: 0-63.
+extern int Fractals30_OpenMethod = 1; // Valid range: 0-63.
 extern bool Fractals_CloseOnChange = TRUE; // Close opposite orders on market change.
-extern ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = T_MA_M_TRAIL; // Trailing Stop method for Fractals. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_MA_F_TRAIL; // Trailing Profit method for Fractals. Set 0 to default. See: ENUM_TRAIL_TYPE.
-/* Fractals backtest log (£1000,auto,ts:25,tp:20,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
- *   £4006.40	8091	1.13	0.50	1027.32	35.39%	0.00000000	Fractals_TrailingProfitMethod=5
+extern ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = T_MA_S_TRAIL; // Trailing Stop method for Fractals. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_MA_LOWEST; // Trailing Profit method for Fractals. Set 0 to default. See: ENUM_TRAIL_TYPE.
+/* Fractals backtest log (ts:25,tp:25,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
+ *   £6129.71	3851	1.24	1.59	1430.47	32.22% (deposit: £1000, no boosting)
+ *   £7682.48	3847	1.30	2.00	1933.09	12.56% (deposit: £10000, no boosting)
+ *   Prev: £4006.40	8091	1.13	0.50	1027.32	35.39%	0.00000000	Fractals_TrailingProfitMethod=5
+ *   Strategy stats:
+ *     Fractals M1: Total net profit: 107 pips, Total orders: 764 (Won: 53.8% [411] | Loss: 46.2% [353]);
+ *     Fractals M5: Total net profit: 728 pips, Total orders: 546 (Won: 48.2% [263] | Loss: 51.8% [283]);
+ *     Fractals M15: Total net profit: 2108 pips, Total orders: 1463 (Won: 39.3% [575] | Loss: 60.7% [888]);
+ *     Fractals M30: Total net profit: 1122 pips, Total orders: 1068 (Won: 39.0% [416] | Loss: 61.0% [652]);
  */
 
 /*
@@ -721,7 +728,7 @@ double sar[H1][3]; int sar_week[H1][7][2];
 double bands[H1][3][3], envelopes[H1][3][3];
 double alligator[H1][3][3];
 double demarker[H1][2], wpr[H1][2];
-double fractals[H1][3];
+double fractals[H1][3][3];
 
 /* TODO:
  *   - multiply successful strategy direction,
@@ -1235,39 +1242,39 @@ void Trade() {
    }
 
    if (info[FRACTALS1][ACTIVE]) {
-      if (Fractals_On_Buy(info[FRACTALS1][TIMEFRAME])) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[FRACTALS1][FACTOR], FRACTALS1, "Fractals M5");
-       if (Fractals_CloseOnChange) CloseOrdersByType(OP_SELL, FRACTALS1, "closing Fractals M5 on market change");
-      } else if (Fractals_On_Sell(info[FRACTALS1][TIMEFRAME])) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[FRACTALS1][FACTOR], FRACTALS1, "Fractals M5");
-       if (Fractals_CloseOnChange) CloseOrdersByType(OP_BUY, FRACTALS1, "closing Fractals M5 on market change");
+      if (Fractals_On_Buy(info[FRACTALS1][TIMEFRAME], info[FRACTALS1][OPEN_METHOD])) {
+       order_placed = ExecuteOrder(OP_BUY, lot_size * info[FRACTALS1][FACTOR], FRACTALS1, name[FRACTALS1]);
+       if (Fractals_CloseOnChange) CloseOrdersByType(OP_SELL, FRACTALS1, "closing on market change: " + name[FRACTALS1]);
+      } else if (Fractals_On_Sell(info[FRACTALS1][TIMEFRAME], info[FRACTALS1][OPEN_METHOD])) {
+       order_placed = ExecuteOrder(OP_SELL, lot_size * info[FRACTALS1][FACTOR], FRACTALS1, name[FRACTALS1]);
+       if (Fractals_CloseOnChange) CloseOrdersByType(OP_BUY, FRACTALS1, "closing on market change: " + name[FRACTALS1]);
       }
    }
    if (info[FRACTALS5][ACTIVE]) {
-      if (Fractals_On_Buy(info[FRACTALS5][TIMEFRAME])) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[FRACTALS5][FACTOR], FRACTALS5, "Fractals M5");
-       if (Fractals_CloseOnChange) CloseOrdersByType(OP_SELL, FRACTALS5, "closing Fractals M5 on market change");
-      } else if (Fractals_On_Sell(info[FRACTALS5][TIMEFRAME])) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[FRACTALS5][FACTOR], FRACTALS5, "Fractals M5");
-       if (Fractals_CloseOnChange) CloseOrdersByType(OP_BUY, FRACTALS5, "closing Fractals M5 on market change");
+      if (Fractals_On_Buy(info[FRACTALS5][TIMEFRAME], info[FRACTALS5][OPEN_METHOD])) {
+       order_placed = ExecuteOrder(OP_BUY, lot_size * info[FRACTALS5][FACTOR], FRACTALS5, name[FRACTALS5]);
+       if (Fractals_CloseOnChange) CloseOrdersByType(OP_SELL, FRACTALS5, "closing on market change: " + name[FRACTALS5]);
+      } else if (Fractals_On_Sell(info[FRACTALS5][TIMEFRAME], info[FRACTALS5][OPEN_METHOD])) {
+       order_placed = ExecuteOrder(OP_SELL, lot_size * info[FRACTALS5][FACTOR], FRACTALS5, name[FRACTALS5]);
+       if (Fractals_CloseOnChange) CloseOrdersByType(OP_BUY, FRACTALS5, "closing on market change: " + name[FRACTALS5]);
       }
    }
    if (info[FRACTALS15][ACTIVE]) {
-      if (Fractals_On_Buy(info[FRACTALS15][TIMEFRAME])) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[FRACTALS15][FACTOR], FRACTALS15, "Fractals M15");
-       if (Fractals_CloseOnChange) CloseOrdersByType(OP_SELL, FRACTALS15, "closing Fractals M15 on market change");
-      } else if (Fractals_On_Sell(info[FRACTALS15][TIMEFRAME])) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[FRACTALS15][FACTOR], FRACTALS15, "Fractals M15");
-       if (Fractals_CloseOnChange) CloseOrdersByType(OP_BUY, FRACTALS15, "closing Fractals M15 on market change");
+      if (Fractals_On_Buy(info[FRACTALS15][TIMEFRAME], info[FRACTALS15][OPEN_METHOD])) {
+       order_placed = ExecuteOrder(OP_BUY, lot_size * info[FRACTALS15][FACTOR], FRACTALS15, name[FRACTALS15]);
+       if (Fractals_CloseOnChange) CloseOrdersByType(OP_SELL, FRACTALS15, "closing on market change: " + name[FRACTALS15]);
+      } else if (Fractals_On_Sell(info[FRACTALS15][TIMEFRAME], info[FRACTALS15][OPEN_METHOD])) {
+       order_placed = ExecuteOrder(OP_SELL, lot_size * info[FRACTALS15][FACTOR], FRACTALS15, name[FRACTALS15]);
+       if (Fractals_CloseOnChange) CloseOrdersByType(OP_BUY, FRACTALS15, "closing on market change: " + name[FRACTALS15]);
       }
    }
    if (info[FRACTALS30][ACTIVE]) {
-      if (Fractals_On_Buy(info[FRACTALS30][TIMEFRAME])) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[FRACTALS30][FACTOR], FRACTALS30, "Fractals M30");
-       if (Fractals_CloseOnChange) CloseOrdersByType(OP_SELL, FRACTALS30, "closing Fractals M30 on market change");
-      } else if (Fractals_On_Sell(info[FRACTALS30][TIMEFRAME])) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[FRACTALS30][FACTOR], FRACTALS30, "Fractals M30");
-       if (Fractals_CloseOnChange) CloseOrdersByType(OP_BUY, FRACTALS30, "closing Fractals M30 on market change");
+      if (Fractals_On_Buy(info[FRACTALS30][TIMEFRAME], info[FRACTALS30][OPEN_METHOD])) {
+       order_placed = ExecuteOrder(OP_BUY, lot_size * info[FRACTALS30][FACTOR], FRACTALS30, name[FRACTALS30]);
+       if (Fractals_CloseOnChange) CloseOrdersByType(OP_SELL, FRACTALS30, "closing on market change: " + name[FRACTALS30]);
+      } else if (Fractals_On_Sell(info[FRACTALS30][TIMEFRAME], info[FRACTALS30][OPEN_METHOD])) {
+       order_placed = ExecuteOrder(OP_SELL, lot_size * info[FRACTALS30][FACTOR], FRACTALS30, name[FRACTALS30]);
+       if (Fractals_CloseOnChange) CloseOrdersByType(OP_BUY, FRACTALS30, "closing on market change: " + name[FRACTALS30]);
       }
    }
 
@@ -1286,29 +1293,25 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
     last_indicators_update = bar_time;
   }*/
 
-  int period = M1, fractal_shift = 0, bands_period = Bands_Period, rsi_period = RSI_Period;
+  int period = M1, bands_period = Bands_Period, rsi_period = RSI_Period;
   switch (timeframe) {
     case PERIOD_M1:
       period = M1;
-      fractal_shift = Fractals1_Shift;
       bands_period = info[BANDS1][CUSTOM_PERIOD];
       rsi_period = info[RSI1][CUSTOM_PERIOD];
       break;
     case PERIOD_M5:
       period = M5;
-      fractal_shift = Fractals5_Shift;
       bands_period = info[BANDS5][CUSTOM_PERIOD];
       rsi_period = info[RSI5][CUSTOM_PERIOD];
       break;
     case PERIOD_M15:
       period = M15;
-      fractal_shift = Fractals15_Shift;
       bands_period = info[BANDS15][CUSTOM_PERIOD];
       rsi_period = info[RSI15][CUSTOM_PERIOD];
       break;
     case PERIOD_M30:
       period = M30;
-      fractal_shift = Fractals30_Shift;
       bands_period = info[BANDS30][CUSTOM_PERIOD];
       rsi_period = info[RSI30][CUSTOM_PERIOD];
       break;
@@ -1409,26 +1412,28 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
     // if (VerboseTrace) text += "Envelopes: " + GetArrayValues(envelopes) + "; ";
   //}
 
-  // if (WPR_Enabled) {
+  if (WPR1_Enabled || WPR5_Enabled || WPR15_Enabled || WPR30_Enabled) {
     // Update the Larry Williams' Percent Range indicator values.
     wpr[period][CURR] = -iWPR(NULL, timeframe, WPR_Period, 0 + WPR_Shift);
     wpr[period][PREV] = -iWPR(NULL, timeframe, WPR_Period, 1 + WPR_Shift);
     wpr[period][FAR]  = -iWPR(NULL, timeframe, WPR_Period, 2 + WPR_Shift);
     // if (VerboseTrace) text += "WPR: " + GetArrayValues(wpr[M1]) + "; ";
-  // }
+  }
 
-  // if (DeMarker_Enabled) {
+  if (DeMarker1_Enabled || DeMarker5_Enabled || DeMarker15_Enabled || DeMarker30_Enabled) {
     // Update DeMarker indicator values.
     demarker[period][CURR] = iDeMarker(NULL, timeframe, DeMarker_Period, 0 + DeMarker_Shift);
     demarker[period][PREV] = iDeMarker(NULL, timeframe, DeMarker_Period, 1 + DeMarker_Shift);
     demarker[period][FAR]  = iDeMarker(NULL, timeframe, DeMarker_Period, 2 + DeMarker_Shift);
     // if (VerboseTrace) text += "DeMarker: " + GetArrayValues(demarker[M1]) + "; ";
-  // }
+  }
 
-  if (Fractals5_Enabled || Fractals15_Enabled || Fractals30_Enabled) {
+  if (Fractals1_Enabled || Fractals5_Enabled || Fractals15_Enabled || Fractals30_Enabled) {
     // Update Fractals indicator values.
-    fractals[period][MODE_LOWER] = iFractals(NULL, timeframe, MODE_LOWER, i + fractal_shift);
-    fractals[period][MODE_UPPER] = iFractals(NULL, timeframe, MODE_UPPER, i + fractal_shift);
+    for (i = 0; i < 3; i++) {
+      fractals[period][i][MODE_LOWER] = iFractals(NULL, timeframe, MODE_LOWER, i);
+      fractals[period][i][MODE_UPPER] = iFractals(NULL, timeframe, MODE_UPPER, i);
+    }
     // text += "fractals: "  + fractals_lower[M5]  + ", Fractals5_upper: " + fractals_upper[M5] + "; ";
   }
 
@@ -1446,7 +1451,6 @@ int ExecuteOrder(int cmd, double volume, int order_type = CUSTOM, string order_c
    // int min_stop_level;
    double max_change = 1;
 
-   last_msg = "Limit: " + MinimumIntervalSec + "; Time: " + TimeCurrent() + "; Diff: " + (TimeCurrent() - last_order_time);
    if (MinimumIntervalSec > 0 && TimeCurrent() - last_order_time < MinimumIntervalSec) {
      err = __FUNCTION__ + "(): There must be a " + MinimumIntervalSec + " sec minimum interval between subsequent trade signals.";
      if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "():" + err);
@@ -1833,6 +1837,7 @@ bool RSI_On_Buy(int period = M1, int open_method = 0, int open_level = 20) {
   if ((open_method &  16) != 0) result = result && rsi[period][CURR] - rsi[period][PREV] > rsi[period][PREV] - rsi[period][FAR];
   if ((open_method &  32) != 0) result = result && Open[CURR] > Close[PREV];
   if ((open_method &  64) != 0) result = result && rsi[period][FAR] > 50;
+  if ((open_method & 128) != 0) result = result && !RSI_On_Sell(M30);
   return result;
 }
 
@@ -1853,6 +1858,7 @@ bool RSI_On_Sell(int period = M1, int open_method = 0, int open_level = 20) {
   if ((open_method &  16) != 0) result = result && rsi[period][PREV] - rsi[period][CURR] > rsi[period][FAR] - rsi[period][PREV];
   if ((open_method &  32) != 0) result = result && Open[CURR] < Close[PREV];
   if ((open_method &  64) != 0) result = result && rsi[period][FAR] < 50;
+  if ((open_method & 128) != 0) result = result && !RSI_On_Buy(M30);
   return result;
 }
 
@@ -2072,18 +2078,34 @@ bool DeMarker_On_Sell(int period = M1, int open_method = 0, double open_level = 
  * Check if Fractals indicator is on buy.
  * @param
  *   period (int) - period to check for
+ *   open_method (int) - open method to use by using bitwise AND operation
  */
-bool Fractals_On_Buy(int period = M1) {
-  return fractals[period][MODE_LOWER] != 0.0;
+bool Fractals_On_Buy(int period = M1, int open_method = 0) {
+  bool result = fractals[period][CURR][MODE_LOWER] != 0.0 || fractals[period][PREV][MODE_LOWER] != 0.0 || fractals[period][FAR][MODE_LOWER] != 0.0;
+  if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
+  if ((open_method &   2) != 0) result = result && !Fractals_On_Sell(period);
+  if ((open_method &   4) != 0) result = result && Fractals_On_Buy(MathMin(period + 1, M30));
+  if ((open_method &   8) != 0) result = result && Fractals_On_Buy(M30);
+  if ((open_method &  16) != 0) result = result && fractals[period][FAR][MODE_LOWER] != 0.0;
+  if ((open_method &  32) != 0) result = result && !Fractals_On_Sell(M30);
+  return result;
 }
 
 /*
  * Check if Fractals indicator is on sell.
  * @param
  *   period (int) - period to check for
+ *   open_method (int) - open method to use by using bitwise AND operation
  */
-bool Fractals_On_Sell(int period = M1) {
-  return fractals[period][MODE_UPPER] != 0.0;
+bool Fractals_On_Sell(int period = M1, int open_method = 0) {
+  bool result = fractals[period][CURR][MODE_UPPER] != 0.0 || fractals[period][PREV][MODE_UPPER] != 0.0 || fractals[period][FAR][MODE_UPPER] != 0.0;
+  if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
+  if ((open_method &   2) != 0) result = result && !Fractals_On_Buy(period);
+  if ((open_method &   4) != 0) result = result && Fractals_On_Sell(MathMin(period + 1, M30));
+  if ((open_method &   8) != 0) result = result && Fractals_On_Sell(M30);
+  if ((open_method &  16) != 0) result = result && fractals[period][FAR][MODE_UPPER] != 0.0;
+  if ((open_method &  32) != 0) result = result && !Fractals_On_Buy(M30);
+  return result;
 }
 
 /*
@@ -3234,25 +3256,29 @@ void InitializeVariables() {
   info[DEMARKER30][OPEN_METHOD] = DeMarker30_OpenMethod;
   info[DEMARKER30][FACTOR]      = 1.0;
 
-  name[FRACTALS1]            = "Fractals M1";
-  info[FRACTALS1][ACTIVE]    = Fractals1_Enabled;
-  info[FRACTALS1][TIMEFRAME] = M1;
-  info[FRACTALS1][FACTOR]    = 1.0;
+  name[FRACTALS1]              = "Fractals M1";
+  info[FRACTALS1][ACTIVE]      = Fractals1_Enabled;
+  info[FRACTALS1][TIMEFRAME]   = M1;
+  info[FRACTALS1][OPEN_METHOD] = Fractals1_OpenMethod;
+  info[FRACTALS1][FACTOR]      = 1.0;
 
-  name[FRACTALS5]            = "Fractals M5";
-  info[FRACTALS5][ACTIVE]    = Fractals5_Enabled;
-  info[FRACTALS5][TIMEFRAME] = M5;
-  info[FRACTALS5][FACTOR]    = 1.0;
+  name[FRACTALS5]              = "Fractals M5";
+  info[FRACTALS5][ACTIVE]      = Fractals5_Enabled;
+  info[FRACTALS5][TIMEFRAME]   = M5;
+  info[FRACTALS5][OPEN_METHOD] = Fractals5_OpenMethod;
+  info[FRACTALS5][FACTOR]      = 1.0;
 
-  name[FRACTALS15]            = "Fractals M15";
-  info[FRACTALS15][ACTIVE]    = Fractals15_Enabled;
-  info[FRACTALS15][TIMEFRAME] = M15;
-  info[FRACTALS15][FACTOR]    = 1.0;
+  name[FRACTALS15]              = "Fractals M15";
+  info[FRACTALS15][ACTIVE]      = Fractals15_Enabled;
+  info[FRACTALS15][TIMEFRAME]   = M15;
+  info[FRACTALS15][OPEN_METHOD] = Fractals15_OpenMethod;
+  info[FRACTALS15][FACTOR]      = 1.0;
 
-  name[FRACTALS30]            = "Fractals M30";
-  info[FRACTALS30][ACTIVE]    = Fractals30_Enabled;
-  info[FRACTALS30][TIMEFRAME] = M30;
-  info[FRACTALS30][FACTOR]    = 1.0;
+  name[FRACTALS30]              = "Fractals M30";
+  info[FRACTALS30][ACTIVE]      = Fractals30_Enabled;
+  info[FRACTALS30][TIMEFRAME]   = M30;
+  info[FRACTALS30][OPEN_METHOD] = Fractals30_OpenMethod;
+  info[FRACTALS30][FACTOR]      = 1.0;
 }
 
 /*
