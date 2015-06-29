@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.045"
+#property version   "1.046"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -46,7 +46,10 @@ enum ENUM_STRATEGY_TYPE {
   ENVELOPES15,
   ENVELOPES30,
   ENVELOPES60,
-  DEMARKER,
+  DEMARKER1,
+  DEMARKER5,
+  DEMARKER15,
+  DEMARKER30,
   WPR1,
   WPR5,
   WPR15,
@@ -173,11 +176,13 @@ extern double TrailingStopAddPerMinute = 0.0; // Decrease trailing stop (in pips
 
 extern string __EA_Order_Parameters__ = "-- Profit/Loss settings (set 0 for auto) --";
 extern double EALotSize = 0; // Default lot size. Set 0 for auto.
-extern int EAMaxOrders = 0; // Maximum orders. Set 0 for auto.
-extern int EAMaxOrdersPerType = 0; // Maximum orders per strategy type. Set 0 for unlimited.
+extern int MaxOrders = 0; // Maximum orders. Set 0 for auto.
+extern int MaxOrdersPerType = 0; // Maximum orders per strategy type. Set 0 for unlimited.
+//extern int MaxOrdersPerDay = 30; // TODO
 extern double EATakeProfit = 0.0;
 extern double EAStopLoss = 0.0;
 extern double RiskRatio = 0; // Suggested value: 1.0. Do not change unless testing.
+extern int MinimumIntervalSec = 15; // Minimum interval between subsequent trade signals. Suggested value: 60.
 
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting (set 1.0 to default) --";
 extern double BestDailyStrategyMultiplierFactor    = 1; // Increase lot size for the best daily strategy.
@@ -418,17 +423,32 @@ extern ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = T_FIXED; // Trailing Profit me
  */
 
 extern string ____DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --";
-extern bool DeMarker_Enabled = TRUE; // Enable DeMarker-based strategy.
-extern ENUM_TIMEFRAMES DeMarker_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int DeMarker_Period = 22; // Suggested value: 110.
+extern bool DeMarker1_Enabled  = TRUE; // Enable DeMarker-based strategy.
+extern bool DeMarker5_Enabled  = TRUE; // Enable DeMarker-based strategy.
+extern bool DeMarker15_Enabled = TRUE; // Enable DeMarker-based strategy.
+extern bool DeMarker30_Enabled = TRUE; // Enable DeMarker-based strategy.
+//extern ENUM_TIMEFRAMES DeMarker_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
+extern int DeMarker_Period = 24; // DeMarker period.
 extern int DeMarker_Shift = 0; // Shift relative to the current bar the given amount of periods ago. Suggested value: 4.
 extern double DeMarker_OpenLevel = 0.2; // Valid range: 0.0-0.4. Suggested value: 0.0.
-extern int DeMarker_OpenMethod = 2; // Valid range: 0-3. Suggested value: 2.
+extern int DeMarker1_OpenMethod = 1; // Valid range: 0-63.
+extern int DeMarker5_OpenMethod = 0; // Valid range: 0-63.
+extern int DeMarker15_OpenMethod = 0; // Valid range: 0-63.
+extern int DeMarker30_OpenMethod = 4; // Valid range: 0-63.
 extern bool DeMarker_CloseOnChange = FALSE; // Close opposite orders on market change.
-extern ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = T_SAR_LOW; // Trailing Stop method for DeMarker. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = T_BANDS_LOW; // Trailing Profit method for DeMarker. Set 0 to default. See: ENUM_TRAIL_TYPE.
-/* DeMarker backtest log (£1000,auto,ts:25,tp:20,gap:10,sp:2) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
- *   £3369.57	1694	1.25	1.99	588.65	21.19%	0.00000000	DeMarker_TrailingProfitMethod=19
+extern ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = T_MA_S_TRAIL; // Trailing Stop method for DeMarker. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = T_BANDS; // Trailing Profit method for DeMarker. Set 0 to default. See: ENUM_TRAIL_TYPE.
+/* DeMarker backtest log (auto,ts:25,tp:20,gap:10,sp:2) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
+ *   £5968.23	5968	1.17	1.00	1314.82	47.46% (deposit: £1000, no boosting)
+ *   £7465.39	5966	1.21	1.25	1306.65	9.32% (deposit: £10000, no boosting)
+ *   $11414.20	5966	1.21	1.91	1776.70	12.99% (deposit: $10000, no boosting)
+ *   Strategy stats:
+ *   DeMarker M1: Total net profit: 930 pips, Total orders: 2145 (Won: 30.7% [659] | Loss: 69.3% [1486]);
+ *   DeMarker M5: Total net profit: 1699 pips, Total orders: 1751 (Won: 31.1% [544] | Loss: 68.9% [1207]);
+ *   DeMarker M15: Total net profit: 1882 pips, Total orders: 1281 (Won: 37.7% [483] | Loss: 62.3% [798]);
+ *   DeMarker M30: Total net profit: 905 pips, Total orders: 789 (Won: 40.7% [321] | Loss: 59.3% [468]);
+ *   Prev: £1929.90	2778	1.13	0.69	525.00	21.84% (deposit: £1000, no boosting)
+ *   Prev: £3369.57	1694	1.25	1.99	588.65	21.19%	0.00000000	DeMarker_TrailingProfitMethod=19 (deposit: £1000)
  */
 
 extern string ____Fractals_Parameters__ = "-- Settings for the Fractals indicator --";
@@ -1134,13 +1154,43 @@ void Trade() {
       }
    }
 
-   if (info[DEMARKER][ACTIVE]) {
-      if (DeMarker_On_Buy(info[DEMARKER][TIMEFRAME], DeMarker_OpenMethod, DeMarker_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[DEMARKER][FACTOR], DEMARKER, "DeMarker" + demarker[M1][0]);
-        if (DeMarker_CloseOnChange) CloseOrdersByType(OP_SELL, DEMARKER, "closing DeMarker on market change");
-      } else if (DeMarker_On_Sell(info[DEMARKER][TIMEFRAME], DeMarker_OpenMethod, DeMarker_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[DEMARKER][FACTOR], DEMARKER, "DeMarker" + demarker[M1][0]);
-        if (DeMarker_CloseOnChange) CloseOrdersByType(OP_BUY, DEMARKER, "closing DeMarker on market change");
+   if (info[DEMARKER1][ACTIVE]) {
+      if (DeMarker_On_Buy(info[DEMARKER1][TIMEFRAME], info[DEMARKER1][OPEN_METHOD], DeMarker_OpenLevel)) {
+        order_placed = ExecuteOrder(OP_BUY, lot_size * info[DEMARKER1][FACTOR], DEMARKER1, name[DEMARKER30]);
+        if (DeMarker_CloseOnChange) CloseOrdersByType(OP_SELL, DEMARKER1, "closing on market change: " + name[DEMARKER1]);
+      } else if (DeMarker_On_Sell(info[DEMARKER1][TIMEFRAME], info[DEMARKER1][OPEN_METHOD], DeMarker_OpenLevel)) {
+        order_placed = ExecuteOrder(OP_SELL, lot_size * info[DEMARKER1][FACTOR], DEMARKER1, name[DEMARKER30]);
+        if (DeMarker_CloseOnChange) CloseOrdersByType(OP_BUY, DEMARKER1, "closing on market change: " + name[DEMARKER1]);
+      }
+   }
+
+   if (info[DEMARKER5][ACTIVE]) {
+      if (DeMarker_On_Buy(info[DEMARKER5][TIMEFRAME], info[DEMARKER5][OPEN_METHOD], DeMarker_OpenLevel)) {
+        order_placed = ExecuteOrder(OP_BUY, lot_size * info[DEMARKER5][FACTOR], DEMARKER5, name[DEMARKER30]);
+        if (DeMarker_CloseOnChange) CloseOrdersByType(OP_SELL, DEMARKER5, "closing on market change: " + name[DEMARKER5]);
+      } else if (DeMarker_On_Sell(info[DEMARKER5][TIMEFRAME], info[DEMARKER5][OPEN_METHOD], DeMarker_OpenLevel)) {
+        order_placed = ExecuteOrder(OP_SELL, lot_size * info[DEMARKER5][FACTOR], DEMARKER5, name[DEMARKER30]);
+        if (DeMarker_CloseOnChange) CloseOrdersByType(OP_BUY, DEMARKER5, "closing on market change: " + name[DEMARKER5]);
+      }
+   }
+
+   if (info[DEMARKER15][ACTIVE]) {
+      if (DeMarker_On_Buy(info[DEMARKER15][TIMEFRAME], info[DEMARKER15][OPEN_METHOD], DeMarker_OpenLevel)) {
+        order_placed = ExecuteOrder(OP_BUY, lot_size * info[DEMARKER15][FACTOR], DEMARKER15, name[DEMARKER30]);
+        if (DeMarker_CloseOnChange) CloseOrdersByType(OP_SELL, DEMARKER15, "closing on market change: " + name[DEMARKER15]);
+      } else if (DeMarker_On_Sell(info[DEMARKER15][TIMEFRAME], info[DEMARKER15][OPEN_METHOD], DeMarker_OpenLevel)) {
+        order_placed = ExecuteOrder(OP_SELL, lot_size * info[DEMARKER15][FACTOR], DEMARKER15, name[DEMARKER30]);
+        if (DeMarker_CloseOnChange) CloseOrdersByType(OP_BUY, DEMARKER15, "closing on market change: " + name[DEMARKER15]);
+      }
+   }
+
+   if (info[DEMARKER30][ACTIVE]) {
+      if (DeMarker_On_Buy(info[DEMARKER30][TIMEFRAME], info[DEMARKER30][OPEN_METHOD], DeMarker_OpenLevel)) {
+        order_placed = ExecuteOrder(OP_BUY, lot_size * info[DEMARKER30][FACTOR], DEMARKER30, name[DEMARKER30]);
+        if (DeMarker_CloseOnChange) CloseOrdersByType(OP_SELL, DEMARKER30, "closing on market change: " + name[DEMARKER30]);
+      } else if (DeMarker_On_Sell(info[DEMARKER30][TIMEFRAME], info[DEMARKER30][OPEN_METHOD], DeMarker_OpenLevel)) {
+        order_placed = ExecuteOrder(OP_SELL, lot_size * info[DEMARKER30][FACTOR], DEMARKER30, name[DEMARKER30]);
+        if (DeMarker_CloseOnChange) CloseOrdersByType(OP_BUY, DEMARKER30, "closing on market change: " + name[DEMARKER30]);
       }
    }
 
@@ -1367,12 +1417,13 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
     // if (VerboseTrace) text += "WPR: " + GetArrayValues(wpr[M1]) + "; ";
   // }
 
-  if (DeMarker_Enabled) {
+  // if (DeMarker_Enabled) {
     // Update DeMarker indicator values.
     demarker[period][CURR] = iDeMarker(NULL, timeframe, DeMarker_Period, 0 + DeMarker_Shift);
     demarker[period][PREV] = iDeMarker(NULL, timeframe, DeMarker_Period, 1 + DeMarker_Shift);
+    demarker[period][FAR]  = iDeMarker(NULL, timeframe, DeMarker_Period, 2 + DeMarker_Shift);
     // if (VerboseTrace) text += "DeMarker: " + GetArrayValues(demarker[M1]) + "; ";
-  }
+  // }
 
   if (Fractals5_Enabled || Fractals15_Enabled || Fractals30_Enabled) {
     // Update Fractals indicator values.
@@ -1395,6 +1446,13 @@ int ExecuteOrder(int cmd, double volume, int order_type = CUSTOM, string order_c
    // int min_stop_level;
    double max_change = 1;
 
+   last_msg = "Limit: " + MinimumIntervalSec + "; Time: " + TimeCurrent() + "; Diff: " + (TimeCurrent() - last_order_time);
+   if (MinimumIntervalSec > 0 && TimeCurrent() - last_order_time < MinimumIntervalSec) {
+     err = __FUNCTION__ + "(): There must be a " + MinimumIntervalSec + " sec minimum interval between subsequent trade signals.";
+     if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "():" + err);
+     last_err = err;
+     return (FALSE);
+   }
    // Check the limits.
    if (volume == 0) {
      err = __FUNCTION__ + "(): Lot size for strategy " + order_type + " is 0.";
@@ -1403,7 +1461,7 @@ int ExecuteOrder(int cmd, double volume, int order_type = CUSTOM, string order_c
      return (FALSE);
    }
    if (GetTotalOrders() >= GetMaxOrders()) {
-     err = __FUNCTION__ + "(): Maximum open and pending orders reached the limit (EAMaxOrders).";
+     err = __FUNCTION__ + "(): Maximum open and pending orders reached the limit (MaxOrders).";
      if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "():" + err);
      last_err = err;
      return (FALSE);
@@ -1411,13 +1469,13 @@ int ExecuteOrder(int cmd, double volume, int order_type = CUSTOM, string order_c
 
    // Check the limits.
    if (GetTotalOrders() >= GetMaxOrders()) {
-     err = __FUNCTION__ + "(): Maximum open and pending orders reached the limit (EAMaxOrders).";
+     err = __FUNCTION__ + "(): Maximum open and pending orders reached the limit (MaxOrders).";
      if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "():" + err);
      last_err = err;
      return (FALSE);
    }
    if (GetTotalOrdersByType(order_type) >= GetMaxOrdersPerType()) {
-     err = __FUNCTION__ + "(): Maximum open and pending orders per type reached the limit (EAMaxOrdersPerType).";
+     err = __FUNCTION__ + "(): Maximum open and pending orders per type reached the limit (MaxOrdersPerType).";
      if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "():" + err);
      last_err = err;
      return (FALSE);
@@ -1458,7 +1516,7 @@ int ExecuteOrder(int cmd, double volume, int order_type = CUSTOM, string order_c
 
       result = TRUE;
       // TicketAdd(order_ticket);
-      // last_order_time = iTime(NULL, PERIOD_M1, 0); // Set last execution bar time.
+      last_order_time = TimeCurrent(); // Set last execution time.
       // last_trail_update = 0; // Set to 0, so trailing stops can be updated faster.
       order_price = OrderOpenPrice();
       if (VerboseInfo) OrderPrint();
@@ -1977,18 +2035,18 @@ bool WPR_On_Sell(int period = M1, int open_method = 0, int open_level = 30) {
  *
  * @param
  *   period (int) - period to check for
- *   open_method (int) - open method to use
+ *   open_method (int) - open method to use by using bitwise AND operation
  *   open_level (double) - open level to consider the signal
  */
 bool DeMarker_On_Buy(int period = M1, int open_method = 0, double open_level = 0.0) {
-  // if (VerboseTrace) { Print("DeMarker_On_Buy(): ", LowestValue(DeMarker), " > ", (0.5 + DeMarker_Filter)); }
-  switch (open_method) {
-    case 0: return (demarker[period][0] < (0.5 - open_level));
-    case 1: return (demarker[period][0] < (0.5 - open_level) && demarker[period][0] > demarker[period][1]);
-    case 2: return (demarker[period][0] < (0.5 - open_level) && demarker[period][0] < demarker[period][1]);
-    case 3: return (demarker[period][0] > (0.5 - open_level) && demarker[period][1] < (0.5 - open_level));
-  }
-  return FALSE;
+  bool result = demarker[period][CURR] < 0.5 - open_level;
+  if ((open_method &   1) != 0) result = result && demarker[period][PREV] < 0.5 - open_level;
+  if ((open_method &   2) != 0) result = result && demarker[period][FAR] < 0.5 - open_level;
+  if ((open_method &   4) != 0) result = result && demarker[period][CURR] < demarker[period][PREV];
+  if ((open_method &   8) != 0) result = result && demarker[period][PREV] < demarker[period][FAR];
+  if ((open_method &  16) != 0) result = result && Open[CURR] < Close[PREV];
+  if ((open_method &  32) != 0) result = result && demarker[period][PREV] < 0.5 - open_level - open_level/2;
+  return result;
 }
 
 /*
@@ -1996,18 +2054,18 @@ bool DeMarker_On_Buy(int period = M1, int open_method = 0, double open_level = 0
  *
  * @param
  *   period (int) - period to check for
- *   open_method (int) - open method to use
+ *   open_method (int) - open method to use by using bitwise AND operation
  *   open_level (double) - open level to consider the signal
  */
 bool DeMarker_On_Sell(int period = M1, int open_method = 0, double open_level = 0.0) {
-  // if (VerboseTrace) { Print("DeMarker_On_Sell(): ", LowestValue(DeMarker), " < ", (0.5 - DeMarker_Filter)); }
-  switch (open_method) {
-    case 0: return (demarker[period][0] > (0.5 + open_level));
-    case 1: return (demarker[period][0] > (0.5 + open_level) && demarker[period][0] < demarker[period][1]);
-    case 2: return (demarker[period][0] > (0.5 + open_level) && demarker[period][0] > demarker[period][1]);
-    case 3: return (demarker[period][0] < (0.5 + open_level) && demarker[period][1] > (0.5 + open_level));
-  }
-  return FALSE;
+  bool result = demarker[period][CURR] > 0.5 + open_level;
+  if ((open_method &   1) != 0) result = result && demarker[period][PREV] > 0.5 + open_level;
+  if ((open_method &   2) != 0) result = result && demarker[period][FAR] > 0.5 + open_level;
+  if ((open_method &   4) != 0) result = result && demarker[period][CURR] > demarker[period][PREV];
+  if ((open_method &   8) != 0) result = result && demarker[period][PREV] > demarker[period][FAR];
+  if ((open_method &  16) != 0) result = result && Open[CURR] > Close[PREV];
+  if ((open_method &  32) != 0) result = result && demarker[period][PREV] > 0.5 + open_level + open_level/2;
+  return result;
 }
 
 /*
@@ -2331,7 +2389,10 @@ int GetTrailingMethod(int order_type, int stop_or_profit) {
       if (Envelopes_TrailingStopMethod > 0)   stop_method   = Envelopes_TrailingStopMethod;
       if (Envelopes_TrailingProfitMethod > 0) profit_method = Envelopes_TrailingProfitMethod;
       break;
-    case DEMARKER:
+    case DEMARKER1:
+    case DEMARKER5:
+    case DEMARKER15:
+    case DEMARKER30:
       if (DeMarker_TrailingStopMethod > 0)   stop_method   = DeMarker_TrailingStopMethod;
       if (DeMarker_TrailingProfitMethod > 0) profit_method = DeMarker_TrailingProfitMethod;
       break;
@@ -2451,17 +2512,15 @@ int GetTotalOrdersByType(int order_type) {
 }
 
 // Calculate open positions.
-int CalculateOrderTypeRatio () {
-   int buys=0, sells=0;
-   for (int i=0; i<OrdersTotal(); i++) {
-      if (OrderSelect(i, SELECT_BY_POS, MODE_TRADES) == FALSE) break;
-      if (OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
-         if(OrderType()==OP_BUY)  buys++;
-         if(OrderType()==OP_SELL) sells++;
-       }
-   }
-   if(buys>0) return(buys);
-   else       return(-sells);
+int CalculateOrdersByCmd(int cmd) {
+  int total = 0;
+  for (int i = 0; i < OrdersTotal(); i++) {
+    if (OrderSelect(i, SELECT_BY_POS, MODE_TRADES) == FALSE) break;
+    if (OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
+       if(OrderType() == cmd) total++;
+     }
+  }
+  return total;
 }
 
 // Calculate open positions.
@@ -2519,7 +2578,7 @@ bool TradeAllowed() {
   //   changing the state of a trading account can be called only if trading by Expert Advisors
   //   is allowed (the "Allow live trading" checkbox is enabled in the Expert Advisor or script properties).
   if (!IsTradeAllowed()) {
-    err = "Trade is not allowed at the moment!";
+    err = "Trade is not allowed at the moment, check the settings!";
     if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "():" + err);
     //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + err);
     last_err = err;
@@ -2720,28 +2779,20 @@ int GetMaxOrdersAuto() {
 
 // Calculate number of maximum of orders allowed to open.
 int GetMaxOrders() {
-  return If(EAMaxOrders > 0, EAMaxOrders, GetMaxOrdersAuto());
+  return If(MaxOrders > 0, MaxOrders, GetMaxOrdersAuto());
 }
 
 // Calculate number of maximum of orders allowed to open per type.
 int GetMaxOrdersPerType() {
-  return If(EAMaxOrdersPerType > 0, EAMaxOrdersPerType, MathMax(MathFloor(GetMaxOrders() / FINAL_STRATEGY_TYPE_ENTRY), 1));
+  return If(MaxOrdersPerType > 0, MaxOrdersPerType, MathMax(MathFloor(GetMaxOrders() / FINAL_STRATEGY_TYPE_ENTRY), 1));
 }
 
 // Get number of active strategies.
 int GetNoOfStrategies() {
-  return (
-    + MA1_Enabled + MA5_Enabled + MA15_Enabled + MA30_Enabled
-    + MACD1_Enabled + MACD5_Enabled + MACD15_Enabled + MACD30_Enabled
-    + Alligator_Enabled
-    + RSI1_Enabled + RSI5_Enabled + RSI15_Enabled + RSI30_Enabled
-    + SAR1_Enabled + SAR5_Enabled + SAR15_Enabled + SAR30_Enabled
-    + Bands1_Enabled + Bands5_Enabled + Bands15_Enabled + Bands30_Enabled
-    + Envelopes1_Enabled + Envelopes5_Enabled + Envelopes15_Enabled + Envelopes30_Enabled
-    + DeMarker_Enabled
-    + WPR1_Enabled + WPR5_Enabled + WPR15_Enabled + WPR30_Enabled
-    + Fractals5_Enabled + Fractals15_Enabled + Fractals30_Enabled
-  );
+  int result = 0;
+  for (int i = 0; i < FINAL_STRATEGY_TYPE_ENTRY; i++)
+    result += info[i][ACTIVE];
+  return result;
 }
 
 // Calculate size of the lot based on the free margin and account leverage automatically.
@@ -3159,10 +3210,29 @@ void InitializeVariables() {
   info[WPR30][OPEN_METHOD]     = WPR30_OpenMethod;
   info[WPR30][FACTOR]          = 1.0;
 
-  name[DEMARKER]             = "DeMarker";
-  info[DEMARKER][ACTIVE]     = DeMarker_Enabled;
-  info[DEMARKER][TIMEFRAME]  = M1;
-  info[DEMARKER][FACTOR]     = 1.0;
+  name[DEMARKER1]               = "DeMarker M1";
+  info[DEMARKER1][ACTIVE]       = DeMarker1_Enabled;
+  info[DEMARKER1][TIMEFRAME]    = M1;
+  info[DEMARKER1][OPEN_METHOD]  = DeMarker1_OpenMethod;
+  info[DEMARKER1][FACTOR]       = 1.0;
+
+  name[DEMARKER5]               = "DeMarker M5";
+  info[DEMARKER5][ACTIVE]       = DeMarker5_Enabled;
+  info[DEMARKER5][TIMEFRAME]    = M5;
+  info[DEMARKER5][OPEN_METHOD]  = DeMarker5_OpenMethod;
+  info[DEMARKER5][FACTOR]       = 1.0;
+
+  name[DEMARKER15]              = "DeMarker M15";
+  info[DEMARKER15][ACTIVE]      = DeMarker15_Enabled;
+  info[DEMARKER15][TIMEFRAME]   = M15;
+  info[DEMARKER15][OPEN_METHOD] = DeMarker15_OpenMethod;
+  info[DEMARKER15][FACTOR]      = 1.0;
+
+  name[DEMARKER30]              = "DeMarker M30";
+  info[DEMARKER30][ACTIVE]      = DeMarker30_Enabled;
+  info[DEMARKER30][TIMEFRAME]   = M30;
+  info[DEMARKER30][OPEN_METHOD] = DeMarker30_OpenMethod;
+  info[DEMARKER30][FACTOR]      = 1.0;
 
   name[FRACTALS1]            = "Fractals M1";
   info[FRACTALS1][ACTIVE]    = Fractals1_Enabled;
@@ -3612,9 +3682,10 @@ string GetOrderTextDetails() {
 // Get order statistics in percentage for each strategy.
 string GetOrdersStats(string sep = "\n") {
   // Prepare text for Total Orders.
-  string total_orders_text = "Open Orders: " + total_orders + " [" + DoubleToStr(CalculateOpenLots(), 2) + " lots]";
+  string total_orders_text = "Open Orders: " + total_orders;
+  total_orders_text += " +" + CalculateOrdersByCmd(OP_BUY) + "/-" + CalculateOrdersByCmd(OP_SELL);
+  total_orders_text += " [" + DoubleToStr(CalculateOpenLots(), 2) + " lots]";
   total_orders_text += " (other: " + GetTotalOrders(FALSE) + ")";
-  total_orders_text += "; ratio: " + CalculateOrderTypeRatio();
   // Prepare data about open orders per strategy type.
   string orders_per_type = "Stats: "; // Display open orders per type.
   if (total_orders > 0) {
@@ -3634,7 +3705,7 @@ string GetAccountTextDetails() {
       "Account Balance: ", DoubleToStr(AccountBalance(), 2), " ", AccountCurrency(), "; ",
       "Account Equity: ", DoubleToStr(AccountEquity(), 2), " ", AccountCurrency(), "; ",
       "Free Margin: ", DoubleToStr(AccountFreeMargin(), 2), " ", AccountCurrency(), "; ",
-      "No of Orders: ", total_orders, " (BUY/SELL ratio: ", CalculateOrderTypeRatio(), "); ",
+      "No of Orders: ", total_orders, " (BUY/SELL: ", CalculateOrdersByCmd(OP_BUY), "/", CalculateOrdersByCmd(OP_BUY), "); ",
       "Risk Ratio: ", DoubleToStr(GetRiskRatio(), 1)
    );
 }
