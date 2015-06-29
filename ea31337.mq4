@@ -5,7 +5,7 @@
 #property description "-------"
 #property copyright   "kenorb"
 #property link        "http://www.mql4.com"
-#property version   "1.047"
+#property version   "1.048"
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -28,7 +28,10 @@ enum ENUM_STRATEGY_TYPE {
   MACD5,
   MACD15,
   MACD30,
-  ALLIGATOR,
+  ALLIGATOR1,
+  ALLIGATOR5,
+  ALLIGATOR15,
+  ALLIGATOR30,
   RSI1,
   RSI5,
   RSI15,
@@ -45,7 +48,6 @@ enum ENUM_STRATEGY_TYPE {
   ENVELOPES5,
   ENVELOPES15,
   ENVELOPES30,
-  ENVELOPES60,
   DEMARKER1,
   DEMARKER5,
   DEMARKER15,
@@ -66,6 +68,8 @@ enum ENUM_STRATEGY_INFO {
   ACTIVE,
   TIMEFRAME,
   OPEN_METHOD,
+  STOP_METHOD,
+  PROFIT_METHOD,
   CUSTOM_PERIOD,
   FACTOR, // Multiply lot factor.
   OPEN_ORDERS,
@@ -121,7 +125,8 @@ enum ENUM_TRAIL_TYPE {
   T_SAR            = 16, // SAR
   T_SAR_LOW        = 17, // SAR Low
   T_BANDS          = 18, // Bands
-  T_BANDS_LOW      = 19  // Bands Low
+  T_BANDS_LOW      = 19, // Bands Low
+  T_ENVELOPES      = 20, // Envelopes
 };
 
 // Define type of tasks.
@@ -250,7 +255,10 @@ extern ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = T_SAR; // Trailing Profit met
  */
 
 extern string ____Alligator_Parameters__ = "-- Settings for the Alligator indicator --";
-extern bool Alligator_Enabled = TRUE; // Enable Alligator custom-based strategy.
+extern bool Alligator1_Enabled  = TRUE; // Enable Alligator custom-based strategy.
+extern bool Alligator5_Enabled  = FALSE; // Enable Alligator custom-based strategy.
+extern bool Alligator15_Enabled = FALSE; // Enable Alligator custom-based strategy.
+extern bool Alligator30_Enabled = FALSE; // Enable Alligator custom-based strategy.
 extern ENUM_TIMEFRAMES Alligator_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int Alligator_Jaw_Period = 12; // Blue line averaging period (Alligator's Jaw).
 extern int Alligator_Jaw_Shift = 0; // Blue line shift relative to the chart.
@@ -262,6 +270,10 @@ extern ENUM_MA_METHOD Alligator_MA_Method = MODE_EMA; // MA method (See: ENUM_MA
 extern ENUM_APPLIED_PRICE Alligator_Applied_Price = PRICE_HIGH; // Applied price. It can be any of ENUM_APPLIED_PRICE enumeration values.
 extern int Alligator_Shift = 0; // The indicator shift relative to the chart.
 extern int Alligator_Shift_Far = 1; // The indicator shift relative to the chart.
+extern int Alligator1_OpenMethod  = 0; // Valid range: 0-255.
+extern int Alligator5_OpenMethod  = 0; // Valid range: 0-255.
+extern int Alligator15_OpenMethod  = 0; // Valid range: 0-255.
+extern int Alligator30_OpenMethod  = 0; // Valid range: 0-255.
 extern double Alligator_OpenLevel = 0.01; // Minimum open level between moving averages to raise the signal.
 extern bool Alligator_CloseOnChange = TRUE; // Close opposite orders on market change.
 extern ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = T_MA_F_FAR; // Trailing Stop method for Alligator. Set 0 to default. See: ENUM_TRAIL_TYPE.
@@ -374,26 +386,37 @@ extern ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = T_FIXED; // Trailing Profit 
  */
 
 extern string ____Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --";
-extern bool Envelopes1_Enabled = TRUE; // Enable Envelopes-based strategy.
-extern bool Envelopes5_Enabled = FALSE; // Enable Envelopes-based strategy.
-extern bool Envelopes15_Enabled = FALSE; // Enable Envelopes-based strategy.
-extern bool Envelopes30_Enabled = FALSE; // Enable Envelopes-based strategy.
+extern bool Envelopes1_Enabled  = TRUE; // Enable Envelopes-based strategy.
+extern bool Envelopes5_Enabled  = TRUE; // Enable Envelopes-based strategy.
+extern bool Envelopes15_Enabled = TRUE; // Enable Envelopes-based strategy.
+extern bool Envelopes30_Enabled = TRUE; // Enable Envelopes-based strategy.
 // extern bool Envelopes60_Enabled = TRUE; // Enable Envelopes-based strategy.
 // extern ENUM_TIMEFRAMES Envelopes_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int Envelopes_MA_Period = 30; // Averaging period to calculate the main line.
+extern int Envelopes_MA_Period = 28; // Averaging period to calculate the main line.
 extern ENUM_MA_METHOD Envelopes_MA_Method = MODE_SMA; // MA method (See: ENUM_MA_METHOD).
 extern int Envelopes_MA_Shift = 0; // The indicator shift relative to the chart.
 extern ENUM_APPLIED_PRICE Envelopes_Applied_Price = PRICE_TYPICAL; // Applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
-extern double Envelopes_Deviation = 0.10; // Percent deviation from the main line.
+extern double Envelopes1_Deviation = 0.10; // Percent deviation from the main line.
+extern double Envelopes5_Deviation = 0.12; // Percent deviation from the main line.
+extern double Envelopes15_Deviation = 0.15; // Percent deviation from the main line.
+extern double Envelopes30_Deviation = 0.4; // Percent deviation from the main line.
 // extern int Envelopes_Shift_Far = 0; // The indicator shift relative to the chart.
-extern int Envelopes_Shift = 0; // The indicator shift relative to the chart.
-extern int Envelopes_OpenMethod = 1; // Valid range: 0-6. Suggested value: x.
-extern bool Envelopes_CloseOnChange = TRUE; // Close opposite orders on market change.
-extern ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = T_BANDS_LOW; // Trailing Stop method for Bands. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = T_SAR; // Trailing Profit method for Bands. Set 0 to default. See: ENUM_TRAIL_TYPE.
-/* Envelopes backtest log (£1000,auto,ts:25,tp:20,gap:10,sp:2) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
- *   £2170.19	3634	1.18	0.60	310.68	17.65%	0.00000000	Envelopes_TrailingStopMethod=14 	Envelopes_TrailingProfitMethod=16
- *   £2110.65	3565	1.18	0.59	360.50	15.14%	0.00000000	Envelopes_TrailingStopMethod=19 	Envelopes_TrailingProfitMethod=16
+extern int Envelopes_Shift = 2; // The indicator shift relative to the chart.
+extern int Envelopes1_OpenMethod = 2; // Valid range: 0-255. Set 0 to default.
+extern int Envelopes5_OpenMethod = 112; // Valid range: 0-255. Set 0 to default.
+extern int Envelopes15_OpenMethod = 16; // Valid range: 0-255. Set 0 to default.
+extern int Envelopes30_OpenMethod = 68; // Valid range: 0-255. Set 0 to default.
+extern bool Envelopes_CloseOnChange = FALSE; // Close opposite orders on market change.
+extern ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = T_MA_M_FAR_TRAIL; // Trailing Stop method for Bands. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = T_ENVELOPES; // Trailing Profit method for Bands. Set 0 to default. See: ENUM_TRAIL_TYPE.
+/* Envelopes backtest log (ts:25,tp:25,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 3, 7,6mln ticks, quality 25%]:
+ *   £5717.15	7065	1.14	0.81	2028.87	28.58% (deposit: £1000, boosting = 1.0)
+ *   £6911.53	7065	1.17	0.98	2106.21	11.96% (deposit: £10000, boosting = 1.0)
+ *   Strategy stats (deposit: £10000):
+ *     Envelopes M1: Total net profit: 113 pips, Total orders: 2775 (Won: 30.1% [836] | Loss: 69.9% [1939]);
+ *     Envelopes M5: Total net profit: 1043 pips, Total orders: 1719 (Won: 29.6% [508] | Loss: 70.4% [1211]);
+ *     Envelopes M15: Total net profit: 441 pips, Total orders: 1538 (Won: 33.6% [517] | Loss: 66.4% [1021]);
+ *     Envelopes M30: Total net profit: 2225 pips, Total orders: 1028 (Won: 43.0% [442] | Loss: 57.0% [586]);
  */
 
 extern string ____WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --";
@@ -478,46 +501,51 @@ extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_MA_LOWEST; // Trailing 
  * Summary backtest log
  * All [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 3, 7,6mln ticks, quality 25%]:
  * Deposit: £1000 (factor = auto)
- *   £47031.51	42533	1.15	1.11	4641.58	21.02% (deposit: £1000, default settings)
- *   £38161.75	41182	1.14	0.93	6686.84	23.33% (deposit: £1000, default settings, previous)
- *   £59168.88	41285	1.12	1.43	12750.98	24.11% (deposit: £10000, default settings)
- *   £890286.13	41405	1.12	21.50	162767.50	24.41% (deposit: £100000, default settings)
+ *   £53685.55	46605	1.12	1.15	15776.94	29.63% (deposit: £1000, default settings)
+ *   £115804.55	46252	1.11	2.50	33190.28	27.86% (deposit: £10000, default settings)
+ *   £1509271.31	46594	1.10	32.39	468036.39	29.66% (deposit: £100000, default settings)
 
-    Strategy stats (deposit £1000, boosting factor: auto):
-    MA M1: Total net profit: 40 pips, Total orders: 6 (Won: 50.0% [3] | Loss: 50.0% [3]);
-    MA M5: Total net profit: 3704 pips, Total orders: 1590 (Won: 45.2% [718] | Loss: 54.8% [872]);
-    MA M15: Total net profit: 2591 pips, Total orders: 759 (Won: 43.1% [327] | Loss: 56.9% [432]);
-    MA M30: Total net profit: 4619 pips, Total orders: 566 (Won: 50.7% [287] | Loss: 49.3% [279]);
-    MACD M1: Total net profit: 60 pips, Total orders: 2303 (Won: 46.2% [1065] | Loss: 53.8% [1238]);
-    MACD M5: Total net profit: 21294 pips, Total orders: 7170 (Won: 43.8% [3138] | Loss: 56.2% [4032]);
-    MACD M15: Total net profit: 17636 pips, Total orders: 5742 (Won: 38.4% [2203] | Loss: 61.6% [3539]);
-    MACD M30: Total net profit: 41872 pips, Total orders: 2556 (Won: 55.4% [1416] | Loss: 44.6% [1140]);
-    Alligator M1: Total net profit: 4859 pips, Total orders: 2049 (Won: 59.4% [1218] | Loss: 40.6% [831]);
-    RSI M1: Total net profit: 34246 pips, Total orders: 2730 (Won: 68.9% [1882] | Loss: 31.1% [848]);
-    RSI M5: Total net profit: 3320 pips, Total orders: 396 (Won: 48.7% [193] | Loss: 51.3% [203]);
-    RSI M15: Total net profit: 6354 pips, Total orders: 479 (Won: 51.6% [247] | Loss: 48.4% [232]);
-    RSI M30: Total net profit: 3038 pips, Total orders: 265 (Won: 47.9% [127] | Loss: 52.1% [138]);
-    SAR M1: Total net profit: 24 pips, Total orders: 1069 (Won: 38.4% [411] | Loss: 61.6% [658]);
-    SAR M5: Total net profit: 810 pips, Total orders: 882 (Won: 38.1% [336] | Loss: 61.9% [546]);
-    SAR M15: Total net profit: 1095 pips, Total orders: 740 (Won: 30.9% [229] | Loss: 69.1% [511]);
-    SAR M30: Total net profit: 2409 pips, Total orders: 417 (Won: 30.2% [126] | Loss: 69.8% [291]);
-    Bands M1: Total net profit: 71216 pips, Total orders: 6533 (Won: 69.9% [4566] | Loss: 30.1% [1967]);
-    Bands M5: Total net profit: 102590 pips, Total orders: 7519 (Won: 67.1% [5047] | Loss: 32.9% [2472]);
-    Bands M15: Total net profit: 23894 pips, Total orders: 1507 (Won: 56.4% [850] | Loss: 43.6% [657]);
-    Bands M30: Total net profit: 13022 pips, Total orders: 787 (Won: 48.7% [383] | Loss: 51.3% [404]);
-    Envelopes M1: Total net profit: 66360 pips, Total orders: 6777 (Won: 64.6% [4376] | Loss: 35.4% [2401]);
-    DeMarker: Total net profit: 23 pips, Total orders: 2694 (Won: 41.9% [1128] | Loss: 58.1% [1566]);
-    WPR M1: Total net profit: 129327 pips, Total orders: 11554 (Won: 79.8% [9220] | Loss: 20.2% [2334]);
-    WPR M5: Total net profit: 81002 pips, Total orders: 5584 (Won: 75.3% [4207] | Loss: 24.7% [1377]);
-    WPR M15: Total net profit: 468 pips, Total orders: 1023 (Won: 36.2% [370] | Loss: 63.8% [653]);
-    WPR M30: Total net profit: -81 pips, Total orders: 764 (Won: 39.5% [302] | Loss: 60.5% [462]);
-    Fractals M5: Total net profit: 28446 pips, Total orders: 17368 (Won: 52.7% [9153] | Loss: 47.3% [8215]);
-    Fractals M15: Total net profit: 37676 pips, Total orders: 10161 (Won: 54.9% [5583] | Loss: 45.1% [4578]);
-    Fractals M30: Total net profit: 24116 pips, Total orders: 6058 (Won: 51.3% [3107] | Loss: 48.7% [2951]);
+    Strategy stats (deposit £10000, default settings):
+      MA M1: Total net profit: 197, Total orders: 6 (Won: 50.0% [3] | Loss: 50.0% [3]);
+      MA M5: Total net profit: 11188, Total orders: 1555 (Won: 46.0% [715] | Loss: 54.0% [840]);
+      MA M15: Total net profit: 4797, Total orders: 780 (Won: 42.4% [331] | Loss: 57.6% [449]);
+      MA M30: Total net profit: 11061, Total orders: 563 (Won: 51.2% [288] | Loss: 48.8% [275]);
+      MACD M1: Total net profit: 624, Total orders: 2188 (Won: 46.3% [1014] | Loss: 53.7% [1174]);
+      MACD M5: Total net profit: 74148, Total orders: 7357 (Won: 42.4% [3119] | Loss: 57.6% [4238]);
+      MACD M15: Total net profit: 65292, Total orders: 7111 (Won: 39.8% [2833] | Loss: 60.2% [4278]);
+      MACD M30: Total net profit: 107723, Total orders: 2702 (Won: 53.6% [1449] | Loss: 46.4% [1253]);
+      Alligator M1: Total net profit: 13302, Total orders: 2002 (Won: 57.9% [1159] | Loss: 42.1% [843]);
+      RSI M1: Total net profit: 102626, Total orders: 2770 (Won: 69.2% [1918] | Loss: 30.8% [852]);
+      RSI M5: Total net profit: 8746, Total orders: 409 (Won: 50.1% [205] | Loss: 49.9% [204]);
+      RSI M15: Total net profit: 6922, Total orders: 469 (Won: 49.7% [233] | Loss: 50.3% [236]);
+      RSI M30: Total net profit: 2828, Total orders: 258 (Won: 46.1% [119] | Loss: 53.9% [139]);
+      SAR M1: Total net profit: 681, Total orders: 1066 (Won: 38.6% [412] | Loss: 61.4% [654]);
+      SAR M5: Total net profit: 6755, Total orders: 892 (Won: 38.3% [342] | Loss: 61.7% [550]);
+      SAR M15: Total net profit: 2103, Total orders: 733 (Won: 30.8% [226] | Loss: 69.2% [507]);
+      SAR M30: Total net profit: 6888, Total orders: 419 (Won: 29.8% [125] | Loss: 70.2% [294]);
+      Bands M1: Total net profit: 287212, Total orders: 6615 (Won: 70.1% [4635] | Loss: 29.9% [1980]);
+      Bands M5: Total net profit: 262345, Total orders: 7613 (Won: 67.3% [5120] | Loss: 32.7% [2493]);
+      Bands M15: Total net profit: 74226, Total orders: 1511 (Won: 56.8% [859] | Loss: 43.2% [652]);
+      Bands M30: Total net profit: 41098, Total orders: 800 (Won: 49.4% [395] | Loss: 50.6% [405]);
+      Envelopes M1: Total net profit: 1453, Total orders: 2719 (Won: 30.0% [817] | Loss: 70.0% [1902]);
+      Envelopes M5: Total net profit: 516, Total orders: 1719 (Won: 29.5% [507] | Loss: 70.5% [1212]);
+      Envelopes M15: Total net profit: -4187, Total orders: 1398 (Won: 33.7% [471] | Loss: 66.3% [927]);
+      Envelopes M30: Total net profit: 3511, Total orders: 814 (Won: 44.1% [359] | Loss: 55.9% [455]);
+      DeMarker M1: Total net profit: 712, Total orders: 2117 (Won: 30.4% [643] | Loss: 69.6% [1474]);
+      DeMarker M5: Total net profit: 1848, Total orders: 1744 (Won: 31.1% [542] | Loss: 68.9% [1202]);
+      DeMarker M15: Total net profit: 4432, Total orders: 1241 (Won: 37.6% [466] | Loss: 62.4% [775]);
+      DeMarker M30: Total net profit: 2986, Total orders: 755 (Won: 40.4% [305] | Loss: 59.6% [450]);
+      WPR M1: Total net profit: 518837, Total orders: 11943 (Won: 79.9% [9539] | Loss: 20.1% [2404]);
+      WPR M5: Total net profit: 263126, Total orders: 5665 (Won: 75.5% [4276] | Loss: 24.5% [1389]);
+      WPR M15: Total net profit: -2025, Total orders: 1040 (Won: 35.9% [373] | Loss: 64.1% [667]);
+      WPR M30: Total net profit: -100, Total orders: 829 (Won: 40.4% [335] | Loss: 59.6% [494]);
+      Fractals M1: Total net profit: 25896, Total orders: 2489 (Won: 53.6% [1334] | Loss: 46.4% [1155]);
+      Fractals M5: Total net profit: 33152, Total orders: 1874 (Won: 52.3% [981] | Loss: 47.7% [893]);
+      Fractals M15: Total net profit: 93479, Total orders: 9267 (Won: 54.0% [5007] | Loss: 46.0% [4260]);
+      Fractals M30: Total net profit: 84824, Total orders: 6337 (Won: 56.1% [3557] | Loss: 43.9% [2780]);
 
  *   Prev: £23053.06	39727	1.13	0.58	3197.04	29.82%
  *   Old: £29408.26	40723	1.14	0.72	6231.99	23.80%
- *   Old: £17022.25	27393	1.14	0.62	1562.87	19.89% [without SAR]
  */
 
 // Define account conditions.
@@ -994,13 +1022,43 @@ void Trade() {
       }
    }
 
-   if (info[ALLIGATOR][ACTIVE]) {
-      if (Alligator_On_Buy(info[ALLIGATOR][TIMEFRAME], Alligator_OpenLevel * pip_size)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[ALLIGATOR][FACTOR], ALLIGATOR, "AlligatorOnBuy");
-        if (Alligator_CloseOnChange) CloseOrdersByType(OP_SELL, ALLIGATOR, "closing Alligator on market change");
-      } else if (Alligator_On_Sell(info[ALLIGATOR][TIMEFRAME], Alligator_OpenLevel * pip_size)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[ALLIGATOR][FACTOR], ALLIGATOR, "AlligatorOnSell");
-        if (Alligator_CloseOnChange) CloseOrdersByType(OP_BUY, ALLIGATOR, "closing Alligator on market change");
+   if (info[ALLIGATOR1][ACTIVE]) {
+      if (Alligator_On_Buy(info[ALLIGATOR1][TIMEFRAME], info[ALLIGATOR1][OPEN_METHOD], Alligator_OpenLevel * pip_size)) {
+        order_placed = ExecuteOrder(OP_BUY, lot_size * info[ALLIGATOR1][FACTOR], ALLIGATOR1, name[ALLIGATOR1]);
+        if (Alligator_CloseOnChange) CloseOrdersByType(OP_SELL, ALLIGATOR1, "closing on market change: " + name[ALLIGATOR1]);
+      } else if (Alligator_On_Sell(info[ALLIGATOR1][TIMEFRAME], info[ALLIGATOR1][OPEN_METHOD], Alligator_OpenLevel * pip_size)) {
+        order_placed = ExecuteOrder(OP_SELL, lot_size * info[ALLIGATOR1][FACTOR], ALLIGATOR1, name[ALLIGATOR1]);
+        if (Alligator_CloseOnChange) CloseOrdersByType(OP_BUY, ALLIGATOR1, "closing on market change: " + name[ALLIGATOR1]);
+      }
+   }
+
+   if (info[ALLIGATOR5][ACTIVE]) {
+      if (Alligator_On_Buy(info[ALLIGATOR5][TIMEFRAME], info[ALLIGATOR5][OPEN_METHOD], Alligator_OpenLevel * pip_size)) {
+        order_placed = ExecuteOrder(OP_BUY, lot_size * info[ALLIGATOR5][FACTOR], ALLIGATOR5, name[ALLIGATOR5]);
+        if (Alligator_CloseOnChange) CloseOrdersByType(OP_SELL, ALLIGATOR5, "closing on market change: " + name[ALLIGATOR5]);
+      } else if (Alligator_On_Sell(info[ALLIGATOR5][TIMEFRAME], info[ALLIGATOR5][OPEN_METHOD], Alligator_OpenLevel * pip_size)) {
+        order_placed = ExecuteOrder(OP_SELL, lot_size * info[ALLIGATOR5][FACTOR], ALLIGATOR5, name[ALLIGATOR5]);
+        if (Alligator_CloseOnChange) CloseOrdersByType(OP_BUY, ALLIGATOR5, "closing on market change: " + name[ALLIGATOR5]);
+      }
+   }
+
+   if (info[ALLIGATOR15][ACTIVE]) {
+      if (Alligator_On_Buy(info[ALLIGATOR15][TIMEFRAME], info[ALLIGATOR15][OPEN_METHOD], Alligator_OpenLevel * pip_size)) {
+        order_placed = ExecuteOrder(OP_BUY, lot_size * info[ALLIGATOR15][FACTOR], ALLIGATOR15, name[ALLIGATOR15]);
+        if (Alligator_CloseOnChange) CloseOrdersByType(OP_SELL, ALLIGATOR15, "closing on market change: " + name[ALLIGATOR15]);
+      } else if (Alligator_On_Sell(info[ALLIGATOR15][TIMEFRAME], info[ALLIGATOR15][OPEN_METHOD], Alligator_OpenLevel * pip_size)) {
+        order_placed = ExecuteOrder(OP_SELL, lot_size * info[ALLIGATOR15][FACTOR], ALLIGATOR15, name[ALLIGATOR15]);
+        if (Alligator_CloseOnChange) CloseOrdersByType(OP_BUY, ALLIGATOR15, "closing on market change: " + name[ALLIGATOR15]);
+      }
+   }
+
+   if (info[ALLIGATOR30][ACTIVE]) {
+      if (Alligator_On_Buy(info[ALLIGATOR30][TIMEFRAME], info[ALLIGATOR30][OPEN_METHOD], Alligator_OpenLevel * pip_size)) {
+        order_placed = ExecuteOrder(OP_BUY, lot_size * info[ALLIGATOR30][FACTOR], ALLIGATOR30, name[ALLIGATOR30]);
+        if (Alligator_CloseOnChange) CloseOrdersByType(OP_SELL, ALLIGATOR30, "closing on market change: " + name[ALLIGATOR30]);
+      } else if (Alligator_On_Sell(info[ALLIGATOR30][TIMEFRAME], info[ALLIGATOR30][OPEN_METHOD], Alligator_OpenLevel * pip_size)) {
+        order_placed = ExecuteOrder(OP_SELL, lot_size * info[ALLIGATOR30][FACTOR], ALLIGATOR30, name[ALLIGATOR30]);
+        if (Alligator_CloseOnChange) CloseOrdersByType(OP_BUY, ALLIGATOR30, "closing on market change: " + name[ALLIGATOR30]);
       }
    }
 
@@ -1125,39 +1183,39 @@ void Trade() {
    }
 
    if (info[ENVELOPES1][ACTIVE]) {
-      if (Envelopes_On_Buy(info[ENVELOPES1][TIMEFRAME], Envelopes_OpenMethod)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[ENVELOPES1][FACTOR], ENVELOPES1, "Envelopes");
-        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_SELL, ENVELOPES1, "closing Envelopes M1 on market change");
-      } else if (Envelopes_On_Sell(info[ENVELOPES1][TIMEFRAME], Envelopes_OpenMethod)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[ENVELOPES1][FACTOR], ENVELOPES1, "Envelopes");
-        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_BUY, ENVELOPES1, "closing Envelopes M1 on market change");
+      if (Envelopes_On_Buy(info[ENVELOPES1][TIMEFRAME], info[ENVELOPES1][OPEN_METHOD])) {
+        order_placed = ExecuteOrder(OP_BUY, lot_size * info[ENVELOPES1][FACTOR], ENVELOPES1, name[ENVELOPES1]);
+        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_SELL, ENVELOPES1, "closing on market change: " + name[ENVELOPES1]);
+      } else if (Envelopes_On_Sell(info[ENVELOPES1][TIMEFRAME], info[ENVELOPES1][OPEN_METHOD])) {
+        order_placed = ExecuteOrder(OP_SELL, lot_size * info[ENVELOPES1][FACTOR], ENVELOPES1, name[ENVELOPES1]);
+        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_BUY, ENVELOPES1, "closing on market change: " + name[ENVELOPES1]);
       }
    }
    if (info[ENVELOPES5][ACTIVE]) {
-      if (Envelopes_On_Buy(info[ENVELOPES5][TIMEFRAME], Envelopes_OpenMethod)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[ENVELOPES5][FACTOR], ENVELOPES5, "Envelopes");
-        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_SELL, ENVELOPES5, "closing Envelopes M5 on market change");
-      } else if (Envelopes_On_Sell(info[ENVELOPES5][TIMEFRAME], Envelopes_OpenMethod)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[ENVELOPES5][FACTOR], ENVELOPES5, "Envelopes");
-        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_BUY, ENVELOPES5, "closing Envelopes M5 on market change");
+      if (Envelopes_On_Buy(info[ENVELOPES5][TIMEFRAME], info[ENVELOPES5][OPEN_METHOD])) {
+        order_placed = ExecuteOrder(OP_BUY, lot_size * info[ENVELOPES5][FACTOR], ENVELOPES5, name[ENVELOPES5]);
+        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_SELL, ENVELOPES5, "closing on market change: " + name[ENVELOPES5]);
+      } else if (Envelopes_On_Sell(info[ENVELOPES5][TIMEFRAME], info[ENVELOPES5][OPEN_METHOD])) {
+        order_placed = ExecuteOrder(OP_SELL, lot_size * info[ENVELOPES5][FACTOR], ENVELOPES5, name[ENVELOPES5]);
+        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_BUY, ENVELOPES5, "closing on market change: " + name[ENVELOPES5]);
       }
    }
    if (info[ENVELOPES15][ACTIVE]) {
-      if (Envelopes_On_Buy(info[ENVELOPES15][TIMEFRAME], Envelopes_OpenMethod)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[ENVELOPES15][FACTOR], ENVELOPES15, "Envelopes");
-        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_SELL, ENVELOPES15, "closing Envelopes M15 on market change");
-      } else if (Envelopes_On_Sell(info[ENVELOPES15][TIMEFRAME], Envelopes_OpenMethod)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[ENVELOPES15][FACTOR], ENVELOPES15, "Envelopes");
-        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_BUY, ENVELOPES15, "closing Envelopes M15 on market change");
+      if (Envelopes_On_Buy(info[ENVELOPES15][TIMEFRAME], info[ENVELOPES15][OPEN_METHOD])) {
+        order_placed = ExecuteOrder(OP_BUY, lot_size * info[ENVELOPES15][FACTOR], ENVELOPES15, name[ENVELOPES15]);
+        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_SELL, ENVELOPES15, "closing on market change: " + name[ENVELOPES15]);
+      } else if (Envelopes_On_Sell(info[ENVELOPES15][TIMEFRAME], info[ENVELOPES15][OPEN_METHOD])) {
+        order_placed = ExecuteOrder(OP_SELL, lot_size * info[ENVELOPES15][FACTOR], ENVELOPES15, name[ENVELOPES15]);
+        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_BUY, ENVELOPES15, "closing on market change: " + name[ENVELOPES15]);
       }
    }
    if (info[ENVELOPES30][ACTIVE]) {
-      if (Envelopes_On_Buy(info[ENVELOPES30][TIMEFRAME], Envelopes_OpenMethod)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[ENVELOPES30][FACTOR], ENVELOPES30, "Envelopes");
-        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_SELL, ENVELOPES30, "closing Envelopes M30 on market change");
-      } else if (Envelopes_On_Sell(info[ENVELOPES30][TIMEFRAME], Envelopes_OpenMethod)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[ENVELOPES30][FACTOR], ENVELOPES30, "Envelopes");
-        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_BUY, ENVELOPES30, "closing Envelopes M30 on market change");
+      if (Envelopes_On_Buy(info[ENVELOPES30][TIMEFRAME], info[ENVELOPES30][OPEN_METHOD])) {
+        order_placed = ExecuteOrder(OP_BUY, lot_size * info[ENVELOPES30][FACTOR], ENVELOPES30, name[ENVELOPES30]);
+        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_SELL, ENVELOPES30, "closing on market change: " + name[ENVELOPES30]);
+      } else if (Envelopes_On_Sell(info[ENVELOPES30][TIMEFRAME], info[ENVELOPES30][OPEN_METHOD])) {
+        order_placed = ExecuteOrder(OP_SELL, lot_size * info[ENVELOPES30][FACTOR], ENVELOPES30, name[ENVELOPES30]);
+        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_BUY, ENVELOPES30, "closing on market change: " + name[ENVELOPES30]);
       }
    }
 
@@ -1294,26 +1352,31 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
   }*/
 
   int period = M1, bands_period = Bands_Period, rsi_period = RSI_Period;
+  double envelopes_deviation = Envelopes1_Deviation;
   switch (timeframe) {
     case PERIOD_M1:
       period = M1;
       bands_period = info[BANDS1][CUSTOM_PERIOD];
       rsi_period = info[RSI1][CUSTOM_PERIOD];
+      envelopes_deviation = Envelopes1_Deviation;
       break;
     case PERIOD_M5:
       period = M5;
       bands_period = info[BANDS5][CUSTOM_PERIOD];
       rsi_period = info[RSI5][CUSTOM_PERIOD];
+      envelopes_deviation = Envelopes5_Deviation;
       break;
     case PERIOD_M15:
       period = M15;
       bands_period = info[BANDS15][CUSTOM_PERIOD];
       rsi_period = info[RSI15][CUSTOM_PERIOD];
+      envelopes_deviation = Envelopes15_Deviation;
       break;
     case PERIOD_M30:
       period = M30;
       bands_period = info[BANDS30][CUSTOM_PERIOD];
       rsi_period = info[RSI30][CUSTOM_PERIOD];
+      envelopes_deviation = Envelopes30_Deviation;
       break;
   }
 
@@ -1356,7 +1419,7 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
     // if (VerboseTrace) text += "MACD: " + GetArrayValues(macd[M1]) + "; Signal: " + GetArrayValues(macd_signal[M1]) + "; ";
   //}
 
-  if (Alligator_Enabled) {
+  if (Alligator1_Enabled || Alligator5_Enabled || Alligator15_Enabled || Alligator30_Enabled) {
     // Update Alligator indicator values.
     // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
     for (i = 0; i < 3; i++) {
@@ -1401,16 +1464,16 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
     // if (VerboseTrace) text += "Bands: " + GetArrayValues(bands) + "; ";
   // }
 
-  //if (Envelopes_Enabled) {
+  if (Envelopes1_Enabled || Envelopes5_Enabled || Envelopes15_Enabled || Envelopes30_Enabled) {
     // Update the Envelopes indicator values.
     for (i = 0; i < 3; i++) {
-      envelopes[period][i][MODE_MAIN]  = iEnvelopes(NULL, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation, MODE_MAIN,  i + Envelopes_Shift);
-      envelopes[period][i][MODE_UPPER] = iEnvelopes(NULL, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation, MODE_UPPER, i + Envelopes_Shift);
-      envelopes[period][i][MODE_LOWER] = iEnvelopes(NULL, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation, MODE_LOWER, i + Envelopes_Shift);
+      envelopes[period][i][MODE_MAIN]  = iEnvelopes(NULL, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, MODE_MAIN,  i + Envelopes_Shift);
+      envelopes[period][i][MODE_UPPER] = iEnvelopes(NULL, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, MODE_UPPER, i + Envelopes_Shift);
+      envelopes[period][i][MODE_LOWER] = iEnvelopes(NULL, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, MODE_LOWER, i + Envelopes_Shift);
     }
     // last_msg = "Env: " + envelopes[M1][0][0] + ", upper: " + envelopes[M1][0][MODE_UPPER] + ", lower: " + envelopes[M1][0][MODE_LOWER];
     // if (VerboseTrace) text += "Envelopes: " + GetArrayValues(envelopes) + "; ";
-  //}
+  }
 
   if (WPR1_Enabled || WPR5_Enabled || WPR15_Enabled || WPR30_Enabled) {
     // Update the Larry Williams' Percent Range indicator values.
@@ -1783,10 +1846,23 @@ bool MACD_On_Sell(int period = M1, int open_method = 0, double open_level = 0.0)
  *
  * @param
  *   period (int) - period to check for
+ *   open_method (int) - open method to use by using bitwise AND operation
  *   min_gap - minimum gap in pips to consider the signal
  */
-bool Alligator_On_Buy(int period = M1, double min_gap = 0) {
+bool Alligator_On_Buy(int period = M1, int open_method = 0, double min_gap = 0) {
   // [x][0] - The Blue line (Alligator's Jaw), [x][1] - The Red Line (Alligator's Teeth), [x][2] - The Green Line (Alligator's Lips)
+  /*
+  bool result = rsi[period][CURR] <= (50 - open_level);
+  if ((open_method &   1) != 0) result = result &&
+  if ((open_method &   2) != 0) result = result &&
+  if ((open_method &   4) != 0) result = result &&
+  if ((open_method &   8) != 0) result = result &&
+  if ((open_method &  16) != 0) result = result &&
+  if ((open_method &  32) != 0) result = result &&
+  if ((open_method &  64) != 0) result = result &&
+  if ((open_method & 128) != 0) result = result &&
+  return result;*/
+
   return (
     alligator[period][0][2] > alligator[period][0][1] + min_gap && // Check if Lips are above Teeth ...
     alligator[period][0][2] > alligator[period][0][0] + min_gap && // ... Lips are above Jaw ...
@@ -1804,10 +1880,22 @@ bool Alligator_On_Buy(int period = M1, double min_gap = 0) {
  *
  * @param
  *   period (int) - period to check for
+ *   open_method (int) - open method to use by using bitwise AND operation
  *   min_gap - minimum gap in pips to consider the signal
  */
-bool Alligator_On_Sell(int period = M1, double min_gap = 0) {
+bool Alligator_On_Sell(int period = M1, int open_method = 0, double min_gap = 0) {
   // [x][0] - The Blue line (Alligator's Jaw), [x][1] - The Red Line (Alligator's Teeth), [x][2] - The Green Line (Alligator's Lips)
+  /*
+  bool result = rsi[period][CURR] <= (50 - open_level);
+  if ((open_method &   1) != 0) result = result &&
+  if ((open_method &   2) != 0) result = result &&
+  if ((open_method &   4) != 0) result = result &&
+  if ((open_method &   8) != 0) result = result &&
+  if ((open_method &  16) != 0) result = result &&
+  if ((open_method &  32) != 0) result = result &&
+  if ((open_method &  64) != 0) result = result &&
+  if ((open_method & 128) != 0) result = result &&
+  return result;*/
   return (
     alligator[period][0][2] + min_gap < alligator[period][0][1] && // Check if Lips are below Teeth and ...
     alligator[period][0][2] + min_gap < alligator[period][0][0] && // ... Lips are below Jaw and ...
@@ -1961,19 +2049,20 @@ bool Bands_On_Sell(int period = M1, int open_method = 0) {
  *
  * @param
  *   period (int) - period to check for
- *   open_method (int) - open method to use
+ *   open_method (int) - open method to use by using bitwise AND operation
  */
 bool Envelopes_On_Buy(int period = M1, int open_method = 0) {
-  switch (open_method) {
-    case 0: return Low[CURR]   < envelopes[period][CURR][MODE_LOWER]; // price value was lower than the lower band
-    case 1: return Low[CURR]   < envelopes[period][CURR][MODE_LOWER] && envelopes[period][CURR][MODE_MAIN] < envelopes[period][PREV][MODE_MAIN]; // ... and trend is downwards
-    case 2: return Low[CURR]   < envelopes[period][CURR][MODE_LOWER] && envelopes[period][CURR][MODE_MAIN] > envelopes[period][PREV][MODE_MAIN] && envelopes[period][CURR][MODE_UPPER] < envelopes[period][PREV][MODE_UPPER]; // .. and the lower envelopes are contracting
-    case 3: return Low[CURR]   < envelopes[period][CURR][MODE_LOWER] && envelopes[period][CURR][MODE_MAIN] > envelopes[period][PREV][MODE_MAIN] && envelopes[period][CURR][MODE_LOWER] > envelopes[period][PREV][MODE_LOWER]; // .. and the upper envelopes are expanding
-    case 4: return Close[CURR] < envelopes[period][CURR][MODE_LOWER]; // closed price value was higher than the upper band
-    case 5: return Close[CURR] < envelopes[period][CURR][MODE_LOWER] && envelopes[period][CURR][MODE_MAIN] < envelopes[period][PREV][MODE_MAIN]; // ... and trend is downwards
-    case 6: return Close[CURR] > envelopes[period][CURR][MODE_LOWER] && Low[PREV] < envelopes[period][CURR][MODE_LOWER]; // price closed within the envelopes, but previous lowest price was lower than the lower band
-  }
-  return FALSE;
+  bool result = Low[CURR] < envelopes[period][CURR][MODE_LOWER] || Low[PREV] < envelopes[period][CURR][MODE_LOWER]; // price low was below the lower band
+  // result = result || (envelopes[period][CURR][MODE_MAIN] > envelopes[period][FAR][MODE_MAIN] && Open[CURR] > envelopes[period][CURR][MODE_UPPER]);
+  if ((open_method &   1) != 0) result = result && Open[CURR] > envelopes[period][CURR][MODE_LOWER];
+  if ((open_method &   2) != 0) result = result && envelopes[period][CURR][MODE_MAIN] < envelopes[period][PREV][MODE_MAIN];
+  if ((open_method &   4) != 0) result = result && envelopes[period][CURR][MODE_LOWER] < envelopes[period][PREV][MODE_LOWER];
+  if ((open_method &   8) != 0) result = result && envelopes[period][CURR][MODE_UPPER] < envelopes[period][PREV][MODE_UPPER];
+  if ((open_method &  16) != 0) result = result && envelopes[period][CURR][MODE_UPPER] - envelopes[period][CURR][MODE_LOWER] > envelopes[period][PREV][MODE_UPPER] - envelopes[period][PREV][MODE_LOWER];
+  if ((open_method &  32) != 0) result = result && Ask < envelopes[period][CURR][MODE_MAIN];
+  if ((open_method &  64) != 0) result = result && Close[CURR] < envelopes[period][CURR][MODE_UPPER];
+  if ((open_method & 128) != 0) result = result && Ask > Close[PREV];
+  return result;
 }
 
 /*
@@ -1981,19 +2070,20 @@ bool Envelopes_On_Buy(int period = M1, int open_method = 0) {
  *
  * @param
  *   period (int) - period to check for
- *   open_method (int) - open method to use
+ *   open_method (int) - open method to use by using bitwise AND operation
  */
 bool Envelopes_On_Sell(int period = M1, int open_method = 0) {
-  switch (open_method) {
-    case 0: return High[CURR]  > envelopes[period][CURR][MODE_UPPER]; // price value was higher than the upper band
-    case 1: return High[CURR]  > envelopes[period][CURR][MODE_UPPER] && envelopes[period][CURR][MODE_MAIN] > envelopes[period][PREV][MODE_MAIN]; // ... and trend is upwards
-    case 2: return High[CURR]  > envelopes[period][CURR][MODE_UPPER] && envelopes[period][CURR][MODE_MAIN] > envelopes[period][PREV][MODE_MAIN] && envelopes[period][CURR][MODE_UPPER] > envelopes[period][PREV][MODE_UPPER]; // .. and the lower envelopes are expanding
-    case 3: return High[CURR]  > envelopes[period][CURR][MODE_UPPER] && envelopes[period][CURR][MODE_MAIN] > envelopes[period][PREV][MODE_MAIN] && envelopes[period][CURR][MODE_LOWER] < envelopes[period][PREV][MODE_LOWER]; // .. and the upper envelopes are contracting
-    case 4: return Close[CURR] > envelopes[period][CURR][MODE_UPPER]; // closed price value was higher than the upper band
-    case 5: return Close[CURR] > envelopes[period][CURR][MODE_UPPER] && envelopes[period][CURR][MODE_MAIN] > envelopes[period][PREV][MODE_MAIN]; // ... and trend is upwards
-    case 6: return Close[CURR] < envelopes[period][CURR][MODE_UPPER] && High[PREV] > envelopes[period][CURR][MODE_UPPER]; // price closed within the envelopes, but previous highest price was higher than the upper band
-  }
-  return FALSE;
+  bool result = High[CURR] > envelopes[period][CURR][MODE_UPPER] || High[PREV] > envelopes[period][CURR][MODE_UPPER]; // price high was above the upper band
+  // result = result || (envelopes[period][CURR][MODE_MAIN] < envelopes[period][FAR][MODE_MAIN] && Open[CURR] < envelopes[period][CURR][MODE_LOWER]);
+  if ((open_method &   1) != 0) result = result && Open[CURR] < envelopes[period][CURR][MODE_UPPER];
+  if ((open_method &   2) != 0) result = result && envelopes[period][CURR][MODE_MAIN] > envelopes[period][PREV][MODE_MAIN];
+  if ((open_method &   4) != 0) result = result && envelopes[period][CURR][MODE_LOWER] > envelopes[period][PREV][MODE_LOWER];
+  if ((open_method &   8) != 0) result = result && envelopes[period][CURR][MODE_UPPER] > envelopes[period][PREV][MODE_UPPER];
+  if ((open_method &  16) != 0) result = result && envelopes[period][CURR][MODE_UPPER] - envelopes[period][CURR][MODE_LOWER] > envelopes[period][PREV][MODE_UPPER] - envelopes[period][PREV][MODE_LOWER];
+  if ((open_method &  32) != 0) result = result && Ask > envelopes[period][CURR][MODE_MAIN];
+  if ((open_method &  64) != 0) result = result && Close[CURR] > envelopes[period][CURR][MODE_UPPER];
+  if ((open_method & 128) != 0) result = result && Ask < Close[PREV];
+  return result;
 }
 
 /*
@@ -2325,13 +2415,16 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
        new_value = If(OpTypeValue(cmd) == loss_or_profit, sar_highest, sar_lowest);
        break;
      case T_BANDS: // Current Bands value.
-       new_value = If(OpTypeValue(cmd) == loss_or_profit, bands[period][0][1], bands[period][0][2]);
+       new_value = If(OpTypeValue(cmd) == loss_or_profit, bands[period][CURR][MODE_UPPER], bands[period][CURR][MODE_LOWER]);
        break;
      case T_BANDS_LOW: // Lowest/highest Bands value.
        new_value = If(OpTypeValue(cmd) == loss_or_profit,
          MathMax(MathMax(bands[period][CURR][MODE_UPPER], bands[period][PREV][MODE_UPPER]), bands[period][FAR][MODE_UPPER]),
          MathMin(MathMin(bands[period][CURR][MODE_LOWER], bands[period][PREV][MODE_LOWER]), bands[period][FAR][MODE_LOWER])
          );
+       break;
+     case T_ENVELOPES: // Current Bands value.
+       new_value = If(OpTypeValue(cmd) == loss_or_profit, envelopes[period][CURR][MODE_UPPER], envelopes[period][CURR][MODE_LOWER]);
        break;
      default:
        if (VerboseDebug) Print(__FUNCTION__ + "(): Error: Unknown trailing stop method: ", method);
@@ -2379,7 +2472,10 @@ int GetTrailingMethod(int order_type, int stop_or_profit) {
       if (MACD_TrailingStopMethod > 0)   stop_method   = MACD_TrailingStopMethod;
       if (MACD_TrailingProfitMethod > 0) profit_method = MACD_TrailingProfitMethod;
       break;
-    case ALLIGATOR:
+    case ALLIGATOR1:
+    case ALLIGATOR5:
+    case ALLIGATOR15:
+    case ALLIGATOR30:
       if (Alligator_TrailingStopMethod > 0)   stop_method   = Alligator_TrailingStopMethod;
       if (Alligator_TrailingProfitMethod > 0) profit_method = Alligator_TrailingProfitMethod;
       break;
@@ -3103,10 +3199,29 @@ void InitializeVariables() {
   info[MACD30][OPEN_METHOD]   = MACD30_OpenMethod;
   info[MACD30][FACTOR]        = 1.0;
 
-  name[ALLIGATOR]           = "Alligator M1";
-  info[ALLIGATOR][ACTIVE]   = Alligator_Enabled;
-  info[ALLIGATOR][TIMEFRAME]= M1;
-  info[ALLIGATOR][FACTOR]   = 1.0;
+  name[ALLIGATOR1]              = "Alligator M1";
+  info[ALLIGATOR1][ACTIVE]      = Alligator1_Enabled;
+  info[ALLIGATOR1][TIMEFRAME]   = M1;
+  info[ALLIGATOR1][OPEN_METHOD] = Alligator1_OpenMethod;
+  info[ALLIGATOR1][FACTOR]      = 1.0;
+
+  name[ALLIGATOR5]              = "Alligator M5";
+  info[ALLIGATOR5][ACTIVE]      = Alligator5_Enabled;
+  info[ALLIGATOR5][TIMEFRAME]   = M5;
+  info[ALLIGATOR5][OPEN_METHOD] = Alligator5_OpenMethod;
+  info[ALLIGATOR5][FACTOR]      = 1.0;
+
+  name[ALLIGATOR15]              = "Alligator M15";
+  info[ALLIGATOR15][ACTIVE]      = Alligator15_Enabled;
+  info[ALLIGATOR15][TIMEFRAME]   = M15;
+  info[ALLIGATOR15][OPEN_METHOD] = Alligator15_OpenMethod;
+  info[ALLIGATOR15][FACTOR]      = 1.0;
+
+  name[ALLIGATOR30]              = "Alligator M30";
+  info[ALLIGATOR30][ACTIVE]      = Alligator30_Enabled;
+  info[ALLIGATOR30][TIMEFRAME]   = M30;
+  info[ALLIGATOR30][OPEN_METHOD] = Alligator30_OpenMethod;
+  info[ALLIGATOR30][FACTOR]      = 1.0;
 
   name[RSI1]                = "RSI M1";
   info[RSI1][ACTIVE]        = RSI1_Enabled;
@@ -3188,25 +3303,33 @@ void InitializeVariables() {
   info[BANDS30][CUSTOM_PERIOD] = Bands_Period;
   info[BANDS30][FACTOR]        = 1.0;
 
-  name[ENVELOPES1]            = "Envelopes M1";
-  info[ENVELOPES1][ACTIVE]    = Envelopes1_Enabled;
-  info[ENVELOPES1][TIMEFRAME] = M1;
-  info[ENVELOPES1][FACTOR]    = 1.0;
+  name[ENVELOPES1]                = "Envelopes M1";
+  info[ENVELOPES1][ACTIVE]        = Envelopes1_Enabled;
+  info[ENVELOPES1][TIMEFRAME]     = M1;
+  info[ENVELOPES1][OPEN_METHOD]   = Envelopes1_OpenMethod;
+  info[ENVELOPES1][CUSTOM_PERIOD] = Envelopes_MA_Period;
+  info[ENVELOPES1][FACTOR]        = 1.0;
 
-  name[ENVELOPES5]            = "Envelopes M5";
-  info[ENVELOPES5][ACTIVE]    = Envelopes5_Enabled;
-  info[ENVELOPES5][TIMEFRAME] = M5;
-  info[ENVELOPES5][FACTOR]    = 1.0;
+  name[ENVELOPES5]                = "Envelopes M5";
+  info[ENVELOPES5][ACTIVE]        = Envelopes5_Enabled;
+  info[ENVELOPES5][TIMEFRAME]     = M5;
+  info[ENVELOPES5][OPEN_METHOD]   = Envelopes5_OpenMethod;
+  info[ENVELOPES5][CUSTOM_PERIOD] = Envelopes_MA_Period;
+  info[ENVELOPES5][FACTOR]        = 1.0;
 
-  name[ENVELOPES15]            = "Envelopes M15";
-  info[ENVELOPES15][ACTIVE]    = Envelopes15_Enabled;
-  info[ENVELOPES15][TIMEFRAME] = M15;
-  info[ENVELOPES15][FACTOR]    = 1.0;
+  name[ENVELOPES15]                = "Envelopes M15";
+  info[ENVELOPES15][ACTIVE]        = Envelopes15_Enabled;
+  info[ENVELOPES15][TIMEFRAME]     = M15;
+  info[ENVELOPES15][OPEN_METHOD]   = Envelopes15_OpenMethod;
+  info[ENVELOPES15][CUSTOM_PERIOD] = Envelopes_MA_Period;
+  info[ENVELOPES15][FACTOR]        = 1.0;
 
-  name[ENVELOPES30]            = "Envelopes M30";
-  info[ENVELOPES30][ACTIVE]    = Envelopes30_Enabled;
-  info[ENVELOPES30][TIMEFRAME] = M30;
-  info[ENVELOPES30][FACTOR]    = 1.0;
+  name[ENVELOPES30]                = "Envelopes M30";
+  info[ENVELOPES30][ACTIVE]        = Envelopes30_Enabled;
+  info[ENVELOPES30][TIMEFRAME]     = M30;
+  info[ENVELOPES30][OPEN_METHOD]   = Envelopes30_OpenMethod;
+  info[ENVELOPES30][CUSTOM_PERIOD] = Envelopes_MA_Period;
+  info[ENVELOPES30][FACTOR]        = 1.0;
 
   name[WPR1]                  = "WPR M1";
   info[WPR1][ACTIVE]          = WPR1_Enabled;
@@ -3629,7 +3752,7 @@ string GetStrategyReport(string sep = "\n") {
   for (int i = 0; i < FINAL_STRATEGY_TYPE_ENTRY; i++) {
     if (info[i][TOTAL_ORDERS] > 0) {
       output += name[i] + ": ";
-      output += "Total net profit: " + info[i][TOTAL_PROFIT] + " pips, ";
+      output += "Total net profit: " + info[i][TOTAL_PROFIT] + ", "; // FIXME: pips/points?
       pc_loss = (100 / NormalizeDouble(info[i][TOTAL_ORDERS], 2)) * info[i][TOTAL_ORDERS_LOSS];
       pc_won  = (100 / NormalizeDouble(info[i][TOTAL_ORDERS], 2)) * info[i][TOTAL_ORDERS_WON];
       output += "Total orders: " + info[i][TOTAL_ORDERS] + " (Won: " + DoubleToStr(pc_won, 1) + "% [" + info[i][TOTAL_ORDERS_WON] + "] | Loss: " + DoubleToStr(pc_loss, 1) + "% [" + info[i][TOTAL_ORDERS_LOSS] + "]); ";
@@ -3731,7 +3854,7 @@ string GetAccountTextDetails() {
       "Account Balance: ", DoubleToStr(AccountBalance(), 2), " ", AccountCurrency(), "; ",
       "Account Equity: ", DoubleToStr(AccountEquity(), 2), " ", AccountCurrency(), "; ",
       "Free Margin: ", DoubleToStr(AccountFreeMargin(), 2), " ", AccountCurrency(), "; ",
-      "No of Orders: ", total_orders, " (BUY/SELL: ", CalculateOrdersByCmd(OP_BUY), "/", CalculateOrdersByCmd(OP_BUY), "); ",
+      "No of Orders: ", total_orders, " (BUY/SELL: ", CalculateOrdersByCmd(OP_BUY), "/", CalculateOrdersByCmd(OP_SELL), "); ",
       "Risk Ratio: ", DoubleToStr(GetRiskRatio(), 1)
    );
 }
@@ -4747,55 +4870,48 @@ void ReportAdd(string msg) {
 /*
  * Write report into file.
  */
-string GenerateReport() {
+string GenerateReport(string sep = "\n") {
   string output = "";
   int i;
   if (InitialDeposit > 0)
-  output += "Initial deposit:                            " + InitialDeposit + "\n";
-  output += "Total net profit:                           " + SummaryProfit + "\n";
-  output += "Gross profit:                               " + GrossProfit + "\n";
-  output += "Gross loss:                                 " + GrossLoss + "\n";
+  output += StringFormat("Initial deposit:                            %s%.2f", InitialDeposit) + sep;
+  output += StringFormat("Total net profit:                           %s%.2f", AccountCurrency(), SummaryProfit) + sep;
+  output += StringFormat("Gross profit:                               %s%.2f", AccountCurrency(), GrossProfit) + sep;
+  output += StringFormat("Gross loss:                                 %s%.2f", AccountCurrency(), GrossLoss)  + sep;
   if (GrossLoss > 0.0)
-  output += StringFormat("Profit factor:                              %.1f\n", ProfitFactor);
-  output += StringFormat("Expected payoff:                            %.1f\n", ExpectedPayoff);
-  output += StringFormat("Absolute drawdown:                          %.2f\n", AbsoluteDrawdown);
-  output += StringFormat("Maximal drawdown:                           %.1f (%.1f%%)\n", MaxDrawdown, MaxDrawdownPercent);
-  output += StringFormat("Relative drawdown:                          (%.1f%%) %.1f\n", RelDrawdownPercent, RelDrawdown);
-  output += "Trades total                                " + SummaryTrades + "\n";
+  output += StringFormat("Profit factor:                              %.2f", ProfitFactor) + sep;
+  output += StringFormat("Expected payoff:                            %.2f", ExpectedPayoff) + sep;
+  output += StringFormat("Absolute drawdown:                          %.2f", AbsoluteDrawdown) + sep;
+  output += StringFormat("Maximal drawdown:                           %.1f (%.1f%%)", MaxDrawdown, MaxDrawdownPercent) + sep;
+  output += StringFormat("Relative drawdown:                          (%.1f%%) %.1f", RelDrawdownPercent, RelDrawdown) + sep;
+  output += StringFormat("Trades total                                %d", SummaryTrades) + sep;
   if(ShortTrades>0)
-  output += "Short positions(won %):                     " + ShortTrades + StringConcatenate("(",100.0*WinShortTrades/ShortTrades,"%)") + "\n";
+  output += StringFormat("Short positions (won %):                    %d (%.1f%%)", ShortTrades, 100.0*WinShortTrades/ShortTrades) + sep;
   if(LongTrades>0)
-  output += "Long positions(won %):                      " + LongTrades + StringConcatenate("(",100.0*WinLongTrades/LongTrades,"%)") + "\n";
+  output += "Long positions(won %):                      " + LongTrades + StringConcatenate("(",100.0*WinLongTrades/LongTrades,"%)") + sep;
   if(ProfitTrades>0)
-  output += "Profit trades (% of total):                 " + ProfitTrades + StringConcatenate("(",100.0*ProfitTrades/SummaryTrades,"%)") + "\n";
+  output += "Profit trades (% of total):                 " + ProfitTrades + StringConcatenate("(",100.0*ProfitTrades/SummaryTrades,"%)") + sep;
   if(LossTrades>0)
-  output += "Loss trades (% of total):                   " + LossTrades + StringConcatenate("(",100.0*LossTrades/SummaryTrades,"%)") + "\n";
-  output += "Largest profit trade:                       " + MaxProfit + "\n";
-  output += "Largest loss trade:                         " + -MinProfit + "\n";
+  output += "Loss trades (% of total):                   " + LossTrades + StringConcatenate("(",100.0*LossTrades/SummaryTrades,"%)") + sep;
+  output += "Largest profit trade:                       " + MaxProfit + sep;
+  output += "Largest loss trade:                         " + -MinProfit + sep;
   if(ProfitTrades>0)
-  output += "Average profit trade:                       " + GrossProfit/ProfitTrades + "\n";
+  output += "Average profit trade:                       " + GrossProfit/ProfitTrades + sep;
   if(LossTrades>0)
-  output += "Average loss trade:                         " + -GrossLoss/LossTrades + "\n";
-  output += "Average consecutive wins:                   " + AvgConWinners + "\n";
-  output += "Average consecutive losses:                 " + AvgConLosers + "\n";
-  output += "Maximum consecutive wins (profit in money): " + ConProfitTrades1 + StringConcatenate(" (", ConProfit1, ")") + "\n";
-  output += "Maximum consecutive losses (loss in money): " + ConLossTrades1 + StringConcatenate(" (", -ConLoss1, ")") + "\n";
-  output += "Maximal consecutive profit (count of wins): " + ConProfit2 + StringConcatenate(" (", ConProfitTrades2, ")") + "\n";
-  output += "Maximal consecutive loss (count of losses): " + -ConLoss2 + StringConcatenate(" (", ConLossTrades2, ")") + "\n";
+  output += "Average loss trade:                         " + -GrossLoss/LossTrades + sep;
+  output += "Average consecutive wins:                   " + AvgConWinners + sep;
+  output += "Average consecutive losses:                 " + AvgConLosers + sep;
+  output += "Maximum consecutive wins (profit in money): " + ConProfitTrades1 + StringConcatenate(" (", ConProfit1, ")") + sep;
+  output += "Maximum consecutive losses (loss in money): " + ConLossTrades1 + StringConcatenate(" (", -ConLoss1, ")") + sep;
+  output += "Maximal consecutive profit (count of wins): " + ConProfit2 + StringConcatenate(" (", ConProfitTrades2, ")") + sep;
+  output += "Maximal consecutive loss (count of losses): " + -ConLoss2 + StringConcatenate(" (", ConLossTrades2, ")") + sep;
   output += GetStrategyReport();
 
   // Write report log.
   if (ArraySize(log) > 0) output += "Report log:\n";
   for (i = 0; i < ArraySize(log); i++)
-   output += log[i] + "\n";
+   output += log[i] + sep;
 
-  if (VerboseDebug) {
-    string result[];
-    ushort sep = StringGetCharacter("\n", 0);
-    for (i = 0; i < StringSplit(output, sep, result); i++) {
-      Print(result[i]);
-    }
-  }
   return output;
 }
 
@@ -4806,8 +4922,17 @@ void WriteReport(string report_name) {
   int handle = FileOpen(report_name, FILE_CSV|FILE_WRITE, '\t');
   if (handle < 1) return;
 
-  FileWrite(handle, GenerateReport());
+  string report = GenerateReport();
+  FileWrite(handle, report);
   FileClose(handle);
+
+  if (VerboseDebug) {
+    string result[];
+    ushort usep = StringGetCharacter("\n", 0);
+    for (int i = 0; i < StringSplit(report, usep, result); i++) {
+      Print(result[i]);
+    }
+  }
 }
 
 /* END: SUMMARY REPORT */
