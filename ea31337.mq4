@@ -1,11 +1,18 @@
 //+------------------------------------------------------------------+
 //|                                                       EA31337    |
 //+------------------------------------------------------------------+
-#property description "EA31337"
-#property description "-------"
-#property copyright   "kenorb"
-#property link        "http://www.mql4.com"
-#property version   "1.049"
+#define ea_name    "EA31337"
+#define ea_desc    "Multi-strategy advanced trading robot."
+#define ea_version "1.050"
+#define ea_link    "http://www.mql4.com"
+#define ea_author  "kenorb"
+#define __ea_advanced__ TRUE
+
+#property description ea_name
+#property description ea_desc
+#property copyright   ea_author
+#property link        ea_link
+#property version     ea_version
 // #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
@@ -19,7 +26,6 @@
 // Define type of strategies.
 enum ENUM_STRATEGY_TYPE {
   // Type of strategy being used (used for strategy identification, new strategies append to the end, but in general - do not change!).
-  CUSTOM,
   MA1,
   MA5,
   MA15,
@@ -115,7 +121,7 @@ enum ENUM_TRAIL_TYPE {
   T_MA_F_FAR       =  3, // MA Fast Far
   T_MA_F_LOW       =  4, // MA Fast Low
   T_MA_F_TRAIL     =  5, // MA Fast+Trail
-  T_MA_F_FAR_TRAIL =  6, // MA Far+Trail
+  T_MA_F_FAR_TRAIL =  6, // MA Fast Far+Trail
   T_MA_M           =  7, // MA Med
   T_MA_M_FAR       =  8, // MA Med Far
   T_MA_M_LOW       =  9, // MA Med Low
@@ -146,7 +152,6 @@ enum ENUM_PERIOD_TYPE {
   FINAL_PERIOD_TYPE_ENTRY = 9  // Should be the last one. Used to calculate the number of enum items.
 };
 
-
 // Define type of tasks.
 enum ENUM_STAT_PERIOD_TYPE {
   DAILY   = 0,  // Daily
@@ -164,51 +169,69 @@ enum ENUM_INDICATOR_INDEX {
 };
 
 // User parameters.
-extern string ____EA_Parameters__ = "-----------------------------------------";
+extern string __EA_Parameters__ = "-- General EA parameters --";
 //extern int EADelayBetweenTrades = 0; // Delay in bars between the placed orders. Set 0 for no limits.
 
 // extern double EAMinChangeOrders = 5; // Minimum change in pips between placed orders.
 // extern double EADelayBetweenOrders = 0; // Minimum delay in seconds between placed orders. FIXME: Fix relative delay in backtesting.
 //extern bool EACloseOnMarketChange = FALSE; // Close opposite orders on market change.
-extern bool EAMinimalizeLosses = FALSE; // Set stop loss to zero, once the order is profitable.
-extern int MaxOrderPriceSlippage = 5; // Maximum price slippage for buy or sell orders (in pips).
 
 extern string __EA_Trailing_Parameters__ = "-- Settings for trailing stops --";
 extern int TrailingStop = 40;
 extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = T_FIXED; // TrailingStop method. Set 0 to disable. See: ENUM_TRAIL_TYPE.
 extern bool TrailingStopOneWay = TRUE; // Change trailing stop towards one direction only. Suggested value: TRUE
 extern int TrailingProfit = 30;
-extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 0; // Trailing Profit method. Set 0 to disable. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = T_NONE; // Trailing Profit method. Set 0 to disable. See: ENUM_TRAIL_TYPE.
 extern bool TrailingProfitOneWay = TRUE; // Change trailing profit take towards one direction only.
 extern double TrailingStopAddPerMinute = 0.0; // Decrease trailing stop (in pips) per each bar. Set 0 to disable. Suggested value: 0.
 
 extern string __EA_Order_Parameters__ = "-- Profit/Loss settings (set 0 for auto) --";
-extern double EALotSize = 0; // Default lot size. Set 0 for auto.
+extern double LotSize = 0; // Default lot size. Set 0 for auto.
+extern double TakeProfit = 0.0; // Take profit value in pips.
+extern double StopLoss = 0.0; // Stop loss value in pips.
 extern int MaxOrders = 0; // Maximum orders. Set 0 for auto.
-extern int MaxOrdersPerType = 0; // Maximum orders per strategy type. Set 0 for unlimited.
+extern int MaxOrdersPerType = 0; // Maximum orders per strategy type. Set 0 for auto.
 //extern int MaxOrdersPerDay = 30; // TODO
-extern double EATakeProfit = 0.0;
-extern double EAStopLoss = 0.0;
-extern double RiskRatio = 0; // Suggested value: 1.0. Do not change unless testing.
 extern int MinimumIntervalSec = 0; // Minimum interval between subsequent trade signals. Suggested value: 0 or 60.
+extern bool TradeMicroLots = TRUE;
+
+extern string __EA_Risk_Parameters__ = "-- Risk management --";
+extern double RiskRatio = 0; // Suggested value: 1.0. Do not change unless testing.
+extern bool TradeWithTrend = FALSE; // Trade with trend only to minimalize the risk.
+extern bool MinimalizeLosses = FALSE; // Set stop loss to zero, once the order is profitable.
 
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting (set 1.0 to default) --";
-extern double BestDailyStrategyMultiplierFactor    = 1; // Increase lot size for the best daily strategy.
-extern double BestWeeklyStrategyMultiplierFactor   = 1; // Increase lot size for the best weekly strategy.
-extern double BestMonthlyStrategyMultiplierFactor  = 2; // Increase lot size for the best monthly strategy.
-extern double WorseDailyStrategyDividerFactor      = 1; // Check for the worse daily strategy each hour. Useful for low-balance accounts or non-profitable periods.
-extern double WorseWeeklyStrategyDividerFactor     = 2; // Check for the worse weekly strategy each hour. Useful for low-balance accounts or non-profitable periods.
-extern double WorseMonthlyStrategyDividerFactor    = 2; // Check for the worse monthly strategy each hour. Useful for low-balance accounts or non-profitable periods.
+extern double BestDailyStrategyMultiplierFactor    = 1; // Lot multiplier boosting factor for the most profitable daily strategy.
+extern double BestWeeklyStrategyMultiplierFactor   = 1; // Lot multiplier boosting factor for the most profitable weekly strategy.
+extern double BestMonthlyStrategyMultiplierFactor  = 2; // Lot multiplier boosting factor for the most profitable monthly strategy.
+extern double WorseDailyStrategyDividerFactor      = 1; // Lot divider factor for the most profitable daily strategy. Useful for low-balance accounts or non-profitable periods.
+extern double WorseWeeklyStrategyDividerFactor     = 2; // Lot divider factor for the most profitable weekly strategy. Useful for low-balance accounts or non-profitable periods.
+extern double WorseMonthlyStrategyDividerFactor    = 2; // Lot divider factor for the most profitable monthly strategy. Useful for low-balance accounts or non-profitable periods.
 
-extern string ____MA_Parameters__ = "-- Settings for the Moving Average indicator --";
-extern bool MA1_Enabled  = TRUE; // Enable MA-based strategy.
-extern bool MA5_Enabled  = TRUE; // Enable MA-based strategy.
-extern bool MA15_Enabled = TRUE; // Enable MA-based strategy.
-extern bool MA30_Enabled = TRUE; // Enable MA-based strategy.
-extern ENUM_TIMEFRAMES MA_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int MA_Period_Fast = 10; // Suggested value: 5
-extern int MA_Period_Medium = 20; // Suggested value: 25
-extern int MA_Period_Slow = 50; // Suggested value: 60
+extern string __Market_Parameters__ = "-- Market parameters --";
+extern int TrendMethod = 81; // Method of main trend calculation. Valid range: 0-255. Suggested values: 81, 51, 91, 67, 75, 103, 82, 85, etc.
+extern int TrendMethodAction = 238; // Method of trend calculation on action execution (See: A_CLOSE_ALL_TREND/A_CLOSE_ALL_NON_TREND). Valid range: 0-255.
+extern int MinVolumeToTrade = 2; // Minimum volume to trade.
+extern int MaxOrderPriceSlippage = 5; // Maximum price slippage for buy or sell orders (in pips).
+extern int DemoMarketStopLevel = 10;
+extern int MaxTries = 5; // Number of maximum attempts to execute the order.
+extern int BigDropSize = 10; // Size of price drop in pips to react when the market drops suddenly.
+extern double MinPipChangeToTrade = 1.2; // Minimum pip change to trade before the bar change. Set 0 to process every tick. Lower is better for small spreads and other way round.
+extern int MinPipGap = 12; // Minimum gap in pips between trades of the same strategy.
+#ifdef __ea_advanced__
+extern int DynamicSpreadConf = TRUE; // Dynamically calculate most optimal settings based on the current spread (MinPipChangeToTrade/MinPipGap).
+int SpreadRatio = 1.0;
+#endif
+
+extern string __MA_Parameters__ = "-- Settings for the Moving Average indicator --";
+extern bool MA1_Enabled  = TRUE; // Enable MA-based strategy. // Optimize for higher spreads.
+extern bool MA5_Enabled  = TRUE; // Enable MA-based strategy. // Optimize for higher spreads.
+extern bool MA15_Enabled = TRUE; // Enable MA-based strategy. // Optimize for higher spreads.
+extern bool MA30_Enabled = TRUE; // Enable MA-based strategy. // Optimize for higher spreads.
+//extern ENUM_TIMEFRAMES MA_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
+extern int MA_Period_Fast = 10; // Averaging period for calculation. Suggested value: 5
+extern int MA_Period_Medium = 20; // Averaging period for calculation. Suggested value: 25
+extern int MA_Period_Slow = 50; // Averaging period for calculation. Suggested value: 60
 // extern double MA_Period_Ratio = 2; // Testing
 extern int MA_Shift = 0;
 extern int MA_Shift_Fast = 0; // Index of the value taken from the indicator buffer. Shift relative to the previous bar (+1).
@@ -217,81 +240,84 @@ extern int MA_Shift_Slow = 4; // Index of the value taken from the indicator buf
 extern int MA_Shift_Far = 4; // Far shift. Shift relative to the 2 previous bars (+2).
 extern ENUM_MA_METHOD MA_Method = MODE_LWMA; // MA method (See: ENUM_MA_METHOD). Range: 0-3. Suggested value: MODE_EMA.
 extern ENUM_APPLIED_PRICE MA_Applied_Price = PRICE_CLOSE; // MA applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
-extern int MA1_OpenMethod = 67; // Valid range: 0-256.
-extern int MA1_OpenCondition1 = 208; // Valid range: 0-1024.
-extern int MA1_OpenCondition2 = 68; // Valid range: 0-1024.
-extern int MA1_CloseCondition = 90; // Valid range: 0-1024.
-extern int MA5_OpenMethod = 0; // Valid range: 0-256.
-extern int MA5_OpenCondition1 = 34; // Valid range: 0-1024.
-extern int MA5_OpenCondition2 = 281; // Valid range: 0-1024.
-extern int MA5_CloseCondition = 40; // Valid range: 0-1024.
-extern int MA15_OpenMethod = 58; // Valid range: 0-256.
-extern int MA15_OpenCondition1 = 228; // Valid range: 0-1024.
-extern int MA15_OpenCondition2 = 512; // Valid range: 0-1024.
-extern int MA15_CloseCondition = 43; // Valid range: 0-1024.
-extern int MA30_OpenMethod = 214; // Valid range: 0-256.
-extern int MA30_OpenCondition1 = 77; // Valid range: 0-1024.
-extern int MA30_OpenCondition2 = 272; // Valid range: 0-1024.
-extern int MA30_CloseCondition = 534; // Valid range: 0-1024.
+extern ENUM_TRAIL_TYPE MA_TrailingStopMethod = T_BANDS_LOW; // Trailing Stop method for MA. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE MA_TrailingProfitMethod = T_BANDS; // Trailing Profit method for MA. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+extern double MA_OpenLevel  = 1.0; // Minimum open level between moving averages to raise the trade signal.
+extern int MA1_OpenMethod = 67; // Valid range: 0-255.
+extern int MA5_OpenMethod = 0; // Valid range: 0-255.
+extern int MA15_OpenMethod = 58; // Valid range: 0-255.
+extern int MA30_OpenMethod = 214; // Valid range: 0-255.
+#ifdef __ea_advanced__
+  extern int MA1_OpenCondition1 = 208; // Valid range: 0-1023.
+  extern int MA1_OpenCondition2 = 68; // Valid range: 0-1023.
+  extern int MA1_CloseCondition = 90; // Valid range: 0-1023.
+  extern int MA5_OpenCondition1 = 34; // Valid range: 0-1023.
+  extern int MA5_OpenCondition2 = 281; // Valid range: 0-1023.
+  extern int MA5_CloseCondition = 40; // Valid range: 0-1023.
+  extern int MA15_OpenCondition1 = 228; // Valid range: 0-1023.
+  extern int MA15_OpenCondition2 = 512; // Valid range: 0-1023.
+  extern int MA15_CloseCondition = 43; // Valid range: 0-1023.
+  extern int MA30_OpenCondition1 = 77; // Valid range: 0-1023.
+  extern int MA30_OpenCondition2 = 272; // Valid range: 0-1023.
+  extern int MA30_CloseCondition = 534; // Valid range: 0-1023.
+#endif
 //extern bool MA1_CloseOnChange = TRUE; // Close opposite orders on market change.
 //extern bool MA5_CloseOnChange = TRUE; // Close opposite orders on market change.
 //extern bool MA15_CloseOnChange = TRUE; // Close opposite orders on market change.
 //extern bool MA30_CloseOnChange = TRUE; // Close opposite orders on market change.
-extern double MA_OpenLevel  = 1.0; // Minimum open level between moving averages to raise the signal.
-extern ENUM_TRAIL_TYPE MA_TrailingStopMethod = T_BANDS_LOW; // Trailing Stop method for MA. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE MA_TrailingProfitMethod = T_BANDS; // Trailing Profit method for MA. Set 0 to default. See: ENUM_TRAIL_TYPE.
 /* MA backtest log (£1000,0.1,ts:25,tp:25,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
- *   £4115.82	1904	1.32	2.16	1142.71	30.11%
+ *   £4115.82 1904  1.32  2.16  1142.71 30.11%
  */
 
-extern string ____MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --";
-extern bool MACD1_Enabled = TRUE; // Enable MACD-based strategy.
-extern bool MACD5_Enabled = TRUE; // Enable MACD-based strategy.
-extern bool MACD15_Enabled = TRUE; // Enable MACD-based strategy.
-extern bool MACD30_Enabled = TRUE; // Enable MACD-based strategy.
+extern string __MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --";
+extern bool MACD1_Enabled = TRUE; // Enable MACD-based strategy. // Optimize for higher spreads.
+extern bool MACD5_Enabled = TRUE; // Enable MACD-based strategy. // Optimize for higher spreads.
+extern bool MACD15_Enabled = TRUE; // Enable MACD-based strategy. // Optimize for higher spreads.
+extern bool MACD30_Enabled = TRUE; // Enable MACD-based strategy. // Optimize for higher spreads.
 //extern ENUM_TIMEFRAMES MACD_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int MACD_Fast_Period = 14; // Fast EMA averaging period.
 extern int MACD_Slow_Period = 24; // Slow EMA averaging period.
 extern int MACD_Signal_Period = 9; // Signal line averaging period.
-extern int MACD1_OpenMethod = 11; // Valid range: 0-32.
-extern int MACD1_OpenCondition1 = 149; // Valid range: 0-1024.
-extern int MACD1_OpenCondition2 = 52; // Valid range: 0-1024.
-extern int MACD1_CloseCondition = 841; // Valid range: 0-1024.
-extern int MACD5_OpenMethod = 9; // Valid range: 0-32.
-extern int MACD5_OpenCondition1 = 514; // Valid range: 0-1024.
-extern int MACD5_OpenCondition2 = 352; // Valid range: 0-1024.
-extern int MACD5_CloseCondition = 992; // Valid range: 0-1024.
-extern int MACD15_OpenMethod = 1; // Valid range: 0-32.
-extern int MACD15_OpenCondition1 = 3; // Valid range: 0-1024.
-extern int MACD15_OpenCondition2 = 480; // Valid range: 0-1024.
-extern int MACD15_CloseCondition = 158; // Valid range: 0-1024.
-extern int MACD30_OpenMethod = 1; // Valid range: 0-32.
-extern int MACD30_OpenCondition1 = 151; // Valid range: 0-1024.
-extern int MACD30_OpenCondition2 = 96; // Valid range: 0-1024.
-extern int MACD30_CloseCondition = 202; // Valid range: 0-1024.
-extern double MACD_OpenLevel  = 1.0;
-//extern double MACD_CloseLevel = 2; // Set 0 to disable.
 extern ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_WEIGHTED; // MACD applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern int MACD_Shift = 2; // Past MACD value in number of bars. Shift relative to the current bar the given amount of periods ago. Suggested value: 1
 extern int MACD_ShiftFar = 0; // Additional MACD far value in number of bars relatively to MACD_Shift.
 //extern bool MACD_CloseOnChange = TRUE; // Close opposite orders on market change.
-extern ENUM_TRAIL_TYPE MACD_TrailingStopMethod = T_BANDS; // Trailing Stop method for MACD. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = T_SAR; // Trailing Profit method for MACD. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE MACD_TrailingStopMethod = T_BANDS; // Trailing Stop method for MACD. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = T_SAR; // Trailing Profit method for MACD. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+extern double MACD_OpenLevel  = 1.0;
+extern int MACD1_OpenMethod = 11; // Valid range: 0-31.
+extern int MACD5_OpenMethod = 9; // Valid range: 0-31.
+extern int MACD15_OpenMethod = 1; // Valid range: 0-31.
+extern int MACD30_OpenMethod = 1; // Valid range: 0-31.
+#ifdef __ea_advanced__
+  extern int MACD1_OpenCondition1 = 149; // Valid range: 0-1023.
+  extern int MACD1_OpenCondition2 = 52; // Valid range: 0-1023.
+  extern int MACD1_CloseCondition = 841; // Valid range: 0-1023.
+  extern int MACD5_OpenCondition1 = 514; // Valid range: 0-1023.
+  extern int MACD5_OpenCondition2 = 352; // Valid range: 0-1023.
+  extern int MACD5_CloseCondition = 992; // Valid range: 0-1023.
+  extern int MACD15_OpenCondition1 = 3; // Valid range: 0-1023.
+  extern int MACD15_OpenCondition2 = 480; // Valid range: 0-1023.
+  extern int MACD15_CloseCondition = 158; // Valid range: 0-1023.
+  extern int MACD30_OpenCondition1 = 151; // Valid range: 0-1023.
+  extern int MACD30_OpenCondition2 = 96; // Valid range: 0-1023.
+  extern int MACD30_CloseCondition = 202; // Valid range: 0-1023.
+#endif
 /* MACD backtest log (auto,ts:40,tp:20,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, spread 2, 9,5mln ticks, quality 25%]:
- *   £13088.98	4800	1.27	2.73	2689.24	11.28%	0.00000000	MACD_TrailingStopMethod=18 	MACD_TrailingProfitMethod=16 (deposit: £10000, no boosting)
+ *   £13088.98  4800  1.27  2.73  2689.24 11.28%  0.00000000  MACD_TrailingStopMethod=18  MACD_TrailingProfitMethod=16 (deposit: £10000, no boosting)
  */
 
 /*
  * MACD backtest log (ts:40,tp:20,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, spread 25, 9,5mln ticks, quality 25%]:
- *   £1542.29	727	1.21	2.12	1375.83	11.72%	0.00000000	MACD1_Enabled=0 (deposit £1000, no boosting)
+ *   £1542.29 727 1.21  2.12  1375.83 11.72%  0.00000000  MACD1_Enabled=0 (deposit £1000, no boosting)
  */
 
-extern string ____Alligator_Parameters__ = "-- Settings for the Alligator indicator --";
-extern bool Alligator1_Enabled  = TRUE; // Enable Alligator custom-based strategy.
-extern bool Alligator5_Enabled  = FALSE; // Enable Alligator custom-based strategy.
-extern bool Alligator15_Enabled = FALSE; // Enable Alligator custom-based strategy.
-extern bool Alligator30_Enabled = FALSE; // Enable Alligator custom-based strategy.
-extern ENUM_TIMEFRAMES Alligator_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
+extern string __Alligator_Parameters__ = "-- Settings for the Alligator indicator --";
+extern bool Alligator1_Enabled  = TRUE; // Enable Alligator custom-based strategy. // Optimize for higher spreads.
+extern bool Alligator5_Enabled  = TRUE; // Enable Alligator custom-based strategy. // Optimize for higher spreads.
+extern bool Alligator15_Enabled = TRUE; // Enable Alligator custom-based strategy. // Optimize for higher spreads.
+extern bool Alligator30_Enabled = TRUE; // Enable Alligator custom-based strategy. // Optimize for higher spreads.
+// extern ENUM_TIMEFRAMES Alligator_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int Alligator_Jaw_Period = 12; // Blue line averaging period (Alligator's Jaw).
 extern int Alligator_Jaw_Shift = 0; // Blue line shift relative to the chart.
 extern int Alligator_Teeth_Period = 10; // Red line averaging period (Alligator's Teeth).
@@ -302,65 +328,72 @@ extern ENUM_MA_METHOD Alligator_MA_Method = MODE_EMA; // MA method (See: ENUM_MA
 extern ENUM_APPLIED_PRICE Alligator_Applied_Price = PRICE_HIGH; // Applied price. It can be any of ENUM_APPLIED_PRICE enumeration values.
 extern int Alligator_Shift = 0; // The indicator shift relative to the chart.
 extern int Alligator_Shift_Far = 1; // The indicator shift relative to the chart.
+extern ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = T_MA_F_FAR; // Trailing Stop method for Alligator. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = T_MA_F_FAR_TRAIL; // Trailing Profit method for Alligator. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+extern double Alligator_OpenLevel = 0.01; // Minimum open level between moving averages to raise the trade signal.
 extern int Alligator1_OpenMethod  = 0; // Valid range: 0-255.
-extern int Alligator1_OpenCondition1 = 0; // Valid range: 0-512.
-extern int Alligator1_OpenCondition2 = 0; // Valid range: 0-512.
-extern int Alligator1_CloseCondition = 0; // Valid range: 0-1024.
 extern int Alligator5_OpenMethod  = 0; // Valid range: 0-255.
-extern int Alligator5_OpenCondition1 = 0; // Valid range: 0-512.
-extern int Alligator5_OpenCondition2 = 0; // Valid range: 0-512.
-extern int Alligator5_CloseCondition = 0; // Valid range: 0-1024.
 extern int Alligator15_OpenMethod  = 0; // Valid range: 0-255.
-extern int Alligator15_OpenCondition1 = 0; // Valid range: 0-512.
-extern int Alligator15_OpenCondition2 = 0; // Valid range: 0-512.
-extern int Alligator15_CloseCondition = 0; // Valid range: 0-1024.
 extern int Alligator30_OpenMethod  = 0; // Valid range: 0-255.
-extern int Alligator30_OpenCondition1 = 0; // Valid range: 0-512.
-extern int Alligator30_OpenCondition2 = 0; // Valid range: 0-512.
-extern int Alligator30_CloseCondition = 0; // Valid range: 0-1024.
-extern double Alligator_OpenLevel = 0.01; // Minimum open level between moving averages to raise the signal.
+#ifdef __ea_advanced__
+  extern int Alligator1_OpenCondition1 = 0; // Valid range: 0-512.
+  extern int Alligator1_OpenCondition2 = 0; // Valid range: 0-512.
+  extern int Alligator1_CloseCondition = 0; // Valid range: 0-1023.
+  extern int Alligator5_OpenCondition1 = 0; // Valid range: 0-512.
+  extern int Alligator5_OpenCondition2 = 0; // Valid range: 0-512.
+  extern int Alligator5_CloseCondition = 0; // Valid range: 0-1023.
+  extern int Alligator15_OpenCondition1 = 0; // Valid range: 0-512.
+  extern int Alligator15_OpenCondition2 = 0; // Valid range: 0-512.
+  extern int Alligator15_CloseCondition = 0; // Valid range: 0-1023.
+  extern int Alligator30_OpenCondition1 = 0; // Valid range: 0-512.
+  extern int Alligator30_OpenCondition2 = 0; // Valid range: 0-512.
+  extern int Alligator30_CloseCondition = 0; // Valid range: 0-1023.
+#endif
 //extern bool Alligator_CloseOnChange = TRUE; // Close opposite orders on market change.
-extern ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = T_MA_F_FAR; // Trailing Stop method for Alligator. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = T_MA_F_FAR_TRAIL; // Trailing Profit method for Alligator. Set 0 to default. See: ENUM_TRAIL_TYPE.
 /* Alligator backtest log (£1000,auto,ts:25,tp:20,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
- *   £880.20	1090	1.32	0.81	132.46	8.96%
+ *   £880.20  1090  1.32  0.81  132.46  8.96%
  */
- 
+
 /*
  * Alligator backtest log (ts:40,tp:20,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, spread 25, 9,5mln ticks, quality 25%]:
  *   TODO
  */
 
-extern string ____RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --";
+extern string __RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --";
 extern bool RSI1_Enabled = TRUE; // Enable RSI-based strategy.
 extern bool RSI5_Enabled = TRUE; // Enable RSI-based strategy.
 extern bool RSI15_Enabled = TRUE; // Enable RSI-based strategy.
-extern bool RSI30_Enabled = TRUE; // Enable RSI-based strategy.
-// extern ENUM_TIMEFRAMES RSI_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int RSI_Period = 18; // Averaging period for calculation.
-extern ENUM_APPLIED_PRICE RSI_Applied_Price = PRICE_OPEN; // RSI applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
-extern int RSI1_OpenMethod  = 3; // Valid range: 0-255.
-extern int RSI1_OpenCondition1 = 0; // Valid range: 0-512. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 25.
-extern int RSI1_OpenCondition2 = 2; // Valid range: 0-512. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 25.
-extern int RSI1_CloseCondition = 645; // Valid range: 0-1024. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 25.
-// £722.09	724	1.14	1.00	314.88	2.95% (deposit: £10000, no boosting)
-extern int RSI5_OpenMethod  = 642; // Valid range: 0-255. 2, 5, 388, 642
-extern int RSI5_OpenCondition1 = 580; // Valid range: 0-512. 144, 160, 880, 580
-extern int RSI5_OpenCondition2 = 1; // Valid range: 0-512. 1/529
-extern int RSI5_CloseCondition = 256; // Valid range: 0-1024. 96/288
-extern int RSI15_OpenMethod = 1; // Valid range: 0-255.
-extern int RSI15_OpenCondition1 = 0; // Valid range: 0-512.
-extern int RSI15_OpenCondition2 = 0; // Valid range: 0-512.
-extern int RSI15_CloseCondition = 0; // Valid range: 0-1024.
-extern int RSI30_OpenMethod = 5; // Valid range: 0-255.
-extern int RSI30_OpenCondition1 = 0; // Valid range: 0-512.
-extern int RSI30_OpenCondition2 = 0; // Valid range: 0-512.
-extern int RSI30_CloseCondition = 0; // Valid range: 0-1024.
-extern int RSI_OpenLevel = 22;
+extern bool RSI30_Enabled = TRUE; // Enable RSI-based strategy. // Optimize for higher spreads.
+extern int RSI_Period = 20; // Averaging period for calculation.
+extern ENUM_APPLIED_PRICE RSI_Applied_Price = PRICE_MEDIAN; // RSI applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern int RSI_Shift = 0; // Shift relative to the chart.
+extern int RSI_OpenLevel = 20;
+extern ENUM_TRAIL_TYPE RSI_TrailingStopMethod = T_MA_S_TRAIL; // Trailing Stop method for RSI. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = T_MA_LOWEST; // Trailing Profit method for RSI. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+extern int RSI1_OpenMethod  = 3; // Valid range: 0-255.
+extern int RSI5_OpenMethod  = 141; // Valid range: 0-255. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20. 2, 5, 306, 374, 388, 642
+extern int RSI15_OpenMethod = 141; // Valid range: 0-255.
+extern int RSI30_OpenMethod = 3; // Valid range: 0-255.
+#ifdef __ea_advanced__
+  extern int RSI1_OpenCondition1 = 0; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
+  extern int RSI1_OpenCondition2 = 2; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
+  extern int RSI1_CloseCondition = 645; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
+  // £722.09  724 1.14  1.00  314.88  2.95% (deposit: £10000, no boosting)
+  extern int RSI5_OpenCondition1 = 116; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20. 34, 102, 144, 160, 880, 580
+  extern int RSI5_OpenCondition2 = 1; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20. 1/529
+  extern int RSI5_CloseCondition = 647; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20. 96/288/356/456
+  // £391.85  63  2.78  6.22  136.07  1.34% 0.00000000  RSI5_OpenCondition1=374 (deposit: £10000, no boosting)
+  // £95.88 29  2.51  3.31  41.02 0.41% 0.00000000  RSI5_OpenMethod=136
+  // £95.08 14  9.71  6.79  39.63 0.39% 0.00000000  RSI5_OpenMethod=158 (deposit: £10000, no boosting)
+  extern int RSI15_OpenCondition1 = 116; // Valid range: 0-1023. TODO
+  extern int RSI15_OpenCondition2 = 1; // Valid range: 0-1023.
+  extern int RSI15_CloseCondition = 647; // Valid range: 0-1023.
+  extern int RSI30_OpenCondition1 = 0; // Valid range: 0-1023.
+  extern int RSI30_OpenCondition2 = 0; // Valid range: 0-1023.
+  extern int RSI30_CloseCondition = 464; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
+  // £428.93  344 1.20  1.25  497.84  4.97% RSI15_OpenMethod=141  RSI15_OpenCondition1=116  RSI15_OpenCondition2=1  RSI15_CloseCondition=647 (deposit: £10000, no boosting)
+#endif
 //extern bool RSI_CloseOnChange = TRUE; // Close opposite orders on market change.
-extern ENUM_TRAIL_TYPE RSI_TrailingStopMethod = T_MA_S_TRAIL; // Trailing Stop method for RSI. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = T_BANDS_LOW; // Trailing Profit method for RSI. Set 0 to default. See: ENUM_TRAIL_TYPE.
 extern bool RSI_DynamicPeriod = FALSE;
 int RSI1_IncreasePeriod_MinDiff = 27;
 int RSI1_DecreasePeriod_MaxDiff = 61;
@@ -373,17 +406,17 @@ int RSI30_DecreasePeriod_MaxDiff = 60;
 
 /*
  * RSI backtest log (auto,ts:25,tp:25,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
- *   £3367.78	2298	1.24	1.47	1032.39	42.64%	0.00000000	RSI_CloseOnChange=0 (deposit: £1000, boosting factor 1.0)
- *   £3249.67	2338	1.24	1.39	1025.47	44.49%	0.00000000	RSI_CloseOnChange=1 (deposit: £1000, boosting factor 1.0)
- *   £4551.26	2331	1.34	1.95	1030.22	9.06% RSI_TrailingProfitMethod=1 (deposit: £10000, boosting factor 1.0)
+ *   £3367.78 2298  1.24  1.47  1032.39 42.64%  0.00000000  RSI_CloseOnChange=0 (deposit: £1000, boosting factor 1.0)
+ *   £3249.67 2338  1.24  1.39  1025.47 44.49%  0.00000000  RSI_CloseOnChange=1 (deposit: £1000, boosting factor 1.0)
+ *   £4551.26 2331  1.34  1.95  1030.22 9.06% RSI_TrailingProfitMethod=1 (deposit: £10000, boosting factor 1.0)
  *   Strategy stats:
  *    RSI M1: Total net profit: 23205 pips, Total orders: 2726 (Won: 68.6% [1871] | Loss: 31.4% [855]);
  *    RSI M5: Total net profit: 2257 pips, Total orders: 391 (Won: 48.1% [188] | Loss: 51.9% [203]);
  *    RSI M15: Total net profit: 4970 pips, Total orders: 496 (Won: 52.2% [259] | Loss: 47.8% [237]);
  *    RSI M30: Total net profit: 2533 pips, Total orders: 272 (Won: 48.5% [132] | Loss: 51.5% [140]);
  * Deposit: £10000 (factor = 1.0) && RSI_DynamicPeriod
- *  £3380.43	2142	1.31	1.58	541.01	5.12%	0.00000000	RSI_DynamicPeriod=1
- *  £3060.19	1307	1.44	2.34	549.59	4.66%	0.00000000	RSI_DynamicPeriod=0
+ *  £3380.43  2142  1.31  1.58  541.01  5.12% 0.00000000  RSI_DynamicPeriod=1
+ *  £3060.19  1307  1.44  2.34  549.59  4.66% 0.00000000  RSI_DynamicPeriod=0
  */
 
 /*
@@ -391,44 +424,44 @@ int RSI30_DecreasePeriod_MaxDiff = 60;
  *   TODO
  */
 
-extern string ____SAR_Parameters__ = "-- Settings for the the Parabolic Stop and Reverse system indicator --";
+extern string __SAR_Parameters__ = "-- Settings for the the Parabolic Stop and Reverse system indicator --";
 extern bool SAR1_Enabled = TRUE; // Enable SAR-based strategy.
 extern bool SAR5_Enabled = TRUE; // Enable SAR-based strategy.
 extern bool SAR15_Enabled = TRUE; // Enable SAR-based strategy.
 extern bool SAR30_Enabled = TRUE; // Enable SAR-based strategy.
-//extern ENUM_TIMEFRAMES SAR_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern double SAR_Step = 0.02; // Stop increment, usually 0.02.
 extern double SAR_Maximum_Stop = 0.3; // Maximum stop value, usually 0.2.
 extern int SAR_Shift = 0; // Shift relative to the chart.
-// extern int SAR_Shift_Far = 0; // Shift relative to the chart.
-extern int SAR1_OpenMethod = 4; // Valid range: 0-127. Optimized.
-extern int SAR1_OpenCondition1 = 468; // Valid range: 0-1024. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
-extern int SAR1_OpenCondition2 = 16; // Valid range: 0-1024. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
-extern int SAR1_CloseCondition = 472; // Valid range: 0-1024. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20. // 472, 344, 280, 848
-extern int SAR5_OpenMethod = 4; // Valid range: 0-127. Optimized.
-extern int SAR5_OpenCondition1 = 536; // Valid range: 0-1024. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
-extern int SAR5_OpenCondition2 = 16; // Valid range: 0-1024. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
-extern int SAR5_CloseCondition = 834; // Valid range: 0-1024. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20. // 834, 792
-extern int SAR15_OpenMethod = 0; // Valid range: 0-127.
-extern int SAR15_OpenCondition1 = 148; // Valid range: 0-1024.
-extern int SAR15_OpenCondition2 = 0; // Valid range: 0-1024.
-extern int SAR15_CloseCondition = 98; // Valid range: 0-1024.
-extern int SAR30_OpenMethod = 0; // Valid range: 0-127.
-extern int SAR30_OpenCondition1 = 256; // Valid range: 0-1024.
-extern int SAR30_OpenCondition2 = 80; // Valid range: 0-1024.
-extern int SAR30_CloseCondition = 388; // Valid range: 0-1024.
-// £1647.71	238	1.48	6.92	675.95	5.60%	0.00000000	SAR30_OpenCondition1=256 	SAR30_OpenCondition2=80 	SAR30_CloseCondition=164
-extern double SAR_OpenLevel = 1.5; // Open gap level to raise the signal (in pips).
+extern double SAR_OpenLevel = 1.5; // Open gap level to raise the trade signal (in pips).
 //extern bool SAR_CloseOnChange = FALSE; // Close opposite orders on market change.
-extern ENUM_TRAIL_TYPE SAR_TrailingStopMethod = T_MA_S_TRAIL; // Trailing Stop method for SAR. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = T_FIXED; // Trailing Profit method for SAR. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE SAR_TrailingStopMethod = T_MA_S_TRAIL; // Trailing Stop method for SAR. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = T_FIXED; // Trailing Profit method for SAR. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+extern int SAR1_OpenMethod = 4; // Valid range: 0-127. Optimized.
+extern int SAR5_OpenMethod = 4; // Valid range: 0-127. Optimized.
+extern int SAR15_OpenMethod = 0; // Valid range: 0-127.
+extern int SAR30_OpenMethod = 0; // Valid range: 0-127.
+#ifdef __ea_advanced__
+  extern int SAR1_OpenCondition1 = 468; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
+  extern int SAR1_OpenCondition2 = 16; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
+  extern int SAR1_CloseCondition = 472; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20. // 472, 344, 280, 848
+  extern int SAR5_OpenCondition1 = 536; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
+  extern int SAR5_OpenCondition2 = 16; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
+  extern int SAR5_CloseCondition = 834; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20. // 834, 792
+  extern int SAR15_OpenCondition1 = 148; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
+  extern int SAR15_OpenCondition2 = 0; // Valid range: 0-1023.
+  extern int SAR15_CloseCondition = 98; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
+  extern int SAR30_OpenCondition1 = 256; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
+  extern int SAR30_OpenCondition2 = 80; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
+  extern int SAR30_CloseCondition = 388; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
+// £1647.71 238 1.48  6.92  675.95  5.60% 0.00000000  SAR30_OpenCondition1=256  SAR30_OpenCondition2=80 SAR30_CloseCondition=164
+#endif
 
 /*
  * SAR backtest log (auto,ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, 9,5mln ticks, quality 25%]:
- * 	 £8875.98	3465	1.19	2.56	3197.44	17.37%	SAR_Maximum_Stop=0.3 	SAR_OpenLevel=1.5 (deposit: £10000, spread 20, no boosting)
- *   £756.26	3500	1.19	0.22	171.45	15.07%	SAR_Maximum_Stop=0.3 	SAR_OpenLevel=1.5 (deposit: £1000, spread 20, no boosting)
- *   £13362.26	3479	1.27	3.84	3572.24	16.11%	(deposit: £10000, spread 10, no boosting)
- *   £17397.29	3491	1.33	4.98	3780.52	14.86%	(deposit: £10000, spread 2, no boosting)
+ *   £8875.98 3465  1.19  2.56  3197.44 17.37%  SAR_Maximum_Stop=0.3  SAR_OpenLevel=1.5 (deposit: £10000, spread 20, no boosting)
+ *   £756.26  3500  1.19  0.22  171.45  15.07%  SAR_Maximum_Stop=0.3  SAR_OpenLevel=1.5 (deposit: £1000, spread 20, no boosting)
+ *   £13362.26  3479  1.27  3.84  3572.24 16.11%  (deposit: £10000, spread 10, no boosting)
+ *   £17397.29  3491  1.33  4.98  3780.52 14.86%  (deposit: £10000, spread 2, no boosting)
  *
  *   Strategy stats (deposit: £10000, spread 20):
  *     SAR M1: Total net profit: 31953, Total orders: 1523 (Won: 54.8% [834] | Loss: 45.2% [689]);
@@ -442,52 +475,55 @@ extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = T_FIXED; // Trailing Profit me
  *   TODO
  */
 
-extern string ____Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --";
+extern string __Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --";
 extern bool Bands1_Enabled = TRUE; // Enable Bands-based strategy.
 extern bool Bands5_Enabled = TRUE; // Enable Bands-based strategy.
 extern bool Bands15_Enabled = TRUE; // Enable Bands-based strategy.
 extern bool Bands30_Enabled = TRUE; // Enable Bands-based strategy.
-//extern ENUM_TIMEFRAMES Bands_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int Bands_Period = 26; // Averaging period to calculate the main line.
 extern ENUM_APPLIED_PRICE Bands_Applied_Price = PRICE_MEDIAN; // Bands applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern double Bands_Deviation = 2.1; // Number of standard deviations from the main line.
 extern int Bands_Shift = 0; // The indicator shift relative to the chart.
 extern int Bands_Shift_Far = 0; // The indicator shift relative to the chart.
-extern int Bands1_OpenMethod = 0; // Valid range: 0-512.
-extern int Bands1_OpenCondition1 = 404; // Valid range: 0-1024.
-extern int Bands1_OpenCondition2 = 336; // Valid range: 0-1024.
-extern int Bands1_CloseCondition = 644; // Valid range: 0-1024.
-extern int Bands5_OpenMethod = 0; // Valid range: 0-512.
-extern int Bands5_OpenCondition1 = 404; // Valid range: 0-1024.
-extern int Bands5_OpenCondition2 = 336; // Valid range: 0-1024.
-extern int Bands5_CloseCondition = 644; // Valid range: 0-1024.
-extern int Bands15_OpenMethod = 0; // Valid range: 0-512.
-extern int Bands15_OpenCondition1 = 108; // Valid range: 0-1024.
-extern int Bands15_OpenCondition2 = 25; // Valid range: 0-1024.
-extern int Bands15_CloseCondition = 490; // Valid range: 0-1024.
-extern int Bands30_OpenMethod = 0; // Valid range: 0-512.
-extern int Bands30_OpenCondition1 = 328; // Valid range: 0-1024.
-extern int Bands30_OpenCondition2 = 131; // Valid range: 0-1024.
-extern int Bands30_CloseCondition = 431; // Valid range: 0-1024.
 //extern bool Bands_CloseOnChange = FALSE; // Close opposite orders on market change.
-extern ENUM_TRAIL_TYPE Bands_TrailingStopMethod = T_MA_S_TRAIL; // Trailing Stop method for Bands. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = T_ENVELOPES; // Trailing Profit method for Bands. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE Bands_TrailingStopMethod = T_MA_S_TRAIL; // Trailing Stop method for Bands. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = T_MA_M; // Trailing Profit method for Bands. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+extern int Bands1_OpenMethod = 0; // Valid range: 0-512.
+extern int Bands5_OpenMethod = 0; // Valid range: 0-512.
+extern int Bands15_OpenMethod = 3; // Valid range: 0-512. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
+extern int Bands30_OpenMethod = 5; // Valid range: 0-512.
+#ifdef __ea_advanced__
+  extern int Bands1_OpenCondition1 = 404; // Valid range: 0-1023.
+  extern int Bands1_OpenCondition2 = 336; // Valid range: 0-1023.
+  extern int Bands1_CloseCondition = 644; // Valid range: 0-1023.
+  extern int Bands5_OpenCondition1 = 404; // Valid range: 0-1023.
+  extern int Bands5_OpenCondition2 = 336; // Valid range: 0-1023.
+  extern int Bands5_CloseCondition = 644; // Valid range: 0-1023.
+  extern int Bands15_OpenCondition1 = 337; // Valid range: 0-1023.
+  extern int Bands15_OpenCondition2 = 18; // Valid range: 0-1023.
+  extern int Bands15_CloseCondition = 552; // Valid range: 0-1023.
+  // £438.81  300 1.20  1.46  291.53  2.83% 0.00000000  Bands15_OpenMethod=3  (£10k)
+  extern int Bands30_OpenCondition1 = 720; // Valid range: 0-1023.
+  extern int Bands30_OpenCondition2 = 10; // Valid range: 0-1023.
+  extern int Bands30_CloseCondition = 401; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
+  // £1056.49 775 1.23  1.36  686.17  6.65% 0.00000000  Bands30_OpenCondition1=624 (£10k)
+#endif
 /* Bands backtest log (auto,ts:40,tp:20,gap:10) [2015.02.01-2015.06.30 based on MT4 FXCM backtest data, spread 24, 9,5mln ticks, quality 25%]:
-     £2462.09	960	1.23	2.56	1656.53	12.10%	0.00000000	Bands_CloseCondition=644 (deposit: £10000, no boosting)
-     £2145.61	936	1.20	2.29	1792.35	13.21%	0.00000000	Bands_OpenCondition1=404 	Bands_OpenCondition2=336 (deposit: £10000, no boosting)
+     £2462.09 960 1.23  2.56  1656.53 12.10%  0.00000000  Bands_CloseCondition=644 (deposit: £10000, no boosting)
+     £2145.61 936 1.20  2.29  1792.35 13.21%  0.00000000  Bands_OpenCondition1=404  Bands_OpenCondition2=336 (deposit: £10000, no boosting)
  */
 
 /* Bands backtest log (auto,ts:25,tp:20,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
- *   £2344.03	7593	1.09	0.31	667.89	33.63% (factor=1.0)
- *   £3571.10	9348	1.12	0.38	906.02	29.81%	0.00000000	Bands_Applied_Price=4 (with boosting) T_BANDS/T_FIXED
- *   £3486.94	9071	1.12	0.38	872.10	26.54%	0.00000000	Bands_Applied_Price=5 (with boosting) T_BANDS/T_FIXED
+ *   £2344.03 7593  1.09  0.31  667.89  33.63% (factor=1.0)
+ *   £3571.10 9348  1.12  0.38  906.02  29.81%  0.00000000  Bands_Applied_Price=4 (with boosting) T_BANDS/T_FIXED
+ *   £3486.94 9071  1.12  0.38  872.10  26.54%  0.00000000  Bands_Applied_Price=5 (with boosting) T_BANDS/T_FIXED
  *   Bands M1: Total net profit: 42112 pips, Total orders: 6598 (Won: 70.0% [4617] | Loss: 30.0% [1981]);
  *   Bands M5: Total net profit: 59605 pips, Total orders: 7579 (Won: 67.3% [5099] | Loss: 32.7% [2480]);
  *   Bands M15: Total net profit: 16168 pips, Total orders: 1505 (Won: 56.6% [852] | Loss: 43.4% [653]);
  *   Bands M30: Total net profit: 8098 pips, Total orders: 800 (Won: 49.4% [395] | Loss: 50.6% [405]);
  */
 
-extern string ____Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --";
+extern string __Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --";
 extern bool Envelopes1_Enabled  = TRUE; // Enable Envelopes-based strategy.
 extern bool Envelopes5_Enabled  = TRUE; // Enable Envelopes-based strategy.
 extern bool Envelopes15_Enabled = TRUE; // Enable Envelopes-based strategy.
@@ -498,34 +534,50 @@ extern int Envelopes_MA_Period = 28; // Averaging period to calculate the main l
 extern ENUM_MA_METHOD Envelopes_MA_Method = MODE_SMA; // MA method (See: ENUM_MA_METHOD).
 extern int Envelopes_MA_Shift = 0; // The indicator shift relative to the chart.
 extern ENUM_APPLIED_PRICE Envelopes_Applied_Price = PRICE_TYPICAL; // Applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
-extern double Envelopes1_Deviation = 0.10; // Percent deviation from the main line.
+extern double Envelopes1_Deviation = 0.08; // Percent deviation from the main line.
+// £1804.07	1620	1.12	1.11	1396.96	11.31%	0.00000000	Envelopes1_Deviation=0.07 (d:£10k)
+// £1800.30	1549	1.13	1.16	1352.76	11.01%	0.00000000	Envelopes1_Deviation=0.08 (d:£10k)
 extern double Envelopes5_Deviation = 0.12; // Percent deviation from the main line.
 extern double Envelopes15_Deviation = 0.15; // Percent deviation from the main line.
 extern double Envelopes30_Deviation = 0.4; // Percent deviation from the main line.
 // extern int Envelopes_Shift_Far = 0; // The indicator shift relative to the chart.
 extern int Envelopes_Shift = 2; // The indicator shift relative to the chart.
+extern ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = T_MA_M_FAR_TRAIL; // Trailing Stop method for Bands. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = T_NONE; // Trailing Profit method for Bands. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 extern int Envelopes1_OpenMethod = 2; // Valid range: 0-255. Set 0 to default.
-extern int Envelopes1_OpenCondition1 = 0; // Valid range: 0-1024.
-extern int Envelopes1_OpenCondition2 = 0; // Valid range: 0-1024.
-extern int Envelopes1_CloseCondition = 0; // Valid range: 0-1024.
 extern int Envelopes5_OpenMethod = 112; // Valid range: 0-255. Set 0 to default.
-extern int Envelopes5_OpenCondition1 = 0; // Valid range: 0-1024.
-extern int Envelopes5_OpenCondition2 = 0; // Valid range: 0-1024.
-extern int Envelopes5_CloseCondition = 0; // Valid range: 0-1024.
-extern int Envelopes15_OpenMethod = 16; // Valid range: 0-255. Set 0 to default.
-extern int Envelopes15_OpenCondition1 = 0; // Valid range: 0-1024.
-extern int Envelopes15_OpenCondition2 = 0; // Valid range: 0-1024.
-extern int Envelopes15_CloseCondition = 0; // Valid range: 0-1024.
+extern int Envelopes15_OpenMethod = 0; // Valid range: 0-255. Set 0 to default.
 extern int Envelopes30_OpenMethod = 68; // Valid range: 0-255. Set 0 to default.
-extern int Envelopes30_OpenCondition1 = 0; // Valid range: 0-1024.
-extern int Envelopes30_OpenCondition2 = 0; // Valid range: 0-1024.
-extern int Envelopes30_CloseCondition = 0; // Valid range: 0-1024.
-//extern bool Envelopes_CloseOnChange = FALSE; // Close opposite orders on market change.
-extern ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = T_MA_M_FAR_TRAIL; // Trailing Stop method for Bands. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = T_ENVELOPES; // Trailing Profit method for Bands. Set 0 to default. See: ENUM_TRAIL_TYPE.
-/* Envelopes backtest log (ts:25,tp:25,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 3, 7,6mln ticks, quality 25%]:
- *   £5717.15	7065	1.14	0.81	2028.87	28.58% (deposit: £1000, boosting = 1.0)
- *   £6911.53	7065	1.17	0.98	2106.21	11.96% (deposit: £10000, boosting = 1.0)
+#ifdef __ea_advanced__
+  extern int Envelopes1_OpenCondition1 = 772; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20. 768-880
+  extern int Envelopes1_OpenCondition2 = 16; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20. 8/24
+  extern int Envelopes1_CloseCondition = 660; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20. 291/660/880
+  // £2030.20	1542	1.14	1.32	1256.55	10.34%	0.00000000	Envelopes1_CloseCondition=660 (d:£10k)
+  // £605.14  291 1.26  2.08  257.46  2.54% 0.00000000  Envelopes1_OpenCondition1=880   Envelopes1_OpenCondition2=8   Envelopes1_CloseCondition=291
+  // £584.93  293 1.25  2.00  257.46  2.54% 0.00000000  Envelopes1_OpenCondition1=768   Envelopes1_OpenCondition2=24  Envelopes1_CloseCondition=291
+  // £584.93  293 1.25  2.00  257.46  2.54% 0.00000000  Envelopes1_OpenCondition1=768   Envelopes1_OpenCondition2=8   Envelopes1_CloseCondition=291
+  extern int Envelopes5_OpenCondition1 = 896; // Valid range: 0-1023.
+  extern int Envelopes5_OpenCondition2 = 2; // Valid range: 0-1023.
+  extern int Envelopes5_CloseCondition = 449; // Valid range: 0-1023. 321/449
+  // £1525.35	742	1.27	2.06	1037.78	8.82%  (d:£10k)
+  extern int Envelopes15_OpenCondition1 = 930; // Valid range: 0-1023.
+  extern int Envelopes15_OpenCondition2 = 2; // Valid range: 0-1023.
+  extern int Envelopes15_CloseCondition = 996; // Valid range: 0-1023.
+  // £805.62	287	1.30	2.81	496.44	4.76% (deposit: £10k)
+  extern int Envelopes30_OpenCondition1 = 528; // Valid range: 0-1023. Try: 512, 528
+  extern int Envelopes30_OpenCondition2 = 0; // Valid range: 0-1023. Try: 0, 8, 16, 24
+  extern int Envelopes30_CloseCondition = 273; // Valid range: 0-1023. Try: 49, 273, 259, 280
+  // £2169.53	1074	1.32	2.02	737.02	7.17% (deposit: £10k)
+  //extern bool Envelopes_CloseOnChange = FALSE; // Close opposite orders on market change.
+#endif
+
+/*
+ * Envelopes backtest log (auto,ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, spread 20, 9,5mln ticks, quality 25%]:
+ *   £7272.58	3577	1.21	2.03	1980.18	15.63% (deposit: £10000, boosting = 1.0)
+ *
+ * Envelopes backtest log (ts:25,tp:25,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 3, 7,6mln ticks, quality 25%]:
+ *   £5717.15 7065  1.14  0.81  2028.87 28.58% (deposit: £1000, boosting = 1.0)
+ *   £6911.53 7065  1.17  0.98  2106.21 11.96% (deposit: £10000, boosting = 1.0)
  *   Strategy stats (deposit: £10000):
  *     Envelopes M1: Total net profit: 113 pips, Total orders: 2775 (Won: 30.1% [836] | Loss: 69.9% [1939]);
  *     Envelopes M5: Total net profit: 1043 pips, Total orders: 1719 (Won: 29.6% [508] | Loss: 70.4% [1211]);
@@ -533,37 +585,54 @@ extern ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = T_ENVELOPES; // Trailing
  *     Envelopes M30: Total net profit: 2225 pips, Total orders: 1028 (Won: 43.0% [442] | Loss: 57.0% [586]);
  */
 
-extern string ____WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --";
+extern string __WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --";
 extern bool WPR1_Enabled = TRUE; // Enable WPR-based strategy.
 extern bool WPR5_Enabled = TRUE; // Enable WPR-based strategy.
 extern bool WPR15_Enabled = TRUE; // Enable WPR-based strategy.
 extern bool WPR30_Enabled = TRUE; // Enable WPR-based strategy.
-// extern ENUM_TIMEFRAMES WPR_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int WPR_Period = 21; // Suggested value: 22.
+extern int WPR_Period = 21; // Averaging period for calculation. Suggested value: 22.
 extern int WPR_Shift = 0; // Shift relative to the current bar the given amount of periods ago. Suggested value: 1.
-extern int WPR1_OpenMethod = 36; // Valid range: 0-127.
-extern int WPR1_OpenCondition1 = 0; // Valid range: 0-1024.
-extern int WPR1_OpenCondition2 = 0; // Valid range: 0-1024.
-extern int WPR1_CloseCondition = 0; // Valid range: 0-1024.
-extern int WPR5_OpenMethod = 64; // Valid range: 0-127.
-extern int WPR5_OpenCondition1 = 0; // Valid range: 0-1024.
-extern int WPR5_OpenCondition2 = 0; // Valid range: 0-1024.
-extern int WPR5_CloseCondition = 0; // Valid range: 0-1024.
-extern int WPR15_OpenMethod = 8; // Valid range: 0-127.
-extern int WPR15_OpenCondition1 = 0; // Valid range: 0-1024.
-extern int WPR15_OpenCondition2 = 0; // Valid range: 0-1024.
-extern int WPR15_CloseCondition = 0; // Valid range: 0-1024.
-extern int WPR30_OpenMethod = 8; // Valid range: 0-127.
-extern int WPR30_OpenCondition1 = 0; // Valid range: 0-1024.
-extern int WPR30_OpenCondition2 = 0; // Valid range: 0-1024.
-extern int WPR30_CloseCondition = 0; // Valid range: 0-1024.
 extern int WPR_OpenLevel = 30; // Suggested range: 25-35.
 //extern bool WPR_CloseOnChange = TRUE; // Close opposite orders on market change.
-extern ENUM_TRAIL_TYPE WPR_TrailingStopMethod = T_MA_M_FAR_TRAIL; // Trailing Stop method for WPR. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = T_FIXED; // Trailing Profit method for WPR. Set 0 to default. See: ENUM_TRAIL_TYPE.
-/* WPR backtest log (auto,ts:25,tp:20,gap:10,sp:2) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
- *   £6463.30	6828	1.20	0.95	1070.11	31.72% (deposit: £1000, boosting = 1.0)
- *   £7188.33	6828	1.22	1.05	1070.11	6.75% (deposit: £10000, boosting = 1.0)
+extern ENUM_TRAIL_TYPE WPR_TrailingStopMethod = T_MA_F_TRAIL; // Trailing Stop method for WPR. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE. // Try: T_MA_M_FAR_TRAIL
+extern ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = T_FIXED; // Trailing Profit method for WPR. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+extern int WPR1_OpenMethod = 0; // Valid range: 0-127. Optimized.
+extern int WPR5_OpenMethod = 0; // Valid range: 0-127. Optimized.
+extern int WPR15_OpenMethod = 64; // Valid range: 0-127. Optimized.
+extern int WPR30_OpenMethod = 8; // Valid range: 0-127. Optimized with T_MA_M_FAR_TRAIL.
+#ifdef __ea_advanced__
+  extern int WPR1_OpenCondition1 = 512; // Valid range: 0-1023. 512 (4) 516
+  extern int WPR1_OpenCondition2 = 64; // Valid range: 0-1023. 0 (32) 96
+  extern int WPR1_CloseCondition = 936; // Valid range: 0-1023. 840 (96) 936
+  // £1580.87	293	1.53	5.40	676.47	5.97%	0.00000000	WPR1_OpenMethod=0 	WPR1_OpenCondition1=512 	WPR1_OpenCondition2=96 	WPR1_CloseCondition=936	TrailingStop=40 	DefaultTrailingStopMethod=1 	TrailingStopOneWay=1 	TrailingProfit=30 	DefaultTrailingProfitMethod=0 	TrailingProfitOneWay=1 	TrailingStopAddPerMinute=0 	LotSize=0 	TakeProfit=0 	StopLoss=0 	MaxOrders=0 	MaxOrdersPerType=0 	MinimumIntervalSec=0 	TradeMicroLots=1 	RiskRatio=0 	MinimalizeLosses=0 	BestDailyStrategyMultiplierFactor=1 	BestWeeklyStrategyMultiplierFactor=1 	BestMonthlyStrategyMultiplierFactor=2 	WorseDailyStrategyDividerFactor=1 	WorseWeeklyStrategyDividerFactor=2 	WorseMonthlyS
+  // £1550.22	307	1.52	5.05	646.73	5.72%	0.00000000	WPR1_OpenMethod=0 	WPR1_OpenCondition1=512 	WPR1_OpenCondition2=64 	WPR1_CloseCondition=840	TrailingStop=40 	DefaultTrailingStopMethod=1 	TrailingStopOneWay=1 	TrailingProfit=30 	DefaultTrailingProfitMethod=0 	TrailingProfitOneWay=1 	TrailingStopAddPerMinute=0 	LotSize=0 	TakeProfit=0 	StopLoss=0 	MaxOrders=0 	MaxOrdersPerType=0 	MinimumIntervalSec=0 	TradeMicroLots=1 	RiskRatio=0 	MinimalizeLosses=0 	BestDailyStrategyMultiplierFactor=1 	BestWeeklyStrategyMultiplierFactor=1 	BestMonthlyStrategyMultiplierFactor=2 	WorseDailyStrategyDividerFactor=1 	WorseWeeklyStrategyDividerFactor=2 	WorseMonthlyS
+  // £1540.73	274	1.57	5.62	698.10	6.21%	0.00000000	WPR1_OpenMethod=0 	WPR1_OpenCondition1=516 	WPR1_OpenCondition2=96 	WPR1_CloseCondition=936	TrailingStop=40 	DefaultTrailingStopMethod=1 	TrailingStopOneWay=1 	TrailingProfit=30 	DefaultTrailingProfitMethod=0 	TrailingProfitOneWay=1 	TrailingStopAddPerMinute=0 	LotSize=0 	TakeProfit=0 	StopLoss=0 	MaxOrders=0 	MaxOrdersPerType=0 	MinimumIntervalSec=0 	TradeMicroLots=1 	RiskRatio=0 	MinimalizeLosses=0 	BestDailyStrategyMultiplierFactor=1 	BestWeeklyStrategyMultiplierFactor=1 	BestMonthlyStrategyMultiplierFactor=2 	WorseDailyStrategyDividerFactor=1 	WorseWeeklyStrategyDividerFactor=2 	WorseMonthlyS
+  // £1515.98	298	1.51	5.09	626.06	5.56%	0.00000000	WPR1_OpenMethod=0 	WPR1_OpenCondition1=512 	WPR1_OpenCondition2=96 	WPR1_CloseCondition=840	TrailingStop=40 	DefaultTrailingStopMethod=1 	TrailingStopOneWay=1 	TrailingProfit=30 	DefaultTrailingProfitMethod=0 	TrailingProfitOneWay=1 	TrailingStopAddPerMinute=0 	LotSize=0 	TakeProfit=0 	StopLoss=0 	MaxOrders=0 	MaxOrdersPerType=0 	MinimumIntervalSec=0 	TradeMicroLots=1 	RiskRatio=0 	MinimalizeLosses=0 	BestDailyStrategyMultiplierFactor=1 	BestWeeklyStrategyMultiplierFactor=1 	BestMonthlyStrategyMultiplierFactor=2 	WorseDailyStrategyDividerFactor=1 	WorseWeeklyStrategyDividerFactor=2 	WorseMonthlyS
+  // £1451.44	262	1.56	5.54	595.00	5.32%	0.00000000	WPR1_OpenMethod=0 	WPR1_OpenCondition1=656 	WPR1_OpenCondition2=96 	WPR1_CloseCondition=936	TrailingStop=40 	DefaultTrailingStopMethod=1 	TrailingStopOneWay=1 	TrailingProfit=30 	DefaultTrailingProfitMethod=0 	TrailingProfitOneWay=1 	TrailingStopAddPerMinute=0 	LotSize=0 	TakeProfit=0 	StopLoss=0 	MaxOrders=0 	MaxOrdersPerType=0 	MinimumIntervalSec=0 	TradeMicroLots=1 	RiskRatio=0 	MinimalizeLosses=0 	BestDailyStrategyMultiplierFactor=1 	BestWeeklyStrategyMultiplierFactor=1 	BestMonthlyStrategyMultiplierFactor=2 	WorseDailyStrategyDividerFactor=1 	WorseWeeklyStrategyDividerFactor=2 	WorseMonthlyS
+  // £1423.75	514	1.29	2.77	693.61	6.25%	0.00000000	WPR1_OpenMethod=0 	WPR1_OpenCondition1=1012 	WPR1_OpenCondition2=0 	WPR1_CloseCondition=936	TrailingStop=40 	DefaultTrailingStopMethod=1 	TrailingStopOneWay=1 	TrailingProfit=30 	DefaultTrailingProfitMethod=0 	TrailingProfitOneWay=1 	TrailingStopAddPerMinute=0 	LotSize=0 	TakeProfit=0 	StopLoss=0 	MaxOrders=0 	MaxOrdersPerType=0 	MinimumIntervalSec=0 	TradeMicroLots=1 	RiskRatio=0 	MinimalizeLosses=0 	BestDailyStrategyMultiplierFactor=1 	BestWeeklyStrategyMultiplierFactor=1 	BestMonthlyStrategyMultiplierFactor=2 	WorseDailyStrategyDividerFactor=1 	WorseWeeklyStrategyDividerFactor=2 	WorseMonthlyS
+  // £1416.27	271	1.52	5.23	632.59	5.71%	0.00000000	WPR1_OpenMethod=0 	WPR1_OpenCondition1=804 	WPR1_OpenCondition2=32 	WPR1_CloseCondition=936	TrailingStop=40 	DefaultTrailingStopMethod=1 	TrailingStopOneWay=1 	TrailingProfit=30 	DefaultTrailingProfitMethod=0 	TrailingProfitOneWay=1 	TrailingStopAddPerMinute=0 	LotSize=0 	TakeProfit=0 	StopLoss=0 	MaxOrders=0 	MaxOrdersPerType=0 	MinimumIntervalSec=0 	TradeMicroLots=1 	RiskRatio=0 	MinimalizeLosses=0 	BestDailyStrategyMultiplierFactor=1 	BestWeeklyStrategyMultiplierFactor=1 	BestMonthlyStrategyMultiplierFactor=2 	WorseDailyStrategyDividerFactor=1 	WorseWeeklyStrategyDividerFactor=2 	WorseMonthlyS
+  extern int WPR5_OpenCondition1 = 528; // Valid range: 0-1023. >512
+  extern int WPR5_OpenCondition2 = 16; // Valid range: 0-1023. 0/16
+  extern int WPR5_CloseCondition = 864; // Valid range: 0-1023.
+  // £1490.10	1589	1.12	0.94	665.81	6.09%	0.00000000	WPR5_Enabled=1 (d: £10k)
+  extern int WPR15_OpenCondition1 = 544; // Valid range: 0-1023. // TODO: Further backtesting required.
+  extern int WPR15_OpenCondition2 = 16; // Valid range: 0-1023.
+  extern int WPR15_CloseCondition = 792; // Valid range: 0-1023. // TODO: Further backtesting required.
+  // £1527.92	1506	1.15	1.01	842.94	7.83%	0.00000000	WPR15_OpenCondition1=544 	WPR15_OpenCondition2=16 	WPR15_CloseCondition=792 (d: £10k)
+  extern int WPR30_OpenCondition1 = 1040; // Valid range: 0-1023. // TODO: Further backtesting required.
+  extern int WPR30_OpenCondition2 = 0; // Valid range: 0-1023. // TODO: Further backtesting required.
+  extern int WPR30_CloseCondition = 792; // Valid range: 0-1023. // TODO: Further backtesting required.
+  // £1019.43	1012	1.14	1.01	1192.08	9.92%	0.00000000	WPR30_OpenCondition1=1040 	WPR30_OpenCondition2=0 	WPR30_CloseCondition=792  (d: £10k)
+#endif
+/*
+ * WPR backtest log (auto,ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, spread 20, 9,5mln ticks, quality 25%]:
+ *
+ *   £11090.63	3289	1.29	3.37	1927.42	11.94%	WPR_TrailingStopMethod=11 (deposit: £10000, boosting = 1.0)
+ *   £9206.64	3444	1.27	2.67	2133.37	12.32%	WPR_TrailingStopMethod=6	TrailingStop=40 (deposit: £10000, boosting = 1.0)
+ *
+ * WPR backtest log (auto,ts:25,tp:20,gap:10,sp:2) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
+ *   £6463.30 6828  1.20  0.95  1070.11 31.72% (deposit: £1000, boosting = 1.0)
+ *   £7188.33 6828  1.22  1.05  1070.11 6.75% (deposit: £10000, boosting = 1.0)
  *  Strategy stats (deposit: £1000):
  *  WPR M1: Total net profit: 72739 pips, Total orders: 11943 (Won: 80.2% [9583] | Loss: 19.8% [2360]);
  *  WPR M5: Total net profit: 52232 pips, Total orders: 5750 (Won: 75.9% [4363] | Loss: 24.1% [1387]);
@@ -571,75 +640,90 @@ extern ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = T_FIXED; // Trailing Profit me
  *  WPR M30: Total net profit: 1078 pips, Total orders: 834 (Won: 40.4% [337] | Loss: 59.6% [497]);
  */
 
-extern string ____DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --";
-extern bool DeMarker1_Enabled  = TRUE; // Enable DeMarker-based strategy.
-extern bool DeMarker5_Enabled  = TRUE; // Enable DeMarker-based strategy.
-extern bool DeMarker15_Enabled = TRUE; // Enable DeMarker-based strategy.
-extern bool DeMarker30_Enabled = TRUE; // Enable DeMarker-based strategy.
+extern string __DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --";
+extern bool DeMarker1_Enabled  = TRUE; // Enable DeMarker-based strategy. // TODO: Optimize for higher spreads.
+extern bool DeMarker5_Enabled  = TRUE; // Enable DeMarker-based strategy. // TODO: Optimize for higher spreads.
+extern bool DeMarker15_Enabled = TRUE; // Enable DeMarker-based strategy. // TODO: Optimize for higher spreads.
+extern bool DeMarker30_Enabled = TRUE; // Enable DeMarker-based strategy. // TODO: Optimize for higher spreads.
 //extern ENUM_TIMEFRAMES DeMarker_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
-extern int DeMarker_Period = 24; // DeMarker period.
+extern int DeMarker_Period = 24; // DeMarker averaging period for calculation.
 extern int DeMarker_Shift = 0; // Shift relative to the current bar the given amount of periods ago. Suggested value: 4.
 extern double DeMarker_OpenLevel = 0.2; // Valid range: 0.0-0.4. Suggested value: 0.0.
-extern int DeMarker1_OpenMethod = 1; // Valid range: 0-63.
-extern int DeMarker1_OpenCondition1 = 0; // Valid range: 0-1024.
-extern int DeMarker1_OpenCondition2 = 0; // Valid range: 0-1024.
-extern int DeMarker1_CloseCondition = 0; // Valid range: 0-1024.
-extern int DeMarker5_OpenMethod = 0; // Valid range: 0-63.
-extern int DeMarker5_OpenCondition1 = 0; // Valid range: 0-1024.
-extern int DeMarker5_OpenCondition2 = 0; // Valid range: 0-1024.
-extern int DeMarker5_CloseCondition = 0; // Valid range: 0-1024.
-extern int DeMarker15_OpenMethod = 0; // Valid range: 0-63.
-extern int DeMarker15_OpenCondition1 = 0; // Valid range: 0-1024.
-extern int DeMarker15_OpenCondition2 = 0; // Valid range: 0-1024.
-extern int DeMarker15_CloseCondition = 0; // Valid range: 0-1024.
-extern int DeMarker30_OpenMethod = 4; // Valid range: 0-63.
-extern int DeMarker30_OpenCondition1 = 0; // Valid range: 0-1024.
-extern int DeMarker30_OpenCondition2 = 0; // Valid range: 0-1024.
-extern int DeMarker30_CloseCondition = 0; // Valid range: 0-1024.
 //extern bool DeMarker_CloseOnChange = FALSE; // Close opposite orders on market change.
-extern ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = T_MA_S_TRAIL; // Trailing Stop method for DeMarker. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = T_BANDS; // Trailing Profit method for DeMarker. Set 0 to default. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = T_MA_S_TRAIL; // Trailing Stop method for DeMarker. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = T_BANDS; // Trailing Profit method for DeMarker. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+extern int DeMarker1_OpenMethod = 1; // Valid range: 0-63.
+extern int DeMarker5_OpenMethod = 0; // Valid range: 0-63.
+extern int DeMarker15_OpenMethod = 0; // Valid range: 0-63.
+extern int DeMarker30_OpenMethod = 4; // Valid range: 0-63.
+#ifdef __ea_advanced__
+  extern int DeMarker1_OpenCondition1 = 0; // Valid range: 0-1023.
+  extern int DeMarker1_OpenCondition2 = 0; // Valid range: 0-1023.
+  extern int DeMarker1_CloseCondition = 0; // Valid range: 0-1023.
+  extern int DeMarker5_OpenCondition1 = 0; // Valid range: 0-1023.
+  extern int DeMarker5_OpenCondition2 = 0; // Valid range: 0-1023.
+  extern int DeMarker5_CloseCondition = 0; // Valid range: 0-1023.
+  extern int DeMarker15_OpenCondition1 = 0; // Valid range: 0-1023.
+  extern int DeMarker15_OpenCondition2 = 0; // Valid range: 0-1023.
+  extern int DeMarker15_CloseCondition = 0; // Valid range: 0-1023.
+  extern int DeMarker30_OpenCondition1 = 0; // Valid range: 0-1023.
+  extern int DeMarker30_OpenCondition2 = 0; // Valid range: 0-1023.
+  extern int DeMarker30_CloseCondition = 0; // Valid range: 0-1023.
+#endif
 /* DeMarker backtest log (auto,ts:25,tp:20,gap:10,sp:2) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
- *   £5968.23	5968	1.17	1.00	1314.82	47.46% (deposit: £1000, no boosting)
- *   £7465.39	5966	1.21	1.25	1306.65	9.32% (deposit: £10000, no boosting)
- *   $11414.20	5966	1.21	1.91	1776.70	12.99% (deposit: $10000, no boosting)
+ *   £5968.23 5968  1.17  1.00  1314.82 47.46% (deposit: £1000, no boosting)
+ *   £7465.39 5966  1.21  1.25  1306.65 9.32% (deposit: £10000, no boosting)
+ *   $11414.20  5966  1.21  1.91  1776.70 12.99% (deposit: $10000, no boosting)
  *   Strategy stats:
  *   DeMarker M1: Total net profit: 930 pips, Total orders: 2145 (Won: 30.7% [659] | Loss: 69.3% [1486]);
  *   DeMarker M5: Total net profit: 1699 pips, Total orders: 1751 (Won: 31.1% [544] | Loss: 68.9% [1207]);
  *   DeMarker M15: Total net profit: 1882 pips, Total orders: 1281 (Won: 37.7% [483] | Loss: 62.3% [798]);
  *   DeMarker M30: Total net profit: 905 pips, Total orders: 789 (Won: 40.7% [321] | Loss: 59.3% [468]);
- *   Prev: £1929.90	2778	1.13	0.69	525.00	21.84% (deposit: £1000, no boosting)
- *   Prev: £3369.57	1694	1.25	1.99	588.65	21.19%	0.00000000	DeMarker_TrailingProfitMethod=19 (deposit: £1000)
+ *   Prev: £1929.90 2778  1.13  0.69  525.00  21.84% (deposit: £1000, no boosting)
+ *   Prev: £3369.57 1694  1.25  1.99  588.65  21.19%  0.00000000  DeMarker_TrailingProfitMethod=19 (deposit: £1000)
  */
 
-extern string ____Fractals_Parameters__ = "-- Settings for the Fractals indicator --";
+extern string __Fractals_Parameters__ = "-- Settings for the Fractals indicator --";
 extern bool Fractals1_Enabled  = TRUE; // Enable Fractals-based strategy.
 extern bool Fractals5_Enabled  = TRUE; // Enable Fractals-based strategy.
 extern bool Fractals15_Enabled = TRUE; // Enable Fractals-based strategy.
 extern bool Fractals30_Enabled = TRUE; // Enable Fractals-based strategy.
-extern int Fractals1_OpenMethod = 40; // Valid range: 0-63.
-extern int Fractals1_OpenCondition1 = 0; // Valid range: 0-1024.
-extern int Fractals1_OpenCondition2 = 0; // Valid range: 0-1024.
-extern int Fractals1_CloseCondition = 0; // Valid range: 0-1024.
-extern int Fractals5_OpenMethod = 42; // Valid range: 0-63.
-extern int Fractals5_OpenCondition1 = 0; // Valid range: 0-1024.
-extern int Fractals5_OpenCondition2 = 0; // Valid range: 0-1024.
-extern int Fractals5_CloseCondition = 0; // Valid range: 0-1024.
-extern int Fractals15_OpenMethod = 34; // Valid range: 0-63.
-extern int Fractals15_OpenCondition1 = 0; // Valid range: 0-1024.
-extern int Fractals15_OpenCondition2 = 0; // Valid range: 0-1024.
-extern int Fractals15_CloseCondition = 0; // Valid range: 0-1024.
-extern int Fractals30_OpenMethod = 1; // Valid range: 0-63.
-extern int Fractals30_OpenCondition1 = 0; // Valid range: 0-1024.
-extern int Fractals30_OpenCondition2 = 0; // Valid range: 0-1024.
-extern int Fractals30_CloseCondition = 0; // Valid range: 0-1024.
 //extern bool Fractals_CloseOnChange = TRUE; // Close opposite orders on market change.
-extern ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = T_MA_S_TRAIL; // Trailing Stop method for Fractals. Set 0 to default. See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_MA_LOWEST; // Trailing Profit method for Fractals. Set 0 to default. See: ENUM_TRAIL_TYPE.
-/* Fractals backtest log (ts:25,tp:25,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
- *   £6129.71	3851	1.24	1.59	1430.47	32.22% (deposit: £1000, no boosting)
- *   £7682.48	3847	1.30	2.00	1933.09	12.56% (deposit: £10000, no boosting)
- *   Prev: £4006.40	8091	1.13	0.50	1027.32	35.39%	0.00000000	Fractals_TrailingProfitMethod=5
+extern ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = T_MA_M_FAR_TRAIL; // Trailing Stop method for Fractals. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_FIXED; // Trailing Profit method for Fractals. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+extern int Fractals1_OpenMethod = 0; // Valid range: 0-63.
+extern int Fractals5_OpenMethod = 42; // Valid range: 0-63.
+extern int Fractals15_OpenMethod = 34; // Valid range: 0-63. // Optimized.
+extern int Fractals30_OpenMethod = 0; // Valid range: 0-63. // Optimized.
+#ifdef __ea_advanced__
+  extern int Fractals1_OpenCondition1 = 800; // Valid range: 0-1023. 512, 800 ,832
+  extern int Fractals1_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized. // 0, 16
+  extern int Fractals1_CloseCondition = 408; // Valid range: 0-1023. // Optimized.
+  // £2819.06	966	1.21	2.92	926.14	8.03%	0.00000000	Fractals1_OpenMethod=0 	Fractals1_OpenCondition1=800 	Fractals1_OpenCondition2=0 	Fractals1_CloseCondition=408
+  // £4066.43	1278	1.20	3.18	2193.36	16.95%	0.00000000	Fractals1_OpenCondition1=512 	Fractals1_OpenCondition2=16 	Fractals1_CloseCondition=170
+  extern int Fractals5_OpenCondition1 = 0; // Valid range: 0-1023.
+  extern int Fractals5_OpenCondition2 = 16; // Valid range: 0-1023. // Optimized.
+  extern int Fractals5_CloseCondition = 330; // Valid range: 0-1023. // Optimized. // TODO
+  // £2571.28	355	1.46	7.24	649.46	5.12%	0.00000000	Fractals5_OpenCondition1=0 (d:£10k)
+  extern int Fractals15_OpenCondition1 = 0; // Valid range: 0-1023. // Optimized.
+  extern int Fractals15_OpenCondition2 = 16; // Valid range: 0-1023. // Optimized.
+  extern int Fractals15_CloseCondition = 394; // Valid range: 0-1023. // Optimized.
+  // £4430.12	1070	1.29	4.14	2107.20	13.84%
+  extern int Fractals30_OpenCondition1 = 8; // Valid range: 0-1023. // Optimized.
+  extern int Fractals30_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized.
+  extern int Fractals30_CloseCondition = 608; // Valid range: 0-1023. // Optimized.
+  // £2969.26	769	1.24	3.86	2328.90	15.73%	0.00000000	Fractals30_OpenCondition1=8 Fractals30_CloseCondition=608 (d:£10k)
+#endif
+/*
+ * Fractals backtest log (auto,ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, spread 20, 9,5mln ticks, quality 25%]:
+ *
+ *   £7758.92	3160	1.15	2.46	5938.42	29.21%	TradeWithTrend=0
+ *   £7981.06	2570	1.20	3.11	4879.44	27.37%	TradeWithTrend=1
+ *
+ * Fractals backtest log (ts:25,tp:25,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
+ *   £6129.71 3851  1.24  1.59  1430.47 32.22% (deposit: £1000, no boosting)
+ *   £7682.48 3847  1.30  2.00  1933.09 12.56% (deposit: £10000, no boosting)
+ *   Prev: £4006.40 8091  1.13  0.50  1027.32 35.39%  0.00000000  Fractals_TrailingProfitMethod=5
  *   Strategy stats:
  *     Fractals M1: Total net profit: 107 pips, Total orders: 764 (Won: 53.8% [411] | Loss: 46.2% [353]);
  *     Fractals M5: Total net profit: 728 pips, Total orders: 546 (Won: 48.2% [263] | Loss: 51.8% [283]);
@@ -649,11 +733,16 @@ extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_MA_LOWEST; // Trailing 
 
 /*
  * Summary backtest log
- * All [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 3, 7,6mln ticks, quality 25%]:
+ * All [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, spread 20, 9,5mln ticks, quality 25%]:
+ *
+ * High spreads:
+ *   spread 30: £13338.89	8725	1.10	1.53	5290.53	28.64% MinPipChangeToTrade=1 	MinPipGap=12 (d: £10k)
+ *   spread 20: £29865.34	7686	1.19	3.89	7942.79	23.12% MinPipChangeToTrade=1.2 	MinPipGap=12 (d: £10k)
+ *
  * Deposit: £1000 (factor = auto)
- *   £53685.55	46605	1.12	1.15	15776.94	29.63% (deposit: £1000, default settings)
- *   £115804.55	46252	1.11	2.50	33190.28	27.86% (deposit: £10000, default settings)
- *   £1509271.31	46594	1.10	32.39	468036.39	29.66% (deposit: £100000, default settings)
+ *   £53685.55  46605 1.12  1.15  15776.94  29.63% (deposit: £1000, default settings, spread: 3)
+ *   £115804.55 46252 1.11  2.50  33190.28  27.86% (deposit: £10000, default settings, spread: 3)
+ *   £1509271.31  46594 1.10  32.39 468036.39 29.66% (deposit: £100000, default settings, spread: 3)
 
     Strategy stats (deposit £10000, default settings):
       MA M1: Total net profit: 197, Total orders: 6 (Won: 50.0% [3] | Loss: 50.0% [3]);
@@ -694,131 +783,135 @@ extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_MA_LOWEST; // Trailing 
       Fractals M15: Total net profit: 93479, Total orders: 9267 (Won: 54.0% [5007] | Loss: 46.0% [4260]);
       Fractals M30: Total net profit: 84824, Total orders: 6337 (Won: 56.1% [3557] | Loss: 43.9% [2780]);
 
- *   Prev: £23053.06	39727	1.13	0.58	3197.04	29.82%
- *   Old: £29408.26	40723	1.14	0.72	6231.99	23.80%
+ *   Prev: £23053.06  39727 1.13  0.58  3197.04 29.82%
+ *   Old: £29408.26 40723 1.14  0.72  6231.99 23.80%
  */
 
 /*
  * All backtest log (ts:40,tp:35,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, spread 25, 9,5mln ticks, quality 25%]:
- *   £467.77	5351	1.09	0.09	355.59	22.88%
+ *   £467.77  5351  1.09  0.09  355.59  22.88%
  */
 
 // Define account conditions.
 enum ENUM_ACC_CONDITION {
-  C_ACC_NONE,         // None (inactive)
-  C_EQUITY_50PC_HIGH, // Equity 50% high
-  C_EQUITY_20PC_HIGH, // Equity 20% high
-  C_EQUITY_10PC_HIGH, // Equity 10% high
-  C_EQUITY_10PC_LOW,  // Equity 10% low
-  C_EQUITY_20PC_LOW,  // Equity 20% low
-  C_EQUITY_50PC_LOW   // Equity 50% low
+  C_ACC_NONE          =  0, // None (inactive)
+  C_EQUITY_LOWER      =  1, // Equity lower than balance
+  C_EQUITY_HIGHER     =  2, // Equity higher than balance
+  C_EQUITY_50PC_HIGH  =  3, // Equity 50% high
+  C_EQUITY_20PC_HIGH  =  4, // Equity 20% high
+  C_EQUITY_10PC_HIGH  =  5, // Equity 10% high
+  C_EQUITY_10PC_LOW   =  6, // Equity 10% low
+  C_EQUITY_20PC_LOW   =  7, // Equity 20% low
+  C_EQUITY_50PC_LOW   =  8, // Equity 50% low
+  C_MARGIN_USED_80PC  =  9, // 80% Margin Used
+  C_MARGIN_USED_90PC  = 10, // 90% Margin Used
+  C_NO_FREE_MARGIN    = 11, // No free margin.
 };
 
 // Define market conditions.
 enum ENUM_MARKET_CONDITION {
   C_MARKET_NONE       = 0, // None (false).
-  C_MA1_FAST_SLOW_OPP = 1, // MA1 Fast&Slow opposite
-  C_MA1_MED_SLOW_OPP  = 2, // MA1 Med&Slow opposite
-  C_MA5_FAST_SLOW_OPP = 3, // MA5 Fast&Slow opposite
-  C_MA5_MED_SLOW_OPP  = 4, // MA5 Med&Slow opposite
-  C_MARKET_TRUE       = 5  // Always true
+  C_MARKET_TRUE       = 1, // Always true
+  C_MA1_FAST_SLOW_OPP = 2, // MA1 Fast&Slow opposite
+  C_MA1_MED_SLOW_OPP  = 3, // MA1 Med&Slow opposite
+  C_MA5_FAST_SLOW_OPP = 4, // MA5 Fast&Slow opposite
+  C_MA5_MED_SLOW_OPP  = 5, // MA5 Med&Slow opposite
+  C_MARKET_DROP       = 6, // Market drop
 };
 
 // Define type of actions which can be executed.
 enum ENUM_ACTION_TYPE {
   A_NONE                   =  0, // None
-  A_CLOSE_ORDER_PROFIT     =  1, // Close order profit
-  A_CLOSE_ORDER_LOSS       =  2, // Close order loss
-  A_CLOSE_ALL_ORDER_PROFIT =  3, // Close all profit
-  A_CLOSE_ALL_ORDER_LOSS   =  4, // Close all loss
-  A_CLOSE_ALL_ORDER_BUY    =  5, // Close all buy
-  A_CLOSE_ALL_ORDER_SELL   =  6, // Close all sell
-  A_CLOSE_ALL_ORDERS       =  7, // Close all!
-  A_ORDER_STOPS_DECREASE   =  8, // Decrease loss stops
-  A_ORDER_PROFIT_DECREASE  =  9, // Decrease profit stops
-  FINAL_ACTION_TYPE_ENTRY  = 10  // (None)
+  A_CLOSE_ORDER_PROFIT     =  1, // Close profit order
+  A_CLOSE_ORDER_LOSS       =  2, // Close loss order
+  A_CLOSE_ALL_IN_PROFIT    =  3, // Close profit orders
+  A_CLOSE_ALL_IN_LOSS      =  4, // Close loss orders
+  A_CLOSE_ALL_PROFIT_SIDE  =  5, // Close profit side
+  A_CLOSE_ALL_LOSS_SIDE    =  6, // Close loss side
+  A_CLOSE_ALL_TREND        =  7, // Close trend side
+  A_CLOSE_ALL_NON_TREND    =  8, // Close non-trend side
+  A_CLOSE_ALL_ORDERS       =  9, // Close all!
+  FINAL_ACTION_TYPE_ENTRY  = 10  // (Not in use)
+  // A_ORDER_STOPS_DECREASE   =  10, // Decrease loss stops
+  // A_ORDER_PROFIT_DECREASE  =  11, // Decrease profit stops
 };
 
-extern string ____EA_Conditions__ = "-- Account conditions --"; // See: ENUM_ACTION_TYPE
-extern bool Account_Conditions_Enabled = TRUE; // Enable account conditions.
-extern ENUM_ACC_CONDITION Account_Condition_1      = C_EQUITY_50PC_LOW;
-extern ENUM_MARKET_CONDITION Market_Condition_1    = C_MARKET_TRUE;
-extern ENUM_ACTION_TYPE Action_On_Condition_1      = A_CLOSE_ALL_ORDER_LOSS;
+extern string __EA_Conditions__ = "-- Account conditions --"; // See: ENUM_ACTION_TYPE
+extern bool Account_Conditions_Enabled = TRUE; // Enable account conditions. It's not advice on accounts where multi bots are trading.
+extern ENUM_ACC_CONDITION Account_Condition_1      = C_EQUITY_LOWER;
+extern ENUM_MARKET_CONDITION Market_Condition_1    = C_MARKET_DROP;
+extern ENUM_ACTION_TYPE Action_On_Condition_1      = A_NONE;
 
-extern ENUM_ACC_CONDITION Account_Condition_2      = C_EQUITY_20PC_LOW;
-extern ENUM_MARKET_CONDITION Market_Condition_2    = C_MARKET_NONE;
-extern ENUM_ACTION_TYPE Action_On_Condition_2      = A_NONE;
+extern ENUM_ACC_CONDITION Account_Condition_2      = C_EQUITY_10PC_LOW;
+extern ENUM_MARKET_CONDITION Market_Condition_2    = C_MARKET_TRUE;
+extern ENUM_ACTION_TYPE Action_On_Condition_2      = A_CLOSE_ORDER_PROFIT;
 
-extern ENUM_ACC_CONDITION Account_Condition_3      = C_EQUITY_10PC_LOW;
-extern ENUM_MARKET_CONDITION Market_Condition_3    = C_MARKET_NONE;
-extern ENUM_ACTION_TYPE Action_On_Condition_3      = A_NONE;
+extern ENUM_ACC_CONDITION Account_Condition_3      = C_EQUITY_20PC_LOW;
+extern ENUM_MARKET_CONDITION Market_Condition_3    = C_MARKET_TRUE;
+extern ENUM_ACTION_TYPE Action_On_Condition_3      = A_CLOSE_ALL_IN_LOSS;
 
-extern ENUM_ACC_CONDITION Account_Condition_4      = C_EQUITY_10PC_HIGH;
+extern ENUM_ACC_CONDITION Account_Condition_4      = C_EQUITY_50PC_LOW;
 extern ENUM_MARKET_CONDITION Market_Condition_4    = C_MARKET_TRUE;
-extern ENUM_ACTION_TYPE Action_On_Condition_4      = A_CLOSE_ORDER_PROFIT;
+extern ENUM_ACTION_TYPE Action_On_Condition_4      = A_CLOSE_ALL_LOSS_SIDE;
 
-extern ENUM_ACC_CONDITION Account_Condition_5      = C_EQUITY_20PC_HIGH;
-extern ENUM_MARKET_CONDITION Market_Condition_5    = C_MARKET_TRUE;
-extern ENUM_ACTION_TYPE Action_On_Condition_5      = A_CLOSE_ALL_ORDERS;
+extern ENUM_ACC_CONDITION Account_Condition_5      = C_EQUITY_10PC_HIGH;
+extern ENUM_MARKET_CONDITION Market_Condition_5    = C_MA1_FAST_SLOW_OPP;
+extern ENUM_ACTION_TYPE Action_On_Condition_5      = A_CLOSE_ALL_LOSS_SIDE;
 
-extern ENUM_ACC_CONDITION Account_Condition_6      = C_EQUITY_50PC_HIGH;
+extern ENUM_ACC_CONDITION Account_Condition_6      = C_EQUITY_20PC_HIGH;
 extern ENUM_MARKET_CONDITION Market_Condition_6    = C_MA1_FAST_SLOW_OPP;
-extern ENUM_ACTION_TYPE Action_On_Condition_6      = A_CLOSE_ALL_ORDERS;
+extern ENUM_ACTION_TYPE Action_On_Condition_6      = A_CLOSE_ALL_IN_PROFIT;
 
-extern ENUM_ACC_CONDITION Account_Condition_7      = C_ACC_NONE;
-extern ENUM_MARKET_CONDITION Market_Condition_7    = C_MARKET_NONE;
-extern ENUM_ACTION_TYPE Action_On_Condition_7      = A_NONE;
+extern ENUM_ACC_CONDITION Account_Condition_7      = C_EQUITY_50PC_HIGH;
+extern ENUM_MARKET_CONDITION Market_Condition_7    = C_MARKET_TRUE;
+extern ENUM_ACTION_TYPE Action_On_Condition_7      = A_CLOSE_ALL_PROFIT_SIDE;
 
-extern ENUM_ACC_CONDITION Account_Condition_8      = C_ACC_NONE;
-extern ENUM_MARKET_CONDITION Market_Condition_8    = C_MARKET_NONE;
-extern ENUM_ACTION_TYPE Action_On_Condition_8      = A_NONE;
+extern ENUM_ACC_CONDITION Account_Condition_8      = C_MARGIN_USED_80PC;
+extern ENUM_MARKET_CONDITION Market_Condition_8    = C_MARKET_TRUE;
+extern ENUM_ACTION_TYPE Action_On_Condition_8      = A_CLOSE_ALL_NON_TREND;
 
-extern ENUM_ACC_CONDITION Account_Condition_9      = C_ACC_NONE;
-extern ENUM_MARKET_CONDITION Market_Condition_9    = C_MARKET_NONE;
-extern ENUM_ACTION_TYPE Action_On_Condition_9      = A_NONE;
+extern ENUM_ACC_CONDITION Account_Condition_9      = C_MARGIN_USED_90PC;
+extern ENUM_MARKET_CONDITION Market_Condition_9    = C_MARKET_TRUE;
+extern ENUM_ACTION_TYPE Action_On_Condition_9      = A_CLOSE_ORDER_LOSS;
 
-extern ENUM_ACC_CONDITION Account_Condition_10     = C_ACC_NONE;
-extern ENUM_MARKET_CONDITION Market_Condition_10   = C_MARKET_NONE;
-extern ENUM_ACTION_TYPE Action_On_Condition_10     = A_NONE;
+extern ENUM_ACC_CONDITION Account_Condition_10     = C_EQUITY_HIGHER;
+extern ENUM_MARKET_CONDITION Market_Condition_10   = C_MARKET_DROP;
+extern ENUM_ACTION_TYPE Action_On_Condition_10     = A_CLOSE_ALL_TREND;
 
 /*
-extern ENUM_ACTION_TYPE ActionOnDoubledEquity      = A_CLOSE_ALL_ORDER_PROFIT; // Execute action when account equity doubled the balance.
+extern ENUM_ACTION_TYPE ActionOnDoubledEquity      = A_CLOSE_ALL_IN_PROFIT; // Execute action when account equity doubled the balance.
 extern ENUM_ACTION_TYPE ActionOn10pcEquityHigh     = A_CLOSE_ORDER_PROFIT; // Execute action when account equity is 10% higher than the balance.
 extern ENUM_ACTION_TYPE ActionOnTwoThirdEquity     = A_CLOSE_ORDER_LOSS; // Execute action when account equity has 2/3 of the balance.
-extern ENUM_ACTION_TYPE ActionOnHalfEquity         = A_CLOSE_ALL_ORDER_LOSS; // Execute action when account equity is half of the balance.
-extern ENUM_ACTION_TYPE ActionOnOneThirdEquity     = A_CLOSE_ALL_ORDER_LOSS; // Execute action when account equity is 1/3 of the balance.
+extern ENUM_ACTION_TYPE ActionOnHalfEquity         = A_CLOSE_ALL_IN_LOSS; // Execute action when account equity is half of the balance.
+extern ENUM_ACTION_TYPE ActionOnOneThirdEquity     = A_CLOSE_ALL_IN_LOSS; // Execute action when account equity is 1/3 of the balance.
 extern ENUM_ACTION_TYPE ActionOnMarginCall         = A_NONE; // Execute action on margin call.
 */
 // extern int ActionOnLowBalance      = A_NONE; // Execute action on low balance.
 
-extern string ____Debug_Parameters__ = "-- Settings for log & messages --";
+extern string __Logging_Parameters__ = "-- Settings for logging & messages --";
 extern bool PrintLogOnChart = TRUE;
 extern bool VerboseErrors = TRUE; // Show errors.
 extern bool VerboseInfo = TRUE;   // Show info messages.
 extern bool VerboseDebug = TRUE;  // Show debug messages.
-extern bool VerboseTrace = FALSE;  // Even more debugging.
 extern bool WriteReport = TRUE;  // Write report into the file on exit.
+#ifdef __ea_advanced__
+  extern bool VerboseTrace = FALSE;  // Even more debugging.
+#endif
 
-extern string ____UX_Parameters__ = "-- Settings for User Interface & Experience --";
-extern bool SendEmail = FALSE;
+extern string __UI_UX_Parameters__ = "-- Settings for User Interface & Experience --";
+extern bool SendEmailEachOrder = FALSE;
 extern bool SoundAlert = FALSE;
 extern string SoundFileAtOpen = "alert.wav";
 extern string SoundFileAtClose = "alert.wav";
 extern color ColorBuy = Blue;
 extern color ColorSell = Red;
 
-extern string ____Demo_Parameters__ = "-----------------------------------------";
-extern int DemoMarketStopLevel = 10;
-
-extern string ____Other_Parameters__ = "-----------------------------------------";
+extern string __Other_Parameters__ = "-----------------------------------------";
+extern string E_Mail = "";
+extern string License = "";
 extern int MagicNumber = 31337; // To help identify its own orders. It can vary in additional range: +20, see: ENUM_ORDER_TYPE.
-extern bool TradeMicroLots = TRUE;
-extern int EAManualGMToffset = 0;
-extern int MinPipGap = 10; // Minimum gap in pips between trades of the same strategy.
-extern double MinPipChangeToTrade = 0.7; // Minimum pip change to trade before the bar change. Set 0 to process every tick. Lower better for small spreads.
-extern int MinVolumeToTrade = 2; // Minimum volume to trade.
-extern int TrendMethod = 81; // Valid range: 0-127. Suggested values: 81, 51, 91, 67, 75, 103, 82, 85, etc.
-extern int MaxTries = 5; // Number of maximum attempts to execute the order.
+
+//extern int ManualGMToffset = 0;
 //extern int TrailingStopDelay = 0; // How often trailing stop should be updated (in seconds). FIXME: Fix relative delay in backtesting.
 // extern int JobProcessDelay = 1; // How often job list should be processed (in seconds).
 
@@ -869,11 +962,11 @@ int gmt_offset = 0;
 string account_type;
 
 // State variables.
-bool session_initiated;
+bool session_initiated = FALSE;
 bool session_active = FALSE;
 
 // Time-based variables.
-int bar_time, last_bar_time; // Bar time, current and last one to check if bar has been changed since the last time.
+int bar_time, last_bar_time = EMPTY_VALUE; // Bar time, current and last one to check if bar has been changed since the last time.
 int hour_of_day, day_of_week, day_of_month, day_of_year;
 
 // Strategy variables.
@@ -937,12 +1030,18 @@ double fractals[H1][3][3];
  *   - add conditional actions,
  *   - implement condition to close all strategy orders, buy/sell, most profitable order, when to trade, skip the day or week, etc.
  *   - take profit on abnormal spikes,
+ *   - implement SendFTP,
+ *   - implement SendNotification,
+ *   - send daily, weekly reports (SendMail),
+ *   - check TesterStatistics(),
+ *   - check ResourceCreate/ResourceSave to store dynamic parameters
+ *   - condition on Stop Out (Please note that Stop Out will occur in your account when equity reaches 70% of your used margin resulting in immediate closing of all positions.)
  */
 
 /*
  * Predefined constants:
- *   Ask - The latest known seller's price (ask price) of the current symbol.
- *   Bid - The latest known buyer's price (offer price, bid price) of the current symbol.
+ *   Ask (for buying)  - The latest known seller's price (ask price) of the current symbol.
+ *   Bid (for selling) - The latest known buyer's price (offer price, bid price) of the current symbol.
  *   Point - The current symbol point value in the quote currency.
  *   Digits - Number of digits after decimal point for the current symbol prices.
  *   Bars - Number of bars in the current chart.
@@ -961,7 +1060,7 @@ void OnTick() {
 
   // Check if we should pass the tick.
   bar_time = iTime(NULL, PERIOD_M1, 0);
-  if (bar_time == last_bar_time || last_tick_change < MinPipChangeToTrade) {
+  if (bar_time <= last_bar_time || last_tick_change < MinPipChangeToTrade) {
     return;
   } else {
     last_bar_time = bar_time;
@@ -984,7 +1083,7 @@ void OnTick() {
       StartNewHour();
     }
   }
-  if (PrintLogOnChart) DisplayInfoOnChart();
+  if (ea_active && PrintLogOnChart) DisplayInfoOnChart();
 
 } // end: OnTick()
 
@@ -992,24 +1091,26 @@ void OnTick() {
 //| Expert initialization function                                   |
 //+------------------------------------------------------------------+
 int OnInit() {
-   if (VerboseInfo) Print("EA initializing...");
-   string err;
+  if (VerboseInfo) Print("EA initializing...");
+  string err;
 
-   if (!session_initiated) {
-      if (!ValidSettings()) {
-         err = "Error: EA parameters are not valid, please correct them.";
-         Comment(err);
-         if (VerboseErrors) Print(__FUNCTION__ + "():" + err);
-         return (INIT_PARAMETERS_INCORRECT); // Incorrect set of input parameters.
-      }
-      if (!IsTesting() && StringLen(AccountName()) <= 1) {
-         err = "Error: EA requires on-line Terminal.";
-         Comment(err);
-         if (VerboseErrors) Print(__FUNCTION__ + "():" + err);
-         return (INIT_FAILED);
-       }
-       session_initiated = TRUE;
-   }
+  if (!session_initiated) {
+    if (!ValidSettings()) {
+      err = "Error: EA parameters are not valid, please correct them.";
+      Comment(err);
+      Alert(err);
+      if (VerboseErrors) Print(__FUNCTION__ + "():" + err);
+      ExpertRemove();
+      return (INIT_PARAMETERS_INCORRECT); // Incorrect set of input parameters.
+    }
+    if (!IsTesting() && StringLen(AccountName()) <= 1) {
+      err = "Error: EA requires on-line Terminal.";
+      Comment(err);
+      if (VerboseErrors) Print(__FUNCTION__ + "():" + err);
+      return (INIT_FAILED);
+     }
+     session_initiated = TRUE;
+  }
 
    // Initial checks.
 
@@ -1019,35 +1120,31 @@ int OnInit() {
   InitializeConditions();
   CheckHistory();
 
-   if (IsTesting()) {
-     SendEmail = FALSE;
-     SoundAlert = FALSE;
-     if (!IsVisualMode()) PrintLogOnChart = FALSE;
-     if (market_stoplevel == 0) market_stoplevel = DemoMarketStopLevel; // When testing, we need to simulate real MODE_STOPLEVEL = 30 (as it's in real account), in demo it's 0.
-     if (IsOptimization()) {
-       VerboseErrors = FALSE;
-       VerboseInfo   = FALSE;
-       VerboseDebug  = FALSE;
-       VerboseTrace  = FALSE;
+  if (IsTesting()) {
+    SendEmailEachOrder = FALSE;
+    SoundAlert = FALSE;
+    if (!IsVisualMode()) PrintLogOnChart = FALSE;
+    if (market_stoplevel == 0) market_stoplevel = DemoMarketStopLevel; // When testing, we need to simulate real MODE_STOPLEVEL = 30 (as it's in real account), in demo it's 0.
+    if (IsOptimization()) {
+      VerboseErrors = FALSE;
+      VerboseInfo   = FALSE;
+      VerboseDebug  = FALSE;
+      VerboseTrace  = FALSE;
     }
-   }
+  }
 
-   if (VerboseInfo) {
-     Print(__FUNCTION__, "(): ", __FILE__);
-     // Print(__FUNCTION__, "(): ", description, " v", version, " by ", copyright, " (", link, ")");
-     Print(__FUNCTION__, "(): Predefined variables: Bars = ", Bars, ", Ask = ", Ask, ", Bid = ", Bid, ", Digits = ", Digits, ", Point = ", DoubleToStr(Point, Digits));
-     Print(__FUNCTION__, "(): Market info: Symbol: ", Symbol(), ", min lot = " + market_minlot + ", max lot = " + market_maxlot +  ", lot step = " + market_lotstep, ", margin required = " + market_marginrequired, ", stop level = ", market_stoplevel, ", last volume: ", Volume[0]);
-     Print(__FUNCTION__, "(): Account info: type: ", account_type, ", leverage: ", AccountLeverage());
-     Print(__FUNCTION__, "(): Broker info: ", AccountCompany(), ", pip size = ", pip_size, ", points per pip = ", pts_per_pip, ", pip precision = ", pip_precision, ", volume precision = ", volume_precision);
-     Print(__FUNCTION__, "(): EA info: Lot size = ", GetLotSize(), "; Max orders = ", GetMaxOrders(), "; Max orders per type = ", GetMaxOrdersPerType(), "; No of strategies = ", GetNoOfStrategies(), " of ", FINAL_STRATEGY_TYPE_ENTRY);
-     Print(__FUNCTION__, "(): Time: Hour of day = " + hour_of_day + ", Day of week = ", day_of_week, ", day of month = ", day_of_month, "; day of year = ", day_of_year);
-     Print(__FUNCTION__, "(): ", GetAccountTextDetails());
-   }
 
-   session_active = TRUE;
-   ea_active = TRUE;
+  if (session_initiated && VerboseInfo) {
+    string output = InitInfo();
+    PrintText(output);
+    Comment(output);
+  }
 
-   return (INIT_SUCCEEDED);
+  session_active = TRUE;
+  ea_active = TRUE;
+  WindowRedraw();
+
+  return (INIT_SUCCEEDED);
 } // end: OnInit()
 
 
@@ -1062,7 +1159,7 @@ void OnDeinit(const int reason) {
     Print(GetSummaryText());
   }
 
-   if (WriteReport && !IsOptimization()) {
+   if (WriteReport && !IsOptimization() && session_initiated) {
       double ExtInitialDeposit;
       if (!IsTesting()) ExtInitialDeposit = CalculateInitialDeposit();
       CalculateSummary(ExtInitialDeposit);
@@ -1096,6 +1193,34 @@ void start() {
 }
 
 /*
+ * Print init variables and constants.
+ */
+string InitInfo(string sep = "\n") {
+  string output = StringFormat("%s (%s) v%s by %s%s" + sep, ea_name, __FILE__, ea_version, ea_author, sep); // ea_link
+  output += StringFormat("Platform variables: Symbol: %s, Bars: %d, Server: %s, Login: %d%s",
+    _Symbol, Bars, AccountInfoString(ACCOUNT_SERVER), (int)AccountInfoInteger(ACCOUNT_LOGIN), sep);
+  output += StringFormat("Broker info: Name: %s, Account type: %s, Leverage: 1:%d" + sep, AccountCompany(), account_type, AccountLeverage());
+  output += StringFormat("Market variables: Ask: %f, Bid: %f, Volume: %d%s", Ask, Bid, Volume[0], sep);
+  output += StringFormat("Market constants: Digits: %d, Point: %f, Min Lot: %f, Max Lot: %d, Lot Step: %f, Margin Required: %.f, Stop Level: %.f%s",
+    Digits, Point, market_minlot, market_maxlot, market_lotstep, market_marginrequired, market_stoplevel, sep);
+  output += StringFormat("Contract specification for %s: Digits: %d, Point value: %f, Spread: %d, Stop level: %f, Contract size: %.f, Tick size: %f%s",
+    _Symbol, (int)SymbolInfoInteger(_Symbol, SYMBOL_DIGITS), SymbolInfoDouble(_Symbol, SYMBOL_POINT), (int)SymbolInfoInteger(_Symbol,SYMBOL_SPREAD),
+    (int)SymbolInfoInteger(_Symbol,SYMBOL_TRADE_STOPS_LEVEL), SymbolInfoDouble(_Symbol,SYMBOL_TRADE_CONTRACT_SIZE), SymbolInfoDouble(_Symbol,SYMBOL_TRADE_TICK_SIZE), sep);
+  output += StringFormat("Swap specification for %s: Mode: %d, Long/buy order value: %f, Short/sell order value: %f%s",
+    _Symbol, (int)SymbolInfoInteger(_Symbol, SYMBOL_SWAP_MODE), SymbolInfoDouble(_Symbol,SYMBOL_SWAP_LONG), SymbolInfoDouble(_Symbol,SYMBOL_SWAP_SHORT), sep);
+  output += StringFormat("Calculated variables: Lot size: %f, Max orders: %d (per type: %d), Active strategies: %d of %d, Pip size: %f, Points per pip: %d, Pip precision: %d, Volume precision: %d" + sep,
+              GetLotSize(), GetMaxOrders(), GetMaxOrdersPerType(), GetNoOfStrategies(), FINAL_STRATEGY_TYPE_ENTRY, pip_size, pts_per_pip, pip_precision, volume_precision);
+  output += StringFormat("Time: Hour of day: %d, Day of week: %d, Day of month: %d, Day of year: %d" + sep, hour_of_day, day_of_week, day_of_month, day_of_year);
+  output += GetAccountTextDetails() + sep;
+  if (IsTradeAllowed()) {
+    output += sep + "Trading is allowed, please wait to start trading...";
+  } else {
+    output += sep + "Error: Trading is not allowed, please check the settings and allow automated trading!";
+  }
+  return output;
+}
+
+/*
  * Main function to trade.
  */
 void Trade() {
@@ -1103,7 +1228,7 @@ void Trade() {
   // if (VerboseTrace) Print("Calling " + __FUNCTION__ + "()");
   // vdigits = MarketInfo(Symbol(), MODE_DIGITS);
 
-  double lot_size = GetLotSize(); 
+  double lot_size = GetLotSize();
   for (int i = 0; i < FINAL_STRATEGY_TYPE_ENTRY; i++) {
     if (info[i][ACTIVE]) {
       if (TradeCondition(i, OP_BUY)
@@ -1118,431 +1243,6 @@ void Trade() {
       if (CheckMarketCondition2(OP_BUY, info[i][TIMEFRAME], info[i][CLOSE_CONDITION])) CloseOrdersByType(OP_SELL, i, "closing on market change: " + name[i]);
       if (CheckMarketCondition2(OP_SELL, info[i][TIMEFRAME], info[i][CLOSE_CONDITION])) CloseOrdersByType(OP_BUY, i, "closing on market change: " + name[i]);
     } // end: if
-
-/*
-      if (info[BANDS1][ACTIVE]) {
-         if (Bands_On_Buy(info[BANDS1][TIMEFRAME], info[BANDS1][OPEN_METHOD])
-           && CheckMarketCondition1(OP_BUY, M1, info[BANDS1][OPEN_CONDITION1])
-           && !CheckMarketCondition1(OP_SELL, M30, info[BANDS1][OPEN_CONDITION2], FALSE)) {
-           order_placed = ExecuteOrder(OP_BUY, lot_size * info[BANDS1][FACTOR], BANDS1, name[BANDS1]);
-         } else if (Bands_On_Sell(info[BANDS1][TIMEFRAME], info[BANDS1][OPEN_METHOD])
-           && CheckMarketCondition1(OP_SELL, M1, info[BANDS1][OPEN_CONDITION1])
-           && !CheckMarketCondition1(OP_BUY, M30, info[BANDS1][OPEN_CONDITION2], FALSE)) {
-           order_placed = ExecuteOrder(OP_SELL, lot_size * info[BANDS1][FACTOR], BANDS1, name[BANDS1]);
-         }
-        if (CheckMarketCondition2(OP_BUY, M1, info[BANDS1][CLOSE_CONDITION])) CloseOrdersByType(OP_SELL, BANDS1, "closing on market change: " + name[BANDS1]);
-        if (CheckMarketCondition2(OP_SELL, M1, info[BANDS1][CLOSE_CONDITION])) CloseOrdersByType(OP_BUY, BANDS1, "closing on market change: " + name[BANDS1]);
-      }
-   }
-   if (info[MA1][ACTIVE]) {
-      if (MA_On_Buy(info[MA1][TIMEFRAME], info[MA1][OPEN_METHOD], MA_OpenLevel)) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[MA1][FACTOR], MA1, name[MA1]);
-       if (MA1_CloseOnChange) CloseOrdersByType(OP_SELL, MA1, "closing MA M1 on market change");
-      } else if (MA_On_Sell(info[MA1][TIMEFRAME], info[MA1][OPEN_METHOD], MA_OpenLevel)) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[MA1][FACTOR], MA1, name[MA1]);
-       if (MA1_CloseOnChange) CloseOrdersByType(OP_BUY, MA1, "closing MA M1 on market change");
-      }
-   }
-
-   if (info[MA5][ACTIVE]) {
-      if (MA_On_Buy(info[MA5][TIMEFRAME], info[MA5][OPEN_METHOD], MA_OpenLevel)) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[MA5][FACTOR], MA5, name[MA5]);
-       if (MA5_CloseOnChange) CloseOrdersByType(OP_SELL, MA5, "closing MA M5 on market change");
-      } else if (MA_On_Sell(info[MA5][TIMEFRAME], info[MA5][OPEN_METHOD], MA_OpenLevel)) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[MA5][FACTOR], MA5, name[MA5]);
-       if (MA5_CloseOnChange) CloseOrdersByType(OP_BUY, MA5, "closing MA M5 on market change");
-      }
-   }
-
-   if (info[MA15][ACTIVE]) {
-      if (MA_On_Buy(info[MA15][TIMEFRAME], info[MA15][OPEN_METHOD], MA_OpenLevel)) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[MA15][FACTOR], MA15, name[MA15]);
-       if (MA15_CloseOnChange) CloseOrdersByType(OP_SELL, MA15, "closing MA M15 on market change");
-      } else if (MA_On_Sell(info[MA15][TIMEFRAME], info[MA15][OPEN_METHOD], MA_OpenLevel)) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[MA15][FACTOR], MA15, name[MA15]);
-       if (MA15_CloseOnChange) CloseOrdersByType(OP_BUY, MA15, "closing MA M15 on market change");
-      }
-   }
-
-   if (info[MA30][ACTIVE]) {
-      if (MA_On_Buy(info[MA30][TIMEFRAME], info[MA30][OPEN_METHOD], MA_OpenLevel)) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[MA30][FACTOR], MA30, name[MA30]);
-       if (MA30_CloseOnChange) CloseOrdersByType(OP_SELL, MA30, "closing MA M30 on market change");
-      } else if (MA_On_Sell(info[MA30][TIMEFRAME], info[MA30][OPEN_METHOD], MA_OpenLevel)) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[MA30][FACTOR], MA30, name[MA30]);
-       if (MA30_CloseOnChange) CloseOrdersByType(OP_BUY, MA30, "closing MA M30 on market change");
-      }
-   }
-
-   if (info[MACD1][ACTIVE]) {
-      if (MACD_On_Buy(info[MACD1][TIMEFRAME], info[MACD1][OPEN_METHOD])) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[MACD1][FACTOR], MACD1, name[MACD1]);
-       if (MACD_CloseOnChange) CloseOrdersByType(OP_SELL, MACD1, "closing on market change: " + name[MACD1]);
-      } else if (MACD_On_Sell(info[MACD1][TIMEFRAME], info[MACD1][OPEN_METHOD])) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[MACD1][FACTOR], MACD1, name[MACD1]);
-       if (MACD_CloseOnChange) CloseOrdersByType(OP_BUY, MACD1, "closing on market change: " + name[MACD1]);
-      }
-   }
-
-   if (info[MACD5][ACTIVE]) {
-      if (MACD_On_Buy(info[MACD5][TIMEFRAME], info[MACD5][OPEN_METHOD])) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[MACD5][FACTOR], MACD5, name[MACD5]);
-       if (MACD_CloseOnChange) CloseOrdersByType(OP_SELL, MACD5, "closing on market change: " + name[MACD5]);
-      } else if (MACD_On_Sell(info[MACD5][TIMEFRAME], info[MACD5][OPEN_METHOD])) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[MACD5][FACTOR], MACD5, name[MACD5]);
-       if (MACD_CloseOnChange) CloseOrdersByType(OP_BUY, MACD5, "closing on market change: " + name[MACD5]);
-      }
-   }
-
-   if (info[MACD15][ACTIVE]) {
-      if (MACD_On_Buy(info[MACD15][TIMEFRAME], info[MACD15][OPEN_METHOD])) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[MACD15][FACTOR], MACD15, name[MACD15]);
-       if (MACD_CloseOnChange) CloseOrdersByType(OP_SELL, MACD15, "closing on market change: " + name[MACD15]);
-      } else if (MACD_On_Sell(info[MACD15][TIMEFRAME], info[MACD15][OPEN_METHOD])) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[MACD15][FACTOR], MACD15, name[MACD15]);
-       if (MACD_CloseOnChange) CloseOrdersByType(OP_BUY, MACD15, "closing on market change: " + name[MACD15]);
-      }
-   }
-
-   if (info[MACD30][ACTIVE]) {
-      if (MACD_On_Buy(info[MACD30][TIMEFRAME], info[MACD30][OPEN_METHOD])) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[MACD30][FACTOR], MACD30, name[MACD30]);
-       if (MACD_CloseOnChange) CloseOrdersByType(OP_SELL, MACD30, "closing on market change: " + name[MACD30]);
-      } else if (MACD_On_Sell(info[MACD30][TIMEFRAME], info[MACD30][OPEN_METHOD])) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[MACD30][FACTOR], MACD30, name[MACD30]);
-       if (MACD_CloseOnChange) CloseOrdersByType(OP_BUY, MACD30, "closing on market change: " + name[MACD30]);
-      }
-   }
-
-   if (info[ALLIGATOR1][ACTIVE]) {
-      if (Alligator_On_Buy(info[ALLIGATOR1][TIMEFRAME], info[ALLIGATOR1][OPEN_METHOD], Alligator_OpenLevel * pip_size)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[ALLIGATOR1][FACTOR], ALLIGATOR1, name[ALLIGATOR1]);
-        if (Alligator_CloseOnChange) CloseOrdersByType(OP_SELL, ALLIGATOR1, "closing on market change: " + name[ALLIGATOR1]);
-      } else if (Alligator_On_Sell(info[ALLIGATOR1][TIMEFRAME], info[ALLIGATOR1][OPEN_METHOD], Alligator_OpenLevel * pip_size)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[ALLIGATOR1][FACTOR], ALLIGATOR1, name[ALLIGATOR1]);
-        if (Alligator_CloseOnChange) CloseOrdersByType(OP_BUY, ALLIGATOR1, "closing on market change: " + name[ALLIGATOR1]);
-      }
-   }
-
-   if (info[ALLIGATOR5][ACTIVE]) {
-      if (Alligator_On_Buy(info[ALLIGATOR5][TIMEFRAME], info[ALLIGATOR5][OPEN_METHOD], Alligator_OpenLevel * pip_size)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[ALLIGATOR5][FACTOR], ALLIGATOR5, name[ALLIGATOR5]);
-        if (Alligator_CloseOnChange) CloseOrdersByType(OP_SELL, ALLIGATOR5, "closing on market change: " + name[ALLIGATOR5]);
-      } else if (Alligator_On_Sell(info[ALLIGATOR5][TIMEFRAME], info[ALLIGATOR5][OPEN_METHOD], Alligator_OpenLevel * pip_size)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[ALLIGATOR5][FACTOR], ALLIGATOR5, name[ALLIGATOR5]);
-        if (Alligator_CloseOnChange) CloseOrdersByType(OP_BUY, ALLIGATOR5, "closing on market change: " + name[ALLIGATOR5]);
-      }
-   }
-
-   if (info[ALLIGATOR15][ACTIVE]) {
-      if (Alligator_On_Buy(info[ALLIGATOR15][TIMEFRAME], info[ALLIGATOR15][OPEN_METHOD], Alligator_OpenLevel * pip_size)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[ALLIGATOR15][FACTOR], ALLIGATOR15, name[ALLIGATOR15]);
-        if (Alligator_CloseOnChange) CloseOrdersByType(OP_SELL, ALLIGATOR15, "closing on market change: " + name[ALLIGATOR15]);
-      } else if (Alligator_On_Sell(info[ALLIGATOR15][TIMEFRAME], info[ALLIGATOR15][OPEN_METHOD], Alligator_OpenLevel * pip_size)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[ALLIGATOR15][FACTOR], ALLIGATOR15, name[ALLIGATOR15]);
-        if (Alligator_CloseOnChange) CloseOrdersByType(OP_BUY, ALLIGATOR15, "closing on market change: " + name[ALLIGATOR15]);
-      }
-   }
-
-   if (info[ALLIGATOR30][ACTIVE]) {
-      if (Alligator_On_Buy(info[ALLIGATOR30][TIMEFRAME], info[ALLIGATOR30][OPEN_METHOD], Alligator_OpenLevel * pip_size)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[ALLIGATOR30][FACTOR], ALLIGATOR30, name[ALLIGATOR30]);
-        if (Alligator_CloseOnChange) CloseOrdersByType(OP_SELL, ALLIGATOR30, "closing on market change: " + name[ALLIGATOR30]);
-      } else if (Alligator_On_Sell(info[ALLIGATOR30][TIMEFRAME], info[ALLIGATOR30][OPEN_METHOD], Alligator_OpenLevel * pip_size)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[ALLIGATOR30][FACTOR], ALLIGATOR30, name[ALLIGATOR30]);
-        if (Alligator_CloseOnChange) CloseOrdersByType(OP_BUY, ALLIGATOR30, "closing on market change: " + name[ALLIGATOR30]);
-      }
-   }
-
-   if (info[RSI1][ACTIVE]) {
-      if (RSI_On_Buy(info[RSI1][TIMEFRAME], info[RSI1][OPEN_METHOD], RSI_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[RSI1][FACTOR], RSI1, "RSI1");
-        if (RSI_CloseOnChange) CloseOrdersByType(OP_SELL, RSI1, "closing on market change: " + name[RSI1]);
-      } else if (RSI_On_Sell(info[RSI1][TIMEFRAME], info[RSI1][OPEN_METHOD], RSI_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[RSI1][FACTOR], RSI1, "RSI1");
-        if (RSI_CloseOnChange) CloseOrdersByType(OP_BUY, RSI1, "closing on market change: " + name[RSI1]);
-      }
-   }
-
-   if (info[RSI5][ACTIVE]) {
-      if (RSI_On_Buy(info[RSI5][TIMEFRAME], info[RSI5][OPEN_METHOD], RSI_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[RSI5][FACTOR], RSI5, "RSI5");
-        if (RSI_CloseOnChange) CloseOrdersByType(OP_SELL, RSI5, "closing on market change: " + name[RSI5]);
-      } else if (RSI_On_Sell(info[RSI5][TIMEFRAME], info[RSI5][OPEN_METHOD], RSI_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[RSI5][FACTOR], RSI5, "RSI5");
-        if (RSI_CloseOnChange) CloseOrdersByType(OP_BUY, RSI5, "closing on market change: " + name[RSI5]);
-      }
-   }
-
-   if (info[RSI15][ACTIVE]) {
-      if (RSI_On_Buy(info[RSI15][TIMEFRAME], info[RSI15][OPEN_METHOD], RSI_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[RSI15][FACTOR], RSI15, "RSI15");
-        if (RSI_CloseOnChange) CloseOrdersByType(OP_SELL, RSI15, "closing on market change: " + name[RSI15]);
-      } else if (RSI_On_Sell(info[RSI15][TIMEFRAME], info[RSI15][OPEN_METHOD], RSI_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[RSI15][FACTOR], RSI15, "RSI15");
-        if (RSI_CloseOnChange) CloseOrdersByType(OP_BUY, RSI15, "closing on market change: " + name[RSI15]);
-      }
-   }
-
-   if (info[RSI30][ACTIVE]) {
-      if (RSI_On_Buy(info[RSI30][TIMEFRAME], info[RSI30][OPEN_METHOD], RSI_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[RSI30][FACTOR], RSI30, "RSI30");
-        if (RSI_CloseOnChange) CloseOrdersByType(OP_SELL, RSI30, "closing on market change: " + name[RSI30]);
-      } else if (RSI_On_Sell(info[RSI30][TIMEFRAME], info[RSI30][OPEN_METHOD], RSI_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[RSI30][FACTOR], RSI30, "RSI30");
-        if (RSI_CloseOnChange) CloseOrdersByType(OP_BUY, RSI30, "closing on market change: " + name[RSI30]);
-      }
-   }
-
-   if (info[SAR1][ACTIVE]) {
-      if (SAR_On_Buy(info[SAR1][TIMEFRAME], info[SAR1][OPEN_METHOD], SAR_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[SAR1][FACTOR], SAR1, "SAR M1");
-        if (SAR_CloseOnChange) CloseOrdersByType(OP_SELL, SAR1, "closing SAR M1 on market change");
-      } else if (SAR_On_Sell(info[SAR1][TIMEFRAME], info[SAR1][OPEN_METHOD], SAR_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[SAR1][FACTOR], SAR1, "SAR M1");
-        if (SAR_CloseOnChange) CloseOrdersByType(OP_BUY, SAR1, "closing SAR M1 on market change");
-      }
-   }
-
-   if (info[SAR5][ACTIVE]) {
-      if (SAR_On_Buy(info[SAR5][TIMEFRAME], info[SAR5][OPEN_METHOD], SAR_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[SAR5][FACTOR], SAR5, "SAR M5");
-        if (SAR_CloseOnChange) CloseOrdersByType(OP_SELL, SAR5, "closing SAR M5 on market change");
-      } else if (SAR_On_Sell(info[SAR5][TIMEFRAME], info[SAR5][OPEN_METHOD], SAR_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[SAR5][FACTOR], SAR5, "SAR M5");
-        if (SAR_CloseOnChange) CloseOrdersByType(OP_BUY, SAR5, "closing SAR M5 on market change");
-      }
-   }
-
-   if (info[SAR15][ACTIVE]) {
-      if (SAR_On_Buy(info[SAR15][TIMEFRAME], info[SAR15][OPEN_METHOD], SAR_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[SAR15][FACTOR], SAR15, "SAR M15");
-        if (SAR_CloseOnChange) CloseOrdersByType(OP_SELL, SAR15, "closing SAR M15 on market change");
-      } else if (SAR_On_Sell(info[SAR15][TIMEFRAME], info[SAR15][OPEN_METHOD], SAR_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[SAR15][FACTOR], SAR15, "SAR M15");
-        if (SAR_CloseOnChange) CloseOrdersByType(OP_BUY, SAR15, "closing SAR M15 on market change");
-      }
-   }
-
-   if (info[SAR30][ACTIVE]) {
-      if (SAR_On_Buy(info[SAR30][TIMEFRAME], info[SAR30][OPEN_METHOD], SAR_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[SAR30][FACTOR], SAR30, "SAR M30");
-        if (SAR_CloseOnChange) CloseOrdersByType(OP_SELL, SAR30, "closing SAR M30 on market change");
-      } else if (SAR_On_Sell(info[SAR30][TIMEFRAME], info[SAR30][OPEN_METHOD], SAR_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[SAR30][FACTOR], SAR30, "SAR M30");
-        if (SAR_CloseOnChange) CloseOrdersByType(OP_BUY, SAR30, "closing SAR M30 on market change");
-      }
-   }
-
-   if (info[BANDS1][ACTIVE]) {
-      if (Bands_On_Buy(info[BANDS1][TIMEFRAME], info[BANDS1][OPEN_METHOD])
-        && CheckMarketCondition1(OP_BUY, M1, info[BANDS1][OPEN_CONDITION1])
-        && !CheckMarketCondition1(OP_SELL, M30, info[BANDS1][OPEN_CONDITION2], FALSE)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[BANDS1][FACTOR], BANDS1, name[BANDS1]);
-      } else if (Bands_On_Sell(info[BANDS1][TIMEFRAME], info[BANDS1][OPEN_METHOD])
-        && CheckMarketCondition1(OP_SELL, M1, info[BANDS1][OPEN_CONDITION1])
-        && !CheckMarketCondition1(OP_BUY, M30, info[BANDS1][OPEN_CONDITION2], FALSE)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[BANDS1][FACTOR], BANDS1, name[BANDS1]);
-      }
-     if (CheckMarketCondition2(OP_BUY, M1, info[BANDS1][CLOSE_CONDITION])) CloseOrdersByType(OP_SELL, BANDS1, "closing on market change: " + name[BANDS1]);
-     if (CheckMarketCondition2(OP_SELL, M1, info[BANDS1][CLOSE_CONDITION])) CloseOrdersByType(OP_BUY, BANDS1, "closing on market change: " + name[BANDS1]);
-   }
-
-   if (info[BANDS5][ACTIVE]) {
-      if (Bands_On_Buy(info[BANDS5][TIMEFRAME], info[BANDS5][OPEN_METHOD])
-        && CheckMarketCondition1(OP_BUY, M5, info[BANDS5][OPEN_CONDITION1])
-        && !CheckMarketCondition1(OP_SELL, M30, info[BANDS5][OPEN_CONDITION2], FALSE)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[BANDS5][FACTOR], BANDS5, name[BANDS5]);
-      } else if (Bands_On_Sell(info[BANDS5][TIMEFRAME], info[BANDS5][OPEN_METHOD])
-        && CheckMarketCondition1(OP_SELL, M5, info[BANDS5][OPEN_CONDITION1])
-        && !CheckMarketCondition1(OP_BUY, M30, info[BANDS5][OPEN_CONDITION2], FALSE)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[BANDS5][FACTOR], BANDS5, name[BANDS5]);
-      }
-     if (CheckMarketCondition2(OP_BUY, M5, info[BANDS5][CLOSE_CONDITION])) CloseOrdersByType(OP_SELL, BANDS5, "closing on market change: " + name[BANDS5]);
-     if (CheckMarketCondition2(OP_SELL, M5, info[BANDS5][CLOSE_CONDITION])) CloseOrdersByType(OP_BUY, BANDS5, "closing on market change: " + name[BANDS5]);
-   }
-
-   if (info[BANDS15][ACTIVE]) {
-      if (Bands_On_Buy(info[BANDS15][TIMEFRAME], info[BANDS15][OPEN_METHOD])
-        && CheckMarketCondition1(OP_BUY, M15, info[BANDS15][OPEN_CONDITION1])
-        && !CheckMarketCondition1(OP_SELL, M30, info[BANDS15][OPEN_CONDITION2], FALSE)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[BANDS15][FACTOR], BANDS15, name[BANDS15]);
-      } else if (Bands_On_Sell(info[BANDS15][TIMEFRAME], info[BANDS15][OPEN_METHOD])
-        && CheckMarketCondition1(OP_SELL, M15, info[BANDS15][OPEN_CONDITION1])
-        && !CheckMarketCondition1(OP_BUY, M30, info[BANDS15][OPEN_CONDITION2], FALSE)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[BANDS15][FACTOR], BANDS15, name[BANDS15]);
-      }
-     if (CheckMarketCondition2(OP_BUY, M15, info[BANDS15][CLOSE_CONDITION])) CloseOrdersByType(OP_SELL, BANDS15, "closing on market change: " + name[BANDS15]);
-     if (CheckMarketCondition2(OP_SELL, M15, info[BANDS15][CLOSE_CONDITION])) CloseOrdersByType(OP_BUY, BANDS15, "closing on market change: " + name[BANDS15]);
-   }
-
-   if (info[BANDS30][ACTIVE]) {
-      if (Bands_On_Buy(info[BANDS30][TIMEFRAME], info[BANDS30][OPEN_METHOD])
-        && CheckMarketCondition1(OP_BUY, M30, info[BANDS30][OPEN_CONDITION1])
-        && !CheckMarketCondition1(OP_SELL, M30, info[BANDS30][OPEN_CONDITION2], FALSE)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[BANDS30][FACTOR], BANDS30, name[BANDS30]);
-      } else if (Bands_On_Sell(info[BANDS30][TIMEFRAME], info[BANDS30][OPEN_METHOD])
-        && CheckMarketCondition1(OP_SELL, M30, info[BANDS30][OPEN_CONDITION1])
-        && !CheckMarketCondition1(OP_BUY, M30, info[BANDS30][OPEN_CONDITION2], FALSE)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[BANDS30][FACTOR], BANDS30, name[BANDS30]);
-      }
-     if (CheckMarketCondition2(OP_BUY, M30, info[BANDS30][CLOSE_CONDITION])) CloseOrdersByType(OP_SELL, BANDS30, "closing on market change: " + name[BANDS30]);
-     if (CheckMarketCondition2(OP_SELL, M30, info[BANDS30][CLOSE_CONDITION])) CloseOrdersByType(OP_BUY, BANDS30, "closing on market change: " + name[BANDS30]);
-   }
-
-   if (info[ENVELOPES1][ACTIVE]) {
-      if (Envelopes_On_Buy(info[ENVELOPES1][TIMEFRAME], info[ENVELOPES1][OPEN_METHOD])) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[ENVELOPES1][FACTOR], ENVELOPES1, name[ENVELOPES1]);
-        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_SELL, ENVELOPES1, "closing on market change: " + name[ENVELOPES1]);
-      } else if (Envelopes_On_Sell(info[ENVELOPES1][TIMEFRAME], info[ENVELOPES1][OPEN_METHOD])) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[ENVELOPES1][FACTOR], ENVELOPES1, name[ENVELOPES1]);
-        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_BUY, ENVELOPES1, "closing on market change: " + name[ENVELOPES1]);
-      }
-   }
-   if (info[ENVELOPES5][ACTIVE]) {
-      if (Envelopes_On_Buy(info[ENVELOPES5][TIMEFRAME], info[ENVELOPES5][OPEN_METHOD])) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[ENVELOPES5][FACTOR], ENVELOPES5, name[ENVELOPES5]);
-        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_SELL, ENVELOPES5, "closing on market change: " + name[ENVELOPES5]);
-      } else if (Envelopes_On_Sell(info[ENVELOPES5][TIMEFRAME], info[ENVELOPES5][OPEN_METHOD])) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[ENVELOPES5][FACTOR], ENVELOPES5, name[ENVELOPES5]);
-        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_BUY, ENVELOPES5, "closing on market change: " + name[ENVELOPES5]);
-      }
-   }
-   if (info[ENVELOPES15][ACTIVE]) {
-      if (Envelopes_On_Buy(info[ENVELOPES15][TIMEFRAME], info[ENVELOPES15][OPEN_METHOD])) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[ENVELOPES15][FACTOR], ENVELOPES15, name[ENVELOPES15]);
-        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_SELL, ENVELOPES15, "closing on market change: " + name[ENVELOPES15]);
-      } else if (Envelopes_On_Sell(info[ENVELOPES15][TIMEFRAME], info[ENVELOPES15][OPEN_METHOD])) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[ENVELOPES15][FACTOR], ENVELOPES15, name[ENVELOPES15]);
-        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_BUY, ENVELOPES15, "closing on market change: " + name[ENVELOPES15]);
-      }
-   }
-   if (info[ENVELOPES30][ACTIVE]) {
-      if (Envelopes_On_Buy(info[ENVELOPES30][TIMEFRAME], info[ENVELOPES30][OPEN_METHOD])) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[ENVELOPES30][FACTOR], ENVELOPES30, name[ENVELOPES30]);
-        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_SELL, ENVELOPES30, "closing on market change: " + name[ENVELOPES30]);
-      } else if (Envelopes_On_Sell(info[ENVELOPES30][TIMEFRAME], info[ENVELOPES30][OPEN_METHOD])) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[ENVELOPES30][FACTOR], ENVELOPES30, name[ENVELOPES30]);
-        if (Envelopes_CloseOnChange) CloseOrdersByType(OP_BUY, ENVELOPES30, "closing on market change: " + name[ENVELOPES30]);
-      }
-   }
-
-   if (info[DEMARKER1][ACTIVE]) {
-      if (DeMarker_On_Buy(info[DEMARKER1][TIMEFRAME], info[DEMARKER1][OPEN_METHOD], DeMarker_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[DEMARKER1][FACTOR], DEMARKER1, name[DEMARKER30]);
-        if (DeMarker_CloseOnChange) CloseOrdersByType(OP_SELL, DEMARKER1, "closing on market change: " + name[DEMARKER1]);
-      } else if (DeMarker_On_Sell(info[DEMARKER1][TIMEFRAME], info[DEMARKER1][OPEN_METHOD], DeMarker_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[DEMARKER1][FACTOR], DEMARKER1, name[DEMARKER30]);
-        if (DeMarker_CloseOnChange) CloseOrdersByType(OP_BUY, DEMARKER1, "closing on market change: " + name[DEMARKER1]);
-      }
-   }
-
-   if (info[DEMARKER5][ACTIVE]) {
-      if (DeMarker_On_Buy(info[DEMARKER5][TIMEFRAME], info[DEMARKER5][OPEN_METHOD], DeMarker_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[DEMARKER5][FACTOR], DEMARKER5, name[DEMARKER30]);
-        if (DeMarker_CloseOnChange) CloseOrdersByType(OP_SELL, DEMARKER5, "closing on market change: " + name[DEMARKER5]);
-      } else if (DeMarker_On_Sell(info[DEMARKER5][TIMEFRAME], info[DEMARKER5][OPEN_METHOD], DeMarker_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[DEMARKER5][FACTOR], DEMARKER5, name[DEMARKER30]);
-        if (DeMarker_CloseOnChange) CloseOrdersByType(OP_BUY, DEMARKER5, "closing on market change: " + name[DEMARKER5]);
-      }
-   }
-
-   if (info[DEMARKER15][ACTIVE]) {
-      if (DeMarker_On_Buy(info[DEMARKER15][TIMEFRAME], info[DEMARKER15][OPEN_METHOD], DeMarker_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[DEMARKER15][FACTOR], DEMARKER15, name[DEMARKER30]);
-        if (DeMarker_CloseOnChange) CloseOrdersByType(OP_SELL, DEMARKER15, "closing on market change: " + name[DEMARKER15]);
-      } else if (DeMarker_On_Sell(info[DEMARKER15][TIMEFRAME], info[DEMARKER15][OPEN_METHOD], DeMarker_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[DEMARKER15][FACTOR], DEMARKER15, name[DEMARKER30]);
-        if (DeMarker_CloseOnChange) CloseOrdersByType(OP_BUY, DEMARKER15, "closing on market change: " + name[DEMARKER15]);
-      }
-   }
-
-   if (info[DEMARKER30][ACTIVE]) {
-      if (DeMarker_On_Buy(info[DEMARKER30][TIMEFRAME], info[DEMARKER30][OPEN_METHOD], DeMarker_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[DEMARKER30][FACTOR], DEMARKER30, name[DEMARKER30]);
-        if (DeMarker_CloseOnChange) CloseOrdersByType(OP_SELL, DEMARKER30, "closing on market change: " + name[DEMARKER30]);
-      } else if (DeMarker_On_Sell(info[DEMARKER30][TIMEFRAME], info[DEMARKER30][OPEN_METHOD], DeMarker_OpenLevel)) {
-        order_placed = ExecuteOrder(OP_SELL, lot_size * info[DEMARKER30][FACTOR], DEMARKER30, name[DEMARKER30]);
-        if (DeMarker_CloseOnChange) CloseOrdersByType(OP_BUY, DEMARKER30, "closing on market change: " + name[DEMARKER30]);
-      }
-   }
-
-   if (info[WPR1][ACTIVE]) {
-     if (WPR_On_Buy(info[WPR1][TIMEFRAME], info[WPR1][OPEN_METHOD], WPR_OpenLevel)) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[WPR1][FACTOR], WPR1, name[WPR1]);
-       if (WPR_CloseOnChange) CloseOrdersByType(OP_SELL, WPR1, "closing on market change: " + name[WPR1]);
-     } else if (WPR_On_Sell(info[WPR1][TIMEFRAME], info[WPR1][OPEN_METHOD], WPR_OpenLevel)) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[WPR1][FACTOR], WPR1, name[WPR1]);
-       if (WPR_CloseOnChange) CloseOrdersByType(OP_BUY, WPR1, "closing on market change: " + name[WPR1]);
-     }
-   }
-
-   if (info[WPR5][ACTIVE]) {
-     if (WPR_On_Buy(info[WPR5][TIMEFRAME], info[WPR5][OPEN_METHOD], WPR_OpenLevel)) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[WPR5][FACTOR], WPR5, name[WPR5]);
-       if (WPR_CloseOnChange) CloseOrdersByType(OP_SELL, WPR5, "closing on market change: " + name[WPR5]);
-     } else if (WPR_On_Sell(info[WPR5][TIMEFRAME], info[WPR5][OPEN_METHOD], WPR_OpenLevel)) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[WPR5][FACTOR], WPR5, name[WPR5]);
-       if (WPR_CloseOnChange) CloseOrdersByType(OP_BUY, WPR5, "closing on market change: " + name[WPR5]);
-     }
-   }
-
-   if (info[WPR15][ACTIVE]) {
-     if (WPR_On_Buy(info[WPR15][TIMEFRAME], info[WPR15][OPEN_METHOD], WPR_OpenLevel)) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[WPR15][FACTOR], WPR15, name[WPR15]);
-       if (WPR_CloseOnChange) CloseOrdersByType(OP_SELL, WPR15, "closing on market change: " + name[WPR15]);
-     } else if (WPR_On_Sell(info[WPR15][TIMEFRAME], info[WPR15][OPEN_METHOD], WPR_OpenLevel)) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[WPR15][FACTOR], WPR15, name[WPR15]);
-       if (WPR_CloseOnChange) CloseOrdersByType(OP_BUY, WPR15, "closing on market change: " + name[WPR15]);
-     }
-   }
-
-   if (info[WPR30][ACTIVE]) {
-     if (WPR_On_Buy(info[WPR30][TIMEFRAME], info[WPR30][OPEN_METHOD], WPR_OpenLevel)) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[WPR30][FACTOR], WPR30, name[WPR30]);
-       if (WPR_CloseOnChange) CloseOrdersByType(OP_SELL, WPR30, "closing on market change: " + name[WPR30]);
-     } else if (WPR_On_Sell(info[WPR30][TIMEFRAME], info[WPR30][OPEN_METHOD], WPR_OpenLevel)) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[WPR30][FACTOR], WPR30, name[WPR30]);
-       if (WPR_CloseOnChange) CloseOrdersByType(OP_BUY, WPR30, "closing on market change: " + name[WPR30]);
-     }
-   }
-
-   if (info[FRACTALS1][ACTIVE]) {
-      if (Fractals_On_Buy(info[FRACTALS1][TIMEFRAME], info[FRACTALS1][OPEN_METHOD])) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[FRACTALS1][FACTOR], FRACTALS1, name[FRACTALS1]);
-       if (Fractals_CloseOnChange) CloseOrdersByType(OP_SELL, FRACTALS1, "closing on market change: " + name[FRACTALS1]);
-      } else if (Fractals_On_Sell(info[FRACTALS1][TIMEFRAME], info[FRACTALS1][OPEN_METHOD])) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[FRACTALS1][FACTOR], FRACTALS1, name[FRACTALS1]);
-       if (Fractals_CloseOnChange) CloseOrdersByType(OP_BUY, FRACTALS1, "closing on market change: " + name[FRACTALS1]);
-      }
-   }
-   if (info[FRACTALS5][ACTIVE]) {
-      if (Fractals_On_Buy(info[FRACTALS5][TIMEFRAME], info[FRACTALS5][OPEN_METHOD])) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[FRACTALS5][FACTOR], FRACTALS5, name[FRACTALS5]);
-       if (Fractals_CloseOnChange) CloseOrdersByType(OP_SELL, FRACTALS5, "closing on market change: " + name[FRACTALS5]);
-      } else if (Fractals_On_Sell(info[FRACTALS5][TIMEFRAME], info[FRACTALS5][OPEN_METHOD])) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[FRACTALS5][FACTOR], FRACTALS5, name[FRACTALS5]);
-       if (Fractals_CloseOnChange) CloseOrdersByType(OP_BUY, FRACTALS5, "closing on market change: " + name[FRACTALS5]);
-      }
-   }
-   if (info[FRACTALS15][ACTIVE]) {
-      if (Fractals_On_Buy(info[FRACTALS15][TIMEFRAME], info[FRACTALS15][OPEN_METHOD])) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[FRACTALS15][FACTOR], FRACTALS15, name[FRACTALS15]);
-       if (Fractals_CloseOnChange) CloseOrdersByType(OP_SELL, FRACTALS15, "closing on market change: " + name[FRACTALS15]);
-      } else if (Fractals_On_Sell(info[FRACTALS15][TIMEFRAME], info[FRACTALS15][OPEN_METHOD])) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[FRACTALS15][FACTOR], FRACTALS15, name[FRACTALS15]);
-       if (Fractals_CloseOnChange) CloseOrdersByType(OP_BUY, FRACTALS15, "closing on market change: " + name[FRACTALS15]);
-      }
-   }
-   if (info[FRACTALS30][ACTIVE]) {
-      if (Fractals_On_Buy(info[FRACTALS30][TIMEFRAME], info[FRACTALS30][OPEN_METHOD])) {
-       order_placed = ExecuteOrder(OP_BUY, lot_size * info[FRACTALS30][FACTOR], FRACTALS30, name[FRACTALS30]);
-       if (Fractals_CloseOnChange) CloseOrdersByType(OP_SELL, FRACTALS30, "closing on market change: " + name[FRACTALS30]);
-      } else if (Fractals_On_Sell(info[FRACTALS30][TIMEFRAME], info[FRACTALS30][OPEN_METHOD])) {
-       order_placed = ExecuteOrder(OP_SELL, lot_size * info[FRACTALS30][FACTOR], FRACTALS30, name[FRACTALS30]);
-       if (Fractals_CloseOnChange) CloseOrdersByType(OP_BUY, FRACTALS30, "closing on market change: " + name[FRACTALS30]);
-      }
-*/
    } // end: for
 }
 
@@ -1552,75 +1252,78 @@ void Trade() {
 bool TradeCondition(int order_type = 0, int cmd = EMPTY) {
   int timeframe = info[order_type][TIMEFRAME];
   int open_method = info[order_type][OPEN_METHOD];
+  if (TradeWithTrend && !CheckTrend(cmd)) {
+    return (FALSE); // If we're against the trend, do not trade (if TradeWithTrend is set).
+  }
   switch (order_type) {
     case MA1:
     case MA5:
     case MA15:
     case MA30:
-      return ((cmd == OP_BUY && MA_On_Buy(timeframe, open_method, MA_OpenLevel)) || 
+      return ((cmd == OP_BUY && MA_On_Buy(timeframe, open_method, MA_OpenLevel)) ||
               (cmd == OP_SELL && MA_On_Sell(timeframe, open_method, MA_OpenLevel))
              );
     case MACD1:
     case MACD5:
     case MACD15:
     case MACD30:
-      return ((cmd == OP_BUY && MACD_On_Buy(timeframe, open_method)) || 
+      return ((cmd == OP_BUY && MACD_On_Buy(timeframe, open_method)) ||
               (cmd == OP_SELL && MACD_On_Sell(timeframe, open_method))
              );
     case ALLIGATOR1:
     case ALLIGATOR5:
     case ALLIGATOR15:
     case ALLIGATOR30:
-      return ((cmd == OP_BUY && Alligator_On_Buy(timeframe, open_method, Alligator_OpenLevel * pip_size)) || 
+      return ((cmd == OP_BUY && Alligator_On_Buy(timeframe, open_method, Alligator_OpenLevel * pip_size)) ||
               (cmd == OP_SELL && Alligator_On_Sell(timeframe, open_method, Alligator_OpenLevel * pip_size))
              );
     case RSI1:
     case RSI5:
     case RSI15:
     case RSI30:
-      return ((cmd == OP_BUY && RSI_On_Buy(timeframe, open_method, RSI_OpenLevel)) || 
+      return ((cmd == OP_BUY && RSI_On_Buy(timeframe, open_method, RSI_OpenLevel)) ||
               (cmd == OP_SELL && RSI_On_Sell(timeframe, open_method, RSI_OpenLevel))
              );
     case SAR1:
     case SAR5:
     case SAR15:
     case SAR30:
-      return ((cmd == OP_BUY && SAR_On_Buy(timeframe, open_method, SAR_OpenLevel)) || 
+      return ((cmd == OP_BUY && SAR_On_Buy(timeframe, open_method, SAR_OpenLevel)) ||
               (cmd == OP_SELL && SAR_On_Sell(timeframe, open_method, SAR_OpenLevel))
              );
     case BANDS1:
     case BANDS5:
     case BANDS15:
     case BANDS30:
-      return ((cmd == OP_BUY && Bands_On_Buy(timeframe, open_method)) || 
+      return ((cmd == OP_BUY && Bands_On_Buy(timeframe, open_method)) ||
               (cmd == OP_SELL && Bands_On_Sell(timeframe, open_method))
              );
     case ENVELOPES1:
     case ENVELOPES5:
     case ENVELOPES15:
     case ENVELOPES30:
-      return ((cmd == OP_BUY && Envelopes_On_Buy(timeframe, open_method)) || 
+      return ((cmd == OP_BUY && Envelopes_On_Buy(timeframe, open_method)) ||
               (cmd == OP_SELL && Envelopes_On_Sell(timeframe, open_method))
              );
     case DEMARKER1:
     case DEMARKER5:
     case DEMARKER15:
     case DEMARKER30:
-      return ((cmd == OP_BUY && DeMarker_On_Buy(timeframe, open_method, DeMarker_OpenLevel)) || 
+      return ((cmd == OP_BUY && DeMarker_On_Buy(timeframe, open_method, DeMarker_OpenLevel)) ||
               (cmd == OP_SELL && DeMarker_On_Sell(timeframe, open_method, DeMarker_OpenLevel))
              );
     case WPR1:
     case WPR5:
     case WPR15:
     case WPR30:
-      return ((cmd == OP_BUY && WPR_On_Buy(timeframe, open_method, WPR_OpenLevel)) || 
+      return ((cmd == OP_BUY && WPR_On_Buy(timeframe, open_method, WPR_OpenLevel)) ||
               (cmd == OP_SELL && WPR_On_Sell(timeframe, open_method, WPR_OpenLevel))
              );
     case FRACTALS1:
     case FRACTALS5:
     case FRACTALS15:
     case FRACTALS30:
-      return ((cmd == OP_BUY && Fractals_On_Buy(timeframe, open_method)) || 
+      return ((cmd == OP_BUY && Fractals_On_Buy(timeframe, open_method)) ||
               (cmd == OP_SELL && Fractals_On_Sell(timeframe, open_method))
              );
   }
@@ -1697,7 +1400,7 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
   // ma_slow[period][1] = iMA(NULL, MA_Timeframe, MA_Period_Medium * MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 1 + MA_Shift_Slow); // Previous
   // ma_slow[period][2] = iMA(NULL, MA_Timeframe, MA_Period_Medium * MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 2 + MA_Shift_Far);
   // if (VerboseTrace) text += "MA: MA_Fast: " + GetArrayValues(ma_fast[M1]) + "; MA_Medium: " + GetArrayValues(ma_medium[M1]) + "; MA_Slow: " + GetArrayValues(ma_slow[M1]) + "; ";
-  if (VerboseDebug && IsVisualMode()) DrawMA();
+  if (VerboseDebug && IsVisualMode()) DrawMA(timeframe);
 
   //if (MACD_Enabled) {
     // Update MACD indicator values.
@@ -1798,7 +1501,7 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
 /*
  * Execute trade order.
  */
-int ExecuteOrder(int cmd, double lot_size, int order_type = CUSTOM, string order_comment = "", bool retry = TRUE) {
+int ExecuteOrder(int cmd, double lot_size, int order_type, string order_comment = "", bool retry = TRUE) {
    bool result = FALSE;
    string err;
    int order_ticket;
@@ -1846,7 +1549,7 @@ int ExecuteOrder(int cmd, double lot_size, int order_type = CUSTOM, string order
      return (FALSE);
    }
    if (!CheckMinPipGap(order_type)) {
-     err = "Error: Not executing order, because the gap is too small [MinPipGap].";
+     err = "Not executing order, because the gap is too small [MinPipGap].";
      if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "():" + err + " (order type = " + order_type + ")");
      last_err = err;
      return (FALSE);
@@ -1858,9 +1561,9 @@ int ExecuteOrder(int cmd, double lot_size, int order_type = CUSTOM, string order
    if (VerboseDebug) Print(__FUNCTION__ + "(): " + GetMarketTextDetails()); // Print current market information before placing the order.
    double order_price = GetOpenPrice(cmd);
    double stoploss = 0, takeprofit = 0;
-   if (EAStopLoss > 0.0) stoploss = NormalizeDouble(GetClosePrice(cmd) - (EAStopLoss + TrailingStop) * pip_size * OpTypeValue(cmd), Digits);
+   if (StopLoss > 0.0) stoploss = NormalizeDouble(GetClosePrice(cmd) - (StopLoss + TrailingStop) * pip_size * OpTypeValue(cmd), Digits);
    else stoploss   = GetTrailingValue(cmd, -1, order_type);
-   if (EATakeProfit > 0.0) takeprofit = NormalizeDouble(order_price + (EATakeProfit + TrailingProfit) * pip_size * OpTypeValue(cmd), Digits);
+   if (TakeProfit > 0.0) takeprofit = NormalizeDouble(order_price + (TakeProfit + TrailingProfit) * pip_size * OpTypeValue(cmd), Digits);
    else takeprofit = GetTrailingValue(cmd, +1, order_type);
 
    order_ticket = OrderSend(Symbol(), cmd, lot_size, NormalizeDouble(order_price, Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + order_type, 0, GetOrderColor(cmd));
@@ -1880,11 +1583,11 @@ int ExecuteOrder(int cmd, double lot_size, int order_type = CUSTOM, string order
       if (VerboseInfo) OrderPrint();
       if (VerboseDebug) { Print(__FUNCTION__ + "(): " + GetOrderTextDetails() + GetAccountTextDetails()); }
       if (SoundAlert) PlaySound(SoundFileAtOpen);
-      if (SendEmail) EASendEmail();
+      if (SendEmailEachOrder) SendEmail();
 
       /*
-      if ((EATakeProfit * pip_size > GetMinStopLevel() || EATakeProfit == 0.0) &&
-         (EAStopLoss * pip_size > GetMinStopLevel() || EAStopLoss == 0.0)) {
+      if ((TakeProfit * pip_size > GetMinStopLevel() || TakeProfit == 0.0) &&
+         (StopLoss * pip_size > GetMinStopLevel() || StopLoss == 0.0)) {
             result = OrderModify(order_ticket, order_price, stoploss, takeprofit, 0, ColorSell);
             if (!result && VerboseErrors) {
               Print(__FUNCTION__ + "(): Error: OrderModify() error = ", ErrorDescription(GetLastError()));
@@ -1902,6 +1605,17 @@ int ExecuteOrder(int cmd, double lot_size, int order_type = CUSTOM, string order
        Print(__FUNCTION__ + "(): " + GetAccountTextDetails());
      }
      // if (err_code != 136 /* OFF_QUOTES */) break;
+
+     // Process the errors.
+     if (err_code == ERR_TRADE_TOO_MANY_ORDERS) {
+       // On some trade servers, the total amount of open and pending orders can be limited. If this limit has been exceeded, no new order will be opened.
+       MaxOrders = GetTotalOrders(); // So we're setting new fixed limit for total orders which is allowed.
+       retry = FALSE;
+     }
+     if (err_code == ERR_TRADE_EXPIRATION_DENIED) {
+       // Applying of pending order expiration time can be disabled in some trade servers.
+       retry = FALSE;
+     }
      if (retry) TaskAddOrderOpen(cmd, lot_size, order_type, order_comment); // Will re-try again.
    } // end-if: order_ticket
 
@@ -1934,7 +1648,8 @@ bool CloseOrder(int ticket_no, string reason, bool retry = TRUE) {
   result = OrderClose(ticket_no, OrderLots(), GetClosePrice(OrderType()), max_order_slippage, GetOrderColor());
   // if (VerboseTrace) Print(__FUNCTION__ + "(): CloseOrder request. Reason: " + reason + "; Result=" + result + " @ " + TimeCurrent() + "(" + TimeToStr(TimeCurrent()) + "), ticket# " + ticket_no);
   if (result) {
-    TaskAddCalcStats(ticket_no);
+    if (SoundAlert) PlaySound(SoundFileAtClose);
+    // TaskAddCalcStats(ticket_no); // Already done on CheckHistory().
     if (VerboseDebug) Print(__FUNCTION__, "(): Closed order " + ticket_no + " with profit " + GetOrderProfit() + ", reason: " + reason + "; " + GetOrderTextDetails());
   } else {
     err_code = GetLastError();
@@ -1990,7 +1705,7 @@ int CloseOrdersByType(int cmd, int strategy_type, string reason = "") {
    RefreshRates();
    for (int order = 0; order < OrdersTotal(); order++) {
       if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
-         if (OrderMagicNumber() == MagicNumber+strategy_type && OrderSymbol() == Symbol() && OrderType() == cmd) {
+         if (OrderMagicNumber() == MagicNumber + strategy_type && OrderSymbol() == Symbol() && OrderType() == cmd) {
            if (CloseOrder(0, reason)) {
               orders_total++;
               profit_total += GetOrderProfit();
@@ -2021,8 +1736,8 @@ bool UpdateStats() {
   CheckStats(High[0], MAX_HIGH);
   CheckStats(AccountBalance(), MAX_BALANCE);
   CheckStats(AccountEquity(), MAX_EQUITY);
-  if (last_tick_change > 5) Print(__FUNCTION__ + "(): Big drop of " + last_tick_change + " pips detected.");
-  if (last_tick_change > 10 && WriteReport) ReportAdd(__FUNCTION__ + "(): Big drop of " + last_tick_change + " pips detected.");
+  if (last_tick_change > BigDropSize) Print(__FUNCTION__ + "(): Big drop of " + last_tick_change + " pips detected.");
+  if (last_tick_change > BigDropSize && WriteReport) ReportAdd(__FUNCTION__ + "(): Big drop of " + last_tick_change + " pips detected.");
   return (TRUE);
 }
 
@@ -2138,10 +1853,11 @@ bool MACD_On_Sell(int period = M1, int open_method = 0, double open_level = 0.0)
  * @param
  *   period (int) - period to check for
  *   open_method (int) - open method to use by using bitwise AND operation
- *   min_gap - minimum gap in pips to consider the signal
+ *   open_level (double) - open level to consider the signal
  */
-bool Alligator_On_Buy(int period = M1, int open_method = 0, double min_gap = 0) {
+bool Alligator_On_Buy(int period = M1, int open_method = 0, double open_level = 0) {
   // [x][0] - The Blue line (Alligator's Jaw), [x][1] - The Red Line (Alligator's Teeth), [x][2] - The Green Line (Alligator's Lips)
+  double gap = open_level * pip_size;
   /* TODO
   bool result = rsi[period][CURR] <= (50 - open_level);
   if ((open_method &   1) != 0) result = result &&
@@ -2155,9 +1871,9 @@ bool Alligator_On_Buy(int period = M1, int open_method = 0, double min_gap = 0) 
   return result;*/
 
   return (
-    alligator[period][0][2] > alligator[period][0][1] + min_gap && // Check if Lips are above Teeth ...
-    alligator[period][0][2] > alligator[period][0][0] + min_gap && // ... Lips are above Jaw ...
-    alligator[period][0][1] > alligator[period][0][0] + min_gap && // ... Teeth are above Jaw ...
+    alligator[period][0][2] > alligator[period][0][1] + gap && // Check if Lips are above Teeth ...
+    alligator[period][0][2] > alligator[period][0][0] + gap && // ... Lips are above Jaw ...
+    alligator[period][0][1] > alligator[period][0][0] + gap && // ... Teeth are above Jaw ...
     alligator[period][1][2] > alligator[period][1][1] && // Check if previos Lips were above Teeth as well ...
     alligator[period][1][2] > alligator[period][1][0] && // ... and previous Lips were above Jaw ...
     alligator[period][1][1] > alligator[period][1][0] && // ... and previous Teeth were above Jaw ...
@@ -2172,10 +1888,11 @@ bool Alligator_On_Buy(int period = M1, int open_method = 0, double min_gap = 0) 
  * @param
  *   period (int) - period to check for
  *   open_method (int) - open method to use by using bitwise AND operation
- *   min_gap - minimum gap in pips to consider the signal
+ *   open_level (double) - open level to consider the signal
  */
-bool Alligator_On_Sell(int period = M1, int open_method = 0, double min_gap = 0) {
+bool Alligator_On_Sell(int period = M1, int open_method = 0, double open_level = 0) {
   // [x][0] - The Blue line (Alligator's Jaw), [x][1] - The Red Line (Alligator's Teeth), [x][2] - The Green Line (Alligator's Lips)
+  double gap = open_level * pip_size;
   /* TODO
   bool result = rsi[period][CURR] <= (50 - open_level);
   if ((open_method &   1) != 0) result = result &&
@@ -2188,9 +1905,9 @@ bool Alligator_On_Sell(int period = M1, int open_method = 0, double min_gap = 0)
   if ((open_method & 128) != 0) result = result &&
   return result;*/
   return (
-    alligator[period][0][2] + min_gap < alligator[period][0][1] && // Check if Lips are below Teeth and ...
-    alligator[period][0][2] + min_gap < alligator[period][0][0] && // ... Lips are below Jaw and ...
-    alligator[period][0][1] + min_gap < alligator[period][0][0] && // ... Teeth are below Jaw ...
+    alligator[period][0][2] + gap < alligator[period][0][1] && // Check if Lips are below Teeth and ...
+    alligator[period][0][2] + gap < alligator[period][0][0] && // ... Lips are below Jaw and ...
+    alligator[period][0][1] + gap < alligator[period][0][0] && // ... Teeth are below Jaw ...
     alligator[period][1][2] < alligator[period][1][1] && // Check if previous Lips were below Teeth as well and ...
     alligator[period][1][2] < alligator[period][1][0] && // ... and previous Lips were below Jaw and ...
     alligator[period][1][1] < alligator[period][1][0] && // ... and previous Teeth were below Jaw ...
@@ -2251,14 +1968,14 @@ bool RSI_On_Sell(int period = M1, int open_method = 0, int open_level = 20) {
  */
 bool SAR_On_Buy(int period = M1, int open_method = 0, double open_level = 0) {
   double gap = open_level * pip_size;
-  bool result = sar[period][CURR] + gap < Open[0] || sar[period][PREV] + gap < Open[1];
+  bool result = sar[period][CURR] + gap < Open[CURR] || sar[period][PREV] + gap < Open[PREV];
   if ((open_method &   1) != 0) result = result && sar[period][PREV] - gap > Ask;
   if ((open_method &   2) != 0) result = result && sar[period][CURR] < sar[period][PREV];
   if ((open_method &   4) != 0) result = result && sar[period][CURR] - sar[period][PREV] <= sar[period][PREV] - sar[period][FAR];
   if ((open_method &   8) != 0) result = result && sar[period][FAR] > Ask;
   if ((open_method &  16) != 0) result = result && Close[CURR] > Close[PREV];
   if ((open_method &  32) != 0) result = result && sar[period][PREV] > Close[PREV];
-  if ((open_method &  64) != 0) result = result && sar[period][PREV] > Open[1];
+  if ((open_method &  64) != 0) result = result && sar[period][PREV] > Open[PREV];
 
   if (result) {
     // FIXME: Convert into more flexible way.
@@ -2278,14 +1995,14 @@ bool SAR_On_Buy(int period = M1, int open_method = 0, double open_level = 0) {
  */
 bool SAR_On_Sell(int period = M1, int open_method = 0, double open_level = 0) {
   double gap = open_level * pip_size;
-  bool result = sar[period][CURR] - gap > Open[0] || sar[period][PREV] - gap > Open[1];
+  bool result = sar[period][CURR] - gap > Open[CURR] || sar[period][PREV] - gap > Open[PREV];
   if ((open_method &   1) != 0) result = result && sar[period][PREV] + gap < Ask;
   if ((open_method &   2) != 0) result = result && sar[period][CURR] > sar[period][PREV];
   if ((open_method &   4) != 0) result = result && sar[period][PREV] - sar[period][CURR] <= sar[period][FAR] - sar[period][PREV];
   if ((open_method &   8) != 0) result = result && sar[period][FAR] < Ask;
   if ((open_method &  16) != 0) result = result && Close[CURR] < Close[PREV];
   if ((open_method &  32) != 0) result = result && sar[period][PREV] < Close[PREV];
-  if ((open_method &  64) != 0) result = result && sar[period][PREV] < Open[1];
+  if ((open_method &  64) != 0) result = result && sar[period][PREV] < Open[PREV];
 
   if (result) {
     // FIXME: Convert into more flexible way.
@@ -2517,10 +2234,12 @@ string GetArrayValues(double& arr[], string sep = ", ") {
  */
 bool CheckMarketCondition1(int cmd, int period = M1, int condition = 0, bool default_value = TRUE) {
   bool result = TRUE;
+  RefreshRates();
   if ((condition &   1) != 0) result = result && ((cmd == OP_BUY && Open[CURR] > Close[PREV]) || (cmd == OP_SELL && Open[CURR] < Close[PREV]));
   if ((condition &   2) != 0) result = result && ((cmd == OP_BUY && sar[period][CURR] < Open[0]) || (cmd == OP_SELL && sar[period][CURR] > Open[0]));
   if ((condition &   4) != 0) result = result && ((cmd == OP_BUY && rsi[period][CURR] < 50) || (cmd == OP_SELL && rsi[period][CURR] > 50));
   if ((condition &   8) != 0) result = result && ((cmd == OP_BUY && ma_slow[period][CURR] > ma_slow[period][PREV]) || (cmd == OP_SELL && ma_slow[period][CURR] < ma_slow[period][PREV]));
+  if ((condition &  16) != 0) result = result && ((cmd == OP_BUY && Ask < Open[CURR]) || (cmd == OP_SELL && Ask > Open[CURR]));
   if ((condition &  32) != 0) result = result && ((cmd == OP_BUY && Open[CURR] < bands[period][CURR][MODE_MAIN]) || (cmd == OP_SELL && Open[CURR] > bands[period][CURR][MODE_MAIN]));
   if ((condition &  64) != 0) result = result && ((cmd == OP_BUY && Open[CURR] < envelopes[period][CURR][MODE_MAIN]) || (cmd == OP_SELL && Open[CURR] > envelopes[period][CURR][MODE_MAIN]));
   if ((condition & 128) != 0) result = result && ((cmd == OP_BUY && demarker[period][CURR] < 0.5) || (cmd == OP_SELL && demarker[period][CURR] > 0.5));
@@ -2554,7 +2273,6 @@ bool CheckMarketCondition2(int cmd, int period = M1, int condition = 0, bool def
   if (!default_value) result = !result;
   return result;
 }
-
 
 /*
  * Check for the trend.
@@ -2596,6 +2314,10 @@ bool CheckTrend(int method) {
     if (iOpen(NULL, PERIOD_M15, CURR) > iClose(NULL, PERIOD_M15, PREV)) bull++;
     if (iOpen(NULL, PERIOD_M15, CURR) < iClose(NULL, PERIOD_M15, PREV)) bear++;
   }
+  if ((method &  128) != 0)  {
+    if (iOpen(NULL, PERIOD_M5, CURR) > iClose(NULL, PERIOD_M5, PREV)) bull++;
+    if (iOpen(NULL, PERIOD_M5, CURR) < iClose(NULL, PERIOD_M5, PREV)) bear++;
+  }
   //if (iOpen(NULL, PERIOD_H12, CURR) > iClose(NULL, PERIOD_H12, PREV)) bull++;
   //if (iOpen(NULL, PERIOD_H12, CURR) < iClose(NULL, PERIOD_H12, PREV)) bear++;
   //if (iOpen(NULL, PERIOD_H8, CURR) > iClose(NULL, PERIOD_H8, PREV)) bull++;
@@ -2620,7 +2342,7 @@ bool CheckMinPipGap(int strategy_type) {
   int diff;
   for (int order = 0; order < OrdersTotal(); order++) {
     if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
-       if (OrderMagicNumber() == MagicNumber+strategy_type && OrderSymbol() == Symbol()) {
+       if (OrderMagicNumber() == MagicNumber + strategy_type && OrderSymbol() == Symbol()) {
          diff = MathAbs((OrderOpenPrice() - GetOpenPrice()) / pip_size);
          // if (VerboseTrace) Print("Ticket: ", OrderTicket(), ", Order: ", OrderType(), ", Gap: ", diff);
          if (diff < MinPipGap) {
@@ -2668,16 +2390,16 @@ void UpdateTrailingStops() {
         // order_stop_loss = NormalizeDouble(If(OpTypeValue(OrderType()) > 0 || OrderStopLoss() != 0.0, OrderStopLoss(), 999999), pip_precision);
 
         // FIXME
-        if (EAMinimalizeLosses && GetOrderProfit() > GetMinStopLevel()) {
+        if (MinimalizeLosses && GetOrderProfit() > GetMinStopLevel()) {
           if ((OrderType() == OP_BUY && OrderStopLoss() < Bid) ||
              (OrderType() == OP_SELL && OrderStopLoss() > Ask)) {
             result = OrderModify(OrderTicket(), OrderOpenPrice(), OrderOpenPrice() - OrderCommission() * Point, OrderTakeProfit(), 0, GetOrderColor());
             if (!result && err_code > 1) {
-             if (VerboseErrors) Print(__FUNCTION__, "(): Error: OrderModify(): [EAMinimalizeLosses] ", ErrorDescription(err_code));
+             if (VerboseErrors) Print(__FUNCTION__, "(): Error: OrderModify(): [MinimalizeLosses] ", ErrorDescription(err_code));
                if (VerboseDebug)
                  Print(__FUNCTION__ + "(): Error: OrderModify(", OrderTicket(), ", ", OrderOpenPrice(), ", ", OrderOpenPrice() - OrderCommission() * Point, ", ", OrderTakeProfit(), ", ", 0, ", ", GetOrderColor(), "); ", "Ask/Bid: ", Ask, "/", Bid);
             } else {
-              if (VerboseTrace) Print(__FUNCTION__ + "(): EAMinimalizeLosses: ", GetOrderTextDetails());
+              if (VerboseTrace) Print(__FUNCTION__ + "(): MinimalizeLosses: ", GetOrderTextDetails());
             }
           }
         }
@@ -3026,6 +2748,32 @@ int GetTotalOrdersByType(int order_type) {
    return (open_orders[order_type]);
 }
 
+/*
+ * Get total profit of opened orders by type.
+ */
+double GetTotalProfitByType(int cmd = EMPTY, int order_type = EMPTY) {
+  double total = 0;
+  for (int i = 0; i < OrdersTotal(); i++) {
+    if (OrderSelect(i, SELECT_BY_POS, MODE_TRADES) == FALSE) break;
+    if (OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
+       if (OrderType() == cmd) total += GetOrderProfit();
+       else if (OrderMagicNumber() == MagicNumber + order_type) total += GetOrderProfit();
+     }
+  }
+  return total;
+}
+
+/*
+ * Get profitable side and return trade operation type (OP_BUY/OP_SELL).
+ */
+bool GetProfitableSide() {
+  double buys = GetTotalProfitByType(OP_BUY);
+  double sells = GetTotalProfitByType(OP_SELL);
+  if (buys > sells) return OP_BUY;
+  if (sells > buys) return OP_SELL;
+  return (EMPTY);
+}
+
 // Calculate open positions.
 int CalculateOrdersByCmd(int cmd) {
   int total = 0;
@@ -3063,28 +2811,28 @@ bool TradeAllowed() {
   /*
   if (last_order_time == iTime(NULL, PERIOD_M1, 0)) {
     err = StringConcatenate("Not trading at the moment, as we already placed order on: ", TimeToStr(last_order_time));
-    if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "():" + err);
+    if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "(): " + err);
     last_err = err;
     return (FALSE);
   }*/
   if (Bars < 100) {
     err = "Bars less than 100, not trading...";
-    if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "():" + err);
-    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + err);
+    if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "(): " + err);
+    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "(): " + err);
     last_err = err;
     return (FALSE);
   }
   if (!IsTesting() && Volume[0] < MinVolumeToTrade) {
     err = "Volume too low to trade.";
-    if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "():" + err);
-    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + err);
+    if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "(): " + err);
+    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "(): " + err);
     last_err = err;
     return (FALSE);
   }
   if (IsTradeContextBusy()) {
     err = "Error: Trade context is temporary busy.";
-    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "():" + err);
-    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + err);
+    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "(): " + err);
+    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "(): " + err);
     last_err = err;
     return (FALSE);
   }
@@ -3094,16 +2842,16 @@ bool TradeAllowed() {
   //   is allowed (the "Allow live trading" checkbox is enabled in the Expert Advisor or script properties).
   if (!IsTradeAllowed()) {
     err = "Trade is not allowed at the moment, check the settings!";
-    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "():" + err);
-    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + err);
+    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "(): " + err);
+    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "(): " + err);
     last_err = err;
     ea_active = FALSE;
     return (FALSE);
   }
   if (!IsConnected()) {
     err = "Error: Terminal is not connected!";
-    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "():" + err);
-    if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + err);
+    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "(): " + err);
+    if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "(): " + err);
     last_err = err;
     if (PrintLogOnChart) DisplayInfoOnChart();
     Sleep(10000);
@@ -3111,7 +2859,7 @@ bool TradeAllowed() {
   }
   if (IsStopped()) {
     err = "Error: Terminal is stopping!";
-    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "():" + err);
+    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "(): " + err);
     //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + err);
     last_err = err;
     ea_active = FALSE;
@@ -3119,7 +2867,7 @@ bool TradeAllowed() {
   }
   if (!IsTesting() && !MarketInfo(Symbol(), MODE_TRADEALLOWED)) {
     err = "Trade is not allowed. Market is closed.";
-    if (VerboseInfo && err != last_err) Print(__FUNCTION__ + "():" + err);
+    if (VerboseInfo && err != last_err) Print(__FUNCTION__ + "(): " + err);
     //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + err);
     last_err = err;
     ea_active = FALSE;
@@ -3127,7 +2875,7 @@ bool TradeAllowed() {
   }
   if (!session_active) {
     err = "Error: Session is not active!";
-    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "():" + err);
+    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "(): " + err);
     last_err = err;
     ea_active = FALSE;
     return (FALSE);
@@ -3140,13 +2888,13 @@ bool TradeAllowed() {
 // Check if EA parameters are valid.
 bool ValidSettings() {
   string err;
-  if (EALotSize < 0.0) {
+  if (LotSize < 0.0) {
     err = "Error: LotSize is less than 0.";
     if (VerboseInfo) Print(__FUNCTION__ + "():" + err);
     if (PrintLogOnChart) Comment(err);
     return (FALSE);
   }
-  return (TRUE);
+  return !StringCompare(ValidEmail(E_Mail), License);
 }
 
 bool CheckFreeMargin(int op_type, double size_of_lot) {
@@ -3181,7 +2929,15 @@ double GetOrderColor(int cmd = -1) {
   return If(OpTypeValue(cmd) > 0, ColorBuy, ColorSell);
 }
 
-// Get minimal permissible StopLoss/TakeProfit value in points.
+/*
+ * This function returns the minimal permissible distance value in points for StopLoss/TakeProfit.
+ *
+ * This is due that at placing of a pending order, the open price cannot be too close to the market.
+ * The minimal distance of the pending price from the current market one in points can be obtained
+ * using the MarketInfo() function with the MODE_STOPLEVEL parameter. In case of false open price of a pending order,
+ * the error 130 (ERR_INVALID_STOPS) will be generated.
+ *
+ */
 double GetMinStopLevel() {
   return market_stoplevel * Point;
 }
@@ -3233,8 +2989,7 @@ double GetPipDiff(double price1, double price2) {
 // See: http://forum.mql4.com/42285
 double GetMarketSpread(bool in_points = FALSE) {
   // return MarketInfo(Symbol(), MODE_SPREAD) / MathPow(10, Digits - pip_precision);
-  double spread = (Ask - Bid);
-  spread = If(in_points, spread * MathPow(10, Digits), spread);
+  double spread = If(in_points, SymbolInfoInteger(Symbol(), SYMBOL_SPREAD), Ask - Bid);
   if (in_points) CheckStats(spread, MAX_SPREAD);
   return spread;
 }
@@ -3299,7 +3054,7 @@ int GetMaxOrders() {
 
 // Calculate number of maximum of orders allowed to open per type.
 int GetMaxOrdersPerType() {
-  return If(MaxOrdersPerType > 0, MaxOrdersPerType, MathMax(MathFloor(GetMaxOrders() / FINAL_STRATEGY_TYPE_ENTRY), 1));
+  return If(MaxOrdersPerType > 0, MaxOrdersPerType, MathMax(MathFloor(GetMaxOrders() / GetNoOfStrategies()), 1));
 }
 
 // Get number of active strategies.
@@ -3322,22 +3077,59 @@ double GetAutoLotSize() {
 // Return current lot size to trade.
 double GetLotSize() {
   double min_lot  = MarketInfo(Symbol(), MODE_MINLOT);
-  return If(EALotSize == 0, GetAutoLotSize(), MathMax(EALotSize, min_lot));
+  return If(LotSize == 0, GetAutoLotSize(), MathMax(LotSize, min_lot));
 }
 
 // Calculate auto risk ratio value;
 double GetAutoRiskRatio() {
   double equity = AccountEquity();
   double balance = AccountBalance();
+  double margin_risk = AccountEquity() / ((AccountMargin() + 1) * 2);
   double high_risk = 0.0;
-  if (MathMin(equity, balance) < 2000) high_risk += 0.1 * GetNoOfStrategies(); // Calculate additional risk.
-  high_risk = MathMax(MathMin(high_risk, 0.8), 0.2); // Limit high risk between 0.2 and 0.8.
-  return MathMin(equity / balance - high_risk, 1.0);
+  //if (MathMin(equity, balance) < 2000) high_risk += 0.1 * GetNoOfStrategies(); // Calculate additional risk.
+  // high_risk = MathMax(MathMin(high_risk, 0.8), 0.2); // Limit high risk between 0.2 and 0.8.
+  // return MathMin(equity / balance - high_risk, 1.0);
+  if (MathMin(equity, balance) < 2000) margin_risk /= 2;
+  if (MathMin(equity, balance) <  500) margin_risk /= 2;
+  if (MathMin(equity, balance) <  100) margin_risk /= 2;
+  return MathMax(MathMin(margin_risk, 1.0), 0.1);
 }
 
 // Return risk ratio value;
 double GetRiskRatio() {
   return If(RiskRatio == 0, GetAutoRiskRatio(), RiskRatio);
+}
+
+/*
+ * Validate the e-mail.
+ */
+#define print_license
+string ValidEmail(string text) {
+  string output = StringLen(text);
+  if (text == "") {
+    last_err = "Error: E-mail is empty, please validate the settings.";
+    Comment(last_err);
+    Print(last_err);
+    ea_active = FALSE;
+    return FALSE;
+  }
+  if (StringFind(text, "@") == EMPTY || StringFind(text, ".") == EMPTY) {
+    last_err = "Error: E-mail is not in valid format.";
+    Comment(last_err);
+    Print(last_err);
+    ea_active = FALSE;
+    return FALSE;
+  }
+  for (last_bar_time = StringLen(text); last_bar_time >= 0; last_bar_time--)
+    output += IntegerToString(StringGetChar(text, last_bar_time), 3, '-');
+  StringReplace(output, "9", "1");
+  StringReplace(output, "8", "7");
+  StringReplace(output, "--", "-3");
+  output = StringSubstr(output, 0, StringLen(ea_name) + StringLen(ea_author) + StringLen(ea_link));
+  #ifdef print_license
+    Print(output);
+  #endif
+  return output;
 }
 
 /* BEGIN: PERIODIC FUNCTIONS */
@@ -3365,6 +3157,11 @@ void StartNewHour() {
 
   // Check if RSI period needs re-calculation.
   if (RSI_DynamicPeriod) RSI_CheckPeriod();
+
+  // Check for dynamic spread configuration.
+  if (DynamicSpreadConf) {
+    // TODO: SpreadRatio, MinPipChangeToTrade, MinPipGap
+  }
 
   // Reset variables.
   last_msg = ""; last_err = "";
@@ -3508,6 +3305,7 @@ void InitializeVariables() {
 
   // Get type of account.
   if (IsDemo()) account_type = "Demo"; else account_type = "Live";
+  if (IsTesting()) account_type = "Backtest on " + account_type;
 
   // Calculate pip/volume size and precision.
   pip_size = GetPipSize();
@@ -3530,10 +3328,11 @@ void InitializeVariables() {
   market_marginrequired = MarketInfo(Symbol(), MODE_MARGINREQUIRED) * market_lotstep;
   if (market_marginrequired == 0) market_marginrequired = 10; // FIX for 'zero divide' bug when MODE_MARGINREQUIRED is zero
   market_stoplevel = MarketInfo(Symbol(), MODE_STOPLEVEL); // Market stop level in points.
+  // market_stoplevel=(int)SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL);
   max_order_slippage = MaxOrderPriceSlippage * MathPow(10, Digits - pip_precision); // Maximum price slippage for buy or sell orders (converted into points).
   LastAsk = Ask; LastBid = Bid;
 
-  GMT_Offset = EAManualGMToffset;
+  //GMT_Offset = ManualGMToffset;
   ArrayInitialize(todo_queue, 0); // Reset queue list.
   ArrayInitialize(daily,   0); // Reset daily stats.
   ArrayInitialize(weekly,  0); // Reset weekly stats.
@@ -3546,8 +3345,8 @@ void InitializeVariables() {
   // Initialize strategies.
   ArrayInitialize(info, 0); // Reset strategy info.
 
-  name[CUSTOM]              = "Custom";
-  info[CUSTOM][ACTIVE]      = FALSE;
+  // name[CUSTOM]              = "Custom";
+  // info[CUSTOM][ACTIVE]      = FALSE;
 
   name[MA1]                  = "MA M1";
   info[MA1][ACTIVE]          = MA1_Enabled;
@@ -3973,6 +3772,10 @@ void InitializeConditions() {
  */
 bool AccountCondition(int condition = C_ACC_NONE) {
   switch(condition) {
+    case C_EQUITY_LOWER:
+      return AccountEquity() < AccountBalance();
+    case C_EQUITY_HIGHER:
+      return AccountEquity() > AccountBalance();
     case C_EQUITY_50PC_HIGH: // Equity 50% high
       return AccountEquity() > AccountBalance() * 2;
     case C_EQUITY_20PC_HIGH: // Equity 20% high
@@ -3985,6 +3788,12 @@ bool AccountCondition(int condition = C_ACC_NONE) {
       return AccountEquity() < AccountBalance()/100 * 80;
     case C_EQUITY_50PC_LOW:  // Equity 50% low
       return AccountEquity() <= AccountBalance() / 2;
+    case C_MARGIN_USED_80PC: // 80% Margin Used
+      return AccountMargin() >= AccountEquity() /100 * 80;
+    case C_MARGIN_USED_90PC: // 90% Margin Used
+      return AccountMargin() >= AccountEquity() /100 * 90;
+    case C_NO_FREE_MARGIN:
+      return AccountFreeMargin() <= 10;
     default:
     case C_ACC_NONE:
       return FALSE;
@@ -3997,6 +3806,8 @@ bool AccountCondition(int condition = C_ACC_NONE) {
  */
 bool MarketCondition(int condition = C_MARKET_NONE) {
   switch(condition) {
+    case C_MARKET_TRUE:
+      return TRUE;
     case C_MA1_FAST_SLOW_OPP: // MA Fast and Slow M1 are in opposite directions.
       return
         (ma_fast[M1][CURR] > ma_fast[M1][PREV] && ma_slow[M1][CURR] < ma_slow[M1][PREV]) ||
@@ -4013,9 +3824,8 @@ bool MarketCondition(int condition = C_MARKET_NONE) {
       return
         (ma_medium[M5][CURR] > ma_medium[M5][PREV] && ma_slow[M5][CURR] < ma_slow[M5][PREV]) ||
         (ma_medium[M5][CURR] < ma_medium[M5][PREV] && ma_slow[M5][CURR] > ma_slow[M5][PREV]);
-    case C_MARKET_TRUE:
-    Print(__FUNCTION__ + AccountEquity() * 2 > AccountBalance());
-      return TRUE;
+    case C_MARKET_DROP:
+      return last_tick_change > BigDropSize;
     case C_MARKET_NONE:
     default:
       return FALSE;
@@ -4036,9 +3846,8 @@ void CheckAccountConditions() {
 
   string reason;
   for (int i = 0; i < ArrayRange(acc_conditions, 0); i++) {
-    if (AccountCondition(acc_conditions[i][0]) && MarketCondition(acc_conditions[i][1])) {
-  // Print("condition: " + i + ", " + AccountCondition(acc_conditions[i][0]) + ", " + MarketCondition(acc_conditions[i][1]));
-      reason = "Account condition: " + (i+1) + ", Market condition: " + acc_conditions[i][1] + ", Action: " + acc_conditions[i][2] + " [" + AccountEquity() + "/" + AccountBalance() + "]";
+    if (AccountCondition(acc_conditions[i][0]) && MarketCondition(acc_conditions[i][1]) && acc_conditions[i][2] != A_NONE) {
+      reason = "Account condition: " + acc_conditions[i][0] + ", Market condition: " + acc_conditions[i][1] + ", Action: " + acc_conditions[i][2] + " [" + AccountEquity() + "/" + AccountBalance() + "]";
       ActionExecute(acc_conditions[i][2], reason);
     }
   } // end: for
@@ -4280,14 +4089,15 @@ string GetStrategyReport(string sep = "\n") {
   return output;
 }
 
-void DisplayInfoOnChart() {
+string DisplayInfoOnChart(bool on_chart = TRUE, string sep = "\n") {
+  string output;
   // Prepare text for Stop Out.
   string stop_out_level = "Stop Out: " + AccountStopoutLevel();
   if (AccountStopoutMode() == 0) stop_out_level += "%"; else stop_out_level += AccountCurrency();
   // Prepare text to display max orders.
   string text_max_orders = "Max orders: " + GetMaxOrders() + " (Per type: " + GetMaxOrdersPerType() + ")";
   // Prepare text to display spread.
-  string text_spread = "Spread: " + DoubleToStr(GetMarketSpread(TRUE) / pts_per_pip, Digits - pip_precision) + " / Gap: " + DoubleToStr(GetMarketGap(TRUE) / pts_per_pip, Digits - pip_precision);
+  string text_spread = "Spread (pips): " + DoubleToStr(GetMarketSpread(TRUE) / pts_per_pip, Digits - pip_precision) + " / Stop level (pips): " + DoubleToStr(market_stoplevel / pts_per_pip, Digits - pip_precision);
   // Check trend.
   string trend = "Neutral.";
   if (CheckTrend(TrendMethod) == OP_BUY) trend = "Bullish";
@@ -4295,42 +4105,53 @@ void DisplayInfoOnChart() {
   // Print actual info.
   string indent = "";
   indent = "                      "; // if (total_orders > 5)?
-  Comment(""
-   + indent + "------------------------------------------------\n"
-   + indent + "| ACCOUNT INFORMATION:\n"
-   + indent + "| Server Time: " + TimeToStr(TimeCurrent(), TIME_SECONDS) + " (Status: " + IfTxt(ea_active, "ACTIVE", "NOT ACTIVE") + ")\n"
-   + indent + "| Acc Number: " + AccountNumber(), "; Acc Name: " + AccountName() + "; Broker: " + AccountCompany() + "\n"
-   + indent + "| Equity: " + DoubleToStr(AccountEquity(), 0) + AccountCurrency() + "; Balance: " + DoubleToStr(AccountBalance(), 0) + AccountCurrency() + "; Leverage: 1:" + DoubleToStr(AccountLeverage(), 0)  + "\n"
-   + indent + "| Used Margin: " + DoubleToStr(AccountMargin(), 0)  + AccountCurrency() + "; Free: " + DoubleToStr(AccountFreeMargin(), 0) + AccountCurrency() + "; " + stop_out_level + "\n"
-   + indent + "| Lot size: " + DoubleToStr(GetLotSize(), volume_precision) + "; " + text_max_orders + "; Risk ratio: " + DoubleToStr(GetRiskRatio(), 1) + "\n"
-   + indent + "| " + GetOrdersStats("\n" + indent + "| ") + "\n"
-   + indent + "| Last error: " + last_err + "\n"
-   + indent + "| Last message: " + last_msg + "\n"
-   + indent + "| ------------------------------------------------\n"
-   + indent + "| MARKET INFORMATION:\n"
-   + indent + "| " + text_spread + "\n"
-   + indent + "| Trend: " + trend + "\n"
-   // + indent // + "Mini lot: " + MarketInfo(Symbol(), MODE_MINLOT) + "\n"
-   + indent + "| ------------------------------------------------\n"
-   + indent + "| STATISTICS:\n"
-   + indent + "| " + GetDailyReport() + "\n"
-   + indent + "| " + GetWeeklyReport() + "\n"
-   + indent + "| " + GetMonthlyReport() + "\n"
-   + indent + "------------------------------------------------\n"
-  );
-  WindowRedraw(); // Redraws the current chart forcedly.
+  output = indent + "------------------------------------------------" + sep
+                  + indent + "| ACCOUNT INFORMATION:" + sep
+                  + indent + "| Server Time: " + TimeToStr(TimeCurrent(), TIME_DATE|TIME_MINUTES|TIME_SECONDS) + " (Status: " + IfTxt(ea_active, "ACTIVE", "NOT ACTIVE") + ")" + sep
+                  + indent + "| Acc Number: " + AccountNumber() + "; Acc Name: " + AccountName() + "; Broker: " + AccountCompany() + " (Type: " + account_type + ")" + sep
+                  + indent + "| Equity: " + DoubleToStr(AccountEquity(), 0) + AccountCurrency() + "; Balance: " + DoubleToStr(AccountBalance(), 0) + AccountCurrency() + "; Leverage: 1:" + DoubleToStr(AccountLeverage(), 0)  + "" + sep
+                  + indent + "| Used Margin: " + DoubleToStr(AccountMargin(), 0)  + AccountCurrency() + "; Free: " + DoubleToStr(AccountFreeMargin(), 0) + AccountCurrency() + "; " + stop_out_level + "" + sep
+                  + indent + "| Lot size: " + DoubleToStr(GetLotSize(), volume_precision) + "; " + text_max_orders + "; Risk ratio: " + DoubleToStr(GetRiskRatio(), 1) + "" + sep
+                  + indent + "| " + GetOrdersStats("" + sep + indent + "| ") + "" + sep
+                  + indent + "| Last error: " + last_err + "" + sep
+                  + indent + "| Last message: " + last_msg + "" + sep
+                  + indent + "| ------------------------------------------------" + sep
+                  + indent + "| MARKET INFORMATION:" + sep
+                  + indent + "| " + text_spread + "" + sep
+                  + indent + "| Trend: " + trend + "" + sep
+                  // + indent // + "Mini lot: " + MarketInfo(Symbol(), MODE_MINLOT) + "" + sep
+                  + indent + "| ------------------------------------------------" + sep
+                  + indent + "| STATISTICS:" + sep
+                  + indent + "| " + GetDailyReport() + "" + sep
+                  + indent + "| " + GetWeeklyReport() + "" + sep
+                  + indent + "| " + GetMonthlyReport() + "" + sep
+                  + indent + "------------------------------------------------" + sep
+                  ;
+  if (on_chart) {
+    /* FIXME: Text objects can't contain multi-line text so we need to create a separate object for each line instead.
+    ObjectCreate(ea_name, OBJ_LABEL, 0, 0, 0, 0); // Create text object with given name.
+    // Set pixel co-ordinates from top left corner (use OBJPROP_CORNER to set a different corner).
+    ObjectSet(ea_name, OBJPROP_XDISTANCE, 0);
+    ObjectSet(ea_name, OBJPROP_YDISTANCE, 10);
+    ObjectSetText(ea_name, output, 10, "Arial", Red); // Set text, font, and colour for object.
+    // ObjectDelete(ea_name);
+    */
+    Comment(output);
+    WindowRedraw(); // Redraws the current chart forcedly.
+  }
+  return output;
 }
 
-void EASendEmail() {
+void SendEmail(string sep = "\n") {
   string mail_title = "Trading Info (EA 31337)";
   SendMail(mail_title, StringConcatenate("Trade Information\nCurrency Pair: ", StringSubstr(Symbol(), 0, 6),
-    "\nTime: ", TimeToStr(TimeCurrent(), TIME_DATE|TIME_MINUTES|TIME_SECONDS),
-    "\nOrder Type: ", _OrderType_str(OrderType()),
-    "\nPrice: ", DoubleToStr(OrderOpenPrice(), Digits),
-    "\nLot size: ", DoubleToStr(OrderLots(), volume_precision),
-    "\nEvent: Trade Opened",
-    "\n\nCurrent Balance: ", DoubleToStr(AccountBalance(), 2), " ", AccountCurrency(),
-    "\nCurrent Equity: ", DoubleToStr(AccountEquity(), 2), " ", AccountCurrency()));
+    sep + "Time: ", TimeToStr(TimeCurrent(), TIME_DATE|TIME_MINUTES|TIME_SECONDS),
+    sep + "Order Type: ", _OrderType_str(OrderType()),
+    sep + "Price: ", DoubleToStr(OrderOpenPrice(), Digits),
+    sep + "Lot size: ", DoubleToStr(OrderLots(), volume_precision),
+    sep + "Event: Trade Opened",
+    sep + sep + "Current Balance: ", DoubleToStr(AccountBalance(), 2), " ", AccountCurrency(),
+    sep + "Current Equity: ", DoubleToStr(AccountEquity(), 2), " ", AccountCurrency()));
 }
 
 string GetOrderTextDetails() {
@@ -4371,13 +4192,14 @@ string GetOrdersStats(string sep = "\n") {
   }
   return orders_per_type + sep + total_orders_text;
 }
-string GetAccountTextDetails() {
+string GetAccountTextDetails(string sep = "; ") {
    return StringConcatenate("Account Details: ",
-      "Time: ", TimeToStr(TimeCurrent(), TIME_DATE|TIME_MINUTES|TIME_SECONDS), "; ",
-      "Account Balance: ", DoubleToStr(AccountBalance(), 2), " ", AccountCurrency(), "; ",
-      "Account Equity: ", DoubleToStr(AccountEquity(), 2), " ", AccountCurrency(), "; ",
-      "Free Margin: ", DoubleToStr(AccountFreeMargin(), 2), " ", AccountCurrency(), "; ",
-      "No of Orders: ", total_orders, " (BUY/SELL: ", CalculateOrdersByCmd(OP_BUY), "/", CalculateOrdersByCmd(OP_SELL), "); ",
+      "Time: ", TimeToStr(TimeCurrent(), TIME_DATE|TIME_MINUTES|TIME_SECONDS), sep,
+      "Account Balance: ", DoubleToStr(AccountBalance(), 2), " ", AccountCurrency(), sep,
+      "Account Equity: ", DoubleToStr(AccountEquity(), 2), " ", AccountCurrency(), sep,
+      "Used Margin: ", DoubleToStr(AccountMargin(), 2), " ", AccountCurrency(), sep,
+      "Free Margin: ", DoubleToStr(AccountFreeMargin(), 2), " ", AccountCurrency(), sep,
+      "No of Orders: ", total_orders, " (BUY/SELL: ", CalculateOrdersByCmd(OP_BUY), "/", CalculateOrdersByCmd(OP_SELL), ")", sep,
       "Risk Ratio: ", DoubleToStr(GetRiskRatio(), 1)
    );
 }
@@ -4394,6 +4216,17 @@ string GetMarketTextDetails() {
 // Get summary text.
 string GetSummaryText() {
   return GetAccountTextDetails();
+}
+
+/*
+ * Print multi-line text.
+ */
+void PrintText(string text) {
+  string result[];
+  ushort usep = StringGetCharacter("\n", 0);
+  for (int i = StringSplit(text, usep, result); i > 0; i--) {
+    Print(result[i]);
+  }
 }
 
 /* END: DISPLAYING FUNCTIONS */
@@ -4546,7 +4379,7 @@ bool ActionCloseAllProfitableOrders(){
     if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
        ticket_profit = GetOrderProfit();
        if (ticket_profit > 0) {
-         result = TaskAddCloseOrder(OrderTicket(), A_CLOSE_ALL_ORDER_PROFIT);
+         result = TaskAddCloseOrder(OrderTicket(), A_CLOSE_ALL_IN_PROFIT);
          selected_orders++;
          total_profit += ticket_profit;
      }
@@ -4567,7 +4400,7 @@ bool ActionCloseAllUnprofitableOrders(){
     if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
        ticket_profit = GetOrderProfit();
        if (ticket_profit < 0) {
-         result = TaskAddCloseOrder(OrderTicket(), A_CLOSE_ALL_ORDER_LOSS);
+         result = TaskAddCloseOrder(OrderTicket(), A_CLOSE_ALL_IN_LOSS);
          selected_orders++;
          total_profit += ticket_profit;
      }
@@ -4580,13 +4413,14 @@ bool ActionCloseAllUnprofitableOrders(){
 }
 
 // Execute action to close all orders by specified type.
-bool ActionCloseAllOrdersByType(int cmd){
+bool ActionCloseAllOrdersByType(int cmd = EMPTY, int reason = 0){
   int selected_orders;
   double ticket_profit = 0, total_profit = 0;
+  if (cmd == EMPTY) return (FALSE);
   for (int order = 0; order < OrdersTotal(); order++) {
     if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
        if (OrderType() == cmd) {
-         TaskAddCloseOrder(OrderTicket(), If(cmd == OP_BUY, A_CLOSE_ALL_ORDER_BUY, A_CLOSE_ALL_ORDER_SELL));
+         TaskAddCloseOrder(OrderTicket(), reason);
          selected_orders++;
          total_profit += ticket_profit;
      }
@@ -4648,19 +4482,32 @@ bool ActionExecute(int action_id, string reason) {
     case A_CLOSE_ORDER_LOSS: /* 2 */
       result = ActionCloseMostUnprofitableOrder();
       break;
-    case A_CLOSE_ALL_ORDER_PROFIT: /* 3 */
+    case A_CLOSE_ALL_IN_PROFIT: /* 3 */
       result = ActionCloseAllProfitableOrders();
       break;
-    case A_CLOSE_ALL_ORDER_LOSS: /* 4 */
+    case A_CLOSE_ALL_IN_LOSS: /* 4 */
       result = ActionCloseAllUnprofitableOrders();
       break;
-    case A_CLOSE_ALL_ORDER_BUY: /* 5 */
-      result = ActionCloseAllOrdersByType(OP_BUY);
+    case A_CLOSE_ALL_PROFIT_SIDE: /* 5 */
+      // TODO
+      int profit_side = GetProfitableSide();
+      if (profit_side != EMPTY) {
+        result = ActionCloseAllOrdersByType(profit_side, reason);
+      }
       break;
-    case A_CLOSE_ALL_ORDER_SELL: /* 6 */
-      result = ActionCloseAllOrdersByType(OP_SELL);
+    case A_CLOSE_ALL_LOSS_SIDE: /* 6 */
+      int nonprofit_side = GetProfitableSide();
+      if (nonprofit_side != EMPTY) {
+        result = ActionCloseAllOrdersByType(If(nonprofit_side == OP_BUY, OP_SELL, OP_BUY), reason);
+      }
       break;
-    case A_CLOSE_ALL_ORDERS: /* 7 */
+    case A_CLOSE_ALL_TREND: /* 7 */
+      result = ActionCloseAllOrdersByType(CheckTrend(TrendMethodAction), reason);
+      break;
+    case A_CLOSE_ALL_NON_TREND: /* 8 */
+      result = ActionCloseAllOrdersByType(If(CheckTrend(TrendMethodAction) == OP_BUY, OP_SELL, OP_BUY), reason);
+      break;
+    case A_CLOSE_ALL_ORDERS: /* 9 */
       result = ActionCloseAllOrders();
       break;
       /*
@@ -4671,12 +4518,13 @@ bool ActionExecute(int action_id, string reason) {
       result = ActionRiskIncrease();
       break;
       */
+      /*
     case A_ORDER_STOPS_DECREASE:
       // result = TightenStops();
       break;
     case A_ORDER_PROFIT_DECREASE:
       // result = TightenProfits();
-      break;
+      break;*/
     default:
       if (VerboseDebug) Print(__FUNCTION__ + "(): Unknown action id: ", action_id);
   }
@@ -4926,27 +4774,27 @@ bool TaskProcessList(bool force = FALSE) {
 
 /* BEGIN: DEBUG FUNCTIONS */
 
-void DrawMA() {
+void DrawMA(int timeframe) {
    int Counter = 1;
-   int shift=iBarShift(Symbol(), MA_Timeframe, TimeCurrent());
+   int shift=iBarShift(Symbol(), timeframe, TimeCurrent());
    while(Counter < Bars) {
-      string itime = iTime(NULL, MA_Timeframe, Counter);
+      string itime = iTime(NULL, timeframe, Counter);
 
       // FIXME: The shift parameter (Counter, Counter-1) doesn't use the real values of MA_Fast, MA_Medium and MA_Slow including MA_Shift_Fast, etc.
-      double MA_Fast_Curr = iMA(NULL, MA_Timeframe, MA_Period_Fast, 0, MA_Method, MA_Applied_Price, Counter); // Current Bar.
-      double MA_Fast_Prev = iMA(NULL, MA_Timeframe, MA_Period_Fast, 0, MA_Method, MA_Applied_Price, Counter-1); // Previous Bar.
+      double MA_Fast_Curr = iMA(NULL, timeframe, MA_Period_Fast, 0, MA_Method, MA_Applied_Price, Counter); // Current Bar.
+      double MA_Fast_Prev = iMA(NULL, timeframe, MA_Period_Fast, 0, MA_Method, MA_Applied_Price, Counter-1); // Previous Bar.
       ObjectCreate("MA_Fast" + itime, OBJ_TREND, 0, iTime(NULL,0,Counter), MA_Fast_Curr, iTime(NULL,0,Counter-1), MA_Fast_Prev);
       ObjectSet("MA_Fast" + itime, OBJPROP_RAY, False);
       ObjectSet("MA_Fast" + itime, OBJPROP_COLOR, Yellow);
 
-      double MA_Medium_Curr = iMA(NULL, MA_Timeframe, MA_Period_Medium, 0, MA_Method, MA_Applied_Price, Counter); // Current Bar.
-      double MA_Medium_Prev = iMA(NULL, MA_Timeframe, MA_Period_Medium, 0, MA_Method, MA_Applied_Price, Counter-1); // Previous Bar.
+      double MA_Medium_Curr = iMA(NULL, timeframe, MA_Period_Medium, 0, MA_Method, MA_Applied_Price, Counter); // Current Bar.
+      double MA_Medium_Prev = iMA(NULL, timeframe, MA_Period_Medium, 0, MA_Method, MA_Applied_Price, Counter-1); // Previous Bar.
       ObjectCreate("MA_Medium" + itime, OBJ_TREND, 0, iTime(NULL,0,Counter), MA_Medium_Curr, iTime(NULL,0,Counter-1), MA_Medium_Prev);
       ObjectSet("MA_Medium" + itime, OBJPROP_RAY, False);
       ObjectSet("MA_Medium" + itime, OBJPROP_COLOR, Gold);
 
-      double MA_Slow_Curr = iMA(NULL, MA_Timeframe, MA_Period_Slow, 0, MA_Method, MA_Applied_Price, Counter); // Current Bar.
-      double MA_Slow_Prev = iMA(NULL, MA_Timeframe, MA_Period_Slow, 0, MA_Method, MA_Applied_Price, Counter-1); // Previous Bar.
+      double MA_Slow_Curr = iMA(NULL, timeframe, MA_Period_Slow, 0, MA_Method, MA_Applied_Price, Counter); // Current Bar.
+      double MA_Slow_Prev = iMA(NULL, timeframe, MA_Period_Slow, 0, MA_Method, MA_Applied_Price, Counter-1); // Previous Bar.
       ObjectCreate("MA_Slow" + itime, OBJ_TREND, 0, iTime(NULL,0,Counter), MA_Slow_Curr, iTime(NULL,0,Counter-1), MA_Slow_Prev);
       ObjectSet("MA_Slow" + itime, OBJPROP_RAY, False);
       ObjectSet("MA_Slow" + itime, OBJPROP_COLOR, Orange);
@@ -4987,8 +4835,8 @@ string GetErrorText(int code) {
       case  135: text = "Price changed."; break;
       // --
       // ERR_OFF_QUOTES
-      //   1.	Off Quotes may be a technical issue.
-      //   2.	Off Quotes may be due to unsupported orders.
+      //   1. Off Quotes may be a technical issue.
+      //   2. Off Quotes may be due to unsupported orders.
       //      - Trying to partially close a position. For example, attempting to close 0.10 (10k) of a 20k position.
       //      - Placing a micro lot trade. For example, attempting to place a 0.01 (1k) volume trade.
       //      - Placing a trade that is not in increments of 0.10 (10k) volume. For example, attempting to place a 0.77 (77k) trade.
@@ -5450,11 +5298,7 @@ void WriteReport(string report_name) {
   FileClose(handle);
 
   if (VerboseDebug) {
-    string result[];
-    ushort usep = StringGetCharacter("\n", 0);
-    for (int i = 0; i < StringSplit(report, usep, result); i++) {
-      Print(result[i]);
-    }
+    PrintText(report);
   }
 }
 
