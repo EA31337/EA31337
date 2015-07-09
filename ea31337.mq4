@@ -3,10 +3,15 @@
 //+------------------------------------------------------------------+
 #define ea_name    "EA31337"
 #define ea_desc    "Multi-strategy advanced trading robot."
-#define ea_version "1.050"
+#define ea_version "1.051"
 #define ea_link    "http://www.mql4.com"
 #define ea_author  "kenorb"
-#define __ea_advanced__ TRUE
+
+// Predefined code configurations.
+#define __ea_advanced__
+//#define __release__
+//#define __disabled__
+//#define __safe__
 
 #property description ea_name
 #property description ea_desc
@@ -73,6 +78,7 @@ enum ENUM_STRATEGY_TYPE {
 enum ENUM_STRATEGY_INFO {
   ACTIVE,
   TIMEFRAME,
+  SPREAD_LIMIT,
   OPEN_METHOD,
   STOP_METHOD,
   PROFIT_METHOD,
@@ -80,7 +86,6 @@ enum ENUM_STRATEGY_INFO {
   OPEN_CONDITION1,
   OPEN_CONDITION2,
   CLOSE_CONDITION,
-  FACTOR, // Multiply lot factor.
   OPEN_ORDERS,
   TOTAL_ORDERS,
   TOTAL_ORDERS_LOSS,
@@ -88,8 +93,17 @@ enum ENUM_STRATEGY_INFO {
   DAILY_PROFIT,
   WEEKLY_PROFIT,
   MONTHLY_PROFIT,
-  TOTAL_PROFIT,
+  TOTAL_GROSS_PROFIT,
+  TOTAL_GROSS_LOSS,
+  TOTAL_NET_PROFIT,
   FINAL_STRATEGY_INFO_ENTRY // Should be the last one. Used to calculate the number of enum items.
+};
+
+// Define type of strategy information entry.
+enum ENUM_STRATEGY_VALUES {
+  LOT_SIZE, // Lot size to trade.
+  FACTOR, // Multiply lot factor.
+  FINAL_STRATEGY_VALUE_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };
 
 // Define type of tasks.
@@ -115,27 +129,31 @@ enum ENUM_VALUE_TYPE {
 
 // Define type of trailing types.
 enum ENUM_TRAIL_TYPE {
-  T_NONE           =  0, // None
-  T_FIXED          =  1, // Fixed
-  T_MA_F_PREV      =  2, // MA Fast Prev
-  T_MA_F_FAR       =  3, // MA Fast Far
-  T_MA_F_LOW       =  4, // MA Fast Low
-  T_MA_F_TRAIL     =  5, // MA Fast+Trail
-  T_MA_F_FAR_TRAIL =  6, // MA Fast Far+Trail
-  T_MA_M           =  7, // MA Med
-  T_MA_M_FAR       =  8, // MA Med Far
-  T_MA_M_LOW       =  9, // MA Med Low
-  T_MA_M_TRAIL     = 10, // MA Med+Trail
-  T_MA_M_FAR_TRAIL = 11, // MA Med Far+Trail
-  T_MA_S           = 12, // MA Slow
-  T_MA_S_FAR       = 13, // MA Slow Far
-  T_MA_S_TRAIL     = 14, // MA Slow+Trail
-  T_MA_LOWEST      = 15, // MA Lowest
-  T_SAR            = 16, // SAR
-  T_SAR_LOW        = 17, // SAR Low
-  T_BANDS          = 18, // Bands
-  T_BANDS_LOW      = 19, // Bands Low
-  T_ENVELOPES      = 20, // Envelopes
+  T_NONE              =  0, // None
+  T_FIXED             =  1, // Fixed
+  T_CLOSE_PREV        =  2, // Previous close
+  T_LOW_HIGH_PREV     =  3, // Previous low/high
+  T_5_BARS            =  4, // 5 bars low/high
+  T_10_BARS           =  5, // 10 bars low/high
+  T_MA_F_PREV         =  6, // MA Fast Prev
+  T_MA_F_FAR          =  7, // MA Fast Far
+  T_MA_F_LOW          =  8, // MA Fast Low
+  T_MA_F_TRAIL        =  9, // MA Fast+Trail
+  T_MA_F_FAR_TRAIL    = 10, // MA Fast Far+Trail
+  T_MA_M              = 11, // MA Med
+  T_MA_M_FAR          = 12, // MA Med Far
+  T_MA_M_LOW          = 13, // MA Med Low
+  T_MA_M_TRAIL        = 14, // MA Med+Trail
+  T_MA_M_FAR_TRAIL    = 15, // MA Med Far+Trail
+  T_MA_S              = 16, // MA Slow
+  T_MA_S_FAR          = 17, // MA Slow Far
+  T_MA_S_TRAIL        = 18, // MA Slow+Trail
+  T_MA_LOWEST         = 19, // MA Lowest
+  T_SAR               = 20, // SAR
+  T_SAR_LOW           = 21, // SAR Low
+  T_BANDS             = 22, // Bands
+  T_BANDS_LOW         = 23, // Bands Low
+  T_ENVELOPES         = 24, // Envelopes
 };
 
 // Define type of tasks.
@@ -186,18 +204,34 @@ extern bool TrailingProfitOneWay = TRUE; // Change trailing profit take towards 
 extern double TrailingStopAddPerMinute = 0.0; // Decrease trailing stop (in pips) per each bar. Set 0 to disable. Suggested value: 0.
 
 extern string __EA_Order_Parameters__ = "-- Profit/Loss settings (set 0 for auto) --";
-extern double LotSize = 0; // Default lot size. Set 0 for auto.
+#ifndef __safe__
+  extern double LotSize = 0; // Default lot size. Set 0 for auto.
+#else
+  extern double LotSize = 0.01;
+#endif
 extern double TakeProfit = 0.0; // Take profit value in pips.
 extern double StopLoss = 0.0; // Stop loss value in pips.
-extern int MaxOrders = 0; // Maximum orders. Set 0 for auto.
+#ifndef __safe__
+  extern int MaxOrders = 0; // Maximum orders. Set 0 for auto.
+#else
+  extern int MaxOrders = 30;
+#endif
 extern int MaxOrdersPerType = 0; // Maximum orders per strategy type. Set 0 for auto.
 //extern int MaxOrdersPerDay = 30; // TODO
-extern int MinimumIntervalSec = 0; // Minimum interval between subsequent trade signals. Suggested value: 0 or 60.
+#ifndef __safe__
+  extern int MinimumIntervalSec = 0; // Minimum interval between subsequent trade signals. Suggested value: 0 or 60.
+#else
+  extern int MinimumIntervalSec = 240;
+#endif
 extern bool TradeMicroLots = TRUE;
 
 extern string __EA_Risk_Parameters__ = "-- Risk management --";
 extern double RiskRatio = 0; // Suggested value: 1.0. Do not change unless testing.
-extern bool TradeWithTrend = FALSE; // Trade with trend only to minimalize the risk.
+#ifndef __safe__
+  extern bool TradeWithTrend = FALSE; // Trade with trend only to minimalize the risk.
+#else
+  extern bool TradeWithTrend = TRUE; // Trade with trend only to minimalize the risk.
+#endif
 extern bool MinimalizeLosses = FALSE; // Set stop loss to zero, once the order is profitable.
 
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting (set 1.0 to default) --";
@@ -209,25 +243,28 @@ extern double WorseWeeklyStrategyDividerFactor     = 2; // Lot divider factor fo
 extern double WorseMonthlyStrategyDividerFactor    = 2; // Lot divider factor for the most profitable monthly strategy. Useful for low-balance accounts or non-profitable periods.
 
 extern string __Market_Parameters__ = "-- Market parameters --";
-extern int TrendMethod = 81; // Method of main trend calculation. Valid range: 0-255. Suggested values: 81, 51, 91, 67, 75, 103, 82, 85, etc.
+extern int TrendMethod = 81; // Method of main trend calculation. Valid range: 0-255. Suggested values: 65!, 71, 81, 83!, 87, etc.
 extern int TrendMethodAction = 238; // Method of trend calculation on action execution (See: A_CLOSE_ALL_TREND/A_CLOSE_ALL_NON_TREND). Valid range: 0-255.
 extern int MinVolumeToTrade = 2; // Minimum volume to trade.
 extern int MaxOrderPriceSlippage = 5; // Maximum price slippage for buy or sell orders (in pips).
 extern int DemoMarketStopLevel = 10;
 extern int MaxTries = 5; // Number of maximum attempts to execute the order.
-extern int BigDropSize = 10; // Size of price drop in pips to react when the market drops suddenly.
-extern double MinPipChangeToTrade = 1.2; // Minimum pip change to trade before the bar change. Set 0 to process every tick. Lower is better for small spreads and other way round.
-extern int MinPipGap = 12; // Minimum gap in pips between trades of the same strategy.
+extern int MarketSuddenDropSize = 10; // Size of sudden price drop in pips to react when the market drops.
+extern int MarketBigDropSize = 50; // Size of big sudden price drop in pips to react when the market drops.
+extern double MinPipChangeToTrade = 0.7; // Minimum pip change to trade before the bar change. Set 0 to process every tick. Lower is better for small spreads and other way round.
+extern int MinPipGap = 10; // Minimum gap in pips between trades of the same strategy.
+extern int MaxSpreadToTrade = 10.0; // Maximum spread to trade (in pips).
 #ifdef __ea_advanced__
-extern int DynamicSpreadConf = TRUE; // Dynamically calculate most optimal settings based on the current spread (MinPipChangeToTrade/MinPipGap).
+extern bool DynamicSpreadConf = FALSE; // Dynamically calculate most optimal settings based on the current spread (MinPipChangeToTrade/MinPipGap).
 int SpreadRatio = 1.0;
 #endif
 
 extern string __MA_Parameters__ = "-- Settings for the Moving Average indicator --";
-extern bool MA1_Enabled  = TRUE; // Enable MA-based strategy. // Optimize for higher spreads.
-extern bool MA5_Enabled  = TRUE; // Enable MA-based strategy. // Optimize for higher spreads.
-extern bool MA15_Enabled = TRUE; // Enable MA-based strategy. // Optimize for higher spreads.
-extern bool MA30_Enabled = TRUE; // Enable MA-based strategy. // Optimize for higher spreads.
+#ifndef __disabled__
+  extern bool MA1_Active = TRUE, MA5_Active = TRUE, MA15_Active = TRUE, MA30_Active = TRUE; // Enable MA-based strategy for specific timeframe.
+#else
+  extern bool MA1_Active = FALSE, MA5_Active = FALSE, MA15_Active = FALSE, MA30_Active = FALSE;
+#endif
 //extern ENUM_TIMEFRAMES MA_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int MA_Period_Fast = 10; // Averaging period for calculation. Suggested value: 5
 extern int MA_Period_Medium = 20; // Averaging period for calculation. Suggested value: 25
@@ -261,6 +298,12 @@ extern int MA30_OpenMethod = 214; // Valid range: 0-255.
   extern int MA30_OpenCondition2 = 272; // Valid range: 0-1023.
   extern int MA30_CloseCondition = 534; // Valid range: 0-1023.
 #endif
+#ifdef __ea_advanced__
+  extern double MA1_MaxSpread  = 5.0; // Maximum spread to trade (in pips).
+  extern double MA5_MaxSpread  = 5.0; // Maximum spread to trade (in pips).
+  extern double MA15_MaxSpread = 5.0; // Maximum spread to trade (in pips).
+  extern double MA30_MaxSpread = 5.0; // Maximum spread to trade (in pips).
+#endif
 //extern bool MA1_CloseOnChange = TRUE; // Close opposite orders on market change.
 //extern bool MA5_CloseOnChange = TRUE; // Close opposite orders on market change.
 //extern bool MA15_CloseOnChange = TRUE; // Close opposite orders on market change.
@@ -270,10 +313,11 @@ extern int MA30_OpenMethod = 214; // Valid range: 0-255.
  */
 
 extern string __MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --";
-extern bool MACD1_Enabled = TRUE; // Enable MACD-based strategy. // Optimize for higher spreads.
-extern bool MACD5_Enabled = TRUE; // Enable MACD-based strategy. // Optimize for higher spreads.
-extern bool MACD15_Enabled = TRUE; // Enable MACD-based strategy. // Optimize for higher spreads.
-extern bool MACD30_Enabled = TRUE; // Enable MACD-based strategy. // Optimize for higher spreads.
+#ifndef __disabled__
+  extern bool MACD1_Active = TRUE, MACD5_Active = TRUE, MACD15_Active = TRUE, MACD30_Active = TRUE; // Enable MACD-based strategy for specific timeframe.
+#else
+  extern bool MACD1_Active = FALSE, MACD5_Active = FALSE, MACD15_Active = FALSE, MACD30_Active = FALSE;
+#endif
 //extern ENUM_TIMEFRAMES MACD_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int MACD_Fast_Period = 14; // Fast EMA averaging period.
 extern int MACD_Slow_Period = 24; // Slow EMA averaging period.
@@ -303,20 +347,27 @@ extern int MACD30_OpenMethod = 1; // Valid range: 0-31.
   extern int MACD30_OpenCondition2 = 96; // Valid range: 0-1023.
   extern int MACD30_CloseCondition = 202; // Valid range: 0-1023.
 #endif
+#ifdef __ea_advanced__
+  extern double MACD1_MaxSpread  = 5.0; // Maximum spread to trade (in pips).
+  extern double MACD5_MaxSpread  = 5.0; // Maximum spread to trade (in pips).
+  extern double MACD15_MaxSpread = 5.0; // Maximum spread to trade (in pips).
+  extern double MACD30_MaxSpread = 5.0; // Maximum spread to trade (in pips).
+#endif
 /* MACD backtest log (auto,ts:40,tp:20,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, spread 2, 9,5mln ticks, quality 25%]:
  *   £13088.98  4800  1.27  2.73  2689.24 11.28%  0.00000000  MACD_TrailingStopMethod=18  MACD_TrailingProfitMethod=16 (deposit: £10000, no boosting)
  */
 
 /*
  * MACD backtest log (ts:40,tp:20,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, spread 25, 9,5mln ticks, quality 25%]:
- *   £1542.29 727 1.21  2.12  1375.83 11.72%  0.00000000  MACD1_Enabled=0 (deposit £1000, no boosting)
+ *   £1542.29 727 1.21  2.12  1375.83 11.72%  0.00000000  MACD1_Active=0 (deposit £1000, no boosting)
  */
 
 extern string __Alligator_Parameters__ = "-- Settings for the Alligator indicator --";
-extern bool Alligator1_Enabled  = TRUE; // Enable Alligator custom-based strategy. // Optimize for higher spreads.
-extern bool Alligator5_Enabled  = TRUE; // Enable Alligator custom-based strategy. // Optimize for higher spreads.
-extern bool Alligator15_Enabled = TRUE; // Enable Alligator custom-based strategy. // Optimize for higher spreads.
-extern bool Alligator30_Enabled = TRUE; // Enable Alligator custom-based strategy. // Optimize for higher spreads.
+#ifndef __disabled__
+  extern bool Alligator1_Active = TRUE, Alligator5_Active = TRUE, Alligator15_Active = TRUE, Alligator30_Active = TRUE; // Enable Alligator custom-based strategy for specific timeframe.
+#else
+  extern bool Alligator1_Active = FALSE, Alligator5_Active = FALSE, Alligator15_Active = FALSE, Alligator30_Active = FALSE;
+#endif
 // extern ENUM_TIMEFRAMES Alligator_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int Alligator_Jaw_Period = 12; // Blue line averaging period (Alligator's Jaw).
 extern int Alligator_Jaw_Shift = 0; // Blue line shift relative to the chart.
@@ -349,6 +400,12 @@ extern int Alligator30_OpenMethod  = 0; // Valid range: 0-255.
   extern int Alligator30_OpenCondition2 = 0; // Valid range: 0-512.
   extern int Alligator30_CloseCondition = 0; // Valid range: 0-1023.
 #endif
+#ifdef __ea_advanced__
+  extern double Alligator1_MaxSpread  = 2.5;  // Maximum spread to trade (in pips).
+  extern double Alligator5_MaxSpread  = 2.5;  // Maximum spread to trade (in pips).
+  extern double Alligator15_MaxSpread = 3.0; // Maximum spread to trade (in pips).
+  extern double Alligator30_MaxSpread = 3.0; // Maximum spread to trade (in pips).
+#endif
 //extern bool Alligator_CloseOnChange = TRUE; // Close opposite orders on market change.
 /* Alligator backtest log (£1000,auto,ts:25,tp:20,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
  *   £880.20  1090  1.32  0.81  132.46  8.96%
@@ -360,38 +417,51 @@ extern int Alligator30_OpenMethod  = 0; // Valid range: 0-255.
  */
 
 extern string __RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --";
-extern bool RSI1_Enabled = TRUE; // Enable RSI-based strategy.
-extern bool RSI5_Enabled = TRUE; // Enable RSI-based strategy.
-extern bool RSI15_Enabled = TRUE; // Enable RSI-based strategy.
-extern bool RSI30_Enabled = TRUE; // Enable RSI-based strategy. // Optimize for higher spreads.
+#ifndef __disabled__
+  extern bool RSI1_Active = TRUE, RSI5_Active = TRUE, RSI15_Active = TRUE, RSI30_Active = TRUE; // Enable RSI-based strategy for specific timeframe.
+#else
+  extern bool RSI1_Active = FALSE, RSI5_Active = FALSE, RSI15_Active = FALSE, RSI30_Active = FALSE;
+#endif
 extern int RSI_Period = 20; // Averaging period for calculation.
 extern ENUM_APPLIED_PRICE RSI_Applied_Price = PRICE_MEDIAN; // RSI applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern int RSI_Shift = 0; // Shift relative to the chart.
 extern int RSI_OpenLevel = 20;
-extern ENUM_TRAIL_TYPE RSI_TrailingStopMethod = T_MA_S_TRAIL; // Trailing Stop method for RSI. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-extern ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = T_MA_LOWEST; // Trailing Profit method for RSI. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
-extern int RSI1_OpenMethod  = 3; // Valid range: 0-255.
-extern int RSI5_OpenMethod  = 141; // Valid range: 0-255. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20. 2, 5, 306, 374, 388, 642
+extern ENUM_TRAIL_TYPE RSI_TrailingStopMethod = T_5_BARS; // Trailing Stop method for RSI. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = T_5_BARS; // Trailing Profit method for RSI. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+extern int RSI1_OpenMethod  = 0; // Valid range: 0-255.
+extern int RSI5_OpenMethod  = 0; // Valid range: 0-255. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20. 2, 5, 306, 374, 388, 642
 extern int RSI15_OpenMethod = 141; // Valid range: 0-255.
 extern int RSI30_OpenMethod = 3; // Valid range: 0-255.
 #ifdef __ea_advanced__
   extern int RSI1_OpenCondition1 = 0; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
-  extern int RSI1_OpenCondition2 = 2; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
-  extern int RSI1_CloseCondition = 645; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
+  extern int RSI1_OpenCondition2 = 64; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
+  extern int RSI1_CloseCondition = 640; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
+  // £1178.40	298	1.50	3.95	343.50	3.29%
   // £722.09  724 1.14  1.00  314.88  2.95% (deposit: £10000, no boosting)
-  extern int RSI5_OpenCondition1 = 116; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20. 34, 102, 144, 160, 880, 580
-  extern int RSI5_OpenCondition2 = 1; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20. 1/529
-  extern int RSI5_CloseCondition = 647; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20. 96/288/356/456
+  extern int RSI5_OpenCondition1 = 36; // Valid range: 0-1023. TODO: To optimize. 36/64
+  extern int RSI5_OpenCondition2 = 76; // Valid range: 0-1023. TODO: To optimize. 1/16/76/196/529
+  extern int RSI5_CloseCondition = 647; // Valid range: 0-1023. TODO: To optimize. 96/288/356/456
+  // £340.45	3	2.96	113.48	401.89	3.76%	0.00000000	RSI5_OpenCondition2=76
+  // £340.42	3	2.96	113.47	401.81	3.76%	0.00000000	RSI5_OpenCondition2=202
+  // £294.01	7	1.94	42.00	686.71	6.28%	0.00000000	RSI5_OpenCondition2=166
+  // £159.90	11	1.36	14.54	845.56	7.75%	0.00000000	RSI5_OpenCondition2=196
   // £391.85  63  2.78  6.22  136.07  1.34% 0.00000000  RSI5_OpenCondition1=374 (deposit: £10000, no boosting)
   // £95.88 29  2.51  3.31  41.02 0.41% 0.00000000  RSI5_OpenMethod=136
   // £95.08 14  9.71  6.79  39.63 0.39% 0.00000000  RSI5_OpenMethod=158 (deposit: £10000, no boosting)
   extern int RSI15_OpenCondition1 = 116; // Valid range: 0-1023. TODO
   extern int RSI15_OpenCondition2 = 1; // Valid range: 0-1023.
   extern int RSI15_CloseCondition = 647; // Valid range: 0-1023.
+  // £11.24	177	1.01	0.06	364.35	3.63%
   extern int RSI30_OpenCondition1 = 0; // Valid range: 0-1023.
   extern int RSI30_OpenCondition2 = 0; // Valid range: 0-1023.
   extern int RSI30_CloseCondition = 464; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
   // £428.93  344 1.20  1.25  497.84  4.97% RSI15_OpenMethod=141  RSI15_OpenCondition1=116  RSI15_OpenCondition2=1  RSI15_CloseCondition=647 (deposit: £10000, no boosting)
+#endif
+#ifdef __ea_advanced__
+  extern double RSI1_MaxSpread = 2.5;  // Maximum spread to trade (in pips).
+  extern double RSI5_MaxSpread = 3.0;  // Maximum spread to trade (in pips).
+  extern double RSI15_MaxSpread = 2.0; // Maximum spread to trade (in pips).
+  extern double RSI30_MaxSpread = 3.0; // Maximum spread to trade (in pips).
 #endif
 //extern bool RSI_CloseOnChange = TRUE; // Close opposite orders on market change.
 extern bool RSI_DynamicPeriod = FALSE;
@@ -425,10 +495,11 @@ int RSI30_DecreasePeriod_MaxDiff = 60;
  */
 
 extern string __SAR_Parameters__ = "-- Settings for the the Parabolic Stop and Reverse system indicator --";
-extern bool SAR1_Enabled = TRUE; // Enable SAR-based strategy.
-extern bool SAR5_Enabled = TRUE; // Enable SAR-based strategy.
-extern bool SAR15_Enabled = TRUE; // Enable SAR-based strategy.
-extern bool SAR30_Enabled = TRUE; // Enable SAR-based strategy.
+#ifndef __disabled__
+  extern bool SAR1_Active = TRUE, SAR5_Active = TRUE, SAR15_Active = TRUE, SAR30_Active = TRUE; // Enable SAR-based strategy for specific timeframe.
+#else
+  extern bool SAR1_Active = FALSE, SAR5_Active = FALSE, SAR15_Active = FALSE, SAR30_Active = FALSE;
+#endif
 extern double SAR_Step = 0.02; // Stop increment, usually 0.02.
 extern double SAR_Maximum_Stop = 0.3; // Maximum stop value, usually 0.2.
 extern int SAR_Shift = 0; // Shift relative to the chart.
@@ -441,19 +512,31 @@ extern int SAR5_OpenMethod = 4; // Valid range: 0-127. Optimized.
 extern int SAR15_OpenMethod = 0; // Valid range: 0-127.
 extern int SAR30_OpenMethod = 0; // Valid range: 0-127.
 #ifdef __ea_advanced__
-  extern int SAR1_OpenCondition1 = 468; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
-  extern int SAR1_OpenCondition2 = 16; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
-  extern int SAR1_CloseCondition = 472; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20. // 472, 344, 280, 848
-  extern int SAR5_OpenCondition1 = 536; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
-  extern int SAR5_OpenCondition2 = 16; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
-  extern int SAR5_CloseCondition = 834; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20. // 834, 792
-  extern int SAR15_OpenCondition1 = 148; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
-  extern int SAR15_OpenCondition2 = 0; // Valid range: 0-1023.
-  extern int SAR15_CloseCondition = 98; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
-  extern int SAR30_OpenCondition1 = 256; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
-  extern int SAR30_OpenCondition2 = 80; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
-  extern int SAR30_CloseCondition = 388; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
-// £1647.71 238 1.48  6.92  675.95  5.60% 0.00000000  SAR30_OpenCondition1=256  SAR30_OpenCondition2=80 SAR30_CloseCondition=164
+  extern int SAR1_OpenCondition1 = 0; // Optimized.
+  extern int SAR1_OpenCondition2 = 0; // Optimized.
+  extern int SAR1_CloseCondition = 472; // Valid range: 0-1023. TODO
+  // £7383.91	1568	1.26	4.71	3409.00	21.09% (d: £10k, sp: 20)
+  extern int SAR5_OpenCondition1 = 0; // Valid range: 0-1023. Optimized.
+  extern int SAR5_OpenCondition2 = 0; // Valid range: 0-1023. Optimized.
+  extern int SAR5_CloseCondition = 472; // Valid range: 0-1023. TODO
+  // £4480.11	1437	1.18	3.12	2597.95	17.42% SAR5_OpenCondition1=0 	SAR5_OpenCondition2=0 	SAR5_CloseCondition=472 (d: £10k, sp: 20)
+  extern int SAR15_OpenCondition1 = 0; // Valid range: 0-1023. Optimized.
+  extern int SAR15_OpenCondition2 = 16; // Valid range: 0-1023.
+  extern int SAR15_CloseCondition = 472; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
+  // Curr: £2850.90	1519	1.11	1.88	2860.35	22.37% (d: £10k, sp: 20)
+  // Prev: £4527.37	1403	1.16	3.23	4657.54	27.21% SAR15_OpenCondition1=0 	SAR15_OpenCondition2=16 	SAR15_CloseCondition=472 (d: £10k, sp: 20)
+  extern int SAR30_OpenCondition1 = 0; // Valid range: 0-1023. Optimized.
+  extern int SAR30_OpenCondition2 = 0; // Valid range: 0-1023. Optimized.
+  extern int SAR30_CloseCondition = 120; // Valid range: 0-1023. Semi-optimized. TODO
+  // Curr: £5994.57	1545	1.15	3.88	6945.93	33.50% (d: £10k, sp: 20)
+  // £1263.96	314	1.25	4.03	1005.41	8.34%	0.00000000	SAR30_OpenMethod=90
+  // Prev: £8649.29	1335	1.22	6.48	6633.18	30.58%	0.00000000	SAR30_CloseCondition=120 (d: £10k, sp: 20)
+#endif
+#ifdef __ea_advanced__
+  extern double SAR1_MaxSpread  = 6.0; // Maximum spread to trade (in pips).
+  extern double SAR5_MaxSpread  = 5.0; // Maximum spread to trade (in pips).
+  extern double SAR15_MaxSpread = 4.0; // Maximum spread to trade (in pips). // TODO
+  extern double SAR30_MaxSpread = 6.0; // Maximum spread to trade (in pips).
 #endif
 
 /*
@@ -476,10 +559,11 @@ extern int SAR30_OpenMethod = 0; // Valid range: 0-127.
  */
 
 extern string __Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --";
-extern bool Bands1_Enabled = TRUE; // Enable Bands-based strategy.
-extern bool Bands5_Enabled = TRUE; // Enable Bands-based strategy.
-extern bool Bands15_Enabled = TRUE; // Enable Bands-based strategy.
-extern bool Bands30_Enabled = TRUE; // Enable Bands-based strategy.
+#ifndef __disabled__
+  extern bool Bands1_Active = TRUE, Bands5_Active = TRUE, Bands15_Active = TRUE, Bands30_Active = TRUE; // Enable Bands-based strategy fpr specific timeframe.
+#else
+  extern bool Bands1_Active = FALSE, Bands5_Active = FALSE, Bands15_Active = FALSE, Bands30_Active = FALSE;
+#endif
 extern int Bands_Period = 26; // Averaging period to calculate the main line.
 extern ENUM_APPLIED_PRICE Bands_Applied_Price = PRICE_MEDIAN; // Bands applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern double Bands_Deviation = 2.1; // Number of standard deviations from the main line.
@@ -490,23 +574,31 @@ extern ENUM_TRAIL_TYPE Bands_TrailingStopMethod = T_MA_S_TRAIL; // Trailing Stop
 extern ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = T_MA_M; // Trailing Profit method for Bands. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 extern int Bands1_OpenMethod = 0; // Valid range: 0-512.
 extern int Bands5_OpenMethod = 0; // Valid range: 0-512.
-extern int Bands15_OpenMethod = 3; // Valid range: 0-512. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
-extern int Bands30_OpenMethod = 5; // Valid range: 0-512.
+extern int Bands15_OpenMethod = 0; // Valid range: 0-512. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
+extern int Bands30_OpenMethod = 0; // Valid range: 0-512.
 #ifdef __ea_advanced__
-  extern int Bands1_OpenCondition1 = 404; // Valid range: 0-1023.
-  extern int Bands1_OpenCondition2 = 336; // Valid range: 0-1023.
+  extern int Bands1_OpenCondition1 = 16; // Valid range: 0-1023. // TODO
+  extern int Bands1_OpenCondition2 = 0; // Valid range: 0-1023. // TODO
   extern int Bands1_CloseCondition = 644; // Valid range: 0-1023.
-  extern int Bands5_OpenCondition1 = 404; // Valid range: 0-1023.
-  extern int Bands5_OpenCondition2 = 336; // Valid range: 0-1023.
-  extern int Bands5_CloseCondition = 644; // Valid range: 0-1023.
-  extern int Bands15_OpenCondition1 = 337; // Valid range: 0-1023.
-  extern int Bands15_OpenCondition2 = 18; // Valid range: 0-1023.
-  extern int Bands15_CloseCondition = 552; // Valid range: 0-1023.
+  // £2634.77	1971	1.12	1.34	2581.00	17.47%	0.00000000	Bands1_OpenCondition1=16 	Bands1_OpenCondition2=0 (d: £10k, sp: 20)
+  extern int Bands5_OpenCondition1 = 0; // Valid range: 0-1023. // TODO
+  extern int Bands5_OpenCondition2 = 64; // Valid range: 0-1023. // TODO
+  extern int Bands5_CloseCondition = 644; // Valid range: 0-1023. // TODO
+  // £1991.44	517	1.40	3.85	710.16	6.11%	0.00000000	Bands5_OpenCondition2=64 (d: £10k, sp: 20)
+  extern int Bands15_OpenCondition1 = 0; // Valid range: 0-1023. // TODO
+  extern int Bands15_OpenCondition2 = 64; // Valid range: 0-1023. // TODO
+  extern int Bands15_CloseCondition = 552; // Valid range: 0-1023. // TODO
   // £438.81  300 1.20  1.46  291.53  2.83% 0.00000000  Bands15_OpenMethod=3  (£10k)
-  extern int Bands30_OpenCondition1 = 720; // Valid range: 0-1023.
+  extern int Bands30_OpenCondition1 = 913; // Valid range: 0-1023.
   extern int Bands30_OpenCondition2 = 10; // Valid range: 0-1023.
   extern int Bands30_CloseCondition = 401; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20.
   // £1056.49 775 1.23  1.36  686.17  6.65% 0.00000000  Bands30_OpenCondition1=624 (£10k)
+#endif
+#ifdef __ea_advanced__
+  extern double Bands1_MaxSpread  = 3.5; // Maximum spread to trade (in pips).
+  extern double Bands5_MaxSpread  = 4.0; // Maximum spread to trade (in pips).
+  extern double Bands15_MaxSpread = 3.0; // Maximum spread to trade (in pips).
+  extern double Bands30_MaxSpread = 5.0; // Maximum spread to trade (in pips).
 #endif
 /* Bands backtest log (auto,ts:40,tp:20,gap:10) [2015.02.01-2015.06.30 based on MT4 FXCM backtest data, spread 24, 9,5mln ticks, quality 25%]:
      £2462.09 960 1.23  2.56  1656.53 12.10%  0.00000000  Bands_CloseCondition=644 (deposit: £10000, no boosting)
@@ -524,11 +616,12 @@ extern int Bands30_OpenMethod = 5; // Valid range: 0-512.
  */
 
 extern string __Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --";
-extern bool Envelopes1_Enabled  = TRUE; // Enable Envelopes-based strategy.
-extern bool Envelopes5_Enabled  = TRUE; // Enable Envelopes-based strategy.
-extern bool Envelopes15_Enabled = TRUE; // Enable Envelopes-based strategy.
-extern bool Envelopes30_Enabled = TRUE; // Enable Envelopes-based strategy.
-// extern bool Envelopes60_Enabled = TRUE; // Enable Envelopes-based strategy.
+#ifndef __disabled__
+  extern bool Envelopes1_Active = TRUE, Envelopes5_Active = TRUE, Envelopes15_Active = TRUE, Envelopes30_Active = TRUE; // Enable Envelopes-based strategy fpr specific timeframe.
+#else
+  extern bool Envelopes1_Active = FALSE, Envelopes5_Active = FALSE, Envelopes15_Active = FALSE, Envelopes30_Active = FALSE;
+#endif
+// extern bool Envelopes60_Active = TRUE; // Enable Envelopes-based strategy.
 // extern ENUM_TIMEFRAMES Envelopes_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int Envelopes_MA_Period = 28; // Averaging period to calculate the main line.
 extern ENUM_MA_METHOD Envelopes_MA_Method = MODE_SMA; // MA method (See: ENUM_MA_METHOD).
@@ -544,25 +637,23 @@ extern double Envelopes30_Deviation = 0.4; // Percent deviation from the main li
 extern int Envelopes_Shift = 2; // The indicator shift relative to the chart.
 extern ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = T_MA_M_FAR_TRAIL; // Trailing Stop method for Bands. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = T_NONE; // Trailing Profit method for Bands. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
-extern int Envelopes1_OpenMethod = 2; // Valid range: 0-255. Set 0 to default.
-extern int Envelopes5_OpenMethod = 112; // Valid range: 0-255. Set 0 to default.
+extern int Envelopes1_OpenMethod = 0; // Valid range: 0-255. Set 0 to default.
+extern int Envelopes5_OpenMethod = 0; // Valid range: 0-255. Set 0 to default.
 extern int Envelopes15_OpenMethod = 0; // Valid range: 0-255. Set 0 to default.
 extern int Envelopes30_OpenMethod = 68; // Valid range: 0-255. Set 0 to default.
 #ifdef __ea_advanced__
-  extern int Envelopes1_OpenCondition1 = 772; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20. 768-880
-  extern int Envelopes1_OpenCondition2 = 16; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20. 8/24
+  extern int Envelopes1_OpenCondition1 = 512; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20. 768-880
+  extern int Envelopes1_OpenCondition2 = 0; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20. 8/24
   extern int Envelopes1_CloseCondition = 660; // Valid range: 0-1023. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20. 291/660/880
-  // £2030.20	1542	1.14	1.32	1256.55	10.34%	0.00000000	Envelopes1_CloseCondition=660 (d:£10k)
-  // £605.14  291 1.26  2.08  257.46  2.54% 0.00000000  Envelopes1_OpenCondition1=880   Envelopes1_OpenCondition2=8   Envelopes1_CloseCondition=291
-  // £584.93  293 1.25  2.00  257.46  2.54% 0.00000000  Envelopes1_OpenCondition1=768   Envelopes1_OpenCondition2=24  Envelopes1_CloseCondition=291
-  // £584.93  293 1.25  2.00  257.46  2.54% 0.00000000  Envelopes1_OpenCondition1=768   Envelopes1_OpenCondition2=8   Envelopes1_CloseCondition=291
-  extern int Envelopes5_OpenCondition1 = 896; // Valid range: 0-1023.
-  extern int Envelopes5_OpenCondition2 = 2; // Valid range: 0-1023.
+  // £4307.54	1398	1.21	3.08	1572.45	11.26%	0.00000000	Envelopes1_OpenMethod=0 (d: £10k, sp: 20)
+  extern int Envelopes5_OpenCondition1 = 512; // Valid range: 0-1023.
+  extern int Envelopes5_OpenCondition2 = 0; // Valid range: 0-1023.
   extern int Envelopes5_CloseCondition = 449; // Valid range: 0-1023. 321/449
-  // £1525.35	742	1.27	2.06	1037.78	8.82%  (d:£10k)
-  extern int Envelopes15_OpenCondition1 = 930; // Valid range: 0-1023.
-  extern int Envelopes15_OpenCondition2 = 2; // Valid range: 0-1023.
-  extern int Envelopes15_CloseCondition = 996; // Valid range: 0-1023.
+  // £1674.27	1581	1.09	1.06	1465.46	11.54% (d: £10k, sp: 20)
+  extern int Envelopes15_OpenCondition1 = 930; // Valid range: 0-1023. // TODO
+  extern int Envelopes15_OpenCondition2 = 2; // Valid range: 0-1023. // TODO
+  extern int Envelopes15_CloseCondition = 996; // Valid range: 0-1023. // TODO
+  // £573.88	235	1.19	2.44	666.16	6.37%	0.00000000	Envelopes15_OpenCondition1=930 	Envelopes15_OpenCondition2=2
   // £805.62	287	1.30	2.81	496.44	4.76% (deposit: £10k)
   extern int Envelopes30_OpenCondition1 = 528; // Valid range: 0-1023. Try: 512, 528
   extern int Envelopes30_OpenCondition2 = 0; // Valid range: 0-1023. Try: 0, 8, 16, 24
@@ -570,7 +661,12 @@ extern int Envelopes30_OpenMethod = 68; // Valid range: 0-255. Set 0 to default.
   // £2169.53	1074	1.32	2.02	737.02	7.17% (deposit: £10k)
   //extern bool Envelopes_CloseOnChange = FALSE; // Close opposite orders on market change.
 #endif
-
+#ifdef __ea_advanced__
+  extern double Envelopes1_MaxSpread  = 4.0; // Maximum spread to trade (in pips).
+  extern double Envelopes5_MaxSpread  = 5.0; // Maximum spread to trade (in pips).
+  extern double Envelopes15_MaxSpread = 4.0; // Maximum spread to trade (in pips).
+  extern double Envelopes30_MaxSpread = 5.0; // Maximum spread to trade (in pips).
+#endif
 /*
  * Envelopes backtest log (auto,ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, spread 20, 9,5mln ticks, quality 25%]:
  *   £7272.58	3577	1.21	2.03	1980.18	15.63% (deposit: £10000, boosting = 1.0)
@@ -586,10 +682,11 @@ extern int Envelopes30_OpenMethod = 68; // Valid range: 0-255. Set 0 to default.
  */
 
 extern string __WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --";
-extern bool WPR1_Enabled = TRUE; // Enable WPR-based strategy.
-extern bool WPR5_Enabled = TRUE; // Enable WPR-based strategy.
-extern bool WPR15_Enabled = TRUE; // Enable WPR-based strategy.
-extern bool WPR30_Enabled = TRUE; // Enable WPR-based strategy.
+#ifndef __disabled__
+  extern bool WPR1_Active = TRUE, WPR5_Active = TRUE, WPR15_Active = TRUE, WPR30_Active = TRUE; // Enable WPR-based strategy for specific timeframe.
+#else
+  extern bool WPR1_Active = FALSE, WPR5_Active = FALSE, WPR15_Active = FALSE, WPR30_Active = FALSE;
+#endif
 extern int WPR_Period = 21; // Averaging period for calculation. Suggested value: 22.
 extern int WPR_Shift = 0; // Shift relative to the current bar the given amount of periods ago. Suggested value: 1.
 extern int WPR_OpenLevel = 30; // Suggested range: 25-35.
@@ -598,31 +695,32 @@ extern ENUM_TRAIL_TYPE WPR_TrailingStopMethod = T_MA_F_TRAIL; // Trailing Stop m
 extern ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = T_FIXED; // Trailing Profit method for WPR. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 extern int WPR1_OpenMethod = 0; // Valid range: 0-127. Optimized.
 extern int WPR5_OpenMethod = 0; // Valid range: 0-127. Optimized.
-extern int WPR15_OpenMethod = 64; // Valid range: 0-127. Optimized.
+extern int WPR15_OpenMethod = 8; // Valid range: 0-127. Optimized.
 extern int WPR30_OpenMethod = 8; // Valid range: 0-127. Optimized with T_MA_M_FAR_TRAIL.
 #ifdef __ea_advanced__
   extern int WPR1_OpenCondition1 = 512; // Valid range: 0-1023. 512 (4) 516
   extern int WPR1_OpenCondition2 = 64; // Valid range: 0-1023. 0 (32) 96
   extern int WPR1_CloseCondition = 936; // Valid range: 0-1023. 840 (96) 936
-  // £1580.87	293	1.53	5.40	676.47	5.97%	0.00000000	WPR1_OpenMethod=0 	WPR1_OpenCondition1=512 	WPR1_OpenCondition2=96 	WPR1_CloseCondition=936	TrailingStop=40 	DefaultTrailingStopMethod=1 	TrailingStopOneWay=1 	TrailingProfit=30 	DefaultTrailingProfitMethod=0 	TrailingProfitOneWay=1 	TrailingStopAddPerMinute=0 	LotSize=0 	TakeProfit=0 	StopLoss=0 	MaxOrders=0 	MaxOrdersPerType=0 	MinimumIntervalSec=0 	TradeMicroLots=1 	RiskRatio=0 	MinimalizeLosses=0 	BestDailyStrategyMultiplierFactor=1 	BestWeeklyStrategyMultiplierFactor=1 	BestMonthlyStrategyMultiplierFactor=2 	WorseDailyStrategyDividerFactor=1 	WorseWeeklyStrategyDividerFactor=2 	WorseMonthlyS
-  // £1550.22	307	1.52	5.05	646.73	5.72%	0.00000000	WPR1_OpenMethod=0 	WPR1_OpenCondition1=512 	WPR1_OpenCondition2=64 	WPR1_CloseCondition=840	TrailingStop=40 	DefaultTrailingStopMethod=1 	TrailingStopOneWay=1 	TrailingProfit=30 	DefaultTrailingProfitMethod=0 	TrailingProfitOneWay=1 	TrailingStopAddPerMinute=0 	LotSize=0 	TakeProfit=0 	StopLoss=0 	MaxOrders=0 	MaxOrdersPerType=0 	MinimumIntervalSec=0 	TradeMicroLots=1 	RiskRatio=0 	MinimalizeLosses=0 	BestDailyStrategyMultiplierFactor=1 	BestWeeklyStrategyMultiplierFactor=1 	BestMonthlyStrategyMultiplierFactor=2 	WorseDailyStrategyDividerFactor=1 	WorseWeeklyStrategyDividerFactor=2 	WorseMonthlyS
-  // £1540.73	274	1.57	5.62	698.10	6.21%	0.00000000	WPR1_OpenMethod=0 	WPR1_OpenCondition1=516 	WPR1_OpenCondition2=96 	WPR1_CloseCondition=936	TrailingStop=40 	DefaultTrailingStopMethod=1 	TrailingStopOneWay=1 	TrailingProfit=30 	DefaultTrailingProfitMethod=0 	TrailingProfitOneWay=1 	TrailingStopAddPerMinute=0 	LotSize=0 	TakeProfit=0 	StopLoss=0 	MaxOrders=0 	MaxOrdersPerType=0 	MinimumIntervalSec=0 	TradeMicroLots=1 	RiskRatio=0 	MinimalizeLosses=0 	BestDailyStrategyMultiplierFactor=1 	BestWeeklyStrategyMultiplierFactor=1 	BestMonthlyStrategyMultiplierFactor=2 	WorseDailyStrategyDividerFactor=1 	WorseWeeklyStrategyDividerFactor=2 	WorseMonthlyS
-  // £1515.98	298	1.51	5.09	626.06	5.56%	0.00000000	WPR1_OpenMethod=0 	WPR1_OpenCondition1=512 	WPR1_OpenCondition2=96 	WPR1_CloseCondition=840	TrailingStop=40 	DefaultTrailingStopMethod=1 	TrailingStopOneWay=1 	TrailingProfit=30 	DefaultTrailingProfitMethod=0 	TrailingProfitOneWay=1 	TrailingStopAddPerMinute=0 	LotSize=0 	TakeProfit=0 	StopLoss=0 	MaxOrders=0 	MaxOrdersPerType=0 	MinimumIntervalSec=0 	TradeMicroLots=1 	RiskRatio=0 	MinimalizeLosses=0 	BestDailyStrategyMultiplierFactor=1 	BestWeeklyStrategyMultiplierFactor=1 	BestMonthlyStrategyMultiplierFactor=2 	WorseDailyStrategyDividerFactor=1 	WorseWeeklyStrategyDividerFactor=2 	WorseMonthlyS
-  // £1451.44	262	1.56	5.54	595.00	5.32%	0.00000000	WPR1_OpenMethod=0 	WPR1_OpenCondition1=656 	WPR1_OpenCondition2=96 	WPR1_CloseCondition=936	TrailingStop=40 	DefaultTrailingStopMethod=1 	TrailingStopOneWay=1 	TrailingProfit=30 	DefaultTrailingProfitMethod=0 	TrailingProfitOneWay=1 	TrailingStopAddPerMinute=0 	LotSize=0 	TakeProfit=0 	StopLoss=0 	MaxOrders=0 	MaxOrdersPerType=0 	MinimumIntervalSec=0 	TradeMicroLots=1 	RiskRatio=0 	MinimalizeLosses=0 	BestDailyStrategyMultiplierFactor=1 	BestWeeklyStrategyMultiplierFactor=1 	BestMonthlyStrategyMultiplierFactor=2 	WorseDailyStrategyDividerFactor=1 	WorseWeeklyStrategyDividerFactor=2 	WorseMonthlyS
-  // £1423.75	514	1.29	2.77	693.61	6.25%	0.00000000	WPR1_OpenMethod=0 	WPR1_OpenCondition1=1012 	WPR1_OpenCondition2=0 	WPR1_CloseCondition=936	TrailingStop=40 	DefaultTrailingStopMethod=1 	TrailingStopOneWay=1 	TrailingProfit=30 	DefaultTrailingProfitMethod=0 	TrailingProfitOneWay=1 	TrailingStopAddPerMinute=0 	LotSize=0 	TakeProfit=0 	StopLoss=0 	MaxOrders=0 	MaxOrdersPerType=0 	MinimumIntervalSec=0 	TradeMicroLots=1 	RiskRatio=0 	MinimalizeLosses=0 	BestDailyStrategyMultiplierFactor=1 	BestWeeklyStrategyMultiplierFactor=1 	BestMonthlyStrategyMultiplierFactor=2 	WorseDailyStrategyDividerFactor=1 	WorseWeeklyStrategyDividerFactor=2 	WorseMonthlyS
-  // £1416.27	271	1.52	5.23	632.59	5.71%	0.00000000	WPR1_OpenMethod=0 	WPR1_OpenCondition1=804 	WPR1_OpenCondition2=32 	WPR1_CloseCondition=936	TrailingStop=40 	DefaultTrailingStopMethod=1 	TrailingStopOneWay=1 	TrailingProfit=30 	DefaultTrailingProfitMethod=0 	TrailingProfitOneWay=1 	TrailingStopAddPerMinute=0 	LotSize=0 	TakeProfit=0 	StopLoss=0 	MaxOrders=0 	MaxOrdersPerType=0 	MinimumIntervalSec=0 	TradeMicroLots=1 	RiskRatio=0 	MinimalizeLosses=0 	BestDailyStrategyMultiplierFactor=1 	BestWeeklyStrategyMultiplierFactor=1 	BestMonthlyStrategyMultiplierFactor=2 	WorseDailyStrategyDividerFactor=1 	WorseWeeklyStrategyDividerFactor=2 	WorseMonthlyS
-  extern int WPR5_OpenCondition1 = 528; // Valid range: 0-1023. >512
+  // £1820.10	647	1.20	2.81	1063.13	9.47% (d: £10k, sp: 20)
+  extern int WPR5_OpenCondition1 = 512; // Valid range: 0-1023. >512
   extern int WPR5_OpenCondition2 = 16; // Valid range: 0-1023. 0/16
   extern int WPR5_CloseCondition = 864; // Valid range: 0-1023.
-  // £1490.10	1589	1.12	0.94	665.81	6.09%	0.00000000	WPR5_Enabled=1 (d: £10k)
-  extern int WPR15_OpenCondition1 = 544; // Valid range: 0-1023. // TODO: Further backtesting required.
-  extern int WPR15_OpenCondition2 = 16; // Valid range: 0-1023.
+  // £1490.10	1589	1.12	0.94	665.81	6.09%	0.00000000	WPR5_Active=1 (d: £10k)
+  extern int WPR15_OpenCondition1 = 0; // Valid range: 0-1023. // TODO: Further backtesting required.
+  extern int WPR15_OpenCondition2 = 0; // Valid range: 0-1023.
   extern int WPR15_CloseCondition = 792; // Valid range: 0-1023. // TODO: Further backtesting required.
+  // £904.67	950	1.09	0.95	2483.61	18.87%	0.00000000	WPR15_OpenMethod=8 (d: £10k, sp: 20)
   // £1527.92	1506	1.15	1.01	842.94	7.83%	0.00000000	WPR15_OpenCondition1=544 	WPR15_OpenCondition2=16 	WPR15_CloseCondition=792 (d: £10k)
   extern int WPR30_OpenCondition1 = 1040; // Valid range: 0-1023. // TODO: Further backtesting required.
   extern int WPR30_OpenCondition2 = 0; // Valid range: 0-1023. // TODO: Further backtesting required.
   extern int WPR30_CloseCondition = 792; // Valid range: 0-1023. // TODO: Further backtesting required.
   // £1019.43	1012	1.14	1.01	1192.08	9.92%	0.00000000	WPR30_OpenCondition1=1040 	WPR30_OpenCondition2=0 	WPR30_CloseCondition=792  (d: £10k)
+#endif
+#ifdef __ea_advanced__
+  extern double WPR1_MaxSpread  = 4.0; // Maximum spread to trade (in pips).
+  extern double WPR5_MaxSpread  = 3.0; // Maximum spread to trade (in pips).
+  extern double WPR15_MaxSpread = 4.0; // Maximum spread to trade (in pips).
+  extern double WPR30_MaxSpread = 5.0; // Maximum spread to trade (in pips).
 #endif
 /*
  * WPR backtest log (auto,ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, spread 20, 9,5mln ticks, quality 25%]:
@@ -641,10 +739,11 @@ extern int WPR30_OpenMethod = 8; // Valid range: 0-127. Optimized with T_MA_M_FA
  */
 
 extern string __DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --";
-extern bool DeMarker1_Enabled  = TRUE; // Enable DeMarker-based strategy. // TODO: Optimize for higher spreads.
-extern bool DeMarker5_Enabled  = TRUE; // Enable DeMarker-based strategy. // TODO: Optimize for higher spreads.
-extern bool DeMarker15_Enabled = TRUE; // Enable DeMarker-based strategy. // TODO: Optimize for higher spreads.
-extern bool DeMarker30_Enabled = TRUE; // Enable DeMarker-based strategy. // TODO: Optimize for higher spreads.
+#ifndef __disabled__
+  extern bool DeMarker1_Active = TRUE, DeMarker5_Active = TRUE, DeMarker15_Active = TRUE, DeMarker30_Active = TRUE; // Enable DeMarker-based strategy for specific timeframe.
+#else
+  extern bool DeMarker1_Active = FALSE, DeMarker5_Active = FALSE, DeMarker15_Active = FALSE, DeMarker30_Active = FALSE;
+#endif
 //extern ENUM_TIMEFRAMES DeMarker_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int DeMarker_Period = 24; // DeMarker averaging period for calculation.
 extern int DeMarker_Shift = 0; // Shift relative to the current bar the given amount of periods ago. Suggested value: 4.
@@ -670,6 +769,12 @@ extern int DeMarker30_OpenMethod = 4; // Valid range: 0-63.
   extern int DeMarker30_OpenCondition2 = 0; // Valid range: 0-1023.
   extern int DeMarker30_CloseCondition = 0; // Valid range: 0-1023.
 #endif
+#ifdef __ea_advanced__
+  extern double DeMarker1_MaxSpread  = 4.0; // Maximum spread to trade (in pips).
+  extern double DeMarker5_MaxSpread  = 3.0; // Maximum spread to trade (in pips).
+  extern double DeMarker15_MaxSpread = 5.0; // Maximum spread to trade (in pips).
+  extern double DeMarker30_MaxSpread = 5.0; // Maximum spread to trade (in pips).
+#endif
 /* DeMarker backtest log (auto,ts:25,tp:20,gap:10,sp:2) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
  *   £5968.23 5968  1.17  1.00  1314.82 47.46% (deposit: £1000, no boosting)
  *   £7465.39 5966  1.21  1.25  1306.65 9.32% (deposit: £10000, no boosting)
@@ -684,10 +789,11 @@ extern int DeMarker30_OpenMethod = 4; // Valid range: 0-63.
  */
 
 extern string __Fractals_Parameters__ = "-- Settings for the Fractals indicator --";
-extern bool Fractals1_Enabled  = TRUE; // Enable Fractals-based strategy.
-extern bool Fractals5_Enabled  = TRUE; // Enable Fractals-based strategy.
-extern bool Fractals15_Enabled = TRUE; // Enable Fractals-based strategy.
-extern bool Fractals30_Enabled = TRUE; // Enable Fractals-based strategy.
+#ifndef __disabled__
+  extern bool Fractals1_Active = TRUE, Fractals5_Active = TRUE, Fractals15_Active = TRUE, Fractals30_Active = TRUE; // Enable Fractals-based strategy for specific timeframe.
+#else
+  extern bool Fractals1_Active = FALSE, Fractals5_Active = FALSE, Fractals15_Active = FALSE, Fractals30_Active = FALSE;
+#endif
 //extern bool Fractals_CloseOnChange = TRUE; // Close opposite orders on market change.
 extern ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = T_MA_M_FAR_TRAIL; // Trailing Stop method for Fractals. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_FIXED; // Trailing Profit method for Fractals. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
@@ -713,6 +819,12 @@ extern int Fractals30_OpenMethod = 0; // Valid range: 0-63. // Optimized.
   extern int Fractals30_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized.
   extern int Fractals30_CloseCondition = 608; // Valid range: 0-1023. // Optimized.
   // £2969.26	769	1.24	3.86	2328.90	15.73%	0.00000000	Fractals30_OpenCondition1=8 Fractals30_CloseCondition=608 (d:£10k)
+#endif
+#ifdef __ea_advanced__
+  extern double Fractals1_MaxSpread  = 4.0; // Maximum spread to trade (in pips).
+  extern double Fractals5_MaxSpread  = 3.0; // Maximum spread to trade (in pips).
+  extern double Fractals15_MaxSpread = 4.0; // Maximum spread to trade (in pips).
+  extern double Fractals30_MaxSpread = 6.0; // Maximum spread to trade (in pips).
 #endif
 /*
  * Fractals backtest log (auto,ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, spread 20, 9,5mln ticks, quality 25%]:
@@ -816,16 +928,17 @@ enum ENUM_MARKET_CONDITION {
   C_MA1_MED_SLOW_OPP  = 3, // MA1 Med&Slow opposite
   C_MA5_FAST_SLOW_OPP = 4, // MA5 Fast&Slow opposite
   C_MA5_MED_SLOW_OPP  = 5, // MA5 Med&Slow opposite
-  C_MARKET_DROP       = 6, // Market drop
+  C_MARKET_BIG_DROP   = 6, // Market big drop
+  C_MARKET_VBIG_DROP  = 7, // Market very big drop
 };
 
 // Define type of actions which can be executed.
 enum ENUM_ACTION_TYPE {
   A_NONE                   =  0, // None
-  A_CLOSE_ORDER_PROFIT     =  1, // Close profit order
-  A_CLOSE_ORDER_LOSS       =  2, // Close loss order
-  A_CLOSE_ALL_IN_PROFIT    =  3, // Close profit orders
-  A_CLOSE_ALL_IN_LOSS      =  4, // Close loss orders
+  A_CLOSE_ORDER_PROFIT     =  1, // Close most profitable order
+  A_CLOSE_ORDER_LOSS       =  2, // Close worse order
+  A_CLOSE_ALL_IN_PROFIT    =  3, // Close all in profit
+  A_CLOSE_ALL_IN_LOSS      =  4, // Close all in loss
   A_CLOSE_ALL_PROFIT_SIDE  =  5, // Close profit side
   A_CLOSE_ALL_LOSS_SIDE    =  6, // Close loss side
   A_CLOSE_ALL_TREND        =  7, // Close trend side
@@ -837,46 +950,54 @@ enum ENUM_ACTION_TYPE {
 };
 
 extern string __EA_Conditions__ = "-- Account conditions --"; // See: ENUM_ACTION_TYPE
-extern bool Account_Conditions_Enabled = TRUE; // Enable account conditions. It's not advice on accounts where multi bots are trading.
+extern bool Account_Conditions_Active = TRUE; // Enable account conditions. It's not advice on accounts where multi bots are trading.
 extern ENUM_ACC_CONDITION Account_Condition_1      = C_EQUITY_LOWER;
-extern ENUM_MARKET_CONDITION Market_Condition_1    = C_MARKET_DROP;
-extern ENUM_ACTION_TYPE Action_On_Condition_1      = A_NONE;
+extern ENUM_MARKET_CONDITION Market_Condition_1    = C_MARKET_BIG_DROP;
+extern ENUM_ACTION_TYPE Action_Active_Condition_1      = A_CLOSE_ALL_LOSS_SIDE;
 
 extern ENUM_ACC_CONDITION Account_Condition_2      = C_EQUITY_10PC_LOW;
-extern ENUM_MARKET_CONDITION Market_Condition_2    = C_MARKET_TRUE;
-extern ENUM_ACTION_TYPE Action_On_Condition_2      = A_CLOSE_ORDER_PROFIT;
+extern ENUM_MARKET_CONDITION Market_Condition_2    = C_MA1_FAST_SLOW_OPP;
+extern ENUM_ACTION_TYPE Action_Active_Condition_2      = A_CLOSE_ORDER_PROFIT;
 
 extern ENUM_ACC_CONDITION Account_Condition_3      = C_EQUITY_20PC_LOW;
 extern ENUM_MARKET_CONDITION Market_Condition_3    = C_MARKET_TRUE;
-extern ENUM_ACTION_TYPE Action_On_Condition_3      = A_CLOSE_ALL_IN_LOSS;
+extern ENUM_ACTION_TYPE Action_Active_Condition_3      = A_CLOSE_ALL_IN_PROFIT;
 
 extern ENUM_ACC_CONDITION Account_Condition_4      = C_EQUITY_50PC_LOW;
 extern ENUM_MARKET_CONDITION Market_Condition_4    = C_MARKET_TRUE;
-extern ENUM_ACTION_TYPE Action_On_Condition_4      = A_CLOSE_ALL_LOSS_SIDE;
+extern ENUM_ACTION_TYPE Action_Active_Condition_4      = A_CLOSE_ALL_LOSS_SIDE;
 
 extern ENUM_ACC_CONDITION Account_Condition_5      = C_EQUITY_10PC_HIGH;
 extern ENUM_MARKET_CONDITION Market_Condition_5    = C_MA1_FAST_SLOW_OPP;
-extern ENUM_ACTION_TYPE Action_On_Condition_5      = A_CLOSE_ALL_LOSS_SIDE;
+extern ENUM_ACTION_TYPE Action_Active_Condition_5      = A_CLOSE_ORDER_PROFIT;
 
 extern ENUM_ACC_CONDITION Account_Condition_6      = C_EQUITY_20PC_HIGH;
-extern ENUM_MARKET_CONDITION Market_Condition_6    = C_MA1_FAST_SLOW_OPP;
-extern ENUM_ACTION_TYPE Action_On_Condition_6      = A_CLOSE_ALL_IN_PROFIT;
+extern ENUM_MARKET_CONDITION Market_Condition_6    = C_MA1_MED_SLOW_OPP;
+extern ENUM_ACTION_TYPE Action_Active_Condition_6      = A_CLOSE_ALL_NON_TREND;
 
 extern ENUM_ACC_CONDITION Account_Condition_7      = C_EQUITY_50PC_HIGH;
 extern ENUM_MARKET_CONDITION Market_Condition_7    = C_MARKET_TRUE;
-extern ENUM_ACTION_TYPE Action_On_Condition_7      = A_CLOSE_ALL_PROFIT_SIDE;
+extern ENUM_ACTION_TYPE Action_Active_Condition_7      = A_CLOSE_ALL_PROFIT_SIDE;
 
 extern ENUM_ACC_CONDITION Account_Condition_8      = C_MARGIN_USED_80PC;
 extern ENUM_MARKET_CONDITION Market_Condition_8    = C_MARKET_TRUE;
-extern ENUM_ACTION_TYPE Action_On_Condition_8      = A_CLOSE_ALL_NON_TREND;
+extern ENUM_ACTION_TYPE Action_Active_Condition_8      = A_CLOSE_ALL_NON_TREND;
 
 extern ENUM_ACC_CONDITION Account_Condition_9      = C_MARGIN_USED_90PC;
 extern ENUM_MARKET_CONDITION Market_Condition_9    = C_MARKET_TRUE;
-extern ENUM_ACTION_TYPE Action_On_Condition_9      = A_CLOSE_ORDER_LOSS;
+extern ENUM_ACTION_TYPE Action_Active_Condition_9      = A_CLOSE_ORDER_LOSS;
 
 extern ENUM_ACC_CONDITION Account_Condition_10     = C_EQUITY_HIGHER;
-extern ENUM_MARKET_CONDITION Market_Condition_10   = C_MARKET_DROP;
-extern ENUM_ACTION_TYPE Action_On_Condition_10     = A_CLOSE_ALL_TREND;
+extern ENUM_MARKET_CONDITION Market_Condition_10   = C_MARKET_BIG_DROP;
+extern ENUM_ACTION_TYPE Action_Active_Condition_10     = A_CLOSE_ALL_TREND;
+
+extern ENUM_ACC_CONDITION Account_Condition_11     = C_ACC_NONE;
+extern ENUM_MARKET_CONDITION Market_Condition_11   = C_MARKET_NONE;
+extern ENUM_ACTION_TYPE Action_Active_Condition_11     = A_NONE;
+
+extern ENUM_ACC_CONDITION Account_Condition_12     = C_ACC_NONE;
+extern ENUM_MARKET_CONDITION Market_Condition_12   = C_MARKET_NONE;
+extern ENUM_ACTION_TYPE Action_Active_Condition_12     = A_NONE;
 
 /*
 extern ENUM_ACTION_TYPE ActionOnDoubledEquity      = A_CLOSE_ALL_IN_PROFIT; // Execute action when account equity doubled the balance.
@@ -892,7 +1013,11 @@ extern string __Logging_Parameters__ = "-- Settings for logging & messages --";
 extern bool PrintLogOnChart = TRUE;
 extern bool VerboseErrors = TRUE; // Show errors.
 extern bool VerboseInfo = TRUE;   // Show info messages.
-extern bool VerboseDebug = TRUE;  // Show debug messages.
+#ifdef __release__
+  extern bool VerboseDebug = FALSE;  // Disable messages on release.
+#else
+  extern bool VerboseDebug = TRUE;  // Show debug messages.
+#endif
 extern bool WriteReport = TRUE;  // Write report into the file on exit.
 #ifdef __ea_advanced__
   extern bool VerboseTrace = FALSE;  // Even more debugging.
@@ -971,6 +1096,7 @@ int hour_of_day, day_of_week, day_of_month, day_of_year;
 
 // Strategy variables.
 int info[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_INFO_ENTRY];
+double conf[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_VALUE_ENTRY];
 int open_orders[FINAL_STRATEGY_TYPE_ENTRY], closed_orders[FINAL_STRATEGY_TYPE_ENTRY];
 int signals[FINAL_STAT_PERIOD_TYPE_ENTRY][FINAL_STRATEGY_TYPE_ENTRY][MN1][2]; // Count signals to buy and sell per period and strategy.
 int tickets[200]; // List of tickets to process.
@@ -998,7 +1124,7 @@ double daily[FINAL_VALUE_TYPE_ENTRY], weekly[FINAL_VALUE_TYPE_ENTRY], monthly[FI
 string log[];
 
 // Condition and actions.
-int acc_conditions[10][3], market_conditions[10][3];
+int acc_conditions[12][3], market_conditions[10][3];
 
 // Indicator variables.
 double ma_fast[H1][3], ma_medium[H1][3], ma_slow[H1][3];
@@ -1009,6 +1135,7 @@ double bands[H1][3][3], envelopes[H1][3][3];
 double alligator[H1][3][3];
 double demarker[H1][2], wpr[H1][2];
 double fractals[H1][3][3];
+double b_power[H1][2][3];
 
 /* TODO:
  *   - multiply successful strategy direction,
@@ -1164,7 +1291,7 @@ void OnDeinit(const int reason) {
       if (!IsTesting()) ExtInitialDeposit = CalculateInitialDeposit();
       CalculateSummary(ExtInitialDeposit);
       string filename = TimeToStr(TimeCurrent(), TIME_DATE|TIME_MINUTES) + "_31337_Report.txt";
-      WriteReport(filename);
+      WriteReport(filename); // Todo: Add: getUninitReasonText(reason)
       Print(__FUNCTION__ + "(): Saved report as: " + filename);
   }
   // #ifdef _DEBUG
@@ -1208,8 +1335,8 @@ string InitInfo(string sep = "\n") {
     (int)SymbolInfoInteger(_Symbol,SYMBOL_TRADE_STOPS_LEVEL), SymbolInfoDouble(_Symbol,SYMBOL_TRADE_CONTRACT_SIZE), SymbolInfoDouble(_Symbol,SYMBOL_TRADE_TICK_SIZE), sep);
   output += StringFormat("Swap specification for %s: Mode: %d, Long/buy order value: %f, Short/sell order value: %f%s",
     _Symbol, (int)SymbolInfoInteger(_Symbol, SYMBOL_SWAP_MODE), SymbolInfoDouble(_Symbol,SYMBOL_SWAP_LONG), SymbolInfoDouble(_Symbol,SYMBOL_SWAP_SHORT), sep);
-  output += StringFormat("Calculated variables: Lot size: %f, Max orders: %d (per type: %d), Active strategies: %d of %d, Pip size: %f, Points per pip: %d, Pip precision: %d, Volume precision: %d" + sep,
-              GetLotSize(), GetMaxOrders(), GetMaxOrdersPerType(), GetNoOfStrategies(), FINAL_STRATEGY_TYPE_ENTRY, pip_size, pts_per_pip, pip_precision, volume_precision);
+  output += StringFormat("Calculated variables: Lot size: %f, Max orders: %d (per type: %d), Active strategies: %d of %d, Pip size: %f, Points per pip: %d, Pip precision: %d, Volume precision: %d, Spread in pips: %f%s",
+              GetLotSize(), GetMaxOrders(), GetMaxOrdersPerType(), GetNoOfStrategies(), FINAL_STRATEGY_TYPE_ENTRY, pip_size, pts_per_pip, pip_precision, volume_precision, ValueToPips(GetMarketSpread()), sep);
   output += StringFormat("Time: Hour of day: %d, Day of week: %d, Day of month: %d, Day of year: %d" + sep, hour_of_day, day_of_week, day_of_month, day_of_year);
   output += GetAccountTextDetails() + sep;
   if (IsTradeAllowed()) {
@@ -1234,11 +1361,13 @@ void Trade() {
       if (TradeCondition(i, OP_BUY)
         && CheckMarketCondition1(OP_BUY, info[i][TIMEFRAME], info[i][OPEN_CONDITION1])
         && !CheckMarketCondition1(OP_SELL, M30, info[i][OPEN_CONDITION2], FALSE)) {
-        order_placed = ExecuteOrder(OP_BUY, lot_size * info[i][FACTOR], i, name[i]);
+        order_placed = ExecuteOrder(OP_BUY, lot_size * conf[i][FACTOR], i, name[i]);
+        //break;
       } else if (TradeCondition(i, OP_SELL)
         && CheckMarketCondition1(OP_SELL, info[i][TIMEFRAME], info[i][OPEN_CONDITION1])
         && !CheckMarketCondition1(OP_BUY, M30, info[i][OPEN_CONDITION2], FALSE)) {
-          order_placed = ExecuteOrder(OP_SELL, lot_size * info[i][FACTOR], i, name[i]);
+          order_placed = ExecuteOrder(OP_SELL, lot_size * conf[i][FACTOR], i, name[i]);
+          //break;
       }
       if (CheckMarketCondition2(OP_BUY, info[i][TIMEFRAME], info[i][CLOSE_CONDITION])) CloseOrdersByType(OP_SELL, i, "closing on market change: " + name[i]);
       if (CheckMarketCondition2(OP_SELL, info[i][TIMEFRAME], info[i][CLOSE_CONDITION])) CloseOrdersByType(OP_BUY, i, "closing on market change: " + name[i]);
@@ -1252,7 +1381,7 @@ void Trade() {
 bool TradeCondition(int order_type = 0, int cmd = EMPTY) {
   int timeframe = info[order_type][TIMEFRAME];
   int open_method = info[order_type][OPEN_METHOD];
-  if (TradeWithTrend && !CheckTrend(cmd)) {
+  if (TradeWithTrend && !CheckTrend(cmd) == cmd) {
     return (FALSE); // If we're against the trend, do not trade (if TradeWithTrend is set).
   }
   switch (order_type) {
@@ -1378,7 +1507,7 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
   string text = __FUNCTION__ + "(): ";
 
   // Update Moving Averages indicator values.
-  // Note: We don't limit MA calculation with MA_Enabled, because this indicator is used for trailing stop calculation.
+  // Note: We don't limit MA calculation with MA_Active, because this indicator is used for trailing stop calculation.
   // Calculate MA Fast.
   ma_fast[period][CURR] = iMA(NULL, timeframe, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, 0); // Current
   ma_fast[period][PREV] = iMA(NULL, timeframe, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, 1 + MA_Shift_Fast); // Previous
@@ -1402,7 +1531,7 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
   // if (VerboseTrace) text += "MA: MA_Fast: " + GetArrayValues(ma_fast[M1]) + "; MA_Medium: " + GetArrayValues(ma_medium[M1]) + "; MA_Slow: " + GetArrayValues(ma_slow[M1]) + "; ";
   if (VerboseDebug && IsVisualMode()) DrawMA(timeframe);
 
-  //if (MACD_Enabled) {
+  //if (MACD_Active) {
     // Update MACD indicator values.
     macd[period][CURR] = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN, 0); // Current
     macd[period][PREV] = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN, 1 + MACD_Shift); // Previous
@@ -1413,7 +1542,7 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
     // if (VerboseTrace) text += "MACD: " + GetArrayValues(macd[M1]) + "; Signal: " + GetArrayValues(macd_signal[M1]) + "; ";
   //}
 
-  // if (Alligator1_Enabled || Alligator5_Enabled || Alligator15_Enabled || Alligator30_Enabled) {
+  // if (Alligator1_Active || Alligator5_Active || Alligator15_Active || Alligator30_Active) {
     // Update Alligator indicator values.
     // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
     for (i = 0; i < 3; i++) {
@@ -1429,7 +1558,7 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
     // if (VerboseTrace) text += "Alligator: " + GetArrayValues(alligator[0]) + GetArrayValues(alligator[1]) + "; ";
   // }
 
-  // if (RSI_Enabled) {
+  // if (RSI_Active) {
     // Update RSI indicator values.
     for (i = 0; i < 3; i++) {
       rsi[period][i] = iRSI(NULL, timeframe, rsi_period, RSI_Applied_Price, i + RSI_Shift);
@@ -1440,7 +1569,7 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
     // if (VerboseTrace) text += "RSI: " + GetArrayValues(rsi[M1]) + "; ";
   // }
 
-  // if (SAR_Enabled) {
+  // if (SAR_Active) {
     // Update SAR indicator values.
     for (i = 0; i < 3; i++) {
       sar[period][i] = iSAR(NULL, timeframe, SAR_Step, SAR_Maximum_Stop, i + SAR_Shift);
@@ -1448,7 +1577,7 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
     // if (VerboseTrace) text += "SAR: " + GetArrayValues(sar[M1]) + "; ";
   // }
 
-  // if (Bands_Enabled) {
+  // if (Bands_Active) {
     // Update the Bollinger Bands indicator values.
     for (i = 0; i < 3; i++) {
       bands[period][i][MODE_MAIN]  = iBands(NULL, timeframe, bands_period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_MAIN,  i + Bands_Shift);
@@ -1458,7 +1587,7 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
     // if (VerboseTrace) text += "Bands: " + GetArrayValues(bands) + "; ";
   // }
 
-  // if (Envelopes1_Enabled || Envelopes5_Enabled || Envelopes15_Enabled || Envelopes30_Enabled) {
+  // if (Envelopes1_Active || Envelopes5_Active || Envelopes15_Active || Envelopes30_Active) {
     // Update the Envelopes indicator values.
     for (i = 0; i < 3; i++) {
       envelopes[period][i][MODE_MAIN]  = iEnvelopes(NULL, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, MODE_MAIN,  i + Envelopes_Shift);
@@ -1469,7 +1598,7 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
     // if (VerboseTrace) text += "Envelopes: " + GetArrayValues(envelopes) + "; ";
   // }
 
-  // if (WPR1_Enabled || WPR5_Enabled || WPR15_Enabled || WPR30_Enabled) {
+  // if (WPR1_Active || WPR5_Active || WPR15_Active || WPR30_Active) {
     // Update the Larry Williams' Percent Range indicator values.
     wpr[period][CURR] = -iWPR(NULL, timeframe, WPR_Period, 0 + WPR_Shift);
     wpr[period][PREV] = -iWPR(NULL, timeframe, WPR_Period, 1 + WPR_Shift);
@@ -1477,7 +1606,7 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
     // if (VerboseTrace) text += "WPR: " + GetArrayValues(wpr[M1]) + "; ";
   // }
 
-  // if (DeMarker1_Enabled || DeMarker5_Enabled || DeMarker15_Enabled || DeMarker30_Enabled) {
+  // if (DeMarker1_Active || DeMarker5_Active || DeMarker15_Active || DeMarker30_Active) {
     // Update DeMarker indicator values.
     demarker[period][CURR] = iDeMarker(NULL, timeframe, DeMarker_Period, 0 + DeMarker_Shift);
     demarker[period][PREV] = iDeMarker(NULL, timeframe, DeMarker_Period, 1 + DeMarker_Shift);
@@ -1485,7 +1614,7 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
     // if (VerboseTrace) text += "DeMarker: " + GetArrayValues(demarker[M1]) + "; ";
   // }
 
-  // if (Fractals1_Enabled || Fractals5_Enabled || Fractals15_Enabled || Fractals30_Enabled) {
+  // if (Fractals1_Active || Fractals5_Active || Fractals15_Active || Fractals30_Active) {
     // Update Fractals indicator values.
     for (i = 0; i < 3; i++) {
       fractals[period][i][MODE_LOWER] = iFractals(NULL, timeframe, MODE_LOWER, i);
@@ -1493,6 +1622,11 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
     }
     // text += "fractals: "  + fractals_lower[M5]  + ", Fractals5_upper: " + fractals_upper[M5] + "; ";
   // }
+
+  for (i = 0; i < 3; i++) {
+    b_power[period][OP_BUY][i]  = iBullsPower(NULL, timeframe, 13, PRICE_CLOSE, i);
+    b_power[period][OP_SELL][i] = iBearsPower(NULL, timeframe, 13, PRICE_CLOSE, i);
+  }
 
   if (VerboseTrace) Print(__FUNCTION__ + "():" + text);
   return (TRUE);
@@ -1548,6 +1682,14 @@ int ExecuteOrder(int cmd, double lot_size, int order_type, string order_comment 
      last_err = err;
      return (FALSE);
    }
+   #ifdef __ea_advanced__
+   if (!CheckSpreadLimit(order_type)) {
+     err = "Not executing order, because the spread is too high." + " (spread = " + DoubleToStr(ValueToPips(GetMarketSpread()), 1) + " pips)";
+     if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "():" + err);
+     last_err = err;
+     return (FALSE);
+   }
+   #endif
    if (!CheckMinPipGap(order_type)) {
      err = "Not executing order, because the gap is too small [MinPipGap].";
      if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "():" + err + " (order type = " + order_type + ")");
@@ -1641,11 +1783,28 @@ int ExecuteOrder(int cmd, double lot_size, int order_type, string order_comment 
    return (result);
 }
 
+/*
+ * Check if spread is not too high for specific strategy.
+ *
+ * @param
+ *   If TRUE, the spread is fine, otherwise return FALSE.
+ */
+bool CheckSpreadLimit(int order_type) {
+  double spread_limit = If(info[order_type][SPREAD_LIMIT] > 0, MathMin(info[order_type][SPREAD_LIMIT], MaxSpreadToTrade), MaxSpreadToTrade);
+  return !(ValueToPips(GetMarketSpread()) > spread_limit);
+}
+
 bool CloseOrder(int ticket_no, string reason, bool retry = TRUE) {
-  bool result;
-  if (ticket_no > 0) result = OrderSelect(ticket_no, SELECT_BY_TICKET);
-  else ticket_no = OrderTicket();
-  result = OrderClose(ticket_no, OrderLots(), GetClosePrice(OrderType()), max_order_slippage, GetOrderColor());
+  bool result = FALSE;
+  if (ticket_no > 0) {
+    if (!OrderSelect(ticket_no, SELECT_BY_TICKET)) {
+      return (FALSE);
+    }
+  } else {
+    ticket_no = OrderTicket();
+  }
+  double close_price = NormalizeDouble(GetClosePrice(), Digits);
+  result = OrderClose(ticket_no, OrderLots(), close_price, max_order_slippage, GetOrderColor());
   // if (VerboseTrace) Print(__FUNCTION__ + "(): CloseOrder request. Reason: " + reason + "; Result=" + result + " @ " + TimeCurrent() + "(" + TimeToStr(TimeCurrent()) + "), ticket# " + ticket_no);
   if (result) {
     if (SoundAlert) PlaySound(SoundFileAtClose);
@@ -1674,10 +1833,12 @@ bool OrderCalc(int ticket_no = 0) {
   info[strategy_type][TOTAL_ORDERS]++;
   if (profit > 0) {
     info[strategy_type][TOTAL_ORDERS_WON]++;
+    info[strategy_type][TOTAL_GROSS_PROFIT] += profit;
   } else {
     info[strategy_type][TOTAL_ORDERS_LOSS]++;
+    info[strategy_type][TOTAL_GROSS_LOSS] += profit;
   }
-  info[strategy_type][TOTAL_PROFIT] += profit;
+  info[strategy_type][TOTAL_NET_PROFIT] += profit;
 
   if (TimeDayOfYear(close_time) == DayOfYear()) {
     info[strategy_type][DAILY_PROFIT] += profit;
@@ -1736,8 +1897,16 @@ bool UpdateStats() {
   CheckStats(High[0], MAX_HIGH);
   CheckStats(AccountBalance(), MAX_BALANCE);
   CheckStats(AccountEquity(), MAX_EQUITY);
-  if (last_tick_change > BigDropSize) Print(__FUNCTION__ + "(): Big drop of " + last_tick_change + " pips detected.");
-  if (last_tick_change > BigDropSize && WriteReport) ReportAdd(__FUNCTION__ + "(): Big drop of " + last_tick_change + " pips detected.");
+  if (last_tick_change > MarketBigDropSize) {
+    last_msg = StringFormat("Very big drop of %f pips detected!", last_tick_change);
+    Print(__FUNCTION__ + "(): " + last_msg);
+    if (WriteReport) ReportAdd(__FUNCTION__ + "(): " + last_msg);
+  }
+  else if (last_tick_change > MarketSuddenDropSize) {
+    last_msg = StringFormat("Big drop of %f pips detected!", last_tick_change);
+    Print(__FUNCTION__ + "(): " + last_msg);
+    if (WriteReport) ReportAdd(__FUNCTION__ + "(): " + last_msg);
+  }
   return (TRUE);
 }
 
@@ -2234,11 +2403,12 @@ string GetArrayValues(double& arr[], string sep = ", ") {
  */
 bool CheckMarketCondition1(int cmd, int period = M1, int condition = 0, bool default_value = TRUE) {
   bool result = TRUE;
-  RefreshRates();
+  RefreshRates(); // ?
   if ((condition &   1) != 0) result = result && ((cmd == OP_BUY && Open[CURR] > Close[PREV]) || (cmd == OP_SELL && Open[CURR] < Close[PREV]));
   if ((condition &   2) != 0) result = result && ((cmd == OP_BUY && sar[period][CURR] < Open[0]) || (cmd == OP_SELL && sar[period][CURR] > Open[0]));
   if ((condition &   4) != 0) result = result && ((cmd == OP_BUY && rsi[period][CURR] < 50) || (cmd == OP_SELL && rsi[period][CURR] > 50));
-  if ((condition &   8) != 0) result = result && ((cmd == OP_BUY && ma_slow[period][CURR] > ma_slow[period][PREV]) || (cmd == OP_SELL && ma_slow[period][CURR] < ma_slow[period][PREV]));
+  if ((condition &   8) != 0) result = result && ((cmd == OP_BUY && Ask > ma_slow[period][CURR]) || (cmd == OP_SELL && Ask < ma_slow[period][CURR]));
+  //if ((condition &   8) != 0) result = result && ((cmd == OP_BUY && ma_slow[period][CURR] > ma_slow[period][PREV]) || (cmd == OP_SELL && ma_slow[period][CURR] < ma_slow[period][PREV]));
   if ((condition &  16) != 0) result = result && ((cmd == OP_BUY && Ask < Open[CURR]) || (cmd == OP_SELL && Ask > Open[CURR]));
   if ((condition &  32) != 0) result = result && ((cmd == OP_BUY && Open[CURR] < bands[period][CURR][MODE_MAIN]) || (cmd == OP_SELL && Open[CURR] > bands[period][CURR][MODE_MAIN]));
   if ((condition &  64) != 0) result = result && ((cmd == OP_BUY && Open[CURR] < envelopes[period][CURR][MODE_MAIN]) || (cmd == OP_SELL && Open[CURR] > envelopes[period][CURR][MODE_MAIN]));
@@ -2452,7 +2622,7 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
    double trail = (TrailingStop + extra_trail) * pip_size;
    double default_trail = If(cmd == OP_BUY, Bid, Ask) + trail * factor;
    int method = GetTrailingMethod(order_type, loss_or_profit);
-   int period = If(order_type >= 0, info[order_type][TIMEFRAME], M1);
+   int timeframe = If(order_type >= 0, info[order_type][TIMEFRAME], M1);
 
    switch (method) {
      case T_NONE: // None
@@ -2461,89 +2631,101 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
      case T_FIXED: // Dynamic fixed.
        new_value = default_trail;
        break;
+     case T_CLOSE_PREV:
+       new_value = iClose(_Symbol, timeframe, PREV);
+       break;
+     case T_LOW_HIGH_PREV:
+       new_value = If(OpTypeValue(cmd) == loss_or_profit, iHigh(_Symbol, timeframe, PREV), iLow(_Symbol, timeframe, PREV));
+       break;
+     case T_5_BARS:
+       new_value = If(OpTypeValue(cmd) == loss_or_profit, iHighest(_Symbol, timeframe, MODE_HIGH, 5, CURR), iLowest(_Symbol, timeframe, MODE_LOW, 5, CURR));
+       break;
+     case T_10_BARS:
+       new_value = If(OpTypeValue(cmd) == loss_or_profit, iHighest(_Symbol, timeframe, MODE_HIGH, 10, CURR), iLowest(_Symbol, timeframe, MODE_LOW, 10, CURR));
+       break;
      case T_MA_F_PREV: // MA Small (Previous)
-       new_value = ma_fast[period][PREV];
+       new_value = ma_fast[timeframe][PREV];
        break;
      case T_MA_F_FAR: // MA Small (Far) - trailing stop. Optimize together with: MA_Shift_Far.
-       new_value = ma_fast[period][FAR];
+       new_value = ma_fast[timeframe][FAR];
        break;
      case T_MA_F_LOW: // Lowest/highest value of MA Fast.
        // FIXME: invalid array access
-       // new_value = If(OpTypeValue(cmd) == loss_or_profit, HighestValue(ma_fast[period]), LowestValue(ma_fast[period]));
-       double highest_ma_fast = MathMax(MathMax(ma_fast[period][CURR], ma_fast[period][PREV]), ma_fast[period][FAR]);
-       double lowest_ma_fast = MathMin(MathMin(ma_fast[period][CURR], ma_fast[period][PREV]), ma_fast[period][FAR]);
+       // new_value = If(OpTypeValue(cmd) == loss_or_profit, HighestValue(ma_fast[timeframe]), LowestValue(ma_fast[timeframe]));
+       double highest_ma_fast = MathMax(MathMax(ma_fast[timeframe][CURR], ma_fast[timeframe][PREV]), ma_fast[timeframe][FAR]);
+       double lowest_ma_fast = MathMin(MathMin(ma_fast[timeframe][CURR], ma_fast[timeframe][PREV]), ma_fast[timeframe][FAR]);
        new_value = If(OpTypeValue(cmd) == loss_or_profit, highest_ma_fast, lowest_ma_fast);
        break;
      case T_MA_F_TRAIL: // MA Small (Current) - trailing stop
-       new_value = ma_fast[period][CURR] + trail * factor;
+       new_value = ma_fast[timeframe][CURR] + trail * factor;
        break;
      case T_MA_F_FAR_TRAIL: // MA Small (Far) - trailing stop
-       new_value = ma_fast[period][FAR] + trail * factor;
+       new_value = ma_fast[timeframe][FAR] + trail * factor;
        break;
      case T_MA_M: // MA Medium (Current)
-       new_value = ma_medium[period][CURR];
+       new_value = ma_medium[timeframe][CURR];
        break;
      case T_MA_M_FAR: // MA Medium (Far)
-       new_value = ma_medium[period][FAR];
+       new_value = ma_medium[timeframe][FAR];
        break;
      case T_MA_M_LOW: // Lowest/highest value of MA Medium.
-       // new_value = If(OpTypeValue(cmd) == loss_or_profit, HighestValue(ma_medium[period]), LowestValue(ma_medium[period]));
-       double highest_ma_medium = MathMax(MathMax(ma_medium[period][CURR], ma_medium[period][PREV]), ma_medium[period][FAR]);
-       double lowest_ma_medium = MathMin(MathMin(ma_medium[period][CURR], ma_medium[period][PREV]), ma_medium[period][FAR]);
+       // new_value = If(OpTypeValue(cmd) == loss_or_profit, HighestValue(ma_medium[timeframe]), LowestValue(ma_medium[timeframe]));
+       double highest_ma_medium = MathMax(MathMax(ma_medium[timeframe][CURR], ma_medium[timeframe][PREV]), ma_medium[timeframe][FAR]);
+       double lowest_ma_medium = MathMin(MathMin(ma_medium[timeframe][CURR], ma_medium[timeframe][PREV]), ma_medium[timeframe][FAR]);
        new_value = If(OpTypeValue(cmd) == loss_or_profit, highest_ma_medium, lowest_ma_medium);
        break;
      case T_MA_M_TRAIL: // MA Small (Current) - trailing stop
-       new_value = ma_medium[period][0] + trail * factor;
+       new_value = ma_medium[timeframe][CURR] + trail * factor;
        break;
      case T_MA_M_FAR_TRAIL: // MA Small (Far) - trailing stop
-       new_value = ma_medium[period][2] + trail * factor;
+       new_value = ma_medium[timeframe][FAR] + trail * factor;
        break;
      case T_MA_S: // MA Slow (Current)
-       new_value = ma_slow[period][0];
+       new_value = ma_slow[timeframe][CURR];
        break;
      case T_MA_S_FAR: // MA Slow (Far)
-       new_value = ma_slow[period][2];
+       new_value = ma_slow[timeframe][FAR];
        break;
      case T_MA_S_TRAIL: // MA Slow (Current) - trailing stop
-       new_value = ma_slow[period][0] + trail * factor;
+       new_value = ma_slow[timeframe][CURR] + trail * factor;
        break;
      case T_MA_LOWEST: // Lowest/highest value of all MAs.
      /* FIXME: invalid array access
        new_value = If(OpTypeValue(cmd) == loss_or_profit,
-                       MathMax(MathMax(LowestValue(ma_fast[period]), LowestValue(ma_medium[period])), LowestValue(ma_slow[period])),
-                       MathMin(MathMin(LowestValue(ma_fast[period]), LowestValue(ma_medium[period])), LowestValue(ma_slow[period]))
+                       MathMax(MathMax(LowestValue(ma_fast[timeframe]), LowestValue(ma_medium[timeframe])), LowestValue(ma_slow[timeframe])),
+                       MathMin(MathMin(LowestValue(ma_fast[timeframe]), LowestValue(ma_medium[timeframe])), LowestValue(ma_slow[timeframe]))
                       );*/
-       double l_highest_ma_fast = MathMax(MathMax(ma_fast[period][CURR], ma_fast[period][PREV]), ma_fast[period][FAR]);
-       double l_lowest_ma_fast = MathMin(MathMin(ma_fast[period][CURR], ma_fast[period][PREV]), ma_fast[period][FAR]);
-       double l_highest_ma_medium = MathMax(MathMax(ma_medium[period][CURR], ma_medium[period][PREV]), ma_medium[period][FAR]);
-       double l_lowest_ma_medium = MathMin(MathMin(ma_medium[period][CURR], ma_medium[period][PREV]), ma_medium[period][FAR]);
-       double l_highest_ma_slow = MathMax(MathMax(ma_slow[period][CURR], ma_slow[period][PREV]), ma_slow[period][FAR]);
-       double l_lowest_ma_slow = MathMin(MathMin(ma_slow[period][CURR], ma_slow[period][PREV]), ma_slow[period][FAR]);
+       double l_highest_ma_fast = MathMax(MathMax(ma_fast[timeframe][CURR], ma_fast[timeframe][PREV]), ma_fast[timeframe][FAR]);
+       double l_lowest_ma_fast = MathMin(MathMin(ma_fast[timeframe][CURR], ma_fast[timeframe][PREV]), ma_fast[timeframe][FAR]);
+       double l_highest_ma_medium = MathMax(MathMax(ma_medium[timeframe][CURR], ma_medium[timeframe][PREV]), ma_medium[timeframe][FAR]);
+       double l_lowest_ma_medium = MathMin(MathMin(ma_medium[timeframe][CURR], ma_medium[timeframe][PREV]), ma_medium[timeframe][FAR]);
+       double l_highest_ma_slow = MathMax(MathMax(ma_slow[timeframe][CURR], ma_slow[timeframe][PREV]), ma_slow[timeframe][FAR]);
+       double l_lowest_ma_slow = MathMin(MathMin(ma_slow[timeframe][CURR], ma_slow[timeframe][PREV]), ma_slow[timeframe][FAR]);
        double highest_ma = MathMax(MathMax(l_highest_ma_fast, l_highest_ma_medium), l_highest_ma_slow);
        double lowest_ma = MathMin(MathMin(l_lowest_ma_fast, l_lowest_ma_medium), l_lowest_ma_slow);
        new_value = If(OpTypeValue(cmd) == loss_or_profit, highest_ma, lowest_ma);
        break;
      case T_SAR: // Current SAR value.
-       new_value = sar[period][0];
+       new_value = sar[timeframe][CURR];
        break;
      case T_SAR_LOW: // Lowest/highest SAR value.
        // FIXME: invalid array access
-       // new_value = If(OpTypeValue(cmd) == loss_or_profit, HighestValue(sar[period]), LowestValue(sar[period]));
-       double sar_highest = MathMax(MathMax(sar[period][CURR], sar[period][PREV]), sar[period][FAR]);
-       double sar_lowest = MathMin(MathMin(sar[period][CURR], sar[period][PREV]), sar[period][FAR]);
+       // new_value = If(OpTypeValue(cmd) == loss_or_profit, HighestValue(sar[timeframe]), LowestValue(sar[timeframe]));
+       double sar_highest = MathMax(MathMax(sar[timeframe][CURR], sar[timeframe][PREV]), sar[timeframe][FAR]);
+       double sar_lowest = MathMin(MathMin(sar[timeframe][CURR], sar[timeframe][PREV]), sar[timeframe][FAR]);
        new_value = If(OpTypeValue(cmd) == loss_or_profit, sar_highest, sar_lowest);
        break;
      case T_BANDS: // Current Bands value.
-       new_value = If(OpTypeValue(cmd) == loss_or_profit, bands[period][CURR][MODE_UPPER], bands[period][CURR][MODE_LOWER]);
+       new_value = If(OpTypeValue(cmd) == loss_or_profit, bands[timeframe][CURR][MODE_UPPER], bands[timeframe][CURR][MODE_LOWER]);
        break;
      case T_BANDS_LOW: // Lowest/highest Bands value.
        new_value = If(OpTypeValue(cmd) == loss_or_profit,
-         MathMax(MathMax(bands[period][CURR][MODE_UPPER], bands[period][PREV][MODE_UPPER]), bands[period][FAR][MODE_UPPER]),
-         MathMin(MathMin(bands[period][CURR][MODE_LOWER], bands[period][PREV][MODE_LOWER]), bands[period][FAR][MODE_LOWER])
+         MathMax(MathMax(bands[timeframe][CURR][MODE_UPPER], bands[timeframe][PREV][MODE_UPPER]), bands[timeframe][FAR][MODE_UPPER]),
+         MathMin(MathMin(bands[timeframe][CURR][MODE_LOWER], bands[timeframe][PREV][MODE_LOWER]), bands[timeframe][FAR][MODE_LOWER])
          );
        break;
      case T_ENVELOPES: // Current Bands value.
-       new_value = If(OpTypeValue(cmd) == loss_or_profit, envelopes[period][CURR][MODE_UPPER], envelopes[period][CURR][MODE_LOWER]);
+       new_value = If(OpTypeValue(cmd) == loss_or_profit, envelopes[timeframe][CURR][MODE_UPPER], envelopes[timeframe][CURR][MODE_LOWER]);
        break;
      default:
        if (VerboseDebug) Print(__FUNCTION__ + "(): Error: Unknown trailing stop method: ", method);
@@ -2659,18 +2841,24 @@ void ShowLine(string oname, double price, int colour = Yellow) {
     ObjectMove(oname, 0, Time[0], price);
 }
 
-// Get current open price depending on the operation type.
-// op_type: SELL = -1, BUY = 1
+/*
+ * Get current open price depending on the operation type.
+ * @param:
+ *   op_type (int)
+ */
 double GetOpenPrice(int op_type = EMPTY_VALUE) {
    if (op_type == EMPTY_VALUE) op_type = OrderType();
-   return If(OpTypeValue(op_type) > 0, Ask, Bid);
+   return If(op_type == OP_BUY, Ask, Bid);
 }
 
-// Get current close price depending on the operation type.
-// op_type: SELL = -1, BUY = 1
+/*
+ * Get current close price depending on the operation type.
+ * @param:
+ *   op_type (int)
+ */
 double GetClosePrice(int op_type = EMPTY_VALUE) {
    if (op_type == EMPTY_VALUE) op_type = OrderType();
-   return If(OpTypeValue(op_type) > 0, Bid, Ask);
+   return If(op_type == OP_BUY, Bid, Ask);
 }
 
 int OpTypeValue(int op_type) {
@@ -3037,13 +3225,25 @@ double NormalizePrice(double p, string pair=""){
    return( MathRound(p/ts) * ts );
 }
 
+/*
+ * Return opposite trade command operation.
+ *
+ * @param
+ *   cmd (int) - trade command operation
+ */
+int CmdOpp(int cmd) {
+  if (cmd == OP_BUY) return OP_SELL;
+  if (cmd == OP_SELL) return OP_BUY;
+  return EMPTY;
+}
+
 // Calculate number of order allowed given risk ratio.
 // Note: Optimal minimum should be 5, otherwise trading with this kind of EA doesn't make any sense.
 int GetMaxOrdersAuto() {
   double free     = AccountFreeMargin();
   double leverage = AccountLeverage();
   double one_lot  = MathMin(MarketInfo(Symbol(), MODE_MARGINREQUIRED), 10); // Price of 1 lot (minimum 10, to make sure we won't divide by zero).
-  double margin_risk = 0.5; // Percent of free margin to use (50%).
+  double margin_risk = 0.5; // Percent of free margin to use (50%). // TODO: Optimize.
   return MathMax((free * margin_risk / one_lot * (100 / leverage) / GetLotSize()) * GetRiskRatio(), 5);
 }
 
@@ -3054,7 +3254,7 @@ int GetMaxOrders() {
 
 // Calculate number of maximum of orders allowed to open per type.
 int GetMaxOrdersPerType() {
-  return If(MaxOrdersPerType > 0, MaxOrdersPerType, MathMax(MathFloor(GetMaxOrders() / GetNoOfStrategies()), 1));
+  return If(MaxOrdersPerType > 0, MaxOrdersPerType, MathMax(MathFloor(GetMaxOrders() / GetNoOfStrategies() / 2), 1));
 }
 
 // Get number of active strategies.
@@ -3154,6 +3354,7 @@ void StartNewHour() {
   ApplyStrategyMultiplierFactor(DAILY, 1, BestDailyStrategyMultiplierFactor);
   ApplyStrategyMultiplierFactor(WEEKLY, 1, BestWeeklyStrategyMultiplierFactor);
   ApplyStrategyMultiplierFactor(MONTHLY, 1, BestMonthlyStrategyMultiplierFactor);
+  // TODO: strategy PROFIT_FACTOR, LOT_SIZE
 
   // Check if RSI period needs re-calculation.
   if (RSI_DynamicPeriod) RSI_CheckPeriod();
@@ -3349,376 +3550,381 @@ void InitializeVariables() {
   // info[CUSTOM][ACTIVE]      = FALSE;
 
   name[MA1]                  = "MA M1";
-  info[MA1][ACTIVE]          = MA1_Enabled;
+  info[MA1][ACTIVE]          = MA1_Active;
   info[MA1][TIMEFRAME]       = M1;
+  info[MA1][SPREAD_LIMIT]    = MA1_MaxSpread;
   info[MA1][OPEN_METHOD]     = MA1_OpenMethod;
   info[MA1][OPEN_CONDITION1] = MA1_OpenCondition1;
   info[MA1][OPEN_CONDITION2] = MA1_OpenCondition2;
   info[MA1][CLOSE_CONDITION] = MA1_CloseCondition;
-  info[MA1][FACTOR]          = 1.0;
 
   name[MA5]                  = "MA M5";
-  info[MA5][ACTIVE]          = MA5_Enabled;
+  info[MA5][ACTIVE]          = MA5_Active;
   info[MA5][TIMEFRAME]       = M5;
+  info[MA5][SPREAD_LIMIT]    = MA5_MaxSpread;
   info[MA5][OPEN_METHOD]     = MA5_OpenMethod;
   info[MA5][OPEN_CONDITION1] = MA5_OpenCondition1;
   info[MA5][OPEN_CONDITION2] = MA5_OpenCondition2;
   info[MA5][CLOSE_CONDITION] = MA5_CloseCondition;
-  info[MA5][FACTOR]          = 1.0;
 
   name[MA15]                  = "MA M15";
-  info[MA15][ACTIVE]          = MA15_Enabled;
+  info[MA15][ACTIVE]          = MA15_Active;
   info[MA15][TIMEFRAME]       = M15;
+  info[MA15][SPREAD_LIMIT]    = MA15_MaxSpread;
   info[MA15][OPEN_METHOD]     = MA15_OpenMethod;
   info[MA15][OPEN_CONDITION1] = MA15_OpenCondition1;
   info[MA15][OPEN_CONDITION2] = MA15_OpenCondition2;
   info[MA15][CLOSE_CONDITION] = MA15_CloseCondition;
-  info[MA15][FACTOR]          = 1.0;
 
   name[MA30]                  = "MA M30";
-  info[MA30][ACTIVE]          = MA30_Enabled;
+  info[MA30][ACTIVE]          = MA30_Active;
   info[MA30][TIMEFRAME]       = M30;
+  info[MA30][SPREAD_LIMIT]    = MA30_MaxSpread;
   info[MA30][OPEN_METHOD]     = MA30_OpenMethod;
   info[MA30][OPEN_CONDITION1] = MA30_OpenCondition1;
   info[MA30][OPEN_CONDITION2] = MA30_OpenCondition2;
   info[MA30][CLOSE_CONDITION] = MA30_CloseCondition;
-  info[MA30][FACTOR]          = 1.0;
 
   name[MACD1]                  = "MACD M1";
-  info[MACD1][ACTIVE]          = MACD1_Enabled;
+  info[MACD1][ACTIVE]          = MACD1_Active;
   info[MACD1][TIMEFRAME]       = M1;
+  info[MACD1][SPREAD_LIMIT]    = MACD1_MaxSpread;
   info[MACD1][OPEN_METHOD]     = MACD1_OpenMethod;
   info[MACD1][OPEN_CONDITION1] = MACD1_OpenCondition1;
   info[MACD1][OPEN_CONDITION2] = MACD1_OpenCondition2;
   info[MACD1][CLOSE_CONDITION] = MACD1_CloseCondition;
-  info[MACD1][FACTOR]          = 1.0;
 
   name[MACD5]                  = "MACD M5";
-  info[MACD5][ACTIVE]          = MACD5_Enabled;
+  info[MACD5][ACTIVE]          = MACD5_Active;
   info[MACD5][TIMEFRAME]       = M5;
+  info[MACD5][SPREAD_LIMIT]    = MACD5_MaxSpread;
   info[MACD5][OPEN_METHOD]     = MACD5_OpenMethod;
   info[MACD5][OPEN_CONDITION1] = MACD5_OpenCondition1;
   info[MACD5][OPEN_CONDITION2] = MACD5_OpenCondition2;
   info[MACD5][CLOSE_CONDITION] = MACD5_CloseCondition;
-  info[MACD5][FACTOR]          = 1.0;
 
   name[MACD15]                  = "MACD M15";
-  info[MACD15][ACTIVE]          = MACD15_Enabled;
+  info[MACD15][ACTIVE]          = MACD15_Active;
   info[MACD15][TIMEFRAME]       = M15;
+  info[MACD15][SPREAD_LIMIT]    = MACD15_MaxSpread;
   info[MACD15][OPEN_METHOD]     = MACD15_OpenMethod;
   info[MACD15][OPEN_CONDITION1] = MACD15_OpenCondition1;
   info[MACD15][OPEN_CONDITION2] = MACD15_OpenCondition2;
   info[MACD15][CLOSE_CONDITION] = MACD15_CloseCondition;
-  info[MACD15][FACTOR]          = 1.0;
 
   name[MACD30]                  = "MACD M30";
-  info[MACD30][ACTIVE]          = MACD30_Enabled;
+  info[MACD30][ACTIVE]          = MACD30_Active;
   info[MACD30][TIMEFRAME]       = M30;
+  info[MACD30][SPREAD_LIMIT]    = MACD30_MaxSpread;
   info[MACD30][OPEN_METHOD]     = MACD30_OpenMethod;
   info[MACD30][OPEN_CONDITION1] = MACD30_OpenCondition1;
   info[MACD30][OPEN_CONDITION2] = MACD30_OpenCondition2;
   info[MACD30][CLOSE_CONDITION] = MACD30_CloseCondition;
-  info[MACD30][FACTOR]          = 1.0;
 
   name[ALLIGATOR1]                  = "Alligator M1";
-  info[ALLIGATOR1][ACTIVE]          = Alligator1_Enabled;
+  info[ALLIGATOR1][ACTIVE]          = Alligator1_Active;
   info[ALLIGATOR1][TIMEFRAME]       = M1;
+  info[ALLIGATOR1][SPREAD_LIMIT]    = Alligator1_MaxSpread;
   info[ALLIGATOR1][OPEN_METHOD]     = Alligator1_OpenMethod;
   info[ALLIGATOR1][OPEN_CONDITION1] = Alligator1_OpenCondition1;
   info[ALLIGATOR1][OPEN_CONDITION2] = Alligator1_OpenCondition2;
   info[ALLIGATOR1][CLOSE_CONDITION] = Alligator1_CloseCondition;
-  info[ALLIGATOR1][FACTOR]          = 1.0;
 
   name[ALLIGATOR5]                  = "Alligator M5";
-  info[ALLIGATOR5][ACTIVE]          = Alligator5_Enabled;
+  info[ALLIGATOR5][ACTIVE]          = Alligator5_Active;
   info[ALLIGATOR5][TIMEFRAME]       = M5;
+  info[ALLIGATOR5][SPREAD_LIMIT]    = Alligator5_MaxSpread;
   info[ALLIGATOR5][OPEN_METHOD]     = Alligator5_OpenMethod;
   info[ALLIGATOR5][OPEN_CONDITION1] = Alligator5_OpenCondition1;
   info[ALLIGATOR5][OPEN_CONDITION2] = Alligator5_OpenCondition2;
   info[ALLIGATOR5][CLOSE_CONDITION] = Alligator5_CloseCondition;
-  info[ALLIGATOR5][FACTOR]          = 1.0;
 
   name[ALLIGATOR15]                  = "Alligator M15";
-  info[ALLIGATOR15][ACTIVE]          = Alligator15_Enabled;
+  info[ALLIGATOR15][ACTIVE]          = Alligator15_Active;
   info[ALLIGATOR15][TIMEFRAME]       = M15;
+  info[ALLIGATOR15][SPREAD_LIMIT]    = Alligator15_MaxSpread;
   info[ALLIGATOR15][OPEN_METHOD]     = Alligator15_OpenMethod;
   info[ALLIGATOR15][OPEN_CONDITION1] = Alligator15_OpenCondition1;
   info[ALLIGATOR15][OPEN_CONDITION2] = Alligator15_OpenCondition2;
   info[ALLIGATOR15][CLOSE_CONDITION] = Alligator15_CloseCondition;
-  info[ALLIGATOR15][FACTOR]          = 1.0;
 
   name[ALLIGATOR30]                  = "Alligator M30";
-  info[ALLIGATOR30][ACTIVE]          = Alligator30_Enabled;
+  info[ALLIGATOR30][ACTIVE]          = Alligator30_Active;
   info[ALLIGATOR30][TIMEFRAME]       = M30;
+  info[ALLIGATOR30][SPREAD_LIMIT]    = Alligator30_MaxSpread;
   info[ALLIGATOR30][OPEN_METHOD]     = Alligator30_OpenMethod;
   info[ALLIGATOR30][OPEN_CONDITION1] = Alligator30_OpenCondition1;
   info[ALLIGATOR30][OPEN_CONDITION2] = Alligator30_OpenCondition2;
   info[ALLIGATOR30][CLOSE_CONDITION] = Alligator30_CloseCondition;
-  info[ALLIGATOR30][FACTOR]          = 1.0;
 
   name[RSI1]                  = "RSI M1";
-  info[RSI1][ACTIVE]          = RSI1_Enabled;
+  info[RSI1][ACTIVE]          = RSI1_Active;
   info[RSI1][TIMEFRAME]       = M1;
+  info[RSI1][SPREAD_LIMIT]    = RSI1_MaxSpread;
   info[RSI1][OPEN_METHOD]     = RSI1_OpenMethod;
   info[RSI1][OPEN_CONDITION1] = RSI1_OpenCondition1;
   info[RSI1][OPEN_CONDITION2] = RSI1_OpenCondition2;
   info[RSI1][CLOSE_CONDITION] = RSI1_CloseCondition;
   info[RSI1][CUSTOM_PERIOD]   = RSI_Period;
-  info[RSI1][FACTOR]          = 1.0;
 
   name[RSI5]                  = "RSI M5";
-  info[RSI5][ACTIVE]          = RSI5_Enabled;
+  info[RSI5][ACTIVE]          = RSI5_Active;
   info[RSI5][TIMEFRAME]       = M5;
+  info[RSI5][SPREAD_LIMIT]    = RSI5_MaxSpread;
   info[RSI5][OPEN_METHOD]     = RSI5_OpenMethod;
   info[RSI5][OPEN_CONDITION1] = RSI5_OpenCondition1;
   info[RSI5][OPEN_CONDITION2] = RSI5_OpenCondition2;
   info[RSI5][CLOSE_CONDITION] = RSI5_CloseCondition;
   info[RSI5][CUSTOM_PERIOD]   = RSI_Period;
-  info[RSI5][FACTOR]          = 1.0;
 
   name[RSI15]                  = "RSI M15";
-  info[RSI15][ACTIVE]          = RSI15_Enabled;
+  info[RSI15][ACTIVE]          = RSI15_Active;
   info[RSI15][TIMEFRAME]       = M15;
+  info[RSI15][SPREAD_LIMIT]    = RSI15_MaxSpread;
   info[RSI15][OPEN_METHOD]     = RSI15_OpenMethod;
   info[RSI15][OPEN_CONDITION1] = RSI15_OpenCondition1;
   info[RSI15][OPEN_CONDITION2] = RSI15_OpenCondition2;
   info[RSI15][CLOSE_CONDITION] = RSI15_CloseCondition;
   info[RSI15][CUSTOM_PERIOD]   = RSI_Period;
-  info[RSI15][FACTOR]          = 1.0;
 
   name[RSI30]                  = "RSI M30";
-  info[RSI30][ACTIVE]          = RSI30_Enabled;
+  info[RSI30][ACTIVE]          = RSI30_Active;
   info[RSI30][TIMEFRAME]       = M30;
+  info[RSI30][SPREAD_LIMIT]    = RSI30_MaxSpread;
   info[RSI30][OPEN_METHOD]     = RSI30_OpenMethod;
   info[RSI30][OPEN_CONDITION1] = RSI30_OpenCondition1;
   info[RSI30][OPEN_CONDITION2] = RSI30_OpenCondition2;
   info[RSI30][CLOSE_CONDITION] = RSI30_CloseCondition;
   info[RSI30][CUSTOM_PERIOD]   = RSI_Period;
-  info[RSI30][FACTOR]          = 1.0;
 
   name[SAR1]                  = "SAR M1";
-  info[SAR1][ACTIVE]          = SAR1_Enabled;
+  info[SAR1][ACTIVE]          = SAR1_Active;
   info[SAR1][TIMEFRAME]       = M1;
+  info[SAR1][SPREAD_LIMIT]    = SAR1_MaxSpread;
   info[SAR1][OPEN_METHOD]     = SAR1_OpenMethod;
   info[SAR1][OPEN_CONDITION1] = SAR1_OpenCondition1;
   info[SAR1][OPEN_CONDITION2] = SAR1_OpenCondition2;
   info[SAR1][CLOSE_CONDITION] = SAR1_CloseCondition;
-  info[SAR1][FACTOR]          = 1.0;
 
   name[SAR5]                  = "SAR M5";
-  info[SAR5][ACTIVE]          = SAR5_Enabled;
+  info[SAR5][ACTIVE]          = SAR5_Active;
   info[SAR5][TIMEFRAME]       = M5;
+  info[SAR5][SPREAD_LIMIT]    = SAR5_MaxSpread;
   info[SAR5][OPEN_METHOD]     = SAR5_OpenMethod;
   info[SAR5][OPEN_CONDITION1] = SAR5_OpenCondition1;
   info[SAR5][OPEN_CONDITION2] = SAR5_OpenCondition2;
   info[SAR5][CLOSE_CONDITION] = SAR5_CloseCondition;
-  info[SAR5][FACTOR]          = 1.0;
 
   name[SAR15]                  = "SAR M15";
-  info[SAR15][ACTIVE]          = SAR15_Enabled;
+  info[SAR15][ACTIVE]          = SAR15_Active;
   info[SAR15][TIMEFRAME]       = M15;
   info[SAR15][OPEN_METHOD]     = SAR15_OpenMethod;
+  info[SAR15][SPREAD_LIMIT]    = SAR15_MaxSpread;
   info[SAR15][OPEN_CONDITION1] = SAR15_OpenCondition1;
   info[SAR15][OPEN_CONDITION2] = SAR15_OpenCondition2;
   info[SAR15][CLOSE_CONDITION] = SAR15_CloseCondition;
-  info[SAR15][FACTOR]          = 1.0;
 
   name[SAR30]                  = "SAR M30";
-  info[SAR30][ACTIVE]          = SAR30_Enabled;
+  info[SAR30][ACTIVE]          = SAR30_Active;
   info[SAR30][TIMEFRAME]       = M30;
+  info[SAR30][SPREAD_LIMIT]    = SAR30_MaxSpread;
   info[SAR30][OPEN_METHOD]     = SAR30_OpenMethod;
   info[SAR30][OPEN_CONDITION1] = SAR30_OpenCondition1;
   info[SAR30][OPEN_CONDITION2] = SAR30_OpenCondition2;
   info[SAR30][CLOSE_CONDITION] = SAR30_CloseCondition;
-  info[SAR30][FACTOR]          = 1.0;
 
   name[BANDS1]                  = "Bands M1";
-  info[BANDS1][ACTIVE]          = Bands1_Enabled;
+  info[BANDS1][ACTIVE]          = Bands1_Active;
   info[BANDS1][TIMEFRAME]       = M1;
+  info[BANDS1][SPREAD_LIMIT]    = Bands1_MaxSpread;
   info[BANDS1][OPEN_METHOD]     = Bands1_OpenMethod;
   info[BANDS1][CUSTOM_PERIOD]   = Bands_Period;
   info[BANDS1][OPEN_CONDITION1] = Bands1_OpenCondition1;
   info[BANDS1][OPEN_CONDITION2] = Bands1_OpenCondition2;
   info[BANDS1][CLOSE_CONDITION] = Bands1_CloseCondition;
-  info[BANDS1][FACTOR]          = 1.0;
 
   name[BANDS5]                  = "Bands M5";
-  info[BANDS5][ACTIVE]          = Bands5_Enabled;
+  info[BANDS5][ACTIVE]          = Bands5_Active;
   info[BANDS5][TIMEFRAME]       = M5;
+  info[BANDS5][SPREAD_LIMIT]    = Bands5_MaxSpread;
   info[BANDS5][OPEN_METHOD]     = Bands5_OpenMethod;
   info[BANDS5][CUSTOM_PERIOD]   = Bands_Period;
   info[BANDS5][OPEN_CONDITION1] = Bands5_OpenCondition1;
   info[BANDS5][OPEN_CONDITION2] = Bands5_OpenCondition2;
   info[BANDS5][CLOSE_CONDITION] = Bands5_CloseCondition;
-  info[BANDS5][FACTOR]          = 1.0;
 
   name[BANDS15]                  = "Bands M15";
-  info[BANDS15][ACTIVE]          = Bands15_Enabled;
+  info[BANDS15][ACTIVE]          = Bands15_Active;
   info[BANDS15][TIMEFRAME]       = M15;
+  info[BANDS15][SPREAD_LIMIT]    = Bands15_MaxSpread;
   info[BANDS15][OPEN_METHOD]     = Bands15_OpenMethod;
   info[BANDS15][CUSTOM_PERIOD]   = Bands_Period;
   info[BANDS15][OPEN_CONDITION1] = Bands15_OpenCondition1;
   info[BANDS15][OPEN_CONDITION2] = Bands15_OpenCondition2;
   info[BANDS15][CLOSE_CONDITION] = Bands15_CloseCondition;
-  info[BANDS15][FACTOR]          = 1.0;
 
   name[BANDS30]                  = "Bands M30";
-  info[BANDS30][ACTIVE]          = Bands30_Enabled;
+  info[BANDS30][ACTIVE]          = Bands30_Active;
   info[BANDS30][TIMEFRAME]       = M30;
+  info[BANDS30][SPREAD_LIMIT]    = Bands30_MaxSpread;
   info[BANDS30][OPEN_METHOD]     = Bands30_OpenMethod;
   info[BANDS30][CUSTOM_PERIOD]   = Bands_Period;
   info[BANDS30][OPEN_CONDITION1] = Bands30_OpenCondition1;
   info[BANDS30][OPEN_CONDITION2] = Bands30_OpenCondition2;
   info[BANDS30][CLOSE_CONDITION] = Bands30_CloseCondition;
-  info[BANDS30][FACTOR]          = 1.0;
 
   name[ENVELOPES1]                  = "Envelopes M1";
-  info[ENVELOPES1][ACTIVE]          = Envelopes1_Enabled;
+  info[ENVELOPES1][ACTIVE]          = Envelopes1_Active;
   info[ENVELOPES1][TIMEFRAME]       = M1;
+  info[ENVELOPES1][SPREAD_LIMIT]    = Envelopes1_MaxSpread;
   info[ENVELOPES1][OPEN_METHOD]     = Envelopes1_OpenMethod;
   info[ENVELOPES1][OPEN_CONDITION1] = Envelopes1_OpenCondition1;
   info[ENVELOPES1][OPEN_CONDITION2] = Envelopes1_OpenCondition2;
   info[ENVELOPES1][CLOSE_CONDITION] = Envelopes1_CloseCondition;
   info[ENVELOPES1][CUSTOM_PERIOD]   = Envelopes_MA_Period;
-  info[ENVELOPES1][FACTOR]          = 1.0;
 
   name[ENVELOPES5]                  = "Envelopes M5";
-  info[ENVELOPES5][ACTIVE]          = Envelopes5_Enabled;
+  info[ENVELOPES5][ACTIVE]          = Envelopes5_Active;
   info[ENVELOPES5][TIMEFRAME]       = M5;
+  info[ENVELOPES5][SPREAD_LIMIT]    = Envelopes5_MaxSpread;
   info[ENVELOPES5][OPEN_METHOD]     = Envelopes5_OpenMethod;
   info[ENVELOPES5][OPEN_CONDITION1] = Envelopes5_OpenCondition1;
   info[ENVELOPES5][OPEN_CONDITION2] = Envelopes5_OpenCondition2;
   info[ENVELOPES5][CLOSE_CONDITION] = Envelopes5_CloseCondition;
   info[ENVELOPES5][CUSTOM_PERIOD]   = Envelopes_MA_Period;
-  info[ENVELOPES5][FACTOR]          = 1.0;
 
   name[ENVELOPES15]                  = "Envelopes M15";
-  info[ENVELOPES15][ACTIVE]          = Envelopes15_Enabled;
+  info[ENVELOPES15][ACTIVE]          = Envelopes15_Active;
   info[ENVELOPES15][TIMEFRAME]       = M15;
+  info[ENVELOPES15][SPREAD_LIMIT]    = Envelopes15_MaxSpread;
   info[ENVELOPES15][OPEN_METHOD]     = Envelopes15_OpenMethod;
   info[ENVELOPES15][OPEN_CONDITION1] = Envelopes15_OpenCondition1;
   info[ENVELOPES15][OPEN_CONDITION2] = Envelopes15_OpenCondition2;
   info[ENVELOPES15][CLOSE_CONDITION] = Envelopes15_CloseCondition;
   info[ENVELOPES15][CUSTOM_PERIOD]   = Envelopes_MA_Period;
-  info[ENVELOPES15][FACTOR]          = 1.0;
 
   name[ENVELOPES30]                  = "Envelopes M30";
-  info[ENVELOPES30][ACTIVE]          = Envelopes30_Enabled;
+  info[ENVELOPES30][ACTIVE]          = Envelopes30_Active;
   info[ENVELOPES30][TIMEFRAME]       = M30;
+  info[ENVELOPES30][SPREAD_LIMIT]    = Envelopes30_MaxSpread;
   info[ENVELOPES30][OPEN_METHOD]     = Envelopes30_OpenMethod;
   info[ENVELOPES30][OPEN_CONDITION1] = Envelopes30_OpenCondition1;
   info[ENVELOPES30][OPEN_CONDITION2] = Envelopes30_OpenCondition2;
   info[ENVELOPES30][CLOSE_CONDITION] = Envelopes30_CloseCondition;
   info[ENVELOPES30][CUSTOM_PERIOD]   = Envelopes_MA_Period;
-  info[ENVELOPES30][FACTOR]          = 1.0;
 
   name[WPR1]                  = "WPR M1";
-  info[WPR1][ACTIVE]          = WPR1_Enabled;
+  info[WPR1][ACTIVE]          = WPR1_Active;
   info[WPR1][TIMEFRAME]       = M1;
   info[WPR1][OPEN_METHOD]     = WPR1_OpenMethod;
+  info[WPR1][SPREAD_LIMIT]    = WPR1_MaxSpread;
   info[WPR1][OPEN_CONDITION1] = WPR1_OpenCondition1;
   info[WPR1][OPEN_CONDITION2] = WPR1_OpenCondition2;
   info[WPR1][CLOSE_CONDITION] = WPR1_CloseCondition;
-  info[WPR1][FACTOR]          = 1.0;
 
   name[WPR5]                  = "WPR M5";
-  info[WPR5][ACTIVE]          = WPR5_Enabled;
+  info[WPR5][ACTIVE]          = WPR5_Active;
   info[WPR5][TIMEFRAME]       = M5;
   info[WPR5][OPEN_METHOD]     = WPR5_OpenMethod;
+  info[WPR5][SPREAD_LIMIT]    = WPR5_MaxSpread;
   info[WPR5][OPEN_CONDITION1] = WPR5_OpenCondition1;
   info[WPR5][OPEN_CONDITION2] = WPR5_OpenCondition2;
   info[WPR5][CLOSE_CONDITION] = WPR5_CloseCondition;
-  info[WPR5][FACTOR]          = 1.0;
 
   name[WPR15]                  = "WPR M15";
-  info[WPR15][ACTIVE]          = WPR15_Enabled;
+  info[WPR15][ACTIVE]          = WPR15_Active;
   info[WPR15][TIMEFRAME]       = M15;
   info[WPR15][OPEN_METHOD]     = WPR15_OpenMethod;
+  info[WPR15][SPREAD_LIMIT]    = WPR15_MaxSpread;
   info[WPR15][OPEN_CONDITION1] = WPR15_OpenCondition1;
   info[WPR15][OPEN_CONDITION2] = WPR15_OpenCondition2;
   info[WPR15][CLOSE_CONDITION] = WPR15_CloseCondition;
-  info[WPR15][FACTOR]          = 1.0;
 
   name[WPR30]                  = "WPR M30";
-  info[WPR30][ACTIVE]          = WPR30_Enabled;
+  info[WPR30][ACTIVE]          = WPR30_Active;
   info[WPR30][TIMEFRAME]       = M30;
+  info[WPR30][SPREAD_LIMIT]    = WPR30_MaxSpread;
   info[WPR30][OPEN_METHOD]     = WPR30_OpenMethod;
   info[WPR30][OPEN_CONDITION1] = WPR30_OpenCondition1;
   info[WPR30][OPEN_CONDITION2] = WPR30_OpenCondition2;
   info[WPR30][CLOSE_CONDITION] = WPR30_CloseCondition;
-  info[WPR30][FACTOR]          = 1.0;
 
   name[DEMARKER1]                  = "DeMarker M1";
-  info[DEMARKER1][ACTIVE]          = DeMarker1_Enabled;
+  info[DEMARKER1][ACTIVE]          = DeMarker1_Active;
   info[DEMARKER1][TIMEFRAME]       = M1;
+  info[DEMARKER1][SPREAD_LIMIT]    = DeMarker1_MaxSpread;
   info[DEMARKER1][OPEN_METHOD]     = DeMarker1_OpenMethod;
   info[DEMARKER1][OPEN_CONDITION1] = DeMarker1_OpenCondition1;
   info[DEMARKER1][OPEN_CONDITION2] = DeMarker1_OpenCondition2;
   info[DEMARKER1][CLOSE_CONDITION] = DeMarker1_CloseCondition;
-  info[DEMARKER1][FACTOR]          = 1.0;
 
   name[DEMARKER5]                  = "DeMarker M5";
-  info[DEMARKER5][ACTIVE]          = DeMarker5_Enabled;
+  info[DEMARKER5][ACTIVE]          = DeMarker5_Active;
   info[DEMARKER5][TIMEFRAME]       = M5;
+  info[DEMARKER5][SPREAD_LIMIT]    = DeMarker5_MaxSpread;
   info[DEMARKER5][OPEN_METHOD]     = DeMarker5_OpenMethod;
   info[DEMARKER5][OPEN_CONDITION1] = DeMarker5_OpenCondition1;
   info[DEMARKER5][OPEN_CONDITION2] = DeMarker5_OpenCondition2;
   info[DEMARKER5][CLOSE_CONDITION] = DeMarker5_CloseCondition;
-  info[DEMARKER5][FACTOR]          = 1.0;
 
   name[DEMARKER15]                  = "DeMarker M15";
-  info[DEMARKER15][ACTIVE]          = DeMarker15_Enabled;
+  info[DEMARKER15][ACTIVE]          = DeMarker15_Active;
   info[DEMARKER15][TIMEFRAME]       = M15;
+  info[DEMARKER15][SPREAD_LIMIT]    = DeMarker15_MaxSpread;
   info[DEMARKER15][OPEN_METHOD]     = DeMarker15_OpenMethod;
   info[DEMARKER15][OPEN_CONDITION1] = DeMarker15_OpenCondition1;
   info[DEMARKER15][OPEN_CONDITION2] = DeMarker15_OpenCondition2;
   info[DEMARKER15][CLOSE_CONDITION] = DeMarker15_CloseCondition;
-  info[DEMARKER15][FACTOR]          = 1.0;
 
   name[DEMARKER30]                  = "DeMarker M30";
-  info[DEMARKER30][ACTIVE]          = DeMarker30_Enabled;
+  info[DEMARKER30][ACTIVE]          = DeMarker30_Active;
   info[DEMARKER30][TIMEFRAME]       = M30;
+  info[DEMARKER30][SPREAD_LIMIT]    = DeMarker30_MaxSpread;
   info[DEMARKER30][OPEN_METHOD]     = DeMarker30_OpenMethod;
   info[DEMARKER30][OPEN_CONDITION1] = DeMarker30_OpenCondition1;
   info[DEMARKER30][OPEN_CONDITION2] = DeMarker30_OpenCondition2;
   info[DEMARKER30][CLOSE_CONDITION] = DeMarker30_CloseCondition;
-  info[DEMARKER30][FACTOR]          = 1.0;
 
   name[FRACTALS1]                  = "Fractals M1";
-  info[FRACTALS1][ACTIVE]          = Fractals1_Enabled;
+  info[FRACTALS1][ACTIVE]          = Fractals1_Active;
   info[FRACTALS1][TIMEFRAME]       = M1;
+  info[FRACTALS1][SPREAD_LIMIT]    = Fractals1_MaxSpread;
   info[FRACTALS1][OPEN_METHOD]     = Fractals1_OpenMethod;
   info[FRACTALS1][OPEN_CONDITION1] = Fractals1_OpenCondition1;
   info[FRACTALS1][OPEN_CONDITION2] = Fractals1_OpenCondition2;
   info[FRACTALS1][CLOSE_CONDITION] = Fractals1_CloseCondition;
-  info[FRACTALS1][FACTOR]          = 1.0;
 
   name[FRACTALS5]                  = "Fractals M5";
-  info[FRACTALS5][ACTIVE]          = Fractals5_Enabled;
+  info[FRACTALS5][ACTIVE]          = Fractals5_Active;
   info[FRACTALS5][TIMEFRAME]       = M5;
+  info[FRACTALS5][SPREAD_LIMIT]    = Fractals5_MaxSpread;
   info[FRACTALS5][OPEN_METHOD]     = Fractals5_OpenMethod;
   info[FRACTALS5][OPEN_CONDITION1] = Fractals5_OpenCondition1;
   info[FRACTALS5][OPEN_CONDITION2] = Fractals5_OpenCondition2;
   info[FRACTALS5][CLOSE_CONDITION] = Fractals5_CloseCondition;
-  info[FRACTALS5][FACTOR]          = 1.0;
 
   name[FRACTALS15]                  = "Fractals M15";
-  info[FRACTALS15][ACTIVE]          = Fractals15_Enabled;
+  info[FRACTALS15][ACTIVE]          = Fractals15_Active;
   info[FRACTALS15][TIMEFRAME]       = M15;
+  info[FRACTALS15][SPREAD_LIMIT]    = Fractals15_MaxSpread;
   info[FRACTALS15][OPEN_METHOD]     = Fractals15_OpenMethod;
   info[FRACTALS15][OPEN_CONDITION1] = Fractals15_OpenCondition1;
   info[FRACTALS15][OPEN_CONDITION2] = Fractals15_OpenCondition2;
   info[FRACTALS15][CLOSE_CONDITION] = Fractals15_CloseCondition;
-  info[FRACTALS15][FACTOR]          = 1.0;
 
   name[FRACTALS30]                  = "Fractals M30";
-  info[FRACTALS30][ACTIVE]          = Fractals30_Enabled;
+  info[FRACTALS30][ACTIVE]          = Fractals30_Active;
   info[FRACTALS30][TIMEFRAME]       = M30;
+  info[FRACTALS30][SPREAD_LIMIT]    = Fractals30_MaxSpread;
   info[FRACTALS30][OPEN_METHOD]     = Fractals30_OpenMethod;
   info[FRACTALS30][OPEN_CONDITION1] = Fractals30_OpenCondition1;
   info[FRACTALS30][OPEN_CONDITION2] = Fractals30_OpenCondition2;
   info[FRACTALS30][CLOSE_CONDITION] = Fractals30_CloseCondition;
-  info[FRACTALS30][FACTOR]          = 1.0;
+
+  ArrSetValueD(conf, FACTOR, 1.0);
+  ArrSetValueD(conf, LOT_SIZE, 1.0);
+  // TODO: ArrSetValue(info, LOT_SIZE, 1.0);
+  // TODO: ArrSetValue(info, FACTOR, 1.0);
 }
 
 /*
@@ -3737,34 +3943,40 @@ void UpdateVariables() {
 void InitializeConditions() {
   acc_conditions[0][0] = Account_Condition_1;
   acc_conditions[0][1] = Market_Condition_1;
-  acc_conditions[0][2] = Action_On_Condition_1;
+  acc_conditions[0][2] = Action_Active_Condition_1;
   acc_conditions[1][0] = Account_Condition_2;
   acc_conditions[1][1] = Market_Condition_2;
-  acc_conditions[1][2] = Action_On_Condition_2;
+  acc_conditions[1][2] = Action_Active_Condition_2;
   acc_conditions[2][0] = Account_Condition_3;
   acc_conditions[2][1] = Market_Condition_3;
-  acc_conditions[2][2] = Action_On_Condition_3;
+  acc_conditions[2][2] = Action_Active_Condition_3;
   acc_conditions[3][0] = Account_Condition_4;
   acc_conditions[3][1] = Market_Condition_4;
-  acc_conditions[3][2] = Action_On_Condition_4;
+  acc_conditions[3][2] = Action_Active_Condition_4;
   acc_conditions[4][0] = Account_Condition_5;
   acc_conditions[4][1] = Market_Condition_5;
-  acc_conditions[4][2] = Action_On_Condition_5;
+  acc_conditions[4][2] = Action_Active_Condition_5;
   acc_conditions[5][0] = Account_Condition_6;
   acc_conditions[5][1] = Market_Condition_6;
-  acc_conditions[5][2] = Action_On_Condition_6;
+  acc_conditions[5][2] = Action_Active_Condition_6;
   acc_conditions[6][0] = Account_Condition_7;
   acc_conditions[6][1] = Market_Condition_7;
-  acc_conditions[6][2] = Action_On_Condition_7;
+  acc_conditions[6][2] = Action_Active_Condition_7;
   acc_conditions[7][0] = Account_Condition_8;
   acc_conditions[7][1] = Market_Condition_8;
-  acc_conditions[7][2] = Action_On_Condition_8;
+  acc_conditions[7][2] = Action_Active_Condition_8;
   acc_conditions[8][0] = Account_Condition_9;
   acc_conditions[8][1] = Market_Condition_9;
-  acc_conditions[8][2] = Action_On_Condition_9;
+  acc_conditions[8][2] = Action_Active_Condition_9;
   acc_conditions[9][0] = Account_Condition_10;
   acc_conditions[9][1] = Market_Condition_10;
-  acc_conditions[9][2] = Action_On_Condition_10;
+  acc_conditions[9][2] = Action_Active_Condition_10;
+  acc_conditions[10][0] = Account_Condition_11;
+  acc_conditions[10][1] = Market_Condition_11;
+  acc_conditions[10][2] = Action_Active_Condition_11;
+  acc_conditions[11][0] = Account_Condition_12;
+  acc_conditions[11][1] = Market_Condition_12;
+  acc_conditions[11][2] = Action_Active_Condition_12;
 }
 
 /*
@@ -3824,8 +4036,10 @@ bool MarketCondition(int condition = C_MARKET_NONE) {
       return
         (ma_medium[M5][CURR] > ma_medium[M5][PREV] && ma_slow[M5][CURR] < ma_slow[M5][PREV]) ||
         (ma_medium[M5][CURR] < ma_medium[M5][PREV] && ma_slow[M5][CURR] > ma_slow[M5][PREV]);
-    case C_MARKET_DROP:
-      return last_tick_change > BigDropSize;
+    case C_MARKET_BIG_DROP:
+      return last_tick_change > MarketSuddenDropSize;
+    case C_MARKET_VBIG_DROP:
+      return last_tick_change > MarketBigDropSize;
     case C_MARKET_NONE:
     default:
       return FALSE;
@@ -3838,7 +4052,7 @@ void CheckAccountConditions() {
 
   // if (VerboseTrace) Print("Calling " + __FUNCTION__ + "()");
 
-  if (!Account_Conditions_Enabled) return;
+  if (!Account_Conditions_Active) return;
 
   if (bar_time == last_action_time) {
     return; // If action was already executed in the same bar, do not check again.
@@ -3878,31 +4092,31 @@ void ApplyStrategyMultiplierFactor(int period = DAILY, int loss_or_profit = 0, d
     if (info[new_strategy][ACTIVE] && info[new_strategy][key] > 10 && new_strategy != previous) { // Check if it's different than the previous one.
       if (previous != EMPTY) {
         if (!info[previous][ACTIVE]) info[previous][ACTIVE] = TRUE;
-        info[previous][FACTOR] = GetDefaultLotFactor(); // Set previous strategy multiplier factor to default.
+        conf[previous][FACTOR] = GetDefaultLotFactor(); // Set previous strategy multiplier factor to default.
         if (VerboseDebug) Print(__FUNCTION__ + "(): Setting multiplier factor to default for strategy: " + previous);
       }
       best_strategy[period] = new_strategy; // Assign the new worse strategy.
       info[new_strategy][ACTIVE] = TRUE;
       new_factor = GetDefaultLotFactor() * factor;
-      info[new_strategy][FACTOR] = new_factor; // Apply multiplier factor for the new strategy.
+      conf[new_strategy][FACTOR] = new_factor; // Apply multiplier factor for the new strategy.
       if (VerboseDebug) Print(__FUNCTION__ + "(): Setting multiplier factor to " + new_factor + " for strategy: " + new_strategy + " (period: " + period_name + ")");
     }
   } else { // Worse strategy.
     if (info[new_strategy][ACTIVE] && info[new_strategy][key] < 10 && new_strategy != previous) { // Check if it's different than the previous one.
       if (previous != EMPTY) {
         if (!info[previous][ACTIVE]) info[previous][ACTIVE] = TRUE;
-        info[previous][FACTOR] = GetDefaultLotFactor(); // Set previous strategy multiplier factor to default.
+        conf[previous][FACTOR] = GetDefaultLotFactor(); // Set previous strategy multiplier factor to default.
         if (VerboseDebug) Print(__FUNCTION__ + "(): Setting multiplier factor to default for strategy: " + previous + " to default.");
       }
       worse_strategy[period] = new_strategy; // Assign the new worse strategy.
       if (factor > 0) {
         new_factor = NormalizeDouble(GetDefaultLotFactor() / factor, Digits);
         info[new_strategy][ACTIVE] = TRUE;
-        info[new_strategy][FACTOR] = new_factor; // Apply multiplier factor for the new strategy.
+        conf[new_strategy][FACTOR] = new_factor; // Apply multiplier factor for the new strategy.
         if (VerboseDebug) Print(__FUNCTION__ + "(): Setting multiplier factor to " + new_factor + " for strategy: " + new_strategy + " (period: " + period_name + ")");
       } else {
         info[new_strategy][ACTIVE] = FALSE;
-        //info[new_strategy][FACTOR] = GetDefaultLotFactor();
+        //conf[new_strategy][FACTOR] = GetDefaultLotFactor();
         if (VerboseDebug) Print(__FUNCTION__ + "(): Disabling strategy: " + new_strategy);
       }
     }
@@ -4078,11 +4292,16 @@ string GetStrategyReport(string sep = "\n") {
   double pc_loss = 0, pc_won = 0;
   for (int i = 0; i < FINAL_STRATEGY_TYPE_ENTRY; i++) {
     if (info[i][TOTAL_ORDERS] > 0) {
-      output += name[i] + ": ";
-      output += "Total net profit: " + info[i][TOTAL_PROFIT] + ", "; // FIXME: pips/points?
+      if (info[i][TOTAL_GROSS_LOSS] > 0)
+      output += StringFormat("Profit factor: %.2f, ",
+                NormalizeDouble(info[i][TOTAL_GROSS_PROFIT], 2) / -NormalizeDouble(info[i][TOTAL_GROSS_LOSS], 2));
+      output += StringFormat("Total net profit: %d, ", info[i][TOTAL_NET_PROFIT]); // FIXME: pips/points?
       pc_loss = (100 / NormalizeDouble(info[i][TOTAL_ORDERS], 2)) * info[i][TOTAL_ORDERS_LOSS];
       pc_won  = (100 / NormalizeDouble(info[i][TOTAL_ORDERS], 2)) * info[i][TOTAL_ORDERS_WON];
-      output += "Total orders: " + info[i][TOTAL_ORDERS] + " (Won: " + DoubleToStr(pc_won, 1) + "% [" + info[i][TOTAL_ORDERS_WON] + "] | Loss: " + DoubleToStr(pc_loss, 1) + "% [" + info[i][TOTAL_ORDERS_LOSS] + "]); ";
+      output += StringFormat("Total orders: %d (Won: %.1f%% [%d] / Loss: %.1f%% [%d])",
+                info[i][TOTAL_ORDERS], pc_won, info[i][TOTAL_ORDERS_WON], pc_loss, info[i][TOTAL_ORDERS_LOSS]);
+      output += " - " + name[i];
+      // output += "Total orders: " + info[i][TOTAL_ORDERS] + " (Won: " + DoubleToStr(pc_won, 1) + "% [" + info[i][TOTAL_ORDERS_WON] + "] | Loss: " + DoubleToStr(pc_loss, 1) + "% [" + info[i][TOTAL_ORDERS_LOSS] + "]); ";
       output += sep;
     }
   }
@@ -4156,7 +4375,7 @@ void SendEmail(string sep = "\n") {
 
 string GetOrderTextDetails() {
    return StringConcatenate("Order Details: ",
-      "Ticket:", OrderTicket(), "; ",
+      "Ticket: ", OrderTicket(), "; ",
       "Time: ", TimeToStr(TimeCurrent(), TIME_DATE|TIME_MINUTES|TIME_SECONDS), "; ",
       "Comment: ", OrderComment(), "; ",
       "Commision: ", OrderCommission(), "; ",
@@ -4321,6 +4540,16 @@ int GetArrKey1ByLowestKey2Value(int& arr[][], int key2) {
   return key1;
 }
 
+
+/*
+ * Set array value for items with specific keys.
+ */
+void ArrSetValueD(double& arr[][], int key, double value) {
+  for (int i = 0; i < ArrayRange(info, 0); i++) {
+    arr[i][key] = value;
+  }
+}
+
 /* END: ARRAY FUNCTIONS */
 
 /* BEGIN: ACTION FUNCTIONS */
@@ -4470,6 +4699,7 @@ int ActionCloseAllOrders(bool only_ours = TRUE) {
 // Note: Executing this can be potentially dangerous for the account if not used wisely.
 bool ActionExecute(int action_id, string reason) {
   bool result = FALSE;
+  int cmd;
   switch (action_id) {
     case A_NONE:
       result = TRUE;
@@ -4490,22 +4720,28 @@ bool ActionExecute(int action_id, string reason) {
       break;
     case A_CLOSE_ALL_PROFIT_SIDE: /* 5 */
       // TODO
-      int profit_side = GetProfitableSide();
-      if (profit_side != EMPTY) {
-        result = ActionCloseAllOrdersByType(profit_side, reason);
+      cmd = GetProfitableSide();
+      if (cmd != EMPTY) {
+        result = ActionCloseAllOrdersByType(cmd, reason);
       }
       break;
     case A_CLOSE_ALL_LOSS_SIDE: /* 6 */
-      int nonprofit_side = GetProfitableSide();
-      if (nonprofit_side != EMPTY) {
-        result = ActionCloseAllOrdersByType(If(nonprofit_side == OP_BUY, OP_SELL, OP_BUY), reason);
+      cmd = GetProfitableSide();
+      if (cmd != EMPTY) {
+        result = ActionCloseAllOrdersByType(CmdOpp(cmd), reason);
       }
       break;
     case A_CLOSE_ALL_TREND: /* 7 */
-      result = ActionCloseAllOrdersByType(CheckTrend(TrendMethodAction), reason);
+      cmd = CheckTrend(TrendMethodAction);
+      if (cmd != EMPTY) {
+        result = ActionCloseAllOrdersByType(cmd, reason);
+      }
       break;
     case A_CLOSE_ALL_NON_TREND: /* 8 */
-      result = ActionCloseAllOrdersByType(If(CheckTrend(TrendMethodAction) == OP_BUY, OP_SELL, OP_BUY), reason);
+      cmd = CheckTrend(TrendMethodAction);
+      if (cmd != EMPTY) {
+        result = ActionCloseAllOrdersByType(CmdOpp(cmd), reason);
+      }
       break;
     case A_CLOSE_ALL_ORDERS: /* 9 */
       result = ActionCloseAllOrders();
@@ -5152,16 +5388,15 @@ void CalculateSummary(double initial_deposit)
    if(ConLoss1<0.0)  ConLoss1*=-1.0;
    if(ConLoss2<0.0)  ConLoss2*=-1.0;
 //---- profit factor
-   if(GrossLoss>0.0) ProfitFactor=GrossProfit/GrossLoss;
+   if (GrossLoss > 0.0) ProfitFactor = GrossProfit / GrossLoss;
 //---- expected payoff
-   if(ProfitTrades>0) avgprofit=GrossProfit/ProfitTrades;
-   if(LossTrades>0)   avgloss  =GrossLoss/LossTrades;
-   if(SummaryTrades>0)
-     {
-      profitkoef=1.0*ProfitTrades/SummaryTrades;
-      losskoef=1.0*LossTrades/SummaryTrades;
-      ExpectedPayoff=profitkoef*avgprofit-losskoef*avgloss;
-     }
+   if (ProfitTrades > 0) avgprofit = GrossProfit / ProfitTrades;
+   if (LossTrades > 0)   avgloss   = GrossLoss   / LossTrades;
+   if (SummaryTrades > 0) {
+    profitkoef = 1.0 * ProfitTrades / SummaryTrades;
+    losskoef = 1.0 * LossTrades / SummaryTrades;
+    ExpectedPayoff = profitkoef * avgprofit - losskoef * avgloss;
+   }
 //---- absolute drawdown
    AbsoluteDrawdown = initial_deposit - MaxLoss;
   }
