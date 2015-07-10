@@ -3,7 +3,8 @@
 //+------------------------------------------------------------------+
 #define ea_name    "EA31337"
 #define ea_desc    "Multi-strategy advanced trading robot."
-#define ea_version "1.052"
+#define ea_version "1.053"
+#define ea_build   __DATETIME__ // FIXME: It's empty
 #define ea_link    "http://www.mql4.com"
 #define ea_author  "kenorb"
 
@@ -89,6 +90,7 @@ enum ENUM_STRATEGY_INFO {
   TOTAL_ORDERS,
   TOTAL_ORDERS_LOSS,
   TOTAL_ORDERS_WON,
+  TOTAL_ERRORS,
   FINAL_STRATEGY_INFO_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };
 
@@ -248,13 +250,18 @@ extern double BestMonthlyStrategyMultiplierFactor  = 1.5; // Lot multiplier boos
 extern double WorseDailyStrategyDividerFactor      = 1.2; // Lot divider factor for the most profitable daily strategy. Useful for low-balance accounts or non-profitable periods.
 extern double WorseWeeklyStrategyDividerFactor     = 1.2; // Lot divider factor for the most profitable weekly strategy. Useful for low-balance accounts or non-profitable periods.
 extern double WorseMonthlyStrategyDividerFactor    = 1.2; // Lot divider factor for the most profitable monthly strategy. Useful for low-balance accounts or non-profitable periods.
+extern double BoostTrendFactor                     = 1.2; // Additional boost when trade is with trend.
 #ifdef __advanced__
   extern bool BoostByProfitFactor                  = TRUE; // Boost strategy by its profit factor. To be more accurate, it requires at least 10 orders to be placed by strategy. It's 1.0 by default.
   extern bool HandicapByProfitFactor               = FALSE; // Handicap by low profit factor.
 #endif
 
 extern string __Market_Parameters__ = "-- Market parameters --";
-extern int TrendMethod = 81; // Method of main trend calculation. Valid range: 0-255. Suggested values: 65!, 71, 81, 83!, 87, etc.
+extern int TrendMethod = 181; // Method of main trend calculation. Valid range: 0-255. Suggested values: 65!, 71, 81, 83!, 87, 181, etc.
+// £11347.25	20908	1.03	0.54	17245.91	58.84%	0.00000000	TrendMethod=181 (d: £10k, spread 24)
+// £11383.51	20278	1.04	0.56	22825.00	67.72%	0.00000000	TrendMethod=81 (d: £10k, spread 24)
+// £3146.85	20099	1.01	0.16	25575.87	77.54%	0.00000000	TrendMethod=81 (d: £10k, spread 28)
+// £1668.90	20747	1.01	0.08	17142.41	71.64%	0.00000000	TrendMethod=181 (d: £10k, spread 28)
 extern int TrendMethodAction = 238; // Method of trend calculation on action execution (See: A_CLOSE_ALL_TREND/A_CLOSE_ALL_NON_TREND). Valid range: 0-255.
 extern int MinVolumeToTrade = 2; // Minimum volume to trade.
 extern int MaxOrderPriceSlippage = 5; // Maximum price slippage for buy or sell orders (in pips).
@@ -1026,51 +1033,51 @@ extern string __EA_Conditions__ = "-- Account conditions --"; // See: ENUM_ACTIO
 extern bool Account_Conditions_Active = TRUE; // Enable account conditions. It's not advice on accounts where multi bots are trading.
 extern ENUM_ACC_CONDITION Account_Condition_1      = C_EQUITY_LOWER;
 extern ENUM_MARKET_CONDITION Market_Condition_1    = C_MARKET_BIG_DROP;
-extern ENUM_ACTION_TYPE Action_Active_Condition_1      = A_CLOSE_ALL_LOSS_SIDE;
+extern ENUM_ACTION_TYPE Action_On_Condition_1      = A_CLOSE_ALL_LOSS_SIDE;
 
 extern ENUM_ACC_CONDITION Account_Condition_2      = C_EQUITY_10PC_LOW;
 extern ENUM_MARKET_CONDITION Market_Condition_2    = C_MA1_FAST_SLOW_OPP;
-extern ENUM_ACTION_TYPE Action_Active_Condition_2      = A_CLOSE_ORDER_PROFIT;
+extern ENUM_ACTION_TYPE Action_On_Condition_2      = A_CLOSE_ORDER_PROFIT;
 
 extern ENUM_ACC_CONDITION Account_Condition_3      = C_EQUITY_20PC_LOW;
 extern ENUM_MARKET_CONDITION Market_Condition_3    = C_MARKET_TRUE;
-extern ENUM_ACTION_TYPE Action_Active_Condition_3      = A_CLOSE_ALL_IN_PROFIT;
+extern ENUM_ACTION_TYPE Action_On_Condition_3      = A_CLOSE_ALL_IN_PROFIT;
 
 extern ENUM_ACC_CONDITION Account_Condition_4      = C_EQUITY_50PC_LOW;
 extern ENUM_MARKET_CONDITION Market_Condition_4    = C_MARKET_TRUE;
-extern ENUM_ACTION_TYPE Action_Active_Condition_4      = A_CLOSE_ALL_LOSS_SIDE;
+extern ENUM_ACTION_TYPE Action_On_Condition_4      = A_CLOSE_ALL_LOSS_SIDE;
 
 extern ENUM_ACC_CONDITION Account_Condition_5      = C_EQUITY_10PC_HIGH;
 extern ENUM_MARKET_CONDITION Market_Condition_5    = C_MA1_FAST_SLOW_OPP;
-extern ENUM_ACTION_TYPE Action_Active_Condition_5      = A_CLOSE_ORDER_PROFIT;
+extern ENUM_ACTION_TYPE Action_On_Condition_5      = A_CLOSE_ORDER_PROFIT;
 
 extern ENUM_ACC_CONDITION Account_Condition_6      = C_EQUITY_20PC_HIGH;
 extern ENUM_MARKET_CONDITION Market_Condition_6    = C_MA1_MED_SLOW_OPP;
-extern ENUM_ACTION_TYPE Action_Active_Condition_6      = A_CLOSE_ALL_NON_TREND;
+extern ENUM_ACTION_TYPE Action_On_Condition_6      = A_CLOSE_ALL_NON_TREND;
 
 extern ENUM_ACC_CONDITION Account_Condition_7      = C_EQUITY_50PC_HIGH;
 extern ENUM_MARKET_CONDITION Market_Condition_7    = C_MARKET_TRUE;
-extern ENUM_ACTION_TYPE Action_Active_Condition_7      = A_CLOSE_ALL_PROFIT_SIDE;
+extern ENUM_ACTION_TYPE Action_On_Condition_7      = A_CLOSE_ALL_PROFIT_SIDE;
 
 extern ENUM_ACC_CONDITION Account_Condition_8      = C_MARGIN_USED_80PC;
 extern ENUM_MARKET_CONDITION Market_Condition_8    = C_MARKET_TRUE;
-extern ENUM_ACTION_TYPE Action_Active_Condition_8      = A_CLOSE_ALL_NON_TREND;
+extern ENUM_ACTION_TYPE Action_On_Condition_8      = A_CLOSE_ALL_NON_TREND;
 
 extern ENUM_ACC_CONDITION Account_Condition_9      = C_MARGIN_USED_90PC;
 extern ENUM_MARKET_CONDITION Market_Condition_9    = C_MARKET_TRUE;
-extern ENUM_ACTION_TYPE Action_Active_Condition_9      = A_CLOSE_ORDER_LOSS;
+extern ENUM_ACTION_TYPE Action_On_Condition_9      = A_CLOSE_ORDER_LOSS;
 
 extern ENUM_ACC_CONDITION Account_Condition_10     = C_EQUITY_HIGHER;
 extern ENUM_MARKET_CONDITION Market_Condition_10   = C_MARKET_BIG_DROP;
-extern ENUM_ACTION_TYPE Action_Active_Condition_10     = A_CLOSE_ALL_TREND;
+extern ENUM_ACTION_TYPE Action_On_Condition_10     = A_CLOSE_ALL_TREND;
 
 extern ENUM_ACC_CONDITION Account_Condition_11     = C_ACC_NONE;
 extern ENUM_MARKET_CONDITION Market_Condition_11   = C_MARKET_NONE;
-extern ENUM_ACTION_TYPE Action_Active_Condition_11     = A_NONE;
+extern ENUM_ACTION_TYPE Action_On_Condition_11     = A_NONE;
 
 extern ENUM_ACC_CONDITION Account_Condition_12     = C_ACC_NONE;
 extern ENUM_MARKET_CONDITION Market_Condition_12   = C_MARKET_NONE;
-extern ENUM_ACTION_TYPE Action_Active_Condition_12     = A_NONE;
+extern ENUM_ACTION_TYPE Action_On_Condition_12     = A_NONE;
 
 /*
 extern ENUM_ACTION_TYPE ActionOnDoubledEquity      = A_CLOSE_ALL_IN_PROFIT; // Execute action when account equity doubled the balance.
@@ -1392,7 +1399,7 @@ void start() {
  * Print init variables and constants.
  */
 string InitInfo(string sep = "\n") {
-  string output = StringFormat("%s (%s) v%s by %s%s", ea_name, __FILE__, ea_version, ea_author, sep); // ea_link
+  string output = StringFormat("%s (%s) v%s [build: %s] by %s%s", ea_name, __FILE__, ea_version, ea_build, ea_author, sep); // ea_link
   output += StringFormat("Platform variables: Symbol: %s, Bars: %d, Server: %s, Login: %d%s",
     _Symbol, Bars, AccountInfoString(ACCOUNT_SERVER), (int)AccountInfoInteger(ACCOUNT_LOGIN), sep);
   output += StringFormat("Broker info: Name: %s, Account type: %s, Leverage: 1:%d" + sep, AccountCompany(), account_type, AccountLeverage());
@@ -1445,6 +1452,9 @@ bool Trade() {
         else if (HandicapByProfitFactor && pf < 1.0) trade_lot *= MathMin(GetStrategyProfitFactor(id), 1.0);
       }
       #endif
+      if (Boosting_Enabled && CheckTrend(TrendMethod) == trade_cmd && BoostTrendFactor != 1.0) {
+        trade_lot *= BoostTrendFactor;
+      }
 
       if (trade_cmd != EMPTY) {
         order_placed &= ExecuteOrder(trade_cmd, trade_lot, id, name[id]);
@@ -1674,7 +1684,6 @@ bool UpdateIndicators(int timeframe = PERIOD_M1) {
       envelopes[period][i][MODE_UPPER] = iEnvelopes(NULL, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, MODE_UPPER, i + Envelopes_Shift);
       envelopes[period][i][MODE_LOWER] = iEnvelopes(NULL, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, MODE_LOWER, i + Envelopes_Shift);
     }
-    // last_msg = "Env: " + envelopes[M1][0][0] + ", upper: " + envelopes[M1][0][MODE_UPPER] + ", lower: " + envelopes[M1][0][MODE_LOWER];
     // if (VerboseTrace) text += "Envelopes: " + GetArrayValues(envelopes) + "; ";
   // }
 
@@ -1794,6 +1803,7 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
       if (!OrderSelect(order_ticket, SELECT_BY_TICKET) && VerboseErrors) {
         Print(__FUNCTION__ + "(): OrderSelect() error = ", ErrorDescription(GetLastError()));
         if (retry) TaskAddOrderOpen(cmd, volume, order_type, order_comment); // Will re-try again.
+        info[order_type][TOTAL_ERRORS]++;
         return (FALSE);
       }
       if (VerboseTrace) Print(__FUNCTION__, "(): Success: OrderSend(", Symbol(), ", ",  _OrderType_str(cmd), ", ", volume, ", ", NormalizeDouble(order_price, Digits), ", ", max_order_slippage, ", ", stoploss, ", ", takeprofit, ", ", order_comment, ", ", MagicNumber + order_type, ", 0, ", GetOrderColor(), ");");
@@ -1840,6 +1850,7 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
        retry = FALSE;
      }
      if (retry) TaskAddOrderOpen(cmd, volume, order_type, order_comment); // Will re-try again.
+     info[order_type][TOTAL_ERRORS]++;
    } // end-if: order_ticket
 
 /*
@@ -1875,7 +1886,6 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
 bool CheckSpreadLimit(int sid) {
   double spread_limit = If(conf[sid][SPREAD_LIMIT] > 0, MathMin(conf[sid][SPREAD_LIMIT], MaxSpreadToTrade), MaxSpreadToTrade);
   double curr_spread = PointsToPips(GetMarketSpread(TRUE));
-  // last_msg = __FUNCTION__ + "(): " + name[sid] + ": " + DoubleToStr(curr_spread, 1) + " <= " + DoubleToStr(spread_limit, 1);
   return curr_spread <= spread_limit;
 }
 
@@ -1899,6 +1909,8 @@ bool CloseOrder(int ticket_no, string reason, bool retry = TRUE) {
     err_code = GetLastError();
     Print(__FUNCTION__, "(): Error: Ticket: ", ticket_no, "; Error: ", GetErrorText(err_code));
     if (retry) TaskAddCloseOrder(ticket_no); // Add task to re-try.
+    int id = GetIdByMagic();
+    if (id != EMPTY) info[id][TOTAL_ERRORS]++;
   } // end-if: !result
   return result;
 }
@@ -1908,11 +1920,9 @@ bool CloseOrder(int ticket_no, string reason, bool retry = TRUE) {
  */
 bool OrderCalc(int ticket_no = 0) {
   // OrderClosePrice(), OrderCloseTime(), OrderComment(), OrderCommission(), OrderExpiration(), OrderLots(), OrderOpenPrice(), OrderOpenTime(), OrderPrint(), OrderProfit(), OrderStopLoss(), OrderSwap(), OrderSymbol(), OrderTakeProfit(), OrderTicket(), OrderType()
-  if (!CheckOurMagicNumber()) {
-    return FALSE;
-  }
   if (ticket_no == 0) ticket_no = OrderTicket();
-  int id = OrderMagicNumber() - MagicNumber;
+  int id = GetIdByMagic();
+  if (id == EMPTY) return FALSE;
   datetime close_time = OrderCloseTime();
   double profit = GetOrderProfit();
   info[id][TOTAL_ORDERS]++;
@@ -1983,14 +1993,14 @@ bool UpdateStats() {
   CheckStats(AccountBalance(), MAX_BALANCE);
   CheckStats(AccountEquity(), MAX_EQUITY);
   if (last_tick_change > MarketBigDropSize) {
-    last_msg = StringFormat("Market very big drop of %.1f pips detected!", last_tick_change);
-    Print(__FUNCTION__ + "(): " + last_msg);
-    if (WriteReport) ReportAdd(__FUNCTION__ + "(): " + last_msg);
+    Message(StringFormat("Market very big drop of %.1f pips detected!", last_tick_change));
+    Print(__FUNCTION__ + "(): " + GetLastMessage());
+    if (WriteReport) ReportAdd(__FUNCTION__ + "(): " + GetLastMessage());
   }
   else if (last_tick_change > MarketSuddenDropSize) {
-    last_msg = StringFormat("Market sudden drop of %.1f pips detected!", last_tick_change);
-    Print(__FUNCTION__ + "(): " + last_msg);
-    if (WriteReport) ReportAdd(__FUNCTION__ + "(): " + last_msg);
+    Message(StringFormat("Market sudden drop of %.1f pips detected!", last_tick_change));
+    Print(__FUNCTION__ + "(): " + GetLastMessage());
+    if (WriteReport) ReportAdd(__FUNCTION__ + "(): " + GetLastMessage());
   }
   return (TRUE);
 }
@@ -2595,12 +2605,14 @@ bool CheckMinPipGap(int strategy_type) {
 bool ValidTrailingValue(double value, int cmd, int loss_or_profit = -1, bool existing = FALSE) {
   double delta = GetMarketGap(); // Calculate minimum market gap.
   double price = GetOpenPrice();
-  bool valid = (value == 0
-       || (cmd == OP_BUY  && loss_or_profit < 0 && price - value > delta)
+  bool valid = (
+          (cmd == OP_BUY  && loss_or_profit < 0 && price - value > delta)
        || (cmd == OP_BUY  && loss_or_profit > 0 && value - price > delta)
        || (cmd == OP_SELL && loss_or_profit < 0 && value - price > delta)
        || (cmd == OP_SELL && loss_or_profit > 0 && price - value > delta)
        );
+  valid &= (value >= 0); // Also must be zero or above.
+  if (!valid && VerboseTrace) Print(__FUNCTION__ + "(): Trailing value not valid: " + value);
   return valid;
 }
 
@@ -2681,7 +2693,6 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
    if (existing && TrailingStopAddPerMinute > 0 && OrderOpenTime() > 0) {
      int min_elapsed = (TimeCurrent() - OrderOpenTime()) / 60;
      extra_trail =+ min_elapsed * TrailingStopAddPerMinute;
-     // if (VerboseDebug) last_msg = "Extra trail: " + extra_trail;
    }
    int factor = If(OpTypeValue(cmd) == loss_or_profit, +1, -1);
    double trail = (TrailingStop + extra_trail) * pip_size;
@@ -2704,9 +2715,13 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
        break;
      case T_5_BARS:
        new_value = If(OpTypeValue(cmd) == loss_or_profit, iHighest(_Symbol, timeframe, MODE_HIGH, 5, CURR), iLowest(_Symbol, timeframe, MODE_LOW, 5, CURR));
+       // FIXME: Sometimes it returns the error: no memory for history data.
+       if (new_value == -1 && VerboseDebug) { err_code = GetLastError(); Print(__FUNCTION__ + "(): " + ErrorDescription(err_code)); }
        break;
      case T_10_BARS:
        new_value = If(OpTypeValue(cmd) == loss_or_profit, iHighest(_Symbol, timeframe, MODE_HIGH, 10, CURR), iLowest(_Symbol, timeframe, MODE_LOW, 10, CURR));
+       // FIXME: Sometimes it returns the error: no memory for history data.
+       if (new_value == -1 && VerboseDebug) { err_code = GetLastError(); Print(__FUNCTION__ + "(): " + ErrorDescription(err_code)); }
        break;
      case T_MA_F_PREV: // MA Small (Previous)
        new_value = ma_fast[timeframe][PREV];
@@ -3435,8 +3450,30 @@ void StartNewHour() {
   }
   #endif
 
-  // Reset variables.
-  last_msg = ""; last_err = "";
+  // Reset messages and errors.
+  Message(NULL);
+}
+
+/*
+ * Queue the message for display.
+ */
+void Message(string msg = NULL) {
+  if (msg == NULL) { last_msg = ""; last_err = ""; }
+  else last_msg = msg;
+}
+
+/*
+ * Get last available message.
+ */
+string GetLastMessage() {
+  return last_msg;
+}
+
+/*
+ * Get last available error.
+ */
+string GetLastErrMsg() {
+  return last_err;
 }
 
 /*
@@ -3604,14 +3641,14 @@ void InitializeVariables() {
   if (market_marginrequired == 0) market_marginrequired = 10; // FIX for 'zero divide' bug when MODE_MARGINREQUIRED is zero
   market_stoplevel = MarketInfo(Symbol(), MODE_STOPLEVEL); // Market stop level in points.
   // market_stoplevel=(int)SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL);
-  max_order_slippage = PipsToPoints(MaxOrderPriceSlippage); // Maximum price slippage for buy or sell orders (converted into points).
   LastAsk = Ask; LastBid = Bid;
 
-  // Calculate pip/volume size and precision.
+  // Calculate pip/volume/slippage size and precision.
   pip_size = GetPipSize();
   pip_precision = GetPipPrecision();
   pts_per_pip = GetPointsPerPip();
   volume_precision = GetVolumePrecision();
+  max_order_slippage = PipsToPoints(MaxOrderPriceSlippage); // Maximum price slippage for buy or sell orders (converted into points).
   lot_size = GetLotSize();
 
   //GMT_Offset = ManualGMToffset;
@@ -4104,40 +4141,40 @@ void UpdateVariables() {
 void InitializeConditions() {
   acc_conditions[0][0] = Account_Condition_1;
   acc_conditions[0][1] = Market_Condition_1;
-  acc_conditions[0][2] = Action_Active_Condition_1;
+  acc_conditions[0][2] = Action_On_Condition_1;
   acc_conditions[1][0] = Account_Condition_2;
   acc_conditions[1][1] = Market_Condition_2;
-  acc_conditions[1][2] = Action_Active_Condition_2;
+  acc_conditions[1][2] = Action_On_Condition_2;
   acc_conditions[2][0] = Account_Condition_3;
   acc_conditions[2][1] = Market_Condition_3;
-  acc_conditions[2][2] = Action_Active_Condition_3;
+  acc_conditions[2][2] = Action_On_Condition_3;
   acc_conditions[3][0] = Account_Condition_4;
   acc_conditions[3][1] = Market_Condition_4;
-  acc_conditions[3][2] = Action_Active_Condition_4;
+  acc_conditions[3][2] = Action_On_Condition_4;
   acc_conditions[4][0] = Account_Condition_5;
   acc_conditions[4][1] = Market_Condition_5;
-  acc_conditions[4][2] = Action_Active_Condition_5;
+  acc_conditions[4][2] = Action_On_Condition_5;
   acc_conditions[5][0] = Account_Condition_6;
   acc_conditions[5][1] = Market_Condition_6;
-  acc_conditions[5][2] = Action_Active_Condition_6;
+  acc_conditions[5][2] = Action_On_Condition_6;
   acc_conditions[6][0] = Account_Condition_7;
   acc_conditions[6][1] = Market_Condition_7;
-  acc_conditions[6][2] = Action_Active_Condition_7;
+  acc_conditions[6][2] = Action_On_Condition_7;
   acc_conditions[7][0] = Account_Condition_8;
   acc_conditions[7][1] = Market_Condition_8;
-  acc_conditions[7][2] = Action_Active_Condition_8;
+  acc_conditions[7][2] = Action_On_Condition_8;
   acc_conditions[8][0] = Account_Condition_9;
   acc_conditions[8][1] = Market_Condition_9;
-  acc_conditions[8][2] = Action_Active_Condition_9;
+  acc_conditions[8][2] = Action_On_Condition_9;
   acc_conditions[9][0] = Account_Condition_10;
   acc_conditions[9][1] = Market_Condition_10;
-  acc_conditions[9][2] = Action_Active_Condition_10;
+  acc_conditions[9][2] = Action_On_Condition_10;
   acc_conditions[10][0] = Account_Condition_11;
   acc_conditions[10][1] = Market_Condition_11;
-  acc_conditions[10][2] = Action_Active_Condition_11;
+  acc_conditions[10][2] = Action_On_Condition_11;
   acc_conditions[11][0] = Account_Condition_12;
   acc_conditions[11][1] = Market_Condition_12;
-  acc_conditions[11][2] = Action_Active_Condition_12;
+  acc_conditions[11][2] = Action_On_Condition_12;
 }
 
 /*
@@ -4255,7 +4292,8 @@ string GetStrategyReport(string sep = "\n") {
       pc_won  = (100 / NormalizeDouble(info[id][TOTAL_ORDERS], 2)) * info[id][TOTAL_ORDERS_WON];
       output += StringFormat("Total orders: %d (Won: %.1f%% [%d] / Loss: %.1f%% [%d])",
                 info[id][TOTAL_ORDERS], pc_won, info[id][TOTAL_ORDERS_WON], pc_loss, info[id][TOTAL_ORDERS_LOSS]);
-      output += " - " + name[id];
+      if (info[id][TOTAL_ERRORS] > 0) output += StringFormat(", Errors: %d", info[id][TOTAL_ERRORS]);
+      output += StringFormat(" - %s", name[id]);
       // output += "Total orders: " + info[id][TOTAL_ORDERS] + " (Won: " + DoubleToStr(pc_won, 1) + "% [" + info[id][TOTAL_ORDERS_WON] + "] | Loss: " + DoubleToStr(pc_loss, 1) + "% [" + info[id][TOTAL_ORDERS_LOSS] + "]); ";
       output += sep;
     }
@@ -4442,6 +4480,16 @@ bool RSI_DecreasePeriod(int period = M1, int condition = 0) {
   return result;
 }
 
+
+/*
+ * Return strategy id by order magic number.
+ */
+int GetIdByMagic(int magic = EMPTY) {
+  if (magic == EMPTY) magic = OrderMagicNumber();
+  int id = magic - MagicNumber;
+  return If(CheckOurMagicNumber(magic), id, EMPTY);
+}
+
 /* END: STRATEGY FUNCTIONS */
 
 /* BEGIN: DISPLAYING FUNCTIONS */
@@ -4538,7 +4586,7 @@ string DisplayInfoOnChart(bool on_chart = TRUE, string sep = "\n") {
                   + indent + "| Lot size: " + DoubleToStr(lot_size, volume_precision) + "; " + text_max_orders + "; Risk ratio: " + DoubleToStr(GetRiskRatio(), 1) + "" + sep
                   + indent + "| " + GetOrdersStats("" + sep + indent + "| ") + "" + sep
                   + indent + "| Last error: " + last_err + "" + sep
-                  + indent + "| Last message: " + last_msg + "" + sep
+                  + indent + "| Last message: " + GetLastMessage() + "" + sep
                   + indent + "| ------------------------------------------------" + sep
                   + indent + "| MARKET INFORMATION:" + sep
                   + indent + "| " + text_spread + "" + sep
@@ -4616,6 +4664,7 @@ string GetOrdersStats(string sep = "\n") {
   }
   return orders_per_type + sep + total_orders_text;
 }
+
 string GetAccountTextDetails(string sep = "; ") {
    return StringConcatenate("Account Details: ",
       "Time: ", TimeToStr(TimeCurrent(), TIME_DATE|TIME_MINUTES|TIME_SECONDS), sep,
@@ -5009,7 +5058,7 @@ bool ActionExecute(int action_id, string reason) {
   if (result) {
     if (VerboseDebug && action_id != A_NONE) Print(__FUNCTION__ + "(): Action id: " + action_id + "; reason: " + reason);
     last_action_time = last_bar_time; // Set last execution bar time.
-    last_msg = __FUNCTION__ + ": " + reason;
+    Message(__FUNCTION__ + ": " + reason);
   } else {
     if (VerboseDebug) Print(__FUNCTION__ + "(): Failed to execute action id: " + action_id + "; reason: " + reason);
   }
@@ -5370,6 +5419,7 @@ string GetErrorText(int code) {
       case 4064: text = "Double parameter expected."; break;
       case 4065: text = "Array as parameter expected."; break;
       case 4066: text = "Requested history data in update state."; break;
+      case 4074: /* ERR_NO_MEMORY_FOR_HISTORY */ text = "No memory for history data."; break;
       case 4099: text = "End of file."; break;
       case 4100: text = "Some file error."; break;
       case 4101: text = "Wrong file name."; break;
