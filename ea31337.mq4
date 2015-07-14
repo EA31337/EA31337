@@ -40,7 +40,7 @@
   #define ea_name    "EA31337 Lite"
 #endif
 #define ea_desc    "Multi-strategy advanced trading robot."
-#define ea_version "1.054"
+#define ea_version "1.055"
 #define ea_build   __DATETIME__ // FIXME: It's empty
 #define ea_link    "http://www.ea31337.com"
 #define ea_author  "kenorb"
@@ -336,12 +336,8 @@ extern int MinPipGap = 10; // Minimum gap in pips between trades of the same str
 extern double MaxSpreadToTrade = 10.0; // Maximum spread to trade (in pips).
 //+------------------------------------------------------------------+
 #ifdef __advanced__
-extern string __Advanced_Parameters__ = "-- Advanced parameters --";
-#ifndef __rider__
-  extern bool DisableCloseConditions = FALSE; // Set TRUE to disable all close conditions for strategies.
-#else
-  extern bool DisableCloseConditions = TRUE;
-#endif
+  extern string __Advanced_Parameters__ = "-- Advanced parameters --";
+  extern bool DisableCloseConditions = FALSE; // Set TRUE to disable all close conditions for strategies. Not useful apart of testing.
   extern int CloseConditionCustom1Method = 0; // Custom 1 indicator-based close condition. Valid range: 0-1023.
   extern int CloseConditionCustom2Method = 0; // Custom 2 indicator-based close condition. Valid range: 0-1023.
   extern int CloseConditionCustom3Method = 0; // Custom 3 indicator-based close condition. Valid range: 0-1023.
@@ -374,7 +370,7 @@ extern ENUM_APPLIED_PRICE MA_Applied_Price = PRICE_CLOSE; // MA applied price (S
   extern ENUM_TRAIL_TYPE MA_TrailingProfitMethod = T_50_BARS_PEAK; // Trailing Profit method for MA. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE MA_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE MA_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE MA_TrailingProfitMethod = T_50_BARS_PEAK;
 #endif
 extern double MA_OpenLevel  = 1.0; // Minimum open level between moving averages to raise the trade signal.
 extern int MA1_OpenMethod = 57; // Valid range: 0-127.
@@ -427,7 +423,7 @@ extern int MACD_ShiftFar = 0; // Additional MACD far value in number of bars rel
   extern ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = T_FIXED; // Trailing Profit method for MACD. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE MACD_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = T_FIXED;
 #endif
 extern double MACD_OpenLevel  = 0.2;
 extern int MACD1_OpenMethod = 0; // Valid range: 0-31.
@@ -482,7 +478,7 @@ extern int Alligator_Shift_Far = 1; // The indicator shift relative to the chart
   extern ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = T_BANDS_PEAK; // Trailing Profit method for Alligator. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = T_BANDS_PEAK;
 #endif
 extern double Alligator_OpenLevel = 0.01; // Minimum open level between moving averages to raise the trade signal.
 extern int Alligator1_OpenMethod  = 6; // Valid range: 0-63.
@@ -604,7 +600,7 @@ extern double SAR_OpenLevel = 0.0; // Open gap level to raise the trade signal (
   extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = T_FIXED; // Trailing Profit method for SAR. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE SAR_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = T_FIXED;
 #endif
 extern int SAR1_OpenMethod  = 0; // Valid range: 0-127. Optimized.
 extern int SAR5_OpenMethod  = 4; // Valid range: 0-127. Optimized.
@@ -1058,6 +1054,8 @@ enum ENUM_ACC_CONDITION {
   C_MARGIN_USED_80PC  = 12, // 80% Margin Used
   C_MARGIN_USED_90PC  = 13, // 90% Margin Used
   C_NO_FREE_MARGIN    = 14, // No free margin.
+  C_ACC_IN_LOSS       = 15, // Account in loss
+  C_ACC_IN_PROFIT     = 16, // Account in profit
 };
 
 // Define market conditions.
@@ -1095,6 +1093,7 @@ extern string __EA_Conditions__ = "-- Account conditions --"; // See: ENUM_ACTIO
 #else
   extern bool Account_Conditions_Active = FALSE;
 #endif
+#ifndef __rider__
 extern ENUM_ACC_CONDITION Account_Condition_1      = C_EQUITY_LOWER;
 extern ENUM_MARKET_CONDITION Market_Condition_1    = C_MARKET_BIG_DROP;
 extern ENUM_ACTION_TYPE Action_On_Condition_1      = A_CLOSE_ALL_LOSS_SIDE;
@@ -1142,16 +1141,56 @@ extern ENUM_ACTION_TYPE Action_On_Condition_11     = A_CLOSE_ALL_IN_LOSS;
 extern ENUM_ACC_CONDITION Account_Condition_12     = C_ACC_NONE;
 extern ENUM_MARKET_CONDITION Market_Condition_12   = C_MARKET_NONE;
 extern ENUM_ACTION_TYPE Action_On_Condition_12     = A_NONE;
+//+------------------------------------------------------------------+
+#else // Rider mode.
+extern ENUM_ACC_CONDITION Account_Condition_1      = C_EQUITY_LOWER;
+extern ENUM_MARKET_CONDITION Market_Condition_1    = C_MARKET_NONE; // C_MARKET_BIG_DROP;
+extern ENUM_ACTION_TYPE Action_On_Condition_1      = A_CLOSE_ALL_LOSS_SIDE;
 
-/*
-extern ENUM_ACTION_TYPE ActionOnDoubledEquity      = A_CLOSE_ALL_IN_PROFIT; // Execute action when account equity doubled the balance.
-extern ENUM_ACTION_TYPE ActionOn10pcEquityHigh     = A_CLOSE_ORDER_PROFIT; // Execute action when account equity is 10% higher than the balance.
-extern ENUM_ACTION_TYPE ActionOnTwoThirdEquity     = A_CLOSE_ORDER_LOSS; // Execute action when account equity has 2/3 of the balance.
-extern ENUM_ACTION_TYPE ActionOnHalfEquity         = A_CLOSE_ALL_IN_LOSS; // Execute action when account equity is half of the balance.
-extern ENUM_ACTION_TYPE ActionOnOneThirdEquity     = A_CLOSE_ALL_IN_LOSS; // Execute action when account equity is 1/3 of the balance.
-extern ENUM_ACTION_TYPE ActionOnMarginCall         = A_NONE; // Execute action on margin call.
-*/
-// extern int ActionOnLowBalance      = A_NONE; // Execute action on low balance.
+extern ENUM_ACC_CONDITION Account_Condition_2      = C_EQUITY_10PC_LOW;
+extern ENUM_MARKET_CONDITION Market_Condition_2    = C_MARKET_NONE; // C_MA1_FAST_SLOW_OPP;
+extern ENUM_ACTION_TYPE Action_On_Condition_2      = A_CLOSE_ORDER_PROFIT;
+
+extern ENUM_ACC_CONDITION Account_Condition_3      = C_EQUITY_20PC_LOW;
+extern ENUM_MARKET_CONDITION Market_Condition_3    = C_MARKET_TRUE;
+extern ENUM_ACTION_TYPE Action_On_Condition_3      = A_CLOSE_ALL_IN_PROFIT;
+
+extern ENUM_ACC_CONDITION Account_Condition_4      = C_EQUITY_50PC_LOW;
+extern ENUM_MARKET_CONDITION Market_Condition_4    = C_MARKET_TRUE;
+extern ENUM_ACTION_TYPE Action_On_Condition_4      = A_CLOSE_ALL_LOSS_SIDE;
+
+extern ENUM_ACC_CONDITION Account_Condition_5      = C_EQUITY_10PC_HIGH;
+extern ENUM_MARKET_CONDITION Market_Condition_5    = C_MA1_FAST_SLOW_OPP;
+extern ENUM_ACTION_TYPE Action_On_Condition_5      = A_CLOSE_ORDER_PROFIT;
+
+extern ENUM_ACC_CONDITION Account_Condition_6      = C_EQUITY_20PC_HIGH;
+extern ENUM_MARKET_CONDITION Market_Condition_6    = C_MA1_FAST_SLOW_OPP;
+extern ENUM_ACTION_TYPE Action_On_Condition_6      = A_CLOSE_ORDER_PROFIT;
+
+extern ENUM_ACC_CONDITION Account_Condition_7      = C_EQUITY_50PC_HIGH;
+extern ENUM_MARKET_CONDITION Market_Condition_7    = C_MA5_FAST_SLOW_OPP;
+extern ENUM_ACTION_TYPE Action_On_Condition_7      = A_CLOSE_ALL_TREND;
+
+extern ENUM_ACC_CONDITION Account_Condition_8      = C_MARGIN_USED_80PC;
+extern ENUM_MARKET_CONDITION Market_Condition_8    = C_MARKET_TRUE;
+extern ENUM_ACTION_TYPE Action_On_Condition_8      = A_CLOSE_ALL_NON_TREND;
+
+extern ENUM_ACC_CONDITION Account_Condition_9      = C_MARGIN_USED_90PC;
+extern ENUM_MARKET_CONDITION Market_Condition_9    = C_MARKET_TRUE;
+extern ENUM_ACTION_TYPE Action_On_Condition_9      = A_CLOSE_ORDER_LOSS;
+
+extern ENUM_ACC_CONDITION Account_Condition_10     = C_EQUITY_HIGHER;
+extern ENUM_MARKET_CONDITION Market_Condition_10   = C_MARKET_BIG_DROP;
+extern ENUM_ACTION_TYPE Action_On_Condition_10     = A_CLOSE_ORDER_PROFIT;
+
+extern ENUM_ACC_CONDITION Account_Condition_11     = C_ACC_TRUE;
+extern ENUM_MARKET_CONDITION Market_Condition_11   = C_MARKET_VBIG_DROP;
+extern ENUM_ACTION_TYPE Action_On_Condition_11     = A_CLOSE_ALL_IN_LOSS;
+
+extern ENUM_ACC_CONDITION Account_Condition_12     = C_ACC_NONE;
+extern ENUM_MARKET_CONDITION Market_Condition_12   = C_MARKET_NONE;
+extern ENUM_ACTION_TYPE Action_On_Condition_12     = A_NONE;
+#endif
 //+------------------------------------------------------------------+
 extern string __Logging_Parameters__ = "-- Settings for logging & messages --";
 extern bool PrintLogOnChart = TRUE;
@@ -1222,7 +1261,7 @@ double market_minlot;
 double market_lotstep;
 double market_marginrequired;
 double market_stoplevel; // Market stop level in points.
-int pip_precision, volume_precision;
+int PipDigits, VolumeDigits;
 int pts_per_pip; // Number points per pip.
 int gmt_offset = 0;
 
@@ -1252,6 +1291,7 @@ double risk_ratio; // Calculated risk ratio.
 int max_orders; // Maximum orders available to open.
 double max_order_slippage; // Maximum price slippage for buy or sell orders (in points)
 double LastAsk, LastBid; // Keep the last ask and bid price.
+string AccCurrency; // Current account currency.
 int err_code; // Error code.
 string last_err, last_msg;
 double last_tick_change; // Last tick change in pips.
@@ -1524,7 +1564,7 @@ double b_power[H1][2][3];
 //| Expert tick function                                             |
 //+------------------------------------------------------------------+
 void OnTick() {
-  // if (!session_initiated) return;
+  if (!session_initiated) return;
 
   // Check the last tick change.
   last_tick_change = MathMax(GetPipDiff(Ask, LastAsk), GetPipDiff(Bid, LastBid));
@@ -1664,17 +1704,19 @@ string InitInfo(string sep = "\n") {
   string output = StringFormat("%s (%s) v%s by %s%s", ea_name, __FILE__, ea_version, ea_author, sep); // ea_link
   output += StringFormat("Platform variables: Symbol: %s, Bars: %d, Server: %s, Login: %d%s",
     _Symbol, Bars, AccountInfoString(ACCOUNT_SERVER), (int)AccountInfoInteger(ACCOUNT_LOGIN), sep);
-  output += StringFormat("Broker info: Name: %s, Account type: %s, Leverage: 1:%d" + sep, AccountCompany(), account_type, AccountLeverage());
+  output += StringFormat("Broker info: Name: %s, Account type: %s, Leverage: 1:%d, Currency: %s%s", AccountCompany(), account_type, AccountLeverage(), AccCurrency, sep);
   output += StringFormat("Market variables: Ask: %f, Bid: %f, Volume: %d%s", Ask, Bid, Volume[0], sep);
-  output += StringFormat("Market constants: Digits: %d, Point: %f, Min Lot: %f, Max Lot: %d, Lot Step: %f, Margin Required: %.f, Stop Level: %.f%s",
-    Digits, Point, market_minlot, market_maxlot, market_lotstep, market_marginrequired, market_stoplevel, sep);
-  output += StringFormat("Contract specification for %s: Digits: %d, Point value: %f, Spread: %d, Stop level: %f, Contract size: %.f, Tick size: %f%s",
+  output += StringFormat("Market constants: Digits: %d, Point: %f, Min Lot: %g, Max Lot: %g, Lot Step: %g, Margin Required: %g, Stop Level: %g%s",
+    Digits, NormalizeDouble(Point, Digits), NormalizeDouble(market_minlot, PipDigits), market_maxlot, market_lotstep, market_marginrequired, market_stoplevel, sep);
+  output += StringFormat("Contract specification for %s: Digits: %d, Point value: %f, Spread: %g, Stop level: %g, Contract size: %g, Tick size: %f%s",
     _Symbol, (int)SymbolInfoInteger(_Symbol, SYMBOL_DIGITS), SymbolInfoDouble(_Symbol, SYMBOL_POINT), (int)SymbolInfoInteger(_Symbol,SYMBOL_SPREAD),
     (int)SymbolInfoInteger(_Symbol,SYMBOL_TRADE_STOPS_LEVEL), SymbolInfoDouble(_Symbol,SYMBOL_TRADE_CONTRACT_SIZE), SymbolInfoDouble(_Symbol,SYMBOL_TRADE_TICK_SIZE), sep);
-  output += StringFormat("Swap specification for %s: Mode: %d, Long/buy order value: %f, Short/sell order value: %f%s",
+  output += StringFormat("Swap specification for %s: Mode: %d, Long/buy order value: %g, Short/sell order value: %g%s",
     _Symbol, (int)SymbolInfoInteger(_Symbol, SYMBOL_SWAP_MODE), SymbolInfoDouble(_Symbol,SYMBOL_SWAP_LONG), SymbolInfoDouble(_Symbol,SYMBOL_SWAP_SHORT), sep);
-  output += StringFormat("Calculated variables: Lot size: %f, Max orders: %d (per type: %d), Active strategies: %d of %d, Pip size: %f, Points per pip: %d, Pip precision: %d, Volume precision: %d, Spread in pips: %f%s",
-              lot_size, max_orders, GetMaxOrdersPerType(), GetNoOfStrategies(), FINAL_STRATEGY_TYPE_ENTRY, pip_size, pts_per_pip, pip_precision, volume_precision, ValueToPips(GetMarketSpread()), sep);
+  output += StringFormat("Calculated variables: Lot size: %g, Max orders: %d (per type: %d), Active strategies: %d of %d, Pip size: %g, Points per pip: %d, Pip digits: %d, Volume digits: %d, Spread in pips: %g%s",
+              NormalizeDouble(lot_size, VolumeDigits), max_orders, GetMaxOrdersPerType(), GetNoOfStrategies(), FINAL_STRATEGY_TYPE_ENTRY,
+              NormalizeDouble(pip_size, PipDigits), pts_per_pip, PipDigits, VolumeDigits,
+              NormalizeDouble(ValueToPips(GetMarketSpread()), PipDigits), sep);
   output += StringFormat("Time: Hour of day: %d, Day of week: %d, Day of month: %d, Day of year: %d" + sep, hour_of_day, day_of_week, day_of_month, day_of_year);
   output += GetAccountTextDetails() + sep;
   if (session_initiated && IsTradeAllowed()) {
@@ -2132,7 +2174,7 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
    }
    order_price = new_price;
 
-   volume = NormalizeDouble(volume / 2.0, volume_precision);
+   volume = NormalizeDouble(volume / 2.0, VolumeDigits);
    if (volume < market_minlot) volume = market_minlot;
    */
    return (result);
@@ -2942,7 +2984,7 @@ void UpdateTrailingStops() {
      if (!OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) continue;
       if (OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
         order_type = OrderMagicNumber() - MagicNumber;
-        // order_stop_loss = NormalizeDouble(If(OpTypeValue(OrderType()) > 0 || OrderStopLoss() != 0.0, OrderStopLoss(), 999999), pip_precision);
+        // order_stop_loss = NormalizeDouble(If(OpTypeValue(OrderType()) > 0 || OrderStopLoss() != 0.0, OrderStopLoss(), 999999), PipDigits);
 
         // FIXME
         if (MinimalizeLosses && GetOrderProfit() > GetMinStopLevel()) {
@@ -3205,7 +3247,7 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
    if (!ValidTrailingValue(new_value, cmd, loss_or_profit, existing)) {
      if (existing && previous == 0 && loss_or_profit == -1) previous = default_trail;
      if (VerboseTrace)
-       Print(__FUNCTION__ + "(): Error: method = " + method + ", ticket = #" + If(existing, OrderTicket(), 0) + ": Invalid Trailing Value: ", new_value, ", previous: ", previous, "; ", GetOrderTextDetails(), ", delta: ", DoubleToStr(delta, pip_precision));
+       Print(__FUNCTION__ + "(): Error: method = " + method + ", ticket = #" + If(existing, OrderTicket(), 0) + ": Invalid Trailing Value: ", new_value, ", previous: ", previous, "; ", GetOrderTextDetails(), ", delta: ", DoubleToStr(delta, PipDigits));
      // If value is invalid, fallback to the previous one.
      return previous;
    }
@@ -3655,35 +3697,55 @@ double GetVolumePrecision() {
 // To be used to replace Point for trade parameters calculations.
 // See: http://forum.mql4.com/30672
 double GetPointsPerPip() {
-  return MathPow(10, Digits - pip_precision);
+  return MathPow(10, Digits - PipDigits);
 }
 
 // Convert value into pips.
 double ValueToPips(double value) {
-  return value * MathPow(10, Digits) / pip_precision;
+  return value * MathPow(10, Digits) / PipDigits;
 }
 
-// Convert pips into points.
+/*
+ * Convert pips into points.
+ */
 double PipsToPoints(double pips) {
   return pips * pts_per_pip;
 }
 
-// Convert points into pips.
+/*
+ * Convert points into pips.
+ */
 double PointsToPips(int points) {
   return points / pts_per_pip;
 }
 
-// Get the difference between two price values (in pips).
+/*
+ * Get the difference between two price values (in pips).
+ */
 double GetPipDiff(double price1, double price2) {
-  return MathAbs(price1 - price2) * MathPow(10, Digits) / pip_precision;
+  return MathAbs(price1 - price2) * MathPow(10, Digits) / PipDigits;
 }
 
-// Current market spread value in pips.
-//
-// Note: Using Mode_SPREAD can return 20 on EURUSD (IBFX), but zero on some other pairs, so using Ask - Bid instead.
-// See: http://forum.mql4.com/42285
+/*
+ * Add currency sign to the plain value.
+ */
+string ValueToCurrency(double value, int digits = 2) {
+  ushort sign; bool prefix = TRUE;
+  if (AccCurrency == "USD") sign = '$';
+  else if (AccCurrency == "GBP") sign = '£';
+  else if (AccCurrency == "EUR") sign = '€';
+  else { sign = AccCurrency; prefix = FALSE; }
+  return IfTxt(prefix, CharToString(sign) + DoubleToStr(value, digits), DoubleToStr(value, digits) + CharToString(sign));
+}
+
+/*
+ * Current market spread value in pips.
+ *
+ * Note: Using Mode_SPREAD can return 20 on EURUSD (IBFX), but zero on some other pairs, so using Ask - Bid instead.
+ * See: http://forum.mql4.com/42285
+ */
 double GetMarketSpread(bool in_points = FALSE) {
-  // return MarketInfo(Symbol(), MODE_SPREAD) / MathPow(10, Digits - pip_precision);
+  // return MarketInfo(Symbol(), MODE_SPREAD) / MathPow(10, Digits - PipDigits);
   double spread = If(in_points, SymbolInfoInteger(Symbol(), SYMBOL_SPREAD), Ask - Bid);
   if (in_points) CheckStats(spread, MAX_SPREAD);
   return spread;
@@ -3694,32 +3756,27 @@ double GetMarketGap(bool in_points = FALSE) {
   return If(in_points, market_stoplevel + GetMarketSpread(TRUE), (market_stoplevel + GetMarketSpread(TRUE)) * Point);
 }
 
+/*
+ * Normalize lot size.
+ */
 double NormalizeLots(double lots, bool ceiling = FALSE, string pair = "") {
-   double lotsize;
-   double precision;
-   if (market_lotstep > 0.0) precision = 1 / market_lotstep;
-   else precision = 1 / market_minlot;
+  // See: http://forum.mql4.com/47988
+  double lotsize;
+  double precision;
+  if (market_lotstep > 0.0) precision = 1 / market_lotstep;
+  else precision = 1 / market_minlot;
 
-   if (ceiling) lotsize = MathCeil(lots * precision) / precision;
-   else lotsize = MathFloor(lots * precision) / precision;
+  if (ceiling) lotsize = MathCeil(lots * precision) / precision;
+  else lotsize = MathFloor(lots * precision) / precision;
 
-   if (lotsize < market_minlot) lotsize = market_minlot;
-   if (lotsize > market_maxlot) lotsize = market_maxlot;
-   return (lotsize);
+  if (lotsize < market_minlot) lotsize = market_minlot;
+  if (lotsize > market_maxlot) lotsize = market_maxlot;
+  return (lotsize);
 }
 
 /*
-double NormalizeLots2(double lots, string pair=""){
-    // See: http://forum.mql4.com/47988
-    if (pair == "") pair = Symbol();
-    double  lotStep     = MarketInfo(pair, MODE_LOTSTEP),
-            minLot      = MarketInfo(pair, MODE_MINLOT);
-    lots            = MathRound(lots/lotStep) * lotStep;
-    if (lots < minLot) lots = 0;    // or minLot
-    return(lots);
-}
-*/
-
+ * Normalize price value.
+ */
 double NormalizePrice(double p, string pair=""){
    // See: http://forum.mql4.com/47988
    // http://forum.mql4.com/43064#515262 zzuegg reports for non-currency DE30:
@@ -3761,19 +3818,26 @@ double GetAccountStopoutLevel() {
  */
 int GetMaxOrdersAuto() {
   double free     = AccountFreeMargin();
-  double leverage = AccountLeverage();
+  double leverage = MathMax(AccountLeverage(), 100);
   double one_lot  = MathMin(MarketInfo(Symbol(), MODE_MARGINREQUIRED), 10); // Price of 1 lot (minimum 10, to make sure we won't divide by zero).
-  double margin_risk = MathMin(0.5, GetAccountStopoutLevel()); // Percent of free margin to risk (e.g. 0.5 = 50%).
-  int balance_limit = MathMax(AccountBalance() / 10, 0); // At least 1 order per 10 currency value. This also prevents trading with negative balance.
-  return MathMin((free * margin_risk / one_lot * (100 / leverage) / lot_size) * risk_ratio, balance_limit);
+  double margin_risk = MathMin(0.1, GetAccountStopoutLevel()); // Percent of free margin to risk (e.g. 0.1 = 10%).
+  int balance_limit = MathMax(MathMin(AccountBalance(), AccountEquity()) / 10, 0); // At least 1 order per 10 currency value. This also prevents trading with negative balance.
+  int previous_limit = MathMax(max_orders, 50);
+  // int previous_limit = MathMax(max_orders, 50)/risk_ratio;
+  // FIXME: The calculation should be improved further more.
+  return MathMin((free / one_lot / lot_size / previous_limit) * (100 / leverage) * risk_ratio, balance_limit);
 }
 
-// Calculate number of maximum of orders allowed to open.
+/*
+ * Calculate number of maximum of orders allowed to open.
+ */
 int GetMaxOrders() {
   return If(MaxOrders > 0, MaxOrders, GetMaxOrdersAuto());
 }
 
-// Calculate number of maximum of orders allowed to open per type.
+/*
+ * Calculate number of maximum of orders allowed to open per type.
+ */
 int GetMaxOrdersPerType() {
   return If(MaxOrdersPerType > 0, MaxOrdersPerType, MathMax(MathFloor(max_orders / GetNoOfStrategies()), 1));
 }
@@ -3794,10 +3858,10 @@ int GetNoOfStrategies() {
 double GetAutoLotSize() {
   double free      = AccountFreeMargin();
   double balance   = AccountBalance();
-  double leverage  = AccountLeverage();
+  double leverage  = MathMax(AccountLeverage(), 100);
   double margin_risk = 0.01; // Percent of free margin to risk per each order (1%).
   double max_avail_lots = MathMin(free, balance) / market_marginrequired * (100 / leverage);
-  double new_lot_size = (max_avail_lots * market_minlot * margin_risk * risk_ratio) / MathMax(GetNoOfStrategies(), 1);
+  double new_lot_size = (max_avail_lots * market_minlot * margin_risk * risk_ratio) / MathMax(GetNoOfStrategies(), 1); // FIXME
 
   // return max_avail_lots * market_minlot * margin_risk * GetRiskRatio() / MathMax(max_orders, 10);
   // return MathMin(MathMax(avail_lots * market_minlot * MarginRisk * GetRiskRatio(), market_minlot), market_maxlot);
@@ -3824,7 +3888,8 @@ double GetAutoRiskRatio() {
   double balance = AccountBalance();
   double free    = AccountFreeMargin();
   double margin  = AccountMargin();
-  double margin_risk = 1 / MathMin(equity, balance) * MathMax(free, balance);
+  double margin_risk = 1 / MathMin(equity, balance) * MathMin(MathMin(free, balance), equity);
+  margin_risk *= GetAccountStopoutLevel(); // Decrease by account Stop Out level.
   if (GetTotalProfit() < 0) margin_risk /= 2; // Half risk if we're in overall loss.
   return margin_risk;
 }
@@ -3839,7 +3904,6 @@ double GetRiskRatio() {
 /*
  * Validate the e-mail.
  */
-#define print_license
 string ValidEmail(string text) {
   string output = StringLen(text);
   if (text == "") {
@@ -3862,6 +3926,7 @@ string ValidEmail(string text) {
   StringReplace(output, "8", "7");
   StringReplace(output, "--", "-3");
   output = StringSubstr(output, 0, StringLen(ea_name) + StringLen(ea_author) + StringLen(ea_link));
+  #ifdef __testing__ #define print_license #endif
   #ifdef print_license
     Print(output);
   #endif
@@ -3877,15 +3942,15 @@ void StartNewHour() {
   hour_of_day = Hour(); // Save the new hour.
   if (VerboseDebug) Print("== New hour: " + hour_of_day);
 
+  // Update variables.
+  risk_ratio = GetRiskRatio();
+  max_orders = GetMaxOrders();
+
   if (day_of_week != DayOfWeek()) { // Check if new day has been started.
     StartNewDay();
   }
 
   CheckHistory(); // Process closed orders.
-
-  // Update variables.
-  // risk_ratio = GetRiskRatio();
-  // max_orders = GetMaxOrders();
 
   // Update strategy factor and lot size.
   if (Boosting_Enabled) UpdateStrategyFactor(DAILY);
@@ -3901,7 +3966,7 @@ void StartNewHour() {
   #endif
 
   // Reset messages and errors.
-  Message(NULL);
+  // Message(NULL);
 }
 
 /*
@@ -3948,8 +4013,6 @@ void StartNewDay() {
 
   // Calculate lot size, orders and risk.
   lot_size = GetLotSize(); // Re-calculate lot size.
-  risk_ratio = GetRiskRatio();
-  max_orders = GetMaxOrders();
   UpdateStrategyLotSize(); // Update strategy lot size.
 
   // Update boosting values.
@@ -4071,7 +4134,7 @@ void StartNewYear() {
 /*
  * Initialize startup variables.
  */
-void InitializeVariables() {
+bool InitializeVariables() {
 
   // Get type of account.
   if (IsDemo()) account_type = "Demo"; else account_type = "Live";
@@ -4094,12 +4157,13 @@ void InitializeVariables() {
   market_stoplevel = MarketInfo(Symbol(), MODE_STOPLEVEL); // Market stop level in points.
   // market_stoplevel=(int)SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL);
   LastAsk = Ask; LastBid = Bid;
+  AccCurrency = AccountCurrency();
 
   // Calculate pip/volume/slippage size and precision.
   pip_size = GetPipSize();
-  pip_precision = GetPipPrecision();
+  PipDigits = GetPipPrecision();
   pts_per_pip = GetPointsPerPip();
-  volume_precision = GetVolumePrecision();
+  VolumeDigits = GetVolumePrecision();
   max_order_slippage = PipsToPoints(MaxOrderPriceSlippage); // Maximum price slippage for buy or sell orders (converted into points).
 
   // Calculate lot size, orders and risk.
@@ -4579,6 +4643,8 @@ void InitializeVariables() {
 
   ArrSetValueD(conf, FACTOR, 1.0);
   ArrSetValueD(conf, LOT_SIZE, lot_size);
+
+  return (TRUE);
 }
 
 /*
@@ -4667,6 +4733,10 @@ bool AccountCondition(int condition = C_ACC_NONE) {
       return AccountMargin() >= AccountEquity() /100 * 90;
     case C_NO_FREE_MARGIN:
       return AccountFreeMargin() <= 10;
+    case C_ACC_IN_LOSS:
+      return GetTotalProfit() < 0;
+    case C_ACC_IN_PROFIT:
+      return GetTotalProfit() > 0;
     default:
     case C_ACC_NONE:
       return FALSE;
@@ -5038,11 +5108,12 @@ string DisplayInfoOnChart(bool on_chart = TRUE, string sep = "\n") {
   string output;
   // Prepare text for Stop Out.
   string stop_out_level = "Stop Out: " + AccountStopoutLevel();
-  if (AccountStopoutMode() == 0) stop_out_level += "%"; else stop_out_level += AccountCurrency();
+  if (AccountStopoutMode() == 0) stop_out_level += "%"; else stop_out_level += AccCurrency;
   // Prepare text to display max orders.
   string text_max_orders = "Max orders: " + max_orders + " (Per type: " + GetMaxOrdersPerType() + ")";
   // Prepare text to display spread.
-  string text_spread = "Spread (pips): " + DoubleToStr(GetMarketSpread(TRUE) / pts_per_pip, Digits - pip_precision) + " / Stop level (pips): " + DoubleToStr(market_stoplevel / pts_per_pip, Digits - pip_precision);
+  string text_spread = "Spread: " + ValueToPips(GetMarketSpread());
+  // string text_spread = "Spread (pips): " + DoubleToStr(GetMarketSpread(TRUE) / pts_per_pip, Digits - PipDigits) + " / Stop level (pips): " + DoubleToStr(market_stoplevel / pts_per_pip, Digits - PipDigits);
   // Check trend.
   string trend = "Neutral.";
   if (CheckTrend(TrendMethod) == OP_BUY) trend = "Bullish";
@@ -5055,9 +5126,9 @@ string DisplayInfoOnChart(bool on_chart = TRUE, string sep = "\n") {
                   + indent + "| ACCOUNT INFORMATION:" + sep
                   + indent + "| Server Time: " + TimeToStr(TimeCurrent(), TIME_DATE|TIME_MINUTES|TIME_SECONDS) + sep
                   + indent + "| Acc Number: " + AccountNumber() + "; Acc Name: " + AccountName() + "; Broker: " + AccountCompany() + " (Type: " + account_type + ")" + sep
-                  + indent + "| Equity: " + DoubleToStr(AccountEquity(), 0) + AccountCurrency() + "; Balance: " + DoubleToStr(AccountBalance(), 0) + AccountCurrency() + "; Leverage: 1:" + DoubleToStr(AccountLeverage(), 0)  + "" + sep
-                  + indent + "| Used Margin: " + DoubleToStr(AccountMargin(), 0)  + AccountCurrency() + "; Free: " + DoubleToStr(AccountFreeMargin(), 0) + AccountCurrency() + "; " + stop_out_level + "" + sep
-                  + indent + "| Lot size: " + DoubleToStr(lot_size, volume_precision) + "; " + text_max_orders + "; Risk ratio: " + DoubleToStr(risk_ratio, 1) + "" + sep
+                  + indent + "| Equity: " + ValueToCurrency(AccountEquity()) + "; Balance: " + ValueToCurrency(AccountBalance()) + "; Leverage: 1:" + DoubleToStr(AccountLeverage(), 0)  + "" + sep
+                  + indent + "| Used Margin: " + ValueToCurrency(AccountMargin()) + "; Free: " + ValueToCurrency(AccountFreeMargin()) + "; " + stop_out_level + "" + sep
+                  + indent + "| Lot size: " + DoubleToStr(lot_size, VolumeDigits) + "; " + text_max_orders + "; Risk ratio: " + DoubleToStr(risk_ratio, 1) + "" + sep
                   + indent + "| " + GetOrdersStats("" + sep + indent + "| ") + "" + sep
                   + indent + "| Last error: " + last_err + "" + sep
                   + indent + "| Last message: " + GetLastMessage() + "" + sep
@@ -5089,15 +5160,19 @@ string DisplayInfoOnChart(bool on_chart = TRUE, string sep = "\n") {
 }
 
 void SendEmail(string sep = "\n") {
-  string mail_title = "Trading Info (EA 31337)";
-  SendMail(mail_title, StringConcatenate("Trade Information\nCurrency Pair: ", StringSubstr(Symbol(), 0, 6),
-    sep + "Time: ", TimeToStr(TimeCurrent(), TIME_DATE|TIME_MINUTES|TIME_SECONDS),
-    sep + "Order Type: ", _OrderType_str(OrderType()),
-    sep + "Price: ", DoubleToStr(OrderOpenPrice(), Digits),
-    sep + "Lot size: ", DoubleToStr(OrderLots(), volume_precision),
-    sep + "Event: Trade Opened",
-    sep + sep + "Current Balance: ", DoubleToStr(AccountBalance(), 2), " ", AccountCurrency(),
-    sep + "Current Equity: ", DoubleToStr(AccountEquity(), 2), " ", AccountCurrency()));
+  string mail_title = "Trading Info - " + ea_name;
+  string body = "Trade Information" + sep;
+  body += sep + StringFormat("Event: %s", "Trade Opened");
+  body += sep + StringFormat("Currency Pair: %s", _Symbol);
+  body += sep + StringFormat("Time: %s", TimeToStr(TimeCurrent(), TIME_DATE|TIME_MINUTES|TIME_SECONDS));
+  body += sep + StringFormat("Order Type: %s", _OrderType_str(OrderType()));
+  body += sep + StringFormat("Price: %s", DoubleToStr(OrderOpenPrice(), Digits));
+  body += sep + StringFormat("Lot size: %s", DoubleToStr(OrderLots(), VolumeDigits));
+  body += sep + StringFormat("Current Balance: %s", ValueToCurrency(AccountBalance()));
+  body += sep + StringFormat("Current Equity: %s", ValueToCurrency(AccountEquity()));
+
+
+  SendMail(mail_title, body);
 }
 
 string GetOrderTextDetails() {
@@ -5142,10 +5217,10 @@ string GetOrdersStats(string sep = "\n") {
 string GetAccountTextDetails(string sep = "; ") {
    return StringConcatenate("Account Details: ",
       "Time: ", TimeToStr(TimeCurrent(), TIME_DATE|TIME_MINUTES|TIME_SECONDS), sep,
-      "Account Balance: ", DoubleToStr(AccountBalance(), 2), " ", AccountCurrency(), sep,
-      "Account Equity: ", DoubleToStr(AccountEquity(), 2), " ", AccountCurrency(), sep,
-      "Used Margin: ", DoubleToStr(AccountMargin(), 2), " ", AccountCurrency(), sep,
-      "Free Margin: ", DoubleToStr(AccountFreeMargin(), 2), " ", AccountCurrency(), sep,
+      "Account Balance: ", ValueToCurrency(AccountBalance()), sep,
+      "Account Equity: ", ValueToCurrency(AccountEquity()), sep,
+      "Used Margin: ", ValueToCurrency(AccountMargin()), sep,
+      "Free Margin: ", ValueToCurrency(AccountFreeMargin()), sep,
       "No of Orders: ", total_orders, " (BUY/SELL: ", CalculateOrdersByCmd(OP_BUY), "/", CalculateOrdersByCmd(OP_SELL), ")", sep,
       "Risk Ratio: ", DoubleToStr(risk_ratio, 1)
    );
@@ -6271,15 +6346,15 @@ string GenerateReport(string sep = "\n") {
   int i;
   if (InitialDeposit > 0)
   output += StringFormat("Initial deposit:                            %s%.2f", InitialDeposit) + sep;
-  output += StringFormat("Total net profit:                           %s%.2f", AccountCurrency(), SummaryProfit) + sep;
-  output += StringFormat("Gross profit:                               %s%.2f", AccountCurrency(), GrossProfit) + sep;
-  output += StringFormat("Gross loss:                                 %s%.2f", AccountCurrency(), GrossLoss)  + sep;
+  output += StringFormat("Total net profit:                           %.2f", ValueToCurrency(SummaryProfit)) + sep;
+  output += StringFormat("Gross profit:                               %.2f", ValueToCurrency(GrossProfit)) + sep;
+  output += StringFormat("Gross loss:                                 %.2f", ValueToCurrency(GrossLoss))  + sep;
   if (GrossLoss > 0.0)
   output += StringFormat("Profit factor:                              %.2f", ProfitFactor) + sep;
   output += StringFormat("Expected payoff:                            %.2f", ExpectedPayoff) + sep;
   output += StringFormat("Absolute drawdown:                          %.2f", AbsoluteDrawdown) + sep;
-  output += StringFormat("Maximal drawdown:                           %.1f (%.1f%%)", MaxDrawdown, MaxDrawdownPercent) + sep;
-  output += StringFormat("Relative drawdown:                          (%.1f%%) %.1f", RelDrawdownPercent, RelDrawdown) + sep;
+  output += StringFormat("Maximal drawdown:                           %.1f (%.1f%%)", ValueToCurrency(MaxDrawdown), MaxDrawdownPercent) + sep;
+  output += StringFormat("Relative drawdown:                          (%.1f%%) %.1f", RelDrawdownPercent, ValueToCurrency(RelDrawdown)) + sep;
   output += StringFormat("Trades total                                %d", SummaryTrades) + sep;
   if(ShortTrades>0)
   output += StringFormat("Short positions (won %):                    %d (%.1f%%)", ShortTrades, 100.0*WinShortTrades/ShortTrades) + sep;
@@ -6330,3 +6405,4 @@ void WriteReport(string report_name) {
 /* END: SUMMARY REPORT */
 
 //+------------------------------------------------------------------+
+// 16-30101111-11-46107105-17101103-64-17114
