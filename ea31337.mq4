@@ -9,7 +9,7 @@
 //#define __release__ // Enable release settings.
 //#define __testing__   // Mode for testing each component.
 //#define __safe__ // Define safe options.
-//#define __rider__     // Activate rider strategy.
+#define __rider__     // Activate rider strategy.
 
 #ifdef __testing__
   #define __disabled__  // Disable all strategies by default.
@@ -27,6 +27,8 @@
   #undef __rider__     // Disable rider strategy by default.
 #endif
 
+//#undef __disabled__
+
 //+------------------------------------------------------------------+
 //| EA properties.
 //+------------------------------------------------------------------+
@@ -40,7 +42,7 @@
   #define ea_name    "EA31337 Lite"
 #endif
 #define ea_desc    "Multi-strategy advanced trading robot."
-#define ea_version "1.055"
+#define ea_version "1.056"
 #define ea_build   __DATETIME__ // FIXME: It's empty
 #define ea_link    "http://www.ea31337.com"
 #define ea_author  "kenorb"
@@ -292,12 +294,13 @@ extern double RiskRatio = 0; // Suggested value: 1.0. Do not change unless testi
 #endif
 extern bool MinimalizeLosses = FALSE; // Set stop loss to zero, once the order is profitable.
 #ifdef __advanced__
-// extern double MarginRisk = 0.1; // Margin risk used to calculate maximum number of orders to open when MaxOrders is 0. The calculation is based on the available free margin. E.g. 0.5 means 50%.
-#ifndef __nospreads__
-  extern bool ApplySpreadLimits = TRUE; // Apply strategy spread limits.
-#else
-  extern bool ApplySpreadLimits = FALSE;
-#endif
+  extern int RiskRatioDecreaseMethod = 3; // Risk ratio calculation method when RiskRatio is set to 0. Valid range: 0-63.
+  extern int RiskRatioIncreaseMethod = 0; // Risk ratio calculation method when RiskRatio is set to 0. Valid range: 0-63.
+  #ifndef __nospreads__
+    extern bool ApplySpreadLimits = TRUE; // Apply strategy spread limits.
+  #else
+    extern bool ApplySpreadLimits = FALSE;
+  #endif
 #endif
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting (set 1.0 to default) --";
@@ -932,6 +935,7 @@ extern ENUM_APPLIED_PRICE B_Power_Applied_Price = PRICE_CLOSE; // MACD applied p
  *
  *   £106725.03	23907	1.11	4.46	59839.20	54.59%	TradeWithTrend=1
  *   £17257.03	32496	1.04	0.53	23297.78	64.43%	TradeWithTrend=0
+ *   TODO: (Rider mode)
  *
  * Deposit: £10000 (default, spread 40)
  *
@@ -1056,6 +1060,12 @@ enum ENUM_ACC_CONDITION {
   C_NO_FREE_MARGIN    = 14, // No free margin.
   C_ACC_IN_LOSS       = 15, // Account in loss
   C_ACC_IN_PROFIT     = 16, // Account in profit
+  C_DBAL_LT_WEEKLY    = 17, // Max. daily balance < max. weekly
+  C_DBAL_GT_WEEKLY    = 18, // Max. daily balance > max. weekly
+  C_WBAL_LT_MONTHLY   = 19, // Max. weekly balance < max. monthly
+  C_WBAL_GT_MONTHLY   = 20, // Max. weekly balance > max. monthly
+  C_ACC_IN_TREND      = 31, // Account in trend
+  C_ACC_IN_NON_TREND  = 32, // Account is against trend
 };
 
 // Define market conditions.
@@ -1567,13 +1577,13 @@ void OnTick() {
   if (!session_initiated) return;
 
   // Check the last tick change.
-  last_tick_change = MathMax(GetPipDiff(Ask, LastAsk), GetPipDiff(Bid, LastBid));
-  LastAsk = Ask; LastBid = Bid;
+  last_tick_change = MathMax(GetPipDiff(Ask, LastAsk, TRUE), GetPipDiff(Bid, LastBid, TRUE));
   // if (VerboseDebug && last_tick_change > 1) Print("Tick change: " + tick_change + "; Ask" + Ask + ", Bid: " + Bid, ", LastAsk: " + LastAsk + ", LastBid: " + LastBid);
 
   // Check if we should pass the tick.
   bar_time = iTime(NULL, PERIOD_M1, 0); // - GMT_Offset
   if (bar_time <= last_bar_time || last_tick_change < MinPipChangeToTrade) {
+    LastAsk = Ask; LastBid = Bid;
     return;
   } else {
     last_bar_time = bar_time;
@@ -1592,9 +1602,10 @@ void OnTick() {
       CheckAccountConditions();
       TaskProcessList();
     }
-    if (!IsOptimization()) UpdateStats();
+    UpdateStats();
   }
   if (ea_active && PrintLogOnChart) DisplayInfoOnChart();
+  LastAsk = Ask; LastBid = Bid;
 
 } // end: OnTick()
 
@@ -2107,6 +2118,7 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
    if (order_ticket >= 0) {
       if (!OrderSelect(order_ticket, SELECT_BY_TICKET) && VerboseErrors) {
         Print(__FUNCTION__ + "(): OrderSelect() error = ", ErrorDescription(GetLastError()));
+        OrderPrint();
         if (retry) TaskAddOrderOpen(cmd, volume, order_type, order_comment); // Will re-try again.
         info[order_type][TOTAL_ERRORS]++;
         return (FALSE);
@@ -2139,8 +2151,11 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
      err_code = GetLastError();
      if (VerboseErrors) Print(__FUNCTION__, "(): OrderSend(): error = ", ErrorDescription(err_code));
      if (VerboseDebug) {
-       Print(__FUNCTION__ + "(): Error: OrderSend(", _Symbol, ", ",  _OrderType_str(cmd), ", ", volume, ", ", NormalizeDouble(order_price, Digits), ", ", max_order_slippage, ", ", stoploss, ", ", takeprofit, ", ", order_comment, ", ", MagicNumber + order_type, ", 0, ", GetOrderColor(), "); ", "Ask/Bid: ", Ask, "/", Bid);
+       PrintFormat("Error: OrderSend(%s, %d, %f, %f, %f, %f, %f, %s, %d, %d, %d)",
+              _Symbol, cmd, volume, NormalizeDouble(order_price, Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + order_type, 0, GetOrderColor(cmd));
        Print(__FUNCTION__ + "(): " + GetAccountTextDetails());
+       Print(__FUNCTION__ + "(): " + GetMarketTextDetails());
+       OrderPrint();
      }
      // if (err_code != 136 /* OFF_QUOTES */) break;
 
@@ -2153,6 +2168,11 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
      if (err_code == ERR_TRADE_EXPIRATION_DENIED) {
        // Applying of pending order expiration time can be disabled in some trade servers.
        retry = FALSE;
+     }
+     if (err_code == ERR_TOO_MANY_REQUESTS) {
+       // It occurs when you send the same command OrderSend()/OrderModify() over and over again in a short period of time.
+       retry = TRUE;
+       Sleep(200); // Wait 200ms.
      }
      if (retry) TaskAddOrderOpen(cmd, volume, order_type, order_comment); // Will re-try again.
      info[order_type][TOTAL_ERRORS]++;
@@ -2212,7 +2232,10 @@ bool CloseOrder(int ticket_no, string reason, bool retry = TRUE) {
     if (VerboseDebug) Print(__FUNCTION__, "(): Closed order " + ticket_no + " with profit " + GetOrderProfit() + ", reason: " + reason + "; " + GetOrderTextDetails());
   } else {
     err_code = GetLastError();
-    Print(__FUNCTION__, "(): Error: Ticket: ", ticket_no, "; Error: ", GetErrorText(err_code));
+    if (VerboseErrors) Print(__FUNCTION__, "(): Error: Ticket: ", ticket_no, "; Error: ", GetErrorText(err_code));
+    if (VerboseDebug) PrintFormat("Error: OrderClose(%d, %f, %f, %f, %d);", ticket_no, OrderLots(), close_price, max_order_slippage, GetOrderColor());
+    if (VerboseDebug) Print(__FUNCTION__ + "(): " + GetMarketTextDetails());
+    OrderPrint();
     if (retry) TaskAddCloseOrder(ticket_no); // Add task to re-try.
     int id = GetIdByMagic();
     if (id != EMPTY) info[id][TOTAL_ERRORS]++;
@@ -2234,9 +2257,15 @@ bool OrderCalc(int ticket_no = 0) {
   if (profit > 0) {
     info[id][TOTAL_ORDERS_WON]++;
     stats[id][TOTAL_GROSS_PROFIT] += profit;
+    if (profit > daily[MAX_PROFIT])   daily[MAX_PROFIT] = profit;
+    if (profit > weekly[MAX_PROFIT])  weekly[MAX_PROFIT] = profit;
+    if (profit > monthly[MAX_PROFIT]) monthly[MAX_PROFIT] = profit;
   } else {
     info[id][TOTAL_ORDERS_LOSS]++;
     stats[id][TOTAL_GROSS_LOSS] += profit;
+    if (profit < daily[MAX_LOSS])     daily[MAX_LOSS] = profit;
+    if (profit < weekly[MAX_LOSS])    weekly[MAX_LOSS] = profit;
+    if (profit < monthly[MAX_LOSS])   monthly[MAX_LOSS] = profit;
   }
   stats[id][TOTAL_NET_PROFIT] += profit;
 
@@ -2298,12 +2327,14 @@ bool UpdateStats() {
   CheckStats(AccountBalance(), MAX_BALANCE);
   CheckStats(AccountEquity(), MAX_EQUITY);
   if (last_tick_change > MarketBigDropSize) {
-    Message(StringFormat("Market very big drop of %.1f pips detected!", last_tick_change));
+    double diff1 = MathMax(GetPipDiff(Ask, LastAsk), GetPipDiff(Bid, LastBid));
+    Message(StringFormat("Market very big drop of %.1f pips detected!", diff1));
     Print(__FUNCTION__ + "(): " + GetLastMessage());
     if (WriteReport) ReportAdd(__FUNCTION__ + "(): " + GetLastMessage());
   }
   else if (VerboseDebug && last_tick_change > MarketSuddenDropSize) {
-    Message(StringFormat("Market sudden drop of %.1f pips detected!", last_tick_change));
+    double diff2 = MathMax(GetPipDiff(Ask, LastAsk), GetPipDiff(Bid, LastBid));
+    Message(StringFormat("Market sudden drop of %.1f pips detected!", diff2));
     Print(__FUNCTION__ + "(): " + GetLastMessage());
     if (WriteReport) ReportAdd(__FUNCTION__ + "(): " + GetLastMessage());
   }
@@ -3380,7 +3411,7 @@ double GetPeakPrice(int timeframe, int mode, int bars) {
   double peak_price = Open[0];
   if (mode == MODE_HIGH) ibar = iHighest(_Symbol, timeframe, MODE_HIGH, bars, CURR);
   if (mode == MODE_LOW)  ibar =  iLowest(_Symbol, timeframe, MODE_LOW,  bars, CURR);
-  if (ibar == -1 && VerboseDebug) { err_code = GetLastError(); Print(__FUNCTION__ + "(): " + ErrorDescription(err_code)); return FALSE; }
+  if (ibar == -1 && VerboseTrace) { err_code = GetLastError(); Print(__FUNCTION__ + "(): " + ErrorDescription(err_code)); return FALSE; }
   if (mode == MODE_HIGH) {
     return iHigh(_Symbol, timeframe, ibar);
   } else if (mode == MODE_LOW) {
@@ -3650,7 +3681,9 @@ double GetOrderProfit() {
   return OrderProfit() - OrderCommission() - OrderSwap();
 }
 
-// Get color of the order.
+/*
+ * Get color of the order.
+ */
 double GetOrderColor(int cmd = -1) {
   if (cmd == -1) cmd = OrderType();
   return If(OpTypeValue(cmd) > 0, ColorBuy, ColorSell);
@@ -3669,7 +3702,9 @@ double GetMinStopLevel() {
   return market_stoplevel * Point;
 }
 
-// Calculate pip size.
+/*
+ * Calculate pip size.
+ */
 double GetPipSize() {
   if (Digits < 4) {
     return 0.01;
@@ -3678,7 +3713,9 @@ double GetPipSize() {
   }
 }
 
-// Calculate pip precision.
+/*
+ * Calculate pip precision.
+ */
 double GetPipPrecision() {
   if (Digits < 4) {
     return 2;
@@ -3687,7 +3724,9 @@ double GetPipPrecision() {
   }
 }
 
-// Calculate volume precision.
+/*
+ * Calculate volume precision.
+ */
 double GetVolumePrecision() {
   if (TradeMicroLots) return 2;
   else return 1;
@@ -3700,7 +3739,9 @@ double GetPointsPerPip() {
   return MathPow(10, Digits - PipDigits);
 }
 
-// Convert value into pips.
+/*
+ * Convert value into pips.
+ */
 double ValueToPips(double value) {
   return value * MathPow(10, Digits) / PipDigits;
 }
@@ -3722,8 +3763,9 @@ double PointsToPips(int points) {
 /*
  * Get the difference between two price values (in pips).
  */
-double GetPipDiff(double price1, double price2) {
-  return MathAbs(price1 - price2) * MathPow(10, Digits) / PipDigits;
+double GetPipDiff(double price1, double price2, bool abs = FALSE) {
+  double diff = If(abs, MathAbs(price1 - price2), price1 - price2);
+  return diff * MathPow(10, Digits) / PipDigits;
 }
 
 /*
@@ -3816,16 +3858,20 @@ double GetAccountStopoutLevel() {
 /*
  * Calculate number of order allowed given risk ratio.
  */
-int GetMaxOrdersAuto() {
-  double free     = AccountFreeMargin();
-  double leverage = MathMax(AccountLeverage(), 100);
-  double one_lot  = MathMin(MarketInfo(Symbol(), MODE_MARGINREQUIRED), 10); // Price of 1 lot (minimum 10, to make sure we won't divide by zero).
-  double margin_risk = MathMin(0.1, GetAccountStopoutLevel()); // Percent of free margin to risk (e.g. 0.1 = 10%).
-  int balance_limit = MathMax(MathMin(AccountBalance(), AccountEquity()) / 10, 0); // At least 1 order per 10 currency value. This also prevents trading with negative balance.
-  int previous_limit = MathMax(max_orders, 50);
-  // int previous_limit = MathMax(max_orders, 50)/risk_ratio;
-  // FIXME: The calculation should be improved further more.
-  return MathMin((free / one_lot / lot_size / previous_limit) * (100 / leverage) * risk_ratio, balance_limit);
+int GetMaxOrdersAuto(bool smooth = TRUE) {
+  double avail_margin = MathMin(AccountFreeMargin(), AccountBalance());
+  double leverage     = MathMax(AccountLeverage(), 100);
+  double one_lot      = MathMin(MarketInfo(Symbol(), MODE_MARGINREQUIRED), 10); // Price of 1 lot (minimum 10, to make sure we won't divide by zero).
+  // double margin_risk  = MathMin(0.1, GetAccountStopoutLevel()); // Percent of free margin to risk (e.g. 0.1 = 10%).
+  int balance_limit   = MathMax(MathMin(AccountBalance(), AccountEquity()) / 2, 0); // At least 1 order per 2 currency value. This also prevents trading with negative balance.
+  double avail_orders = avail_margin / one_lot / lot_size * (100 / leverage);
+  int new_max_orders = MathMin(avail_orders * risk_ratio, (balance_limit * risk_ratio) / lot_size);
+  if (smooth && new_max_orders > max_orders) {
+    max_orders = (max_orders + new_max_orders) / 2; // Increase the limit smoothly.
+  } else {
+    max_orders = new_max_orders;
+  }
+  return max_orders;
 }
 
 /*
@@ -3839,7 +3885,7 @@ int GetMaxOrders() {
  * Calculate number of maximum of orders allowed to open per type.
  */
 int GetMaxOrdersPerType() {
-  return If(MaxOrdersPerType > 0, MaxOrdersPerType, MathMax(MathFloor(max_orders / GetNoOfStrategies()), 1));
+  return If(MaxOrdersPerType > 0, MaxOrdersPerType, MathMax(MathFloor(max_orders / GetNoOfStrategies() ), 1) * 2);
 }
 
 /*
@@ -3856,15 +3902,20 @@ int GetNoOfStrategies() {
  * Calculate size of the lot based on the free margin and account leverage automatically.
  */
 double GetAutoLotSize() {
-  double free      = AccountFreeMargin();
-  double balance   = AccountBalance();
-  double leverage  = MathMax(AccountLeverage(), 100);
   double margin_risk = 0.01; // Percent of free margin to risk per each order (1%).
-  double max_avail_lots = MathMin(free, balance) / market_marginrequired * (100 / leverage);
-  double new_lot_size = (max_avail_lots * market_minlot * margin_risk * risk_ratio) / MathMax(GetNoOfStrategies(), 1); // FIXME
+  double avail_margin = MathMin(AccountFreeMargin(), AccountBalance());
+  double leverage     = MathMax(AccountLeverage(), 100);
+  double one_lot      = MathMin(MarketInfo(Symbol(), MODE_MARGINREQUIRED), 10); // Price of 1 lot (minimum 10, to make sure we won't divide by zero).
+  double avail_orders = avail_margin / one_lot / MathMax(lot_size, 0.01) * (100 / leverage);
+  double new_lot_size = avail_orders * market_minlot * margin_risk * risk_ratio / MathMin(max_orders + 1, 100);
+  // Old:
+  // double free      = AccountFreeMargin();
+  // double balance   = AccountBalance();
+  // double leverage  = MathMax(AccountLeverage(), 100);
+  // double max_avail_lots = MathMin(free, balance) / market_marginrequired * (100 / leverage);
+  // int avail_orders = free / one_lot / lot_size * (100 / leverage);
+  // double new_lot_size = (max_avail_lots * market_minlot * margin_risk * risk_ratio) / MathMax(GetNoOfStrategies(), 1); // FIXME
 
-  // return max_avail_lots * market_minlot * margin_risk * GetRiskRatio() / MathMax(max_orders, 10);
-  // return MathMin(MathMax(avail_lots * market_minlot * MarginRisk * GetRiskRatio(), market_minlot), market_maxlot);
   if (lot_size > 0) {
     return (lot_size + new_lot_size) / 2; // Increase only by average of the previous and new (which should prevent sudden increases).
   } else {
@@ -3881,7 +3932,7 @@ double GetLotSize() {
 }
 
 /*
- * Calculate auto risk ratio value;.
+ * Calculate auto risk ratio value.
  */
 double GetAutoRiskRatio() {
   double equity  = AccountEquity();
@@ -3890,7 +3941,25 @@ double GetAutoRiskRatio() {
   double margin  = AccountMargin();
   double margin_risk = 1 / MathMin(equity, balance) * MathMin(MathMin(free, balance), equity);
   margin_risk *= GetAccountStopoutLevel(); // Decrease by account Stop Out level.
-  if (GetTotalProfit() < 0) margin_risk /= 2; // Half risk if we're in overall loss.
+
+  #ifdef __advanced__
+    if ((RiskRatioDecreaseMethod &  1) != 0) if (AccountCondition(C_ACC_IN_LOSS))      margin_risk /= 2; // Half risk if we're in overall loss.
+    if ((RiskRatioDecreaseMethod &  2) != 0) if (AccountCondition(C_EQUITY_LOWER))     margin_risk -= 0.1;
+    if ((RiskRatioDecreaseMethod &  4) != 0) if (AccountCondition(C_EQUITY_10PC_HIGH)) margin_risk -= 0.1;
+    if ((RiskRatioDecreaseMethod &  8) != 0) if (AccountCondition(C_DBAL_GT_WEEKLY))   margin_risk -= 0.1;
+    if ((RiskRatioDecreaseMethod & 16) != 0) if (AccountCondition(C_WBAL_LT_MONTHLY))  margin_risk -= 0.1;
+    if ((RiskRatioDecreaseMethod & 32) != 0) if (AccountCondition(C_ACC_IN_NON_TREND)) margin_risk -= 0.1;
+
+    if ((RiskRatioIncreaseMethod &  1) != 0) if (AccountCondition(C_ACC_IN_PROFIT))    margin_risk += 0.1;
+    if ((RiskRatioIncreaseMethod &  2) != 0) if (AccountCondition(C_EQUITY_HIGHER))    margin_risk += 0.1;
+    if ((RiskRatioIncreaseMethod &  4) != 0) if (AccountCondition(C_EQUITY_10PC_LOW))  margin_risk += 0.1;
+    if ((RiskRatioIncreaseMethod &  8) != 0) if (AccountCondition(C_DBAL_LT_WEEKLY))   margin_risk += 0.1;
+    if ((RiskRatioIncreaseMethod & 16) != 0) if (AccountCondition(C_WBAL_GT_MONTHLY))  margin_risk += 0.1;
+    if ((RiskRatioIncreaseMethod & 32) != 0) if (AccountCondition(C_ACC_IN_TREND))     margin_risk += 0.1;
+  #else
+    if (GetTotalProfit() < 0) margin_risk /= 2; // Half risk if we're in overall loss.
+  #endif
+
   return margin_risk;
 }
 
@@ -3922,9 +3991,7 @@ string ValidEmail(string text) {
   }
   for (last_bar_time = StringLen(text); last_bar_time >= 0; last_bar_time--)
     output += IntegerToString(StringGetChar(text, last_bar_time), 3, '-');
-  StringReplace(output, "9", "1");
-  StringReplace(output, "8", "7");
-  StringReplace(output, "--", "-3");
+  StringReplace(output, "9", "1"); StringReplace(output, "8", "7"); StringReplace(output, "--", "-3");
   output = StringSubstr(output, 0, StringLen(ea_name) + StringLen(ea_author) + StringLen(ea_link));
   #ifdef __testing__ #define print_license #endif
   #ifdef print_license
@@ -4737,6 +4804,19 @@ bool AccountCondition(int condition = C_ACC_NONE) {
       return GetTotalProfit() < 0;
     case C_ACC_IN_PROFIT:
       return GetTotalProfit() > 0;
+    case C_DBAL_LT_WEEKLY:
+      return daily[MAX_BALANCE] < weekly[MAX_BALANCE];
+    case C_DBAL_GT_WEEKLY:
+      return daily[MAX_BALANCE] > weekly[MAX_BALANCE];
+    case C_WBAL_LT_MONTHLY:
+      return weekly[MAX_BALANCE] < monthly[MAX_BALANCE];
+    case C_WBAL_GT_MONTHLY:
+      return weekly[MAX_BALANCE] > monthly[MAX_BALANCE];
+    case C_ACC_IN_TREND:
+      return (CheckTrend(TrendMethod) == OP_BUY  && CalculateOrdersByCmd(OP_BUY)  > CalculateOrdersByCmd(OP_SELL))
+          || (CheckTrend(TrendMethod) == OP_SELL && CalculateOrdersByCmd(OP_SELL) > CalculateOrdersByCmd(OP_BUY));
+    case C_ACC_IN_NON_TREND:
+      return !AccountCondition(C_ACC_IN_TREND);
     default:
     case C_ACC_NONE:
       return FALSE;
@@ -4792,7 +4872,7 @@ void CheckAccountConditions() {
   string reason;
   for (int i = 0; i < ArrayRange(acc_conditions, 0); i++) {
     if (AccountCondition(acc_conditions[i][0]) && MarketCondition(acc_conditions[i][1]) && acc_conditions[i][2] != A_NONE) {
-      reason = "Account condition: " + acc_conditions[i][0] + ", Market condition: " + acc_conditions[i][1] + ", Action: " + acc_conditions[i][2] + " [" + AccountEquity() + "/" + AccountBalance() + "]";
+      reason = "Account condition: " + acc_conditions[i][0] + ", Market condition: " + acc_conditions[i][1] + ", Action: " + acc_conditions[i][2] + " [E: " + ValueToCurrency(AccountEquity()) + "/B: " + ValueToCurrency(AccountBalance()) + "]";
       ActionExecute(acc_conditions[i][2], reason);
     }
   } // end: for
@@ -5046,8 +5126,8 @@ string GetDailyReport() {
   output += "Tick: "    + daily[MAX_TICK] + "; ";
   // output += "Drop: "    + daily[MAX_DROP] + "; ";
   output += "Spread: "  + daily[MAX_SPREAD] + "; ";
-  // output += "Loss: "    + daily[MAX_LOSS] + "; ";
-  // output += "Profit: "  + daily[MAX_PROFIT] + "; ";
+  output += "Loss: "    + daily[MAX_LOSS] + "; ";
+  output += "Profit: "  + daily[MAX_PROFIT] + "; ";
   output += "Equity: "  + daily[MAX_EQUITY] + "; ";
   output += "Balance: " + daily[MAX_BALANCE] + "; ";
   //output += GetAccountTextDetails() + "; " + GetOrdersStats();
@@ -5069,8 +5149,8 @@ string GetWeeklyReport() {
   output += "Tick: "    + weekly[MAX_TICK] + "; ";
   // output += "Drop: "    + weekly[MAX_DROP] + "; ";
   output += "Spread: "  + weekly[MAX_SPREAD] + "; ";
-  // output += "Loss: "    + weekly[MAX_LOSS] + "; ";
-  // output += "Profit: "  + weekly[MAX_PROFIT] + "; ";
+  output += "Loss: "    + weekly[MAX_LOSS] + "; ";
+  output += "Profit: "  + weekly[MAX_PROFIT] + "; ";
   output += "Equity: "  + weekly[MAX_EQUITY] + "; ";
   output += "Balance: " + weekly[MAX_BALANCE] + "; ";
 
@@ -5091,8 +5171,8 @@ string GetMonthlyReport() {
   output += "Tick: "    + monthly[MAX_TICK] + "; ";
   // output += "Drop: "    + monthly[MAX_DROP] + "; ";
   output += "Spread: "  + monthly[MAX_SPREAD] + "; ";
-  // output += "Loss: "    + monthly[MAX_LOSS] + "; ";
-  // output += "Profit: "  + monthly[MAX_PROFIT] + "; ";
+  output += "Loss: "    + monthly[MAX_LOSS] + "; ";
+  output += "Profit: "  + monthly[MAX_PROFIT] + "; ";
   output += "Equity: "  + monthly[MAX_EQUITY] + "; ";
   output += "Balance: " + monthly[MAX_BALANCE] + "; ";
 
@@ -5128,7 +5208,7 @@ string DisplayInfoOnChart(bool on_chart = TRUE, string sep = "\n") {
                   + indent + "| Acc Number: " + AccountNumber() + "; Acc Name: " + AccountName() + "; Broker: " + AccountCompany() + " (Type: " + account_type + ")" + sep
                   + indent + "| Equity: " + ValueToCurrency(AccountEquity()) + "; Balance: " + ValueToCurrency(AccountBalance()) + "; Leverage: 1:" + DoubleToStr(AccountLeverage(), 0)  + "" + sep
                   + indent + "| Used Margin: " + ValueToCurrency(AccountMargin()) + "; Free: " + ValueToCurrency(AccountFreeMargin()) + "; " + stop_out_level + "" + sep
-                  + indent + "| Lot size: " + DoubleToStr(lot_size, VolumeDigits) + "; " + text_max_orders + "; Risk ratio: " + DoubleToStr(risk_ratio, 1) + "" + sep
+                  + indent + "| Lot size: " + DoubleToStr(lot_size, VolumeDigits) + "; " + text_max_orders + "; Risk ratio: " + DoubleToStr(risk_ratio, 1) + " (" + GetRiskRatioText() + ")" + sep
                   + indent + "| " + GetOrdersStats("" + sep + indent + "| ") + "" + sep
                   + indent + "| Last error: " + last_err + "" + sep
                   + indent + "| Last message: " + GetLastMessage() + "" + sep
@@ -5214,6 +5294,9 @@ string GetOrdersStats(string sep = "\n") {
   return orders_per_type + sep + total_orders_text;
 }
 
+/*
+ * Get information about account conditions in text format.
+ */
 string GetAccountTextDetails(string sep = "; ") {
    return StringConcatenate("Account Details: ",
       "Time: ", TimeToStr(TimeCurrent(), TIME_DATE|TIME_MINUTES|TIME_SECONDS), sep,
@@ -5226,6 +5309,9 @@ string GetAccountTextDetails(string sep = "; ") {
    );
 }
 
+/*
+ * Get information about market conditions in text format.
+ */
 string GetMarketTextDetails() {
    return StringConcatenate("MarketInfo: ",
      "Symbol: ", Symbol(), "; ",
@@ -5235,9 +5321,25 @@ string GetMarketTextDetails() {
    );
 }
 
-// Get summary text.
+/*
+ * Get account summary text.
+ */
 string GetSummaryText() {
   return GetAccountTextDetails();
+}
+
+/*
+ * Get risk ratio text based on the value.
+ */
+string GetRiskRatioText() {
+  string text = "Normal";
+  if (risk_ratio < 0.2) text = "Extremely risky!";
+  else if (risk_ratio < 0.3) text = "Very risky!";
+  else if (risk_ratio < 0.5) text = "Risky!";
+  else if (risk_ratio < 0.9) text = "Below normal, but ok";
+  else if (risk_ratio > 2.0) text = "Very high";
+  else if (risk_ratio > 1.0) text = "High";
+  return text;
 }
 
 /*
@@ -5946,7 +6048,7 @@ string GetErrorText(int code) {
       case  138: text = "Requote."; break;
       case  139: text = "Order is locked."; break;
       case  140: text = "Long positions only allowed."; break;
-      case  141: text = "Too many requests."; break;
+      case  141: /* ERR_TOO_MANY_REQUESTS */ text = "Too many requests."; break;
       case  145: text = "Modification denied because order too close to market."; break;
       case  146: text = "Trade context is busy."; break;
       case  147: text = "Expirations are denied by broker."; break;
@@ -6405,4 +6507,3 @@ void WriteReport(string report_name) {
 /* END: SUMMARY REPORT */
 
 //+------------------------------------------------------------------+
-// 16-30101111-11-46107105-17101103-64-17114
