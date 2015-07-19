@@ -42,7 +42,7 @@
   #define ea_name    "EA31337 Lite"
 #endif
 #define ea_desc    "Multi-strategy advanced trading robot."
-#define ea_version "1.058"
+#define ea_version "1.059"
 #define ea_build   __DATETIME__ // FIXME: It's empty
 #define ea_link    "http://www.ea31337.com"
 #define ea_author  "kenorb"
@@ -206,7 +206,6 @@ enum ENUM_INDICATOR_TYPE { // Define type of indicator.
   AWESOME,
   BANDS,
   BPOWER,
-  BREAKAGE,
   BWMFI,
   CCI,
   DEMARKER,
@@ -352,15 +351,20 @@ enum ENUM_ACC_CONDITION {
 
 // Define market conditions.
 enum ENUM_MARKET_CONDITION {
-  C_MARKET_NONE        = 0, // None (false).
-  C_MARKET_TRUE        = 1, // Always true
-  C_MA1_FAST_SLOW_OPP  = 2, // MA1 Fast&Slow opposite
-  C_MA5_FAST_SLOW_OPP  = 3, // MA5 Fast&Slow opposite
-  C_MA15_FAST_SLOW_OPP = 4, // MA15 Fast&Slow opposite
-  C_MA30_FAST_SLOW_OPP = 5, // MA30 Fast&Slow opposite
-  C_MARKET_BIG_DROP    = 6, // Sudden price drop
-  C_MARKET_VBIG_DROP   = 7, // Very big price drop
+  C_MARKET_NONE        =  0, // None (false).
+  C_MARKET_TRUE        =  1, // Always true
+  C_MA1_FS_ORDERS_OPP  =  2, // MA1 Fast&Slow orders-based opposite
+  C_MA5_FS_ORDERS_OPP  =  3, // MA5 Fast&Slow orders-based opposite
+  C_MA15_FS_ORDERS_OPP =  4, // MA15 Fast&Slow orders-based opposite
+  C_MA30_FS_ORDERS_OPP =  5, // MA30 Fast&Slow orders-based opposite
+  C_MA1_FS_TREND_OPP   =  6, // MA1 Fast&Slow trend-based opposite
+  C_MA5_FS_TREND_OPP   =  7, // MA5 Fast&Slow trend-based opposite
+  C_MA15_FS_TREND_OPP  =  8, // MA15 Fast&Slow trend-based opposite
+  C_MA30_FS_TREND_OPP  =  9, // MA30 Fast&Slow trend-based opposite
+  C_MARKET_BIG_DROP    = 10, // Sudden price drop
+  C_MARKET_VBIG_DROP   = 11, // Very big price drop
 };
+// Note: Trend-based closures are using TrendMethodAction.
 
 // Define type of actions which can be executed.
 enum ENUM_ACTION_TYPE {
@@ -447,10 +451,12 @@ enum ENUM_STAT_PERIOD_TYPE { // Define type of tasks.
 enum ENUM_INDICATOR_INDEX { // Define indicator constants.
   CURR = 0,
   PREV = 1,
-  FAR = 2
+  FAR  = 2,
+  FINAL_INDICATOR_INDEX_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };
 
-enum ENUM_ALLIGATOR { JAW = 0, TEETH = 1, LIPS = 2 };
+enum ENUM_MA { FAST = 0, MEDIUM = 1, SLOW = 2, FINAL_MA_ENTRY };
+enum ENUM_ALLIGATOR { JAW = MODE_GATORJAW-1, TEETH = MODE_GATORTEETH-1, LIPS = MODE_GATORLIPS-1 };
 
 //+------------------------------------------------------------------+
 //| User input variables.
@@ -535,11 +541,22 @@ extern double BoostTrendFactor                     = 1.2; // Additional boost wh
 //+------------------------------------------------------------------+
 extern string __Market_Parameters__ = "-- Market parameters --";
 extern int TrendMethod = 181; // Method of main trend calculation. Valid range: 0-255. Suggested values: 65!, 71, 81, 83!, 87, 181, etc.
-// £11347.25	20908	1.03	0.54	17245.91	58.84%	0.00000000	TrendMethod=181 (d: £10k, spread 24)
-// £11383.51	20278	1.04	0.56	22825.00	67.72%	0.00000000	TrendMethod=81 (d: £10k, spread 24)
-// £3146.85	20099	1.01	0.16	25575.87	77.54%	0.00000000	TrendMethod=81 (d: £10k, spread 28)
-// £1668.90	20747	1.01	0.08	17142.41	71.64%	0.00000000	TrendMethod=181 (d: £10k, spread 28)
-extern int TrendMethodAction = 238; // Method of trend calculation on action execution (See: A_CLOSE_ALL_TREND/A_CLOSE_ALL_NON_TREND). Valid range: 0-255.
+/* Backtest log (ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, 9,5mln ticks, quality 25%]:
+  £11347.25	20908	1.03	0.54	17245.91	58.84%	TrendMethod=181 (d: £10k, spread 24)
+  £11383.51	20278	1.04	0.56	22825.00	67.72%	TrendMethod=81 (d: £10k, spread 24)
+  £3146.85	20099	1.01	0.16	25575.87	77.54%	TrendMethod=81 (d: £10k, spread 28)
+  £1668.90	20747	1.01	0.08	17142.41	71.64%	TrendMethod=181 (d: £10k, spread 28)
+*/
+#ifndef __rider__
+  extern int TrendMethodAction = 238; // Method of trend calculation on action execution (See: A_CLOSE_ALL_TREND/A_CLOSE_ALL_NON_TREND). Valid range: 0-255.
+#else
+  extern int TrendMethodAction = 17;
+/* Backtest log (ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, 9,5mln ticks, quality 25%]:
+     £129847.70	5406	1.25	24.02	83328.01	72.67%	TrendMethodAction=17 (d: £2k, spread 20, __rider__, auto)
+     £84538.74	5282	1.21	16.01	64259.13	72.67%	TrendMethodAction=16 (d: £2k, spread 20, __rider__, auto)
+     £71144.36	5323	1.29	13.37	34450.52	70.68%	TrendMethodAction=25 (d: £2k, spread 20, __rider__, auto)
+*/
+#endif
 extern int MinVolumeToTrade = 2; // Minimum volume to trade.
 extern int MaxOrderPriceSlippage = 5; // Maximum price slippage for buy or sell orders (in pips).
 extern int DemoMarketStopLevel = 10;
@@ -552,6 +569,7 @@ extern double MaxSpreadToTrade = 10.0; // Maximum spread to trade (in pips).
 //+------------------------------------------------------------------+
 #ifdef __advanced__
   extern string __Advanced_Parameters__ = "-- Advanced parameters --";
+  extern bool CloseConditionOnlyProfitable = TRUE; // Close conditions applies only for profitable orders.
   extern bool DisableCloseConditions = FALSE; // Set TRUE to disable all close conditions for strategies. Not useful apart of testing.
   extern int CloseConditionCustom1Method = 0; // Custom 1 indicator-based close condition. Valid range: 0-1023.
   extern int CloseConditionCustom2Method = 0; // Custom 2 indicator-based close condition. Valid range: 0-1023.
@@ -636,15 +654,15 @@ extern ENUM_MARKET_CONDITION Market_Condition_4    = C_MARKET_TRUE;
 extern ENUM_ACTION_TYPE Action_On_Condition_4      = A_CLOSE_ALL_LOSS_SIDE;
 
 extern ENUM_ACC_CONDITION Account_Condition_5      = C_EQUITY_10PC_HIGH;
-extern ENUM_MARKET_CONDITION Market_Condition_5    = C_MARKET_VBIG_DROP;
+extern ENUM_MARKET_CONDITION Market_Condition_5    = C_MARKET_BIG_DROP;
 extern ENUM_ACTION_TYPE Action_On_Condition_5      = A_CLOSE_ORDER_PROFIT;
 
 extern ENUM_ACC_CONDITION Account_Condition_6      = C_EQUITY_20PC_HIGH;
-extern ENUM_MARKET_CONDITION Market_Condition_6    = C_MARKET_BIG_DROP;
+extern ENUM_MARKET_CONDITION Market_Condition_6    = C_MARKET_VBIG_DROP;
 extern ENUM_ACTION_TYPE Action_On_Condition_6      = A_CLOSE_ORDER_PROFIT;
 
 extern ENUM_ACC_CONDITION Account_Condition_7      = C_EQUITY_50PC_HIGH;
-extern ENUM_MARKET_CONDITION Market_Condition_7    = C_MA5_FAST_SLOW_OPP;
+extern ENUM_MARKET_CONDITION Market_Condition_7    = C_MA1_FS_TREND_OPP;
 extern ENUM_ACTION_TYPE Action_On_Condition_7      = A_CLOSE_ORDER_PROFIT;
 
 extern ENUM_ACC_CONDITION Account_Condition_8      = C_MARGIN_USED_80PC;
@@ -663,9 +681,14 @@ extern ENUM_ACC_CONDITION Account_Condition_11     = C_ACC_TRUE;
 extern ENUM_MARKET_CONDITION Market_Condition_11   = C_MARKET_VBIG_DROP;
 extern ENUM_ACTION_TYPE Action_On_Condition_11     = A_CLOSE_ALL_IN_LOSS;
 
-extern ENUM_ACC_CONDITION Account_Condition_12     = C_ACC_NONE;
-extern ENUM_MARKET_CONDITION Market_Condition_12   = C_MARKET_NONE;
-extern ENUM_ACTION_TYPE Action_On_Condition_12     = A_NONE;
+extern ENUM_ACC_CONDITION Account_Condition_12     = C_EQUITY_50PC_HIGH;
+extern ENUM_MARKET_CONDITION Market_Condition_12   = C_MA30_FS_TREND_OPP;
+extern ENUM_ACTION_TYPE Action_On_Condition_12     = A_CLOSE_ALL_LOSS_SIDE;
+  /*
+    77576.22	5258	1.44	14.75	24957.91	77.13%	Market_Condition_12=9 	Action_On_Condition_12=6 (d: £2k, spread: 20, 2015.01.01-06.30)
+    50903.83	5452	1.29	9.34	21735.21	66.82%	Market_Condition_12=9 	Action_On_Condition_12=4 (d: £2k, spread: 20, 2015.01.01-06.30)
+    44363.39	5433	1.30	8.17	22401.58	68.00%	Market_Condition_12=8 	Action_On_Condition_12=1 (d: £2k, spread: 20, 2015.01.01-06.30)
+  */
 #endif
 //+------------------------------------------------------------------+
 extern string __AC_Parameters__ = "-- Settings for the Bill Williams' Accelerator/Decelerator oscillator --";
@@ -682,10 +705,10 @@ extern string __AC_Parameters__ = "-- Settings for the Bill Williams' Accelerato
   extern ENUM_TRAIL_TYPE AC_TrailingProfitMethod = T_MA_FMS_PEAK;
 #endif
 extern double AC_OpenLevel = 0; // Not used currently.
-extern int AC1_OpenMethod = 0; // Valid range: 0-31.
-extern int AC5_OpenMethod = 0; // Valid range: 0-31.
-extern int AC15_OpenMethod = 0; // Valid range: 0-31. // Optimized.
-extern int AC30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTALS_BUY_SELL close condition.
+extern int AC1_OpenMethod = 0; // Valid range: 0-x.
+extern int AC5_OpenMethod = 0; // Valid range: 0-x.
+extern int AC15_OpenMethod = 0; // Valid range: 0-x.
+extern int AC30_OpenMethod = 0; // Valid range: 0-x.
 #ifdef __advanced__
   extern int AC1_OpenCondition1 = 0; // Valid range: 0-1023. 512, 800 ,832
   extern int AC1_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized. // 0, 16
@@ -725,10 +748,10 @@ extern string __AD_Parameters__ = "-- Settings for the Accumulation/Distribution
   extern ENUM_TRAIL_TYPE AD_TrailingProfitMethod = T_MA_FMS_PEAK;
 #endif
 extern double AD_OpenLevel = 0; // Not used currently.
-extern int AD1_OpenMethod = 0; // Valid range: 0-31.
-extern int AD5_OpenMethod = 0; // Valid range: 0-31.
-extern int AD15_OpenMethod = 0; // Valid range: 0-31. // Optimized.
-extern int AD30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTALS_BUY_SELL close condition.
+extern int AD1_OpenMethod = 0; // Valid range: 0-x.
+extern int AD5_OpenMethod = 0; // Valid range: 0-x.
+extern int AD15_OpenMethod = 0; // Valid range: 0-x.
+extern int AD30_OpenMethod = 0; // Valid range: 0-x.
 #ifdef __advanced__
   extern int AD1_OpenCondition1 = 0; // Valid range: 0-1023. 512, 800 ,832
   extern int AD1_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized. // 0, 16
@@ -767,11 +790,13 @@ extern string __ADX_Parameters__ = "-- Settings for the Average Directional Move
   extern ENUM_TRAIL_TYPE ADX_TrailingStopMethod = T_MA_FMS_PEAK;
   extern ENUM_TRAIL_TYPE ADX_TrailingProfitMethod = T_MA_FMS_PEAK;
 #endif
+extern int ADX_Period = 14; // Averaging period to calculate the main line.
+extern ENUM_APPLIED_PRICE ADX_Applied_Price = PRICE_HIGH; // Bands applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern double ADX_OpenLevel = 0; // Not used currently.
-extern int ADX1_OpenMethod = 0; // Valid range: 0-31.
-extern int ADX5_OpenMethod = 0; // Valid range: 0-31.
-extern int ADX15_OpenMethod = 0; // Valid range: 0-31. // Optimized.
-extern int ADX30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTALS_BUY_SELL close condition.
+extern int ADX1_OpenMethod = 0; // Valid range: 0-x.
+extern int ADX5_OpenMethod = 0; // Valid range: 0-x.
+extern int ADX15_OpenMethod = 0; // Valid range: 0-x.
+extern int ADX30_OpenMethod = 0; // Valid range: 0-x.
 #ifdef __advanced__
   extern int ADX1_OpenCondition1 = 0; // Valid range: 0-1023. 512, 800 ,832
   extern int ADX1_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized. // 0, 16
@@ -866,6 +891,8 @@ extern string __ATR_Parameters__ = "-- Settings for the Average True Range indic
   extern ENUM_TRAIL_TYPE ATR_TrailingStopMethod = T_MA_FMS_PEAK;
   extern ENUM_TRAIL_TYPE ATR_TrailingProfitMethod = T_MA_FMS_PEAK;
 #endif
+extern int ATR_Period_Fast = 14; // Averaging period to calculate the main line.
+extern int ATR_Period_Slow = 20; // Averaging period to calculate the main line.
 extern double ATR_OpenLevel = 0; // Not used currently.
 extern int ATR1_OpenMethod = 0; // Valid range: 0-31.
 extern int ATR5_OpenMethod = 0; // Valid range: 0-31.
@@ -1012,7 +1039,7 @@ extern string __BPower_Parameters__ = "-- Settings for the Bulls/Bears Power ind
   extern ENUM_TRAIL_TYPE BPower_TrailingProfitMethod = T_MA_FMS_PEAK;
 #endif
 extern int BPower_Period = 13; // Averaging period for calculation.
-extern ENUM_APPLIED_PRICE BPower_Applied_Price = PRICE_CLOSE; // MACD applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
+extern ENUM_APPLIED_PRICE BPower_Applied_Price = PRICE_CLOSE; // Applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern double BPower_OpenLevel = 0; // Not used currently.
 extern int BPower1_OpenMethod = 0; // Valid range: 0-x.
 extern int BPower5_OpenMethod = 0; // Valid range: 0-x.
@@ -1142,6 +1169,9 @@ extern string __CCI_Parameters__ = "-- Settings for the Commodity Channel Index 
   extern ENUM_TRAIL_TYPE CCI_TrailingStopMethod = T_MA_FMS_PEAK;
   extern ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = T_MA_FMS_PEAK;
 #endif
+extern int CCI_Period_Fast = 12; // Averaging period to calculate the main line.
+extern int CCI_Period_Slow = 20; // Averaging period to calculate the main line.
+extern ENUM_APPLIED_PRICE CCI_Applied_Price = PRICE_CLOSE; // Applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern double CCI_OpenLevel = 0; // Not used currently.
 extern int CCI1_OpenMethod = 0; // Valid range: 0-31.
 extern int CCI5_OpenMethod = 0; // Valid range: 0-31.
@@ -1302,6 +1332,9 @@ extern string __Force_Parameters__ = "-- Settings for the Force Index indicator 
   extern ENUM_TRAIL_TYPE Force_TrailingStopMethod = T_MA_FMS_PEAK;
   extern ENUM_TRAIL_TYPE Force_TrailingProfitMethod = T_MA_FMS_PEAK;
 #endif
+extern int Force_Period = 13; // Averaging period for calculation.
+extern ENUM_MA_METHOD Force_MA_Method = MODE_SMA; // Moving Average method (See: ENUM_MA_METHOD). Range: 0-3.
+extern ENUM_APPLIED_PRICE Force_Applied_price = PRICE_CLOSE; // Applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern double Force_OpenLevel = 0; // Not used currently.
 extern int Force1_OpenMethod = 0; // Valid range: 0-31.
 extern int Force5_OpenMethod = 0; // Valid range: 0-31.
@@ -1437,6 +1470,9 @@ extern string __Ichimoku_Parameters__ = "-- Settings for the Ichimoku Kinko Hyo 
   extern ENUM_TRAIL_TYPE Ichimoku_TrailingStopMethod = T_MA_FMS_PEAK;
   extern ENUM_TRAIL_TYPE Ichimoku_TrailingProfitMethod = T_MA_FMS_PEAK;
 #endif
+extern int Ichimoku_Period_Tenkan_Sen = 9; // Tenkan Sen averaging period.
+extern int Ichimoku_Period_Kijun_Sen = 26; // Kijun Sen averaging period.
+extern int Ichimoku_Period_Senkou_Span_B = 52; // Senkou SpanB averaging period.
 extern double Ichimoku_OpenLevel = 0; // Not used currently.
 extern int Ichimoku1_OpenMethod = 0; // Valid range: 0-31.
 extern int Ichimoku5_OpenMethod = 0; // Valid range: 0-31.
@@ -1588,6 +1624,7 @@ extern string __MFI_Parameters__ = "-- Settings for the Money Flow Index indicat
   extern ENUM_TRAIL_TYPE MFI_TrailingStopMethod = T_MA_FMS_PEAK;
   extern ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = T_MA_FMS_PEAK;
 #endif
+extern int MFI_Period = 14; // Averaging period for calculation.
 extern double MFI_OpenLevel = 0; // Not used currently.
 extern int MFI1_OpenMethod = 0; // Valid range: 0-31.
 extern int MFI5_OpenMethod = 0; // Valid range: 0-31.
@@ -1631,6 +1668,9 @@ extern string __Momentum_Parameters__ = "-- Settings for the Momentum indicator 
   extern ENUM_TRAIL_TYPE Momentum_TrailingStopMethod = T_MA_FMS_PEAK;
   extern ENUM_TRAIL_TYPE Momentum_TrailingProfitMethod = T_MA_FMS_PEAK;
 #endif
+extern int Momentum_Period_Fast = 12; // Averaging period for calculation.
+extern int Momentum_Period_Slow = 20; // Averaging period for calculation.
+extern ENUM_APPLIED_PRICE Momentum_Applied_Price = PRICE_CLOSE; // Applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern double Momentum_OpenLevel = 0; // Not used currently.
 extern int Momentum1_OpenMethod = 0; // Valid range: 0-x.
 extern int Momentum5_OpenMethod = 0; // Valid range: 0-x.
@@ -1674,6 +1714,7 @@ extern string __OBV_Parameters__ = "-- Settings for the On Balance Volume indica
   extern ENUM_TRAIL_TYPE OBV_TrailingStopMethod = T_MA_FMS_PEAK;
   extern ENUM_TRAIL_TYPE OBV_TrailingProfitMethod = T_MA_FMS_PEAK;
 #endif
+extern ENUM_APPLIED_PRICE OBV_Applied_Price = PRICE_CLOSE; // Applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern double OBV_OpenLevel = 0; // Not used currently.
 extern int OBV1_OpenMethod = 0; // Valid range: 0-31.
 extern int OBV5_OpenMethod = 0; // Valid range: 0-31.
@@ -1717,6 +1758,10 @@ extern string __OSMA_Parameters__ = "-- Settings for the Moving Average of Oscil
   extern ENUM_TRAIL_TYPE OSMA_TrailingStopMethod = T_MA_FMS_PEAK;
   extern ENUM_TRAIL_TYPE OSMA_TrailingProfitMethod = T_MA_FMS_PEAK;
 #endif
+extern int OSMA_Period_Fast = 12; // Fast EMA averaging period.
+extern int OSMA_Period_Slow = 26; // Slow EMA averaging period.
+extern int OSMA_Period_Signal = 9; // Signal line averaging period.
+extern ENUM_APPLIED_PRICE OSMA_Applied_Price = PRICE_OPEN; // MACD applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern double OSMA_OpenLevel = 0; // Not used currently.
 extern int OSMA1_OpenMethod = 0; // Valid range: 0-31.
 extern int OSMA5_OpenMethod = 0; // Valid range: 0-31.
@@ -1833,6 +1878,8 @@ extern string __RVI_Parameters__ = "-- Settings for the Relative Vigor Index ind
   extern ENUM_TRAIL_TYPE RVI_TrailingStopMethod = T_MA_FMS_PEAK;
   extern ENUM_TRAIL_TYPE RVI_TrailingProfitMethod = T_MA_FMS_PEAK;
 #endif
+extern int RVI_Shift = 2; // Shift relative to the previous bar the given amount of periods ago.
+extern int RVI_Shift_Far = 0; // Shift relative to the previous bar shift the given amount of periods ago.
 extern double RVI_OpenLevel = 0; // Not used currently.
 extern int RVI1_OpenMethod = 0; // Valid range: 0-31.
 extern int RVI5_OpenMethod = 0; // Valid range: 0-31.
@@ -2155,7 +2202,8 @@ extern int MagicNumber = 31337; // To help identify its own orders. It can vary 
  * Deposit: £2000 (default, spread 2)
  *
  * Deposit: £2000 (default, spread 20)
- *   £17400.47	5516	1.31	3.15	8800.12	73.14%	Market_Condition_6=0 (__rider__)
+ *   £77576.22	5258	1.44	14.75	24957.91	77.13%	Market_Condition_12=9 	Action_On_Condition_12=6 (__rider__, auto)
+ *   £31634.22	5503	1.25	5.75	16191.08	67.12%	Market_Condition_7=6 (__rider__, auto)
  *
  * Deposit: £2000 (default, spread 40)
  * --
@@ -2167,6 +2215,8 @@ extern int MagicNumber = 31337; // To help identify its own orders. It can vary 
  *
  *   £7242.02	23883	1.11	0.30	4013.08	52.91%	TradeWithTrend=1
  *   £1719.22	32541	1.04	0.05	1914.97	55.15%	TradeWithTrend=0
+ *   £8505.73	5452	1.18	1.56	6310.19	79.89%	TradeWithTrend=0 (__rider__, auto)
+ *   £5345.28	4571	1.09	1.17	15073.88	83.51%	TradeWithTrend=1 (__rider__, auto)
  *
  * Deposit: £1000 (default, spread 40)
  *   £281.07	23060	1.01	0.01	1802.54	81.01%	TradeWithTrend=1
@@ -2285,6 +2335,15 @@ extern int MagicNumber = 31337; // To help identify its own orders. It can vary 
  */
 
 /*
+ * Predefined constants:
+ *   Ask (for buying)  - The latest known seller's price (ask price) of the current symbol.
+ *   Bid (for selling) - The latest known buyer's price (offer price, bid price) of the current symbol.
+ *   Point - The current symbol point value in the quote currency.
+ *   Digits - Number of digits after decimal point for the current symbol prices.
+ *   Bars - Number of bars in the current chart.
+ */
+
+/*
  * Notes:
  *   - __MQL4__  macro is defined when compiling *.mq4 file, __MQL5__ macro is defined when compiling *.mq5 one.
  */
@@ -2347,15 +2406,35 @@ int acc_conditions[12][3], market_conditions[10][3];
 string last_cname;
 
 // Indicator variables.
-double ma_fast[H1][3], ma_medium[H1][3], ma_slow[H1][3];
-double macd[H1][3], macd_signal[H1][3];
+double ac[H1][FINAL_INDICATOR_INDEX_ENTRY];
+double ad[H1][FINAL_INDICATOR_INDEX_ENTRY];
+double adx[H1][FINAL_INDICATOR_INDEX_ENTRY][MODE_MINUSDI+1];
+double alligator[H1][FINAL_INDICATOR_INDEX_ENTRY][LIPS+1];
+double atr[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_MA_ENTRY];
+double awesome[H1][FINAL_INDICATOR_INDEX_ENTRY];
+double bands[H1][FINAL_INDICATOR_INDEX_ENTRY][MODE_LOWER+1];
+double bwmfi[H1][FINAL_INDICATOR_INDEX_ENTRY];
+double bpower[H1][FINAL_INDICATOR_INDEX_ENTRY][OP_SELL+1];
+double cci[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_MA_ENTRY];
+double demarker[H1][2];
+double envelopes[H1][FINAL_INDICATOR_INDEX_ENTRY][MODE_LOWER+1];
+double force[H1][FINAL_INDICATOR_INDEX_ENTRY];
+double fractals[H1][FINAL_INDICATOR_INDEX_ENTRY][MODE_LOWER+1];
+double gator[H1][FINAL_INDICATOR_INDEX_ENTRY][LIPS+1];
+double ichimoku[H1][FINAL_INDICATOR_INDEX_ENTRY][MODE_CHIKOUSPAN+1];
+double ma_fast[H1][FINAL_INDICATOR_INDEX_ENTRY], ma_medium[H1][FINAL_INDICATOR_INDEX_ENTRY], ma_slow[H1][FINAL_INDICATOR_INDEX_ENTRY];
+double macd[H1][FINAL_INDICATOR_INDEX_ENTRY][MODE_SIGNAL+1];
+double mfi[H1][FINAL_INDICATOR_INDEX_ENTRY];
+double momentum[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_MA_ENTRY];
+double obv[H1][FINAL_INDICATOR_INDEX_ENTRY];
+double osma[H1][FINAL_INDICATOR_INDEX_ENTRY];
 double rsi[H1][3], rsi_stats[H1][3];
+double rvi[H1][FINAL_INDICATOR_INDEX_ENTRY][MODE_SIGNAL+1];
 double sar[H1][3]; int sar_week[H1][7][2];
-double bands[H1][3][3], envelopes[H1][3][3];
-double alligator[H1][3][3];
-double demarker[H1][2], wpr[H1][2];
-double fractals[H1][3][3];
-double b_power[H1][2][3];
+// double stddev[H1][FINAL_INDICATOR_INDEX_ENTRY];
+// double stochastic[H1][FINAL_INDICATOR_INDEX_ENTRY];
+double wpr[H1][2];
+// double zigzag[H1][FINAL_INDICATOR_INDEX_ENTRY];
 
 /* TODO:
  *   - add trailing stops/profit for support/resistence,
@@ -2371,15 +2450,7 @@ double b_power[H1][2][3];
  *   - check ResourceCreate/ResourceSave to store dynamic parameters
  *   - generate custom tick data for tester\history\EURUSD1_0.fxt
  *   - consider to use Donchian Channel (ihighest/ilowest) for detecting s/r levels
- */
-
-/*
- * Predefined constants:
- *   Ask (for buying)  - The latest known seller's price (ask price) of the current symbol.
- *   Bid (for selling) - The latest known buyer's price (offer price, bid price) of the current symbol.
- *   Point - The current symbol point value in the quote currency.
- *   Digits - Number of digits after decimal point for the current symbol prices.
- *   Bars - Number of bars in the current chart.
+ *   - convert `ma_fast`, `ma_medium`, `ma_slow` into one `ma` variable.
  */
 
 //+------------------------------------------------------------------+
@@ -2404,11 +2475,6 @@ void OnTick() {
 
   if (TradeAllowed()) {
     UpdateVariables();
-    // UpdateIndicator(EMPTY);
-    // UpdateIndicators(PERIOD_M1);
-    // UpdateIndicators(PERIOD_M5);
-    // UpdateIndicators(PERIOD_M15);
-    // UpdateIndicators(PERIOD_M30);
     Trade();
     if (GetTotalOrders() > 0) {
       UpdateTrailingStops();
@@ -2571,8 +2637,8 @@ bool Trade() {
       else if (TradeCondition(id, OP_SELL)) trade_cmd = OP_SELL;
       #ifdef __advanced__
       if (!DisableCloseConditions) {
-        if (CheckMarketEvent(OP_BUY,  PERIOD_M30, info[id][CLOSE_CONDITION])) CloseOrdersByType(OP_SELL, id, "closing on market change: " + sname[id], TRUE);
-        if (CheckMarketEvent(OP_SELL, PERIOD_M30, info[id][CLOSE_CONDITION])) CloseOrdersByType(OP_BUY,  id, "closing on market change: " + sname[id], TRUE);
+        if (CheckMarketEvent(OP_BUY,  PERIOD_M30, info[id][CLOSE_CONDITION])) CloseOrdersByType(OP_SELL, id, "closing on market change: " + sname[id], CloseConditionOnlyProfitable);
+        if (CheckMarketEvent(OP_SELL, PERIOD_M30, info[id][CLOSE_CONDITION])) CloseOrdersByType(OP_BUY,  id, "closing on market change: " + sname[id], CloseConditionOnlyProfitable);
       }
       if (trade_cmd == OP_BUY  && !CheckMarketCondition1(OP_BUY,  info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) trade_cmd = EMPTY;
       if (trade_cmd == OP_SELL && !CheckMarketCondition1(OP_SELL, info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) trade_cmd = EMPTY;
@@ -2642,191 +2708,13 @@ bool TradeCondition(int order_type = 0, int cmd = EMPTY) {
 }
 
 /*
- * Check if strategy is on trade.
- *
- * TODO: Convert this function in more flexible way by breaking down each indicator individually.
- */
-bool UpdateIndicators(int timeframe = PERIOD_M1) {
-
-  // Check if bar time has been changed since last check.
-  // int bar_time = iTime(NULL, PERIOD_M1, 0);
-  // if (bar_time == last_indicators_update) {
-  //   return (FALSE);
-  // } else {
-  //   last_indicators_update = bar_time;
-  // }
-
-  int period = M1, bands_period = Bands_Period, rsi_period = RSI_Period;
-  double envelopes_deviation = Envelopes1_Deviation;
-  switch (timeframe) {
-    case PERIOD_M1:
-      period = M1;
-      bands_period = info[BANDS1][CUSTOM_PERIOD];
-      rsi_period = info[RSI1][CUSTOM_PERIOD];
-      envelopes_deviation = Envelopes1_Deviation;
-      break;
-    case PERIOD_M5:
-      period = M5;
-      bands_period = info[BANDS5][CUSTOM_PERIOD];
-      rsi_period = info[RSI5][CUSTOM_PERIOD];
-      envelopes_deviation = Envelopes5_Deviation;
-      break;
-    case PERIOD_M15:
-      period = M15;
-      bands_period = info[BANDS15][CUSTOM_PERIOD];
-      rsi_period = info[RSI15][CUSTOM_PERIOD];
-      envelopes_deviation = Envelopes15_Deviation;
-      break;
-    case PERIOD_M30:
-      period = M30;
-      bands_period = info[BANDS30][CUSTOM_PERIOD];
-      rsi_period = info[RSI30][CUSTOM_PERIOD];
-      envelopes_deviation = Envelopes30_Deviation;
-      break;
-  }
-
-  int i; string text = __FUNCTION__ + "(): ";
-
-  // Update Moving Averages indicator values.
-  // Note: We don't limit MA calculation with MA_Active, because this indicator is used for trailing stop calculation.
-  // Calculate MA Fast.
-  ma_fast[period][CURR] = iMA(NULL, timeframe, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, 0); // Current
-  ma_fast[period][PREV] = iMA(NULL, timeframe, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, 1 + MA_Shift_Fast); // Previous
-  ma_fast[period][FAR]  = iMA(NULL, timeframe, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, 2 + MA_Shift_Far);
-  // Calculate MA Medium.
-  ma_medium[period][CURR] = iMA(NULL, timeframe, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, 0); // Current
-  ma_medium[period][PREV] = iMA(NULL, timeframe, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, 1 + MA_Shift_Medium); // Previous
-  ma_medium[period][FAR]  = iMA(NULL, timeframe, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, 2 + MA_Shift_Far);
-  // Calculate Ma Slow.
-  ma_slow[period][CURR] = iMA(NULL, timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, 0); // Current
-  ma_slow[period][PREV] = iMA(NULL, timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, 1 + MA_Shift_Slow); // Previous
-  ma_slow[period][FAR]  = iMA(NULL, timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, 2 + MA_Shift_Far);
-
-  // TODO: testing
-  // ma_fast[period][0] = iMA(NULL, MA_Timeframe, MA_Period_Medium / MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 0); // Current
-  // ma_fast[period][1] = iMA(NULL, MA_Timeframe, MA_Period_Medium / MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 1 + MA_Shift_Fast); // Previous
-  // ma_fast[period][2] = iMA(NULL, MA_Timeframe, MA_Period_Medium / MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 2 + MA_Shift_Far);
-  // ma_slow[period][0] = iMA(NULL, MA_Timeframe, MA_Period_Medium * MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 0); // Current
-  // ma_slow[period][1] = iMA(NULL, MA_Timeframe, MA_Period_Medium * MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 1 + MA_Shift_Slow); // Previous
-  // ma_slow[period][2] = iMA(NULL, MA_Timeframe, MA_Period_Medium * MA_Period_Ratio, 0, MA_Method, MA_Applied_Price, 2 + MA_Shift_Far);
-  // if (VerboseTrace) text += "MA: MA_Fast: " + GetArrayValues(ma_fast[M1]) + "; MA_Medium: " + GetArrayValues(ma_medium[M1]) + "; MA_Slow: " + GetArrayValues(ma_slow[M1]) + "; ";
-  if (VerboseDebug && IsVisualMode()) DrawMA(timeframe);
-
-  //if (MACD_Active) {
-    // Update MACD indicator values.
-    macd[period][CURR] = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN, 0); // Current
-    macd[period][PREV] = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN, 1 + MACD_Shift); // Previous
-    macd[period][FAR]  = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN, 2 + MACD_ShiftFar);
-    macd_signal[period][CURR] = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, 0);
-    macd_signal[period][PREV] = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, 1 + MACD_Shift);
-    macd_signal[period][FAR]  = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, 2 + MACD_ShiftFar);
-    // if (VerboseTrace) text += "MACD: " + GetArrayValues(macd[M1]) + "; Signal: " + GetArrayValues(macd_signal[M1]) + "; ";
-  //}
-
-  // if (Alligator1_Active || Alligator5_Active || Alligator15_Active || Alligator30_Active) {
-    // Update Alligator indicator values.
-    // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
-    for (i = 0; i < 3; i++) {
-      alligator[period][i][JAW] = iMA(NULL, timeframe, Alligator_Jaw_Period,   Alligator_Jaw_Shift,   Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
-      alligator[period][i][TEETH] = iMA(NULL, timeframe, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
-      alligator[period][i][LIPS]  = iMA(NULL, timeframe, Alligator_Lips_Period,  Alligator_Lips_Shift,  Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift_Far);
-    }
-    // Which is equivalent to:
-    // alligator[0][0] = iAlligator(NULL, Alligator_Timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
-    // alligator[0][1] = iAlligator(NULL, Alligator_Timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
-    // alligator[0][2] = iAlligator(NULL, Alligator_Timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
-    // if (VerboseTrace) text += "Alligator: " + GetArrayValues(alligator[0]) + GetArrayValues(alligator[1]) + "; ";
-  // }
-
-  // if (RSI_Active) {
-    // Update RSI indicator values.
-    for (i = 0; i < 3; i++) {
-      rsi[period][i] = iRSI(NULL, timeframe, rsi_period, RSI_Applied_Price, i + RSI_Shift);
-      if (rsi[period][i] > rsi_stats[period][MODE_UPPER]) rsi_stats[period][MODE_UPPER] = rsi[period][i]; // Calculate maximum value.
-      if (rsi[period][i] < rsi_stats[period][MODE_LOWER] || rsi_stats[period][MODE_LOWER] == 0) rsi_stats[period][MODE_LOWER] = rsi[period][i]; // Calculate minimum value.
-    }
-    rsi_stats[period][0] = If(rsi_stats[period][0] > 0, (rsi_stats[period][0] + rsi[period][0] + rsi[period][1] + rsi[period][2]) / 4, (rsi[period][0] + rsi[period][1] + rsi[period][2]) / 3); // Calculate average value.
-    // if (VerboseTrace) text += "RSI: " + GetArrayValues(rsi[M1]) + "; ";
-  // }
-
-  // if (SAR_Active) {
-    // Update SAR indicator values.
-    for (i = 0; i < 3; i++) {
-      sar[period][i] = iSAR(NULL, timeframe, SAR_Step, SAR_Maximum_Stop, i + SAR_Shift);
-    }
-    // if (VerboseTrace) text += "SAR: " + GetArrayValues(sar[M1]) + "; ";
-  // }
-
-  // if (Bands_Active) {
-    // Update the Bollinger Bands indicator values.
-    for (i = 0; i < 3; i++) {
-      bands[period][i][MODE_MAIN]  = iBands(NULL, timeframe, bands_period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_MAIN,  i + Bands_Shift);
-      bands[period][i][MODE_UPPER] = iBands(NULL, timeframe, bands_period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_UPPER, i + Bands_Shift);
-      bands[period][i][MODE_LOWER] = iBands(NULL, timeframe, bands_period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_LOWER, i + Bands_Shift);
-    }
-    // if (VerboseTrace) text += "Bands: " + GetArrayValues(bands) + "; ";
-  // }
-
-  // if (Envelopes1_Active || Envelopes5_Active || Envelopes15_Active || Envelopes30_Active) {
-    // Update the Envelopes indicator values.
-    for (i = 0; i < 3; i++) {
-      envelopes[period][i][MODE_MAIN]  = iEnvelopes(NULL, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, MODE_MAIN,  i + Envelopes_Shift);
-      envelopes[period][i][MODE_UPPER] = iEnvelopes(NULL, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, MODE_UPPER, i + Envelopes_Shift);
-      envelopes[period][i][MODE_LOWER] = iEnvelopes(NULL, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, MODE_LOWER, i + Envelopes_Shift);
-    }
-    // if (VerboseTrace) text += "Envelopes: " + GetArrayValues(envelopes) + "; ";
-  // }
-
-  // if (WPR1_Active || WPR5_Active || WPR15_Active || WPR30_Active) {
-    // Update the Larry Williams' Percent Range indicator values.
-    wpr[period][CURR] = -iWPR(NULL, timeframe, WPR_Period, 0 + WPR_Shift);
-    wpr[period][PREV] = -iWPR(NULL, timeframe, WPR_Period, 1 + WPR_Shift);
-    wpr[period][FAR]  = -iWPR(NULL, timeframe, WPR_Period, 2 + WPR_Shift);
-    // if (VerboseTrace) text += "WPR: " + GetArrayValues(wpr[M1]) + "; ";
-  // }
-
-  // if (DeMarker1_Active || DeMarker5_Active || DeMarker15_Active || DeMarker30_Active) {
-    // Update DeMarker indicator values.
-    demarker[period][CURR] = iDeMarker(NULL, timeframe, DeMarker_Period, 0 + DeMarker_Shift);
-    demarker[period][PREV] = iDeMarker(NULL, timeframe, DeMarker_Period, 1 + DeMarker_Shift);
-    demarker[period][FAR]  = iDeMarker(NULL, timeframe, DeMarker_Period, 2 + DeMarker_Shift);
-    // if (VerboseTrace) text += "DeMarker: " + GetArrayValues(demarker[M1]) + "; ";
-  // }
-
-  // if (Fractals1_Active || Fractals5_Active || Fractals15_Active || Fractals30_Active) {
-    // Update Fractals indicator values.
-    for (i = 0; i < 3; i++) {
-      fractals[period][i][MODE_LOWER] = iFractals(NULL, timeframe, MODE_LOWER, i);
-      fractals[period][i][MODE_UPPER] = iFractals(NULL, timeframe, MODE_UPPER, i);
-    }
-    // text += "fractals: "  + fractals_lower[M5]  + ", Fractals5_upper: " + fractals_upper[M5] + "; ";
-  // }
-
-  for (i = 0; i < 3; i++) {
-    b_power[period][OP_BUY][i]  = iBullsPower(NULL, timeframe, BPower_Period, BPower_Applied_Price, i);
-    b_power[period][OP_SELL][i] = iBearsPower(NULL, timeframe, BPower_Period, BPower_Applied_Price, i);
-  }
-  // Message("Bulls: " + b_power[period][OP_BUY][CURR] + ", Bears: " + b_power[period][OP_SELL][CURR]);
-
-  // TODO
-  // stoch[period][MODE_MAIN] = iStochastic(NULL, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, MODE_MAIN, 1);
-  // stoch[period][MODE_SIGNAL] = iStochastic(NULL, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, MODE_SIGNAL, 1);
-  // stoch[period][MODE_MAIN] = iStochastic(NULL, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, MODE_MAIN, 2);
-  // stoch[period][MODE_SIGNAL] = iStochastic(NULL, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, MODE_SIGNAL, 2);
-  // if(stoch4h<stoch4h2){ //Sell signal
-  // if(stoch4h>stoch4h2){//Buy signal
-
-  if (VerboseTrace) Print(__FUNCTION__ + "():" + text);
-  return (TRUE);
-}
-
-/*
  * Update specific indicator.
+ * Gukkuk im Versteck
  */
 bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
   static int processed[FINAL_INDICATOR_TYPE_ENTRY][FINAL_PERIOD_TYPE_ENTRY];
   int i; string text = __FUNCTION__ + "(): ";
-  // if (type == EMPTY) ArrayFill(processed, 0, ArraySize(processed), FALSE); // Reset processed if timeframe is EMPTY.
+  if (type == EMPTY) ArrayFill(processed, 0, ArraySize(processed), FALSE); // Reset processed if timeframe is EMPTY.
   int period = TfToPeriod(timeframe);
   if (processed[type][period] == time_current) {
     return (TRUE); // If it was already processed, ignore it.
@@ -2834,66 +2722,74 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
 
   switch (type) {
     case AC: // Calculates the Bill Williams' Accelerator/Decelerator oscillator.
-      // TODO
-      // double result=iAC(NULL,0,1);
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
+        ac[period][i] = iAC(_Symbol, timeframe, i);
       break;
     case AD: // Calculates the Accumulation/Distribution indicator.
-      // TODO
-      // double result=iAD(NULL, 0, 1);
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
+        ad[period][i] = iAD(_Symbol, timeframe, i);
       break;
     case ADX: // Calculates the Average Directional Movement Index indicator.
-      // TODO
-      //   if(iADX(NULL,0,14,PRICE_HIGH,MODE_MAIN,0)>iADX(NULL,0,14,PRICE_HIGH,MODE_PLUSDI,0)) return(0);
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
+        adx[period][i][MODE_MAIN]    = iADX(_Symbol, timeframe, ADX_Period, ADX_Applied_Price, MODE_MAIN, i);    // Base indicator line
+        adx[period][i][MODE_PLUSDI]  = iADX(_Symbol, timeframe, ADX_Period, ADX_Applied_Price, MODE_PLUSDI, i);  // +DI indicator line
+        adx[period][i][MODE_MINUSDI] = iADX(_Symbol, timeframe, ADX_Period, ADX_Applied_Price, MODE_MINUSDI, i); // -DI indicator line
+      }
       break;
     case ALLIGATOR: // Calculates the Alligator indicator.
       // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
-      for (i = 0; i < 3; i++) {
-        alligator[period][i][JAW] = iMA(NULL, timeframe, Alligator_Jaw_Period,   Alligator_Jaw_Shift,   Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
-        alligator[period][i][TEETH] = iMA(NULL, timeframe, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
-        alligator[period][i][LIPS]  = iMA(NULL, timeframe, Alligator_Lips_Period,  Alligator_Lips_Shift,  Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift_Far);
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
+        alligator[period][i][JAW] = iMA(_Symbol, timeframe, Alligator_Jaw_Period,   Alligator_Jaw_Shift,   Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
+        alligator[period][i][TEETH] = iMA(_Symbol, timeframe, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
+        alligator[period][i][LIPS]  = iMA(_Symbol, timeframe, Alligator_Lips_Period,  Alligator_Lips_Shift,  Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift_Far);
       }
       /* Note: This is equivalent to:
-        alligator[period][i][TEETH] = iAlligator(NULL, Alligator_Timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
-        alligator[period][i][TEETH] = iAlligator(NULL, Alligator_Timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
-        alligator[period][i][LIPS] = iAlligator(NULL, Alligator_Timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
+        alligator[period][i][TEETH] = iAlligator(_Symbol, timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
+        alligator[period][i][TEETH] = iAlligator(_Symbol, timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
+        alligator[period][i][LIPS]  = iAlligator(_Symbol, timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
        */
       break;
     case ATR: // Calculates the Average True Range indicator.
-      // TODO
-      //  if(iATR(NULL,0,12,0)>iATR(NULL,0,20,0)) return(0);
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
+        atr[period][i][FAST] = iATR(_Symbol, timeframe, ATR_Period_Fast, i);
+        atr[period][i][SLOW] = iATR(_Symbol, timeframe, ATR_Period_Slow, i);
+      }
       break;
     case AWESOME: // Calculates the Awesome oscillator.
-      // TODO
-      //  double val=iAO(NULL,0,2);
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
+        awesome[period][i] = iAO(_Symbol, timeframe, i);
       break;
     case BANDS: // Calculates the Bollinger Bands indicator.
       // int sid, bands_period = Bands_Period; // Not used at the moment.
       // sid = GetStrategyViaIndicator(BANDS, timeframe); bands_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
-      for (i = 0; i < 3; i++) {
-        bands[period][i][MODE_MAIN]  = iBands(NULL, timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_MAIN,  i + Bands_Shift);
-        bands[period][i][MODE_UPPER] = iBands(NULL, timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_UPPER, i + Bands_Shift);
-        bands[period][i][MODE_LOWER] = iBands(NULL, timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_LOWER, i + Bands_Shift);
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
+        bands[period][i][MODE_MAIN]  = iBands(_Symbol, timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_MAIN,  i + Bands_Shift);
+        bands[period][i][MODE_UPPER] = iBands(_Symbol, timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_UPPER, i + Bands_Shift);
+        bands[period][i][MODE_LOWER] = iBands(_Symbol, timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_LOWER, i + Bands_Shift);
       }
       break;
     case BPOWER: // Calculates the Bears Power and Bulls Power indicators.
-      for (i = 0; i < 3; i++) {
-        b_power[period][OP_BUY][i]  = iBullsPower(NULL, timeframe, BPower_Period, BPower_Applied_Price, i);
-        b_power[period][OP_SELL][i] = iBearsPower(NULL, timeframe, BPower_Period, BPower_Applied_Price, i);
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
+        bpower[period][i][OP_BUY]  = iBullsPower(_Symbol, timeframe, BPower_Period, BPower_Applied_Price, i);
+        bpower[period][i][OP_SELL] = iBearsPower(_Symbol, timeframe, BPower_Period, BPower_Applied_Price, i);
       }
-      // Message("Bulls: " + b_power[period][OP_BUY][CURR] + ", Bears: " + b_power[period][OP_SELL][CURR]);
+      // Message("Bulls: " + bpower[period][CURR][OP_BUY] + ", Bears: " + bpower[period][CURR][OP_SELL]);
       break;
     case BWMFI: // Calculates the Market Facilitation Index indicator.
-      // TODO
-      //  double val=iBWMFI(NULL,10,0);
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
+        bwmfi[period][i] = iBWMFI(_Symbol, timeframe, i);
+      }
       break;
     case CCI: // Calculates the Commodity Channel Index indicator.
-      // TODO
-      //   if(iCCI(Symbol(),0,12,PRICE_TYPICAL,0)>iCCI(Symbol(),0,20,PRICE_TYPICAL,0)) return(0);
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
+        cci[period][i][FAST] = iCCI(_Symbol, timeframe, CCI_Period_Fast, CCI_Applied_Price, i);
+        cci[period][i][SLOW] = iCCI(_Symbol, timeframe, CCI_Period_Slow, CCI_Applied_Price, i);
+      }
       break;
     case DEMARKER: // Calculates the DeMarker indicator.
-      demarker[period][CURR] = iDeMarker(NULL, timeframe, DeMarker_Period, 0 + DeMarker_Shift);
-      demarker[period][PREV] = iDeMarker(NULL, timeframe, DeMarker_Period, 1 + DeMarker_Shift);
-      demarker[period][FAR]  = iDeMarker(NULL, timeframe, DeMarker_Period, 2 + DeMarker_Shift);
+      demarker[period][CURR] = iDeMarker(_Symbol, timeframe, DeMarker_Period, 0 + DeMarker_Shift);
+      demarker[period][PREV] = iDeMarker(_Symbol, timeframe, DeMarker_Period, 1 + DeMarker_Shift);
+      demarker[period][FAR]  = iDeMarker(_Symbol, timeframe, DeMarker_Period, 2 + DeMarker_Shift);
       break;
     case ENVELOPES: // Calculates the Envelopes indicator.
       double envelopes_deviation = Envelopes30_Deviation;
@@ -2903,73 +2799,85 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
         case M15: envelopes_deviation = Envelopes15_Deviation; break;
         case M30: envelopes_deviation = Envelopes30_Deviation; break;
       }
-      for (i = 0; i < 3; i++) {
-        envelopes[period][i][MODE_MAIN]  = iEnvelopes(NULL, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, MODE_MAIN,  i + Envelopes_Shift);
-        envelopes[period][i][MODE_UPPER] = iEnvelopes(NULL, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, MODE_UPPER, i + Envelopes_Shift);
-        envelopes[period][i][MODE_LOWER] = iEnvelopes(NULL, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, MODE_LOWER, i + Envelopes_Shift);
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
+        envelopes[period][i][MODE_MAIN]  = iEnvelopes(_Symbol, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, MODE_MAIN,  i + Envelopes_Shift);
+        envelopes[period][i][MODE_UPPER] = iEnvelopes(_Symbol, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, MODE_UPPER, i + Envelopes_Shift);
+        envelopes[period][i][MODE_LOWER] = iEnvelopes(_Symbol, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, MODE_LOWER, i + Envelopes_Shift);
       }
       break;
     case FORCE: // Calculates the Force Index indicator.
-      // TODO
-      // double val=iForce(NULL,0,13,MODE_SMA,PRICE_CLOSE,0);
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
+        force[period][i] = iForce(_Symbol, timeframe, Force_Period, Force_MA_Method, Force_Applied_price, i);
+      }
       break;
     case FRACTALS: // Calculates the Fractals indicator.
-      for (i = 0; i < 3; i++) {
-        fractals[period][i][MODE_LOWER] = iFractals(NULL, timeframe, MODE_LOWER, i);
-        fractals[period][i][MODE_UPPER] = iFractals(NULL, timeframe, MODE_UPPER, i);
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
+        fractals[period][i][MODE_LOWER] = iFractals(_Symbol, timeframe, MODE_LOWER, i);
+        fractals[period][i][MODE_UPPER] = iFractals(_Symbol, timeframe, MODE_UPPER, i);
       }
       break;
     case GATOR: // Calculates the Gator oscillator.
-      // TODO
-      //  double diff=iGator(NULL,0,13,8,8,5,5,3,MODE_SMMA,PRICE_MEDIAN,MODE_UPPER,1);
+      // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
+        gator[period][i][TEETH] = iGator(_Symbol, timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
+        gator[period][i][TEETH] = iGator(_Symbol, timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
+        gator[period][i][LIPS]  = iGator(_Symbol, timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
+      }
       break;
     case ICHIMOKU: // Calculates the Ichimoku Kinko Hyo indicator.
-      // TODO
-      //  double tenkan_sen=iIchimoku(NULL,0,9,26,52,MODE_TENKANSEN,1);
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
+        ichimoku[period][i][MODE_TENKANSEN]   = iIchimoku(_Symbol, timeframe, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_TENKANSEN, i);
+        ichimoku[period][i][MODE_KIJUNSEN]    = iIchimoku(_Symbol, timeframe, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_KIJUNSEN, i);
+        ichimoku[period][i][MODE_SENKOUSPANA] = iIchimoku(_Symbol, timeframe, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_SENKOUSPANA, i);
+        ichimoku[period][i][MODE_SENKOUSPANB] = iIchimoku(_Symbol, timeframe, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_SENKOUSPANB, i);
+        ichimoku[period][i][MODE_CHIKOUSPAN]  = iIchimoku(_Symbol, timeframe, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_CHIKOUSPAN, i);
+      }
       break;
     case MA: // Calculates the Moving Average indicator.
       // Calculate MA Fast.
-      ma_fast[period][CURR] = iMA(NULL, timeframe, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, 0); // Current
-      ma_fast[period][PREV] = iMA(NULL, timeframe, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, 1 + MA_Shift_Fast); // Previous
-      ma_fast[period][FAR]  = iMA(NULL, timeframe, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, 2 + MA_Shift_Far);
+      ma_fast[period][CURR] = iMA(NULL, timeframe, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, CURR); // Current
+      ma_fast[period][PREV] = iMA(NULL, timeframe, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, PREV + MA_Shift_Fast); // Previous
+      ma_fast[period][FAR]  = iMA(NULL, timeframe, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Far);
       // Calculate MA Medium.
-      ma_medium[period][CURR] = iMA(NULL, timeframe, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, 0); // Current
-      ma_medium[period][PREV] = iMA(NULL, timeframe, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, 1 + MA_Shift_Medium); // Previous
-      ma_medium[period][FAR]  = iMA(NULL, timeframe, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, 2 + MA_Shift_Far);
+      ma_medium[period][CURR] = iMA(NULL, timeframe, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, CURR); // Current
+      ma_medium[period][PREV] = iMA(NULL, timeframe, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, PREV + MA_Shift_Medium); // Previous
+      ma_medium[period][FAR]  = iMA(NULL, timeframe, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Far);
       // Calculate Ma Slow.
-      ma_slow[period][CURR] = iMA(NULL, timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, 0); // Current
-      ma_slow[period][PREV] = iMA(NULL, timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, 1 + MA_Shift_Slow); // Previous
-      ma_slow[period][FAR]  = iMA(NULL, timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, 2 + MA_Shift_Far);
+      ma_slow[period][CURR] = iMA(NULL, timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, CURR); // Current
+      ma_slow[period][PREV] = iMA(NULL, timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, PREV + MA_Shift_Slow); // Previous
+      ma_slow[period][FAR]  = iMA(NULL, timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Far);
       if (VerboseDebug && IsVisualMode()) DrawMA(timeframe);
       break;
     case MACD: // Calculates the Moving Averages Convergence/Divergence indicator.
-      macd[period][CURR] = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN, 0); // Current
-      macd[period][PREV] = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN, 1 + MACD_Shift); // Previous
-      macd[period][FAR]  = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN, 2 + MACD_ShiftFar);
-      macd_signal[period][CURR] = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, 0);
-      macd_signal[period][PREV] = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, 1 + MACD_Shift);
-      macd_signal[period][FAR]  = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, 2 + MACD_ShiftFar);
+      macd[period][CURR][MODE_MAIN]   = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN,   CURR); // Current
+      macd[period][PREV][MODE_MAIN]   = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN,   PREV + MACD_Shift); // Previous
+      macd[period][FAR][MODE_MAIN]    = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN,   FAR + MACD_ShiftFar);
+      macd[period][CURR][MODE_SIGNAL] = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, CURR); // Current
+      macd[period][PREV][MODE_SIGNAL] = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, PREV + MACD_Shift); // Previous
+      macd[period][FAR][MODE_SIGNAL]  = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, FAR + MACD_ShiftFar);
       break;
     case MFI: // Calculates the Money Flow Index indicator.
-      // TODO
-      //  if(iMFI(NULL,0,14,0)>iMFI(NULL,0,14,1)) return(0);
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
+        mfi[period][i] = iMFI(_Symbol, timeframe, MFI_Period, i);
       break;
     case MOMENTUM: // Calculates the Momentum indicator.
-      // TODO
-      // if(iMomentum(NULL,0,12,PRICE_CLOSE,0)>iMomentum(NULL,0,20,PRICE_CLOSE,0)) return(0);
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
+        momentum[period][i][FAST] = iMomentum(_Symbol, timeframe, Momentum_Period_Fast, Momentum_Applied_Price, i);
+        momentum[period][i][SLOW] = iMomentum(_Symbol, timeframe, Momentum_Period_Slow, Momentum_Applied_Price, i);
+      }
       break;
     case OBV: // Calculates the On Balance Volume indicator.
-      // TODO
-      // double val=iOBV(NULL,0,PRICE_CLOSE,1);
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
+        obv[period][i] = iOBV(_Symbol, timeframe, OBV_Applied_Price, i);
       break;
     case OSMA: // Calculates the Moving Average of Oscillator indicator.
-      // TODO
-      //   if(iOsMA(NULL,0,12,26,9,PRICE_OPEN,1)>iOsMA(NULL,0,12,26,9,PRICE_OPEN,0)) return(0);
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
+        osma[period][i] = iOsMA(_Symbol, timeframe, OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price, i);
       break;
     case RSI: // Calculates the Relative Strength Index indicator.
       // int rsi_period = RSI_Period; // Not used at the moment.
       // sid = GetStrategyViaIndicator(RSI, timeframe); rsi_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
-      for (i = 0; i < 3; i++) {
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         rsi[period][i] = iRSI(NULL, timeframe, RSI_Period, RSI_Applied_Price, i + RSI_Shift);
         if (rsi[period][i] > rsi_stats[period][MODE_UPPER]) rsi_stats[period][MODE_UPPER] = rsi[period][i]; // Calculate maximum value.
         if (rsi[period][i] < rsi_stats[period][MODE_LOWER] || rsi_stats[period][MODE_LOWER] == 0) rsi_stats[period][MODE_LOWER] = rsi[period][i]; // Calculate minimum value.
@@ -2977,13 +2885,16 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
       rsi_stats[period][0] = If(rsi_stats[period][0] > 0, (rsi_stats[period][0] + rsi[period][0] + rsi[period][1] + rsi[period][2]) / 4, (rsi[period][0] + rsi[period][1] + rsi[period][2]) / 3); // Calculate average value.
       break;
     case RVI: // Calculates the Relative Strength Index indicator.
-      // TODO
-      //   if(iRSI(NULL,0,14,PRICE_CLOSE,0)>iRSI(NULL,0,14,PRICE_CLOSE,1)) return(0);
+      rvi[period][CURR][MODE_MAIN]   = iRVI(_Symbol, timeframe, 10, MODE_MAIN, CURR);
+      rvi[period][PREV][MODE_MAIN]   = iRVI(_Symbol, timeframe, 10, MODE_MAIN, PREV + RVI_Shift);
+      rvi[period][FAR][MODE_MAIN]    = iRVI(_Symbol, timeframe, 10, MODE_MAIN, FAR + RVI_Shift_Far);
+      rvi[period][CURR][MODE_SIGNAL] = iRVI(_Symbol, timeframe, 10, MODE_SIGNAL, CURR);
+      rvi[period][PREV][MODE_SIGNAL] = iRVI(_Symbol, timeframe, 10, MODE_SIGNAL, PREV + RVI_Shift);
+      rvi[period][FAR][MODE_SIGNAL]  = iRVI(_Symbol, timeframe, 10, MODE_SIGNAL, FAR + RVI_Shift_Far);
       break;
     case SAR: // Calculates the Parabolic Stop and Reverse system indicator.
-      for (i = 0; i < 3; i++) {
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
         sar[period][i] = iSAR(NULL, timeframe, SAR_Step, SAR_Maximum_Stop, i + SAR_Shift);
-      }
       break;
     case STDDEV: // Calculates the Standard Deviation indicator.
       // TODO
@@ -3001,9 +2912,8 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
       break;
     case WPR: // Calculates the  Larry Williams' Percent Range.
       // Update the Larry Williams' Percent Range indicator values.
-      wpr[period][CURR] = -iWPR(NULL, timeframe, WPR_Period, 0 + WPR_Shift);
-      wpr[period][PREV] = -iWPR(NULL, timeframe, WPR_Period, 1 + WPR_Shift);
-      wpr[period][FAR]  = -iWPR(NULL, timeframe, WPR_Period, 2 + WPR_Shift);
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
+        wpr[period][i] = -iWPR(NULL, timeframe, WPR_Period, i + WPR_Shift);
       break;
     case ZIGZAG: // Calculates the custom ZigZag indicator.
       // TODO
@@ -3331,8 +3241,10 @@ bool Trade_AC(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open_
       //1. Acceleration/Deceleration — AC
       //Buy: if the indicator is above zero and 2 consecutive columns are green or if the indicator is below zero and 3 consecutive columns are green
       //Sell: if the indicator is below zero and 2 consecutive columns are red or if the indicator is above zero and 3 consecutive columns are red
-      if ((iAC(NULL,piac,0)>=0&&iAC(NULL,piac,0)>iAC(NULL,piac,1)&&iAC(NULL,piac,1)>iAC(NULL,piac,2))||(iAC(NULL,piac,0)<=0&&iAC(NULL,piac,0)>iAC(NULL,piac,1)&&iAC(NULL,piac,1)>iAC(NULL,piac,2)&&iAC(NULL,piac,2)>iAC(NULL,piac,3)))
-      if ((iAC(NULL,piac,0)<=0&&iAC(NULL,piac,0)<iAC(NULL,piac,1)&&iAC(NULL,piac,1)<iAC(NULL,piac,2))||(iAC(NULL,piac,0)>=0&&iAC(NULL,piac,0)<iAC(NULL,piac,1)&&iAC(NULL,piac,1)<iAC(NULL,piac,2)&&iAC(NULL,piac,2)<iAC(NULL,piac,3)))
+      if ((iAC(NULL,piac,0)>=0&&iAC(NULL,piac,0)>iAC(NULL,piac,1)&&iAC(NULL,piac,1)>iAC(NULL,piac,2))||(iAC(NULL,piac,0)<=0
+      && iAC(NULL,piac,0)>iAC(NULL,piac,1)&&iAC(NULL,piac,1)>iAC(NULL,piac,2)&&iAC(NULL,piac,2)>iAC(NULL,piac,3)))
+      if ((iAC(NULL,piac,0)<=0&&iAC(NULL,piac,0)<iAC(NULL,piac,1)&&iAC(NULL,piac,1)<iAC(NULL,piac,2))||(iAC(NULL,piac,0)>=0
+      && iAC(NULL,piac,0)<iAC(NULL,piac,1)&&iAC(NULL,piac,1)<iAC(NULL,piac,2)&&iAC(NULL,piac,2)<iAC(NULL,piac,3)))
     */
     case OP_BUY:
       /*
@@ -4159,7 +4071,6 @@ bool Trade_MACD(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double ope
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(MACD, tf, 0);
   switch (cmd) {
     /* TODO:
-
           //20. MACD (1)
           //VERSION EXISTS, THAT THE SIGNAL TO BUY IS TRUE ONLY IF MACD<0, SIGNAL TO SELL - IF MACD>0
           //Buy: MACD rises above the signal line
@@ -4180,18 +4091,18 @@ bool Trade_MACD(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double ope
           {f21=-1;}
     */
     case OP_BUY:
-      result = macd[period][CURR] > macd_signal[period][CURR] + gap; // MACD rises above the signal line.
-      if ((open_method &   1) != 0) result = result && macd[period][FAR] < macd_signal[period][FAR];
-      if ((open_method &   2) != 0) result = result && macd[period][CURR] >= 0;
-      if ((open_method &   4) != 0) result = result && macd[period][PREV] < 0;
+      result = macd[period][CURR][MODE_MAIN] > macd[period][CURR][MODE_SIGNAL] + gap; // MACD rises above the signal line.
+      if ((open_method &   1) != 0) result = result && macd[period][FAR][MODE_MAIN] < macd[period][FAR][MODE_SIGNAL];
+      if ((open_method &   2) != 0) result = result && macd[period][CURR][MODE_MAIN] >= 0;
+      if ((open_method &   4) != 0) result = result && macd[period][PREV][MODE_MAIN] < 0;
       if ((open_method &   8) != 0) result = result && ma_fast[period][CURR] > ma_fast[period][PREV];
       if ((open_method &  16) != 0) result = result && ma_fast[period][CURR] > ma_medium[period][CURR];
       break;
     case OP_SELL:
-      result = macd[period][CURR] < macd_signal[period][CURR] - gap; // MACD falls below the signal line.
-      if ((open_method &   1) != 0) result = result && macd[period][FAR] > macd_signal[period][FAR];
-      if ((open_method &   2) != 0) result = result && macd[period][CURR] <= 0;
-      if ((open_method &   4) != 0) result = result && macd[period][PREV] > 0;
+      result = macd[period][CURR][MODE_MAIN] < macd[period][CURR][MODE_SIGNAL] - gap; // MACD falls below the signal line.
+      if ((open_method &   1) != 0) result = result && macd[period][FAR][MODE_MAIN] > macd[period][FAR][MODE_SIGNAL];
+      if ((open_method &   2) != 0) result = result && macd[period][CURR][MODE_MAIN] <= 0;
+      if ((open_method &   4) != 0) result = result && macd[period][PREV][MODE_MAIN] > 0;
       if ((open_method &   8) != 0) result = result && ma_fast[period][CURR] < ma_fast[period][PREV];
       if ((open_method &  16) != 0) result = result && ma_fast[period][CURR] < ma_medium[period][CURR];
       break;
@@ -6609,27 +6520,25 @@ bool AccCondition(int condition = C_ACC_NONE) {
  * Check market condition.
  */
 bool MarketCondition(int condition = C_MARKET_NONE) {
-  int cmd;
   switch(condition) {
     case C_MARKET_TRUE:
       return TRUE;
-    case C_MA1_FAST_SLOW_OPP: // MA Fast and Slow M1 are in opposite directions.
-      // cmd = CheckTrend();
-      cmd = GetCmdByOrders();
-      return CheckMarketEvent(cmd, PERIOD_M1, C_MA_FAST_SLOW_OPP);
-    case C_MA5_FAST_SLOW_OPP: // MA Fast and Slow M5 are in opposite directions.
-      // cmd = CheckTrend();
-      cmd = GetCmdByOrders();
-      return CheckMarketEvent(cmd, PERIOD_M5, C_MA_FAST_SLOW_OPP);
-    case C_MA15_FAST_SLOW_OPP:
-      // cmd = CheckTrend();
-      cmd = GetCmdByOrders();
-      return CheckMarketEvent(cmd, PERIOD_M15, C_MA_FAST_SLOW_OPP);
-    case C_MA30_FAST_SLOW_OPP:
-      // cmd = CheckTrend();
-      cmd = GetCmdByOrders();
-      return CheckMarketEvent(cmd, PERIOD_M30, C_MA_FAST_SLOW_OPP);
-    // Trend vs. orders
+    case C_MA1_FS_TREND_OPP: // MA Fast and Slow M1 are in opposite directions.
+      return CheckMarketEvent(CheckTrend(TrendMethodAction), PERIOD_M1, C_MA_FAST_SLOW_OPP);
+    case C_MA5_FS_TREND_OPP: // MA Fast and Slow M5 are in opposite directions.
+      return CheckMarketEvent(CheckTrend(TrendMethodAction), PERIOD_M5, C_MA_FAST_SLOW_OPP);
+    case C_MA15_FS_TREND_OPP:
+      return CheckMarketEvent(CheckTrend(TrendMethodAction), PERIOD_M15, C_MA_FAST_SLOW_OPP);
+    case C_MA30_FS_TREND_OPP:
+      return CheckMarketEvent(CheckTrend(TrendMethodAction), PERIOD_M30, C_MA_FAST_SLOW_OPP);
+    case C_MA1_FS_ORDERS_OPP: // MA Fast and Slow M1 are in opposite directions.
+      return CheckMarketEvent(GetCmdByOrders(), PERIOD_M1, C_MA_FAST_SLOW_OPP);
+    case C_MA5_FS_ORDERS_OPP: // MA Fast and Slow M5 are in opposite directions.
+      return CheckMarketEvent(GetCmdByOrders(), PERIOD_M5, C_MA_FAST_SLOW_OPP);
+    case C_MA15_FS_ORDERS_OPP:
+      return CheckMarketEvent(GetCmdByOrders(), PERIOD_M15, C_MA_FAST_SLOW_OPP);
+    case C_MA30_FS_ORDERS_OPP:
+      return CheckMarketEvent(GetCmdByOrders(), PERIOD_M30, C_MA_FAST_SLOW_OPP);
     case C_MARKET_BIG_DROP:
       return last_tick_change > MarketSuddenDropSize;
     case C_MARKET_VBIG_DROP:
@@ -7832,10 +7741,14 @@ string MarketIdToText(int mid) {
   switch (mid) {
     case C_MARKET_NONE: output = "None"; break;
     case C_MARKET_TRUE: output = "Always true"; break;
-    case C_MA1_FAST_SLOW_OPP: output = "MA1 Fast&Slow opposite"; break;
-    case C_MA5_FAST_SLOW_OPP: output = "MA5 Fast&Slow opposite"; break;
-    case C_MA15_FAST_SLOW_OPP: output = "MA15 Fast&Slow opposite"; break;
-    case C_MA30_FAST_SLOW_OPP: output = "MA30 Fast&Slow opposite"; break;
+    case C_MA1_FS_TREND_OPP: output = "MA1 Fast&Slow trend-based opposite"; break;
+    case C_MA5_FS_TREND_OPP: output = "MA5 Fast&Slow trend-based opposite"; break;
+    case C_MA15_FS_TREND_OPP: output = "MA15 Fast&Slow trend-based opposite"; break;
+    case C_MA30_FS_TREND_OPP: output = "MA30 Fast&Slow trend-based opposite"; break;
+    case C_MA1_FS_ORDERS_OPP: output = "MA1 Fast&Slow orders-based opposite"; break;
+    case C_MA5_FS_ORDERS_OPP: output = "MA5 Fast&Slow orders-based opposite"; break;
+    case C_MA15_FS_ORDERS_OPP: output = "MA15 Fast&Slow orders-based opposite"; break;
+    case C_MA30_FS_ORDERS_OPP: output = "MA30 Fast&Slow orders-based opposite"; break;
     case C_MARKET_BIG_DROP: output = "Market big drop"; break;
     case C_MARKET_VBIG_DROP: output = "Market very big drop"; break;
   }
@@ -8052,12 +7965,12 @@ bool TaskRun(int job_id) {
 /*
  * Process task list.
  */
-bool TaskProcessList(bool force = FALSE) {
+bool TaskProcessList(bool with_force = FALSE) {
    int total_run, total_failed, total_removed = 0;
    int no_elem = 8;
 
    // Check if bar time has been changed since last time.
-   if (bar_time == last_queue_process && !force) {
+   if (bar_time == last_queue_process && !with_force) {
      // if (VerboseTrace) Print("TaskProcessList(): Not executed. Bar time: " + bar_time + " == " + last_queue_process);
      return (FALSE); // Do not process job list more often than per each minute bar.
    } else {
