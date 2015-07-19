@@ -42,7 +42,7 @@
   #define ea_name    "EA31337 Lite"
 #endif
 #define ea_desc    "Multi-strategy advanced trading robot."
-#define ea_version "1.059"
+#define ea_version "1.060"
 #define ea_build   __DATETIME__ // FIXME: It's empty
 #define ea_link    "http://www.ea31337.com"
 #define ea_author  "kenorb"
@@ -1517,7 +1517,7 @@ extern int MA_Shift = 0;
 extern int MA_Shift_Fast = 0; // Index of the value taken from the indicator buffer. Shift relative to the previous bar (+1).
 extern int MA_Shift_Medium = 2; // Index of the value taken from the indicator buffer. Shift relative to the previous bar (+1).
 extern int MA_Shift_Slow = 4; // Index of the value taken from the indicator buffer. Shift relative to the previous bar (+1).
-extern int MA_Shift_Far = 4; // Far shift. Shift relative to the 2 previous bars (+2).
+extern int MA_Shift_Far = 1; // Far shift. Shift relative to the 2 previous bars (+2).
 extern ENUM_MA_METHOD MA_Method = MODE_LWMA; // MA method (See: ENUM_MA_METHOD). Range: 0-3. Suggested value: MODE_EMA.
 extern ENUM_APPLIED_PRICE MA_Applied_Price = PRICE_CLOSE; // MA applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 #ifndef __rider__
@@ -1572,7 +1572,7 @@ extern int MACD_Slow_Period = 35; // Slow EMA averaging period.
 extern int MACD_Signal_Period = 9; // Signal line averaging period.
 extern ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_WEIGHTED; // MACD applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern int MACD_Shift = 2; // Past MACD value in number of bars. Shift relative to the current bar the given amount of periods ago. Suggested value: 1
-extern int MACD_ShiftFar = 0; // Additional MACD far value in number of bars relatively to MACD_Shift.
+extern int MACD_Shift_Far = 0; // Additional MACD far value in number of bars relatively to MACD_Shift.
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE MACD_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for MACD. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
   extern ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = T_FIXED; // Trailing Profit method for MACD. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
@@ -1982,6 +1982,10 @@ extern string __StdDev_Parameters__ = "-- Settings for the Standard Deviation in
   extern ENUM_TRAIL_TYPE StdDev_TrailingStopMethod = T_MA_FMS_PEAK;
   extern ENUM_TRAIL_TYPE StdDev_TrailingProfitMethod = T_MA_FMS_PEAK;
 #endif
+extern ENUM_APPLIED_PRICE StdDev_AppliedPrice = PRICE_CLOSE; // MA applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
+extern int StdDev_MA_Period = 10; // Averaging period to calculate the main line.
+extern ENUM_MA_METHOD StdDev_MA_Method = MODE_EMA; // MA method (See: ENUM_MA_METHOD). Range: 0-3. Suggested value: MODE_EMA.
+extern int StdDev_MA_Shift = 0; // Moving Average shift.
 extern double StdDev_OpenLevel = 0.0; // Not used currently.
 extern int StdDev1_OpenMethod = 0; // Valid range: 0-31.
 extern int StdDev5_OpenMethod = 0; // Valid range: 0-31.
@@ -2431,8 +2435,8 @@ double osma[H1][FINAL_INDICATOR_INDEX_ENTRY];
 double rsi[H1][3], rsi_stats[H1][3];
 double rvi[H1][FINAL_INDICATOR_INDEX_ENTRY][MODE_SIGNAL+1];
 double sar[H1][3]; int sar_week[H1][7][2];
-// double stddev[H1][FINAL_INDICATOR_INDEX_ENTRY];
-// double stochastic[H1][FINAL_INDICATOR_INDEX_ENTRY];
+double stddev[H1][FINAL_INDICATOR_INDEX_ENTRY];
+double stochastic[H1][FINAL_INDICATOR_INDEX_ENTRY][MODE_SIGNAL+1];
 double wpr[H1][2];
 // double zigzag[H1][FINAL_INDICATOR_INDEX_ENTRY];
 
@@ -2837,24 +2841,24 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
       // Calculate MA Fast.
       ma_fast[period][CURR] = iMA(NULL, timeframe, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, CURR); // Current
       ma_fast[period][PREV] = iMA(NULL, timeframe, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, PREV + MA_Shift_Fast); // Previous
-      ma_fast[period][FAR]  = iMA(NULL, timeframe, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Far);
+      ma_fast[period][FAR]  = iMA(NULL, timeframe, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Fast + MA_Shift_Far);
       // Calculate MA Medium.
       ma_medium[period][CURR] = iMA(NULL, timeframe, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, CURR); // Current
       ma_medium[period][PREV] = iMA(NULL, timeframe, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, PREV + MA_Shift_Medium); // Previous
-      ma_medium[period][FAR]  = iMA(NULL, timeframe, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Far);
+      ma_medium[period][FAR]  = iMA(NULL, timeframe, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Medium + MA_Shift_Far);
       // Calculate Ma Slow.
       ma_slow[period][CURR] = iMA(NULL, timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, CURR); // Current
       ma_slow[period][PREV] = iMA(NULL, timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, PREV + MA_Shift_Slow); // Previous
-      ma_slow[period][FAR]  = iMA(NULL, timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Far);
+      ma_slow[period][FAR]  = iMA(NULL, timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Slow + MA_Shift_Far);
       if (VerboseDebug && IsVisualMode()) DrawMA(timeframe);
       break;
     case MACD: // Calculates the Moving Averages Convergence/Divergence indicator.
       macd[period][CURR][MODE_MAIN]   = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN,   CURR); // Current
       macd[period][PREV][MODE_MAIN]   = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN,   PREV + MACD_Shift); // Previous
-      macd[period][FAR][MODE_MAIN]    = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN,   FAR + MACD_ShiftFar);
+      macd[period][FAR][MODE_MAIN]    = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN,   FAR + MACD_Shift_Far); // TODO: + MACD_Shift
       macd[period][CURR][MODE_SIGNAL] = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, CURR); // Current
       macd[period][PREV][MODE_SIGNAL] = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, PREV + MACD_Shift); // Previous
-      macd[period][FAR][MODE_SIGNAL]  = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, FAR + MACD_ShiftFar);
+      macd[period][FAR][MODE_SIGNAL]  = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, FAR + MACD_Shift_Far); // TODO: + MACD_Shift
       break;
     case MFI: // Calculates the Money Flow Index indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
@@ -2887,33 +2891,30 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
     case RVI: // Calculates the Relative Strength Index indicator.
       rvi[period][CURR][MODE_MAIN]   = iRVI(_Symbol, timeframe, 10, MODE_MAIN, CURR);
       rvi[period][PREV][MODE_MAIN]   = iRVI(_Symbol, timeframe, 10, MODE_MAIN, PREV + RVI_Shift);
-      rvi[period][FAR][MODE_MAIN]    = iRVI(_Symbol, timeframe, 10, MODE_MAIN, FAR + RVI_Shift_Far);
+      rvi[period][FAR][MODE_MAIN]    = iRVI(_Symbol, timeframe, 10, MODE_MAIN, FAR + RVI_Shift + RVI_Shift_Far);
       rvi[period][CURR][MODE_SIGNAL] = iRVI(_Symbol, timeframe, 10, MODE_SIGNAL, CURR);
       rvi[period][PREV][MODE_SIGNAL] = iRVI(_Symbol, timeframe, 10, MODE_SIGNAL, PREV + RVI_Shift);
-      rvi[period][FAR][MODE_SIGNAL]  = iRVI(_Symbol, timeframe, 10, MODE_SIGNAL, FAR + RVI_Shift_Far);
+      rvi[period][FAR][MODE_SIGNAL]  = iRVI(_Symbol, timeframe, 10, MODE_SIGNAL, FAR + RVI_Shift + RVI_Shift_Far);
       break;
     case SAR: // Calculates the Parabolic Stop and Reverse system indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
         sar[period][i] = iSAR(NULL, timeframe, SAR_Step, SAR_Maximum_Stop, i + SAR_Shift);
       break;
     case STDDEV: // Calculates the Standard Deviation indicator.
-      // TODO
-      // double val=iStdDev(NULL,0,10,0,MODE_EMA,PRICE_CLOSE,0);
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
+        stddev[period][i] = iStdDev(_Symbol, timeframe, StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_AppliedPrice, i);
       break;
     case STOCHASTIC: // Calculates the Stochastic Oscillator.
       // TODO
-      //   if(iStochastic(NULL,0,5,3,3,MODE_SMA,0,MODE_MAIN,0)>iStochastic(NULL,0,5,3,3,MODE_SMA,0,MODE_SIGNAL,0)) return(0);
-      // stoch[period][MODE_MAIN] = iStochastic(NULL, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, MODE_MAIN, 1);
-      // stoch[period][MODE_SIGNAL] = iStochastic(NULL, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, MODE_SIGNAL, 1);
-      // stoch[period][MODE_MAIN] = iStochastic(NULL, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, MODE_MAIN, 2);
-      // stoch[period][MODE_SIGNAL] = iStochastic(NULL, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, MODE_SIGNAL, 2);
-      // if(stoch4h<stoch4h2){ //Sell signal
-      // if(stoch4h>stoch4h2){//Buy signal
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
+        stochastic[period][i][MODE_MAIN]   = iStochastic(_Symbol, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, MODE_MAIN, i);
+        stochastic[period][i][MODE_SIGNAL] = iStochastic(_Symbol, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, MODE_SIGNAL, i);
+      }
       break;
     case WPR: // Calculates the  Larry Williams' Percent Range.
       // Update the Larry Williams' Percent Range indicator values.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
-        wpr[period][i] = -iWPR(NULL, timeframe, WPR_Period, i + WPR_Shift);
+        wpr[period][i] = -iWPR(_Symbol, timeframe, WPR_Period, i + WPR_Shift);
       break;
     case ZIGZAG: // Calculates the custom ZigZag indicator.
       // TODO
@@ -4426,6 +4427,9 @@ bool Trade_Stochastic(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, doub
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(STOCHASTIC, tf, 0.0);
   switch (cmd) {
       /* TODO:
+            //   if(iStochastic(NULL,0,5,3,3,MODE_SMA,0,MODE_MAIN,0)>iStochastic(NULL,0,5,3,3,MODE_SMA,0,MODE_SIGNAL,0)) return(0);
+            // if(stoch4h<stoch4h2){ //Sell signal
+            // if(stoch4h>stoch4h2){//Buy signal
 
             //28. Stochastic Oscillator (1)
             //Buy: main lline rises above 20 after it fell below this point
