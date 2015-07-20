@@ -42,7 +42,7 @@
   #define ea_name    "EA31337 Lite"
 #endif
 #define ea_desc    "Multi-strategy advanced trading robot."
-#define ea_version "1.060"
+#define ea_version "1.061"
 #define ea_build   __DATETIME__ // FIXME: It's empty
 #define ea_link    "http://www.ea31337.com"
 #define ea_author  "kenorb"
@@ -2561,6 +2561,7 @@ void OnDeinit(const int reason) {
   }
 
   if (WriteReport && !IsOptimization() && session_initiated) {
+    //if (reason == REASON_CHARTCHANGE)
     double ExtInitialDeposit;
     if (!IsTesting()) ExtInitialDeposit = CalculateInitialDeposit();
     CalculateSummary(ExtInitialDeposit);
@@ -2609,10 +2610,10 @@ string InitInfo(string sep = "\n") {
     (int)SymbolInfoInteger(_Symbol,SYMBOL_TRADE_STOPS_LEVEL), SymbolInfoDouble(_Symbol,SYMBOL_TRADE_CONTRACT_SIZE), SymbolInfoDouble(_Symbol,SYMBOL_TRADE_TICK_SIZE), sep);
   output += StringFormat("Swap specification for %s: Mode: %d, Long/buy order value: %g, Short/sell order value: %g%s",
     _Symbol, (int)SymbolInfoInteger(_Symbol, SYMBOL_SWAP_MODE), SymbolInfoDouble(_Symbol,SYMBOL_SWAP_LONG), SymbolInfoDouble(_Symbol,SYMBOL_SWAP_SHORT), sep);
-  output += StringFormat("Calculated variables: Lot size: %g, Max orders: %d (per type: %d), Active strategies: %d of %d, Pip size: %g, Points per pip: %d, Pip digits: %d, Volume digits: %d, Spread in pips: %g%s",
+  output += StringFormat("Calculated variables: Lot size: %g, Max orders: %d (per type: %d), Active strategies: %d of %d, Pip size: %g, Points per pip: %d, Pip digits: %d, Volume digits: %d, Spread in pips: %g, Stop Out Level: %.1f%s",
               NormalizeDouble(lot_size, VolumeDigits), max_orders, GetMaxOrdersPerType(), GetNoOfStrategies(), FINAL_STRATEGY_TYPE_ENTRY,
               NormalizeDouble(pip_size, PipDigits), pts_per_pip, PipDigits, VolumeDigits,
-              NormalizeDouble(ValueToPips(GetMarketSpread()), PipDigits), sep);
+              NormalizeDouble(ValueToPips(GetMarketSpread()), PipDigits), GetAccountStopoutLevel(), sep);
   output += StringFormat("Time: Hour of day: %d, Day of week: %d, Day of month: %d, Day of year: %d" + sep, hour_of_day, day_of_week, day_of_month, day_of_year);
   output += GetAccountTextDetails() + sep;
   if (session_initiated && IsTradeAllowed()) {
@@ -5760,14 +5761,21 @@ int CmdOpp(int cmd) {
 
 /*
  * Get account stopout level in range: 0.0 - 1.0 where 1.0 is 100%.
+ *
+ * Notes:
+ *  - if(AccountEquity()/AccountMargin()*100 < AccountStopoutLevel()) { BrokerClosesOrders(); }
  */
 double GetAccountStopoutLevel() {
-  if (AccountStopoutMode() == 0) {
-    return AccountStopoutLevel() / 100;
-  } else { // else it's in account currency.
-    // FIXME: Test it.
-    return AccountEquity() / AccountStopoutLevel();
+  int mode = AccountStopoutMode();
+  int level = AccountStopoutLevel();
+  if (mode == 0 && level > 0) { // Calculation of percentage ratio between margin and equity.
+     return (double)level / 100;
+  } else if (mode == 1) { // Comparison of the free margin level to the absolute value.
+    return 1.0;
+  } else {
+   if (VerboseErrors) PrintFormat("%s(): Not supported mode (%d).", __FUNCTION__, mode);
   }
+  return 1.0;
 }
 
 /*
@@ -5777,9 +5785,10 @@ int GetMaxOrdersAuto(bool smooth = TRUE) {
   double avail_margin = MathMin(AccountFreeMargin(), AccountBalance());
   double leverage     = MathMax(AccountLeverage(), 100);
   int balance_limit   = MathMax(MathMin(AccountBalance(), AccountEquity()) / 2, 0); // At least 1 order per 2 currency value. This also prevents trading with negative balance.
+  double stopout_level = GetAccountStopoutLevel();
   // #ifdef __advanced__ double margin_risk = 0.05; #else double margin_risk = 0.02; #endif // Risk only 1%/2% (0.01/0.02) per order of total available margin.
   double avail_orders = avail_margin / market_marginrequired / MathMax(lot_size, market_lotstep) * (100 / leverage);
-  int new_max_orders = avail_orders * risk_ratio;
+  int new_max_orders = avail_orders * stopout_level * risk_ratio;
   if (VerboseTrace) PrintFormat("%s(): %f / %f / %f * (100/%d)", __FUNCTION__, avail_margin, market_marginrequired, MathMax(lot_size, market_lotstep), leverage);
   if (smooth && new_max_orders > max_orders) {
     max_orders = (max_orders + new_max_orders) / 2; // Increase the limit smoothly.
@@ -5865,10 +5874,9 @@ double GetLotSize() {
 double GetAutoRiskRatio() {
   double equity  = AccountEquity();
   double balance = AccountBalance();
-  double free    = AccountFreeMargin();
-  double margin  = AccountMargin();
+  double free    = AccountFreeMargin(); // Used when you open/close new positions. It can increase decrease during the price movement in favor and vice versa.
+  double margin  = AccountMargin(); // Taken from your depo as a guarantee to maintain your current positions opened. It stays the same untill you open or close positions.
   double new_risk_ratio = 1 / MathMin(equity, balance) * MathMin(MathMin(free, balance), equity);
-  new_risk_ratio *= GetAccountStopoutLevel(); // Decrease by account Stop Out level.
 
   #ifdef __advanced__
     int margin_pc = 100 / equity * margin;
@@ -7064,6 +7072,7 @@ string DisplayInfoOnChart(bool on_chart = TRUE, string sep = "\n") {
   // Prepare text for Stop Out.
   string stop_out_level = "Stop Out: " + AccountStopoutLevel();
   if (AccountStopoutMode() == 0) stop_out_level += "%"; else stop_out_level += AccCurrency;
+  stop_out_level += StringFormat(" (%.1f)", GetAccountStopoutLevel());
   // Prepare text to display max orders.
   string text_max_orders = "Max orders: " + max_orders + " (Per type: " + GetMaxOrdersPerType() + ")";
   // Prepare text to display spread.
@@ -7078,8 +7087,8 @@ string DisplayInfoOnChart(bool on_chart = TRUE, string sep = "\n") {
   indent = "                      "; // if (total_orders > 5)?
   output = indent + "------------------------------------------------" + sep
                   + indent + StringFormat("| %s v%s (Status: %s)%s", ea_name, ea_version, IfTxt(ea_active, "ACTIVE", "NOT ACTIVE"), sep)
-                  + indent + "| ACCOUNT INFORMATION:" + sep
-                  + indent + "| Server Time: " + TimeToStr(time_current, TIME_DATE|TIME_MINUTES|TIME_SECONDS) + sep
+                  + indent + StringFormat("| ACCOUNT INFORMATION:%s", sep)
+                  + indent + StringFormat("| Server Name: %s, Time: %s%s", AccountInfoString(ACCOUNT_SERVER), TimeToStr(time_current, TIME_DATE|TIME_MINUTES|TIME_SECONDS), sep)
                   + indent + "| Acc Number: " + AccountNumber() + "; Acc Name: " + AccountName() + "; Broker: " + AccountCompany() + " (Type: " + account_type + ")" + sep
                   + indent + "| Equity: " + ValueToCurrency(AccountEquity()) + "; Balance: " + ValueToCurrency(AccountBalance()) + "; Leverage: 1:" + DoubleToStr(AccountLeverage(), 0)  + "" + sep
                   + indent + "| Used Margin: " + ValueToCurrency(AccountMargin()) + "; Free: " + ValueToCurrency(AccountFreeMargin()) + "; " + stop_out_level + "" + sep
@@ -7227,7 +7236,7 @@ string GetRiskRatioText() {
 void PrintText(string text) {
   string result[];
   ushort usep = StringGetCharacter("\n", 0);
-  for (int i = StringSplit(text, usep, result); i > 0; i--) {
+  for (int i = StringSplit(text, usep, result)-1; i >= 0; i--) {
     Print(result[i]);
   }
 }
