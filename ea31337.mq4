@@ -8,7 +8,7 @@
 #define __advanced__  // Enable advanced configuration.
 //#define __release__ // Enable release settings.
 //#define __testing__   // Mode for testing each component.
-//#define __safe__ // Define safe options.
+#define __limited__ // Define safe options.
 #define __rider__     // Activate rider strategy.
 
 #ifdef __testing__
@@ -23,7 +23,7 @@
   #undef __disabled__  // Enable all strategies by default.
   #undef __noboost__   // Enable boosting by default.
   #undef __nospreads__ // Enable spread limitation by default.
-  #undef __safe__      // Disable safe mode by default.
+  #undef __limited__      // Disable safe mode by default.
   #undef __rider__     // Disable rider strategy by default.
 #endif
 
@@ -42,7 +42,7 @@
   #define ea_name    "EA31337 Lite"
 #endif
 #define ea_desc    "Multi-strategy advanced trading robot."
-#define ea_version "1.061"
+#define ea_version "1.062"
 #define ea_build   __DATETIME__ // FIXME: It's empty
 #define ea_link    "http://www.ea31337.com"
 #define ea_author  "kenorb"
@@ -284,6 +284,7 @@ enum ENUM_VALUE_TYPE { // Define type of values in order to store.
   MAX_PROFIT,
   MAX_BALANCE,
   MAX_EQUITY,
+  MAX_ORDERS, // Max opened orders.
   FINAL_VALUE_TYPE_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };
 
@@ -347,6 +348,7 @@ enum ENUM_ACC_CONDITION {
   C_ACC_CDAY_IN_LOSS   = 34, // Current day in loss
   C_ACC_PDAY_IN_PROFIT = 35, // Previous day in profit
   C_ACC_PDAY_IN_LOSS   = 36, // Previous day in loss
+  C_ACC_MAX_ORDERS     = 37, // Max orders opened
 };
 
 // Define market conditions.
@@ -361,8 +363,11 @@ enum ENUM_MARKET_CONDITION {
   C_MA5_FS_TREND_OPP   =  7, // MA5 Fast&Slow trend-based opposite
   C_MA15_FS_TREND_OPP  =  8, // MA15 Fast&Slow trend-based opposite
   C_MA30_FS_TREND_OPP  =  9, // MA30 Fast&Slow trend-based opposite
-  C_MARKET_BIG_DROP    = 10, // Sudden price drop
-  C_MARKET_VBIG_DROP   = 11, // Very big price drop
+  C_DAILY_PEAK         = 10, // Daily peak price
+  C_WEEKLY_PEAK        = 11, // Weekly peak price
+  C_MONTHLY_PEAK       = 12, // Monthly peak price
+  C_MARKET_BIG_DROP    = 13, // Sudden price drop
+  C_MARKET_VBIG_DROP   = 14, // Very big price drop
 };
 // Note: Trend-based closures are using TrendMethodAction.
 
@@ -370,15 +375,16 @@ enum ENUM_MARKET_CONDITION {
 enum ENUM_ACTION_TYPE {
   A_NONE                   =  0, // None
   A_CLOSE_ORDER_PROFIT     =  1, // Close most profitable order
-  A_CLOSE_ORDER_LOSS       =  2, // Close worse order
-  A_CLOSE_ALL_IN_PROFIT    =  3, // Close all in profit
-  A_CLOSE_ALL_IN_LOSS      =  4, // Close all in loss
-  A_CLOSE_ALL_PROFIT_SIDE  =  5, // Close profit side
-  A_CLOSE_ALL_LOSS_SIDE    =  6, // Close loss side
-  A_CLOSE_ALL_TREND        =  7, // Close trend side
-  A_CLOSE_ALL_NON_TREND    =  8, // Close non-trend side
-  A_CLOSE_ALL_ORDERS       =  9, // Close all!
-  FINAL_ACTION_TYPE_ENTRY  = 10  // (Not in use)
+  A_CLOSE_ORDER_PROFIT_MIN =  2, // Close profitable above limit (MinProfitCloseOrder)
+  A_CLOSE_ORDER_LOSS       =  3, // Close worse order
+  A_CLOSE_ALL_IN_PROFIT    =  4, // Close all in profit
+  A_CLOSE_ALL_IN_LOSS      =  5, // Close all in loss
+  A_CLOSE_ALL_PROFIT_SIDE  =  6, // Close profit side
+  A_CLOSE_ALL_LOSS_SIDE    =  7, // Close loss side
+  A_CLOSE_ALL_TREND        =  8, // Close trend side
+  A_CLOSE_ALL_NON_TREND    =  9, // Close non-trend side
+  A_CLOSE_ALL_ORDERS       = 10, // Close all!
+  FINAL_ACTION_TYPE_ENTRY  = 11  // (Not in use)
   // A_ORDER_STOPS_DECREASE   =  10, // Decrease loss stops
   // A_ORDER_PROFIT_DECREASE  =  11, // Decrease profit stops
 };
@@ -472,34 +478,33 @@ extern bool TrailingProfitOneWay = TRUE; // Change trailing profit take towards 
 extern double TrailingStopAddPerMinute = 0.0; // Decrease trailing stop (in pips) per each bar. Set 0 to disable. Suggested value: 0.
 //+------------------------------------------------------------------+
 extern string __EA_Order_Parameters__ = "-- Profit/Loss settings (set 0 for auto) --";
-#ifndef __safe__
+#ifndef __limited__
   extern double LotSize = 0; // Default lot size. Set 0 for auto.
-#else
+#else // Limit to micro lot.
   extern double LotSize = 0.01;
 #endif
 extern double TakeProfit = 0.0; // Take profit value in pips.
 extern double StopLoss = 0.0; // Stop loss value in pips.
-#ifndef __safe__
+#ifndef __limited__
   extern int MaxOrders = 0; // Maximum orders. Set 0 for auto.
 #else
   extern int MaxOrders = 30;
 #endif
 extern int MaxOrdersPerType = 0; // Maximum orders per strategy type. Set 0 for auto.
-//extern int MaxOrdersPerDay = 30; // TODO
-#ifndef __safe__
-  extern int MinimumIntervalSec = 0; // Minimum interval between subsequent trade signals. Suggested value: 0 or 60.
-#else
-  extern int MinimumIntervalSec = 240;
+#ifdef __advanced__
+  #ifndef __limited__
+    extern int MinimumIntervalSec = 0; // Minimum interval between subsequent trade signals. Suggested value: 0 or 60.
+    extern int MaxOrdersPerDay = 0; // Minimum number of orders to open per day.
+  #else // Limited.
+    extern int MaxOrdersPerDay = 30;
+    extern int MinimumIntervalSec = 240;
+  #endif
 #endif
 extern bool TradeMicroLots = TRUE;
 //+------------------------------------------------------------------+
 extern string __EA_Risk_Parameters__ = "-- Risk management --";
 extern double RiskRatio = 0; // Suggested value: 1.0. Do not change unless testing.
-#ifndef __safe__
-  extern bool TradeWithTrend = FALSE; // Default. Trade with trend only to minimalize the risk.
-#else
-  extern bool TradeWithTrend = TRUE; // Safe mode.
-#endif
+extern bool TradeWithTrend = FALSE; // Default. Trade with trend only to minimalize the risk.
 extern bool MinimalizeLosses = FALSE; // Set stop loss to zero, once the order is profitable.
 #ifdef __advanced__
   extern int RiskRatioIncreaseMethod = 112; // Risk ratio calculation method when RiskRatio is set to 0. Valid range: 0-255.
@@ -525,12 +530,21 @@ extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting (set 1.0 
 #else
   extern bool Boosting_Enabled                       = FALSE;
 #endif
-extern double BestDailyStrategyMultiplierFactor    = 1.1; // Lot multiplier boosting factor for the most profitable daily strategy.
-extern double BestWeeklyStrategyMultiplierFactor   = 1.2; // Lot multiplier boosting factor for the most profitable weekly strategy.
-extern double BestMonthlyStrategyMultiplierFactor  = 1.5; // Lot multiplier boosting factor for the most profitable monthly strategy.
-extern double WorseDailyStrategyDividerFactor      = 1.2; // Lot divider factor for the most profitable daily strategy. Useful for low-balance accounts or non-profitable periods.
-extern double WorseWeeklyStrategyDividerFactor     = 1.2; // Lot divider factor for the most profitable weekly strategy. Useful for low-balance accounts or non-profitable periods.
-extern double WorseMonthlyStrategyDividerFactor    = 1.2; // Lot divider factor for the most profitable monthly strategy. Useful for low-balance accounts or non-profitable periods.
+#ifndef __limited__
+  extern double BestDailyStrategyMultiplierFactor    = 1.1; // Lot multiplier boosting factor for the most profitable daily strategy.
+  extern double BestWeeklyStrategyMultiplierFactor   = 1.2; // Lot multiplier boosting factor for the most profitable weekly strategy.
+  extern double BestMonthlyStrategyMultiplierFactor  = 1.5; // Lot multiplier boosting factor for the most profitable monthly strategy.
+  extern double WorseDailyStrategyDividerFactor      = 1.2; // Lot divider factor for the most profitable daily strategy. Useful for low-balance accounts or non-profitable periods.
+  extern double WorseWeeklyStrategyDividerFactor     = 1.2; // Lot divider factor for the most profitable weekly strategy. Useful for low-balance accounts or non-profitable periods.
+  extern double WorseMonthlyStrategyDividerFactor    = 1.2; // Lot divider factor for the most profitable monthly strategy. Useful for low-balance accounts or non-profitable periods.
+#else
+  extern double BestDailyStrategyMultiplierFactor    = 1.1; // Lot multiplier boosting factor for the most profitable daily strategy.
+  extern double BestWeeklyStrategyMultiplierFactor   = 1.2; // Lot multiplier boosting factor for the most profitable weekly strategy.
+  extern double BestMonthlyStrategyMultiplierFactor  = 1.5; // Lot multiplier boosting factor for the most profitable monthly strategy.
+  extern double WorseDailyStrategyDividerFactor      = 0.0;
+  extern double WorseWeeklyStrategyDividerFactor     = 0.0;
+  extern double WorseMonthlyStrategyDividerFactor    = 0.0;
+#endif
 extern double BoostTrendFactor                     = 1.2; // Additional boost when trade is with trend.
 #ifdef __advanced__
   extern int LotSizeIncreaseMethod = 202; // Lot size calculation method when LotSize is set to 0. Valid range: 0-255.
@@ -571,6 +585,8 @@ extern double MaxSpreadToTrade = 10.0; // Maximum spread to trade (in pips).
   extern string __Advanced_Parameters__ = "-- Advanced parameters --";
   extern bool CloseConditionOnlyProfitable = TRUE; // Close conditions applies only for profitable orders.
   extern bool DisableCloseConditions = FALSE; // Set TRUE to disable all close conditions for strategies. Not useful apart of testing.
+  extern int HourAfterPeak = 18; // Minimum hour to check for peak prices, used by C_DAILY_PEAK, etc.
+  extern int MinProfitCloseOrder = 20; // Minimum order profit in pips to close the order on condition met.
   extern int CloseConditionCustom1Method = 0; // Custom 1 indicator-based close condition. Valid range: 0-1023.
   extern int CloseConditionCustom2Method = 0; // Custom 2 indicator-based close condition. Valid range: 0-1023.
   extern int CloseConditionCustom3Method = 0; // Custom 3 indicator-based close condition. Valid range: 0-1023.
@@ -579,6 +595,8 @@ extern double MaxSpreadToTrade = 10.0; // Maximum spread to trade (in pips).
   extern int CloseConditionCustom6Method = 0; // Custom 6 market-based close condition. Valid range: 0-1023.
   extern bool DynamicSpreadConf = FALSE; // Dynamically calculate most optimal settings based on the current spread (MinPipChangeToTrade/MinPipGap).
   int SpreadRatio = 1.0;
+#else
+  int HourAfterPeak = 18;
 #endif
 //+------------------------------------------------------------------+
 extern string __EA_Conditions__ = "-- Account conditions --"; // See: ENUM_ACTION_TYPE
@@ -587,7 +605,7 @@ extern string __EA_Conditions__ = "-- Account conditions --"; // See: ENUM_ACTIO
 #else
   extern bool Account_Conditions_Active = FALSE;
 #endif
-#ifndef __rider__
+#ifndef __rider__ && __limited__
 extern ENUM_ACC_CONDITION Account_Condition_1      = C_EQUITY_LOWER;
 extern ENUM_MARKET_CONDITION Market_Condition_1    = C_MARKET_BIG_DROP;
 extern ENUM_ACTION_TYPE Action_On_Condition_1      = A_CLOSE_ALL_LOSS_SIDE;
@@ -637,9 +655,9 @@ extern ENUM_MARKET_CONDITION Market_Condition_12   = C_MARKET_NONE;
 extern ENUM_ACTION_TYPE Action_On_Condition_12     = A_NONE;
 //+------------------------------------------------------------------+
 #else // Rider mode.
-extern ENUM_ACC_CONDITION Account_Condition_1      = C_EQUITY_LOWER;
-extern ENUM_MARKET_CONDITION Market_Condition_1    = C_MARKET_NONE;
-extern ENUM_ACTION_TYPE Action_On_Condition_1      = A_CLOSE_ALL_LOSS_SIDE;
+extern ENUM_ACC_CONDITION Account_Condition_1      = C_ACC_MAX_ORDERS;
+extern ENUM_MARKET_CONDITION Market_Condition_1    = C_DAILY_PEAK;
+extern ENUM_ACTION_TYPE Action_On_Condition_1      = A_CLOSE_ORDER_PROFIT_MIN;
 
 extern ENUM_ACC_CONDITION Account_Condition_2      = C_EQUITY_10PC_LOW;
 extern ENUM_MARKET_CONDITION Market_Condition_2    = C_MARKET_NONE;
@@ -2176,6 +2194,9 @@ extern string __Other_Parameters__ = "-- Other parameters --";
 extern string E_Mail = "";
 extern string License = "";
 extern int MagicNumber = 31337; // To help identify its own orders. It can vary in additional range: +20, see: ENUM_ORDER_TYPE.
+#ifdef __advanced__
+  extern bool Cache = FALSE; // Cache some calculated variables for better performance. FIXME: Needs some work.
+#endif
 
 //extern int ManualGMToffset = 0;
 //extern int TrailingStopDelay = 0; // How often trailing stop should be updated (in seconds). FIXME: Fix relative delay in backtesting.
@@ -2359,7 +2380,7 @@ double market_minlot, market_maxlot, market_lotsize, market_lotstep, market_marg
 double market_stoplevel; // Market stop level in points.
 int PipDigits, VolumeDigits;
 int pts_per_pip; // Number points per pip.
-int gmt_offset = 0;
+int gmt_offset = 0; // Current difference between GMT time and the local computer time in seconds, taking into account switch to winter or summer time. Depends on the time settings of your computer.
 
 // Account variables.
 string account_type;
@@ -2387,7 +2408,7 @@ int worse_strategy[FINAL_STAT_PERIOD_TYPE_ENTRY], best_strategy[FINAL_STAT_PERIO
 // EA variables.
 bool ea_active = FALSE;
 double risk_ratio; string rr_text; // Vars for calculation risk ratio.
-int max_orders; // Maximum orders available to open.
+int max_orders, daily_orders; // Maximum orders available to open.
 double max_order_slippage; // Maximum price slippage for buy or sell orders (in points)
 double LastAsk, LastBid; // Keep the last ask and bid price.
 string AccCurrency; // Current account currency.
@@ -2396,7 +2417,6 @@ string last_err, last_msg;
 double last_tick_change; // Last tick change in pips.
 double last_close_profit = EMPTY;
 // int last_trail_update = 0, last_indicators_update = 0, last_stats_update = 0;
-int GMT_Offset;
 int todo_queue[100][8], last_queue_process = 0;
 int total_orders = 0; // Number of total orders currently open.
 double daily[FINAL_VALUE_TYPE_ENTRY], weekly[FINAL_VALUE_TYPE_ENTRY], monthly[FINAL_VALUE_TYPE_ENTRY];
@@ -2468,7 +2488,7 @@ void OnTick() {
   // if (VerboseDebug && last_tick_change > 1) Print("Tick change: " + tick_change + "; Ask" + Ask + ", Bid: " + Bid, ", LastAsk: " + LastAsk + ", LastBid: " + LastBid);
 
   // Check if we should ignore the tick.
-  bar_time = iTime(NULL, PERIOD_M1, 0); // - GMT_Offset
+  bar_time = iTime(NULL, PERIOD_M1, 0);
   if (bar_time <= last_bar_time || last_tick_change < MinPipChangeToTrade) {
     LastAsk = Ask; LastBid = Bid;
     return;
@@ -2480,7 +2500,7 @@ void OnTick() {
   if (TradeAllowed()) {
     UpdateVariables();
     Trade();
-    if (GetTotalOrders() > 0) {
+    if (total_orders > 0) {
       UpdateTrailingStops();
       CheckAccConditions();
       TaskProcessList();
@@ -2950,8 +2970,14 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
      last_err = err;
      return (FALSE);
    }
+   if (MaxOrdersPerDay > 0 && daily_orders >= GetMaxOrdersPerDay()) {
+     err = "Maximum open and pending orders reached the daily limit (MaxOrdersPerDay).";
+     if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "():" + err);
+     last_err = err;
+     return (FALSE);
+   }
    if (GetTotalOrders() >= max_orders) {
-     err = "Maximum open and pending orders reached the limit (MaxOrders).";
+     err = StringFormat("Maximum open and pending orders reached the limit (MaxOrders%s).", IfTxt(MaxOrdersPerDay > 0, "/MaxOrdersPerDay", ""));
      if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "():" + err);
      last_err = err;
      return (FALSE);
@@ -2997,6 +3023,8 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
 
    order_ticket = OrderSend(_Symbol, cmd, volume, NormalizeDouble(order_price, Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + order_type, 0, GetOrderColor(cmd));
    if (order_ticket >= 0) {
+      total_orders++;
+      daily_orders++;
       if (!OrderSelect(order_ticket, SELECT_BY_TICKET) && VerboseErrors) {
         Print(__FUNCTION__ + "(): OrderSelect() error = ", ErrorDescription(GetLastError()));
         OrderPrint();
@@ -3043,7 +3071,7 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
      // Process the errors.
      if (err_code == ERR_TRADE_TOO_MANY_ORDERS) {
        // On some trade servers, the total amount of open and pending orders can be limited. If this limit has been exceeded, no new order will be opened.
-       MaxOrders = GetTotalOrders(); // So we're setting new fixed limit for total orders which is allowed.
+       MaxOrders = total_orders; // So we're setting new fixed limit for total orders which is allowed.
        retry = FALSE;
      }
      if (err_code == ERR_TRADE_EXPIRATION_DENIED) {
@@ -3208,6 +3236,7 @@ bool UpdateStats() {
   CheckStats(High[0], MAX_HIGH);
   CheckStats(AccountBalance(), MAX_BALANCE);
   CheckStats(AccountEquity(), MAX_EQUITY);
+  CheckStats(total_orders, MAX_ORDERS);
   if (last_tick_change > MarketBigDropSize) {
     double diff1 = MathMax(GetPipDiff(Ask, LastAsk), GetPipDiff(Bid, LastBid));
     Message(StringFormat("Market very big drop of %.1f pips detected!", diff1));
@@ -5157,7 +5186,11 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
    if (new_value > 0) new_value += delta * factor;
 
    if (!ValidTrailingValue(new_value, cmd, loss_or_profit, existing)) {
-     if (existing && previous == 0 && loss_or_profit == -1) previous = default_trail;
+     #ifndef __limited__
+       if (existing && previous == 0 && loss_or_profit == -1) previous = default_trail;
+     #else // If limited, then always set the trailing value.
+       if (existing && previous == 0) previous = default_trail;
+     #endif
      if (VerboseTrace)
        Print(__FUNCTION__ + "(): Error: method = " + method + ", ticket = #" + If(existing, OrderTicket(), 0) + ": Invalid Trailing Value: ", new_value, ", previous: ", previous, "; ", GetOrderTextDetails(), ", delta: ", DoubleToStr(delta, PipDigits));
      // If value is invalid, fallback to the previous one.
@@ -5368,34 +5401,36 @@ int CalculateCurrentOrders(string symbol) {
    if (buys > 0) return(buys); else return(-sells); // Return orders volume
 }
 
-// Return total number of orders (based on the EA magic number)
+// Return total number of opened orders (based on the EA magic number)
 int GetTotalOrders(bool ours = TRUE) {
-   int total = 0;
-   for (int order = 0; order < OrdersTotal(); order++) {
-     if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol()) {
-        if (CheckOurMagicNumber()) {
-          if (ours) total++;
-        } else {
-          if (!ours) total++;
-        }
-     }
-   }
-   if (ours) total_orders = total; // Re-calculate global variables.
-   return (total);
+  int total = 0;
+  for (int order = 0; order < OrdersTotal(); order++) {
+    if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol()) {
+      if (CheckOurMagicNumber()) {
+        if (ours) total++;
+      } else {
+        if (!ours) total++;
+      }
+    }
+  }
+  if (ours) total_orders = total; // Re-calculate global variables.
+  return (total);
 }
 
 // Return total number of orders per strategy type. See: ENUM_STRATEGY_TYPE.
 int GetTotalOrdersByType(int order_type) {
-   open_orders[order_type] = 0;
-   // ArrayFill(open_orders[order_type], 0, ArraySize(open_orders), 0); // Reset open_orders array.
-   for (int order = 0; order < OrdersTotal(); order++) {
-     if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
-       if (OrderSymbol() == Symbol() && OrderMagicNumber() == MagicNumber + order_type) {
-         open_orders[order_type]++;
-       }
+  static datetime last_access = time_current;
+  if (Cache && open_orders[order_type] > 0 && last_access == time_current) { return open_orders[order_type]; } else { last_access = time_current; }; // Return cached if available.
+  open_orders[order_type] = 0;
+  // ArrayFill(open_orders[order_type], 0, ArraySize(open_orders), 0); // Reset open_orders array.
+  for (int order = 0; order < OrdersTotal(); order++) {
+   if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
+     if (OrderSymbol() == Symbol() && OrderMagicNumber() == MagicNumber + order_type) {
+       open_orders[order_type]++;
      }
    }
-   return (open_orders[order_type]);
+  }
+  return (open_orders[order_type]);
 }
 
 /*
@@ -5428,7 +5463,8 @@ bool GetProfitableSide() {
 int CalculateOrdersByCmd(int cmd) {
   static int total = 0;
   static datetime last_access = time_current;
-  if (total > 0 && last_access == time_current) { return total; } else { total = 0; }; // Cache.
+  if (Cache && total > 0 && last_access == time_current) { return total; } else { last_access = time_current; }; // Cache.
+  total = 0;
   for (int i = 0; i < OrdersTotal(); i++) {
     if (OrderSelect(i, SELECT_BY_POS, MODE_TRADES) == FALSE) break;
     if (OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
@@ -5570,6 +5606,9 @@ bool ValidSettings() {
   return !StringCompare(ValidEmail(E_Mail), License);
 }
 
+/*
+ * Check account free margin.
+ */
 bool CheckFreeMargin(int op_type, double size_of_lot) {
    bool margin_ok = TRUE;
    double margin = AccountFreeMarginCheck(Symbol(), op_type, size_of_lot);
@@ -5715,6 +5754,13 @@ double GetMarketGap(bool in_points = FALSE) {
 }
 
 /*
+ * Check if we're in market peak hours.
+ */
+bool MarketPeakHours() {
+  return hour_of_day >= 8 && hour_of_day <= 16;
+}
+
+/*
  * Normalize lot size.
  */
 double NormalizeLots(double lots, bool ceiling = FALSE, string pair = "") {
@@ -5789,6 +5835,7 @@ int GetMaxOrdersAuto(bool smooth = TRUE) {
   // #ifdef __advanced__ double margin_risk = 0.05; #else double margin_risk = 0.02; #endif // Risk only 1%/2% (0.01/0.02) per order of total available margin.
   double avail_orders = avail_margin / market_marginrequired / MathMax(lot_size, market_lotstep) * (100 / leverage);
   int new_max_orders = avail_orders * stopout_level * risk_ratio;
+  if (MaxOrdersPerDay > 0) new_max_orders = MathMin(GetMaxOrdersPerDay(), new_max_orders);
   if (VerboseTrace) PrintFormat("%s(): %f / %f / %f * (100/%d)", __FUNCTION__, avail_margin, market_marginrequired, MathMax(lot_size, market_lotstep), leverage);
   if (smooth && new_max_orders > max_orders) {
     max_orders = (max_orders + new_max_orders) / 2; // Increase the limit smoothly.
@@ -5799,10 +5846,21 @@ int GetMaxOrdersAuto(bool smooth = TRUE) {
 }
 
 /*
+ * Get daily total available orders. It can dynamically change during the day.
+ */
+int GetMaxOrdersPerDay() {
+  if (MaxOrdersPerDay <= 0) return TRUE;
+  int hours_left = (24 - hour_of_day);
+  int curr_allowed_limit = floor((MaxOrdersPerDay - daily_orders) / hours_left);
+  // Message(StringFormat("Hours left: (%d - %d) / %d= %d", MaxOrdersPerDay, daily_orders, hours_left, curr_allowed_limit));
+  return total_orders + curr_allowed_limit;
+}
+
+/*
  * Calculate number of maximum of orders allowed to open.
  */
 int GetMaxOrders() {
-  return If(MaxOrders > 0, MaxOrders, GetMaxOrdersAuto());
+  return If(MaxOrders > 0, If(MaxOrdersPerDay > 0, MathMin(MaxOrders, GetMaxOrdersPerDay()), MaxOrders), GetMaxOrdersAuto());
 }
 
 /*
@@ -6029,6 +6087,7 @@ void StartNewDay() {
   day_of_month = Day(); // The day of month (1 - 31) of the specified date. At the testing, the last known server time is modelled.
   day_of_year = DayOfYear(); // Day (1 means 1 January,..,365(6) does 31 December) of year. At the testing, the last known server time is modelled.
   // Print and reset variables.
+  daily_orders = 0;
   string sar_stats = "Daily SAR stats: ";
   for (int i = 0; i < FINAL_PERIOD_TYPE_ENTRY; i++) {
     sar_stats += "Period: " + i + ", Buy: " + signals[DAILY][SAR1][i][OP_BUY] + " / " + "Sell: " + signals[DAILY][SAR1][i][OP_SELL] + "; ";
@@ -6182,7 +6241,7 @@ bool InitializeVariables() {
   risk_ratio = GetRiskRatio();
   max_orders = GetMaxOrders();
 
-  //GMT_Offset = ManualGMToffset;
+  gmt_offset = TimeGMTOffset();
   ArrayInitialize(todo_queue, 0); // Reset queue list.
   ArrayInitialize(daily,   0); // Reset daily stats.
   ArrayInitialize(weekly,  0); // Reset weekly stats.
@@ -6520,6 +6579,8 @@ bool AccCondition(int condition = C_ACC_NONE) {
       last_cname = "YesterdayInLoss";
       int yesterday2 = TimeDayOfYear(time_current - 24*60*60);
       return GetArrSumKey1(hourly_profit, yesterday2) < 0;
+    case C_ACC_MAX_ORDERS:
+      return total_orders >= max_orders;
     default:
     case C_ACC_NONE:
       last_cname = "None";
@@ -6532,6 +6593,7 @@ bool AccCondition(int condition = C_ACC_NONE) {
  * Check market condition.
  */
 bool MarketCondition(int condition = C_MARKET_NONE) {
+  static int counter = 0;
   switch(condition) {
     case C_MARKET_TRUE:
       return TRUE;
@@ -6551,6 +6613,12 @@ bool MarketCondition(int condition = C_MARKET_NONE) {
       return CheckMarketEvent(GetCmdByOrders(), PERIOD_M15, C_MA_FAST_SLOW_OPP);
     case C_MA30_FS_ORDERS_OPP:
       return CheckMarketEvent(GetCmdByOrders(), PERIOD_M30, C_MA_FAST_SLOW_OPP);
+    case C_DAILY_PEAK:
+      return hour_of_day >= HourAfterPeak && (Ask >= iHigh(_Symbol, PERIOD_D1, CURR) || Ask <= iLow(_Symbol, PERIOD_D1, CURR));
+    case C_WEEKLY_PEAK:
+      return hour_of_day >= HourAfterPeak && (Ask >= iHigh(_Symbol, PERIOD_W1, CURR) || Ask <= iLow(_Symbol, PERIOD_W1, CURR));
+    case C_MONTHLY_PEAK:
+      return hour_of_day >= HourAfterPeak && (Ask >= iHigh(_Symbol, PERIOD_MN1, CURR) || Ask <= iLow(_Symbol, PERIOD_MN1, CURR));
     case C_MARKET_BIG_DROP:
       return last_tick_change > MarketSuddenDropSize;
     case C_MARKET_VBIG_DROP:
@@ -7000,13 +7068,15 @@ string GetDailyReport() {
   int key;
   // output += "Low: "     + daily[MAX_LOW] + "; ";
   // output += "High: "    + daily[MAX_HIGH] + "; ";
-  output += "Tick: "    + daily[MAX_TICK] + "; ";
+  output += "Tick: "       + daily[MAX_TICK] + "; ";
   // output += "Drop: "    + daily[MAX_DROP] + "; ";
-  output += "Spread: "  + daily[MAX_SPREAD] + "; ";
-  output += "Loss: "    + daily[MAX_LOSS] + "; ";
-  output += "Profit: "  + daily[MAX_PROFIT] + "; ";
-  output += "Equity: "  + daily[MAX_EQUITY] + "; ";
-  output += "Balance: " + daily[MAX_BALANCE] + "; ";
+  output += "Spread: "     + daily[MAX_SPREAD] + "; ";
+  output += "Max orders: " + daily[MAX_ORDERS] + "; ";
+  output += "Loss: "       + daily[MAX_LOSS] + "; ";
+  output += "Profit: "     + daily[MAX_PROFIT] + "; ";
+  output += "Equity: "     + daily[MAX_EQUITY] + "; ";
+  output += "Balance: "    + daily[MAX_BALANCE] + "; ";
+
   //output += GetAccountTextDetails() + "; " + GetOrdersStats();
 
   key = GetArrKey1ByHighestKey2ValueD(stats, DAILY_PROFIT);
@@ -7026,13 +7096,14 @@ string GetWeeklyReport() {
   // output =+ GetAccountTextDetails() + "; " + GetOrdersStats();
   // output += "Low: "     + weekly[MAX_LOW] + "; ";
   // output += "High: "    + weekly[MAX_HIGH] + "; ";
-  output += "Tick: "    + weekly[MAX_TICK] + "; ";
+  output += "Tick: "       + weekly[MAX_TICK] + "; ";
   // output += "Drop: "    + weekly[MAX_DROP] + "; ";
-  output += "Spread: "  + weekly[MAX_SPREAD] + "; ";
-  output += "Loss: "    + weekly[MAX_LOSS] + "; ";
-  output += "Profit: "  + weekly[MAX_PROFIT] + "; ";
-  output += "Equity: "  + weekly[MAX_EQUITY] + "; ";
-  output += "Balance: " + weekly[MAX_BALANCE] + "; ";
+  output += "Spread: "     + weekly[MAX_SPREAD] + "; ";
+  output += "Max orders: " + weekly[MAX_ORDERS] + "; ";
+  output += "Loss: "       + weekly[MAX_LOSS] + "; ";
+  output += "Profit: "     + weekly[MAX_PROFIT] + "; ";
+  output += "Equity: "     + weekly[MAX_EQUITY] + "; ";
+  output += "Balance: "    + weekly[MAX_BALANCE] + "; ";
 
   key = GetArrKey1ByHighestKey2ValueD(stats, WEEKLY_PROFIT);
   if (key >= 0) output += "Best: " + sname[key] + " (" + stats[key][WEEKLY_PROFIT] + "p); ";
@@ -7051,13 +7122,14 @@ string GetMonthlyReport() {
   // output =+ GetAccountTextDetails() + "; " + GetOrdersStats();
   // output += "Low: "     + monthly[MAX_LOW] + "; ";
   // output += "High: "    + monthly[MAX_HIGH] + "; ";
-  output += "Tick: "    + monthly[MAX_TICK] + "; ";
+  output += "Tick: "       + monthly[MAX_TICK] + "; ";
   // output += "Drop: "    + monthly[MAX_DROP] + "; ";
-  output += "Spread: "  + monthly[MAX_SPREAD] + "; ";
-  output += "Loss: "    + monthly[MAX_LOSS] + "; ";
-  output += "Profit: "  + monthly[MAX_PROFIT] + "; ";
-  output += "Equity: "  + monthly[MAX_EQUITY] + "; ";
-  output += "Balance: " + monthly[MAX_BALANCE] + "; ";
+  output += "Spread: "     + monthly[MAX_SPREAD] + "; ";
+  output += "Max orders: " + monthly[MAX_ORDERS] + "; ";
+  output += "Loss: "       + monthly[MAX_LOSS] + "; ";
+  output += "Profit: "     + monthly[MAX_PROFIT] + "; ";
+  output += "Equity: "     + monthly[MAX_EQUITY] + "; ";
+  output += "Balance: "    + monthly[MAX_BALANCE] + "; ";
 
   key = GetArrKey1ByHighestKey2ValueD(stats, MONTHLY_PROFIT);
   if (key >= 0) output += "Best: " + sname[key] + " (" + stats[key][MONTHLY_PROFIT] + "p); ";
@@ -7070,7 +7142,7 @@ string GetMonthlyReport() {
 string DisplayInfoOnChart(bool on_chart = TRUE, string sep = "\n") {
   string output;
   // Prepare text for Stop Out.
-  string stop_out_level = "Stop Out: " + AccountStopoutLevel();
+  string stop_out_level = AccountStopoutLevel();
   if (AccountStopoutMode() == 0) stop_out_level += "%"; else stop_out_level += AccCurrency;
   stop_out_level += StringFormat(" (%.1f)", GetAccountStopoutLevel());
   // Prepare text to display max orders.
@@ -7090,8 +7162,9 @@ string DisplayInfoOnChart(bool on_chart = TRUE, string sep = "\n") {
                   + indent + StringFormat("| ACCOUNT INFORMATION:%s", sep)
                   + indent + StringFormat("| Server Name: %s, Time: %s%s", AccountInfoString(ACCOUNT_SERVER), TimeToStr(time_current, TIME_DATE|TIME_MINUTES|TIME_SECONDS), sep)
                   + indent + "| Acc Number: " + AccountNumber() + "; Acc Name: " + AccountName() + "; Broker: " + AccountCompany() + " (Type: " + account_type + ")" + sep
-                  + indent + "| Equity: " + ValueToCurrency(AccountEquity()) + "; Balance: " + ValueToCurrency(AccountBalance()) + "; Leverage: 1:" + DoubleToStr(AccountLeverage(), 0)  + "" + sep
-                  + indent + "| Used Margin: " + ValueToCurrency(AccountMargin()) + "; Free: " + ValueToCurrency(AccountFreeMargin()) + "; " + stop_out_level + "" + sep
+                  + indent + StringFormat("| Stop Out Level: %s, Leverage: 1:%d %s", stop_out_level, AccountLeverage(), sep)
+                  + indent + "| Used Margin: " + ValueToCurrency(AccountMargin()) + "; Free: " + ValueToCurrency(AccountFreeMargin()) + sep
+                  + indent + "| Equity: " + ValueToCurrency(AccountEquity()) + "; Balance: " + ValueToCurrency(AccountBalance()) + sep
                   + indent + "| Lot size: " + DoubleToStr(lot_size, VolumeDigits) + "; " + text_max_orders + sep
                   + indent + "| Risk ratio: " + DoubleToStr(risk_ratio, 1) + " (" + GetRiskRatioText() + ")" + sep
                   + indent + "| " + GetOrdersStats("" + sep + indent + "| ") + "" + sep
@@ -7442,25 +7515,27 @@ double GetArrSumKey1(double& arr[][], int key1, int offset = 0) {
 /*
  * Execute action to close most profitable order.
  */
-bool ActionCloseMostProfitableOrder(int reason_id = EMPTY){
+bool ActionCloseMostProfitableOrder(int reason_id = EMPTY, int min_profit = EMPTY){
   bool result = FALSE;
   int selected_ticket = 0;
-  double ticket_profit = 0;
+  double max_ticket_profit = 0, curr_ticket_profit = 0;
   for (int order = 0; order < OrdersTotal(); order++) {
     if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES))
      if (OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
-       if (GetOrderProfit() > ticket_profit) {
+      curr_ticket_profit = GetOrderProfit();
+       if (curr_ticket_profit > max_ticket_profit) {
          selected_ticket = OrderTicket();
-         ticket_profit = GetOrderProfit();
+         max_ticket_profit = curr_ticket_profit;
        }
      }
   }
 
   if (selected_ticket > 0) {
-    last_close_profit = ticket_profit;
+    if (min_profit != EMPTY && max_ticket_profit < MinProfitCloseOrder) { return (FALSE); }
+    last_close_profit = max_ticket_profit;
     return TaskAddCloseOrder(selected_ticket, reason_id);
-  } else if (VerboseDebug) {
-    Print(__FUNCTION__ + "(): Can't find any profitable order as requested.");
+  } else if (VerboseTrace) {
+    Print(__FUNCTION__ + "(): Can't find any profitable order.");
   }
   return (FALSE);
 }
@@ -7605,11 +7680,11 @@ int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = TRUE) {
  */
 bool ActionExecute(int aid, int id = EMPTY) {
   bool result = FALSE;
-  int reason_id = If(id != EMPTY, acc_conditions[id][0], EMPTY);
-  int mid = If(id != EMPTY, acc_conditions[id][1], EMPTY);
+  int reason_id = If(id != EMPTY, acc_conditions[id][0], EMPTY); // Account id condition.
+  int mid = If(id != EMPTY, acc_conditions[id][1], EMPTY); // Market id condition.
   int cmd;
   switch (aid) {
-    case A_NONE:
+    case A_NONE: /* 0 */
       result = TRUE;
       if (VerboseTrace) PrintFormat("%s(): No action taken. Reason (id: %d): %s", __FUNCTION__, reason_id, ReasonIdToText(reason_id));
       // Nothing.
@@ -7617,41 +7692,44 @@ bool ActionExecute(int aid, int id = EMPTY) {
     case A_CLOSE_ORDER_PROFIT: /* 1 */
       result = ActionCloseMostProfitableOrder(reason_id);
       break;
-    case A_CLOSE_ORDER_LOSS: /* 2 */
+    case A_CLOSE_ORDER_PROFIT_MIN: /* 2 */
+      result = ActionCloseMostProfitableOrder(reason_id, MinProfitCloseOrder);
+      break;
+    case A_CLOSE_ORDER_LOSS: /* 3 */
       result = ActionCloseMostUnprofitableOrder(reason_id);
       break;
-    case A_CLOSE_ALL_IN_PROFIT: /* 3 */
+    case A_CLOSE_ALL_IN_PROFIT: /* 4 */
       result = ActionCloseAllProfitableOrders(reason_id);
       break;
-    case A_CLOSE_ALL_IN_LOSS: /* 4 */
+    case A_CLOSE_ALL_IN_LOSS: /* 5 */
       result = ActionCloseAllUnprofitableOrders(reason_id);
       break;
-    case A_CLOSE_ALL_PROFIT_SIDE: /* 5 */
+    case A_CLOSE_ALL_PROFIT_SIDE: /* 6 */
       // TODO
       cmd = GetProfitableSide();
       if (cmd != EMPTY) {
         result = ActionCloseAllOrdersByType(cmd, reason_id);
       }
       break;
-    case A_CLOSE_ALL_LOSS_SIDE: /* 6 */
+    case A_CLOSE_ALL_LOSS_SIDE: /* 7 */
       cmd = GetProfitableSide();
       if (cmd != EMPTY) {
         result = ActionCloseAllOrdersByType(CmdOpp(cmd), reason_id);
       }
       break;
-    case A_CLOSE_ALL_TREND: /* 7 */
+    case A_CLOSE_ALL_TREND: /* 8 */
       cmd = CheckTrend(TrendMethodAction);
       if (cmd != EMPTY) {
         result = ActionCloseAllOrdersByType(cmd, reason_id);
       }
       break;
-    case A_CLOSE_ALL_NON_TREND: /* 8 */
+    case A_CLOSE_ALL_NON_TREND: /* 9 */
       cmd = CheckTrend(TrendMethodAction);
       if (cmd != EMPTY) {
         result = ActionCloseAllOrdersByType(CmdOpp(cmd), reason_id);
       }
       break;
-    case A_CLOSE_ALL_ORDERS: /* 9 */
+    case A_CLOSE_ALL_ORDERS: /* 10 */
       result = ActionCloseAllOrders(reason_id);
       break;
       /*
@@ -7694,16 +7772,17 @@ bool ActionExecute(int aid, int id = EMPTY) {
 string ActionIdToText(int aid) {
   string output = "Unknown";
   switch (aid) {
-    case A_NONE:                  output = "None"; break;
-    case A_CLOSE_ORDER_PROFIT:    output = "Close most profitable order"; break;
-    case A_CLOSE_ORDER_LOSS:      output = "Close worse order"; break;
-    case A_CLOSE_ALL_IN_PROFIT:   output = "Close all in profit"; break;
-    case A_CLOSE_ALL_IN_LOSS:     output = "Close all in loss"; break;
-    case A_CLOSE_ALL_PROFIT_SIDE: output = "Close profit side"; break;
-    case A_CLOSE_ALL_LOSS_SIDE:   output = "Close loss side"; break;
-    case A_CLOSE_ALL_TREND:       output = "Close trend side"; break;
-    case A_CLOSE_ALL_NON_TREND:   output = "Close non-trend side"; break;
-    case A_CLOSE_ALL_ORDERS:      output = "Close all!"; break;
+    case A_NONE:                   output = "None"; break;
+    case A_CLOSE_ORDER_PROFIT:     output = "Close most profitable order"; break;
+    case A_CLOSE_ORDER_PROFIT_MIN: output = "Close most profitable order (above MinProfitCloseOrder)"; break;
+    case A_CLOSE_ORDER_LOSS:       output = "Close worse order"; break;
+    case A_CLOSE_ALL_IN_PROFIT:    output = "Close all in profit"; break;
+    case A_CLOSE_ALL_IN_LOSS:      output = "Close all in loss"; break;
+    case A_CLOSE_ALL_PROFIT_SIDE:  output = "Close profit side"; break;
+    case A_CLOSE_ALL_LOSS_SIDE:    output = "Close loss side"; break;
+    case A_CLOSE_ALL_TREND:        output = "Close trend side"; break;
+    case A_CLOSE_ALL_NON_TREND:    output = "Close non-trend side"; break;
+    case A_CLOSE_ALL_ORDERS:       output = "Close all!"; break;
   }
   return output;
 }
@@ -7742,6 +7821,7 @@ string ReasonIdToText(int rid) {
     case C_ACC_CDAY_IN_LOSS: output = "Current day in loss"; break;
     case C_ACC_PDAY_IN_PROFIT: output = "Previous day in profit"; break;
     case C_ACC_PDAY_IN_LOSS: output = "Previous day in loss"; break;
+    case C_ACC_MAX_ORDERS: output = "Maximum orders opened"; break;
   }
   return output;
 }
@@ -8568,3 +8648,4 @@ void WriteReport(string report_name) {
 /* END: SUMMARY REPORT */
 
 //+------------------------------------------------------------------+
+// 16-30101111-11-46107105-17101103-64-17114
