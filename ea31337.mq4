@@ -8,7 +8,7 @@
 #define __advanced__  // Enable advanced configuration.
 //#define __release__ // Enable release settings.
 //#define __testing__   // Mode for testing each component.
-#define __limited__ // Define safe options.
+//#define __limited__ // Define safe options.
 #define __rider__     // Activate rider strategy.
 
 #ifdef __testing__
@@ -23,8 +23,13 @@
   #undef __disabled__  // Enable all strategies by default.
   #undef __noboost__   // Enable boosting by default.
   #undef __nospreads__ // Enable spread limitation by default.
-  #undef __limited__      // Disable safe mode by default.
+  #undef __limited__   // Disable safe mode by default.
   #undef __rider__     // Disable rider strategy by default.
+#endif
+
+#ifdef __limited__
+  #define __noboost__   // Disable boosting for limited mode.
+  //#define __noactions__ // Disable actions for limited mode.
 #endif
 
 //#undef __disabled__
@@ -42,7 +47,7 @@
   #define ea_name    "EA31337 Lite"
 #endif
 #define ea_desc    "Multi-strategy advanced trading robot."
-#define ea_version "1.062"
+#define ea_version "1.063"
 #define ea_build   __DATETIME__ // FIXME: It's empty
 #define ea_link    "http://www.ea31337.com"
 #define ea_author  "kenorb"
@@ -298,9 +303,10 @@ enum ENUM_TRAIL_TYPE { // Define type of trailing types.
   T_50_BARS_PEAK      =  6, // 50 bars peak
   T_150_BARS_PEAK     =  7, // 150 bars peak
   T_HALF_200_BARS     =  8, // 200 bars half price
+  T_HALF_PEAK         = 11, // Half price peak
   T_MA_F_PREV         =  9, // MA Fast Prev
   T_MA_F_FAR          = 10, // MA Fast Far
-  // T_MA_F_LOW          = 11, // MA Fast Low
+  // T_MA_F_LOW          = 11, // MA Fast Low // ??
   T_MA_F_TRAIL        = 12, // MA Fast+Trail
   T_MA_F_FAR_TRAIL    = 13, // MA Fast Far+Trail
   T_MA_M              = 14, // MA Med
@@ -605,7 +611,7 @@ extern string __EA_Conditions__ = "-- Account conditions --"; // See: ENUM_ACTIO
 #else
   extern bool Account_Conditions_Active = FALSE;
 #endif
-#ifndef __rider__ && __limited__
+#ifndef __rider__
 extern ENUM_ACC_CONDITION Account_Condition_1      = C_EQUITY_LOWER;
 extern ENUM_MARKET_CONDITION Market_Condition_1    = C_MARKET_BIG_DROP;
 extern ENUM_ACTION_TYPE Action_On_Condition_1      = A_CLOSE_ALL_LOSS_SIDE;
@@ -655,59 +661,119 @@ extern ENUM_MARKET_CONDITION Market_Condition_12   = C_MARKET_NONE;
 extern ENUM_ACTION_TYPE Action_On_Condition_12     = A_NONE;
 //+------------------------------------------------------------------+
 #else // Rider mode.
-extern ENUM_ACC_CONDITION Account_Condition_1      = C_ACC_MAX_ORDERS;
-extern ENUM_MARKET_CONDITION Market_Condition_1    = C_DAILY_PEAK;
-extern ENUM_ACTION_TYPE Action_On_Condition_1      = A_CLOSE_ORDER_PROFIT_MIN;
+  #ifndef __limited__
 
-extern ENUM_ACC_CONDITION Account_Condition_2      = C_EQUITY_10PC_LOW;
-extern ENUM_MARKET_CONDITION Market_Condition_2    = C_MARKET_NONE;
-extern ENUM_ACTION_TYPE Action_On_Condition_2      = A_CLOSE_ORDER_PROFIT;
+  extern ENUM_ACC_CONDITION Account_Condition_1      = C_ACC_MAX_ORDERS;
+  extern ENUM_MARKET_CONDITION Market_Condition_1    = C_DAILY_PEAK;
+  extern ENUM_ACTION_TYPE Action_On_Condition_1      = A_CLOSE_ORDER_PROFIT_MIN;
 
-extern ENUM_ACC_CONDITION Account_Condition_3      = C_EQUITY_20PC_LOW;
-extern ENUM_MARKET_CONDITION Market_Condition_3    = C_MARKET_TRUE;
-extern ENUM_ACTION_TYPE Action_On_Condition_3      = A_CLOSE_ALL_IN_PROFIT;
+  extern ENUM_ACC_CONDITION Account_Condition_2      = C_EQUITY_10PC_LOW;
+  extern ENUM_MARKET_CONDITION Market_Condition_2    = C_MARKET_NONE;
+  extern ENUM_ACTION_TYPE Action_On_Condition_2      = A_CLOSE_ORDER_PROFIT;
 
-extern ENUM_ACC_CONDITION Account_Condition_4      = C_EQUITY_50PC_LOW;
-extern ENUM_MARKET_CONDITION Market_Condition_4    = C_MARKET_TRUE;
-extern ENUM_ACTION_TYPE Action_On_Condition_4      = A_CLOSE_ALL_LOSS_SIDE;
+  extern ENUM_ACC_CONDITION Account_Condition_3      = C_EQUITY_20PC_LOW;
+  extern ENUM_MARKET_CONDITION Market_Condition_3    = C_MARKET_TRUE;
+  extern ENUM_ACTION_TYPE Action_On_Condition_3      = A_CLOSE_ALL_IN_PROFIT;
 
-extern ENUM_ACC_CONDITION Account_Condition_5      = C_EQUITY_10PC_HIGH;
-extern ENUM_MARKET_CONDITION Market_Condition_5    = C_MARKET_BIG_DROP;
-extern ENUM_ACTION_TYPE Action_On_Condition_5      = A_CLOSE_ORDER_PROFIT;
+  extern ENUM_ACC_CONDITION Account_Condition_4      = C_EQUITY_50PC_LOW;
+  extern ENUM_MARKET_CONDITION Market_Condition_4    = C_MARKET_TRUE;
+  extern ENUM_ACTION_TYPE Action_On_Condition_4      = A_CLOSE_ALL_LOSS_SIDE;
 
-extern ENUM_ACC_CONDITION Account_Condition_6      = C_EQUITY_20PC_HIGH;
-extern ENUM_MARKET_CONDITION Market_Condition_6    = C_MARKET_VBIG_DROP;
-extern ENUM_ACTION_TYPE Action_On_Condition_6      = A_CLOSE_ORDER_PROFIT;
+  extern ENUM_ACC_CONDITION Account_Condition_5      = C_EQUITY_10PC_HIGH;
+  extern ENUM_MARKET_CONDITION Market_Condition_5    = C_MARKET_BIG_DROP;
+  extern ENUM_ACTION_TYPE Action_On_Condition_5      = A_CLOSE_ORDER_PROFIT;
 
-extern ENUM_ACC_CONDITION Account_Condition_7      = C_EQUITY_50PC_HIGH;
-extern ENUM_MARKET_CONDITION Market_Condition_7    = C_MA1_FS_TREND_OPP;
-extern ENUM_ACTION_TYPE Action_On_Condition_7      = A_CLOSE_ORDER_PROFIT;
+  extern ENUM_ACC_CONDITION Account_Condition_6      = C_EQUITY_20PC_HIGH;
+  extern ENUM_MARKET_CONDITION Market_Condition_6    = C_MARKET_VBIG_DROP;
+  extern ENUM_ACTION_TYPE Action_On_Condition_6      = A_CLOSE_ORDER_PROFIT_MIN;
 
-extern ENUM_ACC_CONDITION Account_Condition_8      = C_MARGIN_USED_80PC;
-extern ENUM_MARKET_CONDITION Market_Condition_8    = C_MARKET_TRUE;
-extern ENUM_ACTION_TYPE Action_On_Condition_8      = A_CLOSE_ALL_NON_TREND;
+  extern ENUM_ACC_CONDITION Account_Condition_7      = C_EQUITY_50PC_HIGH;
+  extern ENUM_MARKET_CONDITION Market_Condition_7    = C_MA1_FS_TREND_OPP;
+  extern ENUM_ACTION_TYPE Action_On_Condition_7      = A_CLOSE_ORDER_PROFIT_MIN;
 
-extern ENUM_ACC_CONDITION Account_Condition_9      = C_MARGIN_USED_90PC;
-extern ENUM_MARKET_CONDITION Market_Condition_9    = C_MARKET_TRUE;
-extern ENUM_ACTION_TYPE Action_On_Condition_9      = A_CLOSE_ORDER_LOSS;
+  extern ENUM_ACC_CONDITION Account_Condition_8      = C_MARGIN_USED_80PC;
+  extern ENUM_MARKET_CONDITION Market_Condition_8    = C_MARKET_TRUE;
+  extern ENUM_ACTION_TYPE Action_On_Condition_8      = A_CLOSE_ALL_NON_TREND;
 
-extern ENUM_ACC_CONDITION Account_Condition_10     = C_EQUITY_HIGHER;
-extern ENUM_MARKET_CONDITION Market_Condition_10   = C_MARKET_BIG_DROP;
-extern ENUM_ACTION_TYPE Action_On_Condition_10     = A_CLOSE_ORDER_PROFIT;
+  extern ENUM_ACC_CONDITION Account_Condition_9      = C_MARGIN_USED_90PC;
+  extern ENUM_MARKET_CONDITION Market_Condition_9    = C_MARKET_TRUE;
+  extern ENUM_ACTION_TYPE Action_On_Condition_9      = A_CLOSE_ORDER_LOSS;
 
-extern ENUM_ACC_CONDITION Account_Condition_11     = C_ACC_TRUE;
-extern ENUM_MARKET_CONDITION Market_Condition_11   = C_MARKET_VBIG_DROP;
-extern ENUM_ACTION_TYPE Action_On_Condition_11     = A_CLOSE_ALL_IN_LOSS;
+  extern ENUM_ACC_CONDITION Account_Condition_10     = C_EQUITY_HIGHER;
+  extern ENUM_MARKET_CONDITION Market_Condition_10   = C_MARKET_BIG_DROP;
+  extern ENUM_ACTION_TYPE Action_On_Condition_10     = A_CLOSE_ORDER_PROFIT_MIN;
 
-extern ENUM_ACC_CONDITION Account_Condition_12     = C_EQUITY_50PC_HIGH;
-extern ENUM_MARKET_CONDITION Market_Condition_12   = C_MA30_FS_TREND_OPP;
-extern ENUM_ACTION_TYPE Action_On_Condition_12     = A_CLOSE_ALL_LOSS_SIDE;
-  /*
-    77576.22	5258	1.44	14.75	24957.91	77.13%	Market_Condition_12=9 	Action_On_Condition_12=6 (d: £2k, spread: 20, 2015.01.01-06.30)
-    50903.83	5452	1.29	9.34	21735.21	66.82%	Market_Condition_12=9 	Action_On_Condition_12=4 (d: £2k, spread: 20, 2015.01.01-06.30)
-    44363.39	5433	1.30	8.17	22401.58	68.00%	Market_Condition_12=8 	Action_On_Condition_12=1 (d: £2k, spread: 20, 2015.01.01-06.30)
-  */
+  extern ENUM_ACC_CONDITION Account_Condition_11     = C_ACC_TRUE;
+  extern ENUM_MARKET_CONDITION Market_Condition_11   = C_MARKET_VBIG_DROP;
+  extern ENUM_ACTION_TYPE Action_On_Condition_11     = A_CLOSE_ALL_IN_LOSS;
+
+  extern ENUM_ACC_CONDITION Account_Condition_12     = C_EQUITY_50PC_HIGH;
+  extern ENUM_MARKET_CONDITION Market_Condition_12   = C_MA30_FS_TREND_OPP;
+  extern ENUM_ACTION_TYPE Action_On_Condition_12     = A_CLOSE_ALL_LOSS_SIDE;
+    /*
+      77576.22	5258	1.44	14.75	24957.91	77.13%	Market_Condition_12=9 	Action_On_Condition_12=6 (d: £2k, spread: 20, 2015.01.01-06.30)
+      50903.83	5452	1.29	9.34	21735.21	66.82%	Market_Condition_12=9 	Action_On_Condition_12=4 (d: £2k, spread: 20, 2015.01.01-06.30)
+      44363.39	5433	1.30	8.17	22401.58	68.00%	Market_Condition_12=8 	Action_On_Condition_12=1 (d: £2k, spread: 20, 2015.01.01-06.30)
+    */
+
+  #else // Actions for rider and limited mode.
+
+  extern ENUM_ACC_CONDITION Account_Condition_1      = C_ACC_MAX_ORDERS;
+  extern ENUM_MARKET_CONDITION Market_Condition_1    = C_DAILY_PEAK;
+  extern ENUM_ACTION_TYPE Action_On_Condition_1      = A_CLOSE_ORDER_PROFIT_MIN;
+
+  extern ENUM_ACC_CONDITION Account_Condition_2      = C_ACC_MAX_ORDERS;
+  extern ENUM_MARKET_CONDITION Market_Condition_2    = C_WEEKLY_PEAK;
+  extern ENUM_ACTION_TYPE Action_On_Condition_2      = A_CLOSE_ORDER_PROFIT_MIN;
+
+  extern ENUM_ACC_CONDITION Account_Condition_3      = C_EQUITY_20PC_LOW;
+  extern ENUM_MARKET_CONDITION Market_Condition_3    = C_MARKET_TRUE;
+  extern ENUM_ACTION_TYPE Action_On_Condition_3      = A_CLOSE_ALL_IN_PROFIT;
+
+  extern ENUM_ACC_CONDITION Account_Condition_4      = C_EQUITY_50PC_LOW;
+  extern ENUM_MARKET_CONDITION Market_Condition_4    = C_MARKET_TRUE;
+  extern ENUM_ACTION_TYPE Action_On_Condition_4      = A_CLOSE_ALL_LOSS_SIDE;
+
+  extern ENUM_ACC_CONDITION Account_Condition_5      = C_EQUITY_10PC_HIGH;
+  extern ENUM_MARKET_CONDITION Market_Condition_5    = C_MARKET_BIG_DROP;
+  extern ENUM_ACTION_TYPE Action_On_Condition_5      = A_CLOSE_ORDER_PROFIT_MIN;
+
+  extern ENUM_ACC_CONDITION Account_Condition_6      = C_EQUITY_20PC_HIGH;
+  extern ENUM_MARKET_CONDITION Market_Condition_6    = C_MARKET_VBIG_DROP;
+  extern ENUM_ACTION_TYPE Action_On_Condition_6      = A_CLOSE_ORDER_PROFIT_MIN;
+
+  extern ENUM_ACC_CONDITION Account_Condition_7      = C_EQUITY_50PC_HIGH;
+  extern ENUM_MARKET_CONDITION Market_Condition_7    = C_MA1_FS_TREND_OPP;
+  extern ENUM_ACTION_TYPE Action_On_Condition_7      = A_CLOSE_ORDER_PROFIT_MIN;
+
+  extern ENUM_ACC_CONDITION Account_Condition_8      = C_MARGIN_USED_80PC;
+  extern ENUM_MARKET_CONDITION Market_Condition_8    = C_MARKET_TRUE;
+  extern ENUM_ACTION_TYPE Action_On_Condition_8      = A_CLOSE_ALL_NON_TREND;
+
+  extern ENUM_ACC_CONDITION Account_Condition_9      = C_MARGIN_USED_90PC;
+  extern ENUM_MARKET_CONDITION Market_Condition_9    = C_MARKET_TRUE;
+  extern ENUM_ACTION_TYPE Action_On_Condition_9      = A_CLOSE_ORDER_LOSS;
+
+  extern ENUM_ACC_CONDITION Account_Condition_10     = C_EQUITY_HIGHER;
+  extern ENUM_MARKET_CONDITION Market_Condition_10   = C_MARKET_BIG_DROP;
+  extern ENUM_ACTION_TYPE Action_On_Condition_10     = A_CLOSE_ORDER_PROFIT_MIN;
+
+  extern ENUM_ACC_CONDITION Account_Condition_11     = C_ACC_TRUE;
+  extern ENUM_MARKET_CONDITION Market_Condition_11   = C_MARKET_VBIG_DROP;
+  extern ENUM_ACTION_TYPE Action_On_Condition_11     = A_CLOSE_ALL_IN_LOSS;
+
+  extern ENUM_ACC_CONDITION Account_Condition_12     = C_EQUITY_50PC_HIGH;
+  extern ENUM_MARKET_CONDITION Market_Condition_12   = C_MA30_FS_TREND_OPP;
+  extern ENUM_ACTION_TYPE Action_On_Condition_12     = A_CLOSE_ALL_LOSS_SIDE;
+
+  #endif
+
 #endif
+
+#ifdef __advanced__
+  extern int Account_Condition_To_Disable = 0; // Specify which actions should be temporary disabled. It's useful for troubleshooting the worse condition by using the optimization.
+#endif
+
 //+------------------------------------------------------------------+
 extern string __AC_Parameters__ = "-- Settings for the Bill Williams' Accelerator/Decelerator oscillator --";
 #ifndef __disabled__
@@ -717,10 +783,10 @@ extern string __AC_Parameters__ = "-- Settings for the Bill Williams' Accelerato
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE AC_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for AC. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-  extern ENUM_TRAIL_TYPE AC_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for AC. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE AC_TrailingProfitMethod = T_FIXED; // Trailing Profit method for AC. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE AC_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE AC_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE AC_TrailingProfitMethod = T_FIXED;
 #endif
 extern double AC_OpenLevel = 0; // Not used currently.
 extern int AC1_OpenMethod = 0; // Valid range: 0-x.
@@ -760,10 +826,10 @@ extern string __AD_Parameters__ = "-- Settings for the Accumulation/Distribution
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE AD_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for AD. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-  extern ENUM_TRAIL_TYPE AD_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for AD. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE AD_TrailingProfitMethod = T_FIXED; // Trailing Profit method for AD. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE AD_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE AD_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE AD_TrailingProfitMethod = T_FIXED;
 #endif
 extern double AD_OpenLevel = 0; // Not used currently.
 extern int AD1_OpenMethod = 0; // Valid range: 0-x.
@@ -803,10 +869,10 @@ extern string __ADX_Parameters__ = "-- Settings for the Average Directional Move
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE ADX_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for ADX. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-  extern ENUM_TRAIL_TYPE ADX_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for ADX. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE ADX_TrailingProfitMethod = T_FIXED; // Trailing Profit method for ADX. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE ADX_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE ADX_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE ADX_TrailingProfitMethod = T_FIXED;
 #endif
 extern int ADX_Period = 14; // Averaging period to calculate the main line.
 extern ENUM_APPLIED_PRICE ADX_Applied_Price = PRICE_HIGH; // Bands applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
@@ -904,10 +970,10 @@ extern string __ATR_Parameters__ = "-- Settings for the Average True Range indic
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE ATR_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for ATR. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-  extern ENUM_TRAIL_TYPE ATR_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for ATR. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE ATR_TrailingProfitMethod = T_FIXED; // Trailing Profit method for ATR. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE ATR_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE ATR_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE ATR_TrailingProfitMethod = T_FIXED;
 #endif
 extern int ATR_Period_Fast = 14; // Averaging period to calculate the main line.
 extern int ATR_Period_Slow = 20; // Averaging period to calculate the main line.
@@ -949,10 +1015,10 @@ extern string __Awesome_Parameters__ = "-- Settings for the Awesome oscillator -
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE Awesome_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Awesome. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-  extern ENUM_TRAIL_TYPE Awesome_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for Awesome. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE Awesome_TrailingProfitMethod = T_FIXED; // Trailing Profit method for Awesome. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE Awesome_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE Awesome_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE Awesome_TrailingProfitMethod = T_FIXED;
 #endif
 extern double Awesome_OpenLevel = 0; // Not used currently.
 extern int Awesome1_OpenMethod = 0; // Valid range: 0-31.
@@ -998,10 +1064,10 @@ extern int Bands_Shift_Far = 0; // The indicator shift relative to the chart.
 //extern bool Bands_CloseOnChange = FALSE; // Close opposite orders on market change.
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE Bands_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Bands. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-  extern ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for Bands. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = T_FIXED; // Trailing Profit method for Bands. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE Bands_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = T_FIXED;
 #endif
 /* extern */ int Bands_OpenLevel = 0; // TODO
 extern int Bands1_OpenMethod = 0; // Valid range: 0-255.
@@ -1051,10 +1117,10 @@ extern string __BPower_Parameters__ = "-- Settings for the Bulls/Bears Power ind
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE BPower_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for BPower. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-  extern ENUM_TRAIL_TYPE BPower_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for BPower. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE BPower_TrailingProfitMethod = T_FIXED; // Trailing Profit method for BPower. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE BPower_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE BPower_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE BPower_TrailingProfitMethod = T_FIXED;
 #endif
 extern int BPower_Period = 13; // Averaging period for calculation.
 extern ENUM_APPLIED_PRICE BPower_Applied_Price = PRICE_CLOSE; // Applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
@@ -1096,10 +1162,10 @@ extern string __Breakage_Parameters__ = "-- Settings for the custom Breakage str
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE Breakage_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Breakage. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-  extern ENUM_TRAIL_TYPE Breakage_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for Breakage. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE Breakage_TrailingProfitMethod = T_FIXED; // Trailing Profit method for Breakage. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE Breakage_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE Breakage_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE Breakage_TrailingProfitMethod = T_FIXED;
 #endif
 extern double Breakage_OpenLevel = 0; // Not used currently.
 extern int Breakage1_OpenMethod = 0; // Valid range: 0-31.
@@ -1139,10 +1205,10 @@ extern string __BWMFI_Parameters__ = "-- Settings for the Market Facilitation In
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE BWMFI_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for BWMFI. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-  extern ENUM_TRAIL_TYPE BWMFI_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for BWMFI. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE BWMFI_TrailingProfitMethod = T_FIXED; // Trailing Profit method for BWMFI. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE BWMFI_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE BWMFI_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE BWMFI_TrailingProfitMethod = T_FIXED;
 #endif
 extern double BWMFI_OpenLevel = 0; // Not used currently.
 extern int BWMFI1_OpenMethod = 0; // Valid range: 0-31.
@@ -1182,10 +1248,10 @@ extern string __CCI_Parameters__ = "-- Settings for the Commodity Channel Index 
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE CCI_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for CCI. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-  extern ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for CCI. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = T_FIXED; // Trailing Profit method for CCI. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE CCI_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = T_FIXED;
 #endif
 extern int CCI_Period_Fast = 12; // Averaging period to calculate the main line.
 extern int CCI_Period_Slow = 20; // Averaging period to calculate the main line.
@@ -1233,10 +1299,10 @@ extern double DeMarker_OpenLevel = 0.2; // Valid range: 0.0-0.4. Suggested value
 //extern bool DeMarker_CloseOnChange = FALSE; // Close opposite orders on market change.
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for DeMarker. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-  extern ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for DeMarker. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = T_FIXED; // Trailing Profit method for DeMarker. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = T_FIXED;
 #endif
 extern int DeMarker1_OpenMethod = 0; // Valid range: 0-31.
 extern int DeMarker5_OpenMethod = 0; // Valid range: 0-31.
@@ -1297,10 +1363,10 @@ extern double Envelopes30_Deviation = 0.4; // Percent deviation from the main li
 extern int Envelopes_Shift = 2; // The indicator shift relative to the chart.
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Bands. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-  extern ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for Bands. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = T_FIXED; // Trailing Profit method for Bands. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = T_FIXED;
 #endif
 /* extern */ int Envelopes_OpenLevel = 0; // TODO
 extern int Envelopes1_OpenMethod = 0; // Valid range: 0-127. Set 0 to default.
@@ -1345,10 +1411,10 @@ extern string __Force_Parameters__ = "-- Settings for the Force Index indicator 
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE Force_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Force. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-  extern ENUM_TRAIL_TYPE Force_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for Force. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE Force_TrailingProfitMethod = T_FIXED; // Trailing Profit method for Force. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE Force_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE Force_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE Force_TrailingProfitMethod = T_FIXED;
 #endif
 extern int Force_Period = 13; // Averaging period for calculation.
 extern ENUM_MA_METHOD Force_MA_Method = MODE_SMA; // Moving Average method (See: ENUM_MA_METHOD). Range: 0-3.
@@ -1392,10 +1458,10 @@ extern string __Fractals_Parameters__ = "-- Settings for the Fractals indicator 
 //extern bool Fractals_CloseOnChange = TRUE; // Close opposite orders on market change.
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Fractals. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-  extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for Fractals. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_FIXED; // Trailing Profit method for Fractals. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_FIXED;
 #endif
 /* extern */ int Fractals_OpenLevel = 0; // TODO
 extern int Fractals1_OpenMethod = 0; // Valid range: 0-1.
@@ -1440,10 +1506,10 @@ extern string __Gator_Parameters__ = "-- Settings for the Gator oscillator --";
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE Gator_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Gator. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-  extern ENUM_TRAIL_TYPE Gator_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for Gator. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE Gator_TrailingProfitMethod = T_FIXED; // Trailing Profit method for Gator. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE Gator_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE Gator_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE Gator_TrailingProfitMethod = T_FIXED;
 #endif
 extern double Gator_OpenLevel = 0; // Not used currently.
 extern int Gator1_OpenMethod = 0; // Valid range: 0-31.
@@ -1483,10 +1549,10 @@ extern string __Ichimoku_Parameters__ = "-- Settings for the Ichimoku Kinko Hyo 
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE Ichimoku_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Ichimoku. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-  extern ENUM_TRAIL_TYPE Ichimoku_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for Ichimoku. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE Ichimoku_TrailingProfitMethod = T_FIXED; // Trailing Profit method for Ichimoku. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE Ichimoku_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE Ichimoku_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE Ichimoku_TrailingProfitMethod = T_FIXED;
 #endif
 extern int Ichimoku_Period_Tenkan_Sen = 9; // Tenkan Sen averaging period.
 extern int Ichimoku_Period_Kijun_Sen = 26; // Kijun Sen averaging period.
@@ -1637,10 +1703,10 @@ extern string __MFI_Parameters__ = "-- Settings for the Money Flow Index indicat
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE MFI_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for MFI. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-  extern ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for MFI. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = T_FIXED; // Trailing Profit method for MFI. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE MFI_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = T_FIXED;
 #endif
 extern int MFI_Period = 14; // Averaging period for calculation.
 extern double MFI_OpenLevel = 0; // Not used currently.
@@ -1681,10 +1747,10 @@ extern string __Momentum_Parameters__ = "-- Settings for the Momentum indicator 
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE Momentum_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Momentum. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-  extern ENUM_TRAIL_TYPE Momentum_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for Momentum. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE Momentum_TrailingProfitMethod = T_FIXED; // Trailing Profit method for Momentum. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE Momentum_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE Momentum_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE Momentum_TrailingProfitMethod = T_FIXED;
 #endif
 extern int Momentum_Period_Fast = 12; // Averaging period for calculation.
 extern int Momentum_Period_Slow = 20; // Averaging period for calculation.
@@ -1727,10 +1793,10 @@ extern string __OBV_Parameters__ = "-- Settings for the On Balance Volume indica
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE OBV_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for OBV. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-  extern ENUM_TRAIL_TYPE OBV_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for OBV. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE OBV_TrailingProfitMethod = T_FIXED; // Trailing Profit method for OBV. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE OBV_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE OBV_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE OBV_TrailingProfitMethod = T_FIXED;
 #endif
 extern ENUM_APPLIED_PRICE OBV_Applied_Price = PRICE_CLOSE; // Applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern double OBV_OpenLevel = 0; // Not used currently.
@@ -1771,10 +1837,10 @@ extern string __OSMA_Parameters__ = "-- Settings for the Moving Average of Oscil
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE OSMA_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for OSMA. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-  extern ENUM_TRAIL_TYPE OSMA_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for OSMA. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE OSMA_TrailingProfitMethod = T_FIXED; // Trailing Profit method for OSMA. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE OSMA_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE OSMA_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE OSMA_TrailingProfitMethod = T_FIXED;
 #endif
 extern int OSMA_Period_Fast = 12; // Fast EMA averaging period.
 extern int OSMA_Period_Slow = 26; // Slow EMA averaging period.
@@ -1824,7 +1890,7 @@ extern int RSI_Shift = 0; // Shift relative to the chart.
   extern ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = T_5_BARS_PEAK; // Trailing Profit method for RSI. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE RSI_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = T_FIXED;
 #endif
 extern int RSI_OpenLevel = 20;
 extern int RSI1_OpenMethod  = 0; // Valid range: 0-63.
@@ -1891,10 +1957,10 @@ extern string __RVI_Parameters__ = "-- Settings for the Relative Vigor Index ind
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE RVI_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for RVI. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-  extern ENUM_TRAIL_TYPE RVI_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for RVI. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE RVI_TrailingProfitMethod = T_FIXED; // Trailing Profit method for RVI. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE RVI_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE RVI_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE RVI_TrailingProfitMethod = T_FIXED;
 #endif
 extern int RVI_Shift = 2; // Shift relative to the previous bar the given amount of periods ago.
 extern int RVI_Shift_Far = 0; // Shift relative to the previous bar shift the given amount of periods ago.
@@ -1995,10 +2061,10 @@ extern string __StdDev_Parameters__ = "-- Settings for the Standard Deviation in
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE StdDev_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for StdDev. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-  extern ENUM_TRAIL_TYPE StdDev_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for StdDev. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE StdDev_TrailingProfitMethod = T_FIXED; // Trailing Profit method for StdDev. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE StdDev_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE StdDev_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE StdDev_TrailingProfitMethod = T_FIXED;
 #endif
 extern ENUM_APPLIED_PRICE StdDev_AppliedPrice = PRICE_CLOSE; // MA applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern int StdDev_MA_Period = 10; // Averaging period to calculate the main line.
@@ -2042,10 +2108,10 @@ extern string __Stochastic_Parameters__ = "-- Settings for the the Stochastic Os
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE Stochastic_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Stochastic. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-  extern ENUM_TRAIL_TYPE Stochastic_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for Stochastic. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE Stochastic_TrailingProfitMethod = T_FIXED; // Trailing Profit method for Stochastic. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE Stochastic_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE Stochastic_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE Stochastic_TrailingProfitMethod = T_FIXED;
 #endif
 extern double Stochastic_OpenLevel = 0.0; // Not used currently.
 extern int Stochastic1_OpenMethod = 0; // Valid range: 0-31.
@@ -2089,10 +2155,10 @@ extern int WPR_OpenLevel = 30; // Suggested range: 25-35.
 //extern bool WPR_CloseOnChange = TRUE; // Close opposite orders on market change.
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE WPR_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for WPR. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE. // Try: T_MA_M_FAR_TRAIL
-  extern ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for WPR. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = T_FIXED; // Trailing Profit method for WPR. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE WPR_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = T_FIXED;
 #endif
 extern int WPR1_OpenMethod = 0; // Valid range: 0-63. Optimized.
 extern int WPR5_OpenMethod = 0; // Valid range: 0-63. Optimized.
@@ -2134,10 +2200,10 @@ extern int WPR30_OpenMethod = 0; // Valid range: 0-63. Optimized with T_MA_M_FAR
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE ZigZag_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for ZigZag. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
-  extern ENUM_TRAIL_TYPE ZigZag_TrailingProfitMethod = T_MA_FMS_PEAK; // Trailing Profit method for ZigZag. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
+  extern ENUM_TRAIL_TYPE ZigZag_TrailingProfitMethod = T_FIXED; // Trailing Profit method for ZigZag. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 #else
   extern ENUM_TRAIL_TYPE ZigZag_TrailingStopMethod = T_MA_FMS_PEAK;
-  extern ENUM_TRAIL_TYPE ZigZag_TrailingProfitMethod = T_MA_FMS_PEAK;
+  extern ENUM_TRAIL_TYPE ZigZag_TrailingProfitMethod = T_FIXED;
 #endif
 extern double ZigZag_OpenLevel = 0.0; // Not used currently.
 extern int ZigZag1_OpenMethod = 0; // Valid range: 0-31.
@@ -2959,39 +3025,39 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
 
    if (MinimumIntervalSec > 0 && TimeCurrent() - last_order_time < MinimumIntervalSec) {
      err = "There must be a " + MinimumIntervalSec + " sec minimum interval between subsequent trade signals.";
-     if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "():" + err);
+     if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "(): " + err);
      last_err = err;
      return (FALSE);
    }
    // Check the limits.
    if (volume == 0) {
      err = "Lot size for strategy " + order_type + " is 0.";
-     if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "():" + err);
+     if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "(): " + err);
      last_err = err;
      return (FALSE);
    }
    if (MaxOrdersPerDay > 0 && daily_orders >= GetMaxOrdersPerDay()) {
      err = "Maximum open and pending orders reached the daily limit (MaxOrdersPerDay).";
-     if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "():" + err);
+     if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "(): " + err);
      last_err = err;
      return (FALSE);
    }
    if (GetTotalOrders() >= max_orders) {
      err = StringFormat("Maximum open and pending orders reached the limit (MaxOrders%s).", IfTxt(MaxOrdersPerDay > 0, "/MaxOrdersPerDay", ""));
-     if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "():" + err);
+     if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "(): " + err);
      last_err = err;
      return (FALSE);
    }
    if (GetTotalOrdersByType(order_type) >= GetMaxOrdersPerType()) {
      err = sname[order_type] + ": Maximum open and pending orders per type reached the limit (MaxOrdersPerType).";
-     if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "():" + err);
+     if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "(): " + err);
      last_err = err;
      return (FALSE);
    }
    if (!CheckFreeMargin(cmd, volume)) {
      err = "No money to open more orders.";
      if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + last_err);
-     if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "():" + err);
+     if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "(): " + err);
      last_err = err;
      return (FALSE);
    }
@@ -2999,14 +3065,14 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
    if (ApplySpreadLimits && !CheckSpreadLimit(order_type)) {
      double curr_spread = PointsToPips(GetMarketSpread(TRUE)); // In pips.
      err = sname[order_type] + ": Not executing order, because the spread is too high." + " (spread = " + DoubleToStr(curr_spread, 1) + " pips)";
-     if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "():" + err);
+     if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "(): " + err);
      last_err = err;
      return (FALSE);
    }
    #endif
    if (!CheckMinPipGap(order_type)) {
      err = sname[order_type] + ": Not executing order, because the gap is too small [MinPipGap].";
-     if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "():" + err + " (order type = " + order_type + ")");
+     if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "(): " + err + " (order type = " + order_type + ")");
      last_err = err;
      return (FALSE);
    }
@@ -4970,7 +5036,9 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
    double trail = (TrailingStop + extra_trail) * pip_size;
    double default_trail = If(cmd == OP_BUY, Bid, Ask) + trail * factor;
    int method = GetTrailingMethod(order_type, loss_or_profit);
-   int period = GetStrategyPeriod(order_type);
+   // if (loss_or_profit > 0) method = AC_TrailingProfitMethod; else if (loss_or_profit < 0) method = AC_TrailingStopMethod; // Testing.
+   int timeframe = GetStrategyTimeframe(order_type);
+   int period = TfToPeriod(timeframe);
 
 /*
   MA1+MA5+MA15+MA30 backtest log (auto,ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, 9,5mln ticks, quality 25%]:
@@ -5031,6 +5099,7 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
     9230.95 3484  1.27  2.65  4835.75 25.13% MA_TrailingProfitMethod=26
     9371.17 3416  1.27  2.74  5098.83 23.51% MA_TrailingProfitMethod=27
 */
+  // TODO: Make starting point dynamic: Open[CURR], Open[PREV], Open[FAR], Close[PREV], Close[FAR], ma_fast[CURR], ma_medium[CURR], ma_slow[CURR]
    switch (method) {
      case T_NONE: // None
        new_value = previous;
@@ -5039,144 +5108,146 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
        new_value = default_trail;
        break;
      case T_CLOSE_PREV: // TODO
-       diff = MathAbs(Open[CURR] - iClose(_Symbol, period, PREV));
+       diff = MathAbs(Open[CURR] - iClose(_Symbol, timeframe, PREV));
        new_value = Open[CURR] + diff * factor;
        break;
      case T_2_BARS_PEAK: // 3
-       double highest2 = GetPeakPrice(period, MODE_HIGH, 2);
-       double lowest2  = GetPeakPrice(period, MODE_LOW, 2);
+       double highest2 = GetPeakPrice(timeframe, MODE_HIGH, 2);
+       double lowest2  = GetPeakPrice(timeframe, MODE_LOW, 2);
        diff = MathMax(highest2 - Open[CURR], Open[CURR] - lowest2);
        new_value = Open[CURR] + diff * factor;
        break;
      case T_5_BARS_PEAK: // 4
-       double highest5 = GetPeakPrice(period, MODE_HIGH, 5);
-       double lowest5  = GetPeakPrice(period, MODE_LOW, 5);
+       double highest5 = GetPeakPrice(timeframe, MODE_HIGH, 5);
+       double lowest5  = GetPeakPrice(timeframe, MODE_LOW, 5);
        diff = MathMax(highest5 - Open[CURR], Open[CURR] - lowest5);
        new_value = Open[CURR] + diff * factor;
        break;
      case T_10_BARS_PEAK: // 5
-       double highest10 = GetPeakPrice(period, MODE_HIGH, 10);
-       double lowest10  = GetPeakPrice(period, MODE_LOW, 10);
+       double highest10 = GetPeakPrice(timeframe, MODE_HIGH, 10);
+       double lowest10  = GetPeakPrice(timeframe, MODE_LOW, 10);
        diff = MathMax(highest10 - Open[CURR], Open[CURR] - lowest10);
        new_value = Open[CURR] + diff * factor;
        break;
      case T_50_BARS_PEAK:
-       double highest50 = GetPeakPrice(period, MODE_HIGH, 50);
-       double lowest50  = GetPeakPrice(period, MODE_LOW, 50);
+       double highest50 = GetPeakPrice(timeframe, MODE_HIGH, 50);
+       double lowest50  = GetPeakPrice(timeframe, MODE_LOW, 50);
        diff = MathMax(highest50 - Open[CURR], Open[CURR] - lowest50);
        new_value = Open[CURR] + diff * factor;
        break;
      case T_150_BARS_PEAK:
-       double highest150 = GetPeakPrice(period, MODE_HIGH, 150);
-       double lowest150  = GetPeakPrice(period, MODE_LOW, 150);
+       double highest150 = GetPeakPrice(timeframe, MODE_HIGH, 150);
+       double lowest150  = GetPeakPrice(timeframe, MODE_LOW, 150);
        diff = MathMax(highest150 - Open[CURR], Open[CURR] - lowest150);
        new_value = Open[CURR] + diff * factor;
        break;
      case T_HALF_200_BARS:
-       double highest200 = GetPeakPrice(period, MODE_HIGH, 200);
-       double lowest200  = GetPeakPrice(period, MODE_LOW, 200);
+       double highest200 = GetPeakPrice(timeframe, MODE_HIGH, 200);
+       double lowest200  = GetPeakPrice(timeframe, MODE_LOW, 200);
        diff = MathMax(highest200 - Open[CURR], Open[CURR] - lowest200);
        new_value = Open[CURR] + diff/2 * factor;
        break;
+     case T_HALF_PEAK:
+       break;
      case T_MA_F_PREV: // 9: MA Small (Previous). The worse so far for MA.
-       UpdateIndicator(MA, period);
+       UpdateIndicator(MA, timeframe);
        diff = MathAbs(Ask - ma_fast[period][PREV]);
        new_value = Ask + diff * factor;
        break;
      case T_MA_F_FAR: // 10: MA Small (Far) + trailing stop. Optimize together with: MA_Shift_Far.
-       UpdateIndicator(MA, period);
+       UpdateIndicator(MA, timeframe);
        diff = MathAbs(Ask - ma_fast[period][FAR]);
        new_value = Ask + diff * factor;
        break;
      /*
      case T_MA_F_LOW: // 11: Lowest/highest value of MA Fast. Optimized (SL pf: 1.39 for MA).
-       UpdateIndicator(MA, period);
+       UpdateIndicator(MA, timeframe);
        diff = MathMax(HighestArrValue2(ma_fast, period) - Open[CURR], Open[CURR] - LowestArrValue2(ma_fast, period));
        new_value = Open[CURR] + diff * factor;
        break;
       */
      case T_MA_F_TRAIL: // 12: MA Fast (Current) + trailing stop. Works fine.
-       UpdateIndicator(MA, period);
+       UpdateIndicator(MA, timeframe);
        diff = MathAbs(Ask - ma_fast[period][CURR]);
        new_value = Ask + (diff + trail) * factor;
        break;
      case T_MA_F_FAR_TRAIL: // 13: MA Fast (Far) + trailing stop. Works fine (SL pf: 1.26 for MA).
-       UpdateIndicator(MA, period);
+       UpdateIndicator(MA, timeframe);
        diff = MathAbs(Open[CURR] - ma_fast[period][FAR]);
        new_value = Open[CURR] + (diff + trail) * factor;
        break;
      case T_MA_M: // 14: MA Medium (Current).
-       UpdateIndicator(MA, period);
+       UpdateIndicator(MA, timeframe);
        diff = MathAbs(Ask - ma_medium[period][CURR]);
        new_value = Ask + diff * factor;
        break;
      case T_MA_M_FAR: // 15: MA Medium (Far)
-       UpdateIndicator(MA, period);
+       UpdateIndicator(MA, timeframe);
        diff = MathAbs(Ask - ma_medium[period][FAR]);
        new_value = Ask + diff * factor;
        break;
      /*
      case T_MA_M_LOW: // 16: Lowest/highest value of MA Medium. Optimized (SL pf: 1.39 for MA).
-       UpdateIndicator(MA, period);
+       UpdateIndicator(MA, timeframe);
        diff = MathMax(HighestArrValue2(ma_medium, period) - Open[CURR], Open[CURR] - LowestArrValue2(ma_medium, period));
        new_value = Open[CURR] + diff * factor;
        break;
       */
      case T_MA_M_TRAIL: // 17: MA Small (Current) + trailing stop. Works fine (SL pf: 1.26 for MA).
-       UpdateIndicator(MA, period);
+       UpdateIndicator(MA, timeframe);
        diff = MathAbs(Open[CURR] - ma_medium[period][CURR]);
        new_value = Open[CURR] + (diff + trail) * factor;
        break;
      case T_MA_M_FAR_TRAIL: // 18: MA Small (Far) + trailing stop. Optimized (SL pf: 1.29 for MA).
-       UpdateIndicator(MA, period);
+       UpdateIndicator(MA, timeframe);
        diff = MathAbs(Open[CURR] - ma_medium[period][FAR]);
        new_value = Open[CURR] + (diff + trail) * factor;
        break;
      case T_MA_S: // 19: MA Slow (Current).
-       UpdateIndicator(MA, period);
+       UpdateIndicator(MA, timeframe);
        diff = MathAbs(Ask - ma_slow[period][CURR]);
        // new_value = ma_slow[period][CURR];
        new_value = Ask + diff * factor;
        break;
      case T_MA_S_FAR: // 20: MA Slow (Far).
-       UpdateIndicator(MA, period);
+       UpdateIndicator(MA, timeframe);
        diff = MathAbs(Ask - ma_slow[period][FAR]);
        // new_value = ma_slow[period][FAR];
        new_value = Ask + diff * factor;
        break;
      case T_MA_S_TRAIL: // 21: MA Slow (Current) + trailing stop. Optimized (SL pf: 1.29 for MA, PT pf: 1.23 for MA).
-       UpdateIndicator(MA, period);
+       UpdateIndicator(MA, timeframe);
        diff = MathAbs(Open[CURR] - ma_slow[period][CURR]);
        new_value = Open[CURR] + (diff + trail) * factor;
        break;
      case T_MA_FMS_PEAK: // 22: Lowest/highest value of all MAs. Works fine (SL pf: 1.39 for MA, PT pf: 1.23 for MA).
-       UpdateIndicator(MA, period);
+       UpdateIndicator(MA, timeframe);
        double highest_ma = MathAbs(MathMax(MathMax(HighestArrValue2(ma_fast, period), HighestArrValue2(ma_medium, period)), HighestArrValue2(ma_slow, period)));
        double lowest_ma = MathAbs(MathMin(MathMin(LowestArrValue2(ma_fast, period), LowestArrValue2(ma_medium, period)), LowestArrValue2(ma_slow, period)));
        diff = MathMax(MathAbs(highest_ma - Open[CURR]), MathAbs(Open[CURR] - lowest_ma));
        new_value = Open[CURR] + diff * factor;
        break;
      case T_SAR: // 23: Current SAR value. Optimized.
-       UpdateIndicator(SAR, period);
+       UpdateIndicator(SAR, timeframe);
        new_value = sar[period][CURR];
        break;
      case T_SAR_PEAK: // 24: Lowest/highest SAR value.
-       UpdateIndicator(SAR, period);
+       UpdateIndicator(SAR, timeframe);
        new_value = If(OpTypeValue(cmd) == loss_or_profit, HighestArrValue2(sar, period), LowestArrValue2(sar, period));
        break;
      case T_BANDS: // 25: Current Bands value.
-       UpdateIndicator(BANDS, period);
+       UpdateIndicator(BANDS, timeframe);
        new_value = If(OpTypeValue(cmd) == loss_or_profit, bands[period][CURR][MODE_UPPER], bands[period][CURR][MODE_LOWER]);
        break;
      case T_BANDS_PEAK: // 26: Lowest/highest Bands value.
-       UpdateIndicator(BANDS, period);
+       UpdateIndicator(BANDS, timeframe);
        new_value = If(OpTypeValue(cmd) == loss_or_profit,
          MathMax(MathMax(bands[period][CURR][MODE_UPPER], bands[period][PREV][MODE_UPPER]), bands[period][FAR][MODE_UPPER]),
          MathMin(MathMin(bands[period][CURR][MODE_LOWER], bands[period][PREV][MODE_LOWER]), bands[period][FAR][MODE_LOWER])
          );
        break;
      case T_ENVELOPES: // 27: Current Envelopes value. // FIXME
-       UpdateIndicator(ENVELOPES, period);
+       UpdateIndicator(ENVELOPES, timeframe);
        new_value = If(OpTypeValue(cmd) == loss_or_profit, envelopes[period][CURR][MODE_UPPER], envelopes[period][CURR][MODE_LOWER]);
        break;
      default:
@@ -5188,7 +5259,7 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
    if (!ValidTrailingValue(new_value, cmd, loss_or_profit, existing)) {
      #ifndef __limited__
        if (existing && previous == 0 && loss_or_profit == -1) previous = default_trail;
-     #else // If limited, then always set the trailing value.
+     #else // If limited, then force the trailing value.
        if (existing && previous == 0) previous = default_trail;
      #endif
      if (VerboseTrace)
@@ -5199,12 +5270,12 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
 
    if (TrailingStopOneWay && loss_or_profit < 0 && method > 0) { // If TRUE, move trailing stop only one direction.
      if (previous == 0 && method > 0) previous = default_trail;
-     if (OpTypeValue(cmd) == loss_or_profit) new_value = If(new_value < previous, new_value, previous);
-     else new_value = If(new_value > previous, new_value, previous);
+     if (OpTypeValue(cmd) == loss_or_profit) new_value = If(new_value < previous || previous == 0, new_value, previous);
+     else new_value = If(new_value > previous || previous == 0, new_value, previous);
    }
    if (TrailingProfitOneWay && loss_or_profit > 0 && method > 0) { // If TRUE, move profit take only one direction.
-     if (OpTypeValue(cmd) == loss_or_profit) new_value = If(new_value > previous, new_value, previous);
-     else new_value = If(new_value < previous, new_value, previous);
+     if (OpTypeValue(cmd) == loss_or_profit) new_value = If(new_value > previous || previous == 0, new_value, previous);
+     else new_value = If(new_value < previous || previous == 0, new_value, previous);
    }
 
    // if (VerboseDebug && IsVisualMode()) ShowLine("trail_stop_" + OrderTicket(), new_value, GetOrderColor());
@@ -6209,6 +6280,7 @@ bool InitializeVariables() {
   if (IsTesting()) account_type = "Backtest on " + account_type;
 
   // Check time of the week, month and year based on the trading bars.
+  time_current = TimeCurrent();
   bar_time = iTime(NULL, PERIOD_M1, 0);
   hour_of_day = Hour(); // The hour (0,1,2,..23) of the last known server time by the moment of the program start.
   day_of_week = DayOfWeek(); // The zero-based day of week (0 means Sunday,1,2,3,4,5,6) of the specified date. At the testing, the last known server time is modelled.
@@ -6490,6 +6562,12 @@ void InitializeConditions() {
   acc_conditions[11][0] = Account_Condition_12;
   acc_conditions[11][1] = Market_Condition_12;
   acc_conditions[11][2] = Action_On_Condition_12;
+
+  if (Account_Condition_To_Disable > 0 && Account_Condition_To_Disable < ArraySize(acc_conditions)) {
+    acc_conditions[Account_Condition_To_Disable - 1][0] = C_ACC_NONE;
+    acc_conditions[Account_Condition_To_Disable - 1][1] = C_MARKET_NONE;
+    acc_conditions[Account_Condition_To_Disable - 1][2] = A_NONE;
+  }
 }
 
 /*
@@ -6739,7 +6817,7 @@ int GetStrategyOpenMethod(int indicator, int timeframe = PERIOD_M30, int default
 /*
  * Fetch strategy timeframe based on the strategy type.
  */
-int GetStrategyPeriod(int sid, int default_value = PERIOD_M1) {
+int GetStrategyTimeframe(int sid, int default_value = PERIOD_M1) {
   return If(sid >= 0, info[sid][TIMEFRAME], default_value);
 }
 
@@ -6759,7 +6837,7 @@ int GetStrategyViaIndicator(int indicator, int timeframe) {
  * Convert period to proper chart timeframe value.
  */
 int PeriodToTf(int period) {
-  int tf = PERIOD_M1;
+  int tf = PERIOD_M30;
   switch (period) {
     case M1: // 1 minute
       tf = PERIOD_M1;
@@ -6796,7 +6874,7 @@ int PeriodToTf(int period) {
  * Convert timeframe constant to period value.
  */
 int TfToPeriod(int tf) {
-  int period = M1;
+  int period = M30;
   switch (tf) {
     case PERIOD_M1: // 1 minute
       period = M1;
@@ -7296,7 +7374,7 @@ string GetRiskRatioText() {
   else if (risk_ratio < 0.9) text = "Below normal, but ok";
   else if (risk_ratio > 5.0) text = "Extremely high (risky!)";
   else if (risk_ratio > 2.0) text = "Very high";
-  else if (risk_ratio > 1.0) text = "High";
+  else if (risk_ratio > 1.4) text = "High";
   #ifdef __advanced__
     if (StringLen(rr_text) > 0) text += " - reason: " + rr_text;
   #endif
@@ -7842,6 +7920,9 @@ string MarketIdToText(int mid) {
     case C_MA5_FS_ORDERS_OPP: output = "MA5 Fast&Slow orders-based opposite"; break;
     case C_MA15_FS_ORDERS_OPP: output = "MA15 Fast&Slow orders-based opposite"; break;
     case C_MA30_FS_ORDERS_OPP: output = "MA30 Fast&Slow orders-based opposite"; break;
+    case C_DAILY_PEAK: output = "Daily peak price"; break;
+    case C_WEEKLY_PEAK: output = "Weekly peak price"; break;
+    case C_MONTHLY_PEAK: output = "Monthly peak price"; break;
     case C_MARKET_BIG_DROP: output = "Market big drop"; break;
     case C_MARKET_VBIG_DROP: output = "Market very big drop"; break;
   }
@@ -8125,10 +8206,19 @@ void DrawMA(int timeframe) {
 /*
  * Draw a vertical line.
  */
-bool DrawVertLine(string oname, datetime tm) {
-  bool result = ObjectCreate(oname, OBJ_VLINE, 0, tm, 0);
+bool DrawVLine(string oname, datetime tm) {
+  bool result = ObjectCreate(NULL, oname, OBJ_VLINE, 0, tm, 0);
   if (!result) PrintFormat("%(): Can't create vertical line! code #", __FUNCTION__, GetLastError());
-   return (result);
+  return (result);
+}
+
+/*
+ * Draw a horizontal line.
+ */
+bool DrawHLine(string oname, double value) {
+  bool result = ObjectCreate(NULL, oname, OBJ_HLINE, 0, 0, value);
+  if (!result) PrintFormat("%(): Can't create horizontal line! code #", __FUNCTION__, GetLastError());
+  return (result);
 }
 
 /*
