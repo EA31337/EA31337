@@ -47,7 +47,7 @@
   #define ea_name    "EA31337 Lite"
 #endif
 #define ea_desc    "Multi-strategy advanced trading robot."
-#define ea_version "1.063"
+#define ea_version "1.064"
 #define ea_build   __DATETIME__ // FIXME: It's empty
 #define ea_link    "http://www.ea31337.com"
 #define ea_author  "kenorb"
@@ -293,6 +293,14 @@ enum ENUM_VALUE_TYPE { // Define type of values in order to store.
   FINAL_VALUE_TYPE_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };
 
+enum ENUM_ORDER_QUEUE_ENTRY { // Define order queue.
+  Q_SID,        // Strategy id.
+  Q_CMD,        // Type of trade order.
+  Q_TIME,       // Time requested to open.
+  Q_TOTAL,      // Total number of orders queued.
+  FINAL_ORDER_QUEUE_ENTRY // Should be the last one. Used to calculate the number of enum items.
+};
+
 enum ENUM_TRAIL_TYPE { // Define type of trailing types.
   T_NONE              =  0, // None
   T_FIXED             =  1, // Fixed
@@ -303,9 +311,9 @@ enum ENUM_TRAIL_TYPE { // Define type of trailing types.
   T_50_BARS_PEAK      =  6, // 50 bars peak
   T_150_BARS_PEAK     =  7, // 150 bars peak
   T_HALF_200_BARS     =  8, // 200 bars half price
-  T_HALF_PEAK         = 11, // Half price peak
-  T_MA_F_PREV         =  9, // MA Fast Prev
-  T_MA_F_FAR          = 10, // MA Fast Far
+  T_HALF_PEAK_OPEN    =  9, // Half price peak
+  T_MA_F_PREV         = 10, // MA Fast Prev
+  T_MA_F_FAR          = 11, // MA Fast Far
   // T_MA_F_LOW          = 11, // MA Fast Low // ??
   T_MA_F_TRAIL        = 12, // MA Fast+Trail
   T_MA_F_FAR_TRAIL    = 13, // MA Fast Far+Trail
@@ -589,6 +597,8 @@ extern double MaxSpreadToTrade = 10.0; // Maximum spread to trade (in pips).
 //+------------------------------------------------------------------+
 #ifdef __advanced__
   extern string __Advanced_Parameters__ = "-- Advanced parameters --";
+  extern bool QueueOrdersAIActive = TRUE; // Activate AI queue orders for selecting the best strategy to open. At least 2 orders needs to be queued in order to be processed.
+  extern int QueueOrdersAIMethod = 1; // Method for selecting best order to open from the orders queue.
   extern bool CloseConditionOnlyProfitable = TRUE; // Close conditions applies only for profitable orders.
   extern bool DisableCloseConditions = FALSE; // Set TRUE to disable all close conditions for strategies. Not useful apart of testing.
   extern int HourAfterPeak = 18; // Minimum hour to check for peak prices, used by C_DAILY_PEAK, etc.
@@ -2444,6 +2454,7 @@ extern int MagicNumber = 31337; // To help identify its own orders. It can vary 
 double lot_size, pip_size;
 double market_minlot, market_maxlot, market_lotsize, market_lotstep, market_marginrequired, market_margininit;
 double market_stoplevel; // Market stop level in points.
+double curr_spread; // Broker current spread.
 int PipDigits, VolumeDigits;
 int pts_per_pip; // Number points per pip.
 int gmt_offset = 0; // Current difference between GMT time and the local computer time in seconds, taking into account switch to winter or summer time. Depends on the time settings of your computer.
@@ -2494,6 +2505,9 @@ string log[];
 // Condition and actions.
 int acc_conditions[12][3], market_conditions[10][3];
 string last_cname;
+
+// Order queue.
+int order_queue[100][FINAL_ORDER_QUEUE_ENTRY];
 
 // Indicator variables.
 double ac[H1][FINAL_INDICATOR_INDEX_ENTRY];
@@ -2696,10 +2710,10 @@ string InitInfo(string sep = "\n") {
     (int)SymbolInfoInteger(_Symbol,SYMBOL_TRADE_STOPS_LEVEL), SymbolInfoDouble(_Symbol,SYMBOL_TRADE_CONTRACT_SIZE), SymbolInfoDouble(_Symbol,SYMBOL_TRADE_TICK_SIZE), sep);
   output += StringFormat("Swap specification for %s: Mode: %d, Long/buy order value: %g, Short/sell order value: %g%s",
     _Symbol, (int)SymbolInfoInteger(_Symbol, SYMBOL_SWAP_MODE), SymbolInfoDouble(_Symbol,SYMBOL_SWAP_LONG), SymbolInfoDouble(_Symbol,SYMBOL_SWAP_SHORT), sep);
-  output += StringFormat("Calculated variables: Lot size: %g, Max orders: %d (per type: %d), Active strategies: %d of %d, Pip size: %g, Points per pip: %d, Pip digits: %d, Volume digits: %d, Spread in pips: %g, Stop Out Level: %.1f%s",
+  output += StringFormat("Calculated variables: Lot size: %g, Max orders: %d (per type: %d), Active strategies: %d of %d, Pip size: %g, Points per pip: %d, Pip digits: %d, Volume digits: %d, Spread in pips: %.1f, Stop Out Level: %.1f%s",
               NormalizeDouble(lot_size, VolumeDigits), max_orders, GetMaxOrdersPerType(), GetNoOfStrategies(), FINAL_STRATEGY_TYPE_ENTRY,
               NormalizeDouble(pip_size, PipDigits), pts_per_pip, PipDigits, VolumeDigits,
-              NormalizeDouble(ValueToPips(GetMarketSpread()), PipDigits), GetAccountStopoutLevel(), sep);
+              curr_spread, GetAccountStopoutLevel(), sep);
   output += StringFormat("Time: Hour of day: %d, Day of week: %d, Day of month: %d, Day of year: %d" + sep, hour_of_day, day_of_week, day_of_month, day_of_year);
   output += GetAccountTextDetails() + sep;
   if (session_initiated && IsTradeAllowed()) {
@@ -2715,15 +2729,13 @@ string InitInfo(string sep = "\n") {
  */
 bool Trade() {
   bool order_placed = FALSE;
-  double trade_lot;
-  int trade_cmd, pf;
+  int trade_cmd;
   // if (VerboseTrace) Print("Calling " + __FUNCTION__ + "()");
   // vdigits = MarketInfo(Symbol(), MODE_DIGITS);
 
   for (int id = 0; id < FINAL_STRATEGY_TYPE_ENTRY; id++) {
     trade_cmd = EMPTY;
     if (info[id][ACTIVE]) {
-      trade_lot = If(conf[id][LOT_SIZE], conf[id][LOT_SIZE], lot_size) * If(conf[id][FACTOR], conf[id][FACTOR], 1.0);
       if (TradeCondition(id, OP_BUY))  trade_cmd = OP_BUY;
       else if (TradeCondition(id, OP_SELL)) trade_cmd = OP_SELL;
       #ifdef __advanced__
@@ -2735,22 +2747,21 @@ bool Trade() {
       if (trade_cmd == OP_SELL && !CheckMarketCondition1(OP_SELL, info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) trade_cmd = EMPTY;
       if (trade_cmd == OP_BUY  &&  CheckMarketCondition1(OP_SELL, PERIOD_M30, info[id][OPEN_CONDITION2], FALSE)) trade_cmd = EMPTY;
       if (trade_cmd == OP_SELL &&  CheckMarketCondition1(OP_BUY,  PERIOD_M30, info[id][OPEN_CONDITION2], FALSE)) trade_cmd = EMPTY;
-      if (Boosting_Enabled) {
-        pf = GetStrategyProfitFactor(id);
-        if (BoostByProfitFactor && pf > 1.0) trade_lot *= MathMax(GetStrategyProfitFactor(id), 1.0);
-        else if (HandicapByProfitFactor && pf < 1.0) trade_lot *= MathMin(GetStrategyProfitFactor(id), 1.0);
-      }
       #endif
-      if (Boosting_Enabled && CheckTrend() == trade_cmd && BoostTrendFactor != 1.0) {
-        trade_lot *= BoostTrendFactor;
-      }
+
 
       if (trade_cmd != EMPTY) {
-        order_placed &= ExecuteOrder(trade_cmd, trade_lot, id, sname[id]);
+        order_placed &= ExecuteOrder(trade_cmd, id);
       }
 
     } // end: if
-   } // end: for
+  } // end: for
+
+  if (QueueOrdersAIActive && !order_placed && total_orders < max_orders) {
+    if (OrderQueueProcess()) {
+      return (TRUE);
+    }
+  }
   return order_placed;
 }
 
@@ -3014,67 +3025,37 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
 
 /*
  * Execute trade order.
+ *
+ * @param
+ *   cmd (int)
+ *     trade order command to execute
+ *   volume (int)
+ *     volue of the trade to execute (size)
+ *   sid (int)
+ *     strategy id
+ *   order_comment (string)
+ *     order comment
+ *   retry (bool)
+ *     if TRUE, re-try to open again after error/failure
  */
-int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = "", bool retry = TRUE) {
+int ExecuteOrder(int cmd, int sid, double volume = EMPTY, string order_comment = EMPTY, bool retry = TRUE) {
    bool result = FALSE;
-   string err;
    int order_ticket;
-   // int min_stop_level;
-   double max_change = 1;
-   volume = NormalizeLots(volume);
 
-   if (MinimumIntervalSec > 0 && TimeCurrent() - last_order_time < MinimumIntervalSec) {
-     err = "There must be a " + MinimumIntervalSec + " sec minimum interval between subsequent trade signals.";
-     if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "(): " + err);
-     last_err = err;
-     return (FALSE);
+   if (volume == EMPTY) {
+     volume = GetStrategyLotSize(sid, cmd);
+   } else {
+     volume = NormalizeLots(volume);
    }
+
    // Check the limits.
-   if (volume == 0) {
-     err = "Lot size for strategy " + order_type + " is 0.";
-     if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "(): " + err);
-     last_err = err;
+   if (!OpenOrderIsAllowed(cmd, sid, volume)) {
      return (FALSE);
    }
-   if (MaxOrdersPerDay > 0 && daily_orders >= GetMaxOrdersPerDay()) {
-     err = "Maximum open and pending orders reached the daily limit (MaxOrdersPerDay).";
-     if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "(): " + err);
-     last_err = err;
-     return (FALSE);
-   }
-   if (GetTotalOrders() >= max_orders) {
-     err = StringFormat("Maximum open and pending orders reached the limit (MaxOrders%s).", IfTxt(MaxOrdersPerDay > 0, "/MaxOrdersPerDay", ""));
-     if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "(): " + err);
-     last_err = err;
-     return (FALSE);
-   }
-   if (GetTotalOrdersByType(order_type) >= GetMaxOrdersPerType()) {
-     err = sname[order_type] + ": Maximum open and pending orders per type reached the limit (MaxOrdersPerType).";
-     if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "(): " + err);
-     last_err = err;
-     return (FALSE);
-   }
-   if (!CheckFreeMargin(cmd, volume)) {
-     err = "No money to open more orders.";
-     if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + last_err);
-     if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "(): " + err);
-     last_err = err;
-     return (FALSE);
-   }
-   #ifdef __advanced__
-   if (ApplySpreadLimits && !CheckSpreadLimit(order_type)) {
-     double curr_spread = PointsToPips(GetMarketSpread(TRUE)); // In pips.
-     err = sname[order_type] + ": Not executing order, because the spread is too high." + " (spread = " + DoubleToStr(curr_spread, 1) + " pips)";
-     if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "(): " + err);
-     last_err = err;
-     return (FALSE);
-   }
-   #endif
-   if (!CheckMinPipGap(order_type)) {
-     err = sname[order_type] + ": Not executing order, because the gap is too small [MinPipGap].";
-     if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "(): " + err + " (order type = " + order_type + ")");
-     last_err = err;
-     return (FALSE);
+
+   // Check the order comment.
+   if (order_comment == EMPTY) {
+     order_comment = GetStrategyComment(sid);
    }
 
    // Calculate take profit and stop loss.
@@ -3083,56 +3064,47 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
    double order_price = GetOpenPrice(cmd);
    double stoploss = 0, takeprofit = 0;
    if (StopLoss > 0.0) stoploss = NormalizeDouble(GetClosePrice(cmd) - (StopLoss + TrailingStop) * pip_size * OpTypeValue(cmd), Digits);
-   else stoploss   = GetTrailingValue(cmd, -1, order_type);
+   else stoploss   = GetTrailingValue(cmd, -1, sid);
    if (TakeProfit > 0.0) takeprofit = NormalizeDouble(order_price + (TakeProfit + TrailingProfit) * pip_size * OpTypeValue(cmd), Digits);
-   else takeprofit = GetTrailingValue(cmd, +1, order_type);
+   else takeprofit = GetTrailingValue(cmd, +1, sid);
 
-   order_ticket = OrderSend(_Symbol, cmd, volume, NormalizeDouble(order_price, Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + order_type, 0, GetOrderColor(cmd));
+   order_ticket = OrderSend(_Symbol, cmd, volume, NormalizeDouble(order_price, Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + sid, 0, GetOrderColor(cmd));
    if (order_ticket >= 0) {
       total_orders++;
       daily_orders++;
       if (!OrderSelect(order_ticket, SELECT_BY_TICKET) && VerboseErrors) {
         Print(__FUNCTION__ + "(): OrderSelect() error = ", ErrorDescription(GetLastError()));
         OrderPrint();
-        if (retry) TaskAddOrderOpen(cmd, volume, order_type, order_comment); // Will re-try again.
-        info[order_type][TOTAL_ERRORS]++;
+        if (retry) TaskAddOrderOpen(cmd, volume, sid); // Will re-try again.
+        info[sid][TOTAL_ERRORS]++;
         return (FALSE);
       }
-      if (VerboseTrace) Print(__FUNCTION__, "(): Success: OrderSend(", Symbol(), ", ",  _OrderType_str(cmd), ", ", volume, ", ", NormalizeDouble(order_price, Digits), ", ", max_order_slippage, ", ", stoploss, ", ", takeprofit, ", ", order_comment, ", ", MagicNumber + order_type, ", 0, ", GetOrderColor(), ");");
+      if (VerboseTrace) Print(__FUNCTION__, "(): Success: OrderSend(", Symbol(), ", ",  _OrderType_str(cmd), ", ", volume, ", ", NormalizeDouble(order_price, Digits), ", ", max_order_slippage, ", ", stoploss, ", ", takeprofit, ", ", order_comment, ", ", MagicNumber + sid, ", 0, ", GetOrderColor(), ");");
 
       result = TRUE;
       // TicketAdd(order_ticket);
       last_order_time = TimeCurrent(); // Set last execution time.
       // last_trail_update = 0; // Set to 0, so trailing stops can be updated faster.
       order_price = OrderOpenPrice();
+      stats[sid][AVG_SPREAD] = (stats[sid][AVG_SPREAD] + curr_spread) / 2;
       if (VerboseInfo) OrderPrint();
       if (VerboseDebug) { Print(__FUNCTION__ + "(): " + GetOrderTextDetails() + GetAccountTextDetails()); }
       if (SoundAlert) PlaySound(SoundFileAtOpen);
       if (SendEmailEachOrder) SendEmailExecuteOrder();
 
-      /*
-      if ((TakeProfit * pip_size > GetMinStopLevel() || TakeProfit == 0.0) &&
-         (StopLoss * pip_size > GetMinStopLevel() || StopLoss == 0.0)) {
-            result = OrderModify(order_ticket, order_price, stoploss, takeprofit, 0, ColorSell);
-            if (!result && VerboseErrors) {
-              Print(__FUNCTION__ + "(): Error: OrderModify() error = ", ErrorDescription(GetLastError()));
-              if (VerboseDebug) Print(__FUNCTION__ + "():" + " Error: OrderModify(", order_ticket, ", ", order_price, ", ", stoploss, ", ", takeprofit, ", ", 0, ", ", ColorSell, ")");
-            }
-         }
-      */
-      // curr_bar_time = iTime(NULL, PERIOD_M1, 0);
+      if (QueueOrdersAIActive && total_orders >= max_orders) OrderQueueClear(); // Clear queue if we're reached the limit again, so we can start fresh.
+
    } else {
      result = FALSE;
      err_code = GetLastError();
      if (VerboseErrors) Print(__FUNCTION__, "(): OrderSend(): error = ", ErrorDescription(err_code));
      if (VerboseDebug) {
        PrintFormat("Error: OrderSend(%s, %d, %f, %f, %f, %f, %f, %s, %d, %d, %d)",
-              _Symbol, cmd, volume, NormalizeDouble(order_price, Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + order_type, 0, GetOrderColor(cmd));
+              _Symbol, cmd, volume, NormalizeDouble(order_price, Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + sid, 0, GetOrderColor(cmd));
        Print(__FUNCTION__ + "(): " + GetAccountTextDetails());
        Print(__FUNCTION__ + "(): " + GetMarketTextDetails());
        OrderPrint();
      }
-     // if (err_code != 136 /* OFF_QUOTES */) break;
 
      // Process the errors.
      if (err_code == ERR_TRADE_TOO_MANY_ORDERS) {
@@ -3149,30 +3121,65 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
        retry = TRUE;
        Sleep(200); // Wait 200ms.
      }
-     if (retry) TaskAddOrderOpen(cmd, volume, order_type, order_comment); // Will re-try again.
-     info[order_type][TOTAL_ERRORS]++;
+     if (err_code == ERR_OFF_QUOTES) { /* error code: 136 */
+        // Price changed, so we should consider whether to execute order or not.
+        retry = FALSE; // ?
+     }
+     if (retry) TaskAddOrderOpen(cmd, volume, sid); // Will re-try again.
+     info[sid][TOTAL_ERRORS]++;
    } // end-if: order_ticket
 
-/*
-   TriesLeft--;
-   if (TriesLeft > 0 && VerboseDebug) {
-     Print("Price off-quote, will re-try to open the order.");
-   }
-
-   if (cmd == OP_BUY) new_price = Ask; else new_price = Bid;
-
-   if (NormalizeDouble(MathAbs((new_price - order_price) / pip_size), 0) > max_change) {
-     if (VerboseDebug) {
-       Print("Price changed, not executing order: ", cmd);
-     }
-     break;
-   }
-   order_price = new_price;
-
-   volume = NormalizeDouble(volume / 2.0, VolumeDigits);
-   if (volume < market_minlot) volume = market_minlot;
-   */
    return (result);
+}
+
+/*
+ * Check if we can open new order.
+ */
+bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
+  int result = TRUE;
+  string err;
+  if (MinimumIntervalSec > 0 && time_current - last_order_time < MinimumIntervalSec) {
+    err = "There must be a " + MinimumIntervalSec + " sec minimum interval between subsequent trade signals.";
+    if (VerboseTrace && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
+    result = FALSE;
+  } else if (volume < market_minlot) {
+    err = StringFormat("Lot size for strategy %s is %.2f.", sname[sid], volume);
+    if (VerboseTrace && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
+    result = FALSE;
+  } else if (MaxOrdersPerDay > 0 && daily_orders >= GetMaxOrdersPerDay()) {
+    err = "Maximum open and pending orders reached the daily limit (MaxOrdersPerDay).";
+    if (VerboseErrors && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
+    OrderQueueAdd(sid, cmd);
+    result = FALSE;
+  } else if (total_orders >= max_orders) {
+    err = StringFormat("Maximum open and pending orders reached the limit (MaxOrders%s).", IfTxt(MaxOrdersPerDay > 0, "/MaxOrdersPerDay", ""));
+    if (VerboseErrors && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
+    OrderQueueAdd(sid, cmd);
+    result = FALSE;
+  } else if (GetTotalOrdersByType(sid) >= GetMaxOrdersPerType()) {
+    err = sname[sid] + ": Maximum open and pending orders per type reached the limit (MaxOrdersPerType).";
+    if (VerboseErrors && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
+    OrderQueueAdd(sid, cmd);
+    result = FALSE;
+  } else if (!CheckFreeMargin(cmd, volume)) {
+    err = "No money to open more orders.";
+    if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + last_err);
+    if (VerboseErrors && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
+    result = FALSE;
+  } else if (!CheckMinPipGap(sid)) {
+    err = StringFormat("%s: Not executing order, because the gap is too small [MinPipGap].", sname[sid]);
+    if (VerboseTrace && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
+    result = FALSE;
+  }
+  #ifdef __advanced__
+  if (ApplySpreadLimits && !CheckSpreadLimit(sid)) {
+    err = StringFormat("%s: Not executing order, because the spread is too high. (spread = %.1f pips)", sname[sid], curr_spread);
+    if (VerboseTrace && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
+    result = FALSE;
+  }
+  #endif
+  if (err != last_err) last_err = err;
+  return (result);
 }
 
 /*
@@ -3185,7 +3192,6 @@ int ExecuteOrder(int cmd, double volume, int order_type, string order_comment = 
  */
 bool CheckSpreadLimit(int sid) {
   double spread_limit = If(conf[sid][SPREAD_LIMIT] > 0, MathMin(conf[sid][SPREAD_LIMIT], MaxSpreadToTrade), MaxSpreadToTrade);
-  double curr_spread = PointsToPips(GetMarketSpread(TRUE));
   return curr_spread <= spread_limit;
 }
 
@@ -3202,10 +3208,12 @@ bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = TRUE)
   result = OrderClose(ticket_no, OrderLots(), close_price, max_order_slippage, GetOrderColor());
   // if (VerboseTrace) Print(__FUNCTION__ + "(): CloseOrder request. Reason: " + reason + "; Result=" + result + " @ " + TimeCurrent() + "(" + TimeToStr(TimeCurrent()) + "), ticket# " + ticket_no);
   if (result) {
+    total_orders--;
     last_close_profit = GetOrderProfit();
     if (SoundAlert) PlaySound(SoundFileAtClose);
     // TaskAddCalcStats(ticket_no); // Already done on CheckHistory().
     if (VerboseDebug) Print(__FUNCTION__, "(): Closed order " + ticket_no + " with profit " + GetOrderProfit() + " pips, reason: " + ReasonIdToText(reason_id) + "; " + GetOrderTextDetails());
+    if (QueueOrdersAIActive) OrderQueueProcess();
   } else {
     err_code = GetLastError();
     if (VerboseErrors) Print(__FUNCTION__, "(): Error: Ticket: ", ticket_no, "; Error: ", GetErrorText(err_code));
@@ -5039,6 +5047,7 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
    // if (loss_or_profit > 0) method = AC_TrailingProfitMethod; else if (loss_or_profit < 0) method = AC_TrailingStopMethod; // Testing.
    int timeframe = GetStrategyTimeframe(order_type);
    int period = TfToPeriod(timeframe);
+   int symbol = If(existing, OrderSymbol(), _Symbol);
 
 /*
   MA1+MA5+MA15+MA30 backtest log (auto,ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, 9,5mln ticks, quality 25%]:
@@ -5108,7 +5117,7 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
        new_value = default_trail;
        break;
      case T_CLOSE_PREV: // TODO
-       diff = MathAbs(Open[CURR] - iClose(_Symbol, timeframe, PREV));
+       diff = MathAbs(Open[CURR] - iClose(symbol, timeframe, PREV));
        new_value = Open[CURR] + diff * factor;
        break;
      case T_2_BARS_PEAK: // 3
@@ -5147,7 +5156,16 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
        diff = MathMax(highest200 - Open[CURR], Open[CURR] - lowest200);
        new_value = Open[CURR] + diff/2 * factor;
        break;
-     case T_HALF_PEAK:
+     case T_HALF_PEAK_OPEN:
+       if (existing) {
+         // Get the number of bars for the timeframe since open. Zero means that the order was opened during the current bar.
+         int BarShiftOfTradeOpen = iBarShift(symbol, timeframe, OrderOpenTime(), FALSE);
+         // Get the high price from the bar with the given timeframe index
+         double highest_open = GetPeakPrice(timeframe, MODE_HIGH, BarShiftOfTradeOpen + 1);
+         double lowest_open = GetPeakPrice(timeframe, MODE_LOW, BarShiftOfTradeOpen + 1);
+         diff = MathMax(highest_open - Open[CURR], Open[CURR] - lowest_open);
+         new_value = Open[CURR] + diff/2 * factor;
+       }
        break;
      case T_MA_F_PREV: // 9: MA Small (Previous). The worse so far for MA.
        UpdateIndicator(MA, timeframe);
@@ -5412,11 +5430,11 @@ double GetClosePrice(int op_type = EMPTY_VALUE) {
 /*
  * Get peak price at given number of bars.
  */
-double GetPeakPrice(int timeframe, int mode, int bars) {
+double GetPeakPrice(int timeframe, int mode, int bars, int index = CURR) {
   int ibar = -1;
   double peak_price = Open[0];
-  if (mode == MODE_HIGH) ibar = iHighest(_Symbol, timeframe, MODE_HIGH, bars, CURR);
-  if (mode == MODE_LOW)  ibar =  iLowest(_Symbol, timeframe, MODE_LOW,  bars, CURR);
+  if (mode == MODE_HIGH) ibar = iHighest(_Symbol, timeframe, MODE_HIGH, bars, index);
+  if (mode == MODE_LOW)  ibar =  iLowest(_Symbol, timeframe, MODE_LOW,  bars, index);
   if (ibar == -1 && VerboseTrace) { err_code = GetLastError(); Print(__FUNCTION__ + "(): " + ErrorDescription(err_code)); return FALSE; }
   if (mode == MODE_HIGH) {
     return iHigh(_Symbol, timeframe, ibar);
@@ -5815,7 +5833,7 @@ double GetMarketSpread(bool in_points = FALSE) {
   // return MarketInfo(Symbol(), MODE_SPREAD) / MathPow(10, Digits - PipDigits);
   double spread = If(in_points, SymbolInfoInteger(Symbol(), SYMBOL_SPREAD), Ask - Bid);
   if (in_points) CheckStats(spread, MAX_SPREAD);
-  if (VerboseTrace) PrintFormat("%s(): Spread: %f (%s)", __FUNCTION__, spread, IfTxt(in_points, "points", "pips"));
+  // if (VerboseTrace) PrintFormat("%s(): Spread: %f (%s)", __FUNCTION__, spread, IfTxt(in_points, "points", "pips"));
   return spread;
 }
 
@@ -6298,6 +6316,7 @@ bool InitializeVariables() {
   market_margininit = MarketInfo(_Symbol, MODE_MARGININIT); // Initial margin requirements for 1 lot
   market_stoplevel = MarketInfo(_Symbol, MODE_STOPLEVEL); // Market stop level in points.
   // market_stoplevel=(int)SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL);
+  curr_spread = ValueToPips(GetMarketSpread());
   LastAsk = Ask; LastBid = Bid;
   AccCurrency = AccountCurrency();
 
@@ -6319,8 +6338,9 @@ bool InitializeVariables() {
   ArrayInitialize(weekly,  0); // Reset weekly stats.
   ArrayInitialize(monthly, 0); // Reset monthly stats.
   ArrayInitialize(tickets, 0); // Reset ticket list.
-  ArrayInitialize(worse_strategy, EMPTY);
-  ArrayInitialize(best_strategy, EMPTY);
+  ArrayInitialize(worse_strategy, EMPTY); // Reset worse strategy pointer.
+  ArrayInitialize(best_strategy, EMPTY); // Reset best strategy pointer.
+  ArrayInitialize(order_queue, EMPTY); // Reset order queue.
   return (TRUE);
 }
 
@@ -6516,6 +6536,8 @@ bool InitStrategy(int key, string name, bool active, int indicator, int timefram
 void UpdateVariables() {
   time_current = TimeCurrent();
   last_close_profit = EMPTY;
+  total_orders = GetTotalOrders();
+  curr_spread = ValueToPips(GetMarketSpread());
 }
 
 /* END: VARIABLE FUNCTIONS */
@@ -6731,6 +6753,33 @@ double GetDefaultLotFactor() {
 /* BEGIN: STRATEGY FUNCTIONS */
 
 /*
+ * Calculate lot size for specific strategy.
+ */
+double GetStrategyLotSize(int sid, int cmd) {
+  double trade_lot = If(conf[sid][LOT_SIZE], conf[sid][LOT_SIZE], lot_size) * If(conf[sid][FACTOR], conf[sid][FACTOR], 1.0);
+  #ifdef __advanced__
+  if (Boosting_Enabled) {
+    double pf = GetStrategyProfitFactor(sid);
+    if (BoostByProfitFactor && pf > 1.0) trade_lot *= MathMax(GetStrategyProfitFactor(sid), 1.0);
+    else if (HandicapByProfitFactor && pf < 1.0) trade_lot *= MathMin(GetStrategyProfitFactor(sid), 1.0);
+  }
+  #endif
+  if (Boosting_Enabled && CheckTrend() == cmd && BoostTrendFactor != 1.0) {
+    trade_lot *= BoostTrendFactor;
+  }
+  return NormalizeLots(trade_lot);
+}
+
+/*
+ * Get strategy comment for opened order.
+ */
+string GetStrategyComment(int sid, string sep = "|") {
+  string comment = sname[sid];
+  comment =+ StringFormat("%s spread: %.1f", sep, curr_spread);
+  return comment;
+}
+
+/*
  * Get strategy report based on the total orders.
  */
 string GetStrategyReport(string sep = "\n") {
@@ -6792,9 +6841,10 @@ void UpdateStrategyLotSize() {
  */
 double GetStrategyProfitFactor(int id) {
   if (info[id][TOTAL_ORDERS] > 10 && stats[id][TOTAL_GROSS_LOSS] < 0) {
-    return stats[id][TOTAL_GROSS_PROFIT] / -stats[id][TOTAL_GROSS_LOSS];
-  } else
+    return (double)(stats[id][TOTAL_GROSS_PROFIT] / -stats[id][TOTAL_GROSS_LOSS]);
+  } else {
     return 1.0;
+  }
 }
 
 /*
@@ -7992,12 +8042,132 @@ void CheckHistory() {
 
 /* END: TICKET LIST/HISTORY CHECK FUNCTIONS */
 
+/* BEGIN: ORDER QUEUE FUNCTIONS */
+
+/*
+ * Process AI queue of orders to see if we can open any trades.
+ */
+bool OrderQueueProcess(int method = EMPTY) {
+  bool result = FALSE;
+  int queue_size = OrderQueueCount();
+  int sorted_queue[][2];
+  int cmd, sid; double volume;
+  if (method == EMPTY) method = QueueOrdersAIMethod;
+  if (queue_size > 1) {
+    int selected_qid = EMPTY, curr_qid = EMPTY;
+    ArrayResize(sorted_queue, queue_size);
+    for (int i = 0; i < queue_size; i++) {
+      curr_qid = OrderQueueNext(curr_qid);
+      if (curr_qid == EMPTY) break;
+      sorted_queue[i][0] = GetOrderQueueKeyValue(order_queue[curr_qid][Q_SID], method, curr_qid);
+      sorted_queue[i][1] = curr_qid++;
+    }
+    // Sort array by first dimension (descending).
+    ArraySort(sorted_queue, WHOLE_ARRAY, 0, MODE_DESCEND);
+    for (i = 0; i < queue_size; i++) {
+      selected_qid = sorted_queue[i][1];
+      cmd = order_queue[selected_qid][Q_CMD];
+      sid = order_queue[selected_qid][Q_SID];
+      volume = GetStrategyLotSize(sid, cmd);
+      if (OpenOrderIsAllowed(cmd, sid, volume)) {
+        string comment = GetStrategyComment(sid) + " [AIQueued]";
+        result = ExecuteOrder(cmd, sid, volume);
+        break;
+      }
+    }
+  }
+  return result;
+}
+
+/*
+ * Get key based on strategy id in order to prioritize the queue.
+ */
+int GetOrderQueueKeyValue(int sid, int method, int qid) {
+  int key = 0;
+  switch (method) {
+    case  0: key = 0; break;
+    case  1: key = GetStrategyTimeframe(sid); break;
+    case  2: key = GetStrategyProfitFactor(sid) * 100; break;
+    case  3: key = GetStrategyLotSize(sid, order_queue[qid][Q_CMD]) * 100; break;
+    case  4: key = info[sid][OPEN_ORDERS]; break;
+    case  5: key = info[sid][TOTAL_ORDERS]; break;
+    case  6: key = info[sid][TOTAL_ORDERS_WON]; break;
+    case  7: key = -info[sid][TOTAL_ORDERS_LOSS]; break; // TODO: To test.
+    case  8: key = conf[sid][FACTOR]; break;
+    case  9: key = conf[sid][SPREAD_LIMIT]; break;
+    case 10: key = stats[sid][AVG_SPREAD]; break; // TODO: To test.
+    case 11: key = stats[sid][DAILY_PROFIT]; break;
+    case 12: key = stats[sid][WEEKLY_PROFIT]; break;
+    case 13: key = stats[sid][MONTHLY_PROFIT]; break; // TODO: To test.
+    case 14: key = stats[sid][TOTAL_GROSS_PROFIT]; break; // TODO: To test.
+    case 15: key = stats[sid][TOTAL_NET_PROFIT]; break;
+  }
+  // Message("Key: " + key + " for sid: " + sid + ", qid: " + qid);
+
+  return key;
+}
+
+int OrderQueueNext(int index = EMPTY) {
+  if (index == EMPTY) index = 0;
+  for (int qid = index; qid < ArrayRange(order_queue, 0); qid++)
+    if (order_queue[qid][Q_SID] != EMPTY) { return qid; }
+  return (EMPTY);
+}
+
+/*
+ * Add new order to the queue.
+ */
+bool OrderQueueAdd(int sid, int cmd) {
+  bool result = FALSE;
+  int qid = EMPTY, size = ArrayRange(order_queue, 0);
+  for (int i = 0; i < size; i++) {
+    if (order_queue[i][Q_SID] == sid && order_queue[i][Q_CMD] == cmd) {
+      order_queue[i][Q_TOTAL]++;
+      if (VerboseTrace) PrintFormat("%s(): Added qid %d with sid: %d, cmd: %d, time: %d, total: %d", __FUNCTION__, i, sid, cmd, time_current, order_queue[i][Q_TOTAL]);
+      return (TRUE); // Increase the existing if it's there.
+    }
+    if (order_queue[i][Q_SID] == EMPTY) { qid = i; break; } // Find the empty qid.
+  }
+  if (qid == EMPTY && size < 1000) { ArrayResize(order_queue, size + FINAL_ORDER_QUEUE_ENTRY); qid = size; }
+  if (qid == EMPTY) {
+    return (FALSE);
+  } else {
+    order_queue[qid][Q_SID] = sid;
+    order_queue[qid][Q_CMD] = cmd;
+    order_queue[qid][Q_TIME] = time_current;
+    order_queue[qid][Q_TOTAL] = 1;
+    result = TRUE;
+    if (VerboseTrace) PrintFormat("%s(): Added qid: %d with sid: %d, cmd: %d, time: %d, total: %d", __FUNCTION__, qid, sid, cmd, time_current, 1);
+  }
+  return result;
+}
+
+/*
+ * Clear queue from the orders.
+ */
+void OrderQueueClear() {
+  if (VerboseTrace) Print("Calling " + __FUNCTION__ + "().");
+  ArrayFill(order_queue, 0, ArraySize(order_queue), EMPTY);
+}
+
+/*
+ * Check how many orders are in the queue.
+ */
+int OrderQueueCount() {
+  int counter = 0;
+  for (int i = 0; i < ArrayRange(order_queue, 0); i++)
+    if (order_queue[i][Q_SID] != EMPTY) counter++;
+  return (counter);
+}
+
+/* END: ORDER QUEUE FUNCTIONS */
+
 /* BEGIN: TASK FUNCTIONS */
 
 /*
  * Add new closing order task.
  */
-bool TaskAddOrderOpen(int cmd, int volume, int order_type, string order_comment) {
+bool TaskAddOrderOpen(int cmd, int volume, int order_type) {
   int key = cmd+volume+order_type;
   int job_id = TaskFindEmptySlot(cmd+volume+order_type);
   if (job_id >= 0) {
@@ -8005,9 +8175,9 @@ bool TaskAddOrderOpen(int cmd, int volume, int order_type, string order_comment)
     todo_queue[job_id][1] = TASK_ORDER_OPEN;
     todo_queue[job_id][2] = MaxTries; // Set number of retries.
     todo_queue[job_id][3] = cmd;
-    todo_queue[job_id][4] = volume;
+    todo_queue[job_id][4] = EMPTY; // FIXME: Not used currently.
     todo_queue[job_id][5] = order_type;
-    todo_queue[job_id][6] = order_comment;
+    // todo_queue[job_id][6] = order_comment; // FIXME: Not used currently.
     // Print(__FUNCTION__ + "(): Added task (", job_id, ") for ticket: ", todo_queue[job_id][0], ", type: ", todo_queue[job_id][1], " (", todo_queue[job_id][3], ").");
     return TRUE;
   } else {
@@ -8111,10 +8281,10 @@ bool TaskRun(int job_id) {
   switch (task_type) {
     case TASK_ORDER_OPEN:
        int cmd = todo_queue[job_id][3];
-       double volume = todo_queue[job_id][4];
-       int order_type = todo_queue[job_id][5];
-       string order_comment = todo_queue[job_id][6];
-       result = ExecuteOrder(cmd, volume, order_type, order_comment, FALSE);
+       // double volume = todo_queue[job_id][4]; // FIXME: Not used as we can't use double to integer array.
+       int sid = todo_queue[job_id][5];
+       // string order_comment = todo_queue[job_id][6]; // FIXME: Not used as we can't use double to integer array.
+       result = ExecuteOrder(cmd, sid, EMPTY, EMPTY, FALSE);
       break;
     case TASK_ORDER_CLOSE:
         int reason_id = todo_queue[job_id][3];
