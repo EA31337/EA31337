@@ -53,7 +53,7 @@
   #define ea_name    "EA31337 Lite"
 #endif
 #define ea_desc    "Multi-strategy advanced trading robot."
-#define ea_version "1.065"
+#define ea_version "1.066"
 #define ea_build   __DATETIME__ // FIXME: It's empty
 #define ea_link    "http://www.ea31337.com"
 #define ea_author  "kenorb"
@@ -69,9 +69,26 @@
 //+------------------------------------------------------------------+
 //| EA includes.
 //+------------------------------------------------------------------+
-#include <stderror.mqh>
-#include <stdlib.mqh> // Used for: ErrorDescription(), RGB(), CompareDoubles(), DoubleToStrMorePrecision(), IntegerToHexString()
-// #include "debug.mqh"
+#ifdef __MQL4__
+   #include <stdlib.mqh> // Used for: ErrorDescription(), RGB(), CompareDoubles(), DoubleToStrMorePrecision(), IntegerToHexString()
+   #include <stderror.mqh>
+   // #include "debug.mqh"
+#else
+   #include <StdLibErr.mqh>
+   #include <Trade\AccountInfo.mqh>
+#endif
+
+//+------------------------------------------------------------------+
+//| Define constants.
+//+------------------------------------------------------------------+
+
+#ifdef __MQL5__
+   #define EMPTY WRONG_VALUE;
+   #define FALSE false;
+   #define TRUE true;
+#endif
+
+#define TODO NULL;
 
 //+------------------------------------------------------------------+
 //| EA enumerations.
@@ -481,8 +498,36 @@ enum ENUM_INDICATOR_INDEX { // Define indicator constants.
   FINAL_INDICATOR_INDEX_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };
 
+// Indicator enumerations.
 enum ENUM_MA { FAST = 0, MEDIUM = 1, SLOW = 2, FINAL_MA_ENTRY };
-enum ENUM_ALLIGATOR { JAW = MODE_GATORJAW-1, TEETH = MODE_GATORTEETH-1, LIPS = MODE_GATORLIPS-1 };
+#ifdef __MQL4__
+   enum ENUM_LINE { UPPER = MODE_UPPER, LOWER = MODE_LOWER, FINAL_LINE_ENTRY };
+#else
+   enum ENUM_LINE { UPPER = UPPER_LINE, LOWER = LOWER_LINE, FINAL_LINE_ENTRY };
+#endif
+#ifdef __MQL4__
+   enum ENUM_ALLIGATOR { JAW = MODE_GATORJAW, TEETH = MODE_GATORTEETH, LIPS = MODE_GATORLIPS, FINAL_ALLIGATOR_ENTRY };
+#else
+   enum ENUM_ALLIGATOR { JAW = GATORJAW_LINE, TEETH = GATORTEETH_LINE, LIPS = GATORLIPS_LINE, FINAL_ALLIGATOR_ENTRY };
+#endif
+#ifdef __MQL4__
+   enum ENUM_ADX { ADX_MAIN = MODE_MAIN, ADX_PLUSDI = MODE_PLUSDI, ADX_MINUSDI = MODE_MINUSDI, FINAL_ADX_ENTRY };
+#else
+   enum ENUM_ADX { ADX_MAIN = MAIN_LINE, ADX_PLUSDI = PLUSDI_LINE, ADX_MINUSDI = MINUSDI_LINE, FINAL_ADX_ENTRY };
+#endif
+#ifdef __MQL4__
+   enum ENUM_BANDS { BANDS_BASE = MODE_MAIN, BANDS_UPPER = MODE_UPPER, BANDS_LOWER = MODE_LOWER, FINAL_BANDS_ENTRY };
+#else
+   enum ENUM_BANDS { BANDS_BASE = BASE_LINE, BANDS_UPPER = UPPER_BAND, BANDS_LOWER = LOWER_BAND, FINAL_BANDS_ENTRY };
+#endif
+#ifdef __MQL4__
+  enum ENUM_SLINE { MAIN = MODE_MAIN, SIGNAL_LINE = MODE_SIGNAL, FINAL_SLINE_ENTRY };
+#else
+  enum ENUM_SLINE { MAIN = MAIN_LINE, SIGNAL = SIGNAL_LINE, FINAL_SLINE_ENTRY };
+#endif
+#ifdef __MQL4__
+   enum ENUM_ICHIMOKU { TENKANSEN_LINE = MODE_TENKANSEN, KIJUNSEN_LINE = MODE_KIJUNSEN, SENKOUSPANA_LINE = MODE_SENKOUSPANA, SENKOUSPANB_LINE = MODE_SENKOUSPANB, CHIKOUSPAN_LINE = MODE_CHIKOUSPAN };
+#endif
 
 //+------------------------------------------------------------------+
 //| User input variables.
@@ -807,9 +852,15 @@ extern ENUM_ACTION_TYPE Action_On_Condition_12     = A_NONE;
 //+------------------------------------------------------------------+
 extern string __AC_Parameters__ = "-- Settings for the Bill Williams' Accelerator/Decelerator oscillator --";
 #ifndef __disabled__
-  extern bool AC1_Active = TRUE, AC5_Active = TRUE, AC15_Active = TRUE, AC30_Active = TRUE; // Enable AC-based strategy for specific timeframe.
+  extern bool AC1_Active = TRUE;
+  extern bool AC5_Active = TRUE;
+  extern bool AC15_Active = TRUE;
+  extern bool AC30_Active = TRUE; // Enable AC-based strategy for specific timeframe.
 #else
-  extern bool AC1_Active = FALSE, AC5_Active = FALSE, AC15_Active = FALSE, AC30_Active = FALSE;
+  extern bool AC1_Active = FALSE;
+  extern bool AC5_Active = FALSE;
+  extern bool AC15_Active = FALSE;
+  extern bool AC30_Active = FALSE;
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE AC_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for AC. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
@@ -850,9 +901,15 @@ extern int AC30_OpenMethod = 0; // Valid range: 0-x.
 //+------------------------------------------------------------------+
 extern string __AD_Parameters__ = "-- Settings for the Accumulation/Distribution indicator --";
 #ifndef __disabled__
-  extern bool AD1_Active = TRUE, AD5_Active = TRUE, AD15_Active = TRUE, AD30_Active = TRUE; // Enable AD-based strategy for specific timeframe.
+  extern bool AD1_Active = TRUE;
+  extern bool AD5_Active = TRUE;
+  extern bool AD15_Active = TRUE;
+  extern bool AD30_Active = TRUE; // Enable AD-based strategy for specific timeframe.
 #else
-  extern bool AD1_Active = FALSE, AD5_Active = FALSE, AD15_Active = FALSE, AD30_Active = FALSE;
+  extern bool AD1_Active = FALSE;
+  extern bool AD5_Active = FALSE;
+  extern bool AD15_Active = FALSE;
+  extern bool AD30_Active = FALSE;
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE AD_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for AD. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
@@ -893,9 +950,15 @@ extern int AD30_OpenMethod = 0; // Valid range: 0-x.
 //+------------------------------------------------------------------+
 extern string __ADX_Parameters__ = "-- Settings for the Average Directional Movement Index indicator --";
 #ifndef __disabled__
-  extern bool ADX1_Active = TRUE, ADX5_Active = TRUE, ADX15_Active = TRUE, ADX30_Active = TRUE; // Enable ADX-based strategy for specific timeframe.
+  extern bool ADX1_Active = TRUE;
+  extern bool ADX5_Active = TRUE;
+  extern bool ADX15_Active = TRUE;
+  extern bool ADX30_Active = TRUE; // Enable ADX-based strategy for specific timeframe.
 #else
-  extern bool ADX1_Active = FALSE, ADX5_Active = FALSE, ADX15_Active = FALSE, ADX30_Active = FALSE;
+  extern bool ADX1_Active = FALSE;
+  extern bool ADX5_Active = FALSE;
+  extern bool ADX15_Active = FALSE;
+  extern bool ADX30_Active = FALSE;
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE ADX_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for ADX. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
@@ -938,9 +1001,15 @@ extern int ADX30_OpenMethod = 0; // Valid range: 0-x.
 //+------------------------------------------------------------------+
 extern string __Alligator_Parameters__ = "-- Settings for the Alligator indicator --";
 #ifndef __disabled__
-  extern bool Alligator1_Active = TRUE, Alligator5_Active = TRUE, Alligator15_Active = TRUE, Alligator30_Active = TRUE; // Enable Alligator custom-based strategy for specific timeframe.
+  extern bool Alligator1_Active = TRUE;
+  extern bool Alligator5_Active = TRUE;
+  extern bool Alligator15_Active = TRUE;
+  extern bool Alligator30_Active = TRUE; // Enable Alligator custom-based strategy for specific timeframe.
 #else
-  extern bool Alligator1_Active = FALSE, Alligator5_Active = FALSE, Alligator15_Active = FALSE, Alligator30_Active = FALSE;
+  extern bool Alligator1_Active = FALSE;
+  extern bool Alligator5_Active = FALSE;
+  extern bool Alligator15_Active = FALSE;
+  extern bool Alligator30_Active = FALSE;
 #endif
 // extern ENUM_TIMEFRAMES Alligator_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int Alligator_Jaw_Period = 22; // Blue line averaging period (Alligator's Jaw).
@@ -994,9 +1063,15 @@ extern int Alligator30_OpenMethod  = 13; // Valid range: 0-63. This value is use
 //+------------------------------------------------------------------+
 extern string __ATR_Parameters__ = "-- Settings for the Average True Range indicator --";
 #ifndef __disabled__
-  extern bool ATR1_Active = TRUE, ATR5_Active = TRUE, ATR15_Active = TRUE, ATR30_Active = TRUE; // Enable ATR-based strategy for specific timeframe.
+  extern bool ATR1_Active = TRUE;
+  extern bool ATR5_Active = TRUE;
+  extern bool ATR15_Active = TRUE;
+  extern bool ATR30_Active = TRUE; // Enable ATR-based strategy for specific timeframe.
 #else
-  extern bool ATR1_Active = FALSE, ATR5_Active = FALSE, ATR15_Active = FALSE, ATR30_Active = FALSE;
+  extern bool ATR1_Active = FALSE;
+  extern bool ATR5_Active = FALSE;
+  extern bool ATR15_Active = FALSE;
+  extern bool ATR30_Active = FALSE;
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE ATR_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for ATR. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
@@ -1039,9 +1114,15 @@ extern int ATR30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTA
 //+------------------------------------------------------------------+
 extern string __Awesome_Parameters__ = "-- Settings for the Awesome oscillator --";
 #ifndef __disabled__
-  extern bool Awesome1_Active = TRUE, Awesome5_Active = TRUE, Awesome15_Active = TRUE, Awesome30_Active = TRUE; // Enable Awesome-based strategy for specific timeframe.
+  extern bool Awesome1_Active = TRUE;
+  extern bool Awesome5_Active = TRUE;
+  extern bool Awesome15_Active = TRUE;
+  extern bool Awesome30_Active = TRUE; // Enable Awesome-based strategy for specific timeframe.
 #else
-  extern bool Awesome1_Active = FALSE, Awesome5_Active = FALSE, Awesome15_Active = FALSE, Awesome30_Active = FALSE;
+  extern bool Awesome1_Active = FALSE;
+  extern bool Awesome5_Active = FALSE;
+  extern bool Awesome15_Active = FALSE;
+  extern bool Awesome30_Active = FALSE;
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE Awesome_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Awesome. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
@@ -1082,9 +1163,15 @@ extern int Awesome30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FR
 //+------------------------------------------------------------------+
 extern string __Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --";
 #ifndef __disabled__
-  extern bool Bands1_Active = TRUE, Bands5_Active = TRUE, Bands15_Active = TRUE, Bands30_Active = TRUE; // Enable Bands-based strategy fpr specific timeframe.
+  extern bool Bands1_Active = TRUE;
+  extern bool Bands5_Active = TRUE;
+  extern bool Bands15_Active = TRUE;
+  extern bool Bands30_Active = TRUE; // Enable Bands-based strategy fpr specific timeframe.
 #else
-  extern bool Bands1_Active = FALSE, Bands5_Active = FALSE, Bands15_Active = FALSE, Bands30_Active = FALSE;
+  extern bool Bands1_Active = FALSE;
+  extern bool Bands5_Active = FALSE;
+  extern bool Bands15_Active = FALSE;
+  extern bool Bands30_Active = FALSE;
 #endif
 extern int Bands_Period = 26; // Averaging period to calculate the main line.
 extern ENUM_APPLIED_PRICE Bands_Applied_Price = PRICE_MEDIAN; // Bands applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
@@ -1141,9 +1228,15 @@ extern int Bands30_OpenMethod = 0; // Valid range: 0-255. Previously: 417. Used 
 //+------------------------------------------------------------------+
 extern string __BPower_Parameters__ = "-- Settings for the Bulls/Bears Power indicator --";
 #ifndef __disabled__
-  extern bool BPower1_Active = TRUE, BPower5_Active = TRUE, BPower15_Active = TRUE, BPower30_Active = TRUE; // Enable BPower-based strategy for specific timeframe.
+  extern bool BPower1_Active = TRUE;
+  extern bool BPower5_Active = TRUE;
+  extern bool BPower15_Active = TRUE;
+  extern bool BPower30_Active = TRUE; // Enable BPower-based strategy for specific timeframe.
 #else
-  extern bool BPower1_Active = FALSE, BPower5_Active = FALSE, BPower15_Active = FALSE, BPower30_Active = FALSE;
+  extern bool BPower1_Active = FALSE;
+  extern bool BPower5_Active = FALSE;
+  extern bool BPower15_Active = FALSE;
+  extern bool BPower30_Active = FALSE;
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE BPower_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for BPower. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
@@ -1186,9 +1279,15 @@ extern int BPower30_OpenMethod = 0; // Valid range: 0-x. // Optimized for C_FRAC
 //+------------------------------------------------------------------+
 extern string __Breakage_Parameters__ = "-- Settings for the custom Breakage strategy --";
 #ifndef __disabled__
-  extern bool Breakage1_Active = TRUE, Breakage5_Active = TRUE, Breakage15_Active = TRUE, Breakage30_Active = TRUE; // Enable Breakage-based strategy for specific timeframe.
+  extern bool Breakage1_Active = TRUE;
+  extern bool Breakage5_Active = TRUE;
+  extern bool Breakage15_Active = TRUE;
+  extern bool Breakage30_Active = TRUE; // Enable Breakage-based strategy for specific timeframe.
 #else
-  extern bool Breakage1_Active = FALSE, Breakage5_Active = FALSE, Breakage15_Active = FALSE, Breakage30_Active = FALSE;
+  extern bool Breakage1_Active = FALSE;
+  extern bool Breakage5_Active = FALSE;
+  extern bool Breakage15_Active = FALSE;
+  extern bool Breakage30_Active = FALSE;
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE Breakage_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Breakage. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
@@ -1229,9 +1328,15 @@ extern int Breakage30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_F
 //+------------------------------------------------------------------+
 extern string __BWMFI_Parameters__ = "-- Settings for the Market Facilitation Index indicator --";
 #ifndef __disabled__
-  extern bool BWMFI1_Active = TRUE, BWMFI5_Active = TRUE, BWMFI15_Active = TRUE, BWMFI30_Active = TRUE; // Enable BWMFI-based strategy for specific timeframe.
+  extern bool BWMFI1_Active = TRUE;
+  extern bool BWMFI5_Active = TRUE;
+  extern bool BWMFI15_Active = TRUE;
+  extern bool BWMFI30_Active = TRUE; // Enable BWMFI-based strategy for specific timeframe.
 #else
-  extern bool BWMFI1_Active = FALSE, BWMFI5_Active = FALSE, BWMFI15_Active = FALSE, BWMFI30_Active = FALSE;
+  extern bool BWMFI1_Active = FALSE;
+  extern bool BWMFI5_Active = FALSE;
+  extern bool BWMFI15_Active = FALSE;
+  extern bool BWMFI30_Active = FALSE;
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE BWMFI_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for BWMFI. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
@@ -1272,9 +1377,15 @@ extern int BWMFI30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRAC
 //+------------------------------------------------------------------+
 extern string __CCI_Parameters__ = "-- Settings for the Commodity Channel Index indicator --";
 #ifndef __disabled__
-  extern bool CCI1_Active = TRUE, CCI5_Active = TRUE, CCI15_Active = TRUE, CCI30_Active = TRUE; // Enable CCI-based strategy for specific timeframe.
+  extern bool CCI1_Active = TRUE;
+  extern bool CCI5_Active = TRUE;
+  extern bool CCI15_Active = TRUE;
+  extern bool CCI30_Active = TRUE; // Enable CCI-based strategy for specific timeframe.
 #else
-  extern bool CCI1_Active = FALSE, CCI5_Active = FALSE, CCI15_Active = FALSE, CCI30_Active = FALSE;
+  extern bool CCI1_Active = FALSE;
+  extern bool CCI5_Active = FALSE;
+  extern bool CCI15_Active = FALSE;
+  extern bool CCI30_Active = FALSE;
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE CCI_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for CCI. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
@@ -1318,9 +1429,15 @@ extern int CCI30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTA
 //+------------------------------------------------------------------+
 extern string __DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --";
 #ifndef __disabled__
-  extern bool DeMarker1_Active = TRUE, DeMarker5_Active = TRUE, DeMarker15_Active = TRUE, DeMarker30_Active = TRUE; // Enable DeMarker-based strategy for specific timeframe.
+  extern bool DeMarker1_Active = TRUE;
+  extern bool DeMarker5_Active = TRUE;
+  extern bool DeMarker15_Active = TRUE;
+  extern bool DeMarker30_Active = TRUE; // Enable DeMarker-based strategy for specific timeframe.
 #else
-  extern bool DeMarker1_Active = FALSE, DeMarker5_Active = FALSE, DeMarker15_Active = FALSE, DeMarker30_Active = FALSE;
+  extern bool DeMarker1_Active = FALSE;
+  extern bool DeMarker5_Active = FALSE;
+  extern bool DeMarker15_Active = FALSE;
+  extern bool DeMarker30_Active = FALSE;
 #endif
 //extern ENUM_TIMEFRAMES DeMarker_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int DeMarker_Period = 24; // DeMarker averaging period for calculation.
@@ -1375,9 +1492,15 @@ extern int DeMarker30_OpenMethod = 0; // Valid range: 0-31. Used for C_DEMARKER_
 //+------------------------------------------------------------------+
 extern string __Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --";
 #ifndef __disabled__
-  extern bool Envelopes1_Active = TRUE, Envelopes5_Active = TRUE, Envelopes15_Active = TRUE, Envelopes30_Active = TRUE; // Enable Envelopes-based strategy fpr specific timeframe.
+  extern bool Envelopes1_Active = TRUE;
+  extern bool Envelopes5_Active = TRUE;
+  extern bool Envelopes15_Active = TRUE;
+  extern bool Envelopes30_Active = TRUE; // Enable Envelopes-based strategy fpr specific timeframe.
 #else
-  extern bool Envelopes1_Active = FALSE, Envelopes5_Active = FALSE, Envelopes15_Active = FALSE, Envelopes30_Active = FALSE;
+  extern bool Envelopes1_Active = FALSE;
+  extern bool Envelopes5_Active = FALSE;
+  extern bool Envelopes15_Active = FALSE;
+  extern bool Envelopes30_Active = FALSE;
 #endif
 extern int Envelopes_MA_Period = 28; // Averaging period to calculate the main line.
 extern ENUM_MA_METHOD Envelopes_MA_Method = MODE_SMA; // MA method (See: ENUM_MA_METHOD).
@@ -1435,9 +1558,15 @@ extern int Envelopes30_OpenMethod = 4; // Valid range: 0-127. Set 0 to default. 
 //+------------------------------------------------------------------+
 extern string __Force_Parameters__ = "-- Settings for the Force Index indicator --";
 #ifndef __disabled__
-  extern bool Force1_Active = TRUE, Force5_Active = TRUE, Force15_Active = TRUE, Force30_Active = TRUE; // Enable Force-based strategy for specific timeframe.
+  extern bool Force1_Active = TRUE;
+  extern bool Force5_Active = TRUE;
+  extern bool Force15_Active = TRUE;
+  extern bool Force30_Active = TRUE; // Enable Force-based strategy for specific timeframe.
 #else
-  extern bool Force1_Active = FALSE, Force5_Active = FALSE, Force15_Active = FALSE, Force30_Active = FALSE;
+  extern bool Force1_Active = FALSE;
+  extern bool Force5_Active = FALSE;
+  extern bool Force15_Active = FALSE;
+  extern bool Force30_Active = FALSE;
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE Force_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Force. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
@@ -1481,9 +1610,15 @@ extern int Force30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRAC
 //+------------------------------------------------------------------+
 extern string __Fractals_Parameters__ = "-- Settings for the Fractals indicator --";
 #ifndef __disabled__
-  extern bool Fractals1_Active = TRUE, Fractals5_Active = TRUE, Fractals15_Active = TRUE, Fractals30_Active = TRUE; // Enable Fractals-based strategy for specific timeframe.
+  extern bool Fractals1_Active = TRUE;
+  extern bool Fractals5_Active = TRUE;
+  extern bool Fractals15_Active = TRUE;
+  extern bool Fractals30_Active = TRUE; // Enable Fractals-based strategy for specific timeframe.
 #else
-  extern bool Fractals1_Active = FALSE, Fractals5_Active = FALSE, Fractals15_Active = FALSE, Fractals30_Active = FALSE;
+  extern bool Fractals1_Active = FALSE;
+  extern bool Fractals5_Active = FALSE;
+  extern bool Fractals15_Active = FALSE;
+  extern bool Fractals30_Active = FALSE;
 #endif
 //extern bool Fractals_CloseOnChange = TRUE; // Close opposite orders on market change.
 #ifndef __rider__
@@ -1530,9 +1665,15 @@ extern int Fractals30_OpenMethod = 0; // Valid range: 0-1. // Optimized for C_FR
 //+------------------------------------------------------------------+
 extern string __Gator_Parameters__ = "-- Settings for the Gator oscillator --";
 #ifndef __disabled__
-  extern bool Gator1_Active = TRUE, Gator5_Active = TRUE, Gator15_Active = TRUE, Gator30_Active = TRUE; // Enable Gator-based strategy for specific timeframe.
+  extern bool Gator1_Active = TRUE;
+  extern bool Gator5_Active = TRUE;
+  extern bool Gator15_Active = TRUE;
+  extern bool Gator30_Active = TRUE; // Enable Gator-based strategy for specific timeframe.
 #else
-  extern bool Gator1_Active = FALSE, Gator5_Active = FALSE, Gator15_Active = FALSE, Gator30_Active = FALSE;
+  extern bool Gator1_Active = FALSE;
+  extern bool Gator5_Active = FALSE;
+  extern bool Gator15_Active = FALSE;
+  extern bool Gator30_Active = FALSE;
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE Gator_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Gator. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
@@ -1573,9 +1714,15 @@ extern int Gator30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRAC
 //+------------------------------------------------------------------+
 extern string __Ichimoku_Parameters__ = "-- Settings for the Ichimoku Kinko Hyo indicator --";
 #ifndef __disabled__
-  extern bool Ichimoku1_Active = TRUE, Ichimoku5_Active = TRUE, Ichimoku15_Active = TRUE, Ichimoku30_Active = TRUE; // Enable Ichimoku-based strategy for specific timeframe.
+  extern bool Ichimoku1_Active = TRUE;
+  extern bool Ichimoku5_Active = TRUE;
+  extern bool Ichimoku15_Active = TRUE;
+  extern bool Ichimoku30_Active = TRUE; // Enable Ichimoku-based strategy for specific timeframe.
 #else
-  extern bool Ichimoku1_Active = FALSE, Ichimoku5_Active = FALSE, Ichimoku15_Active = FALSE, Ichimoku30_Active = FALSE;
+  extern bool Ichimoku1_Active = FALSE;
+  extern bool Ichimoku5_Active = FALSE;
+  extern bool Ichimoku15_Active = FALSE;
+  extern bool Ichimoku30_Active = FALSE;
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE Ichimoku_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Ichimoku. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
@@ -1619,9 +1766,15 @@ extern int Ichimoku30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_F
 //+------------------------------------------------------------------+
 extern string __MA_Parameters__ = "-- Settings for the Moving Average indicator --";
 #ifndef __disabled__
-  extern bool MA1_Active = TRUE, MA5_Active = TRUE, MA15_Active = TRUE, MA30_Active = TRUE; // Enable MA-based strategy for specific timeframe.
+  extern bool MA1_Active = TRUE;
+  extern bool MA5_Active = TRUE;
+  extern bool MA15_Active = TRUE;
+  extern bool MA30_Active = TRUE; // Enable MA-based strategy for specific timeframe.
 #else
-  extern bool MA1_Active = FALSE, MA5_Active = FALSE, MA15_Active = FALSE, MA30_Active = FALSE;
+  extern bool MA1_Active = FALSE;
+  extern bool MA5_Active = FALSE;
+  extern bool MA15_Active = FALSE;
+  extern bool MA30_Active = FALSE;
 #endif
 extern int MA_Period_Fast = 8; // Averaging period for calculation.
 extern int MA_Period_Medium = 20; // Averaging period for calculation.
@@ -1677,9 +1830,15 @@ extern int MA30_OpenMethod = 71; // Valid range: 0-127. This value is used for c
 //+------------------------------------------------------------------+
 extern string __MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --";
 #ifndef __disabled__
-  extern bool MACD1_Active = TRUE, MACD5_Active = TRUE, MACD15_Active = TRUE, MACD30_Active = TRUE; // Enable MACD-based strategy for specific timeframe.
+  extern bool MACD1_Active = TRUE;
+  extern bool MACD5_Active = TRUE;
+  extern bool MACD15_Active = TRUE;
+  extern bool MACD30_Active = TRUE; // Enable MACD-based strategy for specific timeframe.
 #else
-  extern bool MACD1_Active = FALSE, MACD5_Active = FALSE, MACD15_Active = FALSE, MACD30_Active = FALSE;
+  extern bool MACD1_Active = FALSE;
+  extern bool MACD5_Active = FALSE;
+  extern bool MACD15_Active = FALSE;
+  extern bool MACD30_Active = FALSE;
 #endif
 extern int MACD_Fast_Period = 14; // Fast EMA averaging period.
 extern int MACD_Slow_Period = 35; // Slow EMA averaging period.
@@ -1727,9 +1886,15 @@ extern int MACD30_OpenMethod = 15; // Valid range: 0-31. This value is used for 
 //+------------------------------------------------------------------+
 extern string __MFI_Parameters__ = "-- Settings for the Money Flow Index indicator --";
 #ifndef __disabled__
-  extern bool MFI1_Active = TRUE, MFI5_Active = TRUE, MFI15_Active = TRUE, MFI30_Active = TRUE; // Enable MFI-based strategy for specific timeframe.
+  extern bool MFI1_Active = TRUE;
+  extern bool MFI5_Active = TRUE;
+  extern bool MFI15_Active = TRUE;
+  extern bool MFI30_Active = TRUE; // Enable MFI-based strategy for specific timeframe.
 #else
-  extern bool MFI1_Active = FALSE, MFI5_Active = FALSE, MFI15_Active = FALSE, MFI30_Active = FALSE;
+  extern bool MFI1_Active = FALSE;
+  extern bool MFI5_Active = FALSE;
+  extern bool MFI15_Active = FALSE;
+  extern bool MFI30_Active = FALSE;
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE MFI_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for MFI. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
@@ -1771,9 +1936,15 @@ extern int MFI30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTA
 //+------------------------------------------------------------------+
 extern string __Momentum_Parameters__ = "-- Settings for the Momentum indicator --";
 #ifndef __disabled__
-  extern bool Momentum1_Active = TRUE, Momentum5_Active = TRUE, Momentum15_Active = TRUE, Momentum30_Active = TRUE; // Enable Momentum-based strategy for specific timeframe.
+  extern bool Momentum1_Active = TRUE;
+  extern bool Momentum5_Active = TRUE;
+  extern bool Momentum15_Active = TRUE;
+  extern bool Momentum30_Active = TRUE; // Enable Momentum-based strategy for specific timeframe.
 #else
-  extern bool Momentum1_Active = FALSE, Momentum5_Active = FALSE, Momentum15_Active = FALSE, Momentum30_Active = FALSE;
+  extern bool Momentum1_Active = FALSE;
+  extern bool Momentum5_Active = FALSE;
+  extern bool Momentum15_Active = FALSE;
+  extern bool Momentum30_Active = FALSE;
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE Momentum_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Momentum. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
@@ -1817,9 +1988,15 @@ extern int Momentum30_OpenMethod = 0; // Valid range: 0-x.
 //+------------------------------------------------------------------+
 extern string __OBV_Parameters__ = "-- Settings for the On Balance Volume indicator --";
 #ifndef __disabled__
-  extern bool OBV1_Active = TRUE, OBV5_Active = TRUE, OBV15_Active = TRUE, OBV30_Active = TRUE; // Enable OBV-based strategy for specific timeframe.
+  extern bool OBV1_Active = TRUE;
+  extern bool OBV5_Active = TRUE;
+  extern bool OBV15_Active = TRUE;
+  extern bool OBV30_Active = TRUE; // Enable OBV-based strategy for specific timeframe.
 #else
-  extern bool OBV1_Active = FALSE, OBV5_Active = FALSE, OBV15_Active = FALSE, OBV30_Active = FALSE;
+  extern bool OBV1_Active = FALSE;
+  extern bool OBV5_Active = FALSE;
+  extern bool OBV15_Active = FALSE;
+  extern bool OBV30_Active = FALSE;
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE OBV_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for OBV. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
@@ -1861,9 +2038,15 @@ extern int OBV30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTA
 //+------------------------------------------------------------------+
 extern string __OSMA_Parameters__ = "-- Settings for the Moving Average of Oscillator indicator --";
 #ifndef __disabled__
-  extern bool OSMA1_Active = TRUE, OSMA5_Active = TRUE, OSMA15_Active = TRUE, OSMA30_Active = TRUE; // Enable OSMA-based strategy for specific timeframe.
+  extern bool OSMA1_Active = TRUE;
+  extern bool OSMA5_Active = TRUE;
+  extern bool OSMA15_Active = TRUE;
+  extern bool OSMA30_Active = TRUE; // Enable OSMA-based strategy for specific timeframe.
 #else
-  extern bool OSMA1_Active = FALSE, OSMA5_Active = FALSE, OSMA15_Active = FALSE, OSMA30_Active = FALSE;
+  extern bool OSMA1_Active = FALSE;
+  extern bool OSMA5_Active = FALSE;
+  extern bool OSMA15_Active = FALSE;
+  extern bool OSMA30_Active = FALSE;
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE OSMA_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for OSMA. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
@@ -1908,9 +2091,15 @@ extern int OSMA30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACT
 //+------------------------------------------------------------------+
 extern string __RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --";
 #ifndef __disabled__
-  extern bool RSI1_Active = TRUE, RSI5_Active = TRUE, RSI15_Active = TRUE, RSI30_Active = TRUE; // Enable RSI-based strategy for specific timeframe.
+  extern bool RSI1_Active = TRUE;
+  extern bool RSI5_Active = TRUE;
+  extern bool RSI15_Active = TRUE;
+  extern bool RSI30_Active = TRUE; // Enable RSI-based strategy for specific timeframe.
 #else
-  extern bool RSI1_Active = FALSE, RSI5_Active = FALSE, RSI15_Active = FALSE, RSI30_Active = FALSE;
+  extern bool RSI1_Active = FALSE;
+  extern bool RSI5_Active = FALSE;
+  extern bool RSI15_Active = FALSE;
+  extern bool RSI30_Active = FALSE;
 #endif
 extern int RSI_Period = 20; // Averaging period for calculation.
 extern ENUM_APPLIED_PRICE RSI_Applied_Price = PRICE_MEDIAN; // RSI applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
@@ -1981,9 +2170,15 @@ extern int RSI30_OpenMethod = 2; // Valid range: 0-63. Used for C_RSI_BUY_SELL c
 //+------------------------------------------------------------------+
 extern string __RVI_Parameters__ = "-- Settings for the Relative Vigor Index indicator --";
 #ifndef __disabled__
-  extern bool RVI1_Active = TRUE, RVI5_Active = TRUE, RVI15_Active = TRUE, RVI30_Active = TRUE; // Enable RVI-based strategy for specific timeframe.
+  extern bool RVI1_Active = TRUE;
+  extern bool RVI5_Active = TRUE;
+  extern bool RVI15_Active = TRUE;
+  extern bool RVI30_Active = TRUE; // Enable RVI-based strategy for specific timeframe.
 #else
-  extern bool RVI1_Active = FALSE, RVI5_Active = FALSE, RVI15_Active = FALSE, RVI30_Active = FALSE;
+  extern bool RVI1_Active = FALSE;
+  extern bool RVI5_Active = FALSE;
+  extern bool RVI15_Active = FALSE;
+  extern bool RVI30_Active = FALSE;
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE RVI_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for RVI. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
@@ -2026,9 +2221,15 @@ extern int RVI30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTA
 //+------------------------------------------------------------------+
 extern string __SAR_Parameters__ = "-- Settings for the the Parabolic Stop and Reverse system indicator --";
 #ifndef __disabled__
-  extern bool SAR1_Active = TRUE, SAR5_Active = TRUE, SAR15_Active = TRUE, SAR30_Active = TRUE; // Enable SAR-based strategy for specific timeframe.
+  extern bool SAR1_Active = TRUE;
+  extern bool SAR5_Active = TRUE;
+  extern bool SAR15_Active = TRUE;
+  extern bool SAR30_Active = TRUE; // Enable SAR-based strategy for specific timeframe.
 #else
-  extern bool SAR1_Active = FALSE, SAR5_Active = FALSE, SAR15_Active = FALSE, SAR30_Active = FALSE;
+  extern bool SAR1_Active = FALSE;
+  extern bool SAR5_Active = FALSE;
+  extern bool SAR15_Active = FALSE;
+  extern bool SAR30_Active = FALSE;
 #endif
 extern double SAR_Step = 0.02; // Stop increment, usually 0.02.
 extern double SAR_Maximum_Stop = 0.3; // Maximum stop value, usually 0.2.
@@ -2085,9 +2286,15 @@ extern int SAR30_OpenMethod = 0; // Valid range: 0-127. Used for C_SAR_BUY_SELL 
 //+------------------------------------------------------------------+
 extern string __StdDev_Parameters__ = "-- Settings for the Standard Deviation indicator --";
 #ifndef __disabled__
-  extern bool StdDev1_Active = TRUE, StdDev5_Active = TRUE, StdDev15_Active = TRUE, StdDev30_Active = TRUE; // Enable StdDev-based strategy for specific timeframe.
+  extern bool StdDev1_Active = TRUE;
+  extern bool StdDev5_Active = TRUE;
+  extern bool StdDev15_Active = TRUE;
+  extern bool StdDev30_Active = TRUE; // Enable StdDev-based strategy for specific timeframe.
 #else
-  extern bool StdDev1_Active = FALSE, StdDev5_Active = FALSE, StdDev15_Active = FALSE, StdDev30_Active = FALSE;
+  extern bool StdDev1_Active = FALSE;
+  extern bool StdDev5_Active = FALSE;
+  extern bool StdDev15_Active = FALSE;
+  extern bool StdDev30_Active = FALSE;
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE StdDev_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for StdDev. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
@@ -2132,9 +2339,15 @@ extern int StdDev30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRA
 //+------------------------------------------------------------------+
 extern string __Stochastic_Parameters__ = "-- Settings for the the Stochastic Oscillator --";
 #ifndef __disabled__
-  extern bool Stochastic1_Active = TRUE, Stochastic5_Active = TRUE, Stochastic15_Active = TRUE, Stochastic30_Active = TRUE; // Enable Stochastic-based strategy for specific timeframe.
+  extern bool Stochastic1_Active = TRUE;
+  extern bool Stochastic5_Active = TRUE;
+  extern bool Stochastic15_Active = TRUE;
+  extern bool Stochastic30_Active = TRUE; // Enable Stochastic-based strategy for specific timeframe.
 #else
-  extern bool Stochastic1_Active = FALSE, Stochastic5_Active = FALSE, Stochastic15_Active = FALSE, Stochastic30_Active = FALSE;
+  extern bool Stochastic1_Active = FALSE;
+  extern bool Stochastic5_Active = FALSE;
+  extern bool Stochastic15_Active = FALSE;
+  extern bool Stochastic30_Active = FALSE;
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE Stochastic_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Stochastic. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
@@ -2175,9 +2388,15 @@ extern int Stochastic30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C
 //+------------------------------------------------------------------+
 extern string __WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --";
 #ifndef __disabled__
-  extern bool WPR1_Active = TRUE, WPR5_Active = TRUE, WPR15_Active = TRUE, WPR30_Active = TRUE; // Enable WPR-based strategy for specific timeframe.
+  extern bool WPR1_Active = TRUE;
+  extern bool WPR5_Active = TRUE;
+  extern bool WPR15_Active = TRUE;
+  extern bool WPR30_Active = TRUE; // Enable WPR-based strategy for specific timeframe.
 #else
-  extern bool WPR1_Active = FALSE, WPR5_Active = FALSE, WPR15_Active = FALSE, WPR30_Active = FALSE;
+  extern bool WPR1_Active = FALSE;
+  extern bool WPR5_Active = FALSE;
+  extern bool WPR15_Active = FALSE;
+  extern bool WPR30_Active = FALSE;
 #endif
 extern int WPR_Period = 21; // Averaging period for calculation. Suggested value: 22.
 extern int WPR_Shift = 0; // Shift relative to the current bar the given amount of periods ago. Suggested value: 1.
@@ -2224,9 +2443,15 @@ extern int WPR30_OpenMethod = 0; // Valid range: 0-63. Optimized with T_MA_M_FAR
  */
 //+------------------------------------------------------------------+
 #ifndef __disabled__
-  extern bool ZigZag1_Active = TRUE, ZigZag5_Active = TRUE, ZigZag15_Active = TRUE, ZigZag30_Active = TRUE; // Enable ZigZag-based strategy for specific timeframe.
+  extern bool ZigZag1_Active = TRUE;
+  extern bool ZigZag5_Active = TRUE;
+  extern bool ZigZag15_Active = TRUE;
+  extern bool ZigZag30_Active = TRUE; // Enable ZigZag-based strategy for specific timeframe.
 #else
-  extern bool ZigZag1_Active = FALSE, ZigZag5_Active = FALSE, ZigZag15_Active = FALSE, ZigZag30_Active = FALSE;
+  extern bool ZigZag1_Active = FALSE;
+  extern bool ZigZag5_Active = FALSE;
+  extern bool ZigZag15_Active = FALSE;
+  extern bool ZigZag30_Active = FALSE;
 #endif
 #ifndef __rider__
   extern ENUM_TRAIL_TYPE ZigZag_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for ZigZag. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
@@ -2490,8 +2715,8 @@ bool session_initiated = FALSE;
 bool session_active = FALSE;
 
 // Time-based variables.
-int bar_time, last_bar_time = EMPTY_VALUE; // Bar time, current and last one to check if bar has been changed since the last time.
-datetime time_current = EMPTY_VALUE;
+datetime bar_time, last_bar_time = (int)EMPTY_VALUE; // Bar time, current and last one to check if bar has been changed since the last time.
+datetime time_current = (int)EMPTY_VALUE;
 int hour_of_day, day_of_week, day_of_month, day_of_year;
 int last_order_time = 0, last_action_time = 0;
 int last_history_check = 0; // Last ticket position processed.
@@ -2535,31 +2760,31 @@ int order_queue[100][FINAL_ORDER_QUEUE_ENTRY];
 // Indicator variables.
 double ac[H1][FINAL_INDICATOR_INDEX_ENTRY];
 double ad[H1][FINAL_INDICATOR_INDEX_ENTRY];
-double adx[H1][FINAL_INDICATOR_INDEX_ENTRY][MODE_MINUSDI+1];
-double alligator[H1][FINAL_INDICATOR_INDEX_ENTRY][LIPS+1];
+double adx[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_ADX_ENTRY];
+double alligator[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_ALLIGATOR_ENTRY];
 double atr[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_MA_ENTRY];
 double awesome[H1][FINAL_INDICATOR_INDEX_ENTRY];
-double bands[H1][FINAL_INDICATOR_INDEX_ENTRY][MODE_LOWER+1];
+double bands[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_BANDS_ENTRY];
 double bwmfi[H1][FINAL_INDICATOR_INDEX_ENTRY];
 double bpower[H1][FINAL_INDICATOR_INDEX_ENTRY][OP_SELL+1];
 double cci[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_MA_ENTRY];
 double demarker[H1][2];
-double envelopes[H1][FINAL_INDICATOR_INDEX_ENTRY][MODE_LOWER+1];
+double envelopes[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_LINE_ENTRY];
 double force[H1][FINAL_INDICATOR_INDEX_ENTRY];
-double fractals[H1][FINAL_INDICATOR_INDEX_ENTRY][MODE_LOWER+1];
+double fractals[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_LINE_ENTRY];
 double gator[H1][FINAL_INDICATOR_INDEX_ENTRY][LIPS+1];
-double ichimoku[H1][FINAL_INDICATOR_INDEX_ENTRY][MODE_CHIKOUSPAN+1];
+double ichimoku[H1][FINAL_INDICATOR_INDEX_ENTRY][CHIKOUSPAN_LINE+1];
 double ma_fast[H1][FINAL_INDICATOR_INDEX_ENTRY], ma_medium[H1][FINAL_INDICATOR_INDEX_ENTRY], ma_slow[H1][FINAL_INDICATOR_INDEX_ENTRY];
-double macd[H1][FINAL_INDICATOR_INDEX_ENTRY][MODE_SIGNAL+1];
+double macd[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_SLINE_ENTRY];
 double mfi[H1][FINAL_INDICATOR_INDEX_ENTRY];
 double momentum[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_MA_ENTRY];
 double obv[H1][FINAL_INDICATOR_INDEX_ENTRY];
 double osma[H1][FINAL_INDICATOR_INDEX_ENTRY];
 double rsi[H1][3], rsi_stats[H1][3];
-double rvi[H1][FINAL_INDICATOR_INDEX_ENTRY][MODE_SIGNAL+1];
+double rvi[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_SLINE_ENTRY];
 double sar[H1][3]; int sar_week[H1][7][2];
 double stddev[H1][FINAL_INDICATOR_INDEX_ENTRY];
-double stochastic[H1][FINAL_INDICATOR_INDEX_ENTRY][MODE_SIGNAL+1];
+double stochastic[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_SLINE_ENTRY];
 double wpr[H1][2];
 // double zigzag[H1][FINAL_INDICATOR_INDEX_ENTRY];
 
@@ -2631,7 +2856,7 @@ int OnInit() {
       ExpertRemove();
       return (INIT_PARAMETERS_INCORRECT); // Incorrect set of input parameters.
     }
-    if (!IsTesting() && StringLen(AccountName()) <= 1) {
+    if (!IsTesting() && AccountName() <= 1) {
       err = "Error: EA requires on-line Terminal.";
       Comment(err);
       if (VerboseErrors) Print(__FUNCTION__ + "():" + err);
@@ -2684,10 +2909,10 @@ void OnDeinit(const int reason) {
     Print(GetSummaryText());
   }
 
-  if (WriteReport && !IsOptimization() && session_initiated) {
+  if (WriteReport && !IsOptimization() && session_initiated) { // FIXME: MQL5 for IsOptimization
     //if (reason == REASON_CHARTCHANGE)
     double ExtInitialDeposit;
-    if (!IsTesting()) ExtInitialDeposit = CalculateInitialDeposit();
+    if (!IsTesting()) ExtInitialDeposit = CalculateInitialDeposit(); // FIXME: MQL5: IsTesting()
     CalculateSummary(ExtInitialDeposit);
     string filename = TimeToStr(time_current, TIME_DATE|TIME_MINUTES) + "_31337_Report.txt";
     WriteReport(filename); // Todo: Add: getUninitReasonText(reason)
@@ -2724,7 +2949,7 @@ void start() {
 string InitInfo(string sep = "\n") {
   string output = StringFormat("%s (%s) v%s by %s%s", ea_name, __FILE__, ea_version, ea_author, sep); // ea_link
   output += StringFormat("Platform variables: Symbol: %s, Bars: %d, Server: %s, Login: %d%s",
-    _Symbol, Bars, AccountInfoString(ACCOUNT_SERVER), (int)AccountInfoInteger(ACCOUNT_LOGIN), sep);
+    _Symbol, Bars, AccountInfoString(ACCOUNT_SERVER), (int)AccountInfoInteger(ACCOUNT_LOGIN), sep); // // FIXME: MQL5: Bars
   output += StringFormat("Broker info: Name: %s, Account type: %s, Leverage: 1:%d, Currency: %s%s", AccountCompany(), account_type, AccountLeverage(), AccCurrency, sep);
   output += StringFormat("Market variables: Ask: %f, Bid: %f, Volume: %d%s", Ask, Bid, Volume[0], sep);
   output += StringFormat("Market constants: Digits: %d, Point: %f, Min Lot: %g, Max Lot: %g, Lot Step: %g, Lot Size: %g, Margin Required: %g, Margin Init: %g, Stop Level: %g%s",
@@ -2764,8 +2989,8 @@ bool Trade() {
       else if (TradeCondition(id, OP_SELL)) trade_cmd = OP_SELL;
       #ifdef __advanced__
       if (!DisableCloseConditions) {
-        if (CheckMarketEvent(OP_BUY,  PERIOD_M30, info[id][CLOSE_CONDITION])) CloseOrdersByType(OP_SELL, id, "closing on market change: " + sname[id], CloseConditionOnlyProfitable);
-        if (CheckMarketEvent(OP_SELL, PERIOD_M30, info[id][CLOSE_CONDITION])) CloseOrdersByType(OP_BUY,  id, "closing on market change: " + sname[id], CloseConditionOnlyProfitable);
+        if (CheckMarketEvent(OP_BUY,  PERIOD_M30, info[id][CLOSE_CONDITION])) CloseOrdersByType(OP_SELL, id, NULL, CloseConditionOnlyProfitable); // TODO: reason_id
+        if (CheckMarketEvent(OP_SELL, PERIOD_M30, info[id][CLOSE_CONDITION])) CloseOrdersByType(OP_BUY,  id, NULL, CloseConditionOnlyProfitable); // TODO: reason_id
       }
       if (trade_cmd == OP_BUY  && !CheckMarketCondition1(OP_BUY,  info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) trade_cmd = EMPTY;
       if (trade_cmd == OP_SELL && !CheckMarketCondition1(OP_SELL, info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) trade_cmd = EMPTY;
@@ -2792,7 +3017,7 @@ bool Trade() {
 /*
  * Check if strategy is on trade conditionl.
  */
-bool TradeCondition(int order_type = 0, int cmd = EMPTY) {
+bool TradeCondition(int order_type = 0, int cmd = NULL) {
   if (TradeWithTrend && !CheckTrend() == cmd) {
     return (FALSE); // If we're against the trend, do not trade (if TradeWithTrend is set).
   }
@@ -2889,9 +3114,9 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
       // int sid, bands_period = Bands_Period; // Not used at the moment.
       // sid = GetStrategyViaIndicator(BANDS, timeframe); bands_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        bands[period][i][MODE_MAIN]  = iBands(_Symbol, timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_MAIN,  i + Bands_Shift);
-        bands[period][i][MODE_UPPER] = iBands(_Symbol, timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_UPPER, i + Bands_Shift);
-        bands[period][i][MODE_LOWER] = iBands(_Symbol, timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, MODE_LOWER, i + Bands_Shift);
+        bands[period][i][BANDS_BASE]  = iBands(_Symbol, timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_BASE,  i + Bands_Shift);
+        bands[period][i][BANDS_UPPER] = iBands(_Symbol, timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_UPPER, i + Bands_Shift);
+        bands[period][i][BANDS_LOWER] = iBands(_Symbol, timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_LOWER, i + Bands_Shift);
       }
       break;
     case BPOWER: // Calculates the Bears Power and Bulls Power indicators.
@@ -2927,8 +3152,8 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
       }
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         envelopes[period][i][MODE_MAIN]  = iEnvelopes(_Symbol, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, MODE_MAIN,  i + Envelopes_Shift);
-        envelopes[period][i][MODE_UPPER] = iEnvelopes(_Symbol, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, MODE_UPPER, i + Envelopes_Shift);
-        envelopes[period][i][MODE_LOWER] = iEnvelopes(_Symbol, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, MODE_LOWER, i + Envelopes_Shift);
+        envelopes[period][i][UPPER] = iEnvelopes(_Symbol, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, UPPER, i + Envelopes_Shift);
+        envelopes[period][i][LOWER] = iEnvelopes(_Symbol, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, LOWER, i + Envelopes_Shift);
       }
       break;
     case FORCE: // Calculates the Force Index indicator.
@@ -2938,8 +3163,8 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
       break;
     case FRACTALS: // Calculates the Fractals indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        fractals[period][i][MODE_LOWER] = iFractals(_Symbol, timeframe, MODE_LOWER, i);
-        fractals[period][i][MODE_UPPER] = iFractals(_Symbol, timeframe, MODE_UPPER, i);
+        fractals[period][i][LOWER] = iFractals(_Symbol, timeframe, LOWER, i);
+        fractals[period][i][UPPER] = iFractals(_Symbol, timeframe, UPPER, i);
       }
       break;
     case GATOR: // Calculates the Gator oscillator.
@@ -3005,8 +3230,8 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
       // sid = GetStrategyViaIndicator(RSI, timeframe); rsi_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         rsi[period][i] = iRSI(NULL, timeframe, RSI_Period, RSI_Applied_Price, i + RSI_Shift);
-        if (rsi[period][i] > rsi_stats[period][MODE_UPPER]) rsi_stats[period][MODE_UPPER] = rsi[period][i]; // Calculate maximum value.
-        if (rsi[period][i] < rsi_stats[period][MODE_LOWER] || rsi_stats[period][MODE_LOWER] == 0) rsi_stats[period][MODE_LOWER] = rsi[period][i]; // Calculate minimum value.
+        if (rsi[period][i] > rsi_stats[period][UPPER]) rsi_stats[period][UPPER] = rsi[period][i]; // Calculate maximum value.
+        if (rsi[period][i] < rsi_stats[period][LOWER] || rsi_stats[period][LOWER] == 0) rsi_stats[period][LOWER] = rsi[period][i]; // Calculate minimum value.
       }
       rsi_stats[period][0] = If(rsi_stats[period][0] > 0, (rsi_stats[period][0] + rsi[period][0] + rsi[period][1] + rsi[period][2]) / 4, (rsi[period][0] + rsi[period][1] + rsi[period][2]) / 3); // Calculate average value.
       break;
@@ -3377,23 +3602,23 @@ bool Trade_AC(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open_
     */
     case OP_BUY:
       /*
-        bool result = AC[period][CURR][MODE_LOWER] != 0.0 || AC[period][PREV][MODE_LOWER] != 0.0 || AC[period][FAR][MODE_LOWER] != 0.0;
+        bool result = AC[period][CURR][LOWER] != 0.0 || AC[period][PREV][LOWER] != 0.0 || AC[period][FAR][LOWER] != 0.0;
         if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
         if ((open_method &   2) != 0) result = result && !AC_On_Sell(period);
         if ((open_method &   4) != 0) result = result && AC_On_Buy(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && AC_On_Buy(M30);
-        if ((open_method &  16) != 0) result = result && AC[period][FAR][MODE_LOWER] != 0.0;
+        if ((open_method &  16) != 0) result = result && AC[period][FAR][LOWER] != 0.0;
         if ((open_method &  32) != 0) result = result && !AC_On_Sell(M30);
         */
     break;
     case OP_SELL:
       /*
-        bool result = AC[period][CURR][MODE_UPPER] != 0.0 || AC[period][PREV][MODE_UPPER] != 0.0 || AC[period][FAR][MODE_UPPER] != 0.0;
+        bool result = AC[period][CURR][UPPER] != 0.0 || AC[period][PREV][UPPER] != 0.0 || AC[period][FAR][UPPER] != 0.0;
         if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
         if ((open_method &   2) != 0) result = result && !AC_On_Buy(period);
         if ((open_method &   4) != 0) result = result && AC_On_Sell(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && AC_On_Sell(M30);
-        if ((open_method &  16) != 0) result = result && AC[period][FAR][MODE_UPPER] != 0.0;
+        if ((open_method &  16) != 0) result = result && AC[period][FAR][UPPER] != 0.0;
         if ((open_method &  32) != 0) result = result && !AC_On_Buy(M30);
         */
     break;
@@ -3428,23 +3653,23 @@ bool Trade_AD(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open_
     */
     case OP_BUY:
       /*
-        bool result = AD[period][CURR][MODE_LOWER] != 0.0 || AD[period][PREV][MODE_LOWER] != 0.0 || AD[period][FAR][MODE_LOWER] != 0.0;
+        bool result = AD[period][CURR][LOWER] != 0.0 || AD[period][PREV][LOWER] != 0.0 || AD[period][FAR][LOWER] != 0.0;
         if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
         if ((open_method &   2) != 0) result = result && !AD_On_Sell(period);
         if ((open_method &   4) != 0) result = result && AD_On_Buy(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && AD_On_Buy(M30);
-        if ((open_method &  16) != 0) result = result && AD[period][FAR][MODE_LOWER] != 0.0;
+        if ((open_method &  16) != 0) result = result && AD[period][FAR][LOWER] != 0.0;
         if ((open_method &  32) != 0) result = result && !AD_On_Sell(M30);
         */
     break;
     case OP_SELL:
       /*
-        bool result = AD[period][CURR][MODE_UPPER] != 0.0 || AD[period][PREV][MODE_UPPER] != 0.0 || AD[period][FAR][MODE_UPPER] != 0.0;
+        bool result = AD[period][CURR][UPPER] != 0.0 || AD[period][PREV][UPPER] != 0.0 || AD[period][FAR][UPPER] != 0.0;
         if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
         if ((open_method &   2) != 0) result = result && !AD_On_Buy(period);
         if ((open_method &   4) != 0) result = result && AD_On_Sell(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && AD_On_Sell(M30);
-        if ((open_method &  16) != 0) result = result && AD[period][FAR][MODE_UPPER] != 0.0;
+        if ((open_method &  16) != 0) result = result && AD[period][FAR][UPPER] != 0.0;
         if ((open_method &  32) != 0) result = result && !AD_On_Buy(M30);
         */
     break;
@@ -3479,23 +3704,23 @@ bool Trade_ADX(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
     */
     case OP_BUY:
       /*
-        bool result = ADX[period][CURR][MODE_LOWER] != 0.0 || ADX[period][PREV][MODE_LOWER] != 0.0 || ADX[period][FAR][MODE_LOWER] != 0.0;
+        bool result = ADX[period][CURR][LOWER] != 0.0 || ADX[period][PREV][LOWER] != 0.0 || ADX[period][FAR][LOWER] != 0.0;
         if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
         if ((open_method &   2) != 0) result = result && !ADX_On_Sell(period);
         if ((open_method &   4) != 0) result = result && ADX_On_Buy(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && ADX_On_Buy(M30);
-        if ((open_method &  16) != 0) result = result && ADX[period][FAR][MODE_LOWER] != 0.0;
+        if ((open_method &  16) != 0) result = result && ADX[period][FAR][LOWER] != 0.0;
         if ((open_method &  32) != 0) result = result && !ADX_On_Sell(M30);
         */
     break;
     case OP_SELL:
       /*
-        bool result = ADX[period][CURR][MODE_UPPER] != 0.0 || ADX[period][PREV][MODE_UPPER] != 0.0 || ADX[period][FAR][MODE_UPPER] != 0.0;
+        bool result = ADX[period][CURR][UPPER] != 0.0 || ADX[period][PREV][UPPER] != 0.0 || ADX[period][FAR][UPPER] != 0.0;
         if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
         if ((open_method &   2) != 0) result = result && !ADX_On_Buy(period);
         if ((open_method &   4) != 0) result = result && ADX_On_Sell(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && ADX_On_Sell(M30);
-        if ((open_method &  16) != 0) result = result && ADX[period][FAR][MODE_UPPER] != 0.0;
+        if ((open_method &  16) != 0) result = result && ADX[period][FAR][UPPER] != 0.0;
         if ((open_method &  32) != 0) result = result && !ADX_On_Buy(M30);
         */
     break;
@@ -3549,7 +3774,7 @@ bool Trade_Alligator(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, doubl
             && iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORJAW,1)<=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORJAW,0)
             && iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORTEETH,2)<=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORTEETH,1)
             && iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORTEETH,1)<=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORTEETH,0)
-            && iFractals(NULL,pifr,MODE_UPPER,2)>=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORTEETH,0))
+            && iFractals(NULL,pifr,UPPER,2)>=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORTEETH,0))
             {f3=1;}
             if (iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORLIPS,2)>=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORLIPS,1)
             && iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORLIPS,1)>=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORLIPS,0)
@@ -3557,7 +3782,7 @@ bool Trade_Alligator(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, doubl
             && iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORJAW,1)>=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORJAW,0)
             && iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORTEETH,2)>=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORTEETH,1)
             && iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORTEETH,1)>=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORTEETH,0)
-            && iFractals(NULL,pifr,MODE_LOWER,2)<=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORTEETH,0))
+            && iFractals(NULL,pifr,LOWER,2)<=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORTEETH,0))
             {f3=-1;}
       */
       break;
@@ -3609,23 +3834,23 @@ bool Trade_ATR(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
     */
     case OP_BUY:
       /*
-        bool result = ATR[period][CURR][MODE_LOWER] != 0.0 || ATR[period][PREV][MODE_LOWER] != 0.0 || ATR[period][FAR][MODE_LOWER] != 0.0;
+        bool result = ATR[period][CURR][LOWER] != 0.0 || ATR[period][PREV][LOWER] != 0.0 || ATR[period][FAR][LOWER] != 0.0;
         if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
         if ((open_method &   2) != 0) result = result && !ATR_On_Sell(tf);
         if ((open_method &   4) != 0) result = result && ATR_On_Buy(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && ATR_On_Buy(M30);
-        if ((open_method &  16) != 0) result = result && ATR[period][FAR][MODE_LOWER] != 0.0;
+        if ((open_method &  16) != 0) result = result && ATR[period][FAR][LOWER] != 0.0;
         if ((open_method &  32) != 0) result = result && !ATR_On_Sell(M30);
         */
     break;
     case OP_SELL:
       /*
-        bool result = ATR[period][CURR][MODE_UPPER] != 0.0 || ATR[period][PREV][MODE_UPPER] != 0.0 || ATR[period][FAR][MODE_UPPER] != 0.0;
+        bool result = ATR[period][CURR][UPPER] != 0.0 || ATR[period][PREV][UPPER] != 0.0 || ATR[period][FAR][UPPER] != 0.0;
         if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
         if ((open_method &   2) != 0) result = result && !ATR_On_Buy(tf);
         if ((open_method &   4) != 0) result = result && ATR_On_Sell(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && ATR_On_Sell(M30);
-        if ((open_method &  16) != 0) result = result && ATR[period][FAR][MODE_UPPER] != 0.0;
+        if ((open_method &  16) != 0) result = result && ATR[period][FAR][UPPER] != 0.0;
         if ((open_method &  32) != 0) result = result && !ATR_On_Buy(M30);
         */
     break;
@@ -3659,23 +3884,23 @@ bool Trade_Awesome(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double 
     */
     case OP_BUY:
       /*
-        bool result = Awesome[period][CURR][MODE_LOWER] != 0.0 || Awesome[period][PREV][MODE_LOWER] != 0.0 || Awesome[period][FAR][MODE_LOWER] != 0.0;
+        bool result = Awesome[period][CURR][LOWER] != 0.0 || Awesome[period][PREV][LOWER] != 0.0 || Awesome[period][FAR][LOWER] != 0.0;
         if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
         if ((open_method &   2) != 0) result = result && !Awesome_On_Sell(tf);
         if ((open_method &   4) != 0) result = result && Awesome_On_Buy(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && Awesome_On_Buy(M30);
-        if ((open_method &  16) != 0) result = result && Awesome[period][FAR][MODE_LOWER] != 0.0;
+        if ((open_method &  16) != 0) result = result && Awesome[period][FAR][LOWER] != 0.0;
         if ((open_method &  32) != 0) result = result && !Awesome_On_Sell(M30);
         */
     break;
     case OP_SELL:
       /*
-        bool result = Awesome[period][CURR][MODE_UPPER] != 0.0 || Awesome[period][PREV][MODE_UPPER] != 0.0 || Awesome[period][FAR][MODE_UPPER] != 0.0;
+        bool result = Awesome[period][CURR][UPPER] != 0.0 || Awesome[period][PREV][UPPER] != 0.0 || Awesome[period][FAR][UPPER] != 0.0;
         if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
         if ((open_method &   2) != 0) result = result && !Awesome_On_Buy(tf);
         if ((open_method &   4) != 0) result = result && Awesome_On_Sell(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && Awesome_On_Sell(M30);
-        if ((open_method &  16) != 0) result = result && Awesome[period][FAR][MODE_UPPER] != 0.0;
+        if ((open_method &  16) != 0) result = result && Awesome[period][FAR][UPPER] != 0.0;
         if ((open_method &  32) != 0) result = result && !Awesome_On_Buy(M30);
         */
     break;
@@ -3699,35 +3924,35 @@ bool Trade_Bands(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double op
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(BANDS, tf, 0);
   switch (cmd) {
     case OP_BUY:
-      result = High[CURR]  > bands[period][CURR][MODE_UPPER] || High[PREV] > bands[period][PREV][MODE_UPPER]; // price value was higher than the upper band
-      if ((open_method &   1) != 0) result = result && Close[PREV] > bands[period][CURR][MODE_UPPER];
-      if ((open_method &   2) != 0) result = result && Close[CURR] < bands[period][CURR][MODE_UPPER];
-      if ((open_method &   4) != 0) result = result && (bands[period][CURR][MODE_MAIN] >= bands[period][PREV][MODE_MAIN] && bands[period][PREV][MODE_MAIN] >= bands[period][FAR][MODE_MAIN]);
-      if ((open_method &   8) != 0) result = result && bands[period][CURR][MODE_MAIN] <= bands[period][PREV][MODE_MAIN];
-      if ((open_method &  16) != 0) result = result && (bands[period][CURR][MODE_UPPER] >= bands[period][PREV][MODE_UPPER] || bands[period][CURR][MODE_LOWER] <= bands[period][PREV][MODE_LOWER]);
-      if ((open_method &  32) != 0) result = result && (bands[period][CURR][MODE_UPPER] <= bands[period][PREV][MODE_UPPER] || bands[period][CURR][MODE_LOWER] >= bands[period][PREV][MODE_LOWER]);
-      if ((open_method &  64) != 0) result = result && Ask < bands[period][CURR][MODE_UPPER];
-      if ((open_method & 128) != 0) result = result && Ask > bands[period][CURR][MODE_MAIN];
+      result = High[CURR]  > bands[period][CURR][BANDS_UPPER] || High[PREV] > bands[period][PREV][BANDS_UPPER]; // price value was higher than the upper band
+      if ((open_method &   1) != 0) result = result && Close[PREV] > bands[period][CURR][BANDS_UPPER];
+      if ((open_method &   2) != 0) result = result && Close[CURR] < bands[period][CURR][BANDS_UPPER];
+      if ((open_method &   4) != 0) result = result && (bands[period][CURR][BANDS_BASE] >= bands[period][PREV][BANDS_BASE] && bands[period][PREV][BANDS_BASE] >= bands[period][FAR][BANDS_BASE]);
+      if ((open_method &   8) != 0) result = result && bands[period][CURR][BANDS_BASE] <= bands[period][PREV][BANDS_BASE];
+      if ((open_method &  16) != 0) result = result && (bands[period][CURR][BANDS_UPPER] >= bands[period][PREV][BANDS_UPPER] || bands[period][CURR][BANDS_LOWER] <= bands[period][PREV][BANDS_LOWER]);
+      if ((open_method &  32) != 0) result = result && (bands[period][CURR][BANDS_UPPER] <= bands[period][PREV][BANDS_UPPER] || bands[period][CURR][BANDS_LOWER] >= bands[period][PREV][BANDS_LOWER]);
+      if ((open_method &  64) != 0) result = result && Ask < bands[period][CURR][BANDS_UPPER];
+      if ((open_method & 128) != 0) result = result && Ask > bands[period][CURR][BANDS_BASE];
       //if ((open_method & 256) != 0) result = result && !Bands_On_Buy(M30);
       break;
     case OP_SELL:
-      result = Low[CURR] < bands[period][CURR][MODE_LOWER] || Low[PREV] < bands[period][PREV][MODE_LOWER]; // price value was lower than the lower band
-      if ((open_method &   1) != 0) result = result && Close[PREV] < bands[period][CURR][MODE_LOWER];
-      if ((open_method &   2) != 0) result = result && Close[CURR] > bands[period][CURR][MODE_LOWER];
-      if ((open_method &   4) != 0) result = result && (bands[period][CURR][MODE_MAIN] <= bands[period][PREV][MODE_MAIN] && bands[period][PREV][MODE_MAIN] <= bands[period][FAR][MODE_MAIN]);
-      if ((open_method &   8) != 0) result = result && bands[period][CURR][MODE_MAIN] >= bands[period][PREV][MODE_MAIN];
-      if ((open_method &  16) != 0) result = result && (bands[period][CURR][MODE_UPPER] >= bands[period][PREV][MODE_UPPER] || bands[period][CURR][MODE_LOWER] <= bands[period][PREV][MODE_LOWER]);
-      if ((open_method &  32) != 0) result = result && (bands[period][CURR][MODE_UPPER] <= bands[period][PREV][MODE_UPPER] || bands[period][CURR][MODE_LOWER] >= bands[period][PREV][MODE_LOWER]);
-      if ((open_method &  64) != 0) result = result && Ask > bands[period][CURR][MODE_LOWER];
-      if ((open_method & 128) != 0) result = result && Ask < bands[period][CURR][MODE_MAIN];
+      result = Low[CURR] < bands[period][CURR][BANDS_LOWER] || Low[PREV] < bands[period][PREV][BANDS_LOWER]; // price value was lower than the lower band
+      if ((open_method &   1) != 0) result = result && Close[PREV] < bands[period][CURR][BANDS_LOWER];
+      if ((open_method &   2) != 0) result = result && Close[CURR] > bands[period][CURR][BANDS_LOWER];
+      if ((open_method &   4) != 0) result = result && (bands[period][CURR][BANDS_BASE] <= bands[period][PREV][BANDS_BASE] && bands[period][PREV][BANDS_BASE] <= bands[period][FAR][BANDS_BASE]);
+      if ((open_method &   8) != 0) result = result && bands[period][CURR][BANDS_BASE] >= bands[period][PREV][BANDS_BASE];
+      if ((open_method &  16) != 0) result = result && (bands[period][CURR][BANDS_UPPER] >= bands[period][PREV][BANDS_UPPER] || bands[period][CURR][BANDS_LOWER] <= bands[period][PREV][BANDS_LOWER]);
+      if ((open_method &  32) != 0) result = result && (bands[period][CURR][BANDS_UPPER] <= bands[period][PREV][BANDS_UPPER] || bands[period][CURR][BANDS_LOWER] >= bands[period][PREV][BANDS_LOWER]);
+      if ((open_method &  64) != 0) result = result && Ask > bands[period][CURR][BANDS_LOWER];
+      if ((open_method & 128) != 0) result = result && Ask < bands[period][CURR][BANDS_BASE];
       //if ((open_method & 256) != 0) result = result && !Bands_On_Sell(M30);
     /*
           //9. Bollinger Bands
           //Buy: price crossed lower line upwards (returned to it from below)
           //Sell: price crossed upper line downwards (returned to it from above)
-          if (iBands(NULL,piband,pibandu,ibandotkl,0,PRICE_CLOSE,MODE_LOWER,1)>iClose(NULL,piband2,1)&&iBands(NULL,piband,pibandu,ibandotkl,0,PRICE_CLOSE,MODE_LOWER,0)<=iClose(NULL,piband2,0))
+          if (iBands(NULL,piband,pibandu,ibandotkl,0,PRICE_CLOSE,LOWER,1)>iClose(NULL,piband2,1)&&iBands(NULL,piband,pibandu,ibandotkl,0,PRICE_CLOSE,LOWER,0)<=iClose(NULL,piband2,0))
           {f9=1;}
-          if (iBands(NULL,piband,pibandu,ibandotkl,0,PRICE_CLOSE,MODE_UPPER,1)<iClose(NULL,piband2,1)&&iBands(NULL,piband,pibandu,ibandotkl,0,PRICE_CLOSE,MODE_UPPER,0)>=iClose(NULL,piband2,0))
+          if (iBands(NULL,piband,pibandu,ibandotkl,0,PRICE_CLOSE,UPPER,1)<iClose(NULL,piband2,1)&&iBands(NULL,piband,pibandu,ibandotkl,0,PRICE_CLOSE,UPPER,0)>=iClose(NULL,piband2,0))
           {f9=-1;}
     */
       break;
@@ -3753,23 +3978,23 @@ bool Trade_BPower(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double o
   switch (cmd) {
     case OP_BUY:
       /*
-        bool result = BPower[period][CURR][MODE_LOWER] != 0.0 || BPower[period][PREV][MODE_LOWER] != 0.0 || BPower[period][FAR][MODE_LOWER] != 0.0;
+        bool result = BPower[period][CURR][LOWER] != 0.0 || BPower[period][PREV][LOWER] != 0.0 || BPower[period][FAR][LOWER] != 0.0;
         if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
         if ((open_method &   2) != 0) result = result && !BPower_On_Sell(tf);
         if ((open_method &   4) != 0) result = result && BPower_On_Buy(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && BPower_On_Buy(M30);
-        if ((open_method &  16) != 0) result = result && BPower[period][FAR][MODE_LOWER] != 0.0;
+        if ((open_method &  16) != 0) result = result && BPower[period][FAR][LOWER] != 0.0;
         if ((open_method &  32) != 0) result = result && !BPower_On_Sell(M30);
         */
     break;
     case OP_SELL:
       /*
-        bool result = BPower[period][CURR][MODE_UPPER] != 0.0 || BPower[period][PREV][MODE_UPPER] != 0.0 || BPower[period][FAR][MODE_UPPER] != 0.0;
+        bool result = BPower[period][CURR][UPPER] != 0.0 || BPower[period][PREV][UPPER] != 0.0 || BPower[period][FAR][UPPER] != 0.0;
         if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
         if ((open_method &   2) != 0) result = result && !BPower_On_Buy(tf);
         if ((open_method &   4) != 0) result = result && BPower_On_Sell(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && BPower_On_Sell(M30);
-        if ((open_method &  16) != 0) result = result && BPower[period][FAR][MODE_UPPER] != 0.0;
+        if ((open_method &  16) != 0) result = result && BPower[period][FAR][UPPER] != 0.0;
         if ((open_method &  32) != 0) result = result && !BPower_On_Buy(M30);
         */
     break;
@@ -3793,23 +4018,23 @@ bool Trade_Breakage(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double
   switch (cmd) {
     case OP_BUY:
       /*
-        bool result = Breakage[period][CURR][MODE_LOWER] != 0.0 || Breakage[period][PREV][MODE_LOWER] != 0.0 || Breakage[period][FAR][MODE_LOWER] != 0.0;
+        bool result = Breakage[period][CURR][LOWER] != 0.0 || Breakage[period][PREV][LOWER] != 0.0 || Breakage[period][FAR][LOWER] != 0.0;
         if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
         if ((open_method &   2) != 0) result = result && !Breakage_On_Sell(tf);
         if ((open_method &   4) != 0) result = result && Breakage_On_Buy(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && Breakage_On_Buy(M30);
-        if ((open_method &  16) != 0) result = result && Breakage[period][FAR][MODE_LOWER] != 0.0;
+        if ((open_method &  16) != 0) result = result && Breakage[period][FAR][LOWER] != 0.0;
         if ((open_method &  32) != 0) result = result && !Breakage_On_Sell(M30);
         */
     break;
     case OP_SELL:
       /*
-        bool result = Breakage[period][CURR][MODE_UPPER] != 0.0 || Breakage[period][PREV][MODE_UPPER] != 0.0 || Breakage[period][FAR][MODE_UPPER] != 0.0;
+        bool result = Breakage[period][CURR][UPPER] != 0.0 || Breakage[period][PREV][UPPER] != 0.0 || Breakage[period][FAR][UPPER] != 0.0;
         if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
         if ((open_method &   2) != 0) result = result && !Breakage_On_Buy(tf);
         if ((open_method &   4) != 0) result = result && Breakage_On_Sell(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && Breakage_On_Sell(M30);
-        if ((open_method &  16) != 0) result = result && Breakage[period][FAR][MODE_UPPER] != 0.0;
+        if ((open_method &  16) != 0) result = result && Breakage[period][FAR][UPPER] != 0.0;
         if ((open_method &  32) != 0) result = result && !Breakage_On_Buy(M30);
         */
     break;
@@ -3834,23 +4059,23 @@ bool Trade_BWMFI(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double op
   switch (cmd) {
     case OP_BUY:
       /*
-        bool result = BWMFI[period][CURR][MODE_LOWER] != 0.0 || BWMFI[period][PREV][MODE_LOWER] != 0.0 || BWMFI[period][FAR][MODE_LOWER] != 0.0;
+        bool result = BWMFI[period][CURR][LOWER] != 0.0 || BWMFI[period][PREV][LOWER] != 0.0 || BWMFI[period][FAR][LOWER] != 0.0;
         if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
         if ((open_method &   2) != 0) result = result && !BWMFI_On_Sell(tf);
         if ((open_method &   4) != 0) result = result && BWMFI_On_Buy(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && BWMFI_On_Buy(M30);
-        if ((open_method &  16) != 0) result = result && BWMFI[period][FAR][MODE_LOWER] != 0.0;
+        if ((open_method &  16) != 0) result = result && BWMFI[period][FAR][LOWER] != 0.0;
         if ((open_method &  32) != 0) result = result && !BWMFI_On_Sell(M30);
         */
     break;
     case OP_SELL:
       /*
-        bool result = BWMFI[period][CURR][MODE_UPPER] != 0.0 || BWMFI[period][PREV][MODE_UPPER] != 0.0 || BWMFI[period][FAR][MODE_UPPER] != 0.0;
+        bool result = BWMFI[period][CURR][UPPER] != 0.0 || BWMFI[period][PREV][UPPER] != 0.0 || BWMFI[period][FAR][UPPER] != 0.0;
         if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
         if ((open_method &   2) != 0) result = result && !BWMFI_On_Buy(tf);
         if ((open_method &   4) != 0) result = result && BWMFI_On_Sell(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && BWMFI_On_Sell(M30);
-        if ((open_method &  16) != 0) result = result && BWMFI[period][FAR][MODE_UPPER] != 0.0;
+        if ((open_method &  16) != 0) result = result && BWMFI[period][FAR][UPPER] != 0.0;
         if ((open_method &  32) != 0) result = result && !BWMFI_On_Buy(M30);
         */
     break;
@@ -3885,23 +4110,23 @@ bool Trade_CCI(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
     */
     case OP_BUY:
       /*
-        bool result = CCI[period][CURR][MODE_LOWER] != 0.0 || CCI[period][PREV][MODE_LOWER] != 0.0 || CCI[period][FAR][MODE_LOWER] != 0.0;
+        bool result = CCI[period][CURR][LOWER] != 0.0 || CCI[period][PREV][LOWER] != 0.0 || CCI[period][FAR][LOWER] != 0.0;
         if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
         if ((open_method &   2) != 0) result = result && !CCI_On_Sell(tf);
         if ((open_method &   4) != 0) result = result && CCI_On_Buy(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && CCI_On_Buy(M30);
-        if ((open_method &  16) != 0) result = result && CCI[period][FAR][MODE_LOWER] != 0.0;
+        if ((open_method &  16) != 0) result = result && CCI[period][FAR][LOWER] != 0.0;
         if ((open_method &  32) != 0) result = result && !CCI_On_Sell(M30);
         */
     break;
     case OP_SELL:
       /*
-        bool result = CCI[period][CURR][MODE_UPPER] != 0.0 || CCI[period][PREV][MODE_UPPER] != 0.0 || CCI[period][FAR][MODE_UPPER] != 0.0;
+        bool result = CCI[period][CURR][UPPER] != 0.0 || CCI[period][PREV][UPPER] != 0.0 || CCI[period][FAR][UPPER] != 0.0;
         if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
         if ((open_method &   2) != 0) result = result && !CCI_On_Buy(tf);
         if ((open_method &   4) != 0) result = result && CCI_On_Sell(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && CCI_On_Sell(M30);
-        if ((open_method &  16) != 0) result = result && CCI[period][FAR][MODE_UPPER] != 0.0;
+        if ((open_method &  16) != 0) result = result && CCI[period][FAR][UPPER] != 0.0;
         if ((open_method &  32) != 0) result = result && !CCI_On_Buy(M30);
         */
     break;
@@ -3961,27 +4186,27 @@ bool Trade_Envelopes(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, doubl
   if (open_level == EMPTY)  open_level  = GetStrategyOpenLevel(ENVELOPES, tf, 0.0);
   switch (cmd) {
     case OP_BUY:
-      result = Low[CURR] < envelopes[period][CURR][MODE_LOWER] || Low[PREV] < envelopes[period][CURR][MODE_LOWER]; // price low was below the lower band
-      // result = result || (envelopes[period][CURR][MODE_MAIN] > envelopes[period][FAR][MODE_MAIN] && Open[CURR] > envelopes[period][CURR][MODE_UPPER]);
-      if ((open_method &   1) != 0) result = result && Open[CURR] > envelopes[period][CURR][MODE_LOWER]; // FIXME
+      result = Low[CURR] < envelopes[period][CURR][LOWER] || Low[PREV] < envelopes[period][CURR][LOWER]; // price low was below the lower band
+      // result = result || (envelopes[period][CURR][MODE_MAIN] > envelopes[period][FAR][MODE_MAIN] && Open[CURR] > envelopes[period][CURR][UPPER]);
+      if ((open_method &   1) != 0) result = result && Open[CURR] > envelopes[period][CURR][LOWER]; // FIXME
       if ((open_method &   2) != 0) result = result && envelopes[period][CURR][MODE_MAIN] < envelopes[period][PREV][MODE_MAIN];
-      if ((open_method &   4) != 0) result = result && envelopes[period][CURR][MODE_LOWER] < envelopes[period][PREV][MODE_LOWER];
-      if ((open_method &   8) != 0) result = result && envelopes[period][CURR][MODE_UPPER] < envelopes[period][PREV][MODE_UPPER];
-      if ((open_method &  16) != 0) result = result && envelopes[period][CURR][MODE_UPPER] - envelopes[period][CURR][MODE_LOWER] > envelopes[period][PREV][MODE_UPPER] - envelopes[period][PREV][MODE_LOWER];
+      if ((open_method &   4) != 0) result = result && envelopes[period][CURR][LOWER] < envelopes[period][PREV][LOWER];
+      if ((open_method &   8) != 0) result = result && envelopes[period][CURR][UPPER] < envelopes[period][PREV][UPPER];
+      if ((open_method &  16) != 0) result = result && envelopes[period][CURR][UPPER] - envelopes[period][CURR][LOWER] > envelopes[period][PREV][UPPER] - envelopes[period][PREV][LOWER];
       if ((open_method &  32) != 0) result = result && Ask < envelopes[period][CURR][MODE_MAIN];
-      if ((open_method &  64) != 0) result = result && Close[CURR] < envelopes[period][CURR][MODE_UPPER];
+      if ((open_method &  64) != 0) result = result && Close[CURR] < envelopes[period][CURR][UPPER];
       //if ((open_method & 128) != 0) result = result && Ask > Close[PREV];
       break;
     case OP_SELL:
-      result = High[CURR] > envelopes[period][CURR][MODE_UPPER] || High[PREV] > envelopes[period][CURR][MODE_UPPER]; // price high was above the upper band
-      // result = result || (envelopes[period][CURR][MODE_MAIN] < envelopes[period][FAR][MODE_MAIN] && Open[CURR] < envelopes[period][CURR][MODE_LOWER]);
-      if ((open_method &   1) != 0) result = result && Open[CURR] < envelopes[period][CURR][MODE_UPPER]; // FIXME
+      result = High[CURR] > envelopes[period][CURR][UPPER] || High[PREV] > envelopes[period][CURR][UPPER]; // price high was above the upper band
+      // result = result || (envelopes[period][CURR][MODE_MAIN] < envelopes[period][FAR][MODE_MAIN] && Open[CURR] < envelopes[period][CURR][LOWER]);
+      if ((open_method &   1) != 0) result = result && Open[CURR] < envelopes[period][CURR][UPPER]; // FIXME
       if ((open_method &   2) != 0) result = result && envelopes[period][CURR][MODE_MAIN] > envelopes[period][PREV][MODE_MAIN];
-      if ((open_method &   4) != 0) result = result && envelopes[period][CURR][MODE_LOWER] > envelopes[period][PREV][MODE_LOWER];
-      if ((open_method &   8) != 0) result = result && envelopes[period][CURR][MODE_UPPER] > envelopes[period][PREV][MODE_UPPER];
-      if ((open_method &  16) != 0) result = result && envelopes[period][CURR][MODE_UPPER] - envelopes[period][CURR][MODE_LOWER] > envelopes[period][PREV][MODE_UPPER] - envelopes[period][PREV][MODE_LOWER];
+      if ((open_method &   4) != 0) result = result && envelopes[period][CURR][LOWER] > envelopes[period][PREV][LOWER];
+      if ((open_method &   8) != 0) result = result && envelopes[period][CURR][UPPER] > envelopes[period][PREV][UPPER];
+      if ((open_method &  16) != 0) result = result && envelopes[period][CURR][UPPER] - envelopes[period][CURR][LOWER] > envelopes[period][PREV][UPPER] - envelopes[period][PREV][LOWER];
       if ((open_method &  32) != 0) result = result && Ask > envelopes[period][CURR][MODE_MAIN];
-      if ((open_method &  64) != 0) result = result && Close[CURR] > envelopes[period][CURR][MODE_UPPER];
+      if ((open_method &  64) != 0) result = result && Close[CURR] > envelopes[period][CURR][UPPER];
       //if ((open_method & 128) != 0) result = result && Ask < Close[PREV];
       break;
   }
@@ -4037,16 +4262,16 @@ bool Trade_Fractals(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(FRACTALS, tf, 0.0);
   switch (cmd) {
     case OP_BUY:
-      result = fractals[period][CURR][MODE_LOWER] != 0.0 || fractals[period][PREV][MODE_LOWER] != 0.0 || fractals[period][FAR][MODE_LOWER] != 0.0;
-      if ((open_method &   1) != 0) result = result && fractals[period][FAR][MODE_LOWER] != 0.0;
+      result = fractals[period][CURR][LOWER] != 0.0 || fractals[period][PREV][LOWER] != 0.0 || fractals[period][FAR][LOWER] != 0.0;
+      if ((open_method &   1) != 0) result = result && fractals[period][FAR][LOWER] != 0.0;
       //if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
       // if ((open_method &   2) != 0) result = result && !Fractals_On_Sell(tf);
       // if ((open_method &   4) != 0) result = result && Fractals_On_Buy(MathMin(period + 1, M30));
       // if ((open_method &   8) != 0) result = result && Fractals_On_Buy(M30);
       break;
     case OP_SELL:
-      result = fractals[period][CURR][MODE_UPPER] != 0.0 || fractals[period][PREV][MODE_UPPER] != 0.0 || fractals[period][FAR][MODE_UPPER] != 0.0;
-      if ((open_method &   1) != 0) result = result && fractals[period][FAR][MODE_UPPER] != 0.0;
+      result = fractals[period][CURR][UPPER] != 0.0 || fractals[period][PREV][UPPER] != 0.0 || fractals[period][FAR][UPPER] != 0.0;
+      if ((open_method &   1) != 0) result = result && fractals[period][FAR][UPPER] != 0.0;
       //if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
       // if ((open_method &   2) != 0) result = result && !Fractals_On_Buy(tf);
       // if ((open_method &   4) != 0) result = result && Fractals_On_Sell(MathMin(period + 1, M30));
@@ -4078,7 +4303,7 @@ bool Trade_Gator(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double op
       //Lower part of diagram is taken for calculations. Growth is checked on 4 periods.
       //The flag is 1 of trend is strengthened, 0 - no strengthening, -1 - never.
       //Uses part of Alligator's variables
-      if (iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_LOWER,3)>iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_LOWER,2)&&iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_LOWER,2)>iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_LOWER,1)&&iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_LOWER,1)>iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_LOWER,0))
+      if (iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,3)>iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,2)&&iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,2)>iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,1)&&iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,1)>iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,0))
       {f4=1;}
     */
     case OP_BUY:
@@ -4515,23 +4740,23 @@ bool Trade_StdDev(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double o
     */
     case OP_BUY:
       /*
-        bool result = StdDev[period][CURR][MODE_LOWER] != 0.0 || StdDev[period][PREV][MODE_LOWER] != 0.0 || StdDev[period][FAR][MODE_LOWER] != 0.0;
+        bool result = StdDev[period][CURR][LOWER] != 0.0 || StdDev[period][PREV][LOWER] != 0.0 || StdDev[period][FAR][LOWER] != 0.0;
         if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
         if ((open_method &   2) != 0) result = result && !StdDev_On_Sell(tf);
         if ((open_method &   4) != 0) result = result && StdDev_On_Buy(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && StdDev_On_Buy(M30);
-        if ((open_method &  16) != 0) result = result && StdDev[period][FAR][MODE_LOWER] != 0.0;
+        if ((open_method &  16) != 0) result = result && StdDev[period][FAR][LOWER] != 0.0;
         if ((open_method &  32) != 0) result = result && !StdDev_On_Sell(M30);
         */
     break;
     case OP_SELL:
       /*
-        bool result = StdDev[period][CURR][MODE_UPPER] != 0.0 || StdDev[period][PREV][MODE_UPPER] != 0.0 || StdDev[period][FAR][MODE_UPPER] != 0.0;
+        bool result = StdDev[period][CURR][UPPER] != 0.0 || StdDev[period][PREV][UPPER] != 0.0 || StdDev[period][FAR][UPPER] != 0.0;
         if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
         if ((open_method &   2) != 0) result = result && !StdDev_On_Buy(tf);
         if ((open_method &   4) != 0) result = result && StdDev_On_Sell(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && StdDev_On_Sell(M30);
-        if ((open_method &  16) != 0) result = result && StdDev[period][FAR][MODE_UPPER] != 0.0;
+        if ((open_method &  16) != 0) result = result && StdDev[period][FAR][UPPER] != 0.0;
         if ((open_method &  32) != 0) result = result && !StdDev_On_Buy(M30);
         */
     break;
@@ -4581,23 +4806,23 @@ bool Trade_Stochastic(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, doub
       */
     case OP_BUY:
       /*
-        bool result = Stochastic[period][CURR][MODE_LOWER] != 0.0 || Stochastic[period][PREV][MODE_LOWER] != 0.0 || Stochastic[period][FAR][MODE_LOWER] != 0.0;
+        bool result = Stochastic[period][CURR][LOWER] != 0.0 || Stochastic[period][PREV][LOWER] != 0.0 || Stochastic[period][FAR][LOWER] != 0.0;
         if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
         if ((open_method &   2) != 0) result = result && !Stochastic_On_Sell(tf);
         if ((open_method &   4) != 0) result = result && Stochastic_On_Buy(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && Stochastic_On_Buy(M30);
-        if ((open_method &  16) != 0) result = result && Stochastic[period][FAR][MODE_LOWER] != 0.0;
+        if ((open_method &  16) != 0) result = result && Stochastic[period][FAR][LOWER] != 0.0;
         if ((open_method &  32) != 0) result = result && !Stochastic_On_Sell(M30);
         */
     break;
     case OP_SELL:
       /*
-        bool result = Stochastic[period][CURR][MODE_UPPER] != 0.0 || Stochastic[period][PREV][MODE_UPPER] != 0.0 || Stochastic[period][FAR][MODE_UPPER] != 0.0;
+        bool result = Stochastic[period][CURR][UPPER] != 0.0 || Stochastic[period][PREV][UPPER] != 0.0 || Stochastic[period][FAR][UPPER] != 0.0;
         if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
         if ((open_method &   2) != 0) result = result && !Stochastic_On_Buy(tf);
         if ((open_method &   4) != 0) result = result && Stochastic_On_Sell(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && Stochastic_On_Sell(M30);
-        if ((open_method &  16) != 0) result = result && Stochastic[period][FAR][MODE_UPPER] != 0.0;
+        if ((open_method &  16) != 0) result = result && Stochastic[period][FAR][UPPER] != 0.0;
         if ((open_method &  32) != 0) result = result && !Stochastic_On_Buy(M30);
         */
     break;
@@ -4670,23 +4895,23 @@ bool Trade_ZigZag(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double o
   switch (cmd) {
     case OP_BUY:
       /*
-        bool result = ZigZag[period][CURR][MODE_LOWER] != 0.0 || ZigZag[period][PREV][MODE_LOWER] != 0.0 || ZigZag[period][FAR][MODE_LOWER] != 0.0;
+        bool result = ZigZag[period][CURR][LOWER] != 0.0 || ZigZag[period][PREV][LOWER] != 0.0 || ZigZag[period][FAR][LOWER] != 0.0;
         if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
         if ((open_method &   2) != 0) result = result && !ZigZag_On_Sell(tf);
         if ((open_method &   4) != 0) result = result && ZigZag_On_Buy(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && ZigZag_On_Buy(M30);
-        if ((open_method &  16) != 0) result = result && ZigZag[period][FAR][MODE_LOWER] != 0.0;
+        if ((open_method &  16) != 0) result = result && ZigZag[period][FAR][LOWER] != 0.0;
         if ((open_method &  32) != 0) result = result && !ZigZag_On_Sell(M30);
         */
     break;
     case OP_SELL:
       /*
-        bool result = ZigZag[period][CURR][MODE_UPPER] != 0.0 || ZigZag[period][PREV][MODE_UPPER] != 0.0 || ZigZag[period][FAR][MODE_UPPER] != 0.0;
+        bool result = ZigZag[period][CURR][UPPER] != 0.0 || ZigZag[period][PREV][UPPER] != 0.0 || ZigZag[period][FAR][UPPER] != 0.0;
         if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
         if ((open_method &   2) != 0) result = result && !ZigZag_On_Buy(tf);
         if ((open_method &   4) != 0) result = result && ZigZag_On_Sell(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && ZigZag_On_Sell(M30);
-        if ((open_method &  16) != 0) result = result && ZigZag[period][FAR][MODE_UPPER] != 0.0;
+        if ((open_method &  16) != 0) result = result && ZigZag[period][FAR][UPPER] != 0.0;
         if ((open_method &  32) != 0) result = result && !ZigZag_On_Buy(M30);
         */
     break;
@@ -4730,7 +4955,7 @@ bool CheckMarketCondition1(int cmd, int tf = PERIOD_M30, int condition = 0, bool
   if ((condition &   8) != 0) result = result && UpdateIndicator(MA, tf)        && ((cmd == OP_BUY && Ask > ma_slow[period][CURR]) || (cmd == OP_SELL && Ask < ma_slow[period][CURR]));
 //if ((condition &   8) != 0) result = result && UpdateIndicator(MA, tf)        && ((cmd == OP_BUY && ma_slow[period][CURR] > ma_slow[period][PREV]) || (cmd == OP_SELL && ma_slow[period][CURR] < ma_slow[period][PREV]));
   if ((condition &  16) != 0) result = result && ((cmd == OP_BUY && Ask < Open[CURR]) || (cmd == OP_SELL && Ask > Open[CURR]));
-  if ((condition &  32) != 0) result = result && UpdateIndicator(BANDS, tf)     && ((cmd == OP_BUY && Open[CURR] < bands[period][CURR][MODE_MAIN]) || (cmd == OP_SELL && Open[CURR] > bands[period][CURR][MODE_MAIN]));
+  if ((condition &  32) != 0) result = result && UpdateIndicator(BANDS, tf)     && ((cmd == OP_BUY && Open[CURR] < bands[period][CURR][BANDS_BASE]) || (cmd == OP_SELL && Open[CURR] > bands[period][CURR][BANDS_BASE]));
   if ((condition &  64) != 0) result = result && UpdateIndicator(ENVELOPES, tf) && ((cmd == OP_BUY && Open[CURR] < envelopes[period][CURR][MODE_MAIN]) || (cmd == OP_SELL && Open[CURR] > envelopes[period][CURR][MODE_MAIN]));
   if ((condition & 128) != 0) result = result && UpdateIndicator(DEMARKER, tf)  && ((cmd == OP_BUY && demarker[period][CURR] < 0.5) || (cmd == OP_SELL && demarker[period][CURR] > 0.5));
   if ((condition & 256) != 0) result = result && UpdateIndicator(WPR, tf)       && ((cmd == OP_BUY && wpr[period][CURR] > 50) || (cmd == OP_SELL && wpr[period][CURR] < 50));
@@ -5279,18 +5504,18 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
        break;
      case T_BANDS: // 25: Current Bands value.
        UpdateIndicator(BANDS, timeframe);
-       new_value = If(OpTypeValue(cmd) == loss_or_profit, bands[period][CURR][MODE_UPPER], bands[period][CURR][MODE_LOWER]);
+       new_value = If(OpTypeValue(cmd) == loss_or_profit, bands[period][CURR][BANDS_UPPER], bands[period][CURR][BANDS_LOWER]);
        break;
      case T_BANDS_PEAK: // 26: Lowest/highest Bands value.
        UpdateIndicator(BANDS, timeframe);
        new_value = If(OpTypeValue(cmd) == loss_or_profit,
-         MathMax(MathMax(bands[period][CURR][MODE_UPPER], bands[period][PREV][MODE_UPPER]), bands[period][FAR][MODE_UPPER]),
-         MathMin(MathMin(bands[period][CURR][MODE_LOWER], bands[period][PREV][MODE_LOWER]), bands[period][FAR][MODE_LOWER])
+         MathMax(MathMax(bands[period][CURR][BANDS_UPPER], bands[period][PREV][BANDS_UPPER]), bands[period][FAR][BANDS_UPPER]),
+         MathMin(MathMin(bands[period][CURR][BANDS_LOWER], bands[period][PREV][BANDS_LOWER]), bands[period][FAR][BANDS_LOWER])
          );
        break;
      case T_ENVELOPES: // 27: Current Envelopes value. // FIXME
        UpdateIndicator(ENVELOPES, timeframe);
-       new_value = If(OpTypeValue(cmd) == loss_or_profit, envelopes[period][CURR][MODE_UPPER], envelopes[period][CURR][MODE_LOWER]);
+       new_value = If(OpTypeValue(cmd) == loss_or_profit, envelopes[period][CURR][UPPER], envelopes[period][CURR][LOWER]);
        break;
      default:
        if (VerboseDebug) Print(__FUNCTION__ + "(): Error: Unknown trailing stop method: ", method);
@@ -5549,7 +5774,7 @@ int GetTotalOrdersByType(int order_type) {
 /*
  * Get total profit of opened orders by type.
  */
-double GetTotalProfitByType(int cmd = EMPTY, int order_type = EMPTY) {
+double GetTotalProfitByType(int cmd = NULL, int order_type = NULL) {
   double total = 0;
   for (int i = 0; i < OrdersTotal(); i++) {
     if (OrderSelect(i, SELECT_BY_POS, MODE_TRADES) == FALSE) break;
@@ -5611,8 +5836,8 @@ double CalculateOpenLots() {
 }
 
 // For given magic number, check if it is ours.
-bool CheckOurMagicNumber(int magic_number = EMPTY) {
-  if (magic_number == EMPTY) magic_number = OrderMagicNumber();
+bool CheckOurMagicNumber(int magic_number = NULL) {
+  if (magic_number == NULL) magic_number = OrderMagicNumber();
   return (magic_number >= MagicNumber && magic_number < MagicNumber + FINAL_STRATEGY_TYPE_ENTRY);
 }
 
@@ -5729,7 +5954,7 @@ bool CheckFreeMargin(int op_type, double size_of_lot) {
    return (margin_ok);
 }
 
-void CheckStats(double value, int type, bool max = TRUE) {
+void CheckStats(double value, int type, bool max = true) {
   if (max) {
     if (value > daily[type])   daily[type]   = value;
     if (value > weekly[type])  weekly[type]  = value;
@@ -5830,7 +6055,7 @@ double PointsToPips(int points) {
 /*
  * Get the difference between two price values (in pips).
  */
-double GetPipDiff(double price1, double price2, bool abs = FALSE) {
+double GetPipDiff(double price1, double price2, bool abs = false) {
   double diff = If(abs, MathAbs(price1 - price2), price1 - price2);
   return ValueToPips(diff);
 }
@@ -5853,7 +6078,7 @@ string ValueToCurrency(double value, int digits = 2) {
  * Note: Using Mode_SPREAD can return 20 on EURUSD (IBFX), but zero on some other pairs, so using Ask - Bid instead.
  * See: http://forum.mql4.com/42285
  */
-double GetMarketSpread(bool in_points = FALSE) {
+double GetMarketSpread(bool in_points = false) {
   // return MarketInfo(Symbol(), MODE_SPREAD) / MathPow(10, Digits - PipDigits);
   double spread = If(in_points, SymbolInfoInteger(Symbol(), SYMBOL_SPREAD), Ask - Bid);
   if (in_points) CheckStats(spread, MAX_SPREAD);
@@ -5862,7 +6087,7 @@ double GetMarketSpread(bool in_points = FALSE) {
 }
 
 // Get current minimum marker gap (in points).
-double GetMarketGap(bool in_points = FALSE) {
+double GetMarketGap(bool in_points = false) {
   return If(in_points, market_stoplevel + GetMarketSpread(TRUE), (market_stoplevel + GetMarketSpread(TRUE)) * Point);
 }
 
@@ -5876,7 +6101,7 @@ bool MarketPeakHours() {
 /*
  * Normalize lot size.
  */
-double NormalizeLots(double lots, bool ceiling = FALSE, string pair = "") {
+double NormalizeLots(double lots, bool ceiling = false, string pair = "") {
   // See: http://forum.mql4.com/47988
   double lotsize;
   double precision;
@@ -5940,7 +6165,7 @@ double GetAccountStopoutLevel() {
 /*
  * Calculate number of order allowed given risk ratio.
  */
-int GetMaxOrdersAuto(bool smooth = TRUE) {
+int GetMaxOrdersAuto(bool smooth = true) {
   double avail_margin = MathMin(AccountFreeMargin(), AccountBalance());
   double leverage     = MathMax(AccountLeverage(), 100);
   int balance_limit   = MathMax(MathMin(AccountBalance(), AccountEquity()) / 2, 0); // At least 1 order per 2 currency value. This also prevents trading with negative balance.
@@ -5996,7 +6221,7 @@ int GetNoOfStrategies() {
 /*
  * Calculate size of the lot based on the free margin and account leverage automatically.
  */
-double GetAutoLotSize(bool smooth = TRUE) {
+double GetAutoLotSize(bool smooth = true) {
   double avail_margin = MathMin(AccountFreeMargin(), AccountBalance());
   double leverage     = MathMax(AccountLeverage(), 100);
   #ifdef __advanced__ double margin_risk = 0.02; #else double margin_risk = 0.01; #endif // Risk only 1%/2% (0.01/0.02) per order of total available margin.
@@ -7234,58 +7459,58 @@ void RSI_CheckPeriod() {
   int period;
   // 1 minute period.
   period = M1;
-  if (rsi_stats[period][MODE_UPPER] - rsi_stats[period][MODE_LOWER] < RSI1_IncreasePeriod_MinDiff) {
+  if (rsi_stats[period][UPPER] - rsi_stats[period][LOWER] < RSI1_IncreasePeriod_MinDiff) {
     info[RSI1][CUSTOM_PERIOD] = MathMin(info[RSI1][CUSTOM_PERIOD] + 1, RSI_Period * 2);
     if (VerboseDebug) PrintFormat("Increased " + sname[RSI1] + " period to %d", info[RSI1][CUSTOM_PERIOD]);
     // Reset stats.
-    rsi_stats[period][MODE_UPPER] = 0;
-    rsi_stats[period][MODE_LOWER] = 0;
-  } else if (rsi_stats[period][MODE_UPPER] - rsi_stats[period][MODE_LOWER] > RSI1_DecreasePeriod_MaxDiff) {
+    rsi_stats[period][UPPER] = 0;
+    rsi_stats[period][LOWER] = 0;
+  } else if (rsi_stats[period][UPPER] - rsi_stats[period][LOWER] > RSI1_DecreasePeriod_MaxDiff) {
     info[RSI1][CUSTOM_PERIOD] = MathMax(info[RSI1][CUSTOM_PERIOD] - 1, RSI_Period / 2);
     if (VerboseDebug) PrintFormat("Decreased " + sname[RSI1] + " period to %d", info[RSI1][CUSTOM_PERIOD]);
     // Reset stats.
-    rsi_stats[period][MODE_UPPER] = 0;
-    rsi_stats[period][MODE_LOWER] = 0;
+    rsi_stats[period][UPPER] = 0;
+    rsi_stats[period][LOWER] = 0;
   }
   // 5 minute period.
   period = M5;
-  if (rsi_stats[period][MODE_UPPER] - rsi_stats[period][MODE_LOWER] < RSI5_IncreasePeriod_MinDiff) {
+  if (rsi_stats[period][UPPER] - rsi_stats[period][LOWER] < RSI5_IncreasePeriod_MinDiff) {
     info[RSI5][CUSTOM_PERIOD] = MathMin(info[RSI5][CUSTOM_PERIOD] + 1, RSI_Period * 2);
     if (VerboseDebug) PrintFormat("Increased " + sname[RSI5] + " period to %d", info[RSI1][CUSTOM_PERIOD]);
     // Reset stats.
-    rsi_stats[period][MODE_UPPER] = 0;
-    rsi_stats[period][MODE_LOWER] = 0;
-  } else if (rsi_stats[period][MODE_UPPER] - rsi_stats[period][MODE_LOWER] > RSI5_DecreasePeriod_MaxDiff) {
+    rsi_stats[period][UPPER] = 0;
+    rsi_stats[period][LOWER] = 0;
+  } else if (rsi_stats[period][UPPER] - rsi_stats[period][LOWER] > RSI5_DecreasePeriod_MaxDiff) {
     info[RSI5][CUSTOM_PERIOD] = MathMax(info[RSI5][CUSTOM_PERIOD] - 1, RSI_Period / 2);
     if (VerboseDebug) PrintFormat("Decreased " + sname[RSI5] + " period to %d", info[RSI1][CUSTOM_PERIOD]);
     // Reset stats.
-    rsi_stats[period][MODE_UPPER] = 0;
-    rsi_stats[period][MODE_LOWER] = 0;
+    rsi_stats[period][UPPER] = 0;
+    rsi_stats[period][LOWER] = 0;
   }
   // 15 minute period.
 
   period = M15;
-  if (rsi_stats[period][MODE_UPPER] - rsi_stats[period][MODE_LOWER] < RSI15_IncreasePeriod_MinDiff) {
+  if (rsi_stats[period][UPPER] - rsi_stats[period][LOWER] < RSI15_IncreasePeriod_MinDiff) {
     info[RSI15][CUSTOM_PERIOD] = MathMin(info[RSI15][CUSTOM_PERIOD] + 1, RSI_Period * 2);
     if (VerboseDebug) PrintFormat("Increased " + sname[RSI15] + " period to %d", info[RSI15][CUSTOM_PERIOD]);
     // Reset stats.
-    rsi_stats[period][MODE_UPPER] = 0;
-    rsi_stats[period][MODE_LOWER] = 0;
-  } else if (rsi_stats[period][MODE_UPPER] - rsi_stats[period][MODE_LOWER] > RSI15_DecreasePeriod_MaxDiff) {
+    rsi_stats[period][UPPER] = 0;
+    rsi_stats[period][LOWER] = 0;
+  } else if (rsi_stats[period][UPPER] - rsi_stats[period][LOWER] > RSI15_DecreasePeriod_MaxDiff) {
     info[RSI15][CUSTOM_PERIOD] = MathMax(info[RSI15][CUSTOM_PERIOD] - 1, RSI_Period / 2);
     if (VerboseDebug) PrintFormat("Decreased " + sname[RSI15] + " period to %d", info[RSI15][CUSTOM_PERIOD]);
     // Reset stats.
-    rsi_stats[period][MODE_UPPER] = 0;
-    rsi_stats[period][MODE_LOWER] = 0;
+    rsi_stats[period][UPPER] = 0;
+    rsi_stats[period][LOWER] = 0;
   }
   /*
-  Print(__FUNCTION__ + "(): M1: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][MODE_LOWER] + ", Max: " + rsi_stats[period][MODE_UPPER] + ", Diff: " + ( rsi_stats[period][MODE_UPPER] - rsi_stats[period][MODE_LOWER] ));
+  Print(__FUNCTION__ + "(): M1: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][LOWER] + ", Max: " + rsi_stats[period][UPPER] + ", Diff: " + ( rsi_stats[period][UPPER] - rsi_stats[period][LOWER] ));
   period = M5;
-  Print(__FUNCTION__ + "(): M5: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][MODE_LOWER] + ", Max: " + rsi_stats[period][MODE_UPPER] + ", Diff: " + ( rsi_stats[period][MODE_UPPER] - rsi_stats[period][MODE_LOWER] ));
+  Print(__FUNCTION__ + "(): M5: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][LOWER] + ", Max: " + rsi_stats[period][UPPER] + ", Diff: " + ( rsi_stats[period][UPPER] - rsi_stats[period][LOWER] ));
   period = M15;
-  Print(__FUNCTION__ + "(): M15: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][MODE_LOWER] + ", Max: " + rsi_stats[period][MODE_UPPER] + ", Diff: " + ( rsi_stats[period][MODE_UPPER] - rsi_stats[period][MODE_LOWER] ));
+  Print(__FUNCTION__ + "(): M15: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][LOWER] + ", Max: " + rsi_stats[period][UPPER] + ", Diff: " + ( rsi_stats[period][UPPER] - rsi_stats[period][LOWER] ));
   period = M30;
-  Print(__FUNCTION__ + "(): M30: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][MODE_LOWER] + ", Max: " + rsi_stats[period][MODE_UPPER] + ", Diff: " + ( rsi_stats[period][MODE_UPPER] - rsi_stats[period][MODE_LOWER] ));
+  Print(__FUNCTION__ + "(): M30: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][LOWER] + ", Max: " + rsi_stats[period][UPPER] + ", Diff: " + ( rsi_stats[period][UPPER] - rsi_stats[period][LOWER] ));
   */
 }
 
@@ -7294,11 +7519,11 @@ bool RSI_IncreasePeriod(int tf = PERIOD_M1, int condition = 0) {
   bool result = condition > 0;
   UpdateIndicator(RSI, tf);
   int period = TfToPeriod(tf);
-  if ((condition &   1) != 0) result = result && (rsi_stats[period][MODE_UPPER] > 50 + RSI_OpenLevel + RSI_OpenLevel / 2 && rsi_stats[period][MODE_LOWER] < 50 - RSI_OpenLevel - RSI_OpenLevel / 2);
-  if ((condition &   2) != 0) result = result && (rsi_stats[period][MODE_UPPER] > 50 + RSI_OpenLevel + RSI_OpenLevel / 2 || rsi_stats[period][MODE_LOWER] < 50 - RSI_OpenLevel - RSI_OpenLevel / 2);
+  if ((condition &   1) != 0) result = result && (rsi_stats[period][UPPER] > 50 + RSI_OpenLevel + RSI_OpenLevel / 2 && rsi_stats[period][LOWER] < 50 - RSI_OpenLevel - RSI_OpenLevel / 2);
+  if ((condition &   2) != 0) result = result && (rsi_stats[period][UPPER] > 50 + RSI_OpenLevel + RSI_OpenLevel / 2 || rsi_stats[period][LOWER] < 50 - RSI_OpenLevel - RSI_OpenLevel / 2);
   if ((condition &   4) != 0) result = result && (rsi_stats[period][0] < 50 + RSI_OpenLevel + RSI_OpenLevel / 3 && rsi_stats[period][0] > 50 - RSI_OpenLevel - RSI_OpenLevel / 3);
   // if ((condition &   4) != 0) result = result || rsi_stats[period][0] < 50 + RSI_OpenLevel;
-  if ((condition &   8) != 0) result = result && rsi_stats[period][MODE_UPPER] - rsi_stats[period][MODE_LOWER] < 50;
+  if ((condition &   8) != 0) result = result && rsi_stats[period][UPPER] - rsi_stats[period][LOWER] < 50;
   // if ((condition &  16) != 0) result = result && rsi[period][CURR] - rsi[period][PREV] > rsi[period][PREV] - rsi[period][FAR];
   // if ((condition &  32) != 0) result = result && Open[CURR] > Close[PREV];
   return result;
@@ -7309,11 +7534,11 @@ bool RSI_DecreasePeriod(int tf = PERIOD_M1, int condition = 0) {
   bool result = condition > 0;
   UpdateIndicator(RSI, tf);
   int period = TfToPeriod(tf);
-  if ((condition &   1) != 0) result = result && (rsi_stats[period][MODE_UPPER] <= 50 + RSI_OpenLevel && rsi_stats[period][MODE_LOWER] >= 50 - RSI_OpenLevel);
-  if ((condition &   2) != 0) result = result && (rsi_stats[period][MODE_UPPER] <= 50 + RSI_OpenLevel || rsi_stats[period][MODE_LOWER] >= 50 - RSI_OpenLevel);
+  if ((condition &   1) != 0) result = result && (rsi_stats[period][UPPER] <= 50 + RSI_OpenLevel && rsi_stats[period][LOWER] >= 50 - RSI_OpenLevel);
+  if ((condition &   2) != 0) result = result && (rsi_stats[period][UPPER] <= 50 + RSI_OpenLevel || rsi_stats[period][LOWER] >= 50 - RSI_OpenLevel);
   // if ((condition &   4) != 0) result = result && (rsi_stats[period][0] > 50 + RSI_OpenLevel / 3 || rsi_stats[period][0] < 50 - RSI_OpenLevel / 3);
-  // if ((condition &   4) != 0) result = result && rsi_stats[period][MODE_UPPER] > 50 + (RSI_OpenLevel / 3);
-  // if ((condition &   8) != 0) result = result && && rsi_stats[period][MODE_UPPER] < 50 - (RSI_OpenLevel / 3);
+  // if ((condition &   4) != 0) result = result && rsi_stats[period][UPPER] > 50 + (RSI_OpenLevel / 3);
+  // if ((condition &   8) != 0) result = result && && rsi_stats[period][UPPER] < 50 - (RSI_OpenLevel / 3);
   // if ((condition &  16) != 0) result = result && rsi[period][CURR] - rsi[period][PREV] > rsi[period][PREV] - rsi[period][FAR];
   // if ((condition &  32) != 0) result = result && Open[CURR] > Close[PREV];
   return result;
@@ -7477,7 +7702,7 @@ string GetMonthlyReport() {
   return output;
 }
 
-string DisplayInfoOnChart(bool on_chart = TRUE, string sep = "\n") {
+string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
   string output;
   // Prepare text for Stop Out.
   string stop_out_level = AccountStopoutLevel();
