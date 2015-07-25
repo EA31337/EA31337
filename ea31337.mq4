@@ -27,8 +27,14 @@
   #undef __rider__     // Disable rider strategy by default.
 #endif
 
+#ifdef __rider__
+  #define __nofactor__  // No booting factor for daily, weekly and monthly strategies.
+#endif
+
 #ifdef __limited__
   #define __noboost__   // Disable boosting for limited mode.
+  #define __nofactor__  // No booting factor for daily, weekly and monthly strategies.
+  #define __trend__     // Trade with trend.
   //#define __noactions__ // Disable actions for limited mode.
 #endif
 
@@ -47,7 +53,7 @@
   #define ea_name    "EA31337 Lite"
 #endif
 #define ea_desc    "Multi-strategy advanced trading robot."
-#define ea_version "1.064"
+#define ea_version "1.065"
 #define ea_build   __DATETIME__ // FIXME: It's empty
 #define ea_link    "http://www.ea31337.com"
 #define ea_author  "kenorb"
@@ -518,7 +524,11 @@ extern bool TradeMicroLots = TRUE;
 //+------------------------------------------------------------------+
 extern string __EA_Risk_Parameters__ = "-- Risk management --";
 extern double RiskRatio = 0; // Suggested value: 1.0. Do not change unless testing.
-extern bool TradeWithTrend = FALSE; // Default. Trade with trend only to minimalize the risk.
+#ifndef __trend__
+  extern bool TradeWithTrend = FALSE; // Default. Trade with trend only to minimalize the risk.
+#else
+  extern bool TradeWithTrend = TRUE; // Trade with trend.
+#endif
 extern bool MinimalizeLosses = FALSE; // Set stop loss to zero, once the order is profitable.
 #ifdef __advanced__
   extern int RiskRatioIncreaseMethod = 112; // Risk ratio calculation method when RiskRatio is set to 0. Valid range: 0-255.
@@ -536,6 +546,7 @@ extern bool MinimalizeLosses = FALSE; // Set stop loss to zero, once the order i
   #else
     extern bool ApplySpreadLimits = FALSE;
   #endif
+  extern double MaxSpreadToTrade = 10.0; // Maximum spread to trade (in pips). Only applied if ApplySpreadLimits is TRUE.
 #endif
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting (set 1.0 to default) --";
@@ -544,7 +555,7 @@ extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting (set 1.0 
 #else
   extern bool Boosting_Enabled                       = FALSE;
 #endif
-#ifndef __limited__
+#ifndef __nofactor__
   extern double BestDailyStrategyMultiplierFactor    = 1.1; // Lot multiplier boosting factor for the most profitable daily strategy.
   extern double BestWeeklyStrategyMultiplierFactor   = 1.2; // Lot multiplier boosting factor for the most profitable weekly strategy.
   extern double BestMonthlyStrategyMultiplierFactor  = 1.5; // Lot multiplier boosting factor for the most profitable monthly strategy.
@@ -552,18 +563,26 @@ extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting (set 1.0 
   extern double WorseWeeklyStrategyDividerFactor     = 1.2; // Lot divider factor for the most profitable weekly strategy. Useful for low-balance accounts or non-profitable periods.
   extern double WorseMonthlyStrategyDividerFactor    = 1.2; // Lot divider factor for the most profitable monthly strategy. Useful for low-balance accounts or non-profitable periods.
 #else
-  extern double BestDailyStrategyMultiplierFactor    = 1.1; // Lot multiplier boosting factor for the most profitable daily strategy.
-  extern double BestWeeklyStrategyMultiplierFactor   = 1.2; // Lot multiplier boosting factor for the most profitable weekly strategy.
-  extern double BestMonthlyStrategyMultiplierFactor  = 1.5; // Lot multiplier boosting factor for the most profitable monthly strategy.
-  extern double WorseDailyStrategyDividerFactor      = 0.0;
-  extern double WorseWeeklyStrategyDividerFactor     = 0.0;
-  extern double WorseMonthlyStrategyDividerFactor    = 0.0;
+  extern double BestDailyStrategyMultiplierFactor    = 1.0; // Lot multiplier boosting factor for the most profitable daily strategy.
+  extern double BestWeeklyStrategyMultiplierFactor   = 1.0; // Lot multiplier boosting factor for the most profitable weekly strategy.
+  extern double BestMonthlyStrategyMultiplierFactor  = 1.0; // Lot multiplier boosting factor for the most profitable monthly strategy.
+  extern double WorseDailyStrategyDividerFactor      = 1.0;
+  extern double WorseWeeklyStrategyDividerFactor     = 1.0;
+  extern double WorseMonthlyStrategyDividerFactor    = 1.0;
 #endif
-extern double BoostTrendFactor                     = 1.2; // Additional boost when trade is with trend.
+#ifndef __rider__
+  extern double BoostTrendFactor                     = 1.2; // Additional boost when trade is with trend.
+#else
+  extern double BoostTrendFactor                     = 1.0; // Disable boost trend for rider mode.
+#endif
 #ifdef __advanced__
   extern int LotSizeIncreaseMethod = 202; // Lot size calculation method when LotSize is set to 0. Valid range: 0-255.
   extern int LotSizeDecreaseMethod = 167; // Lot size calculation method when LotSize is set to 0. Valid range: 0-255.
-  extern bool BoostByProfitFactor                  = TRUE; // Boost strategy by its profit factor. To be more accurate, it requires at least 10 orders to be placed by strategy. It's 1.0 by default.
+  #ifndef __rider__
+    extern bool BoostByProfitFactor                  = TRUE; // Boost strategy by its profit factor. To be more accurate, it requires at least 10 orders to be placed by strategy. It's 1.0 by default.
+  #else
+    extern bool BoostByProfitFactor                  = FALSE; // Disable boost by pf for rider strategy.
+  #endif
   extern bool HandicapByProfitFactor               = FALSE; // Handicap by low profit factor.
 #endif
 //+------------------------------------------------------------------+
@@ -593,12 +612,12 @@ extern int MarketSuddenDropSize = 10; // Size of sudden price drop in pips to re
 extern int MarketBigDropSize = 50; // Size of big sudden price drop in pips to react when the market drops.
 extern double MinPipChangeToTrade = 0.7; // Minimum pip change to trade before the bar change. Set 0 to process every tick. Lower is better for small spreads and other way round.
 extern int MinPipGap = 10; // Minimum gap in pips between trades of the same strategy.
-extern double MaxSpreadToTrade = 10.0; // Maximum spread to trade (in pips).
 //+------------------------------------------------------------------+
 #ifdef __advanced__
   extern string __Advanced_Parameters__ = "-- Advanced parameters --";
   extern bool QueueOrdersAIActive = TRUE; // Activate AI queue orders for selecting the best strategy to open. At least 2 orders needs to be queued in order to be processed.
-  extern int QueueOrdersAIMethod = 1; // Method for selecting best order to open from the orders queue.
+  extern int QueueOrdersAIMethod = 3; // Method for selecting best order to open from the orders queue. Valid range: 0-15.
+  extern int QueueOrdersAIFilter = 27; // Method for filtering the orders from the queue. Valid range: 0-255.
   extern bool CloseConditionOnlyProfitable = TRUE; // Close conditions applies only for profitable orders.
   extern bool DisableCloseConditions = FALSE; // Set TRUE to disable all close conditions for strategies. Not useful apart of testing.
   extern int HourAfterPeak = 18; // Minimum hour to check for peak prices, used by C_DAILY_PEAK, etc.
@@ -610,6 +629,7 @@ extern double MaxSpreadToTrade = 10.0; // Maximum spread to trade (in pips).
   extern int CloseConditionCustom5Method = 0; // Custom 5 market-based close condition. Valid range: 0-1023.
   extern int CloseConditionCustom6Method = 0; // Custom 6 market-based close condition. Valid range: 0-1023.
   extern bool DynamicSpreadConf = FALSE; // Dynamically calculate most optimal settings based on the current spread (MinPipChangeToTrade/MinPipGap).
+  extern int SmartToggleComponent = 0; // Dynamically toggle different components. Use only to troubleshoot the overall performance during the optimization. Valid range: 0-43.
   int SpreadRatio = 1.0;
 #else
   int HourAfterPeak = 18;
@@ -673,13 +693,13 @@ extern ENUM_ACTION_TYPE Action_On_Condition_12     = A_NONE;
 #else // Rider mode.
   #ifndef __limited__
 
-  extern ENUM_ACC_CONDITION Account_Condition_1      = C_ACC_MAX_ORDERS;
-  extern ENUM_MARKET_CONDITION Market_Condition_1    = C_DAILY_PEAK;
-  extern ENUM_ACTION_TYPE Action_On_Condition_1      = A_CLOSE_ORDER_PROFIT_MIN;
+  extern ENUM_ACC_CONDITION Account_Condition_1      = C_ACC_NONE;
+  extern ENUM_MARKET_CONDITION Market_Condition_1    = C_MARKET_NONE;
+  extern ENUM_ACTION_TYPE Action_On_Condition_1      = A_NONE;
 
-  extern ENUM_ACC_CONDITION Account_Condition_2      = C_EQUITY_10PC_LOW;
+  extern ENUM_ACC_CONDITION Account_Condition_2      = C_ACC_NONE;
   extern ENUM_MARKET_CONDITION Market_Condition_2    = C_MARKET_NONE;
-  extern ENUM_ACTION_TYPE Action_On_Condition_2      = A_CLOSE_ORDER_PROFIT;
+  extern ENUM_ACTION_TYPE Action_On_Condition_2      = A_NONE;
 
   extern ENUM_ACC_CONDITION Account_Condition_3      = C_EQUITY_20PC_LOW;
   extern ENUM_MARKET_CONDITION Market_Condition_3    = C_MARKET_TRUE;
@@ -689,13 +709,13 @@ extern ENUM_ACTION_TYPE Action_On_Condition_12     = A_NONE;
   extern ENUM_MARKET_CONDITION Market_Condition_4    = C_MARKET_TRUE;
   extern ENUM_ACTION_TYPE Action_On_Condition_4      = A_CLOSE_ALL_LOSS_SIDE;
 
-  extern ENUM_ACC_CONDITION Account_Condition_5      = C_EQUITY_10PC_HIGH;
-  extern ENUM_MARKET_CONDITION Market_Condition_5    = C_MARKET_BIG_DROP;
-  extern ENUM_ACTION_TYPE Action_On_Condition_5      = A_CLOSE_ORDER_PROFIT;
+  extern ENUM_ACC_CONDITION Account_Condition_5      = C_ACC_NONE;
+  extern ENUM_MARKET_CONDITION Market_Condition_5    = C_MARKET_NONE;
+  extern ENUM_ACTION_TYPE Action_On_Condition_5      = A_NONE;
 
-  extern ENUM_ACC_CONDITION Account_Condition_6      = C_EQUITY_20PC_HIGH;
-  extern ENUM_MARKET_CONDITION Market_Condition_6    = C_MARKET_VBIG_DROP;
-  extern ENUM_ACTION_TYPE Action_On_Condition_6      = A_CLOSE_ORDER_PROFIT_MIN;
+  extern ENUM_ACC_CONDITION Account_Condition_6      = C_ACC_NONE;
+  extern ENUM_MARKET_CONDITION Market_Condition_6    = C_MARKET_NONE;
+  extern ENUM_ACTION_TYPE Action_On_Condition_6      = A_NONE;
 
   extern ENUM_ACC_CONDITION Account_Condition_7      = C_EQUITY_50PC_HIGH;
   extern ENUM_MARKET_CONDITION Market_Condition_7    = C_MA1_FS_TREND_OPP;
@@ -715,7 +735,7 @@ extern ENUM_ACTION_TYPE Action_On_Condition_12     = A_NONE;
 
   extern ENUM_ACC_CONDITION Account_Condition_11     = C_ACC_TRUE;
   extern ENUM_MARKET_CONDITION Market_Condition_11   = C_MARKET_VBIG_DROP;
-  extern ENUM_ACTION_TYPE Action_On_Condition_11     = A_CLOSE_ALL_IN_LOSS;
+  extern ENUM_ACTION_TYPE Action_On_Condition_11     = A_CLOSE_ALL_NON_TREND;
 
   extern ENUM_ACC_CONDITION Account_Condition_12     = C_EQUITY_50PC_HIGH;
   extern ENUM_MARKET_CONDITION Market_Condition_12   = C_MA30_FS_TREND_OPP;
@@ -764,13 +784,13 @@ extern ENUM_ACTION_TYPE Action_On_Condition_12     = A_NONE;
   extern ENUM_MARKET_CONDITION Market_Condition_9    = C_MARKET_TRUE;
   extern ENUM_ACTION_TYPE Action_On_Condition_9      = A_CLOSE_ORDER_LOSS;
 
-  extern ENUM_ACC_CONDITION Account_Condition_10     = C_EQUITY_HIGHER;
-  extern ENUM_MARKET_CONDITION Market_Condition_10   = C_MARKET_BIG_DROP;
-  extern ENUM_ACTION_TYPE Action_On_Condition_10     = A_CLOSE_ORDER_PROFIT_MIN;
+  extern ENUM_ACC_CONDITION Account_Condition_10     = C_ACC_NONE;
+  extern ENUM_MARKET_CONDITION Market_Condition_10   = C_MARKET_NONE;
+  extern ENUM_ACTION_TYPE Action_On_Condition_10     = A_NONE;
 
   extern ENUM_ACC_CONDITION Account_Condition_11     = C_ACC_TRUE;
   extern ENUM_MARKET_CONDITION Market_Condition_11   = C_MARKET_VBIG_DROP;
-  extern ENUM_ACTION_TYPE Action_On_Condition_11     = A_CLOSE_ALL_IN_LOSS;
+  extern ENUM_ACTION_TYPE Action_On_Condition_11     = A_CLOSE_ALL_NON_TREND;
 
   extern ENUM_ACC_CONDITION Account_Condition_12     = C_EQUITY_50PC_HIGH;
   extern ENUM_MARKET_CONDITION Market_Condition_12   = C_MA30_FS_TREND_OPP;
@@ -2303,8 +2323,11 @@ extern int MagicNumber = 31337; // To help identify its own orders. It can vary 
  * Deposit: £2000 (default, spread 2)
  *
  * Deposit: £2000 (default, spread 20)
- *   £77576.22	5258	1.44	14.75	24957.91	77.13%	Market_Condition_12=9 	Action_On_Condition_12=6 (__rider__, auto)
+ *   £59968.30	7334	1.46	8.18	24904.84	73.02% TradeWithTrend=0 (__rider__, auto)
+ *   £2201.25	 7360	1.07	0.30	4608.56	76.53%	TradeWithTrend=1 (__rider__, auto)
+ *   Prev: £77576.22	5258	1.44	14.75	24957.91	77.13%	Market_Condition_12=9 	Action_On_Condition_12=6 (__rider__, auto)
  *   £31634.22	5503	1.25	5.75	16191.08	67.12%	Market_Condition_7=6 (__rider__, auto)
+ *   £1396.33	2361	1.40	0.59	615.42	25.54% (__limited__, auto)
  *
  * Deposit: £2000 (default, spread 40)
  * --
@@ -2621,6 +2644,7 @@ int OnInit() {
   InitializeStrategies();
   InitializeConditions();
   CheckHistory();
+  if (SmartToggleComponent) ToggleComponent(SmartToggleComponent);
 
   if (IsTesting()) {
     SendEmailEachOrder = FALSE;
@@ -6345,6 +6369,192 @@ bool InitializeVariables() {
 }
 
 /*
+ * Disable specific component for diagnostic purposes.
+ */
+void ToggleComponent(int component) {
+  switch (component) {
+    // Conditional actions.
+    case 1:
+      Account_Conditions_Active = !Account_Conditions_Active;
+      break;
+    case 2:
+      DisableCloseConditions = !DisableCloseConditions;
+      break;
+    // Boosting
+    case 3:
+      Boosting_Enabled = !Boosting_Enabled;
+      break;
+    case 4:
+      BoostByProfitFactor = !BoostByProfitFactor;
+      break;
+    case 5:
+      if (BestDailyStrategyMultiplierFactor != 1.0 || BestWeeklyStrategyMultiplierFactor != 1.0 || BestMonthlyStrategyMultiplierFactor != 1.0) {
+        BestDailyStrategyMultiplierFactor = 1.0;
+        BestWeeklyStrategyMultiplierFactor = 1.0;
+        BestMonthlyStrategyMultiplierFactor = 1.0;
+      } else {
+        BestDailyStrategyMultiplierFactor = 1.2;
+        BestWeeklyStrategyMultiplierFactor = 1.2;
+        BestMonthlyStrategyMultiplierFactor = 1.5;
+      }
+      break;
+    case 6:
+      if (WorseDailyStrategyDividerFactor != 1.0 || WorseWeeklyStrategyDividerFactor != 1.0 || WorseMonthlyStrategyDividerFactor != 1.0) {
+        WorseDailyStrategyDividerFactor = 1.0;
+        WorseWeeklyStrategyDividerFactor = 1.0;
+        WorseMonthlyStrategyDividerFactor = 1.0;
+      } else {
+        WorseDailyStrategyDividerFactor = 2;
+        WorseWeeklyStrategyDividerFactor = 2;
+        WorseMonthlyStrategyDividerFactor = 0;
+      }
+      break;
+    case 7:
+      if (BoostTrendFactor != 1.0) BoostTrendFactor = 1.0;
+      else BoostTrendFactor = 1.2;
+      break;
+    case 8:
+      HandicapByProfitFactor = !HandicapByProfitFactor;
+      break;
+    // Smart order queue
+    case 9:
+      QueueOrdersAIActive = !QueueOrdersAIActive;
+      break;
+    // Trend
+    case 10:
+      TradeWithTrend = !TradeWithTrend;
+      break;
+    case 11:
+      if (TrendMethod > 0) TrendMethod = 0; else TrendMethod = 181;
+      break;
+    case 12:
+      if (TrendMethodAction > 0) TrendMethodAction = 0; else TrendMethodAction = 17;
+      break;
+    // Risk
+    case 13:
+      if (RiskRatio > 0) RiskRatio = 0.0;
+      else RiskRatio = 1.0;
+      break;
+    case 14:
+      if (RiskRatioIncreaseMethod > 0) RiskRatioIncreaseMethod = 0; else RiskRatioIncreaseMethod = 255;
+      break;
+    case 15:
+      if (RiskRatioDecreaseMethod > 0) RiskRatioIncreaseMethod = 0; else RiskRatioIncreaseMethod = 255;
+      break;
+    case 16:
+      MinimalizeLosses = !MinimalizeLosses;
+      break;
+    // Spreads
+    case 17:
+      ApplySpreadLimits = !ApplySpreadLimits;
+      MaxSpreadToTrade = 100;
+      break;
+    case 18:
+      DynamicSpreadConf = !DynamicSpreadConf;
+      break;
+    // Lot size
+    case 19:
+      if (LotSize > 0) LotSize = 0.0;
+      else LotSize = market_minlot;
+      break;
+    case 20:
+      if (LotSizeIncreaseMethod > 0) LotSizeIncreaseMethod = 0; else LotSizeIncreaseMethod = 255;
+      break;
+    case 21:
+      if (LotSizeDecreaseMethod > 0) LotSizeDecreaseMethod = 0; else LotSizeDecreaseMethod = 255;
+      break;
+    // Order limits
+    case 22:
+      if (MaxOrders > 0) MaxOrders = 0;
+      else MaxOrders = 30;
+      break;
+    case 23:
+      if (MaxOrdersPerType > 0) MaxOrdersPerType = 0;
+      else MaxOrdersPerType = 3;
+      break;
+    case 24:
+      if (MaxOrdersPerDay > 0) MaxOrdersPerDay = 0;
+      else MaxOrdersPerDay = 30;
+      break;
+    case 25:
+      if (MinimumIntervalSec > 0) MinimumIntervalSec = 0;
+      else MinimumIntervalSec = 240;
+      break;
+    // Trade limits
+    case 26:
+      if (MinVolumeToTrade > 0) MinVolumeToTrade = 0;
+      else MinVolumeToTrade = 2;
+      break;
+    case 27:
+      if (MinPipChangeToTrade < 0.5) MinPipChangeToTrade = 1.0;
+      else MinPipChangeToTrade = 0.5;
+      break;
+    case 28:
+      if (MinPipGap < 5) MinPipGap = 10;
+      else MinPipGap = 5;
+      break;
+    // Indicator specific
+    case 29:
+      RSI_DynamicPeriod = !RSI_DynamicPeriod;
+      break;
+    // Profit and loss
+    case 30:
+      if (MinProfitCloseOrder > 20) MinProfitCloseOrder = 0;
+      else MinProfitCloseOrder = 20;
+      break;
+    case 31:
+      if (TakeProfit > 0) TakeProfit = 0;
+      else TakeProfit = 40;
+      break;
+    case 32:
+      if (StopLoss > 0) StopLoss = 0;
+      else StopLoss = 40;
+      break;
+    // Trailing values
+    case 33:
+      if (TrailingStop > 0) TrailingStop = 0;
+      else TrailingStop = 40;
+      break;
+    case 34:
+      if (TrailingProfit > 0) TrailingProfit = 0;
+      else TrailingProfit = 40;
+      break;
+    case 35:
+      TrailingStopOneWay = !TrailingStopOneWay;
+      break;
+    case 36:
+      TrailingProfitOneWay = !TrailingProfitOneWay;
+      break;
+    // Strategies
+    case 37:
+      ArrSetValueI(info, OPEN_CONDITION1,  0);
+      break;
+    case 38:
+      ArrSetValueI(info, OPEN_CONDITION2,  0);
+      break;
+    case 39:
+      ArrSetValueI(info, CLOSE_CONDITION, C_MACD_BUY_SELL);
+      break;
+    case 40:
+      ArrSetValueD(conf, OPEN_LEVEL, 0.0);
+      break;
+    case 41:
+      ArrSetValueD(conf, SPREAD_LIMIT,  100.0);
+      break;
+    case 42:
+      for (int m1 = 0; m1 < ArrayRange(info, 0); m1++)
+        if (info[m1][TIMEFRAME] == PERIOD_M1) info[m1][ACTIVE] = FALSE;
+      break;
+    case 43:
+      for (int m5 = 0; m5 < ArrayRange(info, 0); m5++)
+        if (info[m5][TIMEFRAME] == PERIOD_M5) info[m5][ACTIVE] = FALSE;
+      break;
+    default:
+      break;
+  }
+}
+
+/*
  * Initialize strategies.
  */
 bool InitializeStrategies() {
@@ -7616,9 +7826,18 @@ int GetArrKey1ByLowestKey2ValueD(double& arr[][], int key2) {
 }
 
 /*
- * Set array value for items with specific keys.
+ * Set array value for double items with specific keys.
  */
 void ArrSetValueD(double& arr[][], int key, double value) {
+  for (int i = 0; i < ArrayRange(info, 0); i++) {
+    arr[i][key] = value;
+  }
+}
+
+/*
+ * Set array value for integer items with specific keys.
+ */
+void ArrSetValueI(int& arr[][], int key, int value) {
   for (int i = 0; i < ArrayRange(info, 0); i++) {
     arr[i][key] = value;
   }
@@ -8047,12 +8266,13 @@ void CheckHistory() {
 /*
  * Process AI queue of orders to see if we can open any trades.
  */
-bool OrderQueueProcess(int method = EMPTY) {
+bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
   bool result = FALSE;
   int queue_size = OrderQueueCount();
   int sorted_queue[][2];
-  int cmd, sid; double volume;
+  int cmd, sid, time; double volume;
   if (method == EMPTY) method = QueueOrdersAIMethod;
+  if (filter == EMPTY) filter = QueueOrdersAIFilter;
   if (queue_size > 1) {
     int selected_qid = EMPTY, curr_qid = EMPTY;
     ArrayResize(sorted_queue, queue_size);
@@ -8068,7 +8288,9 @@ bool OrderQueueProcess(int method = EMPTY) {
       selected_qid = sorted_queue[i][1];
       cmd = order_queue[selected_qid][Q_CMD];
       sid = order_queue[selected_qid][Q_SID];
+      time = order_queue[selected_qid][Q_TIME];
       volume = GetStrategyLotSize(sid, cmd);
+      if (!OrderOrderCondition(cmd, sid, time, filter)) continue;
       if (OpenOrderIsAllowed(cmd, sid, volume)) {
         string comment = GetStrategyComment(sid) + " [AIQueued]";
         result = ExecuteOrder(cmd, sid, volume);
@@ -8080,33 +8302,62 @@ bool OrderQueueProcess(int method = EMPTY) {
 }
 
 /*
+ * Check for the market condition to filter out the order queue.
+ */
+bool OrderOrderCondition(int cmd, int sid, int time, int method) {
+  bool result = TRUE;
+  int timeframe = GetStrategyTimeframe(sid);
+  int period = TfToPeriod(timeframe);
+  int qshift = iBarShift(_Symbol, timeframe, time, FALSE); // Get the number of bars for the timeframe since queued.
+  double qopen = iOpen(_Symbol, timeframe, qshift);
+  double qclose = iClose(_Symbol, timeframe, qshift);
+  double qhighest = GetPeakPrice(timeframe, MODE_HIGH, qshift); // Get the high price since queued.
+  double qlowest = GetPeakPrice(timeframe, MODE_LOW, qshift); // Get the lowest price since queued.
+  double diff = MathMax(qhighest - Open[CURR], Open[CURR] - qlowest);
+  if ((method &   1) != 0) result &= (cmd == OP_BUY && qopen < Open[CURR]) || (cmd == OP_SELL && qopen > Open[CURR]);
+  if ((method &   2) != 0) result &= (cmd == OP_BUY && qclose < Close[CURR]) || (cmd == OP_SELL && qclose > Close[CURR]);
+  if ((method &   4) != 0) result &= (cmd == OP_BUY && qlowest < Low[CURR]) || (cmd == OP_SELL && qlowest > Low[CURR]);
+  if ((method &   8) != 0) result &= (cmd == OP_BUY && qhighest > High[CURR]) || (cmd == OP_SELL && qhighest < High[CURR]);
+  if ((method &  16) != 0) result &= UpdateIndicator(SAR, timeframe) && Trade_SAR(cmd, timeframe, 0, 0);
+  if ((method &  32) != 0) result &= UpdateIndicator(DEMARKER, timeframe) && Trade_DeMarker(cmd, timeframe, 0, 0);
+  if ((method &  64) != 0) result &= UpdateIndicator(RSI, timeframe) && Trade_RSI(cmd, timeframe, 0, 0);
+  if ((method & 128) != 0) result &= UpdateIndicator(MA, timeframe) && Trade_MA(cmd, timeframe, 0, 0);
+  return (result);
+}
+
+/*
  * Get key based on strategy id in order to prioritize the queue.
  */
 int GetOrderQueueKeyValue(int sid, int method, int qid) {
   int key = 0;
   switch (method) {
-    case  0: key = 0; break;
-    case  1: key = GetStrategyTimeframe(sid); break;
-    case  2: key = GetStrategyProfitFactor(sid) * 100; break;
-    case  3: key = GetStrategyLotSize(sid, order_queue[qid][Q_CMD]) * 100; break;
-    case  4: key = info[sid][OPEN_ORDERS]; break;
-    case  5: key = info[sid][TOTAL_ORDERS]; break;
-    case  6: key = info[sid][TOTAL_ORDERS_WON]; break;
-    case  7: key = -info[sid][TOTAL_ORDERS_LOSS]; break; // TODO: To test.
-    case  8: key = conf[sid][FACTOR]; break;
-    case  9: key = conf[sid][SPREAD_LIMIT]; break;
-    case 10: key = stats[sid][AVG_SPREAD]; break; // TODO: To test.
-    case 11: key = stats[sid][DAILY_PROFIT]; break;
-    case 12: key = stats[sid][WEEKLY_PROFIT]; break;
-    case 13: key = stats[sid][MONTHLY_PROFIT]; break; // TODO: To test.
-    case 14: key = stats[sid][TOTAL_GROSS_PROFIT]; break; // TODO: To test.
-    case 15: key = stats[sid][TOTAL_NET_PROFIT]; break;
+    case  0: key = order_queue[qid][Q_TIME]; break; // 7867 OK (10k, 0.02)
+    case  1: key = stats[sid][DAILY_PROFIT] * 10; break;
+    case  2: key = stats[sid][WEEKLY_PROFIT] * 10; break;
+    case  3: key = stats[sid][MONTHLY_PROFIT] * 10; break; // Has good results.
+    case  4: key = stats[sid][TOTAL_NET_PROFIT] * 10; break; // Has good results.
+    case  5: key = conf[sid][SPREAD_LIMIT] * 10; break;
+    case  6: key = GetStrategyTimeframe(sid); break;
+    case  7: key = GetStrategyProfitFactor(sid) * 100; break;
+    case  8: key = GetStrategyLotSize(sid, order_queue[qid][Q_CMD]) * 100; break;
+    case  9: key = stats[sid][TOTAL_GROSS_PROFIT]; break;
+    case 10: key = info[sid][TOTAL_ORDERS]; break; // --7846
+    case 11: key -= info[sid][TOTAL_ORDERS_LOSS]; break; // --7662 TODO: To test.
+    case 12: key = info[sid][TOTAL_ORDERS_WON]; break; // --7515
+    case 13: key -= stats[sid][TOTAL_GROSS_LOSS]; break;
+    case 14: key = stats[sid][AVG_SPREAD] * 10; break; // --7396, TODO: To test.
+    case 15: key = conf[sid][FACTOR] * 10; break; // --6976
+
+    // case  4: key = -info[sid][OPEN_ORDERS]; break; // TODO
   }
   // Message("Key: " + key + " for sid: " + sid + ", qid: " + qid);
 
   return key;
 }
 
+/*
+ * Get the next non-empty item from the queue.
+ */
 int OrderQueueNext(int index = EMPTY) {
   if (index == EMPTY) index = 0;
   for (int qid = index; qid < ArrayRange(order_queue, 0); qid++)
