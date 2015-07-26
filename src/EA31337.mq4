@@ -1,10 +1,11 @@
 //+------------------------------------------------------------------+
 //|                                                       EA31337    |
 //+------------------------------------------------------------------+
-
+//
 //+------------------------------------------------------------------+
 //| Predefined code configurations.
 //+------------------------------------------------------------------+
+//
 #define __advanced__  // Enable advanced configuration.
 //#define __release__ // Enable release settings.
 //#define __testing__   // Mode for testing each component.
@@ -55,7 +56,7 @@
 #define ea_desc    "Multi-strategy advanced trading robot."
 #define ea_version "1.066"
 #define ea_build   __DATETIME__ // FIXME: It's empty
-#define ea_link    "http://www.ea31337.com"
+#define ea_link    "https://github.com/EA31337"
 #define ea_author  "kenorb"
 
 #property description ea_name
@@ -532,15 +533,7 @@ enum ENUM_MA { FAST = 0, MEDIUM = 1, SLOW = 2, FINAL_MA_ENTRY };
 //+------------------------------------------------------------------+
 //| User input variables.
 //+------------------------------------------------------------------+
-//extern string __EA_Parameters__ = "-- General EA parameters --";
-extern string __EA_Trailing_Parameters__ = "-- Settings for trailing stops --";
-extern int TrailingStop = 40;
-extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = T_FIXED; // TrailingStop method. Set 0 to disable. See: ENUM_TRAIL_TYPE.
-extern bool TrailingStopOneWay = TRUE; // Change trailing stop towards one direction only. Suggested value: TRUE
-extern int TrailingProfit = 30;
-extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = T_NONE; // Trailing Profit method. Set 0 to disable. See: ENUM_TRAIL_TYPE.
-extern bool TrailingProfitOneWay = TRUE; // Change trailing profit take towards one direction only.
-extern double TrailingStopAddPerMinute = 0.0; // Decrease trailing stop (in pips) per each bar. Set 0 to disable. Suggested value: 0.
+extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v" + ea_version + " --";
 //+------------------------------------------------------------------+
 extern string __EA_Order_Parameters__ = "-- Profit/Loss settings (set 0 for auto) --";
 #ifndef __limited__
@@ -566,6 +559,15 @@ extern int MaxOrdersPerType = 0; // Maximum orders per strategy type. Set 0 for 
   #endif
 #endif
 extern bool TradeMicroLots = TRUE;
+//+------------------------------------------------------------------+
+extern string __EA_Trailing_Parameters__ = "-- Settings for trailing stops --";
+extern int TrailingStop = 40;
+extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = T_FIXED; // TrailingStop method. Set 0 to disable. See: ENUM_TRAIL_TYPE.
+extern bool TrailingStopOneWay = TRUE; // Change trailing stop towards one direction only. Suggested value: TRUE
+extern int TrailingProfit = 30;
+extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = T_NONE; // Trailing Profit method. Set 0 to disable. See: ENUM_TRAIL_TYPE.
+extern bool TrailingProfitOneWay = TRUE; // Change trailing profit take towards one direction only.
+extern double TrailingStopAddPerMinute = 0.0; // Decrease trailing stop (in pips) per each bar. Set 0 to disable. Suggested value: 0.
 //+------------------------------------------------------------------+
 extern string __EA_Risk_Parameters__ = "-- Risk management --";
 extern double RiskRatio = 0; // Suggested value: 1.0. Do not change unless testing.
@@ -666,7 +668,6 @@ extern int MinPipGap = 10; // Minimum gap in pips between trades of the same str
   extern bool CloseConditionOnlyProfitable = TRUE; // Close conditions applies only for profitable orders.
   extern bool DisableCloseConditions = FALSE; // Set TRUE to disable all close conditions for strategies. Not useful apart of testing.
   extern int HourAfterPeak = 18; // Minimum hour to check for peak prices, used by C_DAILY_PEAK, etc.
-  extern int MinProfitCloseOrder = 20; // Minimum order profit in pips to close the order on condition met.
   extern int CloseConditionCustom1Method = 0; // Custom 1 indicator-based close condition. Valid range: 0-1023.
   extern int CloseConditionCustom2Method = 0; // Custom 2 indicator-based close condition. Valid range: 0-1023.
   extern int CloseConditionCustom3Method = 0; // Custom 3 indicator-based close condition. Valid range: 0-1023.
@@ -692,7 +693,7 @@ extern ENUM_MARKET_CONDITION Market_Condition_1    = C_MARKET_BIG_DROP;
 extern ENUM_ACTION_TYPE Action_On_Condition_1      = A_CLOSE_ALL_LOSS_SIDE;
 
 extern ENUM_ACC_CONDITION Account_Condition_2      = C_EQUITY_10PC_LOW;
-extern ENUM_MARKET_CONDITION Market_Condition_2    = C_MA1_FAST_SLOW_OPP;
+extern ENUM_MARKET_CONDITION Market_Condition_2    = C_MA1_FS_TREND_OPP;
 extern ENUM_ACTION_TYPE Action_On_Condition_2      = A_CLOSE_ORDER_PROFIT;
 
 extern ENUM_ACC_CONDITION Account_Condition_3      = C_EQUITY_20PC_LOW;
@@ -704,11 +705,11 @@ extern ENUM_MARKET_CONDITION Market_Condition_4    = C_MARKET_TRUE;
 extern ENUM_ACTION_TYPE Action_On_Condition_4      = A_CLOSE_ALL_LOSS_SIDE;
 
 extern ENUM_ACC_CONDITION Account_Condition_5      = C_EQUITY_10PC_HIGH;
-extern ENUM_MARKET_CONDITION Market_Condition_5    = C_MA1_FAST_SLOW_OPP;
+extern ENUM_MARKET_CONDITION Market_Condition_5    = C_MA1_FS_TREND_OPP;
 extern ENUM_ACTION_TYPE Action_On_Condition_5      = A_CLOSE_ORDER_PROFIT;
 
 extern ENUM_ACC_CONDITION Account_Condition_6      = C_EQUITY_20PC_HIGH;
-extern ENUM_MARKET_CONDITION Market_Condition_6    = C_MA1_MED_SLOW_OPP;
+extern ENUM_MARKET_CONDITION Market_Condition_6    = C_MA1_FS_TREND_OPP;
 extern ENUM_ACTION_TYPE Action_On_Condition_6      = A_CLOSE_ALL_NON_TREND;
 
 extern ENUM_ACC_CONDITION Account_Condition_7      = C_EQUITY_50PC_HIGH;
@@ -844,6 +845,7 @@ extern ENUM_ACTION_TYPE Action_On_Condition_12     = A_NONE;
   #endif
 
 #endif
+extern int Account_Condition_MinProfitCloseOrder = 20; // Minimum order profit in pips to close the order on condition met.
 
 #ifdef __advanced__
   extern int Account_Condition_To_Disable = 0; // Specify which actions should be temporary disabled. It's useful for troubleshooting the worse condition by using the optimization.
@@ -891,12 +893,11 @@ extern int AC30_OpenMethod = 0; // Valid range: 0-x.
   extern int AC30_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized.
   extern ENUM_MARKET_EVENT AC30_CloseCondition = C_MACD_BUY_SELL;
   //
-#endif
-#ifdef __advanced__
   extern double AC1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double AC5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double AC15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
   extern double AC30_MaxSpread = 10.0; // Maximum spread to trade (in pips).
+#else
 #endif
 //+------------------------------------------------------------------+
 extern string __AD_Parameters__ = "-- Settings for the Accumulation/Distribution indicator --";
@@ -940,8 +941,6 @@ extern int AD30_OpenMethod = 0; // Valid range: 0-x.
   extern int AD30_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized.
   extern ENUM_MARKET_EVENT AD30_CloseCondition = C_MACD_BUY_SELL;
   //
-#endif
-#ifdef __advanced__
   extern double AD1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double AD5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double AD15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -991,8 +990,6 @@ extern int ADX30_OpenMethod = 0; // Valid range: 0-x.
   extern int ADX30_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized.
   extern ENUM_MARKET_EVENT ADX30_CloseCondition = C_MACD_BUY_SELL;
   //
-#endif
-#ifdef __advanced__
   extern double ADX1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double ADX5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double ADX15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -1038,17 +1035,19 @@ extern int Alligator30_OpenMethod  = 13; // Valid range: 0-63. This value is use
   extern int Alligator1_OpenCondition1 = 0; // Valid range: 0-1023.
   extern int Alligator1_OpenCondition2 = 0; // Valid range: 0-1023.
   extern ENUM_MARKET_EVENT Alligator1_CloseCondition = C_MA_BUY_SELL;
+  //
   extern int Alligator5_OpenCondition1 = 0; // Valid range: 0-1023.
   extern int Alligator5_OpenCondition2 = 0; // Valid range: 0-1023.
   extern ENUM_MARKET_EVENT Alligator5_CloseCondition = C_MA_BUY_SELL;
+  //
   extern int Alligator15_OpenCondition1 = 0; // Valid range: 0-1023.
   extern int Alligator15_OpenCondition2 = 0; // Valid range: 0-1023.
   extern ENUM_MARKET_EVENT Alligator15_CloseCondition = C_MA_BUY_SELL;
+  //
   extern int Alligator30_OpenCondition1 = 0; // Valid range: 0-1023.
   extern int Alligator30_OpenCondition2 = 0; // Valid range: 0-1023.
   extern ENUM_MARKET_EVENT Alligator30_CloseCondition = C_MACD_BUY_SELL;
-#endif
-#ifdef __advanced__
+  //
   extern double Alligator1_MaxSpread  =  6.0;  // Maximum spread to trade (in pips).
   extern double Alligator5_MaxSpread  =  7.0;  // Maximum spread to trade (in pips).
   extern double Alligator15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -1060,6 +1059,7 @@ extern int Alligator30_OpenMethod  = 13; // Valid range: 0-63. This value is use
  *   £21362.41	2753	1.48	7.76	5174.72	36.07%	0.00000000	Alligator_TrailingStopMethod=22 (rider: d: £10k, spread 20, lot size: 0.1, no boosts, with actions)
  *   £22299.85	2753	1.51	8.10	5106.04	35.06%	0.00000000	Alligator_Jaw_Period=22 	Alligator_Teeth_Period=10 	Alligator_Lips_Period=9 (rider: d: £10k, spread 20, lot size: 0.1, no boosts, with actions)
  */
+#ifdef __advanced__
 //+------------------------------------------------------------------+
 extern string __ATR_Parameters__ = "-- Settings for the Average True Range indicator --";
 #ifndef __disabled__
@@ -1104,8 +1104,6 @@ extern int ATR30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTA
   extern int ATR30_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized.
   extern ENUM_MARKET_EVENT ATR30_CloseCondition = C_MACD_BUY_SELL;
   //
-#endif
-#ifdef __advanced__
   extern double ATR1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double ATR5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double ATR15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -1153,13 +1151,12 @@ extern int Awesome30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FR
   extern int Awesome30_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized.
   extern ENUM_MARKET_EVENT Awesome30_CloseCondition = C_MACD_BUY_SELL;
   //
-#endif
-#ifdef __advanced__
   extern double Awesome1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double Awesome5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double Awesome15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
   extern double Awesome30_MaxSpread = 10.0; // Maximum spread to trade (in pips).
 #endif
+#endif // __advanced__
 //+------------------------------------------------------------------+
 extern string __Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --";
 #ifndef __disabled__
@@ -1211,8 +1208,6 @@ extern int Bands30_OpenMethod = 0; // Valid range: 0-255. Previously: 417. Used 
   extern int Bands30_OpenCondition2 = 0; // Valid range: 0-1023.
   extern ENUM_MARKET_EVENT Bands30_CloseCondition = C_MACD_BUY_SELL;
   // £6710.23	935	1.37	7.18	5805.15	28.88%	0.00000000	Bands30_OpenMethod=0 	Bands30_CloseCondition=2 (d: £10k, sp: 20, ls:0.1, __testing__)
-#endif
-#ifdef __advanced__
   extern double Bands1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double Bands5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double Bands15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -1269,8 +1264,6 @@ extern int BPower30_OpenMethod = 0; // Valid range: 0-x. // Optimized for C_FRAC
   extern int BPower30_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized.
   extern ENUM_MARKET_EVENT BPower30_CloseCondition = C_MACD_BUY_SELL;
   //
-#endif
-#ifdef __advanced__
   extern double BPower1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double BPower5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double BPower15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -1318,8 +1311,6 @@ extern int Breakage30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_F
   extern int Breakage30_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized.
   extern ENUM_MARKET_EVENT Breakage30_CloseCondition = C_MACD_BUY_SELL;
   //
-#endif
-#ifdef __advanced__
   extern double Breakage1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double Breakage5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double Breakage15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -1367,8 +1358,6 @@ extern int BWMFI30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRAC
   extern int BWMFI30_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized.
   extern ENUM_MARKET_EVENT BWMFI30_CloseCondition = C_MACD_BUY_SELL;
   //
-#endif
-#ifdef __advanced__
   extern double BWMFI1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double BWMFI5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double BWMFI15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -1419,8 +1408,6 @@ extern int CCI30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTA
   extern int CCI30_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized.
   extern ENUM_MARKET_EVENT CCI30_CloseCondition = C_MACD_BUY_SELL;
   //
-#endif
-#ifdef __advanced__
   extern double CCI1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double CCI5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double CCI15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -1459,17 +1446,19 @@ extern int DeMarker30_OpenMethod = 0; // Valid range: 0-31. Used for C_DEMARKER_
   extern int DeMarker1_OpenCondition1 = 528; // Valid range: 0-1023.
   extern int DeMarker1_OpenCondition2 = 0; // Valid range: 0-1023.
   extern ENUM_MARKET_EVENT DeMarker1_CloseCondition = C_MACD_BUY_SELL;
+  //
   extern int DeMarker5_OpenCondition1 = 528; // Valid range: 0-1023.
   extern int DeMarker5_OpenCondition2 = 0; // Valid range: 0-1023.
   extern ENUM_MARKET_EVENT DeMarker5_CloseCondition = C_MACD_BUY_SELL;
+  //
   extern int DeMarker15_OpenCondition1 = 528; // Valid range: 0-1023.
   extern int DeMarker15_OpenCondition2 = 0; // Valid range: 0-1023.
   extern ENUM_MARKET_EVENT DeMarker15_CloseCondition = C_MACD_BUY_SELL;
+  //
   extern int DeMarker30_OpenCondition1 = 528; // Valid range: 0-1023.
   extern int DeMarker30_OpenCondition2 = 0; // Valid range: 0-1023.
   extern ENUM_MARKET_EVENT DeMarker30_CloseCondition = C_MACD_BUY_SELL;
-#endif
-#ifdef __advanced__
+  //
   extern double DeMarker1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double DeMarker5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double DeMarker15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -1543,8 +1532,6 @@ extern int Envelopes30_OpenMethod = 4; // Valid range: 0-127. Set 0 to default. 
   extern int Envelopes30_OpenCondition2 = 0; // Valid range: 0-1023. Try: 0, 8, 16, 24
   extern ENUM_MARKET_EVENT Envelopes30_CloseCondition = C_MACD_BUY_SELL;
   //
-#endif
-#ifdef __advanced__
   extern double Envelopes1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double Envelopes5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double Envelopes15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -1555,6 +1542,7 @@ extern int Envelopes30_OpenMethod = 4; // Valid range: 0-127. Set 0 to default. 
  *  £33014.05	2758	1.61	11.97	18039.17	44.56%	Envelopes_MA_Period=26 (d: £10k, sp: 20, ls:0.1, __testing__)
  *  £34606.84	2745	1.64	12.61	17735.31	43.79%	Envelopes_MA_Period=28 (d: £10k, sp: 20, ls:0.1, __testing__)
  */
+
 //+------------------------------------------------------------------+
 extern string __Force_Parameters__ = "-- Settings for the Force Index indicator --";
 #ifndef __disabled__
@@ -1600,8 +1588,6 @@ extern int Force30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRAC
   extern int Force30_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized.
   extern ENUM_MARKET_EVENT Force30_CloseCondition = C_MACD_BUY_SELL;
   //
-#endif
-#ifdef __advanced__
   extern double Force1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double Force5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double Force15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -1650,8 +1636,6 @@ extern int Fractals30_OpenMethod = 0; // Valid range: 0-1. // Optimized for C_FR
   extern int Fractals30_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized.
   extern ENUM_MARKET_EVENT Fractals30_CloseCondition = C_MACD_BUY_SELL;
   //
-#endif
-#ifdef __advanced__
   extern double Fractals1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double Fractals5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double Fractals15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -1704,8 +1688,6 @@ extern int Gator30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRAC
   extern int Gator30_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized.
   extern ENUM_MARKET_EVENT Gator30_CloseCondition = C_MACD_BUY_SELL;
   //
-#endif
-#ifdef __advanced__
   extern double Gator1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double Gator5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double Gator15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -1756,8 +1738,6 @@ extern int Ichimoku30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_F
   extern int Ichimoku30_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized.
   extern ENUM_MARKET_EVENT Ichimoku30_CloseCondition = C_MACD_BUY_SELL;
   //
-#endif
-#ifdef __advanced__
   extern double Ichimoku1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double Ichimoku5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double Ichimoku15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -1803,17 +1783,19 @@ extern int MA30_OpenMethod = 71; // Valid range: 0-127. This value is used for c
   extern int MA1_OpenCondition1 = 512; // Valid range: 0-1023.
   extern int MA1_OpenCondition2 = 0; // Valid range: 0-1023.
   extern ENUM_MARKET_EVENT MA1_CloseCondition = C_MACD_BUY_SELL;
+  //
   extern int MA5_OpenCondition1 = 0; // Valid range: 0-1023.
   extern int MA5_OpenCondition2 = 0; // Valid range: 0-1023.
   extern ENUM_MARKET_EVENT MA5_CloseCondition = C_MACD_BUY_SELL;
+  //
   extern int MA15_OpenCondition1 = 0; // Valid range: 0-1023.
   extern int MA15_OpenCondition2 = 0; // Valid range: 0-1023.
   extern ENUM_MARKET_EVENT MA15_CloseCondition = C_MA_BUY_SELL;
+  //
   extern int MA30_OpenCondition1 = 0; // Valid range: 0-1023.
   extern int MA30_OpenCondition2 = 0; // Valid range: 0-1023.
   extern ENUM_MARKET_EVENT MA30_CloseCondition = C_MA_BUY_SELL;
-#endif
-#ifdef __advanced__
+  //
   extern double MA1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double MA5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double MA15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -1862,17 +1844,19 @@ extern int MACD30_OpenMethod = 15; // Valid range: 0-31. This value is used for 
   extern int MACD1_OpenCondition1 = 0; // Valid range: 0-1023.
   extern int MACD1_OpenCondition2 = 0; // Valid range: 0-1023.
   extern ENUM_MARKET_EVENT MACD1_CloseCondition = C_MACD_BUY_SELL;
+  //
   extern int MACD5_OpenCondition1 = 0; // Valid range: 0-1023.
   extern int MACD5_OpenCondition2 = 0; // Valid range: 0-1023.
   extern ENUM_MARKET_EVENT MACD5_CloseCondition = C_MACD_BUY_SELL;
+  //
   extern int MACD15_OpenCondition1 = 0; // Valid range: 0-1023.
   extern int MACD15_OpenCondition2 = 0; // Valid range: 0-1023.
   extern ENUM_MARKET_EVENT MACD15_CloseCondition = C_MACD_BUY_SELL;
+  //
   extern int MACD30_OpenCondition1 = 0; // Valid range: 0-1023.
   extern int MACD30_OpenCondition2 = 0; // Valid range: 0-1023.
   extern ENUM_MARKET_EVENT MACD30_CloseCondition = C_MACD_BUY_SELL;
-#endif
-#ifdef __advanced__
+  //
   extern double MACD1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double MACD5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double MACD15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -1926,8 +1910,6 @@ extern int MFI30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTA
   extern int MFI30_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized.
   extern ENUM_MARKET_EVENT MFI30_CloseCondition = C_MACD_BUY_SELL;
   //
-#endif
-#ifdef __advanced__
   extern double MFI1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double MFI5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double MFI15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -1978,8 +1960,6 @@ extern int Momentum30_OpenMethod = 0; // Valid range: 0-x.
   extern int Momentum30_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized.
   extern ENUM_MARKET_EVENT Momentum30_CloseCondition = C_MACD_BUY_SELL;
   //
-#endif
-#ifdef __advanced__
   extern double Momentum1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double Momentum5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double Momentum15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -2028,8 +2008,6 @@ extern int OBV30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTA
   extern int OBV30_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized.
   extern ENUM_MARKET_EVENT OBV30_CloseCondition = C_MACD_BUY_SELL;
   //
-#endif
-#ifdef __advanced__
   extern double OBV1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double OBV5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double OBV15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -2081,8 +2059,6 @@ extern int OSMA30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACT
   extern int OSMA30_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized.
   extern ENUM_MARKET_EVENT OSMA30_CloseCondition = C_MACD_BUY_SELL;
   //
-#endif
-#ifdef __advanced__
   extern double OSMA1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double OSMA5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double OSMA15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -2134,8 +2110,6 @@ extern int RSI30_OpenMethod = 2; // Valid range: 0-63. Used for C_RSI_BUY_SELL c
   extern ENUM_MARKET_EVENT RSI30_CloseCondition = C_MACD_BUY_SELL;
   // £4019.61	456	1.41	8.81	1737.77	15.71%	RSI30_OpenMethod=2 (deposit: £10000, spread 20, __testing__)
   // £2927.64	381	1.35	7.68	1737.20	13.53%	RSI30_CloseCondition=2, RSI30_OpenMethod=6 (deposit: £10000, spread 20, __testing__)
-#endif
-#ifdef __advanced__
   extern double RSI1_MaxSpread =   6.0;  // Maximum spread to trade (in pips).
   extern double RSI5_MaxSpread =   7.0;  // Maximum spread to trade (in pips).
   extern double RSI15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -2211,8 +2185,6 @@ extern int RVI30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTA
   extern int RVI30_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized.
   extern ENUM_MARKET_EVENT RVI30_CloseCondition = C_MACD_BUY_SELL;
   //
-#endif
-#ifdef __advanced__
   extern double RVI1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double RVI5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double RVI15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -2263,8 +2235,6 @@ extern int SAR30_OpenMethod = 0; // Valid range: 0-127. Used for C_SAR_BUY_SELL 
   extern int SAR30_OpenCondition2 = 0; // Valid range: 0-1023.
   extern ENUM_MARKET_EVENT SAR30_CloseCondition = C_MACD_BUY_SELL;
   // £13420.26	1141	1.60	11.76	10032.18	24.52% (d: £20k, sp: 20, ls:0.1, __testing__)
-#endif
-#ifdef __advanced__
   extern double SAR1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double SAR5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double SAR15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -2329,8 +2299,6 @@ extern int StdDev30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRA
   extern int StdDev30_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized.
   extern ENUM_MARKET_EVENT StdDev30_CloseCondition = C_MACD_BUY_SELL;
   //
-#endif
-#ifdef __advanced__
   extern double StdDev1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double StdDev5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double StdDev15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -2378,8 +2346,6 @@ extern int Stochastic30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C
   extern int Stochastic30_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized.
   extern ENUM_MARKET_EVENT Stochastic30_CloseCondition = C_MACD_BUY_SELL;
   //
-#endif
-#ifdef __advanced__
   extern double Stochastic1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double Stochastic5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double Stochastic15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -2430,8 +2396,6 @@ extern int WPR30_OpenMethod = 0; // Valid range: 0-63. Optimized with T_MA_M_FAR
   extern int WPR30_OpenCondition2 = 0; // Valid range: 0-1023. // TODO: Further backtesting required.
   extern ENUM_MARKET_EVENT WPR30_CloseCondition = C_MACD_BUY_SELL;
   //
-#endif
-#ifdef __advanced__
   extern double WPR1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double WPR5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double WPR15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -2482,8 +2446,6 @@ extern int ZigZag30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRA
   extern int ZigZag30_OpenCondition2 = 0; // Valid range: 0-1023. // Optimized.
   extern ENUM_MARKET_EVENT ZigZag30_CloseCondition = C_MACD_BUY_SELL;
   //
-#endif
-#ifdef __advanced__
   extern double ZigZag1_MaxSpread  =  6.0; // Maximum spread to trade (in pips).
   extern double ZigZag5_MaxSpread  =  7.0; // Maximum spread to trade (in pips).
   extern double ZigZag15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
@@ -2517,6 +2479,8 @@ extern string License = "";
 extern int MagicNumber = 31337; // To help identify its own orders. It can vary in additional range: +20, see: ENUM_ORDER_TYPE.
 #ifdef __advanced__
   extern bool Cache = FALSE; // Cache some calculated variables for better performance. FIXME: Needs some work.
+#else
+  const bool Cache = FALSE;
 #endif
 
 //extern int ManualGMToffset = 0;
@@ -2869,7 +2833,10 @@ int OnInit() {
   InitializeStrategies();
   InitializeConditions();
   CheckHistory();
+
+  #ifdef __advanced__
   if (SmartToggleComponent) ToggleComponent(SmartToggleComponent);
+  #endif
 
   if (IsTesting()) {
     SendEmailEachOrder = FALSE;
@@ -3006,11 +2973,14 @@ bool Trade() {
     } // end: if
   } // end: for
 
+  #ifdef __advanced__
   if (QueueOrdersAIActive && !order_placed && total_orders < max_orders) {
     if (OrderQueueProcess()) {
       return (TRUE);
     }
   }
+  #endif
+
   return order_placed;
 }
 
@@ -3072,6 +3042,7 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
   }
 
   switch (type) {
+#ifdef __advanced__
     case AC: // Calculates the Bill Williams' Accelerator/Decelerator oscillator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
         ac[period][i] = iAC(_Symbol, timeframe, i);
@@ -3087,6 +3058,7 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
         adx[period][i][MODE_MINUSDI] = iADX(_Symbol, timeframe, ADX_Period, ADX_Applied_Price, MODE_MINUSDI, i); // -DI indicator line
       }
       break;
+#endif
     case ALLIGATOR: // Calculates the Alligator indicator.
       // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
@@ -3100,6 +3072,7 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
         alligator[period][i][LIPS]  = iAlligator(_Symbol, timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
        */
       break;
+#ifdef __advanced__
     case ATR: // Calculates the Average True Range indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         atr[period][i][FAST] = iATR(_Symbol, timeframe, ATR_Period_Fast, i);
@@ -3110,6 +3083,7 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
         awesome[period][i] = iAO(_Symbol, timeframe, i);
       break;
+#endif // __advanced__
     case BANDS: // Calculates the Bollinger Bands indicator.
       // int sid, bands_period = Bands_Period; // Not used at the moment.
       // sid = GetStrategyViaIndicator(BANDS, timeframe); bands_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
@@ -3119,6 +3093,7 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
         bands[period][i][BANDS_LOWER] = iBands(_Symbol, timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_LOWER, i + Bands_Shift);
       }
       break;
+#ifdef __advanced__
     case BPOWER: // Calculates the Bears Power and Bulls Power indicators.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         bpower[period][i][OP_BUY]  = iBullsPower(_Symbol, timeframe, BPower_Period, BPower_Applied_Price, i);
@@ -3137,6 +3112,7 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
         cci[period][i][SLOW] = iCCI(_Symbol, timeframe, CCI_Period_Slow, CCI_Applied_Price, i);
       }
       break;
+#endif
     case DEMARKER: // Calculates the DeMarker indicator.
       demarker[period][CURR] = iDeMarker(_Symbol, timeframe, DeMarker_Period, 0 + DeMarker_Shift);
       demarker[period][PREV] = iDeMarker(_Symbol, timeframe, DeMarker_Period, 1 + DeMarker_Shift);
@@ -3156,11 +3132,13 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
         envelopes[period][i][LOWER] = iEnvelopes(_Symbol, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, LOWER, i + Envelopes_Shift);
       }
       break;
+#ifdef __advanced__
     case FORCE: // Calculates the Force Index indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         force[period][i] = iForce(_Symbol, timeframe, Force_Period, Force_MA_Method, Force_Applied_price, i);
       }
       break;
+#endif
     case FRACTALS: // Calculates the Fractals indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         fractals[period][i][LOWER] = iFractals(_Symbol, timeframe, LOWER, i);
@@ -3341,8 +3319,9 @@ int ExecuteOrder(int cmd, int sid, double volume = EMPTY, string order_comment =
       if (SoundAlert) PlaySound(SoundFileAtOpen);
       if (SendEmailEachOrder) SendEmailExecuteOrder();
 
+      #ifdef __advanced__
       if (QueueOrdersAIActive && total_orders >= max_orders) OrderQueueClear(); // Clear queue if we're reached the limit again, so we can start fresh.
-
+      #endif
    } else {
      result = FALSE;
      err_code = GetLastError();
@@ -3387,28 +3366,23 @@ int ExecuteOrder(int cmd, int sid, double volume = EMPTY, string order_comment =
 bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
   int result = TRUE;
   string err;
-  if (MinimumIntervalSec > 0 && time_current - last_order_time < MinimumIntervalSec) {
-    err = "There must be a " + MinimumIntervalSec + " sec minimum interval between subsequent trade signals.";
-    if (VerboseTrace && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
-    result = FALSE;
-  } else if (volume < market_minlot) {
+  if (volume < market_minlot) {
     err = StringFormat("Lot size for strategy %s is %.2f.", sname[sid], volume);
     if (VerboseTrace && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
     result = FALSE;
-  } else if (MaxOrdersPerDay > 0 && daily_orders >= GetMaxOrdersPerDay()) {
-    err = "Maximum open and pending orders reached the daily limit (MaxOrdersPerDay).";
-    if (VerboseErrors && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
-    OrderQueueAdd(sid, cmd);
-    result = FALSE;
   } else if (total_orders >= max_orders) {
-    err = StringFormat("Maximum open and pending orders reached the limit (MaxOrders%s).", IfTxt(MaxOrdersPerDay > 0, "/MaxOrdersPerDay", ""));
+    err = "Maximum open and pending orders reached the limit (MaxOrders).";
     if (VerboseErrors && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
+    #ifdef __advanced__
     OrderQueueAdd(sid, cmd);
+    #endif
     result = FALSE;
   } else if (GetTotalOrdersByType(sid) >= GetMaxOrdersPerType()) {
     err = sname[sid] + ": Maximum open and pending orders per type reached the limit (MaxOrdersPerType).";
     if (VerboseErrors && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
+    #ifdef __advanced__
     OrderQueueAdd(sid, cmd);
+    #endif
     result = FALSE;
   } else if (!CheckFreeMargin(cmd, volume)) {
     err = "No money to open more orders.";
@@ -3425,12 +3399,22 @@ bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
     err = StringFormat("%s: Not executing order, because the spread is too high. (spread = %.1f pips)", sname[sid], curr_spread);
     if (VerboseTrace && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
     result = FALSE;
+  } else if (MinimumIntervalSec > 0 && time_current - last_order_time < MinimumIntervalSec) {
+    err = "There must be a " + MinimumIntervalSec + " sec minimum interval between subsequent trade signals.";
+    if (VerboseTrace && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
+    result = FALSE;
+  } else if (MaxOrdersPerDay > 0 && daily_orders >= GetMaxOrdersPerDay()) {
+    err = "Maximum open and pending orders reached the daily limit (MaxOrdersPerDay).";
+    if (VerboseErrors && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
+    OrderQueueAdd(sid, cmd);
+    result = FALSE;
   }
   #endif
   if (err != last_err) last_err = err;
   return (result);
 }
 
+#ifdef __advanced__
 /*
  * Check if spread is not too high for specific strategy.
  *
@@ -3443,6 +3427,8 @@ bool CheckSpreadLimit(int sid) {
   double spread_limit = If(conf[sid][SPREAD_LIMIT] > 0, MathMin(conf[sid][SPREAD_LIMIT], MaxSpreadToTrade), MaxSpreadToTrade);
   return curr_spread <= spread_limit;
 }
+
+#endif
 
 bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = TRUE) {
   bool result = FALSE;
@@ -3462,7 +3448,9 @@ bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = TRUE)
     if (SoundAlert) PlaySound(SoundFileAtClose);
     // TaskAddCalcStats(ticket_no); // Already done on CheckHistory().
     if (VerboseDebug) Print(__FUNCTION__, "(): Closed order " + ticket_no + " with profit " + GetOrderProfit() + " pips, reason: " + ReasonIdToText(reason_id) + "; " + GetOrderTextDetails());
+    #ifdef __advanced__
     if (QueueOrdersAIActive) OrderQueueProcess();
+    #endif
   } else {
     err_code = GetLastError();
     if (VerboseErrors) Print(__FUNCTION__, "(): Error: Ticket: ", ticket_no, "; Error: ", GetErrorText(err_code));
@@ -6170,10 +6158,11 @@ int GetMaxOrdersAuto(bool smooth = true) {
   double leverage     = MathMax(AccountLeverage(), 100);
   int balance_limit   = MathMax(MathMin(AccountBalance(), AccountEquity()) / 2, 0); // At least 1 order per 2 currency value. This also prevents trading with negative balance.
   double stopout_level = GetAccountStopoutLevel();
-  // #ifdef __advanced__ double margin_risk = 0.05; #else double margin_risk = 0.02; #endif // Risk only 1%/2% (0.01/0.02) per order of total available margin.
   double avail_orders = avail_margin / market_marginrequired / MathMax(lot_size, market_lotstep) * (100 / leverage);
   int new_max_orders = avail_orders * stopout_level * risk_ratio;
+  #ifdef __advanced__
   if (MaxOrdersPerDay > 0) new_max_orders = MathMin(GetMaxOrdersPerDay(), new_max_orders);
+  #endif
   if (VerboseTrace) PrintFormat("%s(): %f / %f / %f * (100/%d)", __FUNCTION__, avail_margin, market_marginrequired, MathMax(lot_size, market_lotstep), leverage);
   if (smooth && new_max_orders > max_orders) {
     max_orders = (max_orders + new_max_orders) / 2; // Increase the limit smoothly.
@@ -6186,6 +6175,7 @@ int GetMaxOrdersAuto(bool smooth = true) {
 /*
  * Get daily total available orders. It can dynamically change during the day.
  */
+#ifdef __advanced__
 int GetMaxOrdersPerDay() {
   if (MaxOrdersPerDay <= 0) return TRUE;
   int hours_left = (24 - hour_of_day);
@@ -6193,12 +6183,17 @@ int GetMaxOrdersPerDay() {
   // Message(StringFormat("Hours left: (%d - %d) / %d= %d", MaxOrdersPerDay, daily_orders, hours_left, curr_allowed_limit));
   return total_orders + curr_allowed_limit;
 }
+#endif
 
 /*
  * Calculate number of maximum of orders allowed to open.
  */
 int GetMaxOrders() {
-  return If(MaxOrders > 0, If(MaxOrdersPerDay > 0, MathMin(MaxOrders, GetMaxOrdersPerDay()), MaxOrders), GetMaxOrdersAuto());
+  #ifdef __advanced__
+    return If(MaxOrders > 0, If(MaxOrdersPerDay > 0, MathMin(MaxOrders, GetMaxOrdersPerDay()), MaxOrders), GetMaxOrdersAuto());
+  #else
+    return If(MaxOrders > 0, MaxOrders, GetMaxOrdersAuto());
+  #endif
 }
 
 /*
@@ -6361,10 +6356,9 @@ void StartNewHour() {
   // Update strategy factor and lot size.
   if (Boosting_Enabled) UpdateStrategyFactor(DAILY);
 
+  #ifdef __advanced__
   // Check if RSI period needs re-calculation.
   if (RSI_DynamicPeriod) RSI_CheckPeriod();
-
-  #ifdef __advanced__
   // Check for dynamic spread configuration.
   if (DynamicSpreadConf) {
     // TODO: SpreadRatio, MinPipChangeToTrade, MinPipGap
@@ -6593,6 +6587,8 @@ bool InitializeVariables() {
   return (TRUE);
 }
 
+#ifdef __advanced__
+
 /*
  * Disable specific component for diagnostic purposes.
  */
@@ -6724,8 +6720,8 @@ void ToggleComponent(int component) {
       break;
     // Profit and loss
     case 30:
-      if (MinProfitCloseOrder > 20) MinProfitCloseOrder = 0;
-      else MinProfitCloseOrder = 20;
+      if (Account_Condition_MinProfitCloseOrder > 20) Account_Condition_MinProfitCloseOrder = 0;
+      else Account_Condition_MinProfitCloseOrder = 20;
       break;
     case 31:
       if (TakeProfit > 0) TakeProfit = 0;
@@ -6779,6 +6775,8 @@ void ToggleComponent(int component) {
   }
 }
 
+#endif
+
 /*
  * Initialize strategies.
  */
@@ -6790,155 +6788,365 @@ bool InitializeStrategies() {
   ArrayInitialize(stats, 0); // Reset strategy statistics.
 
   // Initialize strategy array variables.
+  #ifdef __advanced__
   InitStrategy(AC1,  "AC M1",  AC1_Active,  AC, PERIOD_M1,  AC1_OpenMethod,  AC_OpenLevel, AC1_OpenCondition1,  AC1_OpenCondition2,  AC1_CloseCondition,  AC1_MaxSpread);
   InitStrategy(AC5,  "AC M5",  AC5_Active,  AC, PERIOD_M5,  AC5_OpenMethod,  AC_OpenLevel, AC5_OpenCondition1,  AC5_OpenCondition2,  AC5_CloseCondition,  AC5_MaxSpread);
   InitStrategy(AC15, "AC M15", AC15_Active, AC, PERIOD_M15, AC15_OpenMethod, AC_OpenLevel, AC15_OpenCondition1, AC15_OpenCondition2, AC15_CloseCondition, AC15_MaxSpread);
   InitStrategy(AC30, "AC M30", AC30_Active, AC, PERIOD_M30, AC30_OpenMethod, AC_OpenLevel, AC30_OpenCondition1, AC30_OpenCondition2, AC30_CloseCondition, AC30_MaxSpread);
+  #else
+  InitStrategy(AC1,  "AC M1",  AC1_Active,  AC, PERIOD_M1,  AC1_OpenMethod,  AC_OpenLevel);
+  InitStrategy(AC5,  "AC M5",  AC5_Active,  AC, PERIOD_M5,  AC5_OpenMethod,  AC_OpenLevel);
+  InitStrategy(AC15, "AC M15", AC15_Active, AC, PERIOD_M15, AC15_OpenMethod, AC_OpenLevel);
+  InitStrategy(AC30, "AC M30", AC30_Active, AC, PERIOD_M30, AC30_OpenMethod, AC_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(AD1,  "AD M1",  AD1_Active,  AD, PERIOD_M1,  AD1_OpenMethod,  AD_OpenLevel, AD1_OpenCondition1,  AD1_OpenCondition2,  AD1_CloseCondition,  AD1_MaxSpread);
   InitStrategy(AD5,  "AD M5",  AD5_Active,  AD, PERIOD_M5,  AD5_OpenMethod,  AD_OpenLevel, AD5_OpenCondition1,  AD5_OpenCondition2,  AD5_CloseCondition,  AD5_MaxSpread);
   InitStrategy(AD15, "AD M15", AD15_Active, AD, PERIOD_M15, AD15_OpenMethod, AD_OpenLevel, AD15_OpenCondition1, AD15_OpenCondition2, AD15_CloseCondition, AD15_MaxSpread);
   InitStrategy(AD30, "AD M30", AD30_Active, AD, PERIOD_M30, AD30_OpenMethod, AD_OpenLevel, AD30_OpenCondition1, AD30_OpenCondition2, AD30_CloseCondition, AD30_MaxSpread);
+  #else
+  InitStrategy(AD1,  "AD M1",  AD1_Active,  AD, PERIOD_M1,  AD1_OpenMethod,  AD_OpenLevel);
+  InitStrategy(AD5,  "AD M5",  AD5_Active,  AD, PERIOD_M5,  AD5_OpenMethod,  AD_OpenLevel);
+  InitStrategy(AD15, "AD M15", AD15_Active, AD, PERIOD_M15, AD15_OpenMethod, AD_OpenLevel);
+  InitStrategy(AD30, "AD M30", AD30_Active, AD, PERIOD_M30, AD30_OpenMethod, AD_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(ADX1,  "ADX M1",  ADX1_Active,  ADX, PERIOD_M1,  ADX1_OpenMethod,  ADX_OpenLevel, ADX1_OpenCondition1,  ADX1_OpenCondition2,  ADX1_CloseCondition,  ADX1_MaxSpread);
   InitStrategy(ADX5,  "ADX M5",  ADX5_Active,  ADX, PERIOD_M5,  ADX5_OpenMethod,  ADX_OpenLevel, ADX5_OpenCondition1,  ADX5_OpenCondition2,  ADX5_CloseCondition,  ADX5_MaxSpread);
   InitStrategy(ADX15, "ADX M15", ADX15_Active, ADX, PERIOD_M15, ADX15_OpenMethod, ADX_OpenLevel, ADX15_OpenCondition1, ADX15_OpenCondition2, ADX15_CloseCondition, ADX15_MaxSpread);
   InitStrategy(ADX30, "ADX M30", ADX30_Active, ADX, PERIOD_M30, ADX30_OpenMethod, ADX_OpenLevel, ADX30_OpenCondition1, ADX30_OpenCondition2, ADX30_CloseCondition, ADX30_MaxSpread);
+  #else
+  InitStrategy(ADX1,  "ADX M1",  ADX1_Active,  ADX, PERIOD_M1,  ADX1_OpenMethod,  ADX_OpenLevel);
+  InitStrategy(ADX5,  "ADX M5",  ADX5_Active,  ADX, PERIOD_M5,  ADX5_OpenMethod,  ADX_OpenLevel);
+  InitStrategy(ADX15, "ADX M15", ADX15_Active, ADX, PERIOD_M15, ADX15_OpenMethod, ADX_OpenLevel);
+  InitStrategy(ADX30, "ADX M30", ADX30_Active, ADX, PERIOD_M30, ADX30_OpenMethod, ADX_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(ALLIGATOR1,  "Alligator M1",  Alligator1_Active,  ALLIGATOR, PERIOD_M1,  Alligator1_OpenMethod,  Alligator_OpenLevel, Alligator1_OpenCondition1,  Alligator1_OpenCondition2,  Alligator1_CloseCondition,  Alligator1_MaxSpread);
   InitStrategy(ALLIGATOR5,  "Alligator M5",  Alligator5_Active,  ALLIGATOR, PERIOD_M5,  Alligator5_OpenMethod,  Alligator_OpenLevel, Alligator5_OpenCondition1,  Alligator5_OpenCondition2,  Alligator5_CloseCondition,  Alligator5_MaxSpread);
   InitStrategy(ALLIGATOR15, "Alligator M15", Alligator15_Active, ALLIGATOR, PERIOD_M15, Alligator15_OpenMethod, Alligator_OpenLevel, Alligator15_OpenCondition1, Alligator15_OpenCondition2, Alligator15_CloseCondition, Alligator15_MaxSpread);
   InitStrategy(ALLIGATOR30, "Alligator M30", Alligator30_Active, ALLIGATOR, PERIOD_M30, Alligator30_OpenMethod, Alligator_OpenLevel, Alligator30_OpenCondition1, Alligator30_OpenCondition2, Alligator30_CloseCondition, Alligator30_MaxSpread);
+  #else
+  InitStrategy(ALLIGATOR1,  "Alligator M1",  Alligator1_Active,  ALLIGATOR, PERIOD_M1,  Alligator1_OpenMethod,  Alligator_OpenLevel);
+  InitStrategy(ALLIGATOR5,  "Alligator M5",  Alligator5_Active,  ALLIGATOR, PERIOD_M5,  Alligator5_OpenMethod,  Alligator_OpenLevel);
+  InitStrategy(ALLIGATOR15, "Alligator M15", Alligator15_Active, ALLIGATOR, PERIOD_M15, Alligator15_OpenMethod, Alligator_OpenLevel);
+  InitStrategy(ALLIGATOR30, "Alligator M30", Alligator30_Active, ALLIGATOR, PERIOD_M30, Alligator30_OpenMethod, Alligator_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(ATR1,  "ATR M1",  ATR1_Active,  ATR, PERIOD_M1,  ATR1_OpenMethod,  ATR_OpenLevel, ATR1_OpenCondition1,  ATR1_OpenCondition2,  ATR1_CloseCondition,  ATR1_MaxSpread);
   InitStrategy(ATR5,  "ATR M5",  ATR5_Active,  ATR, PERIOD_M5,  ATR5_OpenMethod,  ATR_OpenLevel, ATR5_OpenCondition1,  ATR5_OpenCondition2,  ATR5_CloseCondition,  ATR5_MaxSpread);
   InitStrategy(ATR15, "ATR M15", ATR15_Active, ATR, PERIOD_M15, ATR15_OpenMethod, ATR_OpenLevel, ATR15_OpenCondition1, ATR15_OpenCondition2, ATR15_CloseCondition, ATR15_MaxSpread);
   InitStrategy(ATR30, "ATR M30", ATR30_Active, ATR, PERIOD_M30, ATR30_OpenMethod, ATR_OpenLevel, ATR30_OpenCondition1, ATR30_OpenCondition2, ATR30_CloseCondition, ATR30_MaxSpread);
+  #else
+  InitStrategy(ATR1,  "ATR M1",  ATR1_Active,  ATR, PERIOD_M1,  ATR1_OpenMethod,  ATR_OpenLevel);
+  InitStrategy(ATR5,  "ATR M5",  ATR5_Active,  ATR, PERIOD_M5,  ATR5_OpenMethod,  ATR_OpenLevel);
+  InitStrategy(ATR15, "ATR M15", ATR15_Active, ATR, PERIOD_M15, ATR15_OpenMethod, ATR_OpenLevel);
+  InitStrategy(ATR30, "ATR M30", ATR30_Active, ATR, PERIOD_M30, ATR30_OpenMethod, ATR_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(AWESOME1,  "Awesome M1",  Awesome1_Active,  AWESOME, PERIOD_M1,  Awesome1_OpenMethod,  Awesome_OpenLevel, Awesome1_OpenCondition1,  Awesome1_OpenCondition2,  Awesome1_CloseCondition,  Awesome1_MaxSpread);
   InitStrategy(AWESOME5,  "Awesome M5",  Awesome5_Active,  AWESOME, PERIOD_M5,  Awesome5_OpenMethod,  Awesome_OpenLevel, Awesome5_OpenCondition1,  Awesome5_OpenCondition2,  Awesome5_CloseCondition,  Awesome5_MaxSpread);
   InitStrategy(AWESOME15, "Awesome M15", Awesome15_Active, AWESOME, PERIOD_M15, Awesome15_OpenMethod, Awesome_OpenLevel, Awesome15_OpenCondition1, Awesome15_OpenCondition2, Awesome15_CloseCondition, Awesome15_MaxSpread);
   InitStrategy(AWESOME30, "Awesome M30", Awesome30_Active, AWESOME, PERIOD_M30, Awesome30_OpenMethod, Awesome_OpenLevel, Awesome30_OpenCondition1, Awesome30_OpenCondition2, Awesome30_CloseCondition, Awesome30_MaxSpread);
+  #else
+  InitStrategy(AWESOME1,  "Awesome M1",  Awesome1_Active,  AWESOME, PERIOD_M1,  Awesome1_OpenMethod,  Awesome_OpenLevel);
+  InitStrategy(AWESOME5,  "Awesome M5",  Awesome5_Active,  AWESOME, PERIOD_M5,  Awesome5_OpenMethod,  Awesome_OpenLevel);
+  InitStrategy(AWESOME15, "Awesome M15", Awesome15_Active, AWESOME, PERIOD_M15, Awesome15_OpenMethod, Awesome_OpenLevel);
+  InitStrategy(AWESOME30, "Awesome M30", Awesome30_Active, AWESOME, PERIOD_M30, Awesome30_OpenMethod, Awesome_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(BANDS1,  "Bands M1",  Bands1_Active,  BANDS, PERIOD_M1,  Bands1_OpenMethod,  Bands_OpenLevel, Bands1_OpenCondition1,  Bands1_OpenCondition2,  Bands1_CloseCondition,  Bands1_MaxSpread);
   InitStrategy(BANDS5,  "Bands M5",  Bands5_Active,  BANDS, PERIOD_M5,  Bands5_OpenMethod,  Bands_OpenLevel, Bands5_OpenCondition1,  Bands5_OpenCondition2,  Bands5_CloseCondition,  Bands5_MaxSpread);
   InitStrategy(BANDS15, "Bands M15", Bands15_Active, BANDS, PERIOD_M15, Bands15_OpenMethod, Bands_OpenLevel, Bands15_OpenCondition1, Bands15_OpenCondition2, Bands15_CloseCondition, Bands15_MaxSpread);
   InitStrategy(BANDS30, "Bands M30", Bands30_Active, BANDS, PERIOD_M30, Bands30_OpenMethod, Bands_OpenLevel, Bands30_OpenCondition1, Bands30_OpenCondition2, Bands30_CloseCondition, Bands30_MaxSpread);
+  #else
+  InitStrategy(BANDS1,  "Bands M1",  Bands1_Active,  BANDS, PERIOD_M1,  Bands1_OpenMethod,  Bands_OpenLevel);
+  InitStrategy(BANDS5,  "Bands M5",  Bands5_Active,  BANDS, PERIOD_M5,  Bands5_OpenMethod,  Bands_OpenLevel);
+  InitStrategy(BANDS15, "Bands M15", Bands15_Active, BANDS, PERIOD_M15, Bands15_OpenMethod, Bands_OpenLevel);
+  InitStrategy(BANDS30, "Bands M30", Bands30_Active, BANDS, PERIOD_M30, Bands30_OpenMethod, Bands_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(BPOWER1,  "BPower M1",  BPower1_Active,  BPOWER, PERIOD_M1,  BPower1_OpenMethod,  BPower_OpenLevel, BPower1_OpenCondition1,  BPower1_OpenCondition2,  BPower1_CloseCondition,  BPower1_MaxSpread);
   InitStrategy(BPOWER5,  "BPower M5",  BPower5_Active,  BPOWER, PERIOD_M5,  BPower5_OpenMethod,  BPower_OpenLevel, BPower5_OpenCondition1,  BPower5_OpenCondition2,  BPower5_CloseCondition,  BPower5_MaxSpread);
   InitStrategy(BPOWER15, "BPower M15", BPower15_Active, BPOWER, PERIOD_M15, BPower15_OpenMethod, BPower_OpenLevel, BPower15_OpenCondition1, BPower15_OpenCondition2, BPower15_CloseCondition, BPower15_MaxSpread);
   InitStrategy(BPOWER30, "BPower M30", BPower30_Active, BPOWER, PERIOD_M30, BPower30_OpenMethod, BPower_OpenLevel, BPower30_OpenCondition1, BPower30_OpenCondition2, BPower30_CloseCondition, BPower30_MaxSpread);
+  #else
+  InitStrategy(BPOWER1,  "BPower M1",  BPower1_Active,  BPOWER, PERIOD_M1,  BPower1_OpenMethod,  BPower_OpenLevel);
+  InitStrategy(BPOWER5,  "BPower M5",  BPower5_Active,  BPOWER, PERIOD_M5,  BPower5_OpenMethod,  BPower_OpenLevel);
+  InitStrategy(BPOWER15, "BPower M15", BPower15_Active, BPOWER, PERIOD_M15, BPower15_OpenMethod, BPower_OpenLevel);
+  InitStrategy(BPOWER30, "BPower M30", BPower30_Active, BPOWER, PERIOD_M30, BPower30_OpenMethod, BPower_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(BREAKAGE1,  "Breakage M1",  Breakage1_Active,  EMPTY, PERIOD_M1,  Breakage1_OpenMethod,  Breakage_OpenLevel, Breakage1_OpenCondition1,  Breakage1_OpenCondition2,  Breakage1_CloseCondition,  Breakage1_MaxSpread);
   InitStrategy(BREAKAGE5,  "Breakage M5",  Breakage5_Active,  EMPTY, PERIOD_M5,  Breakage5_OpenMethod,  Breakage_OpenLevel, Breakage5_OpenCondition1,  Breakage5_OpenCondition2,  Breakage5_CloseCondition,  Breakage5_MaxSpread);
   InitStrategy(BREAKAGE15, "Breakage M15", Breakage15_Active, EMPTY, PERIOD_M15, Breakage15_OpenMethod, Breakage_OpenLevel, Breakage15_OpenCondition1, Breakage15_OpenCondition2, Breakage15_CloseCondition, Breakage15_MaxSpread);
   InitStrategy(BREAKAGE30, "Breakage M30", Breakage30_Active, EMPTY, PERIOD_M30, Breakage30_OpenMethod, Breakage_OpenLevel, Breakage30_OpenCondition1, Breakage30_OpenCondition2, Breakage30_CloseCondition, Breakage30_MaxSpread);
+  #else
+  InitStrategy(BREAKAGE1,  "Breakage M1",  Breakage1_Active,  EMPTY, PERIOD_M1,  Breakage1_OpenMethod,  Breakage_OpenLevel);
+  InitStrategy(BREAKAGE5,  "Breakage M5",  Breakage5_Active,  EMPTY, PERIOD_M5,  Breakage5_OpenMethod,  Breakage_OpenLevel);
+  InitStrategy(BREAKAGE15, "Breakage M15", Breakage15_Active, EMPTY, PERIOD_M15, Breakage15_OpenMethod, Breakage_OpenLevel);
+  InitStrategy(BREAKAGE30, "Breakage M30", Breakage30_Active, EMPTY, PERIOD_M30, Breakage30_OpenMethod, Breakage_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(BWMFI1,  "BWMFI M1",  BWMFI1_Active,  EMPTY, PERIOD_M1,  BWMFI1_OpenMethod,  BWMFI_OpenLevel, BWMFI1_OpenCondition1,  BWMFI1_OpenCondition2,  BWMFI1_CloseCondition,  BWMFI1_MaxSpread);
   InitStrategy(BWMFI5,  "BWMFI M5",  BWMFI5_Active,  EMPTY, PERIOD_M5,  BWMFI5_OpenMethod,  BWMFI_OpenLevel, BWMFI5_OpenCondition1,  BWMFI5_OpenCondition2,  BWMFI5_CloseCondition,  BWMFI5_MaxSpread);
   InitStrategy(BWMFI15, "BWMFI M15", BWMFI15_Active, EMPTY, PERIOD_M15, BWMFI15_OpenMethod, BWMFI_OpenLevel, BWMFI15_OpenCondition1, BWMFI15_OpenCondition2, BWMFI15_CloseCondition, BWMFI15_MaxSpread);
   InitStrategy(BWMFI30, "BWMFI M30", BWMFI30_Active, EMPTY, PERIOD_M30, BWMFI30_OpenMethod, BWMFI_OpenLevel, BWMFI30_OpenCondition1, BWMFI30_OpenCondition2, BWMFI30_CloseCondition, BWMFI30_MaxSpread);
+  #else
+  InitStrategy(BWMFI1,  "BWMFI M1",  BWMFI1_Active,  EMPTY, PERIOD_M1,  BWMFI1_OpenMethod,  BWMFI_OpenLevel);
+  InitStrategy(BWMFI5,  "BWMFI M5",  BWMFI5_Active,  EMPTY, PERIOD_M5,  BWMFI5_OpenMethod,  BWMFI_OpenLevel);
+  InitStrategy(BWMFI15, "BWMFI M15", BWMFI15_Active, EMPTY, PERIOD_M15, BWMFI15_OpenMethod, BWMFI_OpenLevel);
+  InitStrategy(BWMFI30, "BWMFI M30", BWMFI30_Active, EMPTY, PERIOD_M30, BWMFI30_OpenMethod, BWMFI_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(CCI1,  "CCI M1",  CCI1_Active,  CCI, PERIOD_M1,  CCI1_OpenMethod,  CCI_OpenLevel, CCI1_OpenCondition1,  CCI1_OpenCondition2,  CCI1_CloseCondition,  CCI1_MaxSpread);
   InitStrategy(CCI5,  "CCI M5",  CCI5_Active,  CCI, PERIOD_M5,  CCI5_OpenMethod,  CCI_OpenLevel, CCI5_OpenCondition1,  CCI5_OpenCondition2,  CCI5_CloseCondition,  CCI5_MaxSpread);
   InitStrategy(CCI15, "CCI M15", CCI15_Active, CCI, PERIOD_M15, CCI15_OpenMethod, CCI_OpenLevel, CCI15_OpenCondition1, CCI15_OpenCondition2, CCI15_CloseCondition, CCI15_MaxSpread);
   InitStrategy(CCI30, "CCI M30", CCI30_Active, CCI, PERIOD_M30, CCI30_OpenMethod, CCI_OpenLevel, CCI30_OpenCondition1, CCI30_OpenCondition2, CCI30_CloseCondition, CCI30_MaxSpread);
+  #else
+  InitStrategy(CCI1,  "CCI M1",  CCI1_Active,  CCI, PERIOD_M1,  CCI1_OpenMethod,  CCI_OpenLevel);
+  InitStrategy(CCI5,  "CCI M5",  CCI5_Active,  CCI, PERIOD_M5,  CCI5_OpenMethod,  CCI_OpenLevel);
+  InitStrategy(CCI15, "CCI M15", CCI15_Active, CCI, PERIOD_M15, CCI15_OpenMethod, CCI_OpenLevel);
+  InitStrategy(CCI30, "CCI M30", CCI30_Active, CCI, PERIOD_M30, CCI30_OpenMethod, CCI_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(DEMARKER1,  "DeMarker M1",  DeMarker1_Active,  DEMARKER, PERIOD_M1,  DeMarker1_OpenMethod,  DeMarker_OpenLevel, DeMarker1_OpenCondition1,  DeMarker1_OpenCondition2,  DeMarker1_CloseCondition,  DeMarker1_MaxSpread);
   InitStrategy(DEMARKER5,  "DeMarker M5",  DeMarker5_Active,  DEMARKER, PERIOD_M5,  DeMarker5_OpenMethod,  DeMarker_OpenLevel, DeMarker5_OpenCondition1,  DeMarker5_OpenCondition2,  DeMarker5_CloseCondition,  DeMarker5_MaxSpread);
   InitStrategy(DEMARKER15, "DeMarker M15", DeMarker15_Active, DEMARKER, PERIOD_M15, DeMarker15_OpenMethod, DeMarker_OpenLevel, DeMarker15_OpenCondition1, DeMarker15_OpenCondition2, DeMarker15_CloseCondition, DeMarker15_MaxSpread);
   InitStrategy(DEMARKER30, "DeMarker M30", DeMarker30_Active, DEMARKER, PERIOD_M30, DeMarker30_OpenMethod, DeMarker_OpenLevel, DeMarker30_OpenCondition1, DeMarker30_OpenCondition2, DeMarker30_CloseCondition, DeMarker30_MaxSpread);
+  #else
+  InitStrategy(DEMARKER1,  "DeMarker M1",  DeMarker1_Active,  DEMARKER, PERIOD_M1,  DeMarker1_OpenMethod,  DeMarker_OpenLevel);
+  InitStrategy(DEMARKER5,  "DeMarker M5",  DeMarker5_Active,  DEMARKER, PERIOD_M5,  DeMarker5_OpenMethod,  DeMarker_OpenLevel);
+  InitStrategy(DEMARKER15, "DeMarker M15", DeMarker15_Active, DEMARKER, PERIOD_M15, DeMarker15_OpenMethod, DeMarker_OpenLevel);
+  InitStrategy(DEMARKER30, "DeMarker M30", DeMarker30_Active, DEMARKER, PERIOD_M30, DeMarker30_OpenMethod, DeMarker_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(ENVELOPES1,  "Envelopes M1",  Envelopes1_Active,  ENVELOPES, PERIOD_M1,  Envelopes1_OpenMethod,  Envelopes_OpenLevel, Envelopes1_OpenCondition1,  Envelopes1_OpenCondition2,  Envelopes1_CloseCondition,  Envelopes1_MaxSpread);
   InitStrategy(ENVELOPES5,  "Envelopes M5",  Envelopes5_Active,  ENVELOPES, PERIOD_M5,  Envelopes5_OpenMethod,  Envelopes_OpenLevel, Envelopes5_OpenCondition1,  Envelopes5_OpenCondition2,  Envelopes5_CloseCondition,  Envelopes5_MaxSpread);
   InitStrategy(ENVELOPES15, "Envelopes M15", Envelopes15_Active, ENVELOPES, PERIOD_M15, Envelopes15_OpenMethod, Envelopes_OpenLevel, Envelopes15_OpenCondition1, Envelopes15_OpenCondition2, Envelopes15_CloseCondition, Envelopes15_MaxSpread);
   InitStrategy(ENVELOPES30, "Envelopes M30", Envelopes30_Active, ENVELOPES, PERIOD_M30, Envelopes30_OpenMethod, Envelopes_OpenLevel, Envelopes30_OpenCondition1, Envelopes30_OpenCondition2, Envelopes30_CloseCondition, Envelopes30_MaxSpread);
+  #else
+  InitStrategy(ENVELOPES1,  "Envelopes M1",  Envelopes1_Active,  ENVELOPES, PERIOD_M1,  Envelopes1_OpenMethod,  Envelopes_OpenLevel);
+  InitStrategy(ENVELOPES5,  "Envelopes M5",  Envelopes5_Active,  ENVELOPES, PERIOD_M5,  Envelopes5_OpenMethod,  Envelopes_OpenLevel);
+  InitStrategy(ENVELOPES15, "Envelopes M15", Envelopes15_Active, ENVELOPES, PERIOD_M15, Envelopes15_OpenMethod, Envelopes_OpenLevel);
+  InitStrategy(ENVELOPES30, "Envelopes M30", Envelopes30_Active, ENVELOPES, PERIOD_M30, Envelopes30_OpenMethod, Envelopes_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(FORCE1,  "Force M1",  Force1_Active,  FORCE, PERIOD_M1,  Force1_OpenMethod,  Force_OpenLevel, Force1_OpenCondition1,  Force1_OpenCondition2,  Force1_CloseCondition,  Force1_MaxSpread);
   InitStrategy(FORCE5,  "Force M5",  Force5_Active,  FORCE, PERIOD_M5,  Force5_OpenMethod,  Force_OpenLevel, Force5_OpenCondition1,  Force5_OpenCondition2,  Force5_CloseCondition,  Force5_MaxSpread);
   InitStrategy(FORCE15, "Force M15", Force15_Active, FORCE, PERIOD_M15, Force15_OpenMethod, Force_OpenLevel, Force15_OpenCondition1, Force15_OpenCondition2, Force15_CloseCondition, Force15_MaxSpread);
   InitStrategy(FORCE30, "Force M30", Force30_Active, FORCE, PERIOD_M30, Force30_OpenMethod, Force_OpenLevel, Force30_OpenCondition1, Force30_OpenCondition2, Force30_CloseCondition, Force30_MaxSpread);
+  #else
+  InitStrategy(FORCE1,  "Force M1",  Force1_Active,  FORCE, PERIOD_M1,  Force1_OpenMethod,  Force_OpenLevel);
+  InitStrategy(FORCE5,  "Force M5",  Force5_Active,  FORCE, PERIOD_M5,  Force5_OpenMethod,  Force_OpenLevel);
+  InitStrategy(FORCE15, "Force M15", Force15_Active, FORCE, PERIOD_M15, Force15_OpenMethod, Force_OpenLevel);
+  InitStrategy(FORCE30, "Force M30", Force30_Active, FORCE, PERIOD_M30, Force30_OpenMethod, Force_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(FRACTALS1,  "Fractals M1",  Fractals1_Active,  FRACTALS, PERIOD_M1,  Fractals1_OpenMethod,  Fractals_OpenLevel, Fractals1_OpenCondition1,  Fractals1_OpenCondition2,  Fractals1_CloseCondition,  Fractals1_MaxSpread);
   InitStrategy(FRACTALS5,  "Fractals M5",  Fractals5_Active,  FRACTALS, PERIOD_M5,  Fractals5_OpenMethod,  Fractals_OpenLevel, Fractals5_OpenCondition1,  Fractals5_OpenCondition2,  Fractals5_CloseCondition,  Fractals5_MaxSpread);
   InitStrategy(FRACTALS15, "Fractals M15", Fractals15_Active, FRACTALS, PERIOD_M15, Fractals15_OpenMethod, Fractals_OpenLevel, Fractals15_OpenCondition1, Fractals15_OpenCondition2, Fractals15_CloseCondition, Fractals15_MaxSpread);
   InitStrategy(FRACTALS30, "Fractals M30", Fractals30_Active, FRACTALS, PERIOD_M30, Fractals30_OpenMethod, Fractals_OpenLevel, Fractals30_OpenCondition1, Fractals30_OpenCondition2, Fractals30_CloseCondition, Fractals30_MaxSpread);
+  #else
+  InitStrategy(FRACTALS1,  "Fractals M1",  Fractals1_Active,  FRACTALS, PERIOD_M1,  Fractals1_OpenMethod,  Fractals_OpenLevel);
+  InitStrategy(FRACTALS5,  "Fractals M5",  Fractals5_Active,  FRACTALS, PERIOD_M5,  Fractals5_OpenMethod,  Fractals_OpenLevel);
+  InitStrategy(FRACTALS15, "Fractals M15", Fractals15_Active, FRACTALS, PERIOD_M15, Fractals15_OpenMethod, Fractals_OpenLevel);
+  InitStrategy(FRACTALS30, "Fractals M30", Fractals30_Active, FRACTALS, PERIOD_M30, Fractals30_OpenMethod, Fractals_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(GATOR1,  "Gator M1",  Gator1_Active,  GATOR, PERIOD_M1,  Gator1_OpenMethod,  Gator_OpenLevel, Gator1_OpenCondition1,  Gator1_OpenCondition2,  Gator1_CloseCondition,  Gator1_MaxSpread);
   InitStrategy(GATOR5,  "Gator M5",  Gator5_Active,  GATOR, PERIOD_M5,  Gator5_OpenMethod,  Gator_OpenLevel, Gator5_OpenCondition1,  Gator5_OpenCondition2,  Gator5_CloseCondition,  Gator5_MaxSpread);
   InitStrategy(GATOR15, "Gator M15", Gator15_Active, GATOR, PERIOD_M15, Gator15_OpenMethod, Gator_OpenLevel, Gator15_OpenCondition1, Gator15_OpenCondition2, Gator15_CloseCondition, Gator15_MaxSpread);
   InitStrategy(GATOR30, "Gator M30", Gator30_Active, GATOR, PERIOD_M30, Gator30_OpenMethod, Gator_OpenLevel, Gator30_OpenCondition1, Gator30_OpenCondition2, Gator30_CloseCondition, Gator30_MaxSpread);
+  #else
+  InitStrategy(GATOR1,  "Gator M1",  Gator1_Active,  GATOR, PERIOD_M1,  Gator1_OpenMethod,  Gator_OpenLevel);
+  InitStrategy(GATOR5,  "Gator M5",  Gator5_Active,  GATOR, PERIOD_M5,  Gator5_OpenMethod,  Gator_OpenLevel);
+  InitStrategy(GATOR15, "Gator M15", Gator15_Active, GATOR, PERIOD_M15, Gator15_OpenMethod, Gator_OpenLevel);
+  InitStrategy(GATOR30, "Gator M30", Gator30_Active, GATOR, PERIOD_M30, Gator30_OpenMethod, Gator_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(ICHIMOKU1,  "Ichimoku M1",  Ichimoku1_Active,  ICHIMOKU, PERIOD_M1,  Ichimoku1_OpenMethod,  Ichimoku_OpenLevel, Ichimoku1_OpenCondition1,  Ichimoku1_OpenCondition2,  Ichimoku1_CloseCondition,  Ichimoku1_MaxSpread);
   InitStrategy(ICHIMOKU5,  "Ichimoku M5",  Ichimoku5_Active,  ICHIMOKU, PERIOD_M5,  Ichimoku5_OpenMethod,  Ichimoku_OpenLevel, Ichimoku5_OpenCondition1,  Ichimoku5_OpenCondition2,  Ichimoku5_CloseCondition,  Ichimoku5_MaxSpread);
   InitStrategy(ICHIMOKU15, "Ichimoku M15", Ichimoku15_Active, ICHIMOKU, PERIOD_M15, Ichimoku15_OpenMethod, Ichimoku_OpenLevel, Ichimoku15_OpenCondition1, Ichimoku15_OpenCondition2, Ichimoku15_CloseCondition, Ichimoku15_MaxSpread);
   InitStrategy(ICHIMOKU30, "Ichimoku M30", Ichimoku30_Active, ICHIMOKU, PERIOD_M30, Ichimoku30_OpenMethod, Ichimoku_OpenLevel, Ichimoku30_OpenCondition1, Ichimoku30_OpenCondition2, Ichimoku30_CloseCondition, Ichimoku30_MaxSpread);
+  #else
+  InitStrategy(ICHIMOKU1,  "Ichimoku M1",  Ichimoku1_Active,  ICHIMOKU, PERIOD_M1,  Ichimoku1_OpenMethod,  Ichimoku_OpenLevel);
+  InitStrategy(ICHIMOKU5,  "Ichimoku M5",  Ichimoku5_Active,  ICHIMOKU, PERIOD_M5,  Ichimoku5_OpenMethod,  Ichimoku_OpenLevel);
+  InitStrategy(ICHIMOKU15, "Ichimoku M15", Ichimoku15_Active, ICHIMOKU, PERIOD_M15, Ichimoku15_OpenMethod, Ichimoku_OpenLevel);
+  InitStrategy(ICHIMOKU30, "Ichimoku M30", Ichimoku30_Active, ICHIMOKU, PERIOD_M30, Ichimoku30_OpenMethod, Ichimoku_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(MA1,  "MA M1",  MA1_Active,  MA, PERIOD_M1,  MA1_OpenMethod,  MA_OpenLevel,  MA1_OpenCondition1, MA1_OpenCondition2,  MA1_CloseCondition,  MA1_MaxSpread);
   InitStrategy(MA5,  "MA M5",  MA5_Active,  MA, PERIOD_M5,  MA5_OpenMethod,  MA_OpenLevel,  MA5_OpenCondition1, MA5_OpenCondition2,  MA5_CloseCondition,  MA5_MaxSpread);
   InitStrategy(MA15, "MA M15", MA15_Active, MA, PERIOD_M15, MA15_OpenMethod, MA_OpenLevel, MA15_OpenCondition1, MA15_OpenCondition2, MA15_CloseCondition, MA15_MaxSpread);
   InitStrategy(MA30, "MA M30", MA30_Active, MA, PERIOD_M30, MA30_OpenMethod, MA_OpenLevel, MA30_OpenCondition1, MA30_OpenCondition2, MA30_CloseCondition, MA30_MaxSpread);
+  #else
+  InitStrategy(MA1,  "MA M1",  MA1_Active,  MA, PERIOD_M1,  MA1_OpenMethod,  MA_OpenLevel);
+  InitStrategy(MA5,  "MA M5",  MA5_Active,  MA, PERIOD_M5,  MA5_OpenMethod,  MA_OpenLevel);
+  InitStrategy(MA15, "MA M15", MA15_Active, MA, PERIOD_M15, MA15_OpenMethod, MA_OpenLevel);
+  InitStrategy(MA30, "MA M30", MA30_Active, MA, PERIOD_M30, MA30_OpenMethod, MA_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(MACD1,  "MACD M1",  MACD1_Active,  MACD, PERIOD_M1,  MACD1_OpenMethod,  MACD_OpenLevel, MACD1_OpenCondition1,  MACD1_OpenCondition2,  MACD1_CloseCondition,  MACD1_MaxSpread);
   InitStrategy(MACD5,  "MACD M5",  MACD5_Active,  MACD, PERIOD_M5,  MACD5_OpenMethod,  MACD_OpenLevel, MACD5_OpenCondition1,  MACD5_OpenCondition2,  MACD5_CloseCondition,  MACD5_MaxSpread);
   InitStrategy(MACD15, "MACD M15", MACD15_Active, MACD, PERIOD_M15, MACD15_OpenMethod, MACD_OpenLevel, MACD15_OpenCondition1, MACD15_OpenCondition2, MACD15_CloseCondition, MACD15_MaxSpread);
   InitStrategy(MACD30, "MACD M30", MACD30_Active, MACD, PERIOD_M30, MACD30_OpenMethod, MACD_OpenLevel, MACD30_OpenCondition1, MACD30_OpenCondition2, MACD30_CloseCondition, MACD30_MaxSpread);
+  #else
+  InitStrategy(MACD1,  "MACD M1",  MACD1_Active,  MACD, PERIOD_M1,  MACD1_OpenMethod,  MACD_OpenLevel);
+  InitStrategy(MACD5,  "MACD M5",  MACD5_Active,  MACD, PERIOD_M5,  MACD5_OpenMethod,  MACD_OpenLevel);
+  InitStrategy(MACD15, "MACD M15", MACD15_Active, MACD, PERIOD_M15, MACD15_OpenMethod, MACD_OpenLevel);
+  InitStrategy(MACD30, "MACD M30", MACD30_Active, MACD, PERIOD_M30, MACD30_OpenMethod, MACD_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(MFI1,  "MFI M1",  MFI1_Active,  MFI, PERIOD_M1,  MFI1_OpenMethod,  MFI_OpenLevel, MFI1_OpenCondition1,  MFI1_OpenCondition2,  MFI1_CloseCondition,  MFI1_MaxSpread);
   InitStrategy(MFI5,  "MFI M5",  MFI5_Active,  MFI, PERIOD_M5,  MFI5_OpenMethod,  MFI_OpenLevel, MFI5_OpenCondition1,  MFI5_OpenCondition2,  MFI5_CloseCondition,  MFI5_MaxSpread);
   InitStrategy(MFI15, "MFI M15", MFI15_Active, MFI, PERIOD_M15, MFI15_OpenMethod, MFI_OpenLevel, MFI15_OpenCondition1, MFI15_OpenCondition2, MFI15_CloseCondition, MFI15_MaxSpread);
   InitStrategy(MFI30, "MFI M30", MFI30_Active, MFI, PERIOD_M30, MFI30_OpenMethod, MFI_OpenLevel, MFI30_OpenCondition1, MFI30_OpenCondition2, MFI30_CloseCondition, MFI30_MaxSpread);
+  #else
+  InitStrategy(MFI1,  "MFI M1",  MFI1_Active,  MFI, PERIOD_M1,  MFI1_OpenMethod,  MFI_OpenLevel);
+  InitStrategy(MFI5,  "MFI M5",  MFI5_Active,  MFI, PERIOD_M5,  MFI5_OpenMethod,  MFI_OpenLevel);
+  InitStrategy(MFI15, "MFI M15", MFI15_Active, MFI, PERIOD_M15, MFI15_OpenMethod, MFI_OpenLevel);
+  InitStrategy(MFI30, "MFI M30", MFI30_Active, MFI, PERIOD_M30, MFI30_OpenMethod, MFI_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(MOMENTUM1,  "Momentum M1",  Momentum1_Active,  MOMENTUM, PERIOD_M1,  Momentum1_OpenMethod,  Momentum_OpenLevel, Momentum1_OpenCondition1,  Momentum1_OpenCondition2,  Momentum1_CloseCondition,  Momentum1_MaxSpread);
   InitStrategy(MOMENTUM5,  "Momentum M5",  Momentum5_Active,  MOMENTUM, PERIOD_M5,  Momentum5_OpenMethod,  Momentum_OpenLevel, Momentum5_OpenCondition1,  Momentum5_OpenCondition2,  Momentum5_CloseCondition,  Momentum5_MaxSpread);
   InitStrategy(MOMENTUM15, "Momentum M15", Momentum15_Active, MOMENTUM, PERIOD_M15, Momentum15_OpenMethod, Momentum_OpenLevel, Momentum15_OpenCondition1, Momentum15_OpenCondition2, Momentum15_CloseCondition, Momentum15_MaxSpread);
   InitStrategy(MOMENTUM30, "Momentum M30", Momentum30_Active, MOMENTUM, PERIOD_M30, Momentum30_OpenMethod, Momentum_OpenLevel, Momentum30_OpenCondition1, Momentum30_OpenCondition2, Momentum30_CloseCondition, Momentum30_MaxSpread);
+  #else
+  InitStrategy(MOMENTUM1,  "Momentum M1",  Momentum1_Active,  MOMENTUM, PERIOD_M1,  Momentum1_OpenMethod,  Momentum_OpenLevel);
+  InitStrategy(MOMENTUM5,  "Momentum M5",  Momentum5_Active,  MOMENTUM, PERIOD_M5,  Momentum5_OpenMethod,  Momentum_OpenLevel);
+  InitStrategy(MOMENTUM15, "Momentum M15", Momentum15_Active, MOMENTUM, PERIOD_M15, Momentum15_OpenMethod, Momentum_OpenLevel);
+  InitStrategy(MOMENTUM30, "Momentum M30", Momentum30_Active, MOMENTUM, PERIOD_M30, Momentum30_OpenMethod, Momentum_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(OBV1,  "OBV M1",  OBV1_Active,  OBV, PERIOD_M1,  OBV1_OpenMethod,  OBV_OpenLevel,  OBV1_OpenCondition1, OBV1_OpenCondition2,  OBV1_CloseCondition,  OBV1_MaxSpread);
   InitStrategy(OBV5,  "OBV M5",  OBV5_Active,  OBV, PERIOD_M5,  OBV5_OpenMethod,  OBV_OpenLevel,  OBV5_OpenCondition1, OBV5_OpenCondition2,  OBV5_CloseCondition,  OBV5_MaxSpread);
   InitStrategy(OBV15, "OBV M15", OBV15_Active, OBV, PERIOD_M15, OBV15_OpenMethod, OBV_OpenLevel, OBV15_OpenCondition1, OBV15_OpenCondition2, OBV15_CloseCondition, OBV15_MaxSpread);
   InitStrategy(OBV30, "OBV M30", OBV30_Active, OBV, PERIOD_M30, OBV30_OpenMethod, OBV_OpenLevel, OBV30_OpenCondition1, OBV30_OpenCondition2, OBV30_CloseCondition, OBV30_MaxSpread);
+  #else
+  InitStrategy(OBV1,  "OBV M1",  OBV1_Active,  OBV, PERIOD_M1,  OBV1_OpenMethod,  OBV_OpenLevel);
+  InitStrategy(OBV5,  "OBV M5",  OBV5_Active,  OBV, PERIOD_M5,  OBV5_OpenMethod,  OBV_OpenLevel);
+  InitStrategy(OBV15, "OBV M15", OBV15_Active, OBV, PERIOD_M15, OBV15_OpenMethod, OBV_OpenLevel);
+  InitStrategy(OBV30, "OBV M30", OBV30_Active, OBV, PERIOD_M30, OBV30_OpenMethod, OBV_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(OSMA1,  "OSMA M1",  OSMA1_Active,  OSMA, PERIOD_M1,  OSMA1_OpenMethod,  OSMA_OpenLevel, OSMA1_OpenCondition1,  OSMA1_OpenCondition2,  OSMA1_CloseCondition,  OSMA1_MaxSpread);
   InitStrategy(OSMA5,  "OSMA M5",  OSMA5_Active,  OSMA, PERIOD_M5,  OSMA5_OpenMethod,  OSMA_OpenLevel, OSMA5_OpenCondition1,  OSMA5_OpenCondition2,  OSMA5_CloseCondition,  OSMA5_MaxSpread);
   InitStrategy(OSMA15, "OSMA M15", OSMA15_Active, OSMA, PERIOD_M15, OSMA15_OpenMethod, OSMA_OpenLevel, OSMA15_OpenCondition1, OSMA15_OpenCondition2, OSMA15_CloseCondition, OSMA15_MaxSpread);
   InitStrategy(OSMA30, "OSMA M30", OSMA30_Active, OSMA, PERIOD_M30, OSMA30_OpenMethod, OSMA_OpenLevel, OSMA30_OpenCondition1, OSMA30_OpenCondition2, OSMA30_CloseCondition, OSMA30_MaxSpread);
+  #else
+  InitStrategy(OSMA1,  "OSMA M1",  OSMA1_Active,  OSMA, PERIOD_M1,  OSMA1_OpenMethod,  OSMA_OpenLevel);
+  InitStrategy(OSMA5,  "OSMA M5",  OSMA5_Active,  OSMA, PERIOD_M5,  OSMA5_OpenMethod,  OSMA_OpenLevel);
+  InitStrategy(OSMA15, "OSMA M15", OSMA15_Active, OSMA, PERIOD_M15, OSMA15_OpenMethod, OSMA_OpenLevel);
+  InitStrategy(OSMA30, "OSMA M30", OSMA30_Active, OSMA, PERIOD_M30, OSMA30_OpenMethod, OSMA_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(RSI1,  "RSI M1",  RSI1_Active,  RSI, PERIOD_M1,  RSI1_OpenMethod,  RSI_OpenLevel, RSI1_OpenCondition1,  RSI1_OpenCondition2,  RSI1_CloseCondition,  RSI1_MaxSpread);
   InitStrategy(RSI5,  "RSI M5",  RSI5_Active,  RSI, PERIOD_M5,  RSI5_OpenMethod,  RSI_OpenLevel, RSI5_OpenCondition1,  RSI5_OpenCondition2,  RSI5_CloseCondition,  RSI5_MaxSpread);
   InitStrategy(RSI15, "RSI M15", RSI15_Active, RSI, PERIOD_M15, RSI15_OpenMethod, RSI_OpenLevel, RSI15_OpenCondition1, RSI15_OpenCondition2, RSI15_CloseCondition, RSI15_MaxSpread);
   InitStrategy(RSI30, "RSI M30", RSI30_Active, RSI, PERIOD_M30, RSI30_OpenMethod, RSI_OpenLevel, RSI30_OpenCondition1, RSI30_OpenCondition2, RSI30_CloseCondition, RSI30_MaxSpread);
+  #else
+  InitStrategy(RSI1,  "RSI M1",  RSI1_Active,  RSI, PERIOD_M1,  RSI1_OpenMethod,  RSI_OpenLevel);
+  InitStrategy(RSI5,  "RSI M5",  RSI5_Active,  RSI, PERIOD_M5,  RSI5_OpenMethod,  RSI_OpenLevel);
+  InitStrategy(RSI15, "RSI M15", RSI15_Active, RSI, PERIOD_M15, RSI15_OpenMethod, RSI_OpenLevel);
+  InitStrategy(RSI30, "RSI M30", RSI30_Active, RSI, PERIOD_M30, RSI30_OpenMethod, RSI_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(RVI1,  "RVI M1",  RVI1_Active,  RVI, PERIOD_M1,  RVI1_OpenMethod,  RVI_OpenLevel, RVI1_OpenCondition1,  RVI1_OpenCondition2,  RVI1_CloseCondition,  RVI1_MaxSpread);
   InitStrategy(RVI5,  "RVI M5",  RVI5_Active,  RVI, PERIOD_M5,  RVI5_OpenMethod,  RVI_OpenLevel, RVI5_OpenCondition1,  RVI5_OpenCondition2,  RVI5_CloseCondition,  RVI5_MaxSpread);
   InitStrategy(RVI15, "RVI M15", RVI15_Active, RVI, PERIOD_M15, RVI15_OpenMethod, RVI_OpenLevel, RVI15_OpenCondition1, RVI15_OpenCondition2, RVI15_CloseCondition, RVI15_MaxSpread);
   InitStrategy(RVI30, "RVI M30", RVI30_Active, RVI, PERIOD_M30, RVI30_OpenMethod, RVI_OpenLevel, RVI30_OpenCondition1, RVI30_OpenCondition2, RVI30_CloseCondition, RVI30_MaxSpread);
+  #else
+  InitStrategy(RVI1,  "RVI M1",  RVI1_Active,  RVI, PERIOD_M1,  RVI1_OpenMethod,  RVI_OpenLevel);
+  InitStrategy(RVI5,  "RVI M5",  RVI5_Active,  RVI, PERIOD_M5,  RVI5_OpenMethod,  RVI_OpenLevel);
+  InitStrategy(RVI15, "RVI M15", RVI15_Active, RVI, PERIOD_M15, RVI15_OpenMethod, RVI_OpenLevel);
+  InitStrategy(RVI30, "RVI M30", RVI30_Active, RVI, PERIOD_M30, RVI30_OpenMethod, RVI_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(SAR1,  "SAR M1",  SAR1_Active,  SAR, PERIOD_M1,  SAR1_OpenMethod,  SAR_OpenLevel, SAR1_OpenCondition1,  SAR1_OpenCondition2,  SAR1_CloseCondition,  SAR1_MaxSpread);
   InitStrategy(SAR5,  "SAR M5",  SAR5_Active,  SAR, PERIOD_M5,  SAR5_OpenMethod,  SAR_OpenLevel, SAR5_OpenCondition1,  SAR5_OpenCondition2,  SAR5_CloseCondition,  SAR5_MaxSpread);
   InitStrategy(SAR15, "SAR M15", SAR15_Active, SAR, PERIOD_M15, SAR15_OpenMethod, SAR_OpenLevel, SAR15_OpenCondition1, SAR15_OpenCondition2, SAR15_CloseCondition, SAR15_MaxSpread);
   InitStrategy(SAR30, "SAR M30", SAR30_Active, SAR, PERIOD_M30, SAR30_OpenMethod, SAR_OpenLevel, SAR30_OpenCondition1, SAR30_OpenCondition2, SAR30_CloseCondition, SAR30_MaxSpread);
+  #else
+  InitStrategy(SAR1,  "SAR M1",  SAR1_Active,  SAR, PERIOD_M1,  SAR1_OpenMethod,  SAR_OpenLevel);
+  InitStrategy(SAR5,  "SAR M5",  SAR5_Active,  SAR, PERIOD_M5,  SAR5_OpenMethod,  SAR_OpenLevel);
+  InitStrategy(SAR15, "SAR M15", SAR15_Active, SAR, PERIOD_M15, SAR15_OpenMethod, SAR_OpenLevel);
+  InitStrategy(SAR30, "SAR M30", SAR30_Active, SAR, PERIOD_M30, SAR30_OpenMethod, SAR_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(STDDEV1,  "StdDev M1",  StdDev1_Active,  STDDEV, PERIOD_M1,  StdDev1_OpenMethod,  StdDev_OpenLevel,  StdDev1_OpenCondition1,  StdDev1_OpenCondition2,  StdDev1_CloseCondition,  StdDev1_MaxSpread);
   InitStrategy(STDDEV5,  "StdDev M5",  StdDev5_Active,  STDDEV, PERIOD_M5,  StdDev5_OpenMethod,  StdDev_OpenLevel,  StdDev5_OpenCondition1,  StdDev5_OpenCondition2,  StdDev5_CloseCondition,  StdDev5_MaxSpread);
   InitStrategy(STDDEV15, "StdDev M15", StdDev15_Active, STDDEV, PERIOD_M15, StdDev15_OpenMethod, StdDev_OpenLevel, StdDev15_OpenCondition1, StdDev15_OpenCondition2, StdDev15_CloseCondition, StdDev15_MaxSpread);
   InitStrategy(STDDEV30, "StdDev M30", StdDev30_Active, STDDEV, PERIOD_M30, StdDev30_OpenMethod, StdDev_OpenLevel, StdDev30_OpenCondition1, StdDev30_OpenCondition2, StdDev30_CloseCondition, StdDev30_MaxSpread);
+  #else
+  InitStrategy(STDDEV1,  "StdDev M1",  StdDev1_Active,  STDDEV, PERIOD_M1,  StdDev1_OpenMethod,  StdDev_OpenLevel);
+  InitStrategy(STDDEV5,  "StdDev M5",  StdDev5_Active,  STDDEV, PERIOD_M5,  StdDev5_OpenMethod,  StdDev_OpenLevel);
+  InitStrategy(STDDEV15, "StdDev M15", StdDev15_Active, STDDEV, PERIOD_M15, StdDev15_OpenMethod, StdDev_OpenLevel);
+  InitStrategy(STDDEV30, "StdDev M30", StdDev30_Active, STDDEV, PERIOD_M30, StdDev30_OpenMethod, StdDev_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(STOCHASTIC1,  "Stochastic M1",  Stochastic1_Active,  STOCHASTIC, PERIOD_M1,  Stochastic1_OpenMethod,  Stochastic_OpenLevel,  Stochastic1_OpenCondition1,  Stochastic1_OpenCondition2,  Stochastic1_CloseCondition,  Stochastic1_MaxSpread);
   InitStrategy(STOCHASTIC5,  "Stochastic M5",  Stochastic5_Active,  STOCHASTIC, PERIOD_M5,  Stochastic5_OpenMethod,  Stochastic_OpenLevel,  Stochastic5_OpenCondition1,  Stochastic5_OpenCondition2,  Stochastic5_CloseCondition,  Stochastic5_MaxSpread);
   InitStrategy(STOCHASTIC15, "Stochastic M15", Stochastic15_Active, STOCHASTIC, PERIOD_M15, Stochastic15_OpenMethod, Stochastic_OpenLevel, Stochastic15_OpenCondition1, Stochastic15_OpenCondition2, Stochastic15_CloseCondition, Stochastic15_MaxSpread);
   InitStrategy(STOCHASTIC30, "Stochastic M30", Stochastic30_Active, STOCHASTIC, PERIOD_M30, Stochastic30_OpenMethod, Stochastic_OpenLevel, Stochastic30_OpenCondition1, Stochastic30_OpenCondition2, Stochastic30_CloseCondition, Stochastic30_MaxSpread);
+  #else
+  InitStrategy(STOCHASTIC1,  "Stochastic M1",  Stochastic1_Active,  STOCHASTIC, PERIOD_M1,  Stochastic1_OpenMethod,  Stochastic_OpenLevel);
+  InitStrategy(STOCHASTIC5,  "Stochastic M5",  Stochastic5_Active,  STOCHASTIC, PERIOD_M5,  Stochastic5_OpenMethod,  Stochastic_OpenLevel);
+  InitStrategy(STOCHASTIC15, "Stochastic M15", Stochastic15_Active, STOCHASTIC, PERIOD_M15, Stochastic15_OpenMethod, Stochastic_OpenLevel);
+  InitStrategy(STOCHASTIC30, "Stochastic M30", Stochastic30_Active, STOCHASTIC, PERIOD_M30, Stochastic30_OpenMethod, Stochastic_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(WPR1,  "WPR M1",  WPR1_Active,  WPR, PERIOD_M1,  WPR1_OpenMethod,  WPR_OpenLevel, WPR1_OpenCondition1,  WPR1_OpenCondition2,  WPR1_CloseCondition,  WPR1_MaxSpread);
   InitStrategy(WPR5,  "WPR M5",  WPR5_Active,  WPR, PERIOD_M5,  WPR5_OpenMethod,  WPR_OpenLevel, WPR5_OpenCondition1,  WPR5_OpenCondition2,  WPR5_CloseCondition,  WPR5_MaxSpread);
   InitStrategy(WPR15, "WPR M15", WPR15_Active, WPR, PERIOD_M15, WPR15_OpenMethod, WPR_OpenLevel, WPR15_OpenCondition1, WPR15_OpenCondition2, WPR15_CloseCondition, WPR15_MaxSpread);
   InitStrategy(WPR30, "WPR M30", WPR30_Active, WPR, PERIOD_M30, WPR30_OpenMethod, WPR_OpenLevel, WPR30_OpenCondition1, WPR30_OpenCondition2, WPR30_CloseCondition, WPR30_MaxSpread);
+  #else
+  InitStrategy(WPR1,  "WPR M1",  WPR1_Active,  WPR, PERIOD_M1,  WPR1_OpenMethod,  WPR_OpenLevel);
+  InitStrategy(WPR5,  "WPR M5",  WPR5_Active,  WPR, PERIOD_M5,  WPR5_OpenMethod,  WPR_OpenLevel);
+  InitStrategy(WPR15, "WPR M15", WPR15_Active, WPR, PERIOD_M15, WPR15_OpenMethod, WPR_OpenLevel);
+  InitStrategy(WPR30, "WPR M30", WPR30_Active, WPR, PERIOD_M30, WPR30_OpenMethod, WPR_OpenLevel);
+  #endif
 
+  #ifdef __advanced__
   InitStrategy(ZIGZAG1,  "ZigZag M1",  ZigZag1_Active,  ZIGZAG, PERIOD_M1,  ZigZag1_OpenMethod,  ZigZag_OpenLevel, ZigZag1_OpenCondition1,  ZigZag1_OpenCondition2,  ZigZag1_CloseCondition,  ZigZag1_MaxSpread);
   InitStrategy(ZIGZAG5,  "ZigZag M5",  ZigZag5_Active,  ZIGZAG, PERIOD_M5,  ZigZag5_OpenMethod,  ZigZag_OpenLevel, ZigZag5_OpenCondition1,  ZigZag5_OpenCondition2,  ZigZag5_CloseCondition,  ZigZag5_MaxSpread);
   InitStrategy(ZIGZAG15, "ZigZag M15", ZigZag15_Active, ZIGZAG, PERIOD_M15, ZigZag15_OpenMethod, ZigZag_OpenLevel, ZigZag15_OpenCondition1, ZigZag15_OpenCondition2, ZigZag15_CloseCondition, ZigZag15_MaxSpread);
   InitStrategy(ZIGZAG30, "ZigZag M30", ZigZag30_Active, ZIGZAG, PERIOD_M30, ZigZag30_OpenMethod, ZigZag_OpenLevel, ZigZag30_OpenCondition1, ZigZag30_OpenCondition2, ZigZag30_CloseCondition, ZigZag30_MaxSpread);
+  #else
+  InitStrategy(ZIGZAG1,  "ZigZag M1",  ZigZag1_Active,  ZIGZAG, PERIOD_M1,  ZigZag1_OpenMethod,  ZigZag_OpenLevel);
+  InitStrategy(ZIGZAG5,  "ZigZag M5",  ZigZag5_Active,  ZIGZAG, PERIOD_M5,  ZigZag5_OpenMethod,  ZigZag_OpenLevel);
+  InitStrategy(ZIGZAG15, "ZigZag M15", ZigZag15_Active, ZIGZAG, PERIOD_M15, ZigZag15_OpenMethod, ZigZag_OpenLevel);
+  InitStrategy(ZIGZAG30, "ZigZag M30", ZigZag30_Active, ZIGZAG, PERIOD_M30, ZigZag30_OpenMethod, ZigZag_OpenLevel);
+  #endif
 
   ArrSetValueD(conf, FACTOR, 1.0);
   ArrSetValueD(conf, LOT_SIZE, lot_size);
@@ -6949,7 +7157,7 @@ bool InitializeStrategies() {
 /*
  * Initialize specific strategy.
  */
-bool InitStrategy(int key, string name, bool active, int indicator, int timeframe, int open_method, double open_level, int open_cond1, int open_cond2, int close_cond, double max_spread) {
+bool InitStrategy(int key, string name, bool active, int indicator, int timeframe, int open_method = 0, double open_level = 0.0, int open_cond1 = 0, int open_cond2 = 0, int close_cond = 0, double max_spread = 0.0) {
   sname[key]                 = name;
   info[key][ACTIVE]          = active;
   info[key][TIMEFRAME]       = timeframe;
@@ -7020,11 +7228,13 @@ void InitializeConditions() {
   acc_conditions[11][1] = Market_Condition_12;
   acc_conditions[11][2] = Action_On_Condition_12;
 
+  #ifdef __advanced__
   if (Account_Condition_To_Disable > 0 && Account_Condition_To_Disable < ArraySize(acc_conditions)) {
     acc_conditions[Account_Condition_To_Disable - 1][0] = C_ACC_NONE;
     acc_conditions[Account_Condition_To_Disable - 1][1] = C_MARKET_NONE;
     acc_conditions[Account_Condition_To_Disable - 1][2] = A_NONE;
   }
+  #endif
 }
 
 /*
@@ -7449,6 +7659,7 @@ void ApplyStrategyMultiplierFactor(int period = DAILY, int loss_or_profit = 0, d
   }
 }
 
+#ifdef __advanced__
 /*
  * Check if RSI period needs any change.
  *
@@ -7543,6 +7754,7 @@ bool RSI_DecreasePeriod(int tf = PERIOD_M1, int condition = 0) {
   // if ((condition &  32) != 0) result = result && Open[CURR] > Close[PREV];
   return result;
 }
+#endif
 
 /*
  * Return strategy id by order magic number.
@@ -8103,7 +8315,7 @@ bool ActionCloseMostProfitableOrder(int reason_id = EMPTY, int min_profit = EMPT
   }
 
   if (selected_ticket > 0) {
-    if (min_profit != EMPTY && max_ticket_profit < MinProfitCloseOrder) { return (FALSE); }
+    if (min_profit != EMPTY && max_ticket_profit < Account_Condition_MinProfitCloseOrder) { return (FALSE); }
     last_close_profit = max_ticket_profit;
     return TaskAddCloseOrder(selected_ticket, reason_id);
   } else if (VerboseTrace) {
@@ -8265,7 +8477,7 @@ bool ActionExecute(int aid, int id = EMPTY) {
       result = ActionCloseMostProfitableOrder(reason_id);
       break;
     case A_CLOSE_ORDER_PROFIT_MIN: /* 2 */
-      result = ActionCloseMostProfitableOrder(reason_id, MinProfitCloseOrder);
+      result = ActionCloseMostProfitableOrder(reason_id, Account_Condition_MinProfitCloseOrder);
       break;
     case A_CLOSE_ORDER_LOSS: /* 3 */
       result = ActionCloseMostUnprofitableOrder(reason_id);
@@ -8488,6 +8700,7 @@ void CheckHistory() {
 
 /* BEGIN: ORDER QUEUE FUNCTIONS */
 
+#ifdef __advanced__
 /*
  * Process AI queue of orders to see if we can open any trades.
  */
@@ -8635,6 +8848,8 @@ int OrderQueueCount() {
     if (order_queue[i][Q_SID] != EMPTY) counter++;
   return (counter);
 }
+
+#endif
 
 /* END: ORDER QUEUE FUNCTIONS */
 
@@ -9384,4 +9599,3 @@ void WriteReport(string report_name) {
 /* END: SUMMARY REPORT */
 
 //+------------------------------------------------------------------+
-// 16-30101111-11-46107105-17101103-64-17114
