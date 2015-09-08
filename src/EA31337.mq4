@@ -8,9 +8,11 @@
 //
 #define __advanced__  // Enable advanced configuration.
 //#define __release__ // Enable release settings.
-//#define __testing__   // Mode for testing each component.
-//#define __limited__ // Define safe options.
+// #define __testing__   // Mode for testing each component.
+#define __limited__   // Define safe options.
 #define __rider__     // Activate rider strategy.
+#define __nolicense__
+//#define __experimental__
 
 #ifdef __testing__
   #define __disabled__  // Disable all strategies by default.
@@ -26,9 +28,11 @@
   #undef __nospreads__ // Enable spread limitation by default.
   #undef __limited__   // Disable safe mode by default.
   #undef __rider__     // Disable rider strategy by default.
+  #undef __experimental__
 #endif
 
 #ifdef __rider__
+  #define __advanced__  // Rider mode works only with advanced mode.
   #define __nofactor__  // No booting factor for daily, weekly and monthly strategies.
 #endif
 
@@ -541,8 +545,8 @@ extern string __EA_Order_Parameters__ = "-- Profit/Loss settings (set 0 for auto
 #else // Limit to micro lot.
   extern double LotSize = 0.01;
 #endif
-extern double TakeProfit = 0.0; // Take profit value in pips.
-extern double StopLoss = 0.0; // Stop loss value in pips.
+extern double TakeProfit = 0.0; // Take profit value in pips. [start=0,step=10,stop=80]
+extern double StopLoss = 0.0; // Stop loss value in pips. [start=0,step=10,stop=80]
 #ifndef __limited__
   extern int MaxOrders = 0; // Maximum orders. Set 0 for auto.
 #else
@@ -1059,7 +1063,6 @@ extern int Alligator30_OpenMethod  = 13; // Valid range: 0-63. This value is use
  *   £21362.41	2753	1.48	7.76	5174.72	36.07%	0.00000000	Alligator_TrailingStopMethod=22 (rider: d: £10k, spread 20, lot size: 0.1, no boosts, with actions)
  *   £22299.85	2753	1.51	8.10	5106.04	35.06%	0.00000000	Alligator_Jaw_Period=22 	Alligator_Teeth_Period=10 	Alligator_Lips_Period=9 (rider: d: £10k, spread 20, lot size: 0.1, no boosts, with actions)
  */
-#ifdef __advanced__
 //+------------------------------------------------------------------+
 extern string __ATR_Parameters__ = "-- Settings for the Average True Range indicator --";
 #ifndef __disabled__
@@ -1156,7 +1159,6 @@ extern int Awesome30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FR
   extern double Awesome15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
   extern double Awesome30_MaxSpread = 10.0; // Maximum spread to trade (in pips).
 #endif
-#endif // __advanced__
 //+------------------------------------------------------------------+
 extern string __Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --";
 #ifndef __disabled__
@@ -2474,10 +2476,26 @@ extern color ColorBuy = Blue;
 extern color ColorSell = Red;
 //+------------------------------------------------------------------+
 extern string __Other_Parameters__ = "-- Other parameters --";
-extern string E_Mail = "";
-extern string License = "";
+
+#ifndef __nolicense__
+  extern string E_Mail = "";
+  extern string License = "";
+#else
+  #ifdef __rider__
+    string E_Mail = ea_name + ea_version + "@example.com";
+    string License = "30-30101111-11-46101107112101-17120101-64-54-";
+  #else
+    #ifdef __advanced__
+      string E_Mail = ea_name + ea_version + "@example.com";
+      string License = "123";
+    #else
+      string E_mail = ""
+      string License = ""
+    #endif
+  #endif
+#endif
 extern int MagicNumber = 31337; // To help identify its own orders. It can vary in additional range: +20, see: ENUM_ORDER_TYPE.
-#ifdef __advanced__
+#ifdef __experimental__
   extern bool Cache = FALSE; // Cache some calculated variables for better performance. FIXME: Needs some work.
 #else
   const bool Cache = FALSE;
@@ -2895,6 +2913,9 @@ void OnDeinit(const int reason) {
 // FIXME: Doesn't seems to work.
 void OnTesterInit() {
   if (VerboseDebug) Print("Calling " + __FUNCTION__ + "()");
+  #ifdef __MQL5__
+    ParameterSetRange(LotSize, 0, 0.0, 0.01, 0.01, 0.1);
+  #endif
 }
 
 // The init event handler for tester.
@@ -6181,7 +6202,7 @@ int GetMaxOrdersPerDay() {
   int hours_left = (24 - hour_of_day);
   int curr_allowed_limit = floor((MaxOrdersPerDay - daily_orders) / hours_left);
   // Message(StringFormat("Hours left: (%d - %d) / %d= %d", MaxOrdersPerDay, daily_orders, hours_left, curr_allowed_limit));
-  return total_orders + curr_allowed_limit;
+  return MathMin(MathMax((total_orders - daily_orders), 1) + curr_allowed_limit, MaxOrdersPerDay);
 }
 #endif
 
@@ -7921,7 +7942,10 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
   if (AccountStopoutMode() == 0) stop_out_level += "%"; else stop_out_level += AccCurrency;
   stop_out_level += StringFormat(" (%.1f)", GetAccountStopoutLevel());
   // Prepare text to display max orders.
-  string text_max_orders = "Max orders: " + max_orders + " (Per type: " + GetMaxOrdersPerType() + ")";
+  string text_max_orders = "Max orders: " + max_orders + " [Per type: " + GetMaxOrdersPerType() + "]";
+  #ifdef __advanced__
+    if (MaxOrdersPerDay > 0) text_max_orders += StringFormat(" [Per day: %d]", MaxOrdersPerDay);
+  #endif
   // Prepare text to display spread.
   string text_spread = StringFormat("Spread: %.1f pips", ValueToPips(GetMarketSpread()));
   // string text_spread = "Spread (pips): " + DoubleToStr(GetMarketSpread(TRUE) / pts_per_pip, Digits - PipDigits) + " / Stop level (pips): " + DoubleToStr(market_stoplevel / pts_per_pip, Digits - PipDigits);
