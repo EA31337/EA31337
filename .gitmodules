@@ -1,3 +1,6 @@
 [submodule "wiki"]
 	path = wiki
 	url = git@github.com:EA31337/EA31337-Wiki.wiki.git
+[submodule "sets"]
+	path = sets
+	url = git@github.com:EA31337/EA31337-Sets.git
