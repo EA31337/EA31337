@@ -4,3 +4,6 @@
 [submodule "sets"]
 	path = sets
 	url = git@github.com:EA31337/EA31337-Sets.git
+[submodule "src/MQL5-MQL4"]
+	path = src/MQL5-MQL4
+	url = git@github.com:EA31337/MQL5-MQL4-Common.git
