@@ -13,7 +13,7 @@
 
 // Other modes.
 //#define __testing__      // Mode for testing each component.
-#define __nolicense__    // Disable licensing.
+//#define __nolicense__    // Disable licensing.
 //#define __limited__      // Define safe options.
 //#define __release__      // Enable release settings.
 //#define __experimental__ // Enable experimental options.
