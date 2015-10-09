@@ -15,6 +15,13 @@
   #define __noboost__   // Disable boosting by default.
   #define __nospreads__ // Disable spread limits.
   #define __nodebug__   // Disable debug messages by default.
+  #define __nolicense__ // Disable licensing.
+#endif
+
+#ifdef __backtest__
+   #ifndef __nolicense__
+     #define __nolicense__    // Disable licensing.
+   #endif
 #endif
 
 #ifdef __release__

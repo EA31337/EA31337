@@ -19,7 +19,10 @@ mql.exe:
 	curl -O http://files.metaquotes.net/metaquotes.software.corp/mt5/mql.exe
 
 set-mode:
+# E.g.: make set-mode MODE="__advanced__"
 ifdef MODE
 	git checkout -- src/include/EA/ea-mode.mqh
 	ex -s +"%s@^\zs.*\ze#define \($(MODE)\)@@g" -cwq src/include/EA/ea-mode.mqh
 endif
+
+#releases/EA31337-Backtest-Lite-%.ex4: mql.exe

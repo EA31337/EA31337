@@ -7,6 +7,8 @@
 //+------------------------------------------------------------------+
 #include <EA\ea-mode.mqh>
 #include <EA\ea-code-conf.mqh>
+#include <EA\ea-properties.mqh>
+#include <EA\ea-license.mqh>
 #include <EA\ea-enums.mqh>
 
 #ifdef __MQL4__
@@ -19,33 +21,7 @@
    #include <MQL5-MQL4\MQL4Common.mqh> // Provides common MQL4 back-compability for MQL5.
 #endif
 
-//+------------------------------------------------------------------+
-//| EA properties.
-//+------------------------------------------------------------------+
-
-#define ea_desc    "Multi-strategy advanced trading robot."
-#define ea_version "1.066"
-#define ea_build   __DATETIME__ // FIXME: It's empty
-#define ea_link    "https://github.com/EA31337"
-#define ea_author  "kenorb"
-#define ea_copy    "Copyright 2015, kenorb"
-#ifdef __advanced__ // Get correct EA name.
-  #ifdef __rider__
-    #define ea_name    "EA31337 Rider"
-  #else
-    #define ea_name    "EA31337"
-  #endif
-#else
-  #define ea_name    "EA31337 Lite"
-#endif
-
-#property description ea_name
-#property description ea_desc
-#property copyright   ea_author
-#property link        ea_link
-#property version     ea_version
-#property copyright   ea_copy
-// #property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
+//#property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 //#property strict
 
 //+------------------------------------------------------------------+
@@ -60,24 +36,6 @@ extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v"
   #endif
 #else
   #include <EA\ea-input-lite.mqh>
-#endif
-
-#ifndef __nolicense__
-  extern string E_Mail = "";
-  extern string License = "";
-#else
-  #ifdef __advanced__
-    #ifdef __rider__
-      string E_Mail = ea_name + ea_version + ea_copy + "@example.com";
-      string License = "52-30101111-11-46101107112101-17120101-64-17";
-    #else // Advanced.
-      string E_Mail = ea_name + ea_version + ea_copy + "@example.com";
-      string License = "46-30101111-11-46101107112101-17120101";
-    #endif
-  #else // Lite.
-    string E_Mail = ea_name + ea_version + ea_copy + "@example.com";
-    string License = "51-30101111-11-46101107112101-17120101-64-1";
-  #endif
 #endif
 
 //+------------------------------------------------------------------+
@@ -423,10 +381,10 @@ int OnInit() {
      session_initiated = TRUE;
   }
 
-  InitializeVariables();
-  InitializeStrategies();
-  InitializeConditions();
-  CheckHistory();
+  session_initiated &= InitializeVariables();
+  session_initiated &= InitializeStrategies();
+  session_initiated &= InitializeConditions();
+  session_initiated &= CheckHistory();
 
   #ifdef __advanced__
   if (SmartToggleComponent) ToggleComponent(SmartToggleComponent);
@@ -455,7 +413,7 @@ int OnInit() {
   ea_active = TRUE;
   WindowRedraw();
 
-  return (INIT_SUCCEEDED);
+  return If(session_initiated, INIT_SUCCEEDED, INIT_FAILED);
 } // end: OnInit()
 
 //+------------------------------------------------------------------+
@@ -475,7 +433,7 @@ void OnDeinit(const int reason) {
     double ExtInitialDeposit;
     if (!IsTesting()) ExtInitialDeposit = CalculateInitialDeposit(); // FIXME: MQL5: IsTesting()
     CalculateSummary(ExtInitialDeposit);
-    string filename = TimeToStr(time_current, TIME_DATE|TIME_MINUTES) + "_31337_Report.txt";
+    string filename = ea_name + " - " + TimeToStr(time_current, TIME_DATE|TIME_MINUTES) + " - Report.txt";
     WriteReport(filename); // Todo: Add: getUninitReasonText(reason)
     Print(__FUNCTION__ + "(): Saved report as: " + filename);
   }
@@ -1022,6 +980,7 @@ bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
  */
 bool CheckSpreadLimit(int sid) {
   double spread_limit = If(conf[sid][SPREAD_LIMIT] > 0, MathMin(conf[sid][SPREAD_LIMIT], MaxSpreadToTrade), MaxSpreadToTrade);
+  #ifdef __backtest__ if (curr_spread > 10) { PrintFormat("%s(): Error: %s", __FUNCTION__, "Backtesting over 10 pips not supported, sorry."); ExpertRemove(); } #endif
   return curr_spread <= spread_limit;
 }
 
@@ -3520,10 +3479,17 @@ bool ValidSettings() {
    // TODO: IsDllsAllowed(), IsLibrariesAllowed()
   if (LotSize < 0.0) {
     err = "Error: LotSize is less than 0.";
-    if (VerboseInfo) Print(__FUNCTION__ + "():" + err);
+    if (VerboseErrors) Print(__FUNCTION__ + "(): " + err);
     if (PrintLogOnChart) Comment(err);
     return (FALSE);
   }
+  #ifdef __backtest__
+    if (!IsDemo() || !IsTesting()) {
+       err = "Error: This version is compiled for backtest mode only.";
+       if (VerboseErrors) Print(__FUNCTION__ + "(): " + err);
+       if (PrintLogOnChart) Comment(err);
+    }
+  #endif
   E_Mail = StringTrimLeft(StringTrimRight(E_Mail));
   License = StringTrimLeft(StringTrimRight(License));
   return !StringCompare(ValidEmail(E_Mail), License);
@@ -4134,9 +4100,12 @@ void StartNewYear() {
  */
 bool InitializeVariables() {
 
+  bool init = TRUE;
+
   // Get type of account.
   if (IsDemo()) account_type = "Demo"; else account_type = "Live";
   if (IsTesting()) account_type = "Backtest on " + account_type;
+  #ifdef __backtest__ init &= IsTesting(); #endif
 
   // Check time of the week, month and year based on the trading bars.
   time_current = TimeCurrent();
@@ -4182,7 +4151,7 @@ bool InitializeVariables() {
   ArrayInitialize(worse_strategy, EMPTY); // Reset worse strategy pointer.
   ArrayInitialize(best_strategy, EMPTY); // Reset best strategy pointer.
   ArrayInitialize(order_queue, EMPTY); // Reset order queue.
-  return (TRUE);
+  return (init);
 }
 
 #ifdef __advanced__
@@ -4788,7 +4757,7 @@ void UpdateVariables() {
 /*
  * Initialize user defined conditions.
  */
-void InitializeConditions() {
+bool InitializeConditions() {
   acc_conditions[0][0] = Account_Condition_1;
   acc_conditions[0][1] = Market_Condition_1;
   acc_conditions[0][2] = Action_On_Condition_1;
@@ -4833,6 +4802,7 @@ void InitializeConditions() {
     acc_conditions[Account_Condition_To_Disable - 1][2] = A_NONE;
   }
   #endif
+  return TRUE;
 }
 
 /*
@@ -6285,7 +6255,7 @@ bool TicketRemove(int ticket_no) {
 /*
  * Process order history.
  */
-void CheckHistory() {
+bool CheckHistory() {
   double total_profit = 0;
   for(int pos = last_history_check; pos < HistoryTotal(); pos++) {
     if (!OrderSelect(pos, SELECT_BY_POS, MODE_HISTORY)) continue;
@@ -6295,6 +6265,7 @@ void CheckHistory() {
   }
   hourly_profit[day_of_year][hour_of_day] = total_profit; // Update hourly profit.
   last_history_check = pos;
+  return (TRUE);
 }
 
 /* END: TICKET LIST/HISTORY CHECK FUNCTIONS */
@@ -6734,12 +6705,12 @@ string GetErrorText(int code) {
       //      - Placing a micro lot trade. For example, attempting to place a 0.01 (1k) volume trade.
       //      - Placing a trade that is not in increments of 0.10 (10k) volume. For example, attempting to place a 0.77 (77k) trade.
       //      - Adding a stop or limit to a market order before the order executes. For example, setting an EA to place a 0.1 volume (10k) buy market order with a stop loss of 50 pips.
-      case  136: text = "Off quotes."; break;
+      case  136: text = "Off quotes."; #ifdef __backtest__ ExpertRemove(); #endif break;
       case  137: text = "Broker is busy (never returned error)."; break;
-      case  138: text = "Requote."; break;
+      case  138: text = "Requote."; #ifdef __backtest__ ExpertRemove(); #endif break;
       case  139: text = "Order is locked."; break;
       case  140: text = "Long positions only allowed."; break;
-      case  141: /* ERR_TOO_MANY_REQUESTS */ text = "Too many requests."; break;
+      case  141: /* ERR_TOO_MANY_REQUESTS */ text = "Too many requests."; #ifdef __backtest__ ExpertRemove(); #endif break;
       case  145: text = "Modification denied because order too close to market."; break;
       case  146: text = "Trade context is busy."; break;
       case  147: text = "Expirations are denied by broker."; break;
