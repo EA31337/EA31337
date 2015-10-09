@@ -1865,7 +1865,7 @@ extern string __Logging_Parameters__ = "-- Settings for logging & messages --";
 extern bool PrintLogOnChart = TRUE;
 extern bool VerboseErrors = TRUE; // Show errors.
 extern bool VerboseInfo = TRUE;   // Show info messages.
-#ifdef __release__ || !__nodebug__
+#ifdef __release__ // || !__nodebug__ // @fixme
   extern bool VerboseDebug = FALSE;  // Disable messages on release.
 #else
   extern bool VerboseDebug = TRUE;  // Show debug messages.

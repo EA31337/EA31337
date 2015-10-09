@@ -16,5 +16,5 @@
 //#define __nolicense__    // Disable licensing.
 #define __backtest__     // For backtest only.
 //#define __limited__      // Define safe options.
-//#define __release__      // Enable release settings.
+#define __release__      // Enable release settings.
 //#define __experimental__ // Enable experimental options.
