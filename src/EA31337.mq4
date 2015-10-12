@@ -8,15 +8,21 @@
 #include <EA\ea-mode.mqh>
 #include <EA\ea-code-conf.mqh>
 #include <EA\ea-enums.mqh>
-
+#include <EA\ea-common.mqh>
+#include <EA\ea-mql4.mqh>
+#include <EA\ea-mql5.mqh>
+  
 #ifdef __MQL4__
    #include <stdlib.mqh> // Used for: ErrorDescription(), RGB(), CompareDoubles(), DoubleToStrMorePrecision(), IntegerToHexString()
    #include <stderror.mqh>
    // #include "debug.mqh"
 #else
+   #include <stderror.mq5>
+   #include <stdlib.mq5>
+   #include <stdlib.mq4> // Used for: ErrorDescription(), RGB(), CompareDoubles(), DoubleToStrMorePrecision(), IntegerToHexString()
    #include <StdLibErr.mqh>
    #include <Trade\AccountInfo.mqh>
-   #include <MQL5-MQL4\MQL4Common.mqh> // Provides common MQL4 back-compability for MQL5.
+   #include "MQL5-MQL4\MQL4Common.mqh" // Provides common MQL4 back-compability for MQL5.
 #endif
 
 //+------------------------------------------------------------------+
@@ -414,7 +420,7 @@ int OnInit() {
       ExpertRemove();
       return (INIT_PARAMETERS_INCORRECT); // Incorrect set of input parameters.
     }
-    if (!IsTesting() && AccountName() <= 1) {
+    if (!IsTesting() && AccountName() == "") {
       err = "Error: EA requires on-line Terminal.";
       Comment(err);
       if (VerboseErrors) Print(__FUNCTION__ + "():" + err);
@@ -466,13 +472,13 @@ void OnDeinit(const int reason) {
   time_current = TimeCurrent();
   if (VerboseDebug) Print("Calling " + __FUNCTION__ + "()");
   if (VerboseInfo) {
-    Print(__FUNCTION__ + "():" + "EA deinitializing, reason: " + getUninitReasonText(reason) + " (code: " + reason + ")"); // Also: _UninitReason.
+    Print(__FUNCTION__ + "():" + "EA deinitializing, reason: " + getUninitReasonText(reason) + " (code: " + IntegerToString(reason) + ")"); // Also: _UninitReason.
     Print(GetSummaryText());
   }
 
   if (WriteReport && !IsOptimization() && session_initiated) { // FIXME: MQL5 for IsOptimization
     //if (reason == REASON_CHARTCHANGE)
-    double ExtInitialDeposit;
+    double ExtInitialDeposit = AccountBalance();
     if (!IsTesting()) ExtInitialDeposit = CalculateInitialDeposit(); // FIXME: MQL5: IsTesting()
     CalculateSummary(ExtInitialDeposit);
     string filename = TimeToStr(time_current, TIME_DATE|TIME_MINUTES) + "_31337_Report.txt";
@@ -490,7 +496,7 @@ void OnDeinit(const int reason) {
 void OnTesterInit() {
   if (VerboseDebug) Print("Calling " + __FUNCTION__ + "()");
   #ifdef __MQL5__
-    ParameterSetRange(LotSize, 0, 0.0, 0.01, 0.01, 0.1);
+    ParameterSetRange(DoubleToString(LotSize), 0, 0.0, 0.01, 0.01, 0.1);
   #endif
 }
 
@@ -515,7 +521,7 @@ string InitInfo(string sep = "\n") {
   output += StringFormat("Platform variables: Symbol: %s, Bars: %d, Server: %s, Login: %d%s",
     _Symbol, Bars, AccountInfoString(ACCOUNT_SERVER), (int)AccountInfoInteger(ACCOUNT_LOGIN), sep); // // FIXME: MQL5: Bars
   output += StringFormat("Broker info: Name: %s, Account type: %s, Leverage: 1:%d, Currency: %s%s", AccountCompany(), account_type, AccountLeverage(), AccCurrency, sep);
-  output += StringFormat("Market variables: Ask: %f, Bid: %f, Volume: %d%s", Ask, Bid, Volume[0], sep);
+  output += StringFormat("Market variables: Ask: %f, Bid: %f, Volume: %d%s", Ask, Bid, GetVolume(0), sep);
   output += StringFormat("Market constants: Digits: %d, Point: %f, Min Lot: %g, Max Lot: %g, Lot Step: %g, Lot Size: %g, Margin Required: %g, Margin Init: %g, Stop Level: %g%s",
     Digits, NormalizeDouble(Point, Digits), NormalizeDouble(market_minlot, PipDigits), market_maxlot, market_lotstep, market_lotsize, market_marginrequired, market_margininit, market_stoplevel, sep);
   output += StringFormat("Contract specification for %s: Digits: %d, Point value: %f, Spread: %g, Stop level: %g, Contract size: %g, Tick size: %f%s",
@@ -638,6 +644,8 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
     return (TRUE); // If it was already processed, ignore it.
   }
 
+  double envelopes_deviation = Envelopes30_Deviation;
+
   switch (type) {
 #ifdef __advanced__
     case AC: // Calculates the Bill Williams' Accelerator/Decelerator oscillator.
@@ -716,7 +724,6 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
       demarker[period][FAR]  = iDeMarker(_Symbol, timeframe, DeMarker_Period, 2 + DeMarker_Shift);
       break;
     case ENVELOPES: // Calculates the Envelopes indicator.
-      double envelopes_deviation = Envelopes30_Deviation;
       switch (period) {
         case M1: envelopes_deviation = Envelopes1_Deviation; break;
         case M5: envelopes_deviation = Envelopes5_Deviation; break;
@@ -843,7 +850,7 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
       break;
   } // end: switch
 
-  processed[type][period] = time_current;
+  processed[type][period] = (int)time_current;
   return (TRUE);
 }
 
@@ -862,7 +869,7 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
  *   retry (bool)
  *     if TRUE, re-try to open again after error/failure
  */
-int ExecuteOrder(int cmd, int sid, double volume = EMPTY, string order_comment = EMPTY, bool retry = TRUE) {
+int ExecuteOrder(int cmd, int sid, double volume = EMPTY, string order_comment = EMPTY_STRING, bool retry = TRUE) {
    bool result = FALSE;
    int order_ticket;
 
@@ -878,7 +885,7 @@ int ExecuteOrder(int cmd, int sid, double volume = EMPTY, string order_comment =
    }
 
    // Check the order comment.
-   if (order_comment == EMPTY) {
+   if (order_comment == EMPTY_STRING) {
      order_comment = GetStrategyComment(sid);
    }
 
@@ -899,7 +906,7 @@ int ExecuteOrder(int cmd, int sid, double volume = EMPTY, string order_comment =
       if (!OrderSelect(order_ticket, SELECT_BY_TICKET) && VerboseErrors) {
         Print(__FUNCTION__ + "(): OrderSelect() error = ", ErrorDescription(GetLastError()));
         OrderPrint();
-        if (retry) TaskAddOrderOpen(cmd, volume, sid); // Will re-try again.
+        if (retry) TaskAddOrderOpen(cmd, (int)volume, sid); // Will re-try again.
         info[sid][TOTAL_ERRORS]++;
         return (FALSE);
       }
@@ -1140,8 +1147,8 @@ bool UpdateStats() {
   // Check if bar time has been changed since last check.
   // int bar_time = iTime(NULL, PERIOD_M1, 0);
   CheckStats(last_tick_change, MAX_TICK);
-  CheckStats(Low[0],  MAX_LOW);
-  CheckStats(High[0], MAX_HIGH);
+  CheckStats(GetLow(0),  MAX_LOW);
+  CheckStats(GetHigh(0), MAX_HIGH);
   CheckStats(AccountBalance(), MAX_BALANCE);
   CheckStats(AccountEquity(), MAX_EQUITY);
   CheckStats(total_orders, MAX_ORDERS);
@@ -1188,7 +1195,7 @@ bool Trade_AC(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open_
     case OP_BUY:
       /*
         bool result = AC[period][CURR][LOWER] != 0.0 || AC[period][PREV][LOWER] != 0.0 || AC[period][FAR][LOWER] != 0.0;
-        if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
+        if ((open_method &   1) != 0) result = result && GetOpen(CURR) > GetClose(CURR);
         if ((open_method &   2) != 0) result = result && !AC_On_Sell(period);
         if ((open_method &   4) != 0) result = result && AC_On_Buy(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && AC_On_Buy(M30);
@@ -1199,7 +1206,7 @@ bool Trade_AC(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open_
     case OP_SELL:
       /*
         bool result = AC[period][CURR][UPPER] != 0.0 || AC[period][PREV][UPPER] != 0.0 || AC[period][FAR][UPPER] != 0.0;
-        if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
+        if ((open_method &   1) != 0) result = result && GetOpen(CURR) < GetClose(CURR);
         if ((open_method &   2) != 0) result = result && !AC_On_Buy(period);
         if ((open_method &   4) != 0) result = result && AC_On_Sell(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && AC_On_Sell(M30);
@@ -1239,7 +1246,7 @@ bool Trade_AD(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open_
     case OP_BUY:
       /*
         bool result = AD[period][CURR][LOWER] != 0.0 || AD[period][PREV][LOWER] != 0.0 || AD[period][FAR][LOWER] != 0.0;
-        if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
+        if ((open_method &   1) != 0) result = result && GetOpen(CURR) > GetClose(CURR);
         if ((open_method &   2) != 0) result = result && !AD_On_Sell(period);
         if ((open_method &   4) != 0) result = result && AD_On_Buy(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && AD_On_Buy(M30);
@@ -1250,7 +1257,7 @@ bool Trade_AD(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open_
     case OP_SELL:
       /*
         bool result = AD[period][CURR][UPPER] != 0.0 || AD[period][PREV][UPPER] != 0.0 || AD[period][FAR][UPPER] != 0.0;
-        if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
+        if ((open_method &   1) != 0) result = result && GetOpen(CURR) < GetClose(CURR);
         if ((open_method &   2) != 0) result = result && !AD_On_Buy(period);
         if ((open_method &   4) != 0) result = result && AD_On_Sell(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && AD_On_Sell(M30);
@@ -1290,7 +1297,7 @@ bool Trade_ADX(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
     case OP_BUY:
       /*
         bool result = ADX[period][CURR][LOWER] != 0.0 || ADX[period][PREV][LOWER] != 0.0 || ADX[period][FAR][LOWER] != 0.0;
-        if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
+        if ((open_method &   1) != 0) result = result && GetOpen(CURR) > GetClose(CURR);
         if ((open_method &   2) != 0) result = result && !ADX_On_Sell(period);
         if ((open_method &   4) != 0) result = result && ADX_On_Buy(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && ADX_On_Buy(M30);
@@ -1301,7 +1308,7 @@ bool Trade_ADX(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
     case OP_SELL:
       /*
         bool result = ADX[period][CURR][UPPER] != 0.0 || ADX[period][PREV][UPPER] != 0.0 || ADX[period][FAR][UPPER] != 0.0;
-        if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
+        if ((open_method &   1) != 0) result = result && GetOpen(CURR) < GetClose(CURR);
         if ((open_method &   2) != 0) result = result && !ADX_On_Buy(period);
         if ((open_method &   4) != 0) result = result && ADX_On_Sell(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && ADX_On_Sell(M30);
@@ -1420,7 +1427,7 @@ bool Trade_ATR(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
     case OP_BUY:
       /*
         bool result = ATR[period][CURR][LOWER] != 0.0 || ATR[period][PREV][LOWER] != 0.0 || ATR[period][FAR][LOWER] != 0.0;
-        if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
+        if ((open_method &   1) != 0) result = result && GetOpen(CURR) > GetClose(CURR);
         if ((open_method &   2) != 0) result = result && !ATR_On_Sell(tf);
         if ((open_method &   4) != 0) result = result && ATR_On_Buy(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && ATR_On_Buy(M30);
@@ -1431,7 +1438,7 @@ bool Trade_ATR(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
     case OP_SELL:
       /*
         bool result = ATR[period][CURR][UPPER] != 0.0 || ATR[period][PREV][UPPER] != 0.0 || ATR[period][FAR][UPPER] != 0.0;
-        if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
+        if ((open_method &   1) != 0) result = result && GetOpen(CURR) < GetClose(CURR);
         if ((open_method &   2) != 0) result = result && !ATR_On_Buy(tf);
         if ((open_method &   4) != 0) result = result && ATR_On_Sell(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && ATR_On_Sell(M30);
@@ -1470,7 +1477,7 @@ bool Trade_Awesome(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double 
     case OP_BUY:
       /*
         bool result = Awesome[period][CURR][LOWER] != 0.0 || Awesome[period][PREV][LOWER] != 0.0 || Awesome[period][FAR][LOWER] != 0.0;
-        if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
+        if ((open_method &   1) != 0) result = result && GetOpen(CURR) > GetClose(CURR);
         if ((open_method &   2) != 0) result = result && !Awesome_On_Sell(tf);
         if ((open_method &   4) != 0) result = result && Awesome_On_Buy(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && Awesome_On_Buy(M30);
@@ -1481,7 +1488,7 @@ bool Trade_Awesome(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double 
     case OP_SELL:
       /*
         bool result = Awesome[period][CURR][UPPER] != 0.0 || Awesome[period][PREV][UPPER] != 0.0 || Awesome[period][FAR][UPPER] != 0.0;
-        if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
+        if ((open_method &   1) != 0) result = result && GetOpen(CURR) < GetClose(CURR);
         if ((open_method &   2) != 0) result = result && !Awesome_On_Buy(tf);
         if ((open_method &   4) != 0) result = result && Awesome_On_Sell(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && Awesome_On_Sell(M30);
@@ -1509,9 +1516,9 @@ bool Trade_Bands(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double op
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(BANDS, tf, 0);
   switch (cmd) {
     case OP_BUY:
-      result = High[CURR]  > bands[period][CURR][BANDS_UPPER] || High[PREV] > bands[period][PREV][BANDS_UPPER]; // price value was higher than the upper band
-      if ((open_method &   1) != 0) result = result && Close[PREV] > bands[period][CURR][BANDS_UPPER];
-      if ((open_method &   2) != 0) result = result && Close[CURR] < bands[period][CURR][BANDS_UPPER];
+      result = GetHigh(CURR)  > bands[period][CURR][BANDS_UPPER] || GetHigh(PREV) > bands[period][PREV][BANDS_UPPER]; // price value was higher than the upper band
+      if ((open_method &   1) != 0) result = result && GetClose(PREV) > bands[period][CURR][BANDS_UPPER];
+      if ((open_method &   2) != 0) result = result && GetClose(CURR) < bands[period][CURR][BANDS_UPPER];
       if ((open_method &   4) != 0) result = result && (bands[period][CURR][BANDS_BASE] >= bands[period][PREV][BANDS_BASE] && bands[period][PREV][BANDS_BASE] >= bands[period][FAR][BANDS_BASE]);
       if ((open_method &   8) != 0) result = result && bands[period][CURR][BANDS_BASE] <= bands[period][PREV][BANDS_BASE];
       if ((open_method &  16) != 0) result = result && (bands[period][CURR][BANDS_UPPER] >= bands[period][PREV][BANDS_UPPER] || bands[period][CURR][BANDS_LOWER] <= bands[period][PREV][BANDS_LOWER]);
@@ -1521,9 +1528,9 @@ bool Trade_Bands(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double op
       //if ((open_method & 256) != 0) result = result && !Bands_On_Buy(M30);
       break;
     case OP_SELL:
-      result = Low[CURR] < bands[period][CURR][BANDS_LOWER] || Low[PREV] < bands[period][PREV][BANDS_LOWER]; // price value was lower than the lower band
-      if ((open_method &   1) != 0) result = result && Close[PREV] < bands[period][CURR][BANDS_LOWER];
-      if ((open_method &   2) != 0) result = result && Close[CURR] > bands[period][CURR][BANDS_LOWER];
+      result = GetLow(CURR) < bands[period][CURR][BANDS_LOWER] || GetLow(PREV) < bands[period][PREV][BANDS_LOWER]; // price value was lower than the lower band
+      if ((open_method &   1) != 0) result = result && GetClose(PREV) < bands[period][CURR][BANDS_LOWER];
+      if ((open_method &   2) != 0) result = result && GetClose(CURR) > bands[period][CURR][BANDS_LOWER];
       if ((open_method &   4) != 0) result = result && (bands[period][CURR][BANDS_BASE] <= bands[period][PREV][BANDS_BASE] && bands[period][PREV][BANDS_BASE] <= bands[period][FAR][BANDS_BASE]);
       if ((open_method &   8) != 0) result = result && bands[period][CURR][BANDS_BASE] >= bands[period][PREV][BANDS_BASE];
       if ((open_method &  16) != 0) result = result && (bands[period][CURR][BANDS_UPPER] >= bands[period][PREV][BANDS_UPPER] || bands[period][CURR][BANDS_LOWER] <= bands[period][PREV][BANDS_LOWER]);
@@ -1564,7 +1571,7 @@ bool Trade_BPower(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double o
     case OP_BUY:
       /*
         bool result = BPower[period][CURR][LOWER] != 0.0 || BPower[period][PREV][LOWER] != 0.0 || BPower[period][FAR][LOWER] != 0.0;
-        if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
+        if ((open_method &   1) != 0) result = result && GetOpen(CURR) > GetClose(CURR);
         if ((open_method &   2) != 0) result = result && !BPower_On_Sell(tf);
         if ((open_method &   4) != 0) result = result && BPower_On_Buy(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && BPower_On_Buy(M30);
@@ -1575,7 +1582,7 @@ bool Trade_BPower(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double o
     case OP_SELL:
       /*
         bool result = BPower[period][CURR][UPPER] != 0.0 || BPower[period][PREV][UPPER] != 0.0 || BPower[period][FAR][UPPER] != 0.0;
-        if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
+        if ((open_method &   1) != 0) result = result && GetOpen(CURR) < GetClose(CURR);
         if ((open_method &   2) != 0) result = result && !BPower_On_Buy(tf);
         if ((open_method &   4) != 0) result = result && BPower_On_Sell(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && BPower_On_Sell(M30);
@@ -1604,7 +1611,7 @@ bool Trade_Breakage(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double
     case OP_BUY:
       /*
         bool result = Breakage[period][CURR][LOWER] != 0.0 || Breakage[period][PREV][LOWER] != 0.0 || Breakage[period][FAR][LOWER] != 0.0;
-        if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
+        if ((open_method &   1) != 0) result = result && GetOpen(CURR) > GetClose(CURR);
         if ((open_method &   2) != 0) result = result && !Breakage_On_Sell(tf);
         if ((open_method &   4) != 0) result = result && Breakage_On_Buy(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && Breakage_On_Buy(M30);
@@ -1615,7 +1622,7 @@ bool Trade_Breakage(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double
     case OP_SELL:
       /*
         bool result = Breakage[period][CURR][UPPER] != 0.0 || Breakage[period][PREV][UPPER] != 0.0 || Breakage[period][FAR][UPPER] != 0.0;
-        if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
+        if ((open_method &   1) != 0) result = result && GetOpen(CURR) < GetClose(CURR);
         if ((open_method &   2) != 0) result = result && !Breakage_On_Buy(tf);
         if ((open_method &   4) != 0) result = result && Breakage_On_Sell(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && Breakage_On_Sell(M30);
@@ -1645,7 +1652,7 @@ bool Trade_BWMFI(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double op
     case OP_BUY:
       /*
         bool result = BWMFI[period][CURR][LOWER] != 0.0 || BWMFI[period][PREV][LOWER] != 0.0 || BWMFI[period][FAR][LOWER] != 0.0;
-        if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
+        if ((open_method &   1) != 0) result = result && GetOpen(CURR) > GetClose(CURR);
         if ((open_method &   2) != 0) result = result && !BWMFI_On_Sell(tf);
         if ((open_method &   4) != 0) result = result && BWMFI_On_Buy(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && BWMFI_On_Buy(M30);
@@ -1656,7 +1663,7 @@ bool Trade_BWMFI(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double op
     case OP_SELL:
       /*
         bool result = BWMFI[period][CURR][UPPER] != 0.0 || BWMFI[period][PREV][UPPER] != 0.0 || BWMFI[period][FAR][UPPER] != 0.0;
-        if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
+        if ((open_method &   1) != 0) result = result && GetOpen(CURR) < GetClose(CURR);
         if ((open_method &   2) != 0) result = result && !BWMFI_On_Buy(tf);
         if ((open_method &   4) != 0) result = result && BWMFI_On_Sell(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && BWMFI_On_Sell(M30);
@@ -1696,7 +1703,7 @@ bool Trade_CCI(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
     case OP_BUY:
       /*
         bool result = CCI[period][CURR][LOWER] != 0.0 || CCI[period][PREV][LOWER] != 0.0 || CCI[period][FAR][LOWER] != 0.0;
-        if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
+        if ((open_method &   1) != 0) result = result && GetOpen(CURR) > GetClose(CURR);
         if ((open_method &   2) != 0) result = result && !CCI_On_Sell(tf);
         if ((open_method &   4) != 0) result = result && CCI_On_Buy(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && CCI_On_Buy(M30);
@@ -1707,7 +1714,7 @@ bool Trade_CCI(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
     case OP_SELL:
       /*
         bool result = CCI[period][CURR][UPPER] != 0.0 || CCI[period][PREV][UPPER] != 0.0 || CCI[period][FAR][UPPER] != 0.0;
-        if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
+        if ((open_method &   1) != 0) result = result && GetOpen(CURR) < GetClose(CURR);
         if ((open_method &   2) != 0) result = result && !CCI_On_Buy(tf);
         if ((open_method &   4) != 0) result = result && CCI_On_Sell(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && CCI_On_Sell(M30);
@@ -1771,28 +1778,28 @@ bool Trade_Envelopes(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, doubl
   if (open_level == EMPTY)  open_level  = GetStrategyOpenLevel(ENVELOPES, tf, 0.0);
   switch (cmd) {
     case OP_BUY:
-      result = Low[CURR] < envelopes[period][CURR][LOWER] || Low[PREV] < envelopes[period][CURR][LOWER]; // price low was below the lower band
-      // result = result || (envelopes[period][CURR][MODE_MAIN] > envelopes[period][FAR][MODE_MAIN] && Open[CURR] > envelopes[period][CURR][UPPER]);
-      if ((open_method &   1) != 0) result = result && Open[CURR] > envelopes[period][CURR][LOWER]; // FIXME
+      result = GetLow(CURR) < envelopes[period][CURR][LOWER] || GetLow(PREV) < envelopes[period][CURR][LOWER]; // price low was below the lower band
+      // result = result || (envelopes[period][CURR][MODE_MAIN] > envelopes[period][FAR][MODE_MAIN] && GetOpen(CURR) > envelopes[period][CURR][UPPER]);
+      if ((open_method &   1) != 0) result = result && GetOpen(CURR) > envelopes[period][CURR][LOWER]; // FIXME
       if ((open_method &   2) != 0) result = result && envelopes[period][CURR][MODE_MAIN] < envelopes[period][PREV][MODE_MAIN];
       if ((open_method &   4) != 0) result = result && envelopes[period][CURR][LOWER] < envelopes[period][PREV][LOWER];
       if ((open_method &   8) != 0) result = result && envelopes[period][CURR][UPPER] < envelopes[period][PREV][UPPER];
       if ((open_method &  16) != 0) result = result && envelopes[period][CURR][UPPER] - envelopes[period][CURR][LOWER] > envelopes[period][PREV][UPPER] - envelopes[period][PREV][LOWER];
       if ((open_method &  32) != 0) result = result && Ask < envelopes[period][CURR][MODE_MAIN];
-      if ((open_method &  64) != 0) result = result && Close[CURR] < envelopes[period][CURR][UPPER];
-      //if ((open_method & 128) != 0) result = result && Ask > Close[PREV];
+      if ((open_method &  64) != 0) result = result && GetClose(CURR) < envelopes[period][CURR][UPPER];
+      //if ((open_method & 128) != 0) result = result && Ask > GetClose(PREV);
       break;
     case OP_SELL:
-      result = High[CURR] > envelopes[period][CURR][UPPER] || High[PREV] > envelopes[period][CURR][UPPER]; // price high was above the upper band
-      // result = result || (envelopes[period][CURR][MODE_MAIN] < envelopes[period][FAR][MODE_MAIN] && Open[CURR] < envelopes[period][CURR][LOWER]);
-      if ((open_method &   1) != 0) result = result && Open[CURR] < envelopes[period][CURR][UPPER]; // FIXME
+      result = GetHigh(CURR) > envelopes[period][CURR][UPPER] || GetHigh(PREV) > envelopes[period][CURR][UPPER]; // price high was above the upper band
+      // result = result || (envelopes[period][CURR][MODE_MAIN] < envelopes[period][FAR][MODE_MAIN] && GetOpen(CURR) < envelopes[period][CURR][LOWER]);
+      if ((open_method &   1) != 0) result = result && GetOpen(CURR) < envelopes[period][CURR][UPPER]; // FIXME
       if ((open_method &   2) != 0) result = result && envelopes[period][CURR][MODE_MAIN] > envelopes[period][PREV][MODE_MAIN];
       if ((open_method &   4) != 0) result = result && envelopes[period][CURR][LOWER] > envelopes[period][PREV][LOWER];
       if ((open_method &   8) != 0) result = result && envelopes[period][CURR][UPPER] > envelopes[period][PREV][UPPER];
       if ((open_method &  16) != 0) result = result && envelopes[period][CURR][UPPER] - envelopes[period][CURR][LOWER] > envelopes[period][PREV][UPPER] - envelopes[period][PREV][LOWER];
       if ((open_method &  32) != 0) result = result && Ask > envelopes[period][CURR][MODE_MAIN];
-      if ((open_method &  64) != 0) result = result && Close[CURR] > envelopes[period][CURR][UPPER];
-      //if ((open_method & 128) != 0) result = result && Ask < Close[PREV];
+      if ((open_method &  64) != 0) result = result && GetClose(CURR) > envelopes[period][CURR][UPPER];
+      //if ((open_method & 128) != 0) result = result && Ask < GetClose(PREV);
       break;
   }
   return result;
@@ -1849,7 +1856,7 @@ bool Trade_Fractals(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double
     case OP_BUY:
       result = fractals[period][CURR][LOWER] != 0.0 || fractals[period][PREV][LOWER] != 0.0 || fractals[period][FAR][LOWER] != 0.0;
       if ((open_method &   1) != 0) result = result && fractals[period][FAR][LOWER] != 0.0;
-      //if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
+      //if ((open_method &   1) != 0) result = result && GetOpen(CURR) > GetClose(CURR);
       // if ((open_method &   2) != 0) result = result && !Fractals_On_Sell(tf);
       // if ((open_method &   4) != 0) result = result && Fractals_On_Buy(MathMin(period + 1, M30));
       // if ((open_method &   8) != 0) result = result && Fractals_On_Buy(M30);
@@ -1857,7 +1864,7 @@ bool Trade_Fractals(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double
     case OP_SELL:
       result = fractals[period][CURR][UPPER] != 0.0 || fractals[period][PREV][UPPER] != 0.0 || fractals[period][FAR][UPPER] != 0.0;
       if ((open_method &   1) != 0) result = result && fractals[period][FAR][UPPER] != 0.0;
-      //if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
+      //if ((open_method &   1) != 0) result = result && GetOpen(CURR) < GetClose(CURR);
       // if ((open_method &   2) != 0) result = result && !Fractals_On_Buy(tf);
       // if ((open_method &   4) != 0) result = result && Fractals_On_Sell(MathMin(period + 1, M30));
       // if ((open_method &   8) != 0) result = result && Fractals_On_Sell(M30);
@@ -2194,7 +2201,7 @@ bool Trade_RSI(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
       if ((open_method &   8) != 0) result = result && rsi[period][FAR]  < (50 - open_level);
       if ((open_method &  16) != 0) result = result && rsi[period][CURR] - rsi[period][PREV] > rsi[period][PREV] - rsi[period][FAR];
       if ((open_method &  32) != 0) result = result && rsi[period][FAR] > 50;
-      //if ((open_method &  32) != 0) result = result && Open[CURR] > Close[PREV];
+      //if ((open_method &  32) != 0) result = result && GetOpen(CURR) > GetClose(PREV);
       //if ((open_method & 128) != 0) result = result && !RSI_On_Sell(M30);
       break;
     case OP_SELL:
@@ -2205,7 +2212,7 @@ bool Trade_RSI(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
       if ((open_method &   8) != 0) result = result && rsi[period][FAR]  > (50 + open_level);
       if ((open_method &  16) != 0) result = result && rsi[period][PREV] - rsi[period][CURR] > rsi[period][FAR] - rsi[period][PREV];
       if ((open_method &  32) != 0) result = result && rsi[period][FAR] < 50;
-      //if ((open_method &  32) != 0) result = result && Open[CURR] < Close[PREV];
+      //if ((open_method &  32) != 0) result = result && GetOpen(CURR) < GetClose(PREV);
       //if ((open_method & 128) != 0) result = result && !RSI_On_Buy(M30);
       break;
   }
@@ -2265,14 +2272,14 @@ bool Trade_SAR(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(SAR, tf, 0);
   switch (cmd) {
     case OP_BUY:
-      result = sar[period][CURR] + gap < Open[CURR] || sar[period][PREV] + gap < Open[PREV];
+      result = sar[period][CURR] + gap < GetOpen(CURR) || sar[period][PREV] + gap < GetOpen(PREV);
       if ((open_method &   1) != 0) result = result && sar[period][PREV] - gap > Ask;
       if ((open_method &   2) != 0) result = result && sar[period][CURR] < sar[period][PREV];
       if ((open_method &   4) != 0) result = result && sar[period][CURR] - sar[period][PREV] <= sar[period][PREV] - sar[period][FAR];
       if ((open_method &   8) != 0) result = result && sar[period][FAR] > Ask;
-      if ((open_method &  16) != 0) result = result && sar[period][CURR] <= Close[CURR];
-      if ((open_method &  32) != 0) result = result && sar[period][PREV] > Close[PREV];
-      if ((open_method &  64) != 0) result = result && sar[period][PREV] > Open[PREV];
+      if ((open_method &  16) != 0) result = result && sar[period][CURR] <= GetClose(CURR);
+      if ((open_method &  32) != 0) result = result && sar[period][PREV] > GetClose(PREV);
+      if ((open_method &  64) != 0) result = result && sar[period][PREV] > GetOpen(PREV);
       if (result) {
         // FIXME: Convert into more flexible way.
         signals[DAILY][SAR1][period][OP_BUY]++; signals[WEEKLY][SAR1][period][OP_BUY]++;
@@ -2280,14 +2287,14 @@ bool Trade_SAR(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
       }
       break;
     case OP_SELL:
-      result = sar[period][CURR] - gap > Open[CURR] || sar[period][PREV] - gap > Open[PREV];
+      result = sar[period][CURR] - gap > GetOpen(CURR) || sar[period][PREV] - gap > GetOpen(PREV);
       if ((open_method &   1) != 0) result = result && sar[period][PREV] + gap < Ask;
       if ((open_method &   2) != 0) result = result && sar[period][CURR] > sar[period][PREV];
       if ((open_method &   4) != 0) result = result && sar[period][PREV] - sar[period][CURR] <= sar[period][FAR] - sar[period][PREV];
       if ((open_method &   8) != 0) result = result && sar[period][FAR] < Ask;
-      if ((open_method &  16) != 0) result = result && sar[period][CURR] >= Close[CURR];
-      if ((open_method &  32) != 0) result = result && sar[period][PREV] < Close[PREV];
-      if ((open_method &  64) != 0) result = result && sar[period][PREV] < Open[PREV];
+      if ((open_method &  16) != 0) result = result && sar[period][CURR] >= GetClose(CURR);
+      if ((open_method &  32) != 0) result = result && sar[period][PREV] < GetClose(PREV);
+      if ((open_method &  64) != 0) result = result && sar[period][PREV] < GetOpen(PREV);
       if (result) {
         // FIXME: Convert into more flexible way.
         signals[DAILY][SAR1][period][OP_SELL]++; signals[WEEKLY][SAR1][period][OP_SELL]++;
@@ -2326,7 +2333,7 @@ bool Trade_StdDev(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double o
     case OP_BUY:
       /*
         bool result = StdDev[period][CURR][LOWER] != 0.0 || StdDev[period][PREV][LOWER] != 0.0 || StdDev[period][FAR][LOWER] != 0.0;
-        if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
+        if ((open_method &   1) != 0) result = result && GetOpen(CURR) > GetClose(CURR);
         if ((open_method &   2) != 0) result = result && !StdDev_On_Sell(tf);
         if ((open_method &   4) != 0) result = result && StdDev_On_Buy(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && StdDev_On_Buy(M30);
@@ -2337,7 +2344,7 @@ bool Trade_StdDev(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double o
     case OP_SELL:
       /*
         bool result = StdDev[period][CURR][UPPER] != 0.0 || StdDev[period][PREV][UPPER] != 0.0 || StdDev[period][FAR][UPPER] != 0.0;
-        if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
+        if ((open_method &   1) != 0) result = result && GetOpen(CURR) < GetClose(CURR);
         if ((open_method &   2) != 0) result = result && !StdDev_On_Buy(tf);
         if ((open_method &   4) != 0) result = result && StdDev_On_Sell(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && StdDev_On_Sell(M30);
@@ -2392,7 +2399,7 @@ bool Trade_Stochastic(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, doub
     case OP_BUY:
       /*
         bool result = Stochastic[period][CURR][LOWER] != 0.0 || Stochastic[period][PREV][LOWER] != 0.0 || Stochastic[period][FAR][LOWER] != 0.0;
-        if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
+        if ((open_method &   1) != 0) result = result && GetOpen(CURR) > GetClose(CURR);
         if ((open_method &   2) != 0) result = result && !Stochastic_On_Sell(tf);
         if ((open_method &   4) != 0) result = result && Stochastic_On_Buy(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && Stochastic_On_Buy(M30);
@@ -2403,7 +2410,7 @@ bool Trade_Stochastic(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, doub
     case OP_SELL:
       /*
         bool result = Stochastic[period][CURR][UPPER] != 0.0 || Stochastic[period][PREV][UPPER] != 0.0 || Stochastic[period][FAR][UPPER] != 0.0;
-        if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
+        if ((open_method &   1) != 0) result = result && GetOpen(CURR) < GetClose(CURR);
         if ((open_method &   2) != 0) result = result && !Stochastic_On_Buy(tf);
         if ((open_method &   4) != 0) result = result && Stochastic_On_Sell(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && Stochastic_On_Sell(M30);
@@ -2481,7 +2488,7 @@ bool Trade_ZigZag(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double o
     case OP_BUY:
       /*
         bool result = ZigZag[period][CURR][LOWER] != 0.0 || ZigZag[period][PREV][LOWER] != 0.0 || ZigZag[period][FAR][LOWER] != 0.0;
-        if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
+        if ((open_method &   1) != 0) result = result && GetOpen(CURR) > GetClose(CURR);
         if ((open_method &   2) != 0) result = result && !ZigZag_On_Sell(tf);
         if ((open_method &   4) != 0) result = result && ZigZag_On_Buy(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && ZigZag_On_Buy(M30);
@@ -2492,7 +2499,7 @@ bool Trade_ZigZag(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double o
     case OP_SELL:
       /*
         bool result = ZigZag[period][CURR][UPPER] != 0.0 || ZigZag[period][PREV][UPPER] != 0.0 || ZigZag[period][FAR][UPPER] != 0.0;
-        if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
+        if ((open_method &   1) != 0) result = result && GetOpen(CURR) < GetClose(CURR);
         if ((open_method &   2) != 0) result = result && !ZigZag_On_Buy(tf);
         if ((open_method &   4) != 0) result = result && ZigZag_On_Sell(MathMin(period + 1, M30));
         if ((open_method &   8) != 0) result = result && ZigZag_On_Sell(M30);
@@ -2534,14 +2541,14 @@ bool CheckMarketCondition1(int cmd, int tf = PERIOD_M30, int condition = 0, bool
   bool result = TRUE;
   RefreshRates(); // ?
   int period = TfToPeriod(tf);
-  if ((condition &   1) != 0) result = result && ((cmd == OP_BUY && Open[CURR] > Close[PREV]) || (cmd == OP_SELL && Open[CURR] < Close[PREV]));
-  if ((condition &   2) != 0) result = result && UpdateIndicator(SAR, tf)       && ((cmd == OP_BUY && sar[period][CURR] < Open[0]) || (cmd == OP_SELL && sar[period][CURR] > Open[0]));
+  if ((condition &   1) != 0) result = result && ((cmd == OP_BUY && GetOpen(CURR) > GetClose(PREV)) || (cmd == OP_SELL && GetOpen(CURR) < GetClose(PREV)));
+  if ((condition &   2) != 0) result = result && UpdateIndicator(SAR, tf)       && ((cmd == OP_BUY && sar[period][CURR] < GetOpen(0)) || (cmd == OP_SELL && sar[period][CURR] > GetOpen(0)));
   if ((condition &   4) != 0) result = result && UpdateIndicator(RSI, tf)       && ((cmd == OP_BUY && rsi[period][CURR] < 50) || (cmd == OP_SELL && rsi[period][CURR] > 50));
   if ((condition &   8) != 0) result = result && UpdateIndicator(MA, tf)        && ((cmd == OP_BUY && Ask > ma_slow[period][CURR]) || (cmd == OP_SELL && Ask < ma_slow[period][CURR]));
 //if ((condition &   8) != 0) result = result && UpdateIndicator(MA, tf)        && ((cmd == OP_BUY && ma_slow[period][CURR] > ma_slow[period][PREV]) || (cmd == OP_SELL && ma_slow[period][CURR] < ma_slow[period][PREV]));
-  if ((condition &  16) != 0) result = result && ((cmd == OP_BUY && Ask < Open[CURR]) || (cmd == OP_SELL && Ask > Open[CURR]));
-  if ((condition &  32) != 0) result = result && UpdateIndicator(BANDS, tf)     && ((cmd == OP_BUY && Open[CURR] < bands[period][CURR][BANDS_BASE]) || (cmd == OP_SELL && Open[CURR] > bands[period][CURR][BANDS_BASE]));
-  if ((condition &  64) != 0) result = result && UpdateIndicator(ENVELOPES, tf) && ((cmd == OP_BUY && Open[CURR] < envelopes[period][CURR][MODE_MAIN]) || (cmd == OP_SELL && Open[CURR] > envelopes[period][CURR][MODE_MAIN]));
+  if ((condition &  16) != 0) result = result && ((cmd == OP_BUY && Ask < GetOpen(CURR)) || (cmd == OP_SELL && Ask > GetOpen(CURR)));
+  if ((condition &  32) != 0) result = result && UpdateIndicator(BANDS, tf)     && ((cmd == OP_BUY && GetOpen(CURR) < bands[period][CURR][BANDS_BASE]) || (cmd == OP_SELL && GetOpen(CURR) > bands[period][CURR][BANDS_BASE]));
+  if ((condition &  64) != 0) result = result && UpdateIndicator(ENVELOPES, tf) && ((cmd == OP_BUY && GetOpen(CURR) < envelopes[period][CURR][MODE_MAIN]) || (cmd == OP_SELL && GetOpen(CURR) > envelopes[period][CURR][MODE_MAIN]));
   if ((condition & 128) != 0) result = result && UpdateIndicator(DEMARKER, tf)  && ((cmd == OP_BUY && demarker[period][CURR] < 0.5) || (cmd == OP_SELL && demarker[period][CURR] > 0.5));
   if ((condition & 256) != 0) result = result && UpdateIndicator(WPR, tf)       && ((cmd == OP_BUY && wpr[period][CURR] > 50) || (cmd == OP_SELL && wpr[period][CURR] < 50));
   if ((condition & 512) != 0) result = result && cmd == CheckTrend();
@@ -2942,7 +2949,26 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
     9230.95 3484  1.27  2.65  4835.75 25.13% MA_TrailingProfitMethod=26
     9371.17 3416  1.27  2.74  5098.83 23.51% MA_TrailingProfitMethod=27
 */
-  // TODO: Make starting point dynamic: Open[CURR], Open[PREV], Open[FAR], Close[PREV], Close[FAR], ma_fast[CURR], ma_medium[CURR], ma_slow[CURR]
+  // TODO: Make starting point dynamic: GetOpen(CURR), GetOpen(PREV), GetOpen(FAR), GetClose(PREV), GetClose(FAR), ma_fast[CURR], ma_medium[CURR], ma_slow[CURR]
+
+   double highest2;
+   double lowest2;
+   double highest5;
+   double lowest5;
+   double highest10;
+   double lowest10;
+   double highest50;
+   double lowest50;
+   double highest150;
+   double lowest150;
+   double highest200;
+   double lowest200;
+   int BarShiftOfTradeOpen;
+   double highest_open;
+   double lowest_open;
+   double highest_ma;
+   double lowest_ma;
+   
    switch (method) {
      case T_NONE: // None
        new_value = previous;
@@ -2951,54 +2977,54 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
        new_value = default_trail;
        break;
      case T_CLOSE_PREV: // TODO
-       diff = MathAbs(Open[CURR] - iClose(symbol, timeframe, PREV));
-       new_value = Open[CURR] + diff * factor;
+       diff = MathAbs(GetOpen(CURR) - iClose(symbol, timeframe, PREV));
+       new_value = GetOpen(CURR) + diff * factor;
        break;
      case T_2_BARS_PEAK: // 3
-       double highest2 = GetPeakPrice(timeframe, MODE_HIGH, 2);
-       double lowest2  = GetPeakPrice(timeframe, MODE_LOW, 2);
-       diff = MathMax(highest2 - Open[CURR], Open[CURR] - lowest2);
-       new_value = Open[CURR] + diff * factor;
+       highest2 = GetPeakPrice(timeframe, MODE_HIGH, 2);
+       lowest2  = GetPeakPrice(timeframe, MODE_LOW, 2);
+       diff = MathMax(highest2 - GetOpen(CURR), GetOpen(CURR) - lowest2);
+       new_value = GetOpen(CURR) + diff * factor;
        break;
      case T_5_BARS_PEAK: // 4
-       double highest5 = GetPeakPrice(timeframe, MODE_HIGH, 5);
-       double lowest5  = GetPeakPrice(timeframe, MODE_LOW, 5);
-       diff = MathMax(highest5 - Open[CURR], Open[CURR] - lowest5);
-       new_value = Open[CURR] + diff * factor;
+       highest5 = GetPeakPrice(timeframe, MODE_HIGH, 5);
+       lowest5  = GetPeakPrice(timeframe, MODE_LOW, 5);
+       diff = MathMax(highest5 - GetOpen(CURR), GetOpen(CURR) - lowest5);
+       new_value = GetOpen(CURR) + diff * factor;
        break;
      case T_10_BARS_PEAK: // 5
-       double highest10 = GetPeakPrice(timeframe, MODE_HIGH, 10);
-       double lowest10  = GetPeakPrice(timeframe, MODE_LOW, 10);
-       diff = MathMax(highest10 - Open[CURR], Open[CURR] - lowest10);
-       new_value = Open[CURR] + diff * factor;
+       highest10 = GetPeakPrice(timeframe, MODE_HIGH, 10);
+       lowest10  = GetPeakPrice(timeframe, MODE_LOW, 10);
+       diff = MathMax(highest10 - GetOpen(CURR), GetOpen(CURR) - lowest10);
+       new_value = GetOpen(CURR) + diff * factor;
        break;
      case T_50_BARS_PEAK:
-       double highest50 = GetPeakPrice(timeframe, MODE_HIGH, 50);
-       double lowest50  = GetPeakPrice(timeframe, MODE_LOW, 50);
-       diff = MathMax(highest50 - Open[CURR], Open[CURR] - lowest50);
-       new_value = Open[CURR] + diff * factor;
+       highest50 = GetPeakPrice(timeframe, MODE_HIGH, 50);
+       lowest50  = GetPeakPrice(timeframe, MODE_LOW, 50);
+       diff = MathMax(highest50 - GetOpen(CURR), GetOpen(CURR) - lowest50);
+       new_value = GetOpen(CURR) + diff * factor;
        break;
      case T_150_BARS_PEAK:
-       double highest150 = GetPeakPrice(timeframe, MODE_HIGH, 150);
-       double lowest150  = GetPeakPrice(timeframe, MODE_LOW, 150);
-       diff = MathMax(highest150 - Open[CURR], Open[CURR] - lowest150);
-       new_value = Open[CURR] + diff * factor;
+       highest150 = GetPeakPrice(timeframe, MODE_HIGH, 150);
+       lowest150  = GetPeakPrice(timeframe, MODE_LOW, 150);
+       diff = MathMax(highest150 - GetOpen(CURR), GetOpen(CURR) - lowest150);
+       new_value = GetOpen(CURR) + diff * factor;
        break;
      case T_HALF_200_BARS:
-       double highest200 = GetPeakPrice(timeframe, MODE_HIGH, 200);
-       double lowest200  = GetPeakPrice(timeframe, MODE_LOW, 200);
-       diff = MathMax(highest200 - Open[CURR], Open[CURR] - lowest200);
-       new_value = Open[CURR] + diff/2 * factor;
+       highest200 = GetPeakPrice(timeframe, MODE_HIGH, 200);
+       lowest200  = GetPeakPrice(timeframe, MODE_LOW, 200);
+       diff = MathMax(highest200 - GetOpen(CURR), GetOpen(CURR) - lowest200);
+       new_value = GetOpen(CURR) + diff/2 * factor;
        break;
      case T_HALF_PEAK_OPEN:
        if (existing) {
          // Get the number of bars for the timeframe since open. Zero means that the order was opened during the current bar.
-         int BarShiftOfTradeOpen = iBarShift(symbol, timeframe, OrderOpenTime(), FALSE);
+         BarShiftOfTradeOpen = iBarShift(symbol, timeframe, OrderOpenTime(), FALSE);
          // Get the high price from the bar with the given timeframe index
-         double highest_open = GetPeakPrice(timeframe, MODE_HIGH, BarShiftOfTradeOpen + 1);
-         double lowest_open = GetPeakPrice(timeframe, MODE_LOW, BarShiftOfTradeOpen + 1);
-         diff = MathMax(highest_open - Open[CURR], Open[CURR] - lowest_open);
-         new_value = Open[CURR] + diff/2 * factor;
+         highest_open = GetPeakPrice(timeframe, MODE_HIGH, BarShiftOfTradeOpen + 1);
+         lowest_open = GetPeakPrice(timeframe, MODE_LOW, BarShiftOfTradeOpen + 1);
+         diff = MathMax(highest_open - GetOpen(CURR), GetOpen(CURR) - lowest_open);
+         new_value = GetOpen(CURR) + diff/2 * factor;
        }
        break;
      case T_MA_F_PREV: // 9: MA Small (Previous). The worse so far for MA.
@@ -3014,8 +3040,8 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
      /*
      case T_MA_F_LOW: // 11: Lowest/highest value of MA Fast. Optimized (SL pf: 1.39 for MA).
        UpdateIndicator(MA, timeframe);
-       diff = MathMax(HighestArrValue2(ma_fast, period) - Open[CURR], Open[CURR] - LowestArrValue2(ma_fast, period));
-       new_value = Open[CURR] + diff * factor;
+       diff = MathMax(HighestArrValue2(ma_fast, period) - GetOpen(CURR), GetOpen(CURR) - LowestArrValue2(ma_fast, period));
+       new_value = GetOpen(CURR) + diff * factor;
        break;
       */
      case T_MA_F_TRAIL: // 12: MA Fast (Current) + trailing stop. Works fine.
@@ -3025,8 +3051,8 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
        break;
      case T_MA_F_FAR_TRAIL: // 13: MA Fast (Far) + trailing stop. Works fine (SL pf: 1.26 for MA).
        UpdateIndicator(MA, timeframe);
-       diff = MathAbs(Open[CURR] - ma_fast[period][FAR]);
-       new_value = Open[CURR] + (diff + trail) * factor;
+       diff = MathAbs(GetOpen(CURR) - ma_fast[period][FAR]);
+       new_value = GetOpen(CURR) + (diff + trail) * factor;
        break;
      case T_MA_M: // 14: MA Medium (Current).
        UpdateIndicator(MA, timeframe);
@@ -3041,19 +3067,19 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
      /*
      case T_MA_M_LOW: // 16: Lowest/highest value of MA Medium. Optimized (SL pf: 1.39 for MA).
        UpdateIndicator(MA, timeframe);
-       diff = MathMax(HighestArrValue2(ma_medium, period) - Open[CURR], Open[CURR] - LowestArrValue2(ma_medium, period));
-       new_value = Open[CURR] + diff * factor;
+       diff = MathMax(HighestArrValue2(ma_medium, period) - GetOpen(CURR), GetOpen(CURR) - LowestArrValue2(ma_medium, period));
+       new_value = GetOpen(CURR) + diff * factor;
        break;
       */
      case T_MA_M_TRAIL: // 17: MA Small (Current) + trailing stop. Works fine (SL pf: 1.26 for MA).
        UpdateIndicator(MA, timeframe);
-       diff = MathAbs(Open[CURR] - ma_medium[period][CURR]);
-       new_value = Open[CURR] + (diff + trail) * factor;
+       diff = MathAbs(GetOpen(CURR) - ma_medium[period][CURR]);
+       new_value = GetOpen(CURR) + (diff + trail) * factor;
        break;
      case T_MA_M_FAR_TRAIL: // 18: MA Small (Far) + trailing stop. Optimized (SL pf: 1.29 for MA).
        UpdateIndicator(MA, timeframe);
-       diff = MathAbs(Open[CURR] - ma_medium[period][FAR]);
-       new_value = Open[CURR] + (diff + trail) * factor;
+       diff = MathAbs(GetOpen(CURR) - ma_medium[period][FAR]);
+       new_value = GetOpen(CURR) + (diff + trail) * factor;
        break;
      case T_MA_S: // 19: MA Slow (Current).
        UpdateIndicator(MA, timeframe);
@@ -3069,15 +3095,15 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
        break;
      case T_MA_S_TRAIL: // 21: MA Slow (Current) + trailing stop. Optimized (SL pf: 1.29 for MA, PT pf: 1.23 for MA).
        UpdateIndicator(MA, timeframe);
-       diff = MathAbs(Open[CURR] - ma_slow[period][CURR]);
-       new_value = Open[CURR] + (diff + trail) * factor;
+       diff = MathAbs(GetOpen(CURR) - ma_slow[period][CURR]);
+       new_value = GetOpen(CURR) + (diff + trail) * factor;
        break;
      case T_MA_FMS_PEAK: // 22: Lowest/highest value of all MAs. Works fine (SL pf: 1.39 for MA, PT pf: 1.23 for MA).
        UpdateIndicator(MA, timeframe);
-       double highest_ma = MathAbs(MathMax(MathMax(HighestArrValue2(ma_fast, period), HighestArrValue2(ma_medium, period)), HighestArrValue2(ma_slow, period)));
-       double lowest_ma = MathAbs(MathMin(MathMin(LowestArrValue2(ma_fast, period), LowestArrValue2(ma_medium, period)), LowestArrValue2(ma_slow, period)));
-       diff = MathMax(MathAbs(highest_ma - Open[CURR]), MathAbs(Open[CURR] - lowest_ma));
-       new_value = Open[CURR] + diff * factor;
+       highest_ma = MathAbs(MathMax(MathMax(HighestArrValue2(ma_fast, period), HighestArrValue2(ma_medium, period)), HighestArrValue2(ma_slow, period)));
+       lowest_ma = MathAbs(MathMin(MathMin(LowestArrValue2(ma_fast, period), LowestArrValue2(ma_medium, period)), LowestArrValue2(ma_slow, period)));
+       diff = MathMax(MathAbs(highest_ma - GetOpen(CURR)), MathAbs(GetOpen(CURR) - lowest_ma));
+       new_value = GetOpen(CURR) + diff * factor;
        break;
      case T_SAR: // 23: Current SAR value. Optimized.
        UpdateIndicator(SAR, timeframe);
@@ -3266,7 +3292,7 @@ double GetClosePrice(int op_type = EMPTY_VALUE) {
  */
 double GetPeakPrice(int timeframe, int mode, int bars, int index = CURR) {
   int ibar = -1;
-  double peak_price = Open[0];
+  double peak_price = GetOpen(0);
   if (mode == MODE_HIGH) ibar = iHighest(_Symbol, timeframe, MODE_HIGH, bars, index);
   if (mode == MODE_LOW)  ibar =  iLowest(_Symbol, timeframe, MODE_LOW,  bars, index);
   if (ibar == -1 && VerboseTrace) { err_code = GetLastError(); Print(__FUNCTION__ + "(): " + ErrorDescription(err_code)); return FALSE; }
@@ -3444,7 +3470,7 @@ bool TradeAllowed() {
     last_err = err;
     return (FALSE);
   }
-  if (!IsTesting() && Volume[0] < MinVolumeToTrade) {
+  if (!IsTesting() && GetVolume(0) < MinVolumeToTrade) {
     err = "Volume too low to trade.";
     if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "(): " + err);
     //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "(): " + err);
@@ -3561,7 +3587,7 @@ double GetOrderProfit() {
 /*
  * Get color of the order.
  */
-double GetOrderColor(int cmd = -1) {
+color GetOrderColor(int cmd = -1) {
   if (cmd == -1) cmd = OrderType();
   return If(OpTypeValue(cmd) > 0, ColorBuy, ColorSell);
 }
@@ -5334,7 +5360,7 @@ bool RSI_IncreasePeriod(int tf = PERIOD_M1, int condition = 0) {
   // if ((condition &   4) != 0) result = result || rsi_stats[period][0] < 50 + RSI_OpenLevel;
   if ((condition &   8) != 0) result = result && rsi_stats[period][UPPER] - rsi_stats[period][LOWER] < 50;
   // if ((condition &  16) != 0) result = result && rsi[period][CURR] - rsi[period][PREV] > rsi[period][PREV] - rsi[period][FAR];
-  // if ((condition &  32) != 0) result = result && Open[CURR] > Close[PREV];
+  // if ((condition &  32) != 0) result = result && GetOpen(CURR) > GetClose(PREV);
   return result;
 }
 
@@ -5349,7 +5375,7 @@ bool RSI_DecreasePeriod(int tf = PERIOD_M1, int condition = 0) {
   // if ((condition &   4) != 0) result = result && rsi_stats[period][UPPER] > 50 + (RSI_OpenLevel / 3);
   // if ((condition &   8) != 0) result = result && && rsi_stats[period][UPPER] < 50 - (RSI_OpenLevel / 3);
   // if ((condition &  16) != 0) result = result && rsi[period][CURR] - rsi[period][PREV] > rsi[period][PREV] - rsi[period][FAR];
-  // if ((condition &  32) != 0) result = result && Open[CURR] > Close[PREV];
+  // if ((condition &  32) != 0) result = result && GetOpen(CURR) > GetClose(PREV);
   return result;
 }
 #endif
@@ -5741,7 +5767,7 @@ double HighestArrValue(double& arr[]) {
 /*
  * Find lower value within the 2-dim array of floats by the key.
  */
-double LowestArrValue2(double& arr[][], int key1) {
+double LowestArrValue2(double& arr ARRAY_INDEX_2D, int key1) {
   double lowest = 0;
   for (int i = 0; i < ArrayRange(arr, 1); i++) {
     if (arr[key1][i] < lowest) {
@@ -5754,7 +5780,7 @@ double LowestArrValue2(double& arr[][], int key1) {
 /*
  * Find higher value within the 2-dim array of floats by the key.
  */
-double HighestArrValue2(double& arr[][], int key1) {
+double HighestArrValue2(double& arr ARRAY_INDEX_2D, int key1) {
   double highest = 0;
   for (int i = 0; i < ArrayRange(arr, 1); i++) {
     if (arr[key1][i] > highest) {
@@ -5767,7 +5793,7 @@ double HighestArrValue2(double& arr[][], int key1) {
 /*
  * Find highest value in 2-dim array of integers by the key.
  */
-int HighestValueByKey(int& arr[][], int key) {
+int HighestValueByKey(int& arr ARRAY_INDEX_2D, int key) {
   double highest = 0;
   for (int i = 0; i < ArrayRange(arr, 1); i++) {
     if (arr[key][i] > highest) {
@@ -5780,7 +5806,7 @@ int HighestValueByKey(int& arr[][], int key) {
 /*
  * Find lowest value in 2-dim array of integers by the key.
  */
-int LowestValueByKey(int& arr[][], int key) {
+int LowestValueByKey(int& arr ARRAY_INDEX_2D, int key) {
   double lowest = 0;
   for (int i = 0; i < ArrayRange(arr, 1); i++) {
     if (arr[key][i] < lowest) {
@@ -5791,7 +5817,7 @@ int LowestValueByKey(int& arr[][], int key) {
 }
 
 /*
-int GetLowestArrDoubleValue(double& arr[][], int key) {
+int GetLowestArrDoubleValue(double& arr ARRAY_INDEX_2D, int key) {
   double lowest = -1;
   for (int i = 0; i < ArrayRange(arr, 0); i++) {
     for (int j = 0; j < ArrayRange(arr, 1); j++) {
@@ -5806,7 +5832,7 @@ int GetLowestArrDoubleValue(double& arr[][], int key) {
 /*
  * Find key in array of integers with highest value.
  */
-int GetArrKey1ByHighestKey2Value(int& arr[][], int key2) {
+int GetArrKey1ByHighestKey2Value(int& arr ARRAY_INDEX_2D, int key2) {
   int key1 = EMPTY;
   int highest = 0;
   for (int i = 0; i < ArrayRange(arr, 0); i++) {
@@ -5821,7 +5847,7 @@ int GetArrKey1ByHighestKey2Value(int& arr[][], int key2) {
 /*
  * Find key in array of integers with lowest value.
  */
-int GetArrKey1ByLowestKey2Value(int& arr[][], int key2) {
+int GetArrKey1ByLowestKey2Value(int& arr ARRAY_INDEX_2D, int key2) {
   int key1 = EMPTY;
   int lowest = 0;
   for (int i = 0; i < ArrayRange(arr, 0); i++) {
@@ -5836,7 +5862,7 @@ int GetArrKey1ByLowestKey2Value(int& arr[][], int key2) {
 /*
  * Find key in array of doubles with highest value.
  */
-int GetArrKey1ByHighestKey2ValueD(double& arr[][], int key2) {
+int GetArrKey1ByHighestKey2ValueD(double& arr ARRAY_INDEX_2D, int key2) {
   int key1 = EMPTY;
   int highest = 0;
   for (int i = 0; i < ArrayRange(arr, 0); i++) {
@@ -5851,7 +5877,7 @@ int GetArrKey1ByHighestKey2ValueD(double& arr[][], int key2) {
 /*
  * Find key in array of doubles with lowest value.
  */
-int GetArrKey1ByLowestKey2ValueD(double& arr[][], int key2) {
+int GetArrKey1ByLowestKey2ValueD(double& arr ARRAY_INDEX_2D, int key2) {
   int key1 = EMPTY;
   int lowest = 0;
   for (int i = 0; i < ArrayRange(arr, 0); i++) {
@@ -5866,7 +5892,7 @@ int GetArrKey1ByLowestKey2ValueD(double& arr[][], int key2) {
 /*
  * Set array value for double items with specific keys.
  */
-void ArrSetValueD(double& arr[][], int key, double value) {
+void ArrSetValueD(double& arr ARRAY_INDEX_2D, int key, double value) {
   for (int i = 0; i < ArrayRange(info, 0); i++) {
     arr[i][key] = value;
   }
@@ -5875,7 +5901,7 @@ void ArrSetValueD(double& arr[][], int key, double value) {
 /*
  * Set array value for integer items with specific keys.
  */
-void ArrSetValueI(int& arr[][], int key, int value) {
+void ArrSetValueI(int& arr ARRAY_INDEX_2D, int key, int value) {
   for (int i = 0; i < ArrayRange(info, 0); i++) {
     arr[i][key] = value;
   }
@@ -5884,7 +5910,7 @@ void ArrSetValueI(int& arr[][], int key, int value) {
 /*
  * Calculate sum of 2 dimentional array based on given key.
  */
-double GetArrSumKey1(double& arr[][], int key1, int offset = 0) {
+double GetArrSumKey1(double& arr ARRAY_INDEX_2D, int key1, int offset = 0) {
   double sum = 0;
   offset = MathMin(offset, ArrayRange(arr, 1) - 1);
   for (int i = offset; i < ArrayRange(arr, 1); i++) {
@@ -6352,11 +6378,11 @@ bool OrderOrderCondition(int cmd, int sid, int time, int method) {
   double qclose = iClose(_Symbol, timeframe, qshift);
   double qhighest = GetPeakPrice(timeframe, MODE_HIGH, qshift); // Get the high price since queued.
   double qlowest = GetPeakPrice(timeframe, MODE_LOW, qshift); // Get the lowest price since queued.
-  double diff = MathMax(qhighest - Open[CURR], Open[CURR] - qlowest);
-  if ((method &   1) != 0) result &= (cmd == OP_BUY && qopen < Open[CURR]) || (cmd == OP_SELL && qopen > Open[CURR]);
-  if ((method &   2) != 0) result &= (cmd == OP_BUY && qclose < Close[CURR]) || (cmd == OP_SELL && qclose > Close[CURR]);
-  if ((method &   4) != 0) result &= (cmd == OP_BUY && qlowest < Low[CURR]) || (cmd == OP_SELL && qlowest > Low[CURR]);
-  if ((method &   8) != 0) result &= (cmd == OP_BUY && qhighest > High[CURR]) || (cmd == OP_SELL && qhighest < High[CURR]);
+  double diff = MathMax(qhighest - GetOpen(CURR), GetOpen(CURR) - qlowest);
+  if ((method &   1) != 0) result &= (cmd == OP_BUY && qopen < GetOpen(CURR)) || (cmd == OP_SELL && qopen > GetOpen(CURR));
+  if ((method &   2) != 0) result &= (cmd == OP_BUY && qclose < GetClose(CURR)) || (cmd == OP_SELL && qclose > GetClose(CURR));
+  if ((method &   4) != 0) result &= (cmd == OP_BUY && qlowest < GetLow(CURR)) || (cmd == OP_SELL && qlowest > GetLow(CURR));
+  if ((method &   8) != 0) result &= (cmd == OP_BUY && qhighest > GetHigh(CURR)) || (cmd == OP_SELL && qhighest < GetHigh(CURR));
   if ((method &  16) != 0) result &= UpdateIndicator(SAR, timeframe) && Trade_SAR(cmd, timeframe, 0, 0);
   if ((method &  32) != 0) result &= UpdateIndicator(DEMARKER, timeframe) && Trade_DeMarker(cmd, timeframe, 0, 0);
   if ((method &  64) != 0) result &= UpdateIndicator(RSI, timeframe) && Trade_RSI(cmd, timeframe, 0, 0);

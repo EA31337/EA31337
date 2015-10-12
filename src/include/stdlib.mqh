@@ -3,7 +3,13 @@
 //|                      Copyright © 2004, MetaQuotes Software Corp. |
 //|                                       http://www.metaquotes.net/ |
 //+------------------------------------------------------------------+
-#import "stdlib.ex4"
+
+#ifdef __MQL5__
+  #include "stdlib.mq4"
+#else
+  #import "stdlib.ex4"
+#endif
+
 
 string ErrorDescription(int error_code);
 int    RGB(int red_value,int green_value,int blue_value);
