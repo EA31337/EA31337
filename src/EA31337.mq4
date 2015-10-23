@@ -3484,10 +3484,11 @@ bool ValidSettings() {
     return (FALSE);
   }
   #ifdef __backtest__
-    if (!IsDemo() || !IsTesting()) {
+    if (!IsTesting()) {
        err = "Error: This version is compiled for backtest mode only.";
        if (VerboseErrors) Print(__FUNCTION__ + "(): " + err);
        if (PrintLogOnChart) Comment(err);
+       return (FALSE);
     }
   #endif
   E_Mail = StringTrimLeft(StringTrimRight(E_Mail));
