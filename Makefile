@@ -4,8 +4,10 @@ EA="EA31337"
 EX4="src/$(EA).ex4"
 EX5="src/$(EA).ex5"
 VER=$(shell grep 'define ea_version' src/include/EA/ea-properties.mqh | grep -o '[0-9].*[0-9]')
-FILE := $(lastword $(MAKEFILE_LIST)) # Determine this makefile's path.
+FILE=$(lastword $(MAKEFILE_LIST)) # Determine this makefile's path.
 OUT="releases"
+MKFILE=$(abspath $(lastword $(MAKEFILE_LIST)))
+CWD=$(notdir $(patsubst %/,%,$(dir $(MKFILE))))
 all: requirements $(MQL) mql4
 
 requirements:
@@ -36,27 +38,40 @@ ifdef MODE
 	ex -s +"%s@^\zs.*\ze#define \($(MODE)\)@@g" -cwq src/include/EA/ea-mode.mqh
 endif
 
+set-none:
+	git checkout -- src/include/EA/ea-mode.mqh
+
+set-lite:
+	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__backtest__"
+
+set-advanced:
+	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__backtest__\|__advanced__"
+
+set-rider:
+	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__backtest__\|__rider__"
+
 clean:
 	find . '(' -name '*.ex4' -or -name '*.ex5' ')' -delete
 
 release: mql.exe \
 		clean \
-		releases/$(EA)-Backtest-Lite-%.ex4 \
-		releases/$(EA)-Backtest-Advanced-%.ex4 \
-		releases/$(EA)-Backtest-Rider-%.ex4
-	git --git-dir=releases/.git add -v -A
-	git --git-dir=releases/.git commit -v -m "$(EA) v${VER} released." -a
-	git --git-dir=releases/.git tag -f "v$(VER)"
-	@echo "$(EA) v${VER} released."
+		$(OUT)/$(EA)-Backtest-Lite-%.ex4 \
+		$(OUT)/$(EA)-Backtest-Advanced-%.ex4 \
+		$(OUT)/$(EA)-Backtest-Rider-%.ex4
+		git --git-dir=$(OUT)/.git add -v -A
+		$(eval GIT_EXTRAS := $(shell git --git-dir=$(OUT)/.git tag "v$(VER)" || echo "--amend"))
+		@echo $(GIT_EXTRAS)
+		git --git-dir=$(OUT)/.git commit -v -m "$(EA) v${VER} released." -a $(GIT_EXTRAS)
+		git --git-dir=$(OUT)/.git tag -f "v$(VER)"
+		eval $(shell cd $(OUT) && sha1sum *.* > .files.crc)
+		@$(MAKE) -f $(FILE) set-none
+		@echo "$(EA) v${VER} released."
 
-releases/$(EA)-Backtest-Lite-%.ex4:
-	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__backtest__"
+$(OUT)/$(EA)-Backtest-Lite-%.ex4: set-lite
 	wine mql.exe /o /i:src /mql4 $(SRC) && cp -v "$(EX4)" "$(OUT)/$(EA)-Backtest-Lite-v$(VER).ex4"
 
-releases/$(EA)-Backtest-Advanced-%.ex4:
-	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__backtest__\|__advanced__"
+$(OUT)/$(EA)-Backtest-Advanced-%.ex4: set-advanced
 	wine mql.exe /o /i:src /mql4 $(SRC) && cp -v "$(EX4)" "$(OUT)/$(EA)-Backtest-Advanced-v$(VER).ex4"
 
-releases/$(EA)-Backtest-Rider-%.ex4:
-	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__backtest__\|__rider__"
+$(OUT)/$(EA)-Backtest-Rider-%.ex4: set-rider
 	wine mql.exe /o /i:src /mql4 $(SRC) && cp -v "$(EX4)" "$(OUT)/$(EA)-Backtest-Rider-v$(VER).ex4"
