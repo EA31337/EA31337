@@ -10,3 +10,6 @@
 [submodule "EA31337-releases"]
 	path = releases
 	url = git@github.com:mycognitive/EA31337-releases.git
+[submodule "_VM"]
+	path = _VM
+	url = git@github.com:EA31337/FX-MT-VM.git

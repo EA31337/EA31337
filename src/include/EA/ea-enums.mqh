@@ -295,13 +295,13 @@ enum ENUM_ACC_CONDITION {
   C_DBAL_GT_WEEKLY     = 18, // Max. daily balance > max. weekly
   C_WBAL_LT_MONTHLY    = 19, // Max. weekly balance < max. monthly
   C_WBAL_GT_MONTHLY    = 20, // Max. weekly balance > max. monthly
-  C_ACC_IN_TREND       = 31, // Account in trend
-  C_ACC_IN_NON_TREND   = 32, // Account is against trend
-  C_ACC_CDAY_IN_PROFIT = 33, // Current day in profit
-  C_ACC_CDAY_IN_LOSS   = 34, // Current day in loss
-  C_ACC_PDAY_IN_PROFIT = 35, // Previous day in profit
-  C_ACC_PDAY_IN_LOSS   = 36, // Previous day in loss
-  C_ACC_MAX_ORDERS     = 37, // Max orders opened
+  C_ACC_IN_TREND       = 21, // Account in trend
+  C_ACC_IN_NON_TREND   = 22, // Account is against trend
+  C_ACC_CDAY_IN_PROFIT = 23, // Current day in profit
+  C_ACC_CDAY_IN_LOSS   = 24, // Current day in loss
+  C_ACC_PDAY_IN_PROFIT = 25, // Previous day in profit
+  C_ACC_PDAY_IN_LOSS   = 26, // Previous day in loss
+  C_ACC_MAX_ORDERS     = 27, // Max orders opened
 };
 
 // Define market conditions.
