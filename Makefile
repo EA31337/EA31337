@@ -15,8 +15,14 @@ requirements:
 	type -a ex
 	type -a wine
 
-mql4: requirements $(MQL) src/%.ex4
-mql5: requirements $(MQL) src/%.ex5
+lite: set-lite mql4 set-none
+advanced: set-lite mql4 set-none
+rider: set-lite mql4 set-none
+
+mql4: requirements $(MQL) clean src/%.ex4
+	@echo MQL4 compiled.
+mql5: requirements $(MQL) clean src/%.ex5
+	@echo MQL5 compiled.
 
 test: requirements set-mode $(MQL)
 	wine mql.exe /s /i:src /mql4 $(SRC)
@@ -40,24 +46,27 @@ endif
 
 set-none:
 	git checkout -- src/include/EA/ea-mode.mqh
+	ex -s +":g@^#define@s@^@//" -cwq src/include/EA/ea-mode.mqh
 
-set-lite:
+set-lite: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__backtest__"
 
-set-advanced:
+set-advanced: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__backtest__\|__advanced__"
 
-set-rider:
+set-rider: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__backtest__\|__rider__"
 
 clean:
-	find . '(' -name '*.ex4' -or -name '*.ex5' ')' -delete
+	@echo Cleaning...
+	find src/ '(' -name '*.ex4' -or -name '*.ex5' ')' -delete
 
 release: mql.exe \
 		clean \
 		$(OUT)/$(EA)-Backtest-Lite-%.ex4 \
 		$(OUT)/$(EA)-Backtest-Advanced-%.ex4 \
 		$(OUT)/$(EA)-Backtest-Rider-%.ex4
+		@echo Making release...
 		git --git-dir=$(OUT)/.git add -v -A
 		$(eval GIT_EXTRAS := $(shell git --git-dir=$(OUT)/.git tag "v$(VER)" || echo "--amend"))
 		@echo $(GIT_EXTRAS)
