@@ -15,9 +15,9 @@ requirements:
 	type -a ex
 	type -a wine
 
-lite: set-lite mql4 set-none
-advanced: set-lite mql4 set-none
-rider: set-lite mql4 set-none
+lite: 		set-lite 		 mql4 set-none
+advanced: set-advanced mql4 set-none
+rider: 		set-rider 	 mql4 set-none
 
 mql4: requirements $(MQL) clean src/%.ex4
 	@echo MQL4 compiled.
