@@ -37,8 +37,8 @@ src/%.ex5: set-mode $(SRC)
 mql.exe:
 	curl -O http://files.metaquotes.net/metaquotes.software.corp/mt5/mql.exe
 
-set-mode:
 # E.g.: make set-mode MODE="__advanced__"
+set-mode:
 ifdef MODE
 	git checkout -- src/include/EA/ea-mode.mqh
 	ex -s +"%s@^\zs.*\ze#define \($(MODE)\)@@g" -cwq src/include/EA/ea-mode.mqh
@@ -63,9 +63,9 @@ clean:
 
 release: mql.exe \
 		clean \
-		$(OUT)/$(EA)-Backtest-Lite-%.ex4 \
-		$(OUT)/$(EA)-Backtest-Advanced-%.ex4 \
-		$(OUT)/$(EA)-Backtest-Rider-%.ex4
+		$(OUT)/$(EA)-Lite-Backtest-%.ex4 \
+		$(OUT)/$(EA)-Advanced-Backtest-%.ex4 \
+		$(OUT)/$(EA)-Rider-Backtest-%.ex4
 		@echo Making release...
 		git --git-dir=$(OUT)/.git add -v -A
 		$(eval GIT_EXTRAS := $(shell git --git-dir=$(OUT)/.git tag "v$(VER)" || echo "--amend"))
@@ -76,11 +76,11 @@ release: mql.exe \
 		@$(MAKE) -f $(FILE) set-none
 		@echo "$(EA) v${VER} released."
 
-$(OUT)/$(EA)-Backtest-Lite-%.ex4: set-lite
-	wine mql.exe /o /i:src /mql4 $(SRC) && cp -v "$(EX4)" "$(OUT)/$(EA)-Backtest-Lite-v$(VER).ex4"
+$(OUT)/$(EA)-Lite-Backtest-%.ex4: set-lite
+	wine mql.exe /o /i:src /mql4 $(SRC) && cp -v "$(EX4)" "$(OUT)/$(EA)-Lite-Backtest-v$(VER).ex4"
 
-$(OUT)/$(EA)-Backtest-Advanced-%.ex4: set-advanced
-	wine mql.exe /o /i:src /mql4 $(SRC) && cp -v "$(EX4)" "$(OUT)/$(EA)-Backtest-Advanced-v$(VER).ex4"
+$(OUT)/$(EA)-Advanced-Backtest-%.ex4: set-advanced
+	wine mql.exe /o /i:src /mql4 $(SRC) && cp -v "$(EX4)" "$(OUT)/$(EA)-Advanced-Backtest-v$(VER).ex4"
 
-$(OUT)/$(EA)-Backtest-Rider-%.ex4: set-rider
-	wine mql.exe /o /i:src /mql4 $(SRC) && cp -v "$(EX4)" "$(OUT)/$(EA)-Backtest-Rider-v$(VER).ex4"
+$(OUT)/$(EA)-Rider-Backtest-%.ex4: set-rider
+	wine mql.exe /o /i:src /mql4 $(SRC) && cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-Backtest-v$(VER).ex4"
