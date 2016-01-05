@@ -1,8 +1,8 @@
 # Ignore configuration files that may contain sensitive information.
 build.properties
 
-# Ignore compiler.
-mql.exe
+# Ignore compiled binaries.
+*.exe
 
 # Ignore compiled binary files.
 src/*.ex4

@@ -95,51 +95,51 @@ extern string __EA_Conditions__ = "-- Account conditions --"; // See: ENUM_ACTIO
 #else
   extern bool Account_Conditions_Active = FALSE;
 #endif
-extern ENUM_ACC_CONDITION Account_Condition_1      = C_EQUITY_LOWER;
+extern ENUM_ACC_CONDITION Account_Condition_1      = C_ACC_TRUE;
 extern ENUM_MARKET_CONDITION Market_Condition_1    = C_MARKET_BIG_DROP;
 extern ENUM_ACTION_TYPE Action_On_Condition_1      = A_CLOSE_ALL_LOSS_SIDE;
 
-extern ENUM_ACC_CONDITION Account_Condition_2      = C_EQUITY_10PC_LOW;
+extern ENUM_ACC_CONDITION Account_Condition_2      = C_EQUITY_LOWER;
 extern ENUM_MARKET_CONDITION Market_Condition_2    = C_MA1_FS_TREND_OPP;
 extern ENUM_ACTION_TYPE Action_On_Condition_2      = A_CLOSE_ORDER_PROFIT;
 
-extern ENUM_ACC_CONDITION Account_Condition_3      = C_EQUITY_20PC_LOW;
+extern ENUM_ACC_CONDITION Account_Condition_3      = C_EQUITY_HIGHER;
 extern ENUM_MARKET_CONDITION Market_Condition_3    = C_MARKET_TRUE;
 extern ENUM_ACTION_TYPE Action_On_Condition_3      = A_CLOSE_ALL_IN_PROFIT;
 
-extern ENUM_ACC_CONDITION Account_Condition_4      = C_EQUITY_50PC_LOW;
+extern ENUM_ACC_CONDITION Account_Condition_4      = C_EQUITY_50PC_HIGH;
 extern ENUM_MARKET_CONDITION Market_Condition_4    = C_MARKET_TRUE;
 extern ENUM_ACTION_TYPE Action_On_Condition_4      = A_CLOSE_ALL_LOSS_SIDE;
 
-extern ENUM_ACC_CONDITION Account_Condition_5      = C_EQUITY_10PC_HIGH;
+extern ENUM_ACC_CONDITION Account_Condition_5      = C_EQUITY_20PC_HIGH;
 extern ENUM_MARKET_CONDITION Market_Condition_5    = C_MA1_FS_TREND_OPP;
 extern ENUM_ACTION_TYPE Action_On_Condition_5      = A_CLOSE_ORDER_PROFIT;
 
-extern ENUM_ACC_CONDITION Account_Condition_6      = C_EQUITY_20PC_HIGH;
+extern ENUM_ACC_CONDITION Account_Condition_6      = C_EQUITY_10PC_HIGH;
 extern ENUM_MARKET_CONDITION Market_Condition_6    = C_MA1_FS_TREND_OPP;
 extern ENUM_ACTION_TYPE Action_On_Condition_6      = A_CLOSE_ALL_NON_TREND;
 
-extern ENUM_ACC_CONDITION Account_Condition_7      = C_EQUITY_50PC_HIGH;
+extern ENUM_ACC_CONDITION Account_Condition_7      = C_EQUITY_10PC_LOW;
 extern ENUM_MARKET_CONDITION Market_Condition_7    = C_MARKET_TRUE;
 extern ENUM_ACTION_TYPE Action_On_Condition_7      = A_CLOSE_ALL_PROFIT_SIDE;
 
-extern ENUM_ACC_CONDITION Account_Condition_8      = C_MARGIN_USED_80PC;
+extern ENUM_ACC_CONDITION Account_Condition_8      = C_EQUITY_20PC_LOW;
 extern ENUM_MARKET_CONDITION Market_Condition_8    = C_MARKET_TRUE;
 extern ENUM_ACTION_TYPE Action_On_Condition_8      = A_CLOSE_ALL_NON_TREND;
 
-extern ENUM_ACC_CONDITION Account_Condition_9      = C_MARGIN_USED_90PC;
+extern ENUM_ACC_CONDITION Account_Condition_9      = C_EQUITY_50PC_LOW;
 extern ENUM_MARKET_CONDITION Market_Condition_9    = C_MARKET_TRUE;
 extern ENUM_ACTION_TYPE Action_On_Condition_9      = A_CLOSE_ORDER_LOSS;
 
-extern ENUM_ACC_CONDITION Account_Condition_10     = C_EQUITY_HIGHER;
+extern ENUM_ACC_CONDITION Account_Condition_10     = C_MARGIN_USED_50PC;
 extern ENUM_MARKET_CONDITION Market_Condition_10   = C_MARKET_BIG_DROP;
 extern ENUM_ACTION_TYPE Action_On_Condition_10     = A_CLOSE_ALL_TREND;
 
-extern ENUM_ACC_CONDITION Account_Condition_11     = C_ACC_TRUE;
+extern ENUM_ACC_CONDITION Account_Condition_11     = C_MARGIN_USED_70PC;
 extern ENUM_MARKET_CONDITION Market_Condition_11   = C_MARKET_VBIG_DROP;
 extern ENUM_ACTION_TYPE Action_On_Condition_11     = A_CLOSE_ALL_IN_LOSS;
 
-extern ENUM_ACC_CONDITION Account_Condition_12     = C_ACC_NONE;
+extern ENUM_ACC_CONDITION Account_Condition_12     = C_MARGIN_USED_80PC;
 extern ENUM_MARKET_CONDITION Market_Condition_12   = C_MARKET_NONE;
 extern ENUM_ACTION_TYPE Action_On_Condition_12     = A_NONE;
 extern int Account_Condition_MinProfitCloseOrder = 20; // Minimum order profit in pips to close the order on condition met.
