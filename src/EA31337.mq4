@@ -6109,7 +6109,7 @@ bool ActionExecute(int aid, int id = EMPTY) {
   // reason = "Account condition: " + acc_conditions[i][0] + ", Market condition: " + acc_conditions[i][1] + ", Action: " + acc_conditions[i][2] + " [E: " + ValueToCurrency(AccountEquity()) + "/B: " + ValueToCurrency(AccountBalance()) + "]";
 
   TaskProcessList(TRUE); // Process task list immediately after action has been taken.
-  if (VerboseInfo) Print(__FUNCTION__ + "(): " + GetAccountTextDetails() + GetOrdersStats());
+  if (VerboseInfo) PrintFormat("%s(): %s; %s", __FUNCTION__, GetAccountTextDetails(), GetOrdersStats());
   if (result) {
     Message(StringFormat("%s(): Executed action: %s (id: %d), because of market condition: %s (id: %d) and account condition: %s (id: %d) [E:%s/B:%s/P:%sp].",
       __FUNCTION__, ActionIdToText(aid), aid, MarketIdToText(mid), mid, ReasonIdToText(reason_id), reason_id, ValueToCurrency(AccountEquity()), ValueToCurrency(AccountBalance()), DoubleToStr(last_close_profit, 1)));
