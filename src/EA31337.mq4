@@ -733,12 +733,12 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
       if (VerboseDebug && IsVisualMode()) DrawMA(timeframe);
       break;
     case MACD: // Calculates the Moving Averages Convergence/Divergence indicator.
-      macd[period][CURR][MODE_MAIN]   = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN,   CURR); // Current
-      macd[period][PREV][MODE_MAIN]   = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN,   PREV + MACD_Shift); // Previous
-      macd[period][FAR][MODE_MAIN]    = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN,   FAR + MACD_Shift_Far); // TODO: + MACD_Shift
-      macd[period][CURR][MODE_SIGNAL] = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, CURR); // Current
-      macd[period][PREV][MODE_SIGNAL] = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, PREV + MACD_Shift); // Previous
-      macd[period][FAR][MODE_SIGNAL]  = iMACD(NULL, timeframe, MACD_Fast_Period, MACD_Slow_Period, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, FAR + MACD_Shift_Far); // TODO: + MACD_Shift
+      macd[period][CURR][MODE_MAIN]   = iMACD(NULL, timeframe, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN,   CURR); // Current
+      macd[period][PREV][MODE_MAIN]   = iMACD(NULL, timeframe, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN,   PREV + MACD_Shift); // Previous
+      macd[period][FAR][MODE_MAIN]    = iMACD(NULL, timeframe, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN,   FAR + MACD_Shift_Far); // TODO: + MACD_Shift
+      macd[period][CURR][MODE_SIGNAL] = iMACD(NULL, timeframe, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, CURR); // Current
+      macd[period][PREV][MODE_SIGNAL] = iMACD(NULL, timeframe, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, PREV + MACD_Shift); // Previous
+      macd[period][FAR][MODE_SIGNAL]  = iMACD(NULL, timeframe, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, FAR + MACD_Shift_Far); // TODO: + MACD_Shift
       break;
     case MFI: // Calculates the Money Flow Index indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)

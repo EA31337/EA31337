@@ -1097,8 +1097,8 @@ extern string __MACD_Parameters__ = "-- Settings for the Moving Averages Converg
   extern bool MACD15_Active = FALSE;
   extern bool MACD30_Active = FALSE;
 #endif
-extern int MACD_Fast_Period = 14; // Fast EMA averaging period.
-extern int MACD_Slow_Period = 35; // Slow EMA averaging period.
+extern int MACD_Period_Fast = 14; // Fast EMA averaging period.
+extern int MACD_Period_Slow = 35; // Slow EMA averaging period.
 extern int MACD_Signal_Period = 9; // Signal line averaging period.
 extern ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_WEIGHTED; // MACD applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern int MACD_Shift = 2; // Past MACD value in number of bars. Shift relative to the current bar the given amount of periods ago. Suggested value: 1
@@ -1132,7 +1132,7 @@ extern double MACD15_MaxSpread =  8.0; // Maximum spread to trade (in pips).
 extern double MACD30_MaxSpread = 10.0; // Maximum spread to trade (in pips).
 /*
  * MACD backtest log (auto,ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, 9,5mln ticks, quality 25%]:
- *   £33714.17	5911	1.37	5.70	8643.29	53.15%	0.00000000	MACD_Fast_Period=12 	MACD_Slow_Period=30 	MACD_Signal_Period=9 (deposit £10000, spread 25, no boosting, no actions)
+ *   £33714.17	5911	1.37	5.70	8643.29	53.15%	0.00000000	MACD_Period_Fast=12 	MACD_Period_Slow=30 	MACD_Signal_Period=9 (deposit £10000, spread 25, no boosting, no actions)
  *
  */
 //+------------------------------------------------------------------+
