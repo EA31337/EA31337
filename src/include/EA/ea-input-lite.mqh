@@ -71,12 +71,6 @@ extern double BoostTrendFactor                     = 1.2; // Additional boost wh
 //+------------------------------------------------------------------+
 extern string __Market_Parameters__ = "-- Market parameters --";
 extern int TrendMethod = 181; // Method of main trend calculation. Valid range: 0-255. Suggested values: 65!, 71, 81, 83!, 87, 181, etc.
-/* Backtest log (ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, 9,5mln ticks, quality 25%]:
-  £11347.25	20908	1.03	0.54	17245.91	58.84%	TrendMethod=181 (d: £10k, spread 24)
-  £11383.51	20278	1.04	0.56	22825.00	67.72%	TrendMethod=81 (d: £10k, spread 24)
-  £3146.85	20099	1.01	0.16	25575.87	77.54%	TrendMethod=81 (d: £10k, spread 28)
-  £1668.90	20747	1.01	0.08	17142.41	71.64%	TrendMethod=181 (d: £10k, spread 28)
-*/
 extern int TrendMethodAction = 238; // Method of trend calculation on action execution (See: A_CLOSE_ALL_TREND/A_CLOSE_ALL_NON_TREND). Valid range: 0-255.
 extern int MinVolumeToTrade = 2; // Minimum volume to trade.
 extern int MaxOrderPriceSlippage = 5; // Maximum price slippage for buy or sell orders (in pips).
@@ -236,12 +230,6 @@ extern int Alligator1_OpenMethod  = 6; // Valid range: 0-63.
 extern int Alligator5_OpenMethod  = 6; // Valid range: 0-63.
 extern int Alligator15_OpenMethod  = 9; // Valid range: 0-63.
 extern int Alligator30_OpenMethod  = 13; // Valid range: 0-63. This value is used for close condition. Used for C_MA_BUY_SELL close condition (6). (2765/1.20)
-/*
- * Alligator backtest log (ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, 9,5mln ticks, quality 25%]:
- *   £18429.60	4363	1.32	4.22	14102.48	63.82% (d: £10k, spread 25, lot size: 0.1, no boosts/actions)
- *   £21362.41	2753	1.48	7.76	5174.72	36.07%	0.00000000	Alligator_TrailingStopMethod=22 (rider: d: £10k, spread 20, lot size: 0.1, no boosts, with actions)
- *   £22299.85	2753	1.51	8.10	5106.04	35.06%	0.00000000	Alligator_Jaw_Period=22 	Alligator_Teeth_Period=10 	Alligator_Lips_Period=9 (rider: d: £10k, spread 20, lot size: 0.1, no boosts, with actions)
- */
 //+------------------------------------------------------------------+
 extern string __ATR_Parameters__ = "-- Settings for the Average True Range indicator --";
 #ifndef __disabled__
@@ -310,13 +298,6 @@ extern int Bands1_OpenMethod = 0; // Valid range: 0-255.
 extern int Bands5_OpenMethod = 0; // Valid range: 0-255.
 extern int Bands15_OpenMethod = 16; // Valid range: 0-255.
 extern int Bands30_OpenMethod = 0; // Valid range: 0-255. Previously: 417. Used for C_BANDS_BUY_SELL close condition.
-/*
- * Bands backtest log (auto,ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, 9,5mln ticks, quality 25%]:
- *   £30087.06	3123	1.49	9.63	21508.48	59.74% Bands_TrailingProfitMethod=7 (d: £10k, sp: 20, ls:0.1, __testing__)
- *   £28420.72	3126	1.47	9.09	20860.99	65.05% Bands_TrailingProfitMethod=1 (d: £10k, sp: 20, ls:0.1, __testing__)
- *
- *   Strategy stats (deposit: £10000, spread 20, ls:auto, __testing__):
- */
 //+------------------------------------------------------------------+
 extern string __BPower_Parameters__ = "-- Settings for the Bulls/Bears Power indicator --";
 #ifndef __disabled__
@@ -426,20 +407,6 @@ extern int DeMarker1_OpenMethod = 0; // Valid range: 0-31.
 extern int DeMarker5_OpenMethod = 0; // Valid range: 0-31.
 extern int DeMarker15_OpenMethod = 0; // Valid range: 0-31.
 extern int DeMarker30_OpenMethod = 0; // Valid range: 0-31. Used for C_DEMARKER_BUY_SELL close condition.
-/* DeMarker backtest log (auto,ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, spread 20, 9,5mln ticks, quality 25%]:
- *   £32058.66	2358	1.68	13.60	13837.63	37.93%
-
- *   £5968.23 5968  1.17  1.00  1314.82 47.46% (deposit: £1000, no boosting)
- *   £7465.39 5966  1.21  1.25  1306.65 9.32% (deposit: £10000, no boosting)
- *   $11414.20  5966  1.21  1.91  1776.70 12.99% (deposit: $10000, no boosting)
- *   Strategy stats:
- *   DeMarker M1: Total net profit: 930 pips, Total orders: 2145 (Won: 30.7% [659] | Loss: 69.3% [1486]);
- *   DeMarker M5: Total net profit: 1699 pips, Total orders: 1751 (Won: 31.1% [544] | Loss: 68.9% [1207]);
- *   DeMarker M15: Total net profit: 1882 pips, Total orders: 1281 (Won: 37.7% [483] | Loss: 62.3% [798]);
- *   DeMarker M30: Total net profit: 905 pips, Total orders: 789 (Won: 40.7% [321] | Loss: 59.3% [468]);
- *   Prev: £1929.90 2778  1.13  0.69  525.00  21.84% (deposit: £1000, no boosting)
- *   Prev: £3369.57 1694  1.25  1.99  588.65  21.19%  0.00000000  DeMarker_TrailingProfitMethod=19 (deposit: £1000)
- */
 //+------------------------------------------------------------------+
 extern string __Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --";
 #ifndef __disabled__
@@ -458,8 +425,6 @@ extern ENUM_MA_METHOD Envelopes_MA_Method = MODE_SMA; // MA method (See: ENUM_MA
 extern int Envelopes_MA_Shift = 0; // The indicator shift relative to the chart.
 extern ENUM_APPLIED_PRICE Envelopes_Applied_Price = PRICE_TYPICAL; // Applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern double Envelopes1_Deviation = 0.08; // Percent deviation from the main line.
-// £1804.07	1620	1.12	1.11	1396.96	11.31%	0.00000000	Envelopes1_Deviation=0.07 (d:£10k)
-// £1800.30	1549	1.13	1.16	1352.76	11.01%	0.00000000	Envelopes1_Deviation=0.08 (d:£10k)
 extern double Envelopes5_Deviation = 0.12; // Percent deviation from the main line.
 extern double Envelopes15_Deviation = 0.15; // Percent deviation from the main line.
 extern double Envelopes30_Deviation = 0.4; // Percent deviation from the main line.
@@ -472,12 +437,6 @@ extern int Envelopes1_OpenMethod = 0; // Valid range: 0-127. Set 0 to default.
 extern int Envelopes5_OpenMethod = 0; // Valid range: 0-127. Set 0 to default.
 extern int Envelopes15_OpenMethod = 0; // Valid range: 0-127. Set 0 to default.
 extern int Envelopes30_OpenMethod = 4; // Valid range: 0-127. Set 0 to default. Used for C_ENVELOPES_BUY_SELL close condition.
-/*
- * Envelopes backtest log (auto,ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, 9,5mln ticks, quality 25%]:
- *  £33014.05	2758	1.61	11.97	18039.17	44.56%	Envelopes_MA_Period=26 (d: £10k, sp: 20, ls:0.1, __testing__)
- *  £34606.84	2745	1.64	12.61	17735.31	43.79%	Envelopes_MA_Period=28 (d: £10k, sp: 20, ls:0.1, __testing__)
- */
-
 //+------------------------------------------------------------------+
 extern string __Force_Parameters__ = "-- Settings for the Force Index indicator --";
 #ifndef __disabled__
@@ -522,11 +481,6 @@ extern int Fractals1_OpenMethod = 0; // Valid range: 0-1.
 extern int Fractals5_OpenMethod = 0; // Valid range: 0-1.
 extern int Fractals15_OpenMethod = 0; // Valid range: 0-1. // Optimized.
 extern int Fractals30_OpenMethod = 0; // Valid range: 0-1. // Optimized for C_FRACTALS_BUY_SELL close condition.
-/*
- * Fractals backtest log (auto,ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, spread 20, 9,5mln ticks, quality 25%]:
- *   £40321.54	2672	1.77	15.09	25486.83	54.12%	0.00000000	Account_Conditions_Active=0 (d: £10k, sp: 20, ls:0.1, __testing__)
- *   £21560.33	3143	1.45	6.86	4752.95	26.95%	0.00000000	Account_Conditions_Active=1 (d: £10k, sp: 20, ls:0.1, __testing__)
- */
 //+------------------------------------------------------------------+
 extern string __Gator_Parameters__ = "-- Settings for the Gator oscillator --";
 #ifndef __disabled__
@@ -601,14 +555,6 @@ extern int MA1_OpenMethod = 57; // Valid range: 0-127.
 extern int MA5_OpenMethod = 51; // Valid range: 0-127.
 extern int MA15_OpenMethod = 65; // Valid range: 0-127.
 extern int MA30_OpenMethod = 71; // Valid range: 0-127. This value is used for close condition.
-/*
- * MA backtest log [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, 9,5mln ticks, quality 25%]:
- *   £49952.57	2906	1.29	17.19	17750.78	29.01%	TradeWithTrend=0 (d: £10k, spread: 25, no boosting, no actions, lot size: auto, with C_EVENT_NONE)
- *   £34911.40	2422	1.30	14.41	11890.54	26.95%	TradeWithTrend=1 (d: £10k, spread: 25, no boosting, no actions, lot size: auto, with C_EVENT_NONE)
- *   £27566.63	3177	1.23	8.68	13847.12	33.39%	TradeWithTrend=0 (d: £10k, spread: 25, no boosting, no actions, lot size: auto, with C_MA_BUY_SELL)
- *   £24780.05	2920	1.27	8.49	10192.43	32.01%	TradeWithTrend=0 (d: £10k, spread: 20, no boosting, no actions, lot size: auto, with C_MA_BUY_SELL)
- *   £22280.33	2413	1.31	9.23	6611.29	28.83%	TradeWithTrend=1 (d: £10k, spread: 20, no boosting, no actions, lot size: auto, with C_MA_BUY_SELL)
- */
 //+------------------------------------------------------------------+
 extern string __MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --";
 #ifndef __disabled__
@@ -635,11 +581,6 @@ extern int MACD1_OpenMethod = 0; // Valid range: 0-31.
 extern int MACD5_OpenMethod = 0; // Valid range: 0-31.
 extern int MACD15_OpenMethod = 0; // Valid range: 0-31.
 extern int MACD30_OpenMethod = 15; // Valid range: 0-31. This value is used for close condition.
-/*
- * MACD backtest log (auto,ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, 9,5mln ticks, quality 25%]:
- *   £33714.17	5911	1.37	5.70	8643.29	53.15%	0.00000000	MACD_Period_Fast=12 	MACD_Period_Slow=30 	MACD_Signal_Period=9 (deposit £10000, spread 25, no boosting, no actions)
- *
- */
 //+------------------------------------------------------------------+
 extern string __MFI_Parameters__ = "-- Settings for the Money Flow Index indicator --";
 #ifndef __disabled__
@@ -752,25 +693,6 @@ extern int RSI1_OpenMethod  = 0; // Valid range: 0-63.
 extern int RSI5_OpenMethod  = 0; // Valid range: 0-63. Optimized based on genetic algorithm between 2015.01.01-2015.06.30 with spread 20. 2, 5, 306, 374, 388, 642
 extern int RSI15_OpenMethod = 0; // Valid range: 0-63.
 extern int RSI30_OpenMethod = 2; // Valid range: 0-63. Used for C_RSI_BUY_SELL close condition (6).
-/*
- * RSI backtest log (ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, 9,5mln ticks, quality 25%]:
- *
- * RSI backtest log (auto,ts:25,tp:25,gap:10) [2015.01.05-2015.06.20 based on MT4 FXCM backtest data, spread 2, 7,6mln ticks, quality 25%]:
- *   £3367.78 2298  1.24  1.47  1032.39 42.64%  0.00000000  RSI_CloseOnChange=0 (deposit: £1000, boosting factor 1.0)
- *   £3249.67 2338  1.24  1.39  1025.47 44.49%  0.00000000  RSI_CloseOnChange=1 (deposit: £1000, boosting factor 1.0)
- *   £4551.26 2331  1.34  1.95  1030.22 9.06% RSI_TrailingProfitMethod=1 (deposit: £10000, boosting factor 1.0)
- *   Strategy stats:
- *    RSI M1: Total net profit: 23205 pips, Total orders: 2726 (Won: 68.6% [1871] | Loss: 31.4% [855]);
- *    RSI M5: Total net profit: 2257 pips, Total orders: 391 (Won: 48.1% [188] | Loss: 51.9% [203]);
- *    RSI M15: Total net profit: 4970 pips, Total orders: 496 (Won: 52.2% [259] | Loss: 47.8% [237]);
- *    RSI M30: Total net profit: 2533 pips, Total orders: 272 (Won: 48.5% [132] | Loss: 51.5% [140]);
- * Deposit: £10000 (factor = 1.0) && RSI_DynamicPeriod
- *  £3380.43  2142  1.31  1.58  541.01  5.12% 0.00000000  RSI_DynamicPeriod=1
- *  £3060.19  1307  1.44  2.34  549.59  4.66% 0.00000000  RSI_DynamicPeriod=0
- *
- * RSI backtest log (ts:40,tp:20,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, spread 25, 9,5mln ticks, quality 25%]:
- *   TODO
- */
 //+------------------------------------------------------------------+
 extern string __RVI_Parameters__ = "-- Settings for the Relative Vigor Index indicator --";
 #ifndef __disabled__
@@ -816,19 +738,6 @@ extern int SAR1_OpenMethod  = 0; // Valid range: 0-127. Optimized.
 extern int SAR5_OpenMethod  = 4; // Valid range: 0-127. Optimized.
 extern int SAR15_OpenMethod = 0; // Valid range: 0-127. Optimized.
 extern int SAR30_OpenMethod = 0; // Valid range: 0-127. Used for C_SAR_BUY_SELL close condition.
-/*
- * SAR backtest log (auto,ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, 9,5mln ticks, quality 25%]:
- *   £37878.53	4274	1.21	8.86	69890.74	76.77%	TradeWithTrend=0 (d: £20k, sp: 20, ls:auto, __testing__)
- *   £25549.59	4007	1.18	6.38	60049.74	76.82%	TradeWithTrend=1 (d: £20k, sp: 20, ls:auto, __testing__)
- *   £45203.65	5586	1.18	8.09	27420.74	48.15%	Account_Conditions_Active=1 (d: £20k, sp: 20, ls:auto, with actions, no boosting)
- *
- *   Strategy stats (deposit: £10000, spread 20, ls:auto, __testing__):
-      Profit factor: 1.14, Total net profit: 6131.69pips (+51196.06/-45064.37), Total orders: 1083 (Won: 27.9% [302] / Loss: 72.1% [781]) - SAR M1
-      Profit factor: 1.30, Total net profit: 11347.41pips (+48828.04/-37480.63), Total orders: 901 (Won: 28.5% [257] / Loss: 71.5% [644]) - SAR M5
-      Profit factor: 1.17, Total net profit: 8120.80pips (+57220.29/-49099.49), Total orders: 1145 (Won: 26.2% [300] / Loss: 73.8% [845]) - SAR M15
-      Profit factor: 1.27, Total net profit: 12706.46pips (+59705.56/-46999.10), Total orders: 1131 (Won: 27.9% [315] / Loss: 72.1% [816]) - SAR M30
- *
- */
 //+------------------------------------------------------------------+
 extern string __StdDev_Parameters__ = "-- Settings for the Standard Deviation indicator --";
 #ifndef __disabled__
@@ -896,10 +805,6 @@ extern int WPR1_OpenMethod = 0; // Valid range: 0-63. Optimized.
 extern int WPR5_OpenMethod = 0; // Valid range: 0-63. Optimized.
 extern int WPR15_OpenMethod = 0; // Valid range: 0-63. Optimized.
 extern int WPR30_OpenMethod = 0; // Valid range: 0-63. Optimized with T_MA_M_FAR_TRAIL (8). Used for C_WPR_BUY_SELL close condition (16).
-/*
- * WPR backtest log (auto,ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, spread 20, 9,5mln ticks, quality 25%]:
- *   £34417.03	2394	1.74	14.38	16126.15	44.53% (d: £10k, sp: 20, ls:0.1, __testing__)
- */
 //+------------------------------------------------------------------+
 #ifndef __disabled__
   extern bool ZigZag1_Active = TRUE;
@@ -949,7 +854,6 @@ extern int MagicNumber = 31337; // To help identify its own orders. It can vary 
 #else
   const bool Cache = FALSE;
 #endif
-
 //extern int ManualGMToffset = 0;
 //extern int TrailingStopDelay = 0; // How often trailing stop should be updated (in seconds). FIXME: Fix relative delay in backtesting.
 //extern int JobProcessDelay = 1; // How often job list should be processed (in seconds).
