@@ -15,58 +15,63 @@
 //| User input variables.
 //+------------------------------------------------------------------+
 extern string __EA_Order_Parameters__ = "-- Profit/Loss settings (set 0 for auto) --";
-#ifndef __limited__ extern double LotSize = 0; // Default lot size. Set 0 for auto.
-#else               extern double LotSize = 0.01; // Limit to micro lot.
-#endif
-extern double TakeProfit = 0.0; // Take profit value in pips. [start=0,step=10,stop=80]
-extern double StopLoss = 0.0; // Stop loss value in pips. [start=0,step=10,stop=80]
-#ifndef __limited__
-  extern int MaxOrders = 0; // Maximum orders. Set 0 for auto.
-#else
-  extern int MaxOrders = 30;
-#endif
-extern int MaxOrdersPerType = 0; // Maximum orders per strategy type. Set 0 for auto.
+
+// Default lot size. Set 0 for auto.
+extern double LotSize = 0;
+
+// Take profit value in pips.
+extern double TakeProfit = 160;
+
+// Stop loss value in pips.
+extern double StopLoss = 120;
+
+// Maximum orders. Set 0 for auto.
+extern int MaxOrders = 0;
+
+// Maximum orders per strategy type. Set 0 for auto.
+extern int MaxOrdersPerType = 15;
 extern bool TradeMicroLots = TRUE;
+
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Settings for trailing stops --";
 extern int TrailingStop = 40;
-extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = T_FIXED; // TrailingStop method. Set 0 to disable. See: ENUM_TRAIL_TYPE.
-extern bool TrailingStopOneWay = TRUE; // Change trailing stop towards one direction only. Suggested value: TRUE
-extern int TrailingProfit = 30;
-extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = T_NONE; // Trailing Profit method. Set 0 to disable. See: ENUM_TRAIL_TYPE.
-extern bool TrailingProfitOneWay = TRUE; // Change trailing profit take towards one direction only.
-extern double TrailingStopAddPerMinute = 0.0; // Decrease trailing stop (in pips) per each bar. Set 0 to disable. Suggested value: 0.
+
+// TrailingStop method. Set 0 to disable. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 8;
+
+// Change trailing stop towards one direction only.
+extern bool TrailingStopOneWay = FALSE;
+extern int TrailingProfit = 20;
+
+// Trailing Profit method. Set 0 to disable. See: ENUM_TRAIL_TYPE.
+extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 17;
+
+// Change trailing profit take towards one direction only.
+extern bool TrailingProfitOneWay = TRUE;
+
+// Decrease trailing stop (in pips) per each bar. Set 0 to disable. Suggested value: 0.
+extern double TrailingStopAddPerMinute = 0.0;
+
 //+------------------------------------------------------------------+
 extern string __EA_Risk_Parameters__ = "-- Risk management --";
-extern double RiskRatio = 0; // Suggested value: 1.0. Do not change unless testing.
-#ifndef __trend__
-  extern bool TradeWithTrend = FALSE; // Default. Trade with trend only to minimalize the risk.
-#else
-  extern bool TradeWithTrend = TRUE; // Trade with trend.
-#endif
+
+// Suggested value: 1.0. Do not change unless testing.
+extern double RiskRatio = 0;
+
+// Trade with trend (to minimalize the risk).
+extern bool TradeWithTrend = FALSE;
 extern bool MinimalizeLosses = FALSE; // Set stop loss to zero, once the order is profitable.
+
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting (set 1.0 to default) --";
-#ifndef __noboost__
-  extern bool Boosting_Enabled                       = TRUE; // Default. Enable boosting section.
-#else
-  extern bool Boosting_Enabled                       = FALSE;
-#endif
-#ifndef __nofactor__
-  extern double BestDailyStrategyMultiplierFactor    = 1.1; // Lot multiplier boosting factor for the most profitable daily strategy.
-  extern double BestWeeklyStrategyMultiplierFactor   = 1.2; // Lot multiplier boosting factor for the most profitable weekly strategy.
-  extern double BestMonthlyStrategyMultiplierFactor  = 1.5; // Lot multiplier boosting factor for the most profitable monthly strategy.
-  extern double WorseDailyStrategyDividerFactor      = 1.2; // Lot divider factor for the most profitable daily strategy. Useful for low-balance accounts or non-profitable periods.
-  extern double WorseWeeklyStrategyDividerFactor     = 1.2; // Lot divider factor for the most profitable weekly strategy. Useful for low-balance accounts or non-profitable periods.
-  extern double WorseMonthlyStrategyDividerFactor    = 1.2; // Lot divider factor for the most profitable monthly strategy. Useful for low-balance accounts or non-profitable periods.
-#else
-  extern double BestDailyStrategyMultiplierFactor    = 1.0; // Lot multiplier boosting factor for the most profitable daily strategy.
-  extern double BestWeeklyStrategyMultiplierFactor   = 1.0; // Lot multiplier boosting factor for the most profitable weekly strategy.
-  extern double BestMonthlyStrategyMultiplierFactor  = 1.0; // Lot multiplier boosting factor for the most profitable monthly strategy.
-  extern double WorseDailyStrategyDividerFactor      = 1.0;
-  extern double WorseWeeklyStrategyDividerFactor     = 1.0;
-  extern double WorseMonthlyStrategyDividerFactor    = 1.0;
-#endif
+// Default. Enable boosting section.
+extern bool Boosting_Enabled                       = TRUE;
+extern double BestDailyStrategyMultiplierFactor    = 1.1; // Lot multiplier boosting factor for the most profitable daily strategy.
+extern double BestWeeklyStrategyMultiplierFactor   = 1.2; // Lot multiplier boosting factor for the most profitable weekly strategy.
+extern double BestMonthlyStrategyMultiplierFactor  = 1.5; // Lot multiplier boosting factor for the most profitable monthly strategy.
+extern double WorseDailyStrategyDividerFactor      = 1.2; // Lot divider factor for the most profitable daily strategy. Useful for low-balance accounts or non-profitable periods.
+extern double WorseWeeklyStrategyDividerFactor     = 1.2; // Lot divider factor for the most profitable weekly strategy. Useful for low-balance accounts or non-profitable periods.
+extern double WorseMonthlyStrategyDividerFactor    = 1.2; // Lot divider factor for the most profitable monthly strategy. Useful for low-balance accounts or non-profitable periods.
 extern double BoostTrendFactor                     = 1.2; // Additional boost when trade is with trend.
 //+------------------------------------------------------------------+
 extern string __Market_Parameters__ = "-- Market parameters --";
@@ -84,11 +89,7 @@ extern int MinPipGap = 10; // Minimum gap in pips between trades of the same str
 int HourAfterPeak = 18;
 //+------------------------------------------------------------------+
 extern string __EA_Conditions__ = "-- Account conditions --"; // See: ENUM_ACTION_TYPE
-#ifndef __noactions__
   extern bool Account_Conditions_Active = TRUE; // Enable account conditions. It's not advice on accounts where multi bots are trading.
-#else
-  extern bool Account_Conditions_Active = FALSE;
-#endif
 extern ENUM_ACC_CONDITION Account_Condition_1      = C_ACC_TRUE;
 extern ENUM_MARKET_CONDITION Market_Condition_1    = C_MARKET_BIG_DROP;
 extern ENUM_ACTION_TYPE Action_On_Condition_1      = A_CLOSE_ALL_LOSS_SIDE;
@@ -139,17 +140,10 @@ extern ENUM_ACTION_TYPE Action_On_Condition_12     = A_NONE;
 extern int Account_Condition_MinProfitCloseOrder = 20; // Minimum order profit in pips to close the order on condition met.
 //+------------------------------------------------------------------+
 extern string __AC_Parameters__ = "-- Settings for the Bill Williams' Accelerator/Decelerator oscillator --";
-#ifndef __disabled__
   extern bool AC1_Active = TRUE;
   extern bool AC5_Active = TRUE;
   extern bool AC15_Active = TRUE;
   extern bool AC30_Active = TRUE; // Enable AC-based strategy for specific timeframe.
-#else
-  extern bool AC1_Active = FALSE;
-  extern bool AC5_Active = FALSE;
-  extern bool AC15_Active = FALSE;
-  extern bool AC30_Active = FALSE;
-#endif
 extern ENUM_TRAIL_TYPE AC_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for AC. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE AC_TrailingProfitMethod = T_FIXED; // Trailing Profit method for AC. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 extern double AC_OpenLevel = 0; // Not used currently.
@@ -159,17 +153,10 @@ extern int AC15_OpenMethod = 0; // Valid range: 0-x.
 extern int AC30_OpenMethod = 0; // Valid range: 0-x.
 //+------------------------------------------------------------------+
 extern string __AD_Parameters__ = "-- Settings for the Accumulation/Distribution indicator --";
-#ifndef __disabled__
   extern bool AD1_Active = TRUE;
   extern bool AD5_Active = TRUE;
   extern bool AD15_Active = TRUE;
   extern bool AD30_Active = TRUE; // Enable AD-based strategy for specific timeframe.
-#else
-  extern bool AD1_Active = FALSE;
-  extern bool AD5_Active = FALSE;
-  extern bool AD15_Active = FALSE;
-  extern bool AD30_Active = FALSE;
-#endif
 extern ENUM_TRAIL_TYPE AD_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for AD. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE AD_TrailingProfitMethod = T_FIXED; // Trailing Profit method for AD. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 extern double AD_OpenLevel = 0; // Not used currently.
@@ -179,17 +166,10 @@ extern int AD15_OpenMethod = 0; // Valid range: 0-x.
 extern int AD30_OpenMethod = 0; // Valid range: 0-x.
 //+------------------------------------------------------------------+
 extern string __ADX_Parameters__ = "-- Settings for the Average Directional Movement Index indicator --";
-#ifndef __disabled__
   extern bool ADX1_Active = TRUE;
   extern bool ADX5_Active = TRUE;
   extern bool ADX15_Active = TRUE;
   extern bool ADX30_Active = TRUE; // Enable ADX-based strategy for specific timeframe.
-#else
-  extern bool ADX1_Active = FALSE;
-  extern bool ADX5_Active = FALSE;
-  extern bool ADX15_Active = FALSE;
-  extern bool ADX30_Active = FALSE;
-#endif
 extern ENUM_TRAIL_TYPE ADX_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for ADX. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE ADX_TrailingProfitMethod = T_FIXED; // Trailing Profit method for ADX. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 extern int ADX_Period = 14; // Averaging period to calculate the main line.
@@ -201,17 +181,10 @@ extern int ADX15_OpenMethod = 0; // Valid range: 0-x.
 extern int ADX30_OpenMethod = 0; // Valid range: 0-x.
 //+------------------------------------------------------------------+
 extern string __Alligator_Parameters__ = "-- Settings for the Alligator indicator --";
-#ifndef __disabled__
   extern bool Alligator1_Active = TRUE;
   extern bool Alligator5_Active = TRUE;
   extern bool Alligator15_Active = TRUE;
   extern bool Alligator30_Active = TRUE; // Enable Alligator custom-based strategy for specific timeframe.
-#else
-  extern bool Alligator1_Active = FALSE;
-  extern bool Alligator5_Active = FALSE;
-  extern bool Alligator15_Active = FALSE;
-  extern bool Alligator30_Active = FALSE;
-#endif
 // extern ENUM_TIMEFRAMES Alligator_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int Alligator_Jaw_Period = 22; // Blue line averaging period (Alligator's Jaw).
 extern int Alligator_Jaw_Shift = 0; // Blue line shift relative to the chart.
@@ -232,17 +205,10 @@ extern int Alligator15_OpenMethod  = 9; // Valid range: 0-63.
 extern int Alligator30_OpenMethod  = 13; // Valid range: 0-63. This value is used for close condition. Used for C_MA_BUY_SELL close condition (6). (2765/1.20)
 //+------------------------------------------------------------------+
 extern string __ATR_Parameters__ = "-- Settings for the Average True Range indicator --";
-#ifndef __disabled__
-  extern bool ATR1_Active = TRUE;
-  extern bool ATR5_Active = TRUE;
-  extern bool ATR15_Active = TRUE;
-  extern bool ATR30_Active = TRUE; // Enable ATR-based strategy for specific timeframe.
-#else
-  extern bool ATR1_Active = FALSE;
-  extern bool ATR5_Active = FALSE;
-  extern bool ATR15_Active = FALSE;
-  extern bool ATR30_Active = FALSE;
-#endif
+extern bool ATR1_Active = TRUE;
+extern bool ATR5_Active = TRUE;
+extern bool ATR15_Active = TRUE;
+extern bool ATR30_Active = TRUE; // Enable ATR-based strategy for specific timeframe.
 extern ENUM_TRAIL_TYPE ATR_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for ATR. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE ATR_TrailingProfitMethod = T_FIXED; // Trailing Profit method for ATR. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 extern int ATR_Period_Fast = 14; // Averaging period to calculate the main line.
@@ -254,17 +220,10 @@ extern int ATR15_OpenMethod = 0; // Valid range: 0-31. // Optimized.
 extern int ATR30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTALS_BUY_SELL close condition.
 //+------------------------------------------------------------------+
 extern string __Awesome_Parameters__ = "-- Settings for the Awesome oscillator --";
-#ifndef __disabled__
-  extern bool Awesome1_Active = TRUE;
-  extern bool Awesome5_Active = TRUE;
-  extern bool Awesome15_Active = TRUE;
-  extern bool Awesome30_Active = TRUE; // Enable Awesome-based strategy for specific timeframe.
-#else
-  extern bool Awesome1_Active = FALSE;
-  extern bool Awesome5_Active = FALSE;
-  extern bool Awesome15_Active = FALSE;
-  extern bool Awesome30_Active = FALSE;
-#endif
+extern bool Awesome1_Active = TRUE;
+extern bool Awesome5_Active = TRUE;
+extern bool Awesome15_Active = TRUE;
+extern bool Awesome30_Active = TRUE; // Enable Awesome-based strategy for specific timeframe.
 extern ENUM_TRAIL_TYPE Awesome_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Awesome. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE Awesome_TrailingProfitMethod = T_FIXED; // Trailing Profit method for Awesome. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 extern double Awesome_OpenLevel = 0; // Not used currently.
@@ -274,17 +233,10 @@ extern int Awesome15_OpenMethod = 0; // Valid range: 0-31. // Optimized.
 extern int Awesome30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTALS_BUY_SELL close condition.
 //+------------------------------------------------------------------+
 extern string __Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --";
-#ifndef __disabled__
-  extern bool Bands1_Active = TRUE;
-  extern bool Bands5_Active = TRUE;
-  extern bool Bands15_Active = TRUE;
-  extern bool Bands30_Active = TRUE; // Enable Bands-based strategy fpr specific timeframe.
-#else
-  extern bool Bands1_Active = FALSE;
-  extern bool Bands5_Active = FALSE;
-  extern bool Bands15_Active = FALSE;
-  extern bool Bands30_Active = FALSE;
-#endif
+extern bool Bands1_Active = TRUE;
+extern bool Bands5_Active = TRUE;
+extern bool Bands15_Active = TRUE;
+extern bool Bands30_Active = TRUE; // Enable Bands-based strategy fpr specific timeframe.
 extern int Bands_Period = 26; // Averaging period to calculate the main line.
 extern ENUM_APPLIED_PRICE Bands_Applied_Price = PRICE_MEDIAN; // Bands applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern double Bands_Deviation = 2.1; // Number of standard deviations from the main line.
@@ -300,17 +252,10 @@ extern int Bands15_OpenMethod = 16; // Valid range: 0-255.
 extern int Bands30_OpenMethod = 0; // Valid range: 0-255. Previously: 417. Used for C_BANDS_BUY_SELL close condition.
 //+------------------------------------------------------------------+
 extern string __BPower_Parameters__ = "-- Settings for the Bulls/Bears Power indicator --";
-#ifndef __disabled__
-  extern bool BPower1_Active = TRUE;
-  extern bool BPower5_Active = TRUE;
-  extern bool BPower15_Active = TRUE;
-  extern bool BPower30_Active = TRUE; // Enable BPower-based strategy for specific timeframe.
-#else
-  extern bool BPower1_Active = FALSE;
-  extern bool BPower5_Active = FALSE;
-  extern bool BPower15_Active = FALSE;
-  extern bool BPower30_Active = FALSE;
-#endif
+extern bool BPower1_Active = TRUE;
+extern bool BPower5_Active = TRUE;
+extern bool BPower15_Active = TRUE;
+extern bool BPower30_Active = TRUE; // Enable BPower-based strategy for specific timeframe.
 extern ENUM_TRAIL_TYPE BPower_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for BPower. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE BPower_TrailingProfitMethod = T_FIXED; // Trailing Profit method for BPower. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 extern int BPower_Period = 13; // Averaging period for calculation.
@@ -322,17 +267,10 @@ extern int BPower15_OpenMethod = 0; // Valid range: 0-x. // Optimized.
 extern int BPower30_OpenMethod = 0; // Valid range: 0-x. // Optimized for C_FRACTALS_BUY_SELL close condition.
 //+------------------------------------------------------------------+
 extern string __Breakage_Parameters__ = "-- Settings for the custom Breakage strategy --";
-#ifndef __disabled__
-  extern bool Breakage1_Active = TRUE;
-  extern bool Breakage5_Active = TRUE;
-  extern bool Breakage15_Active = TRUE;
-  extern bool Breakage30_Active = TRUE; // Enable Breakage-based strategy for specific timeframe.
-#else
-  extern bool Breakage1_Active = FALSE;
-  extern bool Breakage5_Active = FALSE;
-  extern bool Breakage15_Active = FALSE;
-  extern bool Breakage30_Active = FALSE;
-#endif
+extern bool Breakage1_Active = TRUE;
+extern bool Breakage5_Active = TRUE;
+extern bool Breakage15_Active = TRUE;
+extern bool Breakage30_Active = TRUE; // Enable Breakage-based strategy for specific timeframe.
 extern ENUM_TRAIL_TYPE Breakage_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Breakage. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE Breakage_TrailingProfitMethod = T_FIXED; // Trailing Profit method for Breakage. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 extern double Breakage_OpenLevel = 0; // Not used currently.
@@ -342,17 +280,10 @@ extern int Breakage15_OpenMethod = 0; // Valid range: 0-31. // Optimized.
 extern int Breakage30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTALS_BUY_SELL close condition.
 //+------------------------------------------------------------------+
 extern string __BWMFI_Parameters__ = "-- Settings for the Market Facilitation Index indicator --";
-#ifndef __disabled__
-  extern bool BWMFI1_Active = TRUE;
-  extern bool BWMFI5_Active = TRUE;
-  extern bool BWMFI15_Active = TRUE;
-  extern bool BWMFI30_Active = TRUE; // Enable BWMFI-based strategy for specific timeframe.
-#else
-  extern bool BWMFI1_Active = FALSE;
-  extern bool BWMFI5_Active = FALSE;
-  extern bool BWMFI15_Active = FALSE;
-  extern bool BWMFI30_Active = FALSE;
-#endif
+extern bool BWMFI1_Active = TRUE;
+extern bool BWMFI5_Active = TRUE;
+extern bool BWMFI15_Active = TRUE;
+extern bool BWMFI30_Active = TRUE; // Enable BWMFI-based strategy for specific timeframe.
 extern ENUM_TRAIL_TYPE BWMFI_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for BWMFI. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE BWMFI_TrailingProfitMethod = T_FIXED; // Trailing Profit method for BWMFI. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 extern double BWMFI_OpenLevel = 0; // Not used currently.
@@ -362,17 +293,10 @@ extern int BWMFI15_OpenMethod = 0; // Valid range: 0-31. // Optimized.
 extern int BWMFI30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTALS_BUY_SELL close condition.
 //+------------------------------------------------------------------+
 extern string __CCI_Parameters__ = "-- Settings for the Commodity Channel Index indicator --";
-#ifndef __disabled__
-  extern bool CCI1_Active = TRUE;
-  extern bool CCI5_Active = TRUE;
-  extern bool CCI15_Active = TRUE;
-  extern bool CCI30_Active = TRUE; // Enable CCI-based strategy for specific timeframe.
-#else
-  extern bool CCI1_Active = FALSE;
-  extern bool CCI5_Active = FALSE;
-  extern bool CCI15_Active = FALSE;
-  extern bool CCI30_Active = FALSE;
-#endif
+extern bool CCI1_Active = TRUE;
+extern bool CCI5_Active = TRUE;
+extern bool CCI15_Active = TRUE;
+extern bool CCI30_Active = TRUE; // Enable CCI-based strategy for specific timeframe.
 extern ENUM_TRAIL_TYPE CCI_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for CCI. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = T_FIXED; // Trailing Profit method for CCI. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 extern int CCI_Period_Fast = 12; // Averaging period to calculate the main line.
@@ -385,17 +309,10 @@ extern int CCI15_OpenMethod = 0; // Valid range: 0-31. // Optimized.
 extern int CCI30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTALS_BUY_SELL close condition.
 //+------------------------------------------------------------------+
 extern string __DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --";
-#ifndef __disabled__
-  extern bool DeMarker1_Active = TRUE;
-  extern bool DeMarker5_Active = TRUE;
-  extern bool DeMarker15_Active = TRUE;
-  extern bool DeMarker30_Active = TRUE; // Enable DeMarker-based strategy for specific timeframe.
-#else
-  extern bool DeMarker1_Active = FALSE;
-  extern bool DeMarker5_Active = FALSE;
-  extern bool DeMarker15_Active = FALSE;
-  extern bool DeMarker30_Active = FALSE;
-#endif
+extern bool DeMarker1_Active = TRUE;
+extern bool DeMarker5_Active = TRUE;
+extern bool DeMarker15_Active = TRUE;
+extern bool DeMarker30_Active = TRUE; // Enable DeMarker-based strategy for specific timeframe.
 //extern ENUM_TIMEFRAMES DeMarker_Timeframe = PERIOD_M1; // Timeframe (0 means the current chart).
 extern int DeMarker_Period = 24; // DeMarker averaging period for calculation.
 extern int DeMarker_Shift = 0; // Shift relative to the current bar the given amount of periods ago. Suggested value: 4.
@@ -409,17 +326,10 @@ extern int DeMarker15_OpenMethod = 0; // Valid range: 0-31.
 extern int DeMarker30_OpenMethod = 0; // Valid range: 0-31. Used for C_DEMARKER_BUY_SELL close condition.
 //+------------------------------------------------------------------+
 extern string __Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --";
-#ifndef __disabled__
-  extern bool Envelopes1_Active = TRUE;
-  extern bool Envelopes5_Active = TRUE;
-  extern bool Envelopes15_Active = TRUE;
-  extern bool Envelopes30_Active = TRUE; // Enable Envelopes-based strategy fpr specific timeframe.
-#else
-  extern bool Envelopes1_Active = FALSE;
-  extern bool Envelopes5_Active = FALSE;
-  extern bool Envelopes15_Active = FALSE;
-  extern bool Envelopes30_Active = FALSE;
-#endif
+extern bool Envelopes1_Active = TRUE;
+extern bool Envelopes5_Active = TRUE;
+extern bool Envelopes15_Active = TRUE;
+extern bool Envelopes30_Active = TRUE; // Enable Envelopes-based strategy fpr specific timeframe.
 extern int Envelopes_MA_Period = 28; // Averaging period to calculate the main line.
 extern ENUM_MA_METHOD Envelopes_MA_Method = MODE_SMA; // MA method (See: ENUM_MA_METHOD).
 extern int Envelopes_MA_Shift = 0; // The indicator shift relative to the chart.
@@ -439,17 +349,10 @@ extern int Envelopes15_OpenMethod = 0; // Valid range: 0-127. Set 0 to default.
 extern int Envelopes30_OpenMethod = 4; // Valid range: 0-127. Set 0 to default. Used for C_ENVELOPES_BUY_SELL close condition.
 //+------------------------------------------------------------------+
 extern string __Force_Parameters__ = "-- Settings for the Force Index indicator --";
-#ifndef __disabled__
-  extern bool Force1_Active = TRUE;
-  extern bool Force5_Active = TRUE;
-  extern bool Force15_Active = TRUE;
-  extern bool Force30_Active = TRUE; // Enable Force-based strategy for specific timeframe.
-#else
-  extern bool Force1_Active = FALSE;
-  extern bool Force5_Active = FALSE;
-  extern bool Force15_Active = FALSE;
-  extern bool Force30_Active = FALSE;
-#endif
+extern bool Force1_Active = TRUE;
+extern bool Force5_Active = TRUE;
+extern bool Force15_Active = TRUE;
+extern bool Force30_Active = TRUE; // Enable Force-based strategy for specific timeframe.
 extern ENUM_TRAIL_TYPE Force_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Force. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE Force_TrailingProfitMethod = T_FIXED; // Trailing Profit method for Force. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 extern int Force_Period = 13; // Averaging period for calculation.
@@ -462,17 +365,10 @@ extern int Force15_OpenMethod = 0; // Valid range: 0-31. // Optimized.
 extern int Force30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTALS_BUY_SELL close condition.
 //+------------------------------------------------------------------+
 extern string __Fractals_Parameters__ = "-- Settings for the Fractals indicator --";
-#ifndef __disabled__
-  extern bool Fractals1_Active = TRUE;
-  extern bool Fractals5_Active = TRUE;
-  extern bool Fractals15_Active = TRUE;
-  extern bool Fractals30_Active = TRUE; // Enable Fractals-based strategy for specific timeframe.
-#else
-  extern bool Fractals1_Active = FALSE;
-  extern bool Fractals5_Active = FALSE;
-  extern bool Fractals15_Active = FALSE;
-  extern bool Fractals30_Active = FALSE;
-#endif
+extern bool Fractals1_Active = TRUE;
+extern bool Fractals5_Active = TRUE;
+extern bool Fractals15_Active = TRUE;
+extern bool Fractals30_Active = TRUE; // Enable Fractals-based strategy for specific timeframe.
 //extern bool Fractals_CloseOnChange = TRUE; // Close opposite orders on market change.
 extern ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Fractals. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_FIXED; // Trailing Profit method for Fractals. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
@@ -483,17 +379,10 @@ extern int Fractals15_OpenMethod = 0; // Valid range: 0-1. // Optimized.
 extern int Fractals30_OpenMethod = 0; // Valid range: 0-1. // Optimized for C_FRACTALS_BUY_SELL close condition.
 //+------------------------------------------------------------------+
 extern string __Gator_Parameters__ = "-- Settings for the Gator oscillator --";
-#ifndef __disabled__
-  extern bool Gator1_Active = TRUE;
-  extern bool Gator5_Active = TRUE;
-  extern bool Gator15_Active = TRUE;
-  extern bool Gator30_Active = TRUE; // Enable Gator-based strategy for specific timeframe.
-#else
-  extern bool Gator1_Active = FALSE;
-  extern bool Gator5_Active = FALSE;
-  extern bool Gator15_Active = FALSE;
-  extern bool Gator30_Active = FALSE;
-#endif
+extern bool Gator1_Active = TRUE;
+extern bool Gator5_Active = TRUE;
+extern bool Gator15_Active = TRUE;
+extern bool Gator30_Active = TRUE; // Enable Gator-based strategy for specific timeframe.
 extern ENUM_TRAIL_TYPE Gator_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Gator. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE Gator_TrailingProfitMethod = T_FIXED; // Trailing Profit method for Gator. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 extern double Gator_OpenLevel = 0; // Not used currently.
@@ -503,17 +392,10 @@ extern int Gator15_OpenMethod = 0; // Valid range: 0-31. // Optimized.
 extern int Gator30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTALS_BUY_SELL close condition.
 //+------------------------------------------------------------------+
 extern string __Ichimoku_Parameters__ = "-- Settings for the Ichimoku Kinko Hyo indicator --";
-#ifndef __disabled__
-  extern bool Ichimoku1_Active = TRUE;
-  extern bool Ichimoku5_Active = TRUE;
-  extern bool Ichimoku15_Active = TRUE;
-  extern bool Ichimoku30_Active = TRUE; // Enable Ichimoku-based strategy for specific timeframe.
-#else
-  extern bool Ichimoku1_Active = FALSE;
-  extern bool Ichimoku5_Active = FALSE;
-  extern bool Ichimoku15_Active = FALSE;
-  extern bool Ichimoku30_Active = FALSE;
-#endif
+extern bool Ichimoku1_Active = TRUE;
+extern bool Ichimoku5_Active = TRUE;
+extern bool Ichimoku15_Active = TRUE;
+extern bool Ichimoku30_Active = TRUE; // Enable Ichimoku-based strategy for specific timeframe.
 extern ENUM_TRAIL_TYPE Ichimoku_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Ichimoku. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE Ichimoku_TrailingProfitMethod = T_FIXED; // Trailing Profit method for Ichimoku. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 extern int Ichimoku_Period_Tenkan_Sen = 9; // Tenkan Sen averaging period.
@@ -526,17 +408,10 @@ extern int Ichimoku15_OpenMethod = 0; // Valid range: 0-31. // Optimized.
 extern int Ichimoku30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTALS_BUY_SELL close condition.
 //+------------------------------------------------------------------+
 extern string __MA_Parameters__ = "-- Settings for the Moving Average indicator --";
-#ifndef __disabled__
-  extern bool MA1_Active = TRUE;
-  extern bool MA5_Active = TRUE;
-  extern bool MA15_Active = TRUE;
-  extern bool MA30_Active = TRUE; // Enable MA-based strategy for specific timeframe.
-#else
-  extern bool MA1_Active = FALSE;
-  extern bool MA5_Active = FALSE;
-  extern bool MA15_Active = FALSE;
-  extern bool MA30_Active = FALSE;
-#endif
+extern bool MA1_Active = TRUE;
+extern bool MA5_Active = TRUE;
+extern bool MA15_Active = TRUE;
+extern bool MA30_Active = TRUE; // Enable MA-based strategy for specific timeframe.
 extern int MA_Period_Fast = 8; // Averaging period for calculation.
 extern int MA_Period_Medium = 20; // Averaging period for calculation.
 extern int MA_Period_Slow = 40; // Averaging period for calculation.
@@ -557,17 +432,10 @@ extern int MA15_OpenMethod = 65; // Valid range: 0-127.
 extern int MA30_OpenMethod = 71; // Valid range: 0-127. This value is used for close condition.
 //+------------------------------------------------------------------+
 extern string __MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --";
-#ifndef __disabled__
-  extern bool MACD1_Active = TRUE;
-  extern bool MACD5_Active = TRUE;
-  extern bool MACD15_Active = TRUE;
-  extern bool MACD30_Active = TRUE; // Enable MACD-based strategy for specific timeframe.
-#else
-  extern bool MACD1_Active = FALSE;
-  extern bool MACD5_Active = FALSE;
-  extern bool MACD15_Active = FALSE;
-  extern bool MACD30_Active = FALSE;
-#endif
+extern bool MACD1_Active = TRUE;
+extern bool MACD5_Active = TRUE;
+extern bool MACD15_Active = TRUE;
+extern bool MACD30_Active = TRUE; // Enable MACD-based strategy for specific timeframe.
 extern int MACD_Period_Fast = 14; // Fast EMA averaging period.
 extern int MACD_Period_Slow = 35; // Slow EMA averaging period.
 extern int MACD_Signal_Period = 9; // Signal line averaging period.
@@ -583,17 +451,10 @@ extern int MACD15_OpenMethod = 0; // Valid range: 0-31.
 extern int MACD30_OpenMethod = 15; // Valid range: 0-31. This value is used for close condition.
 //+------------------------------------------------------------------+
 extern string __MFI_Parameters__ = "-- Settings for the Money Flow Index indicator --";
-#ifndef __disabled__
-  extern bool MFI1_Active = TRUE;
-  extern bool MFI5_Active = TRUE;
-  extern bool MFI15_Active = TRUE;
-  extern bool MFI30_Active = TRUE; // Enable MFI-based strategy for specific timeframe.
-#else
-  extern bool MFI1_Active = FALSE;
-  extern bool MFI5_Active = FALSE;
-  extern bool MFI15_Active = FALSE;
-  extern bool MFI30_Active = FALSE;
-#endif
+extern bool MFI1_Active = TRUE;
+extern bool MFI5_Active = TRUE;
+extern bool MFI15_Active = TRUE;
+extern bool MFI30_Active = TRUE; // Enable MFI-based strategy for specific timeframe.
 extern ENUM_TRAIL_TYPE MFI_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for MFI. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = T_FIXED; // Trailing Profit method for MFI. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 extern int MFI_Period = 14; // Averaging period for calculation.
@@ -604,17 +465,10 @@ extern int MFI15_OpenMethod = 0; // Valid range: 0-31. // Optimized.
 extern int MFI30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTALS_BUY_SELL close condition.
 //+------------------------------------------------------------------+
 extern string __Momentum_Parameters__ = "-- Settings for the Momentum indicator --";
-#ifndef __disabled__
-  extern bool Momentum1_Active = TRUE;
-  extern bool Momentum5_Active = TRUE;
-  extern bool Momentum15_Active = TRUE;
-  extern bool Momentum30_Active = TRUE; // Enable Momentum-based strategy for specific timeframe.
-#else
-  extern bool Momentum1_Active = FALSE;
-  extern bool Momentum5_Active = FALSE;
-  extern bool Momentum15_Active = FALSE;
-  extern bool Momentum30_Active = FALSE;
-#endif
+extern bool Momentum1_Active = TRUE;
+extern bool Momentum5_Active = TRUE;
+extern bool Momentum15_Active = TRUE;
+extern bool Momentum30_Active = TRUE; // Enable Momentum-based strategy for specific timeframe.
 extern ENUM_TRAIL_TYPE Momentum_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Momentum. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE Momentum_TrailingProfitMethod = T_FIXED; // Trailing Profit method for Momentum. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 extern int Momentum_Period_Fast = 12; // Averaging period for calculation.
@@ -627,17 +481,10 @@ extern int Momentum15_OpenMethod = 0; // Valid range: 0-x.
 extern int Momentum30_OpenMethod = 0; // Valid range: 0-x.
 //+------------------------------------------------------------------+
 extern string __OBV_Parameters__ = "-- Settings for the On Balance Volume indicator --";
-#ifndef __disabled__
-  extern bool OBV1_Active = TRUE;
-  extern bool OBV5_Active = TRUE;
-  extern bool OBV15_Active = TRUE;
-  extern bool OBV30_Active = TRUE; // Enable OBV-based strategy for specific timeframe.
-#else
-  extern bool OBV1_Active = FALSE;
-  extern bool OBV5_Active = FALSE;
-  extern bool OBV15_Active = FALSE;
-  extern bool OBV30_Active = FALSE;
-#endif
+extern bool OBV1_Active = TRUE;
+extern bool OBV5_Active = TRUE;
+extern bool OBV15_Active = TRUE;
+extern bool OBV30_Active = TRUE; // Enable OBV-based strategy for specific timeframe.
 extern ENUM_TRAIL_TYPE OBV_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for OBV. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE OBV_TrailingProfitMethod = T_FIXED; // Trailing Profit method for OBV. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_APPLIED_PRICE OBV_Applied_Price = PRICE_CLOSE; // Applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
@@ -648,17 +495,10 @@ extern int OBV15_OpenMethod = 0; // Valid range: 0-31. // Optimized.
 extern int OBV30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTALS_BUY_SELL close condition.
 //+------------------------------------------------------------------+
 extern string __OSMA_Parameters__ = "-- Settings for the Moving Average of Oscillator indicator --";
-#ifndef __disabled__
-  extern bool OSMA1_Active = TRUE;
-  extern bool OSMA5_Active = TRUE;
-  extern bool OSMA15_Active = TRUE;
-  extern bool OSMA30_Active = TRUE; // Enable OSMA-based strategy for specific timeframe.
-#else
-  extern bool OSMA1_Active = FALSE;
-  extern bool OSMA5_Active = FALSE;
-  extern bool OSMA15_Active = FALSE;
-  extern bool OSMA30_Active = FALSE;
-#endif
+extern bool OSMA1_Active = TRUE;
+extern bool OSMA5_Active = TRUE;
+extern bool OSMA15_Active = TRUE;
+extern bool OSMA30_Active = TRUE; // Enable OSMA-based strategy for specific timeframe.
 extern ENUM_TRAIL_TYPE OSMA_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for OSMA. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE OSMA_TrailingProfitMethod = T_FIXED; // Trailing Profit method for OSMA. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 extern int OSMA_Period_Fast = 12; // Fast EMA averaging period.
@@ -672,17 +512,10 @@ extern int OSMA15_OpenMethod = 0; // Valid range: 0-31. // Optimized.
 extern int OSMA30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTALS_BUY_SELL close condition.
 //+------------------------------------------------------------------+
 extern string __RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --";
-#ifndef __disabled__
-  extern bool RSI1_Active = TRUE;
-  extern bool RSI5_Active = TRUE;
-  extern bool RSI15_Active = TRUE;
-  extern bool RSI30_Active = TRUE; // Enable RSI-based strategy for specific timeframe.
-#else
-  extern bool RSI1_Active = FALSE;
-  extern bool RSI5_Active = FALSE;
-  extern bool RSI15_Active = FALSE;
-  extern bool RSI30_Active = FALSE;
-#endif
+extern bool RSI1_Active = TRUE;
+extern bool RSI5_Active = TRUE;
+extern bool RSI15_Active = TRUE;
+extern bool RSI30_Active = TRUE; // Enable RSI-based strategy for specific timeframe.
 extern int RSI_Period = 20; // Averaging period for calculation.
 extern ENUM_APPLIED_PRICE RSI_Applied_Price = PRICE_MEDIAN; // RSI applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern int RSI_Shift = 0; // Shift relative to the chart.
@@ -695,17 +528,10 @@ extern int RSI15_OpenMethod = 0; // Valid range: 0-63.
 extern int RSI30_OpenMethod = 2; // Valid range: 0-63. Used for C_RSI_BUY_SELL close condition (6).
 //+------------------------------------------------------------------+
 extern string __RVI_Parameters__ = "-- Settings for the Relative Vigor Index indicator --";
-#ifndef __disabled__
-  extern bool RVI1_Active = TRUE;
-  extern bool RVI5_Active = TRUE;
-  extern bool RVI15_Active = TRUE;
-  extern bool RVI30_Active = TRUE; // Enable RVI-based strategy for specific timeframe.
-#else
-  extern bool RVI1_Active = FALSE;
-  extern bool RVI5_Active = FALSE;
-  extern bool RVI15_Active = FALSE;
-  extern bool RVI30_Active = FALSE;
-#endif
+extern bool RVI1_Active = TRUE;
+extern bool RVI5_Active = TRUE;
+extern bool RVI15_Active = TRUE;
+extern bool RVI30_Active = TRUE; // Enable RVI-based strategy for specific timeframe.
 extern ENUM_TRAIL_TYPE RVI_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for RVI. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE RVI_TrailingProfitMethod = T_FIXED; // Trailing Profit method for RVI. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 extern int RVI_Shift = 2; // Shift relative to the previous bar the given amount of periods ago.
@@ -717,17 +543,10 @@ extern int RVI15_OpenMethod = 0; // Valid range: 0-31. // Optimized.
 extern int RVI30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTALS_BUY_SELL close condition.
 //+------------------------------------------------------------------+
 extern string __SAR_Parameters__ = "-- Settings for the the Parabolic Stop and Reverse system indicator --";
-#ifndef __disabled__
-  extern bool SAR1_Active = TRUE;
-  extern bool SAR5_Active = TRUE;
-  extern bool SAR15_Active = TRUE;
-  extern bool SAR30_Active = TRUE; // Enable SAR-based strategy for specific timeframe.
-#else
-  extern bool SAR1_Active = FALSE;
-  extern bool SAR5_Active = FALSE;
-  extern bool SAR15_Active = FALSE;
-  extern bool SAR30_Active = FALSE;
-#endif
+extern bool SAR1_Active = TRUE;
+extern bool SAR5_Active = TRUE;
+extern bool SAR15_Active = TRUE;
+extern bool SAR30_Active = TRUE; // Enable SAR-based strategy for specific timeframe.
 extern double SAR_Step = 0.02; // Stop increment, usually 0.02.
 extern double SAR_Maximum_Stop = 0.3; // Maximum stop value, usually 0.2.
 extern int SAR_Shift = 0; // Shift relative to the chart.
@@ -740,17 +559,10 @@ extern int SAR15_OpenMethod = 0; // Valid range: 0-127. Optimized.
 extern int SAR30_OpenMethod = 0; // Valid range: 0-127. Used for C_SAR_BUY_SELL close condition.
 //+------------------------------------------------------------------+
 extern string __StdDev_Parameters__ = "-- Settings for the Standard Deviation indicator --";
-#ifndef __disabled__
-  extern bool StdDev1_Active = TRUE;
-  extern bool StdDev5_Active = TRUE;
-  extern bool StdDev15_Active = TRUE;
-  extern bool StdDev30_Active = TRUE; // Enable StdDev-based strategy for specific timeframe.
-#else
-  extern bool StdDev1_Active = FALSE;
-  extern bool StdDev5_Active = FALSE;
-  extern bool StdDev15_Active = FALSE;
-  extern bool StdDev30_Active = FALSE;
-#endif
+extern bool StdDev1_Active = TRUE;
+extern bool StdDev5_Active = TRUE;
+extern bool StdDev15_Active = TRUE;
+extern bool StdDev30_Active = TRUE; // Enable StdDev-based strategy for specific timeframe.
 extern ENUM_TRAIL_TYPE StdDev_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for StdDev. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE StdDev_TrailingProfitMethod = T_FIXED; // Trailing Profit method for StdDev. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_APPLIED_PRICE StdDev_AppliedPrice = PRICE_CLOSE; // MA applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
@@ -764,17 +576,10 @@ extern int StdDev15_OpenMethod = 0; // Valid range: 0-31. // Optimized.
 extern int StdDev30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTALS_BUY_SELL close condition.
 //+------------------------------------------------------------------+
 extern string __Stochastic_Parameters__ = "-- Settings for the the Stochastic Oscillator --";
-#ifndef __disabled__
-  extern bool Stochastic1_Active = TRUE;
-  extern bool Stochastic5_Active = TRUE;
-  extern bool Stochastic15_Active = TRUE;
-  extern bool Stochastic30_Active = TRUE; // Enable Stochastic-based strategy for specific timeframe.
-#else
-  extern bool Stochastic1_Active = FALSE;
-  extern bool Stochastic5_Active = FALSE;
-  extern bool Stochastic15_Active = FALSE;
-  extern bool Stochastic30_Active = FALSE;
-#endif
+extern bool Stochastic1_Active = TRUE;
+extern bool Stochastic5_Active = TRUE;
+extern bool Stochastic15_Active = TRUE;
+extern bool Stochastic30_Active = TRUE; // Enable Stochastic-based strategy for specific timeframe.
 extern ENUM_TRAIL_TYPE Stochastic_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for Stochastic. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE Stochastic_TrailingProfitMethod = T_FIXED; // Trailing Profit method for Stochastic. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 extern double Stochastic_OpenLevel = 0.0; // Not used currently.
@@ -784,17 +589,10 @@ extern int Stochastic15_OpenMethod = 0; // Valid range: 0-31. // Optimized.
 extern int Stochastic30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRACTALS_BUY_SELL close condition.
 //+------------------------------------------------------------------+
 extern string __WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --";
-#ifndef __disabled__
-  extern bool WPR1_Active = TRUE;
-  extern bool WPR5_Active = TRUE;
-  extern bool WPR15_Active = TRUE;
-  extern bool WPR30_Active = TRUE; // Enable WPR-based strategy for specific timeframe.
-#else
-  extern bool WPR1_Active = FALSE;
-  extern bool WPR5_Active = FALSE;
-  extern bool WPR15_Active = FALSE;
-  extern bool WPR30_Active = FALSE;
-#endif
+extern bool WPR1_Active = TRUE;
+extern bool WPR5_Active = TRUE;
+extern bool WPR15_Active = TRUE;
+extern bool WPR30_Active = TRUE; // Enable WPR-based strategy for specific timeframe.
 extern int WPR_Period = 21; // Averaging period for calculation. Suggested value: 22.
 extern int WPR_Shift = 0; // Shift relative to the current bar the given amount of periods ago. Suggested value: 1.
 extern int WPR_OpenLevel = 30; // Suggested range: 25-35.
@@ -806,17 +604,10 @@ extern int WPR5_OpenMethod = 0; // Valid range: 0-63. Optimized.
 extern int WPR15_OpenMethod = 0; // Valid range: 0-63. Optimized.
 extern int WPR30_OpenMethod = 0; // Valid range: 0-63. Optimized with T_MA_M_FAR_TRAIL (8). Used for C_WPR_BUY_SELL close condition (16).
 //+------------------------------------------------------------------+
-#ifndef __disabled__
-  extern bool ZigZag1_Active = TRUE;
-  extern bool ZigZag5_Active = TRUE;
-  extern bool ZigZag15_Active = TRUE;
-  extern bool ZigZag30_Active = TRUE; // Enable ZigZag-based strategy for specific timeframe.
-#else
-  extern bool ZigZag1_Active = FALSE;
-  extern bool ZigZag5_Active = FALSE;
-  extern bool ZigZag15_Active = FALSE;
-  extern bool ZigZag30_Active = FALSE;
-#endif
+extern bool ZigZag1_Active = TRUE;
+extern bool ZigZag5_Active = TRUE;
+extern bool ZigZag15_Active = TRUE;
+extern bool ZigZag30_Active = TRUE; // Enable ZigZag-based strategy for specific timeframe.
 extern ENUM_TRAIL_TYPE ZigZag_TrailingStopMethod = T_MA_FMS_PEAK; // Trailing Stop method for ZigZag. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE ZigZag_TrailingProfitMethod = T_FIXED; // Trailing Profit method for ZigZag. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 extern double ZigZag_OpenLevel = 0.0; // Not used currently.
@@ -827,13 +618,12 @@ extern int ZigZag30_OpenMethod = 0; // Valid range: 0-31. // Optimized for C_FRA
 //+------------------------------------------------------------------+
 extern string __Logging_Parameters__ = "-- Settings for logging & messages --";
 extern bool PrintLogOnChart = TRUE;
-extern bool VerboseErrors = TRUE; // Show errors.
-extern bool VerboseInfo = TRUE;   // Show info messages.
-#ifdef __release__
-  extern bool VerboseDebug = FALSE; // Disable messages on release.
-#else
-  extern bool VerboseDebug = TRUE;  // Show debug messages.
-#endif
+// Display errors.
+extern bool VerboseErrors = TRUE;
+// Display info messages.
+extern bool VerboseInfo = TRUE;
+// Display debug messages.
+extern bool VerboseDebug = FALSE;
 extern bool WriteReport = TRUE;  // Write report into the file on exit.
 extern bool VerboseTrace = FALSE;  // Even more debugging.
 //+------------------------------------------------------------------+
@@ -849,8 +639,9 @@ extern color ColorSell = Red;
 extern string __Other_Parameters__ = "-- Other parameters --";
 
 extern int MagicNumber = 31337; // To help identify its own orders. It can vary in additional range: +20, see: ENUM_ORDER_TYPE.
+// Cache some calculated variables for better performance. FIXME: Needs some work.
 #ifdef __experimental__
-  extern bool Cache = FALSE; // Cache some calculated variables for better performance. FIXME: Needs some work.
+  extern bool Cache = FALSE;
 #else
   const bool Cache = FALSE;
 #endif
