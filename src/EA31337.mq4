@@ -6126,7 +6126,7 @@ bool ActionExecute(int aid, int id = EMPTY) {
     Message(StringFormat("%s(): Executed action: %s (id: %d), because of market condition: %s (id: %d) and account condition: %s (id: %d) [E:%s/B:%s/P:%sp].",
       __FUNCTION__, ActionIdToText(aid), aid, MarketIdToText(mid), mid, ReasonIdToText(reason_id), reason_id, ValueToCurrency(AccountEquity()), ValueToCurrency(AccountBalance()), DoubleToStr(last_close_profit, 1)));
     if (VerboseDebug && aid != A_NONE) Print(GetLastMessage());
-    if (WriteReport) ReportAdd(GetLastMessage());
+    if (WriteReport && VerboseDebug) ReportAdd(GetLastMessage());
     last_action_time = last_bar_time; // Set last execution bar time.
   } else {
     if (VerboseDebug) Message(StringFormat("%s(): Failed to execute action: %s (id: %d), condition: %s (id: %d).", __FUNCTION__, ActionIdToText(aid), aid, ReasonIdToText(reason_id), reason_id));
