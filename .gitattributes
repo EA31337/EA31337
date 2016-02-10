@@ -14,12 +14,10 @@
 # Shorthand for binary files.
 # - Do not treat them as text.
 # - Include binary diff in patches instead of "binary files differ."
-[attr]MQLbinary  -text diff
-
-# Auto-detect text files, ensure they use LF.
-*         text=auto eol=lf
+[attr]binary  -text diff
 
 # Define text file attributes.
 *.mq4     MQLtext diff=c
 *.mq5     MQLtext diff=c
 *.mqh     MQLtext diff=c
+*.exe     binary

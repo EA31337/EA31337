@@ -34,8 +34,8 @@ src/%.ex4: set-mode $(SRC)
 src/%.ex5: set-mode $(SRC)
 	wine mql.exe /o /i:src /mql5 $(SRC)
 
-mql.exe:
-	curl -O http://files.metaquotes.net/metaquotes.software.corp/mt5/mql.exe
+#mql.exe:
+#  curl -O http://files.metaquotes.net/metaquotes.software.corp/mt5/mql.exe
 
 # E.g.: make set-mode MODE="__advanced__"
 set-mode:
