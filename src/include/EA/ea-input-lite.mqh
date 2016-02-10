@@ -235,7 +235,6 @@ extern bool Alligator5_Active = TRUE;
 extern bool Alligator15_Active = TRUE;
 extern bool Alligator30_Active = TRUE;
 // Timeframe (0 means the current chart).
-// extern ENUM_TIMEFRAMES Alligator_Timeframe = PERIOD_M1;
 // Blue line averaging period (Alligator's Jaw).
 extern int Alligator_Jaw_Period = 20;
 // Blue line shift relative to the chart.
@@ -450,8 +449,6 @@ extern bool DeMarker1_Active = TRUE;
 extern bool DeMarker5_Active = TRUE;
 extern bool DeMarker15_Active = TRUE;
 extern bool DeMarker30_Active = TRUE;
-// Timeframe (0 means the current chart).
-//extern ENUM_TIMEFRAMES DeMarker_Timeframe = PERIOD_M1;
 // DeMarker averaging period for calculation.
 extern int DeMarker_Period = 24;
 // Shift relative to the current bar the given amount of periods ago. Suggested value: 4.
