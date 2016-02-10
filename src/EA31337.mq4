@@ -346,7 +346,9 @@ void OnTick() {
     Trade();
     if (total_orders > 0) {
       UpdateTrailingStops();
+      #ifdef __advanced__
       CheckAccConditions();
+      #endif
       TaskProcessList();
     }
     UpdateStats();
@@ -383,7 +385,9 @@ int OnInit() {
 
   session_initiated &= InitializeVariables();
   session_initiated &= InitializeStrategies();
+  #ifdef __advanced__
   session_initiated &= InitializeConditions();
+  #endif
   session_initiated &= CheckHistory();
 
   #ifdef __advanced__
@@ -970,6 +974,7 @@ bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
 }
 
 #ifdef __advanced__
+
 /*
  * Check if spread is not too high for specific strategy.
  *
@@ -1003,9 +1008,11 @@ bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = TRUE)
     last_close_profit = GetOrderProfit();
     if (SoundAlert) PlaySound(SoundFileAtClose);
     // TaskAddCalcStats(ticket_no); // Already done on CheckHistory().
-    if (VerboseDebug) Print(__FUNCTION__, "(): Closed order " + ticket_no + " with profit " + GetOrderProfit() + " pips, reason: " + ReasonIdToText(reason_id) + "; " + GetOrderTextDetails());
     #ifdef __advanced__
-    if (QueueOrdersAIActive) OrderQueueProcess();
+      if (VerboseDebug) Print(__FUNCTION__, "(): Closed order " + ticket_no + " with profit " + GetOrderProfit() + " pips, reason: " + ReasonIdToText(reason_id) + "; " + GetOrderTextDetails());
+      if (QueueOrdersAIActive) OrderQueueProcess();
+    #else
+      if (VerboseDebug) Print(__FUNCTION__, "(): Closed order " + ticket_no + " with profit " + GetOrderProfit() + " pips; " + GetOrderTextDetails());
     #endif
   } else {
     err_code = GetLastError();
@@ -4755,6 +4762,7 @@ void UpdateVariables() {
 
 /* BEGIN: CONDITION FUNCTIONS */
 
+#ifdef __advanced__
 /*
  * Initialize user defined conditions.
  */
@@ -4956,6 +4964,8 @@ void CheckAccConditions() {
     }
   } // end: for
 }
+
+#endif
 
 /*
  * Get default multiplier lot factor.
@@ -5868,6 +5878,8 @@ double GetArrSumKey1(double& arr[][], int key1, int offset = 0) {
 
 /* BEGIN: ACTION FUNCTIONS */
 
+#ifdef __advanced__
+
 /*
  * Execute action to close most profitable order.
  */
@@ -6206,6 +6218,8 @@ string MarketIdToText(int mid) {
   }
   return output;
 }
+
+#endif
 
 /* END: ACTION FUNCTIONS */
 
