@@ -1,9 +1,6 @@
 # Ignore configuration files that may contain sensitive information.
 build.properties
 
-# Ignore compiled binaries.
-*.exe
-
 # Ignore compiled binary files.
 src/*.ex4
 src/*.ex5
