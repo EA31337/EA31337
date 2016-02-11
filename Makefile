@@ -57,6 +57,15 @@ set-advanced: set-none
 set-rider: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__backtest__\|__rider__"
 
+set-lite-nolicense: set-none
+	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__nolicense__"
+
+set-advanced-nolicense: set-none
+	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__nolicense__\|__advanced__"
+
+set-rider-nolicense: set-none
+	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__nolicense__\|__rider__"
+
 clean:
 	@echo Cleaning...
 	find src/ '(' -name '*.ex4' -or -name '*.ex5' ')' -delete
