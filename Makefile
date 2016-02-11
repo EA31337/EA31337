@@ -15,9 +15,9 @@ requirements:
 	type -a ex
 	type -a wine
 
-lite: 		set-lite 		 mql4 set-none
-advanced: set-advanced mql4 set-none
-rider: 		set-rider 	 mql4 set-none
+lite: 		set-lite-backtest      mql4 set-none
+advanced: set-advanced-backtest  mql4 set-none
+rider: 		set-rider-backtest  	 mql4 set-none
 
 mql4: requirements $(MQL) clean src/%.ex4
 	@echo MQL4 compiled.
@@ -45,16 +45,17 @@ ifdef MODE
 endif
 
 set-none:
+	@echo Reverting modes.
 	git checkout -- src/include/EA/ea-mode.mqh
 	ex -s +":g@^#define@s@^@//" -cwq src/include/EA/ea-mode.mqh
 
-set-lite: set-none
+set-lite-backtest: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__backtest__"
 
-set-advanced: set-none
+set-advanced-backtest: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__backtest__\|__advanced__"
 
-set-rider: set-none
+set-rider-backtest: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__backtest__\|__rider__"
 
 set-lite-nolicense: set-none
@@ -66,7 +67,7 @@ set-advanced-nolicense: set-none
 set-rider-nolicense: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__nolicense__\|__rider__"
 
-clean:
+clean: set-none
 	@echo Cleaning...
 	find src/ '(' -name '*.ex4' -or -name '*.ex5' ')' -delete
 
@@ -85,11 +86,11 @@ release: mql.exe \
 		@$(MAKE) -f $(FILE) set-none
 		@echo "$(EA) v${VER} released."
 
-$(OUT)/$(EA)-Lite-Backtest-%.ex4: set-lite
+$(OUT)/$(EA)-Lite-Backtest-%.ex4: set-lite-backtest
 	wine mql.exe /o /i:src /mql4 $(SRC) && cp -v "$(EX4)" "$(OUT)/$(EA)-Lite-Backtest-v$(VER).ex4"
 
-$(OUT)/$(EA)-Advanced-Backtest-%.ex4: set-advanced
+$(OUT)/$(EA)-Advanced-Backtest-%.ex4: set-advanced-backtest
 	wine mql.exe /o /i:src /mql4 $(SRC) && cp -v "$(EX4)" "$(OUT)/$(EA)-Advanced-Backtest-v$(VER).ex4"
 
-$(OUT)/$(EA)-Rider-Backtest-%.ex4: set-rider
+$(OUT)/$(EA)-Rider-Backtest-%.ex4: set-rider-backtest
 	wine mql.exe /o /i:src /mql4 $(SRC) && cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-Backtest-v$(VER).ex4"
