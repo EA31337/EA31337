@@ -225,6 +225,8 @@ int gmt_offset = 0; // Current difference between GMT time and the local compute
 
 // Account variables.
 string account_type;
+double init_deposit; // Initial deposit.
+int init_spread; // Initial spread.
 
 // State variables.
 bool session_initiated = FALSE;
@@ -408,9 +410,10 @@ int OnInit() {
   }
 
   if (session_initiated && VerboseInfo) {
-    string output = InitInfo();
+    string output = InitInfo(TRUE);
     PrintText(output);
     Comment(output);
+    ReportAdd(InitInfo());
   }
 
   session_active = TRUE;
@@ -437,7 +440,7 @@ void OnDeinit(const int reason) {
     double ExtInitialDeposit;
     if (!IsTesting()) ExtInitialDeposit = CalculateInitialDeposit(); // FIXME: MQL5: IsTesting()
     CalculateSummary(ExtInitialDeposit);
-    string filename = ea_name + " - " + TimeToStr(time_current, TIME_DATE|TIME_MINUTES) + " - Report.txt";
+    string filename = StringFormat("%s-v%s-%s-%.0f%s-s%d-%s-Report.txt", ea_name, ea_version, _Symbol, init_deposit, AccCurrency, init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES));
     WriteReport(filename); // Todo: Add: getUninitReasonText(reason)
     Print(__FUNCTION__ + "(): Saved report as: " + filename);
   }
@@ -472,7 +475,7 @@ void start() {
 /*
  * Print init variables and constants.
  */
-string InitInfo(string sep = "\n") {
+string InitInfo(bool startup = False, string sep = "\n") {
   string output = StringFormat("%s (%s) v%s by %s (%s)%s", ea_name, __FILE__, ea_version, ea_author, ea_link, sep);
   output += StringFormat("Platform variables: Symbol: %s, Bars: %d, Server: %s, Login: %d%s",
     _Symbol, Bars, AccountInfoString(ACCOUNT_SERVER), (int)AccountInfoInteger(ACCOUNT_LOGIN), sep); // // FIXME: MQL5: Bars
@@ -481,20 +484,22 @@ string InitInfo(string sep = "\n") {
   output += StringFormat("Market constants: Digits: %d, Point: %f, Min Lot: %g, Max Lot: %g, Lot Step: %g, Lot Size: %g, Margin Required: %g, Margin Init: %g, Stop Level: %g%s",
     Digits, NormalizeDouble(Point, Digits), NormalizeDouble(market_minlot, PipDigits), market_maxlot, market_lotstep, market_lotsize, market_marginrequired, market_margininit, market_stoplevel, sep);
   output += StringFormat("Contract specification for %s: Digits: %d, Point value: %f, Spread: %g, Stop level: %g, Contract size: %g, Tick size: %f%s",
-    _Symbol, (int)SymbolInfoInteger(_Symbol, SYMBOL_DIGITS), SymbolInfoDouble(_Symbol, SYMBOL_POINT), (int)SymbolInfoInteger(_Symbol,SYMBOL_SPREAD),
-    (int)SymbolInfoInteger(_Symbol,SYMBOL_TRADE_STOPS_LEVEL), SymbolInfoDouble(_Symbol,SYMBOL_TRADE_CONTRACT_SIZE), SymbolInfoDouble(_Symbol,SYMBOL_TRADE_TICK_SIZE), sep);
+    _Symbol, (int)SymbolInfoInteger(_Symbol, SYMBOL_DIGITS), SymbolInfoDouble(_Symbol, SYMBOL_POINT), (int)SymbolInfoInteger(_Symbol, SYMBOL_SPREAD),
+    (int)SymbolInfoInteger(_Symbol,SYMBOL_TRADE_STOPS_LEVEL), SymbolInfoDouble(_Symbol, SYMBOL_TRADE_CONTRACT_SIZE), SymbolInfoDouble(_Symbol, SYMBOL_TRADE_TICK_SIZE), sep);
   output += StringFormat("Swap specification for %s: Mode: %d, Long/buy order value: %g, Short/sell order value: %g%s",
-    _Symbol, (int)SymbolInfoInteger(_Symbol, SYMBOL_SWAP_MODE), SymbolInfoDouble(_Symbol,SYMBOL_SWAP_LONG), SymbolInfoDouble(_Symbol,SYMBOL_SWAP_SHORT), sep);
+    _Symbol, (int)SymbolInfoInteger(_Symbol, SYMBOL_SWAP_MODE), SymbolInfoDouble(_Symbol, SYMBOL_SWAP_LONG), SymbolInfoDouble(_Symbol, SYMBOL_SWAP_SHORT), sep);
   output += StringFormat("Calculated variables: Lot size: %g, Max orders: %d (per type: %d), Active strategies: %d of %d, Pip size: %g, Points per pip: %d, Pip digits: %d, Volume digits: %d, Spread in pips: %.1f, Stop Out Level: %.1f%s",
               NormalizeDouble(lot_size, VolumeDigits), max_orders, GetMaxOrdersPerType(), GetNoOfStrategies(), FINAL_STRATEGY_TYPE_ENTRY,
               NormalizeDouble(pip_size, PipDigits), pts_per_pip, PipDigits, VolumeDigits,
               curr_spread, GetAccountStopoutLevel(), sep);
   output += StringFormat("Time: Hour of day: %d, Day of week: %d, Day of month: %d, Day of year: %d" + sep, hour_of_day, day_of_week, day_of_month, day_of_year);
   output += GetAccountTextDetails() + sep;
-  if (session_initiated && IsTradeAllowed()) {
-    output += sep + "Trading is allowed, please wait to start trading...";
-  } else {
-    output += sep + "Error: Trading is not allowed, please check the settings and allow automated trading!";
+  if (startup) {
+    if (session_initiated && IsTradeAllowed()) {
+      output += sep + "Trading is allowed, please wait to start trading...";
+    } else {
+      output += sep + "Error: Trading is not allowed, please check the settings and allow automated trading!";
+    }
   }
   return output;
 }
@@ -4136,6 +4141,8 @@ bool InitializeVariables() {
   // market_stoplevel=(int)SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL);
   curr_spread = ValueToPips(GetMarketSpread());
   LastAsk = Ask; LastBid = Bid;
+  init_deposit = AccountBalance();
+  init_spread = GetMarketSpread(TRUE);
   AccCurrency = AccountCurrency();
 
   // Calculate pip/volume/slippage size and precision.
@@ -7083,31 +7090,30 @@ void InitializeSummaries(double initial_deposit)
    AvgConWinners=0;
    AvgConLosers=0;
   }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-double CalculateInitialDeposit()
-  {
-   double initial_deposit=AccountBalance();
+
+/*
+ * Calculates initial deposit based on the current balance and previous orders.
+ */
+double CalculateInitialDeposit() {
+   double initial_deposit = AccountBalance();
 //----
-   for(int i=HistoryTotal()-1; i>=0; i--)
-     {
-      if(!OrderSelect(i,SELECT_BY_POS,MODE_HISTORY)) continue;
-      int type=OrderType();
+   for (int i = HistoryTotal()-1; i>=0; i--) {
+      if (!OrderSelect(i, SELECT_BY_POS, MODE_HISTORY)) continue;
+      int type = OrderType();
       //---- initial balance not considered
-      if(i==0 && type==OP_BALANCE) break;
-      if(type==OP_BUY || type==OP_SELL)
-        {
+      if (i == 0 && type == OP_BALANCE) break;
+      if (type == OP_BUY || type == OP_SELL) {
          //---- calculate profit
-         double profit=OrderProfit()+OrderCommission()+OrderSwap();
+         double profit=OrderProfit() + OrderCommission() + OrderSwap();
          //---- and decrease balance
-         initial_deposit-=profit;
+         initial_deposit -= profit;
         }
-      if(type==OP_BALANCE || type==OP_CREDIT)
-         initial_deposit-=OrderProfit();
+      if (type==OP_BALANCE || type==OP_CREDIT) {
+         initial_deposit -= OrderProfit();
+      }
      }
 //----
-   return(initial_deposit);
+   return (initial_deposit);
 }
 
 /*
