@@ -15,9 +15,13 @@ requirements:
 	type -a ex
 	type -a wine
 
-lite: 		set-lite-backtest      mql4 set-none
-advanced: set-advanced-backtest  mql4 set-none
-rider: 		set-rider-backtest  	 mql4 set-none
+Lite: 		set-lite      mql4 set-none
+Advanced: set-advanced  mql4 set-none
+Rider: 		set-rider			mql4 set-none
+
+Lite-Backtest:			set-lite-backtest      mql4 set-none
+Advanced-Backtest:	set-advanced-backtest  mql4 set-none
+Rider-Backtest:			set-rider-backtest  	 mql4 set-none
 
 mql4: requirements $(MQL) clean src/%.ex4
 	@echo MQL4 compiled.
@@ -48,6 +52,15 @@ set-none:
 	@echo Reverting modes.
 	git checkout -- src/include/EA/ea-mode.mqh
 	ex -s +":g@^#define@s@^@//" -cwq src/include/EA/ea-mode.mqh
+
+set-lite: set-none
+	@$(MAKE) -f $(FILE) set-mode MODE="__release__"
+
+set-advanced: set-none
+	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__advanced__"
+
+set-rider: set-none
+	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__rider__"
 
 set-lite-backtest: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__backtest__"
