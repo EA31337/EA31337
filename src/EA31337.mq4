@@ -225,7 +225,7 @@ int gmt_offset = 0; // Current difference between GMT time and the local compute
 
 // Account variables.
 string account_type;
-double init_deposit; // Initial deposit.
+double init_balance; // Initial account balance.
 int init_spread; // Initial spread.
 
 // State variables.
@@ -243,7 +243,7 @@ int last_history_check = 0; // Last ticket position processed.
 int info[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_INFO_ENTRY];
 double conf[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_VALUE_ENTRY], stats[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_STAT_ENTRY];
 int open_orders[FINAL_STRATEGY_TYPE_ENTRY], closed_orders[FINAL_STRATEGY_TYPE_ENTRY];
-int signals[FINAL_STAT_PERIOD_TYPE_ENTRY][FINAL_STRATEGY_TYPE_ENTRY][MN1][2]; // Count signals to buy and sell per period and strategy.
+int signals[FINAL_STAT_PERIOD_TYPE_ENTRY][FINAL_STRATEGY_TYPE_ENTRY][FINAL_PERIOD_TYPE_ENTRY][2]; // Count signals to buy and sell per period and strategy.
 int tickets[200]; // List of tickets to process.
 string sname[FINAL_STRATEGY_TYPE_ENTRY];
 int worse_strategy[FINAL_STAT_PERIOD_TYPE_ENTRY], best_strategy[FINAL_STAT_PERIOD_TYPE_ENTRY];
@@ -286,7 +286,7 @@ double bands[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_BANDS_ENTRY];
 double bwmfi[H1][FINAL_INDICATOR_INDEX_ENTRY];
 double bpower[H1][FINAL_INDICATOR_INDEX_ENTRY][OP_SELL+1];
 double cci[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_MA_ENTRY];
-double demarker[H1][2];
+double demarker[H1][FINAL_INDICATOR_INDEX_ENTRY];
 double envelopes[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_LINE_ENTRY];
 double force[H1][FINAL_INDICATOR_INDEX_ENTRY];
 double fractals[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_LINE_ENTRY];
@@ -303,8 +303,8 @@ double rvi[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_SLINE_ENTRY];
 double sar[H1][3]; int sar_week[H1][7][2];
 double stddev[H1][FINAL_INDICATOR_INDEX_ENTRY];
 double stochastic[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_SLINE_ENTRY];
-double wpr[H1][2];
-// double zigzag[H1][FINAL_INDICATOR_INDEX_ENTRY];
+double wpr[H1][FINAL_INDICATOR_INDEX_ENTRY];
+double zigzag[H1][FINAL_INDICATOR_INDEX_ENTRY];
 
 /* TODO:
  *   - add trailing stops/profit for support/resistence,
@@ -312,7 +312,6 @@ double wpr[H1][2];
  *   - check risky dates and times,
  *   - check for risky patterns,
  *   - implement condition to close all strategy orders, buy/sell, most profitable order, when to trade, skip the day or week, etc.
- *   - take profit on abnormal spikes,
  *   - implement SendFTP,
  *   - implement SendNotification,
  *   - send daily, weekly reports (SendMail),
@@ -372,14 +371,14 @@ int OnInit() {
       err = "Error: EA parameters are not valid, please correct them.";
       Comment(err);
       Alert(err);
-      if (VerboseErrors) Print(__FUNCTION__ + "():" + err);
+      if (VerboseErrors) Print(__FUNCTION__ + "(): " + err);
       ExpertRemove();
       return (INIT_PARAMETERS_INCORRECT); // Incorrect set of input parameters.
     }
-    if (!IsTesting() && AccountName() <= 1) {
+    if (!IsTesting() && AccountNumber() <= 1) {
       err = "Error: EA requires on-line Terminal.";
       Comment(err);
-      if (VerboseErrors) Print(__FUNCTION__ + "():" + err);
+      if (VerboseErrors) Print(__FUNCTION__ + "(): " + err);
       return (INIT_FAILED);
      }
      session_initiated = TRUE;
@@ -431,16 +430,15 @@ void OnDeinit(const int reason) {
   time_current = TimeCurrent();
   if (VerboseDebug) Print("Calling " + __FUNCTION__ + "()");
   if (VerboseInfo) {
-    Print(__FUNCTION__ + "():" + "EA deinitializing, reason: " + getUninitReasonText(reason) + " (code: " + reason + ")"); // Also: _UninitReason.
+    Print(__FUNCTION__ + "(): " + "EA deinitializing, reason: " + getUninitReasonText(reason) + " (code: " + IntegerToString(reason) + ")"); // Also: _UninitReason.
     Print(GetSummaryText());
   }
 
   if (WriteReport && !IsOptimization() && session_initiated) { // FIXME: MQL5 for IsOptimization
     //if (reason == REASON_CHARTCHANGE)
-    double ExtInitialDeposit;
-    if (!IsTesting()) ExtInitialDeposit = CalculateInitialDeposit(); // FIXME: MQL5: IsTesting()
+    double ExtInitialDeposit = CalculateInitialDeposit();
     CalculateSummary(ExtInitialDeposit);
-    string filename = StringFormat("%s-v%s-%s-%.0f%s-s%d-%s-Report.txt", ea_name, ea_version, _Symbol, init_deposit, AccCurrency, init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES));
+    string filename = StringFormat("%s-v%s-%s-%.0f%s-s%d-%s-Report.txt", ea_name, ea_version, _Symbol, ExtInitialDeposit, AccCurrency, init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES));
     WriteReport(filename); // Todo: Add: getUninitReasonText(reason)
     Print(__FUNCTION__ + "(): Saved report as: " + filename);
   }
@@ -605,6 +603,7 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
     return (TRUE); // If it was already processed, ignore it.
   }
 
+  double envelopes_deviation;
   switch (type) {
 #ifdef __advanced__
     case AC: // Calculates the Bill Williams' Accelerator/Decelerator oscillator.
@@ -683,7 +682,7 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
       demarker[period][FAR]  = iDeMarker(_Symbol, timeframe, DeMarker_Period, 2 + DeMarker_Shift);
       break;
     case ENVELOPES: // Calculates the Envelopes indicator.
-      double envelopes_deviation = Envelopes30_Deviation;
+      envelopes_deviation = Envelopes30_Deviation;
       switch (period) {
         case M1: envelopes_deviation = Envelopes1_Deviation; break;
         case M5: envelopes_deviation = Envelopes5_Deviation; break;
@@ -829,7 +828,7 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
  *   retry (bool)
  *     if TRUE, re-try to open again after error/failure
  */
-int ExecuteOrder(int cmd, int sid, double volume = EMPTY, string order_comment = EMPTY, bool retry = TRUE) {
+int ExecuteOrder(int cmd, int sid, double volume = EMPTY, string order_comment = "", bool retry = TRUE) {
    bool result = FALSE;
    int order_ticket;
 
@@ -845,7 +844,7 @@ int ExecuteOrder(int cmd, int sid, double volume = EMPTY, string order_comment =
    }
 
    // Check the order comment.
-   if (order_comment == EMPTY) {
+   if (order_comment == "") {
      order_comment = GetStrategyComment(sid);
    }
 
@@ -1014,10 +1013,10 @@ bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = TRUE)
     if (SoundAlert) PlaySound(SoundFileAtClose);
     // TaskAddCalcStats(ticket_no); // Already done on CheckHistory().
     #ifdef __advanced__
-      if (VerboseDebug) Print(__FUNCTION__, "(): Closed order " + ticket_no + " with profit " + GetOrderProfit() + " pips, reason: " + ReasonIdToText(reason_id) + "; " + GetOrderTextDetails());
+      if (VerboseDebug) Print(__FUNCTION__, "(): Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(GetOrderProfit()) + " pips, reason: " + ReasonIdToText(reason_id) + "; " + GetOrderTextDetails());
       if (QueueOrdersAIActive) OrderQueueProcess();
     #else
-      if (VerboseDebug) Print(__FUNCTION__, "(): Closed order " + ticket_no + " with profit " + GetOrderProfit() + " pips; " + GetOrderTextDetails());
+      if (VerboseDebug) Print(__FUNCTION__, "(): Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(GetOrderProfit()) + " pips; " + GetOrderTextDetails());
     #endif
   } else {
     err_code = GetLastError();
@@ -1079,10 +1078,12 @@ double OrderCalc(int ticket_no = 0) {
  *   strategy_type (int) - strategy type, see ENUM_STRATEGY_TYPE
  */
 int CloseOrdersByType(int cmd, int strategy_id, int reason_id, bool only_profitable = FALSE) {
-   int orders_total, order_failed;
-   double profit_total;
+   int orders_total = 0;
+   int order_failed = 0;
+   double profit_total = 0.0;
    RefreshRates();
-   for (int order = 0; order < OrdersTotal(); order++) {
+   int order;
+   for (order = 0; order < OrdersTotal(); order++) {
       if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
         if (strategy_id == GetIdByMagic() && OrderSymbol() == Symbol() && OrderType() == cmd) {
           if (only_profitable && GetOrderProfit() < 0) continue;
@@ -1095,7 +1096,7 @@ int CloseOrdersByType(int cmd, int strategy_id, int reason_id, bool only_profita
         }
       } else {
         if (VerboseDebug)
-          Print(__FUNCTION__ + "(" + cmd + ", " + strategy_id + "): Error: Order: " + order + "; Message: ", GetErrorText(err_code));
+          Print(__FUNCTION__ + "(" + _OrderType_str(cmd) + ", " + IntegerToString(strategy_id) + "): Error: Order: " + IntegerToString(order) + "; Message: ", GetErrorText(err_code));
         // TaskAddCloseOrder(OrderTicket(), reason_id); // Add task to re-try.
       }
    }
@@ -2914,6 +2915,7 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
     9371.17 3416  1.27  2.74  5098.83 23.51% MA_TrailingProfitMethod=27
 */
   // TODO: Make starting point dynamic: Open[CURR], Open[PREV], Open[FAR], Close[PREV], Close[FAR], ma_fast[CURR], ma_medium[CURR], ma_slow[CURR]
+   double highest_ma, lowest_ma;
    switch (method) {
      case T_NONE: // None
        new_value = previous;
@@ -2926,39 +2928,27 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
        new_value = Open[CURR] + diff * factor;
        break;
      case T_2_BARS_PEAK: // 3
-       double highest2 = GetPeakPrice(timeframe, MODE_HIGH, 2);
-       double lowest2  = GetPeakPrice(timeframe, MODE_LOW, 2);
-       diff = MathMax(highest2 - Open[CURR], Open[CURR] - lowest2);
+       diff = MathMax(GetPeakPrice(timeframe, MODE_HIGH, 2) - Open[CURR], Open[CURR] - GetPeakPrice(timeframe, MODE_LOW, 2));
        new_value = Open[CURR] + diff * factor;
        break;
      case T_5_BARS_PEAK: // 4
-       double highest5 = GetPeakPrice(timeframe, MODE_HIGH, 5);
-       double lowest5  = GetPeakPrice(timeframe, MODE_LOW, 5);
-       diff = MathMax(highest5 - Open[CURR], Open[CURR] - lowest5);
+       diff = MathMax(GetPeakPrice(timeframe, MODE_HIGH, 5) - Open[CURR], Open[CURR] - GetPeakPrice(timeframe, MODE_LOW, 5));
        new_value = Open[CURR] + diff * factor;
        break;
      case T_10_BARS_PEAK: // 5
-       double highest10 = GetPeakPrice(timeframe, MODE_HIGH, 10);
-       double lowest10  = GetPeakPrice(timeframe, MODE_LOW, 10);
-       diff = MathMax(highest10 - Open[CURR], Open[CURR] - lowest10);
+       diff = MathMax(GetPeakPrice(timeframe, MODE_HIGH, 10) - Open[CURR], Open[CURR] - GetPeakPrice(timeframe, MODE_LOW, 10));
        new_value = Open[CURR] + diff * factor;
        break;
      case T_50_BARS_PEAK:
-       double highest50 = GetPeakPrice(timeframe, MODE_HIGH, 50);
-       double lowest50  = GetPeakPrice(timeframe, MODE_LOW, 50);
-       diff = MathMax(highest50 - Open[CURR], Open[CURR] - lowest50);
+       diff = MathMax(GetPeakPrice(timeframe, MODE_HIGH, 50) - Open[CURR], Open[CURR] - GetPeakPrice(timeframe, MODE_LOW, 50));
        new_value = Open[CURR] + diff * factor;
        break;
      case T_150_BARS_PEAK:
-       double highest150 = GetPeakPrice(timeframe, MODE_HIGH, 150);
-       double lowest150  = GetPeakPrice(timeframe, MODE_LOW, 150);
-       diff = MathMax(highest150 - Open[CURR], Open[CURR] - lowest150);
+       diff = MathMax(GetPeakPrice(timeframe, MODE_HIGH, 150) - Open[CURR], Open[CURR] - GetPeakPrice(timeframe, MODE_LOW, 150));
        new_value = Open[CURR] + diff * factor;
        break;
      case T_HALF_200_BARS:
-       double highest200 = GetPeakPrice(timeframe, MODE_HIGH, 200);
-       double lowest200  = GetPeakPrice(timeframe, MODE_LOW, 200);
-       diff = MathMax(highest200 - Open[CURR], Open[CURR] - lowest200);
+       diff = MathMax(GetPeakPrice(timeframe, MODE_HIGH, 200) - Open[CURR], Open[CURR] - GetPeakPrice(timeframe, MODE_LOW, 200));
        new_value = Open[CURR] + diff/2 * factor;
        break;
      case T_HALF_PEAK_OPEN:
@@ -3045,8 +3035,8 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
        break;
      case T_MA_FMS_PEAK: // 22: Lowest/highest value of all MAs. Works fine (SL pf: 1.39 for MA, PT pf: 1.23 for MA).
        UpdateIndicator(MA, timeframe);
-       double highest_ma = MathAbs(MathMax(MathMax(HighestArrValue2(ma_fast, period), HighestArrValue2(ma_medium, period)), HighestArrValue2(ma_slow, period)));
-       double lowest_ma = MathAbs(MathMin(MathMin(LowestArrValue2(ma_fast, period), LowestArrValue2(ma_medium, period)), LowestArrValue2(ma_slow, period)));
+       highest_ma = MathAbs(MathMax(MathMax(HighestArrValue2(ma_fast, period), HighestArrValue2(ma_medium, period)), HighestArrValue2(ma_slow, period)));
+       lowest_ma = MathAbs(MathMin(MathMin(LowestArrValue2(ma_fast, period), LowestArrValue2(ma_medium, period)), LowestArrValue2(ma_slow, period)));
        diff = MathMax(MathAbs(highest_ma - Open[CURR]), MathAbs(Open[CURR] - lowest_ma));
        new_value = Open[CURR] + diff * factor;
        break;
@@ -3920,7 +3910,7 @@ void StartNewHour() {
   CheckHistory(); // Process closed orders for previous hour.
 
   hour_of_day = Hour(); // Start the new hour.
-  if (VerboseDebug) Print("== New hour: " + hour_of_day);
+  if (VerboseDebug) PrintFormat("== New hour: %d", hour_of_day);
 
   // Update variables.
   risk_ratio = GetRiskRatio();
@@ -3972,7 +3962,7 @@ string GetLastErrMsg() {
  * Executed for every new day.
  */
 void StartNewDay() {
-  if (VerboseInfo) Print("== New day (day of month: " + Day() + "; day of year: " + DayOfYear() + ") ==");
+  if (VerboseInfo) PrintFormat("== New day (day of month: %d; day of year: %d ==",  Day(), DayOfYear());
 
   // Print daily report at end of each day.
   if (VerboseInfo) Print(GetDailyReport());
@@ -4141,7 +4131,7 @@ bool InitializeVariables() {
   // market_stoplevel=(int)SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL);
   curr_spread = ValueToPips(GetMarketSpread());
   LastAsk = Ask; LastBid = Bid;
-  init_deposit = AccountBalance();
+  init_balance = AccountBalance();
   init_spread = GetMarketSpread(TRUE);
   AccCurrency = AccountCurrency();
 
@@ -5429,14 +5419,14 @@ string GetDailyReport() {
   int key;
   // output += "Low: "     + daily[MAX_LOW] + "; ";
   // output += "High: "    + daily[MAX_HIGH] + "; ";
-  output += "Tick: "       + daily[MAX_TICK] + "; ";
+  output += StringFormat("Tick: %.0f; ", daily[MAX_TICK]);
   // output += "Drop: "    + daily[MAX_DROP] + "; ";
-  output += "Spread: "     + daily[MAX_SPREAD] + "; ";
-  output += "Max orders: " + daily[MAX_ORDERS] + "; ";
-  output += "Loss: "       + daily[MAX_LOSS] + "; ";
-  output += "Profit: "     + daily[MAX_PROFIT] + "; ";
-  output += "Equity: "     + daily[MAX_EQUITY] + "; ";
-  output += "Balance: "    + daily[MAX_BALANCE] + "; ";
+  output += StringFormat("Spread: %.1f; ", daily[MAX_SPREAD]);
+  output += StringFormat("Max orders: %.0f; ", daily[MAX_ORDERS]);
+  output += StringFormat("Loss: %.2f; ", daily[MAX_LOSS]);
+  output += StringFormat("Profit: %.2f; ", daily[MAX_PROFIT]);
+  output += StringFormat("Equity: %.2f; ", daily[MAX_EQUITY]);
+  output += StringFormat("Balance: %.2f; ", daily[MAX_BALANCE]);
 
   //output += GetAccountTextDetails() + "; " + GetOrdersStats();
 
@@ -5525,7 +5515,7 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
                   + indent + StringFormat("| %s v%s (Status: %s)%s", ea_name, ea_version, IfTxt(ea_active, "ACTIVE", "NOT ACTIVE"), sep)
                   + indent + StringFormat("| ACCOUNT INFORMATION:%s", sep)
                   + indent + StringFormat("| Server Name: %s, Time: %s%s", AccountInfoString(ACCOUNT_SERVER), TimeToStr(time_current, TIME_DATE|TIME_MINUTES|TIME_SECONDS), sep)
-                  + indent + "| Acc Number: " + AccountNumber() + "; Acc Name: " + AccountName() + "; Broker: " + AccountCompany() + " (Type: " + account_type + ")" + sep
+                  + indent + "| Acc Number: " + IntegerToString(AccountNumber()) + "; Acc Name: " + AccountName() + "; Broker: " + AccountCompany() + " (Type: " + account_type + ")" + sep
                   + indent + StringFormat("| Stop Out Level: %s, Leverage: 1:%d %s", stop_out_level, AccountLeverage(), sep)
                   + indent + "| Used Margin: " + ValueToCurrency(AccountMargin()) + "; Free: " + ValueToCurrency(AccountFreeMargin()) + sep
                   + indent + "| Equity: " + ValueToCurrency(AccountEquity()) + "; Balance: " + ValueToCurrency(AccountBalance()) + sep
@@ -5594,19 +5584,21 @@ string GetOrderTextDetails() {
    );
 }
 
-// Get order statistics in percentage for each strategy.
+/*
+ * Get order statistics in percentage for each strategy.
+ */
 string GetOrdersStats(string sep = "\n") {
   // Prepare text for Total Orders.
-  string total_orders_text = "Open Orders: " + total_orders;
-  total_orders_text += " +" + CalculateOrdersByCmd(OP_BUY) + "/-" + CalculateOrdersByCmd(OP_SELL);
-  total_orders_text += " [" + DoubleToStr(CalculateOpenLots(), 2) + " lots]";
-  total_orders_text += " (other: " + GetTotalOrders(FALSE) + ")";
+  string total_orders_text = StringFormat("Open Orders: %d", total_orders);
+  total_orders_text += StringFormat(" +%d/-%d", CalculateOrdersByCmd(OP_BUY),  CalculateOrdersByCmd(OP_SELL));
+  total_orders_text += StringFormat(" [%.2f lots]", CalculateOpenLots());
+  total_orders_text += StringFormat(" (other: %d)", GetTotalOrders(FALSE));
   // Prepare data about open orders per strategy type.
   string orders_per_type = "Stats: "; // Display open orders per type.
   if (total_orders > 0) {
     for (int i = 0; i < FINAL_STRATEGY_TYPE_ENTRY; i++) {
       if (open_orders[i] > 0) {
-        orders_per_type += sname[i] + ": " + MathFloor(100 / total_orders * open_orders[i]) + "%, ";
+        orders_per_type += StringFormat("%s: %.1f%%", sname[i], MathFloor(100 / total_orders * open_orders[i]));
       }
     }
   } else {
@@ -6279,7 +6271,8 @@ bool TicketRemove(int ticket_no) {
  */
 bool CheckHistory() {
   double total_profit = 0;
-  for(int pos = last_history_check; pos < HistoryTotal(); pos++) {
+  int pos;
+  for (pos = last_history_check; pos < HistoryTotal(); pos++) {
     if (!OrderSelect(pos, SELECT_BY_POS, MODE_HISTORY)) continue;
     if (OrderCloseTime() > last_history_check && CheckOurMagicNumber()) {
       total_profit =+ OrderCalc();
@@ -6561,18 +6554,19 @@ bool TaskRun(int job_id) {
   int key = todo_queue[job_id][0];
   int task_type = todo_queue[job_id][1];
   int retries = todo_queue[job_id][2];
+  int cmd, sid, reason_id;
   // if (VerboseTrace) Print(__FUNCTION__ + "(): Job id: " + job_id + "; Task type: " + task_type);
 
   switch (task_type) {
     case TASK_ORDER_OPEN:
-       int cmd = todo_queue[job_id][3];
+       cmd = todo_queue[job_id][3];
        // double volume = todo_queue[job_id][4]; // FIXME: Not used as we can't use double to integer array.
-       int sid = todo_queue[job_id][5];
+       sid = todo_queue[job_id][5];
        // string order_comment = todo_queue[job_id][6]; // FIXME: Not used as we can't use double to integer array.
        result = ExecuteOrder(cmd, sid, EMPTY, EMPTY, FALSE);
       break;
     case TASK_ORDER_CLOSE:
-        int reason_id = todo_queue[job_id][3];
+        reason_id = todo_queue[job_id][3];
         if (OrderSelect(key, SELECT_BY_TICKET)) {
           if (CloseOrder(key, reason_id, FALSE))
             result = TaskRemove(job_id);
@@ -6810,25 +6804,41 @@ string GetErrorText(int code) {
  * Get text description based on the uninitialization reason code.
  */
 string getUninitReasonText(int reasonCode) {
-   string text="";
+   string text = "";
    switch(reasonCode) {
-      case REASON_PROGRAM:
-         text="EA terminated its operation by calling the ExpertRemove() function."; break;
-      case REASON_ACCOUNT:
-         text="Account was changed."; break;
-      case REASON_CHARTCHANGE:
-         text="Symbol or timeframe was changed."; break;
-      case REASON_CHARTCLOSE:
-         text="Chart was closed."; break;
-      case REASON_PARAMETERS:
-         text="Input-parameter was changed."; break;
-      case REASON_RECOMPILE:
-         text="Program " + __FILE__ + " was recompiled."; break;
-      case REASON_REMOVE:
-         text="Program " + __FILE__ + " was removed from the chart."; break;
-      case REASON_TEMPLATE:
-         text="New template was applied to chart."; break;
-      default:text="Unknown reason.";
+     case REASON_PROGRAM: // 0
+       text = "EA terminated its operation by calling the ExpertRemove() function.";
+       break;
+     case REASON_REMOVE: // 1 (implemented for the indicators only)
+       text = "Program " + __FILE__ + " has been deleted from the chart.";
+       break;
+      case REASON_RECOMPILE: // 2 (implemented for the indicators)
+        text = "Program " + __FILE__ + " has been recompiled.";
+        break;
+      case REASON_CHARTCHANGE: // 3
+        text = "Symbol or chart period has been changed.";
+        break;
+      case REASON_CHARTCLOSE: // 4
+        text = "Chart has been closed.";
+        break;
+      case REASON_PARAMETERS: // 5
+        text = "Input parameters have been changed by a user.";
+        break;
+      case REASON_ACCOUNT: // 6
+        text = "Another account has been activated or reconnection to the trade server has occurred due to changes in the account settings.";
+        break;
+      case REASON_TEMPLATE: // 7
+        text = "	A new template has been applied to chart.";
+        break;
+      case REASON_INITFAILED: // 8
+        text = "Configuration issue. OnInit() handler has returned a nonzero value.";
+        break;
+      case REASON_CLOSE: // 9
+        text = "Terminal has been closed.";
+        break;
+      default:
+        text = "Unknown reason.";
+        break;
      }
    return text;
 }
@@ -6881,6 +6891,7 @@ void CalculateSummary(double initial_deposit)
    double sequential=0.0, prevprofit=EMPTY_VALUE, drawdownpercent, drawdown;
    double maxpeak=initial_deposit, minpeak=initial_deposit, balance=initial_deposit;
    int    trades_total = HistoryTotal();
+   double profit;
 //---- initialize summaries
    InitializeSummaries(initial_deposit);
 //----
@@ -6890,7 +6901,7 @@ void CalculateSummary(double initial_deposit)
       //---- initial balance not considered
       if (i == 0 && type == OP_BALANCE) continue;
       //---- calculate profit
-      double profit = OrderProfit() + OrderCommission() + OrderSwap();
+      profit = OrderProfit() + OrderCommission() + OrderSwap();
       balance += profit;
       //---- drawdown check
       if(maxpeak<balance) {
@@ -7095,25 +7106,31 @@ void InitializeSummaries(double initial_deposit)
  * Calculates initial deposit based on the current balance and previous orders.
  */
 double CalculateInitialDeposit() {
-   double initial_deposit = AccountBalance();
-//----
-   for (int i = HistoryTotal()-1; i>=0; i--) {
+  static double initial_deposit = 0;
+  if (initial_deposit > 0) {
+    return initial_deposit;
+  }
+  else if (IsTesting()) {  // FIXME: MQL5: IsTesting()
+    initial_deposit = init_balance;
+  } else {
+    initial_deposit = AccountBalance();
+    for (int i = HistoryTotal()-1; i>=0; i--) {
       if (!OrderSelect(i, SELECT_BY_POS, MODE_HISTORY)) continue;
       int type = OrderType();
       //---- initial balance not considered
       if (i == 0 && type == OP_BALANCE) break;
       if (type == OP_BUY || type == OP_SELL) {
-         //---- calculate profit
-         double profit=OrderProfit() + OrderCommission() + OrderSwap();
-         //---- and decrease balance
-         initial_deposit -= profit;
-        }
-      if (type==OP_BALANCE || type==OP_CREDIT) {
-         initial_deposit -= OrderProfit();
+        //---- calculate profit
+        double profit=OrderProfit() + OrderCommission() + OrderSwap();
+        //---- and decrease balance
+        initial_deposit -= profit;
       }
-     }
-//----
-   return (initial_deposit);
+      if (type==OP_BALANCE || type==OP_CREDIT) {
+        initial_deposit -= OrderProfit();
+      }
+    }
+  }
+  return (initial_deposit);
 }
 
 /*
@@ -7131,38 +7148,38 @@ void ReportAdd(string msg) {
 string GenerateReport(string sep = "\n") {
   string output = "";
   int i;
-  if (InitialDeposit > 0)
-  output += StringFormat("Initial deposit:                            %s%.2f", InitialDeposit) + sep;
+  output += StringFormat("Initial deposit:                            %.2f", ValueToCurrency(CalculateInitialDeposit())) + sep;
   output += StringFormat("Total net profit:                           %.2f", ValueToCurrency(SummaryProfit)) + sep;
   output += StringFormat("Gross profit:                               %.2f", ValueToCurrency(GrossProfit)) + sep;
   output += StringFormat("Gross loss:                                 %.2f", ValueToCurrency(GrossLoss))  + sep;
-  if (GrossLoss > 0.0)
   output += StringFormat("Profit factor:                              %.2f", ProfitFactor) + sep;
   output += StringFormat("Expected payoff:                            %.2f", ExpectedPayoff) + sep;
   output += StringFormat("Absolute drawdown:                          %.2f", AbsoluteDrawdown) + sep;
   output += StringFormat("Maximal drawdown:                           %.1f (%.1f%%)", ValueToCurrency(MaxDrawdown), MaxDrawdownPercent) + sep;
   output += StringFormat("Relative drawdown:                          (%.1f%%) %.1f", RelDrawdownPercent, ValueToCurrency(RelDrawdown)) + sep;
   output += StringFormat("Trades total                                %d", SummaryTrades) + sep;
-  if(ShortTrades>0)
-  output += StringFormat("Short positions (won %):                    %d (%.1f%%)", ShortTrades, 100.0*WinShortTrades/ShortTrades) + sep;
-  if(LongTrades>0)
-  output += "Long positions(won %):                      " + LongTrades + StringConcatenate(" (",100.0*WinLongTrades/LongTrades,"%)") + sep;
-  if(ProfitTrades>0)
-  output += "Profit trades (% of total):                 " + ProfitTrades + StringConcatenate(" (",100.0*ProfitTrades/SummaryTrades,"%)") + sep;
-  if(LossTrades>0)
-  output += "Loss trades (% of total):                   " + LossTrades + StringConcatenate(" (",100.0*LossTrades/SummaryTrades,"%)") + sep;
-  output += "Largest profit trade:                       " + MaxProfit + sep;
-  output += "Largest loss trade:                         " + -MinProfit + sep;
-  if(ProfitTrades>0)
-  output += "Average profit trade:                       " + GrossProfit/ProfitTrades + sep;
-  if(LossTrades>0)
-  output += StringFormat("Average loss trade:                         %.2f%s", -GrossLoss/LossTrades, sep);
-  output += "Average consecutive wins:                   " + AvgConWinners + sep;
-  output += "Average consecutive losses:                 " + AvgConLosers + sep;
-  output += "Maximum consecutive wins (profit in money): " + ConProfitTrades1 + StringConcatenate(" (", ConProfit1, ")") + sep;
-  output += "Maximum consecutive losses (loss in money): " + ConLossTrades1 + StringConcatenate(" (", -ConLoss1, ")") + sep;
-  output += "Maximal consecutive profit (count of wins): " + ConProfit2 + StringConcatenate(" (", ConProfitTrades2, ")") + sep;
-  output += "Maximal consecutive loss (count of losses): " + -ConLoss2 + StringConcatenate(" (", ConLossTrades2, ")") + sep;
+  if (ShortTrades > 0) {
+  output += StringFormat("Short positions (won %%):                    %d (%.1f%%)", ShortTrades, 100.0*WinShortTrades/ShortTrades) + sep;
+  }
+  if (LongTrades > 0) {
+  output += StringFormat("Long positions (won %%):                     %d (%.1f%%)", LongTrades, 100.0*WinLongTrades/LongTrades) + sep;
+  }
+  if (ProfitTrades > 0)
+  output += StringFormat("Profit trades (%% of total):                 %d (%.1f%%)", ProfitTrades, 100.0*ProfitTrades/SummaryTrades) + sep;
+  if (LossTrades>0)
+  output += StringFormat("Loss trades (%% of total):                   %d (%.1f%%)", LossTrades, 100.0*LossTrades/SummaryTrades) + sep;
+  output += StringFormat("Largest profit trade:                       %.2f", MaxProfit) + sep;
+  output += StringFormat("Largest loss trade:                         %.2f", -MinProfit) + sep;
+  if (ProfitTrades > 0)
+  output += StringFormat("Average profit trade:                       %.2f", GrossProfit/ProfitTrades) + sep;
+  if (LossTrades > 0)
+  output += StringFormat("Average loss trade:                         %.2f", -GrossLoss/LossTrades) + sep;
+  output += StringFormat("Average consecutive wins:                   %.2f", AvgConWinners) + sep;
+  output += StringFormat("Average consecutive losses:                 %.2f", AvgConLosers) + sep;
+  output += StringFormat("Maximum consecutive wins (profit in money): %d %.2f", ConProfitTrades1, ConProfit1, ")") + sep;
+  output += StringFormat("Maximum consecutive losses (loss in money): %d %.2f", ConLossTrades1, -ConLoss1) + sep;
+  output += StringFormat("Maximal consecutive profit (count of wins): %.2f %d", ConProfit2, ConProfitTrades2) + sep;
+  output += StringFormat("Maximal consecutive loss (count of losses): %.2f %d", ConLoss2, ConLossTrades2) + sep;
   output += GetStrategyReport();
 
   // Write report log.

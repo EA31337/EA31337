@@ -44,3 +44,4 @@
 #property link        ea_link
 #property version     ea_version
 #property copyright   ea_copy
+#property strict

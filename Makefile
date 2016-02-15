@@ -4,7 +4,7 @@ EA="EA31337"
 EX4="src/$(EA).ex4"
 EX5="src/$(EA).ex5"
 VER=$(shell grep 'define ea_version' src/include/EA/ea-properties.mqh | grep -o '[0-9].*[0-9]')
-FILE=$(lastword $(MAKEFILE_LIST)) # Determine this makefile's path.
+FILE=$(lastword $(MAKEFILE_LIST)) # Determine this Makefile's path.
 OUT="releases"
 MKFILE=$(abspath $(lastword $(MAKEFILE_LIST)))
 CWD=$(notdir $(patsubst %/,%,$(dir $(MKFILE))))
@@ -18,6 +18,10 @@ requirements:
 Lite: 		set-lite      mql4 set-none
 Advanced: set-advanced  mql4 set-none
 Rider: 		set-rider			mql4 set-none
+
+Lite-Full: 		  set-lite-full       mql4 set-none
+Advanced-Full:  set-advanced-full   mql4 set-none
+Rider-Full: 		set-rider-full			mql4 set-none
 
 Lite-Backtest:			set-lite-backtest      mql4 set-none
 Advanced-Backtest:	set-advanced-backtest  mql4 set-none
@@ -71,13 +75,13 @@ set-advanced-backtest: set-none
 set-rider-backtest: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__backtest__\|__rider__"
 
-set-lite-nolicense: set-none
+set-lite-full: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__nolicense__"
 
-set-advanced-nolicense: set-none
+set-advanced-full: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__nolicense__\|__advanced__"
 
-set-rider-nolicense: set-none
+set-rider-full: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__nolicense__\|__rider__"
 
 clean: set-none

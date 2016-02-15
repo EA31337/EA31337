@@ -908,9 +908,9 @@ extern bool VerboseErrors = TRUE;
 // Display info messages.
 extern bool VerboseInfo = TRUE;
 // Display debug messages.
-extern bool VerboseDebug = FALSE;
+extern bool VerboseDebug = TRUE;
 // Display even more debugging.
-extern bool VerboseTrace = FALSE;
+bool VerboseTrace = FALSE;
 // Write report into the file on exit.
 extern bool WriteReport = TRUE;
 
