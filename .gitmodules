@@ -10,3 +10,6 @@
 [submodule "VM"]
 	path = _VM
 	url = git@github.com:EA31337/FX-MT-VM.git
+[submodule "test_results"]
+	path = _test_results
+	url = git@github.com:EA31337/EA31337-Dev-Test-Results.git
