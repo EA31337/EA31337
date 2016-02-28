@@ -21,8 +21,12 @@
    #include <MQL5-MQL4\MQL4Common.mqh> // Provides common MQL4 back-compability for MQL5.
 #endif
 
+//+------------------------------------------------------------------+
+//| EA properties.
+//+------------------------------------------------------------------+
+#property version     ea_version
+
 //#property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
-//#property strict
 
 //+------------------------------------------------------------------+
 //| User input variables.
