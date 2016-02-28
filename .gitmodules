@@ -13,3 +13,6 @@
 [submodule "EA31337-Lite-Sets"]
 	path = sets/Lite
 	url = git@github.com:EA31337/EA31337-Lite-Sets.git
+[submodule "releases/Lite"]
+	path = releases/Lite
+	url = git@github.com:EA31337/EA31337-Lite-Releases.git
