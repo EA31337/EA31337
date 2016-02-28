@@ -4,9 +4,9 @@
 [submodule "src/MQL5-MQL4"]
 	path = src/MQL5-MQL4
 	url = git@github.com:EA31337/MQL5-MQL4-Common.git
-[submodule "EA31337-releases"]
+[submodule "EA31337-Lite-Releases"]
 	path = releases
-	url = git@github.com:mycognitive/EA31337-releases.git
+	url = git@github.com:EA31337/EA31337-Lite-Releases.git
 [submodule "VM"]
 	path = _VM
 	url = git@github.com:EA31337/FX-MT-VM.git
