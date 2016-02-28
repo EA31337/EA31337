@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                                ea-properties.mqh |
-//|                                           Copyright 2015, kenorb |
+//|                                           Copyright 2016, kenorb |
 //|                                       https://github.com/EA31337 |
 //+------------------------------------------------------------------+
 
@@ -13,7 +13,7 @@
 #define ea_build   __DATETIME__ // FIXME: It's empty
 #define ea_link    "https://github.com/EA31337"
 #define ea_author  "kenorb"
-#define ea_copy    "Copyright 2015, kenorb"
+#define ea_copy    "Copyright 2016, kenorb"
 
 // Get the correct name of EA.
 #ifndef __backtest__
