@@ -13,3 +13,6 @@
 [submodule "test_results"]
 	path = _test_results
 	url = git@github.com:EA31337/EA31337-Dev-Test-Results.git
+[submodule "EA31337-Lite-Sets"]
+	path = sets/Lite
+	url = git@github.com:EA31337/EA31337-Lite-Sets.git
