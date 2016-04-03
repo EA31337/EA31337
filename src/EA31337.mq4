@@ -16,7 +16,7 @@
 #include <EA\ea-enums.mqh>
 
 #ifdef __MQL4__
-   #include <stdlib.mqh> // Used for: ErrorDescription(), RGB(), CompareDoubles(), DoubleToStrMorePrecision(), IntegerToHexString()
+   #include <EA\MQL4\stdlib.mq4> // Used for: ErrorDescription(), RGB(), CompareDoubles(), DoubleToStrMorePrecision(), IntegerToHexString()
    #include <stderror.mqh>
    // #include "debug.mqh"
 #else
