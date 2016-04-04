@@ -11,7 +11,7 @@ echo "Checking dependencies..."
 type vagrant
 
 echo "Compiling..."
-[ -n "$1" ] && make -C "$CWD" $1
+[ -n "$VER" ] && make -C "$CWD" $VER
 
 echo "Initializing VM..."
 cd "$VM_DIR"
@@ -26,12 +26,14 @@ echo "Cleaning previous reports..."
 find "$REP_DIR" -type f -print -delete
 
 echo "Running tests..."
-for month in {01..12}; do
-  vagrant ssh -c "/vagrant/scripts/run_backtest.sh -t -r "EA31337-$VER-EURUSD-DS-s10-2014-$month" -c GBP -e EA31337 -d 2000 -p EURUSD -y 2014 -m $month -s 10 -b DS -D /vagrant/files/reports"
+for year in {2013..2015}; do
+  for month in {01..12}; do
+    vagrant ssh -c "/vagrant/scripts/run_backtest.sh -C -t -r "EA31337-$VER-EURUSD-DS-s10-$year-$month" -c GBP -e EA31337 -d 2000 -p EURUSD -y $year -m $month -s 10 -b DS -D /vagrant/files/reports"
+    mv -v "$REP_DIR"/*$VER* "$OUT"/$VER
+  done
 done
 #vagrant ssh -c "/vagrant/scripts/run_backtest.sh -c GBP -e EA31337 -d 2000 -p EURUSD -y 2014 -s 10 -b N5 -D /vagrant/files"
 #vagrant ssh -c "/vagrant/scripts/run_backtest.sh -c GBP -e EA31337 -d 2000 -p EURUSD -y 2014 -s 10 -b W5 -D /vagrant/files"
 #vagrant ssh -c "/vagrant/scripts/run_backtest.sh -c GBP -e EA31337 -d 2000 -p EURUSD -y 2014 -s 10 -b C5 -D /vagrant/files"
 #vagrant ssh -c "/vagrant/scripts/run_backtest.sh -c GBP -e EA31337 -d 2000 -p EURUSD -y 2014 -s 10 -b Z5 -D /vagrant/files"
 #vagrant ssh -c "/vagrant/scripts/run_backtest.sh -c GBP -e EA31337 -d 2000 -p EURUSD -y 2014 -s 10 -b R9 -D /vagrant/files"
-mv -v "$REP_DIR"/*$VER* "$OUT"/$VER
