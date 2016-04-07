@@ -1,5 +1,5 @@
-#!/bin/bash -e
-#set -e
+#!/usr/bin/env bash
+set -e
 CWD=$(git rev-parse --show-toplevel 2> /dev/null || (cd -P -- "$(dirname -- "$0")/.." && pwd -P))
 VM_DIR="$CWD/_VM"
 EA_DIR="$CWD/src"
@@ -27,8 +27,8 @@ find "$REP_DIR" -type f -print -delete
 
 echo "Running tests..."
 for year in {2013..2015}; do
-  for month in {01..12}; do
-    vagrant ssh -c "/vagrant/scripts/run_backtest.sh -C -t -r "EA31337-$VER-EURUSD-DS-s10-$year-$month" -c GBP -e EA31337 -d 2000 -p EURUSD -y $year -m $month -s 10 -b DS -D /vagrant/files/reports"
+  for month in {01..12}; do # Note: Leading zero syntax requires Bash >=4.x.
+    vagrant ssh -c "TRACE=1 /vagrant/scripts/run_backtest.sh -t -r "EA31337-$VER-EURUSD-DS-s10-$year-$month" -c GBP -e EA31337 -d 2000 -p EURUSD -y $year -m $month -s 10 -b DS -D /vagrant/files/reports"
     mv -v "$REP_DIR"/*$VER* "$OUT"/$VER
   done
 done
