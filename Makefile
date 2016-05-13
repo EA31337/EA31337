@@ -103,6 +103,9 @@ release: mql.exe \
 		@$(MAKE) -f $(FILE) set-none
 		@echo "$(EA) v${VER} released."
 
+mt4-install:
+		install -v "$(EX4)" "$(shell find ~/.wine -name terminal.exe -execdir pwd ';' -quit)/MQL4/Experts"
+
 $(OUT)/$(EA)-Lite-Backtest-%.ex4: set-lite-backtest
 	wine mql.exe /o /i:src /mql4 $(SRC) && cp -v "$(EX4)" "$(OUT)/$(EA)-Lite-Backtest-v$(VER).ex4"
 
