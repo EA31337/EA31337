@@ -93,15 +93,15 @@ release: mql.exe \
 		$(OUT)/$(EA)-Lite-Backtest-%.ex4 \
 		$(OUT)/$(EA)-Advanced-Backtest-%.ex4 \
 		$(OUT)/$(EA)-Rider-Backtest-%.ex4
-		@echo Making release...
-		git --git-dir=$(OUT)/.git add -v -A
-		$(eval GIT_EXTRAS := $(shell git --git-dir=$(OUT)/.git tag "v$(VER)" || echo "--amend"))
-		@echo $(GIT_EXTRAS)
-		git --git-dir=$(OUT)/.git commit -v -m "$(EA) v${VER} released." -a $(GIT_EXTRAS)
-		git --git-dir=$(OUT)/.git tag -f "v$(VER)"
-		eval $(shell cd $(OUT) && sha1sum *.* > .files.crc)
-		@$(MAKE) -f $(FILE) set-none
-		@echo "$(EA) v${VER} released."
+		# @echo Making release...
+		# git --git-dir=$(OUT)/.git add -v -A
+		# $(eval GIT_EXTRAS := $(shell git --git-dir=$(OUT)/.git tag "v$(VER)" || echo "--amend"))
+		# @echo $(GIT_EXTRAS)
+		# git --git-dir=$(OUT)/.git commit -v -m "$(EA) v${VER} released." -a $(GIT_EXTRAS)
+		# git --git-dir=$(OUT)/.git tag -f "v$(VER)"
+		# eval $(shell cd $(OUT) && sha1sum *.* > .files.crc)
+		# @$(MAKE) -f $(FILE) set-none
+		# @echo "$(EA) v${VER} released."
 
 mt4-install:
 		install -v "$(EX4)" "$(shell find ~/.wine -name terminal.exe -execdir pwd ';' -quit)/MQL4/Experts"
