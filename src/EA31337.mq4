@@ -1306,10 +1306,10 @@ bool Trade_ADX(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
 bool Trade_Alligator(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open_level = EMPTY) {
   // [x][0] - The Blue line (Alligator's Jaw), [x][1] - The Red Line (Alligator's Teeth), [x][2] - The Green Line (Alligator's Lips)
   bool result = FALSE; int period = TfToPeriod(tf);
-  double gap = open_level * pip_size;
   UpdateIndicator(ALLIGATOR, tf);
   if (open_method == EMPTY) open_method = GetStrategyOpenMethod(ALLIGATOR, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(ALLIGATOR, tf, 0.0);
+  double gap = open_level * pip_size;
 
   switch(cmd) {
     case OP_BUY:
@@ -1942,10 +1942,10 @@ bool Trade_Ichimoku(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double
  */
 bool Trade_MA(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open_level = EMPTY) {
   bool result = FALSE; int period = TfToPeriod(tf);
-  double gap = open_level * pip_size;
   UpdateIndicator(MA, tf);
   if (open_method == EMPTY) open_method = GetStrategyOpenMethod(MA, tf, 0);
   if (open_level == EMPTY)  open_level  = GetStrategyOpenLevel(MA, tf, 0);
+  double gap = open_level * pip_size;
 
   switch (cmd) {
     case OP_BUY:
@@ -1983,11 +1983,11 @@ bool Trade_MA(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open_
  */
 bool Trade_MACD(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open_level = EMPTY) {
   bool result = FALSE; int period = TfToPeriod(tf);
-  double gap = open_level * pip_size;
   UpdateIndicator(MA, tf);
   UpdateIndicator(MACD, tf);
   if (open_method == EMPTY) open_method = GetStrategyOpenMethod(MACD, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(MACD, tf, 0);
+  double gap = open_level * pip_size;
   switch (cmd) {
     /* TODO:
           //20. MACD (1)
@@ -2238,11 +2238,11 @@ bool Trade_RVI(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_SAR(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open_level = EMPTY) {
-  double gap = open_level * pip_size;
   bool result = FALSE; int period = TfToPeriod(tf);
   UpdateIndicator(SAR, tf);
   if (open_method == EMPTY) open_method = GetStrategyOpenMethod(SAR, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(SAR, tf, 0);
+  double gap = open_level * pip_size;
   switch (cmd) {
     case OP_BUY:
       result = sar[period][CURR] + gap < Open[CURR] || sar[period][PREV] + gap < Open[PREV];
@@ -4743,11 +4743,11 @@ bool InitStrategy(int key, string name, bool active, int indicator, int timefram
   info[key][TIMEFRAME]       = timeframe;
   info[key][INDICATOR]       = indicator;
   info[key][OPEN_METHOD]     = open_method;
+  conf[key][OPEN_LEVEL]      = open_level;
   #ifdef __advanced__
   info[key][OPEN_CONDITION1] = open_cond1;
   info[key][OPEN_CONDITION2] = open_cond2;
   info[key][CLOSE_CONDITION] = close_cond;
-  conf[key][OPEN_LEVEL]      = open_level;
   conf[key][SPREAD_LIMIT]    = max_spread;
   #endif
   return (TRUE);
@@ -6815,12 +6815,12 @@ string getUninitReasonText(int reasonCode) {
    string text = "";
    switch(reasonCode) {
      case REASON_PROGRAM: // 0
-       text = "EA terminated its operation by calling the ExpertRemove() function.";
+       text = "EA terminated its operation."; // By calling the ExpertRemove() function?!
        break;
      case REASON_REMOVE: // 1 (implemented for the indicators only)
        text = "Program " + __FILE__ + " has been deleted from the chart.";
        break;
-      case REASON_RECOMPILE: // 2 (implemented for the indicators)
+      case REASON_RECOMPILE: // 2 (implemented for the indicators only)
         text = "Program " + __FILE__ + " has been recompiled.";
         break;
       case REASON_CHARTCHANGE: // 3
