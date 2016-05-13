@@ -9,7 +9,7 @@
 //+------------------------------------------------------------------+
 
 #define ea_desc    "Multi-strategy advanced trading robot."
-#define ea_version "1.067"
+#define ea_version "1.068"
 #define ea_build   __DATETIME__ // FIXME: It's empty
 #define ea_link    "https://github.com/EA31337"
 #define ea_author  "kenorb"
