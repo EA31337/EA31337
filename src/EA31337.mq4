@@ -4899,13 +4899,17 @@ bool AccCondition(int condition = C_ACC_NONE) {
       last_cname = "TodayInLoss";
       return GetArrSumKey1(hourly_profit, day_of_year, 10) < 0;
     case C_ACC_PDAY_IN_PROFIT: // Check if previous day in profit.
-      last_cname = "YesterdayInProfit";
-      int yesterday1 = TimeDayOfYear(time_current - 24*60*60);
-      return GetArrSumKey1(hourly_profit, yesterday1) > 0;
+      {
+        last_cname = "YesterdayInProfit";
+        int yesterday1 = TimeDayOfYear(time_current - 24*60*60);
+        return GetArrSumKey1(hourly_profit, yesterday1) > 0;
+      }
     case C_ACC_PDAY_IN_LOSS: // Check if previous day in loss.
-      last_cname = "YesterdayInLoss";
-      int yesterday2 = TimeDayOfYear(time_current - 24*60*60);
-      return GetArrSumKey1(hourly_profit, yesterday2) < 0;
+      {
+        last_cname = "YesterdayInLoss";
+        int yesterday2 = TimeDayOfYear(time_current - 24*60*60);
+        return GetArrSumKey1(hourly_profit, yesterday2) < 0;
+      }
     case C_ACC_MAX_ORDERS:
       return total_orders >= max_orders;
     default:
@@ -6317,7 +6321,7 @@ bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
     }
     // Sort array by first dimension (descending).
     ArraySort(sorted_queue, WHOLE_ARRAY, 0, MODE_DESCEND);
-    for (i = 0; i < queue_size; i++) {
+    for (int i = 0; i < queue_size; i++) {
       selected_qid = sorted_queue[i][1];
       cmd = order_queue[selected_qid][Q_CMD];
       sid = order_queue[selected_qid][Q_SID];
