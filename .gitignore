@@ -2,8 +2,8 @@
 build.properties
 
 # Ignore compiled binary files.
-src/*.ex4
-src/*.ex5
+*.ex4
+*.ex5
 
 # Ignore Finder metadata files on Mac
 .DS_Store
