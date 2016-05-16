@@ -1,13 +1,13 @@
-.PHONY: all test mql4 mql5 requirements \
+.PHONY: all test mql4 mql5 requirements set-none \
 		Lite Advanced Rider
 MQL=mql.exe
 SRC=$(wildcard src/*.mq4)
-EA="EA31337"
+EA=EA31337
 EX4="src/$(EA).ex4"
 EX5="src/$(EA).ex5"
 VER=$(shell grep 'define ea_version' src/include/EA/ea-properties.mqh | grep -o '[0-9].*[0-9]')
 FILE=$(lastword $(MAKEFILE_LIST)) # Determine this Makefile's path.
-OUT="releases"
+OUT=releases
 MKFILE=$(abspath $(lastword $(MAKEFILE_LIST)))
 CWD=$(notdir $(patsubst %/,%,$(dir $(MKFILE))))
 all: requirements $(MQL) compile-mql4
@@ -17,18 +17,18 @@ requirements:
 	type -a ex
 	type -a wine
 
-Lite: 		set-lite      compile-mql4 set-none
-Advanced: set-advanced  compile-mql4 set-none
-Rider: 		set-rider			compile-mql4 set-none
-
-Lite-Full: 		  set-lite-full       compile-mql4 set-none
-Advanced-Full:  set-advanced-full   compile-mql4 set-none
-Rider-Full: 		set-rider-full			compile-mql4 set-none
+Lite: 		set-lite      compile-mql4 set-none $(OUT)/$(EA)-Lite-%.ex4
+Advanced: set-advanced  compile-mql4 set-none $(OUT)/$(EA)-Advanced-%.ex4
+Rider: 		set-rider			compile-mql4 set-none $(OUT)/$(EA)-Rider-%.ex4
 
 Lite-Backtest:			set-lite-backtest      compile-mql4 set-none $(OUT)/$(EA)-Lite-Backtest-%.ex4
 Advanced-Backtest:	set-advanced-backtest  compile-mql4 set-none $(OUT)/$(EA)-Advanced-Backtest-%.ex4
 Rider-Backtest:			set-rider-backtest  	 compile-mql4 set-none $(OUT)/$(EA)-Rider-Backtest-%.ex4
 Backtest: Lite-Backtest Advanced-Backtest Rider-Backtest
+
+Lite-Full: 		  set-lite-full       compile-mql4 set-none $(OUT)/$(EA)-Lite-Full-%.ex4
+Advanced-Full:  set-advanced-full   compile-mql4 set-none $(OUT)/$(EA)-Advanced-Full-%.ex4
+Rider-Full: 		set-rider-full			compile-mql4 set-none $(OUT)/$(EA)-Rider-Full-%.ex4
 
 compile-mql4: requirements $(MQL) clean src/%.ex4
 	@$(MAKE) -f $(FILE) set-none
@@ -91,7 +91,7 @@ set-rider-full: set-none
 
 clean: set-none
 	@echo Cleaning...
-	find src/ '(' -name '*.ex4' -or -name '*.ex5' ')' -delete
+	find "${OUT}" src/ '(' -name '*.ex4' -or -name '*.ex5' ')' -delete
 
 release: mql.exe \
 		clean \
@@ -116,6 +116,24 @@ $(OUT)/$(EA)-Advanced-Backtest-%.ex4: set-advanced-backtest
 
 $(OUT)/$(EA)-Rider-Backtest-%.ex4: set-rider-backtest
 	wine mql.exe /o /i:src /mql4 $(SRC) && cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-Backtest-v$(VER).ex4"
+
+$(OUT)/$(EA)-Lite-Full-%.ex4: set-lite-full
+	wine mql.exe /o /i:src /mql4 $(SRC) && cp -v "$(EX4)" "$(OUT)/$(EA)-Lite-Full-v$(VER).ex4"
+
+$(OUT)/$(EA)-Advanced-Full-%.ex4: set-advanced-full
+	wine mql.exe /o /i:src /mql4 $(SRC) && cp -v "$(EX4)" "$(OUT)/$(EA)-Advanced-Full-v$(VER).ex4"
+
+$(OUT)/$(EA)-Rider-Full-%.ex4: set-rider-full
+	wine mql.exe /o /i:src /mql4 $(SRC) && cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-Full-v$(VER).ex4"
+
+$(OUT)/$(EA)-Lite-%.ex4: set-lite
+	wine mql.exe /o /i:src /mql4 $(SRC) && cp -v "$(EX4)" "$(OUT)/$(EA)-Lite-v$(VER).ex4"
+
+$(OUT)/$(EA)-Advanced-%.ex4: set-advanced
+	wine mql.exe /o /i:src /mql4 $(SRC) && cp -v "$(EX4)" "$(OUT)/$(EA)-Advanced-v$(VER).ex4"
+
+$(OUT)/$(EA)-Rider-%.ex4: set-rider
+	wine mql.exe /o /i:src /mql4 $(SRC) && cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-v$(VER).ex4"
 
 mt4-install:
 		install -v "$(EX4)" "$(shell find ~/.wine -name terminal.exe -execdir pwd ';' -quit)/MQL4/Experts"
