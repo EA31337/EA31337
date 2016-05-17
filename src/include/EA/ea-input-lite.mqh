@@ -283,7 +283,7 @@ extern ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = 22;
 // TODO
 /* extern */ int Bands_OpenLevel = 0;
 // Valid range: 0-255.
-extern int Bands1_OpenMethod = 70;
+extern int Bands1_OpenMethod = 18;
 // Valid range: 0-255.
 extern int Bands5_OpenMethod = 124;
 // Valid range: 0-255.
@@ -396,7 +396,7 @@ extern int DeMarker_Period = 24;
 // Shift relative to the current bar the given amount of periods ago. Suggested value: 4.
 extern int DeMarker_Shift = 0;
 // Valid range: 0.0-0.4. Suggested value: 0.0.
-extern double DeMarker_OpenLevel = 0.20000000;
+extern double DeMarker_OpenLevel = 0.2;
 // Close opposite orders on market change.
 // Trailing Stop method for DeMarker. Set 0 to default (DefaultTrailingStopMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = 1;
@@ -614,7 +614,7 @@ extern int MACD_Shift_Far = 0;
 extern ENUM_TRAIL_TYPE MACD_TrailingStopMethod = 21;
 // Trailing Profit method for MACD. Set 0 to default (DefaultTrailingProfitMethod). See: ENUM_TRAIL_TYPE.
 extern ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = 27;
-extern double MACD_OpenLevel = 0.20000000;
+extern double MACD_OpenLevel = 0.3;
 // Valid range: 0-31.
 extern int MACD1_OpenMethod = 0;
 // Valid range: 0-31.
