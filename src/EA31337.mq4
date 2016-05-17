@@ -1489,9 +1489,20 @@ bool Trade_Bands(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double op
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(BANDS, tf, 0);
   switch (cmd) {
     case OP_BUY:
+      result = Low[CURR] < bands[period][CURR][BANDS_LOWER] || Low[PREV] < bands[period][PREV][BANDS_LOWER]; // price value was lower than the lower band
+      if ((open_method &   1) != 0) result = result && Close[PREV] < bands[period][CURR][BANDS_LOWER];
+      if ((open_method &   2) != 0) result = result && Close[FAR] < bands[period][CURR][BANDS_LOWER];
+      if ((open_method &   4) != 0) result = result && (bands[period][CURR][BANDS_BASE] <= bands[period][PREV][BANDS_BASE] && bands[period][PREV][BANDS_BASE] <= bands[period][FAR][BANDS_BASE]);
+      if ((open_method &   8) != 0) result = result && bands[period][CURR][BANDS_BASE] >= bands[period][PREV][BANDS_BASE];
+      if ((open_method &  16) != 0) result = result && (bands[period][CURR][BANDS_UPPER] >= bands[period][PREV][BANDS_UPPER] || bands[period][CURR][BANDS_LOWER] <= bands[period][PREV][BANDS_LOWER]);
+      if ((open_method &  32) != 0) result = result && (bands[period][CURR][BANDS_UPPER] <= bands[period][PREV][BANDS_UPPER] || bands[period][CURR][BANDS_LOWER] >= bands[period][PREV][BANDS_LOWER]);
+      if ((open_method &  64) != 0) result = result && Ask > bands[period][CURR][BANDS_LOWER];
+      if ((open_method & 128) != 0) result = result && Ask < bands[period][CURR][BANDS_BASE];
+      //if ((open_method & 256) != 0) result = result && !Bands_On_Sell(M30);
+    case OP_SELL:
       result = High[CURR]  > bands[period][CURR][BANDS_UPPER] || High[PREV] > bands[period][PREV][BANDS_UPPER]; // price value was higher than the upper band
       if ((open_method &   1) != 0) result = result && Close[PREV] > bands[period][CURR][BANDS_UPPER];
-      if ((open_method &   2) != 0) result = result && Close[CURR] < bands[period][CURR][BANDS_UPPER];
+      if ((open_method &   2) != 0) result = result && Close[FAR] > bands[period][CURR][BANDS_UPPER];
       if ((open_method &   4) != 0) result = result && (bands[period][CURR][BANDS_BASE] >= bands[period][PREV][BANDS_BASE] && bands[period][PREV][BANDS_BASE] >= bands[period][FAR][BANDS_BASE]);
       if ((open_method &   8) != 0) result = result && bands[period][CURR][BANDS_BASE] <= bands[period][PREV][BANDS_BASE];
       if ((open_method &  16) != 0) result = result && (bands[period][CURR][BANDS_UPPER] >= bands[period][PREV][BANDS_UPPER] || bands[period][CURR][BANDS_LOWER] <= bands[period][PREV][BANDS_LOWER]);
@@ -1500,17 +1511,6 @@ bool Trade_Bands(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double op
       if ((open_method & 128) != 0) result = result && Ask > bands[period][CURR][BANDS_BASE];
       //if ((open_method & 256) != 0) result = result && !Bands_On_Buy(M30);
       break;
-    case OP_SELL:
-      result = Low[CURR] < bands[period][CURR][BANDS_LOWER] || Low[PREV] < bands[period][PREV][BANDS_LOWER]; // price value was lower than the lower band
-      if ((open_method &   1) != 0) result = result && Close[PREV] < bands[period][CURR][BANDS_LOWER];
-      if ((open_method &   2) != 0) result = result && Close[CURR] > bands[period][CURR][BANDS_LOWER];
-      if ((open_method &   4) != 0) result = result && (bands[period][CURR][BANDS_BASE] <= bands[period][PREV][BANDS_BASE] && bands[period][PREV][BANDS_BASE] <= bands[period][FAR][BANDS_BASE]);
-      if ((open_method &   8) != 0) result = result && bands[period][CURR][BANDS_BASE] >= bands[period][PREV][BANDS_BASE];
-      if ((open_method &  16) != 0) result = result && (bands[period][CURR][BANDS_UPPER] >= bands[period][PREV][BANDS_UPPER] || bands[period][CURR][BANDS_LOWER] <= bands[period][PREV][BANDS_LOWER]);
-      if ((open_method &  32) != 0) result = result && (bands[period][CURR][BANDS_UPPER] <= bands[period][PREV][BANDS_UPPER] || bands[period][CURR][BANDS_LOWER] >= bands[period][PREV][BANDS_LOWER]);
-      if ((open_method &  64) != 0) result = result && Ask > bands[period][CURR][BANDS_LOWER];
-      if ((open_method & 128) != 0) result = result && Ask < bands[period][CURR][BANDS_BASE];
-      //if ((open_method & 256) != 0) result = result && !Bands_On_Sell(M30);
     /*
           //9. Bollinger Bands
           //Buy: price crossed lower line upwards (returned to it from below)
