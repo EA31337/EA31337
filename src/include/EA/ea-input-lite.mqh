@@ -906,7 +906,7 @@ extern bool PrintLogOnChart = 1;
 // Display errors.
 extern bool VerboseErrors = 1;
 // Display info messages.
-extern bool VerboseInfo = 0;
+extern bool VerboseInfo = 1;
 // Display debug messages.
 bool VerboseDebug = 0;
 // Display even more debugging.
