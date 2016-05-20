@@ -226,7 +226,8 @@ extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v"
 double lot_size, pip_size;
 double market_minlot, market_maxlot, market_lotsize, market_lotstep, market_marginrequired, market_margininit;
 double market_stoplevel; // Market stop level in points.
-double curr_spread; // Broker current spread.
+double order_freezelevel; // Order freeze level in points.
+double curr_spread; // Broker current spread in pips.
 int PipDigits, VolumeDigits;
 int pts_per_pip; // Number points per pip.
 int gmt_offset = 0; // Current difference between GMT time and the local computer time in seconds, taking into account switch to winter or summer time. Depends on the time settings of your computer.
@@ -243,7 +244,7 @@ bool session_active = FALSE;
 // Time-based variables.
 datetime bar_time, last_bar_time = (int)EMPTY_VALUE; // Bar time, current and last one to check if bar has been changed since the last time.
 datetime time_current = (int)EMPTY_VALUE;
-int hour_of_day, day_of_week, day_of_month, day_of_year;
+int hour_of_day, day_of_week, day_of_month, day_of_year, month, year;
 int last_order_time = 0, last_action_time = 0;
 int last_history_check = 0; // Last ticket position processed.
 
@@ -484,20 +485,56 @@ string InitInfo(bool startup = False, string sep = "\n") {
   string output = StringFormat("%s (%s) v%s by %s (%s)%s", ea_name, __FILE__, ea_version, ea_author, ea_link, sep);
   output += StringFormat("Platform variables: Symbol: %s, Bars: %d, Server: %s, Login: %d%s",
     _Symbol, Bars, AccountInfoString(ACCOUNT_SERVER), (int)AccountInfoInteger(ACCOUNT_LOGIN), sep); // // FIXME: MQL5: Bars
-  output += StringFormat("Broker info: Name: %s, Account type: %s, Leverage: 1:%d, Currency: %s%s", AccountCompany(), account_type, AccountLeverage(), AccCurrency, sep);
-  output += StringFormat("Market variables: Ask: %f, Bid: %f, Volume: %d%s", Ask, Bid, Volume[0], sep);
-  output += StringFormat("Market constants: Digits: %d, Point: %f, Min Lot: %g, Max Lot: %g, Lot Step: %g, Lot Size: %g, Margin Required: %g, Margin Init: %g, Stop Level: %g%s",
-    Digits, NormalizeDouble(Point, Digits), NormalizeDouble(market_minlot, PipDigits), market_maxlot, market_lotstep, market_lotsize, market_marginrequired, market_margininit, market_stoplevel, sep);
-  output += StringFormat("Contract specification for %s: Digits: %d, Point value: %f, Spread: %g, Stop level: %g, Contract size: %g, Tick size: %f%s",
-    _Symbol, (int)SymbolInfoInteger(_Symbol, SYMBOL_DIGITS), SymbolInfoDouble(_Symbol, SYMBOL_POINT), (int)SymbolInfoInteger(_Symbol, SYMBOL_SPREAD),
-    (int)SymbolInfoInteger(_Symbol,SYMBOL_TRADE_STOPS_LEVEL), SymbolInfoDouble(_Symbol, SYMBOL_TRADE_CONTRACT_SIZE), SymbolInfoDouble(_Symbol, SYMBOL_TRADE_TICK_SIZE), sep);
+  output += StringFormat("Broker info: Name: %s, Account type: %s, Leverage: 1:%d, Currency: %s%s",
+      AccountCompany(), account_type, AccountLeverage(), AccCurrency, sep);
+  output += StringFormat("Market variables: Ask: %g, Bid: %g, Volume: %d%s",
+      NormalizeDouble(Ask, Digits), NormalizeDouble(Bid, Digits), Volume[0], sep);
+  output += StringFormat("Market constants: Digits: %d, Point: %g, Min Lot: %g, Max Lot: %g, Lot Step: %g, Lot Size: %g, Margin Required: %g, Margin Init: %g, Stop Level: %d points, Freeze level: %d points%s",
+      Digits,
+      NormalizeDouble(Point, Digits),
+      NormalizeDouble(market_minlot, PipDigits),
+      market_maxlot,
+      market_lotstep,
+      market_lotsize,
+      market_marginrequired,
+      market_margininit,
+      market_stoplevel,
+      order_freezelevel,
+      sep);
+  output += StringFormat("Contract specification for %s: Profit mode: %d, Margin mode: %d, Spread: %d (points), Tick size: %g, Point value: %g, Digits: %d, Trade stop level: %g, Trade contract size: %g%s",
+      _Symbol,
+      MarketInfo(_Symbol, MODE_PROFITCALCMODE),
+      MarketInfo(_Symbol, MODE_MARGINCALCMODE),
+      (int)SymbolInfoInteger(_Symbol, SYMBOL_SPREAD),
+      SymbolInfoDouble(_Symbol, SYMBOL_TRADE_TICK_SIZE),
+      SymbolInfoDouble(_Symbol, SYMBOL_POINT),
+      (int)SymbolInfoInteger(_Symbol, SYMBOL_DIGITS),
+      (int)SymbolInfoInteger(_Symbol,SYMBOL_TRADE_STOPS_LEVEL),
+      SymbolInfoDouble(_Symbol, SYMBOL_TRADE_CONTRACT_SIZE),
+      sep);
   output += StringFormat("Swap specification for %s: Mode: %d, Long/buy order value: %g, Short/sell order value: %g%s",
-    _Symbol, (int)SymbolInfoInteger(_Symbol, SYMBOL_SWAP_MODE), SymbolInfoDouble(_Symbol, SYMBOL_SWAP_LONG), SymbolInfoDouble(_Symbol, SYMBOL_SWAP_SHORT), sep);
-  output += StringFormat("Calculated variables: Lot size: %g, Max orders: %d (per type: %d), Active strategies: %d of %d, Pip size: %g, Points per pip: %d, Pip digits: %d, Volume digits: %d, Spread in pips: %.1f, Stop Out Level: %.1f%s",
-              NormalizeDouble(lot_size, VolumeDigits), max_orders, GetMaxOrdersPerType(), GetNoOfStrategies(), FINAL_STRATEGY_TYPE_ENTRY,
-              NormalizeDouble(pip_size, PipDigits), pts_per_pip, PipDigits, VolumeDigits,
-              curr_spread, GetAccountStopoutLevel(), sep);
-  output += StringFormat("Time: Hour of day: %d, Day of week: %d, Day of month: %d, Day of year: %d" + sep, hour_of_day, day_of_week, day_of_month, day_of_year);
+      _Symbol,
+      (int)SymbolInfoInteger(_Symbol, SYMBOL_SWAP_MODE),
+      SymbolInfoDouble(_Symbol, SYMBOL_SWAP_LONG),
+      SymbolInfoDouble(_Symbol, SYMBOL_SWAP_SHORT),
+      sep);
+  output += StringFormat("Calculated variables: Pip size: %g, Lot size: %g, Points per pip: %d, Pip digits: %d, Volume digits: %d, Spread in pips: %.1f, Stop Out Level: %.1f%s",
+      NormalizeDouble(pip_size, PipDigits),
+      NormalizeDouble(lot_size, VolumeDigits),
+      pts_per_pip,
+      PipDigits,
+      VolumeDigits,
+      curr_spread,
+      GetAccountStopoutLevel(),
+      sep);
+  output += StringFormat("Strategies: Active strategies: %d of %d, Max orders: %d (per type: %d)%s",
+      GetNoOfStrategies(),
+      FINAL_STRATEGY_TYPE_ENTRY,
+      max_orders,
+      GetMaxOrdersPerType(),
+      sep);
+  output += StringFormat("Datetime: Hour of day: %d, Day of week: %d, Day of month: %d, Day of year: %d, Month: %d, Year: %d%s",
+      hour_of_day, day_of_week, day_of_month, day_of_year, month, year, sep);
   output += GetAccountTextDetails() + sep;
   if (startup) {
     if (session_initiated && IsTradeAllowed()) {
@@ -4121,6 +4158,9 @@ void StartNewMonth() {
   if (VerboseInfo) Print("== New month ==");
   if (VerboseInfo) Print(GetMonthlyReport()); // Print monthly report at end of each month.
 
+  // Store new data.
+  month = Month(); // Returns the current month as number (1-January,2,3,4,5,6,7,8,9,10,11,12), i.e., the number of month of the last known server time.
+
   // Reset variables.
   string sar_stats = "Monthly SAR stats: ";
   for (int i = 0; i < FINAL_PERIOD_TYPE_ENTRY; i++) {
@@ -4153,6 +4193,9 @@ void StartNewYear() {
   if (VerboseInfo) Print("== New year ==");
   // if (VerboseInfo) Print(GetYearlyReport()); // Print monthly report at end of each year.
 
+  // Store new data.
+  year = Year(); // Returns the current year, i.e., the year of the last known server time.
+
   // Reset variables.
   for (int i = 0; i < FINAL_PERIOD_TYPE_ENTRY; i++) {
     signals[YEARLY][SAR1][i][OP_BUY] = 0;
@@ -4183,6 +4226,8 @@ bool InitializeVariables() {
   day_of_week = DayOfWeek(); // The zero-based day of week (0 means Sunday,1,2,3,4,5,6) of the specified date. At the testing, the last known server time is modelled.
   day_of_month = Day(); // The day of month (1 - 31) of the specified date. At the testing, the last known server time is modelled.
   day_of_year = DayOfYear(); // Day (1 means 1 January,..,365(6) does 31 December) of year. At the testing, the last known server time is modelled.
+  month = Month(); // Returns the current month as number (1-January,2,3,4,5,6,7,8,9,10,11,12), i.e., the number of month of the last known server time.
+  year = Year(); // Returns the current year, i.e., the year of the last known server time.
 
   market_minlot = MarketInfo(_Symbol, MODE_MINLOT); // Minimum permitted amount of a lot
   if (market_minlot == 0.0) market_minlot = 0.1;
@@ -4194,6 +4239,7 @@ bool InitializeVariables() {
   if (market_marginrequired == 0) market_marginrequired = 10; // Fix for 'zero divide' bug when MODE_MARGINREQUIRED is zero.
   market_margininit = MarketInfo(_Symbol, MODE_MARGININIT); // Initial margin requirements for 1 lot
   market_stoplevel = MarketInfo(_Symbol, MODE_STOPLEVEL); // Market stop level in points.
+  order_freezelevel = MarketInfo(_Symbol, MODE_FREEZELEVEL); // Order freeze level in points. If the execution price lies within the range defined by the freeze level, the order cannot be modified, cancelled or closed.
   // market_stoplevel=(int)SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL);
   curr_spread = ValueToPips(GetMarketSpread());
   LastAsk = Ask; LastBid = Bid;
@@ -5066,7 +5112,7 @@ double GetStrategyLotSize(int sid, int cmd) {
  */
 string GetStrategyComment(int sid, string sep = "|") {
   string comment = sname[sid];
-  comment =+ StringFormat("%s spread: %.1f", sep, curr_spread);
+  comment =+ StringFormat("%s spread: %.1f pips", sep, curr_spread);
   return comment;
 }
 
@@ -5491,7 +5537,7 @@ string GetDailyReport() {
   // output += "High: "    + daily[MAX_HIGH] + "; ";
   output += StringFormat("Tick: %.0f; ", daily[MAX_TICK]);
   // output += "Drop: "    + daily[MAX_DROP] + "; ";
-  output += StringFormat("Spread: %.1f; ", daily[MAX_SPREAD]);
+  output += StringFormat("Spread (pips): %.1f; ", daily[MAX_SPREAD]);
   output += StringFormat("Max orders: %.0f; ", daily[MAX_ORDERS]);
   output += StringFormat("Loss: %.2f; ", daily[MAX_LOSS]);
   output += StringFormat("Profit: %.2f; ", daily[MAX_PROFIT]);
@@ -5517,14 +5563,14 @@ string GetWeeklyReport() {
   // output =+ GetAccountTextDetails() + "; " + GetOrdersStats();
   // output += "Low: "     + weekly[MAX_LOW] + "; ";
   // output += "High: "    + weekly[MAX_HIGH] + "; ";
-  output += "Tick: "       + weekly[MAX_TICK] + "; ";
+  output += "Tick: "         + weekly[MAX_TICK] + "; ";
   // output += "Drop: "    + weekly[MAX_DROP] + "; ";
-  output += "Spread: "     + weekly[MAX_SPREAD] + "; ";
-  output += "Max orders: " + weekly[MAX_ORDERS] + "; ";
-  output += "Loss: "       + weekly[MAX_LOSS] + "; ";
-  output += "Profit: "     + weekly[MAX_PROFIT] + "; ";
-  output += "Equity: "     + weekly[MAX_EQUITY] + "; ";
-  output += "Balance: "    + weekly[MAX_BALANCE] + "; ";
+  output += "Spread (pips):" + weekly[MAX_SPREAD] + "; ";
+  output += "Max orders: "   + weekly[MAX_ORDERS] + "; ";
+  output += "Loss: "         + weekly[MAX_LOSS] + "; ";
+  output += "Profit: "       + weekly[MAX_PROFIT] + "; ";
+  output += "Equity: "       + weekly[MAX_EQUITY] + "; ";
+  output += "Balance: "      + weekly[MAX_BALANCE] + "; ";
 
   key = GetArrKey1ByHighestKey2ValueD(stats, WEEKLY_PROFIT);
   if (key >= 0) output += "Best: " + sname[key] + " (" + stats[key][WEEKLY_PROFIT] + "p); ";
@@ -5543,14 +5589,14 @@ string GetMonthlyReport() {
   // output =+ GetAccountTextDetails() + "; " + GetOrdersStats();
   // output += "Low: "     + monthly[MAX_LOW] + "; ";
   // output += "High: "    + monthly[MAX_HIGH] + "; ";
-  output += "Tick: "       + monthly[MAX_TICK] + "; ";
+  output += "Tick: "          + monthly[MAX_TICK] + "; ";
   // output += "Drop: "    + monthly[MAX_DROP] + "; ";
-  output += "Spread: "     + monthly[MAX_SPREAD] + "; ";
-  output += "Max orders: " + monthly[MAX_ORDERS] + "; ";
-  output += "Loss: "       + monthly[MAX_LOSS] + "; ";
-  output += "Profit: "     + monthly[MAX_PROFIT] + "; ";
-  output += "Equity: "     + monthly[MAX_EQUITY] + "; ";
-  output += "Balance: "    + monthly[MAX_BALANCE] + "; ";
+  output += "Spread (pips): " + monthly[MAX_SPREAD] + "; ";
+  output += "Max orders: "    + monthly[MAX_ORDERS] + "; ";
+  output += "Loss: "          + monthly[MAX_LOSS] + "; ";
+  output += "Profit: "        + monthly[MAX_PROFIT] + "; ";
+  output += "Equity: "        + monthly[MAX_EQUITY] + "; ";
+  output += "Balance: "       + monthly[MAX_BALANCE] + "; ";
 
   key = GetArrKey1ByHighestKey2ValueD(stats, MONTHLY_PROFIT);
   if (key >= 0) output += "Best: " + sname[key] + " (" + stats[key][MONTHLY_PROFIT] + "p); ";
@@ -5572,7 +5618,7 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
     if (MaxOrdersPerDay > 0) text_max_orders += StringFormat(" [Per day: %d]", MaxOrdersPerDay);
   #endif
   // Prepare text to display spread.
-  string text_spread = StringFormat("Spread: %.1f pips", ValueToPips(GetMarketSpread()));
+  string text_spread = StringFormat("Spread: %g pips", curr_spread);
   // string text_spread = "Spread (pips): " + DoubleToStr(GetMarketSpread(TRUE) / pts_per_pip, Digits - PipDigits) + " / Stop level (pips): " + DoubleToStr(market_stoplevel / pts_per_pip, Digits - PipDigits);
   // Check trend.
   string trend = "Neutral.";
