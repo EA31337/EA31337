@@ -489,7 +489,7 @@ string InitInfo(bool startup = False, string sep = "\n") {
       AccountCompany(), account_type, AccountLeverage(), AccCurrency, sep);
   output += StringFormat("Market variables: Ask: %g, Bid: %g, Volume: %d%s",
       NormalizeDouble(Ask, Digits), NormalizeDouble(Bid, Digits), Volume[0], sep);
-  output += StringFormat("Market constants: Digits: %d, Point: %g, Min Lot: %g, Max Lot: %g, Lot Step: %g, Lot Size: %g, Margin Required: %g, Margin Init: %g, Stop Level: %d points, Freeze level: %d points%s",
+  output += StringFormat("Market constants: Digits: %d, Point: %g, Min Lot: %g, Max Lot: %g, Lot Step: %g, Lot Size: %g, Margin Required: %g, Margin Init: %g, Stop Level: %d pts, Freeze level: %d pts%s",
       Digits,
       NormalizeDouble(Point, Digits),
       NormalizeDouble(market_minlot, PipDigits),
@@ -2833,6 +2833,8 @@ void UpdateTrailingStops() {
         // order_stop_loss = NormalizeDouble(If(OpTypeValue(OrderType()) > 0 || OrderStopLoss() != 0.0, OrderStopLoss(), 999999), PipDigits);
 
         // FIXME
+        // Make sure we get the minimum distance to StopLevel and freezing distance.
+        // See: https://book.mql4.com/appendix/limits
         if (MinimalizeLosses && GetOrderProfit() > GetMinStopLevel()) {
           if ((OrderType() == OP_BUY && OrderStopLoss() < Bid) ||
              (OrderType() == OP_SELL && OrderStopLoss() > Ask)) {
@@ -3554,8 +3556,8 @@ bool ValidSpread() {
     double lot_step = MarketInfo(_Symbol, MODE_LOTSTEP);
     if (real_spread ==  0 || symbol_spread != real_spread) {
         if (VerboseInfo) {
-            PrintFormat("Reported spread: %d points", symbol_spread);
-            PrintFormat("Real spread    : %d points", real_spread);
+            PrintFormat("Reported spread: %d pts", symbol_spread);
+            PrintFormat("Real spread    : %d pts", real_spread);
             PrintFormat("Ask/Bid        : %g/%g", NormalizeDouble(Ask, Digits), NormalizeDouble(Bid, Digits));
             PrintFormat("Symbol digits  : %g", Digits);
             PrintFormat("Lot step       : %g", lot_step);
@@ -3643,12 +3645,14 @@ double GetOrderColor(int cmd = -1) {
  *
  * This is due that at placing of a pending order, the open price cannot be too close to the market.
  * The minimal distance of the pending price from the current market one in points can be obtained
- * using the MarketInfo() function with the MODE_STOPLEVEL parameter. In case of false open price of a pending order,
- * the error 130 (ERR_INVALID_STOPS) will be generated.
+ * using the MarketInfo() function with the MODE_STOPLEVEL parameter.
+ * Related error messages:
+ *   Error 130 (ERR_INVALID_STOPS) happens In case of false open price of a pending order.
+ *   Error 145 (ERR_TRADE_MODIFY_DENIED) happens when modification of order was too close to market.
  *
  */
 double GetMinStopLevel() {
-  return market_stoplevel * Point;
+  return MathMax((market_stoplevel + 1) * Point, (order_freezelevel + 1) * Point);
 }
 
 /*
@@ -3739,7 +3743,7 @@ double GetMarketSpread(bool in_points = false) {
   // return MarketInfo(Symbol(), MODE_SPREAD) / MathPow(10, Digits - PipDigits);
   double spread = If(in_points, SymbolInfoInteger(Symbol(), SYMBOL_SPREAD), Ask - Bid);
   if (in_points) CheckStats(spread, MAX_SPREAD);
-  // if (VerboseTrace) PrintFormat("%s(): Spread: %f (%s)", __FUNCTION__, spread, IfTxt(in_points, "points", "pips"));
+  // if (VerboseTrace) PrintFormat("%s(): Spread: %f (%s)", __FUNCTION__, spread, IfTxt(in_points, "pts", "pips"));
   return spread;
 }
 
@@ -5746,7 +5750,7 @@ string GetMarketTextDetails() {
      "Symbol: ", Symbol(), "; ",
      "Ask: ", DoubleToStr(Ask, Digits), "; ",
      "Bid: ", DoubleToStr(Bid, Digits), "; ",
-     "Spread: ", GetMarketSpread(TRUE), " points = ", ValueToPips(GetMarketSpread()), " pips; "
+     "Spread: ", GetMarketSpread(TRUE), " pts = ", ValueToPips(GetMarketSpread()), " pips; "
    );
 }
 
