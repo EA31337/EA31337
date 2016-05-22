@@ -35,6 +35,7 @@
 //+------------------------------------------------------------------+
 #include <EA\public-classes\Account.mqh>
 #include <EA\public-classes\Arrays.mqh>
+#include <EA\public-classes\Backtest.mqh>
 #include <EA\public-classes\Convert.mqh>
 #include <EA\public-classes\Draw.mqh>
 #include <EA\public-classes\Errors.mqh>
@@ -3479,69 +3480,16 @@ bool ValidSettings() {
        if (PrintLogOnChart) Comment(err);
        return (FALSE);
     }
-    if (!ValidSpread() || !ValidLotstep()) {
-        return (FALSE);
-    }
   #endif
+  if (IsTesting()) {
+      if (!Backtest::ValidSpread() || !Backtest::ValidLotstep()) {
+            if (VerboseErrors) Print(__FUNCTION__ + "(): Error: Backtest settings are invalid!");
+          return (FALSE);
+      }
+  }
   E_Mail = StringTrimLeft(StringTrimRight(E_Mail));
   License = StringTrimLeft(StringTrimRight(License));
   return !StringCompare(ValidEmail(E_Mail), License);
-}
-
-/*
- * Check if spread is valid.
- */
-bool ValidSpread() {
-    long symbol_spread = SymbolInfoInteger(_Symbol, SYMBOL_SPREAD);
-    int real_spread = (int)MathRound((Ask - Bid) * MathPow(10, Digits));
-    double lot_step = MarketInfo(_Symbol, MODE_LOTSTEP);
-    if (real_spread ==  0 || symbol_spread != real_spread) {
-        if (VerboseInfo) {
-            PrintFormat("Reported spread: %d pts", symbol_spread);
-            PrintFormat("Real spread    : %d pts", real_spread);
-            PrintFormat("Ask/Bid        : %g/%g", NormalizeDouble(Ask, Digits), NormalizeDouble(Bid, Digits));
-            PrintFormat("Symbol digits  : %g", Digits);
-            PrintFormat("Lot step       : %g", lot_step);
-        }
-        if (VerboseErrors) PrintFormat("Error: Spread is not valid, it's %d!", real_spread);
-        return (FALSE);
-    }
-    if (VerboseInfo) Print("Spread is valid.");
-    return (TRUE);
-}
-
-
-/*
- * Check if lot step is valid.
- */
-bool ValidLotstep() {
-    long symbol_spread = SymbolInfoInteger(_Symbol, SYMBOL_SPREAD);
-    int real_spread = (int)MathRound((Ask - Bid) * MathPow(10, Digits));
-    double lot_step = MarketInfo(_Symbol, MODE_LOTSTEP);
-    switch (Digits) {
-        case 4:
-            if (lot_step != 0.1) {
-                if (VerboseInfo) {
-                    PrintFormat("Symbol digits  : %g", Digits);
-                    PrintFormat("Lot step       : %g", lot_step);
-                }
-                if (VerboseErrors) PrintFormat("Error: Expected lot step for %d digits: 0.1, found: %g", Digits, lot_step);
-                return (FALSE);
-            }
-            break;
-        case 5:
-            if (lot_step != 0.01) {
-                if (VerboseInfo) {
-                    PrintFormat("Symbol digits  : %g", Digits);
-                    PrintFormat("Lot step       : %g", lot_step);
-                }
-                if (VerboseErrors) PrintFormat("Error: Expected lot step for %d digits: 0.01, found: %g", Digits, lot_step);
-                return (FALSE);
-            }
-            break;
-    }
-    if (VerboseInfo) Print("Lot step is valid.");
-    return (TRUE);
 }
 
 void CheckStats(double value, int type, bool max = true) {
@@ -5032,7 +4980,7 @@ void UpdateStrategyFactor(int period) {
  * Update strategy lot size.
  */
 void UpdateStrategyLotSize() {
-  for (int i; i < ArrayRange(conf, 0); i++) {
+  for (int i = 0; i < ArrayRange(conf, 0); i++) {
     conf[i][LOT_SIZE] = lot_size * conf[i][FACTOR];
   }
 }
