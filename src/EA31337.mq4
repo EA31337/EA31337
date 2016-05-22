@@ -5037,7 +5037,7 @@ int GetStrategyViaIndicator(int indicator, int timeframe) {
  */
 double GetTotalProfit() {
   double total_profit = 0;
-  for (int id; id < ArrayRange(stats, 0); id++) {
+  for (int id = 0; id < ArrayRange(stats, 0); id++) {
     total_profit += stats[id][TOTAL_NET_PROFIT];
   }
   return total_profit;
@@ -5597,7 +5597,7 @@ bool ActionCloseMostUnprofitableOrder(int reason_id = EMPTY){
  */
 bool ActionCloseAllProfitableOrders(int reason_id = EMPTY){
   bool result = FALSE;
-  int selected_orders;
+  int selected_orders = 0;
   double ticket_profit = 0, total_profit = 0;
   for (int order = 0; order < OrdersTotal(); order++) {
     if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
@@ -5621,7 +5621,7 @@ bool ActionCloseAllProfitableOrders(int reason_id = EMPTY){
  */
 bool ActionCloseAllUnprofitableOrders(int reason_id = EMPTY){
   bool result = FALSE;
-  int selected_orders;
+  int selected_orders = 0;
   double ticket_profit = 0, total_profit = 0;
   for (int order = 0; order < OrdersTotal(); order++) {
     if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
@@ -5644,7 +5644,7 @@ bool ActionCloseAllUnprofitableOrders(int reason_id = EMPTY){
  * Execute action to close all orders by specified type.
  */
 bool ActionCloseAllOrdersByType(int cmd = EMPTY, int reason_id = EMPTY){
-  int selected_orders;
+  int selected_orders = 0;
   double ticket_profit = 0, total_profit = 0;
   if (cmd == EMPTY) return (FALSE);
   for (int order = 0; order < OrdersTotal(); order++) {
