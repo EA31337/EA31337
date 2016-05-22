@@ -910,9 +910,9 @@ int ExecuteOrder(int cmd, int sid, double volume = EMPTY, string order_comment =
    if (VerboseDebug) Print(__FUNCTION__ + "(): " + GetMarketTextDetails()); // Print current market information before placing the order.
    double order_price = GetOpenPrice(cmd);
    double stoploss = 0, takeprofit = 0;
-   if (StopLoss > 0.0) stoploss = NormalizeDouble(GetClosePrice(cmd) - (StopLoss + TrailingStop) * pip_size * OpTypeValue(cmd), Digits);
+   if (StopLoss > 0.0) stoploss = NormalizeDouble(GetClosePrice(cmd) - (StopLoss + TrailingStop) * pip_size * Convert::OrderTypeToValue(cmd), Digits);
    else stoploss   = GetTrailingValue(cmd, -1, sid);
-   if (TakeProfit > 0.0) takeprofit = NormalizeDouble(order_price + (TakeProfit + TrailingProfit) * pip_size * OpTypeValue(cmd), Digits);
+   if (TakeProfit > 0.0) takeprofit = NormalizeDouble(order_price + (TakeProfit + TrailingProfit) * pip_size * Convert::OrderTypeToValue(cmd), Digits);
    else takeprofit = GetTrailingValue(cmd, +1, sid);
 
    order_ticket = OrderSend(_Symbol, cmd, volume, NormalizeDouble(order_price, Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + sid, 0, GetOrderColor(cmd));
@@ -2828,7 +2828,7 @@ void UpdateTrailingStops() {
      if (!OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) continue;
       if (OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
         order_type = OrderMagicNumber() - MagicNumber;
-        // order_stop_loss = NormalizeDouble(Misc::If(OpTypeValue(OrderType()) > 0 || OrderStopLoss() != 0.0, OrderStopLoss(), 999999), pip_digits);
+        // order_stop_loss = NormalizeDouble(Misc::If(Convert::OrderTypeToValue(OrderType()) > 0 || OrderStopLoss() != 0.0, OrderStopLoss(), 999999), pip_digits);
 
         // FIXME
         // Make sure we get the minimum distance to StopLevel and freezing distance.
@@ -2890,7 +2890,7 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
      int min_elapsed = (TimeCurrent() - OrderOpenTime()) / 60;
      extra_trail =+ min_elapsed * TrailingStopAddPerMinute;
    }
-   int factor = Misc::If(OpTypeValue(cmd) == loss_or_profit, +1, -1);
+   int factor = Misc::If(Convert::OrderTypeToValue(cmd) == loss_or_profit, +1, -1);
    double trail = (TrailingStop + extra_trail) * pip_size;
    double default_trail = Misc::If(cmd == OP_BUY, Bid, Ask) + trail * factor;
    int method = GetTrailingMethod(order_type, loss_or_profit);
@@ -3090,22 +3090,22 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
        break;
      case T_SAR_PEAK: // 24: Lowest/highest SAR value.
        UpdateIndicator(SAR, timeframe);
-       new_value = Misc::If(OpTypeValue(cmd) == loss_or_profit, Arrays::HighestArrValue2(sar, period), Arrays::LowestArrValue2(sar, period));
+       new_value = Misc::If(Convert::OrderTypeToValue(cmd) == loss_or_profit, Arrays::HighestArrValue2(sar, period), Arrays::LowestArrValue2(sar, period));
        break;
      case T_BANDS: // 25: Current Bands value.
        UpdateIndicator(BANDS, timeframe);
-       new_value = Misc::If(OpTypeValue(cmd) == loss_or_profit, bands[period][CURR][BANDS_UPPER], bands[period][CURR][BANDS_LOWER]);
+       new_value = Misc::If(Convert::OrderTypeToValue(cmd) == loss_or_profit, bands[period][CURR][BANDS_UPPER], bands[period][CURR][BANDS_LOWER]);
        break;
      case T_BANDS_PEAK: // 26: Lowest/highest Bands value.
        UpdateIndicator(BANDS, timeframe);
-       new_value = Misc::If(OpTypeValue(cmd) == loss_or_profit,
+       new_value = Misc::If(Convert::OrderTypeToValue(cmd) == loss_or_profit,
          MathMax(MathMax(bands[period][CURR][BANDS_UPPER], bands[period][PREV][BANDS_UPPER]), bands[period][FAR][BANDS_UPPER]),
          MathMin(MathMin(bands[period][CURR][BANDS_LOWER], bands[period][PREV][BANDS_LOWER]), bands[period][FAR][BANDS_LOWER])
          );
        break;
      case T_ENVELOPES: // 27: Current Envelopes value. // FIXME
        UpdateIndicator(ENVELOPES, timeframe);
-       new_value = Misc::If(OpTypeValue(cmd) == loss_or_profit, envelopes[period][CURR][UPPER], envelopes[period][CURR][LOWER]);
+       new_value = Misc::If(Convert::OrderTypeToValue(cmd) == loss_or_profit, envelopes[period][CURR][UPPER], envelopes[period][CURR][LOWER]);
        break;
      default:
        if (VerboseDebug) Print(__FUNCTION__ + "(): Error: Unknown trailing stop method: ", method);
@@ -3127,11 +3127,11 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
 
    if (TrailingStopOneWay && loss_or_profit < 0 && method > 0) { // If TRUE, move trailing stop only one direction.
      if (previous == 0 && method > 0) previous = default_trail;
-     if (OpTypeValue(cmd) == loss_or_profit) new_value = Misc::If(new_value < previous || previous == 0, new_value, previous);
+     if (Convert::OrderTypeToValue(cmd) == loss_or_profit) new_value = Misc::If(new_value < previous || previous == 0, new_value, previous);
      else new_value = Misc::If(new_value > previous || previous == 0, new_value, previous);
    }
    if (TrailingProfitOneWay && loss_or_profit > 0 && method > 0) { // If TRUE, move profit take only one direction.
-     if (OpTypeValue(cmd) == loss_or_profit) new_value = Misc::If(new_value > previous || previous == 0, new_value, previous);
+     if (Convert::OrderTypeToValue(cmd) == loss_or_profit) new_value = Misc::If(new_value > previous || previous == 0, new_value, previous);
      else new_value = Misc::If(new_value < previous || previous == 0, new_value, previous);
    }
 
@@ -3282,23 +3282,6 @@ double GetPeakPrice(int timeframe, int mode, int bars, int index = CURR) {
   } else {
     return FALSE;
   }
-}
-
-int OpTypeValue(int op_type) {
-   switch (op_type) {
-      case OP_SELL:
-      case OP_SELLLIMIT:
-      case OP_SELLSTOP:
-        return -1;
-        break;
-      case OP_BUY:
-      case OP_BUYLIMIT:
-      case OP_BUYSTOP:
-        return 1;
-        break;
-      default:
-        return FALSE;
-   }
 }
 
 // Calculate open positions (in volume).
@@ -3621,7 +3604,7 @@ double GetOrderProfit() {
  */
 double GetOrderColor(int cmd = -1) {
   if (cmd == -1) cmd = OrderType();
-  return Misc::If(OpTypeValue(cmd) > 0, (int)ColorBuy, (int)ColorSell);
+  return Misc::If(Convert::OrderTypeToValue(cmd) > 0, (int)ColorBuy, (int)ColorSell);
 }
 
 /*
