@@ -3135,7 +3135,7 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
      else new_value = Misc::If(new_value < previous || previous == 0, new_value, previous);
    }
 
-   // if (VerboseDebug && IsVisualMode()) ShowLine("trail_stop_" + OrderTicket(), new_value, GetOrderColor());
+   // if (VerboseDebug && IsVisualMode()) Draw::ShowLine("trail_stop_" + OrderTicket(), new_value, GetOrderColor());
    return NormalizeDouble(new_value, Digits);
 }
 
@@ -3238,12 +3238,6 @@ int GetTrailingMethod(int order_type, int stop_or_profit) {
       if (VerboseTrace) Print(__FUNCTION__ + "(): Unknown order type: " + order_type);
   }
   return Misc::If(stop_or_profit > 0, profit_method, stop_method);
-}
-
-void ShowLine(string oname, double price, int colour = Yellow) {
-    ObjectCreate(ChartID(), oname, OBJ_HLINE, 0, Time[0], price, 0, 0);
-    ObjectSet(oname, OBJPROP_COLOR, colour);
-    ObjectMove(oname, 0, Time[0], price);
 }
 
 /*
