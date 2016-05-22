@@ -908,9 +908,9 @@ int ExecuteOrder(int cmd, int sid, double volume = EMPTY, string order_comment =
    // Calculate take profit and stop loss.
    RefreshRates();
    if (VerboseDebug) Print(__FUNCTION__ + "(): " + GetMarketTextDetails()); // Print current market information before placing the order.
-   double order_price = GetOpenPrice(cmd);
+   double order_price = Market::GetOpenPrice(cmd);
    double stoploss = 0, takeprofit = 0;
-   if (StopLoss > 0.0) stoploss = NormalizeDouble(GetClosePrice(cmd) - (StopLoss + TrailingStop) * pip_size * Convert::OrderTypeToValue(cmd), Digits);
+   if (StopLoss > 0.0) stoploss = NormalizeDouble(Market::GetClosePrice(cmd) - (StopLoss + TrailingStop) * pip_size * Convert::OrderTypeToValue(cmd), Digits);
    else stoploss   = GetTrailingValue(cmd, -1, sid);
    if (TakeProfit > 0.0) takeprofit = NormalizeDouble(order_price + (TakeProfit + TrailingProfit) * pip_size * Convert::OrderTypeToValue(cmd), Digits);
    else takeprofit = GetTrailingValue(cmd, +1, sid);
@@ -1061,7 +1061,7 @@ bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = TRUE)
   } else {
     ticket_no = OrderTicket();
   }
-  double close_price = NormalizeDouble(GetClosePrice(), Digits);
+  double close_price = NormalizeDouble(Market::GetClosePrice(), Digits);
   result = OrderClose(ticket_no, OrderLots(), close_price, max_order_slippage, GetOrderColor());
   // if (VerboseTrace) Print(__FUNCTION__ + "(): CloseOrder request. Reason: " + reason + "; Result=" + result + " @ " + TimeCurrent() + "(" + TimeToStr(TimeCurrent()) + "), ticket# " + ticket_no);
   if (result) {
@@ -2782,7 +2782,7 @@ bool CheckMinPipGap(int strategy_type) {
   for (int order = 0; order < OrdersTotal(); order++) {
     if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
        if (OrderMagicNumber() == MagicNumber + strategy_type && OrderSymbol() == Symbol()) {
-         diff = MathAbs((OrderOpenPrice() - GetOpenPrice()) / pip_size);
+         diff = MathAbs((OrderOpenPrice() - Market::GetOpenPrice()) / pip_size);
          // if (VerboseTrace) Print("Ticket: ", OrderTicket(), ", Order: ", OrderType(), ", Gap: ", diff);
          if (diff < MinPipGap) {
            return FALSE;
@@ -2798,7 +2798,7 @@ bool CheckMinPipGap(int strategy_type) {
 // Validate value for trailing stop.
 bool ValidTrailingValue(double value, int cmd, int loss_or_profit = -1, bool existing = FALSE) {
   double delta = GetMarketGap(); // Calculate minimum market gap.
-  double price = GetOpenPrice();
+  double price = Market::GetOpenPrice();
   bool valid = (
           (cmd == OP_BUY  && loss_or_profit < 0 && price - value > delta)
        || (cmd == OP_BUY  && loss_or_profit > 0 && value - price > delta)
@@ -3244,26 +3244,6 @@ void ShowLine(string oname, double price, int colour = Yellow) {
     ObjectCreate(ChartID(), oname, OBJ_HLINE, 0, Time[0], price, 0, 0);
     ObjectSet(oname, OBJPROP_COLOR, colour);
     ObjectMove(oname, 0, Time[0], price);
-}
-
-/*
- * Get current open price depending on the operation type.
- * @param:
- *   op_type (int)
- */
-double GetOpenPrice(int op_type = EMPTY_VALUE) {
-   if (op_type == EMPTY_VALUE) op_type = OrderType();
-   return Misc::If(op_type == OP_BUY, Ask, Bid);
-}
-
-/*
- * Get current close price depending on the operation type.
- * @param:
- *   op_type (int)
- */
-double GetClosePrice(int op_type = EMPTY_VALUE) {
-   if (op_type == EMPTY_VALUE) op_type = OrderType();
-   return Misc::If(op_type == OP_BUY, Bid, Ask);
 }
 
 /*
