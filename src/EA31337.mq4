@@ -36,6 +36,7 @@
 #include <EA\public-classes\Market.mqh>
 #include <EA\public-classes\Arrays.mqh>
 #include <EA\public-classes\Draw.mqh>
+#include <EA\public-classes\Misc.mqh>
 
 //#property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 
@@ -437,7 +438,7 @@ int OnInit() {
   ea_active = TRUE;
   WindowRedraw();
 
-  return If(session_initiated, INIT_SUCCEEDED, INIT_FAILED);
+  return Misc::If(session_initiated, (int)INIT_SUCCEEDED, (int)INIT_FAILED);
 } // end: OnInit()
 
 //+------------------------------------------------------------------+
@@ -828,7 +829,7 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
         if (rsi[period][i] > rsi_stats[period][UPPER]) rsi_stats[period][UPPER] = rsi[period][i]; // Calculate maximum value.
         if (rsi[period][i] < rsi_stats[period][LOWER] || rsi_stats[period][LOWER] == 0) rsi_stats[period][LOWER] = rsi[period][i]; // Calculate minimum value.
       }
-      rsi_stats[period][0] = If(rsi_stats[period][0] > 0, (rsi_stats[period][0] + rsi[period][0] + rsi[period][1] + rsi[period][2]) / 4, (rsi[period][0] + rsi[period][1] + rsi[period][2]) / 3); // Calculate average value.
+      rsi_stats[period][0] = Misc::If(rsi_stats[period][0] > 0, (rsi_stats[period][0] + rsi[period][0] + rsi[period][1] + rsi[period][2]) / 4, (rsi[period][0] + rsi[period][1] + rsi[period][2]) / 3); // Calculate average value.
       break;
     case RVI: // Calculates the Relative Strength Index indicator.
       rvi[period][CURR][MODE_MAIN]   = iRVI(_Symbol, timeframe, 10, MODE_MAIN, CURR);
@@ -1042,7 +1043,7 @@ bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
  *   If TRUE, the spread is fine, otherwise return FALSE.
  */
 bool CheckSpreadLimit(int sid) {
-  double spread_limit = If(conf[sid][SPREAD_LIMIT] > 0, MathMin(conf[sid][SPREAD_LIMIT], MaxSpreadToTrade), MaxSpreadToTrade);
+  double spread_limit = Misc::If(conf[sid][SPREAD_LIMIT] > 0, MathMin(conf[sid][SPREAD_LIMIT], MaxSpreadToTrade), MaxSpreadToTrade);
   #ifdef __backtest__ if (curr_spread > 10) { PrintFormat("%s(): Error: %s", __FUNCTION__, "Backtesting over 10 pips not supported, sorry."); ExpertRemove(); } #endif
   return curr_spread <= spread_limit;
 }
@@ -2825,7 +2826,7 @@ void UpdateTrailingStops() {
      if (!OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) continue;
       if (OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
         order_type = OrderMagicNumber() - MagicNumber;
-        // order_stop_loss = NormalizeDouble(If(OpTypeValue(OrderType()) > 0 || OrderStopLoss() != 0.0, OrderStopLoss(), 999999), pip_digits);
+        // order_stop_loss = NormalizeDouble(Misc::If(OpTypeValue(OrderType()) > 0 || OrderStopLoss() != 0.0, OrderStopLoss(), 999999), pip_digits);
 
         // FIXME
         // Make sure we get the minimum distance to StopLevel and freezing distance.
@@ -2887,14 +2888,14 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
      int min_elapsed = (TimeCurrent() - OrderOpenTime()) / 60;
      extra_trail =+ min_elapsed * TrailingStopAddPerMinute;
    }
-   int factor = If(OpTypeValue(cmd) == loss_or_profit, +1, -1);
+   int factor = Misc::If(OpTypeValue(cmd) == loss_or_profit, +1, -1);
    double trail = (TrailingStop + extra_trail) * pip_size;
-   double default_trail = If(cmd == OP_BUY, Bid, Ask) + trail * factor;
+   double default_trail = Misc::If(cmd == OP_BUY, Bid, Ask) + trail * factor;
    int method = GetTrailingMethod(order_type, loss_or_profit);
    // if (loss_or_profit > 0) method = AC_TrailingProfitMethod; else if (loss_or_profit < 0) method = AC_TrailingStopMethod; // Testing.
    int timeframe = GetStrategyTimeframe(order_type);
    int period = TfToPeriod(timeframe);
-   int symbol = If(existing, OrderSymbol(), _Symbol);
+   int symbol = Misc::If(existing, OrderSymbol(), _Symbol);
 
 /*
   MA1+MA5+MA15+MA30 backtest log (auto,ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, 9,5mln ticks, quality 25%]:
@@ -3087,22 +3088,22 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
        break;
      case T_SAR_PEAK: // 24: Lowest/highest SAR value.
        UpdateIndicator(SAR, timeframe);
-       new_value = If(OpTypeValue(cmd) == loss_or_profit, Arrays::HighestArrValue2(sar, period), Arrays::LowestArrValue2(sar, period));
+       new_value = Misc::If(OpTypeValue(cmd) == loss_or_profit, Arrays::HighestArrValue2(sar, period), Arrays::LowestArrValue2(sar, period));
        break;
      case T_BANDS: // 25: Current Bands value.
        UpdateIndicator(BANDS, timeframe);
-       new_value = If(OpTypeValue(cmd) == loss_or_profit, bands[period][CURR][BANDS_UPPER], bands[period][CURR][BANDS_LOWER]);
+       new_value = Misc::If(OpTypeValue(cmd) == loss_or_profit, bands[period][CURR][BANDS_UPPER], bands[period][CURR][BANDS_LOWER]);
        break;
      case T_BANDS_PEAK: // 26: Lowest/highest Bands value.
        UpdateIndicator(BANDS, timeframe);
-       new_value = If(OpTypeValue(cmd) == loss_or_profit,
+       new_value = Misc::If(OpTypeValue(cmd) == loss_or_profit,
          MathMax(MathMax(bands[period][CURR][BANDS_UPPER], bands[period][PREV][BANDS_UPPER]), bands[period][FAR][BANDS_UPPER]),
          MathMin(MathMin(bands[period][CURR][BANDS_LOWER], bands[period][PREV][BANDS_LOWER]), bands[period][FAR][BANDS_LOWER])
          );
        break;
      case T_ENVELOPES: // 27: Current Envelopes value. // FIXME
        UpdateIndicator(ENVELOPES, timeframe);
-       new_value = If(OpTypeValue(cmd) == loss_or_profit, envelopes[period][CURR][UPPER], envelopes[period][CURR][LOWER]);
+       new_value = Misc::If(OpTypeValue(cmd) == loss_or_profit, envelopes[period][CURR][UPPER], envelopes[period][CURR][LOWER]);
        break;
      default:
        if (VerboseDebug) Print(__FUNCTION__ + "(): Error: Unknown trailing stop method: ", method);
@@ -3117,19 +3118,19 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
        if (existing && previous == 0) previous = default_trail;
      #endif
      if (VerboseTrace)
-       Print(__FUNCTION__ + "(): Error: method = " + method + ", ticket = #" + If(existing, OrderTicket(), 0) + ": Invalid Trailing Value: ", new_value, ", previous: ", previous, "; ", GetOrderTextDetails(), ", delta: ", DoubleToStr(delta, pip_digits));
+       Print(__FUNCTION__ + "(): Error: method = " + method + ", ticket = #" + Misc::If(existing, OrderTicket(), 0) + ": Invalid Trailing Value: ", new_value, ", previous: ", previous, "; ", GetOrderTextDetails(), ", delta: ", DoubleToStr(delta, pip_digits));
      // If value is invalid, fallback to the previous one.
      return previous;
    }
 
    if (TrailingStopOneWay && loss_or_profit < 0 && method > 0) { // If TRUE, move trailing stop only one direction.
      if (previous == 0 && method > 0) previous = default_trail;
-     if (OpTypeValue(cmd) == loss_or_profit) new_value = If(new_value < previous || previous == 0, new_value, previous);
-     else new_value = If(new_value > previous || previous == 0, new_value, previous);
+     if (OpTypeValue(cmd) == loss_or_profit) new_value = Misc::If(new_value < previous || previous == 0, new_value, previous);
+     else new_value = Misc::If(new_value > previous || previous == 0, new_value, previous);
    }
    if (TrailingProfitOneWay && loss_or_profit > 0 && method > 0) { // If TRUE, move profit take only one direction.
-     if (OpTypeValue(cmd) == loss_or_profit) new_value = If(new_value > previous || previous == 0, new_value, previous);
-     else new_value = If(new_value < previous || previous == 0, new_value, previous);
+     if (OpTypeValue(cmd) == loss_or_profit) new_value = Misc::If(new_value > previous || previous == 0, new_value, previous);
+     else new_value = Misc::If(new_value < previous || previous == 0, new_value, previous);
    }
 
    // if (VerboseDebug && IsVisualMode()) ShowLine("trail_stop_" + OrderTicket(), new_value, GetOrderColor());
@@ -3234,7 +3235,7 @@ int GetTrailingMethod(int order_type, int stop_or_profit) {
     default:
       if (VerboseTrace) Print(__FUNCTION__ + "(): Unknown order type: " + order_type);
   }
-  return If(stop_or_profit > 0, profit_method, stop_method);
+  return Misc::If(stop_or_profit > 0, profit_method, stop_method);
 }
 
 void ShowLine(string oname, double price, int colour = Yellow) {
@@ -3250,7 +3251,7 @@ void ShowLine(string oname, double price, int colour = Yellow) {
  */
 double GetOpenPrice(int op_type = EMPTY_VALUE) {
    if (op_type == EMPTY_VALUE) op_type = OrderType();
-   return If(op_type == OP_BUY, Ask, Bid);
+   return Misc::If(op_type == OP_BUY, Ask, Bid);
 }
 
 /*
@@ -3260,7 +3261,7 @@ double GetOpenPrice(int op_type = EMPTY_VALUE) {
  */
 double GetClosePrice(int op_type = EMPTY_VALUE) {
    if (op_type == EMPTY_VALUE) op_type = OrderType();
-   return If(op_type == OP_BUY, Bid, Ask);
+   return Misc::If(op_type == OP_BUY, Bid, Ask);
 }
 
 /*
@@ -3296,20 +3297,6 @@ int OpTypeValue(int op_type) {
       default:
         return FALSE;
    }
-}
-
-// Return double depending on the condition.
-double If(bool condition, double on_true, double on_false) {
-   // if condition is TRUE, return on_true, otherwise on_false
-   if (condition) return (on_true);
-   else return (on_false);
-}
-
-// Return string depending on the condition.
-string IfTxt(bool condition, string on_true, string on_false) {
-   // if condition is TRUE, return on_true, otherwise on_false
-   if (condition) return (on_true);
-   else return (on_false);
 }
 
 // Calculate open positions (in volume).
@@ -3632,7 +3619,7 @@ double GetOrderProfit() {
  */
 double GetOrderColor(int cmd = -1) {
   if (cmd == -1) cmd = OrderType();
-  return If(OpTypeValue(cmd) > 0, ColorBuy, ColorSell);
+  return Misc::If(OpTypeValue(cmd) > 0, (int)ColorBuy, (int)ColorSell);
 }
 
 /*
@@ -3675,7 +3662,7 @@ double PointsToPips(int points) {
  * Get the difference between two price values (in pips).
  */
 double GetPipDiff(double price1, double price2, bool abs = false) {
-  double diff = If(abs, MathAbs(price1 - price2), price1 - price2);
+  double diff = Misc::If(abs, MathAbs(price1 - price2), price1 - price2);
   return ValueToPips(diff);
 }
 
@@ -3688,7 +3675,7 @@ string ValueToCurrency(double value, int digits = 2) {
   else if (AccCurrency == "GBP") sign = '£';
   else if (AccCurrency == "EUR") sign = '€';
   else { sign = AccCurrency; prefix = FALSE; }
-  return IfTxt(prefix, CharToString(sign) + DoubleToStr(value, digits), DoubleToStr(value, digits) + CharToString(sign));
+  return Misc::IfS(prefix, CharToString(sign) + DoubleToStr(value, digits), DoubleToStr(value, digits) + CharToString(sign));
 }
 
 /*
@@ -3699,15 +3686,15 @@ string ValueToCurrency(double value, int digits = 2) {
  */
 double GetMarketSpread(bool in_points = false) {
   // return MarketInfo(Symbol(), MODE_SPREAD) / MathPow(10, Digits - pip_digits);
-  double spread = If(in_points, SymbolInfoInteger(Symbol(), SYMBOL_SPREAD), Ask - Bid);
+  double spread = Misc::If(in_points, SymbolInfoInteger(Symbol(), SYMBOL_SPREAD), Ask - Bid);
   if (in_points) CheckStats(spread, MAX_SPREAD);
-  // if (VerboseTrace) PrintFormat("%s(): Spread: %f (%s)", __FUNCTION__, spread, IfTxt(in_points, "pts", "pips"));
+  // if (VerboseTrace) PrintFormat("%s(): Spread: %f (%s)", __FUNCTION__, spread, Misc::IfS(in_points, "pts", "pips"));
   return spread;
 }
 
 // Get current minimum marker gap (in points).
 double GetMarketGap(bool in_points = false) {
-  return If(in_points, market_stoplevel + GetMarketSpread(TRUE), (market_stoplevel + GetMarketSpread(TRUE)) * Point);
+  return Misc::If(in_points, market_stoplevel + GetMarketSpread(TRUE), (market_stoplevel + GetMarketSpread(TRUE)) * Point);
 }
 
 /*
@@ -3821,9 +3808,9 @@ int GetMaxOrdersPerDay() {
  */
 int GetMaxOrders() {
   #ifdef __advanced__
-    return If(MaxOrders > 0, If(MaxOrdersPerDay > 0, MathMin(MaxOrders, GetMaxOrdersPerDay()), MaxOrders), GetMaxOrdersAuto());
+    return Misc::If(MaxOrders > 0, Misc::If(MaxOrdersPerDay > 0, MathMin(MaxOrders, GetMaxOrdersPerDay()), MaxOrders), GetMaxOrdersAuto());
   #else
-    return If(MaxOrders > 0, MaxOrders, GetMaxOrdersAuto());
+    return Misc::If(MaxOrders > 0, MaxOrders, GetMaxOrdersAuto());
   #endif
 }
 
@@ -3831,7 +3818,7 @@ int GetMaxOrders() {
  * Calculate number of maximum of orders allowed to open per type.
  */
 int GetMaxOrdersPerType() {
-  return If(MaxOrdersPerType > 0, MaxOrdersPerType, MathMax(MathFloor(max_orders / MathMax(GetNoOfStrategies(), 1) ), 1) * 2);
+  return Misc::If(MaxOrdersPerType > 0, (int)MaxOrdersPerType, (int)MathMax(MathFloor(max_orders / MathMax(GetNoOfStrategies(), 1) ), 1) * 2);
 }
 
 /*
@@ -3887,7 +3874,7 @@ double GetAutoLotSize(bool smooth = true) {
  * Return current lot size to trade.
  */
 double GetLotSize() {
-  return NormalizeLots(If(LotSize == 0, GetAutoLotSize(), LotSize));
+  return NormalizeLots(Misc::If(LotSize == 0, GetAutoLotSize(), LotSize));
 }
 
 /*
@@ -3902,7 +3889,7 @@ double GetAutoRiskRatio() {
 
   #ifdef __advanced__
     int margin_pc = 100 / equity * margin;
-    rr_text = IfTxt(new_risk_ratio < 1.0, StringFormat("-MarginUsed=%d%%|", margin_pc), ""); string s = "|";
+    rr_text = Misc::IfS(new_risk_ratio < 1.0, StringFormat("-MarginUsed=%d%%|", margin_pc), ""); string s = "|";
     if ((RiskRatioIncreaseMethod &   1) != 0) if (AccCondition(C_ACC_IN_PROFIT))      { new_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
     if ((RiskRatioIncreaseMethod &   2) != 0) if (AccCondition(C_EQUITY_10PC_LOW))    { new_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
     if ((RiskRatioIncreaseMethod &   4) != 0) if (AccCondition(C_EQUITY_20PC_LOW))    { new_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
@@ -3932,7 +3919,7 @@ double GetAutoRiskRatio() {
  * Return risk ratio value.
  */
 double GetRiskRatio() {
-  return If(RiskRatio == 0, GetAutoRiskRatio(), RiskRatio);
+  return Misc::If(RiskRatio == 0, GetAutoRiskRatio(), RiskRatio);
 }
 
 /*
@@ -5057,7 +5044,7 @@ double GetDefaultLotFactor() {
  * Calculate lot size for specific strategy.
  */
 double GetStrategyLotSize(int sid, int cmd) {
-  double trade_lot = If(conf[sid][LOT_SIZE], conf[sid][LOT_SIZE], lot_size) * If(conf[sid][FACTOR], conf[sid][FACTOR], 1.0);
+  double trade_lot = Misc::If(conf[sid][LOT_SIZE], conf[sid][LOT_SIZE], lot_size) * Misc::If(conf[sid][FACTOR], conf[sid][FACTOR], 1.0);
   #ifdef __advanced__
   if (Boosting_Enabled) {
     double pf = GetStrategyProfitFactor(sid);
@@ -5154,7 +5141,7 @@ double GetStrategyProfitFactor(int id) {
 double GetStrategyOpenLevel(int indicator, int timeframe = PERIOD_M30, double default_value = 0.0) {
   int sid = GetStrategyViaIndicator(indicator, timeframe);
   // Message(StringFormat("%s(): indi = %d, timeframe = %d, sid = %d, open_level = %f", __FUNCTION__, indicator, timeframe, sid, conf[sid][OPEN_LEVEL]));
-  return If(sid != EMPTY, conf[sid][OPEN_LEVEL], default_value);
+  return Misc::If(sid != EMPTY, conf[sid][OPEN_LEVEL], default_value);
 }
 
 /*
@@ -5162,14 +5149,14 @@ double GetStrategyOpenLevel(int indicator, int timeframe = PERIOD_M30, double de
  */
 int GetStrategyOpenMethod(int indicator, int timeframe = PERIOD_M30, int default_value = 0) {
   int sid = GetStrategyViaIndicator(indicator, timeframe);
-  return If(sid != EMPTY, info[sid][OPEN_METHOD], default_value);
+  return Misc::If(sid != EMPTY, info[sid][OPEN_METHOD], default_value);
 }
 
 /*
  * Fetch strategy timeframe based on the strategy type.
  */
 int GetStrategyTimeframe(int sid, int default_value = PERIOD_M1) {
-  return If(sid >= 0, info[sid][TIMEFRAME], default_value);
+  return Misc::If(sid >= 0, info[sid][TIMEFRAME], default_value);
 }
 
 /*
@@ -5274,11 +5261,11 @@ double GetTotalProfit() {
  */
 void ApplyStrategyMultiplierFactor(int period = DAILY, int loss_or_profit = 0, double factor = 1.0) {
   if (GetNoOfStrategies() <= 1 || factor == 1.0) return;
-  int key = If(period == MONTHLY, MONTHLY_PROFIT, If(period == WEEKLY, WEEKLY_PROFIT, DAILY_PROFIT));
-  string period_name = IfTxt(period == MONTHLY, "montly", IfTxt(period == WEEKLY, "weekly", "daily"));
-  int new_strategy = If(loss_or_profit > 0, Arrays::GetArrKey1ByHighestKey2ValueD(stats, key), Arrays::GetArrKey1ByLowestKey2ValueD(stats, key));
+  int key = Misc::If(period == MONTHLY, MONTHLY_PROFIT, Misc::If(period == WEEKLY, (int)WEEKLY_PROFIT, (int)DAILY_PROFIT));
+  string period_name = Misc::IfS(period == MONTHLY, "montly", Misc::IfS(period == WEEKLY, "weekly", "daily"));
+  int new_strategy = Misc::If(loss_or_profit > 0, Arrays::GetArrKey1ByHighestKey2ValueD(stats, key), Arrays::GetArrKey1ByLowestKey2ValueD(stats, key));
   if (new_strategy == EMPTY) return;
-  int previous = If(loss_or_profit > 0, best_strategy[period], worse_strategy[period]);
+  int previous = Misc::If(loss_or_profit > 0, best_strategy[period], worse_strategy[period]);
   double new_factor = 1.0;
   if (loss_or_profit > 0) { // Best strategy.
     if (info[new_strategy][ACTIVE] && stats[new_strategy][key] > 10 && new_strategy != previous) { // Check if it's different than the previous one.
@@ -5418,7 +5405,7 @@ bool RSI_DecreasePeriod(int tf = PERIOD_M1, int condition = 0) {
 int GetIdByMagic(int magic = EMPTY) {
   if (magic == EMPTY) magic = OrderMagicNumber();
   int id = magic - MagicNumber;
-  return If(CheckOurMagicNumber(magic), id, EMPTY);
+  return Misc::If(CheckOurMagicNumber(magic), id, EMPTY);
 }
 
 /* END: STRATEGY FUNCTIONS */
@@ -5486,7 +5473,7 @@ void CalculateSupRes() {
 string GetHourlyReport(string sep = ", ") {
   string output = StringFormat("Hourly profit (total: %.1fp): ", Arrays::GetArrSumKey1(hourly_profit, day_of_year));
   for (int h = 0; h < hour_of_day; h++) {
-    output += StringFormat("%d: %.1fp%s", h, hourly_profit[day_of_year][h], IfTxt(h < hour_of_day, sep, ""));
+    output += StringFormat("%d: %.1fp%s", h, hourly_profit[day_of_year][h], Misc::IfS(h < hour_of_day, sep, ""));
   }
   return output;
 }
@@ -5592,7 +5579,7 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
   string indent = "";
   indent = "                      "; // if (total_orders > 5)?
   output = indent + "------------------------------------------------" + sep
-                  + indent + StringFormat("| %s v%s (Status: %s)%s", ea_name, ea_version, IfTxt(ea_active, "ACTIVE", "NOT ACTIVE"), sep)
+                  + indent + StringFormat("| %s v%s (Status: %s)%s", ea_name, ea_version, Misc::IfS(ea_active, "ACTIVE", "NOT ACTIVE"), sep)
                   + indent + StringFormat("| ACCOUNT INFORMATION:%s", sep)
                   + indent + StringFormat("| Server Name: %s, Time: %s%s", AccountInfoString(ACCOUNT_SERVER), TimeToStr(time_current, TIME_DATE|TIME_MINUTES|TIME_SECONDS), sep)
                   + indent + "| Acc Number: " + IntegerToString(AccountNumber()) + "; Acc Name: " + AccountName() + "; Broker: " + AccountCompany() + " (Type: " + account_type + ")" + sep
@@ -5954,8 +5941,8 @@ int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = TRUE) {
  */
 bool ActionExecute(int aid, int id = EMPTY) {
   bool result = FALSE;
-  int reason_id = If(id != EMPTY, acc_conditions[id][0], EMPTY); // Account id condition.
-  int mid = If(id != EMPTY, acc_conditions[id][1], EMPTY); // Market id condition.
+  int reason_id = Misc::If(id != EMPTY, acc_conditions[id][0], EMPTY); // Account id condition.
+  int mid = Misc::If(id != EMPTY, acc_conditions[id][1], EMPTY); // Market id condition.
   int cmd;
   switch (aid) {
     case A_NONE: /* 0 */
