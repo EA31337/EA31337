@@ -33,6 +33,7 @@
 //+------------------------------------------------------------------+
 //| Public classes.
 //+------------------------------------------------------------------+
+#include <EA\public-classes\Account.mqh>
 #include <EA\public-classes\Arrays.mqh>
 #include <EA\public-classes\Convert.mqh>
 #include <EA\public-classes\Draw.mqh>
@@ -1003,7 +1004,7 @@ bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
     OrderQueueAdd(sid, cmd);
     #endif
     result = FALSE;
-  } else if (!CheckFreeMargin(cmd, volume)) {
+  } else if (!Account::CheckFreeMargin(cmd, volume)) {
     err = "No money to open more orders.";
     if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + last_err);
     if (VerboseErrors && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
@@ -3541,16 +3542,6 @@ bool ValidLotstep() {
     }
     if (VerboseInfo) Print("Lot step is valid.");
     return (TRUE);
-}
-
-/*
- * Check account free margin.
- */
-bool CheckFreeMargin(int op_type, double size_of_lot) {
-   bool margin_ok = TRUE;
-   double margin = AccountFreeMarginCheck(Symbol(), op_type, size_of_lot);
-   if (GetLastError() == 134 /* NOT_ENOUGH_MONEY */) margin_ok = FALSE;
-   return (margin_ok);
 }
 
 void CheckStats(double value, int type, bool max = true) {
