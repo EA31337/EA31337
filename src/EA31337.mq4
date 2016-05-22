@@ -36,6 +36,7 @@
 #include <EA\public-classes\Account.mqh>
 #include <EA\public-classes\Arrays.mqh>
 #include <EA\public-classes\Backtest.mqh>
+#include <EA\public-classes\Check.mqh>
 #include <EA\public-classes\Convert.mqh>
 #include <EA\public-classes\Draw.mqh>
 #include <EA\public-classes\Errors.mqh>
@@ -398,7 +399,7 @@ int OnInit() {
       if (VerboseErrors) Print(__FUNCTION__ + "(): " + err);
       return (INIT_PARAMETERS_INCORRECT); // Incorrect set of input parameters.
     }
-    if (!IsTesting() && AccountNumber() <= 1) {
+    if (!Check::IsTesting() && AccountNumber() <= 1) {
       err = "Error: EA requires on-line Terminal.";
       Comment(err);
       if (VerboseErrors) Print(__FUNCTION__ + "(): " + err);
@@ -416,12 +417,12 @@ int OnInit() {
   if (SmartToggleComponent) ToggleComponent(SmartToggleComponent);
   #endif
 
-  if (IsTesting()) {
+  if (Check::IsTesting()) {
     SendEmailEachOrder = FALSE;
     SoundAlert = FALSE;
-    if (!IsVisualMode()) PrintLogOnChart = FALSE;
+    if (!Check::IsVisualMode()) PrintLogOnChart = FALSE;
     if (market_stoplevel == 0) market_stoplevel = DemoMarketStopLevel; // When testing, we need to simulate real MODE_STOPLEVEL = 30 (as it's in real account), in demo it's 0.
-    if (IsOptimization()) {
+    if (Check::IsOptimization()) {
       VerboseErrors = FALSE;
       VerboseInfo   = FALSE;
       VerboseDebug  = FALSE;
@@ -455,7 +456,7 @@ void OnDeinit(const int reason) {
     Print(GetSummaryText());
   }
 
-  if (WriteReport && !IsOptimization() && session_initiated) { // FIXME: MQL5 for IsOptimization
+  if (WriteReport && !Check::IsOptimization() && session_initiated) {
     //if (reason == REASON_CHARTCHANGE)
     double ExtInitialDeposit = CalculateInitialDeposit();
     CalculateSummary(ExtInitialDeposit);
@@ -796,7 +797,7 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
       ma_slow[period][CURR] = iMA(NULL, timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, CURR); // Current
       ma_slow[period][PREV] = iMA(NULL, timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, PREV + MA_Shift_Slow); // Previous
       ma_slow[period][FAR]  = iMA(NULL, timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Slow + MA_Shift_Far);
-      if (VerboseDebug && IsVisualMode()) Draw::DrawMA(timeframe);
+      if (VerboseDebug && Check::IsVisualMode()) Draw::DrawMA(timeframe);
       break;
     case MACD: // Calculates the Moving Averages Convergence/Divergence indicator.
       macd[period][CURR][MODE_MAIN]   = iMACD(NULL, timeframe, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN,   CURR); // Current
@@ -867,7 +868,7 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
       break;
   } // end: switch
 
-  processed[type][period] = time_current;
+  processed[type][period] = time_current; // @fixme: warning 43: possible loss of data due to type conversion
   return (TRUE);
 }
 
@@ -916,6 +917,7 @@ int ExecuteOrder(int cmd, int sid, double volume = EMPTY, string order_comment =
    if (TakeProfit > 0.0) takeprofit = NormalizeDouble(order_price + (TakeProfit + TrailingProfit) * pip_size * Convert::OrderTypeToValue(cmd), Digits);
    else takeprofit = GetTrailingValue(cmd, +1, sid);
 
+   // @fixme: warning 43: possible loss of data due to type conversion: max_order_slippage & GetOrderColor
    order_ticket = OrderSend(_Symbol, cmd, volume, NormalizeDouble(order_price, Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + sid, 0, GetOrderColor(cmd));
    if (order_ticket >= 0) {
       total_orders++;
@@ -923,6 +925,7 @@ int ExecuteOrder(int cmd, int sid, double volume = EMPTY, string order_comment =
       if (!OrderSelect(order_ticket, SELECT_BY_TICKET) && VerboseErrors) {
         Print(__FUNCTION__ + "(): OrderSelect() error = ", ErrorDescription(GetLastError()));
         OrderPrint();
+        // @fixme: warning 43: possible loss of data due to type conversion: volume
         if (retry) TaskAddOrderOpen(cmd, volume, sid); // Will re-try again.
         info[sid][TOTAL_ERRORS]++;
         return (FALSE);
@@ -3136,7 +3139,7 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
      else new_value = Misc::If(new_value < previous || previous == 0, new_value, previous);
    }
 
-   // if (VerboseDebug && IsVisualMode()) Draw::ShowLine("trail_stop_" + OrderTicket(), new_value, GetOrderColor());
+   // if (VerboseDebug && Check::IsVisualMode()) Draw::ShowLine("trail_stop_" + OrderTicket(), new_value, GetOrderColor());
    return NormalizeDouble(new_value, Digits);
 }
 
@@ -3393,7 +3396,7 @@ bool TradeAllowed() {
     last_err = err;
     return (FALSE);
   }
-  if (!IsTesting() && Volume[0] < MinVolumeToTrade) {
+  if (!Check::IsTesting() && Volume[0] < MinVolumeToTrade) {
     err = "Volume too low to trade.";
     if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "(): " + err);
     //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "(): " + err);
@@ -3436,7 +3439,7 @@ bool TradeAllowed() {
     ea_active = FALSE;
     return (FALSE);
   }
-  if (!IsTesting() && !MarketInfo(Symbol(), MODE_TRADEALLOWED)) {
+  if (!Check::IsTesting() && !MarketInfo(Symbol(), MODE_TRADEALLOWED)) {
     err = "Trade is not allowed. Market is closed.";
     if (VerboseInfo && err != last_err) Print(__FUNCTION__ + "(): " + err);
     //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + err);
@@ -3444,7 +3447,7 @@ bool TradeAllowed() {
     ea_active = FALSE;
     return (FALSE);
   }
-  if (!IsTesting() && !IsExpertEnabled()) {
+  if (!Check::IsTesting() && !IsExpertEnabled()) {
     err = "Error: You need to enable: 'Enable Expert Advisor'/'AutoTrading'.";
     if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "(): " + err);
     last_err = err;
@@ -3474,16 +3477,16 @@ bool ValidSettings() {
     return (FALSE);
   }
   #ifdef __backtest__
-    if (!IsTesting()) {
+    if (!Check::IsTesting()) {
        err = "Error: This version is compiled for backtest mode only.";
        if (VerboseErrors) Print(__FUNCTION__ + "(): " + err);
        if (PrintLogOnChart) Comment(err);
        return (FALSE);
     }
   #endif
-  if (IsTesting()) {
+  if (Check::IsTesting()) {
       if (!Backtest::ValidSpread() || !Backtest::ValidLotstep()) {
-            if (VerboseErrors) Print(__FUNCTION__ + "(): Error: Backtest settings are invalid!");
+            if (VerboseErrors) Print(__FUNCTION__ + "(): Error2: Backtest settings are invalid!");
           return (FALSE);
       }
   }
@@ -4026,8 +4029,8 @@ bool InitializeVariables() {
 
   // Get type of account.
   if (IsDemo()) account_type = "Demo"; else account_type = "Live";
-  if (IsTesting()) account_type = "Backtest on " + account_type;
-  #ifdef __backtest__ init &= IsTesting(); #endif
+  if (Check::IsTesting()) account_type = "Backtest on " + account_type;
+  #ifdef __backtest__ init &= Check::IsTesting(); #endif
 
   // Check time of the week, month and year based on the trading bars.
   time_current = TimeCurrent();
@@ -6134,7 +6137,7 @@ bool TaskAddCloseOrder(int ticket_no, int reason = EMPTY) {
     // if (VerboseTrace) Print("TaskAddCloseOrder(): Allocated task (id: ", job_id, ") for ticket: ", todo_queue[job_id][0], ".");
     return TRUE;
   } else {
-    if (VerboseTrace) Print(__FUNCTION__ + "(): Failed to allocate close task for ticket: " + ticket_no);
+    if (VerboseTrace) PrintFormat("%s(): Failed to allocate close task for ticket: %d", __FUNCTION__, ticket_no);
     return FALSE; // Job is not allocated.
   }
 }
@@ -6152,7 +6155,7 @@ bool TaskAddCalcStats(int ticket_no, int order_type = EMPTY) {
     // if (VerboseTrace) Print(__FUNCTION__ + "(): Allocated task (id: ", job_id, ") for ticket: ", todo_queue[job_id][0], ".");
     return TRUE;
   } else {
-    if (VerboseTrace) Print(__FUNCTION__ + "(): Failed to allocate task for ticket: " + ticket_no);
+    if (VerboseTrace) PrintFormat("%s(): Failed to allocate close task for ticket: %d", __FUNCTION__, ticket_no);
     return FALSE; // Job is not allocated.
   }
 }
@@ -6666,7 +6669,7 @@ double CalculateInitialDeposit() {
   if (initial_deposit > 0) {
     return initial_deposit;
   }
-  else if (IsTesting()) {  // FIXME: MQL5: IsTesting()
+  else if (Check::IsTesting() || Check::IsOptimization()) {
     initial_deposit = init_balance;
   } else {
     initial_deposit = AccountBalance();
