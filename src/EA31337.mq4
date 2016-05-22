@@ -371,9 +371,7 @@ void OnTick() {
     Trade();
     if (total_orders > 0) {
       UpdateTrailingStops();
-      #ifdef __advanced__
       CheckAccConditions();
-      #endif
       TaskProcessList();
     }
     UpdateStats();
@@ -409,9 +407,7 @@ int OnInit() {
 
   session_initiated &= InitializeVariables();
   session_initiated &= InitializeStrategies();
-  #ifdef __advanced__
   session_initiated &= InitializeConditions();
-  #endif
   session_initiated &= CheckHistory();
 
   #ifdef __advanced__
@@ -1038,7 +1034,6 @@ bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
 }
 
 #ifdef __advanced__
-
 /*
  * Check if spread is not too high for specific strategy.
  *
@@ -1072,6 +1067,7 @@ bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = TRUE)
     last_close_profit = GetOrderProfit();
     if (SoundAlert) PlaySound(SoundFileAtClose);
     // TaskAddCalcStats(ticket_no); // Already done on CheckHistory().
+    if (VerboseDebug) Print(__FUNCTION__, "(): Closed order " + ticket_no + " with profit " + GetOrderProfit() + " pips, reason: " + ReasonIdToText(reason_id) + "; " + GetOrderTextDetails());
     #ifdef __advanced__
       if (VerboseDebug) Print(__FUNCTION__, "(): Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(GetOrderProfit()) + " pips, reason: " + ReasonIdToText(reason_id) + "; " + GetOrderTextDetails());
       if (QueueOrdersAIActive) OrderQueueProcess();
@@ -4748,7 +4744,6 @@ void UpdateVariables() {
 
 /* BEGIN: CONDITION FUNCTIONS */
 
-#ifdef __advanced__
 /*
  * Initialize user defined conditions.
  */
@@ -4768,6 +4763,8 @@ bool InitializeConditions() {
   acc_conditions[4][0] = Account_Condition_5;
   acc_conditions[4][1] = Market_Condition_5;
   acc_conditions[4][2] = Action_On_Condition_5;
+
+  #ifdef __advanced__
   acc_conditions[5][0] = Account_Condition_6;
   acc_conditions[5][1] = Market_Condition_6;
   acc_conditions[5][2] = Action_On_Condition_6;
@@ -4789,6 +4786,7 @@ bool InitializeConditions() {
   acc_conditions[11][0] = Account_Condition_12;
   acc_conditions[11][1] = Market_Condition_12;
   acc_conditions[11][2] = Action_On_Condition_12;
+  #endif
 
   #ifdef __advanced__
   if (Account_Condition_To_Disable > 0 && Account_Condition_To_Disable < ArraySize(acc_conditions)) {
@@ -4954,8 +4952,6 @@ void CheckAccConditions() {
     }
   } // end: for
 }
-
-#endif
 
 /*
  * Get default multiplier lot factor.
@@ -5604,8 +5600,6 @@ void TxtRemoveSepChar(string& text, string sep) {
 
 /* BEGIN: ACTION FUNCTIONS */
 
-#ifdef __advanced__
-
 /*
  * Execute action to close most profitable order.
  */
@@ -5944,8 +5938,6 @@ string MarketIdToText(int mid) {
   }
   return output;
 }
-
-#endif
 
 /* END: ACTION FUNCTIONS */
 

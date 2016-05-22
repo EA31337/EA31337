@@ -85,6 +85,8 @@ extern double BoostTrendFactor = 1.3;
 extern string __Market_Parameters__ = "-- Market parameters --";
 // Method of main trend calculation. Valid range: 0-255. Suggested values: 65!, 71, 81, 83!, 87, 181, etc.
 extern int TrendMethod = 135;
+// Method of trend calculation on action execution (See: A_CLOSE_ALL_TREND/A_CLOSE_ALL_NON_TREND). Valid range: 0-255.
+extern int TrendMethodAction = 238;
 // Minimum volume to trade.
 extern int MinVolumeToTrade = 2;
 // Maximum price slippage for buy or sell orders (in pips).
@@ -102,6 +104,36 @@ extern double MinPipChangeToTrade = 0.70000000;
 extern int MinPipGap = 80;
 //+------------------------------------------------------------------+
 int HourAfterPeak = 18;
+//+------------------------------------------------------------------+
+// See: ENUM_ACTION_TYPE
+extern string __EA_Conditions__ = "-- Account conditions --";
+
+// Enable account conditions.
+// Note: It's not advice to use on accounts where multi bots are trading.
+extern bool Account_Conditions_Active = TRUE;
+extern ENUM_ACC_CONDITION Account_Condition_1      = 5; // Equity 20% high.
+extern ENUM_MARKET_CONDITION Market_Condition_1    = 9;
+extern ENUM_ACTION_TYPE Action_On_Condition_1      = 8;
+
+extern ENUM_ACC_CONDITION Account_Condition_2      = 8; // Equity 20% low.
+extern ENUM_MARKET_CONDITION Market_Condition_2    = 14;
+extern ENUM_ACTION_TYPE Action_On_Condition_2      = 10;
+
+extern ENUM_ACC_CONDITION Account_Condition_3      = 13; // 90% Margin Used.
+extern ENUM_MARKET_CONDITION Market_Condition_3    = 9;
+extern ENUM_ACTION_TYPE Action_On_Condition_3      = 5;
+
+extern ENUM_ACC_CONDITION Account_Condition_4      = 2; // Equity lower than balance.
+extern ENUM_MARKET_CONDITION Market_Condition_4    = 13; // Sudden price drop.
+extern ENUM_ACTION_TYPE Action_On_Condition_4      = 8;
+
+extern ENUM_ACC_CONDITION Account_Condition_5      = 18; // Max. daily balance > max. weekly.
+extern ENUM_MARKET_CONDITION Market_Condition_5    = 7;
+extern ENUM_ACTION_TYPE Action_On_Condition_5      = 10;
+
+// Minimum order profit in pips to close the order on condition met.
+extern int Account_Condition_MinProfitCloseOrder = 20;
+
 //+------------------------------------------------------------------+
 extern string __AC_Parameters__ = "-- Settings for the Bill Williams' Accelerator/Decelerator oscillator --";
 // Enable AC-based strategy for specific timeframe.
