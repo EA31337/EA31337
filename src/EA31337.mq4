@@ -15,6 +15,11 @@
 #include <EA\ea-license.mqh>
 #include <EA\ea-enums.mqh>
 
+//+------------------------------------------------------------------+
+//| Public classes.
+//+------------------------------------------------------------------+
+#include <EA\public-classes\Market.mqh>
+
 #ifdef __MQL4__
    #include <EA\MQL4\stdlib.mq4> // Used for: ErrorDescription(), RGB(), CompareDoubles(), DoubleToStrMorePrecision(), IntegerToHexString()
    #include <stderror.mqh>
@@ -222,13 +227,16 @@ extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v"
  */
 //+------------------------------------------------------------------+
 
+// Class variables.
+Market market(string);
+
 // Market/session variables.
-double lot_size, pip_size;
+double pip_size, lot_size;
 double market_minlot, market_maxlot, market_lotsize, market_lotstep, market_marginrequired, market_margininit;
 double market_stoplevel; // Market stop level in points.
 double order_freezelevel; // Order freeze level in points.
 double curr_spread; // Broker current spread in pips.
-int PipDigits, VolumeDigits;
+int pip_digits, volume_digits;
 int pts_per_pip; // Number points per pip.
 int gmt_offset = 0; // Current difference between GMT time and the local computer time in seconds, taking into account switch to winter or summer time. Depends on the time settings of your computer.
 
@@ -492,7 +500,7 @@ string InitInfo(bool startup = False, string sep = "\n") {
   output += StringFormat("Market constants: Digits: %d, Point: %g, Min Lot: %g, Max Lot: %g, Lot Step: %g, Lot Size: %g, Margin Required: %g, Margin Init: %g, Stop Level: %d pts, Freeze level: %d pts%s",
       Digits,
       NormalizeDouble(Point, Digits),
-      NormalizeDouble(market_minlot, PipDigits),
+      NormalizeDouble(market_minlot, pip_digits),
       market_maxlot,
       market_lotstep,
       market_lotsize,
@@ -519,11 +527,11 @@ string InitInfo(bool startup = False, string sep = "\n") {
       SymbolInfoDouble(_Symbol, SYMBOL_SWAP_SHORT),
       sep);
   output += StringFormat("Calculated variables: Pip size: %g, Lot size: %g, Points per pip: %d, Pip digits: %d, Volume digits: %d, Spread in pips: %.1f, Stop Out Level: %.1f%s",
-      NormalizeDouble(pip_size, PipDigits),
-      NormalizeDouble(lot_size, VolumeDigits),
+      NormalizeDouble(pip_size, pip_digits),
+      NormalizeDouble(lot_size, volume_digits),
       pts_per_pip,
-      PipDigits,
-      VolumeDigits,
+      pip_digits,
+      volume_digits,
       curr_spread,
       GetAccountStopoutLevel(),
       sep);
@@ -2830,7 +2838,7 @@ void UpdateTrailingStops() {
      if (!OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) continue;
       if (OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
         order_type = OrderMagicNumber() - MagicNumber;
-        // order_stop_loss = NormalizeDouble(If(OpTypeValue(OrderType()) > 0 || OrderStopLoss() != 0.0, OrderStopLoss(), 999999), PipDigits);
+        // order_stop_loss = NormalizeDouble(If(OpTypeValue(OrderType()) > 0 || OrderStopLoss() != 0.0, OrderStopLoss(), 999999), pip_digits);
 
         // FIXME
         // Make sure we get the minimum distance to StopLevel and freezing distance.
@@ -3122,7 +3130,7 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
        if (existing && previous == 0) previous = default_trail;
      #endif
      if (VerboseTrace)
-       Print(__FUNCTION__ + "(): Error: method = " + method + ", ticket = #" + If(existing, OrderTicket(), 0) + ": Invalid Trailing Value: ", new_value, ", previous: ", previous, "; ", GetOrderTextDetails(), ", delta: ", DoubleToStr(delta, PipDigits));
+       Print(__FUNCTION__ + "(): Error: method = " + method + ", ticket = #" + If(existing, OrderTicket(), 0) + ": Invalid Trailing Value: ", new_value, ", previous: ", previous, "; ", GetOrderTextDetails(), ", delta: ", DoubleToStr(delta, pip_digits));
      // If value is invalid, fallback to the previous one.
      return previous;
    }
@@ -3656,47 +3664,10 @@ double GetMinStopLevel() {
 }
 
 /*
- * Calculate pip size.
- */
-double GetPipSize() {
-  if (Digits < 4) {
-    return 0.01;
-  } else {
-    return 0.0001;
-  }
-}
-
-/*
- * Calculate pip precision.
- */
-double GetPipPrecision() {
-  if (Digits < 4) {
-    return 2;
-  } else {
-    return 4;
-  }
-}
-
-/*
- * Calculate volume precision.
- */
-double GetVolumePrecision() {
-  if (TradeMicroLots) return 2;
-  else return 1;
-}
-
-// Calculate number of points per pip.
-// To be used to replace Point for trade parameters calculations.
-// See: http://forum.mql4.com/30672
-double GetPointsPerPip() {
-  return MathPow(10, Digits - PipDigits);
-}
-
-/*
  * Convert value into pips.
  */
 double ValueToPips(double value) {
-  return value * MathPow(10, PipDigits);
+  return value * MathPow(10, pip_digits);
 }
 
 /*
@@ -3740,7 +3711,7 @@ string ValueToCurrency(double value, int digits = 2) {
  * See: http://forum.mql4.com/42285
  */
 double GetMarketSpread(bool in_points = false) {
-  // return MarketInfo(Symbol(), MODE_SPREAD) / MathPow(10, Digits - PipDigits);
+  // return MarketInfo(Symbol(), MODE_SPREAD) / MathPow(10, Digits - pip_digits);
   double spread = If(in_points, SymbolInfoInteger(Symbol(), SYMBOL_SPREAD), Ask - Bid);
   if (in_points) CheckStats(spread, MAX_SPREAD);
   // if (VerboseTrace) PrintFormat("%s(): Spread: %f (%s)", __FUNCTION__, spread, IfTxt(in_points, "pts", "pips"));
@@ -4252,10 +4223,12 @@ bool InitializeVariables() {
   AccCurrency = AccountCurrency();
 
   // Calculate pip/volume/slippage size and precision.
-  pip_size = GetPipSize();
-  PipDigits = GetPipPrecision();
-  pts_per_pip = GetPointsPerPip();
-  VolumeDigits = GetVolumePrecision();
+  // Market *market = new Market(_Symbol);
+  pip_size = Market::GetPipSize();
+  pip_digits = Market::GetPipDigits();
+  pts_per_pip = Market::GetPointsPerPip();
+  volume_digits = Market::GetVolumePrecision(TradeMicroLots);
+
   max_order_slippage = PipsToPoints(MaxOrderPriceSlippage); // Maximum price slippage for buy or sell orders (converted into points).
 
   // Calculate lot size, orders and risk.
@@ -5623,7 +5596,7 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
   #endif
   // Prepare text to display spread.
   string text_spread = StringFormat("Spread: %g pips", curr_spread);
-  // string text_spread = "Spread (pips): " + DoubleToStr(GetMarketSpread(TRUE) / pts_per_pip, Digits - PipDigits) + " / Stop level (pips): " + DoubleToStr(market_stoplevel / pts_per_pip, Digits - PipDigits);
+  // string text_spread = "Spread (pips): " + DoubleToStr(GetMarketSpread(TRUE) / pts_per_pip, Digits - pip_digits) + " / Stop level (pips): " + DoubleToStr(market_stoplevel / pts_per_pip, Digits - pip_digits);
   // Check trend.
   string trend = "Neutral.";
   if (CheckTrend() == OP_BUY) trend = "Bullish";
@@ -5639,7 +5612,7 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
                   + indent + StringFormat("| Stop Out Level: %s, Leverage: 1:%d %s", stop_out_level, AccountLeverage(), sep)
                   + indent + "| Used Margin: " + ValueToCurrency(AccountMargin()) + "; Free: " + ValueToCurrency(AccountFreeMargin()) + sep
                   + indent + "| Equity: " + ValueToCurrency(AccountEquity()) + "; Balance: " + ValueToCurrency(AccountBalance()) + sep
-                  + indent + "| Lot size: " + DoubleToStr(lot_size, VolumeDigits) + "; " + text_max_orders + sep
+                  + indent + "| Lot size: " + DoubleToStr(lot_size, volume_digits) + "; " + text_max_orders + sep
                   + indent + "| Risk ratio: " + DoubleToStr(risk_ratio, 1) + " (" + GetRiskRatioText() + ")" + sep
                   + indent + "| " + GetOrdersStats("" + sep + indent + "| ") + "" + sep
                   + indent + "| Last error: " + last_err + "" + sep
@@ -5680,7 +5653,7 @@ void SendEmailExecuteOrder(string sep = "<br>\n") {
   body += sep + StringFormat("Time: %s", TimeToStr(time_current, TIME_DATE|TIME_MINUTES|TIME_SECONDS));
   body += sep + StringFormat("Order Type: %s", _OrderType_str(OrderType()));
   body += sep + StringFormat("Price: %s", DoubleToStr(OrderOpenPrice(), Digits));
-  body += sep + StringFormat("Lot size: %s", DoubleToStr(OrderLots(), VolumeDigits));
+  body += sep + StringFormat("Lot size: %s", DoubleToStr(OrderLots(), volume_digits));
   body += sep + StringFormat("Current Balance: %s", ValueToCurrency(AccountBalance()));
   body += sep + StringFormat("Current Equity: %s", ValueToCurrency(AccountEquity()));
   SendMail(mail_title, body);
