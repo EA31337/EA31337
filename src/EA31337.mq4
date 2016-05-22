@@ -16,9 +16,9 @@
 #include <EA\ea-enums.mqh>
 
 //+------------------------------------------------------------------+
-//| Public classes.
+//| EA properties.
 //+------------------------------------------------------------------+
-#include <EA\public-classes\Market.mqh>
+#property version     ea_version
 
 #ifdef __MQL4__
    #include <EA\MQL4\stdlib.mq4> // Used for: ErrorDescription(), RGB(), CompareDoubles(), DoubleToStrMorePrecision(), IntegerToHexString()
@@ -31,9 +31,10 @@
 #endif
 
 //+------------------------------------------------------------------+
-//| EA properties.
+//| Public classes.
 //+------------------------------------------------------------------+
-#property version     ea_version
+#include <EA\public-classes\Market.mqh>
+#include <EA\public-classes\Arrays.mqh>
 
 //#property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 
@@ -2531,21 +2532,6 @@ bool Trade_ZigZag(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double o
 /* END: INDICATOR FUNCTIONS */
 
 /*
- * Return plain text of array values separated by the delimiter.
- *
- * @param
- *   double arr[] - array to look for the values
- *   string sep - delimiter to separate array values
- */
-string GetArrayValues(double& arr[], string sep = ", ") {
-  string result = "";
-  for (int i = 0; i < ArraySize(arr); i++) {
-    result = result + i + ":" + arr[i] + sep;
-  }
-  return StringSubstr(result, 0, StringLen(result) - StringLen(sep)); // Return text without last separator.
-}
-
-/*
  * Check for market condition.
  *
  * @param
@@ -3029,7 +3015,7 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
      /*
      case T_MA_F_LOW: // 11: Lowest/highest value of MA Fast. Optimized (SL pf: 1.39 for MA).
        UpdateIndicator(MA, timeframe);
-       diff = MathMax(HighestArrValue2(ma_fast, period) - Open[CURR], Open[CURR] - LowestArrValue2(ma_fast, period));
+       diff = MathMax(Arrays::HighestArrValue2(ma_fast, period) - Open[CURR], Open[CURR] - Arrays::LowestArrValue2(ma_fast, period));
        new_value = Open[CURR] + diff * factor;
        break;
       */
@@ -3056,7 +3042,7 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
      /*
      case T_MA_M_LOW: // 16: Lowest/highest value of MA Medium. Optimized (SL pf: 1.39 for MA).
        UpdateIndicator(MA, timeframe);
-       diff = MathMax(HighestArrValue2(ma_medium, period) - Open[CURR], Open[CURR] - LowestArrValue2(ma_medium, period));
+       diff = MathMax(Arrays::HighestArrValue2(ma_medium, period) - Open[CURR], Open[CURR] - Arrays::LowestArrValue2(ma_medium, period));
        new_value = Open[CURR] + diff * factor;
        break;
       */
@@ -3089,8 +3075,8 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
        break;
      case T_MA_FMS_PEAK: // 22: Lowest/highest value of all MAs. Works fine (SL pf: 1.39 for MA, PT pf: 1.23 for MA).
        UpdateIndicator(MA, timeframe);
-       highest_ma = MathAbs(MathMax(MathMax(HighestArrValue2(ma_fast, period), HighestArrValue2(ma_medium, period)), HighestArrValue2(ma_slow, period)));
-       lowest_ma = MathAbs(MathMin(MathMin(LowestArrValue2(ma_fast, period), LowestArrValue2(ma_medium, period)), LowestArrValue2(ma_slow, period)));
+       highest_ma = MathAbs(MathMax(MathMax(Arrays::HighestArrValue2(ma_fast, period), Arrays::HighestArrValue2(ma_medium, period)), Arrays::HighestArrValue2(ma_slow, period)));
+       lowest_ma = MathAbs(MathMin(MathMin(Arrays::LowestArrValue2(ma_fast, period), Arrays::LowestArrValue2(ma_medium, period)), Arrays::LowestArrValue2(ma_slow, period)));
        diff = MathMax(MathAbs(highest_ma - Open[CURR]), MathAbs(Open[CURR] - lowest_ma));
        new_value = Open[CURR] + diff * factor;
        break;
@@ -3100,7 +3086,7 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
        break;
      case T_SAR_PEAK: // 24: Lowest/highest SAR value.
        UpdateIndicator(SAR, timeframe);
-       new_value = If(OpTypeValue(cmd) == loss_or_profit, HighestArrValue2(sar, period), LowestArrValue2(sar, period));
+       new_value = If(OpTypeValue(cmd) == loss_or_profit, Arrays::HighestArrValue2(sar, period), Arrays::LowestArrValue2(sar, period));
        break;
      case T_BANDS: // 25: Current Bands value.
        UpdateIndicator(BANDS, timeframe);
@@ -4409,19 +4395,19 @@ void ToggleComponent(int component) {
       break;
     // Strategies
     case 37:
-      ArrSetValueI(info, OPEN_CONDITION1,  0);
+      Arrays::ArrSetValueI(info, OPEN_CONDITION1,  0);
       break;
     case 38:
-      ArrSetValueI(info, OPEN_CONDITION2,  0);
+      Arrays::ArrSetValueI(info, OPEN_CONDITION2,  0);
       break;
     case 39:
-      ArrSetValueI(info, CLOSE_CONDITION, C_MACD_BUY_SELL);
+      Arrays::ArrSetValueI(info, CLOSE_CONDITION, C_MACD_BUY_SELL);
       break;
     case 40:
-      ArrSetValueD(conf, OPEN_LEVEL, 0.0);
+      Arrays::ArrSetValueD(conf, OPEN_LEVEL, 0.0);
       break;
     case 41:
-      ArrSetValueD(conf, SPREAD_LIMIT,  100.0);
+      Arrays::ArrSetValueD(conf, SPREAD_LIMIT,  100.0);
       break;
     case 42:
       for (int m1 = 0; m1 < ArrayRange(info, 0); m1++)
@@ -4809,8 +4795,8 @@ bool InitializeStrategies() {
   InitStrategy(ZIGZAG30, "ZigZag M30", ZigZag30_Active, ZIGZAG, PERIOD_M30, ZigZag30_OpenMethod, ZigZag_OpenLevel);
   #endif
 
-  ArrSetValueD(conf, FACTOR, 1.0);
-  ArrSetValueD(conf, LOT_SIZE, lot_size);
+  Arrays::ArrSetValueD(conf, FACTOR, 1.0);
+  Arrays::ArrSetValueD(conf, LOT_SIZE, lot_size);
 
   return (TRUE);
 }
@@ -4975,21 +4961,21 @@ bool AccCondition(int condition = C_ACC_NONE) {
       return !AccCondition(C_ACC_IN_TREND);
     case C_ACC_CDAY_IN_PROFIT: // Check if current day in profit.
       last_cname = "TodayInProfit";
-      return GetArrSumKey1(hourly_profit, day_of_year, 10) > 0;
+      return Arrays::GetArrSumKey1(hourly_profit, day_of_year, 10) > 0;
     case C_ACC_CDAY_IN_LOSS: // Check if current day in loss.
       last_cname = "TodayInLoss";
-      return GetArrSumKey1(hourly_profit, day_of_year, 10) < 0;
+      return Arrays::GetArrSumKey1(hourly_profit, day_of_year, 10) < 0;
     case C_ACC_PDAY_IN_PROFIT: // Check if previous day in profit.
       {
         last_cname = "YesterdayInProfit";
         int yesterday1 = TimeDayOfYear(time_current - 24*60*60);
-        return GetArrSumKey1(hourly_profit, yesterday1) > 0;
+        return Arrays::GetArrSumKey1(hourly_profit, yesterday1) > 0;
       }
     case C_ACC_PDAY_IN_LOSS: // Check if previous day in loss.
       {
         last_cname = "YesterdayInLoss";
         int yesterday2 = TimeDayOfYear(time_current - 24*60*60);
-        return GetArrSumKey1(hourly_profit, yesterday2) < 0;
+        return Arrays::GetArrSumKey1(hourly_profit, yesterday2) < 0;
       }
     case C_ACC_MAX_ORDERS:
       return total_orders >= max_orders;
@@ -5289,7 +5275,7 @@ void ApplyStrategyMultiplierFactor(int period = DAILY, int loss_or_profit = 0, d
   if (GetNoOfStrategies() <= 1 || factor == 1.0) return;
   int key = If(period == MONTHLY, MONTHLY_PROFIT, If(period == WEEKLY, WEEKLY_PROFIT, DAILY_PROFIT));
   string period_name = IfTxt(period == MONTHLY, "montly", IfTxt(period == WEEKLY, "weekly", "daily"));
-  int new_strategy = If(loss_or_profit > 0, GetArrKey1ByHighestKey2ValueD(stats, key), GetArrKey1ByLowestKey2ValueD(stats, key));
+  int new_strategy = If(loss_or_profit > 0, Arrays::GetArrKey1ByHighestKey2ValueD(stats, key), Arrays::GetArrKey1ByLowestKey2ValueD(stats, key));
   if (new_strategy == EMPTY) return;
   int previous = If(loss_or_profit > 0, best_strategy[period], worse_strategy[period]);
   double new_factor = 1.0;
@@ -5497,7 +5483,7 @@ void CalculateSupRes() {
  * Get text output of hourly profit report.
  */
 string GetHourlyReport(string sep = ", ") {
-  string output = StringFormat("Hourly profit (total: %.1fp): ", GetArrSumKey1(hourly_profit, day_of_year));
+  string output = StringFormat("Hourly profit (total: %.1fp): ", Arrays::GetArrSumKey1(hourly_profit, day_of_year));
   for (int h = 0; h < hour_of_day; h++) {
     output += StringFormat("%d: %.1fp%s", h, hourly_profit[day_of_year][h], IfTxt(h < hour_of_day, sep, ""));
   }
@@ -5523,9 +5509,9 @@ string GetDailyReport() {
 
   //output += GetAccountTextDetails() + "; " + GetOrdersStats();
 
-  key = GetArrKey1ByHighestKey2ValueD(stats, DAILY_PROFIT);
+  key = Arrays::GetArrKey1ByHighestKey2ValueD(stats, DAILY_PROFIT);
   if (key >= 0) output += "Best: " + sname[key] + " (" + stats[key][DAILY_PROFIT] + "p); ";
-  key = GetArrKey1ByLowestKey2ValueD(stats, DAILY_PROFIT);
+  key = Arrays::GetArrKey1ByLowestKey2ValueD(stats, DAILY_PROFIT);
   if (key >= 0) output += "Worse: " + sname[key] + " (" + stats[key][DAILY_PROFIT] + "p); ";
 
   return output;
@@ -5549,9 +5535,9 @@ string GetWeeklyReport() {
   output += "Equity: "       + weekly[MAX_EQUITY] + "; ";
   output += "Balance: "      + weekly[MAX_BALANCE] + "; ";
 
-  key = GetArrKey1ByHighestKey2ValueD(stats, WEEKLY_PROFIT);
+  key = Arrays::GetArrKey1ByHighestKey2ValueD(stats, WEEKLY_PROFIT);
   if (key >= 0) output += "Best: " + sname[key] + " (" + stats[key][WEEKLY_PROFIT] + "p); ";
-  key = GetArrKey1ByLowestKey2ValueD(stats, WEEKLY_PROFIT);
+  key = Arrays::GetArrKey1ByLowestKey2ValueD(stats, WEEKLY_PROFIT);
   if (key >= 0) output += "Worse: " + sname[key] + " (" + stats[key][WEEKLY_PROFIT] + "p); ";
 
   return output;
@@ -5575,9 +5561,9 @@ string GetMonthlyReport() {
   output += "Equity: "        + monthly[MAX_EQUITY] + "; ";
   output += "Balance: "       + monthly[MAX_BALANCE] + "; ";
 
-  key = GetArrKey1ByHighestKey2ValueD(stats, MONTHLY_PROFIT);
+  key = Arrays::GetArrKey1ByHighestKey2ValueD(stats, MONTHLY_PROFIT);
   if (key >= 0) output += "Best: " + sname[key] + " (" + stats[key][MONTHLY_PROFIT] + "p); ";
-  key = GetArrKey1ByLowestKey2ValueD(stats, MONTHLY_PROFIT);
+  key = Arrays::GetArrKey1ByLowestKey2ValueD(stats, MONTHLY_PROFIT);
   if (key >= 0) output += "Worse: " + sname[key] + " (" + stats[key][MONTHLY_PROFIT] + "p); ";
 
   return output;
@@ -5794,179 +5780,6 @@ void TxtRemoveSepChar(string& text, string sep) {
 }
 
 /* END: STRING FUNCTIONS */
-
-/* BEGIN: ARRAY FUNCTIONS */
-
-/*
- * Find lower value within the 1-dim array of floats.
- */
-double LowestArrValue(double& arr[]) {
-  return (arr[ArrayMinimum(arr)]);
-}
-
-/*
- * Find higher value within the 1-dim array of floats.
- */
-double HighestArrValue(double& arr[]) {
-   return (arr[ArrayMaximum(arr)]);
-}
-
-/*
- * Find lower value within the 2-dim array of floats by the key.
- */
-double LowestArrValue2(double& arr[][], int key1) {
-  double lowest = 0;
-  for (int i = 0; i < ArrayRange(arr, 1); i++) {
-    if (arr[key1][i] < lowest) {
-      lowest = arr[key1][i];
-    }
-  }
-  return lowest;
-}
-
-/*
- * Find higher value within the 2-dim array of floats by the key.
- */
-double HighestArrValue2(double& arr[][], int key1) {
-  double highest = 0;
-  for (int i = 0; i < ArrayRange(arr, 1); i++) {
-    if (arr[key1][i] > highest) {
-      highest = arr[key1][i];
-    }
-  }
-  return highest;
-}
-
-/*
- * Find highest value in 2-dim array of integers by the key.
- */
-int HighestValueByKey(int& arr[][], int key) {
-  double highest = 0;
-  for (int i = 0; i < ArrayRange(arr, 1); i++) {
-    if (arr[key][i] > highest) {
-      highest = arr[key][i];
-    }
-  }
-  return highest;
-}
-
-/*
- * Find lowest value in 2-dim array of integers by the key.
- */
-int LowestValueByKey(int& arr[][], int key) {
-  double lowest = 0;
-  for (int i = 0; i < ArrayRange(arr, 1); i++) {
-    if (arr[key][i] < lowest) {
-      lowest = arr[key][i];
-    }
-  }
-  return lowest;
-}
-
-/*
-int GetLowestArrDoubleValue(double& arr[][], int key) {
-  double lowest = -1;
-  for (int i = 0; i < ArrayRange(arr, 0); i++) {
-    for (int j = 0; j < ArrayRange(arr, 1); j++) {
-      if (arr[i][j] < lowest) {
-        lowest = arr[i][j];
-      }
-    }
-  }
-  return lowest;
-}*/
-
-/*
- * Find key in array of integers with highest value.
- */
-int GetArrKey1ByHighestKey2Value(int& arr[][], int key2) {
-  int key1 = EMPTY;
-  int highest = 0;
-  for (int i = 0; i < ArrayRange(arr, 0); i++) {
-      if (arr[i][key2] > highest) {
-        highest = arr[i][key2];
-        key1 = i;
-      }
-  }
-  return key1;
-}
-
-/*
- * Find key in array of integers with lowest value.
- */
-int GetArrKey1ByLowestKey2Value(int& arr[][], int key2) {
-  int key1 = EMPTY;
-  int lowest = 0;
-  for (int i = 0; i < ArrayRange(arr, 0); i++) {
-      if (arr[i][key2] < lowest) {
-        lowest = arr[i][key2];
-        key1 = i;
-      }
-  }
-  return key1;
-}
-
-/*
- * Find key in array of doubles with highest value.
- */
-int GetArrKey1ByHighestKey2ValueD(double& arr[][], int key2) {
-  int key1 = EMPTY;
-  int highest = 0;
-  for (int i = 0; i < ArrayRange(arr, 0); i++) {
-      if (arr[i][key2] > highest) {
-        highest = arr[i][key2];
-        key1 = i;
-      }
-  }
-  return key1;
-}
-
-/*
- * Find key in array of doubles with lowest value.
- */
-int GetArrKey1ByLowestKey2ValueD(double& arr[][], int key2) {
-  int key1 = EMPTY;
-  int lowest = 0;
-  for (int i = 0; i < ArrayRange(arr, 0); i++) {
-      if (arr[i][key2] < lowest) {
-        lowest = arr[i][key2];
-        key1 = i;
-      }
-  }
-  return key1;
-}
-
-/*
- * Set array value for double items with specific keys.
- */
-void ArrSetValueD(double& arr[][], int key, double value) {
-  for (int i = 0; i < ArrayRange(info, 0); i++) {
-    arr[i][key] = value;
-  }
-}
-
-/*
- * Set array value for integer items with specific keys.
- */
-void ArrSetValueI(int& arr[][], int key, int value) {
-  for (int i = 0; i < ArrayRange(info, 0); i++) {
-    arr[i][key] = value;
-  }
-}
-
-/*
- * Calculate sum of 2 dimentional array based on given key.
- */
-double GetArrSumKey1(double& arr[][], int key1, int offset = 0) {
-  double sum = 0;
-  offset = MathMin(offset, ArrayRange(arr, 1) - 1);
-  for (int i = offset; i < ArrayRange(arr, 1); i++) {
-    sum += arr[key1][i];
-  }
-  return sum;
-}
-
-/* END: ARRAY FUNCTIONS */
 
 /* BEGIN: ACTION FUNCTIONS */
 
