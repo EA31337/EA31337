@@ -37,8 +37,10 @@
 #include <EA\public-classes\Convert.mqh>
 #include <EA\public-classes\Draw.mqh>
 #include <EA\public-classes\Errors.mqh>
+#include <EA\public-classes\Orders.mqh>
 #include <EA\public-classes\Market.mqh>
 #include <EA\public-classes\Misc.mqh>
+#include <EA\public-classes\Report.mqh>
 
 //#property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 
@@ -460,7 +462,8 @@ void OnDeinit(const int reason) {
     double ExtInitialDeposit = CalculateInitialDeposit();
     CalculateSummary(ExtInitialDeposit);
     string filename = StringFormat("%s-v%s-%s-%.0f%s-s%d-%s-Report.txt", ea_name, ea_version, _Symbol, ExtInitialDeposit, AccCurrency, init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES));
-    WriteReport(filename); // Todo: Add: Errors::GetUninitReasonText(reason)
+    string data = GenerateReport();
+    Report::WriteReport(filename, data, VerboseInfo); // Todo: Add: Errors::GetUninitReasonText(reason)
     Print(__FUNCTION__ + "(): Saved report as: " + filename);
   }
   // #ifdef _DEBUG
@@ -3625,13 +3628,6 @@ double GetMarketSpread(bool in_points = false) {
 // Get current minimum marker gap (in points).
 double GetMarketGap(bool in_points = false) {
   return Misc::If(in_points, market_stoplevel + GetMarketSpread(TRUE), (market_stoplevel + GetMarketSpread(TRUE)) * Point);
-}
-
-/*
- * Check if we're in market peak hours.
- */
-bool MarketPeakHours() {
-  return hour_of_day >= 8 && hour_of_day <= 16;
 }
 
 /*
@@ -6817,22 +6813,6 @@ string GenerateReport(string sep = "\n") {
    output += log[i] + sep;
 
   return output;
-}
-
-/*
- * Write report into file.
- */
-void WriteReport(string report_name) {
-  int handle = FileOpen(report_name, FILE_CSV|FILE_WRITE, '\t');
-  if (handle < 1) return;
-
-  string report = GenerateReport();
-  FileWrite(handle, report);
-  FileClose(handle);
-
-  if (VerboseDebug) {
-    PrintText(report);
-  }
 }
 
 /* END: SUMMARY REPORT */
