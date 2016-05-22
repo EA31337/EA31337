@@ -351,7 +351,7 @@ void OnTick() {
   if (!session_initiated) return;
 
   // Check the last tick change.
-  last_tick_change = MathMax(GetPipDiff(Ask, LastAsk, TRUE), GetPipDiff(Bid, LastBid, TRUE));
+  last_tick_change = MathMax(Convert::GetPipDiff(Ask, LastAsk, TRUE), Convert::GetPipDiff(Bid, LastBid, TRUE));
   // if (VerboseDebug && last_tick_change > 1) Print("Tick change: " + tick_change + "; Ask" + Ask + ", Bid: " + Bid, ", LastAsk: " + LastAsk + ", LastBid: " + LastBid);
 
   // Check if we should ignore the tick.
@@ -1175,13 +1175,13 @@ bool UpdateStats() {
   CheckStats(AccountEquity(), MAX_EQUITY);
   CheckStats(total_orders, MAX_ORDERS);
   if (last_tick_change > MarketBigDropSize) {
-    double diff1 = MathMax(GetPipDiff(Ask, LastAsk), GetPipDiff(Bid, LastBid));
+    double diff1 = MathMax(Convert::GetPipDiff(Ask, LastAsk), Convert::GetPipDiff(Bid, LastBid));
     Message(StringFormat("Market very big drop of %.1f pips detected!", diff1));
     Print(__FUNCTION__ + "(): " + GetLastMessage());
     if (WriteReport) ReportAdd(__FUNCTION__ + "(): " + GetLastMessage());
   }
   else if (VerboseDebug && last_tick_change > MarketSuddenDropSize) {
-    double diff2 = MathMax(GetPipDiff(Ask, LastAsk), GetPipDiff(Bid, LastBid));
+    double diff2 = MathMax(Convert::GetPipDiff(Ask, LastAsk), Convert::GetPipDiff(Bid, LastBid));
     Message(StringFormat("Market sudden drop of %.1f pips detected!", diff2));
     Print(__FUNCTION__ + "(): " + GetLastMessage());
     if (WriteReport) ReportAdd(__FUNCTION__ + "(): " + GetLastMessage());
@@ -3597,35 +3597,6 @@ double GetMinStopLevel() {
 }
 
 /*
- * Convert value into pips.
- */
-double ValueToPips(double value) {
-  return value * MathPow(10, pip_digits);
-}
-
-/*
- * Convert pips into points.
- */
-double PipsToPoints(double pips) {
-  return pips * pts_per_pip;
-}
-
-/*
- * Convert points into pips.
- */
-double PointsToPips(int points) {
-  return points / pts_per_pip;
-}
-
-/*
- * Get the difference between two price values (in pips).
- */
-double GetPipDiff(double price1, double price2, bool abs = false) {
-  double diff = Misc::If(abs, MathAbs(price1 - price2), price1 - price2);
-  return ValueToPips(diff);
-}
-
-/*
  * Add currency sign to the plain value.
  */
 string ValueToCurrency(double value, int digits = 2) {
@@ -4149,7 +4120,7 @@ bool InitializeVariables() {
   market_stoplevel = MarketInfo(_Symbol, MODE_STOPLEVEL); // Market stop level in points.
   order_freezelevel = MarketInfo(_Symbol, MODE_FREEZELEVEL); // Order freeze level in points. If the execution price lies within the range defined by the freeze level, the order cannot be modified, cancelled or closed.
   // market_stoplevel=(int)SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL);
-  curr_spread = ValueToPips(GetMarketSpread());
+  curr_spread = Convert::ValueToPips(GetMarketSpread());
   LastAsk = Ask; LastBid = Bid;
   init_balance = AccountBalance();
   init_spread = GetMarketSpread(TRUE);
@@ -4162,7 +4133,7 @@ bool InitializeVariables() {
   pts_per_pip = Market::GetPointsPerPip();
   volume_digits = Market::GetVolumePrecision(TradeMicroLots);
 
-  max_order_slippage = PipsToPoints(MaxOrderPriceSlippage); // Maximum price slippage for buy or sell orders (converted into points).
+  max_order_slippage = Convert::PipsToPoints(MaxOrderPriceSlippage); // Maximum price slippage for buy or sell orders (converted into points).
 
   // Calculate lot size, orders and risk.
   lot_size = GetLotSize();
@@ -4774,7 +4745,7 @@ void UpdateVariables() {
   time_current = TimeCurrent();
   last_close_profit = EMPTY;
   total_orders = GetTotalOrders();
-  curr_spread = ValueToPips(GetMarketSpread());
+  curr_spread = Convert::ValueToPips(GetMarketSpread());
 }
 
 /* END: VARIABLE FUNCTIONS */
@@ -5582,7 +5553,7 @@ string GetMarketTextDetails() {
      "Symbol: ", Symbol(), "; ",
      "Ask: ", DoubleToStr(Ask, Digits), "; ",
      "Bid: ", DoubleToStr(Bid, Digits), "; ",
-     "Spread: ", GetMarketSpread(TRUE), " pts = ", ValueToPips(GetMarketSpread()), " pips; "
+     "Spread: ", GetMarketSpread(TRUE), " pts = ", Convert::ValueToPips(GetMarketSpread()), " pips; "
    );
 }
 
