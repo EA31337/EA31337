@@ -38,6 +38,7 @@
 #include <EA\public-classes\Backtest.mqh>
 #include <EA\public-classes\Check.mqh>
 #include <EA\public-classes\Convert.mqh>
+#include <EA\public-classes\DateTime.mqh>
 #include <EA\public-classes\Draw.mqh>
 #include <EA\public-classes\Errors.mqh>
 #include <EA\public-classes\Orders.mqh>
@@ -279,7 +280,7 @@ int worse_strategy[FINAL_STAT_PERIOD_TYPE_ENTRY], best_strategy[FINAL_STAT_PERIO
 bool ea_active = FALSE;
 double risk_ratio; string rr_text; // Vars for calculation risk ratio.
 int max_orders, daily_orders; // Maximum orders available to open.
-double max_order_slippage; // Maximum price slippage for buy or sell orders (in points)
+int max_order_slippage; // Maximum price slippage for buy or sell orders (in points)
 double LastAsk, LastBid; // Keep the last ask and bid price.
 string AccCurrency; // Current account currency.
 int err_code; // Error code.
@@ -878,7 +879,7 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
  * @param
  *   cmd (int)
  *     trade order command to execute
- *   volume (int)
+ *   trade_volume (int)
  *     volue of the trade to execute (size)
  *   sid (int)
  *     strategy id
@@ -887,18 +888,18 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
  *   retry (bool)
  *     if TRUE, re-try to open again after error/failure
  */
-int ExecuteOrder(int cmd, int sid, double volume = EMPTY, string order_comment = "", bool retry = TRUE) {
+int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_comment = "", bool retry = TRUE) {
    bool result = FALSE;
    int order_ticket;
 
-   if (volume == EMPTY) {
-     volume = GetStrategyLotSize(sid, cmd);
+   if (trade_volume == EMPTY) {
+     trade_volume = GetStrategyLotSize(sid, cmd);
    } else {
-     volume = NormalizeLots(volume);
+     trade_volume = NormalizeLots(trade_volume);
    }
 
    // Check the limits.
-   if (!OpenOrderIsAllowed(cmd, sid, volume)) {
+   if (!OpenOrderIsAllowed(cmd, sid, trade_volume)) {
      return (FALSE);
    }
 
@@ -917,20 +918,20 @@ int ExecuteOrder(int cmd, int sid, double volume = EMPTY, string order_comment =
    if (TakeProfit > 0.0) takeprofit = NormalizeDouble(order_price + (TakeProfit + TrailingProfit) * pip_size * Convert::OrderTypeToValue(cmd), Digits);
    else takeprofit = GetTrailingValue(cmd, +1, sid);
 
-   // @fixme: warning 43: possible loss of data due to type conversion: max_order_slippage & GetOrderColor
-   order_ticket = OrderSend(_Symbol, cmd, volume, NormalizeDouble(order_price, Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + sid, 0, GetOrderColor(cmd));
+   // @fixme: warning 43: possible loss of data due to type conversion: GetOrderColor
+   order_ticket = OrderSend(_Symbol, cmd, NormalizeLots(trade_volume), NormalizeDouble(order_price, Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + sid, 0, GetOrderColor(cmd));
    if (order_ticket >= 0) {
       total_orders++;
       daily_orders++;
       if (!OrderSelect(order_ticket, SELECT_BY_TICKET) && VerboseErrors) {
         Print(__FUNCTION__ + "(): OrderSelect() error = ", ErrorDescription(GetLastError()));
         OrderPrint();
-        // @fixme: warning 43: possible loss of data due to type conversion: volume
-        if (retry) TaskAddOrderOpen(cmd, volume, sid); // Will re-try again.
+        // @fixme: warning 43: possible loss of data due to type conversion: trade_volume
+        if (retry) TaskAddOrderOpen(cmd, trade_volume, sid); // Will re-try again.
         info[sid][TOTAL_ERRORS]++;
         return (FALSE);
       }
-      if (VerboseTrace) Print(__FUNCTION__, "(): Success: OrderSend(", Symbol(), ", ",  Convert::OrderTypeToString(cmd), ", ", volume, ", ", NormalizeDouble(order_price, Digits), ", ", max_order_slippage, ", ", stoploss, ", ", takeprofit, ", ", order_comment, ", ", MagicNumber + sid, ", 0, ", GetOrderColor(), ");");
+      if (VerboseTrace) Print(__FUNCTION__, "(): Success: OrderSend(", Symbol(), ", ",  Convert::OrderTypeToString(cmd), ", ", NormalizeDouble(trade_volume, volume_digits), ", ", NormalizeDouble(order_price, Digits), ", ", max_order_slippage, ", ", stoploss, ", ", takeprofit, ", ", order_comment, ", ", MagicNumber + sid, ", 0, ", GetOrderColor(), ");");
 
       result = TRUE;
       // TicketAdd(order_ticket);
@@ -951,8 +952,8 @@ int ExecuteOrder(int cmd, int sid, double volume = EMPTY, string order_comment =
      err_code = GetLastError();
      if (VerboseErrors) Print(__FUNCTION__, "(): OrderSend(): error = ", ErrorDescription(err_code));
      if (VerboseDebug) {
-       PrintFormat("Error: OrderSend(%s, %d, %f, %f, %f, %f, %f, %s, %d, %d, %d)",
-              _Symbol, cmd, volume, NormalizeDouble(order_price, Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + sid, 0, GetOrderColor(cmd));
+       PrintFormat("Error: OrderSend(%s, %s, %g, %f, %d, %f, %f, %s, %d, %d, %d)",
+              _Symbol, Convert::OrderTypeToString(cmd), NormalizeLots(trade_volume), NormalizeDouble(order_price, Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + sid, 0, GetOrderColor(cmd));
        Print(__FUNCTION__ + "(): " + GetAccountTextDetails());
        Print(__FUNCTION__ + "(): " + GetMarketTextDetails());
        OrderPrint();
@@ -977,7 +978,7 @@ int ExecuteOrder(int cmd, int sid, double volume = EMPTY, string order_comment =
         // Price changed, so we should consider whether to execute order or not.
         retry = FALSE; // ?
      }
-     if (retry) TaskAddOrderOpen(cmd, volume, sid); // Will re-try again.
+     if (retry) TaskAddOrderOpen(cmd, trade_volume, sid); // Will re-try again.
      info[sid][TOTAL_ERRORS]++;
    } // end-if: order_ticket
 
@@ -1118,13 +1119,13 @@ double OrderCalc(int ticket_no = 0) {
   }
   stats[id][TOTAL_NET_PROFIT] += profit;
 
-  if (TimeDayOfYear(close_time) == DayOfYear()) {
+  if (DateTime::TimeDayOfYear(close_time) == DayOfYear()) {
     stats[id][DAILY_PROFIT] += profit;
   }
-  if (TimeDayOfWeek(close_time) <= DayOfWeek()) {
+  if (DateTime::TimeDayOfWeek(close_time) <= DayOfWeek()) {
     stats[id][WEEKLY_PROFIT] += profit;
   }
-  if (TimeDay(close_time) <= Day()) {
+  if (DateTime::TimeDay(close_time) <= Day()) {
     stats[id][MONTHLY_PROFIT] += profit;
   }
   //TicketRemove(ticket_no);
@@ -3571,7 +3572,7 @@ double GetMarketGap(bool in_points = false) {
 /*
  * Normalize lot size.
  */
-double NormalizeLots(double lots, bool ceiling = false, string pair = "") {
+double NormalizeLots(double lots, bool ceiling = False, string pair = "") {
   // See: http://forum.mql4.com/47988
   double lotsize;
   double precision;
@@ -3583,7 +3584,7 @@ double NormalizeLots(double lots, bool ceiling = false, string pair = "") {
 
   if (lotsize < market_minlot) lotsize = market_minlot;
   if (lotsize > market_maxlot) lotsize = market_maxlot;
-  return (lotsize);
+  return NormalizeDouble(lotsize, volume_digits);
 }
 
 /*
@@ -3599,18 +3600,6 @@ double NormalizePrice(double p, string pair=""){
    if (pair == "") pair = Symbol();
    double ts = MarketInfo(pair, MODE_TICKSIZE);
    return( MathRound(p/ts) * ts );
-}
-
-/*
- * Return opposite trade command operation.
- *
- * @param
- *   cmd (int) - trade command operation
- */
-int CmdOpp(int cmd) {
-  if (cmd == OP_BUY) return OP_SELL;
-  if (cmd == OP_SELL) return OP_BUY;
-  return EMPTY;
 }
 
 /*
@@ -3972,7 +3961,7 @@ void StartNewMonth() {
   if (VerboseInfo) Print(GetMonthlyReport()); // Print monthly report at end of each month.
 
   // Store new data.
-  month = Month(); // Returns the current month as number (1-January,2,3,4,5,6,7,8,9,10,11,12), i.e., the number of month of the last known server time.
+  month = DateTime::Month(); // Returns the current month as number (1-January,2,3,4,5,6,7,8,9,10,11,12), i.e., the number of month of the last known server time.
 
   // Reset variables.
   string sar_stats = "Monthly SAR stats: ";
@@ -4007,7 +3996,7 @@ void StartNewYear() {
   // if (VerboseInfo) Print(GetYearlyReport()); // Print monthly report at end of each year.
 
   // Store new data.
-  year = Year(); // Returns the current year, i.e., the year of the last known server time.
+  year = DateTime::Year(); // Returns the current year, i.e., the year of the last known server time.
 
   // Reset variables.
   for (int i = 0; i < FINAL_PERIOD_TYPE_ENTRY; i++) {
@@ -4035,12 +4024,12 @@ bool InitializeVariables() {
   // Check time of the week, month and year based on the trading bars.
   time_current = TimeCurrent();
   bar_time = iTime(NULL, PERIOD_M1, 0);
-  hour_of_day = Hour(); // The hour (0,1,2,..23) of the last known server time by the moment of the program start.
-  day_of_week = DayOfWeek(); // The zero-based day of week (0 means Sunday,1,2,3,4,5,6) of the specified date. At the testing, the last known server time is modelled.
-  day_of_month = Day(); // The day of month (1 - 31) of the specified date. At the testing, the last known server time is modelled.
-  day_of_year = DayOfYear(); // Day (1 means 1 January,..,365(6) does 31 December) of year. At the testing, the last known server time is modelled.
-  month = Month(); // Returns the current month as number (1-January,2,3,4,5,6,7,8,9,10,11,12), i.e., the number of month of the last known server time.
-  year = Year(); // Returns the current year, i.e., the year of the last known server time.
+  hour_of_day = DateTime::Hour(); // The hour (0,1,2,..23) of the last known server time by the moment of the program start.
+  day_of_week = DateTime::DayOfWeek(); // The zero-based day of week (0 means Sunday,1,2,3,4,5,6) of the specified date. At the testing, the last known server time is modelled.
+  day_of_month = DateTime::Day(); // The day of month (1 - 31) of the specified date. At the testing, the last known server time is modelled.
+  day_of_year = DateTime::DayOfYear(); // Day (1 means 1 January,..,365(6) does 31 December) of year. At the testing, the last known server time is modelled.
+  month = DateTime::Month(); // Returns the current month as number (1-January,2,3,4,5,6,7,8,9,10,11,12), i.e., the number of month of the last known server time.
+  year = DateTime::Year(); // Returns the current year, i.e., the year of the last known server time.
 
   market_minlot = MarketInfo(_Symbol, MODE_MINLOT); // Minimum permitted amount of a lot
   if (market_minlot == 0.0) market_minlot = 0.1;
@@ -4822,13 +4811,13 @@ bool AccCondition(int condition = C_ACC_NONE) {
     case C_ACC_PDAY_IN_PROFIT: // Check if previous day in profit.
       {
         last_cname = "YesterdayInProfit";
-        int yesterday1 = TimeDayOfYear(time_current - 24*60*60);
+        int yesterday1 = DateTime::TimeDayOfYear(time_current - 24*60*60);
         return Arrays::GetArrSumKey1(hourly_profit, yesterday1) > 0;
       }
     case C_ACC_PDAY_IN_LOSS: // Check if previous day in loss.
       {
         last_cname = "YesterdayInLoss";
-        int yesterday2 = TimeDayOfYear(time_current - 24*60*60);
+        int yesterday2 = DateTime::TimeDayOfYear(time_current - 24*60*60);
         return Arrays::GetArrSumKey1(hourly_profit, yesterday2) < 0;
       }
     case C_ACC_MAX_ORDERS:
@@ -5276,9 +5265,9 @@ string GetDailyReport() {
   int key;
   // output += "Low: "     + daily[MAX_LOW] + "; ";
   // output += "High: "    + daily[MAX_HIGH] + "; ";
-  output += StringFormat("Tick: %.0f; ", daily[MAX_TICK]);
+  output += StringFormat("Tick: %g; ", daily[MAX_TICK]);
   // output += "Drop: "    + daily[MAX_DROP] + "; ";
-  output += StringFormat("Spread (pips): %.1f; ", daily[MAX_SPREAD]);
+  output += StringFormat("Spread (pts): %g; ", daily[MAX_SPREAD]);
   output += StringFormat("Max orders: %.0f; ", daily[MAX_ORDERS]);
   output += StringFormat("Loss: %.2f; ", daily[MAX_LOSS]);
   output += StringFormat("Profit: %.2f; ", daily[MAX_PROFIT]);
@@ -5304,9 +5293,9 @@ string GetWeeklyReport() {
   // output =+ GetAccountTextDetails() + "; " + GetOrdersStats();
   // output += "Low: "     + weekly[MAX_LOW] + "; ";
   // output += "High: "    + weekly[MAX_HIGH] + "; ";
-  output += "Tick: "         + weekly[MAX_TICK] + "; ";
+  output += StringFormat("Tick: %g; ", weekly[MAX_TICK]);
   // output += "Drop: "    + weekly[MAX_DROP] + "; ";
-  output += "Spread (pips):" + weekly[MAX_SPREAD] + "; ";
+  output += StringFormat("Spread (pts): %g; ", weekly[MAX_SPREAD]);
   output += "Max orders: "   + weekly[MAX_ORDERS] + "; ";
   output += "Loss: "         + weekly[MAX_LOSS] + "; ";
   output += "Profit: "       + weekly[MAX_PROFIT] + "; ";
@@ -5330,9 +5319,9 @@ string GetMonthlyReport() {
   // output =+ GetAccountTextDetails() + "; " + GetOrdersStats();
   // output += "Low: "     + monthly[MAX_LOW] + "; ";
   // output += "High: "    + monthly[MAX_HIGH] + "; ";
-  output += "Tick: "          + monthly[MAX_TICK] + "; ";
+  output += StringFormat("Tick: %g; ", monthly[MAX_TICK]);
   // output += "Drop: "    + monthly[MAX_DROP] + "; ";
-  output += "Spread (pips): " + monthly[MAX_SPREAD] + "; ";
+  output += StringFormat("Spread (pts): %g; ", monthly[MAX_SPREAD]);
   output += "Max orders: "    + monthly[MAX_ORDERS] + "; ";
   output += "Loss: "          + monthly[MAX_LOSS] + "; ";
   output += "Profit: "        + monthly[MAX_PROFIT] + "; ";
@@ -5487,7 +5476,7 @@ string GetMarketTextDetails() {
      "Symbol: ", Symbol(), "; ",
      "Ask: ", DoubleToStr(Ask, Digits), "; ",
      "Bid: ", DoubleToStr(Bid, Digits), "; ",
-     "Spread: ", GetMarketSpread(TRUE), " pts = ", Convert::ValueToPips(GetMarketSpread()), " pips; "
+     StringFormat("Spread: %g pts = %.2f pips", GetMarketSpread(True), Convert::ValueToPips(GetMarketSpread()))
    );
 }
 
@@ -5744,7 +5733,7 @@ bool ActionExecute(int aid, int id = EMPTY) {
     case A_CLOSE_ALL_LOSS_SIDE: /* 7 */
       cmd = GetProfitableSide();
       if (cmd != EMPTY) {
-        result = ActionCloseAllOrdersByType(CmdOpp(cmd), reason_id);
+        result = ActionCloseAllOrdersByType(Convert::OrderTypeOpp(cmd), reason_id);
       }
       break;
     case A_CLOSE_ALL_TREND: /* 8 */
@@ -5756,7 +5745,7 @@ bool ActionExecute(int aid, int id = EMPTY) {
     case A_CLOSE_ALL_NON_TREND: /* 9 */
       cmd = CheckTrend(TrendMethodAction);
       if (cmd != EMPTY) {
-        result = ActionCloseAllOrdersByType(CmdOpp(cmd), reason_id);
+        result = ActionCloseAllOrdersByType(Convert::OrderTypeOpp(cmd), reason_id);
       }
       break;
     case A_CLOSE_ALL_ORDERS: /* 10 */
