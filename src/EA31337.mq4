@@ -196,32 +196,6 @@ extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v"
  *   £467.77  5351  1.09  0.09  355.59  22.88%
  */
 //+------------------------------------------------------------------+
-/*
- * Default enumerations:
- *
- * ENUM_MA_METHOD values:
- *   0: MODE_SMA (Simple averaging)
- *   1: MODE_EMA (Exponential averaging)
- *   2: MODE_SMMA (Smoothed averaging)
- *   3: MODE_LWMA (Linear-weighted averaging)
- *
- * ENUM_APPLIED_PRICE values:
- *   0: PRICE_CLOSE (Close price)
- *   1: PRICE_OPEN (Open price)
- *   2: PRICE_HIGH (The maximum price for the period)
- *   3: PRICE_LOW (The minimum price for the period)
- *   4: PRICE_MEDIAN (Median price, (high + low)/2
- *   5: PRICE_TYPICAL (Typical price, (high + low + close)/3
- *   6: PRICE_WEIGHTED (Average price, (high + low + close + close)/4
- *
- * Trade operation:
- *   0: OP_BUY (Buy operation)
- *   1: OP_SELL (Sell operation)
- *   2: OP_BUYLIMIT (Buy limit pending order)
- *   3: OP_SELLLIMIT (Sell limit pending order)
- *   4: OP_BUYSTOP (Buy stop pending order)
- *   5: OP_SELLSTOP (Sell stop pending order)
- */
 
 /*
  * Predefined constants:
@@ -950,7 +924,11 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
    } else {
      result = FALSE;
      err_code = GetLastError();
-     if (VerboseErrors) Print(__FUNCTION__, "(): OrderSend(): error = ", ErrorDescription(err_code));
+     if (VerboseErrors) {
+         last_err = StringFormat("%s: OrderSend(): error = %s", __FUNCTION__, ErrorDescription(err_code));
+         Print(last_err);
+         if (WriteReport) ReportAdd(last_err);
+     }
      if (VerboseDebug) {
        PrintFormat("Error: OrderSend(%s, %s, %g, %f, %d, %f, %f, %s, %d, %d, %d)",
               _Symbol, Convert::OrderTypeToString(cmd), NormalizeLots(trade_volume), NormalizeDouble(order_price, Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + sid, 0, GetOrderColor(cmd));
@@ -964,6 +942,11 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
        // On some trade servers, the total amount of open and pending orders can be limited. If this limit has been exceeded, no new order will be opened.
        MaxOrders = total_orders; // So we're setting new fixed limit for total orders which is allowed.
        retry = FALSE;
+     }
+     if (err_code == ERR_INVALID_TRADE_VOLUME) { // OrderSend error 131
+        // Invalid trade volume.
+        // Usually happens when volume is not normalized, or on invalid volume value.
+        retry = FALSE;
      }
      if (err_code == ERR_TRADE_EXPIRATION_DENIED) {
        // Applying of pending order expiration time can be disabled in some trade servers.
@@ -3487,7 +3470,7 @@ bool ValidSettings() {
   #endif
   if (Check::IsTesting()) {
       if (!Backtest::ValidSpread() || !Backtest::ValidLotstep()) {
-            if (VerboseErrors) Print(__FUNCTION__ + "(): Error2: Backtest settings are invalid!");
+          if (VerboseErrors) Print(__FUNCTION__ + "(): Error: Backtest settings are invalid!");
           return (FALSE);
       }
   }

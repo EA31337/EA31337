@@ -6,6 +6,33 @@
 #property copyright "Copyright 2016, kenorb"
 #property link      "https://github.com/EA31337"
 
+/*
+ * Default enumerations:
+ *
+ * ENUM_MA_METHOD values:
+ *   0: MODE_SMA (Simple averaging)
+ *   1: MODE_EMA (Exponential averaging)
+ *   2: MODE_SMMA (Smoothed averaging)
+ *   3: MODE_LWMA (Linear-weighted averaging)
+ *
+ * ENUM_APPLIED_PRICE values:
+ *   0: PRICE_CLOSE (Close price)
+ *   1: PRICE_OPEN (Open price)
+ *   2: PRICE_HIGH (The maximum price for the period)
+ *   3: PRICE_LOW (The minimum price for the period)
+ *   4: PRICE_MEDIAN (Median price) = (high + low)/2
+ *   5: PRICE_TYPICAL (Typical price) = (high + low + close)/3
+ *   6: PRICE_WEIGHTED (Average price) = (high + low + close + close)/4
+ *
+ * Trade operation:
+ *   0: OP_BUY (Buy operation)
+ *   1: OP_SELL (Sell operation)
+ *   2: OP_BUYLIMIT (Buy limit pending order)
+ *   3: OP_SELLLIMIT (Sell limit pending order)
+ *   4: OP_BUYSTOP (Buy stop pending order)
+ *   5: OP_SELLSTOP (Sell stop pending order)
+ */
+
 //+------------------------------------------------------------------+
 //| EA enumerations.
 //+------------------------------------------------------------------+
