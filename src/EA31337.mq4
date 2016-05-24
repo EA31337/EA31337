@@ -371,13 +371,13 @@ int OnInit() {
       err = "Error: EA parameters are not valid, please correct them.";
       Comment(err);
       Alert(err);
-      if (VerboseErrors) Print(__FUNCTION__ + "(): " + err);
+      if (VerboseErrors) Print(__FUNCTION__ + ": " + err);
       return (INIT_PARAMETERS_INCORRECT); // Incorrect set of input parameters.
     }
     if (!Check::IsTesting() && AccountNumber() <= 1) {
       err = "Error: EA requires on-line Terminal.";
       Comment(err);
-      if (VerboseErrors) Print(__FUNCTION__ + "(): " + err);
+      if (VerboseErrors) Print(__FUNCTION__ + ": " + err);
       return (INIT_FAILED);
      }
      session_initiated = TRUE;
@@ -425,9 +425,9 @@ int OnInit() {
 void OnDeinit(const int reason) {
   ea_active = TRUE;
   time_current = TimeCurrent();
-  if (VerboseDebug) Print("Calling " + __FUNCTION__ + "()");
+  if (VerboseDebug) Print("Calling " + __FUNCTION__ + ".");
   if (VerboseInfo) {
-    Print(__FUNCTION__ + "(): " + "EA deinitializing, reason: " + Errors::GetUninitReasonText(reason) + " (code: " + IntegerToString(reason) + ")"); // Also: _UninitReason.
+    Print(__FUNCTION__ + ": " + "EA deinitializing, reason: " + Errors::GetUninitReasonText(reason) + " (code: " + IntegerToString(reason) + ")"); // Also: _UninitReason.
     Print(GetSummaryText());
   }
 
@@ -438,7 +438,7 @@ void OnDeinit(const int reason) {
     string filename = StringFormat("%s-v%s-%s-%.0f%s-s%d-%s-Report.txt", ea_name, ea_version, _Symbol, ExtInitialDeposit, AccCurrency, init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES));
     string data = GenerateReport();
     Report::WriteReport(filename, data, VerboseInfo); // Todo: Add: Errors::GetUninitReasonText(reason)
-    Print(__FUNCTION__ + "(): Saved report as: " + filename);
+    Print(__FUNCTION__ + ": Saved report as: " + filename);
   }
   // #ifdef _DEBUG
   // DEBUG("n=" + n + " : " +  DoubleToStrMorePrecision(val,19) );
@@ -449,7 +449,7 @@ void OnDeinit(const int reason) {
 // The init event handler for tester.
 // FIXME: Doesn't seems to work.
 void OnTesterInit() {
-  if (VerboseDebug) Print("Calling " + __FUNCTION__ + "()");
+  if (VerboseDebug) Print("Calling " + __FUNCTION__ + ".");
   #ifdef __MQL5__
     ParameterSetRange(LotSize, 0, 0.0, 0.01, 0.01, 0.1);
   #endif
@@ -458,14 +458,14 @@ void OnTesterInit() {
 // The init event handler for tester.
 // FIXME: Doesn't seems to work.
 void OnTesterDeinit() {
-  if (VerboseDebug) Print("Calling " + __FUNCTION__ + "()");
+  if (VerboseDebug) Print("Calling " + __FUNCTION__ + ".");
 }
 
 // The Start event handler, which is automatically generated only for running scripts.
 // FIXME: Doesn't seems to be called, however MT4 doesn't want to execute EA without it.
 void start() {
-  if (VerboseTrace) Print("Calling " + __FUNCTION__ + "()");
-  if (VerboseInfo) Print(__FUNCTION__ + "(): " + GetMarketTextDetails());
+  if (VerboseTrace) Print("Calling " + __FUNCTION__ + ".");
+  if (VerboseInfo) Print(__FUNCTION__ + ": " + GetMarketTextDetails());
 }
 
 /*
@@ -542,7 +542,7 @@ string InitInfo(bool startup = False, string sep = "\n") {
 bool Trade() {
   bool order_placed = FALSE;
   int trade_cmd;
-  // if (VerboseTrace) Print("Calling " + __FUNCTION__ + "()");
+  // if (VerboseTrace) Print("Calling " + __FUNCTION__ + ".");
   // vdigits = MarketInfo(Symbol(), MODE_DIGITS);
 
   for (int id = 0; id < FINAL_STRATEGY_TYPE_ENTRY; id++) {
@@ -630,7 +630,7 @@ bool TradeCondition(int order_type = 0, int cmd = NULL) {
  */
 bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
   static int processed[FINAL_INDICATOR_TYPE_ENTRY][FINAL_PERIOD_TYPE_ENTRY];
-  int i; string text = __FUNCTION__ + "(): ";
+  int i; string text = __FUNCTION__ + ": ";
   if (type == EMPTY) ArrayFill(processed, 0, ArraySize(processed), FALSE); // Reset processed if timeframe is EMPTY.
   int period = Convert::TfToPeriod(timeframe);
   if (processed[type][period] == time_current) {
@@ -884,7 +884,7 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
 
    // Calculate take profit and stop loss.
    RefreshRates();
-   if (VerboseDebug) Print(__FUNCTION__ + "(): " + GetMarketTextDetails()); // Print current market information before placing the order.
+   if (VerboseDebug) Print(__FUNCTION__ + ": " + GetMarketTextDetails()); // Print current market information before placing the order.
    double order_price = Market::GetOpenPrice(cmd);
    double stoploss = 0, takeprofit = 0;
    if (StopLoss > 0.0) stoploss = NormalizeDouble(Market::GetClosePrice(cmd) - (StopLoss + TrailingStop) * pip_size * Convert::OrderTypeToValue(cmd), Digits);
@@ -898,14 +898,14 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
       total_orders++;
       daily_orders++;
       if (!OrderSelect(order_ticket, SELECT_BY_TICKET) && VerboseErrors) {
-        Print(__FUNCTION__ + "(): OrderSelect() error = ", ErrorDescription(GetLastError()));
+        Print(__FUNCTION__ + ": OrderSelect() error = ", ErrorDescription(GetLastError()));
         OrderPrint();
         // @fixme: warning 43: possible loss of data due to type conversion: trade_volume
         if (retry) TaskAddOrderOpen(cmd, trade_volume, sid); // Will re-try again.
         info[sid][TOTAL_ERRORS]++;
         return (FALSE);
       }
-      if (VerboseTrace) Print(__FUNCTION__, "(): Success: OrderSend(", Symbol(), ", ",  Convert::OrderTypeToString(cmd), ", ", NormalizeDouble(trade_volume, volume_digits), ", ", NormalizeDouble(order_price, Digits), ", ", max_order_slippage, ", ", stoploss, ", ", takeprofit, ", ", order_comment, ", ", MagicNumber + sid, ", 0, ", GetOrderColor(), ");");
+      if (VerboseTrace) Print(__FUNCTION__, ": Success: OrderSend(", Symbol(), ", ",  Convert::OrderTypeToString(cmd), ", ", NormalizeDouble(trade_volume, volume_digits), ", ", NormalizeDouble(order_price, Digits), ", ", max_order_slippage, ", ", stoploss, ", ", takeprofit, ", ", order_comment, ", ", MagicNumber + sid, ", 0, ", GetOrderColor(), ");");
 
       result = TRUE;
       // TicketAdd(order_ticket);
@@ -914,7 +914,7 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
       order_price = OrderOpenPrice();
       stats[sid][AVG_SPREAD] = (stats[sid][AVG_SPREAD] + curr_spread) / 2;
       if (VerboseInfo) OrderPrint();
-      if (VerboseDebug) { Print(__FUNCTION__ + "(): " + GetOrderTextDetails() + GetAccountTextDetails()); }
+      if (VerboseDebug) { Print(__FUNCTION__ + ": " + GetOrderTextDetails() + GetAccountTextDetails()); }
       if (SoundAlert) PlaySound(SoundFileAtOpen);
       if (SendEmailEachOrder) SendEmailExecuteOrder();
 
@@ -932,8 +932,8 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
      if (VerboseDebug) {
        PrintFormat("Error: OrderSend(%s, %s, %g, %f, %d, %f, %f, %s, %d, %d, %d)",
               _Symbol, Convert::OrderTypeToString(cmd), NormalizeLots(trade_volume), NormalizeDouble(order_price, Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + sid, 0, GetOrderColor(cmd));
-       Print(__FUNCTION__ + "(): " + GetAccountTextDetails());
-       Print(__FUNCTION__ + "(): " + GetMarketTextDetails());
+       Print(__FUNCTION__ + ": " + GetAccountTextDetails());
+       Print(__FUNCTION__ + ": " + GetMarketTextDetails());
        OrderPrint();
      }
 
@@ -1050,24 +1050,24 @@ bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = TRUE)
   }
   double close_price = NormalizeDouble(Market::GetClosePrice(), Digits);
   result = OrderClose(ticket_no, OrderLots(), close_price, max_order_slippage, GetOrderColor());
-  // if (VerboseTrace) Print(__FUNCTION__ + "(): CloseOrder request. Reason: " + reason + "; Result=" + result + " @ " + TimeCurrent() + "(" + TimeToStr(TimeCurrent()) + "), ticket# " + ticket_no);
+  // if (VerboseTrace) Print(__FUNCTION__ + ": CloseOrder request. Reason: " + reason + "; Result=" + result + " @ " + TimeCurrent() + "(" + TimeToStr(TimeCurrent()) + "), ticket# " + ticket_no);
   if (result) {
     total_orders--;
     last_close_profit = GetOrderProfit();
     if (SoundAlert) PlaySound(SoundFileAtClose);
     // TaskAddCalcStats(ticket_no); // Already done on CheckHistory().
-    if (VerboseDebug) Print(__FUNCTION__, "(): Closed order " + ticket_no + " with profit " + GetOrderProfit() + " pips, reason: " + ReasonIdToText(reason_id) + "; " + GetOrderTextDetails());
+    if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + ticket_no + " with profit " + GetOrderProfit() + " pips, reason: " + ReasonIdToText(reason_id) + "; " + GetOrderTextDetails());
     #ifdef __advanced__
-      if (VerboseDebug) Print(__FUNCTION__, "(): Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(GetOrderProfit()) + " pips, reason: " + ReasonIdToText(reason_id) + "; " + GetOrderTextDetails());
+      if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(GetOrderProfit()) + " pips, reason: " + ReasonIdToText(reason_id) + "; " + GetOrderTextDetails());
       if (QueueOrdersAIActive) OrderQueueProcess();
     #else
-      if (VerboseDebug) Print(__FUNCTION__, "(): Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(GetOrderProfit()) + " pips; " + GetOrderTextDetails());
+      if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(GetOrderProfit()) + " pips; " + GetOrderTextDetails());
     #endif
   } else {
     err_code = GetLastError();
-    if (VerboseErrors) Print(__FUNCTION__, "(): Error: Ticket: ", ticket_no, "; Error: ", GetErrorText(err_code));
+    if (VerboseErrors) Print(__FUNCTION__, ": Error: Ticket: ", ticket_no, "; Error: ", GetErrorText(err_code));
     if (VerboseDebug) PrintFormat("Error: OrderClose(%d, %f, %f, %f, %d);", ticket_no, OrderLots(), close_price, max_order_slippage, GetOrderColor());
-    if (VerboseDebug) Print(__FUNCTION__ + "(): " + GetMarketTextDetails());
+    if (VerboseDebug) Print(__FUNCTION__ + ": " + GetMarketTextDetails());
     OrderPrint();
     if (retry) TaskAddCloseOrder(ticket_no, reason_id); // Add task to re-try.
     int id = GetIdByMagic();
@@ -1165,14 +1165,14 @@ bool UpdateStats() {
   if (last_tick_change > MarketBigDropSize) {
     double diff1 = MathMax(Convert::GetPipDiff(Ask, LastAsk), Convert::GetPipDiff(Bid, LastBid));
     Message(StringFormat("Market very big drop of %.1f pips detected!", diff1));
-    Print(__FUNCTION__ + "(): " + GetLastMessage());
-    if (WriteReport) ReportAdd(__FUNCTION__ + "(): " + GetLastMessage());
+    Print(__FUNCTION__ + ": " + GetLastMessage());
+    if (WriteReport) ReportAdd(__FUNCTION__ + ": " + GetLastMessage());
   }
   else if (VerboseDebug && last_tick_change > MarketSuddenDropSize) {
     double diff2 = MathMax(Convert::GetPipDiff(Ask, LastAsk), Convert::GetPipDiff(Bid, LastBid));
     Message(StringFormat("Market sudden drop of %.1f pips detected!", diff2));
-    Print(__FUNCTION__ + "(): " + GetLastMessage());
-    if (WriteReport) ReportAdd(__FUNCTION__ + "(): " + GetLastMessage());
+    Print(__FUNCTION__ + ": " + GetLastMessage());
+    if (WriteReport) ReportAdd(__FUNCTION__ + ": " + GetLastMessage());
   }
   return (TRUE);
 }
@@ -2777,7 +2777,7 @@ bool CheckMinPipGap(int strategy_type) {
          }
        }
     } else if (VerboseDebug) {
-        Print(__FUNCTION__ + "(): Error: Strategy type = " + strategy_type + ", pos: " + order + ", message: ", GetErrorText(err_code));
+        Print(__FUNCTION__ + ": Error: Strategy type = " + strategy_type + ", pos: " + order + ", message: ", GetErrorText(err_code));
     }
   }
   return TRUE;
@@ -2794,7 +2794,7 @@ bool ValidTrailingValue(double value, int cmd, int loss_or_profit = -1, bool exi
        || (cmd == OP_SELL && loss_or_profit > 0 && price - value > delta)
        );
   valid &= (value >= 0); // Also must be zero or above.
-  if (!valid && VerboseTrace) Print(__FUNCTION__ + "(): Trailing value not valid: " + value);
+  if (!valid && VerboseTrace) Print(__FUNCTION__ + ": Trailing value not valid: " + value);
   return valid;
 }
 
@@ -2826,11 +2826,11 @@ void UpdateTrailingStops() {
              (OrderType() == OP_SELL && OrderStopLoss() > Ask)) {
             result = OrderModify(OrderTicket(), OrderOpenPrice(), OrderOpenPrice() - OrderCommission() * Point, OrderTakeProfit(), 0, GetOrderColor());
             if (!result && err_code > 1) {
-             if (VerboseErrors) Print(__FUNCTION__, "(): Error: OrderModify(): [MinimalizeLosses] ", ErrorDescription(err_code));
+             if (VerboseErrors) Print(__FUNCTION__, ": Error: OrderModify(): [MinimalizeLosses] ", ErrorDescription(err_code));
                if (VerboseDebug)
-                 Print(__FUNCTION__ + "(): Error: OrderModify(", OrderTicket(), ", ", OrderOpenPrice(), ", ", OrderOpenPrice() - OrderCommission() * Point, ", ", OrderTakeProfit(), ", ", 0, ", ", GetOrderColor(), "); ", "Ask/Bid: ", Ask, "/", Bid);
+                 Print(__FUNCTION__ + ": Error: OrderModify(", OrderTicket(), ", ", OrderOpenPrice(), ", ", OrderOpenPrice() - OrderCommission() * Point, ", ", OrderTakeProfit(), ", ", 0, ", ", GetOrderColor(), "); ", "Ask/Bid: ", Ask, "/", Bid);
             } else {
-              if (VerboseTrace) Print(__FUNCTION__ + "(): MinimalizeLosses: ", GetOrderTextDetails());
+              if (VerboseTrace) Print(__FUNCTION__ + ": MinimalizeLosses: ", GetOrderTextDetails());
             }
           }
         }
@@ -2843,9 +2843,9 @@ void UpdateTrailingStops() {
            if (!result) {
              err_code = GetLastError();
              if (err_code > 1) {
-               if (VerboseErrors) Print(__FUNCTION__, "(): Error: OrderModify(): ", ErrorDescription(err_code));
+               if (VerboseErrors) Print(__FUNCTION__, ": Error: OrderModify(): ", ErrorDescription(err_code));
                if (VerboseDebug)
-                 Print(__FUNCTION__ + "(): Error: OrderModify(", OrderTicket(), ", ", OrderOpenPrice(), ", ", new_trailing_stop, ", ", new_profit_take, ", ", 0, ", ", GetOrderColor(), "); ", "Ask/Bid: ", Ask, "/", Bid);
+                 Print(__FUNCTION__ + ": Error: OrderModify(", OrderTicket(), ", ", OrderOpenPrice(), ", ", new_trailing_stop, ", ", new_profit_take, ", ", 0, ", ", GetOrderColor(), "); ", "Ask/Bid: ", Ask, "/", Bid);
              }
            } else {
              // if (VerboseTrace) Print("UpdateTrailingStops(): OrderModify(): ", GetOrderTextDetails());
@@ -3096,7 +3096,7 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
        new_value = Misc::If(Convert::OrderTypeToValue(cmd) == loss_or_profit, envelopes[period][CURR][UPPER], envelopes[period][CURR][LOWER]);
        break;
      default:
-       if (VerboseDebug) Print(__FUNCTION__ + "(): Error: Unknown trailing stop method: ", method);
+       if (VerboseDebug) Print(__FUNCTION__ + ": Error: Unknown trailing stop method: ", method);
    }
 
    if (new_value > 0) new_value += delta * factor;
@@ -3108,7 +3108,7 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
        if (existing && previous == 0) previous = default_trail;
      #endif
      if (VerboseTrace)
-       Print(__FUNCTION__ + "(): Error: method = " + method + ", ticket = #" + Misc::If(existing, OrderTicket(), 0) + ": Invalid Trailing Value: ", new_value, ", previous: ", previous, "; ", GetOrderTextDetails(), ", delta: ", DoubleToStr(delta, pip_digits));
+       Print(__FUNCTION__ + ": Error: method = " + method + ", ticket = #" + Misc::If(existing, OrderTicket(), 0) + ": Invalid Trailing Value: ", new_value, ", previous: ", previous, "; ", GetOrderTextDetails(), ", delta: ", DoubleToStr(delta, pip_digits));
      // If value is invalid, fallback to the previous one.
      return previous;
    }
@@ -3223,7 +3223,7 @@ int GetTrailingMethod(int order_type, int stop_or_profit) {
       if (ZigZag_TrailingProfitMethod > 0) profit_method = ZigZag_TrailingProfitMethod;
       break;
     default:
-      if (VerboseTrace) Print(__FUNCTION__ + "(): Unknown order type: " + order_type);
+      if (VerboseTrace) Print(__FUNCTION__ + ": Unknown order type: " + order_type);
   }
   return Misc::If(stop_or_profit > 0, profit_method, stop_method);
 }
@@ -3236,7 +3236,7 @@ double GetPeakPrice(int timeframe, int mode, int bars, int index = CURR) {
   double peak_price = Open[0];
   if (mode == MODE_HIGH) ibar = iHighest(_Symbol, timeframe, MODE_HIGH, bars, index);
   if (mode == MODE_LOW)  ibar =  iLowest(_Symbol, timeframe, MODE_LOW,  bars, index);
-  if (ibar == -1 && VerboseTrace) { err_code = GetLastError(); Print(__FUNCTION__ + "(): " + ErrorDescription(err_code)); return FALSE; }
+  if (ibar == -1 && VerboseTrace) { err_code = GetLastError(); Print(__FUNCTION__ + ": " + ErrorDescription(err_code)); return FALSE; }
   if (mode == MODE_HIGH) {
     return iHigh(_Symbol, timeframe, ibar);
   } else if (mode == MODE_LOW) {
@@ -3369,28 +3369,28 @@ bool TradeAllowed() {
   /*
   if (last_order_time == iTime(NULL, PERIOD_M1, 0)) {
     err = StringConcatenate("Not trading at the moment, as we already placed order on: ", TimeToStr(last_order_time));
-    if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "(): " + err);
+    if (VerboseTrace && err != last_err) Print(__FUNCTION__ + ": " + err);
     last_err = err;
     return (FALSE);
   }*/
   if (Bars < 100) {
     err = "Bars less than 100, not trading...";
-    if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "(): " + err);
-    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "(): " + err);
+    if (VerboseTrace && err != last_err) Print(__FUNCTION__ + ": " + err);
+    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + ": " + err);
     last_err = err;
     return (FALSE);
   }
   if (!Check::IsTesting() && Volume[0] < MinVolumeToTrade) {
     err = "Volume too low to trade.";
-    if (VerboseTrace && err != last_err) Print(__FUNCTION__ + "(): " + err);
-    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "(): " + err);
+    if (VerboseTrace && err != last_err) Print(__FUNCTION__ + ": " + err);
+    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + ": " + err);
     last_err = err;
     return (FALSE);
   }
   if (IsTradeContextBusy()) {
     err = "Error: Trade context is temporary busy.";
-    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "(): " + err);
-    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "(): " + err);
+    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + ": " + err);
+    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + ": " + err);
     last_err = err;
     return (FALSE);
   }
@@ -3400,16 +3400,16 @@ bool TradeAllowed() {
   //   is allowed (the "Allow live trading" checkbox is enabled in the Expert Advisor or script properties).
   if (!IsTradeAllowed()) {
     err = "Trade is not allowed at the moment, check the settings!";
-    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "(): " + err);
-    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "(): " + err);
+    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + ": " + err);
+    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + ": " + err);
     last_err = err;
     ea_active = FALSE;
     return (FALSE);
   }
   if (!IsConnected()) {
     err = "Error: Terminal is not connected!";
-    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "(): " + err);
-    if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "(): " + err);
+    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + ": " + err);
+    if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + ": " + err);
     last_err = err;
     if (PrintLogOnChart) DisplayInfoOnChart();
     Sleep(10000);
@@ -3417,7 +3417,7 @@ bool TradeAllowed() {
   }
   if (IsStopped()) {
     err = "Error: Terminal is stopping!";
-    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "(): " + err);
+    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + ": " + err);
     //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + err);
     last_err = err;
     ea_active = FALSE;
@@ -3425,7 +3425,7 @@ bool TradeAllowed() {
   }
   if (!Check::IsTesting() && !MarketInfo(Symbol(), MODE_TRADEALLOWED)) {
     err = "Trade is not allowed. Market is closed.";
-    if (VerboseInfo && err != last_err) Print(__FUNCTION__ + "(): " + err);
+    if (VerboseInfo && err != last_err) Print(__FUNCTION__ + ": " + err);
     //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + err);
     last_err = err;
     ea_active = FALSE;
@@ -3433,14 +3433,14 @@ bool TradeAllowed() {
   }
   if (!Check::IsTesting() && !IsExpertEnabled()) {
     err = "Error: You need to enable: 'Enable Expert Advisor'/'AutoTrading'.";
-    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "(): " + err);
+    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + ": " + err);
     last_err = err;
     ea_active = FALSE;
     return (FALSE);
   }
   if (!session_active) {
     err = "Error: Session is not active!";
-    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + "(): " + err);
+    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + ": " + err);
     last_err = err;
     ea_active = FALSE;
     return (FALSE);
@@ -3456,21 +3456,21 @@ bool ValidSettings() {
    // TODO: IsDllsAllowed(), IsLibrariesAllowed()
   if (LotSize < 0.0) {
     err = "Error: LotSize is less than 0.";
-    if (VerboseErrors) Print(__FUNCTION__ + "(): " + err);
+    if (VerboseErrors) Print(__FUNCTION__ + ": " + err);
     if (PrintLogOnChart) Comment(err);
     return (FALSE);
   }
   #ifdef __backtest__
     if (!Check::IsTesting()) {
        err = "Error: This version is compiled for backtest mode only.";
-       if (VerboseErrors) Print(__FUNCTION__ + "(): " + err);
+       if (VerboseErrors) Print(__FUNCTION__ + ": " + err);
        if (PrintLogOnChart) Comment(err);
        return (FALSE);
     }
   #endif
   if (Check::IsTesting()) {
       if (!Backtest::ValidSpread() || !Backtest::ValidLotstep()) {
-          if (VerboseErrors) Print(__FUNCTION__ + "(): Error: Backtest settings are invalid!");
+          if (VerboseErrors) Print(__FUNCTION__ + ": Error: Backtest settings are invalid!");
           return (FALSE);
       }
   }
@@ -4856,7 +4856,7 @@ bool MarketCondition(int condition = C_MARKET_NONE) {
 
 // Check our account if certain conditions are met.
 void CheckAccConditions() {
-  // if (VerboseTrace) Print("Calling " + __FUNCTION__ + "()");
+  // if (VerboseTrace) Print("Calling " + __FUNCTION__ + ".");
   if (!Account_Conditions_Active) return;
   if (bar_time == last_action_time) return; // If action was already executed in the same bar, do not check again.
 
@@ -5034,31 +5034,31 @@ void ApplyStrategyMultiplierFactor(int period = DAILY, int loss_or_profit = 0, d
       if (previous != EMPTY) {
         if (!info[previous][ACTIVE]) info[previous][ACTIVE] = TRUE;
         conf[previous][FACTOR] = GetDefaultLotFactor(); // Set previous strategy multiplier factor to default.
-        if (VerboseDebug) Print(__FUNCTION__ + "(): Setting multiplier factor to default for strategy: " + previous);
+        if (VerboseDebug) Print(__FUNCTION__ + ": Setting multiplier factor to default for strategy: " + previous);
       }
       best_strategy[period] = new_strategy; // Assign the new worse strategy.
       info[new_strategy][ACTIVE] = TRUE;
       new_factor = GetDefaultLotFactor() * factor;
       conf[new_strategy][FACTOR] = new_factor; // Apply multiplier factor for the new strategy.
-      if (VerboseDebug) Print(__FUNCTION__ + "(): Setting multiplier factor to " + new_factor + " for strategy: " + new_strategy + " (period: " + period_name + ")");
+      if (VerboseDebug) Print(__FUNCTION__ + ": Setting multiplier factor to " + new_factor + " for strategy: " + new_strategy + " (period: " + period_name + ")");
     }
   } else { // Worse strategy.
     if (info[new_strategy][ACTIVE] && stats[new_strategy][key] < 10 && new_strategy != previous) { // Check if it's different than the previous one.
       if (previous != EMPTY) {
         if (!info[previous][ACTIVE]) info[previous][ACTIVE] = TRUE;
         conf[previous][FACTOR] = GetDefaultLotFactor(); // Set previous strategy multiplier factor to default.
-        if (VerboseDebug) Print(__FUNCTION__ + "(): Setting multiplier factor to default for strategy: " + previous + " to default.");
+        if (VerboseDebug) Print(__FUNCTION__ + ": Setting multiplier factor to default for strategy: " + previous + " to default.");
       }
       worse_strategy[period] = new_strategy; // Assign the new worse strategy.
       if (factor > 0) {
         new_factor = NormalizeDouble(GetDefaultLotFactor() / factor, Digits);
         info[new_strategy][ACTIVE] = TRUE;
         conf[new_strategy][FACTOR] = new_factor; // Apply multiplier factor for the new strategy.
-        if (VerboseDebug) Print(__FUNCTION__ + "(): Setting multiplier factor to " + new_factor + " for strategy: " + new_strategy + " (period: " + period_name + ")");
+        if (VerboseDebug) Print(__FUNCTION__ + ": Setting multiplier factor to " + new_factor + " for strategy: " + new_strategy + " (period: " + period_name + ")");
       } else {
         info[new_strategy][ACTIVE] = FALSE;
         //conf[new_strategy][FACTOR] = GetDefaultLotFactor();
-        if (VerboseDebug) Print(__FUNCTION__ + "(): Disabling strategy: " + new_strategy);
+        if (VerboseDebug) Print(__FUNCTION__ + ": Disabling strategy: " + new_strategy);
       }
     }
   }
@@ -5120,13 +5120,13 @@ void RSI_CheckPeriod() {
     rsi_stats[period][LOWER] = 0;
   }
   /*
-  Print(__FUNCTION__ + "(): M1: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][LOWER] + ", Max: " + rsi_stats[period][UPPER] + ", Diff: " + ( rsi_stats[period][UPPER] - rsi_stats[period][LOWER] ));
+  Print(__FUNCTION__ + ": M1: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][LOWER] + ", Max: " + rsi_stats[period][UPPER] + ", Diff: " + ( rsi_stats[period][UPPER] - rsi_stats[period][LOWER] ));
   period = M5;
-  Print(__FUNCTION__ + "(): M5: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][LOWER] + ", Max: " + rsi_stats[period][UPPER] + ", Diff: " + ( rsi_stats[period][UPPER] - rsi_stats[period][LOWER] ));
+  Print(__FUNCTION__ + ": M5: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][LOWER] + ", Max: " + rsi_stats[period][UPPER] + ", Diff: " + ( rsi_stats[period][UPPER] - rsi_stats[period][LOWER] ));
   period = M15;
-  Print(__FUNCTION__ + "(): M15: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][LOWER] + ", Max: " + rsi_stats[period][UPPER] + ", Diff: " + ( rsi_stats[period][UPPER] - rsi_stats[period][LOWER] ));
+  Print(__FUNCTION__ + ": M15: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][LOWER] + ", Max: " + rsi_stats[period][UPPER] + ", Diff: " + ( rsi_stats[period][UPPER] - rsi_stats[period][LOWER] ));
   period = M30;
-  Print(__FUNCTION__ + "(): M30: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][LOWER] + ", Max: " + rsi_stats[period][UPPER] + ", Diff: " + ( rsi_stats[period][UPPER] - rsi_stats[period][LOWER] ));
+  Print(__FUNCTION__ + ": M30: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][LOWER] + ", Max: " + rsi_stats[period][UPPER] + ", Diff: " + ( rsi_stats[period][UPPER] - rsi_stats[period][LOWER] ));
   */
 }
 
@@ -5537,7 +5537,7 @@ bool ActionCloseMostProfitableOrder(int reason_id = EMPTY, int min_profit = EMPT
     last_close_profit = max_ticket_profit;
     return TaskAddCloseOrder(selected_ticket, reason_id);
   } else if (VerboseTrace) {
-    Print(__FUNCTION__ + "(): Can't find any profitable order.");
+    Print(__FUNCTION__ + ": Can't find any profitable order.");
   }
   return (FALSE);
 }
@@ -5562,7 +5562,7 @@ bool ActionCloseMostUnprofitableOrder(int reason_id = EMPTY){
     last_close_profit = ticket_profit;
     return TaskAddCloseOrder(selected_ticket, reason_id);
   } else if (VerboseDebug) {
-    Print(__FUNCTION__ + "(): Can't find any unprofitable order as requested.");
+    Print(__FUNCTION__ + ": Can't find any unprofitable order as requested.");
   }
   return (FALSE);
 }
@@ -5586,7 +5586,7 @@ bool ActionCloseAllProfitableOrders(int reason_id = EMPTY){
 
   if (selected_orders > 0) {
     last_close_profit = total_profit;
-    if (VerboseInfo) Print(__FUNCTION__ + "(): Queued " + selected_orders + " orders to close with expected profit of " + total_profit + " pips.");
+    if (VerboseInfo) Print(__FUNCTION__ + ": Queued " + selected_orders + " orders to close with expected profit of " + total_profit + " pips.");
   }
   return (result);
 }
@@ -5610,7 +5610,7 @@ bool ActionCloseAllUnprofitableOrders(int reason_id = EMPTY){
 
   if (selected_orders > 0) {
     last_close_profit = total_profit;
-    if (VerboseInfo) Print(__FUNCTION__ + "(): Queued " + selected_orders + " orders to close with expected loss of " + total_profit + " pips.");
+    if (VerboseInfo) Print(__FUNCTION__ + ": Queued " + selected_orders + " orders to close with expected loss of " + total_profit + " pips.");
   }
   return (result);
 }
@@ -5664,13 +5664,13 @@ int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = TRUE) {
          processed++;
       } else {
         if (VerboseDebug)
-         Print(__FUNCTION__ + "(): Error: Order Pos: " + order + "; Message: ", GetErrorText(GetLastError()));
+         Print(__FUNCTION__ + ": Error: Order Pos: " + order + "; Message: ", GetErrorText(GetLastError()));
       }
    }
 
    if (processed > 0) {
     last_close_profit = total_profit;
-     if (VerboseInfo) Print(__FUNCTION__ + "(): Queued " + processed + " orders out of " + total + " for closure.");
+     if (VerboseInfo) Print(__FUNCTION__ + ": Queued " + processed + " orders out of " + total + " for closure.");
    }
    return (processed > 0);
 }
@@ -5750,7 +5750,7 @@ bool ActionExecute(int aid, int id = EMPTY) {
       // result = TightenProfits();
       break;*/
     default:
-      if (VerboseDebug) Print(__FUNCTION__ + "(): Unknown action id: ", aid);
+      if (VerboseDebug) Print(__FUNCTION__ + ": Unknown action id: ", aid);
   }
   // reason = "Account condition: " + acc_conditions[i][0] + ", Market condition: " + acc_conditions[i][1] + ", Action: " + acc_conditions[i][2] + " [E: " + ValueToCurrency(AccountEquity()) + "/B: " + ValueToCurrency(AccountBalance()) + "]";
 
@@ -5876,7 +5876,7 @@ bool TicketAdd(int ticket_no) {
     if (size < 1000) { // Set array hard limit to prevent memory leak.
       ArrayResize(tickets, size + 10);
       // ArrayFill(tickets, size - 1, ArraySize(tickets) - size - 1, 0);
-      if (VerboseDebug) Print(__FUNCTION__ + "(): Couldn't allocate Ticket slot, re-sizing the array. New size: ",  (size + 1), ", Old size: ", size);
+      if (VerboseDebug) Print(__FUNCTION__ + ": Couldn't allocate Ticket slot, re-sizing the array. New size: ",  (size + 1), ", Old size: ", size);
       slot = size;
     }
     return (FALSE); // Array exceeded hard limit, probably because of some memory leak.
@@ -6089,7 +6089,7 @@ bool TaskAddOrderOpen(int cmd, int volume, int order_type) {
     todo_queue[job_id][4] = EMPTY; // FIXME: Not used currently.
     todo_queue[job_id][5] = order_type;
     // todo_queue[job_id][6] = order_comment; // FIXME: Not used currently.
-    // Print(__FUNCTION__ + "(): Added task (", job_id, ") for ticket: ", todo_queue[job_id][0], ", type: ", todo_queue[job_id][1], " (", todo_queue[job_id][3], ").");
+    // Print(__FUNCTION__ + ": Added task (", job_id, ") for ticket: ", todo_queue[job_id][0], ", type: ", todo_queue[job_id][1], " (", todo_queue[job_id][3], ").");
     return TRUE;
   } else {
     return FALSE; // Job not allocated.
@@ -6124,7 +6124,7 @@ bool TaskAddCalcStats(int ticket_no, int order_type = EMPTY) {
     todo_queue[job_id][1] = TASK_CALC_STATS;
     todo_queue[job_id][2] = MaxTries; // Set number of retries.
     todo_queue[job_id][3] = order_type;
-    // if (VerboseTrace) Print(__FUNCTION__ + "(): Allocated task (id: ", job_id, ") for ticket: ", todo_queue[job_id][0], ".");
+    // if (VerboseTrace) Print(__FUNCTION__ + ": Allocated task (id: ", job_id, ") for ticket: ", todo_queue[job_id][0], ".");
     return TRUE;
   } else {
     if (VerboseTrace) PrintFormat("%s(): Failed to allocate close task for ticket: %d", __FUNCTION__, ticket_no);
@@ -6136,7 +6136,7 @@ bool TaskAddCalcStats(int ticket_no, int order_type = EMPTY) {
 bool TaskRemove(int job_id) {
   todo_queue[job_id][0] = 0;
   todo_queue[job_id][2] = 0;
-  // if (VerboseTrace) Print(__FUNCTION__ + "(): Task removed for id: " + job_id);
+  // if (VerboseTrace) Print(__FUNCTION__ + ": Task removed for id: " + job_id);
   return TRUE;
 }
 
@@ -6144,7 +6144,7 @@ bool TaskRemove(int job_id) {
 bool TaskExistByKey(int key) {
   for (int job_id = 0; job_id < ArrayRange(todo_queue, 0); job_id++) {
     if (todo_queue[job_id][0] == key) {
-      // if (VerboseTrace) Print(__FUNCTION__ + "(): Task already allocated for key: " + key);
+      // if (VerboseTrace) Print(__FUNCTION__ + ": Task already allocated for key: " + key);
       return (TRUE);
       break;
     }
@@ -6159,9 +6159,9 @@ int TaskFindEmptySlot(int key) {
   int taken = 0;
   if (!TaskExistByKey(key)) {
     for (int job_id = 0; job_id < ArrayRange(todo_queue, 0); job_id++) {
-      if (VerboseTrace) Print(__FUNCTION__ + "(): job_id = " + job_id + "; key: " + todo_queue[job_id][0]);
+      if (VerboseTrace) Print(__FUNCTION__ + ": job_id = " + job_id + "; key: " + todo_queue[job_id][0]);
       if (todo_queue[job_id][0] <= 0) { // Find empty slot.
-        // if (VerboseTrace) Print(__FUNCTION__ + "(): Found empty slot at: " + job_id);
+        // if (VerboseTrace) Print(__FUNCTION__ + ": Found empty slot at: " + job_id);
         return job_id;
       } else taken++;
     }
@@ -6169,11 +6169,11 @@ int TaskFindEmptySlot(int key) {
     int size = ArrayRange(todo_queue, 0);
     if (size < 1000) { // Set array hard limit.
       ArrayResize(todo_queue, size + 10);
-      if (VerboseDebug) Print(__FUNCTION__ + "(): Couldn't allocate Task slot, re-sizing array. New size: ",  (size + 1), ", Old size: ", size);
+      if (VerboseDebug) Print(__FUNCTION__ + ": Couldn't allocate Task slot, re-sizing array. New size: ",  (size + 1), ", Old size: ", size);
       return size;
     } else {
       // Array exceeded hard limit, probably because of some memory leak.
-      if (VerboseDebug) Print(__FUNCTION__ + "(): Couldn't allocate task slot, all are taken (" + taken + "). Size: " + size);
+      if (VerboseDebug) Print(__FUNCTION__ + ": Couldn't allocate task slot, all are taken (" + taken + "). Size: " + size);
     }
   }
   return EMPTY;
@@ -6188,7 +6188,7 @@ bool TaskRun(int job_id) {
   int task_type = todo_queue[job_id][1];
   int retries = todo_queue[job_id][2];
   int cmd, sid, reason_id;
-  // if (VerboseTrace) Print(__FUNCTION__ + "(): Job id: " + job_id + "; Task type: " + task_type);
+  // if (VerboseTrace) Print(__FUNCTION__ + ": Job id: " + job_id + "; Task type: " + task_type);
 
   switch (task_type) {
     case TASK_ORDER_OPEN:
@@ -6209,11 +6209,11 @@ bool TaskRun(int job_id) {
         if (OrderSelect(key, SELECT_BY_TICKET, MODE_HISTORY)) {
           OrderCalc(key);
         } else {
-          if (VerboseDebug) Print(__FUNCTION__ + "(): Access to history failed with error: (" + GetLastError() + ").");
+          if (VerboseDebug) Print(__FUNCTION__ + ": Access to history failed with error: (" + GetLastError() + ").");
         }
       break;
     default:
-      if (VerboseDebug) Print(__FUNCTION__ + "(): Unknown task: ", task_type);
+      if (VerboseDebug) Print(__FUNCTION__ + ": Unknown task: ", task_type);
   };
   return result;
 }
@@ -6249,7 +6249,7 @@ bool TaskProcessList(bool with_force = FALSE) {
       }
    } // end: for
    if (VerboseDebug && total_run+total_failed > 0)
-     Print(__FUNCTION__, "(): Processed ", total_run+total_failed, " jobs (", total_run, " run, ", total_failed, " failed (", total_removed, " removed)).");
+     Print(__FUNCTION__, ": Processed ", total_run+total_failed, " jobs (", total_run, " run, ", total_failed, " failed (", total_removed, " removed)).");
   return TRUE;
 }
 
