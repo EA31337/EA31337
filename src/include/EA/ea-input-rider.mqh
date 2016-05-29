@@ -1487,7 +1487,7 @@ extern string __StdDev_Parameters__ = "-- Settings for the Standard Deviation in
 #endif
 extern ENUM_TRAIL_TYPE StdDev_TrailingStopMethod = T_MA_FMS_PEAK;
 extern ENUM_TRAIL_TYPE StdDev_TrailingProfitMethod = T_FIXED;
-extern ENUM_APPLIED_PRICE StdDev_AppliedPrice = PRICE_CLOSE; // MA applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
+extern ENUM_APPLIED_PRICE StdDev_Applied_Price = PRICE_CLOSE; // MA applied price (See: ENUM_APPLIED_PRICE). Range: 0-6.
 extern int StdDev_MA_Period = 10; // Averaging period to calculate the main line.
 extern ENUM_MA_METHOD StdDev_MA_Method = MODE_EMA; // MA method (See: ENUM_MA_METHOD). Range: 0-3. Suggested value: MODE_EMA.
 extern int StdDev_MA_Shift = 0; // Moving Average shift.
