@@ -1350,6 +1350,7 @@ extern string SoundFileAtClose = "alert.wav"; // Sound: on order close
 
 //+------------------------------------------------------------------+
 extern string __Backtest_Parameters__ = "-- Backtest & troubleshooting parameters --"; // >>> BACKTESTING <<<
+extern bool ValidateMarketSettings = TRUE; // Startup market settings validation.
 extern int DemoMarketStopLevel = 10; // Demo market stop level
 extern int SmartToggleComponent = 0; // Override: Toggle different components (0-43)
 extern int Account_Condition_To_Disable = 0; // Override: Disable specific n action.

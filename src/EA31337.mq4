@@ -272,7 +272,7 @@ double hourly_profit[367][24]; // Keep track of hourly profit.
 string log[];
 
 // Condition and actions.
-int acc_conditions[12][3], market_conditions[10][3];
+int acc_conditions[30][3];
 string last_cname;
 
 // Order queue.
@@ -3469,7 +3469,7 @@ bool ValidSettings() {
        return (FALSE);
     }
   #endif
-  if (Check::IsTesting()) {
+  if (Check::IsTesting() && ValidateMarketSettings) {
       if (!Backtest::ValidSpread() || !Backtest::ValidLotstep()) {
           if (VerboseErrors) Print(__FUNCTION__ + ": Error: Backtest market settings are invalid!");
           return (FALSE);
