@@ -571,7 +571,7 @@ bool Trade() {
   } // end: for
 
   #ifdef __advanced__
-  if (QueueOrdersAIActive && !order_placed && total_orders < max_orders) {
+  if (SmartQueueActive && !order_placed && total_orders < max_orders) {
     if (OrderQueueProcess()) {
       return (TRUE);
     }
@@ -825,7 +825,7 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
       break;
     case STDDEV: // Calculates the Standard Deviation indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
-        stddev[period][i] = iStdDev(_Symbol, timeframe, StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_AppliedPrice, i);
+        stddev[period][i] = iStdDev(_Symbol, timeframe, StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price, i);
       break;
     case STOCHASTIC: // Calculates the Stochastic Oscillator.
       // TODO
@@ -920,7 +920,7 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
       if (SendEmailEachOrder) SendEmailExecuteOrder();
 
       #ifdef __advanced__
-      if (QueueOrdersAIActive && total_orders >= max_orders) OrderQueueClear(); // Clear queue if we're reached the limit again, so we can start fresh.
+      if (SmartQueueActive && total_orders >= max_orders) OrderQueueClear(); // Clear queue if we're reached the limit again, so we can start fresh.
       #endif
    } else {
      result = FALSE;
@@ -1008,8 +1008,8 @@ bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
     err = StringFormat("%s: Not executing order, because the spread is too high. (spread = %.1f pips)", sname[sid], curr_spread);
     if (VerboseTrace && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
     result = FALSE;
-  } else if (MinimumIntervalSec > 0 && time_current - last_order_time < MinimumIntervalSec) {
-    err = "There must be a " + MinimumIntervalSec + " sec minimum interval between subsequent trade signals.";
+  } else if (MinIntervalSec > 0 && time_current - last_order_time < MinIntervalSec) {
+    err = "There must be a " + MinIntervalSec + " sec minimum interval between subsequent trade signals.";
     if (VerboseTrace && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
     result = FALSE;
   } else if (MaxOrdersPerDay > 0 && daily_orders >= GetMaxOrdersPerDay()) {
@@ -1060,7 +1060,7 @@ bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = TRUE)
     if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + ticket_no + " with profit " + Order::GetOrderProfit() + " pips, reason: " + ReasonIdToText(reason_id) + "; " + Order::GetOrderToText());
     #ifdef __advanced__
       if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(Order::GetOrderProfit()) + " pips, reason: " + ReasonIdToText(reason_id) + "; " + Order::GetOrderToText());
-      if (QueueOrdersAIActive) OrderQueueProcess();
+      if (SmartQueueActive) OrderQueueProcess();
     #else
       if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(Order::GetOrderProfit()) + " pips; " + Order::GetOrderToText());
     #endif
@@ -4104,7 +4104,7 @@ void ToggleComponent(int component) {
       break;
     // Smart order queue
     case 9:
-      QueueOrdersAIActive = !QueueOrdersAIActive;
+      SmartQueueActive = !SmartQueueActive;
       break;
     // Trend
     case 10:
@@ -4163,8 +4163,8 @@ void ToggleComponent(int component) {
       else MaxOrdersPerDay = 30;
       break;
     case 25:
-      if (MinimumIntervalSec > 0) MinimumIntervalSec = 0;
-      else MinimumIntervalSec = 240;
+      if (MinIntervalSec > 0) MinIntervalSec = 0;
+      else MinIntervalSec = 240;
       break;
     // Trade limits
     case 26:
@@ -4694,6 +4694,60 @@ bool InitializeConditions() {
   acc_conditions[11][0] = Account_Condition_12;
   acc_conditions[11][1] = Market_Condition_12;
   acc_conditions[11][2] = Action_On_Condition_12;
+  acc_conditions[12][0] = Account_Condition_13;
+  acc_conditions[12][1] = Market_Condition_13;
+  acc_conditions[12][2] = Action_On_Condition_13;
+  acc_conditions[13][0] = Account_Condition_14;
+  acc_conditions[13][1] = Market_Condition_14;
+  acc_conditions[13][2] = Action_On_Condition_14;
+  acc_conditions[14][0] = Account_Condition_15;
+  acc_conditions[14][1] = Market_Condition_15;
+  acc_conditions[14][2] = Action_On_Condition_15;
+  acc_conditions[15][0] = Account_Condition_16;
+  acc_conditions[15][1] = Market_Condition_16;
+  acc_conditions[15][2] = Action_On_Condition_16;
+  acc_conditions[16][0] = Account_Condition_17;
+  acc_conditions[16][1] = Market_Condition_17;
+  acc_conditions[16][2] = Action_On_Condition_17;
+  acc_conditions[17][0] = Account_Condition_18;
+  acc_conditions[17][1] = Market_Condition_18;
+  acc_conditions[17][2] = Action_On_Condition_18;
+  acc_conditions[18][0] = Account_Condition_19;
+  acc_conditions[18][1] = Market_Condition_19;
+  acc_conditions[18][2] = Action_On_Condition_19;
+  acc_conditions[19][0] = Account_Condition_20;
+  acc_conditions[19][1] = Market_Condition_20;
+  acc_conditions[19][2] = Action_On_Condition_20;
+  acc_conditions[20][0] = Account_Condition_21;
+  acc_conditions[20][1] = Market_Condition_21;
+  acc_conditions[20][2] = Action_On_Condition_21;
+  acc_conditions[21][0] = Account_Condition_22;
+  acc_conditions[21][1] = Market_Condition_22;
+  acc_conditions[21][2] = Action_On_Condition_22;
+  acc_conditions[22][0] = Account_Condition_23;
+  acc_conditions[22][1] = Market_Condition_23;
+  acc_conditions[22][2] = Action_On_Condition_23;
+  acc_conditions[23][0] = Account_Condition_24;
+  acc_conditions[23][1] = Market_Condition_24;
+  acc_conditions[23][2] = Action_On_Condition_24;
+  acc_conditions[24][0] = Account_Condition_25;
+  acc_conditions[24][1] = Market_Condition_25;
+  acc_conditions[24][2] = Action_On_Condition_25;
+  acc_conditions[25][0] = Account_Condition_26;
+  acc_conditions[25][1] = Market_Condition_26;
+  acc_conditions[25][2] = Action_On_Condition_26;
+  acc_conditions[26][0] = Account_Condition_27;
+  acc_conditions[26][1] = Market_Condition_27;
+  acc_conditions[26][2] = Action_On_Condition_27;
+  acc_conditions[27][0] = Account_Condition_28;
+  acc_conditions[27][1] = Market_Condition_28;
+  acc_conditions[27][2] = Action_On_Condition_28;
+  acc_conditions[28][0] = Account_Condition_29;
+  acc_conditions[28][1] = Market_Condition_29;
+  acc_conditions[28][2] = Action_On_Condition_29;
+  acc_conditions[29][0] = Account_Condition_30;
+  acc_conditions[29][1] = Market_Condition_30;
+  acc_conditions[29][2] = Action_On_Condition_30;
   #endif
 
   #ifdef __advanced__
@@ -5905,8 +5959,8 @@ bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
   int queue_size = OrderQueueCount();
   int sorted_queue[][2];
   int cmd, sid, time; double volume;
-  if (method == EMPTY) method = QueueOrdersAIMethod;
-  if (filter == EMPTY) filter = QueueOrdersAIFilter;
+  if (method == EMPTY) method = SmartQueueMethod;
+  if (filter == EMPTY) filter = SmartQueueFilter;
   if (queue_size > 1) {
     int selected_qid = EMPTY, curr_qid = EMPTY;
     ArrayResize(sorted_queue, queue_size);

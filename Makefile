@@ -29,20 +29,14 @@ Lite-Full: 		  $(OUT)/$(EA)-Lite-Full-%.ex4
 Advanced-Full:  $(OUT)/$(EA)-Advanced-Full-%.ex4
 Rider-Full: 		$(OUT)/$(EA)-Rider-Full-%.ex4
 
-compile-mql4: requirements $(MQL) clean-src src/$(EA).ex4
+compile-mql4: requirements $(MQL) clean-src $(OUT)/$(EA).ex4
 	@echo MQL4 compiled.
-compile-mql5: requirements $(MQL) clean-src src/$(EA).ex5
+compile-mql5: requirements $(MQL) clean-src $(OUT)/$(EA).ex5
 	@echo MQL5 compiled.
 
 test: requirements set-mode $(MQL)
 	wine mql.exe /s /i:src /mql4 $(SRC)
 	wine mql.exe /s /i:src /mql5 $(SRC)
-
-src/$(EA).ex4:
-	wine mql.exe /o /i:src /mql4 $(SRC)
-
-src/$(EA).ex5:
-	wine mql.exe /o /i:src /mql5 $(SRC)
 
 #mql.exe:
 #  curl -O http://files.metaquotes.net/metaquotes.software.corp/mt5/mql.exe
@@ -108,32 +102,65 @@ release: mql.exe \
 		$(OUT)/$(EA)-Advanced-Full-%.ex4 \
 		$(OUT)/$(EA)-Rider-Full-%.ex4
 
-$(OUT)/$(EA)-Lite-Backtest-%.ex4: clean-src set-lite-backtest src/$(EA).ex4 set-none
+$(OUT)/$(EA)-Lite-Backtest-%.ex4: \
+		set-lite-backtest \
+		$(OUT)/$(EA).ex4 \
+		set-none
 	cp -v "$(EX4)" "$(OUT)/$(EA)-Lite-Backtest-v$(VER).ex4"
 
-$(OUT)/$(EA)-Advanced-Backtest-%.ex4: clean-src set-advanced-backtest src/$(EA).ex4 set-none
+$(OUT)/$(EA)-Advanced-Backtest-%.ex4: \
+		set-advanced-backtest \
+		$(OUT)/$(EA).ex4 \
+		set-none
 	cp -v "$(EX4)" "$(OUT)/$(EA)-Advanced-Backtest-v$(VER).ex4"
 
-$(OUT)/$(EA)-Rider-Backtest-%.ex4: clean-src set-rider-backtest src/$(EA).ex4 set-none
+$(OUT)/$(EA)-Rider-Backtest-%.ex4: \
+		set-rider-backtest \
+		$(OUT)/$(EA).ex4 \
+		set-none
 	cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-Backtest-v$(VER).ex4"
 
-$(OUT)/$(EA)-Lite-Full-%.ex4: clean-src set-lite-full src/$(EA).ex4 set-none
+$(OUT)/$(EA)-Lite-Full-%.ex4: \
+		set-lite-full \
+		$(OUT)/$(EA).ex4 \
+		set-none
 	cp -v "$(EX4)" "$(OUT)/$(EA)-Lite-Full-v$(VER).ex4"
 
-$(OUT)/$(EA)-Advanced-Full-%.ex4: clean-src set-advanced-full src/$(EA).ex4 set-none
+$(OUT)/$(EA)-Advanced-Full-%.ex4: \
+		set-advanced-full \
+		$(OUT)/$(EA).ex4 \
+		set-none
 	cp -v "$(EX4)" "$(OUT)/$(EA)-Advanced-Full-v$(VER).ex4"
 
-$(OUT)/$(EA)-Rider-Full-%.ex4: clean-src set-rider-full src/$(EA).ex4 set-none
+$(OUT)/$(EA)-Rider-Full-%.ex4: \
+		set-rider-full \
+		$(OUT)/$(EA).ex4 \
+		set-none
 	cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-Full-v$(VER).ex4"
 
-$(OUT)/$(EA)-Lite-%.ex4: clean-src set-lite src/$(EA).ex4 set-none
+$(OUT)/$(EA)-Lite-%.ex4: \
+		set-lite \
+		$(OUT)/$(EA).ex4 \
+		set-none
 	cp -v "$(EX4)" "$(OUT)/$(EA)-Lite-v$(VER).ex4"
 
-$(OUT)/$(EA)-Advanced-%.ex4: clean-src set-advanced src/$(EA).ex4 set-none
+$(OUT)/$(EA)-Advanced-%.ex4: \
+		set-advanced \
+		$(OUT)/$(EA).ex4 \
+		set-none
 	cp -v "$(EX4)" "$(OUT)/$(EA)-Advanced-v$(VER).ex4"
 
-$(OUT)/$(EA)-Rider-%.ex4: clean-src set-rider src/$(EA).ex4 set-none
+$(OUT)/$(EA)-Rider-%.ex4: \
+		set-rider \
+		$(OUT)/$(EA).ex4 \
+		set-none
 	cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-v$(VER).ex4"
+
+$(OUT)/$(EA).ex4: src/$(EA).mq4 src/include/EA/ea-mode.mqh
+	wine mql.exe /o /i:src /mql4 $(SRC)
+
+$(OUT)/$(EA).ex5: src/$(EA).mq4 src/include/EA/ea-mode.mqh
+	wine mql.exe /o /i:src /mql5 $(SRC)
 
 mt4-install:
 		install -v "$(EX4)" "$(shell find ~/.wine -name terminal.exe -execdir pwd ';' -quit)/MQL4/Experts"

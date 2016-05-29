@@ -16,12 +16,22 @@
 //+------------------------------------------------------------------+
 
 //+------------------------------------------------------------------+
+extern string __Trade_Parameters__ = "-- Trade parameters --"; // >>> TRADE <<<
+extern int      MaxOrders = 0; // Max orders (0 = auto)
+extern int      MaxOrdersPerType = 15; // Max orders per type (0 = auto)
+extern double   LotSize = 0.00000000; // Lot size (0 = auto)
+extern bool     TradeMicroLots = 1; // Trade micro lots?
+extern int TrendMethod = 135; // Main trend method (0-255)
+extern int MinVolumeToTrade = 2; // Min volume to trade
+extern int MaxOrderPriceSlippage = 5; // Max price slippage (in pips)
+extern int MaxTries = 5; // Max retries for opening orders
+extern double MinPipChangeToTrade = 0.70000000; // Min pip change to trade (0 = every tick)
+extern int MinPipGap = 80; // Min gap between trades per type (in pips)
+
+//+------------------------------------------------------------------+
 extern string   __EA_Order_Parameters__ = "-- Profit and loss parameters --"; // >>> PROFIT/LOSS <<<
 extern double   TakeProfit = 140; // Take profit in pips (0 = none)
 extern double   StopLoss = 160; // Stop loss in pips (0 = none)
-extern int      MaxOrders = 0; // Max orders (0 = auto)
-extern int      MaxOrdersPerType = 15; // Max orders per type (0 = auto)
-extern bool     TradeMicroLots = 1; // Trade micro lots?
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
@@ -48,16 +58,6 @@ extern double WorseDailyStrategyDividerFactor = 1.00000000; // Divider for the w
 extern double WorseWeeklyStrategyDividerFactor = 1; // Divider for the worse weekly strategy
 extern double WorseMonthlyStrategyDividerFactor = 1.00000000; // Divider for the worse monthly strategy
 extern double BoostTrendFactor = 1.3; // Boost trend factor
-
-//+------------------------------------------------------------------+
-extern string __Trade_Parameters__ = "-- Trade parameters --"; // >>> TRADE <<<
-extern double   LotSize = 0.00000000; // Lot size (0 = auto)
-extern int TrendMethod = 135; // Main trend method (0-255)
-extern int MinVolumeToTrade = 2; // Min volume to trade
-extern int MaxOrderPriceSlippage = 5; // Max price slippage (in pips)
-extern int MaxTries = 5; // Max retries for opening orders
-extern double MinPipChangeToTrade = 0.70000000; // Min pip change to trade (0 = every tick)
-extern int MinPipGap = 80; // Min gap between trades per type (in pips)
 
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions__ = "-- Account conditions --"; // >>> CONDITIONS & ACTIONS <<<
@@ -410,10 +410,10 @@ extern int MACD_Shift_Far = 0; // Shift Far
 extern ENUM_TRAIL_TYPE MACD_TrailingStopMethod = 21; // Trail stop method
 extern ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = 27; // Trail profit method
 extern double MACD_OpenLevel = 0.3; // Open level
-extern int MACD1_OpenMethod = 0; // Open method for M1 (0-
-extern int MACD5_OpenMethod = 28; // Open method for M5 (0-
-extern int MACD15_OpenMethod = 18; // Open method for M15 (0-
-extern int MACD30_OpenMethod = 4; // Open method for M30 (0-
+extern int MACD1_OpenMethod = 0; // Open method for M1 (0-31)
+extern int MACD5_OpenMethod = 28; // Open method for M5 (0-31)
+extern int MACD15_OpenMethod = 18; // Open method for M15 (0-31)
+extern int MACD30_OpenMethod = 4; // Open method for M30 (0-31)
 
 //+------------------------------------------------------------------+
 string __MFI_Parameters__ = "-- Settings for the Money Flow Index indicator --"; // >>> MFI <<<
@@ -622,7 +622,11 @@ bool VerboseTrace = 0; // Display trace messages
 //+------------------------------------------------------------------+
 extern string __UI_UX_Parameters__ = "-- Settings for User Interface & Experience --"; // >>> UI & UX <<<
 extern bool SendEmailEachOrder = 0; // Send e-mail per each order
+extern color ColorBuy = 16711680; // Color: Buy
+extern color ColorSell = 255; // Color: Sell
 extern bool SoundAlert = 0; // Enable sound alerts
+extern string SoundFileAtOpen = "alert.wav"; // Sound: on order open
+extern string SoundFileAtClose = "alert.wav"; // Sound: on order close
 // extern bool SendLogs = FALSE; // Send logs to remote host for diagnostic purposes.
 
 //+------------------------------------------------------------------+
@@ -632,10 +636,6 @@ extern int DemoMarketStopLevel = 10; // Demo market stop level
 //+------------------------------------------------------------------+
 extern string __Constants__ = "-- Constants --"; // >>> CONSTANTS <<<
 extern int MagicNumber = 31337; // Unique magic number (+40)
-extern color ColorBuy = 16711680; // Color: Buy
-extern color ColorSell = 255; // Color: Sell
-extern string SoundFileAtOpen = "alert.wav"; // Sound: on order open
-extern string SoundFileAtClose = "alert.wav"; // Sound: on order close
 
 //+------------------------------------------------------------------+
 extern string __Other_Parameters__ = "-- Other parameters --"; // >>> OTHER <<<
