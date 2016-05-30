@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                                     ea-enums.mqh |
-//|                                           Copyright 2016, kenorb |
+//|                            Copyright 2016, 31337 Investments Ltd |
 //|                                       https://github.com/EA31337 |
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, kenorb"

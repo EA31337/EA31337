@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                 EA31337 - multi-strategy advanced trading robot. |
-//|                                           Copyright 2016, kenorb |
+//|                            Copyright 2016, 31337 Investments Ltd |
 //|                                       https://github.com/EA31337 |
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, kenorb"
@@ -23,7 +23,6 @@
 #else
   #include <EA\lite\ea-conf.mqh>
 #endif
-#include <EA\ea-license.mqh>
 
 //+------------------------------------------------------------------+
 //| EA properties.
