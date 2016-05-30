@@ -9,16 +9,36 @@
 //+------------------------------------------------------------------+
 //| EA includes.
 //+------------------------------------------------------------------+
+
 #include <EA\ea-mode.mqh>
 #include <EA\ea-code-conf.mqh>
 #include <EA\ea-properties.mqh>
-#include <EA\ea-license.mqh>
 #include <EA\ea-enums.mqh>
+#ifdef __advanced__
+  #ifdef __rider__
+    #include <EA\rider\ea-conf.mqh>
+  #else
+    #include <EA\advanced\ea-conf.mqh>
+  #endif
+#else
+  #include <EA\lite\ea-conf.mqh>
+#endif
+#include <EA\ea-license.mqh>
 
 //+------------------------------------------------------------------+
 //| EA properties.
 //+------------------------------------------------------------------+
 #property version     ea_version
+#property description ea_name
+#property description ea_desc
+#property link        ea_link
+#property copyright   ea_copy
+#property icon        "resources\favicon.ico"
+#property strict
+//#property stacksize
+//#property tester_file "trade_patterns.csv"    // File with the data to be read by an Expert Advisor.
+//#property tester_indicator "smoothed_ma.ex4"  // File with a custom indicator specified in iCustom() as a variable.
+//#property tester_library "MT4EA2DLL.dll" // Library file name from <terminal_data_folder>\MQL4\Libraries\ to be sent to a virtual server.
 
 #ifdef __MQL4__
    #include <EA\MQL4\stdlib.mq4> // Used for: ErrorDescription(), RGB(), CompareDoubles(), DoubleToStrMorePrecision(), IntegerToHexString()
@@ -46,21 +66,23 @@
 #include <EA\public-classes\Market.mqh>
 #include <EA\public-classes\Misc.mqh>
 #include <EA\public-classes\Report.mqh>
+#include <EA\public-classes\Terminal.mqh>
 
 //#property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 
 //+------------------------------------------------------------------+
 //| User input variables.
 //+------------------------------------------------------------------+
-extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v" + ea_version + " --";
+extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v" + ea_version + " --"; // >>> EA31337 <<<
+
 #ifdef __advanced__ // Include default input settings based on the mode.
   #ifdef __rider__
-    #include <EA\ea-input-rider.mqh>
+    #include <EA\rider\ea-input.mqh>
   #else
-    #include <EA\ea-input-advanced.mqh>
+    #include <EA\advanced\ea-input.mqh>
   #endif
 #else
-  #include <EA\ea-input-lite.mqh>
+  #include <EA\lite\ea-input.mqh>
 #endif
 
 //+------------------------------------------------------------------+

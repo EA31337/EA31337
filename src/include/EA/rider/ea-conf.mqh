@@ -5,12 +5,11 @@
 //+------------------------------------------------------------------+
 
 //+------------------------------------------------------------------+
-//| EA defines.
+//| EA global configuration for Rider
 //+------------------------------------------------------------------+
 
-#define ea_version "1.069rc1"
-#define ea_desc    "Multi-strategy advanced trading robot operating on multiple time frames at the same time."
-#define ea_build   __DATETIME__ // FIXME: It's empty
-#define ea_link    "https://github.com/EA31337"
-#define ea_author  "kenorb"
-#define ea_copy    "Copyright 2016, kenorb"
+#ifdef __backtest__
+#define ea_name    "EA31337 Rider (Backtest)"
+#else
+#define ea_name    "EA31337 Rider"
+#endif
