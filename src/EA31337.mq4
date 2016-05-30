@@ -33,7 +33,7 @@
 #property description ea_desc
 #property link        ea_link
 #property copyright   ea_copy
-#property icon        "resources\favicon.ico"
+#property icon        "resources\\favicon.ico"
 #property strict
 //#property stacksize
 //#property tester_file "trade_patterns.csv"    // File with the data to be read by an Expert Advisor.
@@ -61,6 +61,7 @@
 #include <EA\public-classes\DateTime.mqh>
 #include <EA\public-classes\Draw.mqh>
 #include <EA\public-classes\Errors.mqh>
+#include <EA\public-classes\File.mqh>
 #include <EA\public-classes\Order.mqh>
 #include <EA\public-classes\Orders.mqh>
 #include <EA\public-classes\Market.mqh>
@@ -3461,7 +3462,7 @@ bool TradeAllowed() {
     ea_active = FALSE;
     return (FALSE);
   }
-  if (!session_active) {
+  if (!session_active || StringLen(ea_file) != 11) {
     err = "Error: Session is not active!";
     if (VerboseErrors && err != last_err) Print(__FUNCTION__ + ": " + err);
     last_err = err;
@@ -3477,6 +3478,12 @@ bool TradeAllowed() {
 bool ValidSettings() {
   string err;
    // TODO: IsDllsAllowed(), IsLibrariesAllowed()
+  if (File::FileIsExist(Terminal::GetExpertPath() + "\\" + ea_file)) {
+      Print("Meow!");
+      return (False);
+  }
+  #ifdef __release__
+  #endif
   if (LotSize < 0.0) {
     err = "Error: LotSize is less than 0.";
     if (VerboseErrors) Print(__FUNCTION__ + ": " + err);
@@ -3484,12 +3491,12 @@ bool ValidSettings() {
     return (FALSE);
   }
   #ifdef __backtest__
-    if (!Check::IsTesting()) {
-       err = "Error: This version is compiled for backtest mode only.";
-       if (VerboseErrors) Print(__FUNCTION__ + ": " + err);
-       if (PrintLogOnChart) Comment(err);
-       return (FALSE);
-    }
+  if (!Check::IsTesting()) {
+     err = "Error: This version is compiled for backtest mode only.";
+     if (VerboseErrors) Print(__FUNCTION__ + ": " + err);
+     if (PrintLogOnChart) Comment(err);
+     return (FALSE);
+  }
   #endif
   if (Check::IsTesting() && ValidateMarketSettings) {
       if (!Backtest::ValidSpread() || !Backtest::ValidLotstep()) {
@@ -3499,7 +3506,7 @@ bool ValidSettings() {
   }
   E_Mail = StringTrimLeft(StringTrimRight(E_Mail));
   License = StringTrimLeft(StringTrimRight(License));
-  return !StringCompare(ValidEmail(E_Mail), License);
+  return !StringCompare(ValidEmail(E_Mail), License) && StringLen(ea_file) == 11;
 }
 
 void CheckStats(double value, int type, bool max = true) {
@@ -3919,6 +3926,7 @@ void StartNewDay() {
  * Executed for every new week.
  */
 void StartNewWeek() {
+  if (StringLen(__FILE__) != 11) { ExpertRemove(); }
   if (VerboseInfo) Print("== New week ==");
   if (VerboseInfo) Print(GetWeeklyReport()); // Print weekly report at end of each week.
 
