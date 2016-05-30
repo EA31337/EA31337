@@ -360,8 +360,8 @@ extern int Alligator30_OpenCondition1 = 0; // Open condition 1 for M30 (0-1023)
 extern int Alligator30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
 extern ENUM_MARKET_EVENT Alligator30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
 //
-extern double Alligator1_MaxSpread  =  6.0;  // Max spread to trade for M1 (pips)
-extern double Alligator5_MaxSpread  =  7.0;  // Max spread to trade for M5 (pips)
+extern double Alligator1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+extern double Alligator5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 extern double Alligator15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
 extern double Alligator30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
@@ -1089,8 +1089,8 @@ extern ENUM_MARKET_EVENT RSI15_CloseCondition = C_MACD_BUY_SELL; // Close condit
 extern int RSI30_OpenCondition1 = 0; // Open condition 1 for M30 (0-1023)
 extern int RSI30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
 extern ENUM_MARKET_EVENT RSI30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
-extern double RSI1_MaxSpread =   6.0;  // Max spread to trade for M1 (pips)
-extern double RSI5_MaxSpread =   7.0;  // Max spread to trade for M5 (pips)
+extern double RSI1_MaxSpread =   6.0; // Max spread to trade for M1 (pips)
+extern double RSI5_MaxSpread =   7.0; // Max spread to trade for M5 (pips)
 extern double RSI15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
 extern double RSI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 extern bool RSI_DynamicPeriod = FALSE;
