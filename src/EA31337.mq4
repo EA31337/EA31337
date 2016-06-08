@@ -24,6 +24,15 @@
   #include <EA\lite\ea-conf.mqh>
 #endif
 
+#ifdef __MQL4__
+   #include <EA\MQL4\stdlib.mq4> // Used for: ErrorDescription(), RGB(), CompareDoubles(), DoubleToStrMorePrecision(), IntegerToHexString()
+   #include <stderror.mqh>
+   // #include "debug.mqh"
+#else
+   #include <StdLibErr.mqh>
+   #include <Trade\AccountInfo.mqh>
+   #include <MQL5-MQL4\MQL4Common.mqh> // Provides common MQL4 back-compability for MQL5.
+#endif
 //+------------------------------------------------------------------+
 //| EA properties.
 //+------------------------------------------------------------------+
@@ -39,18 +48,13 @@
 //#property tester_indicator "smoothed_ma.ex4"  // File with a custom indicator specified in iCustom() as a variable.
 //#property tester_library "MT4EA2DLL.dll" // Library file name from <terminal_data_folder>\MQL4\Libraries\ to be sent to a virtual server.
 
-#ifdef __MQL4__
-   #include <EA\MQL4\stdlib.mq4> // Used for: ErrorDescription(), RGB(), CompareDoubles(), DoubleToStrMorePrecision(), IntegerToHexString()
-   #include <stderror.mqh>
-   // #include "debug.mqh"
-#else
-   #include <StdLibErr.mqh>
-   #include <Trade\AccountInfo.mqh>
-   #include <MQL5-MQL4\MQL4Common.mqh> // Provides common MQL4 back-compability for MQL5.
-#endif
+//+------------------------------------------------------------------+
+//| EA defines.
+//+------------------------------------------------------------------+
+#define ea_file    __FILE__
 
 //+------------------------------------------------------------------+
-//| Public classes.
+//| Include public classes.
 //+------------------------------------------------------------------+
 #include <EA\public-classes\Account.mqh>
 #include <EA\public-classes\Arrays.mqh>
@@ -65,6 +69,7 @@
 #include <EA\public-classes\Orders.mqh>
 #include <EA\public-classes\Market.mqh>
 #include <EA\public-classes\Misc.mqh>
+#include <EA\public-classes\Msg.mqh>
 #include <EA\public-classes\Report.mqh>
 #include <EA\public-classes\Terminal.mqh>
 
@@ -388,19 +393,15 @@ void OnTick() {
 int OnInit() {
   string err;
 
-  if (VerboseInfo) PrintFormat("%s (%s) v%s (%s) initializing...", ea_name, __FILE__, ea_version, ea_link);
+  if (VerboseInfo) PrintFormat("%s v%s (%s) initializing...", ea_name, ea_version, ea_link);
   if (!session_initiated) {
     if (!ValidSettings()) {
-      err = "Error: EA parameters are not valid, please correct them.";
-      Comment(err);
-      Alert(err);
-      if (VerboseErrors) Print(__FUNCTION__ + ": " + err);
-      return (INIT_PARAMETERS_INCORRECT); // Incorrect set of input parameters.
+      // Incorrect set of input parameters occured.
+      Msg::ShowText("EA parameters are not valid, please correct.", "Error", __FUNCTION__, __LINE__, VerboseErrors, TRUE, TRUE);
+      return (INIT_PARAMETERS_INCORRECT);
     }
     if (!Check::IsTesting() && AccountNumber() <= 1) {
-      err = "Error: EA requires on-line Terminal.";
-      Comment(err);
-      if (VerboseErrors) Print(__FUNCTION__ + ": " + err);
+      Msg::ShowText("EA requires on-line Terminal.", "Error", __FUNCTION__, __LINE__, VerboseErrors, TRUE);
       return (INIT_FAILED);
      }
      session_initiated = TRUE;
@@ -419,7 +420,8 @@ int OnInit() {
     SendEmailEachOrder = FALSE;
     SoundAlert = FALSE;
     if (!Check::IsVisualMode()) PrintLogOnChart = FALSE;
-    if (market_stoplevel == 0) market_stoplevel = DemoMarketStopLevel; // When testing, we need to simulate real MODE_STOPLEVEL = 30 (as it's in real account), in demo it's 0.
+    // When testing, we need to simulate real MODE_STOPLEVEL = 30 (as it's in real account), in demo it's 0.
+    if (market_stoplevel == 0) market_stoplevel = DemoMarketStopLevel;
     if (Check::IsOptimization()) {
       VerboseErrors = FALSE;
       VerboseInfo   = FALSE;
@@ -448,11 +450,12 @@ int OnInit() {
 void OnDeinit(const int reason) {
   ea_active = TRUE;
   time_current = TimeCurrent();
-  if (VerboseDebug) Print("Calling " + __FUNCTION__ + ".");
-  if (VerboseInfo) {
-    Print(__FUNCTION__ + ": " + "EA deinitializing, reason: " + Errors::GetUninitReasonText(reason) + " (code: " + IntegerToString(reason) + ")"); // Also: _UninitReason.
-    Print(GetSummaryText());
-  }
+  Msg::ShowText(StringFormat("reason = %d", reason), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
+  // Also: _UninitReason.
+  Msg::ShowText(
+      StringFormat("EA deinitializing, reason: %s (code: %s)", Errors::GetUninitReasonText(reason), IntegerToString(reason)),
+      "Info", __FUNCTION__, __LINE__, VerboseInfo);
+  Msg::ShowText(GetSummaryText(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
 
   if (WriteReport && !Check::IsOptimization() && session_initiated) {
     //if (reason == REASON_CHARTCHANGE)
@@ -553,7 +556,7 @@ string InitInfo(bool startup = False, string sep = "\n") {
     if (session_initiated && IsTradeAllowed()) {
       output += sep + "Trading is allowed, please wait to start trading...";
     } else {
-      output += sep + "Error: Trading is not allowed, please check the settings and allow automated trading!";
+      output += sep + StringFormat("Error %d: Trading is not allowed, please check the settings and allow automated trading!", __LINE__);
     }
   }
   return output;
@@ -953,8 +956,8 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
          if (WriteReport) ReportAdd(last_err);
      }
      if (VerboseDebug) {
-       PrintFormat("Error: OrderSend(%s, %s, %g, %f, %d, %f, %f, %s, %d, %d, %d)",
-              _Symbol, Convert::OrderTypeToString(cmd), NormalizeLots(trade_volume), NormalizeDouble(order_price, Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + sid, 0, GetOrderColor(cmd));
+       PrintFormat("Error %d: OrderSend(%s, %s, %g, %f, %d, %f, %f, %s, %d, %d, %d)",
+              __LINE__, _Symbol, Convert::OrderTypeToString(cmd), NormalizeLots(trade_volume), NormalizeDouble(order_price, Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + sid, 0, GetOrderColor(cmd));
        Print(__FUNCTION__ + ": " + GetAccountTextDetails());
        Print(__FUNCTION__ + ": " + GetMarketTextDetails());
        OrderPrint();
@@ -1056,7 +1059,9 @@ bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
  */
 bool CheckSpreadLimit(int sid) {
   double spread_limit = Misc::If(conf[sid][SPREAD_LIMIT] > 0, MathMin(conf[sid][SPREAD_LIMIT], MaxSpreadToTrade), MaxSpreadToTrade);
-  #ifdef __backtest__ if (curr_spread > 10) { PrintFormat("%s(): Error: %s", __FUNCTION__, "Backtesting over 10 pips not supported, sorry."); ExpertRemove(); } #endif
+  #ifdef __backtest__
+  if (curr_spread > 10) { PrintFormat("%s: Error %d: %s", __FUNCTION__, __LINE__, "Backtesting over 10 pips not supported, sorry."); ExpertRemove(); }
+  #endif
   return curr_spread <= spread_limit;
 }
 
@@ -3119,7 +3124,7 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
        new_value = Misc::If(Convert::OrderTypeToValue(cmd) == loss_or_profit, envelopes[period][CURR][UPPER], envelopes[period][CURR][LOWER]);
        break;
      default:
-       if (VerboseDebug) Print(__FUNCTION__ + ": Error: Unknown trailing stop method: ", method);
+       if (VerboseDebug) PrintFormat("%s: Error %d: Unknown trailing stop method: ", __FUNCTION__, __LINE__, method);
    }
 
    if (new_value > 0) new_value += delta * factor;
@@ -3397,21 +3402,21 @@ bool TradeAllowed() {
     return (FALSE);
   }*/
   if (Bars < 100) {
-    err = "Bars less than 100, not trading...";
+    err = StringFormat("Error %d: Bars less than 100, not trading...", __LINE__);
     if (VerboseTrace && err != last_err) Print(__FUNCTION__ + ": " + err);
     //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + ": " + err);
     last_err = err;
     return (FALSE);
   }
   if (!Check::IsTesting() && Volume[0] < MinVolumeToTrade) {
-    err = "Volume too low to trade.";
+    err = StringFormat("Error %d: Volume too low to trade.", __LINE__);
     if (VerboseTrace && err != last_err) Print(__FUNCTION__ + ": " + err);
     //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + ": " + err);
     last_err = err;
     return (FALSE);
   }
   if (IsTradeContextBusy()) {
-    err = "Error: Trade context is temporary busy.";
+    err = StringFormat("Error %d: Trade context is temporary busy.", __LINE__);
     if (VerboseErrors && err != last_err) Print(__FUNCTION__ + ": " + err);
     //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + ": " + err);
     last_err = err;
@@ -3422,7 +3427,7 @@ bool TradeAllowed() {
   //   changing the state of a trading account can be called only if trading by Expert Advisors
   //   is allowed (the "Allow live trading" checkbox is enabled in the Expert Advisor or script properties).
   if (!IsTradeAllowed()) {
-    err = "Trade is not allowed at the moment, check the settings!";
+    err = StringFormat("Error %d: Trade is not allowed at the moment, check the settings!", __LINE__);
     if (VerboseErrors && err != last_err) Print(__FUNCTION__ + ": " + err);
     //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + ": " + err);
     last_err = err;
@@ -3478,33 +3483,34 @@ bool ValidSettings() {
   string err;
    // TODO: IsDllsAllowed(), IsLibrariesAllowed()
   if (File::FileIsExist(Terminal::GetExpertPath() + "\\" + ea_file)) {
-      Print("Meow!");
-      return (False);
+    Msg::ShowText("Meow!", "Error", __FUNCTION__, __LINE__, TRUE, TRUE, TRUE);
+    return (FALSE);
   }
   #ifdef __release__
   #endif
   if (LotSize < 0.0) {
-    err = "Error: LotSize is less than 0.";
-    if (VerboseErrors) Print(__FUNCTION__ + ": " + err);
-    if (PrintLogOnChart) Comment(err);
+    Msg::ShowText("LotSize is less than 0.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
     return (FALSE);
   }
   #ifdef __backtest__
   if (!Check::IsTesting()) {
-     err = "Error: This version is compiled for backtest mode only.";
-     if (VerboseErrors) Print(__FUNCTION__ + ": " + err);
-     if (PrintLogOnChart) Comment(err);
-     return (FALSE);
+    Msg::ShowText("This version is compiled for backtest mode only.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
+    return (FALSE);
   }
   #endif
   if (Check::IsTesting() && ValidateMarketSettings) {
-      if (!Backtest::ValidSpread() || !Backtest::ValidLotstep()) {
-          if (VerboseErrors) Print(__FUNCTION__ + ": Error: Backtest market settings are invalid!");
-          return (FALSE);
-      }
+    if (!Backtest::ValidSpread() || !Backtest::ValidLotstep()) {
+      Msg::ShowText("Backtest market settings are invalid!", "Error", __FUNCTION__, __LINE__, VerboseErrors);
+      return (FALSE);
+    }
   }
   E_Mail = StringTrimLeft(StringTrimRight(E_Mail));
   License = StringTrimLeft(StringTrimRight(License));
+  Comment("ea_file: " + ea_file);
+  Comment("ea_file2: " + ea_file2);
+  Comment("__FILE__: " + __FILE__);
+  Comment("StringLen: " + StringLen(__FILE__));
+  return !StringCompare(ValidEmail(E_Mail), License);
   return !StringCompare(ValidEmail(E_Mail), License) && StringLen(ea_file) == 11;
 }
 
@@ -3786,16 +3792,12 @@ double GetRiskRatio() {
 string ValidEmail(string text) {
   string output = StringLen(text);
   if (text == "") {
-    last_err = "Error: E-mail is empty, please validate the settings.";
-    Comment(last_err);
-    Print(last_err);
+    Msg::ShowText("E-mail is empty, please validate the settings.", "Error", __FUNCTION__, __LINE__, TRUE, TRUE, TRUE);
     ea_active = FALSE;
     return FALSE;
   }
   if (StringFind(text, "@") == EMPTY || StringFind(text, ".") == EMPTY) {
-    last_err = "Error: E-mail is not in valid format.";
-    Comment(last_err);
-    Print(last_err);
+    Msg::ShowText("E-mail is not in valid format.", "Error", __FUNCTION__, __LINE__, TRUE, TRUE, TRUE);
     ea_active = FALSE;
     return FALSE;
   }

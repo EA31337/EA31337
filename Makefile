@@ -1,6 +1,8 @@
 .PHONY: all test compile-mql4 compile-mql5 requirements set-none \
 		clean clean-src clean-releases \
+		Lite-Backtest Advanced-Backtest Rider-Backtest \
 		Lite Advanced Rider
+
 MQL=mql.exe
 SRC=$(wildcard src/*.mq4)
 EA=EA31337
@@ -79,6 +81,9 @@ set-advanced-full: set-none
 
 set-rider-full: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__nolicense__\|__rider__"
+
+set-testing:
+	@$(MAKE) -f $(FILE) set-mode MODE="__testing__"
 
 clean-all: clean-src clean-releases
 

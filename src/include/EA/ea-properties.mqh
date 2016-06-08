@@ -14,4 +14,4 @@
 #define ea_link    "https://github.com/EA31337"
 #define ea_author  "kenorb"
 #define ea_copy    "Copyright 2016, kenorb"
-#define ea_file    __FILE__
+#define ea_file2 __FILE__
