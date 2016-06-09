@@ -23,10 +23,10 @@
   extern string License = "";
 #else
   #ifndef __backtest__
-  string E_Mail = ea_name + ea_version + ea_copy + "@example.com";
-  string License = "51-30101111-11-46101107112101-17120101-64-1";
+  string E_Mail = ea_name + ea_version + ea_copy + ea_file + "@ea31337.com";
+  string License = "77-30101111-11-46-55-51-51-41-51-17101-6410";
   #else
-  string E_Mail = ea_name + ea_version + ea_copy + "@example.com";
-  string License = "62-30101111-11-46101107112101-17120101-64-171141111101";
+  string E_Mail = ea_name + ea_version + ea_copy + ea_file + "@ea31337.com";
+  string License = "77-30101111-11-46-55-51-51-41-51-17101-64104113101-461";
   #endif
 #endif
