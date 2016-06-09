@@ -7,6 +7,11 @@
 #property link      "https://github.com/EA31337"
 
 //+------------------------------------------------------------------+
+//| EA defines.
+//+------------------------------------------------------------------+
+#define ea_file    __FILE__
+
+//+------------------------------------------------------------------+
 //| EA includes.
 //+------------------------------------------------------------------+
 
@@ -47,11 +52,6 @@
 //#property tester_file "trade_patterns.csv"    // File with the data to be read by an Expert Advisor.
 //#property tester_indicator "smoothed_ma.ex4"  // File with a custom indicator specified in iCustom() as a variable.
 //#property tester_library "MT4EA2DLL.dll" // Library file name from <terminal_data_folder>\MQL4\Libraries\ to be sent to a virtual server.
-
-//+------------------------------------------------------------------+
-//| EA defines.
-//+------------------------------------------------------------------+
-#define ea_file    __FILE__
 
 //+------------------------------------------------------------------+
 //| Include public classes.
