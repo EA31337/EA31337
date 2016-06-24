@@ -121,10 +121,10 @@ int AD30_OpenMethod = 15; // Open method for M30 (0-?)
 
 //+------------------------------------------------------------------+
 string __ADX_Parameters__ = "-- Settings for the Average Directional Movement Index indicator --"; // >>> ADX (NOT IMPLEMENTED YET) <<<
-bool ADX1_Active = 1; // Enable for M1
-bool ADX5_Active = 1; // Enable for M5
-bool ADX15_Active = 1; // Enable for M15
-bool ADX30_Active = 1; // Enable for M30
+bool ADX1_Active = 0; // Enable for M1
+bool ADX5_Active = 0; // Enable for M5
+bool ADX15_Active = 0; // Enable for M15
+bool ADX30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE ADX_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE ADX_TrailingProfitMethod = 1; // Trail profit method
 int ADX_Period = 14; // Period
@@ -161,10 +161,10 @@ extern int Alligator30_OpenMethod = 1; // Open method for M30 (0-63)
 
 //+------------------------------------------------------------------+
 string __ATR_Parameters__ = "-- Settings for the Average True Range indicator --"; // >>> ATR <<<
-bool ATR1_Active = 1; // Enable for M1
-bool ATR5_Active = 1; // Enable for M5
-bool ATR15_Active = 1; // Enable for M15
-bool ATR30_Active = 1; // Enable for M30
+bool ATR1_Active = 0; // Enable for M1
+bool ATR5_Active = 0; // Enable for M5
+bool ATR15_Active = 0; // Enable for M15
+bool ATR30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE ATR_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE ATR_TrailingProfitMethod = 1; // Trail profit method
 int ATR_Period_Fast = 14; // Period Fast
@@ -177,10 +177,10 @@ int ATR30_OpenMethod = 31; // Open method for M30 (0-31)
 
 //+------------------------------------------------------------------+
 string __Awesome_Parameters__ = "-- Settings for the Awesome oscillator --"; // >>> AWESOME <<<
-bool Awesome1_Active = 1; // Enable for M1
-bool Awesome5_Active = 1; // Enable for M5
-bool Awesome15_Active = 1; // Enable for M15
-bool Awesome30_Active = 1; // Enable for M30
+bool Awesome1_Active = 0; // Enable for M1
+bool Awesome5_Active = 0; // Enable for M5
+bool Awesome15_Active = 0; // Enable for M15
+bool Awesome30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE Awesome_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE Awesome_TrailingProfitMethod = 1; // Trail profit method
 double Awesome_OpenLevel = 0.00000000; // Open level
@@ -210,10 +210,10 @@ extern int Bands30_OpenMethod = 225; // Open method for M30 (0-255)
 
 //+------------------------------------------------------------------+
 string __BPower_Parameters__ = "-- Settings for the Bulls/Bears Power indicator --"; // >>> BULLS/BEARS POWER <<<
-bool BPower1_Active = 1; // Enable for M1
-bool BPower5_Active = 1; // Enable for M5
-bool BPower15_Active = 1; // Enable for M15
-bool BPower30_Active = 1; // Enable for M30
+bool BPower1_Active = 0; // Enable for M1
+bool BPower5_Active = 0; // Enable for M5
+bool BPower15_Active = 0; // Enable for M15
+bool BPower30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE BPower_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE BPower_TrailingProfitMethod = 1; // Trail profit method
 int BPower_Period = 13; // Period
@@ -226,10 +226,10 @@ int BPower30_OpenMethod = 15; // Open method for M30 (0-
 
 //+------------------------------------------------------------------+
 string __Breakage_Parameters__ = "-- Settings for the custom Breakage strategy --"; // >>> BREAKAGE <<<
-bool Breakage1_Active = 1; // Enable for M1
-bool Breakage5_Active = 1; // Enable for M5
-bool Breakage15_Active = 1; // Enable for M15
-bool Breakage30_Active = 1; // Enable for M30
+bool Breakage1_Active = 0; // Enable for M1
+bool Breakage5_Active = 0; // Enable for M5
+bool Breakage15_Active = 0; // Enable for M15
+bool Breakage30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE Breakage_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE Breakage_TrailingProfitMethod = 1; // Trail profit method
 double Breakage_OpenLevel = 0.00000000; // Open level
@@ -240,10 +240,10 @@ int Breakage30_OpenMethod = 0; // Open method for M30 (0-31)
 
 //+------------------------------------------------------------------+
 string __BWMFI_Parameters__ = "-- Settings for the Market Facilitation Index indicator --"; // >>> BWMFI <<<
-bool BWMFI1_Active = 1; // Enable for M1
-bool BWMFI5_Active = 1; // Enable for M5
-bool BWMFI15_Active = 1; // Enable for M15
-bool BWMFI30_Active = 1; // Enable for M30
+bool BWMFI1_Active = 0; // Enable for M1
+bool BWMFI5_Active = 0; // Enable for M5
+bool BWMFI15_Active = 0; // Enable for M15
+bool BWMFI30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE BWMFI_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE BWMFI_TrailingProfitMethod = 1; // Trail profit method
 double BWMFI_OpenLevel = 0.00000000; // Open level
@@ -254,10 +254,10 @@ int BWMFI30_OpenMethod = 0; // Open method for M30 (0-
 
 //+------------------------------------------------------------------+
 string __CCI_Parameters__ = "-- Settings for the Commodity Channel Index indicator --"; // >>> CCI <<<
-bool CCI1_Active = 1; // Enable for M1
-bool CCI5_Active = 1; // Enable for M5
-bool CCI15_Active = 1; // Enable for M15
-bool CCI30_Active = 1; // Enable for M30
+bool CCI1_Active = 0; // Enable for M1
+bool CCI5_Active = 0; // Enable for M5
+bool CCI15_Active = 0; // Enable for M15
+bool CCI30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE CCI_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = 1; // Trail profit method
 int CCI_Period_Fast = 12; // Period Fast
@@ -311,10 +311,10 @@ extern int Envelopes30_OpenMethod = 48; // Open method for M30 (0-127)
 
 //+------------------------------------------------------------------+
 string __Force_Parameters__ = "-- Settings for the Force Index indicator --"; // >>> FORCE <<<
-bool Force1_Active = 1; // Enable for M1
-bool Force5_Active = 1; // Enable for M5
-bool Force15_Active = 1; // Enable for M15
-bool Force30_Active = 1; // Enable for M30
+bool Force1_Active = 0; // Enable for M1
+bool Force5_Active = 0; // Enable for M5
+bool Force15_Active = 0; // Enable for M15
+bool Force30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE Force_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE Force_TrailingProfitMethod = 1; // Trail profit method
 int Force_Period = 13; // Period
@@ -342,10 +342,10 @@ extern int Fractals30_OpenMethod = 1; // Open method for M30 (0-1)
 
 //+------------------------------------------------------------------+
 string __Gator_Parameters__ = "-- Settings for the Gator oscillator --"; // >>> GATOR <<<
-bool Gator1_Active = 1; // Enable for M1
-bool Gator5_Active = 1; // Enable for M5
-bool Gator15_Active = 1; // Enable for M15
-bool Gator30_Active = 1; // Enable for M30
+bool Gator1_Active = 0; // Enable for M1
+bool Gator5_Active = 0; // Enable for M5
+bool Gator15_Active = 0; // Enable for M15
+bool Gator30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE Gator_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE Gator_TrailingProfitMethod = 1; // Trail profit method
 double Gator_OpenLevel = 0.00000000; // Open level
@@ -356,10 +356,10 @@ int Gator30_OpenMethod = 0; // Open method for M30 (0-
 
 //+------------------------------------------------------------------+
 string __Ichimoku_Parameters__ = "-- Settings for the Ichimoku Kinko Hyo indicator --"; // >>> ICHIMOKU <<<
-bool Ichimoku1_Active = 1; // Enable for M1
-bool Ichimoku5_Active = 1; // Enable for M5
-bool Ichimoku15_Active = 1; // Enable for M15
-bool Ichimoku30_Active = 1; // Enable for M30
+bool Ichimoku1_Active = 0; // Enable for M1
+bool Ichimoku5_Active = 0; // Enable for M5
+bool Ichimoku15_Active = 0; // Enable for M15
+bool Ichimoku30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE Ichimoku_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE Ichimoku_TrailingProfitMethod = 1; // Trail profit method
 int Ichimoku_Period_Tenkan_Sen = 9; // Period Tenkan Sen
@@ -417,10 +417,10 @@ extern int MACD30_OpenMethod = 4; // Open method for M30 (0-31)
 
 //+------------------------------------------------------------------+
 string __MFI_Parameters__ = "-- Settings for the Money Flow Index indicator --"; // >>> MFI <<<
-bool MFI1_Active = 1; // Enable for M1
-bool MFI5_Active = 1; // Enable for M5
-bool MFI15_Active = 1; // Enable for M15
-bool MFI30_Active = 1; // Enable for M30
+bool MFI1_Active = 0; // Enable for M1
+bool MFI5_Active = 0; // Enable for M5
+bool MFI15_Active = 0; // Enable for M15
+bool MFI30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE MFI_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = 1; // Trail profit method
 int MFI_Period = 14; // Period
@@ -432,10 +432,10 @@ int MFI30_OpenMethod = 0; // Open method for M30 (0-
 
 //+------------------------------------------------------------------+
 string __Momentum_Parameters__ = "-- Settings for the Momentum indicator --"; // >>> MOMENTUM <<<
-bool Momentum1_Active = 1; // Enable for M1
-bool Momentum5_Active = 1; // Enable for M5
-bool Momentum15_Active = 1; // Enable for M15
-bool Momentum30_Active = 1; // Enable for M30
+bool Momentum1_Active = 0; // Enable for M1
+bool Momentum5_Active = 0; // Enable for M5
+bool Momentum15_Active = 0; // Enable for M15
+bool Momentum30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE Momentum_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE Momentum_TrailingProfitMethod = 1; // Trail profit method
 int Momentum_Period_Fast = 12; // Period Fast
@@ -449,10 +449,10 @@ int Momentum30_OpenMethod = 15; // Open method for M30 (0-
 
 //+------------------------------------------------------------------+
 string __OBV_Parameters__ = "-- Settings for the On Balance Volume indicator --"; // >>> OBV <<<
-bool OBV1_Active = 1; // Enable for M1
-bool OBV5_Active = 1; // Enable for M5
-bool OBV15_Active = 1; // Enable for M15
-bool OBV30_Active = 1; // Enable for M30
+bool OBV1_Active = 0; // Enable for M1
+bool OBV5_Active = 0; // Enable for M5
+bool OBV15_Active = 0; // Enable for M15
+bool OBV30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE OBV_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE OBV_TrailingProfitMethod = 1; // Trail profit method
 ENUM_APPLIED_PRICE OBV_Applied_Price = 0; // Applied Price
@@ -499,10 +499,10 @@ extern int RSI30_OpenMethod = 2; // Open method for M30 (0-63)
 
 //+------------------------------------------------------------------+
 string __RVI_Parameters__ = "-- Settings for the Relative Vigor Index indicator --"; // >>> RVI <<<
-bool RVI1_Active = 1; // Enable for M1
-bool RVI5_Active = 1; // Enable for M5
-bool RVI15_Active = 1; // Enable for M15
-bool RVI30_Active = 1; // Enable for M30
+bool RVI1_Active = 0; // Enable for M1
+bool RVI5_Active = 0; // Enable for M5
+bool RVI15_Active = 0; // Enable for M15
+bool RVI30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE RVI_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE RVI_TrailingProfitMethod = 1; // Trail profit method
 int RVI_Shift = 2; // Shift
@@ -532,10 +532,10 @@ extern int SAR30_OpenMethod = 20; // Open method for M30 (0-127)
 
 //+------------------------------------------------------------------+
 string __StdDev_Parameters__ = "-- Settings for the Standard Deviation indicator --"; // >>> STDDEV <<<
-bool StdDev1_Active = 1; // Enable for M1
-bool StdDev5_Active = 1; // Enable for M5
-bool StdDev15_Active = 1; // Enable for M15
-bool StdDev30_Active = 1; // Enable for M30
+bool StdDev1_Active = 0; // Enable for M1
+bool StdDev5_Active = 0; // Enable for M5
+bool StdDev15_Active = 0; // Enable for M15
+bool StdDev30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE StdDev_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE StdDev_TrailingProfitMethod = 1; // Trail profit method
 ENUM_APPLIED_PRICE StdDev_Applied_Price = 0; // Applied Price
@@ -550,10 +550,10 @@ int StdDev30_OpenMethod = 31; // Open method for M30 (0-
 
 //+------------------------------------------------------------------+
 string __Stochastic_Parameters__ = "-- Settings for the the Stochastic Oscillator --"; // >>> STOCHASTIC <<<
-bool Stochastic1_Active = 1; // Enable for M1
-bool Stochastic5_Active = 1; // Enable for M5
-bool Stochastic15_Active = 1; // Enable for M15
-bool Stochastic30_Active = 1; // Enable for M30
+bool Stochastic1_Active = 0; // Enable for M1
+bool Stochastic5_Active = 0; // Enable for M5
+bool Stochastic15_Active = 0; // Enable for M15
+bool Stochastic30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE Stochastic_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE Stochastic_TrailingProfitMethod = 1; // Trail profit method
 double Stochastic_OpenLevel = 0.00000000; // Open level
@@ -580,10 +580,10 @@ extern int WPR30_OpenMethod = 0; // Open method for M30 (0-63)
 
 //+------------------------------------------------------------------+
 string __ZigZag_Parameters__ = "-- Settings for the ZigZag indicator --"; // >>> ZIGZAG <<<
-bool ZigZag1_Active = 1; // Enable for M1
-bool ZigZag5_Active = 1; // Enable for M5
-bool ZigZag15_Active = 1; // Enable for M15
-bool ZigZag30_Active = 1; // Enable for M30
+bool ZigZag1_Active = 0; // Enable for M1
+bool ZigZag5_Active = 0; // Enable for M5
+bool ZigZag15_Active = 0; // Enable for M15
+bool ZigZag30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE ZigZag_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE ZigZag_TrailingProfitMethod = 1; // Trail profit method
 double ZigZag_OpenLevel = 0.00000000; // Open level
