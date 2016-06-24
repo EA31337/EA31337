@@ -286,7 +286,7 @@ int max_order_slippage; // Maximum price slippage for buy or sell orders (in poi
 double LastAsk, LastBid; // Keep the last ask and bid price.
 string AccCurrency; // Current account currency.
 int err_code; // Error code.
-string last_err, last_msg;
+string last_err, last_msg, last_debug, last_trace;
 double last_tick_change; // Last tick change in pips.
 double last_close_profit = EMPTY;
 // int last_trail_update = 0, last_indicators_update = 0, last_stats_update = 0;
@@ -505,7 +505,7 @@ string InitInfo(bool startup = False, string sep = "\n") {
       AccountCompany(), account_type, AccountLeverage(), AccCurrency, sep);
   output += StringFormat("Market variables: Ask: %g, Bid: %g, Volume: %d%s",
       NormalizeDouble(Ask, Digits), NormalizeDouble(Bid, Digits), Volume[0], sep);
-  output += StringFormat("Market constants: Digits: %d, Point: %g, Min Lot: %g, Max Lot: %g, Lot Step: %g, Lot Size: %g, Margin Required: %g, Margin Init: %g, Stop Level: %d pts, Freeze level: %d pts%s",
+  output += StringFormat("Market constants: Digits: %d, Point: %g, Min Lot: %g, Max Lot: %g, Lot Step: %g, Lot Size: %g, Margin Required: %g, Margin Init: %g, Stop Level: %dpts, Freeze level: %dpts%s",
       Digits,
       NormalizeDouble(Point, Digits),
       NormalizeDouble(market_minlot, pip_digits),
@@ -950,16 +950,17 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
    } else {
      result = FALSE;
      err_code = GetLastError();
+     last_err = Msg::ShowText(ErrorDescription(err_code), "Error", __FUNCTION__, __LINE__, VerboseInfo | VerboseErrors);
      if (VerboseErrors) {
-         last_err = StringFormat("%s: OrderSend(): error = %s", __FUNCTION__, ErrorDescription(err_code));
-         Print(last_err);
-         if (WriteReport) ReportAdd(last_err);
+       if (WriteReport) ReportAdd(last_err);
      }
      if (VerboseDebug) {
-       PrintFormat("Error %d: OrderSend(%s, %s, %g, %f, %d, %f, %f, %s, %d, %d, %d)",
-              __LINE__, _Symbol, Convert::OrderTypeToString(cmd), NormalizeLots(trade_volume), NormalizeDouble(order_price, Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + sid, 0, GetOrderColor(cmd));
-       Print(__FUNCTION__ + ": " + GetAccountTextDetails());
-       Print(__FUNCTION__ + ": " + GetMarketTextDetails());
+       last_debug = Msg::ShowText(
+         StringFormat("OrderSend(%s, %s, %g, %f, %d, %f, %f, %s, %d, %d, %d)",
+           _Symbol, Convert::OrderTypeToString(cmd), NormalizeLots(trade_volume), NormalizeDouble(order_price, Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + sid, 0, GetOrderColor(cmd)),
+           "Debug", __FUNCTION__, __LINE__, VerboseDebug | VerboseTrace);
+       StringFormat(GetAccountTextDetails(), "Debug", __FUNCTION__, __LINE__, VerboseDebug | VerboseTrace);
+       StringFormat(GetMarketTextDetails(), "Debug", __FUNCTION__, __LINE__, VerboseDebug | VerboseTrace);
        OrderPrint();
      }
 
@@ -1001,45 +1002,36 @@ bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
   int result = TRUE;
   string err;
   if (volume < market_minlot) {
-    err = StringFormat("Lot size for strategy %s is %.2f.", sname[sid], volume);
-    if (VerboseTrace && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
+    last_trace = Msg::ShowText(StringFormat("%s: Lot size = %.2f", sname[sid], volume), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
     result = FALSE;
   } else if (total_orders >= max_orders) {
-    err = "Maximum open and pending orders reached the limit (MaxOrders).";
-    if (VerboseErrors && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
+    last_msg = Msg::ShowText("Maximum open and pending orders reached the limit (MaxOrders).", "Info", __FUNCTION__, __LINE__, VerboseInfo);
     #ifdef __advanced__
     OrderQueueAdd(sid, cmd);
     #endif
     result = FALSE;
   } else if (GetTotalOrdersByType(sid) >= GetMaxOrdersPerType()) {
-    err = sname[sid] + ": Maximum open and pending orders per type reached the limit (MaxOrdersPerType).";
-    if (VerboseErrors && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
+    last_msg = Msg::ShowText(StringFormat("%s: Maximum open and pending orders per type reached the limit (MaxOrdersPerType).", sname[sid]), "Info", __FUNCTION__, __LINE__, VerboseInfo);
     #ifdef __advanced__
     OrderQueueAdd(sid, cmd);
     #endif
     result = FALSE;
   } else if (!Account::CheckFreeMargin(cmd, volume)) {
-    err = "No money to open more orders.";
-    if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + last_err);
-    if (VerboseErrors && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
+    last_err = Msg::ShowText("No money to open more orders.", "Error", __FUNCTION__, __LINE__, VerboseInfo | VerboseErrors, PrintLogOnChart);
     result = FALSE;
   } else if (!CheckMinPipGap(sid)) {
-    err = StringFormat("%s: Not executing order, because the gap is too small [MinPipGap].", sname[sid]);
-    if (VerboseTrace && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
+    last_trace = Msg::ShowText(StringFormat("%s: Not executing order, because the gap is too small [MinPipGap].", sname[sid]), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
     result = FALSE;
   }
   #ifdef __advanced__
   if (ApplySpreadLimits && !CheckSpreadLimit(sid)) {
-    err = StringFormat("%s: Not executing order, because the spread is too high. (spread = %.1f pips)", sname[sid], curr_spread);
-    if (VerboseTrace && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
+    last_trace = Msg::ShowText(StringFormat("%s: Not executing order, because the spread is too high. (spread = %.1f pips).", sname[sid], curr_spread), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
     result = FALSE;
   } else if (MinIntervalSec > 0 && time_current - last_order_time < MinIntervalSec) {
-    err = "There must be a " + MinIntervalSec + " sec minimum interval between subsequent trade signals.";
-    if (VerboseTrace && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
+    last_trace = Msg::ShowText(StringFormat("%s: There must be a %d sec minimum interval between subsequent trade signals.", sname[sid], MinIntervalSec), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
     result = FALSE;
   } else if (MaxOrdersPerDay > 0 && daily_orders >= GetMaxOrdersPerDay()) {
-    err = "Maximum open and pending orders reached the daily limit (MaxOrdersPerDay).";
-    if (VerboseErrors && err != last_err) PrintFormat("%s(): %s", __FUNCTION__, err);
+    last_err = Msg::ShowText("Maximum open and pending orders reached the daily limit (MaxOrdersPerDay).", "Info", __FUNCTION__, __LINE__, VerboseInfo);
     OrderQueueAdd(sid, cmd);
     result = FALSE;
   }
@@ -3402,24 +3394,21 @@ bool TradeAllowed() {
     return (FALSE);
   }*/
   if (Bars < 100) {
-    err = StringFormat("Error %d: Bars less than 100, not trading...", __LINE__);
-    if (VerboseTrace && err != last_err) Print(__FUNCTION__ + ": " + err);
-    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + ": " + err);
-    last_err = err;
+    last_debug = Msg::ShowText("Bars less than 100, not trading.", "Debug", __FUNCTION__, __LINE__, VerboseDebug);
+    if (PrintLogOnChart) DisplayInfoOnChart();
+    ea_active = FALSE;
     return (FALSE);
   }
   if (!Check::IsTesting() && Volume[0] < MinVolumeToTrade) {
-    err = StringFormat("Error %d: Volume too low to trade.", __LINE__);
-    if (VerboseTrace && err != last_err) Print(__FUNCTION__ + ": " + err);
-    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + ": " + err);
-    last_err = err;
+    last_debug = Msg::ShowText("Volume too low to trade.", "Debug", __FUNCTION__, __LINE__, VerboseDebug);
+    if (PrintLogOnChart) DisplayInfoOnChart();
+    ea_active = FALSE;
     return (FALSE);
   }
   if (IsTradeContextBusy()) {
-    err = StringFormat("Error %d: Trade context is temporary busy.", __LINE__);
-    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + ": " + err);
-    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + ": " + err);
-    last_err = err;
+    last_err = Msg::ShowText("Trade context is temporary busy.", "Error", __FUNCTION__, __LINE__, VerboseErrors);
+    if (PrintLogOnChart) DisplayInfoOnChart();
+    ea_active = FALSE;
     return (FALSE);
   }
   // Check if the EA is allowed to trade and trading context is not busy, otherwise returns false.
@@ -3427,49 +3416,34 @@ bool TradeAllowed() {
   //   changing the state of a trading account can be called only if trading by Expert Advisors
   //   is allowed (the "Allow live trading" checkbox is enabled in the Expert Advisor or script properties).
   if (!IsTradeAllowed()) {
-    err = StringFormat("Error %d: Trade is not allowed at the moment, check the settings!", __LINE__);
-    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + ": " + err);
-    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + ": " + err);
-    last_err = err;
+    last_err = Msg::ShowText("Trade is not allowed at the moment, check the settings!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
     ea_active = FALSE;
     return (FALSE);
   }
   if (!IsConnected()) {
-    err = "Error: Terminal is not connected!";
-    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + ": " + err);
-    if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + ": " + err);
-    last_err = err;
+    last_err = Msg::ShowText("Terminal is not connected!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
     if (PrintLogOnChart) DisplayInfoOnChart();
-    Sleep(10000);
+    ea_active = FALSE;
     return (FALSE);
   }
   if (IsStopped()) {
-    err = "Error: Terminal is stopping!";
-    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + ": " + err);
-    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + err);
-    last_err = err;
+    last_err = Msg::ShowText("Terminal is stopping!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
     ea_active = FALSE;
     return (FALSE);
   }
   if (!Check::IsTesting() && !MarketInfo(Symbol(), MODE_TRADEALLOWED)) {
-    err = "Trade is not allowed. Market is closed.";
-    if (VerboseInfo && err != last_err) Print(__FUNCTION__ + ": " + err);
-    //if (PrintLogOnChart && err != last_err) Comment(__FUNCTION__ + "():" + err);
-    last_err = err;
+    last_err = Msg::ShowText("Trade is not allowed, because market is closed.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
+    if (PrintLogOnChart) DisplayInfoOnChart();
     ea_active = FALSE;
     return (FALSE);
   }
   if (!Check::IsTesting() && !IsExpertEnabled()) {
-    err = "Error: You need to enable: 'Enable Expert Advisor'/'AutoTrading'.";
-    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + ": " + err);
-    last_err = err;
+    last_err = Msg::ShowText("You need to enable: 'Enable Expert Advisor'/'AutoTrading'.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
     ea_active = FALSE;
     return (FALSE);
   }
   if (!session_active || StringLen(ea_file) != 11) {
-    err = "Error: Session is not active!";
-    if (VerboseErrors && err != last_err) Print(__FUNCTION__ + ": " + err);
-    last_err = err;
+    last_err = Msg::ShowText("Session is not active!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
     ea_active = FALSE;
     return (FALSE);
   }
@@ -4062,7 +4036,7 @@ bool InitializeVariables() {
   pip_size = Market::GetPipSize();
   pip_digits = Market::GetPipDigits();
   pts_per_pip = Market::GetPointsPerPip();
-  volume_digits = Market::GetVolumePrecision(TradeMicroLots);
+  volume_digits = Market::GetVolumeDigits(TradeMicroLots);
 
   max_order_slippage = Convert::PipsToPoints(MaxOrderPriceSlippage); // Maximum price slippage for buy or sell orders (converted into points).
 
@@ -5431,7 +5405,7 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
                   + indent + "| Risk ratio: " + DoubleToStr(risk_ratio, 1) + " (" + GetRiskRatioText() + ")" + sep
                   + indent + "| " + GetOrdersStats("" + sep + indent + "| ") + "" + sep
                   + indent + "| Last error: " + last_err + "" + sep
-                  + indent + "| Last message: " + GetLastMessage() + "" + sep
+                  + indent + "| Last message: " + last_msg + "" + sep
                   + indent + "| ------------------------------------------------" + sep
                   + indent + "| MARKET INFORMATION:" + sep
                   + indent + "| " + text_spread + "" + sep
@@ -5520,7 +5494,7 @@ string GetMarketTextDetails() {
      "Symbol: ", Symbol(), "; ",
      "Ask: ", DoubleToStr(Ask, Digits), "; ",
      "Bid: ", DoubleToStr(Bid, Digits), "; ",
-     StringFormat("Spread: %g pts = %.2f pips", GetMarketSpread(True), Convert::ValueToPips(GetMarketSpread()))
+     StringFormat("Spread: %gpts = %.2f pips", GetMarketSpread(True), Convert::ValueToPips(GetMarketSpread()))
    );
 }
 
@@ -5811,20 +5785,27 @@ bool ActionExecute(int aid, int id = EMPTY) {
       // result = TightenProfits();
       break;*/
     default:
-      if (VerboseDebug) Print(__FUNCTION__ + ": Unknown action id: ", aid);
+      Msg::ShowText(
+        StringFormat("Unknown action id: %d", aid),
+        "Error", __FUNCTION__, __LINE__, VerboseErrors);
   }
   // reason = "Account condition: " + acc_conditions[i][0] + ", Market condition: " + acc_conditions[i][1] + ", Action: " + acc_conditions[i][2] + " [E: " + ValueToCurrency(AccountEquity()) + "/B: " + ValueToCurrency(AccountBalance()) + "]";
 
   TaskProcessList(TRUE); // Process task list immediately after action has been taken.
-  if (VerboseInfo) PrintFormat("%s(): %s; %s", __FUNCTION__, GetAccountTextDetails(), GetOrdersStats());
+  Msg::ShowText(GetAccountTextDetails() + "; " + GetOrdersStats(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
   if (result) {
-    Message(StringFormat("%s(): Executed action: %s (id: %d), because of market condition: %s (id: %d) and account condition: %s (id: %d) [E:%s/B:%s/P:%sp].",
-      __FUNCTION__, ActionIdToText(aid), aid, MarketIdToText(mid), mid, ReasonIdToText(reason_id), reason_id, ValueToCurrency(AccountEquity()), ValueToCurrency(AccountBalance()), DoubleToStr(last_close_profit, 1)));
-    if (VerboseDebug && aid != A_NONE) Print(GetLastMessage());
+    Msg::ShowText(
+        StringFormat("Executed action: %s (id: %d), because of market condition: %s (id: %d) and account condition: %s (id: %d) [E:%s/B:%s/P:%sp].",
+          ActionIdToText(aid), aid, MarketIdToText(mid), mid, ReasonIdToText(reason_id), reason_id, ValueToCurrency(AccountEquity()), ValueToCurrency(AccountBalance()), DoubleToStr(last_close_profit, 1)),
+        "Info", __FUNCTION__, __LINE__, VerboseInfo);
+    Msg::ShowText(last_msg, "Debug", __FUNCTION__, __LINE__, VerboseDebug && aid != A_NONE);
     if (WriteReport && VerboseDebug) ReportAdd(GetLastMessage());
     last_action_time = last_bar_time; // Set last execution bar time.
   } else {
-    if (VerboseDebug) Message(StringFormat("%s(): Failed to execute action: %s (id: %d), condition: %s (id: %d).", __FUNCTION__, ActionIdToText(aid), aid, ReasonIdToText(reason_id), reason_id));
+    Msg::ShowText(
+      StringFormat("Failed to execute action: %s (id: %d), condition: %s (id: %d).",
+        ActionIdToText(aid), aid, ReasonIdToText(reason_id), reason_id),
+      "Error", __FUNCTION__, __LINE__, VerboseErrors);
   }
   return result;
 }
