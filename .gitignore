@@ -1,5 +1,6 @@
 # Ignore configuration files that may contain sensitive information.
 build.properties
+logs/
 
 # Ignore compiled binary files.
 *.ex4

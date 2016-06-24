@@ -87,7 +87,7 @@ set-testing:
 
 clean-all: clean-src clean-releases
 
-clean-src: set-none
+clean-src:
 	@echo Cleaning src...
 	find src/ '(' -name '*.ex4' -or -name '*.ex5' ')' -delete
 
