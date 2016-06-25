@@ -7,11 +7,6 @@
 #property link      "https://github.com/EA31337"
 
 //+------------------------------------------------------------------+
-//| EA defines.
-//+------------------------------------------------------------------+
-#define ea_file    __FILE__
-
-//+------------------------------------------------------------------+
 //| EA includes.
 //+------------------------------------------------------------------+
 
@@ -392,7 +387,6 @@ void OnTick() {
 //+------------------------------------------------------------------+
 int OnInit() {
   string err;
-
   if (VerboseInfo) PrintFormat("%s v%s (%s) initializing...", ea_name, ea_version, ea_link);
   if (!session_initiated) {
     if (!ValidSettings()) {
@@ -400,10 +394,13 @@ int OnInit() {
       Msg::ShowText("EA parameters are not valid, please correct.", "Error", __FUNCTION__, __LINE__, VerboseErrors, TRUE, TRUE);
       return (INIT_PARAMETERS_INCORRECT);
     }
-    if (!Check::IsTesting() && AccountNumber() <= 1) {
+    #ifdef __release__
+    if (Check::IsRealtime() && AccountNumber() <= 1) {
+      // @todo: Fails when debugging.
       Msg::ShowText("EA requires on-line Terminal.", "Error", __FUNCTION__, __LINE__, VerboseErrors, TRUE);
       return (INIT_FAILED);
      }
+     #endif
      session_initiated = TRUE;
   }
 
@@ -416,7 +413,7 @@ int OnInit() {
   if (SmartToggleComponent) ToggleComponent(SmartToggleComponent);
   #endif
 
-  if (Check::IsTesting()) {
+  if (!Check::IsRealtime()) {
     SendEmailEachOrder = FALSE;
     SoundAlert = FALSE;
     if (!Check::IsVisualMode()) PrintLogOnChart = FALSE;
@@ -494,11 +491,11 @@ void start() {
   if (VerboseInfo) Print(__FUNCTION__ + ": " + GetMarketTextDetails());
 }
 
-/*
+/**
  * Print init variables and constants.
  */
 string InitInfo(bool startup = False, string sep = "\n") {
-  string output = StringFormat("%s (%s) v%s by %s (%s)%s", ea_name, __FILE__, ea_version, ea_author, ea_link, sep);
+  string output = StringFormat("%s v%s by %s (%s)%s", ea_name, ea_version, ea_author, ea_link, sep);
   output += StringFormat("Platform variables: Symbol: %s, Bars: %d, Server: %s, Login: %d%s",
     _Symbol, Bars, AccountInfoString(ACCOUNT_SERVER), (int)AccountInfoInteger(ACCOUNT_LOGIN), sep); // // FIXME: MQL5: Bars
   output += StringFormat("Broker info: Name: %s, Account type: %s, Leverage: 1:%d, Currency: %s%s",
@@ -517,7 +514,7 @@ string InitInfo(bool startup = False, string sep = "\n") {
       market_stoplevel,
       order_freezelevel,
       sep);
-  output += StringFormat("Contract specification for %s: Profit mode: %d, Margin mode: %d, Spread: %d (points), Tick size: %g, Point value: %g, Digits: %d, Trade stop level: %g, Trade contract size: %g%s",
+  output += StringFormat("Contract specification for %s: Profit mode: %d, Margin mode: %d, Spread: %d (pts), Tick size: %g, Point value: %g, Digits: %d, Trade stop level: %g, Trade contract size: %g%s",
       _Symbol,
       MarketInfo(_Symbol, MODE_PROFITCALCMODE),
       MarketInfo(_Symbol, MODE_MARGINCALCMODE),
@@ -562,7 +559,7 @@ string InitInfo(bool startup = False, string sep = "\n") {
   return output;
 }
 
-/*
+/**
  * Main function to trade.
  */
 bool Trade() {
@@ -606,7 +603,7 @@ bool Trade() {
   return order_placed;
 }
 
-/*
+/**
  * Check if strategy is on trade conditionl.
  */
 bool TradeCondition(int order_type = 0, int cmd = NULL) {
@@ -650,7 +647,7 @@ bool TradeCondition(int order_type = 0, int cmd = NULL) {
   return FALSE;
 }
 
-/*
+/**
  * Update specific indicator.
  * Gukkuk im Versteck
  */
@@ -873,7 +870,7 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
   return (TRUE);
 }
 
-/*
+/**
  * Execute trade order.
  *
  * @param
@@ -995,7 +992,7 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
    return (result);
 }
 
-/*
+/**
  * Check if we can open new order.
  */
 bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
@@ -1041,7 +1038,7 @@ bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
 }
 
 #ifdef __advanced__
-/*
+/**
  * Check if spread is not too high for specific strategy.
  *
  * @param
@@ -1096,7 +1093,7 @@ bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = TRUE)
   return result;
 }
 
-/*
+/**
  * Re-calculate statistics based on the order and return the profit value.
  */
 double OrderCalc(int ticket_no = 0) {
@@ -1135,7 +1132,7 @@ double OrderCalc(int ticket_no = 0) {
   return profit;
 }
 
-/*
+/**
  * Close order by type of order and strategy used. See: ENUM_STRATEGY_TYPE.
  *
  * @param
@@ -1199,7 +1196,7 @@ bool UpdateStats() {
 
 /* INDICATOR FUNCTIONS */
 
-/*
+/**
  * Check if AC indicator is on buy or sell.
  *
  * @param
@@ -1248,7 +1245,7 @@ bool Trade_AC(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open_
   return result;
 }
 
-/*
+/**
  * Check if AD indicator is on buy or sell.
  *
  * @param
@@ -1299,7 +1296,7 @@ bool Trade_AD(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open_
   return result;
 }
 
-/*
+/**
  * Check if ADX indicator is on buy or sell.
  *
  * @param
@@ -1351,7 +1348,7 @@ bool Trade_ADX(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
 }
 
 
-/*
+/**
  * Check if Alligator indicator is on buy or sell.
  *
  * @param
@@ -1429,7 +1426,7 @@ bool Trade_Alligator(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, doubl
   return result;
 }
 
-/*
+/**
  * Check if ATR indicator is on buy or sell.
  *
  * @param
@@ -1480,7 +1477,7 @@ bool Trade_ATR(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
   return result;
 }
 
-/*
+/**
  * Check if Awesome indicator is on buy or sell.
  *
  * @param
@@ -1530,7 +1527,7 @@ bool Trade_Awesome(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double 
   return result;
 }
 
-/*
+/**
  * Check if Bands indicator is on buy or sell.
  *
  * @param
@@ -1583,7 +1580,7 @@ bool Trade_Bands(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double op
   return result;
 }
 
-/*
+/**
  * Check if BPower indicator is on buy or sell.
  *
  * @param
@@ -1624,7 +1621,7 @@ bool Trade_BPower(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double o
   return result;
 }
 
-/*
+/**
  * Check if Breakage indicator is on buy or sell.
  *
  * @param
@@ -1664,7 +1661,7 @@ bool Trade_Breakage(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double
   return result;
 }
 
-/*
+/**
  * Check if BWMFI indicator is on buy or sell.
  *
  * @param
@@ -1705,7 +1702,7 @@ bool Trade_BWMFI(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double op
   return result;
 }
 
-/*
+/**
  * Check if CCI indicator is on buy or sell.
  *
  * @param
@@ -1756,7 +1753,7 @@ bool Trade_CCI(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
   return result;
 }
 
-/*
+/**
  * Check if DeMarker indicator is on buy or sell.
  *
  * @param
@@ -1792,7 +1789,7 @@ bool Trade_DeMarker(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double
   return result;
 }
 
-/*
+/**
  * Check if Envelopes indicator is on sell.
  *
  * @param
@@ -1835,7 +1832,7 @@ bool Trade_Envelopes(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, doubl
   return result;
 }
 
-/*
+/**
  * Check if Force indicator is on buy or sell.
  *
  * @param
@@ -1868,7 +1865,7 @@ bool Trade_Force(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double op
   return result;
 }
 
-/*
+/**
  * Check if Fractals indicator is on buy or sell.
  *
  * @param
@@ -1903,7 +1900,7 @@ bool Trade_Fractals(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double
   return result;
 }
 
-/*
+/**
  * Check if Gator indicator is on buy or sell.
  *
  * @param
@@ -1936,7 +1933,7 @@ bool Trade_Gator(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double op
   return result;
 }
 
-/*
+/**
  * Check if Ichimoku indicator is on buy or sell.
  *
  * @param
@@ -1988,7 +1985,7 @@ bool Trade_Ichimoku(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double
   return result;
 }
 
-/*
+/**
  * Check if MA indicator is on buy.
  *
  * @param
@@ -2029,7 +2026,7 @@ bool Trade_MA(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open_
   return result;
 }
 
-/*
+/**
  * Check if MACD indicator is on buy.
  *
  * @param
@@ -2086,7 +2083,7 @@ bool Trade_MACD(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double ope
   return result;
 }
 
-/*
+/**
  * Check if MFI indicator is on buy or sell.
  *
  * @param
@@ -2118,7 +2115,7 @@ bool Trade_MFI(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
   return result;
 }
 
-/*
+/**
  * Check if Momentum indicator is on buy or sell.
  *
  * @param
@@ -2141,7 +2138,7 @@ bool Trade_Momentum(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double
   return result;
 }
 
-/*
+/**
  * Check if OBV indicator is on buy or sell.
  *
  * @param
@@ -2164,7 +2161,7 @@ bool Trade_OBV(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
   return result;
 }
 
-/*
+/**
  * Check if OSMA indicator is on buy or sell.
  *
  * @param
@@ -2208,7 +2205,7 @@ bool Trade_OSMA(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double ope
   return result;
 }
 
-/*
+/**
  * Check if RSI indicator is on buy.
  *
  * @param
@@ -2249,7 +2246,7 @@ bool Trade_RSI(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
   return result;
 }
 
-/*
+/**
  * Check if RVI indicator is on buy or sell.
  *
  * @param
@@ -2284,7 +2281,7 @@ bool Trade_RVI(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
   return result;
 }
 
-/*
+/**
  * Check if SAR indicator is on buy or sell.
  *
  * @param
@@ -2336,7 +2333,7 @@ bool Trade_SAR(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
   return result;
 }
 
-/*
+/**
  * Check if StdDev indicator is on buy or sell.
  *
  * @param
@@ -2386,7 +2383,7 @@ bool Trade_StdDev(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double o
   return result;
 }
 
-/*
+/**
  * Check if Stochastic indicator is on buy or sell.
  *
  * @param
@@ -2452,7 +2449,7 @@ bool Trade_Stochastic(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, doub
   return result;
 }
 
-/*
+/**
  * Check if WPR indicator is on buy or sell.
  *
  * @param
@@ -2500,7 +2497,7 @@ bool Trade_WPR(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
   return result;
 }
 
-/*
+/**
  * Check if ZigZag indicator is on buy or sell.
  *
  * @param
@@ -2543,7 +2540,7 @@ bool Trade_ZigZag(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double o
 
 /* END: INDICATOR FUNCTIONS */
 
-/*
+/**
  * Check for market condition.
  *
  * @param
@@ -2571,7 +2568,7 @@ bool CheckMarketCondition1(int cmd, int tf = PERIOD_M30, int condition = 0, bool
   return result;
 }
 
-/*
+/**
  * Check for market event.
  *
  * @param
@@ -2721,7 +2718,7 @@ bool CheckMarketEvent(int cmd = EMPTY, int tf = PERIOD_M30, int condition = EMPT
   return result;
 }
 
-/*
+/**
  * Check for the trend.
  *
  * @param
@@ -2779,7 +2776,7 @@ bool CheckTrend(int method = EMPTY) {
   else return EMPTY;
 }
 
-/*
+/**
  * Check if order match has minimum gap in pips configured by MinPipGap parameter.
  *
  * @param
@@ -2875,7 +2872,7 @@ void UpdateTrailingStops() {
   }
 }
 
-/*
+/**
  * Calculate the new trailing stop. If calculation fails, use the previous one.
  *
  * @params:
@@ -2907,7 +2904,7 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
    int period = Convert::TfToPeriod(timeframe);
    int symbol = Misc::If(existing, OrderSymbol(), _Symbol);
 
-/*
+/**
   MA1+MA5+MA15+MA30 backtest log (auto,ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, 9,5mln ticks, quality 25%]:
 
   Stop loss (d: GBP10k, lot size: 0.1, spread: 2, no boosting, no actions):
@@ -3248,7 +3245,7 @@ int GetTrailingMethod(int order_type, int stop_or_profit) {
   return Misc::If(stop_or_profit > 0, profit_method, stop_method);
 }
 
-/*
+/**
  * Get peak price at given number of bars.
  */
 double GetPeakPrice(int timeframe, int mode, int bars, int index = CURR) {
@@ -3312,7 +3309,7 @@ int GetTotalOrdersByType(int order_type) {
   return (open_orders[order_type]);
 }
 
-/*
+/**
  * Get total profit of opened orders by type.
  */
 double GetTotalProfitByType(int cmd = NULL, int order_type = NULL) {
@@ -3327,7 +3324,7 @@ double GetTotalProfitByType(int cmd = NULL, int order_type = NULL) {
   return total;
 }
 
-/*
+/**
  * Get profitable side and return trade operation type (OP_BUY/OP_SELL).
  */
 bool GetProfitableSide() {
@@ -3353,7 +3350,7 @@ int CalculateOrdersByCmd(int cmd) {
   return total;
 }
 
-/*
+/**
  * Calculate trade order command based on the majority of opened orders.
  */
 int GetCmdByOrders() {
@@ -3399,7 +3396,7 @@ bool TradeAllowed() {
     ea_active = FALSE;
     return (FALSE);
   }
-  if (!Check::IsTesting() && Volume[0] < MinVolumeToTrade) {
+  if (Check::IsRealtime() && Volume[0] < MinVolumeToTrade) {
     last_debug = Msg::ShowText("Volume too low to trade.", "Debug", __FUNCTION__, __LINE__, VerboseDebug);
     if (PrintLogOnChart) DisplayInfoOnChart();
     ea_active = FALSE;
@@ -3431,13 +3428,13 @@ bool TradeAllowed() {
     ea_active = FALSE;
     return (FALSE);
   }
-  if (!Check::IsTesting() && !MarketInfo(Symbol(), MODE_TRADEALLOWED)) {
+  if (Check::IsRealtime() && !MarketInfo(Symbol(), MODE_TRADEALLOWED)) {
     last_err = Msg::ShowText("Trade is not allowed, because market is closed.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
     if (PrintLogOnChart) DisplayInfoOnChart();
     ea_active = FALSE;
     return (FALSE);
   }
-  if (!Check::IsTesting() && !IsExpertEnabled()) {
+  if (Check::IsRealtime() && !IsExpertEnabled()) {
     last_err = Msg::ShowText("You need to enable: 'Enable Expert Advisor'/'AutoTrading'.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
     ea_active = FALSE;
     return (FALSE);
@@ -3456,23 +3453,27 @@ bool TradeAllowed() {
 bool ValidSettings() {
   string err;
    // TODO: IsDllsAllowed(), IsLibrariesAllowed()
+  /* @todo
   if (File::FileIsExist(Terminal::GetExpertPath() + "\\" + ea_file)) {
     Msg::ShowText("Meow!", "Error", __FUNCTION__, __LINE__, TRUE, TRUE, TRUE);
     return (FALSE);
   }
   #ifdef __release__
   #endif
+  */
   if (LotSize < 0.0) {
     Msg::ShowText("LotSize is less than 0.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
     return (FALSE);
   }
+  #ifdef __release__
   #ifdef __backtest__
-  if (!Check::IsTesting()) {
+  if (Check::IsRealtime()) {
     Msg::ShowText("This version is compiled for backtest mode only.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
     return (FALSE);
   }
   #endif
-  if (Check::IsTesting() && ValidateMarketSettings) {
+  #endif
+  if (!Check::IsRealtime() && ValidateMarketSettings) {
     if (!Backtest::ValidSpread() || !Backtest::ValidLotstep()) {
       Msg::ShowText("Backtest market settings are invalid!", "Error", __FUNCTION__, __LINE__, VerboseErrors);
       return (FALSE);
@@ -3480,11 +3481,6 @@ bool ValidSettings() {
   }
   E_Mail = StringTrimLeft(StringTrimRight(E_Mail));
   License = StringTrimLeft(StringTrimRight(License));
-  Comment("ea_file: " + ea_file);
-  Comment("ea_file2: " + ea_file2);
-  Comment("__FILE__: " + __FILE__);
-  Comment("StringLen: " + StringLen(__FILE__));
-  return !StringCompare(ValidEmail(E_Mail), License);
   return !StringCompare(ValidEmail(E_Mail), License) && StringLen(ea_file) == 11;
 }
 
@@ -3500,7 +3496,7 @@ void CheckStats(double value, int type, bool max = true) {
   }
 }
 
-/*
+/**
  * Get color of the order.
  */
 double GetOrderColor(int cmd = -1) {
@@ -3508,7 +3504,7 @@ double GetOrderColor(int cmd = -1) {
   return Misc::If(Convert::OrderTypeToValue(cmd) > 0, (int)ColorBuy, (int)ColorSell);
 }
 
-/*
+/**
  * This function returns the minimal permissible distance value in points for StopLoss/TakeProfit.
  *
  * This is due that at placing of a pending order, the open price cannot be too close to the market.
@@ -3523,7 +3519,7 @@ double GetMinStopLevel() {
   return MathMax((market_stoplevel + 1) * Point, (order_freezelevel + 1) * Point);
 }
 
-/*
+/**
  * Add currency sign to the plain value.
  */
 string ValueToCurrency(double value, int digits = 2) {
@@ -3535,7 +3531,7 @@ string ValueToCurrency(double value, int digits = 2) {
   return Misc::If(prefix, CharToString(sign) + DoubleToStr(value, digits), DoubleToStr(value, digits) + CharToString(sign));
 }
 
-/*
+/**
  * Current market spread value in pips.
  *
  * Note: Using Mode_SPREAD can return 20 on EURUSD (IBFX), but zero on some other pairs, so using Ask - Bid instead.
@@ -3554,7 +3550,7 @@ double GetMarketGap(bool in_points = false) {
   return Misc::If(in_points, market_stoplevel + GetMarketSpread(TRUE), (market_stoplevel + GetMarketSpread(TRUE)) * Point);
 }
 
-/*
+/**
  * Normalize lot size.
  */
 double NormalizeLots(double lots, bool ceiling = False, string pair = "") {
@@ -3572,7 +3568,7 @@ double NormalizeLots(double lots, bool ceiling = False, string pair = "") {
   return NormalizeDouble(lotsize, volume_digits);
 }
 
-/*
+/**
  * Normalize price value.
  */
 double NormalizePrice(double p, string pair=""){
@@ -3587,7 +3583,7 @@ double NormalizePrice(double p, string pair=""){
    return( MathRound(p/ts) * ts );
 }
 
-/*
+/**
  * Get account stopout level in range: 0.0 - 1.0 where 1.0 is 100%.
  *
  * Notes:
@@ -3606,7 +3602,7 @@ double GetAccountStopoutLevel() {
   return 1.0;
 }
 
-/*
+/**
  * Calculate number of order allowed given risk ratio.
  */
 int GetMaxOrdersAuto(bool smooth = true) {
@@ -3628,7 +3624,7 @@ int GetMaxOrdersAuto(bool smooth = true) {
   return max_orders;
 }
 
-/*
+/**
  * Get daily total available orders. It can dynamically change during the day.
  */
 #ifdef __advanced__
@@ -3641,7 +3637,7 @@ int GetMaxOrdersPerDay() {
 }
 #endif
 
-/*
+/**
  * Calculate number of maximum of orders allowed to open.
  */
 int GetMaxOrders() {
@@ -3652,14 +3648,14 @@ int GetMaxOrders() {
   #endif
 }
 
-/*
+/**
  * Calculate number of maximum of orders allowed to open per type.
  */
 int GetMaxOrdersPerType() {
   return Misc::If(MaxOrdersPerType > 0, (int)MaxOrdersPerType, (int)MathMax(MathFloor(max_orders / MathMax(GetNoOfStrategies(), 1) ), 1) * 2);
 }
 
-/*
+/**
  * Get number of active strategies.
  */
 int GetNoOfStrategies() {
@@ -3669,14 +3665,13 @@ int GetNoOfStrategies() {
   return result;
 }
 
-/*
+/**
  * Calculate size of the lot based on the free margin and account leverage automatically.
  */
 double GetAutoLotSize(bool smooth = true) {
   double avail_margin = MathMin(AccountFreeMargin(), AccountBalance());
   double leverage     = MathMax(AccountLeverage(), 100);
-  #ifdef __advanced__ double margin_risk = 0.02; #else double margin_risk = 0.01; #endif // Risk only 1%/2% (0.01/0.02) per order of total available margin.
-  // double margin_risk = 0.01; // Risk only 1% of total available margin per order.
+  #ifdef __advanced__ double margin_risk = 0.02; #else double margin_risk = 0.01; #endif // Risk only 2%/1% (0.02/0.01) per order of total available margin.
   double new_lot_size = avail_margin / market_marginrequired * margin_risk * risk_ratio;
 
   #ifdef __advanced__
@@ -3702,20 +3697,21 @@ double GetAutoLotSize(bool smooth = true) {
   #endif
 
   if (smooth) {
-    return (lot_size + new_lot_size) / 2; // Increase only by average of the previous and new (which should prevent sudden increases).
+    // Increase only by average of the previous and new (which should prevent sudden increases).
+    return (lot_size + new_lot_size) / 2;
   } else {
     return new_lot_size;
   }
 }
 
-/*
+/**
  * Return current lot size to trade.
  */
 double GetLotSize() {
   return NormalizeLots(Misc::If(LotSize == 0, GetAutoLotSize(), LotSize));
 }
 
-/*
+/**
  * Calculate auto risk ratio value.
  */
 double GetAutoRiskRatio() {
@@ -3753,14 +3749,14 @@ double GetAutoRiskRatio() {
   return new_risk_ratio;
 }
 
-/*
+/**
  * Return risk ratio value.
  */
 double GetRiskRatio() {
   return Misc::If(RiskRatio == 0, GetAutoRiskRatio(), RiskRatio);
 }
 
-/*
+/**
  * Validate the e-mail.
  */
 string ValidEmail(string text) {
@@ -3789,7 +3785,7 @@ string ValidEmail(string text) {
 
 /* BEGIN: PERIODIC FUNCTIONS */
 
-/*
+/**
  * Executed for every hour.
  */
 void StartNewHour() {
@@ -3822,7 +3818,7 @@ void StartNewHour() {
   // Message(NULL);
 }
 
-/*
+/**
  * Queue the message for display.
  */
 void Message(string msg = NULL) {
@@ -3830,21 +3826,21 @@ void Message(string msg = NULL) {
   else last_msg = msg;
 }
 
-/*
+/**
  * Get last available message.
  */
 string GetLastMessage() {
   return last_msg;
 }
 
-/*
+/**
  * Get last available error.
  */
 string GetLastErrMsg() {
   return last_err;
 }
 
-/*
+/**
  * Executed for every new day.
  */
 void StartNewDay() {
@@ -3897,7 +3893,7 @@ void StartNewDay() {
   if (VerboseInfo) Print(strategy_stats);
 }
 
-/*
+/**
  * Executed for every new week.
  */
 void StartNewWeek() {
@@ -3935,7 +3931,7 @@ void StartNewWeek() {
   if (VerboseInfo) Print(strategy_stats);
 }
 
-/*
+/**
  * Executed for every new month.
  */
 void StartNewMonth() {
@@ -3970,7 +3966,7 @@ void StartNewMonth() {
   if (VerboseInfo) Print(strategy_stats);
 }
 
-/*
+/**
  * Executed for every new year.
  */
 void StartNewYear() {
@@ -3991,7 +3987,7 @@ void StartNewYear() {
 
 /* BEGIN: VARIABLE FUNCTIONS */
 
-/*
+/**
  * Initialize startup variables.
  */
 bool InitializeVariables() {
@@ -4000,8 +3996,8 @@ bool InitializeVariables() {
 
   // Get type of account.
   if (IsDemo()) account_type = "Demo"; else account_type = "Live";
-  if (Check::IsTesting()) account_type = "Backtest on " + account_type;
-  #ifdef __backtest__ init &= Check::IsTesting(); #endif
+  if (!Check::IsRealtime()) account_type = "Backtest on " + account_type;
+  #ifdef __backtest__ init &= !Check::IsRealtime(); #endif
 
   // Check time of the week, month and year based on the trading bars.
   time_current = TimeCurrent();
@@ -4013,14 +4009,27 @@ bool InitializeVariables() {
   month = DateTime::Month(); // Returns the current month as number (1-January,2,3,4,5,6,7,8,9,10,11,12), i.e., the number of month of the last known server time.
   year = DateTime::Year(); // Returns the current year, i.e., the year of the last known server time.
 
-  market_minlot = MarketInfo(_Symbol, MODE_MINLOT); // Minimum permitted amount of a lot
-  if (market_minlot == 0.0) market_minlot = 0.1;
-  market_maxlot = MarketInfo(_Symbol, MODE_MAXLOT); // Maximum permitted amount of a lot
-  if (market_maxlot == 0.0) market_maxlot = 100;
-  market_lotstep = MarketInfo(_Symbol, MODE_LOTSTEP); // Step for changing lots.
   market_lotsize = MarketInfo(_Symbol, MODE_LOTSIZE); // Lot size in the base currency.
+  market_lotstep = MarketInfo(_Symbol, MODE_LOTSTEP); // Step for changing lots.
+  if (!Check::IsRealtime()) {
+    if (market_lotstep == 0.0) market_lotstep = 0.01;
+  }
+
+  market_minlot = MarketInfo(_Symbol, MODE_MINLOT); // Minimum permitted amount of a lot
+  if (!Check::IsRealtime()) {
+    if (market_minlot == 0.0) market_minlot = market_lotstep;
+  }
+
+  market_maxlot = MarketInfo(_Symbol, MODE_MAXLOT); // Maximum permitted amount of a lot
+  if (!Check::IsRealtime()) {
+    if (market_maxlot == 0.0) market_maxlot = 100;
+  }
+
   market_marginrequired = MarketInfo(_Symbol, MODE_MARGINREQUIRED); // Free margin required to open 1 lot for buying.
-  if (market_marginrequired == 0) market_marginrequired = 10; // Fix for 'zero divide' bug when MODE_MARGINREQUIRED is zero.
+  if (!Check::IsRealtime()) {
+    if (market_marginrequired == 0) market_marginrequired = 10; // Fix for 'zero divide' bug when MODE_MARGINREQUIRED is zero.
+  }
+
   market_margininit = MarketInfo(_Symbol, MODE_MARGININIT); // Initial margin requirements for 1 lot
   market_stoplevel = MarketInfo(_Symbol, MODE_STOPLEVEL); // Market stop level in points.
   order_freezelevel = MarketInfo(_Symbol, MODE_FREEZELEVEL); // Order freeze level in points. If the execution price lies within the range defined by the freeze level, the order cannot be modified, cancelled or closed.
@@ -4059,7 +4068,7 @@ bool InitializeVariables() {
 
 #ifdef __advanced__
 
-/*
+/**
  * Disable specific component for diagnostic purposes.
  */
 void ToggleComponent(int component) {
@@ -4247,7 +4256,7 @@ void ToggleComponent(int component) {
 
 #endif
 
-/*
+/**
  * Initialize strategies.
  */
 bool InitializeStrategies() {
@@ -4624,7 +4633,7 @@ bool InitializeStrategies() {
   return (TRUE);
 }
 
-/*
+/**
  * Initialize specific strategy.
  */
 bool InitStrategy(int key, string name, bool active, int indicator, int timeframe, int open_method = 0, double open_level = 0.0, int open_cond1 = 0, int open_cond2 = 0, int close_cond = 0, double max_spread = 0.0) {
@@ -4643,7 +4652,7 @@ bool InitStrategy(int key, string name, bool active, int indicator, int timefram
   return (TRUE);
 }
 
-/*
+/**
  * Update global variables.
  */
 void UpdateVariables() {
@@ -4657,7 +4666,7 @@ void UpdateVariables() {
 
 /* BEGIN: CONDITION FUNCTIONS */
 
-/*
+/**
  * Initialize user defined conditions.
  */
 bool InitializeConditions() {
@@ -4765,7 +4774,7 @@ bool InitializeConditions() {
   return TRUE;
 }
 
-/*
+/**
  * Check account condition.
  */
 bool AccCondition(int condition = C_ACC_NONE) {
@@ -4866,7 +4875,7 @@ bool AccCondition(int condition = C_ACC_NONE) {
   return FALSE;
 }
 
-/*
+/**
  * Check market condition.
  */
 bool MarketCondition(int condition = C_MARKET_NONE) {
@@ -4920,7 +4929,7 @@ void CheckAccConditions() {
   } // end: for
 }
 
-/*
+/**
  * Get default multiplier lot factor.
  */
 double GetDefaultLotFactor() {
@@ -4929,7 +4938,7 @@ double GetDefaultLotFactor() {
 
 /* BEGIN: STRATEGY FUNCTIONS */
 
-/*
+/**
  * Calculate lot size for specific strategy.
  */
 double GetStrategyLotSize(int sid, int cmd) {
@@ -4947,7 +4956,7 @@ double GetStrategyLotSize(int sid, int cmd) {
   return NormalizeLots(trade_lot);
 }
 
-/*
+/**
  * Get strategy comment for opened order.
  */
 string GetStrategyComment(int sid, string sep = "|") {
@@ -4956,7 +4965,7 @@ string GetStrategyComment(int sid, string sep = "|") {
   return comment;
 }
 
-/*
+/**
  * Get strategy report based on the total orders.
  */
 string GetStrategyReport(string sep = "\n") {
@@ -4981,7 +4990,7 @@ string GetStrategyReport(string sep = "\n") {
   return output;
 }
 
-/*
+/**
  * Apply strategy boosting.
  */
 void UpdateStrategyFactor(int period) {
@@ -5004,7 +5013,7 @@ void UpdateStrategyFactor(int period) {
   }
 }
 
-/*
+/**
  * Update strategy lot size.
  */
 void UpdateStrategyLotSize() {
@@ -5013,7 +5022,7 @@ void UpdateStrategyLotSize() {
   }
 }
 
-/*
+/**
  * Calculate strategy profit factor.
  */
 double GetStrategyProfitFactor(int id) {
@@ -5024,7 +5033,7 @@ double GetStrategyProfitFactor(int id) {
   }
 }
 
-/*
+/**
  * Fetch strategy open level based on the indicator and timeframe.
  */
 double GetStrategyOpenLevel(int indicator, int timeframe = PERIOD_M30, double default_value = 0.0) {
@@ -5033,7 +5042,7 @@ double GetStrategyOpenLevel(int indicator, int timeframe = PERIOD_M30, double de
   return Misc::If(sid != EMPTY, conf[sid][OPEN_LEVEL], default_value);
 }
 
-/*
+/**
  * Fetch strategy open level based on the indicator and timeframe.
  */
 int GetStrategyOpenMethod(int indicator, int timeframe = PERIOD_M30, int default_value = 0) {
@@ -5041,14 +5050,14 @@ int GetStrategyOpenMethod(int indicator, int timeframe = PERIOD_M30, int default
   return Misc::If(sid != EMPTY, info[sid][OPEN_METHOD], default_value);
 }
 
-/*
+/**
  * Fetch strategy timeframe based on the strategy type.
  */
 int GetStrategyTimeframe(int sid, int default_value = PERIOD_M1) {
   return Misc::If(sid >= 0, info[sid][TIMEFRAME], default_value);
 }
 
-/*
+/**
  * Get strategy id based on the indicator and timeframe.
  */
 int GetStrategyViaIndicator(int indicator, int timeframe) {
@@ -5060,7 +5069,7 @@ int GetStrategyViaIndicator(int indicator, int timeframe) {
   return EMPTY;
 }
 
-/*
+/**
  * Calculate total strategy profit.
  */
 double GetTotalProfit() {
@@ -5071,7 +5080,7 @@ double GetTotalProfit() {
   return total_profit;
 }
 
-/*
+/**
  * Apply strategy multiplier factor based on the strategy profit or loss.
  */
 void ApplyStrategyMultiplierFactor(int period = DAILY, int loss_or_profit = 0, double factor = 1.0) {
@@ -5118,7 +5127,7 @@ void ApplyStrategyMultiplierFactor(int period = DAILY, int loss_or_profit = 0, d
 }
 
 #ifdef __advanced__
-/*
+/**
  * Check if RSI period needs any change.
  *
  * FIXME: Doesn't improve much.
@@ -5214,7 +5223,7 @@ bool RSI_DecreasePeriod(int tf = PERIOD_M1, int condition = 0) {
 }
 #endif
 
-/*
+/**
  * Return strategy id by order magic number.
  */
 int GetIdByMagic(int magic = EMPTY) {
@@ -5227,7 +5236,7 @@ int GetIdByMagic(int magic = EMPTY) {
 
 /* BEGIN: SUPPORT/RESISTANCE CALCULATION */
 
-/*
+/**
 // See: http://forum.mql4.com/49780
 void CalculateSupRes() {
    int commonPoint;
@@ -5282,7 +5291,7 @@ void CalculateSupRes() {
 
 /* BEGIN: DISPLAYING FUNCTIONS */
 
-/*
+/**
  * Get text output of hourly profit report.
  */
 string GetHourlyReport(string sep = ", ") {
@@ -5293,7 +5302,7 @@ string GetHourlyReport(string sep = ", ") {
   return output;
 }
 
-/*
+/**
  * Get text output of daily report.
  */
 string GetDailyReport() {
@@ -5320,7 +5329,7 @@ string GetDailyReport() {
   return output;
 }
 
-/*
+/**
  * Get text output of weekly report.
  */
 string GetWeeklyReport() {
@@ -5346,7 +5355,7 @@ string GetWeeklyReport() {
   return output;
 }
 
-/*
+/**
  * Get text output of monthly report.
  */
 string GetMonthlyReport() {
@@ -5448,7 +5457,7 @@ void SendEmailExecuteOrder(string sep = "<br>\n") {
   SendMail(mail_title, body);
 }
 
-/*
+/**
  * Get order statistics in percentage for each strategy.
  */
 string GetOrdersStats(string sep = "\n") {
@@ -5471,7 +5480,7 @@ string GetOrdersStats(string sep = "\n") {
   return orders_per_type + sep + total_orders_text;
 }
 
-/*
+/**
  * Get information about account conditions in text format.
  */
 string GetAccountTextDetails(string sep = "; ") {
@@ -5486,7 +5495,7 @@ string GetAccountTextDetails(string sep = "; ") {
    );
 }
 
-/*
+/**
  * Get information about market conditions in text format.
  */
 string GetMarketTextDetails() {
@@ -5498,14 +5507,14 @@ string GetMarketTextDetails() {
    );
 }
 
-/*
+/**
  * Get account summary text.
  */
 string GetSummaryText() {
   return GetAccountTextDetails();
 }
 
-/*
+/**
  * Get risk ratio text based on the value.
  */
 string GetRiskRatioText() {
@@ -5523,7 +5532,7 @@ string GetRiskRatioText() {
   return text;
 }
 
-/*
+/**
  * Print multi-line text.
  */
 void PrintText(string text) {
@@ -5538,7 +5547,7 @@ void PrintText(string text) {
 
 /* BEGIN: STRING FUNCTIONS */
 
-/*
+/**
  * Remove separator character from the end of the string.
  */
 void TxtRemoveSepChar(string& text, string sep) {
@@ -5549,7 +5558,7 @@ void TxtRemoveSepChar(string& text, string sep) {
 
 /* BEGIN: ACTION FUNCTIONS */
 
-/*
+/**
  * Execute action to close most profitable order.
  */
 bool ActionCloseMostProfitableOrder(int reason_id = EMPTY, int min_profit = EMPTY){
@@ -5577,7 +5586,7 @@ bool ActionCloseMostProfitableOrder(int reason_id = EMPTY, int min_profit = EMPT
   return (FALSE);
 }
 
-/*
+/**
  * Execute action to close most unprofitable order.
  */
 bool ActionCloseMostUnprofitableOrder(int reason_id = EMPTY){
@@ -5602,7 +5611,7 @@ bool ActionCloseMostUnprofitableOrder(int reason_id = EMPTY){
   return (FALSE);
 }
 
-/*
+/**
  * Execute action to close all profitable orders.
  */
 bool ActionCloseAllProfitableOrders(int reason_id = EMPTY){
@@ -5626,7 +5635,7 @@ bool ActionCloseAllProfitableOrders(int reason_id = EMPTY){
   return (result);
 }
 
-/*
+/**
  * Execute action to close all unprofitable orders.
  */
 bool ActionCloseAllUnprofitableOrders(int reason_id = EMPTY){
@@ -5650,7 +5659,7 @@ bool ActionCloseAllUnprofitableOrders(int reason_id = EMPTY){
   return (result);
 }
 
-/*
+/**
  * Execute action to close all orders by specified type.
  */
 bool ActionCloseAllOrdersByType(int cmd = EMPTY, int reason_id = EMPTY){
@@ -5673,7 +5682,7 @@ bool ActionCloseAllOrdersByType(int cmd = EMPTY, int reason_id = EMPTY){
   return (FALSE);
 }
 
-/*
+/**
  * Execute action to close all orders.
  *
  * Notes:
@@ -5710,7 +5719,7 @@ int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = TRUE) {
    return (processed > 0);
 }
 
-/*
+/**
  * Execute action by its id. See: EA_Conditions parameters.
  *
  * Note: Executing random actions can be potentially dangerous for the account if not used wisely.
@@ -5810,7 +5819,7 @@ bool ActionExecute(int aid, int id = EMPTY) {
   return result;
 }
 
-/*
+/**
  * Convert action id into text representation.
  */
 string ActionIdToText(int aid) {
@@ -5831,7 +5840,7 @@ string ActionIdToText(int aid) {
   return output;
 }
 
-/*
+/**
  * Convert reason id into text representation.
  */
 string ReasonIdToText(int rid) {
@@ -5870,7 +5879,7 @@ string ReasonIdToText(int rid) {
   return output;
 }
 
-/*
+/**
  * Convert market id condition into text representation.
  */
 string MarketIdToText(int mid) {
@@ -5899,7 +5908,7 @@ string MarketIdToText(int mid) {
 
 /* BEGIN: TICKET LIST/HISTORY CHECK FUNCTIONS */
 
-/*
+/**
  * Add ticket to list for further processing.
  */
 bool TicketAdd(int ticket_no) {
@@ -5928,7 +5937,7 @@ bool TicketAdd(int ticket_no) {
   return (TRUE);
 }
 
-/*
+/**
  * Remove ticket from the list after it has been processed.
  */
 bool TicketRemove(int ticket_no) {
@@ -5941,7 +5950,7 @@ bool TicketRemove(int ticket_no) {
   return (FALSE);
 }
 
-/*
+/**
  * Process order history.
  */
 bool CheckHistory() {
@@ -5963,7 +5972,7 @@ bool CheckHistory() {
 /* BEGIN: ORDER QUEUE FUNCTIONS */
 
 #ifdef __advanced__
-/*
+/**
  * Process AI queue of orders to see if we can open any trades.
  */
 bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
@@ -6001,7 +6010,7 @@ bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
   return result;
 }
 
-/*
+/**
  * Check for the market condition to filter out the order queue.
  */
 bool OrderOrderCondition(int cmd, int sid, int time, int method) {
@@ -6025,7 +6034,7 @@ bool OrderOrderCondition(int cmd, int sid, int time, int method) {
   return (result);
 }
 
-/*
+/**
  * Get key based on strategy id in order to prioritize the queue.
  */
 int GetOrderQueueKeyValue(int sid, int method, int qid) {
@@ -6055,7 +6064,7 @@ int GetOrderQueueKeyValue(int sid, int method, int qid) {
   return key;
 }
 
-/*
+/**
  * Get the next non-empty item from the queue.
  */
 int OrderQueueNext(int index = EMPTY) {
@@ -6065,7 +6074,7 @@ int OrderQueueNext(int index = EMPTY) {
   return (EMPTY);
 }
 
-/*
+/**
  * Add new order to the queue.
  */
 bool OrderQueueAdd(int sid, int cmd) {
@@ -6093,7 +6102,7 @@ bool OrderQueueAdd(int sid, int cmd) {
   return result;
 }
 
-/*
+/**
  * Clear queue from the orders.
  */
 void OrderQueueClear() {
@@ -6101,7 +6110,7 @@ void OrderQueueClear() {
   ArrayFill(order_queue, 0, ArraySize(order_queue), EMPTY);
 }
 
-/*
+/**
  * Check how many orders are in the queue.
  */
 int OrderQueueCount() {
@@ -6117,7 +6126,7 @@ int OrderQueueCount() {
 
 /* BEGIN: TASK FUNCTIONS */
 
-/*
+/**
  * Add new closing order task.
  */
 bool TaskAddOrderOpen(int cmd, int volume, int order_type) {
@@ -6138,7 +6147,7 @@ bool TaskAddOrderOpen(int cmd, int volume, int order_type) {
   }
 }
 
-/*
+/**
  * Add new close task by job id.
  */
 bool TaskAddCloseOrder(int ticket_no, int reason = EMPTY) {
@@ -6156,7 +6165,7 @@ bool TaskAddCloseOrder(int ticket_no, int reason = EMPTY) {
   }
 }
 
-/*
+/**
  * Add new task to recalculate loss/profit.
  */
 bool TaskAddCalcStats(int ticket_no, int order_type = EMPTY) {
@@ -6194,7 +6203,7 @@ bool TaskExistByKey(int key) {
   return (FALSE);
 }
 
-/*
+/**
  * Find available slot id.
  */
 int TaskFindEmptySlot(int key) {
@@ -6221,7 +6230,7 @@ int TaskFindEmptySlot(int key) {
   return EMPTY;
 }
 
-/*
+/**
  * Run specific task.
  */
 bool TaskRun(int job_id) {
@@ -6260,7 +6269,7 @@ bool TaskRun(int job_id) {
   return result;
 }
 
-/*
+/**
  * Process task list.
  */
 bool TaskProcessList(bool with_force = FALSE) {
@@ -6299,7 +6308,7 @@ bool TaskProcessList(bool with_force = FALSE) {
 
 /* BEGIN: ERROR HANDLING FUNCTIONS */
 
-/*
+/**
  * Get textual representation of the error based on its code.
  *
  * Note: The error codes are defined in stderror.mqh.
@@ -6675,7 +6684,7 @@ void InitializeSummaries(double initial_deposit)
    AvgConLosers=0;
   }
 
-/*
+/**
  * Calculates initial deposit based on the current balance and previous orders.
  */
 double CalculateInitialDeposit() {
@@ -6683,7 +6692,7 @@ double CalculateInitialDeposit() {
   if (initial_deposit > 0) {
     return initial_deposit;
   }
-  else if (Check::IsTesting() || Check::IsOptimization()) {
+  else if (!Check::IsRealtime()) {
     initial_deposit = init_balance;
   } else {
     initial_deposit = AccountBalance();
@@ -6706,7 +6715,7 @@ double CalculateInitialDeposit() {
   return (initial_deposit);
 }
 
-/*
+/**
  * Add message into the report file.
  */
 void ReportAdd(string msg) {
@@ -6715,7 +6724,7 @@ void ReportAdd(string msg) {
   log[last] = TimeToStr(time_current,TIME_DATE|TIME_SECONDS) + ": " + msg;
 }
 
-/*
+/**
  * Write report into file.
  */
 string GenerateReport(string sep = "\n") {
