@@ -4009,30 +4009,48 @@ bool InitializeVariables() {
   month = DateTime::Month(); // Returns the current month as number (1-January,2,3,4,5,6,7,8,9,10,11,12), i.e., the number of month of the last known server time.
   year = DateTime::Year(); // Returns the current year, i.e., the year of the last known server time.
 
+  // @todo Move to method.
   market_lotsize = MarketInfo(_Symbol, MODE_LOTSIZE); // Lot size in the base currency.
+  if (market_lotstep == 0.0) {
+    init &= !ValidateMarketSettings;
+    Msg::ShowText("Invalid MODE_LOTSIZE, it's zero!", "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateMarketSettings);
+  }
+
   market_lotstep = MarketInfo(_Symbol, MODE_LOTSTEP); // Step for changing lots.
-  if (!Check::IsRealtime()) {
-    if (market_lotstep == 0.0) market_lotstep = 0.01;
+  // @todo: Move to method.
+  if (market_lotstep == 0.0) {
+    init &= !ValidateMarketSettings;
+    Msg::ShowText("Invalid MODE_LOTSTEP, it's zero!", "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateMarketSettings);
+    market_lotstep = 0.01;
   }
 
   market_minlot = MarketInfo(_Symbol, MODE_MINLOT); // Minimum permitted amount of a lot
-  if (!Check::IsRealtime()) {
-    if (market_minlot == 0.0) market_minlot = market_lotstep;
+  // @todo: Move to method.
+  if (market_minlot == 0.0) {
+    init &= !ValidateMarketSettings;
+    Msg::ShowText("Invalid MODE_MINLOT, it's zero!", "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateMarketSettings);
+    market_minlot = market_lotstep;
   }
 
   market_maxlot = MarketInfo(_Symbol, MODE_MAXLOT); // Maximum permitted amount of a lot
-  if (!Check::IsRealtime()) {
-    if (market_maxlot == 0.0) market_maxlot = 100;
+  // @todo: Move to method.
+  if (market_maxlot == 0.0) {
+    init &= !ValidateMarketSettings;
+    Msg::ShowText("Invalid MODE_MAXLOT, it's zero!", "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateMarketSettings);
+    market_maxlot = 100;
   }
 
   market_marginrequired = MarketInfo(_Symbol, MODE_MARGINREQUIRED); // Free margin required to open 1 lot for buying.
-  if (!Check::IsRealtime()) {
-    if (market_marginrequired == 0) market_marginrequired = 10; // Fix for 'zero divide' bug when MODE_MARGINREQUIRED is zero.
+  if (market_marginrequired == 0) {
+    init &= !ValidateMarketSettings;
+    Msg::ShowText("Invalid MODE_MARGINREQUIRED, it's zero!", "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateMarketSettings);
+    market_marginrequired = 10; // Fix for 'zero divide' bug when MODE_MARGINREQUIRED is zero.
   }
 
   market_margininit = MarketInfo(_Symbol, MODE_MARGININIT); // Initial margin requirements for 1 lot
   market_stoplevel = MarketInfo(_Symbol, MODE_STOPLEVEL); // Market stop level in points.
   order_freezelevel = MarketInfo(_Symbol, MODE_FREEZELEVEL); // Order freeze level in points. If the execution price lies within the range defined by the freeze level, the order cannot be modified, cancelled or closed.
+
   // market_stoplevel=(int)SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL);
   curr_spread = Convert::ValueToPips(GetMarketSpread());
   LastAsk = Ask; LastBid = Bid;
