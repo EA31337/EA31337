@@ -1,4 +1,4 @@
-#!/bin/sh -xe
+#!/bin/sh -e
 read test_name args <<<$@
 [ $# -eq 0 ] && { echo Usage: $0; exit 1; }
 CWD="$(cd -P -- "$(dirname -- "$0")" && pwd -P)"
@@ -19,21 +19,30 @@ REP_NAME="${test_name}--${SYMBOL}-${DEPOSIT}${CURRENCY}-${YEAR}year-${SPREAD}spr
 VM_DIR="_VM"
 LOG_DIR="$ROOT/logs"
 
+run_test() {
+  local test_name="$1"
+
+  VM_NAME="$test_name" vagrant up --provider=aws --no-provision --destroy-on-error
+
+  time \
+  VM_NAME="$test_name" \
+  RUN_TEST="-t -x -o -I TestModel=0 -E VerboseInfo=1 -f */\"$SET_DIR\"/*.set -e EA31337-$VERSION -c $CURRENCY -p $SYMBOL -d $DEPOSIT -s $SPREAD -y $YEAR -M $MT4_VER -D $DIGITS -b $BT_SOURCE -i \"\$(find ~ -name \*${test_name}.rules)\" -r \"$REP_NAME\" -O */\"$OPT_DIR\" $args " \
+  PUSH_REPO=1 \
+  TERMINATE=1 \
+  vagrant provision
+}
+
 . "$ROOT"/conf/aws/load_env.lite.inc.sh
 
 [ ! -d "$LOG_DIR" ] && mkdir -vp "$LOG_DIR"
 
 cd "$ROOT"/"$VM_DIR"
 
-(
-time \
-  VM_NAME="$test_name" vagrant up --provider=aws --no-provision --destroy-on-error
+find "$ROOT/sets/$VERSION" -type f -name "*$1*.rules" -print0 | while IFS= read -r -d '' rule_file; do
+  test_name="$(basename "${rule_file%.*}")"
 
-time \
-  VM_NAME="$test_name" \
-  RUN_TEST="-t -o -I TestModel=1 -E VerboseInfo=1 -f */\"$SET_DIR\"/*.set -e EA31337-$VERSION -c $CURRENCY -p $SYMBOL -d $DEPOSIT -s $SPREAD -y $YEAR -M $MT4_VER -D $DIGITS -b $BT_SOURCE -i \"\$(find ~ -name \*${test_name}.rules)\" -r \"$REP_NAME\" -O */\"$OPT_DIR\" " \
-  PUSH_REPO=1 \
-  TERMINATE=1 \
-  $args \
-  vagrant provision
-) | tee "$LOG_DIR/${test_name:-$0}.log"
+  echo "Starting ${test_name}..."
+
+  ( run_test $test_name | tee "$LOG_DIR/${test_name:-$0}.log" ) > /dev/null &
+
+done

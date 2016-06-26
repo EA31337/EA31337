@@ -4069,10 +4069,12 @@ bool InitializeVariables() {
     Msg::ShowText(StringFormat("Account free margin is %g!", Account::AccountFreeMargin()), "Error", __FUNCTION__, __LINE__, VerboseErrors);
     return (FALSE);
   }
+  /* @fixme: https://travis-ci.org/EA31337-Tester/EA31337-Lite-Sets/builds/140302386
   if (Account::AccountMargin() <= 0) {
     Msg::ShowText(StringFormat("Account margin is %g!", Account::AccountMargin()), "Error", __FUNCTION__, __LINE__, VerboseErrors);
     return (FALSE);
   }
+  */
 
   init_spread = GetMarketSpread(TRUE);
   AccCurrency = AccountCurrency();
