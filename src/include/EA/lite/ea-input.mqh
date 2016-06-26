@@ -463,22 +463,22 @@ int OBV15_OpenMethod = 0; // Open method for M15 (0-
 int OBV30_OpenMethod = 0; // Open method for M30 (0-
 
 //+------------------------------------------------------------------+
-extern string __OSMA_Parameters__ = "-- Settings for the Moving Average of Oscillator indicator --"; // >>> OSMA <<<
-extern bool OSMA1_Active = 1; // Enable for M1
-extern bool OSMA5_Active = 1; // Enable for M5
-extern bool OSMA15_Active = 1; // Enable for M15
-extern bool OSMA30_Active = 1; // Enable for M30
-extern ENUM_TRAIL_TYPE OSMA_TrailingStopMethod = 22; // Trail stop method
-extern ENUM_TRAIL_TYPE OSMA_TrailingProfitMethod = 1; // Trail profit method
-extern int OSMA_Period_Fast = 12; // Period Fast
-extern int OSMA_Period_Slow = 26; // Period Slow
-extern int OSMA_Period_Signal = 9; // Period for signal
-extern ENUM_APPLIED_PRICE OSMA_Applied_Price = 1; // Applied Price
-extern double OSMA_OpenLevel = 0.00000000; // Open level
-extern int OSMA1_OpenMethod = 0; // Open method for M1 (0-
-extern int OSMA5_OpenMethod = 0; // Open method for M5 (0-
-extern int OSMA15_OpenMethod = 0; // Open method for M15 (0-
-extern int OSMA30_OpenMethod = 0; // Open method for M30 (0-
+string __OSMA_Parameters__ = "-- Settings for the Moving Average of Oscillator indicator --"; // >>> OSMA <<<
+bool OSMA1_Active = 1; // Enable for M1
+bool OSMA5_Active = 1; // Enable for M5
+bool OSMA15_Active = 1; // Enable for M15
+bool OSMA30_Active = 1; // Enable for M30
+ENUM_TRAIL_TYPE OSMA_TrailingStopMethod = 22; // Trail stop method
+ENUM_TRAIL_TYPE OSMA_TrailingProfitMethod = 1; // Trail profit method
+int OSMA_Period_Fast = 12; // Period Fast
+int OSMA_Period_Slow = 26; // Period Slow
+int OSMA_Period_Signal = 9; // Period for signal
+ENUM_APPLIED_PRICE OSMA_Applied_Price = 1; // Applied Price
+double OSMA_OpenLevel = 0.00000000; // Open level
+int OSMA1_OpenMethod = 0; // Open method for M1 (0-
+int OSMA5_OpenMethod = 0; // Open method for M5 (0-
+int OSMA15_OpenMethod = 0; // Open method for M15 (0-
+int OSMA30_OpenMethod = 0; // Open method for M30 (0-
 
 //+------------------------------------------------------------------+
 extern string __RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --"; // >>> RSI <<<
