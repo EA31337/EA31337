@@ -199,7 +199,7 @@ extern int Bands_Period = 26; // Period
 extern ENUM_APPLIED_PRICE Bands_Applied_Price = 2; // Applied Price
 extern double Bands_Deviation = 2.3; // Deviation
 extern int Bands_Shift = 1; // Shift
-extern int Bands_Shift_Far = 4; // Shift Far
+/* @todo extern */ int Bands_Shift_Far = 4; // Shift Far
 extern ENUM_TRAIL_TYPE Bands_TrailingStopMethod = 12; // Trail stop method
 extern ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = 22; // Trail profit method
 /* @todo extern */ int Bands_OpenLevel = 0; // Open level
@@ -464,10 +464,10 @@ int OBV30_OpenMethod = 0; // Open method for M30 (0-
 
 //+------------------------------------------------------------------+
 string __OSMA_Parameters__ = "-- Settings for the Moving Average of Oscillator indicator --"; // >>> OSMA <<<
-bool OSMA1_Active = 1; // Enable for M1
-bool OSMA5_Active = 1; // Enable for M5
-bool OSMA15_Active = 1; // Enable for M15
-bool OSMA30_Active = 1; // Enable for M30
+bool OSMA1_Active = 0; // Enable for M1
+bool OSMA5_Active = 0; // Enable for M5
+bool OSMA15_Active = 0; // Enable for M15
+bool OSMA30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE OSMA_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE OSMA_TrailingProfitMethod = 1; // Trail profit method
 int OSMA_Period_Fast = 12; // Period Fast
@@ -568,14 +568,14 @@ extern bool WPR1_Active = 0; // Enable for M1
 extern bool WPR5_Active = 1; // Enable for M5
 extern bool WPR15_Active = 1; // Enable for M15
 extern bool WPR30_Active = 1; // Enable for M30
-extern int WPR_Period = 21; // Period
+extern int WPR_Period = 14; // Period
 extern int WPR_Shift = 0; // Shift
-extern int WPR_OpenLevel = 30; // Open level
+extern int WPR_OpenLevel = 20; // Open level
 extern ENUM_TRAIL_TYPE WPR_TrailingStopMethod = 7; // Trail stop method
 extern ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = 10; // Trail profit method
-extern int WPR1_OpenMethod = 32; // Open method for M1 (0-63)
-extern int WPR5_OpenMethod = 31; // Open method for M5 (0-63)
-extern int WPR15_OpenMethod = 42; // Open method for M15 (0-63)
+extern int WPR1_OpenMethod = 0; // Open method for M1 (0-63)
+extern int WPR5_OpenMethod = 0; // Open method for M5 (0-63)
+extern int WPR15_OpenMethod = 0; // Open method for M15 (0-63)
 extern int WPR30_OpenMethod = 0; // Open method for M30 (0-63)
 
 //+------------------------------------------------------------------+
