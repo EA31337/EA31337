@@ -27,24 +27,21 @@ run_test() {
 
   time \
   VM_NAME="$test_name" \
-  RUN_TEST="-t -x -o -I TestModel=0 -E VerboseInfo=1 -f */\"$SET_DIR\"/*.set -e EA31337-$VERSION -c $CURRENCY -p $SYMBOL -d $DEPOSIT -s $SPREAD -y $YEAR -M $MT4_VER -D $DIGITS -b $BT_SOURCE -i \"\$(find ~ -name \*${test_name}.rule*)\" -r \"$rep_name\" -O */\"$OPT_DIR\" $args " \
-  PUSH_REPO=1 \
-  TERMINATE=1 \
+  RUN_TEST="-t -x -o -I TestModel=0 -E VerboseInfo=1 -f */\"$SET_DIR\"/*.set -e EA31337 -c $CURRENCY -p $SYMBOL -d $DEPOSIT -s $SPREAD -y $YEAR -M $MT4_VER -D $DIGITS -b $BT_SOURCE -i \"\$(find ~ -name \*${test_name}.rule*)\" -r \"$rep_name\" -O */\"$OPT_DIR\" $args " \
   vagrant provision
 }
 
-. "$ROOT"/conf/aws/load_env.lite.inc.sh
+. "$ROOT"/conf/aws/load_env.local.inc.sh
 
 [ ! -d "$LOG_DIR" ] && mkdir -vp "$LOG_DIR"
 
 cd "$ROOT"/"$VM_DIR"
 
-find "$ROOT/sets/$VERSION" -type f '(' -name "*$pattern*.rule*" -a -not -name "*.disabled" ')' -print0 | while IFS= read -r -d '' rule_file; do
+find "$ROOT/sets" -type f -name "*$pattern*.rule*" -print0 | while IFS= read -r -d '' rule_file; do
   test_name="$(basename "${rule_file%.*}")"
 
   echo "Starting ${test_name}..."
-  echo "Report name: ${test_name}--${SYMBOL}-${DEPOSIT}${CURRENCY}-${YEAR}year-${SPREAD}spread-${BT_SOURCE}-optimization-test"
 
-  ( run_test "$test_name" | tee "$LOG_DIR/${test_name:-$0}.log" ) > /dev/null &
+  run_test "$test_name" | tee "$LOG_DIR/${test_name:-$0}.log"
 
 done

@@ -413,24 +413,11 @@ enum ENUM_MARKET_EVENT {
 #endif
 };
 
-enum ENUM_PERIOD_TYPE { // Define type of tasks.
-  M1  = 0, // 1 minute
-  M5  = 1, // 5 minutes
-  M15 = 2, // 15 minutes
-  M30 = 3, // 30 minutes
-  H1  = 4, // 1 hour
-  H4  = 5, // 4 hours
-  D1  = 6, // daily
-  W1  = 7, // weekly
-  MN1 = 8, // monthly
-  FINAL_PERIOD_TYPE_ENTRY = 9  // Should be the last one. Used to calculate the number of enum items.
-};
-
 enum ENUM_STAT_PERIOD_TYPE { // Define type of tasks.
-  DAILY   = 0,  // Daily
+  DAILY   = 0, // Daily
   WEEKLY  = 1, // Weekly
   MONTHLY = 2, // Monthly
-  YEARLY  = 3,  // Yearly
+  YEARLY  = 3, // Yearly
   FINAL_STAT_PERIOD_TYPE_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };
 

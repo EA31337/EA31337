@@ -3,8 +3,6 @@
 //|                            Copyright 2016, 31337 Investments Ltd |
 //|                                       https://github.com/EA31337 |
 //+------------------------------------------------------------------+
-#property copyright "Copyright 2016, kenorb"
-#property link      "https://github.com/EA31337"
 
 //+------------------------------------------------------------------+
 //| EA includes.
@@ -514,7 +512,7 @@ string InitInfo(bool startup = False, string sep = "\n") {
       market_stoplevel,
       order_freezelevel,
       sep);
-  output += StringFormat("Contract specification for %s: Profit mode: %d, Margin mode: %d, Spread: %d (pts), Tick size: %g, Point value: %g, Digits: %d, Trade stop level: %g, Trade contract size: %g%s",
+  output += StringFormat("Contract specification for %s: Profit mode: %d, Margin mode: %d, Spread: %dpts, Tick size: %g, Point value: %g, Digits: %d, Trade stop level: %g, Trade contract size: %g%s",
       _Symbol,
       MarketInfo(_Symbol, MODE_PROFITCALCMODE),
       MarketInfo(_Symbol, MODE_MARGINCALCMODE),
@@ -858,8 +856,10 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
       break;
     case WPR: // Calculates the  Larry Williams' Percent Range.
       // Update the Larry Williams' Percent Range indicator values.
-      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         wpr[period][i] = -iWPR(_Symbol, timeframe, WPR_Period, i + WPR_Shift);
+        // PrintFormat("WPR period:%i/timeframe:%i %.2f/%.2f", WPR_Period, timeframe, wpr[period][i], -iWPR(NULL,0,14,0));
+      }
       break;
     case ZIGZAG: // Calculates the custom ZigZag indicator.
       // TODO
@@ -1541,9 +1541,10 @@ bool Trade_Bands(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double op
   UpdateIndicator(BANDS, tf);
   if (open_method == EMPTY) open_method = GetStrategyOpenMethod(BANDS, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(BANDS, tf, 0);
+  result = (Low[CURR] < bands[period][CURR][BANDS_LOWER] || Low[PREV] < bands[period][PREV][BANDS_LOWER]); // Price value was lower than the lower band.
+  result |= (High[CURR]  > bands[period][CURR][BANDS_UPPER] || High[PREV] > bands[period][PREV][BANDS_UPPER]); // Price value was higher than the upper band.
   switch (cmd) {
     case OP_BUY:
-      result = Low[CURR] < bands[period][CURR][BANDS_LOWER] || Low[PREV] < bands[period][PREV][BANDS_LOWER]; // price value was lower than the lower band
       if ((open_method &   1) != 0) result = result && Close[PREV] < bands[period][CURR][BANDS_LOWER];
       if ((open_method &   2) != 0) result = result && Close[FAR] < bands[period][CURR][BANDS_LOWER];
       if ((open_method &   4) != 0) result = result && (bands[period][CURR][BANDS_BASE] <= bands[period][PREV][BANDS_BASE] && bands[period][PREV][BANDS_BASE] <= bands[period][FAR][BANDS_BASE]);
@@ -1552,9 +1553,8 @@ bool Trade_Bands(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double op
       if ((open_method &  32) != 0) result = result && (bands[period][CURR][BANDS_UPPER] <= bands[period][PREV][BANDS_UPPER] || bands[period][CURR][BANDS_LOWER] >= bands[period][PREV][BANDS_LOWER]);
       if ((open_method &  64) != 0) result = result && Ask > bands[period][CURR][BANDS_LOWER];
       if ((open_method & 128) != 0) result = result && Ask < bands[period][CURR][BANDS_BASE];
-      //if ((open_method & 256) != 0) result = result && !Bands_On_Sell(M30);
+      if ((open_method & 256) != 0) result = result && !Trade_Bands(Convert::OrderTypeOpp(cmd), Convert::PeriodToTf(MathMin(period + 1, M30)));
     case OP_SELL:
-      result = High[CURR]  > bands[period][CURR][BANDS_UPPER] || High[PREV] > bands[period][PREV][BANDS_UPPER]; // price value was higher than the upper band
       if ((open_method &   1) != 0) result = result && Close[PREV] > bands[period][CURR][BANDS_UPPER];
       if ((open_method &   2) != 0) result = result && Close[FAR] > bands[period][CURR][BANDS_UPPER];
       if ((open_method &   4) != 0) result = result && (bands[period][CURR][BANDS_BASE] >= bands[period][PREV][BANDS_BASE] && bands[period][PREV][BANDS_BASE] >= bands[period][FAR][BANDS_BASE]);
@@ -1563,7 +1563,7 @@ bool Trade_Bands(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double op
       if ((open_method &  32) != 0) result = result && (bands[period][CURR][BANDS_UPPER] <= bands[period][PREV][BANDS_UPPER] || bands[period][CURR][BANDS_LOWER] >= bands[period][PREV][BANDS_LOWER]);
       if ((open_method &  64) != 0) result = result && Ask < bands[period][CURR][BANDS_UPPER];
       if ((open_method & 128) != 0) result = result && Ask > bands[period][CURR][BANDS_BASE];
-      //if ((open_method & 256) != 0) result = result && !Bands_On_Buy(M30);
+      if ((open_method & 256) != 0) result = result && !Trade_Bands(Convert::OrderTypeOpp(cmd), Convert::PeriodToTf(MathMin(period + 1, M30)));
       break;
     /*
           //9. Bollinger Bands
@@ -3660,8 +3660,9 @@ int GetMaxOrdersPerType() {
  */
 int GetNoOfStrategies() {
   int result = 0;
-  for (int i = 0; i < FINAL_STRATEGY_TYPE_ENTRY; i++)
+  for (int i = 0; i < FINAL_STRATEGY_TYPE_ENTRY; i++) {
     result += info[i][ACTIVE];
+  }
   return result;
 }
 
@@ -3672,6 +3673,7 @@ double GetAutoLotSize(bool smooth = true) {
   double avail_margin = MathMin(AccountFreeMargin(), AccountBalance());
   double leverage     = MathMax(AccountLeverage(), 100);
   #ifdef __advanced__ double margin_risk = 0.02; #else double margin_risk = 0.01; #endif // Risk only 2%/1% (0.02/0.01) per order of total available margin.
+  // @todo: Improve the logic, especially margin_risk.
   double new_lot_size = avail_margin / market_marginrequired * margin_risk * risk_ratio;
 
   #ifdef __advanced__
@@ -5351,7 +5353,7 @@ string GetDailyReport() {
   // output += "High: "    + daily[MAX_HIGH] + "; ";
   output += StringFormat("Tick: %g; ", daily[MAX_TICK]);
   // output += "Drop: "    + daily[MAX_DROP] + "; ";
-  output += StringFormat("Spread (pts): %g; ", daily[MAX_SPREAD]);
+  output += StringFormat("Spread: %gpts; ", daily[MAX_SPREAD]);
   output += StringFormat("Max orders: %.0f; ", daily[MAX_ORDERS]);
   output += StringFormat("Loss: %.2f; ", daily[MAX_LOSS]);
   output += StringFormat("Profit: %.2f; ", daily[MAX_PROFIT]);
@@ -5379,7 +5381,7 @@ string GetWeeklyReport() {
   // output += "High: "    + weekly[MAX_HIGH] + "; ";
   output += StringFormat("Tick: %g; ", weekly[MAX_TICK]);
   // output += "Drop: "    + weekly[MAX_DROP] + "; ";
-  output += StringFormat("Spread (pts): %g; ", weekly[MAX_SPREAD]);
+  output += StringFormat("Spread: %gpts; ", weekly[MAX_SPREAD]);
   output += "Max orders: "   + weekly[MAX_ORDERS] + "; ";
   output += "Loss: "         + weekly[MAX_LOSS] + "; ";
   output += "Profit: "       + weekly[MAX_PROFIT] + "; ";
@@ -5405,7 +5407,7 @@ string GetMonthlyReport() {
   // output += "High: "    + monthly[MAX_HIGH] + "; ";
   output += StringFormat("Tick: %g; ", monthly[MAX_TICK]);
   // output += "Drop: "    + monthly[MAX_DROP] + "; ";
-  output += StringFormat("Spread (pts): %g; ", monthly[MAX_SPREAD]);
+  output += StringFormat("Spread: %gpts; ", monthly[MAX_SPREAD]);
   output += "Max orders: "    + monthly[MAX_ORDERS] + "; ";
   output += "Loss: "          + monthly[MAX_LOSS] + "; ";
   output += "Profit: "        + monthly[MAX_PROFIT] + "; ";
