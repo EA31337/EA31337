@@ -90,6 +90,7 @@ extern string __EA_Account_Conditions_Params__ = "-- Account conditions paramete
 extern int MarketSuddenDropSize = 10; // Drop in pips to react
 extern int MarketBigDropSize = 50; // Big drop in pips to react
 extern int TrendMethodAction = 238; // Trend method for actions (0-255)
+extern int MarketSpecificHour = 0; // Specific hour used for conditions (0-23)
 
 //+------------------------------------------------------------------+
 string __AC_Parameters__ = "-- Settings for the Bill Williams' Accelerator/Decelerator oscillator --"; // >>> AC (NOT IMPLEMENTED YET) <<<

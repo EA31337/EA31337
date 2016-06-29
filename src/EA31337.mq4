@@ -3803,7 +3803,8 @@ void StartNewHour() {
   risk_ratio = GetRiskRatio();
   max_orders = GetMaxOrders();
 
-  if (day_of_week != DayOfWeek()) { // Check if new day has been started.
+  // Check if new day has been started.
+  if (day_of_week != DayOfWeek()) {
     StartNewDay();
   }
 
@@ -4951,6 +4952,21 @@ bool MarketCondition(int condition = C_MARKET_NONE) {
       return last_tick_change > MarketSuddenDropSize;
     case C_MARKET_VBIG_DROP:
       return last_tick_change > MarketBigDropSize;
+    case C_MARKET_AT_HOUR:
+      {
+        static int hour_invoked = -1;
+        if (MarketSpecificHour == hour_of_day && hour_invoked <= hour_of_day) {
+          // Invoke only once a day.
+          hour_invoked = hour_of_day + 1;
+          return (TRUE);
+        } else {
+          if (hour_of_day < hour_invoked) {
+            // Reset hour on the next day.
+            hour_invoked = -1;
+          }
+          return (FALSE);
+        }
+      }
     case C_MARKET_NONE:
     default:
       return FALSE;
@@ -5846,7 +5862,7 @@ bool ActionExecute(int aid, int id = EMPTY) {
   Msg::ShowText(GetAccountTextDetails() + "; " + GetOrdersStats(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
   if (result) {
     Msg::ShowText(
-        StringFormat("Executed action: %s (id: %d), because of market condition: %s (id: %d) and account condition: %s (id: %d) [E:%s/B:%s/P:%sp].",
+        StringFormat("Executed action: %s (id: %d), because of market condition: %s (id: %d) and account condition is: %s (id: %d) [E:%s/B:%s/P:%sp].",
           ActionIdToText(aid), aid, MarketIdToText(mid), mid, ReasonIdToText(reason_id), reason_id, ValueToCurrency(Account::AccountEquity()), ValueToCurrency(AccountBalance()), DoubleToStr(last_close_profit, 1)),
         "Info", __FUNCTION__, __LINE__, VerboseInfo);
     Msg::ShowText(last_msg, "Debug", __FUNCTION__, __LINE__, VerboseDebug && aid != A_NONE);
@@ -5942,6 +5958,7 @@ string MarketIdToText(int mid) {
     case C_MONTHLY_PEAK: output = "Monthly peak price"; break;
     case C_MARKET_BIG_DROP: output = "Market big drop"; break;
     case C_MARKET_VBIG_DROP: output = "Market very big drop"; break;
+    case C_MARKET_AT_HOUR: output = StringFormat("at specific %d hour", MarketSpecificHour); break;
   }
   return output;
 }

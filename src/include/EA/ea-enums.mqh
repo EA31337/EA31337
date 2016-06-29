@@ -348,6 +348,7 @@ enum ENUM_MARKET_CONDITION {
   C_MONTHLY_PEAK       = 12, // Monthly peak price
   C_MARKET_BIG_DROP    = 13, // Sudden price drop
   C_MARKET_VBIG_DROP   = 14, // Very big price drop
+  C_MARKET_AT_HOUR     = 15, // At specific hour
 };
 // Note: Trend-based closures are using TrendMethodAction.
 
