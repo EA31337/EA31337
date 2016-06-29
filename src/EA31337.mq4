@@ -680,14 +680,14 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
     case ALLIGATOR: // Calculates the Alligator indicator.
       // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        alligator[period][i][JAW] = iMA(_Symbol, timeframe, Alligator_Jaw_Period,   Alligator_Jaw_Shift,   Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
-        alligator[period][i][TEETH] = iMA(_Symbol, timeframe, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
-        alligator[period][i][LIPS]  = iMA(_Symbol, timeframe, Alligator_Lips_Period,  Alligator_Lips_Shift,  Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift_Far);
+        alligator[period][i][JAW] = iMA(_Symbol, timeframe, Alligator_Period_Jaw,   Alligator_Jaw_Shift,   Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
+        alligator[period][i][TEETH] = iMA(_Symbol, timeframe, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
+        alligator[period][i][LIPS]  = iMA(_Symbol, timeframe, Alligator_Period_Lips,  Alligator_Lips_Shift,  Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift_Far);
       }
       /* Note: This is equivalent to:
-        alligator[period][i][TEETH] = iAlligator(_Symbol, timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
-        alligator[period][i][TEETH] = iAlligator(_Symbol, timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
-        alligator[period][i][LIPS]  = iAlligator(_Symbol, timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
+        alligator[period][i][TEETH] = iAlligator(_Symbol, timeframe, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
+        alligator[period][i][TEETH] = iAlligator(_Symbol, timeframe, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
+        alligator[period][i][LIPS]  = iAlligator(_Symbol, timeframe, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
        */
       break;
 #ifdef __advanced__
@@ -766,9 +766,9 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
     case GATOR: // Calculates the Gator oscillator.
       // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        gator[period][i][TEETH] = iGator(_Symbol, timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
-        gator[period][i][TEETH] = iGator(_Symbol, timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
-        gator[period][i][LIPS]  = iGator(_Symbol, timeframe, Alligator_Jaw_Period, Alligator_Jaw_Shift, Alligator_Teeth_Period, Alligator_Teeth_Shift, Alligator_Lips_Period, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
+        gator[period][i][TEETH] = iGator(_Symbol, timeframe, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
+        gator[period][i][TEETH] = iGator(_Symbol, timeframe, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
+        gator[period][i][LIPS]  = iGator(_Symbol, timeframe, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
       }
       break;
     case ICHIMOKU: // Calculates the Ichimoku Kinko Hyo indicator.
