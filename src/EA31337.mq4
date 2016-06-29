@@ -1755,6 +1755,7 @@ bool Trade_CCI(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double open
 
 /**
  * Check if DeMarker indicator is on buy or sell.
+ * Demarker Technical Indicator is based on the comparison of the period maximum with the previous period maximum.
  *
  * @param
  *   cmd (int) - type of trade order command
@@ -1769,7 +1770,7 @@ bool Trade_DeMarker(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double
   if (open_level == EMPTY)  open_level  = GetStrategyOpenLevel(DEMARKER, tf, 0.0);
   switch (cmd) {
     case OP_BUY:
-      result = demarker[period][CURR] < 0.5 - open_level;
+      result = demarker[period][CURR] <= 0.5 - open_level;
       if ((open_method &   1) != 0) result = result && demarker[period][PREV] < 0.5 - open_level;
       if ((open_method &   2) != 0) result = result && demarker[period][FAR] < 0.5 - open_level;
       if ((open_method &   4) != 0) result = result && demarker[period][CURR] < demarker[period][PREV];
@@ -1777,7 +1778,7 @@ bool Trade_DeMarker(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double
       if ((open_method &  16) != 0) result = result && demarker[period][PREV] < 0.5 - open_level - open_level/2;
       break;
     case OP_SELL:
-      result = demarker[period][CURR] > 0.5 + open_level;
+      result = demarker[period][CURR] >= 0.5 + open_level;
       if ((open_method &   1) != 0) result = result && demarker[period][PREV] > 0.5 + open_level;
       if ((open_method &   2) != 0) result = result && demarker[period][FAR] > 0.5 + open_level;
       if ((open_method &   4) != 0) result = result && demarker[period][CURR] > demarker[period][PREV];
