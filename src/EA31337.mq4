@@ -660,7 +660,7 @@ bool TradeCondition(int order_type = 0, int cmd = NULL) {
  * Update specific indicator.
  * Gukkuk im Versteck
  */
-bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1) {
+bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL) {
   static int processed[FINAL_INDICATOR_TYPE_ENTRY][FINAL_PERIOD_TYPE_ENTRY];
   int i; string text = __FUNCTION__ + ": ";
   if (type == EMPTY) ArrayFill(processed, 0, ArraySize(processed), FALSE); // Reset processed if tf is EMPTY.
@@ -674,78 +674,78 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1) {
 #ifdef __advanced__
     case AC: // Calculates the Bill Williams' Accelerator/Decelerator oscillator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
-        ac[period][i] = iAC(_Symbol, tf, i);
+        ac[period][i] = iAC(symbol, tf, i);
       break;
     case AD: // Calculates the Accumulation/Distribution indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
-        ad[period][i] = iAD(_Symbol, tf, i);
+        ad[period][i] = iAD(symbol, tf, i);
       break;
     case ADX: // Calculates the Average Directional Movement Index indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        adx[period][i][MODE_MAIN]    = iADX(_Symbol, tf, ADX_Period, ADX_Applied_Price, MODE_MAIN, i);    // Base indicator line
-        adx[period][i][MODE_PLUSDI]  = iADX(_Symbol, tf, ADX_Period, ADX_Applied_Price, MODE_PLUSDI, i);  // +DI indicator line
-        adx[period][i][MODE_MINUSDI] = iADX(_Symbol, tf, ADX_Period, ADX_Applied_Price, MODE_MINUSDI, i); // -DI indicator line
+        adx[period][i][MODE_MAIN]    = iADX(symbol, tf, ADX_Period, ADX_Applied_Price, MODE_MAIN, i);    // Base indicator line
+        adx[period][i][MODE_PLUSDI]  = iADX(symbol, tf, ADX_Period, ADX_Applied_Price, MODE_PLUSDI, i);  // +DI indicator line
+        adx[period][i][MODE_MINUSDI] = iADX(symbol, tf, ADX_Period, ADX_Applied_Price, MODE_MINUSDI, i); // -DI indicator line
       }
       break;
 #endif
     case ALLIGATOR: // Calculates the Alligator indicator.
       // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        alligator[period][i][JAW] = iMA(_Symbol, tf, Alligator_Period_Jaw,   Alligator_Jaw_Shift,   Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
-        alligator[period][i][TEETH] = iMA(_Symbol, tf, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
-        alligator[period][i][LIPS]  = iMA(_Symbol, tf, Alligator_Period_Lips,  Alligator_Lips_Shift,  Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift_Far);
+        alligator[period][i][JAW] = iMA(symbol, tf, Alligator_Period_Jaw,   Alligator_Jaw_Shift,   Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
+        alligator[period][i][TEETH] = iMA(symbol, tf, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
+        alligator[period][i][LIPS]  = iMA(symbol, tf, Alligator_Period_Lips,  Alligator_Lips_Shift,  Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift_Far);
       }
       /* Note: This is equivalent to:
-        alligator[period][i][TEETH] = iAlligator(_Symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
-        alligator[period][i][TEETH] = iAlligator(_Symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
-        alligator[period][i][LIPS]  = iAlligator(_Symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
+        alligator[period][i][TEETH] = iAlligator(symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
+        alligator[period][i][TEETH] = iAlligator(symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
+        alligator[period][i][LIPS]  = iAlligator(symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
        */
       break;
 #ifdef __advanced__
     case ATR: // Calculates the Average True Range indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        atr[period][i][FAST] = iATR(_Symbol, tf, ATR_Period_Fast, i);
-        atr[period][i][SLOW] = iATR(_Symbol, tf, ATR_Period_Slow, i);
+        atr[period][i][FAST] = iATR(symbol, tf, ATR_Period_Fast, i);
+        atr[period][i][SLOW] = iATR(symbol, tf, ATR_Period_Slow, i);
       }
       break;
     case AWESOME: // Calculates the Awesome oscillator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
-        awesome[period][i] = iAO(_Symbol, tf, i);
+        awesome[period][i] = iAO(symbol, tf, i);
       break;
 #endif // __advanced__
     case BANDS: // Calculates the Bollinger Bands indicator.
       // int sid, bands_period = Bands_Period; // Not used at the moment.
       // sid = GetStrategyViaIndicator(BANDS, tf); bands_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        bands[period][i][BANDS_BASE]  = iBands(_Symbol, tf, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_BASE,  i + Bands_Shift);
-        bands[period][i][BANDS_UPPER] = iBands(_Symbol, tf, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_UPPER, i + Bands_Shift);
-        bands[period][i][BANDS_LOWER] = iBands(_Symbol, tf, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_LOWER, i + Bands_Shift);
+        bands[period][i][BANDS_BASE]  = iBands(symbol, tf, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_BASE,  i + Bands_Shift);
+        bands[period][i][BANDS_UPPER] = iBands(symbol, tf, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_UPPER, i + Bands_Shift);
+        bands[period][i][BANDS_LOWER] = iBands(symbol, tf, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_LOWER, i + Bands_Shift);
       }
       break;
 #ifdef __advanced__
     case BPOWER: // Calculates the Bears Power and Bulls Power indicators.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        bpower[period][i][OP_BUY]  = iBullsPower(_Symbol, tf, BPower_Period, BPower_Applied_Price, i);
-        bpower[period][i][OP_SELL] = iBearsPower(_Symbol, tf, BPower_Period, BPower_Applied_Price, i);
+        bpower[period][i][OP_BUY]  = iBullsPower(symbol, tf, BPower_Period, BPower_Applied_Price, i);
+        bpower[period][i][OP_SELL] = iBearsPower(symbol, tf, BPower_Period, BPower_Applied_Price, i);
       }
       // Message("Bulls: " + bpower[period][CURR][OP_BUY] + ", Bears: " + bpower[period][CURR][OP_SELL]);
       break;
     case BWMFI: // Calculates the Market Facilitation Index indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        bwmfi[period][i] = iBWMFI(_Symbol, tf, i);
+        bwmfi[period][i] = iBWMFI(symbol, tf, i);
       }
       break;
     case CCI: // Calculates the Commodity Channel Index indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        cci[period][i][FAST] = iCCI(_Symbol, tf, CCI_Period_Fast, CCI_Applied_Price, i);
-        cci[period][i][SLOW] = iCCI(_Symbol, tf, CCI_Period_Slow, CCI_Applied_Price, i);
+        cci[period][i][FAST] = iCCI(symbol, tf, CCI_Period_Fast, CCI_Applied_Price, i);
+        cci[period][i][SLOW] = iCCI(symbol, tf, CCI_Period_Slow, CCI_Applied_Price, i);
       }
       break;
 #endif
     case DEMARKER: // Calculates the DeMarker indicator.
-      demarker[period][CURR] = iDeMarker(_Symbol, tf, DeMarker_Period, 0 + DeMarker_Shift);
-      demarker[period][PREV] = iDeMarker(_Symbol, tf, DeMarker_Period, 1 + DeMarker_Shift);
-      demarker[period][FAR]  = iDeMarker(_Symbol, tf, DeMarker_Period, 2 + DeMarker_Shift);
+      demarker[period][CURR] = iDeMarker(symbol, tf, DeMarker_Period, 0 + DeMarker_Shift);
+      demarker[period][PREV] = iDeMarker(symbol, tf, DeMarker_Period, 1 + DeMarker_Shift);
+      demarker[period][FAR]  = iDeMarker(symbol, tf, DeMarker_Period, 2 + DeMarker_Shift);
       PrintFormat("Period: %d, DeMarker: %g", period, demarker[period][CURR]);
       break;
     case ENVELOPES: // Calculates the Envelopes indicator.
@@ -757,81 +757,81 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1) {
         case M30: envelopes_deviation = Envelopes30_Deviation; break;
       }
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        envelopes[period][i][MODE_MAIN]  = iEnvelopes(_Symbol, tf, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, MODE_MAIN,  i + Envelopes_Shift);
-        envelopes[period][i][UPPER] = iEnvelopes(_Symbol, tf, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, UPPER, i + Envelopes_Shift);
-        envelopes[period][i][LOWER] = iEnvelopes(_Symbol, tf, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, LOWER, i + Envelopes_Shift);
+        envelopes[period][i][MODE_MAIN]  = iEnvelopes(symbol, tf, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, MODE_MAIN,  i + Envelopes_Shift);
+        envelopes[period][i][UPPER] = iEnvelopes(symbol, tf, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, UPPER, i + Envelopes_Shift);
+        envelopes[period][i][LOWER] = iEnvelopes(symbol, tf, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, LOWER, i + Envelopes_Shift);
       }
       break;
 #ifdef __advanced__
     case FORCE: // Calculates the Force Index indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        force[period][i] = iForce(_Symbol, tf, Force_Period, Force_MA_Method, Force_Applied_price, i);
+        force[period][i] = iForce(symbol, tf, Force_Period, Force_MA_Method, Force_Applied_price, i);
       }
       break;
 #endif
     case FRACTALS: // Calculates the Fractals indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        fractals[period][i][LOWER] = iFractals(_Symbol, tf, LOWER, i);
-        fractals[period][i][UPPER] = iFractals(_Symbol, tf, UPPER, i);
+        fractals[period][i][LOWER] = iFractals(symbol, tf, LOWER, i);
+        fractals[period][i][UPPER] = iFractals(symbol, tf, UPPER, i);
       }
       break;
     case GATOR: // Calculates the Gator oscillator.
       // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        gator[period][i][TEETH] = iGator(_Symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
-        gator[period][i][TEETH] = iGator(_Symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
-        gator[period][i][LIPS]  = iGator(_Symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
+        gator[period][i][TEETH] = iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
+        gator[period][i][TEETH] = iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
+        gator[period][i][LIPS]  = iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
       }
       break;
     case ICHIMOKU: // Calculates the Ichimoku Kinko Hyo indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        ichimoku[period][i][MODE_TENKANSEN]   = iIchimoku(_Symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_TENKANSEN, i);
-        ichimoku[period][i][MODE_KIJUNSEN]    = iIchimoku(_Symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_KIJUNSEN, i);
-        ichimoku[period][i][MODE_SENKOUSPANA] = iIchimoku(_Symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_SENKOUSPANA, i);
-        ichimoku[period][i][MODE_SENKOUSPANB] = iIchimoku(_Symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_SENKOUSPANB, i);
-        ichimoku[period][i][MODE_CHIKOUSPAN]  = iIchimoku(_Symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_CHIKOUSPAN, i);
+        ichimoku[period][i][MODE_TENKANSEN]   = iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_TENKANSEN, i);
+        ichimoku[period][i][MODE_KIJUNSEN]    = iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_KIJUNSEN, i);
+        ichimoku[period][i][MODE_SENKOUSPANA] = iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_SENKOUSPANA, i);
+        ichimoku[period][i][MODE_SENKOUSPANB] = iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_SENKOUSPANB, i);
+        ichimoku[period][i][MODE_CHIKOUSPAN]  = iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_CHIKOUSPAN, i);
       }
       break;
     case MA: // Calculates the Moving Average indicator.
       // Calculate MA Fast.
-      ma_fast[period][CURR] = iMA(NULL, tf, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, CURR); // Current
-      ma_fast[period][PREV] = iMA(NULL, tf, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, PREV + MA_Shift_Fast); // Previous
-      ma_fast[period][FAR]  = iMA(NULL, tf, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Fast + MA_Shift_Far);
+      ma_fast[period][CURR] = iMA(symbol, tf, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, CURR); // Current
+      ma_fast[period][PREV] = iMA(symbol, tf, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, PREV + MA_Shift_Fast); // Previous
+      ma_fast[period][FAR]  = iMA(symbol, tf, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Fast + MA_Shift_Far);
       // Calculate MA Medium.
-      ma_medium[period][CURR] = iMA(NULL, tf, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, CURR); // Current
-      ma_medium[period][PREV] = iMA(NULL, tf, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, PREV + MA_Shift_Medium); // Previous
-      ma_medium[period][FAR]  = iMA(NULL, tf, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Medium + MA_Shift_Far);
+      ma_medium[period][CURR] = iMA(symbol, tf, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, CURR); // Current
+      ma_medium[period][PREV] = iMA(symbol, tf, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, PREV + MA_Shift_Medium); // Previous
+      ma_medium[period][FAR]  = iMA(symbol, tf, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Medium + MA_Shift_Far);
       // Calculate Ma Slow.
-      ma_slow[period][CURR] = iMA(NULL, tf, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, CURR); // Current
-      ma_slow[period][PREV] = iMA(NULL, tf, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, PREV + MA_Shift_Slow); // Previous
-      ma_slow[period][FAR]  = iMA(NULL, tf, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Slow + MA_Shift_Far);
+      ma_slow[period][CURR] = iMA(symbol, tf, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, CURR); // Current
+      ma_slow[period][PREV] = iMA(symbol, tf, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, PREV + MA_Shift_Slow); // Previous
+      ma_slow[period][FAR]  = iMA(symbol, tf, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Slow + MA_Shift_Far);
       if (VerboseDebug && Check::IsVisualMode()) Draw::DrawMA(tf);
       break;
     case MACD: // Calculates the Moving Averages Convergence/Divergence indicator.
-      macd[period][CURR][MODE_MAIN]   = iMACD(NULL, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN,   CURR); // Current
-      macd[period][PREV][MODE_MAIN]   = iMACD(NULL, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN,   PREV + MACD_Shift); // Previous
-      macd[period][FAR][MODE_MAIN]    = iMACD(NULL, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN,   FAR + MACD_Shift_Far); // TODO: + MACD_Shift
-      macd[period][CURR][MODE_SIGNAL] = iMACD(NULL, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, CURR); // Current
-      macd[period][PREV][MODE_SIGNAL] = iMACD(NULL, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, PREV + MACD_Shift); // Previous
-      macd[period][FAR][MODE_SIGNAL]  = iMACD(NULL, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, FAR + MACD_Shift_Far); // TODO: + MACD_Shift
+      macd[period][CURR][MODE_MAIN]   = iMACD(symbol, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price, MODE_MAIN,   CURR); // Current
+      macd[period][PREV][MODE_MAIN]   = iMACD(symbol, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price, MODE_MAIN,   PREV + MACD_Shift); // Previous
+      macd[period][FAR][MODE_MAIN]    = iMACD(symbol, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price, MODE_MAIN,   FAR + MACD_Shift_Far); // TODO: + MACD_Shift
+      macd[period][CURR][MODE_SIGNAL] = iMACD(symbol, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price, MODE_SIGNAL, CURR); // Current
+      macd[period][PREV][MODE_SIGNAL] = iMACD(symbol, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price, MODE_SIGNAL, PREV + MACD_Shift); // Previous
+      macd[period][FAR][MODE_SIGNAL]  = iMACD(symbol, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price, MODE_SIGNAL, FAR + MACD_Shift_Far); // TODO: + MACD_Shift
       break;
     case MFI: // Calculates the Money Flow Index indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
-        mfi[period][i] = iMFI(_Symbol, tf, MFI_Period, i);
+        mfi[period][i] = iMFI(symbol, tf, MFI_Period, i);
       break;
     case MOMENTUM: // Calculates the Momentum indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        momentum[period][i][FAST] = iMomentum(_Symbol, tf, Momentum_Period_Fast, Momentum_Applied_Price, i);
-        momentum[period][i][SLOW] = iMomentum(_Symbol, tf, Momentum_Period_Slow, Momentum_Applied_Price, i);
+        momentum[period][i][FAST] = iMomentum(symbol, tf, Momentum_Period_Fast, Momentum_Applied_Price, i);
+        momentum[period][i][SLOW] = iMomentum(symbol, tf, Momentum_Period_Slow, Momentum_Applied_Price, i);
       }
       break;
     case OBV: // Calculates the On Balance Volume indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
-        obv[period][i] = iOBV(_Symbol, tf, OBV_Applied_Price, i);
+        obv[period][i] = iOBV(symbol, tf, OBV_Applied_Price, i);
       break;
     case OSMA: // Calculates the Moving Average of Oscillator indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
-        osma[period][i] = iOsMA(_Symbol, tf, OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price, i);
+        osma[period][i] = iOsMA(symbol, tf, OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price, i);
       break;
     case RSI: // Calculates the Relative Strength Index indicator.
       // int rsi_period = RSI_Period; // Not used at the moment.
@@ -844,12 +844,12 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1) {
       rsi_stats[period][0] = Misc::If(rsi_stats[period][0] > 0, (rsi_stats[period][0] + rsi[period][0] + rsi[period][1] + rsi[period][2]) / 4, (rsi[period][0] + rsi[period][1] + rsi[period][2]) / 3); // Calculate average value.
       break;
     case RVI: // Calculates the Relative Strength Index indicator.
-      rvi[period][CURR][MODE_MAIN]   = iRVI(_Symbol, tf, 10, MODE_MAIN, CURR);
-      rvi[period][PREV][MODE_MAIN]   = iRVI(_Symbol, tf, 10, MODE_MAIN, PREV + RVI_Shift);
-      rvi[period][FAR][MODE_MAIN]    = iRVI(_Symbol, tf, 10, MODE_MAIN, FAR + RVI_Shift + RVI_Shift_Far);
-      rvi[period][CURR][MODE_SIGNAL] = iRVI(_Symbol, tf, 10, MODE_SIGNAL, CURR);
-      rvi[period][PREV][MODE_SIGNAL] = iRVI(_Symbol, tf, 10, MODE_SIGNAL, PREV + RVI_Shift);
-      rvi[period][FAR][MODE_SIGNAL]  = iRVI(_Symbol, tf, 10, MODE_SIGNAL, FAR + RVI_Shift + RVI_Shift_Far);
+      rvi[period][CURR][MODE_MAIN]   = iRVI(symbol, tf, 10, MODE_MAIN, CURR);
+      rvi[period][PREV][MODE_MAIN]   = iRVI(symbol, tf, 10, MODE_MAIN, PREV + RVI_Shift);
+      rvi[period][FAR][MODE_MAIN]    = iRVI(symbol, tf, 10, MODE_MAIN, FAR + RVI_Shift + RVI_Shift_Far);
+      rvi[period][CURR][MODE_SIGNAL] = iRVI(symbol, tf, 10, MODE_SIGNAL, CURR);
+      rvi[period][PREV][MODE_SIGNAL] = iRVI(symbol, tf, 10, MODE_SIGNAL, PREV + RVI_Shift);
+      rvi[period][FAR][MODE_SIGNAL]  = iRVI(symbol, tf, 10, MODE_SIGNAL, FAR + RVI_Shift + RVI_Shift_Far);
       break;
     case SAR: // Calculates the Parabolic Stop and Reverse system indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
@@ -857,20 +857,19 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1) {
       break;
     case STDDEV: // Calculates the Standard Deviation indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
-        stddev[period][i] = iStdDev(_Symbol, tf, StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price, i);
+        stddev[period][i] = iStdDev(symbol, tf, StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price, i);
       break;
     case STOCHASTIC: // Calculates the Stochastic Oscillator.
       // TODO
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        stochastic[period][i][MODE_MAIN]   = iStochastic(_Symbol, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, MODE_MAIN, i);
-        stochastic[period][i][MODE_SIGNAL] = iStochastic(_Symbol, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, MODE_SIGNAL, i);
+        stochastic[period][i][MODE_MAIN]   = iStochastic(symbol, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, MODE_MAIN, i);
+        stochastic[period][i][MODE_SIGNAL] = iStochastic(symbol, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, MODE_SIGNAL, i);
       }
       break;
     case WPR: // Calculates the  Larry Williams' Percent Range.
       // Update the Larry Williams' Percent Range indicator values.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        wpr[period][i] = -iWPR(_Symbol, tf, WPR_Period, i + WPR_Shift);
-        // PrintFormat("WPR period:%i/tf:%i %.2f/%.2f", WPR_Period, tf, wpr[period][i], -iWPR(NULL,0,14,0));
+        wpr[period][i] = -iWPR(symbol, tf, WPR_Period, i + WPR_Shift);
       }
       break;
     case ZIGZAG: // Calculates the custom ZigZag indicator.
@@ -1554,7 +1553,7 @@ bool Trade_Bands(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double op
   if (open_method == EMPTY) open_method = GetStrategyOpenMethod(BANDS, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(BANDS, tf, 0);
   result = (Low[CURR] < bands[period][CURR][BANDS_LOWER] || Low[PREV] < bands[period][PREV][BANDS_LOWER]); // Price value was lower than the lower band.
-  result |= (High[CURR]  > bands[period][CURR][BANDS_UPPER] || High[PREV] > bands[period][PREV][BANDS_UPPER]); // Price value was higher than the upper band.
+  result |= (High[CURR] > bands[period][CURR][BANDS_UPPER] || High[PREV] > bands[period][PREV][BANDS_UPPER]); // Price value was higher than the upper band.
   switch (cmd) {
     case OP_BUY:
       if ((open_method &   1) != 0) result = result && Close[PREV] < bands[period][CURR][BANDS_LOWER];
@@ -6108,7 +6107,7 @@ bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
  */
 bool OpenOrderCondition(int cmd, int sid, int time, int method) {
   bool result = TRUE;
-  int tf = GetStrategytf(sid);
+  int tf = GetStrategyTimeframe(sid);
   int period = Convert::TfToPeriod(tf);
   int qshift = iBarShift(_Symbol, tf, time, FALSE); // Get the number of bars for the tf since queued.
   double qopen = iOpen(_Symbol, tf, qshift);
