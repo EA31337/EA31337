@@ -544,6 +544,17 @@ string InitInfo(bool startup = False, string sep = "\n") {
       max_orders,
       GetMaxOrdersPerType(),
       sep);
+  output += StringFormat("Timeframes: M1: %s, M5: %s, M15: %s, M30: %s, H1: %s, H4: %s, D1: %s, W1: %s, MN1: %s",
+      CheckTf(PERIOD_M1)  ? "Active" : "Not active",
+      CheckTf(PERIOD_M5)  ? "Active" : "Not active",
+      CheckTf(PERIOD_M15) ? "Active" : "Not active",
+      CheckTf(PERIOD_M30) ? "Active" : "Not active",
+      CheckTf(PERIOD_H1)  ? "Active" : "Not active",
+      CheckTf(PERIOD_H4)  ? "Active" : "Not active",
+      CheckTf(PERIOD_D1)  ? "Active" : "Not active",
+      CheckTf(PERIOD_W1)  ? "Active" : "Not active",
+      CheckTf(PERIOD_MN1) ? "Active" : "Not active",
+      sep);
   output += StringFormat("Datetime: Hour of day: %d, Day of week: %d, Day of month: %d, Day of year: %d, Month: %d, Year: %d%s",
       hour_of_day, day_of_week, day_of_month, day_of_year, month, year, sep);
   output += GetAccountTextDetails() + sep;
@@ -649,11 +660,11 @@ bool TradeCondition(int order_type = 0, int cmd = NULL) {
  * Update specific indicator.
  * Gukkuk im Versteck
  */
-bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
+bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1) {
   static int processed[FINAL_INDICATOR_TYPE_ENTRY][FINAL_PERIOD_TYPE_ENTRY];
   int i; string text = __FUNCTION__ + ": ";
-  if (type == EMPTY) ArrayFill(processed, 0, ArraySize(processed), FALSE); // Reset processed if timeframe is EMPTY.
-  int period = Convert::TfToPeriod(timeframe);
+  if (type == EMPTY) ArrayFill(processed, 0, ArraySize(processed), FALSE); // Reset processed if tf is EMPTY.
+  int period = Convert::TfToPeriod(tf);
   if (processed[type][period] == time_current) {
     return (TRUE); // If it was already processed, ignore it.
   }
@@ -663,78 +674,79 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
 #ifdef __advanced__
     case AC: // Calculates the Bill Williams' Accelerator/Decelerator oscillator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
-        ac[period][i] = iAC(_Symbol, timeframe, i);
+        ac[period][i] = iAC(_Symbol, tf, i);
       break;
     case AD: // Calculates the Accumulation/Distribution indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
-        ad[period][i] = iAD(_Symbol, timeframe, i);
+        ad[period][i] = iAD(_Symbol, tf, i);
       break;
     case ADX: // Calculates the Average Directional Movement Index indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        adx[period][i][MODE_MAIN]    = iADX(_Symbol, timeframe, ADX_Period, ADX_Applied_Price, MODE_MAIN, i);    // Base indicator line
-        adx[period][i][MODE_PLUSDI]  = iADX(_Symbol, timeframe, ADX_Period, ADX_Applied_Price, MODE_PLUSDI, i);  // +DI indicator line
-        adx[period][i][MODE_MINUSDI] = iADX(_Symbol, timeframe, ADX_Period, ADX_Applied_Price, MODE_MINUSDI, i); // -DI indicator line
+        adx[period][i][MODE_MAIN]    = iADX(_Symbol, tf, ADX_Period, ADX_Applied_Price, MODE_MAIN, i);    // Base indicator line
+        adx[period][i][MODE_PLUSDI]  = iADX(_Symbol, tf, ADX_Period, ADX_Applied_Price, MODE_PLUSDI, i);  // +DI indicator line
+        adx[period][i][MODE_MINUSDI] = iADX(_Symbol, tf, ADX_Period, ADX_Applied_Price, MODE_MINUSDI, i); // -DI indicator line
       }
       break;
 #endif
     case ALLIGATOR: // Calculates the Alligator indicator.
       // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        alligator[period][i][JAW] = iMA(_Symbol, timeframe, Alligator_Period_Jaw,   Alligator_Jaw_Shift,   Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
-        alligator[period][i][TEETH] = iMA(_Symbol, timeframe, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
-        alligator[period][i][LIPS]  = iMA(_Symbol, timeframe, Alligator_Period_Lips,  Alligator_Lips_Shift,  Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift_Far);
+        alligator[period][i][JAW] = iMA(_Symbol, tf, Alligator_Period_Jaw,   Alligator_Jaw_Shift,   Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
+        alligator[period][i][TEETH] = iMA(_Symbol, tf, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
+        alligator[period][i][LIPS]  = iMA(_Symbol, tf, Alligator_Period_Lips,  Alligator_Lips_Shift,  Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift_Far);
       }
       /* Note: This is equivalent to:
-        alligator[period][i][TEETH] = iAlligator(_Symbol, timeframe, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
-        alligator[period][i][TEETH] = iAlligator(_Symbol, timeframe, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
-        alligator[period][i][LIPS]  = iAlligator(_Symbol, timeframe, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
+        alligator[period][i][TEETH] = iAlligator(_Symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
+        alligator[period][i][TEETH] = iAlligator(_Symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
+        alligator[period][i][LIPS]  = iAlligator(_Symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
        */
       break;
 #ifdef __advanced__
     case ATR: // Calculates the Average True Range indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        atr[period][i][FAST] = iATR(_Symbol, timeframe, ATR_Period_Fast, i);
-        atr[period][i][SLOW] = iATR(_Symbol, timeframe, ATR_Period_Slow, i);
+        atr[period][i][FAST] = iATR(_Symbol, tf, ATR_Period_Fast, i);
+        atr[period][i][SLOW] = iATR(_Symbol, tf, ATR_Period_Slow, i);
       }
       break;
     case AWESOME: // Calculates the Awesome oscillator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
-        awesome[period][i] = iAO(_Symbol, timeframe, i);
+        awesome[period][i] = iAO(_Symbol, tf, i);
       break;
 #endif // __advanced__
     case BANDS: // Calculates the Bollinger Bands indicator.
       // int sid, bands_period = Bands_Period; // Not used at the moment.
-      // sid = GetStrategyViaIndicator(BANDS, timeframe); bands_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
+      // sid = GetStrategyViaIndicator(BANDS, tf); bands_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        bands[period][i][BANDS_BASE]  = iBands(_Symbol, timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_BASE,  i + Bands_Shift);
-        bands[period][i][BANDS_UPPER] = iBands(_Symbol, timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_UPPER, i + Bands_Shift);
-        bands[period][i][BANDS_LOWER] = iBands(_Symbol, timeframe, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_LOWER, i + Bands_Shift);
+        bands[period][i][BANDS_BASE]  = iBands(_Symbol, tf, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_BASE,  i + Bands_Shift);
+        bands[period][i][BANDS_UPPER] = iBands(_Symbol, tf, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_UPPER, i + Bands_Shift);
+        bands[period][i][BANDS_LOWER] = iBands(_Symbol, tf, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_LOWER, i + Bands_Shift);
       }
       break;
 #ifdef __advanced__
     case BPOWER: // Calculates the Bears Power and Bulls Power indicators.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        bpower[period][i][OP_BUY]  = iBullsPower(_Symbol, timeframe, BPower_Period, BPower_Applied_Price, i);
-        bpower[period][i][OP_SELL] = iBearsPower(_Symbol, timeframe, BPower_Period, BPower_Applied_Price, i);
+        bpower[period][i][OP_BUY]  = iBullsPower(_Symbol, tf, BPower_Period, BPower_Applied_Price, i);
+        bpower[period][i][OP_SELL] = iBearsPower(_Symbol, tf, BPower_Period, BPower_Applied_Price, i);
       }
       // Message("Bulls: " + bpower[period][CURR][OP_BUY] + ", Bears: " + bpower[period][CURR][OP_SELL]);
       break;
     case BWMFI: // Calculates the Market Facilitation Index indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        bwmfi[period][i] = iBWMFI(_Symbol, timeframe, i);
+        bwmfi[period][i] = iBWMFI(_Symbol, tf, i);
       }
       break;
     case CCI: // Calculates the Commodity Channel Index indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        cci[period][i][FAST] = iCCI(_Symbol, timeframe, CCI_Period_Fast, CCI_Applied_Price, i);
-        cci[period][i][SLOW] = iCCI(_Symbol, timeframe, CCI_Period_Slow, CCI_Applied_Price, i);
+        cci[period][i][FAST] = iCCI(_Symbol, tf, CCI_Period_Fast, CCI_Applied_Price, i);
+        cci[period][i][SLOW] = iCCI(_Symbol, tf, CCI_Period_Slow, CCI_Applied_Price, i);
       }
       break;
 #endif
     case DEMARKER: // Calculates the DeMarker indicator.
-      demarker[period][CURR] = iDeMarker(_Symbol, timeframe, DeMarker_Period, 0 + DeMarker_Shift);
-      demarker[period][PREV] = iDeMarker(_Symbol, timeframe, DeMarker_Period, 1 + DeMarker_Shift);
-      demarker[period][FAR]  = iDeMarker(_Symbol, timeframe, DeMarker_Period, 2 + DeMarker_Shift);
+      demarker[period][CURR] = iDeMarker(_Symbol, tf, DeMarker_Period, 0 + DeMarker_Shift);
+      demarker[period][PREV] = iDeMarker(_Symbol, tf, DeMarker_Period, 1 + DeMarker_Shift);
+      demarker[period][FAR]  = iDeMarker(_Symbol, tf, DeMarker_Period, 2 + DeMarker_Shift);
+      PrintFormat("Period: %d, DeMarker: %g", period, demarker[period][CURR]);
       break;
     case ENVELOPES: // Calculates the Envelopes indicator.
       envelopes_deviation = Envelopes30_Deviation;
@@ -745,107 +757,107 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
         case M30: envelopes_deviation = Envelopes30_Deviation; break;
       }
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        envelopes[period][i][MODE_MAIN]  = iEnvelopes(_Symbol, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, MODE_MAIN,  i + Envelopes_Shift);
-        envelopes[period][i][UPPER] = iEnvelopes(_Symbol, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, UPPER, i + Envelopes_Shift);
-        envelopes[period][i][LOWER] = iEnvelopes(_Symbol, timeframe, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, LOWER, i + Envelopes_Shift);
+        envelopes[period][i][MODE_MAIN]  = iEnvelopes(_Symbol, tf, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, MODE_MAIN,  i + Envelopes_Shift);
+        envelopes[period][i][UPPER] = iEnvelopes(_Symbol, tf, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, UPPER, i + Envelopes_Shift);
+        envelopes[period][i][LOWER] = iEnvelopes(_Symbol, tf, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, LOWER, i + Envelopes_Shift);
       }
       break;
 #ifdef __advanced__
     case FORCE: // Calculates the Force Index indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        force[period][i] = iForce(_Symbol, timeframe, Force_Period, Force_MA_Method, Force_Applied_price, i);
+        force[period][i] = iForce(_Symbol, tf, Force_Period, Force_MA_Method, Force_Applied_price, i);
       }
       break;
 #endif
     case FRACTALS: // Calculates the Fractals indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        fractals[period][i][LOWER] = iFractals(_Symbol, timeframe, LOWER, i);
-        fractals[period][i][UPPER] = iFractals(_Symbol, timeframe, UPPER, i);
+        fractals[period][i][LOWER] = iFractals(_Symbol, tf, LOWER, i);
+        fractals[period][i][UPPER] = iFractals(_Symbol, tf, UPPER, i);
       }
       break;
     case GATOR: // Calculates the Gator oscillator.
       // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        gator[period][i][TEETH] = iGator(_Symbol, timeframe, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
-        gator[period][i][TEETH] = iGator(_Symbol, timeframe, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
-        gator[period][i][LIPS]  = iGator(_Symbol, timeframe, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
+        gator[period][i][TEETH] = iGator(_Symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
+        gator[period][i][TEETH] = iGator(_Symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
+        gator[period][i][LIPS]  = iGator(_Symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
       }
       break;
     case ICHIMOKU: // Calculates the Ichimoku Kinko Hyo indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        ichimoku[period][i][MODE_TENKANSEN]   = iIchimoku(_Symbol, timeframe, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_TENKANSEN, i);
-        ichimoku[period][i][MODE_KIJUNSEN]    = iIchimoku(_Symbol, timeframe, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_KIJUNSEN, i);
-        ichimoku[period][i][MODE_SENKOUSPANA] = iIchimoku(_Symbol, timeframe, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_SENKOUSPANA, i);
-        ichimoku[period][i][MODE_SENKOUSPANB] = iIchimoku(_Symbol, timeframe, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_SENKOUSPANB, i);
-        ichimoku[period][i][MODE_CHIKOUSPAN]  = iIchimoku(_Symbol, timeframe, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_CHIKOUSPAN, i);
+        ichimoku[period][i][MODE_TENKANSEN]   = iIchimoku(_Symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_TENKANSEN, i);
+        ichimoku[period][i][MODE_KIJUNSEN]    = iIchimoku(_Symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_KIJUNSEN, i);
+        ichimoku[period][i][MODE_SENKOUSPANA] = iIchimoku(_Symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_SENKOUSPANA, i);
+        ichimoku[period][i][MODE_SENKOUSPANB] = iIchimoku(_Symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_SENKOUSPANB, i);
+        ichimoku[period][i][MODE_CHIKOUSPAN]  = iIchimoku(_Symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_CHIKOUSPAN, i);
       }
       break;
     case MA: // Calculates the Moving Average indicator.
       // Calculate MA Fast.
-      ma_fast[period][CURR] = iMA(NULL, timeframe, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, CURR); // Current
-      ma_fast[period][PREV] = iMA(NULL, timeframe, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, PREV + MA_Shift_Fast); // Previous
-      ma_fast[period][FAR]  = iMA(NULL, timeframe, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Fast + MA_Shift_Far);
+      ma_fast[period][CURR] = iMA(NULL, tf, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, CURR); // Current
+      ma_fast[period][PREV] = iMA(NULL, tf, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, PREV + MA_Shift_Fast); // Previous
+      ma_fast[period][FAR]  = iMA(NULL, tf, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Fast + MA_Shift_Far);
       // Calculate MA Medium.
-      ma_medium[period][CURR] = iMA(NULL, timeframe, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, CURR); // Current
-      ma_medium[period][PREV] = iMA(NULL, timeframe, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, PREV + MA_Shift_Medium); // Previous
-      ma_medium[period][FAR]  = iMA(NULL, timeframe, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Medium + MA_Shift_Far);
+      ma_medium[period][CURR] = iMA(NULL, tf, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, CURR); // Current
+      ma_medium[period][PREV] = iMA(NULL, tf, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, PREV + MA_Shift_Medium); // Previous
+      ma_medium[period][FAR]  = iMA(NULL, tf, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Medium + MA_Shift_Far);
       // Calculate Ma Slow.
-      ma_slow[period][CURR] = iMA(NULL, timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, CURR); // Current
-      ma_slow[period][PREV] = iMA(NULL, timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, PREV + MA_Shift_Slow); // Previous
-      ma_slow[period][FAR]  = iMA(NULL, timeframe, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Slow + MA_Shift_Far);
-      if (VerboseDebug && Check::IsVisualMode()) Draw::DrawMA(timeframe);
+      ma_slow[period][CURR] = iMA(NULL, tf, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, CURR); // Current
+      ma_slow[period][PREV] = iMA(NULL, tf, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, PREV + MA_Shift_Slow); // Previous
+      ma_slow[period][FAR]  = iMA(NULL, tf, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Slow + MA_Shift_Far);
+      if (VerboseDebug && Check::IsVisualMode()) Draw::DrawMA(tf);
       break;
     case MACD: // Calculates the Moving Averages Convergence/Divergence indicator.
-      macd[period][CURR][MODE_MAIN]   = iMACD(NULL, timeframe, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN,   CURR); // Current
-      macd[period][PREV][MODE_MAIN]   = iMACD(NULL, timeframe, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN,   PREV + MACD_Shift); // Previous
-      macd[period][FAR][MODE_MAIN]    = iMACD(NULL, timeframe, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN,   FAR + MACD_Shift_Far); // TODO: + MACD_Shift
-      macd[period][CURR][MODE_SIGNAL] = iMACD(NULL, timeframe, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, CURR); // Current
-      macd[period][PREV][MODE_SIGNAL] = iMACD(NULL, timeframe, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, PREV + MACD_Shift); // Previous
-      macd[period][FAR][MODE_SIGNAL]  = iMACD(NULL, timeframe, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, FAR + MACD_Shift_Far); // TODO: + MACD_Shift
+      macd[period][CURR][MODE_MAIN]   = iMACD(NULL, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN,   CURR); // Current
+      macd[period][PREV][MODE_MAIN]   = iMACD(NULL, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN,   PREV + MACD_Shift); // Previous
+      macd[period][FAR][MODE_MAIN]    = iMACD(NULL, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_MAIN,   FAR + MACD_Shift_Far); // TODO: + MACD_Shift
+      macd[period][CURR][MODE_SIGNAL] = iMACD(NULL, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, CURR); // Current
+      macd[period][PREV][MODE_SIGNAL] = iMACD(NULL, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, PREV + MACD_Shift); // Previous
+      macd[period][FAR][MODE_SIGNAL]  = iMACD(NULL, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Signal_Period, MACD_Applied_Price, MODE_SIGNAL, FAR + MACD_Shift_Far); // TODO: + MACD_Shift
       break;
     case MFI: // Calculates the Money Flow Index indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
-        mfi[period][i] = iMFI(_Symbol, timeframe, MFI_Period, i);
+        mfi[period][i] = iMFI(_Symbol, tf, MFI_Period, i);
       break;
     case MOMENTUM: // Calculates the Momentum indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        momentum[period][i][FAST] = iMomentum(_Symbol, timeframe, Momentum_Period_Fast, Momentum_Applied_Price, i);
-        momentum[period][i][SLOW] = iMomentum(_Symbol, timeframe, Momentum_Period_Slow, Momentum_Applied_Price, i);
+        momentum[period][i][FAST] = iMomentum(_Symbol, tf, Momentum_Period_Fast, Momentum_Applied_Price, i);
+        momentum[period][i][SLOW] = iMomentum(_Symbol, tf, Momentum_Period_Slow, Momentum_Applied_Price, i);
       }
       break;
     case OBV: // Calculates the On Balance Volume indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
-        obv[period][i] = iOBV(_Symbol, timeframe, OBV_Applied_Price, i);
+        obv[period][i] = iOBV(_Symbol, tf, OBV_Applied_Price, i);
       break;
     case OSMA: // Calculates the Moving Average of Oscillator indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
-        osma[period][i] = iOsMA(_Symbol, timeframe, OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price, i);
+        osma[period][i] = iOsMA(_Symbol, tf, OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price, i);
       break;
     case RSI: // Calculates the Relative Strength Index indicator.
       // int rsi_period = RSI_Period; // Not used at the moment.
-      // sid = GetStrategyViaIndicator(RSI, timeframe); rsi_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
+      // sid = GetStrategyViaIndicator(RSI, tf); rsi_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        rsi[period][i] = iRSI(NULL, timeframe, RSI_Period, RSI_Applied_Price, i + RSI_Shift);
+        rsi[period][i] = iRSI(NULL, tf, RSI_Period, RSI_Applied_Price, i + RSI_Shift);
         if (rsi[period][i] > rsi_stats[period][UPPER]) rsi_stats[period][UPPER] = rsi[period][i]; // Calculate maximum value.
         if (rsi[period][i] < rsi_stats[period][LOWER] || rsi_stats[period][LOWER] == 0) rsi_stats[period][LOWER] = rsi[period][i]; // Calculate minimum value.
       }
       rsi_stats[period][0] = Misc::If(rsi_stats[period][0] > 0, (rsi_stats[period][0] + rsi[period][0] + rsi[period][1] + rsi[period][2]) / 4, (rsi[period][0] + rsi[period][1] + rsi[period][2]) / 3); // Calculate average value.
       break;
     case RVI: // Calculates the Relative Strength Index indicator.
-      rvi[period][CURR][MODE_MAIN]   = iRVI(_Symbol, timeframe, 10, MODE_MAIN, CURR);
-      rvi[period][PREV][MODE_MAIN]   = iRVI(_Symbol, timeframe, 10, MODE_MAIN, PREV + RVI_Shift);
-      rvi[period][FAR][MODE_MAIN]    = iRVI(_Symbol, timeframe, 10, MODE_MAIN, FAR + RVI_Shift + RVI_Shift_Far);
-      rvi[period][CURR][MODE_SIGNAL] = iRVI(_Symbol, timeframe, 10, MODE_SIGNAL, CURR);
-      rvi[period][PREV][MODE_SIGNAL] = iRVI(_Symbol, timeframe, 10, MODE_SIGNAL, PREV + RVI_Shift);
-      rvi[period][FAR][MODE_SIGNAL]  = iRVI(_Symbol, timeframe, 10, MODE_SIGNAL, FAR + RVI_Shift + RVI_Shift_Far);
+      rvi[period][CURR][MODE_MAIN]   = iRVI(_Symbol, tf, 10, MODE_MAIN, CURR);
+      rvi[period][PREV][MODE_MAIN]   = iRVI(_Symbol, tf, 10, MODE_MAIN, PREV + RVI_Shift);
+      rvi[period][FAR][MODE_MAIN]    = iRVI(_Symbol, tf, 10, MODE_MAIN, FAR + RVI_Shift + RVI_Shift_Far);
+      rvi[period][CURR][MODE_SIGNAL] = iRVI(_Symbol, tf, 10, MODE_SIGNAL, CURR);
+      rvi[period][PREV][MODE_SIGNAL] = iRVI(_Symbol, tf, 10, MODE_SIGNAL, PREV + RVI_Shift);
+      rvi[period][FAR][MODE_SIGNAL]  = iRVI(_Symbol, tf, 10, MODE_SIGNAL, FAR + RVI_Shift + RVI_Shift_Far);
       break;
     case SAR: // Calculates the Parabolic Stop and Reverse system indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
-        sar[period][i] = iSAR(NULL, timeframe, SAR_Step, SAR_Maximum_Stop, i + SAR_Shift);
+        sar[period][i] = iSAR(NULL, tf, SAR_Step, SAR_Maximum_Stop, i + SAR_Shift);
       break;
     case STDDEV: // Calculates the Standard Deviation indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
-        stddev[period][i] = iStdDev(_Symbol, timeframe, StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price, i);
+        stddev[period][i] = iStdDev(_Symbol, tf, StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price, i);
       break;
     case STOCHASTIC: // Calculates the Stochastic Oscillator.
       // TODO
@@ -857,8 +869,8 @@ bool UpdateIndicator(int type = EMPTY, int timeframe = PERIOD_M1) {
     case WPR: // Calculates the  Larry Williams' Percent Range.
       // Update the Larry Williams' Percent Range indicator values.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        wpr[period][i] = -iWPR(_Symbol, timeframe, WPR_Period, i + WPR_Shift);
-        // PrintFormat("WPR period:%i/timeframe:%i %.2f/%.2f", WPR_Period, timeframe, wpr[period][i], -iWPR(NULL,0,14,0));
+        wpr[period][i] = -iWPR(_Symbol, tf, WPR_Period, i + WPR_Shift);
+        // PrintFormat("WPR period:%i/tf:%i %.2f/%.2f", WPR_Period, tf, wpr[period][i], -iWPR(NULL,0,14,0));
       }
       break;
     case ZIGZAG: // Calculates the custom ZigZag indicator.
@@ -1776,6 +1788,7 @@ bool Trade_DeMarker(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double
       if ((open_method &   4) != 0) result = result && demarker[period][CURR] < demarker[period][PREV];
       if ((open_method &   8) != 0) result = result && demarker[period][PREV] < demarker[period][FAR];
       if ((open_method &  16) != 0) result = result && demarker[period][PREV] < 0.5 - open_level - open_level/2;
+      PrintFormat("DeMarker buy: %g <= %g", demarker[period][CURR], 0.5 - open_level);
       break;
     case OP_SELL:
       result = demarker[period][CURR] >= 0.5 + open_level;
@@ -1784,6 +1797,7 @@ bool Trade_DeMarker(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double
       if ((open_method &   4) != 0) result = result && demarker[period][CURR] > demarker[period][PREV];
       if ((open_method &   8) != 0) result = result && demarker[period][PREV] > demarker[period][FAR];
       if ((open_method &  16) != 0) result = result && demarker[period][PREV] > 0.5 + open_level + open_level/2;
+      PrintFormat("DeMarker sell: %g >= %g", demarker[period][CURR], 0.5 + open_level);
       break;
   }
 
@@ -4303,6 +4317,7 @@ void ToggleComponent(int component) {
  * Initialize strategies.
  */
 bool InitializeStrategies() {
+  bool init = TRUE;
 
   // Initialize/reset strategy arrays.
   ArrayInitialize(info, 0);  // Reset strategy info.
@@ -4311,364 +4326,369 @@ bool InitializeStrategies() {
 
   // Initialize strategy array variables.
   #ifdef __advanced__
-  InitStrategy(AC1,  "AC M1",  AC1_Active,  AC, PERIOD_M1,  AC1_OpenMethod,  AC_OpenLevel, AC1_OpenCondition1,  AC1_OpenCondition2,  AC1_CloseCondition,  AC1_MaxSpread);
-  InitStrategy(AC5,  "AC M5",  AC5_Active,  AC, PERIOD_M5,  AC5_OpenMethod,  AC_OpenLevel, AC5_OpenCondition1,  AC5_OpenCondition2,  AC5_CloseCondition,  AC5_MaxSpread);
-  InitStrategy(AC15, "AC M15", AC15_Active, AC, PERIOD_M15, AC15_OpenMethod, AC_OpenLevel, AC15_OpenCondition1, AC15_OpenCondition2, AC15_CloseCondition, AC15_MaxSpread);
-  InitStrategy(AC30, "AC M30", AC30_Active, AC, PERIOD_M30, AC30_OpenMethod, AC_OpenLevel, AC30_OpenCondition1, AC30_OpenCondition2, AC30_CloseCondition, AC30_MaxSpread);
+  init &= InitStrategy(AC1,  "AC M1",  AC1_Active,  AC, PERIOD_M1,  AC1_OpenMethod,  AC_OpenLevel, AC1_OpenCondition1,  AC1_OpenCondition2,  AC1_CloseCondition,  AC1_MaxSpread);
+  init &= InitStrategy(AC5,  "AC M5",  AC5_Active,  AC, PERIOD_M5,  AC5_OpenMethod,  AC_OpenLevel, AC5_OpenCondition1,  AC5_OpenCondition2,  AC5_CloseCondition,  AC5_MaxSpread);
+  init &= InitStrategy(AC15, "AC M15", AC15_Active, AC, PERIOD_M15, AC15_OpenMethod, AC_OpenLevel, AC15_OpenCondition1, AC15_OpenCondition2, AC15_CloseCondition, AC15_MaxSpread);
+  init &= InitStrategy(AC30, "AC M30", AC30_Active, AC, PERIOD_M30, AC30_OpenMethod, AC_OpenLevel, AC30_OpenCondition1, AC30_OpenCondition2, AC30_CloseCondition, AC30_MaxSpread);
   #else
-  InitStrategy(AC1,  "AC M1",  AC1_Active,  AC, PERIOD_M1,  AC1_OpenMethod,  AC_OpenLevel);
-  InitStrategy(AC5,  "AC M5",  AC5_Active,  AC, PERIOD_M5,  AC5_OpenMethod,  AC_OpenLevel);
-  InitStrategy(AC15, "AC M15", AC15_Active, AC, PERIOD_M15, AC15_OpenMethod, AC_OpenLevel);
-  InitStrategy(AC30, "AC M30", AC30_Active, AC, PERIOD_M30, AC30_OpenMethod, AC_OpenLevel);
+  init &= InitStrategy(AC1,  "AC M1",  AC1_Active,  AC, PERIOD_M1,  AC1_OpenMethod,  AC_OpenLevel);
+  init &= InitStrategy(AC5,  "AC M5",  AC5_Active,  AC, PERIOD_M5,  AC5_OpenMethod,  AC_OpenLevel);
+  init &= InitStrategy(AC15, "AC M15", AC15_Active, AC, PERIOD_M15, AC15_OpenMethod, AC_OpenLevel);
+  init &= InitStrategy(AC30, "AC M30", AC30_Active, AC, PERIOD_M30, AC30_OpenMethod, AC_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(AD1,  "AD M1",  AD1_Active,  AD, PERIOD_M1,  AD1_OpenMethod,  AD_OpenLevel, AD1_OpenCondition1,  AD1_OpenCondition2,  AD1_CloseCondition,  AD1_MaxSpread);
-  InitStrategy(AD5,  "AD M5",  AD5_Active,  AD, PERIOD_M5,  AD5_OpenMethod,  AD_OpenLevel, AD5_OpenCondition1,  AD5_OpenCondition2,  AD5_CloseCondition,  AD5_MaxSpread);
-  InitStrategy(AD15, "AD M15", AD15_Active, AD, PERIOD_M15, AD15_OpenMethod, AD_OpenLevel, AD15_OpenCondition1, AD15_OpenCondition2, AD15_CloseCondition, AD15_MaxSpread);
-  InitStrategy(AD30, "AD M30", AD30_Active, AD, PERIOD_M30, AD30_OpenMethod, AD_OpenLevel, AD30_OpenCondition1, AD30_OpenCondition2, AD30_CloseCondition, AD30_MaxSpread);
+  init &= InitStrategy(AD1,  "AD M1",  AD1_Active,  AD, PERIOD_M1,  AD1_OpenMethod,  AD_OpenLevel, AD1_OpenCondition1,  AD1_OpenCondition2,  AD1_CloseCondition,  AD1_MaxSpread);
+  init &= InitStrategy(AD5,  "AD M5",  AD5_Active,  AD, PERIOD_M5,  AD5_OpenMethod,  AD_OpenLevel, AD5_OpenCondition1,  AD5_OpenCondition2,  AD5_CloseCondition,  AD5_MaxSpread);
+  init &= InitStrategy(AD15, "AD M15", AD15_Active, AD, PERIOD_M15, AD15_OpenMethod, AD_OpenLevel, AD15_OpenCondition1, AD15_OpenCondition2, AD15_CloseCondition, AD15_MaxSpread);
+  init &= InitStrategy(AD30, "AD M30", AD30_Active, AD, PERIOD_M30, AD30_OpenMethod, AD_OpenLevel, AD30_OpenCondition1, AD30_OpenCondition2, AD30_CloseCondition, AD30_MaxSpread);
   #else
-  InitStrategy(AD1,  "AD M1",  AD1_Active,  AD, PERIOD_M1,  AD1_OpenMethod,  AD_OpenLevel);
-  InitStrategy(AD5,  "AD M5",  AD5_Active,  AD, PERIOD_M5,  AD5_OpenMethod,  AD_OpenLevel);
-  InitStrategy(AD15, "AD M15", AD15_Active, AD, PERIOD_M15, AD15_OpenMethod, AD_OpenLevel);
-  InitStrategy(AD30, "AD M30", AD30_Active, AD, PERIOD_M30, AD30_OpenMethod, AD_OpenLevel);
+  init &= InitStrategy(AD1,  "AD M1",  AD1_Active,  AD, PERIOD_M1,  AD1_OpenMethod,  AD_OpenLevel);
+  init &= InitStrategy(AD5,  "AD M5",  AD5_Active,  AD, PERIOD_M5,  AD5_OpenMethod,  AD_OpenLevel);
+  init &= InitStrategy(AD15, "AD M15", AD15_Active, AD, PERIOD_M15, AD15_OpenMethod, AD_OpenLevel);
+  init &= InitStrategy(AD30, "AD M30", AD30_Active, AD, PERIOD_M30, AD30_OpenMethod, AD_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(ADX1,  "ADX M1",  ADX1_Active,  ADX, PERIOD_M1,  ADX1_OpenMethod,  ADX_OpenLevel, ADX1_OpenCondition1,  ADX1_OpenCondition2,  ADX1_CloseCondition,  ADX1_MaxSpread);
-  InitStrategy(ADX5,  "ADX M5",  ADX5_Active,  ADX, PERIOD_M5,  ADX5_OpenMethod,  ADX_OpenLevel, ADX5_OpenCondition1,  ADX5_OpenCondition2,  ADX5_CloseCondition,  ADX5_MaxSpread);
-  InitStrategy(ADX15, "ADX M15", ADX15_Active, ADX, PERIOD_M15, ADX15_OpenMethod, ADX_OpenLevel, ADX15_OpenCondition1, ADX15_OpenCondition2, ADX15_CloseCondition, ADX15_MaxSpread);
-  InitStrategy(ADX30, "ADX M30", ADX30_Active, ADX, PERIOD_M30, ADX30_OpenMethod, ADX_OpenLevel, ADX30_OpenCondition1, ADX30_OpenCondition2, ADX30_CloseCondition, ADX30_MaxSpread);
+  init &= InitStrategy(ADX1,  "ADX M1",  ADX1_Active,  ADX, PERIOD_M1,  ADX1_OpenMethod,  ADX_OpenLevel, ADX1_OpenCondition1,  ADX1_OpenCondition2,  ADX1_CloseCondition,  ADX1_MaxSpread);
+  init &= InitStrategy(ADX5,  "ADX M5",  ADX5_Active,  ADX, PERIOD_M5,  ADX5_OpenMethod,  ADX_OpenLevel, ADX5_OpenCondition1,  ADX5_OpenCondition2,  ADX5_CloseCondition,  ADX5_MaxSpread);
+  init &= InitStrategy(ADX15, "ADX M15", ADX15_Active, ADX, PERIOD_M15, ADX15_OpenMethod, ADX_OpenLevel, ADX15_OpenCondition1, ADX15_OpenCondition2, ADX15_CloseCondition, ADX15_MaxSpread);
+  init &= InitStrategy(ADX30, "ADX M30", ADX30_Active, ADX, PERIOD_M30, ADX30_OpenMethod, ADX_OpenLevel, ADX30_OpenCondition1, ADX30_OpenCondition2, ADX30_CloseCondition, ADX30_MaxSpread);
   #else
-  InitStrategy(ADX1,  "ADX M1",  ADX1_Active,  ADX, PERIOD_M1,  ADX1_OpenMethod,  ADX_OpenLevel);
-  InitStrategy(ADX5,  "ADX M5",  ADX5_Active,  ADX, PERIOD_M5,  ADX5_OpenMethod,  ADX_OpenLevel);
-  InitStrategy(ADX15, "ADX M15", ADX15_Active, ADX, PERIOD_M15, ADX15_OpenMethod, ADX_OpenLevel);
-  InitStrategy(ADX30, "ADX M30", ADX30_Active, ADX, PERIOD_M30, ADX30_OpenMethod, ADX_OpenLevel);
+  init &= InitStrategy(ADX1,  "ADX M1",  ADX1_Active,  ADX, PERIOD_M1,  ADX1_OpenMethod,  ADX_OpenLevel);
+  init &= InitStrategy(ADX5,  "ADX M5",  ADX5_Active,  ADX, PERIOD_M5,  ADX5_OpenMethod,  ADX_OpenLevel);
+  init &= InitStrategy(ADX15, "ADX M15", ADX15_Active, ADX, PERIOD_M15, ADX15_OpenMethod, ADX_OpenLevel);
+  init &= InitStrategy(ADX30, "ADX M30", ADX30_Active, ADX, PERIOD_M30, ADX30_OpenMethod, ADX_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(ALLIGATOR1,  "Alligator M1",  Alligator1_Active,  ALLIGATOR, PERIOD_M1,  Alligator1_OpenMethod,  Alligator_OpenLevel, Alligator1_OpenCondition1,  Alligator1_OpenCondition2,  Alligator1_CloseCondition,  Alligator1_MaxSpread);
-  InitStrategy(ALLIGATOR5,  "Alligator M5",  Alligator5_Active,  ALLIGATOR, PERIOD_M5,  Alligator5_OpenMethod,  Alligator_OpenLevel, Alligator5_OpenCondition1,  Alligator5_OpenCondition2,  Alligator5_CloseCondition,  Alligator5_MaxSpread);
-  InitStrategy(ALLIGATOR15, "Alligator M15", Alligator15_Active, ALLIGATOR, PERIOD_M15, Alligator15_OpenMethod, Alligator_OpenLevel, Alligator15_OpenCondition1, Alligator15_OpenCondition2, Alligator15_CloseCondition, Alligator15_MaxSpread);
-  InitStrategy(ALLIGATOR30, "Alligator M30", Alligator30_Active, ALLIGATOR, PERIOD_M30, Alligator30_OpenMethod, Alligator_OpenLevel, Alligator30_OpenCondition1, Alligator30_OpenCondition2, Alligator30_CloseCondition, Alligator30_MaxSpread);
+  init &= InitStrategy(ALLIGATOR1,  "Alligator M1",  Alligator1_Active,  ALLIGATOR, PERIOD_M1,  Alligator1_OpenMethod,  Alligator_OpenLevel, Alligator1_OpenCondition1,  Alligator1_OpenCondition2,  Alligator1_CloseCondition,  Alligator1_MaxSpread);
+  init &= InitStrategy(ALLIGATOR5,  "Alligator M5",  Alligator5_Active,  ALLIGATOR, PERIOD_M5,  Alligator5_OpenMethod,  Alligator_OpenLevel, Alligator5_OpenCondition1,  Alligator5_OpenCondition2,  Alligator5_CloseCondition,  Alligator5_MaxSpread);
+  init &= InitStrategy(ALLIGATOR15, "Alligator M15", Alligator15_Active, ALLIGATOR, PERIOD_M15, Alligator15_OpenMethod, Alligator_OpenLevel, Alligator15_OpenCondition1, Alligator15_OpenCondition2, Alligator15_CloseCondition, Alligator15_MaxSpread);
+  init &= InitStrategy(ALLIGATOR30, "Alligator M30", Alligator30_Active, ALLIGATOR, PERIOD_M30, Alligator30_OpenMethod, Alligator_OpenLevel, Alligator30_OpenCondition1, Alligator30_OpenCondition2, Alligator30_CloseCondition, Alligator30_MaxSpread);
   #else
-  InitStrategy(ALLIGATOR1,  "Alligator M1",  Alligator1_Active,  ALLIGATOR, PERIOD_M1,  Alligator1_OpenMethod,  Alligator_OpenLevel);
-  InitStrategy(ALLIGATOR5,  "Alligator M5",  Alligator5_Active,  ALLIGATOR, PERIOD_M5,  Alligator5_OpenMethod,  Alligator_OpenLevel);
-  InitStrategy(ALLIGATOR15, "Alligator M15", Alligator15_Active, ALLIGATOR, PERIOD_M15, Alligator15_OpenMethod, Alligator_OpenLevel);
-  InitStrategy(ALLIGATOR30, "Alligator M30", Alligator30_Active, ALLIGATOR, PERIOD_M30, Alligator30_OpenMethod, Alligator_OpenLevel);
+  init &= InitStrategy(ALLIGATOR1,  "Alligator M1",  Alligator1_Active,  ALLIGATOR, PERIOD_M1,  Alligator1_OpenMethod,  Alligator_OpenLevel);
+  init &= InitStrategy(ALLIGATOR5,  "Alligator M5",  Alligator5_Active,  ALLIGATOR, PERIOD_M5,  Alligator5_OpenMethod,  Alligator_OpenLevel);
+  init &= InitStrategy(ALLIGATOR15, "Alligator M15", Alligator15_Active, ALLIGATOR, PERIOD_M15, Alligator15_OpenMethod, Alligator_OpenLevel);
+  init &= InitStrategy(ALLIGATOR30, "Alligator M30", Alligator30_Active, ALLIGATOR, PERIOD_M30, Alligator30_OpenMethod, Alligator_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(ATR1,  "ATR M1",  ATR1_Active,  ATR, PERIOD_M1,  ATR1_OpenMethod,  ATR_OpenLevel, ATR1_OpenCondition1,  ATR1_OpenCondition2,  ATR1_CloseCondition,  ATR1_MaxSpread);
-  InitStrategy(ATR5,  "ATR M5",  ATR5_Active,  ATR, PERIOD_M5,  ATR5_OpenMethod,  ATR_OpenLevel, ATR5_OpenCondition1,  ATR5_OpenCondition2,  ATR5_CloseCondition,  ATR5_MaxSpread);
-  InitStrategy(ATR15, "ATR M15", ATR15_Active, ATR, PERIOD_M15, ATR15_OpenMethod, ATR_OpenLevel, ATR15_OpenCondition1, ATR15_OpenCondition2, ATR15_CloseCondition, ATR15_MaxSpread);
-  InitStrategy(ATR30, "ATR M30", ATR30_Active, ATR, PERIOD_M30, ATR30_OpenMethod, ATR_OpenLevel, ATR30_OpenCondition1, ATR30_OpenCondition2, ATR30_CloseCondition, ATR30_MaxSpread);
+  init &= InitStrategy(ATR1,  "ATR M1",  ATR1_Active,  ATR, PERIOD_M1,  ATR1_OpenMethod,  ATR_OpenLevel, ATR1_OpenCondition1,  ATR1_OpenCondition2,  ATR1_CloseCondition,  ATR1_MaxSpread);
+  init &= InitStrategy(ATR5,  "ATR M5",  ATR5_Active,  ATR, PERIOD_M5,  ATR5_OpenMethod,  ATR_OpenLevel, ATR5_OpenCondition1,  ATR5_OpenCondition2,  ATR5_CloseCondition,  ATR5_MaxSpread);
+  init &= InitStrategy(ATR15, "ATR M15", ATR15_Active, ATR, PERIOD_M15, ATR15_OpenMethod, ATR_OpenLevel, ATR15_OpenCondition1, ATR15_OpenCondition2, ATR15_CloseCondition, ATR15_MaxSpread);
+  init &= InitStrategy(ATR30, "ATR M30", ATR30_Active, ATR, PERIOD_M30, ATR30_OpenMethod, ATR_OpenLevel, ATR30_OpenCondition1, ATR30_OpenCondition2, ATR30_CloseCondition, ATR30_MaxSpread);
   #else
-  InitStrategy(ATR1,  "ATR M1",  ATR1_Active,  ATR, PERIOD_M1,  ATR1_OpenMethod,  ATR_OpenLevel);
-  InitStrategy(ATR5,  "ATR M5",  ATR5_Active,  ATR, PERIOD_M5,  ATR5_OpenMethod,  ATR_OpenLevel);
-  InitStrategy(ATR15, "ATR M15", ATR15_Active, ATR, PERIOD_M15, ATR15_OpenMethod, ATR_OpenLevel);
-  InitStrategy(ATR30, "ATR M30", ATR30_Active, ATR, PERIOD_M30, ATR30_OpenMethod, ATR_OpenLevel);
+  init &= InitStrategy(ATR1,  "ATR M1",  ATR1_Active,  ATR, PERIOD_M1,  ATR1_OpenMethod,  ATR_OpenLevel);
+  init &= InitStrategy(ATR5,  "ATR M5",  ATR5_Active,  ATR, PERIOD_M5,  ATR5_OpenMethod,  ATR_OpenLevel);
+  init &= InitStrategy(ATR15, "ATR M15", ATR15_Active, ATR, PERIOD_M15, ATR15_OpenMethod, ATR_OpenLevel);
+  init &= InitStrategy(ATR30, "ATR M30", ATR30_Active, ATR, PERIOD_M30, ATR30_OpenMethod, ATR_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(AWESOME1,  "Awesome M1",  Awesome1_Active,  AWESOME, PERIOD_M1,  Awesome1_OpenMethod,  Awesome_OpenLevel, Awesome1_OpenCondition1,  Awesome1_OpenCondition2,  Awesome1_CloseCondition,  Awesome1_MaxSpread);
-  InitStrategy(AWESOME5,  "Awesome M5",  Awesome5_Active,  AWESOME, PERIOD_M5,  Awesome5_OpenMethod,  Awesome_OpenLevel, Awesome5_OpenCondition1,  Awesome5_OpenCondition2,  Awesome5_CloseCondition,  Awesome5_MaxSpread);
-  InitStrategy(AWESOME15, "Awesome M15", Awesome15_Active, AWESOME, PERIOD_M15, Awesome15_OpenMethod, Awesome_OpenLevel, Awesome15_OpenCondition1, Awesome15_OpenCondition2, Awesome15_CloseCondition, Awesome15_MaxSpread);
-  InitStrategy(AWESOME30, "Awesome M30", Awesome30_Active, AWESOME, PERIOD_M30, Awesome30_OpenMethod, Awesome_OpenLevel, Awesome30_OpenCondition1, Awesome30_OpenCondition2, Awesome30_CloseCondition, Awesome30_MaxSpread);
+  init &= InitStrategy(AWESOME1,  "Awesome M1",  Awesome1_Active,  AWESOME, PERIOD_M1,  Awesome1_OpenMethod,  Awesome_OpenLevel, Awesome1_OpenCondition1,  Awesome1_OpenCondition2,  Awesome1_CloseCondition,  Awesome1_MaxSpread);
+  init &= InitStrategy(AWESOME5,  "Awesome M5",  Awesome5_Active,  AWESOME, PERIOD_M5,  Awesome5_OpenMethod,  Awesome_OpenLevel, Awesome5_OpenCondition1,  Awesome5_OpenCondition2,  Awesome5_CloseCondition,  Awesome5_MaxSpread);
+  init &= InitStrategy(AWESOME15, "Awesome M15", Awesome15_Active, AWESOME, PERIOD_M15, Awesome15_OpenMethod, Awesome_OpenLevel, Awesome15_OpenCondition1, Awesome15_OpenCondition2, Awesome15_CloseCondition, Awesome15_MaxSpread);
+  init &= InitStrategy(AWESOME30, "Awesome M30", Awesome30_Active, AWESOME, PERIOD_M30, Awesome30_OpenMethod, Awesome_OpenLevel, Awesome30_OpenCondition1, Awesome30_OpenCondition2, Awesome30_CloseCondition, Awesome30_MaxSpread);
   #else
-  InitStrategy(AWESOME1,  "Awesome M1",  Awesome1_Active,  AWESOME, PERIOD_M1,  Awesome1_OpenMethod,  Awesome_OpenLevel);
-  InitStrategy(AWESOME5,  "Awesome M5",  Awesome5_Active,  AWESOME, PERIOD_M5,  Awesome5_OpenMethod,  Awesome_OpenLevel);
-  InitStrategy(AWESOME15, "Awesome M15", Awesome15_Active, AWESOME, PERIOD_M15, Awesome15_OpenMethod, Awesome_OpenLevel);
-  InitStrategy(AWESOME30, "Awesome M30", Awesome30_Active, AWESOME, PERIOD_M30, Awesome30_OpenMethod, Awesome_OpenLevel);
+  init &= InitStrategy(AWESOME1,  "Awesome M1",  Awesome1_Active,  AWESOME, PERIOD_M1,  Awesome1_OpenMethod,  Awesome_OpenLevel);
+  init &= InitStrategy(AWESOME5,  "Awesome M5",  Awesome5_Active,  AWESOME, PERIOD_M5,  Awesome5_OpenMethod,  Awesome_OpenLevel);
+  init &= InitStrategy(AWESOME15, "Awesome M15", Awesome15_Active, AWESOME, PERIOD_M15, Awesome15_OpenMethod, Awesome_OpenLevel);
+  init &= InitStrategy(AWESOME30, "Awesome M30", Awesome30_Active, AWESOME, PERIOD_M30, Awesome30_OpenMethod, Awesome_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(BANDS1,  "Bands M1",  Bands1_Active,  BANDS, PERIOD_M1,  Bands1_OpenMethod,  Bands_OpenLevel, Bands1_OpenCondition1,  Bands1_OpenCondition2,  Bands1_CloseCondition,  Bands1_MaxSpread);
-  InitStrategy(BANDS5,  "Bands M5",  Bands5_Active,  BANDS, PERIOD_M5,  Bands5_OpenMethod,  Bands_OpenLevel, Bands5_OpenCondition1,  Bands5_OpenCondition2,  Bands5_CloseCondition,  Bands5_MaxSpread);
-  InitStrategy(BANDS15, "Bands M15", Bands15_Active, BANDS, PERIOD_M15, Bands15_OpenMethod, Bands_OpenLevel, Bands15_OpenCondition1, Bands15_OpenCondition2, Bands15_CloseCondition, Bands15_MaxSpread);
-  InitStrategy(BANDS30, "Bands M30", Bands30_Active, BANDS, PERIOD_M30, Bands30_OpenMethod, Bands_OpenLevel, Bands30_OpenCondition1, Bands30_OpenCondition2, Bands30_CloseCondition, Bands30_MaxSpread);
+  init &= InitStrategy(BANDS1,  "Bands M1",  Bands1_Active,  BANDS, PERIOD_M1,  Bands1_OpenMethod,  Bands_OpenLevel, Bands1_OpenCondition1,  Bands1_OpenCondition2,  Bands1_CloseCondition,  Bands1_MaxSpread);
+  init &= InitStrategy(BANDS5,  "Bands M5",  Bands5_Active,  BANDS, PERIOD_M5,  Bands5_OpenMethod,  Bands_OpenLevel, Bands5_OpenCondition1,  Bands5_OpenCondition2,  Bands5_CloseCondition,  Bands5_MaxSpread);
+  init &= InitStrategy(BANDS15, "Bands M15", Bands15_Active, BANDS, PERIOD_M15, Bands15_OpenMethod, Bands_OpenLevel, Bands15_OpenCondition1, Bands15_OpenCondition2, Bands15_CloseCondition, Bands15_MaxSpread);
+  init &= InitStrategy(BANDS30, "Bands M30", Bands30_Active, BANDS, PERIOD_M30, Bands30_OpenMethod, Bands_OpenLevel, Bands30_OpenCondition1, Bands30_OpenCondition2, Bands30_CloseCondition, Bands30_MaxSpread);
   #else
-  InitStrategy(BANDS1,  "Bands M1",  Bands1_Active,  BANDS, PERIOD_M1,  Bands1_OpenMethod,  Bands_OpenLevel);
-  InitStrategy(BANDS5,  "Bands M5",  Bands5_Active,  BANDS, PERIOD_M5,  Bands5_OpenMethod,  Bands_OpenLevel);
-  InitStrategy(BANDS15, "Bands M15", Bands15_Active, BANDS, PERIOD_M15, Bands15_OpenMethod, Bands_OpenLevel);
-  InitStrategy(BANDS30, "Bands M30", Bands30_Active, BANDS, PERIOD_M30, Bands30_OpenMethod, Bands_OpenLevel);
+  init &= InitStrategy(BANDS1,  "Bands M1",  Bands1_Active,  BANDS, PERIOD_M1,  Bands1_OpenMethod,  Bands_OpenLevel);
+  init &= InitStrategy(BANDS5,  "Bands M5",  Bands5_Active,  BANDS, PERIOD_M5,  Bands5_OpenMethod,  Bands_OpenLevel);
+  init &= InitStrategy(BANDS15, "Bands M15", Bands15_Active, BANDS, PERIOD_M15, Bands15_OpenMethod, Bands_OpenLevel);
+  init &= InitStrategy(BANDS30, "Bands M30", Bands30_Active, BANDS, PERIOD_M30, Bands30_OpenMethod, Bands_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(BPOWER1,  "BPower M1",  BPower1_Active,  BPOWER, PERIOD_M1,  BPower1_OpenMethod,  BPower_OpenLevel, BPower1_OpenCondition1,  BPower1_OpenCondition2,  BPower1_CloseCondition,  BPower1_MaxSpread);
-  InitStrategy(BPOWER5,  "BPower M5",  BPower5_Active,  BPOWER, PERIOD_M5,  BPower5_OpenMethod,  BPower_OpenLevel, BPower5_OpenCondition1,  BPower5_OpenCondition2,  BPower5_CloseCondition,  BPower5_MaxSpread);
-  InitStrategy(BPOWER15, "BPower M15", BPower15_Active, BPOWER, PERIOD_M15, BPower15_OpenMethod, BPower_OpenLevel, BPower15_OpenCondition1, BPower15_OpenCondition2, BPower15_CloseCondition, BPower15_MaxSpread);
-  InitStrategy(BPOWER30, "BPower M30", BPower30_Active, BPOWER, PERIOD_M30, BPower30_OpenMethod, BPower_OpenLevel, BPower30_OpenCondition1, BPower30_OpenCondition2, BPower30_CloseCondition, BPower30_MaxSpread);
+  init &= InitStrategy(BPOWER1,  "BPower M1",  BPower1_Active,  BPOWER, PERIOD_M1,  BPower1_OpenMethod,  BPower_OpenLevel, BPower1_OpenCondition1,  BPower1_OpenCondition2,  BPower1_CloseCondition,  BPower1_MaxSpread);
+  init &= InitStrategy(BPOWER5,  "BPower M5",  BPower5_Active,  BPOWER, PERIOD_M5,  BPower5_OpenMethod,  BPower_OpenLevel, BPower5_OpenCondition1,  BPower5_OpenCondition2,  BPower5_CloseCondition,  BPower5_MaxSpread);
+  init &= InitStrategy(BPOWER15, "BPower M15", BPower15_Active, BPOWER, PERIOD_M15, BPower15_OpenMethod, BPower_OpenLevel, BPower15_OpenCondition1, BPower15_OpenCondition2, BPower15_CloseCondition, BPower15_MaxSpread);
+  init &= InitStrategy(BPOWER30, "BPower M30", BPower30_Active, BPOWER, PERIOD_M30, BPower30_OpenMethod, BPower_OpenLevel, BPower30_OpenCondition1, BPower30_OpenCondition2, BPower30_CloseCondition, BPower30_MaxSpread);
   #else
-  InitStrategy(BPOWER1,  "BPower M1",  BPower1_Active,  BPOWER, PERIOD_M1,  BPower1_OpenMethod,  BPower_OpenLevel);
-  InitStrategy(BPOWER5,  "BPower M5",  BPower5_Active,  BPOWER, PERIOD_M5,  BPower5_OpenMethod,  BPower_OpenLevel);
-  InitStrategy(BPOWER15, "BPower M15", BPower15_Active, BPOWER, PERIOD_M15, BPower15_OpenMethod, BPower_OpenLevel);
-  InitStrategy(BPOWER30, "BPower M30", BPower30_Active, BPOWER, PERIOD_M30, BPower30_OpenMethod, BPower_OpenLevel);
+  init &= InitStrategy(BPOWER1,  "BPower M1",  BPower1_Active,  BPOWER, PERIOD_M1,  BPower1_OpenMethod,  BPower_OpenLevel);
+  init &= InitStrategy(BPOWER5,  "BPower M5",  BPower5_Active,  BPOWER, PERIOD_M5,  BPower5_OpenMethod,  BPower_OpenLevel);
+  init &= InitStrategy(BPOWER15, "BPower M15", BPower15_Active, BPOWER, PERIOD_M15, BPower15_OpenMethod, BPower_OpenLevel);
+  init &= InitStrategy(BPOWER30, "BPower M30", BPower30_Active, BPOWER, PERIOD_M30, BPower30_OpenMethod, BPower_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(BREAKAGE1,  "Breakage M1",  Breakage1_Active,  EMPTY, PERIOD_M1,  Breakage1_OpenMethod,  Breakage_OpenLevel, Breakage1_OpenCondition1,  Breakage1_OpenCondition2,  Breakage1_CloseCondition,  Breakage1_MaxSpread);
-  InitStrategy(BREAKAGE5,  "Breakage M5",  Breakage5_Active,  EMPTY, PERIOD_M5,  Breakage5_OpenMethod,  Breakage_OpenLevel, Breakage5_OpenCondition1,  Breakage5_OpenCondition2,  Breakage5_CloseCondition,  Breakage5_MaxSpread);
-  InitStrategy(BREAKAGE15, "Breakage M15", Breakage15_Active, EMPTY, PERIOD_M15, Breakage15_OpenMethod, Breakage_OpenLevel, Breakage15_OpenCondition1, Breakage15_OpenCondition2, Breakage15_CloseCondition, Breakage15_MaxSpread);
-  InitStrategy(BREAKAGE30, "Breakage M30", Breakage30_Active, EMPTY, PERIOD_M30, Breakage30_OpenMethod, Breakage_OpenLevel, Breakage30_OpenCondition1, Breakage30_OpenCondition2, Breakage30_CloseCondition, Breakage30_MaxSpread);
+  init &= InitStrategy(BREAKAGE1,  "Breakage M1",  Breakage1_Active,  EMPTY, PERIOD_M1,  Breakage1_OpenMethod,  Breakage_OpenLevel, Breakage1_OpenCondition1,  Breakage1_OpenCondition2,  Breakage1_CloseCondition,  Breakage1_MaxSpread);
+  init &= InitStrategy(BREAKAGE5,  "Breakage M5",  Breakage5_Active,  EMPTY, PERIOD_M5,  Breakage5_OpenMethod,  Breakage_OpenLevel, Breakage5_OpenCondition1,  Breakage5_OpenCondition2,  Breakage5_CloseCondition,  Breakage5_MaxSpread);
+  init &= InitStrategy(BREAKAGE15, "Breakage M15", Breakage15_Active, EMPTY, PERIOD_M15, Breakage15_OpenMethod, Breakage_OpenLevel, Breakage15_OpenCondition1, Breakage15_OpenCondition2, Breakage15_CloseCondition, Breakage15_MaxSpread);
+  init &= InitStrategy(BREAKAGE30, "Breakage M30", Breakage30_Active, EMPTY, PERIOD_M30, Breakage30_OpenMethod, Breakage_OpenLevel, Breakage30_OpenCondition1, Breakage30_OpenCondition2, Breakage30_CloseCondition, Breakage30_MaxSpread);
   #else
-  InitStrategy(BREAKAGE1,  "Breakage M1",  Breakage1_Active,  EMPTY, PERIOD_M1,  Breakage1_OpenMethod,  Breakage_OpenLevel);
-  InitStrategy(BREAKAGE5,  "Breakage M5",  Breakage5_Active,  EMPTY, PERIOD_M5,  Breakage5_OpenMethod,  Breakage_OpenLevel);
-  InitStrategy(BREAKAGE15, "Breakage M15", Breakage15_Active, EMPTY, PERIOD_M15, Breakage15_OpenMethod, Breakage_OpenLevel);
-  InitStrategy(BREAKAGE30, "Breakage M30", Breakage30_Active, EMPTY, PERIOD_M30, Breakage30_OpenMethod, Breakage_OpenLevel);
+  init &= InitStrategy(BREAKAGE1,  "Breakage M1",  Breakage1_Active,  EMPTY, PERIOD_M1,  Breakage1_OpenMethod,  Breakage_OpenLevel);
+  init &= InitStrategy(BREAKAGE5,  "Breakage M5",  Breakage5_Active,  EMPTY, PERIOD_M5,  Breakage5_OpenMethod,  Breakage_OpenLevel);
+  init &= InitStrategy(BREAKAGE15, "Breakage M15", Breakage15_Active, EMPTY, PERIOD_M15, Breakage15_OpenMethod, Breakage_OpenLevel);
+  init &= InitStrategy(BREAKAGE30, "Breakage M30", Breakage30_Active, EMPTY, PERIOD_M30, Breakage30_OpenMethod, Breakage_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(BWMFI1,  "BWMFI M1",  BWMFI1_Active,  EMPTY, PERIOD_M1,  BWMFI1_OpenMethod,  BWMFI_OpenLevel, BWMFI1_OpenCondition1,  BWMFI1_OpenCondition2,  BWMFI1_CloseCondition,  BWMFI1_MaxSpread);
-  InitStrategy(BWMFI5,  "BWMFI M5",  BWMFI5_Active,  EMPTY, PERIOD_M5,  BWMFI5_OpenMethod,  BWMFI_OpenLevel, BWMFI5_OpenCondition1,  BWMFI5_OpenCondition2,  BWMFI5_CloseCondition,  BWMFI5_MaxSpread);
-  InitStrategy(BWMFI15, "BWMFI M15", BWMFI15_Active, EMPTY, PERIOD_M15, BWMFI15_OpenMethod, BWMFI_OpenLevel, BWMFI15_OpenCondition1, BWMFI15_OpenCondition2, BWMFI15_CloseCondition, BWMFI15_MaxSpread);
-  InitStrategy(BWMFI30, "BWMFI M30", BWMFI30_Active, EMPTY, PERIOD_M30, BWMFI30_OpenMethod, BWMFI_OpenLevel, BWMFI30_OpenCondition1, BWMFI30_OpenCondition2, BWMFI30_CloseCondition, BWMFI30_MaxSpread);
+  init &= InitStrategy(BWMFI1,  "BWMFI M1",  BWMFI1_Active,  EMPTY, PERIOD_M1,  BWMFI1_OpenMethod,  BWMFI_OpenLevel, BWMFI1_OpenCondition1,  BWMFI1_OpenCondition2,  BWMFI1_CloseCondition,  BWMFI1_MaxSpread);
+  init &= InitStrategy(BWMFI5,  "BWMFI M5",  BWMFI5_Active,  EMPTY, PERIOD_M5,  BWMFI5_OpenMethod,  BWMFI_OpenLevel, BWMFI5_OpenCondition1,  BWMFI5_OpenCondition2,  BWMFI5_CloseCondition,  BWMFI5_MaxSpread);
+  init &= InitStrategy(BWMFI15, "BWMFI M15", BWMFI15_Active, EMPTY, PERIOD_M15, BWMFI15_OpenMethod, BWMFI_OpenLevel, BWMFI15_OpenCondition1, BWMFI15_OpenCondition2, BWMFI15_CloseCondition, BWMFI15_MaxSpread);
+  init &= InitStrategy(BWMFI30, "BWMFI M30", BWMFI30_Active, EMPTY, PERIOD_M30, BWMFI30_OpenMethod, BWMFI_OpenLevel, BWMFI30_OpenCondition1, BWMFI30_OpenCondition2, BWMFI30_CloseCondition, BWMFI30_MaxSpread);
   #else
-  InitStrategy(BWMFI1,  "BWMFI M1",  BWMFI1_Active,  EMPTY, PERIOD_M1,  BWMFI1_OpenMethod,  BWMFI_OpenLevel);
-  InitStrategy(BWMFI5,  "BWMFI M5",  BWMFI5_Active,  EMPTY, PERIOD_M5,  BWMFI5_OpenMethod,  BWMFI_OpenLevel);
-  InitStrategy(BWMFI15, "BWMFI M15", BWMFI15_Active, EMPTY, PERIOD_M15, BWMFI15_OpenMethod, BWMFI_OpenLevel);
-  InitStrategy(BWMFI30, "BWMFI M30", BWMFI30_Active, EMPTY, PERIOD_M30, BWMFI30_OpenMethod, BWMFI_OpenLevel);
+  init &= InitStrategy(BWMFI1,  "BWMFI M1",  BWMFI1_Active,  EMPTY, PERIOD_M1,  BWMFI1_OpenMethod,  BWMFI_OpenLevel);
+  init &= InitStrategy(BWMFI5,  "BWMFI M5",  BWMFI5_Active,  EMPTY, PERIOD_M5,  BWMFI5_OpenMethod,  BWMFI_OpenLevel);
+  init &= InitStrategy(BWMFI15, "BWMFI M15", BWMFI15_Active, EMPTY, PERIOD_M15, BWMFI15_OpenMethod, BWMFI_OpenLevel);
+  init &= InitStrategy(BWMFI30, "BWMFI M30", BWMFI30_Active, EMPTY, PERIOD_M30, BWMFI30_OpenMethod, BWMFI_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(CCI1,  "CCI M1",  CCI1_Active,  CCI, PERIOD_M1,  CCI1_OpenMethod,  CCI_OpenLevel, CCI1_OpenCondition1,  CCI1_OpenCondition2,  CCI1_CloseCondition,  CCI1_MaxSpread);
-  InitStrategy(CCI5,  "CCI M5",  CCI5_Active,  CCI, PERIOD_M5,  CCI5_OpenMethod,  CCI_OpenLevel, CCI5_OpenCondition1,  CCI5_OpenCondition2,  CCI5_CloseCondition,  CCI5_MaxSpread);
-  InitStrategy(CCI15, "CCI M15", CCI15_Active, CCI, PERIOD_M15, CCI15_OpenMethod, CCI_OpenLevel, CCI15_OpenCondition1, CCI15_OpenCondition2, CCI15_CloseCondition, CCI15_MaxSpread);
-  InitStrategy(CCI30, "CCI M30", CCI30_Active, CCI, PERIOD_M30, CCI30_OpenMethod, CCI_OpenLevel, CCI30_OpenCondition1, CCI30_OpenCondition2, CCI30_CloseCondition, CCI30_MaxSpread);
+  init &= InitStrategy(CCI1,  "CCI M1",  CCI1_Active,  CCI, PERIOD_M1,  CCI1_OpenMethod,  CCI_OpenLevel, CCI1_OpenCondition1,  CCI1_OpenCondition2,  CCI1_CloseCondition,  CCI1_MaxSpread);
+  init &= InitStrategy(CCI5,  "CCI M5",  CCI5_Active,  CCI, PERIOD_M5,  CCI5_OpenMethod,  CCI_OpenLevel, CCI5_OpenCondition1,  CCI5_OpenCondition2,  CCI5_CloseCondition,  CCI5_MaxSpread);
+  init &= InitStrategy(CCI15, "CCI M15", CCI15_Active, CCI, PERIOD_M15, CCI15_OpenMethod, CCI_OpenLevel, CCI15_OpenCondition1, CCI15_OpenCondition2, CCI15_CloseCondition, CCI15_MaxSpread);
+  init &= InitStrategy(CCI30, "CCI M30", CCI30_Active, CCI, PERIOD_M30, CCI30_OpenMethod, CCI_OpenLevel, CCI30_OpenCondition1, CCI30_OpenCondition2, CCI30_CloseCondition, CCI30_MaxSpread);
   #else
-  InitStrategy(CCI1,  "CCI M1",  CCI1_Active,  CCI, PERIOD_M1,  CCI1_OpenMethod,  CCI_OpenLevel);
-  InitStrategy(CCI5,  "CCI M5",  CCI5_Active,  CCI, PERIOD_M5,  CCI5_OpenMethod,  CCI_OpenLevel);
-  InitStrategy(CCI15, "CCI M15", CCI15_Active, CCI, PERIOD_M15, CCI15_OpenMethod, CCI_OpenLevel);
-  InitStrategy(CCI30, "CCI M30", CCI30_Active, CCI, PERIOD_M30, CCI30_OpenMethod, CCI_OpenLevel);
+  init &= InitStrategy(CCI1,  "CCI M1",  CCI1_Active,  CCI, PERIOD_M1,  CCI1_OpenMethod,  CCI_OpenLevel);
+  init &= InitStrategy(CCI5,  "CCI M5",  CCI5_Active,  CCI, PERIOD_M5,  CCI5_OpenMethod,  CCI_OpenLevel);
+  init &= InitStrategy(CCI15, "CCI M15", CCI15_Active, CCI, PERIOD_M15, CCI15_OpenMethod, CCI_OpenLevel);
+  init &= InitStrategy(CCI30, "CCI M30", CCI30_Active, CCI, PERIOD_M30, CCI30_OpenMethod, CCI_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(DEMARKER1,  "DeMarker M1",  DeMarker1_Active,  DEMARKER, PERIOD_M1,  DeMarker1_OpenMethod,  DeMarker_OpenLevel, DeMarker1_OpenCondition1,  DeMarker1_OpenCondition2,  DeMarker1_CloseCondition,  DeMarker1_MaxSpread);
-  InitStrategy(DEMARKER5,  "DeMarker M5",  DeMarker5_Active,  DEMARKER, PERIOD_M5,  DeMarker5_OpenMethod,  DeMarker_OpenLevel, DeMarker5_OpenCondition1,  DeMarker5_OpenCondition2,  DeMarker5_CloseCondition,  DeMarker5_MaxSpread);
-  InitStrategy(DEMARKER15, "DeMarker M15", DeMarker15_Active, DEMARKER, PERIOD_M15, DeMarker15_OpenMethod, DeMarker_OpenLevel, DeMarker15_OpenCondition1, DeMarker15_OpenCondition2, DeMarker15_CloseCondition, DeMarker15_MaxSpread);
-  InitStrategy(DEMARKER30, "DeMarker M30", DeMarker30_Active, DEMARKER, PERIOD_M30, DeMarker30_OpenMethod, DeMarker_OpenLevel, DeMarker30_OpenCondition1, DeMarker30_OpenCondition2, DeMarker30_CloseCondition, DeMarker30_MaxSpread);
+  init &= InitStrategy(DEMARKER1,  "DeMarker M1",  DeMarker1_Active,  DEMARKER, PERIOD_M1,  DeMarker1_OpenMethod,  DeMarker_OpenLevel, DeMarker1_OpenCondition1,  DeMarker1_OpenCondition2,  DeMarker1_CloseCondition,  DeMarker1_MaxSpread);
+  init &= InitStrategy(DEMARKER5,  "DeMarker M5",  DeMarker5_Active,  DEMARKER, PERIOD_M5,  DeMarker5_OpenMethod,  DeMarker_OpenLevel, DeMarker5_OpenCondition1,  DeMarker5_OpenCondition2,  DeMarker5_CloseCondition,  DeMarker5_MaxSpread);
+  init &= InitStrategy(DEMARKER15, "DeMarker M15", DeMarker15_Active, DEMARKER, PERIOD_M15, DeMarker15_OpenMethod, DeMarker_OpenLevel, DeMarker15_OpenCondition1, DeMarker15_OpenCondition2, DeMarker15_CloseCondition, DeMarker15_MaxSpread);
+  init &= InitStrategy(DEMARKER30, "DeMarker M30", DeMarker30_Active, DEMARKER, PERIOD_M30, DeMarker30_OpenMethod, DeMarker_OpenLevel, DeMarker30_OpenCondition1, DeMarker30_OpenCondition2, DeMarker30_CloseCondition, DeMarker30_MaxSpread);
   #else
-  InitStrategy(DEMARKER1,  "DeMarker M1",  DeMarker1_Active,  DEMARKER, PERIOD_M1,  DeMarker1_OpenMethod,  DeMarker_OpenLevel);
-  InitStrategy(DEMARKER5,  "DeMarker M5",  DeMarker5_Active,  DEMARKER, PERIOD_M5,  DeMarker5_OpenMethod,  DeMarker_OpenLevel);
-  InitStrategy(DEMARKER15, "DeMarker M15", DeMarker15_Active, DEMARKER, PERIOD_M15, DeMarker15_OpenMethod, DeMarker_OpenLevel);
-  InitStrategy(DEMARKER30, "DeMarker M30", DeMarker30_Active, DEMARKER, PERIOD_M30, DeMarker30_OpenMethod, DeMarker_OpenLevel);
+  init &= InitStrategy(DEMARKER1,  "DeMarker M1",  DeMarker1_Active,  DEMARKER, PERIOD_M1,  DeMarker1_OpenMethod,  DeMarker_OpenLevel);
+  init &= InitStrategy(DEMARKER5,  "DeMarker M5",  DeMarker5_Active,  DEMARKER, PERIOD_M5,  DeMarker5_OpenMethod,  DeMarker_OpenLevel);
+  init &= InitStrategy(DEMARKER15, "DeMarker M15", DeMarker15_Active, DEMARKER, PERIOD_M15, DeMarker15_OpenMethod, DeMarker_OpenLevel);
+  init &= InitStrategy(DEMARKER30, "DeMarker M30", DeMarker30_Active, DEMARKER, PERIOD_M30, DeMarker30_OpenMethod, DeMarker_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(ENVELOPES1,  "Envelopes M1",  Envelopes1_Active,  ENVELOPES, PERIOD_M1,  Envelopes1_OpenMethod,  Envelopes_OpenLevel, Envelopes1_OpenCondition1,  Envelopes1_OpenCondition2,  Envelopes1_CloseCondition,  Envelopes1_MaxSpread);
-  InitStrategy(ENVELOPES5,  "Envelopes M5",  Envelopes5_Active,  ENVELOPES, PERIOD_M5,  Envelopes5_OpenMethod,  Envelopes_OpenLevel, Envelopes5_OpenCondition1,  Envelopes5_OpenCondition2,  Envelopes5_CloseCondition,  Envelopes5_MaxSpread);
-  InitStrategy(ENVELOPES15, "Envelopes M15", Envelopes15_Active, ENVELOPES, PERIOD_M15, Envelopes15_OpenMethod, Envelopes_OpenLevel, Envelopes15_OpenCondition1, Envelopes15_OpenCondition2, Envelopes15_CloseCondition, Envelopes15_MaxSpread);
-  InitStrategy(ENVELOPES30, "Envelopes M30", Envelopes30_Active, ENVELOPES, PERIOD_M30, Envelopes30_OpenMethod, Envelopes_OpenLevel, Envelopes30_OpenCondition1, Envelopes30_OpenCondition2, Envelopes30_CloseCondition, Envelopes30_MaxSpread);
+  init &= InitStrategy(ENVELOPES1,  "Envelopes M1",  Envelopes1_Active,  ENVELOPES, PERIOD_M1,  Envelopes1_OpenMethod,  Envelopes_OpenLevel, Envelopes1_OpenCondition1,  Envelopes1_OpenCondition2,  Envelopes1_CloseCondition,  Envelopes1_MaxSpread);
+  init &= InitStrategy(ENVELOPES5,  "Envelopes M5",  Envelopes5_Active,  ENVELOPES, PERIOD_M5,  Envelopes5_OpenMethod,  Envelopes_OpenLevel, Envelopes5_OpenCondition1,  Envelopes5_OpenCondition2,  Envelopes5_CloseCondition,  Envelopes5_MaxSpread);
+  init &= InitStrategy(ENVELOPES15, "Envelopes M15", Envelopes15_Active, ENVELOPES, PERIOD_M15, Envelopes15_OpenMethod, Envelopes_OpenLevel, Envelopes15_OpenCondition1, Envelopes15_OpenCondition2, Envelopes15_CloseCondition, Envelopes15_MaxSpread);
+  init &= InitStrategy(ENVELOPES30, "Envelopes M30", Envelopes30_Active, ENVELOPES, PERIOD_M30, Envelopes30_OpenMethod, Envelopes_OpenLevel, Envelopes30_OpenCondition1, Envelopes30_OpenCondition2, Envelopes30_CloseCondition, Envelopes30_MaxSpread);
   #else
-  InitStrategy(ENVELOPES1,  "Envelopes M1",  Envelopes1_Active,  ENVELOPES, PERIOD_M1,  Envelopes1_OpenMethod,  Envelopes_OpenLevel);
-  InitStrategy(ENVELOPES5,  "Envelopes M5",  Envelopes5_Active,  ENVELOPES, PERIOD_M5,  Envelopes5_OpenMethod,  Envelopes_OpenLevel);
-  InitStrategy(ENVELOPES15, "Envelopes M15", Envelopes15_Active, ENVELOPES, PERIOD_M15, Envelopes15_OpenMethod, Envelopes_OpenLevel);
-  InitStrategy(ENVELOPES30, "Envelopes M30", Envelopes30_Active, ENVELOPES, PERIOD_M30, Envelopes30_OpenMethod, Envelopes_OpenLevel);
+  init &= InitStrategy(ENVELOPES1,  "Envelopes M1",  Envelopes1_Active,  ENVELOPES, PERIOD_M1,  Envelopes1_OpenMethod,  Envelopes_OpenLevel);
+  init &= InitStrategy(ENVELOPES5,  "Envelopes M5",  Envelopes5_Active,  ENVELOPES, PERIOD_M5,  Envelopes5_OpenMethod,  Envelopes_OpenLevel);
+  init &= InitStrategy(ENVELOPES15, "Envelopes M15", Envelopes15_Active, ENVELOPES, PERIOD_M15, Envelopes15_OpenMethod, Envelopes_OpenLevel);
+  init &= InitStrategy(ENVELOPES30, "Envelopes M30", Envelopes30_Active, ENVELOPES, PERIOD_M30, Envelopes30_OpenMethod, Envelopes_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(FORCE1,  "Force M1",  Force1_Active,  FORCE, PERIOD_M1,  Force1_OpenMethod,  Force_OpenLevel, Force1_OpenCondition1,  Force1_OpenCondition2,  Force1_CloseCondition,  Force1_MaxSpread);
-  InitStrategy(FORCE5,  "Force M5",  Force5_Active,  FORCE, PERIOD_M5,  Force5_OpenMethod,  Force_OpenLevel, Force5_OpenCondition1,  Force5_OpenCondition2,  Force5_CloseCondition,  Force5_MaxSpread);
-  InitStrategy(FORCE15, "Force M15", Force15_Active, FORCE, PERIOD_M15, Force15_OpenMethod, Force_OpenLevel, Force15_OpenCondition1, Force15_OpenCondition2, Force15_CloseCondition, Force15_MaxSpread);
-  InitStrategy(FORCE30, "Force M30", Force30_Active, FORCE, PERIOD_M30, Force30_OpenMethod, Force_OpenLevel, Force30_OpenCondition1, Force30_OpenCondition2, Force30_CloseCondition, Force30_MaxSpread);
+  init &= InitStrategy(FORCE1,  "Force M1",  Force1_Active,  FORCE, PERIOD_M1,  Force1_OpenMethod,  Force_OpenLevel, Force1_OpenCondition1,  Force1_OpenCondition2,  Force1_CloseCondition,  Force1_MaxSpread);
+  init &= InitStrategy(FORCE5,  "Force M5",  Force5_Active,  FORCE, PERIOD_M5,  Force5_OpenMethod,  Force_OpenLevel, Force5_OpenCondition1,  Force5_OpenCondition2,  Force5_CloseCondition,  Force5_MaxSpread);
+  init &= InitStrategy(FORCE15, "Force M15", Force15_Active, FORCE, PERIOD_M15, Force15_OpenMethod, Force_OpenLevel, Force15_OpenCondition1, Force15_OpenCondition2, Force15_CloseCondition, Force15_MaxSpread);
+  init &= InitStrategy(FORCE30, "Force M30", Force30_Active, FORCE, PERIOD_M30, Force30_OpenMethod, Force_OpenLevel, Force30_OpenCondition1, Force30_OpenCondition2, Force30_CloseCondition, Force30_MaxSpread);
   #else
-  InitStrategy(FORCE1,  "Force M1",  Force1_Active,  FORCE, PERIOD_M1,  Force1_OpenMethod,  Force_OpenLevel);
-  InitStrategy(FORCE5,  "Force M5",  Force5_Active,  FORCE, PERIOD_M5,  Force5_OpenMethod,  Force_OpenLevel);
-  InitStrategy(FORCE15, "Force M15", Force15_Active, FORCE, PERIOD_M15, Force15_OpenMethod, Force_OpenLevel);
-  InitStrategy(FORCE30, "Force M30", Force30_Active, FORCE, PERIOD_M30, Force30_OpenMethod, Force_OpenLevel);
+  init &= InitStrategy(FORCE1,  "Force M1",  Force1_Active,  FORCE, PERIOD_M1,  Force1_OpenMethod,  Force_OpenLevel);
+  init &= InitStrategy(FORCE5,  "Force M5",  Force5_Active,  FORCE, PERIOD_M5,  Force5_OpenMethod,  Force_OpenLevel);
+  init &= InitStrategy(FORCE15, "Force M15", Force15_Active, FORCE, PERIOD_M15, Force15_OpenMethod, Force_OpenLevel);
+  init &= InitStrategy(FORCE30, "Force M30", Force30_Active, FORCE, PERIOD_M30, Force30_OpenMethod, Force_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(FRACTALS1,  "Fractals M1",  Fractals1_Active,  FRACTALS, PERIOD_M1,  Fractals1_OpenMethod,  Fractals_OpenLevel, Fractals1_OpenCondition1,  Fractals1_OpenCondition2,  Fractals1_CloseCondition,  Fractals1_MaxSpread);
-  InitStrategy(FRACTALS5,  "Fractals M5",  Fractals5_Active,  FRACTALS, PERIOD_M5,  Fractals5_OpenMethod,  Fractals_OpenLevel, Fractals5_OpenCondition1,  Fractals5_OpenCondition2,  Fractals5_CloseCondition,  Fractals5_MaxSpread);
-  InitStrategy(FRACTALS15, "Fractals M15", Fractals15_Active, FRACTALS, PERIOD_M15, Fractals15_OpenMethod, Fractals_OpenLevel, Fractals15_OpenCondition1, Fractals15_OpenCondition2, Fractals15_CloseCondition, Fractals15_MaxSpread);
-  InitStrategy(FRACTALS30, "Fractals M30", Fractals30_Active, FRACTALS, PERIOD_M30, Fractals30_OpenMethod, Fractals_OpenLevel, Fractals30_OpenCondition1, Fractals30_OpenCondition2, Fractals30_CloseCondition, Fractals30_MaxSpread);
+  init &= InitStrategy(FRACTALS1,  "Fractals M1",  Fractals1_Active,  FRACTALS, PERIOD_M1,  Fractals1_OpenMethod,  Fractals_OpenLevel, Fractals1_OpenCondition1,  Fractals1_OpenCondition2,  Fractals1_CloseCondition,  Fractals1_MaxSpread);
+  init &= InitStrategy(FRACTALS5,  "Fractals M5",  Fractals5_Active,  FRACTALS, PERIOD_M5,  Fractals5_OpenMethod,  Fractals_OpenLevel, Fractals5_OpenCondition1,  Fractals5_OpenCondition2,  Fractals5_CloseCondition,  Fractals5_MaxSpread);
+  init &= InitStrategy(FRACTALS15, "Fractals M15", Fractals15_Active, FRACTALS, PERIOD_M15, Fractals15_OpenMethod, Fractals_OpenLevel, Fractals15_OpenCondition1, Fractals15_OpenCondition2, Fractals15_CloseCondition, Fractals15_MaxSpread);
+  init &= InitStrategy(FRACTALS30, "Fractals M30", Fractals30_Active, FRACTALS, PERIOD_M30, Fractals30_OpenMethod, Fractals_OpenLevel, Fractals30_OpenCondition1, Fractals30_OpenCondition2, Fractals30_CloseCondition, Fractals30_MaxSpread);
   #else
-  InitStrategy(FRACTALS1,  "Fractals M1",  Fractals1_Active,  FRACTALS, PERIOD_M1,  Fractals1_OpenMethod,  Fractals_OpenLevel);
-  InitStrategy(FRACTALS5,  "Fractals M5",  Fractals5_Active,  FRACTALS, PERIOD_M5,  Fractals5_OpenMethod,  Fractals_OpenLevel);
-  InitStrategy(FRACTALS15, "Fractals M15", Fractals15_Active, FRACTALS, PERIOD_M15, Fractals15_OpenMethod, Fractals_OpenLevel);
-  InitStrategy(FRACTALS30, "Fractals M30", Fractals30_Active, FRACTALS, PERIOD_M30, Fractals30_OpenMethod, Fractals_OpenLevel);
+  init &= InitStrategy(FRACTALS1,  "Fractals M1",  Fractals1_Active,  FRACTALS, PERIOD_M1,  Fractals1_OpenMethod,  Fractals_OpenLevel);
+  init &= InitStrategy(FRACTALS5,  "Fractals M5",  Fractals5_Active,  FRACTALS, PERIOD_M5,  Fractals5_OpenMethod,  Fractals_OpenLevel);
+  init &= InitStrategy(FRACTALS15, "Fractals M15", Fractals15_Active, FRACTALS, PERIOD_M15, Fractals15_OpenMethod, Fractals_OpenLevel);
+  init &= InitStrategy(FRACTALS30, "Fractals M30", Fractals30_Active, FRACTALS, PERIOD_M30, Fractals30_OpenMethod, Fractals_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(GATOR1,  "Gator M1",  Gator1_Active,  GATOR, PERIOD_M1,  Gator1_OpenMethod,  Gator_OpenLevel, Gator1_OpenCondition1,  Gator1_OpenCondition2,  Gator1_CloseCondition,  Gator1_MaxSpread);
-  InitStrategy(GATOR5,  "Gator M5",  Gator5_Active,  GATOR, PERIOD_M5,  Gator5_OpenMethod,  Gator_OpenLevel, Gator5_OpenCondition1,  Gator5_OpenCondition2,  Gator5_CloseCondition,  Gator5_MaxSpread);
-  InitStrategy(GATOR15, "Gator M15", Gator15_Active, GATOR, PERIOD_M15, Gator15_OpenMethod, Gator_OpenLevel, Gator15_OpenCondition1, Gator15_OpenCondition2, Gator15_CloseCondition, Gator15_MaxSpread);
-  InitStrategy(GATOR30, "Gator M30", Gator30_Active, GATOR, PERIOD_M30, Gator30_OpenMethod, Gator_OpenLevel, Gator30_OpenCondition1, Gator30_OpenCondition2, Gator30_CloseCondition, Gator30_MaxSpread);
+  init &= InitStrategy(GATOR1,  "Gator M1",  Gator1_Active,  GATOR, PERIOD_M1,  Gator1_OpenMethod,  Gator_OpenLevel, Gator1_OpenCondition1,  Gator1_OpenCondition2,  Gator1_CloseCondition,  Gator1_MaxSpread);
+  init &= InitStrategy(GATOR5,  "Gator M5",  Gator5_Active,  GATOR, PERIOD_M5,  Gator5_OpenMethod,  Gator_OpenLevel, Gator5_OpenCondition1,  Gator5_OpenCondition2,  Gator5_CloseCondition,  Gator5_MaxSpread);
+  init &= InitStrategy(GATOR15, "Gator M15", Gator15_Active, GATOR, PERIOD_M15, Gator15_OpenMethod, Gator_OpenLevel, Gator15_OpenCondition1, Gator15_OpenCondition2, Gator15_CloseCondition, Gator15_MaxSpread);
+  init &= InitStrategy(GATOR30, "Gator M30", Gator30_Active, GATOR, PERIOD_M30, Gator30_OpenMethod, Gator_OpenLevel, Gator30_OpenCondition1, Gator30_OpenCondition2, Gator30_CloseCondition, Gator30_MaxSpread);
   #else
-  InitStrategy(GATOR1,  "Gator M1",  Gator1_Active,  GATOR, PERIOD_M1,  Gator1_OpenMethod,  Gator_OpenLevel);
-  InitStrategy(GATOR5,  "Gator M5",  Gator5_Active,  GATOR, PERIOD_M5,  Gator5_OpenMethod,  Gator_OpenLevel);
-  InitStrategy(GATOR15, "Gator M15", Gator15_Active, GATOR, PERIOD_M15, Gator15_OpenMethod, Gator_OpenLevel);
-  InitStrategy(GATOR30, "Gator M30", Gator30_Active, GATOR, PERIOD_M30, Gator30_OpenMethod, Gator_OpenLevel);
+  init &= InitStrategy(GATOR1,  "Gator M1",  Gator1_Active,  GATOR, PERIOD_M1,  Gator1_OpenMethod,  Gator_OpenLevel);
+  init &= InitStrategy(GATOR5,  "Gator M5",  Gator5_Active,  GATOR, PERIOD_M5,  Gator5_OpenMethod,  Gator_OpenLevel);
+  init &= InitStrategy(GATOR15, "Gator M15", Gator15_Active, GATOR, PERIOD_M15, Gator15_OpenMethod, Gator_OpenLevel);
+  init &= InitStrategy(GATOR30, "Gator M30", Gator30_Active, GATOR, PERIOD_M30, Gator30_OpenMethod, Gator_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(ICHIMOKU1,  "Ichimoku M1",  Ichimoku1_Active,  ICHIMOKU, PERIOD_M1,  Ichimoku1_OpenMethod,  Ichimoku_OpenLevel, Ichimoku1_OpenCondition1,  Ichimoku1_OpenCondition2,  Ichimoku1_CloseCondition,  Ichimoku1_MaxSpread);
-  InitStrategy(ICHIMOKU5,  "Ichimoku M5",  Ichimoku5_Active,  ICHIMOKU, PERIOD_M5,  Ichimoku5_OpenMethod,  Ichimoku_OpenLevel, Ichimoku5_OpenCondition1,  Ichimoku5_OpenCondition2,  Ichimoku5_CloseCondition,  Ichimoku5_MaxSpread);
-  InitStrategy(ICHIMOKU15, "Ichimoku M15", Ichimoku15_Active, ICHIMOKU, PERIOD_M15, Ichimoku15_OpenMethod, Ichimoku_OpenLevel, Ichimoku15_OpenCondition1, Ichimoku15_OpenCondition2, Ichimoku15_CloseCondition, Ichimoku15_MaxSpread);
-  InitStrategy(ICHIMOKU30, "Ichimoku M30", Ichimoku30_Active, ICHIMOKU, PERIOD_M30, Ichimoku30_OpenMethod, Ichimoku_OpenLevel, Ichimoku30_OpenCondition1, Ichimoku30_OpenCondition2, Ichimoku30_CloseCondition, Ichimoku30_MaxSpread);
+  init &= InitStrategy(ICHIMOKU1,  "Ichimoku M1",  Ichimoku1_Active,  ICHIMOKU, PERIOD_M1,  Ichimoku1_OpenMethod,  Ichimoku_OpenLevel, Ichimoku1_OpenCondition1,  Ichimoku1_OpenCondition2,  Ichimoku1_CloseCondition,  Ichimoku1_MaxSpread);
+  init &= InitStrategy(ICHIMOKU5,  "Ichimoku M5",  Ichimoku5_Active,  ICHIMOKU, PERIOD_M5,  Ichimoku5_OpenMethod,  Ichimoku_OpenLevel, Ichimoku5_OpenCondition1,  Ichimoku5_OpenCondition2,  Ichimoku5_CloseCondition,  Ichimoku5_MaxSpread);
+  init &= InitStrategy(ICHIMOKU15, "Ichimoku M15", Ichimoku15_Active, ICHIMOKU, PERIOD_M15, Ichimoku15_OpenMethod, Ichimoku_OpenLevel, Ichimoku15_OpenCondition1, Ichimoku15_OpenCondition2, Ichimoku15_CloseCondition, Ichimoku15_MaxSpread);
+  init &= InitStrategy(ICHIMOKU30, "Ichimoku M30", Ichimoku30_Active, ICHIMOKU, PERIOD_M30, Ichimoku30_OpenMethod, Ichimoku_OpenLevel, Ichimoku30_OpenCondition1, Ichimoku30_OpenCondition2, Ichimoku30_CloseCondition, Ichimoku30_MaxSpread);
   #else
-  InitStrategy(ICHIMOKU1,  "Ichimoku M1",  Ichimoku1_Active,  ICHIMOKU, PERIOD_M1,  Ichimoku1_OpenMethod,  Ichimoku_OpenLevel);
-  InitStrategy(ICHIMOKU5,  "Ichimoku M5",  Ichimoku5_Active,  ICHIMOKU, PERIOD_M5,  Ichimoku5_OpenMethod,  Ichimoku_OpenLevel);
-  InitStrategy(ICHIMOKU15, "Ichimoku M15", Ichimoku15_Active, ICHIMOKU, PERIOD_M15, Ichimoku15_OpenMethod, Ichimoku_OpenLevel);
-  InitStrategy(ICHIMOKU30, "Ichimoku M30", Ichimoku30_Active, ICHIMOKU, PERIOD_M30, Ichimoku30_OpenMethod, Ichimoku_OpenLevel);
+  init &= InitStrategy(ICHIMOKU1,  "Ichimoku M1",  Ichimoku1_Active,  ICHIMOKU, PERIOD_M1,  Ichimoku1_OpenMethod,  Ichimoku_OpenLevel);
+  init &= InitStrategy(ICHIMOKU5,  "Ichimoku M5",  Ichimoku5_Active,  ICHIMOKU, PERIOD_M5,  Ichimoku5_OpenMethod,  Ichimoku_OpenLevel);
+  init &= InitStrategy(ICHIMOKU15, "Ichimoku M15", Ichimoku15_Active, ICHIMOKU, PERIOD_M15, Ichimoku15_OpenMethod, Ichimoku_OpenLevel);
+  init &= InitStrategy(ICHIMOKU30, "Ichimoku M30", Ichimoku30_Active, ICHIMOKU, PERIOD_M30, Ichimoku30_OpenMethod, Ichimoku_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(MA1,  "MA M1",  MA1_Active,  MA, PERIOD_M1,  MA1_OpenMethod,  MA_OpenLevel,  MA1_OpenCondition1, MA1_OpenCondition2,  MA1_CloseCondition,  MA1_MaxSpread);
-  InitStrategy(MA5,  "MA M5",  MA5_Active,  MA, PERIOD_M5,  MA5_OpenMethod,  MA_OpenLevel,  MA5_OpenCondition1, MA5_OpenCondition2,  MA5_CloseCondition,  MA5_MaxSpread);
-  InitStrategy(MA15, "MA M15", MA15_Active, MA, PERIOD_M15, MA15_OpenMethod, MA_OpenLevel, MA15_OpenCondition1, MA15_OpenCondition2, MA15_CloseCondition, MA15_MaxSpread);
-  InitStrategy(MA30, "MA M30", MA30_Active, MA, PERIOD_M30, MA30_OpenMethod, MA_OpenLevel, MA30_OpenCondition1, MA30_OpenCondition2, MA30_CloseCondition, MA30_MaxSpread);
+  init &= InitStrategy(MA1,  "MA M1",  MA1_Active,  MA, PERIOD_M1,  MA1_OpenMethod,  MA_OpenLevel,  MA1_OpenCondition1, MA1_OpenCondition2,  MA1_CloseCondition,  MA1_MaxSpread);
+  init &= InitStrategy(MA5,  "MA M5",  MA5_Active,  MA, PERIOD_M5,  MA5_OpenMethod,  MA_OpenLevel,  MA5_OpenCondition1, MA5_OpenCondition2,  MA5_CloseCondition,  MA5_MaxSpread);
+  init &= InitStrategy(MA15, "MA M15", MA15_Active, MA, PERIOD_M15, MA15_OpenMethod, MA_OpenLevel, MA15_OpenCondition1, MA15_OpenCondition2, MA15_CloseCondition, MA15_MaxSpread);
+  init &= InitStrategy(MA30, "MA M30", MA30_Active, MA, PERIOD_M30, MA30_OpenMethod, MA_OpenLevel, MA30_OpenCondition1, MA30_OpenCondition2, MA30_CloseCondition, MA30_MaxSpread);
   #else
-  InitStrategy(MA1,  "MA M1",  MA1_Active,  MA, PERIOD_M1,  MA1_OpenMethod,  MA_OpenLevel);
-  InitStrategy(MA5,  "MA M5",  MA5_Active,  MA, PERIOD_M5,  MA5_OpenMethod,  MA_OpenLevel);
-  InitStrategy(MA15, "MA M15", MA15_Active, MA, PERIOD_M15, MA15_OpenMethod, MA_OpenLevel);
-  InitStrategy(MA30, "MA M30", MA30_Active, MA, PERIOD_M30, MA30_OpenMethod, MA_OpenLevel);
+  init &= InitStrategy(MA1,  "MA M1",  MA1_Active,  MA, PERIOD_M1,  MA1_OpenMethod,  MA_OpenLevel);
+  init &= InitStrategy(MA5,  "MA M5",  MA5_Active,  MA, PERIOD_M5,  MA5_OpenMethod,  MA_OpenLevel);
+  init &= InitStrategy(MA15, "MA M15", MA15_Active, MA, PERIOD_M15, MA15_OpenMethod, MA_OpenLevel);
+  init &= InitStrategy(MA30, "MA M30", MA30_Active, MA, PERIOD_M30, MA30_OpenMethod, MA_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(MACD1,  "MACD M1",  MACD1_Active,  MACD, PERIOD_M1,  MACD1_OpenMethod,  MACD_OpenLevel, MACD1_OpenCondition1,  MACD1_OpenCondition2,  MACD1_CloseCondition,  MACD1_MaxSpread);
-  InitStrategy(MACD5,  "MACD M5",  MACD5_Active,  MACD, PERIOD_M5,  MACD5_OpenMethod,  MACD_OpenLevel, MACD5_OpenCondition1,  MACD5_OpenCondition2,  MACD5_CloseCondition,  MACD5_MaxSpread);
-  InitStrategy(MACD15, "MACD M15", MACD15_Active, MACD, PERIOD_M15, MACD15_OpenMethod, MACD_OpenLevel, MACD15_OpenCondition1, MACD15_OpenCondition2, MACD15_CloseCondition, MACD15_MaxSpread);
-  InitStrategy(MACD30, "MACD M30", MACD30_Active, MACD, PERIOD_M30, MACD30_OpenMethod, MACD_OpenLevel, MACD30_OpenCondition1, MACD30_OpenCondition2, MACD30_CloseCondition, MACD30_MaxSpread);
+  init &= InitStrategy(MACD1,  "MACD M1",  MACD1_Active,  MACD, PERIOD_M1,  MACD1_OpenMethod,  MACD_OpenLevel, MACD1_OpenCondition1,  MACD1_OpenCondition2,  MACD1_CloseCondition,  MACD1_MaxSpread);
+  init &= InitStrategy(MACD5,  "MACD M5",  MACD5_Active,  MACD, PERIOD_M5,  MACD5_OpenMethod,  MACD_OpenLevel, MACD5_OpenCondition1,  MACD5_OpenCondition2,  MACD5_CloseCondition,  MACD5_MaxSpread);
+  init &= InitStrategy(MACD15, "MACD M15", MACD15_Active, MACD, PERIOD_M15, MACD15_OpenMethod, MACD_OpenLevel, MACD15_OpenCondition1, MACD15_OpenCondition2, MACD15_CloseCondition, MACD15_MaxSpread);
+  init &= InitStrategy(MACD30, "MACD M30", MACD30_Active, MACD, PERIOD_M30, MACD30_OpenMethod, MACD_OpenLevel, MACD30_OpenCondition1, MACD30_OpenCondition2, MACD30_CloseCondition, MACD30_MaxSpread);
   #else
-  InitStrategy(MACD1,  "MACD M1",  MACD1_Active,  MACD, PERIOD_M1,  MACD1_OpenMethod,  MACD_OpenLevel);
-  InitStrategy(MACD5,  "MACD M5",  MACD5_Active,  MACD, PERIOD_M5,  MACD5_OpenMethod,  MACD_OpenLevel);
-  InitStrategy(MACD15, "MACD M15", MACD15_Active, MACD, PERIOD_M15, MACD15_OpenMethod, MACD_OpenLevel);
-  InitStrategy(MACD30, "MACD M30", MACD30_Active, MACD, PERIOD_M30, MACD30_OpenMethod, MACD_OpenLevel);
+  init &= InitStrategy(MACD1,  "MACD M1",  MACD1_Active,  MACD, PERIOD_M1,  MACD1_OpenMethod,  MACD_OpenLevel);
+  init &= InitStrategy(MACD5,  "MACD M5",  MACD5_Active,  MACD, PERIOD_M5,  MACD5_OpenMethod,  MACD_OpenLevel);
+  init &= InitStrategy(MACD15, "MACD M15", MACD15_Active, MACD, PERIOD_M15, MACD15_OpenMethod, MACD_OpenLevel);
+  init &= InitStrategy(MACD30, "MACD M30", MACD30_Active, MACD, PERIOD_M30, MACD30_OpenMethod, MACD_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(MFI1,  "MFI M1",  MFI1_Active,  MFI, PERIOD_M1,  MFI1_OpenMethod,  MFI_OpenLevel, MFI1_OpenCondition1,  MFI1_OpenCondition2,  MFI1_CloseCondition,  MFI1_MaxSpread);
-  InitStrategy(MFI5,  "MFI M5",  MFI5_Active,  MFI, PERIOD_M5,  MFI5_OpenMethod,  MFI_OpenLevel, MFI5_OpenCondition1,  MFI5_OpenCondition2,  MFI5_CloseCondition,  MFI5_MaxSpread);
-  InitStrategy(MFI15, "MFI M15", MFI15_Active, MFI, PERIOD_M15, MFI15_OpenMethod, MFI_OpenLevel, MFI15_OpenCondition1, MFI15_OpenCondition2, MFI15_CloseCondition, MFI15_MaxSpread);
-  InitStrategy(MFI30, "MFI M30", MFI30_Active, MFI, PERIOD_M30, MFI30_OpenMethod, MFI_OpenLevel, MFI30_OpenCondition1, MFI30_OpenCondition2, MFI30_CloseCondition, MFI30_MaxSpread);
+  init &= InitStrategy(MFI1,  "MFI M1",  MFI1_Active,  MFI, PERIOD_M1,  MFI1_OpenMethod,  MFI_OpenLevel, MFI1_OpenCondition1,  MFI1_OpenCondition2,  MFI1_CloseCondition,  MFI1_MaxSpread);
+  init &= InitStrategy(MFI5,  "MFI M5",  MFI5_Active,  MFI, PERIOD_M5,  MFI5_OpenMethod,  MFI_OpenLevel, MFI5_OpenCondition1,  MFI5_OpenCondition2,  MFI5_CloseCondition,  MFI5_MaxSpread);
+  init &= InitStrategy(MFI15, "MFI M15", MFI15_Active, MFI, PERIOD_M15, MFI15_OpenMethod, MFI_OpenLevel, MFI15_OpenCondition1, MFI15_OpenCondition2, MFI15_CloseCondition, MFI15_MaxSpread);
+  init &= InitStrategy(MFI30, "MFI M30", MFI30_Active, MFI, PERIOD_M30, MFI30_OpenMethod, MFI_OpenLevel, MFI30_OpenCondition1, MFI30_OpenCondition2, MFI30_CloseCondition, MFI30_MaxSpread);
   #else
-  InitStrategy(MFI1,  "MFI M1",  MFI1_Active,  MFI, PERIOD_M1,  MFI1_OpenMethod,  MFI_OpenLevel);
-  InitStrategy(MFI5,  "MFI M5",  MFI5_Active,  MFI, PERIOD_M5,  MFI5_OpenMethod,  MFI_OpenLevel);
-  InitStrategy(MFI15, "MFI M15", MFI15_Active, MFI, PERIOD_M15, MFI15_OpenMethod, MFI_OpenLevel);
-  InitStrategy(MFI30, "MFI M30", MFI30_Active, MFI, PERIOD_M30, MFI30_OpenMethod, MFI_OpenLevel);
+  init &= InitStrategy(MFI1,  "MFI M1",  MFI1_Active,  MFI, PERIOD_M1,  MFI1_OpenMethod,  MFI_OpenLevel);
+  init &= InitStrategy(MFI5,  "MFI M5",  MFI5_Active,  MFI, PERIOD_M5,  MFI5_OpenMethod,  MFI_OpenLevel);
+  init &= InitStrategy(MFI15, "MFI M15", MFI15_Active, MFI, PERIOD_M15, MFI15_OpenMethod, MFI_OpenLevel);
+  init &= InitStrategy(MFI30, "MFI M30", MFI30_Active, MFI, PERIOD_M30, MFI30_OpenMethod, MFI_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(MOMENTUM1,  "Momentum M1",  Momentum1_Active,  MOMENTUM, PERIOD_M1,  Momentum1_OpenMethod,  Momentum_OpenLevel, Momentum1_OpenCondition1,  Momentum1_OpenCondition2,  Momentum1_CloseCondition,  Momentum1_MaxSpread);
-  InitStrategy(MOMENTUM5,  "Momentum M5",  Momentum5_Active,  MOMENTUM, PERIOD_M5,  Momentum5_OpenMethod,  Momentum_OpenLevel, Momentum5_OpenCondition1,  Momentum5_OpenCondition2,  Momentum5_CloseCondition,  Momentum5_MaxSpread);
-  InitStrategy(MOMENTUM15, "Momentum M15", Momentum15_Active, MOMENTUM, PERIOD_M15, Momentum15_OpenMethod, Momentum_OpenLevel, Momentum15_OpenCondition1, Momentum15_OpenCondition2, Momentum15_CloseCondition, Momentum15_MaxSpread);
-  InitStrategy(MOMENTUM30, "Momentum M30", Momentum30_Active, MOMENTUM, PERIOD_M30, Momentum30_OpenMethod, Momentum_OpenLevel, Momentum30_OpenCondition1, Momentum30_OpenCondition2, Momentum30_CloseCondition, Momentum30_MaxSpread);
+  init &= InitStrategy(MOMENTUM1,  "Momentum M1",  Momentum1_Active,  MOMENTUM, PERIOD_M1,  Momentum1_OpenMethod,  Momentum_OpenLevel, Momentum1_OpenCondition1,  Momentum1_OpenCondition2,  Momentum1_CloseCondition,  Momentum1_MaxSpread);
+  init &= InitStrategy(MOMENTUM5,  "Momentum M5",  Momentum5_Active,  MOMENTUM, PERIOD_M5,  Momentum5_OpenMethod,  Momentum_OpenLevel, Momentum5_OpenCondition1,  Momentum5_OpenCondition2,  Momentum5_CloseCondition,  Momentum5_MaxSpread);
+  init &= InitStrategy(MOMENTUM15, "Momentum M15", Momentum15_Active, MOMENTUM, PERIOD_M15, Momentum15_OpenMethod, Momentum_OpenLevel, Momentum15_OpenCondition1, Momentum15_OpenCondition2, Momentum15_CloseCondition, Momentum15_MaxSpread);
+  init &= InitStrategy(MOMENTUM30, "Momentum M30", Momentum30_Active, MOMENTUM, PERIOD_M30, Momentum30_OpenMethod, Momentum_OpenLevel, Momentum30_OpenCondition1, Momentum30_OpenCondition2, Momentum30_CloseCondition, Momentum30_MaxSpread);
   #else
-  InitStrategy(MOMENTUM1,  "Momentum M1",  Momentum1_Active,  MOMENTUM, PERIOD_M1,  Momentum1_OpenMethod,  Momentum_OpenLevel);
-  InitStrategy(MOMENTUM5,  "Momentum M5",  Momentum5_Active,  MOMENTUM, PERIOD_M5,  Momentum5_OpenMethod,  Momentum_OpenLevel);
-  InitStrategy(MOMENTUM15, "Momentum M15", Momentum15_Active, MOMENTUM, PERIOD_M15, Momentum15_OpenMethod, Momentum_OpenLevel);
-  InitStrategy(MOMENTUM30, "Momentum M30", Momentum30_Active, MOMENTUM, PERIOD_M30, Momentum30_OpenMethod, Momentum_OpenLevel);
+  init &= InitStrategy(MOMENTUM1,  "Momentum M1",  Momentum1_Active,  MOMENTUM, PERIOD_M1,  Momentum1_OpenMethod,  Momentum_OpenLevel);
+  init &= InitStrategy(MOMENTUM5,  "Momentum M5",  Momentum5_Active,  MOMENTUM, PERIOD_M5,  Momentum5_OpenMethod,  Momentum_OpenLevel);
+  init &= InitStrategy(MOMENTUM15, "Momentum M15", Momentum15_Active, MOMENTUM, PERIOD_M15, Momentum15_OpenMethod, Momentum_OpenLevel);
+  init &= InitStrategy(MOMENTUM30, "Momentum M30", Momentum30_Active, MOMENTUM, PERIOD_M30, Momentum30_OpenMethod, Momentum_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(OBV1,  "OBV M1",  OBV1_Active,  OBV, PERIOD_M1,  OBV1_OpenMethod,  OBV_OpenLevel,  OBV1_OpenCondition1, OBV1_OpenCondition2,  OBV1_CloseCondition,  OBV1_MaxSpread);
-  InitStrategy(OBV5,  "OBV M5",  OBV5_Active,  OBV, PERIOD_M5,  OBV5_OpenMethod,  OBV_OpenLevel,  OBV5_OpenCondition1, OBV5_OpenCondition2,  OBV5_CloseCondition,  OBV5_MaxSpread);
-  InitStrategy(OBV15, "OBV M15", OBV15_Active, OBV, PERIOD_M15, OBV15_OpenMethod, OBV_OpenLevel, OBV15_OpenCondition1, OBV15_OpenCondition2, OBV15_CloseCondition, OBV15_MaxSpread);
-  InitStrategy(OBV30, "OBV M30", OBV30_Active, OBV, PERIOD_M30, OBV30_OpenMethod, OBV_OpenLevel, OBV30_OpenCondition1, OBV30_OpenCondition2, OBV30_CloseCondition, OBV30_MaxSpread);
+  init &= InitStrategy(OBV1,  "OBV M1",  OBV1_Active,  OBV, PERIOD_M1,  OBV1_OpenMethod,  OBV_OpenLevel,  OBV1_OpenCondition1, OBV1_OpenCondition2,  OBV1_CloseCondition,  OBV1_MaxSpread);
+  init &= InitStrategy(OBV5,  "OBV M5",  OBV5_Active,  OBV, PERIOD_M5,  OBV5_OpenMethod,  OBV_OpenLevel,  OBV5_OpenCondition1, OBV5_OpenCondition2,  OBV5_CloseCondition,  OBV5_MaxSpread);
+  init &= InitStrategy(OBV15, "OBV M15", OBV15_Active, OBV, PERIOD_M15, OBV15_OpenMethod, OBV_OpenLevel, OBV15_OpenCondition1, OBV15_OpenCondition2, OBV15_CloseCondition, OBV15_MaxSpread);
+  init &= InitStrategy(OBV30, "OBV M30", OBV30_Active, OBV, PERIOD_M30, OBV30_OpenMethod, OBV_OpenLevel, OBV30_OpenCondition1, OBV30_OpenCondition2, OBV30_CloseCondition, OBV30_MaxSpread);
   #else
-  InitStrategy(OBV1,  "OBV M1",  OBV1_Active,  OBV, PERIOD_M1,  OBV1_OpenMethod,  OBV_OpenLevel);
-  InitStrategy(OBV5,  "OBV M5",  OBV5_Active,  OBV, PERIOD_M5,  OBV5_OpenMethod,  OBV_OpenLevel);
-  InitStrategy(OBV15, "OBV M15", OBV15_Active, OBV, PERIOD_M15, OBV15_OpenMethod, OBV_OpenLevel);
-  InitStrategy(OBV30, "OBV M30", OBV30_Active, OBV, PERIOD_M30, OBV30_OpenMethod, OBV_OpenLevel);
+  init &= InitStrategy(OBV1,  "OBV M1",  OBV1_Active,  OBV, PERIOD_M1,  OBV1_OpenMethod,  OBV_OpenLevel);
+  init &= InitStrategy(OBV5,  "OBV M5",  OBV5_Active,  OBV, PERIOD_M5,  OBV5_OpenMethod,  OBV_OpenLevel);
+  init &= InitStrategy(OBV15, "OBV M15", OBV15_Active, OBV, PERIOD_M15, OBV15_OpenMethod, OBV_OpenLevel);
+  init &= InitStrategy(OBV30, "OBV M30", OBV30_Active, OBV, PERIOD_M30, OBV30_OpenMethod, OBV_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(OSMA1,  "OSMA M1",  OSMA1_Active,  OSMA, PERIOD_M1,  OSMA1_OpenMethod,  OSMA_OpenLevel, OSMA1_OpenCondition1,  OSMA1_OpenCondition2,  OSMA1_CloseCondition,  OSMA1_MaxSpread);
-  InitStrategy(OSMA5,  "OSMA M5",  OSMA5_Active,  OSMA, PERIOD_M5,  OSMA5_OpenMethod,  OSMA_OpenLevel, OSMA5_OpenCondition1,  OSMA5_OpenCondition2,  OSMA5_CloseCondition,  OSMA5_MaxSpread);
-  InitStrategy(OSMA15, "OSMA M15", OSMA15_Active, OSMA, PERIOD_M15, OSMA15_OpenMethod, OSMA_OpenLevel, OSMA15_OpenCondition1, OSMA15_OpenCondition2, OSMA15_CloseCondition, OSMA15_MaxSpread);
-  InitStrategy(OSMA30, "OSMA M30", OSMA30_Active, OSMA, PERIOD_M30, OSMA30_OpenMethod, OSMA_OpenLevel, OSMA30_OpenCondition1, OSMA30_OpenCondition2, OSMA30_CloseCondition, OSMA30_MaxSpread);
+  init &= InitStrategy(OSMA1,  "OSMA M1",  OSMA1_Active,  OSMA, PERIOD_M1,  OSMA1_OpenMethod,  OSMA_OpenLevel, OSMA1_OpenCondition1,  OSMA1_OpenCondition2,  OSMA1_CloseCondition,  OSMA1_MaxSpread);
+  init &= InitStrategy(OSMA5,  "OSMA M5",  OSMA5_Active,  OSMA, PERIOD_M5,  OSMA5_OpenMethod,  OSMA_OpenLevel, OSMA5_OpenCondition1,  OSMA5_OpenCondition2,  OSMA5_CloseCondition,  OSMA5_MaxSpread);
+  init &= InitStrategy(OSMA15, "OSMA M15", OSMA15_Active, OSMA, PERIOD_M15, OSMA15_OpenMethod, OSMA_OpenLevel, OSMA15_OpenCondition1, OSMA15_OpenCondition2, OSMA15_CloseCondition, OSMA15_MaxSpread);
+  init &= InitStrategy(OSMA30, "OSMA M30", OSMA30_Active, OSMA, PERIOD_M30, OSMA30_OpenMethod, OSMA_OpenLevel, OSMA30_OpenCondition1, OSMA30_OpenCondition2, OSMA30_CloseCondition, OSMA30_MaxSpread);
   #else
-  InitStrategy(OSMA1,  "OSMA M1",  OSMA1_Active,  OSMA, PERIOD_M1,  OSMA1_OpenMethod,  OSMA_OpenLevel);
-  InitStrategy(OSMA5,  "OSMA M5",  OSMA5_Active,  OSMA, PERIOD_M5,  OSMA5_OpenMethod,  OSMA_OpenLevel);
-  InitStrategy(OSMA15, "OSMA M15", OSMA15_Active, OSMA, PERIOD_M15, OSMA15_OpenMethod, OSMA_OpenLevel);
-  InitStrategy(OSMA30, "OSMA M30", OSMA30_Active, OSMA, PERIOD_M30, OSMA30_OpenMethod, OSMA_OpenLevel);
+  init &= InitStrategy(OSMA1,  "OSMA M1",  OSMA1_Active,  OSMA, PERIOD_M1,  OSMA1_OpenMethod,  OSMA_OpenLevel);
+  init &= InitStrategy(OSMA5,  "OSMA M5",  OSMA5_Active,  OSMA, PERIOD_M5,  OSMA5_OpenMethod,  OSMA_OpenLevel);
+  init &= InitStrategy(OSMA15, "OSMA M15", OSMA15_Active, OSMA, PERIOD_M15, OSMA15_OpenMethod, OSMA_OpenLevel);
+  init &= InitStrategy(OSMA30, "OSMA M30", OSMA30_Active, OSMA, PERIOD_M30, OSMA30_OpenMethod, OSMA_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(RSI1,  "RSI M1",  RSI1_Active,  RSI, PERIOD_M1,  RSI1_OpenMethod,  RSI_OpenLevel, RSI1_OpenCondition1,  RSI1_OpenCondition2,  RSI1_CloseCondition,  RSI1_MaxSpread);
-  InitStrategy(RSI5,  "RSI M5",  RSI5_Active,  RSI, PERIOD_M5,  RSI5_OpenMethod,  RSI_OpenLevel, RSI5_OpenCondition1,  RSI5_OpenCondition2,  RSI5_CloseCondition,  RSI5_MaxSpread);
-  InitStrategy(RSI15, "RSI M15", RSI15_Active, RSI, PERIOD_M15, RSI15_OpenMethod, RSI_OpenLevel, RSI15_OpenCondition1, RSI15_OpenCondition2, RSI15_CloseCondition, RSI15_MaxSpread);
-  InitStrategy(RSI30, "RSI M30", RSI30_Active, RSI, PERIOD_M30, RSI30_OpenMethod, RSI_OpenLevel, RSI30_OpenCondition1, RSI30_OpenCondition2, RSI30_CloseCondition, RSI30_MaxSpread);
+  init &= InitStrategy(RSI1,  "RSI M1",  RSI1_Active,  RSI, PERIOD_M1,  RSI1_OpenMethod,  RSI_OpenLevel, RSI1_OpenCondition1,  RSI1_OpenCondition2,  RSI1_CloseCondition,  RSI1_MaxSpread);
+  init &= InitStrategy(RSI5,  "RSI M5",  RSI5_Active,  RSI, PERIOD_M5,  RSI5_OpenMethod,  RSI_OpenLevel, RSI5_OpenCondition1,  RSI5_OpenCondition2,  RSI5_CloseCondition,  RSI5_MaxSpread);
+  init &= InitStrategy(RSI15, "RSI M15", RSI15_Active, RSI, PERIOD_M15, RSI15_OpenMethod, RSI_OpenLevel, RSI15_OpenCondition1, RSI15_OpenCondition2, RSI15_CloseCondition, RSI15_MaxSpread);
+  init &= InitStrategy(RSI30, "RSI M30", RSI30_Active, RSI, PERIOD_M30, RSI30_OpenMethod, RSI_OpenLevel, RSI30_OpenCondition1, RSI30_OpenCondition2, RSI30_CloseCondition, RSI30_MaxSpread);
   #else
-  InitStrategy(RSI1,  "RSI M1",  RSI1_Active,  RSI, PERIOD_M1,  RSI1_OpenMethod,  RSI_OpenLevel);
-  InitStrategy(RSI5,  "RSI M5",  RSI5_Active,  RSI, PERIOD_M5,  RSI5_OpenMethod,  RSI_OpenLevel);
-  InitStrategy(RSI15, "RSI M15", RSI15_Active, RSI, PERIOD_M15, RSI15_OpenMethod, RSI_OpenLevel);
-  InitStrategy(RSI30, "RSI M30", RSI30_Active, RSI, PERIOD_M30, RSI30_OpenMethod, RSI_OpenLevel);
+  init &= InitStrategy(RSI1,  "RSI M1",  RSI1_Active,  RSI, PERIOD_M1,  RSI1_OpenMethod,  RSI_OpenLevel);
+  init &= InitStrategy(RSI5,  "RSI M5",  RSI5_Active,  RSI, PERIOD_M5,  RSI5_OpenMethod,  RSI_OpenLevel);
+  init &= InitStrategy(RSI15, "RSI M15", RSI15_Active, RSI, PERIOD_M15, RSI15_OpenMethod, RSI_OpenLevel);
+  init &= InitStrategy(RSI30, "RSI M30", RSI30_Active, RSI, PERIOD_M30, RSI30_OpenMethod, RSI_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(RVI1,  "RVI M1",  RVI1_Active,  RVI, PERIOD_M1,  RVI1_OpenMethod,  RVI_OpenLevel, RVI1_OpenCondition1,  RVI1_OpenCondition2,  RVI1_CloseCondition,  RVI1_MaxSpread);
-  InitStrategy(RVI5,  "RVI M5",  RVI5_Active,  RVI, PERIOD_M5,  RVI5_OpenMethod,  RVI_OpenLevel, RVI5_OpenCondition1,  RVI5_OpenCondition2,  RVI5_CloseCondition,  RVI5_MaxSpread);
-  InitStrategy(RVI15, "RVI M15", RVI15_Active, RVI, PERIOD_M15, RVI15_OpenMethod, RVI_OpenLevel, RVI15_OpenCondition1, RVI15_OpenCondition2, RVI15_CloseCondition, RVI15_MaxSpread);
-  InitStrategy(RVI30, "RVI M30", RVI30_Active, RVI, PERIOD_M30, RVI30_OpenMethod, RVI_OpenLevel, RVI30_OpenCondition1, RVI30_OpenCondition2, RVI30_CloseCondition, RVI30_MaxSpread);
+  init &= InitStrategy(RVI1,  "RVI M1",  RVI1_Active,  RVI, PERIOD_M1,  RVI1_OpenMethod,  RVI_OpenLevel, RVI1_OpenCondition1,  RVI1_OpenCondition2,  RVI1_CloseCondition,  RVI1_MaxSpread);
+  init &= InitStrategy(RVI5,  "RVI M5",  RVI5_Active,  RVI, PERIOD_M5,  RVI5_OpenMethod,  RVI_OpenLevel, RVI5_OpenCondition1,  RVI5_OpenCondition2,  RVI5_CloseCondition,  RVI5_MaxSpread);
+  init &= InitStrategy(RVI15, "RVI M15", RVI15_Active, RVI, PERIOD_M15, RVI15_OpenMethod, RVI_OpenLevel, RVI15_OpenCondition1, RVI15_OpenCondition2, RVI15_CloseCondition, RVI15_MaxSpread);
+  init &= InitStrategy(RVI30, "RVI M30", RVI30_Active, RVI, PERIOD_M30, RVI30_OpenMethod, RVI_OpenLevel, RVI30_OpenCondition1, RVI30_OpenCondition2, RVI30_CloseCondition, RVI30_MaxSpread);
   #else
-  InitStrategy(RVI1,  "RVI M1",  RVI1_Active,  RVI, PERIOD_M1,  RVI1_OpenMethod,  RVI_OpenLevel);
-  InitStrategy(RVI5,  "RVI M5",  RVI5_Active,  RVI, PERIOD_M5,  RVI5_OpenMethod,  RVI_OpenLevel);
-  InitStrategy(RVI15, "RVI M15", RVI15_Active, RVI, PERIOD_M15, RVI15_OpenMethod, RVI_OpenLevel);
-  InitStrategy(RVI30, "RVI M30", RVI30_Active, RVI, PERIOD_M30, RVI30_OpenMethod, RVI_OpenLevel);
+  init &= InitStrategy(RVI1,  "RVI M1",  RVI1_Active,  RVI, PERIOD_M1,  RVI1_OpenMethod,  RVI_OpenLevel);
+  init &= InitStrategy(RVI5,  "RVI M5",  RVI5_Active,  RVI, PERIOD_M5,  RVI5_OpenMethod,  RVI_OpenLevel);
+  init &= InitStrategy(RVI15, "RVI M15", RVI15_Active, RVI, PERIOD_M15, RVI15_OpenMethod, RVI_OpenLevel);
+  init &= InitStrategy(RVI30, "RVI M30", RVI30_Active, RVI, PERIOD_M30, RVI30_OpenMethod, RVI_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(SAR1,  "SAR M1",  SAR1_Active,  SAR, PERIOD_M1,  SAR1_OpenMethod,  SAR_OpenLevel, SAR1_OpenCondition1,  SAR1_OpenCondition2,  SAR1_CloseCondition,  SAR1_MaxSpread);
-  InitStrategy(SAR5,  "SAR M5",  SAR5_Active,  SAR, PERIOD_M5,  SAR5_OpenMethod,  SAR_OpenLevel, SAR5_OpenCondition1,  SAR5_OpenCondition2,  SAR5_CloseCondition,  SAR5_MaxSpread);
-  InitStrategy(SAR15, "SAR M15", SAR15_Active, SAR, PERIOD_M15, SAR15_OpenMethod, SAR_OpenLevel, SAR15_OpenCondition1, SAR15_OpenCondition2, SAR15_CloseCondition, SAR15_MaxSpread);
-  InitStrategy(SAR30, "SAR M30", SAR30_Active, SAR, PERIOD_M30, SAR30_OpenMethod, SAR_OpenLevel, SAR30_OpenCondition1, SAR30_OpenCondition2, SAR30_CloseCondition, SAR30_MaxSpread);
+  init &= InitStrategy(SAR1,  "SAR M1",  SAR1_Active,  SAR, PERIOD_M1,  SAR1_OpenMethod,  SAR_OpenLevel, SAR1_OpenCondition1,  SAR1_OpenCondition2,  SAR1_CloseCondition,  SAR1_MaxSpread);
+  init &= InitStrategy(SAR5,  "SAR M5",  SAR5_Active,  SAR, PERIOD_M5,  SAR5_OpenMethod,  SAR_OpenLevel, SAR5_OpenCondition1,  SAR5_OpenCondition2,  SAR5_CloseCondition,  SAR5_MaxSpread);
+  init &= InitStrategy(SAR15, "SAR M15", SAR15_Active, SAR, PERIOD_M15, SAR15_OpenMethod, SAR_OpenLevel, SAR15_OpenCondition1, SAR15_OpenCondition2, SAR15_CloseCondition, SAR15_MaxSpread);
+  init &= InitStrategy(SAR30, "SAR M30", SAR30_Active, SAR, PERIOD_M30, SAR30_OpenMethod, SAR_OpenLevel, SAR30_OpenCondition1, SAR30_OpenCondition2, SAR30_CloseCondition, SAR30_MaxSpread);
   #else
-  InitStrategy(SAR1,  "SAR M1",  SAR1_Active,  SAR, PERIOD_M1,  SAR1_OpenMethod,  SAR_OpenLevel);
-  InitStrategy(SAR5,  "SAR M5",  SAR5_Active,  SAR, PERIOD_M5,  SAR5_OpenMethod,  SAR_OpenLevel);
-  InitStrategy(SAR15, "SAR M15", SAR15_Active, SAR, PERIOD_M15, SAR15_OpenMethod, SAR_OpenLevel);
-  InitStrategy(SAR30, "SAR M30", SAR30_Active, SAR, PERIOD_M30, SAR30_OpenMethod, SAR_OpenLevel);
+  init &= InitStrategy(SAR1,  "SAR M1",  SAR1_Active,  SAR, PERIOD_M1,  SAR1_OpenMethod,  SAR_OpenLevel);
+  init &= InitStrategy(SAR5,  "SAR M5",  SAR5_Active,  SAR, PERIOD_M5,  SAR5_OpenMethod,  SAR_OpenLevel);
+  init &= InitStrategy(SAR15, "SAR M15", SAR15_Active, SAR, PERIOD_M15, SAR15_OpenMethod, SAR_OpenLevel);
+  init &= InitStrategy(SAR30, "SAR M30", SAR30_Active, SAR, PERIOD_M30, SAR30_OpenMethod, SAR_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(STDDEV1,  "StdDev M1",  StdDev1_Active,  STDDEV, PERIOD_M1,  StdDev1_OpenMethod,  StdDev_OpenLevel,  StdDev1_OpenCondition1,  StdDev1_OpenCondition2,  StdDev1_CloseCondition,  StdDev1_MaxSpread);
-  InitStrategy(STDDEV5,  "StdDev M5",  StdDev5_Active,  STDDEV, PERIOD_M5,  StdDev5_OpenMethod,  StdDev_OpenLevel,  StdDev5_OpenCondition1,  StdDev5_OpenCondition2,  StdDev5_CloseCondition,  StdDev5_MaxSpread);
-  InitStrategy(STDDEV15, "StdDev M15", StdDev15_Active, STDDEV, PERIOD_M15, StdDev15_OpenMethod, StdDev_OpenLevel, StdDev15_OpenCondition1, StdDev15_OpenCondition2, StdDev15_CloseCondition, StdDev15_MaxSpread);
-  InitStrategy(STDDEV30, "StdDev M30", StdDev30_Active, STDDEV, PERIOD_M30, StdDev30_OpenMethod, StdDev_OpenLevel, StdDev30_OpenCondition1, StdDev30_OpenCondition2, StdDev30_CloseCondition, StdDev30_MaxSpread);
+  init &= InitStrategy(STDDEV1,  "StdDev M1",  StdDev1_Active,  STDDEV, PERIOD_M1,  StdDev1_OpenMethod,  StdDev_OpenLevel,  StdDev1_OpenCondition1,  StdDev1_OpenCondition2,  StdDev1_CloseCondition,  StdDev1_MaxSpread);
+  init &= InitStrategy(STDDEV5,  "StdDev M5",  StdDev5_Active,  STDDEV, PERIOD_M5,  StdDev5_OpenMethod,  StdDev_OpenLevel,  StdDev5_OpenCondition1,  StdDev5_OpenCondition2,  StdDev5_CloseCondition,  StdDev5_MaxSpread);
+  init &= InitStrategy(STDDEV15, "StdDev M15", StdDev15_Active, STDDEV, PERIOD_M15, StdDev15_OpenMethod, StdDev_OpenLevel, StdDev15_OpenCondition1, StdDev15_OpenCondition2, StdDev15_CloseCondition, StdDev15_MaxSpread);
+  init &= InitStrategy(STDDEV30, "StdDev M30", StdDev30_Active, STDDEV, PERIOD_M30, StdDev30_OpenMethod, StdDev_OpenLevel, StdDev30_OpenCondition1, StdDev30_OpenCondition2, StdDev30_CloseCondition, StdDev30_MaxSpread);
   #else
-  InitStrategy(STDDEV1,  "StdDev M1",  StdDev1_Active,  STDDEV, PERIOD_M1,  StdDev1_OpenMethod,  StdDev_OpenLevel);
-  InitStrategy(STDDEV5,  "StdDev M5",  StdDev5_Active,  STDDEV, PERIOD_M5,  StdDev5_OpenMethod,  StdDev_OpenLevel);
-  InitStrategy(STDDEV15, "StdDev M15", StdDev15_Active, STDDEV, PERIOD_M15, StdDev15_OpenMethod, StdDev_OpenLevel);
-  InitStrategy(STDDEV30, "StdDev M30", StdDev30_Active, STDDEV, PERIOD_M30, StdDev30_OpenMethod, StdDev_OpenLevel);
+  init &= InitStrategy(STDDEV1,  "StdDev M1",  StdDev1_Active,  STDDEV, PERIOD_M1,  StdDev1_OpenMethod,  StdDev_OpenLevel);
+  init &= InitStrategy(STDDEV5,  "StdDev M5",  StdDev5_Active,  STDDEV, PERIOD_M5,  StdDev5_OpenMethod,  StdDev_OpenLevel);
+  init &= InitStrategy(STDDEV15, "StdDev M15", StdDev15_Active, STDDEV, PERIOD_M15, StdDev15_OpenMethod, StdDev_OpenLevel);
+  init &= InitStrategy(STDDEV30, "StdDev M30", StdDev30_Active, STDDEV, PERIOD_M30, StdDev30_OpenMethod, StdDev_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(STOCHASTIC1,  "Stochastic M1",  Stochastic1_Active,  STOCHASTIC, PERIOD_M1,  Stochastic1_OpenMethod,  Stochastic_OpenLevel,  Stochastic1_OpenCondition1,  Stochastic1_OpenCondition2,  Stochastic1_CloseCondition,  Stochastic1_MaxSpread);
-  InitStrategy(STOCHASTIC5,  "Stochastic M5",  Stochastic5_Active,  STOCHASTIC, PERIOD_M5,  Stochastic5_OpenMethod,  Stochastic_OpenLevel,  Stochastic5_OpenCondition1,  Stochastic5_OpenCondition2,  Stochastic5_CloseCondition,  Stochastic5_MaxSpread);
-  InitStrategy(STOCHASTIC15, "Stochastic M15", Stochastic15_Active, STOCHASTIC, PERIOD_M15, Stochastic15_OpenMethod, Stochastic_OpenLevel, Stochastic15_OpenCondition1, Stochastic15_OpenCondition2, Stochastic15_CloseCondition, Stochastic15_MaxSpread);
-  InitStrategy(STOCHASTIC30, "Stochastic M30", Stochastic30_Active, STOCHASTIC, PERIOD_M30, Stochastic30_OpenMethod, Stochastic_OpenLevel, Stochastic30_OpenCondition1, Stochastic30_OpenCondition2, Stochastic30_CloseCondition, Stochastic30_MaxSpread);
+  init &= InitStrategy(STOCHASTIC1,  "Stochastic M1",  Stochastic1_Active,  STOCHASTIC, PERIOD_M1,  Stochastic1_OpenMethod,  Stochastic_OpenLevel,  Stochastic1_OpenCondition1,  Stochastic1_OpenCondition2,  Stochastic1_CloseCondition,  Stochastic1_MaxSpread);
+  init &= InitStrategy(STOCHASTIC5,  "Stochastic M5",  Stochastic5_Active,  STOCHASTIC, PERIOD_M5,  Stochastic5_OpenMethod,  Stochastic_OpenLevel,  Stochastic5_OpenCondition1,  Stochastic5_OpenCondition2,  Stochastic5_CloseCondition,  Stochastic5_MaxSpread);
+  init &= InitStrategy(STOCHASTIC15, "Stochastic M15", Stochastic15_Active, STOCHASTIC, PERIOD_M15, Stochastic15_OpenMethod, Stochastic_OpenLevel, Stochastic15_OpenCondition1, Stochastic15_OpenCondition2, Stochastic15_CloseCondition, Stochastic15_MaxSpread);
+  init &= InitStrategy(STOCHASTIC30, "Stochastic M30", Stochastic30_Active, STOCHASTIC, PERIOD_M30, Stochastic30_OpenMethod, Stochastic_OpenLevel, Stochastic30_OpenCondition1, Stochastic30_OpenCondition2, Stochastic30_CloseCondition, Stochastic30_MaxSpread);
   #else
-  InitStrategy(STOCHASTIC1,  "Stochastic M1",  Stochastic1_Active,  STOCHASTIC, PERIOD_M1,  Stochastic1_OpenMethod,  Stochastic_OpenLevel);
-  InitStrategy(STOCHASTIC5,  "Stochastic M5",  Stochastic5_Active,  STOCHASTIC, PERIOD_M5,  Stochastic5_OpenMethod,  Stochastic_OpenLevel);
-  InitStrategy(STOCHASTIC15, "Stochastic M15", Stochastic15_Active, STOCHASTIC, PERIOD_M15, Stochastic15_OpenMethod, Stochastic_OpenLevel);
-  InitStrategy(STOCHASTIC30, "Stochastic M30", Stochastic30_Active, STOCHASTIC, PERIOD_M30, Stochastic30_OpenMethod, Stochastic_OpenLevel);
+  init &= InitStrategy(STOCHASTIC1,  "Stochastic M1",  Stochastic1_Active,  STOCHASTIC, PERIOD_M1,  Stochastic1_OpenMethod,  Stochastic_OpenLevel);
+  init &= InitStrategy(STOCHASTIC5,  "Stochastic M5",  Stochastic5_Active,  STOCHASTIC, PERIOD_M5,  Stochastic5_OpenMethod,  Stochastic_OpenLevel);
+  init &= InitStrategy(STOCHASTIC15, "Stochastic M15", Stochastic15_Active, STOCHASTIC, PERIOD_M15, Stochastic15_OpenMethod, Stochastic_OpenLevel);
+  init &= InitStrategy(STOCHASTIC30, "Stochastic M30", Stochastic30_Active, STOCHASTIC, PERIOD_M30, Stochastic30_OpenMethod, Stochastic_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(WPR1,  "WPR M1",  WPR1_Active,  WPR, PERIOD_M1,  WPR1_OpenMethod,  WPR_OpenLevel, WPR1_OpenCondition1,  WPR1_OpenCondition2,  WPR1_CloseCondition,  WPR1_MaxSpread);
-  InitStrategy(WPR5,  "WPR M5",  WPR5_Active,  WPR, PERIOD_M5,  WPR5_OpenMethod,  WPR_OpenLevel, WPR5_OpenCondition1,  WPR5_OpenCondition2,  WPR5_CloseCondition,  WPR5_MaxSpread);
-  InitStrategy(WPR15, "WPR M15", WPR15_Active, WPR, PERIOD_M15, WPR15_OpenMethod, WPR_OpenLevel, WPR15_OpenCondition1, WPR15_OpenCondition2, WPR15_CloseCondition, WPR15_MaxSpread);
-  InitStrategy(WPR30, "WPR M30", WPR30_Active, WPR, PERIOD_M30, WPR30_OpenMethod, WPR_OpenLevel, WPR30_OpenCondition1, WPR30_OpenCondition2, WPR30_CloseCondition, WPR30_MaxSpread);
+  init &= InitStrategy(WPR1,  "WPR M1",  WPR1_Active,  WPR, PERIOD_M1,  WPR1_OpenMethod,  WPR_OpenLevel, WPR1_OpenCondition1,  WPR1_OpenCondition2,  WPR1_CloseCondition,  WPR1_MaxSpread);
+  init &= InitStrategy(WPR5,  "WPR M5",  WPR5_Active,  WPR, PERIOD_M5,  WPR5_OpenMethod,  WPR_OpenLevel, WPR5_OpenCondition1,  WPR5_OpenCondition2,  WPR5_CloseCondition,  WPR5_MaxSpread);
+  init &= InitStrategy(WPR15, "WPR M15", WPR15_Active, WPR, PERIOD_M15, WPR15_OpenMethod, WPR_OpenLevel, WPR15_OpenCondition1, WPR15_OpenCondition2, WPR15_CloseCondition, WPR15_MaxSpread);
+  init &= InitStrategy(WPR30, "WPR M30", WPR30_Active, WPR, PERIOD_M30, WPR30_OpenMethod, WPR_OpenLevel, WPR30_OpenCondition1, WPR30_OpenCondition2, WPR30_CloseCondition, WPR30_MaxSpread);
   #else
-  InitStrategy(WPR1,  "WPR M1",  WPR1_Active,  WPR, PERIOD_M1,  WPR1_OpenMethod,  WPR_OpenLevel);
-  InitStrategy(WPR5,  "WPR M5",  WPR5_Active,  WPR, PERIOD_M5,  WPR5_OpenMethod,  WPR_OpenLevel);
-  InitStrategy(WPR15, "WPR M15", WPR15_Active, WPR, PERIOD_M15, WPR15_OpenMethod, WPR_OpenLevel);
-  InitStrategy(WPR30, "WPR M30", WPR30_Active, WPR, PERIOD_M30, WPR30_OpenMethod, WPR_OpenLevel);
+  init &= InitStrategy(WPR1,  "WPR M1",  WPR1_Active,  WPR, PERIOD_M1,  WPR1_OpenMethod,  WPR_OpenLevel);
+  init &= InitStrategy(WPR5,  "WPR M5",  WPR5_Active,  WPR, PERIOD_M5,  WPR5_OpenMethod,  WPR_OpenLevel);
+  init &= InitStrategy(WPR15, "WPR M15", WPR15_Active, WPR, PERIOD_M15, WPR15_OpenMethod, WPR_OpenLevel);
+  init &= InitStrategy(WPR30, "WPR M30", WPR30_Active, WPR, PERIOD_M30, WPR30_OpenMethod, WPR_OpenLevel);
   #endif
 
   #ifdef __advanced__
-  InitStrategy(ZIGZAG1,  "ZigZag M1",  ZigZag1_Active,  ZIGZAG, PERIOD_M1,  ZigZag1_OpenMethod,  ZigZag_OpenLevel, ZigZag1_OpenCondition1,  ZigZag1_OpenCondition2,  ZigZag1_CloseCondition,  ZigZag1_MaxSpread);
-  InitStrategy(ZIGZAG5,  "ZigZag M5",  ZigZag5_Active,  ZIGZAG, PERIOD_M5,  ZigZag5_OpenMethod,  ZigZag_OpenLevel, ZigZag5_OpenCondition1,  ZigZag5_OpenCondition2,  ZigZag5_CloseCondition,  ZigZag5_MaxSpread);
-  InitStrategy(ZIGZAG15, "ZigZag M15", ZigZag15_Active, ZIGZAG, PERIOD_M15, ZigZag15_OpenMethod, ZigZag_OpenLevel, ZigZag15_OpenCondition1, ZigZag15_OpenCondition2, ZigZag15_CloseCondition, ZigZag15_MaxSpread);
-  InitStrategy(ZIGZAG30, "ZigZag M30", ZigZag30_Active, ZIGZAG, PERIOD_M30, ZigZag30_OpenMethod, ZigZag_OpenLevel, ZigZag30_OpenCondition1, ZigZag30_OpenCondition2, ZigZag30_CloseCondition, ZigZag30_MaxSpread);
+  init &= InitStrategy(ZIGZAG1,  "ZigZag M1",  ZigZag1_Active,  ZIGZAG, PERIOD_M1,  ZigZag1_OpenMethod,  ZigZag_OpenLevel, ZigZag1_OpenCondition1,  ZigZag1_OpenCondition2,  ZigZag1_CloseCondition,  ZigZag1_MaxSpread);
+  init &= InitStrategy(ZIGZAG5,  "ZigZag M5",  ZigZag5_Active,  ZIGZAG, PERIOD_M5,  ZigZag5_OpenMethod,  ZigZag_OpenLevel, ZigZag5_OpenCondition1,  ZigZag5_OpenCondition2,  ZigZag5_CloseCondition,  ZigZag5_MaxSpread);
+  init &= InitStrategy(ZIGZAG15, "ZigZag M15", ZigZag15_Active, ZIGZAG, PERIOD_M15, ZigZag15_OpenMethod, ZigZag_OpenLevel, ZigZag15_OpenCondition1, ZigZag15_OpenCondition2, ZigZag15_CloseCondition, ZigZag15_MaxSpread);
+  init &= InitStrategy(ZIGZAG30, "ZigZag M30", ZigZag30_Active, ZIGZAG, PERIOD_M30, ZigZag30_OpenMethod, ZigZag_OpenLevel, ZigZag30_OpenCondition1, ZigZag30_OpenCondition2, ZigZag30_CloseCondition, ZigZag30_MaxSpread);
   #else
-  InitStrategy(ZIGZAG1,  "ZigZag M1",  ZigZag1_Active,  ZIGZAG, PERIOD_M1,  ZigZag1_OpenMethod,  ZigZag_OpenLevel);
-  InitStrategy(ZIGZAG5,  "ZigZag M5",  ZigZag5_Active,  ZIGZAG, PERIOD_M5,  ZigZag5_OpenMethod,  ZigZag_OpenLevel);
-  InitStrategy(ZIGZAG15, "ZigZag M15", ZigZag15_Active, ZIGZAG, PERIOD_M15, ZigZag15_OpenMethod, ZigZag_OpenLevel);
-  InitStrategy(ZIGZAG30, "ZigZag M30", ZigZag30_Active, ZIGZAG, PERIOD_M30, ZigZag30_OpenMethod, ZigZag_OpenLevel);
+  init &= InitStrategy(ZIGZAG1,  "ZigZag M1",  ZigZag1_Active,  ZIGZAG, PERIOD_M1,  ZigZag1_OpenMethod,  ZigZag_OpenLevel);
+  init &= InitStrategy(ZIGZAG5,  "ZigZag M5",  ZigZag5_Active,  ZIGZAG, PERIOD_M5,  ZigZag5_OpenMethod,  ZigZag_OpenLevel);
+  init &= InitStrategy(ZIGZAG15, "ZigZag M15", ZigZag15_Active, ZIGZAG, PERIOD_M15, ZigZag15_OpenMethod, ZigZag_OpenLevel);
+  init &= InitStrategy(ZIGZAG30, "ZigZag M30", ZigZag30_Active, ZIGZAG, PERIOD_M30, ZigZag30_OpenMethod, ZigZag_OpenLevel);
   #endif
+
+  if (!init && ValidateMarketSettings) {
+    Msg::ShowText("Initiation of strategies failed!", "Error", __FUNCTION__, __LINE__, VerboseErrors);
+    return (FALSE);
+  }
 
   Arrays::ArrSetValueD(conf, FACTOR, 1.0);
   Arrays::ArrSetValueD(conf, LOT_SIZE, lot_size);
@@ -4677,9 +4697,23 @@ bool InitializeStrategies() {
 }
 
 /**
+ * Check whether timeframe is valid.
+ */
+bool CheckTf(int tf = PERIOD_M1, string symbol = NULL) {
+  return iMA(symbol, tf, 13, 8, MODE_SMMA, PRICE_MEDIAN, 0) > 0;
+
+}
+
+/**
  * Initialize specific strategy.
  */
 bool InitStrategy(int key, string name, bool active, int indicator, int timeframe, int open_method = 0, double open_level = 0.0, int open_cond1 = 0, int open_cond2 = 0, int close_cond = 0, double max_spread = 0.0) {
+  if (active && !CheckTf(timeframe)) {
+    Msg::ShowText(
+      StringFormat("Cannot initialize %s strategy, because its timeframe (%d) is not active!", name, timeframe),
+      "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
+    return (FALSE);
+  }
   sname[key]                 = name;
   info[key][ACTIVE]          = active;
   info[key][TIMEFRAME]       = timeframe;
@@ -6058,7 +6092,7 @@ bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
       sid = order_queue[selected_qid][Q_SID];
       time = order_queue[selected_qid][Q_TIME];
       volume = GetStrategyLotSize(sid, cmd);
-      if (!OrderOrderCondition(cmd, sid, time, filter)) continue;
+      if (!OpenOrderCondition(cmd, sid, time, filter)) continue;
       if (OpenOrderIsAllowed(cmd, sid, volume)) {
         string comment = GetStrategyComment(sid) + " [AIQueued]";
         result = ExecuteOrder(cmd, sid, volume);
@@ -6072,24 +6106,24 @@ bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
 /**
  * Check for the market condition to filter out the order queue.
  */
-bool OrderOrderCondition(int cmd, int sid, int time, int method) {
+bool OpenOrderCondition(int cmd, int sid, int time, int method) {
   bool result = TRUE;
-  int timeframe = GetStrategyTimeframe(sid);
-  int period = Convert::TfToPeriod(timeframe);
-  int qshift = iBarShift(_Symbol, timeframe, time, FALSE); // Get the number of bars for the timeframe since queued.
-  double qopen = iOpen(_Symbol, timeframe, qshift);
-  double qclose = iClose(_Symbol, timeframe, qshift);
-  double qhighest = GetPeakPrice(timeframe, MODE_HIGH, qshift); // Get the high price since queued.
-  double qlowest = GetPeakPrice(timeframe, MODE_LOW, qshift); // Get the lowest price since queued.
+  int tf = GetStrategytf(sid);
+  int period = Convert::TfToPeriod(tf);
+  int qshift = iBarShift(_Symbol, tf, time, FALSE); // Get the number of bars for the tf since queued.
+  double qopen = iOpen(_Symbol, tf, qshift);
+  double qclose = iClose(_Symbol, tf, qshift);
+  double qhighest = GetPeakPrice(tf, MODE_HIGH, qshift); // Get the high price since queued.
+  double qlowest = GetPeakPrice(tf, MODE_LOW, qshift); // Get the lowest price since queued.
   double diff = MathMax(qhighest - Open[CURR], Open[CURR] - qlowest);
   if ((method &   1) != 0) result &= (cmd == OP_BUY && qopen < Open[CURR]) || (cmd == OP_SELL && qopen > Open[CURR]);
   if ((method &   2) != 0) result &= (cmd == OP_BUY && qclose < Close[CURR]) || (cmd == OP_SELL && qclose > Close[CURR]);
   if ((method &   4) != 0) result &= (cmd == OP_BUY && qlowest < Low[CURR]) || (cmd == OP_SELL && qlowest > Low[CURR]);
   if ((method &   8) != 0) result &= (cmd == OP_BUY && qhighest > High[CURR]) || (cmd == OP_SELL && qhighest < High[CURR]);
-  if ((method &  16) != 0) result &= UpdateIndicator(SAR, timeframe) && Trade_SAR(cmd, timeframe, 0, 0);
-  if ((method &  32) != 0) result &= UpdateIndicator(DEMARKER, timeframe) && Trade_DeMarker(cmd, timeframe, 0, 0);
-  if ((method &  64) != 0) result &= UpdateIndicator(RSI, timeframe) && Trade_RSI(cmd, timeframe, 0, 0);
-  if ((method & 128) != 0) result &= UpdateIndicator(MA, timeframe) && Trade_MA(cmd, timeframe, 0, 0);
+  if ((method &  16) != 0) result &= UpdateIndicator(SAR, tf) && Trade_SAR(cmd, tf, 0, 0);
+  if ((method &  32) != 0) result &= UpdateIndicator(DEMARKER, tf) && Trade_DeMarker(cmd, tf, 0, 0);
+  if ((method &  64) != 0) result &= UpdateIndicator(RSI, tf) && Trade_RSI(cmd, tf, 0, 0);
+  if ((method & 128) != 0) result &= UpdateIndicator(MA, tf) && Trade_MA(cmd, tf, 0, 0);
   return (result);
 }
 
