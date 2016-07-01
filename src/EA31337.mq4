@@ -387,7 +387,7 @@ int OnInit() {
   string err;
   if (VerboseInfo) PrintFormat("%s v%s (%s) initializing...", ea_name, ea_version, ea_link);
   if (!session_initiated) {
-    if (!ValidSettings()) {
+    if (!CheckSettings()) {
       // Incorrect set of input parameters occured.
       Msg::ShowText("EA parameters are not valid, please correct.", "Error", __FUNCTION__, __LINE__, VerboseErrors, TRUE, TRUE);
       return (INIT_PARAMETERS_INCORRECT);
@@ -661,12 +661,14 @@ bool TradeCondition(int order_type = 0, int cmd = NULL) {
  * Gukkuk im Versteck
  */
 bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL) {
+  bool success = TRUE;
   static datetime processed[FINAL_INDICATOR_TYPE_ENTRY][FINAL_PERIOD_TYPE_ENTRY];
   int i; string text = __FUNCTION__ + ": ";
   if (type == EMPTY) ArrayFill(processed, 0, ArraySize(processed), FALSE); // Reset processed if tf is EMPTY.
   int period = Convert::TfToPeriod(tf);
   if (processed[type][period] == time_current) {
-    return (TRUE); // If it was already processed, ignore it.
+    // If it was already processed, ignore it.
+    return (TRUE);
   }
 
   double envelopes_deviation;
@@ -691,10 +693,12 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
     case ALLIGATOR: // Calculates the Alligator indicator.
       // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        alligator[period][i][JAW] = iMA(symbol, tf, Alligator_Period_Jaw,   Alligator_Jaw_Shift,   Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
+        alligator[period][i][LIPS]  = iMA(symbol, tf, Alligator_Period_Lips,  Alligator_Lips_Shift,  Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
         alligator[period][i][TEETH] = iMA(symbol, tf, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
-        alligator[period][i][LIPS]  = iMA(symbol, tf, Alligator_Period_Lips,  Alligator_Lips_Shift,  Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift_Far);
+        alligator[period][i][JAW]   = iMA(symbol, tf, Alligator_Period_Jaw,   Alligator_Jaw_Shift,   Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
       }
+      success = (bool)alligator[period][CURR][JAW];
+      if (VerboseDebug) PrintFormat("Alligator %d: %g/%g/%g", tf, alligator[period][i][LIPS], alligator[period][i][TEETH], alligator[period][i][JAW]);
       /* Note: This is equivalent to:
         alligator[period][i][TEETH] = iAlligator(symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
         alligator[period][i][TEETH] = iAlligator(symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
@@ -709,8 +713,9 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
       }
       break;
     case AWESOME: // Calculates the Awesome oscillator.
-      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         awesome[period][i] = iAO(symbol, tf, i);
+      }
       break;
 #endif // __advanced__
     case BANDS: // Calculates the Bollinger Bands indicator.
@@ -721,6 +726,7 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
         bands[period][i][BANDS_UPPER] = iBands(symbol, tf, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_UPPER, i + Bands_Shift);
         bands[period][i][BANDS_LOWER] = iBands(symbol, tf, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_LOWER, i + Bands_Shift);
       }
+      success = (bool)bands[period][CURR][BANDS_BASE];
       if (VerboseDebug) PrintFormat("Bands %d: %g/%g/%g", tf, bands[period][CURR][BANDS_LOWER], bands[period][CURR][BANDS_BASE], bands[period][CURR][BANDS_UPPER]);
       break;
 #ifdef __advanced__
@@ -729,24 +735,28 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
         bpower[period][i][OP_BUY]  = iBullsPower(symbol, tf, BPower_Period, BPower_Applied_Price, i);
         bpower[period][i][OP_SELL] = iBearsPower(symbol, tf, BPower_Period, BPower_Applied_Price, i);
       }
+      success = (bool)(bpower[period][CURR][OP_BUY] || bpower[period][CURR][OP_SELL]);
       // Message("Bulls: " + bpower[period][CURR][OP_BUY] + ", Bears: " + bpower[period][CURR][OP_SELL]);
       break;
     case BWMFI: // Calculates the Market Facilitation Index indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         bwmfi[period][i] = iBWMFI(symbol, tf, i);
       }
+      success = (bool)bwmfi[period][CURR];
       break;
     case CCI: // Calculates the Commodity Channel Index indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         cci[period][i][FAST] = iCCI(symbol, tf, CCI_Period_Fast, CCI_Applied_Price, i);
         cci[period][i][SLOW] = iCCI(symbol, tf, CCI_Period_Slow, CCI_Applied_Price, i);
       }
+      success = (bool)cci[period][CURR][SLOW];
       break;
 #endif
     case DEMARKER: // Calculates the DeMarker indicator.
       demarker[period][CURR] = iDeMarker(symbol, tf, DeMarker_Period, 0 + DeMarker_Shift);
       demarker[period][PREV] = iDeMarker(symbol, tf, DeMarker_Period, 1 + DeMarker_Shift);
       demarker[period][FAR]  = iDeMarker(symbol, tf, DeMarker_Period, 2 + DeMarker_Shift);
+      success = (bool)demarker[period][CURR];
       // PrintFormat("Period: %d, DeMarker: %g", period, demarker[period][CURR]);
       break;
     case ENVELOPES: // Calculates the Envelopes indicator.
@@ -762,12 +772,14 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
         envelopes[period][i][UPPER] = iEnvelopes(symbol, tf, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, UPPER, i + Envelopes_Shift);
         envelopes[period][i][LOWER] = iEnvelopes(symbol, tf, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, LOWER, i + Envelopes_Shift);
       }
+      success = (bool)envelopes[period][CURR][MODE_MAIN];
       break;
 #ifdef __advanced__
     case FORCE: // Calculates the Force Index indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         force[period][i] = iForce(symbol, tf, Force_Period, Force_MA_Method, Force_Applied_price, i);
       }
+      success = (bool)force[period][CURR];
       break;
 #endif
     case FRACTALS: // Calculates the Fractals indicator.
@@ -779,10 +791,11 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
     case GATOR: // Calculates the Gator oscillator.
       // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        gator[period][i][TEETH] = iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
+        gator[period][i][LIPS]  = iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
         gator[period][i][TEETH] = iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
-        gator[period][i][LIPS]  = iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Teeth, Alligator_Teeth_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
+        gator[period][i][JAW] = iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Jaw, Alligator_Jaw_Shift, Alligator_Period_Lips, Alligator_Lips_Shift, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
       }
+      success = (bool)gator[period][CURR][JAW];
       break;
     case ICHIMOKU: // Calculates the Ichimoku Kinko Hyo indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
@@ -792,6 +805,7 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
         ichimoku[period][i][MODE_SENKOUSPANB] = iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_SENKOUSPANB, i);
         ichimoku[period][i][MODE_CHIKOUSPAN]  = iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_CHIKOUSPAN, i);
       }
+      success = (bool)ichimoku[period][CURR][MODE_TENKANSEN];
       break;
     case MA: // Calculates the Moving Average indicator.
       // Calculate MA Fast.
@@ -806,6 +820,7 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
       ma_slow[period][CURR] = iMA(symbol, tf, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, CURR); // Current
       ma_slow[period][PREV] = iMA(symbol, tf, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, PREV + MA_Shift_Slow); // Previous
       ma_slow[period][FAR]  = iMA(symbol, tf, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Slow + MA_Shift_Far);
+      success = (bool)ma_slow[period][CURR];
       if (VerboseDebug && Check::IsVisualMode()) Draw::DrawMA(tf);
       break;
     case MACD: // Calculates the Moving Averages Convergence/Divergence indicator.
@@ -815,24 +830,32 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
       macd[period][CURR][MODE_SIGNAL] = iMACD(symbol, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price, MODE_SIGNAL, CURR); // Current
       macd[period][PREV][MODE_SIGNAL] = iMACD(symbol, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price, MODE_SIGNAL, PREV + MACD_Shift); // Previous
       macd[period][FAR][MODE_SIGNAL]  = iMACD(symbol, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price, MODE_SIGNAL, FAR + MACD_Shift_Far); // TODO: + MACD_Shift
+      success = (bool)macd[period][CURR][MODE_MAIN];
       break;
     case MFI: // Calculates the Money Flow Index indicator.
-      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         mfi[period][i] = iMFI(symbol, tf, MFI_Period, i);
+      }
+      success = (bool)mfi[period][CURR];
       break;
     case MOMENTUM: // Calculates the Momentum indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         momentum[period][i][FAST] = iMomentum(symbol, tf, Momentum_Period_Fast, Momentum_Applied_Price, i);
         momentum[period][i][SLOW] = iMomentum(symbol, tf, Momentum_Period_Slow, Momentum_Applied_Price, i);
       }
+      success = (bool)momentum[period][CURR][SLOW];
       break;
     case OBV: // Calculates the On Balance Volume indicator.
-      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         obv[period][i] = iOBV(symbol, tf, OBV_Applied_Price, i);
+      }
+      success = (bool)obv[period][CURR];
       break;
     case OSMA: // Calculates the Moving Average of Oscillator indicator.
-      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         osma[period][i] = iOsMA(symbol, tf, OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price, i);
+      }
+      success = (bool)osma[period][CURR];
       break;
     case RSI: // Calculates the Relative Strength Index indicator.
       // int rsi_period = RSI_Period; // Not used at the moment.
@@ -843,6 +866,7 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
         if (rsi[period][i] < rsi_stats[period][LOWER] || rsi_stats[period][LOWER] == 0) rsi_stats[period][LOWER] = rsi[period][i]; // Calculate minimum value.
       }
       rsi_stats[period][0] = Misc::If(rsi_stats[period][0] > 0, (rsi_stats[period][0] + rsi[period][0] + rsi[period][1] + rsi[period][2]) / 4, (rsi[period][0] + rsi[period][1] + rsi[period][2]) / 3); // Calculate average value.
+      success = (bool)rsi[period][CURR];
       break;
     case RVI: // Calculates the Relative Strength Index indicator.
       rvi[period][CURR][MODE_MAIN]   = iRVI(symbol, tf, 10, MODE_MAIN, CURR);
@@ -851,14 +875,19 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
       rvi[period][CURR][MODE_SIGNAL] = iRVI(symbol, tf, 10, MODE_SIGNAL, CURR);
       rvi[period][PREV][MODE_SIGNAL] = iRVI(symbol, tf, 10, MODE_SIGNAL, PREV + RVI_Shift);
       rvi[period][FAR][MODE_SIGNAL]  = iRVI(symbol, tf, 10, MODE_SIGNAL, FAR + RVI_Shift + RVI_Shift_Far);
+      success = (bool)rvi[period][CURR][MODE_MAIN];
       break;
     case SAR: // Calculates the Parabolic Stop and Reverse system indicator.
-      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         sar[period][i] = iSAR(NULL, tf, SAR_Step, SAR_Maximum_Stop, i + SAR_Shift);
+      }
+      success = (bool)sar[period][CURR];
       break;
     case STDDEV: // Calculates the Standard Deviation indicator.
-      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         stddev[period][i] = iStdDev(symbol, tf, StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price, i);
+      }
+      success = stddev[period][CURR];
       break;
     case STOCHASTIC: // Calculates the Stochastic Oscillator.
       // TODO
@@ -866,12 +895,14 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
         stochastic[period][i][MODE_MAIN]   = iStochastic(symbol, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, MODE_MAIN, i);
         stochastic[period][i][MODE_SIGNAL] = iStochastic(symbol, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, MODE_SIGNAL, i);
       }
+      success = stochastic[period][CURR][MODE_MAIN];
       break;
     case WPR: // Calculates the  Larry Williams' Percent Range.
       // Update the Larry Williams' Percent Range indicator values.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         wpr[period][i] = -iWPR(symbol, tf, WPR_Period, i + WPR_Shift);
       }
+      success = wpr[period][CURR];
       break;
     case ZIGZAG: // Calculates the custom ZigZag indicator.
       // TODO
@@ -3463,7 +3494,7 @@ bool TradeAllowed() {
 }
 
 // Check if EA parameters are valid.
-bool ValidSettings() {
+bool CheckSettings() {
   string err;
    // TODO: IsDllsAllowed(), IsLibrariesAllowed()
   /* @todo
@@ -3486,9 +3517,9 @@ bool ValidSettings() {
   }
   #endif
   #endif
-  if (!Check::IsRealtime() && ValidateMarketSettings) {
+  if (!Check::IsRealtime() && ValidateSettings) {
     if (!Backtest::ValidSpread() || !Backtest::ValidLotstep()) {
-      Msg::ShowText("Backtest market settings are invalid!", "Error", __FUNCTION__, __LINE__, VerboseErrors);
+      Msg::ShowText("Backtest market settings are invalid!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
       return (FALSE);
     }
   }
@@ -4030,38 +4061,38 @@ bool InitializeVariables() {
   // @todo Move to method.
   market_lotsize = MarketInfo(_Symbol, MODE_LOTSIZE); // Lot size in the base currency.
   if (market_lotsize <= 0.0) {
-    init &= !ValidateMarketSettings;
-    Msg::ShowText(StringFormat("Invalid MODE_LOTSIZE: %g", market_lotsize), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateMarketSettings);
+    init &= !ValidateSettings;
+    Msg::ShowText(StringFormat("Invalid MODE_LOTSIZE: %g", market_lotsize), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
   }
 
   market_lotstep = MarketInfo(_Symbol, MODE_LOTSTEP); // Step for changing lots.
   // @todo: Move to method.
   if (market_lotstep <= 0.0) {
-    init &= !ValidateMarketSettings;
-    Msg::ShowText(StringFormat("Invalid MODE_LOTSTEP: %g", market_lotstep), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateMarketSettings);
+    init &= !ValidateSettings;
+    Msg::ShowText(StringFormat("Invalid MODE_LOTSTEP: %g", market_lotstep), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
     market_lotstep = 0.01;
   }
 
   market_minlot = MarketInfo(_Symbol, MODE_MINLOT); // Minimum permitted amount of a lot
   // @todo: Move to method.
   if (market_minlot <= 0.0) {
-    init &= !ValidateMarketSettings;
-    Msg::ShowText(StringFormat("Invalid MODE_MINLOT: %g", market_minlot), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateMarketSettings);
+    init &= !ValidateSettings;
+    Msg::ShowText(StringFormat("Invalid MODE_MINLOT: %g", market_minlot), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
     market_minlot = market_lotstep;
   }
 
   market_maxlot = MarketInfo(_Symbol, MODE_MAXLOT); // Maximum permitted amount of a lot
   // @todo: Move to method.
   if (market_maxlot <= 0.0) {
-    init &= !ValidateMarketSettings;
-    Msg::ShowText(StringFormat("Invalid MODE_MAXLOT: %g", market_maxlot), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateMarketSettings);
+    init &= !ValidateSettings;
+    Msg::ShowText(StringFormat("Invalid MODE_MAXLOT: %g", market_maxlot), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
     market_maxlot = 100;
   }
 
   market_marginrequired = MarketInfo(_Symbol, MODE_MARGINREQUIRED); // Free margin required to open 1 lot for buying.
   if (market_marginrequired == 0) {
-    init &= !ValidateMarketSettings;
-    Msg::ShowText(StringFormat("Invalid MODE_MARGINREQUIRED: %g", market_marginrequired), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateMarketSettings);
+    init &= !ValidateSettings;
+    Msg::ShowText(StringFormat("Invalid MODE_MARGINREQUIRED: %g", market_marginrequired), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
     market_marginrequired = 10; // Fix for 'zero divide' bug when MODE_MARGINREQUIRED is zero.
   }
 
@@ -4074,15 +4105,15 @@ bool InitializeVariables() {
   LastAsk = Ask; LastBid = Bid;
   init_balance = Account::AccountBalance();
   if (init_balance <= 0) {
-    Msg::ShowText(StringFormat("Account balance is %g!", init_balance), "Error", __FUNCTION__, __LINE__, VerboseErrors);
+    Msg::ShowText(StringFormat("Account balance is %g!", init_balance), "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
     return (FALSE);
   }
   if (Account::AccountEquity() <= 0) {
-    Msg::ShowText(StringFormat("Account equity is %g!", Account::AccountEquity()), "Error", __FUNCTION__, __LINE__, VerboseErrors);
+    Msg::ShowText(StringFormat("Account equity is %g!", Account::AccountEquity()), "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
     return (FALSE);
   }
   if (Account::AccountFreeMargin() <= 0) {
-    Msg::ShowText(StringFormat("Account free margin is %g!", Account::AccountFreeMargin()), "Error", __FUNCTION__, __LINE__, VerboseErrors);
+    Msg::ShowText(StringFormat("Account free margin is %g!", Account::AccountFreeMargin()), "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
     return (FALSE);
   }
   /* @fixme: https://travis-ci.org/EA31337-Tester/EA31337-Lite-Sets/builds/140302386
@@ -4683,8 +4714,8 @@ bool InitializeStrategies() {
   init &= InitStrategy(ZIGZAG30, "ZigZag M30", ZigZag30_Active, ZIGZAG, PERIOD_M30, ZigZag30_OpenMethod, ZigZag_OpenLevel);
   #endif
 
-  if (!init && ValidateMarketSettings) {
-    Msg::ShowText("Initiation of strategies failed!", "Error", __FUNCTION__, __LINE__, VerboseErrors);
+  if (!init && ValidateSettings) {
+    Msg::ShowText("Initiation of strategies failed!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
     return (FALSE);
   }
 
@@ -4706,11 +4737,29 @@ bool CheckTf(int tf = PERIOD_M1, string symbol = NULL) {
  * Initialize specific strategy.
  */
 bool InitStrategy(int key, string name, bool active, int indicator, int timeframe, int open_method = 0, double open_level = 0.0, int open_cond1 = 0, int open_cond2 = 0, int close_cond = 0, double max_spread = 0.0) {
-  if (active && !CheckTf(timeframe)) {
-    Msg::ShowText(
-      StringFormat("Cannot initialize %s strategy, because its timeframe (%d) is not active!", name, timeframe),
-      "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
-    return (FALSE);
+  if (active) {
+    // Validate whether the timeframe is working.
+    if (!CheckTf(timeframe)) {
+      Msg::ShowText(
+        StringFormat("Cannot initialize %s strategy, because its timeframe (%d) is not active!%s", name, timeframe, ValidateSettings ? " Disabling..." : ""),
+        "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
+      if (ValidateSettings) {
+        return (FALSE);
+      } else {
+        active = FALSE;
+      }
+    }
+    // Validate whether indicator of the strategy is working.
+    if (!UpdateIndicator(INDICATOR, timeframe)) {
+      Msg::ShowText(
+        StringFormat("Cannot initialize indicator for the %s strategy!%s", name, ValidateSettings ? " Disabling..." : ""),
+        "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
+      if (ValidateSettings) {
+        return (FALSE);
+      } else {
+        active = FALSE;
+      }
+    }
   }
   sname[key]                 = name;
   info[key][ACTIVE]          = active;

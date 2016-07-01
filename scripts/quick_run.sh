@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Example usage:
+#   quick_run.sh Lite-Backtest -i sets/Lite/_rules/.init.rules.inc -i sets/Lite/_rules/Strategy-Bands/Strategy-Bands-Bands1_Active.rules -I TestVisualEnable=1 -E Bands1_Active=1,Bands5_Active=1 -m1
 set -e
 [ "$TRACE" ] && set -x
 [ ! "$NOFAIL" ] && set -e
