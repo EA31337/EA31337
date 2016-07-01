@@ -27,7 +27,7 @@ run_test() {
 
   time \
   VM_NAME="$test_name" \
-  RUN_TEST="-t -x -o -I TestModel=0 -E VerboseInfo=1 -f */\"$SET_DIR\"/*.set -e EA31337-$VERSION -c $CURRENCY -p $SYMBOL -d $DEPOSIT -s $SPREAD -y $YEAR -M $MT4_VER -D $DIGITS -b $BT_SOURCE -i \"\$(find ~ -name \*${test_name}.rule*)\" -r \"$rep_name\" -O */\"$OPT_DIR\" $args " \
+  RUN_TEST="-t -x -o -I TestModel=0 -E VerboseInfo=1,maxdrawdown_enable=0 -f */\"$SET_DIR\"/*.set -e EA31337-$VERSION -c $CURRENCY -p $SYMBOL -d $DEPOSIT -s $SPREAD -y $YEAR -M $MT4_VER -D $DIGITS -b $BT_SOURCE -i \"\$(find ~ -name .init.rules.inc)\" -i \"\$(find ~ -name \*${test_name}.rule\*)\" -r \"$rep_name\" -O */\"$OPT_DIR\" $args " \
   PUSH_REPO=1 \
   TERMINATE=1 \
   vagrant provision
@@ -46,5 +46,6 @@ find "$ROOT/sets/$VERSION" -type f '(' -name "*$pattern*.rule*" -a -not -name "*
   echo "Report name: ${test_name}--${SYMBOL}-${DEPOSIT}${CURRENCY}-${YEAR}year-${SPREAD}spread-${BT_SOURCE}-optimization-test"
 
   ( run_test "$test_name" | tee "$LOG_DIR/${test_name:-$0}.log" ) > /dev/null &
+  sleep 2
 
 done
