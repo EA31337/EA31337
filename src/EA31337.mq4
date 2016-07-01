@@ -403,7 +403,7 @@ int OnInit() {
   }
 
   session_initiated &= InitializeVariables();
-  session_initiated &= InitializeStrategies();
+  session_initiated &= InitStrategies();
   session_initiated &= InitializeConditions();
   session_initiated &= CheckHistory();
 
@@ -436,7 +436,7 @@ int OnInit() {
   ea_active = TRUE;
   WindowRedraw();
 
-  return Misc::If(session_initiated, (int)INIT_SUCCEEDED, (int)INIT_FAILED);
+  return (session_initiated ? INIT_SUCCEEDED : INIT_FAILED);
 } // end: OnInit()
 
 //+------------------------------------------------------------------+
@@ -579,7 +579,7 @@ bool Trade() {
 
   for (int id = 0; id < FINAL_STRATEGY_TYPE_ENTRY; id++) {
     trade_cmd = EMPTY;
-    if (info[id][ACTIVE]) {
+    if (info[id][ACTIVE] && !info[id][SUSPENDED]) {
       if (TradeCondition(id, OP_BUY))  trade_cmd = OP_BUY;
       else if (TradeCondition(id, OP_SELL)) trade_cmd = OP_SELL;
       #ifdef __advanced__
@@ -698,7 +698,7 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
         alligator[period][i][JAW]   = iMA(symbol, tf, Alligator_Period_Jaw,   Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
       }
       success = (bool)alligator[period][CURR][JAW];
-      if (VerboseDebug) PrintFormat("Alligator %d: %g/%g/%g", tf, alligator[period][i][LIPS], alligator[period][i][TEETH], alligator[period][i][JAW]);
+      if (VerboseDebug) PrintFormat("Alligator %d: %g/%g/%g", tf, alligator[period][CURR][LIPS], alligator[period][CURR][TEETH], alligator[period][CURR][JAW]);
       /* Note: This is equivalent to:
         alligator[period][i][TEETH] = iAlligator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
         alligator[period][i][TEETH] = iAlligator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
@@ -967,7 +967,7 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
         Print(__FUNCTION__ + ": OrderSelect() error = ", ErrorDescription(GetLastError()));
         OrderPrint();
         // @fixme: warning 43: possible loss of data due to type conversion: trade_volume
-        if (retry) TaskAddOrderOpen(cmd, trade_volume, sid); // Will re-try again.
+        if (retry) TaskAddOrderOpen(cmd, trade_volume, sid); // Will re-try again. // warning 43: possible loss of data due to type conversion
         info[sid][TOTAL_ERRORS]++;
         return (FALSE);
       }
@@ -975,7 +975,7 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
 
       result = TRUE;
       // TicketAdd(order_ticket);
-      last_order_time = TimeCurrent(); // Set last execution time.
+      last_order_time = TimeCurrent(); // Set last execution time. // warning 43: possible loss of data due to type conversion
       // last_trail_update = 0; // Set to 0, so trailing stops can be updated faster.
       order_price = OrderOpenPrice();
       stats[sid][AVG_SPREAD] = (stats[sid][AVG_SPREAD] + curr_spread) / 2;
@@ -1028,7 +1028,7 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
         // Price changed, so we should consider whether to execute order or not.
         retry = FALSE; // ?
      }
-     if (retry) TaskAddOrderOpen(cmd, trade_volume, sid); // Will re-try again.
+     if (retry) TaskAddOrderOpen(cmd, trade_volume, sid); // Will re-try again. // warning 43: possible loss of data due to type conversion
      info[sid][TOTAL_ERRORS]++;
    } // end-if: order_ticket
 
@@ -1062,6 +1062,8 @@ bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
   } else if (!CheckMinPipGap(sid)) {
     last_trace = Msg::ShowText(StringFormat("%s: Not executing order, because the gap is too small [MinPipGap].", sname[sid]), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
     result = FALSE;
+  } else if (!CheckProfitFactorLimits(sid)) {
+    result = FALSE;
   }
   #ifdef __advanced__
   if (ApplySpreadLimits && !CheckSpreadLimit(sid)) {
@@ -1078,6 +1080,39 @@ bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
   #endif
   if (err != last_err) last_err = err;
   return (result);
+}
+
+/**
+ * Check if profit factor is not restricted for the specific strategy.
+ *
+ * @param
+ *   sid (int) - strategy id
+ * @return
+ *   If TRUE, the profit factor is fine, otherwise return FALSE.
+ */
+bool CheckProfitFactorLimits(int sid = EMPTY) {
+  if (sid == EMPTY) {
+    // If sid is empty, unsuspend all strategies.
+    // TODO
+    return (TRUE);
+  }
+  if (MinProfitFactorToTrade > 0 && conf[sid][FACTOR] < MinProfitFactorToTrade) {
+    last_err = Msg::ShowText(
+      StringFormat("%s: Minimum profit factor reached, disabling strategy. (pf = %.1f)",
+        sname[sid], conf[sid][FACTOR]),
+      "Error", __FUNCTION__, __LINE__, VerboseErrors);
+    info[sid][SUSPENDED] = TRUE;
+    return (FALSE);
+  }
+  if (MaxProfitFactorToTrade > 0 && conf[sid][FACTOR] > MaxProfitFactorToTrade) {
+    last_err = Msg::ShowText(
+      StringFormat("%s: Maximum profit factor reached, disabling strategy. (pf = %.1f)",
+        sname[sid], conf[sid][FACTOR]),
+      "Error", __FUNCTION__, __LINE__, VerboseErrors);
+    info[sid][SUSPENDED] = TRUE;
+    return (FALSE);
+  }
+  return (TRUE);
 }
 
 #ifdef __advanced__
@@ -1109,14 +1144,14 @@ bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = TRUE)
     ticket_no = OrderTicket();
   }
   double close_price = NormalizeDouble(Market::GetClosePrice(), Digits);
-  result = OrderClose(ticket_no, OrderLots(), close_price, max_order_slippage, GetOrderColor());
+  result = OrderClose(ticket_no, OrderLots(), close_price, max_order_slippage, GetOrderColor()); // @fixme: warning 43: possible loss of data due to type conversion
   // if (VerboseTrace) Print(__FUNCTION__ + ": CloseOrder request. Reason: " + reason + "; Result=" + result + " @ " + TimeCurrent() + "(" + TimeToStr(TimeCurrent()) + "), ticket# " + ticket_no);
   if (result) {
     total_orders--;
     last_close_profit = Order::GetOrderProfit();
     if (SoundAlert) PlaySound(SoundFileAtClose);
     // TaskAddCalcStats(ticket_no); // Already done on CheckHistory().
-    if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + ticket_no + " with profit " + Order::GetOrderProfit() + " pips, reason: " + ReasonIdToText(reason_id) + "; " + Order::GetOrderToText());
+    if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + ticket_no + " with profit " + Order::GetOrderProfit() + " pips, reason: " + ReasonIdToText(reason_id) + "; " + Order::GetOrderToText()); // @fixme: warning 181: implicit conversion from 'number' to 'string'
     #ifdef __advanced__
       if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(Order::GetOrderProfit()) + " pips, reason: " + ReasonIdToText(reason_id) + "; " + Order::GetOrderToText());
       if (SmartQueueActive) OrderQueueProcess();
@@ -2831,17 +2866,18 @@ bool CheckMinPipGap(int strategy_type) {
   for (int order = 0; order < OrdersTotal(); order++) {
     if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
        if (OrderMagicNumber() == MagicNumber + strategy_type && OrderSymbol() == Symbol()) {
-         diff = MathAbs((OrderOpenPrice() - Market::GetOpenPrice()) / pip_size);
+         diff = MathAbs((OrderOpenPrice() - Market::GetOpenPrice()) / pip_size); // @fixme: warning 43: possible loss of data due to type conversion
          // if (VerboseTrace) Print("Ticket: ", OrderTicket(), ", Order: ", OrderType(), ", Gap: ", diff);
          if (diff < MinPipGap) {
-           return FALSE;
+           return (FALSE);
          }
        }
     } else if (VerboseDebug) {
-        Print(__FUNCTION__ + ": Error: Strategy type = " + strategy_type + ", pos: " + order + ", message: ", GetErrorText(err_code));
+      // @fixme: warning 181: implicit conversion from 'number' to 'string'
+      Print(__FUNCTION__ + ": Error: Strategy type = " + strategy_type + ", pos: " + order + ", message: ", GetErrorText(err_code));
     }
   }
-  return TRUE;
+  return (TRUE);
 }
 
 // Validate value for trailing stop.
@@ -3839,7 +3875,13 @@ string ValidEmail(string text) {
 void StartNewHour() {
   CheckHistory(); // Process closed orders for previous hour.
 
-  hour_of_day = Hour(); // Start the new hour.
+  // Process actions.
+  CheckAccConditions();
+
+  // Start the new hour.
+  // Note: This needs to be after action processing.
+  hour_of_day = Hour();
+
   if (VerboseDebug) PrintFormat("== New hour: %d", hour_of_day);
 
   // Update variables.
@@ -3898,6 +3940,9 @@ void StartNewDay() {
   // Print daily report at end of each day.
   if (VerboseInfo) Print(GetDailyReport());
 
+  // Process actions.
+  CheckAccConditions();
+
   // Check if day started another week.
   if (DayOfWeek() < day_of_week) {
     StartNewWeek();
@@ -3950,6 +3995,9 @@ void StartNewWeek() {
   if (VerboseInfo) Print("== New week ==");
   if (VerboseInfo) Print(GetWeeklyReport()); // Print weekly report at end of each week.
 
+  // Process actions.
+  CheckAccConditions();
+
   // Calculate lot size, orders and risk.
   lot_size = GetLotSize(); // Re-calculate lot size.
   UpdateStrategyLotSize(); // Update strategy lot size.
@@ -3986,6 +4034,9 @@ void StartNewWeek() {
 void StartNewMonth() {
   if (VerboseInfo) Print("== New month ==");
   if (VerboseInfo) Print(GetMonthlyReport()); // Print monthly report at end of each month.
+
+  // Process actions.
+  CheckAccConditions();
 
   // Store new data.
   month = DateTime::Month(); // Returns the current month as number (1-January,2,3,4,5,6,7,8,9,10,11,12), i.e., the number of month of the last known server time.
@@ -4123,7 +4174,7 @@ bool InitializeVariables() {
   }
   */
 
-  init_spread = GetMarketSpread(TRUE);
+  init_spread = GetMarketSpread(TRUE); // @todo
   AccCurrency = AccountCurrency();
 
   // Calculate pip/volume/slippage size and precision.
@@ -4345,7 +4396,7 @@ void ToggleComponent(int component) {
 /**
  * Initialize strategies.
  */
-bool InitializeStrategies() {
+bool InitStrategies() {
   bool init = TRUE;
 
   // Initialize/reset strategy arrays.
@@ -4730,7 +4781,6 @@ bool InitializeStrategies() {
  */
 bool CheckTf(int tf = PERIOD_M1, string symbol = NULL) {
   return iMA(symbol, tf, 13, 8, MODE_SMMA, PRICE_MEDIAN, 0) > 0;
-
 }
 
 /**
@@ -4763,10 +4813,12 @@ bool InitStrategy(int key, string name, bool active, int indicator, int timefram
   }
   sname[key]                 = name;
   info[key][ACTIVE]          = active;
+  info[key][SUSPENDED]       = FALSE;
   info[key][TIMEFRAME]       = timeframe;
   info[key][INDICATOR]       = indicator;
   info[key][OPEN_METHOD]     = signal_method;
   conf[key][OPEN_LEVEL]      = open_level;
+  conf[key][FACTOR]          = 1.0;
   #ifdef __advanced__
   info[key][OPEN_CONDITION1] = open_cond1;
   info[key][OPEN_CONDITION2] = open_cond2;
@@ -5048,6 +5100,14 @@ bool MarketCondition(int condition = C_MARKET_NONE) {
           return (FALSE);
         }
       }
+    case C_NEW_HOUR:
+      return hour_of_day != Hour();
+    case C_NEW_DAY:
+      return day_of_week != DayOfWeek();
+    case C_NEW_WEEK:
+      return DayOfWeek() < day_of_week;
+    case C_NEW_MONTH:
+      return Day() < day_of_month;
     case C_MARKET_NONE:
     default:
       return FALSE;
@@ -5081,7 +5141,7 @@ double GetDefaultLotFactor() {
  * Calculate lot size for specific strategy.
  */
 double GetStrategyLotSize(int sid, int cmd) {
-  double trade_lot = Misc::If(conf[sid][LOT_SIZE], conf[sid][LOT_SIZE], lot_size) * Misc::If(conf[sid][FACTOR], conf[sid][FACTOR], 1.0);
+  double trade_lot = (conf[sid][LOT_SIZE] > 0 ? conf[sid][LOT_SIZE] : lot_size) * (conf[sid][FACTOR] > 0 ? conf[sid][FACTOR] : 1.0);
   #ifdef __advanced__
   if (Boosting_Enabled) {
     double pf = GetStrategyProfitFactor(sid);
@@ -5916,6 +5976,12 @@ bool ActionExecute(int aid, int id = EMPTY) {
       break;
     case A_CLOSE_ALL_ORDERS: /* 10 */
       result = ActionCloseAllOrders(reason_id);
+      break;
+    case A_SUSPEND_STRATEGIES: /* 11 */
+      Arrays::ArrSetValueI(info, SUSPENDED, (int)TRUE);
+      break;
+    case A_UNSUSPEND_STRATEGIES: /* 12 */
+      Arrays::ArrSetValueI(info, SUSPENDED, (int)FALSE);
       break;
       /*
     case A_RISK_REDUCE:
