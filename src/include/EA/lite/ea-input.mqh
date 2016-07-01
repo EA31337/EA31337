@@ -101,10 +101,10 @@ bool AC30_Active = 0; // Enable on M30
 ENUM_TRAIL_TYPE AC_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE AC_TrailingProfitMethod = 1; // Trail profit method
 double AC_OpenLevel = 0.00000000; // Open level
-int AC1_OpenMethod = 15; // Open method for M1 (0-?)
-int AC5_OpenMethod = 15; // Open method for M5 (0-?)
-int AC15_OpenMethod = 15; // Open method for M15 (0-?)
-int AC30_OpenMethod = 15; // Open method for M30 (0-?)
+int AC1_SignalMethod = 15; // Signal method for M1 (0-?)
+int AC5_SignalMethod = 15; // Signal method for M5 (0-?)
+int AC15_SignalMethod = 15; // Signal method for M15 (0-?)
+int AC30_SignalMethod = 15; // Signal method for M30 (0-?)
 
 //+------------------------------------------------------------------+
 string __AD_Parameters__ = "-- Settings for the Accumulation/Distribution indicator --"; // >>> AD (NOT IMPLEMENTED YET) <<<
@@ -115,10 +115,10 @@ bool AD30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE AD_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE AD_TrailingProfitMethod = 1; // Trail profit method
 double AD_OpenLevel = 0.00000000; // Open level
-int AD1_OpenMethod = 15; // Open method for M1 (0-?)
-int AD5_OpenMethod = 15; // Open method for M5 (0-?)
-int AD15_OpenMethod = 15; // Open method for M15 (0-?)
-int AD30_OpenMethod = 15; // Open method for M30 (0-?)
+int AD1_SignalMethod = 15; // Signal method for M1 (0-?)
+int AD5_SignalMethod = 15; // Signal method for M5 (0-?)
+int AD15_SignalMethod = 15; // Signal method for M15 (0-?)
+int AD30_SignalMethod = 15; // Signal method for M30 (0-?)
 
 //+------------------------------------------------------------------+
 string __ADX_Parameters__ = "-- Settings for the Average Directional Movement Index indicator --"; // >>> ADX (NOT IMPLEMENTED YET) <<<
@@ -131,10 +131,10 @@ ENUM_TRAIL_TYPE ADX_TrailingProfitMethod = 1; // Trail profit method
 int ADX_Period = 14; // Period
 ENUM_APPLIED_PRICE ADX_Applied_Price = 2; // Applied Price
 double ADX_OpenLevel = 0.00000000; // Open level
-int ADX1_OpenMethod = 15; // Open method for M1 (0-?)
-int ADX5_OpenMethod = 15; // Open method for M5 (0-?)
-int ADX15_OpenMethod = 15; // Open method for M15 (0-?)
-int ADX30_OpenMethod = 15; // Open method for M30 (0-?)
+int ADX1_SignalMethod = 15; // Signal method for M1 (0-?)
+int ADX5_SignalMethod = 15; // Signal method for M5 (0-?)
+int ADX15_SignalMethod = 15; // Signal method for M15 (0-?)
+int ADX30_SignalMethod = 15; // Signal method for M30 (0-?)
 
 //+------------------------------------------------------------------+
 extern string __Alligator_Parameters__ = "-- Settings for the Alligator indicator --"; // >>> ALLIGATOR <<<
@@ -155,10 +155,10 @@ extern int Alligator_Shift_Far = 2; // Shift Far
 extern ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = 22; // Trail stop method
 extern ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = 24; // Trail profit method
 extern double Alligator_OpenLevel = 0.02; // Open level
-extern int Alligator1_OpenMethod = 41; // Open method for M1 (0-63)
-extern int Alligator5_OpenMethod = 2; // Open method for M5 (0-63)
-extern int Alligator15_OpenMethod = 63; // Open method for M15 (0-63)
-extern int Alligator30_OpenMethod = 1; // Open method for M30 (0-63)
+extern int Alligator1_SignalMethod = 41; // Signal method for M1 (0-63)
+extern int Alligator5_SignalMethod = 2; // Signal method for M5 (0-63)
+extern int Alligator15_SignalMethod = 63; // Signal method for M15 (0-63)
+extern int Alligator30_SignalMethod = 1; // Signal method for M30 (0-63)
 
 //+------------------------------------------------------------------+
 string __ATR_Parameters__ = "-- Settings for the Average True Range indicator --"; // >>> ATR <<<
@@ -171,10 +171,10 @@ ENUM_TRAIL_TYPE ATR_TrailingProfitMethod = 1; // Trail profit method
 int ATR_Period_Fast = 14; // Period Fast
 int ATR_Period_Slow = 20; // Period Slow
 double ATR_OpenLevel = 0.00000000; // Open level
-int ATR1_OpenMethod = 31; // Open method for M1 (0-31)
-int ATR5_OpenMethod = 31; // Open method for M5 (0-31)
-int ATR15_OpenMethod = 31; // Open method for M15 (0-31)
-int ATR30_OpenMethod = 31; // Open method for M30 (0-31)
+int ATR1_SignalMethod = 31; // Signal method for M1 (0-31)
+int ATR5_SignalMethod = 31; // Signal method for M5 (0-31)
+int ATR15_SignalMethod = 31; // Signal method for M15 (0-31)
+int ATR30_SignalMethod = 31; // Signal method for M30 (0-31)
 
 //+------------------------------------------------------------------+
 string __Awesome_Parameters__ = "-- Settings for the Awesome oscillator --"; // >>> AWESOME <<<
@@ -185,10 +185,10 @@ bool Awesome30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE Awesome_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE Awesome_TrailingProfitMethod = 1; // Trail profit method
 double Awesome_OpenLevel = 0.00000000; // Open level
-int Awesome1_OpenMethod = 31; // Open method for M1 (0-31)
-int Awesome5_OpenMethod = 0; // Open method for M5 (0-31)
-int Awesome15_OpenMethod = 31; // Open method for M15 (0-31)
-int Awesome30_OpenMethod = 31; // Open method for M30 (0-31)
+int Awesome1_SignalMethod = 31; // Signal method for M1 (0-31)
+int Awesome5_SignalMethod = 0; // Signal method for M5 (0-31)
+int Awesome15_SignalMethod = 31; // Signal method for M15 (0-31)
+int Awesome30_SignalMethod = 31; // Signal method for M30 (0-31)
 
 //+------------------------------------------------------------------+
 extern string __Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --"; // >>> BANDS <<<
@@ -204,10 +204,10 @@ extern int Bands_Shift = 1; // Shift
 extern ENUM_TRAIL_TYPE Bands_TrailingStopMethod = 12; // Trail stop method
 extern ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = 22; // Trail profit method
 /* @todo extern */ int Bands_OpenLevel = 0; // Open level
-extern int Bands1_OpenMethod = 18; // Open method for M1 (0-255)
-extern int Bands5_OpenMethod = 124; // Open method for M5 (0-255)
-extern int Bands15_OpenMethod = 0; // Open method for M15 (0-255)
-extern int Bands30_OpenMethod = 225; // Open method for M30 (0-255)
+extern int Bands1_SignalMethod = 18; // Signal method for M1 (0-255)
+extern int Bands5_SignalMethod = 124; // Signal method for M5 (0-255)
+extern int Bands15_SignalMethod = 0; // Signal method for M15 (0-255)
+extern int Bands30_SignalMethod = 225; // Signal method for M30 (0-255)
 
 //+------------------------------------------------------------------+
 string __BPower_Parameters__ = "-- Settings for the Bulls/Bears Power indicator --"; // >>> BULLS/BEARS POWER <<<
@@ -220,10 +220,10 @@ ENUM_TRAIL_TYPE BPower_TrailingProfitMethod = 1; // Trail profit method
 int BPower_Period = 13; // Period
 ENUM_APPLIED_PRICE BPower_Applied_Price = 0; // Applied Price
 double BPower_OpenLevel = 0.00000000; // Open level
-int BPower1_OpenMethod = 15; // Open method for M1 (0-
-int BPower5_OpenMethod = 15; // Open method for M5 (0-
-int BPower15_OpenMethod = 15; // Open method for M15 (0-
-int BPower30_OpenMethod = 15; // Open method for M30 (0-
+int BPower1_SignalMethod = 15; // Signal method for M1 (0-
+int BPower5_SignalMethod = 15; // Signal method for M5 (0-
+int BPower15_SignalMethod = 15; // Signal method for M15 (0-
+int BPower30_SignalMethod = 15; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
 string __Breakage_Parameters__ = "-- Settings for the custom Breakage strategy --"; // >>> BREAKAGE <<<
@@ -234,10 +234,10 @@ bool Breakage30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE Breakage_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE Breakage_TrailingProfitMethod = 1; // Trail profit method
 double Breakage_OpenLevel = 0.00000000; // Open level
-int Breakage1_OpenMethod = 0; // Open method for M1 (0-31)
-int Breakage5_OpenMethod = 0; // Open method for M5 (0-31)
-int Breakage15_OpenMethod = 0; // Open method for M15 (0-31)
-int Breakage30_OpenMethod = 0; // Open method for M30 (0-31)
+int Breakage1_SignalMethod = 0; // Signal method for M1 (0-31)
+int Breakage5_SignalMethod = 0; // Signal method for M5 (0-31)
+int Breakage15_SignalMethod = 0; // Signal method for M15 (0-31)
+int Breakage30_SignalMethod = 0; // Signal method for M30 (0-31)
 
 //+------------------------------------------------------------------+
 string __BWMFI_Parameters__ = "-- Settings for the Market Facilitation Index indicator --"; // >>> BWMFI <<<
@@ -248,10 +248,10 @@ bool BWMFI30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE BWMFI_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE BWMFI_TrailingProfitMethod = 1; // Trail profit method
 double BWMFI_OpenLevel = 0.00000000; // Open level
-int BWMFI1_OpenMethod = 0; // Open method for M1 (0-
-int BWMFI5_OpenMethod = 0; // Open method for M5 (0-
-int BWMFI15_OpenMethod = 0; // Open method for M15 (0-
-int BWMFI30_OpenMethod = 0; // Open method for M30 (0-
+int BWMFI1_SignalMethod = 0; // Signal method for M1 (0-
+int BWMFI5_SignalMethod = 0; // Signal method for M5 (0-
+int BWMFI15_SignalMethod = 0; // Signal method for M15 (0-
+int BWMFI30_SignalMethod = 0; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
 string __CCI_Parameters__ = "-- Settings for the Commodity Channel Index indicator --"; // >>> CCI <<<
@@ -265,10 +265,10 @@ int CCI_Period_Fast = 12; // Period Fast
 int CCI_Period_Slow = 20; // Period Slow
 ENUM_APPLIED_PRICE CCI_Applied_Price = 0; // Applied Price
 double CCI_OpenLevel = 0.00000000; // Open level
-int CCI1_OpenMethod = 0; // Open method for M1 (0-
-int CCI5_OpenMethod = 0; // Open method for M5 (0-
-int CCI15_OpenMethod = 0; // Open method for M15 (0-
-int CCI30_OpenMethod = 0; // Open method for M30 (0-
+int CCI1_SignalMethod = 0; // Signal method for M1 (0-
+int CCI5_SignalMethod = 0; // Signal method for M5 (0-
+int CCI15_SignalMethod = 0; // Signal method for M15 (0-
+int CCI30_SignalMethod = 0; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
 extern string __DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --"; // >>> DEMARKER <<<
@@ -281,10 +281,10 @@ extern int DeMarker_Shift = 0; // Shift
 extern double DeMarker_OpenLevel = 0.2; // Open level (0.0-0.4)
 extern ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = 1; // Trail stop method
 extern ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = 9; // Trail profit method
-extern int DeMarker1_OpenMethod = 3; // Open method for M1 (0-
-extern int DeMarker5_OpenMethod = 31; // Open method for M5 (0-
-extern int DeMarker15_OpenMethod = 31; // Open method for M15 (0-
-extern int DeMarker30_OpenMethod = 25; // Open method for M30 (0-
+extern int DeMarker1_SignalMethod = 3; // Signal method for M1 (0-
+extern int DeMarker5_SignalMethod = 31; // Signal method for M5 (0-
+extern int DeMarker15_SignalMethod = 31; // Signal method for M15 (0-
+extern int DeMarker30_SignalMethod = 25; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
 extern string __Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --"; // >>> ENVELOPES <<<
@@ -305,10 +305,10 @@ int Envelopes_Shift_Far = 0; // Shift Far
 extern ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = 1; // Trail stop method
 extern ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = 14; // Trail profit method
 /* @todo extern */ int Envelopes_OpenLevel = 0; // Open level
-extern int Envelopes1_OpenMethod = 80; // Open method for M1 (0-127)
-extern int Envelopes5_OpenMethod = 62; // Open method for M5 (0-127)
-extern int Envelopes15_OpenMethod = 126; // Open method for M15 (0-127)
-extern int Envelopes30_OpenMethod = 48; // Open method for M30 (0-127)
+extern int Envelopes1_SignalMethod = 80; // Signal method for M1 (0-127)
+extern int Envelopes5_SignalMethod = 62; // Signal method for M5 (0-127)
+extern int Envelopes15_SignalMethod = 126; // Signal method for M15 (0-127)
+extern int Envelopes30_SignalMethod = 48; // Signal method for M30 (0-127)
 
 //+------------------------------------------------------------------+
 string __Force_Parameters__ = "-- Settings for the Force Index indicator --"; // >>> FORCE <<<
@@ -322,10 +322,10 @@ int Force_Period = 13; // Period
 ENUM_MA_METHOD Force_MA_Method = 3; // MA Method
 ENUM_APPLIED_PRICE Force_Applied_price = 0; // Applied Price
 double Force_OpenLevel = 0.00000000; // Open level
-int Force1_OpenMethod = 31; // Open method for M1 (0-
-int Force5_OpenMethod = 31; // Open method for M5 (0-
-int Force15_OpenMethod = 31; // Open method for M15 (0-
-int Force30_OpenMethod = 31; // Open method for M30 (0-
+int Force1_SignalMethod = 31; // Signal method for M1 (0-
+int Force5_SignalMethod = 31; // Signal method for M5 (0-
+int Force15_SignalMethod = 31; // Signal method for M15 (0-
+int Force30_SignalMethod = 31; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
 extern string __Fractals_Parameters__ = "-- Settings for the Fractals indicator --"; // >>> FRACTALS <<<
@@ -336,10 +336,10 @@ extern bool Fractals30_Active = 1; // Enable for M30
 extern ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = 1; // Trail stop method
 extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = 1; // Trail profit method
 /* @todo extern */ int Fractals_OpenLevel = 0; // Open level
-extern int Fractals1_OpenMethod = 1; // Open method for M1 (0-1)
-extern int Fractals5_OpenMethod = 1; // Open method for M5 (0-1)
-extern int Fractals15_OpenMethod = 0; // Open method for M15 (0-1)
-extern int Fractals30_OpenMethod = 1; // Open method for M30 (0-1)
+extern int Fractals1_SignalMethod = 1; // Signal method for M1 (0-1)
+extern int Fractals5_SignalMethod = 1; // Signal method for M5 (0-1)
+extern int Fractals15_SignalMethod = 0; // Signal method for M15 (0-1)
+extern int Fractals30_SignalMethod = 1; // Signal method for M30 (0-1)
 
 //+------------------------------------------------------------------+
 string __Gator_Parameters__ = "-- Settings for the Gator oscillator --"; // >>> GATOR <<<
@@ -350,10 +350,10 @@ bool Gator30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE Gator_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE Gator_TrailingProfitMethod = 1; // Trail profit method
 double Gator_OpenLevel = 0.00000000; // Open level
-int Gator1_OpenMethod = 0; // Open method for M1 (0-
-int Gator5_OpenMethod = 0; // Open method for M5 (0-
-int Gator15_OpenMethod = 0; // Open method for M15 (0-
-int Gator30_OpenMethod = 0; // Open method for M30 (0-
+int Gator1_SignalMethod = 0; // Signal method for M1 (0-
+int Gator5_SignalMethod = 0; // Signal method for M5 (0-
+int Gator15_SignalMethod = 0; // Signal method for M15 (0-
+int Gator30_SignalMethod = 0; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
 string __Ichimoku_Parameters__ = "-- Settings for the Ichimoku Kinko Hyo indicator --"; // >>> ICHIMOKU <<<
@@ -367,10 +367,10 @@ int Ichimoku_Period_Tenkan_Sen = 9; // Period Tenkan Sen
 int Ichimoku_Period_Kijun_Sen = 26; // Period Kijun Sen
 int Ichimoku_Period_Senkou_Span_B = 52; // Period Senkou Span B
 double Ichimoku_OpenLevel = 0.00000000; // Open level
-int Ichimoku1_OpenMethod = 0; // Open method for M1 (0-
-int Ichimoku5_OpenMethod = 0; // Open method for M5 (0-
-int Ichimoku15_OpenMethod = 0; // Open method for M15 (0-
-int Ichimoku30_OpenMethod = 0; // Open method for M30 (0-
+int Ichimoku1_SignalMethod = 0; // Signal method for M1 (0-
+int Ichimoku5_SignalMethod = 0; // Signal method for M5 (0-
+int Ichimoku15_SignalMethod = 0; // Signal method for M15 (0-
+int Ichimoku30_SignalMethod = 0; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
 extern string __MA_Parameters__ = "-- Settings for the Moving Average indicator --"; // >>> MA <<<
@@ -391,10 +391,10 @@ extern ENUM_APPLIED_PRICE MA_Applied_Price = 0; // Applied Price
 extern ENUM_TRAIL_TYPE MA_TrailingStopMethod = 13; // Trail stop method
 extern ENUM_TRAIL_TYPE MA_TrailingProfitMethod = 1; // Trail profit method
 extern double MA_OpenLevel = 1.2; // Open level
-extern int MA1_OpenMethod = 40; // Open method for M1 (0-127)
-extern int MA5_OpenMethod = 97; // Open method for M5 (0-127)
-extern int MA15_OpenMethod = 7; // Open method for M15 (0-127)
-extern int MA30_OpenMethod = 48; // Open method for M30 (0-127)
+extern int MA1_SignalMethod = 40; // Signal method for M1 (0-127)
+extern int MA5_SignalMethod = 97; // Signal method for M5 (0-127)
+extern int MA15_SignalMethod = 7; // Signal method for M15 (0-127)
+extern int MA30_SignalMethod = 48; // Signal method for M30 (0-127)
 
 //+------------------------------------------------------------------+
 extern string __MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --"; // >>> MACD <<<
@@ -411,10 +411,10 @@ extern int MACD_Shift_Far = 0; // Shift Far
 extern ENUM_TRAIL_TYPE MACD_TrailingStopMethod = 21; // Trail stop method
 extern ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = 27; // Trail profit method
 extern double MACD_OpenLevel = 0.3; // Open level
-extern int MACD1_OpenMethod = 0; // Open method for M1 (0-31)
-extern int MACD5_OpenMethod = 28; // Open method for M5 (0-31)
-extern int MACD15_OpenMethod = 18; // Open method for M15 (0-31)
-extern int MACD30_OpenMethod = 4; // Open method for M30 (0-31)
+extern int MACD1_SignalMethod = 0; // Signal method for M1 (0-31)
+extern int MACD5_SignalMethod = 28; // Signal method for M5 (0-31)
+extern int MACD15_SignalMethod = 18; // Signal method for M15 (0-31)
+extern int MACD30_SignalMethod = 4; // Signal method for M30 (0-31)
 
 //+------------------------------------------------------------------+
 string __MFI_Parameters__ = "-- Settings for the Money Flow Index indicator --"; // >>> MFI <<<
@@ -426,10 +426,10 @@ ENUM_TRAIL_TYPE MFI_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = 1; // Trail profit method
 int MFI_Period = 14; // Period
 double MFI_OpenLevel = 0.00000000; // Open level
-int MFI1_OpenMethod = 0; // Open method for M1 (0-
-int MFI5_OpenMethod = 0; // Open method for M5 (0-
-int MFI15_OpenMethod = 0; // Open method for M15 (0-
-int MFI30_OpenMethod = 0; // Open method for M30 (0-
+int MFI1_SignalMethod = 0; // Signal method for M1 (0-
+int MFI5_SignalMethod = 0; // Signal method for M5 (0-
+int MFI15_SignalMethod = 0; // Signal method for M15 (0-
+int MFI30_SignalMethod = 0; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
 string __Momentum_Parameters__ = "-- Settings for the Momentum indicator --"; // >>> MOMENTUM <<<
@@ -443,10 +443,10 @@ int Momentum_Period_Fast = 12; // Period Fast
 int Momentum_Period_Slow = 20; // Period Slow
 ENUM_APPLIED_PRICE Momentum_Applied_Price = 0; // Applied Price
 double Momentum_OpenLevel = 0.00000000; // Open level
-int Momentum1_OpenMethod = 15; // Open method for M1 (0-
-int Momentum5_OpenMethod = 15; // Open method for M5 (0-
-int Momentum15_OpenMethod = 15; // Open method for M15 (0-
-int Momentum30_OpenMethod = 15; // Open method for M30 (0-
+int Momentum1_SignalMethod = 15; // Signal method for M1 (0-
+int Momentum5_SignalMethod = 15; // Signal method for M5 (0-
+int Momentum15_SignalMethod = 15; // Signal method for M15 (0-
+int Momentum30_SignalMethod = 15; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
 string __OBV_Parameters__ = "-- Settings for the On Balance Volume indicator --"; // >>> OBV <<<
@@ -458,10 +458,10 @@ ENUM_TRAIL_TYPE OBV_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE OBV_TrailingProfitMethod = 1; // Trail profit method
 ENUM_APPLIED_PRICE OBV_Applied_Price = 0; // Applied Price
 double OBV_OpenLevel = 0.00000000; // Open level
-int OBV1_OpenMethod = 0; // Open method for M1 (0-
-int OBV5_OpenMethod = 0; // Open method for M5 (0-
-int OBV15_OpenMethod = 0; // Open method for M15 (0-
-int OBV30_OpenMethod = 0; // Open method for M30 (0-
+int OBV1_SignalMethod = 0; // Signal method for M1 (0-
+int OBV5_SignalMethod = 0; // Signal method for M5 (0-
+int OBV15_SignalMethod = 0; // Signal method for M15 (0-
+int OBV30_SignalMethod = 0; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
 string __OSMA_Parameters__ = "-- Settings for the Moving Average of Oscillator indicator --"; // >>> OSMA <<<
@@ -476,10 +476,10 @@ int OSMA_Period_Slow = 26; // Period Slow
 int OSMA_Period_Signal = 9; // Period for signal
 ENUM_APPLIED_PRICE OSMA_Applied_Price = 1; // Applied Price
 double OSMA_OpenLevel = 0.00000000; // Open level
-int OSMA1_OpenMethod = 0; // Open method for M1 (0-
-int OSMA5_OpenMethod = 0; // Open method for M5 (0-
-int OSMA15_OpenMethod = 0; // Open method for M15 (0-
-int OSMA30_OpenMethod = 0; // Open method for M30 (0-
+int OSMA1_SignalMethod = 0; // Signal method for M1 (0-
+int OSMA5_SignalMethod = 0; // Signal method for M5 (0-
+int OSMA15_SignalMethod = 0; // Signal method for M15 (0-
+int OSMA30_SignalMethod = 0; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
 extern string __RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --"; // >>> RSI <<<
@@ -493,10 +493,10 @@ extern int RSI_Shift = 0; // Shift
 extern ENUM_TRAIL_TYPE RSI_TrailingStopMethod = 17; // Trail stop method
 extern ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = 20; // Trail profit method
 extern int RSI_OpenLevel = 20; // Open level
-extern int RSI1_OpenMethod = 50; // Open method for M1 (0-63)
-extern int RSI5_OpenMethod = 33; // Open method for M5 (0-63)
-extern int RSI15_OpenMethod = 6; // Open method for M15 (0-63)
-extern int RSI30_OpenMethod = 2; // Open method for M30 (0-63)
+extern int RSI1_SignalMethod = 50; // Signal method for M1 (0-63)
+extern int RSI5_SignalMethod = 33; // Signal method for M5 (0-63)
+extern int RSI15_SignalMethod = 6; // Signal method for M15 (0-63)
+extern int RSI30_SignalMethod = 2; // Signal method for M30 (0-63)
 
 //+------------------------------------------------------------------+
 string __RVI_Parameters__ = "-- Settings for the Relative Vigor Index indicator --"; // >>> RVI <<<
@@ -509,10 +509,10 @@ ENUM_TRAIL_TYPE RVI_TrailingProfitMethod = 1; // Trail profit method
 int RVI_Shift = 2; // Shift
 int RVI_Shift_Far = 0; // Shift Far
 double RVI_OpenLevel = 0.00000000; // Open level
-int RVI1_OpenMethod = 0; // Open method for M1 (0-
-int RVI5_OpenMethod = 0; // Open method for M5 (0-
-int RVI15_OpenMethod = 0; // Open method for M15 (0-
-int RVI30_OpenMethod = 0; // Open method for M30 (0-
+int RVI1_SignalMethod = 0; // Signal method for M1 (0-
+int RVI5_SignalMethod = 0; // Signal method for M5 (0-
+int RVI15_SignalMethod = 0; // Signal method for M15 (0-
+int RVI30_SignalMethod = 0; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
 extern string __SAR_Parameters__ = "-- Settings for the the Parabolic Stop and Reverse system indicator --"; // >>> SAR <<<
@@ -526,10 +526,10 @@ extern int SAR_Shift = 0; // Shift
 extern ENUM_TRAIL_TYPE SAR_TrailingStopMethod = 12; // Trail stop method
 extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = 18; // Trail profit method
 extern double SAR_OpenLevel = 0.2; // Open level
-extern int SAR1_OpenMethod = 127; // Open method for M1 (0-127)
-extern int SAR5_OpenMethod = 86; // Open method for M5 (0-127)
-extern int SAR15_OpenMethod = 16; // Open method for M15 (0-127)
-extern int SAR30_OpenMethod = 20; // Open method for M30 (0-127)
+extern int SAR1_SignalMethod = 127; // Signal method for M1 (0-127)
+extern int SAR5_SignalMethod = 86; // Signal method for M5 (0-127)
+extern int SAR15_SignalMethod = 16; // Signal method for M15 (0-127)
+extern int SAR30_SignalMethod = 20; // Signal method for M30 (0-127)
 
 //+------------------------------------------------------------------+
 string __StdDev_Parameters__ = "-- Settings for the Standard Deviation indicator --"; // >>> STDDEV <<<
@@ -544,10 +544,10 @@ int StdDev_MA_Period = 10; // Period
 ENUM_MA_METHOD StdDev_MA_Method = 1; // MA Method
 int StdDev_MA_Shift = 0; // Shift
 double StdDev_OpenLevel = 0.00000000; // Open level
-int StdDev1_OpenMethod = 31; // Open method for M1 (0-
-int StdDev5_OpenMethod = 31; // Open method for M5 (0-
-int StdDev15_OpenMethod = 31; // Open method for M15 (0-
-int StdDev30_OpenMethod = 31; // Open method for M30 (0-
+int StdDev1_SignalMethod = 31; // Signal method for M1 (0-
+int StdDev5_SignalMethod = 31; // Signal method for M5 (0-
+int StdDev15_SignalMethod = 31; // Signal method for M15 (0-
+int StdDev30_SignalMethod = 31; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
 string __Stochastic_Parameters__ = "-- Settings for the the Stochastic Oscillator --"; // >>> STOCHASTIC <<<
@@ -558,10 +558,10 @@ bool Stochastic30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE Stochastic_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE Stochastic_TrailingProfitMethod = 1; // Trail profit method
 double Stochastic_OpenLevel = 0.00000000; // Open level
-int Stochastic1_OpenMethod = 0; // Open method for M1 (0-
-int Stochastic5_OpenMethod = 0; // Open method for M5 (0-
-int Stochastic15_OpenMethod = 0; // Open method for M15 (0-
-int Stochastic30_OpenMethod = 0; // Open method for M30 (0-
+int Stochastic1_SignalMethod = 0; // Signal method for M1 (0-
+int Stochastic5_SignalMethod = 0; // Signal method for M5 (0-
+int Stochastic15_SignalMethod = 0; // Signal method for M15 (0-
+int Stochastic30_SignalMethod = 0; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
 extern string __WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --"; // >>> WPR <<<
@@ -574,10 +574,10 @@ extern int WPR_Shift = 0; // Shift
 extern int WPR_OpenLevel = 20; // Open level
 extern ENUM_TRAIL_TYPE WPR_TrailingStopMethod = 7; // Trail stop method
 extern ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = 10; // Trail profit method
-extern int WPR1_OpenMethod = 0; // Open method for M1 (0-63)
-extern int WPR5_OpenMethod = 0; // Open method for M5 (0-63)
-extern int WPR15_OpenMethod = 0; // Open method for M15 (0-63)
-extern int WPR30_OpenMethod = 0; // Open method for M30 (0-63)
+extern int WPR1_SignalMethod = 0; // Signal method for M1 (0-63)
+extern int WPR5_SignalMethod = 0; // Signal method for M5 (0-63)
+extern int WPR15_SignalMethod = 0; // Signal method for M15 (0-63)
+extern int WPR30_SignalMethod = 0; // Signal method for M30 (0-63)
 
 //+------------------------------------------------------------------+
 string __ZigZag_Parameters__ = "-- Settings for the ZigZag indicator --"; // >>> ZIGZAG <<<
@@ -588,10 +588,10 @@ bool ZigZag30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE ZigZag_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE ZigZag_TrailingProfitMethod = 1; // Trail profit method
 double ZigZag_OpenLevel = 0.00000000; // Open level
-int ZigZag1_OpenMethod = 0; // Open method for M1 (0-31)
-int ZigZag5_OpenMethod = 0; // Open method for M5 (0-31)
-int ZigZag15_OpenMethod = 0; // Open method for M15 (0-31)
-int ZigZag30_OpenMethod = 0; // Open method for M30 (0-31)
+int ZigZag1_SignalMethod = 0; // Signal method for M1 (0-31)
+int ZigZag5_SignalMethod = 0; // Signal method for M5 (0-31)
+int ZigZag15_SignalMethod = 0; // Signal method for M15 (0-31)
+int ZigZag30_SignalMethod = 0; // Signal method for M30 (0-31)
 
 //+------------------------------------------------------------------+
 extern string __Experimental_Parameters__ = "-- Experimental parameters (not safe) --"; // >>> EXPERIMENTAL <<<
