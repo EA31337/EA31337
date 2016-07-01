@@ -45,19 +45,24 @@ extern double TrailingStopAddPerMinute = 0; // Decrease trail stop per minute (p
 
 //+------------------------------------------------------------------+
 extern string __EA_Risk_Parameters__ = "-- Risk management parameters --"; // >>> RISK <<
-extern double RiskRatio = 0.00000000; // Risk ratio (0 = auto, 1.0 = normal)
 extern bool TradeWithTrend = 0; // Trade with trend
+extern double RiskRatio = 0.00000000; // Risk ratio (0 = auto, 1.0 = normal)
+
+//+------------------------------------------------------------------+
+extern string __Strategy_Parameters__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGIES <<<
+extern double MinProfitFactorToTrade = 1.00; // Min. profit factor per strategy to trade
+extern double MaxProfitFactorToTrade = 2.00; // Max. profit factor per strategy to trade
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameters (set 1.0 for default) --"; // >>> BOOSTING <<<
 extern bool Boosting_Enabled = 1; // Enable boosting
+extern double BoostTrendFactor = 1.3; // Boost trend factor
 extern double BestDailyStrategyMultiplierFactor = 1.5; // Multiplier for the best daily strategy
 extern double BestWeeklyStrategyMultiplierFactor = 1.00000000; // Multiplier for the best weekly strategy
 extern double BestMonthlyStrategyMultiplierFactor = 1.00000000; // Multiplier for the best monthly strategy
 extern double WorseDailyStrategyDividerFactor = 1.00000000; // Divider for the worse daily strategy
 extern double WorseWeeklyStrategyDividerFactor = 1; // Divider for the worse weekly strategy
 extern double WorseMonthlyStrategyDividerFactor = 1.00000000; // Divider for the worse monthly strategy
-extern double BoostTrendFactor = 1.3; // Boost trend factor
 
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions__ = "-- Account conditions --"; // >>> CONDITIONS & ACTIONS <<<

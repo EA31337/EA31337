@@ -54,11 +54,17 @@ extern bool TradeWithTrend = 0; // Trade with trend
 extern bool ApplySpreadLimits = TRUE; // Apply strategy spread limits
 extern int RiskRatioIncreaseMethod = 112; // Risk ratio increase method (0-255)
 extern int RiskRatioDecreaseMethod = 216; // Risk ratio decrease method (0-255)
+
+//+------------------------------------------------------------------+
+extern string __Strategy_Parameters__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGIES <<<
+extern double MinProfitFactorToTrade = 1.00; // Min. profit factor per strategy to trade
+extern double MaxProfitFactorToTrade = 2.00; // Max. profit factor per strategy to trade
 extern double MaxSpreadToTrade = 10.0; // Max spread to trade (in pips), 0 - disable limit
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameters (set 1.0 for default) --"; // >>> BOOSTING <<<
 extern bool Boosting_Enabled = 1; // Enable boosting
+extern double BoostTrendFactor = 1.2; // Boost trend factor
 extern bool BoostByProfitFactor = TRUE; // Boost strategy by its profit factor.
 extern bool HandicapByProfitFactor = FALSE; // Handicap by its low profit factor
 extern double BestDailyStrategyMultiplierFactor = 1.1; // Multiplier for the best daily strategy
@@ -67,7 +73,6 @@ extern double BestMonthlyStrategyMultiplierFactor = 1.5; // Multiplier for the b
 extern double WorseDailyStrategyDividerFactor = 1.2; // Divider for the worse daily strategy
 extern double WorseWeeklyStrategyDividerFactor = 1.2; // Divider for the worse weekly strategy
 extern double WorseMonthlyStrategyDividerFactor = 1.2; // Divider for the worse monthly strategy
-extern double BoostTrendFactor = 1.2; // Boost trend factor
 
 //+------------------------------------------------------------------+
 extern string __SmartQueue_Parameters__ = "-- Smart queue parameters --"; // >>> SMART QUEUE <<<
