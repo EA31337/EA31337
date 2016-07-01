@@ -544,7 +544,7 @@ string InitInfo(bool startup = False, string sep = "\n") {
       max_orders,
       GetMaxOrdersPerType(),
       sep);
-  output += StringFormat("Timeframes: M1: %s, M5: %s, M15: %s, M30: %s, H1: %s, H4: %s, D1: %s, W1: %s, MN1: %s",
+  output += StringFormat("Timeframes: M1: %s, M5: %s, M15: %s, M30: %s, H1: %s, H4: %s, D1: %s, W1: %s, MN1: %s;%s",
       CheckTf(PERIOD_M1)  ? "Active" : "Not active",
       CheckTf(PERIOD_M5)  ? "Active" : "Not active",
       CheckTf(PERIOD_M15) ? "Active" : "Not active",
@@ -661,7 +661,7 @@ bool TradeCondition(int order_type = 0, int cmd = NULL) {
  * Gukkuk im Versteck
  */
 bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL) {
-  static int processed[FINAL_INDICATOR_TYPE_ENTRY][FINAL_PERIOD_TYPE_ENTRY];
+  static datetime processed[FINAL_INDICATOR_TYPE_ENTRY][FINAL_PERIOD_TYPE_ENTRY];
   int i; string text = __FUNCTION__ + ": ";
   if (type == EMPTY) ArrayFill(processed, 0, ArraySize(processed), FALSE); // Reset processed if tf is EMPTY.
   int period = Convert::TfToPeriod(tf);
@@ -721,6 +721,7 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
         bands[period][i][BANDS_UPPER] = iBands(symbol, tf, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_UPPER, i + Bands_Shift);
         bands[period][i][BANDS_LOWER] = iBands(symbol, tf, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_LOWER, i + Bands_Shift);
       }
+      PrintFormat("Bands %d: %g/%g/%g", tf, bands[period][CURR][BANDS_LOWER], bands[period][CURR][BANDS_BASE], bands[period][CURR][BANDS_UPPER]);
       break;
 #ifdef __advanced__
     case BPOWER: // Calculates the Bears Power and Bulls Power indicators.
@@ -746,7 +747,7 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
       demarker[period][CURR] = iDeMarker(symbol, tf, DeMarker_Period, 0 + DeMarker_Shift);
       demarker[period][PREV] = iDeMarker(symbol, tf, DeMarker_Period, 1 + DeMarker_Shift);
       demarker[period][FAR]  = iDeMarker(symbol, tf, DeMarker_Period, 2 + DeMarker_Shift);
-      PrintFormat("Period: %d, DeMarker: %g", period, demarker[period][CURR]);
+      // PrintFormat("Period: %d, DeMarker: %g", period, demarker[period][CURR]);
       break;
     case ENVELOPES: // Calculates the Envelopes indicator.
       envelopes_deviation = Envelopes30_Deviation;
@@ -1552,10 +1553,10 @@ bool Trade_Bands(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double op
   UpdateIndicator(BANDS, tf);
   if (open_method == EMPTY) open_method = GetStrategyOpenMethod(BANDS, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(BANDS, tf, 0);
-  result = (Low[CURR] < bands[period][CURR][BANDS_LOWER] || Low[PREV] < bands[period][PREV][BANDS_LOWER]); // Price value was lower than the lower band.
-  result |= (High[CURR] > bands[period][CURR][BANDS_UPPER] || High[PREV] > bands[period][PREV][BANDS_UPPER]); // Price value was higher than the upper band.
   switch (cmd) {
     case OP_BUY:
+      // Price value was lower than the lower band.
+      result = (bands[period][CURR][BANDS_LOWER] > Low[CURR] || bands[period][PREV][BANDS_LOWER] > Low[CURR]);
       if ((open_method &   1) != 0) result = result && Close[PREV] < bands[period][CURR][BANDS_LOWER];
       if ((open_method &   2) != 0) result = result && Close[FAR] < bands[period][CURR][BANDS_LOWER];
       if ((open_method &   4) != 0) result = result && (bands[period][CURR][BANDS_BASE] <= bands[period][PREV][BANDS_BASE] && bands[period][PREV][BANDS_BASE] <= bands[period][FAR][BANDS_BASE]);
@@ -1566,6 +1567,8 @@ bool Trade_Bands(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double op
       if ((open_method & 128) != 0) result = result && Ask < bands[period][CURR][BANDS_BASE];
       if ((open_method & 256) != 0) result = result && !Trade_Bands(Convert::OrderTypeOpp(cmd), Convert::PeriodToTf(MathMin(period + 1, M30)));
     case OP_SELL:
+      // Price value was higher than the upper band.
+      result = (bands[period][CURR][BANDS_UPPER] > High[CURR] || bands[period][PREV][BANDS_UPPER] > High[PREV]);
       if ((open_method &   1) != 0) result = result && Close[PREV] > bands[period][CURR][BANDS_UPPER];
       if ((open_method &   2) != 0) result = result && Close[FAR] > bands[period][CURR][BANDS_UPPER];
       if ((open_method &   4) != 0) result = result && (bands[period][CURR][BANDS_BASE] >= bands[period][PREV][BANDS_BASE] && bands[period][PREV][BANDS_BASE] >= bands[period][FAR][BANDS_BASE]);
@@ -1584,6 +1587,8 @@ bool Trade_Bands(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double op
           {f9=1;}
           if (iBands(NULL,piband,pibandu,ibandotkl,0,PRICE_CLOSE,UPPER,1)<iClose(NULL,piband2,1)&&iBands(NULL,piband,pibandu,ibandotkl,0,PRICE_CLOSE,UPPER,0)>=iClose(NULL,piband2,0))
           {f9=-1;}
+
+        if(iBands(NULL,0,Period1,2,0,PRICE_CLOSE,MODE_MAIN,i)>=iBands(NULL,0,Period1,2,0,PRICE_CLOSE,MODE_MAIN,i+1))
     */
       break;
   }
@@ -1896,7 +1901,7 @@ bool Trade_Fractals(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double
   switch (cmd) {
     case OP_BUY:
       result = fractals[period][CURR][LOWER] != 0.0 || fractals[period][PREV][LOWER] != 0.0 || fractals[period][FAR][LOWER] != 0.0;
-      if ((open_method &   1) != 0) result = result && fractals[period][FAR][LOWER] != 0.0;
+      if ((open_method &   1) != 0) result = result && fractals[period][FAR][LOWER] != 0.0; // @fixme?
       //if ((open_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
       // if ((open_method &   2) != 0) result = result && !Fractals_On_Sell(tf);
       // if ((open_method &   4) != 0) result = result && Fractals_On_Buy(MathMin(period + 1, M30));
@@ -1904,7 +1909,7 @@ bool Trade_Fractals(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double
       break;
     case OP_SELL:
       result = fractals[period][CURR][UPPER] != 0.0 || fractals[period][PREV][UPPER] != 0.0 || fractals[period][FAR][UPPER] != 0.0;
-      if ((open_method &   1) != 0) result = result && fractals[period][FAR][UPPER] != 0.0;
+      if ((open_method &   1) != 0) result = result && fractals[period][FAR][UPPER] != 0.0; // @fixme?
       //if ((open_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
       // if ((open_method &   2) != 0) result = result && !Fractals_On_Buy(tf);
       // if ((open_method &   4) != 0) result = result && Fractals_On_Sell(MathMin(period + 1, M30));
