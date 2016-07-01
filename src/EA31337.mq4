@@ -721,7 +721,7 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
         bands[period][i][BANDS_UPPER] = iBands(symbol, tf, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_UPPER, i + Bands_Shift);
         bands[period][i][BANDS_LOWER] = iBands(symbol, tf, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_LOWER, i + Bands_Shift);
       }
-      PrintFormat("Bands %d: %g/%g/%g", tf, bands[period][CURR][BANDS_LOWER], bands[period][CURR][BANDS_BASE], bands[period][CURR][BANDS_UPPER]);
+      if (VerboseDebug) PrintFormat("Bands %d: %g/%g/%g", tf, bands[period][CURR][BANDS_LOWER], bands[period][CURR][BANDS_BASE], bands[period][CURR][BANDS_UPPER]);
       break;
 #ifdef __advanced__
     case BPOWER: // Calculates the Bears Power and Bulls Power indicators.
@@ -1553,43 +1553,37 @@ bool Trade_Bands(int cmd, int tf = PERIOD_M1, int open_method = EMPTY, double op
   UpdateIndicator(BANDS, tf);
   if (open_method == EMPTY) open_method = GetStrategyOpenMethod(BANDS, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(BANDS, tf, 0);
+  double lowest = fmin(Low[CURR], fmin(Low[PREV], Low[FAR]));
+  double highest = fmax(High[CURR], fmax(High[PREV], High[FAR]));
   switch (cmd) {
     case OP_BUY:
       // Price value was lower than the lower band.
-      result = (bands[period][CURR][BANDS_LOWER] > Low[CURR] || bands[period][PREV][BANDS_LOWER] > Low[CURR]);
-      if ((open_method &   1) != 0) result = result && Close[PREV] < bands[period][CURR][BANDS_LOWER];
-      if ((open_method &   2) != 0) result = result && Close[FAR] < bands[period][CURR][BANDS_LOWER];
-      if ((open_method &   4) != 0) result = result && (bands[period][CURR][BANDS_BASE] <= bands[period][PREV][BANDS_BASE] && bands[period][PREV][BANDS_BASE] <= bands[period][FAR][BANDS_BASE]);
-      if ((open_method &   8) != 0) result = result && bands[period][CURR][BANDS_BASE] >= bands[period][PREV][BANDS_BASE];
-      if ((open_method &  16) != 0) result = result && (bands[period][CURR][BANDS_UPPER] >= bands[period][PREV][BANDS_UPPER] || bands[period][CURR][BANDS_LOWER] <= bands[period][PREV][BANDS_LOWER]);
-      if ((open_method &  32) != 0) result = result && (bands[period][CURR][BANDS_UPPER] <= bands[period][PREV][BANDS_UPPER] || bands[period][CURR][BANDS_LOWER] >= bands[period][PREV][BANDS_LOWER]);
-      if ((open_method &  64) != 0) result = result && Ask > bands[period][CURR][BANDS_LOWER];
-      if ((open_method & 128) != 0) result = result && Ask < bands[period][CURR][BANDS_BASE];
-      if ((open_method & 256) != 0) result = result && !Trade_Bands(Convert::OrderTypeOpp(cmd), Convert::PeriodToTf(MathMin(period + 1, M30)));
+      result = (
+          lowest < fmax(fmax(bands[period][CURR][BANDS_LOWER], bands[period][PREV][BANDS_LOWER]), bands[period][FAR][BANDS_LOWER])
+          );
+      // Buy: price crossed lower line upwards (returned to it from below).
+      if ((open_method &   1) != 0) result = result && fmin(Close[PREV], Close[FAR]) < bands[period][CURR][BANDS_LOWER];
+      if ((open_method &   2) != 0) result = result && (bands[period][CURR][BANDS_LOWER] > bands[period][FAR][BANDS_LOWER]);
+      if ((open_method &   4) != 0) result = result && (bands[period][CURR][BANDS_BASE] > bands[period][FAR][BANDS_BASE]);
+      if ((open_method &   8) != 0) result = result && (bands[period][CURR][BANDS_UPPER] > bands[period][FAR][BANDS_UPPER]);
+      if ((open_method &  16) != 0) result = result && highest > bands[period][CURR][BANDS_BASE];
+      if ((open_method &  32) != 0) result = result && Open[CURR] < bands[period][CURR][BANDS_BASE];
+      if ((open_method &  64) != 0) result = result && fmin(Close[PREV], Close[FAR]) > bands[period][CURR][BANDS_BASE];
+      if ((open_method & 128) != 0) result = result && !Trade_Bands(Convert::OrderTypeOpp(cmd), Convert::PeriodToTf(MathMin(period + 1, M30)));
     case OP_SELL:
       // Price value was higher than the upper band.
-      result = (bands[period][CURR][BANDS_UPPER] > High[CURR] || bands[period][PREV][BANDS_UPPER] > High[PREV]);
-      if ((open_method &   1) != 0) result = result && Close[PREV] > bands[period][CURR][BANDS_UPPER];
-      if ((open_method &   2) != 0) result = result && Close[FAR] > bands[period][CURR][BANDS_UPPER];
-      if ((open_method &   4) != 0) result = result && (bands[period][CURR][BANDS_BASE] >= bands[period][PREV][BANDS_BASE] && bands[period][PREV][BANDS_BASE] >= bands[period][FAR][BANDS_BASE]);
-      if ((open_method &   8) != 0) result = result && bands[period][CURR][BANDS_BASE] <= bands[period][PREV][BANDS_BASE];
-      if ((open_method &  16) != 0) result = result && (bands[period][CURR][BANDS_UPPER] >= bands[period][PREV][BANDS_UPPER] || bands[period][CURR][BANDS_LOWER] <= bands[period][PREV][BANDS_LOWER]);
-      if ((open_method &  32) != 0) result = result && (bands[period][CURR][BANDS_UPPER] <= bands[period][PREV][BANDS_UPPER] || bands[period][CURR][BANDS_LOWER] >= bands[period][PREV][BANDS_LOWER]);
-      if ((open_method &  64) != 0) result = result && Ask < bands[period][CURR][BANDS_UPPER];
-      if ((open_method & 128) != 0) result = result && Ask > bands[period][CURR][BANDS_BASE];
-      if ((open_method & 256) != 0) result = result && !Trade_Bands(Convert::OrderTypeOpp(cmd), Convert::PeriodToTf(MathMin(period + 1, M30)));
-      break;
-    /*
-          //9. Bollinger Bands
-          //Buy: price crossed lower line upwards (returned to it from below)
-          //Sell: price crossed upper line downwards (returned to it from above)
-          if (iBands(NULL,piband,pibandu,ibandotkl,0,PRICE_CLOSE,LOWER,1)>iClose(NULL,piband2,1)&&iBands(NULL,piband,pibandu,ibandotkl,0,PRICE_CLOSE,LOWER,0)<=iClose(NULL,piband2,0))
-          {f9=1;}
-          if (iBands(NULL,piband,pibandu,ibandotkl,0,PRICE_CLOSE,UPPER,1)<iClose(NULL,piband2,1)&&iBands(NULL,piband,pibandu,ibandotkl,0,PRICE_CLOSE,UPPER,0)>=iClose(NULL,piband2,0))
-          {f9=-1;}
-
-        if(iBands(NULL,0,Period1,2,0,PRICE_CLOSE,MODE_MAIN,i)>=iBands(NULL,0,Period1,2,0,PRICE_CLOSE,MODE_MAIN,i+1))
-    */
+      result = (
+          highest > fmin(fmin(bands[period][CURR][BANDS_UPPER], bands[period][PREV][BANDS_UPPER]), bands[period][FAR][BANDS_UPPER])
+          );
+      // Sell: price crossed upper line downwards (returned to it from above).
+      if ((open_method &   1) != 0) result = result && fmin(Close[PREV], Close[FAR]) > bands[period][CURR][BANDS_UPPER];
+      if ((open_method &   2) != 0) result = result && (bands[period][CURR][BANDS_LOWER] < bands[period][FAR][BANDS_LOWER]);
+      if ((open_method &   4) != 0) result = result && (bands[period][CURR][BANDS_BASE] < bands[period][FAR][BANDS_BASE]);
+      if ((open_method &   8) != 0) result = result && (bands[period][CURR][BANDS_UPPER] < bands[period][FAR][BANDS_UPPER]);
+      if ((open_method &  16) != 0) result = result && lowest < bands[period][CURR][BANDS_BASE];
+      if ((open_method &  32) != 0) result = result && Open[CURR] > bands[period][CURR][BANDS_BASE];
+      if ((open_method &  64) != 0) result = result && fmin(Close[PREV], Close[FAR]) < bands[period][CURR][BANDS_BASE];
+      if ((open_method & 128) != 0) result = result && !Trade_Bands(Convert::OrderTypeOpp(cmd), Convert::PeriodToTf(MathMin(period + 1, M30)));
       break;
   }
 
