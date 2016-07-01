@@ -30,7 +30,7 @@ for year in {2013..2015}; do
   for month in {01..12}; do # Note: Leading zero syntax requires Bash >=4.x.
     for deposit in {500..2000..500}; do
       for spread in {10..20..10}; do
-        vagrant ssh -c "/vagrant/scripts/run_backtest.sh -v -t -r "EA31337-$VER-EURUSD-DS-${deposit}GBP-s${spread}-$year-$month" -c GBP -e EA31337 -d $deposit -p EURUSD -m $month -y $year -s $spread -b DS -D5 -O /vagrant/files/reports"
+        vagrant ssh -c "/vagrant/scripts/run_backtest.sh -v -t -r "EA31337-$VER-EURUSD-DS-${deposit}GBP-s${spread}-$year-$month" -e EA31337 -d $deposit -p EURUSD -m $month -y $year -s $spread -b DS -D5 -O /vagrant/files/reports"
         mkdir -p "$OUT"/$VER/$year
         mv -v "$REP_DIR"/*$VER* "$OUT"/$VER/$year
       done
