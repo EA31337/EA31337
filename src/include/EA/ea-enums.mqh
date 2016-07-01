@@ -203,6 +203,7 @@ enum ENUM_INDICATOR_TYPE { // Define type of indicator.
 
 enum ENUM_STRATEGY_INFO { // Define type of strategy information entry.
   ACTIVE,
+  SUSPENDED,
   TIMEFRAME,
   INDICATOR,
   OPEN_METHOD,
@@ -224,7 +225,7 @@ enum ENUM_STRATEGY_VALUE { // Define strategy value entry.
   LOT_SIZE,   // Lot size to trade.
   FACTOR,     // Multiply lot factor.
   OPEN_LEVEL, // Value to raise the signal.
-  SPREAD_LIMIT,
+  SPREAD_LIMIT, // Spread limit.
   FINAL_STRATEGY_VALUE_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };
 
@@ -349,6 +350,10 @@ enum ENUM_MARKET_CONDITION {
   C_MARKET_BIG_DROP    = 13, // Sudden price drop
   C_MARKET_VBIG_DROP   = 14, // Very big price drop
   C_MARKET_AT_HOUR     = 15, // At specific hour
+  C_NEW_HOUR           = 16, // New hour
+  C_NEW_DAY            = 17, // New day
+  C_NEW_WEEK           = 18, // New week
+  C_NEW_MONTH          = 19, // New month
 };
 // Note: Trend-based closures are using TrendMethodAction.
 
@@ -365,7 +370,9 @@ enum ENUM_ACTION_TYPE {
   A_CLOSE_ALL_TREND        =  8, // Close trend side
   A_CLOSE_ALL_NON_TREND    =  9, // Close non-trend side
   A_CLOSE_ALL_ORDERS       = 10, // Close all!
-  FINAL_ACTION_TYPE_ENTRY  = 11  // (Not in use)
+  A_SUSPEND_STRATEGIES     = 11, // Suspend all strategies
+  A_UNSUSPEND_STRATEGIES   = 12, // Unsuspend all strategies
+  FINAL_ACTION_TYPE_ENTRY  = 13  // (Not in use)
   // A_ORDER_STOPS_DECREASE   =  10, // Decrease loss stops
   // A_ORDER_PROFIT_DECREASE  =  11, // Decrease profit stops
 };
