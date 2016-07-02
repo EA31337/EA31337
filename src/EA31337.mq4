@@ -312,7 +312,7 @@ double cci[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_MA_ENTRY];
 double demarker[H1][FINAL_INDICATOR_INDEX_ENTRY];
 double envelopes[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_LINE_ENTRY];
 double force[H1][FINAL_INDICATOR_INDEX_ENTRY];
-double fractals[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_LINE_ENTRY];
+double fractals[H4][FINAL_INDICATOR_INDEX_ENTRY][FINAL_LINE_ENTRY];
 double gator[H1][FINAL_INDICATOR_INDEX_ENTRY][LIPS+1];
 double ichimoku[H1][FINAL_INDICATOR_INDEX_ENTRY][CHIKOUSPAN_LINE+1];
 double ma_fast[H1][FINAL_INDICATOR_INDEX_ENTRY], ma_medium[H1][FINAL_INDICATOR_INDEX_ENTRY], ma_slow[H1][FINAL_INDICATOR_INDEX_ENTRY];
@@ -617,10 +617,9 @@ bool Trade() {
  */
 bool TradeCondition(int order_type = 0, int cmd = NULL) {
   if (TradeWithTrend && !CheckTrend() == cmd) {
-    return (FALSE); // If we're against the trend, do not trade (if TradeWithTrend is set).
+    return (FALSE); // When TradeWithTrend is set and we're against the trend, do not trade.
   }
   int tf = info[order_type][TIMEFRAME];
-  // int signal_method = info[order_type][OPEN_METHOD];
   switch (order_type) {
     case AC1: case AC5: case AC15: case AC30:                                 return Trade_AC(cmd, tf);
     case AD1: case AD5: case AD15: case AD30:                                 return Trade_AD(cmd, tf);
@@ -665,7 +664,7 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
   static datetime processed[FINAL_INDICATOR_TYPE_ENTRY][FINAL_PERIOD_TYPE_ENTRY];
   int i; string text = __FUNCTION__ + ": ";
   if (type == EMPTY) ArrayFill(processed, 0, ArraySize(processed), FALSE); // Reset processed if tf is EMPTY.
-  int period = Convert::TfToPeriod(tf);
+  int period = Convert::TfToIndex(tf);
   if (processed[type][period] == time_current) {
     // If it was already processed, ignore it.
     return (TRUE);
@@ -1093,25 +1092,27 @@ bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
 bool CheckProfitFactorLimits(int sid = EMPTY) {
   if (sid == EMPTY) {
     // If sid is empty, unsuspend all strategies.
-    // TODO
+    ActionExecute(A_UNSUSPEND_STRATEGIES);
     return (TRUE);
   }
-  if (MinProfitFactorToTrade > 0 && conf[sid][FACTOR] < MinProfitFactorToTrade) {
+  conf[sid][PROFIT_FACTOR] = GetStrategyProfitFactor(sid);
+  if (ProfitFactorMinToTrade > 0 && conf[sid][PROFIT_FACTOR] < ProfitFactorMinToTrade) {
     last_err = Msg::ShowText(
       StringFormat("%s: Minimum profit factor reached, disabling strategy. (pf = %.1f)",
-        sname[sid], conf[sid][FACTOR]),
+        sname[sid], conf[sid][PROFIT_FACTOR]),
       "Error", __FUNCTION__, __LINE__, VerboseErrors);
     info[sid][SUSPENDED] = TRUE;
     return (FALSE);
   }
-  if (MaxProfitFactorToTrade > 0 && conf[sid][FACTOR] > MaxProfitFactorToTrade) {
+  if (ProfitFactorMaxToTrade > 0 && conf[sid][PROFIT_FACTOR] > ProfitFactorMaxToTrade) {
     last_err = Msg::ShowText(
       StringFormat("%s: Maximum profit factor reached, disabling strategy. (pf = %.1f)",
-        sname[sid], conf[sid][FACTOR]),
+        sname[sid], conf[sid][PROFIT_FACTOR]),
       "Error", __FUNCTION__, __LINE__, VerboseErrors);
     info[sid][SUSPENDED] = TRUE;
     return (FALSE);
   }
+  if (VerboseDebug) PrintFormat("%s: Profit factor: %.1f", sname[sid], conf[sid][PROFIT_FACTOR]);
   return (TRUE);
 }
 
@@ -1283,7 +1284,7 @@ bool UpdateStats() {
  *   signal_method (int) - signal method to use by using bitwise AND operation
  */
 bool Trade_AC(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(AC, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(AC, tf, 0);
   if (open_level == EMPTY)  open_level  = GetStrategyOpenLevel(AC, tf, 0.0);
@@ -1333,7 +1334,7 @@ bool Trade_AC(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double ope
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_AD(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(AD, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(AD, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(AD, tf, 0.0);
@@ -1384,7 +1385,7 @@ bool Trade_AD(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double ope
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_ADX(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(ADX, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(ADX, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(ADX, tf, 0.0);
@@ -1437,7 +1438,7 @@ bool Trade_ADX(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double op
  */
 bool Trade_Alligator(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
   // [x][0] - The Blue line (Alligator's Jaw), [x][1] - The Red Line (Alligator's Teeth), [x][2] - The Green Line (Alligator's Lips)
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(ALLIGATOR, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(ALLIGATOR, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(ALLIGATOR, tf, 0.0);
@@ -1514,7 +1515,7 @@ bool Trade_Alligator(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, dou
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_ATR(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(ATR, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(ATR, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(ATR, tf, 0.0);
@@ -1565,7 +1566,7 @@ bool Trade_ATR(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double op
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_Awesome(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(AWESOME, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(AWESOME, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(AWESOME, tf, 0.0);
@@ -1615,7 +1616,7 @@ bool Trade_Awesome(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, doubl
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_Bands(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(BANDS, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(BANDS, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(BANDS, tf, 0);
@@ -1635,7 +1636,7 @@ bool Trade_Bands(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double 
       if ((signal_method &  16) != 0) result = result && highest > bands[period][CURR][BANDS_BASE];
       if ((signal_method &  32) != 0) result = result && Open[CURR] < bands[period][CURR][BANDS_BASE];
       if ((signal_method &  64) != 0) result = result && fmin(Close[PREV], Close[FAR]) > bands[period][CURR][BANDS_BASE];
-      if ((signal_method & 128) != 0) result = result && !Trade_Bands(Convert::OrderTypeOpp(cmd), Convert::PeriodToTf(MathMin(period + 1, M30)));
+      if ((signal_method & 128) != 0) result = result && !Trade_Bands(Convert::OrderTypeOpp(cmd), Convert::IndexToTf(MathMin(period + 1, M30)));
     case OP_SELL:
       // Price value was higher than the upper band.
       result = (
@@ -1649,7 +1650,7 @@ bool Trade_Bands(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double 
       if ((signal_method &  16) != 0) result = result && lowest < bands[period][CURR][BANDS_BASE];
       if ((signal_method &  32) != 0) result = result && Open[CURR] > bands[period][CURR][BANDS_BASE];
       if ((signal_method &  64) != 0) result = result && fmin(Close[PREV], Close[FAR]) < bands[period][CURR][BANDS_BASE];
-      if ((signal_method & 128) != 0) result = result && !Trade_Bands(Convert::OrderTypeOpp(cmd), Convert::PeriodToTf(MathMin(period + 1, M30)));
+      if ((signal_method & 128) != 0) result = result && !Trade_Bands(Convert::OrderTypeOpp(cmd), Convert::IndexToTf(MathMin(period + 1, M30)));
       break;
   }
 
@@ -1666,7 +1667,7 @@ bool Trade_Bands(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double 
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_BPower(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(BPOWER, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(BPOWER, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(BPOWER, tf, 0.0);
@@ -1707,7 +1708,7 @@ bool Trade_BPower(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_Breakage(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   // if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(BWMFI, tf, 0);
   // if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(BWMFI, tf, 0.0);
   switch (cmd) {
@@ -1747,7 +1748,7 @@ bool Trade_Breakage(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, doub
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_BWMFI(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(BWMFI, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(BWMFI, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(BWMFI, tf, 0.0);
@@ -1788,7 +1789,7 @@ bool Trade_BWMFI(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double 
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_CCI(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(CCI, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(CCI, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(CCI, tf, 0.0);
@@ -1840,7 +1841,7 @@ bool Trade_CCI(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double op
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_DeMarker(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(DEMARKER, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(DEMARKER, tf, 0);
   if (open_level == EMPTY)  open_level  = GetStrategyOpenLevel(DEMARKER, tf, 0.0);
@@ -1852,7 +1853,7 @@ bool Trade_DeMarker(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, doub
       if ((signal_method &   4) != 0) result = result && demarker[period][CURR] < demarker[period][PREV];
       if ((signal_method &   8) != 0) result = result && demarker[period][PREV] < demarker[period][FAR];
       if ((signal_method &  16) != 0) result = result && demarker[period][PREV] < 0.5 - open_level - open_level/2;
-      PrintFormat("DeMarker buy: %g <= %g", demarker[period][CURR], 0.5 - open_level);
+      // PrintFormat("DeMarker buy: %g <= %g", demarker[period][CURR], 0.5 - open_level);
       break;
     case OP_SELL:
       result = demarker[period][CURR] >= 0.5 + open_level;
@@ -1861,7 +1862,7 @@ bool Trade_DeMarker(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, doub
       if ((signal_method &   4) != 0) result = result && demarker[period][CURR] > demarker[period][PREV];
       if ((signal_method &   8) != 0) result = result && demarker[period][PREV] > demarker[period][FAR];
       if ((signal_method &  16) != 0) result = result && demarker[period][PREV] > 0.5 + open_level + open_level/2;
-      PrintFormat("DeMarker sell: %g >= %g", demarker[period][CURR], 0.5 + open_level);
+      // PrintFormat("DeMarker sell: %g >= %g", demarker[period][CURR], 0.5 + open_level);
       break;
   }
 
@@ -1878,7 +1879,7 @@ bool Trade_DeMarker(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, doub
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_Envelopes(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(ENVELOPES, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(ENVELOPES, tf, 0);
   if (open_level == EMPTY)  open_level  = GetStrategyOpenLevel(ENVELOPES, tf, 0.0);
@@ -1921,7 +1922,7 @@ bool Trade_Envelopes(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, dou
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_Force(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(FORCE, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(FORCE, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(FORCE, tf, 0.0);
@@ -1954,25 +1955,29 @@ bool Trade_Force(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double 
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_Fractals(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int index = Convert::TfToIndex(tf);
   UpdateIndicator(FRACTALS, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(FRACTALS, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(FRACTALS, tf, 0.0);
+  bool lower = (fractals[index][CURR][LOWER] != 0.0 || fractals[index][PREV][LOWER] != 0.0 || fractals[index][FAR][LOWER] != 0.0);
+  bool upper = (fractals[index][CURR][UPPER] != 0.0 || fractals[index][PREV][UPPER] != 0.0 || fractals[index][FAR][UPPER] != 0.0);
   switch (cmd) {
     case OP_BUY:
-      result = fractals[period][CURR][LOWER] != 0.0 || fractals[period][PREV][LOWER] != 0.0 || fractals[period][FAR][LOWER] != 0.0;
-      if ((signal_method &   1) != 0) result = result && fractals[period][FAR][LOWER] != 0.0; // @fixme?
+      result = lower;
+      if ((signal_method &   1) != 0) result &= !upper;
+      if ((signal_method &   2) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), fmax(index + 1, H1));
+      if ((signal_method &   4) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), fmax(index + 2, H1));
       //if ((signal_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
       // if ((signal_method &   2) != 0) result = result && !Fractals_On_Sell(tf);
-      // if ((signal_method &   4) != 0) result = result && Fractals_On_Buy(MathMin(period + 1, M30));
       // if ((signal_method &   8) != 0) result = result && Fractals_On_Buy(M30);
       break;
     case OP_SELL:
-      result = fractals[period][CURR][UPPER] != 0.0 || fractals[period][PREV][UPPER] != 0.0 || fractals[period][FAR][UPPER] != 0.0;
-      if ((signal_method &   1) != 0) result = result && fractals[period][FAR][UPPER] != 0.0; // @fixme?
+      result = upper;
+      if ((signal_method &   1) != 0) result &= !lower;
+      if ((signal_method &   2) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), fmax(index + 1, H1));
+      if ((signal_method &   4) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), fmax(index + 2, H1));
       //if ((signal_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
       // if ((signal_method &   2) != 0) result = result && !Fractals_On_Buy(tf);
-      // if ((signal_method &   4) != 0) result = result && Fractals_On_Sell(MathMin(period + 1, M30));
       // if ((signal_method &   8) != 0) result = result && Fractals_On_Sell(M30);
       break;
   }
@@ -1989,7 +1994,7 @@ bool Trade_Fractals(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, doub
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_Gator(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(GATOR, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(GATOR, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(GATOR, tf, 0.0);
@@ -2022,7 +2027,7 @@ bool Trade_Gator(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double 
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_Ichimoku(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(ICHIMOKU, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(ICHIMOKU, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(ICHIMOKU, tf, 0.0);
@@ -2074,7 +2079,7 @@ bool Trade_Ichimoku(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, doub
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_MA(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(MA, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(MA, tf, 0);
   if (open_level == EMPTY)  open_level  = GetStrategyOpenLevel(MA, tf, 0);
@@ -2115,7 +2120,7 @@ bool Trade_MA(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double ope
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_MACD(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(MA, tf);
   UpdateIndicator(MACD, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(MACD, tf, 0);
@@ -2172,7 +2177,7 @@ bool Trade_MACD(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double o
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_MFI(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(MFI, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(MFI, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(MFI, tf, 0.0);
@@ -2204,7 +2209,7 @@ bool Trade_MFI(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double op
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_Momentum(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(MOMENTUM, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(MOMENTUM, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(MOMENTUM, tf, 0.0);
@@ -2227,7 +2232,7 @@ bool Trade_Momentum(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, doub
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_OBV(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(OBV, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(OBV, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(OBV, tf, 0.0);
@@ -2250,7 +2255,7 @@ bool Trade_OBV(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double op
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_OSMA(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(OSMA, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(OSMA, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(OSMA, tf, 0.0);
@@ -2294,7 +2299,7 @@ bool Trade_OSMA(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double o
  *   open_level - open level to consider the signal
  */
 bool Trade_RSI(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(RSI, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(RSI, tf, 0);
   if (open_level == EMPTY)  open_level  = GetStrategyOpenLevel(RSI, tf, 20);
@@ -2335,7 +2340,7 @@ bool Trade_RSI(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double op
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_RVI(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(RVI, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(RVI, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(RVI, tf, 20);
@@ -2371,7 +2376,7 @@ bool Trade_RVI(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double op
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_SAR(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(SAR, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(SAR, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(SAR, tf, 0);
@@ -2422,7 +2427,7 @@ bool Trade_SAR(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double op
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_StdDev(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(STDDEV, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(STDDEV, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(STDDEV, tf, 0.0);
@@ -2472,7 +2477,7 @@ bool Trade_StdDev(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_Stochastic(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(STOCHASTIC, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(STOCHASTIC, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(STOCHASTIC, tf, 0.0);
@@ -2538,7 +2543,7 @@ bool Trade_Stochastic(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, do
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_WPR(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(WPR, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(WPR, tf, 0);
   if (open_level == EMPTY)  open_level  = GetStrategyOpenLevel(WPR, tf, 0);
@@ -2586,7 +2591,7 @@ bool Trade_WPR(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double op
  *   open_level (double) - open level to consider the signal
  */
 bool Trade_ZigZag(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double open_level = EMPTY) {
-  bool result = FALSE; int period = Convert::TfToPeriod(tf);
+  bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(ZIGZAG, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(ZIGZAG, tf, 0);
   if (open_level  == EMPTY) open_level  = GetStrategyOpenLevel(ZIGZAG, tf, 0.0);
@@ -2631,7 +2636,7 @@ bool Trade_ZigZag(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double
 bool CheckMarketCondition1(int cmd, int tf = PERIOD_M30, int condition = 0, bool default_value = TRUE) {
   bool result = TRUE;
   RefreshRates(); // ?
-  int period = Convert::TfToPeriod(tf);
+  int period = Convert::TfToIndex(tf);
   if ((condition &   1) != 0) result = result && ((cmd == OP_BUY && Open[CURR] > Close[PREV]) || (cmd == OP_SELL && Open[CURR] < Close[PREV]));
   if ((condition &   2) != 0) result = result && UpdateIndicator(SAR, tf)       && ((cmd == OP_BUY && sar[period][CURR] < Open[0]) || (cmd == OP_SELL && sar[period][CURR] > Open[0]));
   if ((condition &   4) != 0) result = result && UpdateIndicator(RSI, tf)       && ((cmd == OP_BUY && rsi[period][CURR] < 50) || (cmd == OP_SELL && rsi[period][CURR] > 50));
@@ -2658,7 +2663,7 @@ bool CheckMarketCondition1(int cmd, int tf = PERIOD_M30, int condition = 0, bool
  */
 bool CheckMarketEvent(int cmd = EMPTY, int tf = PERIOD_M30, int condition = EMPTY) {
   bool result = FALSE;
-  int period = Convert::TfToPeriod(tf);
+  int period = Convert::TfToIndex(tf);
   if (cmd == EMPTY || condition == EMPTY) return (FALSE);
   switch (condition) {
     case C_AC_BUY_SELL:
@@ -2981,7 +2986,7 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = EMPTY
    int method = GetTrailingMethod(order_type, loss_or_profit);
    // if (loss_or_profit > 0) method = AC_TrailingProfitMethod; else if (loss_or_profit < 0) method = AC_TrailingStopMethod; // Testing.
    int timeframe = GetStrategyTimeframe(order_type);
-   int period = Convert::TfToPeriod(timeframe);
+   int period = Convert::TfToIndex(timeframe);
    int symbol = Misc::If(existing, OrderSymbol(), _Symbol);
 
 /**
@@ -4818,7 +4823,7 @@ bool InitStrategy(int key, string name, bool active, int indicator, int timefram
   info[key][INDICATOR]       = indicator;
   info[key][OPEN_METHOD]     = signal_method;
   conf[key][OPEN_LEVEL]      = open_level;
-  conf[key][FACTOR]          = 1.0;
+  conf[key][PROFIT_FACTOR]   = GetDefaultProfitFactor();
   #ifdef __advanced__
   info[key][OPEN_CONDITION1] = open_cond1;
   info[key][OPEN_CONDITION2] = open_cond2;
@@ -5131,7 +5136,7 @@ void CheckAccConditions() {
 /**
  * Get default multiplier lot factor.
  */
-double GetDefaultLotFactor() {
+double GetDefaultProfitFactor() {
   return 1.0;
 }
 
@@ -5224,9 +5229,9 @@ void UpdateStrategyLotSize() {
 /**
  * Calculate strategy profit factor.
  */
-double GetStrategyProfitFactor(int id) {
-  if (info[id][TOTAL_ORDERS] > 10 && stats[id][TOTAL_GROSS_LOSS] < 0) {
-    return (double)(stats[id][TOTAL_GROSS_PROFIT] / -stats[id][TOTAL_GROSS_LOSS]);
+double GetStrategyProfitFactor(int sid) {
+  if (info[sid][TOTAL_ORDERS] > 10 && stats[sid][TOTAL_GROSS_LOSS] < 0) {
+    return (double)(stats[sid][TOTAL_GROSS_PROFIT] / -stats[sid][TOTAL_GROSS_LOSS]);
   } else {
     return 1.0;
   }
@@ -5294,12 +5299,12 @@ void ApplyStrategyMultiplierFactor(int period = DAILY, int loss_or_profit = 0, d
     if (info[new_strategy][ACTIVE] && stats[new_strategy][key] > 10 && new_strategy != previous) { // Check if it's different than the previous one.
       if (previous != EMPTY) {
         if (!info[previous][ACTIVE]) info[previous][ACTIVE] = TRUE;
-        conf[previous][FACTOR] = GetDefaultLotFactor(); // Set previous strategy multiplier factor to default.
+        conf[previous][FACTOR] = GetDefaultProfitFactor(); // Set previous strategy multiplier factor to default.
         if (VerboseDebug) Print(__FUNCTION__ + ": Setting multiplier factor to default for strategy: " + previous);
       }
       best_strategy[period] = new_strategy; // Assign the new worse strategy.
       info[new_strategy][ACTIVE] = TRUE;
-      new_factor = GetDefaultLotFactor() * factor;
+      new_factor = GetDefaultProfitFactor() * factor;
       conf[new_strategy][FACTOR] = new_factor; // Apply multiplier factor for the new strategy.
       if (VerboseDebug) Print(__FUNCTION__ + ": Setting multiplier factor to " + new_factor + " for strategy: " + new_strategy + " (period: " + period_name + ")");
     }
@@ -5307,18 +5312,18 @@ void ApplyStrategyMultiplierFactor(int period = DAILY, int loss_or_profit = 0, d
     if (info[new_strategy][ACTIVE] && stats[new_strategy][key] < 10 && new_strategy != previous) { // Check if it's different than the previous one.
       if (previous != EMPTY) {
         if (!info[previous][ACTIVE]) info[previous][ACTIVE] = TRUE;
-        conf[previous][FACTOR] = GetDefaultLotFactor(); // Set previous strategy multiplier factor to default.
+        conf[previous][FACTOR] = GetDefaultProfitFactor(); // Set previous strategy multiplier factor to default.
         if (VerboseDebug) Print(__FUNCTION__ + ": Setting multiplier factor to default for strategy: " + previous + " to default.");
       }
       worse_strategy[period] = new_strategy; // Assign the new worse strategy.
       if (factor > 0) {
-        new_factor = NormalizeDouble(GetDefaultLotFactor() / factor, Digits);
+        new_factor = NormalizeDouble(GetDefaultProfitFactor() / factor, Digits);
         info[new_strategy][ACTIVE] = TRUE;
         conf[new_strategy][FACTOR] = new_factor; // Apply multiplier factor for the new strategy.
         if (VerboseDebug) Print(__FUNCTION__ + ": Setting multiplier factor to " + new_factor + " for strategy: " + new_strategy + " (period: " + period_name + ")");
       } else {
         info[new_strategy][ACTIVE] = FALSE;
-        //conf[new_strategy][FACTOR] = GetDefaultLotFactor();
+        //conf[new_strategy][FACTOR] = GetDefaultProfitFactor();
         if (VerboseDebug) Print(__FUNCTION__ + ": Disabling strategy: " + new_strategy);
       }
     }
@@ -5395,7 +5400,7 @@ void RSI_CheckPeriod() {
 bool RSI_IncreasePeriod(int tf = PERIOD_M1, int condition = 0) {
   bool result = condition > 0;
   UpdateIndicator(RSI, tf);
-  int period = Convert::TfToPeriod(tf);
+  int period = Convert::TfToIndex(tf);
   if ((condition &   1) != 0) result = result && (rsi_stats[period][UPPER] > 50 + RSI_OpenLevel + RSI_OpenLevel / 2 && rsi_stats[period][LOWER] < 50 - RSI_OpenLevel - RSI_OpenLevel / 2);
   if ((condition &   2) != 0) result = result && (rsi_stats[period][UPPER] > 50 + RSI_OpenLevel + RSI_OpenLevel / 2 || rsi_stats[period][LOWER] < 50 - RSI_OpenLevel - RSI_OpenLevel / 2);
   if ((condition &   4) != 0) result = result && (rsi_stats[period][0] < 50 + RSI_OpenLevel + RSI_OpenLevel / 3 && rsi_stats[period][0] > 50 - RSI_OpenLevel - RSI_OpenLevel / 3);
@@ -5410,7 +5415,7 @@ bool RSI_IncreasePeriod(int tf = PERIOD_M1, int condition = 0) {
 bool RSI_DecreasePeriod(int tf = PERIOD_M1, int condition = 0) {
   bool result = condition > 0;
   UpdateIndicator(RSI, tf);
-  int period = Convert::TfToPeriod(tf);
+  int period = Convert::TfToIndex(tf);
   if ((condition &   1) != 0) result = result && (rsi_stats[period][UPPER] <= 50 + RSI_OpenLevel && rsi_stats[period][LOWER] >= 50 - RSI_OpenLevel);
   if ((condition &   2) != 0) result = result && (rsi_stats[period][UPPER] <= 50 + RSI_OpenLevel || rsi_stats[period][LOWER] >= 50 - RSI_OpenLevel);
   // if ((condition &   4) != 0) result = result && (rsi_stats[period][0] > 50 + RSI_OpenLevel / 3 || rsi_stats[period][0] < 50 - RSI_OpenLevel / 3);
@@ -5921,6 +5926,9 @@ int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = TRUE) {
 /**
  * Execute action by its id. See: EA_Conditions parameters.
  *
+ * @param int aid Action ID.
+ * @param int id Condition ID.
+ *
  * Note: Executing random actions can be potentially dangerous for the account if not used wisely.
  */
 bool ActionExecute(int aid, int id = EMPTY) {
@@ -5982,6 +5990,11 @@ bool ActionExecute(int aid, int id = EMPTY) {
       break;
     case A_UNSUSPEND_STRATEGIES: /* 12 */
       Arrays::ArrSetValueI(info, SUSPENDED, (int)FALSE);
+      break;
+    case A_RESET_STRATEGY_STATS: /* 13 */
+      Arrays::ArrSetValueD(conf, PROFIT_FACTOR, GetDefaultProfitFactor());
+      Arrays::ArrSetValueD(stats, TOTAL_GROSS_LOSS,   0.0);
+      Arrays::ArrSetValueD(stats, TOTAL_GROSS_PROFIT, 0.0);
       break;
       /*
     case A_RISK_REDUCE:
@@ -6222,7 +6235,7 @@ bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
 bool OpenOrderCondition(int cmd, int sid, int time, int method) {
   bool result = TRUE;
   int tf = GetStrategyTimeframe(sid);
-  int period = Convert::TfToPeriod(tf);
+  int period = Convert::TfToIndex(tf);
   int qshift = iBarShift(_Symbol, tf, time, FALSE); // Get the number of bars for the tf since queued.
   double qopen = iOpen(_Symbol, tf, qshift);
   double qclose = iClose(_Symbol, tf, qshift);

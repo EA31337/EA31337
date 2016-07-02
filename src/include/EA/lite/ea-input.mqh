@@ -50,8 +50,8 @@ extern double RiskRatio = 0.00000000; // Risk ratio (0 = auto, 1.0 = normal)
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Parameters__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGIES <<<
-extern double MinProfitFactorToTrade = 1.00; // Min. profit factor per strategy to trade
-extern double MaxProfitFactorToTrade = 2.00; // Max. profit factor per strategy to trade
+extern double ProfitFactorMinToTrade = 0.90; // Min. profit factor per strategy to trade
+extern double ProfitFactorMaxToTrade = 5.00; // Max. profit factor per strategy to trade
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameters (set 1.0 for default) --"; // >>> BOOSTING <<<
@@ -341,10 +341,10 @@ extern bool Fractals30_Active = 1; // Enable for M30
 extern ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = 1; // Trail stop method
 extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = 1; // Trail profit method
 /* @todo extern */ int Fractals_OpenLevel = 0; // Open level
-extern int Fractals1_SignalMethod = 1; // Signal method for M1 (0-1)
-extern int Fractals5_SignalMethod = 1; // Signal method for M5 (0-1)
-extern int Fractals15_SignalMethod = 0; // Signal method for M15 (0-1)
-extern int Fractals30_SignalMethod = 1; // Signal method for M30 (0-1)
+extern int Fractals1_SignalMethod = 0; // Signal method for M1 (0-7)
+extern int Fractals5_SignalMethod = 0; // Signal method for M5 (0-7)
+extern int Fractals15_SignalMethod = 0; // Signal method for M15 (0-7)
+extern int Fractals30_SignalMethod = 0; // Signal method for M30 (0-7)
 
 //+------------------------------------------------------------------+
 string __Gator_Parameters__ = "-- Settings for the Gator oscillator --"; // >>> GATOR <<<
@@ -637,7 +637,7 @@ extern string SoundFileAtClose = "alert.wav"; // Sound: on order close
 
 //+------------------------------------------------------------------+
 extern string __Backtest_Parameters__ = "-- Backtest parameters --"; // >>> BACKTESTING <<<
-extern bool ValidateSettings = TRUE; // Validate startup settings
+extern bool ValidateSettings = FALSE; // Validate startup settings
 extern int DemoMarketStopLevel = 10; // Demo market stop level
 
 //+------------------------------------------------------------------+

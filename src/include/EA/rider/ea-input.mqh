@@ -57,8 +57,8 @@ extern int RiskRatioDecreaseMethod = 216; // Risk ratio decrease method (0-255)
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Parameters__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGIES <<<
-extern double MinProfitFactorToTrade = 1.00; // Min. profit factor per strategy to trade
-extern double MaxProfitFactorToTrade = 2.00; // Max. profit factor per strategy to trade
+extern double ProfitFactorMinToTrade = 0.90; // Min. profit factor per strategy to trade
+extern double ProfitFactorMaxToTrade = 5.00; // Max. profit factor per strategy to trade
 extern double MaxSpreadToTrade = 10.0; // Max spread to trade (in pips), 0 - disable limit
 
 //+------------------------------------------------------------------+
@@ -743,10 +743,10 @@ extern bool Fractals30_Active = 1; // Enable for M30
 ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = T_NONE; // Trail stop method
 ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_NONE; // Trail profit method
 /* @todo extern */ int Fractals_OpenLevel = 0; // Open level
-int Fractals1_SignalMethod = 0; // Signal method for M1 (0-1)
-int Fractals5_SignalMethod = 0; // Signal method for M5 (0-1)
-int Fractals15_SignalMethod = 0; // Signal method for M15 (0-1)
-int Fractals30_SignalMethod = 0; // Signal method for M30 (0-1)
+int Fractals1_SignalMethod = 0; // Signal method for M1 (0-7)
+int Fractals5_SignalMethod = 0; // Signal method for M5 (0-7)
+int Fractals15_SignalMethod = 0; // Signal method for M15 (0-7)
+int Fractals30_SignalMethod = 0; // Signal method for M30 (0-7)
 extern int Fractals1_OpenCondition1 = 528; // Open condition 1 for M1 (0-1023)
 extern int Fractals1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
 extern ENUM_MARKET_EVENT Fractals1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1

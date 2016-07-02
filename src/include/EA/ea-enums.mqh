@@ -222,10 +222,11 @@ enum ENUM_STRATEGY_INFO { // Define type of strategy information entry.
 };
 
 enum ENUM_STRATEGY_VALUE { // Define strategy value entry.
-  LOT_SIZE,   // Lot size to trade.
-  FACTOR,     // Multiply lot factor.
-  OPEN_LEVEL, // Value to raise the signal.
-  SPREAD_LIMIT, // Spread limit.
+  LOT_SIZE,      // Lot size to trade.
+  FACTOR,        // Multiply lot factor.
+  PROFIT_FACTOR, // Profit factor.
+  OPEN_LEVEL,    // Value to raise the signal.
+  SPREAD_LIMIT,  // Spread limit.
   FINAL_STRATEGY_VALUE_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };
 
@@ -372,7 +373,8 @@ enum ENUM_ACTION_TYPE {
   A_CLOSE_ALL_ORDERS       = 10, // Close all!
   A_SUSPEND_STRATEGIES     = 11, // Suspend all strategies
   A_UNSUSPEND_STRATEGIES   = 12, // Unsuspend all strategies
-  FINAL_ACTION_TYPE_ENTRY  = 13  // (Not in use)
+  A_RESET_STRATEGY_STATS   = 13, // Reset strategy stats
+  FINAL_ACTION_TYPE_ENTRY  = 14  // (Not in use)
   // A_ORDER_STOPS_DECREASE   =  10, // Decrease loss stops
   // A_ORDER_PROFIT_DECREASE  =  11, // Decrease profit stops
 };
