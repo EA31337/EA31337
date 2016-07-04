@@ -14,8 +14,8 @@
 // Other modes.
 //#define __testing__      // Mode for testing each component.
 //#define __nolicense__    // Disable licensing.
-#define __backtest__     // For backtest only.
+//#define __backtest__     // For backtest only.
 //#define __limited__      // Define safe options.
-#define __release__      // Enable release settings.
+//#define __release__      // Enable release settings.
 //#define __debug__        // Enable debugging.
 //#define __experimental__ // Enable experimental options.

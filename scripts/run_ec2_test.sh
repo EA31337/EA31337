@@ -39,7 +39,7 @@ run_test() {
 
 cd "$ROOT"/"$VM_DIR"
 
-find "$ROOT/sets/$VERSION" -type f '(' -name "*$pattern*.rule*" -a -not -name "*.disabled" ')' -print0 | while IFS= read -r -d '' rule_file; do
+find "$ROOT/sets/$VERSION" -type f '(' -name "*$pattern*.rule*" -a -not -name "*.disabled*" ')' -print0 | while IFS= read -r -d '' rule_file; do
   test_name="$(basename "${rule_file%.*}")"
 
   echo "Starting ${test_name}..."

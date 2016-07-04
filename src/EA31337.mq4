@@ -369,6 +369,7 @@ void OnTick() {
     UpdateVariables();
     Trade();
     if (total_orders > 0) {
+      CheckOrders();
       UpdateTrailingStops();
       CheckAccConditions();
       TaskProcessList();
@@ -1135,6 +1136,9 @@ bool CheckSpreadLimit(int sid) {
 
 #endif
 
+/**
+ * Close order.
+ */
 bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = TRUE) {
   bool result = FALSE;
   if (ticket_no > 0) {
@@ -1152,7 +1156,10 @@ bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = TRUE)
     last_close_profit = Order::GetOrderProfit();
     if (SoundAlert) PlaySound(SoundFileAtClose);
     // TaskAddCalcStats(ticket_no); // Already done on CheckHistory().
-    if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + ticket_no + " with profit " + Order::GetOrderProfit() + " pips, reason: " + ReasonIdToText(reason_id) + "; " + Order::GetOrderToText()); // @fixme: warning 181: implicit conversion from 'number' to 'string'
+    last_msg = StringFormat("Closed order %d with profit %g pips (%s)", ticket_no, Order::GetOrderProfit(), ReasonIdToText(reason_id));
+    Message(last_msg);
+    Msg::ShowText(last_msg, "Info", __FUNCTION__, __LINE__, VerboseInfo);
+    last_debug = Msg::ShowText(Order::GetOrderToText(), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
     #ifdef __advanced__
       if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(Order::GetOrderProfit()) + " pips, reason: " + ReasonIdToText(reason_id) + "; " + Order::GetOrderToText());
       if (SmartQueueActive) OrderQueueProcess();
@@ -2900,6 +2907,27 @@ bool ValidTrailingValue(double value, int cmd, int loss_or_profit = -1, bool exi
   return valid;
 }
 
+/**
+ * Check orders for certain checks.
+ */
+void CheckOrders() {
+  double elapsed_h;
+  for (int i = 0; i < OrdersTotal(); i++) {
+    if (!OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) { continue; }
+    if (CheckOurMagicNumber() && OrderOpenTime() > 0) {
+      if (CloseOrderAfterXHours > 0) {
+        elapsed_h = (TimeCurrent() - OrderOpenTime()) / 60 / 60;
+        if (elapsed_h >= CloseOrderAfterXHours) {
+          TaskAddCloseOrder(OrderTicket(), R_ORDER_EXPIRED);
+        }
+      }
+    }
+  } // end: for
+}
+
+/**
+ * Update trailing stops for opened orders.
+ */
 void UpdateTrailingStops() {
    bool result; // Check result of executed orders.
    double new_trailing_stop, new_profit_take;
@@ -2915,7 +2943,7 @@ void UpdateTrailingStops() {
    }*/
 
    for (int i = 0; i < OrdersTotal(); i++) {
-     if (!OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) continue;
+     if (!OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) { continue; }
       if (OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
         order_type = OrderMagicNumber() - MagicNumber;
         // order_stop_loss = NormalizeDouble(Misc::If(Convert::OrderTypeToValue(OrderType()) > 0 || OrderStopLoss() != 0.0, OrderStopLoss(), 999999), pip_digits);
@@ -2939,7 +2967,7 @@ void UpdateTrailingStops() {
 
         new_trailing_stop = NormalizeDouble(GetTrailingValue(OrderType(), -1, order_type, OrderStopLoss(), TRUE), Digits);
         new_profit_take   = NormalizeDouble(GetTrailingValue(OrderType(), +1, order_type, OrderTakeProfit(), TRUE), Digits);
-        //if (MathAbs(OrderStopLoss() - new_trailing_stop) >= pip_size || MathAbs(OrderTakeProfit() - new_profit_take) >= pip_size) { // Perform update on pip change.
+        // if (MathAbs(OrderStopLoss() - new_trailing_stop) >= pip_size || MathAbs(OrderTakeProfit() - new_profit_take) >= pip_size) // Perform update on pip change.
         if (new_trailing_stop != OrderStopLoss() || new_profit_take != OrderTakeProfit()) { // Perform update on change only.
            result = OrderModify(OrderTicket(), OrderOpenPrice(), new_trailing_stop, new_profit_take, 0, GetOrderColor());
            if (!result) {
@@ -2954,7 +2982,7 @@ void UpdateTrailingStops() {
            }
         }
      }
-  }
+  } // end: for
 }
 
 /**
@@ -5173,7 +5201,7 @@ string GetStrategyComment(int sid, string sep = "|") {
  * Get strategy report based on the total orders.
  */
 string GetStrategyReport(string sep = "\n") {
-  string output = "Strategy stats: " + sep;
+  string output = "Strategy stats:" + sep;
   double pc_loss = 0, pc_won = 0;
   for (int id = 0; id < FINAL_STRATEGY_TYPE_ENTRY; id++) {
     if (info[id][TOTAL_ORDERS] > 0) {
@@ -6065,34 +6093,35 @@ string ReasonIdToText(int rid) {
   string output = "Unknown";
   switch (rid) {
     case EMPTY: output = "Empty"; break;
-    case C_ACC_NONE: output = "None (inactive)"; break;
-    case C_ACC_TRUE: output = "Always true"; break;
-    case C_EQUITY_LOWER: output = "Equity lower than balance"; break;
-    case C_EQUITY_HIGHER: output = "Equity higher than balance"; break;
-    case C_EQUITY_50PC_HIGH: output = "Equity 50% high"; break;
-    case C_EQUITY_20PC_HIGH: output = "Equity 20% high"; break;
-    case C_EQUITY_10PC_HIGH: output = "Equity 10% high"; break;
-    case C_EQUITY_10PC_LOW: output = "Equity 10% low"; break;
-    case C_EQUITY_20PC_LOW: output = "Equity 20% low"; break;
-    case C_EQUITY_50PC_LOW: output = "Equity 50% low"; break;
-    case C_MARGIN_USED_50PC: output = "50% Margin Used"; break;
-    case C_MARGIN_USED_70PC: output = "70% Margin Used"; break;
-    case C_MARGIN_USED_80PC: output = "80% Margin Used"; break;
-    case C_MARGIN_USED_90PC: output = "90% Margin Used"; break;
-    case C_NO_FREE_MARGIN: output = "No free margin."; break;
-    case C_ACC_IN_LOSS: output = "Account in loss"; break;
-    case C_ACC_IN_PROFIT: output = "Account in profit"; break;
-    case C_DBAL_LT_WEEKLY: output = "Max. daily balance < max. weekly"; break;
-    case C_DBAL_GT_WEEKLY: output = "Max. daily balance > max. weekly"; break;
-    case C_WBAL_LT_MONTHLY: output = "Max. weekly balance < max. monthly"; break;
-    case C_WBAL_GT_MONTHLY: output = "Max. weekly balance > max. monthly"; break;
-    case C_ACC_IN_TREND: output = "Account in trend"; break;
-    case C_ACC_IN_NON_TREND: output = "Account is against trend"; break;
-    case C_ACC_CDAY_IN_PROFIT: output = "Current day in profit"; break;
-    case C_ACC_CDAY_IN_LOSS: output = "Current day in loss"; break;
-    case C_ACC_PDAY_IN_PROFIT: output = "Previous day in profit"; break;
-    case C_ACC_PDAY_IN_LOSS: output = "Previous day in loss"; break;
-    case C_ACC_MAX_ORDERS: output = "Maximum orders opened"; break;
+    case R_NONE: output = "None (inactive)"; break;
+    case R_TRUE: output = "Always true"; break;
+    case R_EQUITY_LOWER: output = "Equity lower than balance"; break;
+    case R_EQUITY_HIGHER: output = "Equity higher than balance"; break;
+    case R_EQUITY_50PC_HIGH: output = "Equity 50% high"; break;
+    case R_EQUITY_20PC_HIGH: output = "Equity 20% high"; break;
+    case R_EQUITY_10PC_HIGH: output = "Equity 10% high"; break;
+    case R_EQUITY_10PC_LOW: output = "Equity 10% low"; break;
+    case R_EQUITY_20PC_LOW: output = "Equity 20% low"; break;
+    case R_EQUITY_50PC_LOW: output = "Equity 50% low"; break;
+    case R_MARGIN_USED_50PC: output = "50% Margin Used"; break;
+    case R_MARGIN_USED_70PC: output = "70% Margin Used"; break;
+    case R_MARGIN_USED_80PC: output = "80% Margin Used"; break;
+    case R_MARGIN_USED_90PC: output = "90% Margin Used"; break;
+    case R_NO_FREE_MARGIN: output = "No free margin"; break;
+    case R_ACC_IN_LOSS: output = "Account in loss"; break;
+    case R_ACC_IN_PROFIT: output = "Account in profit"; break;
+    case R_DBAL_LT_WEEKLY: output = "Max. daily balance < max. weekly"; break;
+    case R_DBAL_GT_WEEKLY: output = "Max. daily balance > max. weekly"; break;
+    case R_WBAL_LT_MONTHLY: output = "Max. weekly balance < max. monthly"; break;
+    case R_WBAL_GT_MONTHLY: output = "Max. weekly balance > max. monthly"; break;
+    case R_ACC_IN_TREND: output = "Account in trend"; break;
+    case R_ACC_IN_NON_TREND: output = "Account is against trend"; break;
+    case R_ACC_CDAY_IN_PROFIT: output = "Current day in profit"; break;
+    case R_ACC_CDAY_IN_LOSS: output = "Current day in loss"; break;
+    case R_ACC_PDAY_IN_PROFIT: output = "Previous day in profit"; break;
+    case R_ACC_PDAY_IN_LOSS: output = "Previous day in loss"; break;
+    case R_ACC_MAX_ORDERS: output = "Maximum orders opened"; break;
+    case R_ORDER_EXPIRED: output = "Order expired (CloseOrderAfterXHours)"; break;
   }
   return output;
 }

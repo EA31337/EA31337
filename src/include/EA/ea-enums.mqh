@@ -423,6 +423,39 @@ enum ENUM_MARKET_EVENT {
 #endif
 };
 
+// Define reasons.
+enum ENUM_REASON_TYPE {
+  R_NONE                = C_ACC_NONE, // None
+  R_TRUE                = C_ACC_TRUE, // True
+  R_EQUITY_LOWER        = C_EQUITY_LOWER, // Equity lower than balance.
+  R_EQUITY_HIGHER       = C_EQUITY_HIGHER, // Equity higher than balance.
+  R_EQUITY_50PC_HIGH    = C_EQUITY_50PC_HIGH, // Equity 50% high.
+  R_EQUITY_20PC_HIGH    = C_EQUITY_20PC_HIGH, // Equity 20% high.
+  R_EQUITY_10PC_HIGH    = C_EQUITY_10PC_HIGH, // Equity 10% high.
+  R_EQUITY_10PC_LOW     = C_EQUITY_10PC_LOW, // Equity 10% low.
+  R_EQUITY_20PC_LOW     = C_EQUITY_20PC_LOW, // Equity 20% low.
+  R_EQUITY_50PC_LOW     = C_EQUITY_50PC_LOW, // Equity 50% low.
+  R_MARGIN_USED_50PC    = C_MARGIN_USED_50PC, // 50% Margin Used.
+  R_MARGIN_USED_70PC    = C_MARGIN_USED_70PC, // 70% Margin Used.
+  R_MARGIN_USED_80PC    = C_MARGIN_USED_80PC, // 80% Margin Used.
+  R_MARGIN_USED_90PC    = C_MARGIN_USED_90PC, // 90% Margin Used.
+  R_NO_FREE_MARGIN      = C_NO_FREE_MARGIN, // No free margin.
+  R_ACC_IN_LOSS         = C_ACC_IN_LOSS, // Account in loss.
+  R_ACC_IN_PROFIT       = C_ACC_IN_PROFIT, // Account in profit.
+  R_DBAL_LT_WEEKLY      = C_DBAL_LT_WEEKLY, // Max. daily balance < max. weekly.
+  R_DBAL_GT_WEEKLY      = C_DBAL_GT_WEEKLY, // Max. daily balance > max. weekly.
+  R_WBAL_LT_MONTHLY     = C_WBAL_LT_MONTHLY, // Max. weekly balance < max. monthly.
+  R_WBAL_GT_MONTHLY     = C_WBAL_GT_MONTHLY, // Max. weekly balance > max. monthly.
+  R_ACC_IN_TREND        = C_ACC_IN_TREND, // Account in trend.
+  R_ACC_IN_NON_TREND    = C_ACC_IN_NON_TREND, // Account is against trend.
+  R_ACC_CDAY_IN_PROFIT  = C_ACC_CDAY_IN_PROFIT, // Current day in profit.
+  R_ACC_CDAY_IN_LOSS    = C_ACC_CDAY_IN_LOSS, // Current day in loss.
+  R_ACC_PDAY_IN_PROFIT  = C_ACC_PDAY_IN_PROFIT, // Previous day in profit.
+  R_ACC_PDAY_IN_LOSS    = C_ACC_PDAY_IN_LOSS, // Previous day in loss.
+  R_ACC_MAX_ORDERS      = C_ACC_MAX_ORDERS, // Maximum orders opened.
+  R_ORDER_EXPIRED,
+};
+
 enum ENUM_STAT_PERIOD_TYPE { // Define type of tasks.
   DAILY   = 0, // Daily
   WEEKLY  = 1, // Weekly

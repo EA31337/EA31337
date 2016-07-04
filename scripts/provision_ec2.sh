@@ -38,3 +38,4 @@ vagrant up --provider=aws --no-provision --destroy-on-error
 vagrant provision | tee "${LOG_DIR}/${VM_NAME}.log"
 vagrant ssh -c "/vagrant/scripts/eval.sh install_mt 4.0.0.971"
 vagrant ssh
+# E.g. EA31337-Lite-Sets/_scripts/run_backtests.sh EURUSD\*2014 -S ValidateSettings=0
