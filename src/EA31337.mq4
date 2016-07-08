@@ -1060,7 +1060,7 @@ bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
     last_err = Msg::ShowText("No money to open more orders.", "Error", __FUNCTION__, __LINE__, VerboseInfo | VerboseErrors, PrintLogOnChart);
     result = FALSE;
   } else if (!CheckMinPipGap(sid)) {
-    last_trace = Msg::ShowText(StringFormat("%s: Not executing order, because the gap is too small [MinPipGap].", sname[sid]), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
+    last_trace = Msg::ShowText(StringFormat("%s: Not executing order, because the gap is too small [MinPipGap].", sname[sid]), "Info", __FUNCTION__, __LINE__, VerboseInfo);
     result = FALSE;
   } else if (!CheckProfitFactorLimits(sid)) {
     result = FALSE;
@@ -3762,7 +3762,7 @@ int GetMaxOrders() {
 }
 
 /**
- * Calculate number of maximum of orders allowed to open per type.
+ * Calculate the limit of maximum orders to open per each strategy.
  */
 int GetMaxOrdersPerType() {
   return Misc::If(MaxOrdersPerType > 0, (int)MaxOrdersPerType, (int)MathMax(MathFloor(max_orders / MathMax(GetNoOfStrategies(), 1) ), 1) * 2);
