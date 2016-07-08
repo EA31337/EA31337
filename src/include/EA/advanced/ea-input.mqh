@@ -34,15 +34,15 @@ extern int      MinIntervalSec = 0; // Min interval between subsequent trade sig
 
 //+------------------------------------------------------------------+
 extern string   __EA_Order_Parameters__ = "-- Profit and loss parameters --"; // >>> PROFIT/LOSS <<<
-extern double   TakeProfit = 0; // Take profit in pips (0 = none)
-extern double   StopLoss = 0; // Stop loss in pips (0 = none)
+extern double   TakeProfit = 0; // Take profit (in pips, 0 = none)
+extern double   StopLoss = 0; // Stop loss (in pips, 0 = none)
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
-extern int TrailingStop = 40; // Trailing stop in pips
+extern int TrailingStop = 40; // Trailing stop (in pips)
 extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = T_MA_FMS_PEAK; // Default trail stop method (0 = none)
 extern bool TrailingStopOneWay = TRUE; // Trailing stop one way?
-extern int TrailingProfit = 30; // Trailing profit in pips
+extern int TrailingProfit = 30; // Trailing profit (in pips)
 extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = T_FIXED; // Default trail profit method
 extern bool TrailingProfitOneWay = TRUE; // Trailing profit one way?
 extern double TrailingStopAddPerMinute = 0; // Decrease trail stop per minute (pip/min)
@@ -65,8 +65,8 @@ extern double ProfitFactorMaxToTrade = 5.00; // Max. profit factor per strategy 
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameters (set 1.0 for default) --"; // >>> BOOSTING <<<
 extern bool Boosting_Enabled = 1; // Enable boosting
-extern double BoostTrendFactor = 1.2; // Boost trend factor
-extern bool BoostByProfitFactor = TRUE; // Boost strategy by its profit factor.
+extern double BoostTrendFactor = 1.2; // Boost by trend factor
+extern bool BoostByProfitFactor = TRUE; // Boost strategy by its profit factor
 extern bool HandicapByProfitFactor = FALSE; // Handicap by its low profit factor
 extern double BestDailyStrategyMultiplierFactor = 1.1; // Multiplier for the best daily strategy
 extern double BestWeeklyStrategyMultiplierFactor = 1.2; // Multiplier for the best weekly strategy
@@ -216,7 +216,7 @@ extern int MarketSuddenDropSize = 10; // Drop in pips to react
 extern int MarketBigDropSize = 50; // Big drop in pips to react
 extern int TrendMethodAction = 238; // Trend method for actions (0-255)
 extern int MarketSpecificHour = 0; // Specific hour used for conditions (0-23)
-extern bool CloseConditionOnlyProfitable = TRUE; // Apply close condition only for profitable orders.
+extern bool CloseConditionOnlyProfitable = TRUE; // Apply close condition only for profitable orders
 extern int CloseConditionCustom1Method = 0; // Custom 1 indicator-based close condition (0-1023)
 extern int CloseConditionCustom2Method = 0; // Custom 2 indicator-based close condition (0-1023)
 extern int CloseConditionCustom3Method = 0; // Custom 3 indicator-based close condition (0-1023)
@@ -1338,11 +1338,11 @@ int SpreadRatio = 1.0;
 
 //+------------------------------------------------------------------+
 extern string __Logging_Parameters__ = "-- Settings for logging & messages --"; // >>> LOGS & MESSAGES <<<
-extern bool WriteReport = 1; // Write file report on exit.
+extern bool WriteReport = 1; // Write file report on exit
 extern bool PrintLogOnChart = 1; // Display info on chart
-extern bool VerboseErrors = 1; // Display errors.
-extern bool VerboseInfo = 1; // Display info messages.
-bool VerboseDebug = 0; // Display debug messages.
+extern bool VerboseErrors = 1; // Display errors
+extern bool VerboseInfo = 1; // Display info messages
+bool VerboseDebug = 0; // Display debug messages
 bool VerboseTrace = 0; // Display trace messages
 
 //+------------------------------------------------------------------+
@@ -1353,15 +1353,15 @@ extern color ColorSell = 255; // Color: Sell
 extern bool SoundAlert = 0; // Enable sound alerts
 extern string SoundFileAtOpen = "alert.wav"; // Sound: on order open
 extern string SoundFileAtClose = "alert.wav"; // Sound: on order close
-// extern bool SendLogs = FALSE; // Send logs to remote host for diagnostic purposes.
+// extern bool SendLogs = FALSE; // Send logs to remote host for diagnostic purposes
 
 //+------------------------------------------------------------------+
 extern string __Backtest_Parameters__ = "-- Backtest & troubleshooting parameters --"; // >>> BACKTESTING <<<
 extern bool ValidateSettings = TRUE; // Validate startup settings
 extern int DemoMarketStopLevel = 10; // Demo market stop level
 extern int SmartToggleComponent = 0; // Override: Toggle different components (0-43)
-extern int Account_Condition_To_Disable = 0; // Override: Disable specific n action.
-extern bool DisableCloseConditions = FALSE; // Override: Disable all close conditions.
+extern int Account_Condition_To_Disable = 0; // Override: Disable specific n action
+extern bool DisableCloseConditions = FALSE; // Override: Disable all close conditions
 
 //+------------------------------------------------------------------+
 extern string __Constants__ = "-- Constants --"; // >>> CONSTANTS <<<

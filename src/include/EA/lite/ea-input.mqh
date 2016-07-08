@@ -30,15 +30,15 @@ extern int MinPipGap = 60; // Min gap between trades per type (in pips)
 
 //+------------------------------------------------------------------+
 extern string   __EA_Order_Parameters__ = "-- Profit and loss parameters --"; // >>> PROFIT/LOSS <<<
-extern double   TakeProfit = 140.00000000; // Take profit in pips (0 = none)
-extern double   StopLoss = 140.00000000; // Stop loss in pips (0 = none)
+extern double   TakeProfit = 140.00000000; // Take profit (in pips, 0 = none)
+extern double   StopLoss = 140.00000000; // Stop loss (in pips, 0 = none)
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
-extern int TrailingStop = 50; // Trailing stop in pips
+extern int TrailingStop = 50; // Trailing stop (in pips)
 extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 7; // Default trail stop method (0 = none)
 extern bool TrailingStopOneWay = 0; // Trailing stop one way?
-extern int TrailingProfit = 80; // Trailing profit in pips
+extern int TrailingProfit = 80; // Trailing profit (in pips)
 extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 17; // Default trail profit method
 extern bool TrailingProfitOneWay = 1; // Trailing profit one way?
 extern double TrailingStopAddPerMinute = 0.00000000; // Decrease trail stop per minute (pip/min)
@@ -57,7 +57,7 @@ extern double ProfitFactorMaxToTrade = 5.00000000; // Max. profit factor per str
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameters (set 1.0 for default) --"; // >>> BOOSTING <<<
 extern bool Boosting_Enabled = 1; // Enable boosting
-extern double BoostTrendFactor = 1.30000000; // Boost trend factor
+extern double BoostTrendFactor = 1.30000000; // Boost by trend factor
 extern double BestDailyStrategyMultiplierFactor = 1.50000000; // Multiplier for the best daily strategy
 extern double BestWeeklyStrategyMultiplierFactor = 1.00000000; // Multiplier for the best weekly strategy
 extern double BestMonthlyStrategyMultiplierFactor = 1.00000000; // Multiplier for the best monthly strategy
@@ -619,11 +619,11 @@ int JobProcessDelay = 1; // Job process delay
 
 //+------------------------------------------------------------------+
 extern string __Logging_Parameters__ = "-- Settings for logging & messages --"; // >>> LOGS & MESSAGES <<<
-extern bool WriteReport = 1; // Write file report on exit.
+extern bool WriteReport = 1; // Write file report on exit
 extern bool PrintLogOnChart = 1; // Display info on chart
-extern bool VerboseErrors = 1; // Display errors.
-extern bool VerboseInfo = 1; // Display info messages.
-bool VerboseDebug = 0; // Display debug messages.
+extern bool VerboseErrors = 1; // Display errors
+extern bool VerboseInfo = 1; // Display info messages
+bool VerboseDebug = 0; // Display debug messages
 bool VerboseTrace = 0; // Display trace messages
 
 //+------------------------------------------------------------------+
@@ -634,7 +634,7 @@ extern color ColorSell = 255; // Color: Sell
 extern bool SoundAlert = 0; // Enable sound alerts
 extern string SoundFileAtOpen = "alert.wav"; // Sound: on order open
 extern string SoundFileAtClose = "alert.wav"; // Sound: on order close
-// extern bool SendLogs = FALSE; // Send logs to remote host for diagnostic purposes.
+// extern bool SendLogs = FALSE; // Send logs to remote host for diagnostic purposes
 
 //+------------------------------------------------------------------+
 extern string __Backtest_Parameters__ = "-- Backtest parameters --"; // >>> BACKTESTING <<<
