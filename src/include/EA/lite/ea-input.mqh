@@ -89,7 +89,7 @@ extern ENUM_ACC_CONDITION Account_Condition_5 = 18; // 5. Account condition
 extern ENUM_MARKET_CONDITION Market_Condition_5 = 7; // 5. Market condition
 extern ENUM_ACTION_TYPE Action_On_Condition_5 = 10; // 5. Action to take
 
-extern int Account_Condition_MinProfitCloseOrder = 20; // Min pip profit on action to close (and)
+extern int Account_Condition_MinProfitCloseOrder = 20; // Min pip profit on action to close
 
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions_Params__ = "-- Account conditions parameters --"; // >>> CONDITIONS & ACTIONS PARAMS <<<

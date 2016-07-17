@@ -5751,7 +5751,8 @@ string GetSummaryText() {
  */
 string GetRiskRatioText() {
   string text = "Normal";
-  if (risk_ratio < 0.2) text = "Extremely risky!";
+  if (RiskRatio == 0 && risk_ratio < 0.9) text = "Set low manually";
+  else if (risk_ratio < 0.2) text = "Extremely risky!";
   else if (risk_ratio < 0.3) text = "Very risky!";
   else if (risk_ratio < 0.5) text = "Risky!";
   else if (risk_ratio < 0.9) text = "Below normal, but ok";
@@ -5791,7 +5792,7 @@ void TxtRemoveSepChar(string& text, string sep) {
 /* BEGIN: ACTION FUNCTIONS */
 
 /**
- * Execute action to close most profitable order.
+ * Execute action to close the most profitable order.
  */
 bool ActionCloseMostProfitableOrder(int reason_id = EMPTY, int min_profit = EMPTY){
   bool result = FALSE;
