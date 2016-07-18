@@ -5751,7 +5751,7 @@ string GetSummaryText() {
  */
 string GetRiskRatioText() {
   string text = "Normal";
-  if (RiskRatio == 0 && risk_ratio < 0.9) text = "Set low manually";
+  if (RiskRatio != 0.0 && risk_ratio < 0.9) text = "Set low manually";
   else if (risk_ratio < 0.2) text = "Extremely risky!";
   else if (risk_ratio < 0.3) text = "Very risky!";
   else if (risk_ratio < 0.5) text = "Risky!";
