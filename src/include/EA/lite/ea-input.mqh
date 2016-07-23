@@ -471,10 +471,10 @@ int OBV30_SignalMethod = 0; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
 string __OSMA_Parameters__ = "-- Settings for the Moving Average of Oscillator indicator --"; // >>> OSMA <<<
-bool OSMA1_Active = 1; // Enable for M1
-bool OSMA5_Active = 1; // Enable for M5
-bool OSMA15_Active = 1; // Enable for M15
-bool OSMA30_Active = 1; // Enable for M30
+bool OSMA1_Active = 0; // Enable for M1
+bool OSMA5_Active = 0; // Enable for M5
+bool OSMA15_Active = 0; // Enable for M15
+bool OSMA30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE OSMA_TrailingStopMethod = 18; // Trail stop method
 ENUM_TRAIL_TYPE OSMA_TrailingProfitMethod = 22; // Trail profit method
 int OSMA_Period_Fast = 11; // Period Fast
