@@ -237,7 +237,7 @@ extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v"
 Market market(string);
 
 // Market/session variables.
-double pip_size, lot_size;
+double pip_size, lot_size, risk_margin;
 double market_minlot, market_maxlot, market_lotsize, market_lotstep, market_marginrequired, market_margininit;
 double market_stoplevel; // Market stop level in points.
 double order_freezelevel; // Order freeze level in points.
@@ -3782,7 +3782,7 @@ int GetNoOfStrategies() {
 /**
  * Calculate size of the lot based on the free margin and account leverage automatically.
  */
-double GetAutoLotSize(bool smooth = true) {
+double GetLotSizeAuto(bool smooth = true) {
   double avail_margin = MathMin(AccountFreeMargin(), AccountBalance());
   double leverage     = MathMax(AccountLeverage(), 100);
   #ifdef __advanced__ double margin_risk = 0.02; #else double margin_risk = 0.01; #endif // Risk only 2%/1% (0.02/0.01) per order of total available margin.
@@ -3823,7 +3823,29 @@ double GetAutoLotSize(bool smooth = true) {
  * Return current lot size to trade.
  */
 double GetLotSize() {
-  return NormalizeLots(Misc::If(LotSize == 0, GetAutoLotSize(), LotSize));
+  return NormalizeLots(Misc::If(LotSize == 0, GetLotSizeAuto(), LotSize));
+}
+
+/**
+ * Calculate size of the lot based on the free margin and account leverage automatically.
+ */
+double GetRiskMarginAuto(bool smooth = true) {
+  double new_risk_margin = 0.01;
+  if (smooth) {
+    // Increase only by average of the previous and new (which should prevent sudden increases).
+    return (risk_margin + new_risk_margin) / 2;
+  } else {
+    return new_risk_margin;
+  }
+}
+
+/**
+ * Return risk margin.
+ * @return
+ *   Range: 0.01-1.00
+ */
+double GetRiskMargin() {
+  return RiskMargin == 0 ? GetRiskMarginAuto() : RiskMargin/100;
 }
 
 /**
@@ -4032,6 +4054,7 @@ void StartNewWeek() {
   CheckAccConditions();
 
   // Calculate lot size, orders and risk.
+  risk_margin = GetRiskMargin(); // Re-calculate risk margin.
   lot_size = GetLotSize(); // Re-calculate lot size.
   UpdateStrategyLotSize(); // Update strategy lot size.
   if (Boosting_Enabled) UpdateStrategyFactor(MONTHLY);
@@ -4219,9 +4242,10 @@ bool InitializeVariables() {
 
   max_order_slippage = Convert::PipsToPoints(MaxOrderPriceSlippage); // Maximum price slippage for buy or sell orders (converted into points).
 
-  // Calculate lot size, orders and risk.
-  lot_size = GetLotSize();
-  risk_ratio = GetRiskRatio();
+  // Calculate lot size, orders, risk ratio and margin risk.
+  risk_ratio = GetRiskRatio();   // Re-calculate risk ratio.
+  risk_margin = GetRiskMargin(); // Re-calculate risk margin.
+  lot_size = GetLotSize();       // Re-calculate lot size.
   max_orders = GetMaxOrders();
 
   gmt_offset = TimeGMTOffset();
