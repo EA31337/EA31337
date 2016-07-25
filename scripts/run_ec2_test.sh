@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 read pattern args <<<$@
-[ $# -eq 0 ] && { echo Usage: $0; exit 1; }
+[ $# -eq 0 ] && { echo "Usage: $0 (test_name)"; exit 1; }
 CWD="$(cd -P -- "$(dirname -- "$0")" && pwd -P)"
 ROOT="$(git rev-parse --show-toplevel || echo $CWD)"
 VERSION=${VERSION:-"Lite"}

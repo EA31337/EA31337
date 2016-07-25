@@ -12,6 +12,6 @@ grep "^[[:alnum:]][0-9A-Za-z_]\+=" "$SET" | while read opt; do
   eval $opt
   value=${!name}
   ! [[ $value == ?(-)+([0-9.]) ]] && value="\"$value\""
-  ex "+%s/$name\s\+=.*;/$name = $value;/" -scwq "$MQH"
+  ex "+%s/ $name\s\+=.*;/ $name = $value;/" -scwq "$MQH"
 done
 echo $0 done.

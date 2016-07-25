@@ -47,7 +47,7 @@ extern double TrailingStopAddPerMinute = 0.00000000; // Decrease trail stop per 
 extern string __EA_Risk_Parameters__ = "-- Risk management parameters --"; // >>> RISK <<
 extern bool TradeWithTrend = 0; // Trade with trend
 extern double RiskRatio = 0.00000000; // Risk ratio (0 = auto, 1.0 = normal)
-extern double RiskMargin = 0.0; // Risk margin (0-100, 0 = auto, 1 = 1%)
+extern double RiskMargin = 1; // Risk margin (0-100, 0 = auto, 1 = 1%)
 extern int CloseOrderAfterXHours = 0; // Close order after X hours (0 = disabled)
 
 //+------------------------------------------------------------------+
@@ -145,7 +145,7 @@ int ADX30_SignalMethod = 15; // Signal method for M30 (0-?)
 
 //+------------------------------------------------------------------+
 extern string __Alligator_Parameters__ = "-- Settings for the Alligator indicator --"; // >>> ALLIGATOR <<<
-extern bool Alligator1_Active = 1; // Enable for M1
+extern bool Alligator1_Active = 0; // Enable for M1
 extern bool Alligator5_Active = 1; // Enable for M5
 extern bool Alligator15_Active = 1; // Enable for M15
 extern bool Alligator30_Active = 1; // Enable for M30
@@ -162,10 +162,10 @@ extern int Alligator_Shift_Far = 3; // Shift Far
 extern ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = 22; // Trail stop method
 extern ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = 24; // Trail profit method
 extern double Alligator_SignalLevel = 0.02000000; // Signal level
-extern int Alligator1_SignalMethod = 21; // Signal method for M1 (0-63)
-extern int Alligator5_SignalMethod = 0; // Signal method for M5 (0-63)
-extern int Alligator15_SignalMethod = 0; // Signal method for M15 (0-63)
-extern int Alligator30_SignalMethod = 33; // Signal method for M30 (0-63)
+extern int Alligator1_SignalMethod = 27; // Signal method for M1 (0-63)
+extern int Alligator5_SignalMethod = 24; // Signal method for M5 (0-63)
+extern int Alligator15_SignalMethod = 57; // Signal method for M15 (0-63)
+extern int Alligator30_SignalMethod = 57; // Signal method for M30 (0-63)
 
 //+------------------------------------------------------------------+
 string __ATR_Parameters__ = "-- Settings for the Average True Range indicator --"; // >>> ATR <<<
@@ -212,8 +212,8 @@ extern ENUM_TRAIL_TYPE Bands_TrailingStopMethod = 23; // Trail stop method
 extern ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = 27; // Trail profit method
 /* @todo extern */ int Bands_SignalLevel = 0; // Signal level
 extern int Bands1_SignalMethod = 0; // Signal method for M1 (0-255)
-extern int Bands5_SignalMethod = 0; // Signal method for M5 (0-255)
-extern int Bands15_SignalMethod = 0; // Signal method for M15 (0-255)
+extern int Bands5_SignalMethod = 28; // Signal method for M5 (0-255)
+extern int Bands15_SignalMethod = 238; // Signal method for M15 (0-255)
 extern int Bands30_SignalMethod = 0; // Signal method for M30 (0-255)
 
 //+------------------------------------------------------------------+
@@ -279,18 +279,18 @@ int CCI30_SignalMethod = 0; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
 extern string __DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --"; // >>> DEMARKER <<<
-extern bool DeMarker1_Active = 1; // Enable for M1
-extern bool DeMarker5_Active = 1; // Enable for M5
-extern bool DeMarker15_Active = 1; // Enable for M15
+extern bool DeMarker1_Active = 0; // Enable for M1
+extern bool DeMarker5_Active = 0; // Enable for M5
+extern bool DeMarker15_Active = 0; // Enable for M15
 extern bool DeMarker30_Active = 1; // Enable for M30
 extern int DeMarker_Period = 23; // Period
 extern int DeMarker_Shift = 1; // Shift
 extern double DeMarker_SignalLevel = 0.40000000; // Signal level (0.0-0.4)
 extern ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = 13; // Trail stop method
 extern ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = 24; // Trail profit method
-extern int DeMarker1_SignalMethod = 15; // Signal method for M1 (0-
-extern int DeMarker5_SignalMethod = 15; // Signal method for M5 (0-
-extern int DeMarker15_SignalMethod = 15; // Signal method for M15 (0-
+extern int DeMarker1_SignalMethod = 0; // Signal method for M1 (0-
+extern int DeMarker5_SignalMethod = 30; // Signal method for M5 (0-
+extern int DeMarker15_SignalMethod = 30; // Signal method for M15 (0-
 extern int DeMarker30_SignalMethod = 12; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
@@ -312,10 +312,10 @@ int Envelopes_Shift_Far = 0; // Shift Far
 extern ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = 6; // Trail stop method
 extern ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = 24; // Trail profit method
 /* @todo extern */ int Envelopes_SignalLevel = 0; // Signal level
-extern int Envelopes1_SignalMethod = 126; // Signal method for M1 (0-127)
-extern int Envelopes5_SignalMethod = 48; // Signal method for M5 (0-127)
-extern int Envelopes15_SignalMethod = 126; // Signal method for M15 (0-127)
-extern int Envelopes30_SignalMethod = 126; // Signal method for M30 (0-127)
+extern int Envelopes1_SignalMethod = 30; // Signal method for M1 (0-127)
+extern int Envelopes5_SignalMethod = 63; // Signal method for M5 (0-127)
+extern int Envelopes15_SignalMethod = 81; // Signal method for M15 (0-127)
+extern int Envelopes30_SignalMethod = 96; // Signal method for M30 (0-127)
 
 //+------------------------------------------------------------------+
 string __Force_Parameters__ = "-- Settings for the Force Index indicator --"; // >>> FORCE <<<
@@ -336,17 +336,17 @@ int Force30_SignalMethod = 31; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
 extern string __Fractals_Parameters__ = "-- Settings for the Fractals indicator --"; // >>> FRACTALS <<<
-extern bool Fractals1_Active = 1; // Enable for M1
-extern bool Fractals5_Active = 1; // Enable for M5
-extern bool Fractals15_Active = 1; // Enable for M15
-extern bool Fractals30_Active = 1; // Enable for M30
+extern bool Fractals1_Active = 0; // Enable for M1
+extern bool Fractals5_Active = 0; // Enable for M5
+extern bool Fractals15_Active = 0; // Enable for M15
+extern bool Fractals30_Active = 0; // Enable for M30
 extern ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = 12; // Trail stop method
 extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = 24; // Trail profit method
 /* @todo extern */ int Fractals_SignalLevel = 0; // Signal level
-extern int Fractals1_SignalMethod = 1; // Signal method for M1 (0-7)
-extern int Fractals5_SignalMethod = 1; // Signal method for M5 (0-7)
-extern int Fractals15_SignalMethod = 1; // Signal method for M15 (0-7)
-extern int Fractals30_SignalMethod = 4; // Signal method for M30 (0-7)
+extern int Fractals1_SignalMethod = 7; // Signal method for M1 (0-7)
+extern int Fractals5_SignalMethod = 7; // Signal method for M5 (0-7)
+extern int Fractals15_SignalMethod = 7; // Signal method for M15 (0-7)
+extern int Fractals30_SignalMethod = 7; // Signal method for M30 (0-7)
 
 //+------------------------------------------------------------------+
 string __Gator_Parameters__ = "-- Settings for the Gator oscillator --"; // >>> GATOR <<<
@@ -383,7 +383,7 @@ int Ichimoku30_SignalMethod = 0; // Signal method for M30 (0-
 extern string __MA_Parameters__ = "-- Settings for the Moving Average indicator --"; // >>> MA <<<
 extern bool MA1_Active = 1; // Enable for M1
 extern bool MA5_Active = 1; // Enable for M5
-extern bool MA15_Active = 1; // Enable for M15
+extern bool MA15_Active = 0; // Enable for M15
 extern bool MA30_Active = 1; // Enable for M30
 extern int MA_Period_Fast = 11; // Period Fast
 extern int MA_Period_Medium = 20; // Period Medium
@@ -398,10 +398,10 @@ extern ENUM_APPLIED_PRICE MA_Applied_Price = 0; // Applied Price
 extern ENUM_TRAIL_TYPE MA_TrailingStopMethod = 18; // Trail stop method
 extern ENUM_TRAIL_TYPE MA_TrailingProfitMethod = 22; // Trail profit method
 extern double MA_SignalLevel = 1.20000000; // Signal level
-extern int MA1_SignalMethod = 15; // Signal method for M1 (0-127)
-extern int MA5_SignalMethod = 9; // Signal method for M5 (0-127)
-extern int MA15_SignalMethod = 24; // Signal method for M15 (0-127)
-extern int MA30_SignalMethod = 14; // Signal method for M30 (0-127)
+extern int MA1_SignalMethod = 120; // Signal method for M1 (0-127)
+extern int MA5_SignalMethod = 0; // Signal method for M5 (0-127)
+extern int MA15_SignalMethod = 75; // Signal method for M15 (0-127)
+extern int MA30_SignalMethod = 51; // Signal method for M30 (0-127)
 
 //+------------------------------------------------------------------+
 extern string __MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --"; // >>> MACD <<<
@@ -418,10 +418,10 @@ extern int MACD_Shift_Far = 0; // Shift Far
 extern ENUM_TRAIL_TYPE MACD_TrailingStopMethod = 17; // Trail stop method
 extern ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = 24; // Trail profit method
 extern double MACD_SignalLevel = 0.30000000; // Signal level
-extern int MACD1_SignalMethod = 18; // Signal method for M1 (0-31)
-extern int MACD5_SignalMethod = 16; // Signal method for M5 (0-31)
+extern int MACD1_SignalMethod = 0; // Signal method for M1 (0-31)
+extern int MACD5_SignalMethod = 4; // Signal method for M5 (0-31)
 extern int MACD15_SignalMethod = 25; // Signal method for M15 (0-31)
-extern int MACD30_SignalMethod = 6; // Signal method for M30 (0-31)
+extern int MACD30_SignalMethod = 4; // Signal method for M30 (0-31)
 
 //+------------------------------------------------------------------+
 string __MFI_Parameters__ = "-- Settings for the Money Flow Index indicator --"; // >>> MFI <<<
@@ -500,10 +500,10 @@ extern int RSI_Shift = 0; // Shift
 extern ENUM_TRAIL_TYPE RSI_TrailingStopMethod = 9; // Trail stop method
 extern ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = 24; // Trail profit method
 extern int RSI_SignalLevel = 18; // Signal level
-extern int RSI1_SignalMethod = 23; // Signal method for M1 (0-63)
-extern int RSI5_SignalMethod = 54; // Signal method for M5 (0-63)
-extern int RSI15_SignalMethod = 14; // Signal method for M15 (0-63)
-extern int RSI30_SignalMethod = 8; // Signal method for M30 (0-63)
+extern int RSI1_SignalMethod = 21; // Signal method for M1 (0-63)
+extern int RSI5_SignalMethod = 63; // Signal method for M5 (0-63)
+extern int RSI15_SignalMethod = 49; // Signal method for M15 (0-63)
+extern int RSI30_SignalMethod = 54; // Signal method for M30 (0-63)
 
 //+------------------------------------------------------------------+
 string __RVI_Parameters__ = "-- Settings for the Relative Vigor Index indicator --"; // >>> RVI <<<
@@ -533,9 +533,9 @@ extern int SAR_Shift = 0; // Shift
 extern ENUM_TRAIL_TYPE SAR_TrailingStopMethod = 1; // Trail stop method
 extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = 18; // Trail profit method
 extern double SAR_SignalLevel = 0.40000000; // Signal level
-extern int SAR1_SignalMethod = 114; // Signal method for M1 (0-127)
+extern int SAR1_SignalMethod = 119; // Signal method for M1 (0-127)
 extern int SAR5_SignalMethod = 0; // Signal method for M5 (0-127)
-extern int SAR15_SignalMethod = 0; // Signal method for M15 (0-127)
+extern int SAR15_SignalMethod = 105; // Signal method for M15 (0-127)
 extern int SAR30_SignalMethod = 33; // Signal method for M30 (0-127)
 
 //+------------------------------------------------------------------+
