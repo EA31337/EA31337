@@ -545,17 +545,7 @@ string InitInfo(bool startup = False, string sep = "\n") {
       max_orders,
       GetMaxOrdersPerType(),
       sep);
-  output += StringFormat("Timeframes: M1: %s, M5: %s, M15: %s, M30: %s, H1: %s, H4: %s, D1: %s, W1: %s, MN1: %s;%s",
-      CheckTf(PERIOD_M1)  ? "Active" : "Not active",
-      CheckTf(PERIOD_M5)  ? "Active" : "Not active",
-      CheckTf(PERIOD_M15) ? "Active" : "Not active",
-      CheckTf(PERIOD_M30) ? "Active" : "Not active",
-      CheckTf(PERIOD_H1)  ? "Active" : "Not active",
-      CheckTf(PERIOD_H4)  ? "Active" : "Not active",
-      CheckTf(PERIOD_D1)  ? "Active" : "Not active",
-      CheckTf(PERIOD_W1)  ? "Active" : "Not active",
-      CheckTf(PERIOD_MN1) ? "Active" : "Not active",
-      sep);
+  output += ListTimeframes() + sep;
   output += StringFormat("Datetime: Hour of day: %d, Day of week: %d, Day of month: %d, Day of year: %d, Month: %d, Year: %d%s",
       hour_of_day, day_of_week, day_of_month, day_of_year, month, year, sep);
   output += GetAccountTextDetails() + sep;
@@ -567,6 +557,28 @@ string InitInfo(bool startup = False, string sep = "\n") {
     }
   }
   return output;
+}
+
+/**
+ * Check whether timeframes are active.
+ */
+string ListTimeframes(bool print = False) {
+  string output = StringFormat("Timeframes: M1: %s, M5: %s, M15: %s, M30: %s, H1: %s, H4: %s, D1: %s, W1: %s, MN1: %s;",
+    CheckTf(PERIOD_M1)  ? "Active" : "Not active",
+    CheckTf(PERIOD_M5)  ? "Active" : "Not active",
+    CheckTf(PERIOD_M15) ? "Active" : "Not active",
+    CheckTf(PERIOD_M30) ? "Active" : "Not active",
+    CheckTf(PERIOD_H1)  ? "Active" : "Not active",
+    CheckTf(PERIOD_H4)  ? "Active" : "Not active",
+    CheckTf(PERIOD_D1)  ? "Active" : "Not active",
+    CheckTf(PERIOD_W1)  ? "Active" : "Not active",
+    CheckTf(PERIOD_MN1) ? "Active" : "Not active");
+  if (print) {
+    return Msg::ShowText(output, "Info", __FUNCTION__, __LINE__, VerboseInfo);
+  }
+  else {
+    return output;
+  }
 }
 
 /**
@@ -953,9 +965,9 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
    if (VerboseDebug) Print(__FUNCTION__ + ": " + GetMarketTextDetails()); // Print current market information before placing the order.
    double order_price = Market::GetOpenPrice(cmd);
    double stoploss = 0, takeprofit = 0;
-   if (StopLoss > 0.0) stoploss = NormalizeDouble(Market::GetClosePrice(cmd) - (StopLoss + TrailingStop) * pip_size * Convert::OrderTypeToValue(cmd), Digits);
+   if (StopLoss > 0) stoploss = NormalizeDouble(Market::GetClosePrice(cmd) - (StopLoss + TrailingStop) * pip_size * Convert::OrderTypeToValue(cmd), Digits);
    else stoploss   = GetTrailingValue(cmd, -1, sid);
-   if (TakeProfit > 0.0) takeprofit = NormalizeDouble(order_price + (TakeProfit + TrailingProfit) * pip_size * Convert::OrderTypeToValue(cmd), Digits);
+   if (TakeProfit > 0) takeprofit = NormalizeDouble(order_price + (TakeProfit + TrailingProfit) * pip_size * Convert::OrderTypeToValue(cmd), Digits);
    else takeprofit = GetTrailingValue(cmd, +1, sid);
 
    // @fixme: warning 43: possible loss of data due to type conversion: GetOrderColor
@@ -964,7 +976,7 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
       total_orders++;
       daily_orders++;
       if (!OrderSelect(order_ticket, SELECT_BY_TICKET) && VerboseErrors) {
-        Print(__FUNCTION__ + ": OrderSelect() error = ", ErrorDescription(GetLastError()));
+        Msg::ShowText(ErrorDescription(GetLastError()), "Error", __FUNCTION__, __LINE__, VerboseErrors);
         OrderPrint();
         // @fixme: warning 43: possible loss of data due to type conversion: trade_volume
         if (retry) TaskAddOrderOpen(cmd, trade_volume, sid); // Will re-try again. // warning 43: possible loss of data due to type conversion
@@ -980,7 +992,7 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
       order_price = OrderOpenPrice();
       stats[sid][AVG_SPREAD] = (stats[sid][AVG_SPREAD] + curr_spread) / 2;
       if (VerboseInfo) OrderPrint();
-      if (VerboseDebug) { Print(__FUNCTION__ + ": " + Order::GetOrderToText() + GetAccountTextDetails()); }
+      Msg::ShowText(Order::GetOrderToText() + GetAccountTextDetails(), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
       if (SoundAlert) PlaySound(SoundFileAtOpen);
       if (SendEmailEachOrder) SendEmailExecuteOrder();
 
@@ -1000,7 +1012,7 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
            _Symbol, Convert::OrderTypeToString(cmd), NormalizeLots(trade_volume), NormalizeDouble(order_price, Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + sid, 0, GetOrderColor(cmd)),
            "Debug", __FUNCTION__, __LINE__, VerboseDebug | VerboseTrace);
        StringFormat(GetAccountTextDetails(), "Debug", __FUNCTION__, __LINE__, VerboseDebug | VerboseTrace);
-       StringFormat(GetMarketTextDetails(), "Debug", __FUNCTION__, __LINE__, VerboseDebug | VerboseTrace);
+       StringFormat(GetMarketTextDetails(),  "Debug", __FUNCTION__, __LINE__, VerboseDebug | VerboseTrace);
        OrderPrint();
      }
 
@@ -4823,6 +4835,7 @@ bool InitStrategies() {
   #endif
 
   if (!init && ValidateSettings) {
+    ListTimeframes(True);
     Msg::ShowText("Initiation of strategies failed!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
     return (FALSE);
   }
@@ -5216,9 +5229,7 @@ double GetStrategyLotSize(int sid, int cmd) {
  * Get strategy comment for opened order.
  */
 string GetStrategyComment(int sid, string sep = "|") {
-  string comment = sname[sid];
-  comment =+ StringFormat("%s spread: %.1f pips", sep, curr_spread);
-  return comment;
+  return StringFormat("%s %s spread: %.1f pips", sname[sid], sep, curr_spread);
 }
 
 /**
@@ -5699,6 +5710,9 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
   return output;
 }
 
+/**
+ * Send e-mail about the order.
+ */
 void SendEmailExecuteOrder(string sep = "<br>\n") {
   string mail_title = "Trading Info - " + ea_name;
   string body = "Trade Information" + sep;
@@ -5708,6 +5722,7 @@ void SendEmailExecuteOrder(string sep = "<br>\n") {
   body += sep + StringFormat("Order Type: %s", Convert::OrderTypeToString(OrderType()));
   body += sep + StringFormat("Price: %s", DoubleToStr(OrderOpenPrice(), Digits));
   body += sep + StringFormat("Lot size: %s", DoubleToStr(OrderLots(), volume_digits));
+  body += sep + StringFormat("Comment: %s", OrderComment());
   body += sep + StringFormat("Current Balance: %s", ValueToCurrency(Account::AccountBalance()));
   body += sep + StringFormat("Current Equity: %s", ValueToCurrency(Account::AccountEquity()));
   SendMail(mail_title, body);

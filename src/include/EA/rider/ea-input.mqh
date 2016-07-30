@@ -34,8 +34,8 @@ extern int      MinIntervalSec = 0; // Min interval between subsequent trade sig
 
 //+------------------------------------------------------------------+
 extern string   __EA_Order_Parameters__ = "-- Profit and loss parameters --"; // >>> PROFIT/LOSS <<<
-extern double   TakeProfit = 0; // Take profit (in pips, 0 = none)
-extern double   StopLoss = 0; // Stop loss (in pips, 0 = none)
+extern int      TakeProfit = 0; // Take profit (in pips, 0 = none)
+extern int      StopLoss = 0; // Stop loss (in pips, 0 = none)
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<

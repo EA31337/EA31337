@@ -30,8 +30,8 @@ extern int MinPipGap = 60; // Min gap between trades per type (in pips)
 
 //+------------------------------------------------------------------+
 extern string   __EA_Order_Parameters__ = "-- Profit and loss parameters --"; // >>> PROFIT/LOSS <<<
-extern double   TakeProfit = 140.00000000; // Take profit (in pips, 0 = none)
-extern double   StopLoss = 140.00000000; // Stop loss (in pips, 0 = none)
+extern int      TakeProfit = 0; // Take profit (in pips, 0 = none)
+extern int      StopLoss = 0; // Stop loss (in pips, 0 = none)
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
