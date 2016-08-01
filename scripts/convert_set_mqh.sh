@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # Script to convert key-value parameters from set into mqh file.
+# E.g.
+# ./scripts/convert_set_mqh.sh sets/Lite/EURUSD/default/2000USD/10-spread/5-digits/2014/EA31337-Lite.set src/include/EA/lite/ea-input.mqh
 type ex > /dev/null
 [ $# -lt 2 ] && { echo "Usage: $0 (set-file) (mqh-file)"; exit 1; }
 SET=$1
