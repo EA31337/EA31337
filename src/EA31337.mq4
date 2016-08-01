@@ -2106,24 +2106,26 @@ bool Trade_MA(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double sig
 
   switch (cmd) {
     case OP_BUY:
-      result = ma_fast[period][CURR] > ma_medium[period][CURR] + gap;
-      if ((signal_method &   1) != 0) result = result && ma_fast[period][CURR] > ma_slow[period][CURR] + gap;
-      if ((signal_method &   2) != 0) result = result && ma_medium[period][CURR] > ma_slow[period][CURR];
-      if ((signal_method &   4) != 0) result = result && ma_slow[period][CURR] > ma_slow[period][PREV];
-      if ((signal_method &   8) != 0) result = result && ma_fast[period][CURR] > ma_fast[period][PREV];
-      if ((signal_method &  16) != 0) result = result && ma_fast[period][CURR] - ma_medium[period][CURR] > ma_medium[period][CURR] - ma_slow[period][CURR];
-      if ((signal_method &  32) != 0) result = result && (ma_medium[period][PREV] < ma_slow[period][PREV] || ma_medium[period][FAR] < ma_slow[period][FAR]);
-      if ((signal_method &  64) != 0) result = result && (ma_fast[period][PREV] < ma_medium[period][PREV] || ma_fast[period][FAR] < ma_medium[period][FAR]);
+      result  = ma_fast[period][CURR]   > ma_medium[period][CURR] + gap;
+      result &= ma_medium[period][CURR] > ma_slow[period][CURR];
+      if ((signal_method &   1) != 0) result &= ma_fast[period][CURR] > ma_slow[period][CURR] + gap;
+      if ((signal_method &   2) != 0) result &= ma_medium[period][CURR] > ma_slow[period][CURR];
+      if ((signal_method &   4) != 0) result &= ma_slow[period][CURR] > ma_slow[period][PREV];
+      if ((signal_method &   8) != 0) result &= ma_fast[period][CURR] > ma_fast[period][PREV];
+      if ((signal_method &  16) != 0) result &= ma_fast[period][CURR] - ma_medium[period][CURR] > ma_medium[period][CURR] - ma_slow[period][CURR];
+      if ((signal_method &  32) != 0) result &= (ma_medium[period][PREV] < ma_slow[period][PREV] || ma_medium[period][FAR] < ma_slow[period][FAR]);
+      if ((signal_method &  64) != 0) result &= (ma_fast[period][PREV] < ma_medium[period][PREV] || ma_fast[period][FAR] < ma_medium[period][FAR]);
       break;
     case OP_SELL:
-      result = ma_fast[period][CURR] < ma_medium[period][CURR] - gap;
-      if ((signal_method &   1) != 0) result = result && ma_fast[period][CURR] < ma_slow[period][CURR] - gap;
-      if ((signal_method &   2) != 0) result = result && ma_medium[period][CURR] < ma_slow[period][CURR];
-      if ((signal_method &   4) != 0) result = result && ma_slow[period][CURR] < ma_slow[period][PREV];
-      if ((signal_method &   8) != 0) result = result && ma_fast[period][CURR] < ma_fast[period][PREV];
-      if ((signal_method &  16) != 0) result = result && ma_medium[period][CURR] - ma_fast[period][CURR] > ma_slow[period][CURR] - ma_medium[period][CURR];
-      if ((signal_method &  32) != 0) result = result && (ma_medium[period][PREV] > ma_slow[period][PREV] || ma_medium[period][FAR] > ma_slow[period][FAR]);
-      if ((signal_method &  64) != 0) result = result && (ma_fast[period][PREV] > ma_medium[period][PREV] || ma_fast[period][FAR] > ma_medium[period][FAR]);
+      result  = ma_fast[period][CURR]   < ma_medium[period][CURR] - gap;
+      result &= ma_medium[period][CURR] < ma_slow[period][CURR];
+      if ((signal_method &   1) != 0) result &= ma_fast[period][CURR] < ma_slow[period][CURR] - gap;
+      if ((signal_method &   2) != 0) result &= ma_medium[period][CURR] < ma_slow[period][CURR];
+      if ((signal_method &   4) != 0) result &= ma_slow[period][CURR] < ma_slow[period][PREV];
+      if ((signal_method &   8) != 0) result &= ma_fast[period][CURR] < ma_fast[period][PREV];
+      if ((signal_method &  16) != 0) result &= ma_medium[period][CURR] - ma_fast[period][CURR] > ma_slow[period][CURR] - ma_medium[period][CURR];
+      if ((signal_method &  32) != 0) result &= (ma_medium[period][PREV] > ma_slow[period][PREV] || ma_medium[period][FAR] > ma_slow[period][FAR]);
+      if ((signal_method &  64) != 0) result &= (ma_fast[period][PREV] > ma_medium[period][PREV] || ma_fast[period][FAR] > ma_medium[period][FAR]);
       break;
   }
   return result;
