@@ -87,8 +87,8 @@ extern ENUM_MARKET_CONDITION Market_Condition_4 = 13; // 4. Market condition
 extern ENUM_ACTION_TYPE Action_On_Condition_4 = 10; // 4. Action to take
 
 extern ENUM_ACC_CONDITION Account_Condition_5 = 18; // 5. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_5 = 7; // 5. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_5 = 10; // 5. Action to take
+extern ENUM_MARKET_CONDITION Market_Condition_5 = 6; // 5. Market condition
+extern ENUM_ACTION_TYPE Action_On_Condition_5 = 8; // 5. Action to take
 
 extern int Account_Condition_MinProfitCloseOrder = 20; // Min pip profit on action to close
 
@@ -149,22 +149,22 @@ extern bool Alligator1_Active = 0; // Enable for M1
 extern bool Alligator5_Active = 1; // Enable for M5
 extern bool Alligator15_Active = 1; // Enable for M15
 extern bool Alligator30_Active = 0; // Enable for M30
-extern int Alligator_Period_Jaw = 19; // Jaw Period
+extern int Alligator_Period_Jaw = 16; // Jaw Period
 extern int Alligator_Shift_Jaw = 2; // Jaw Shift
-extern int Alligator_Period_Teeth = 7; // Teeth Period
+extern int Alligator_Period_Teeth = 10; // Teeth Period
 extern int Alligator_Shift_Teeth = 4; // Teeth Shift
-extern int Alligator_Period_Lips = 7; // Lips Period
+extern int Alligator_Period_Lips = 3; // Lips Period
 extern int Alligator_Shift_Lips = 1; // Lips Shift
 extern ENUM_MA_METHOD Alligator_MA_Method = 2; // MA Method
-extern ENUM_APPLIED_PRICE Alligator_Applied_Price = 1; // Applied Price
+extern ENUM_APPLIED_PRICE Alligator_Applied_Price = 3; // Applied Price
 extern int Alligator_Shift = 1; // Shift
 extern int Alligator_Shift_Far = 4; // Shift Far
 extern ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = 2; // Trail stop method
-extern ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = 24; // Trail profit method
-extern double Alligator_SignalLevel = 0; // Signal level
-extern int Alligator1_SignalMethod = 27; // Signal method for M1 (0-63)
-extern int Alligator5_SignalMethod = 24; // Signal method for M5 (0-63)
-extern int Alligator15_SignalMethod = 57; // Signal method for M15 (0-63)
+extern ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = 5; // Trail profit method
+extern double Alligator_SignalLevel = -0.01; // Signal level
+extern int Alligator1_SignalMethod = 45; // Signal method for M1 (0-63)
+extern int Alligator5_SignalMethod = 27; // Signal method for M5 (0-63)
+extern int Alligator15_SignalMethod = 51; // Signal method for M15 (0-63)
 extern int Alligator30_SignalMethod = 57; // Signal method for M30 (0-63)
 
 //+------------------------------------------------------------------+
@@ -306,7 +306,7 @@ extern ENUM_APPLIED_PRICE Envelopes_Applied_Price = 3; // Applied Price
 extern double Envelopes1_Deviation = 0.1; // Deviation for M1
 extern double Envelopes5_Deviation = 0.1; // Deviation for M5
 extern double Envelopes15_Deviation = 0.15; // Deviation for M15
-extern double Envelopes30_Deviation = 0.20000000; // Deviation for M30
+extern double Envelopes30_Deviation = 0.2; // Deviation for M30
 extern int Envelopes_Shift = 2; // Shift
 int Envelopes_Shift_Far = 0; // Shift Far
 extern ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = 12; // Trail stop method
