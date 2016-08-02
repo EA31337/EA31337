@@ -237,11 +237,12 @@ extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v"
 Market market(string);
 
 // Market/session variables.
-double pip_size, lot_size, risk_margin;
+double pip_size, lot_size;
 double market_minlot, market_maxlot, market_lotsize, market_lotstep, market_marginrequired, market_margininit;
 double market_stoplevel; // Market stop level in points.
 double order_freezelevel; // Order freeze level in points.
 double curr_spread; // Broker current spread in pips.
+double risk_margin = 1.0; // Risk marigin in percent.
 int pip_digits, volume_digits;
 int pts_per_pip; // Number points per pip.
 int gmt_offset = 0; // Current difference between GMT time and the local computer time in seconds, taking into account switch to winter or summer time. Depends on the time settings of your computer.
@@ -274,7 +275,7 @@ int worse_strategy[FINAL_STAT_PERIOD_TYPE_ENTRY], best_strategy[FINAL_STAT_PERIO
 // EA variables.
 bool ea_active = FALSE;
 double risk_ratio; string rr_text; // Vars for calculation risk ratio.
-int max_orders, daily_orders; // Maximum orders available to open.
+int max_orders = 10, daily_orders; // Maximum orders available to open.
 int max_order_slippage; // Maximum price slippage for buy or sell orders (in points)
 double LastAsk, LastBid; // Keep the last ask and bid price.
 string AccCurrency; // Current account currency.
@@ -538,6 +539,9 @@ string InitInfo(bool startup = False, string sep = "\n") {
       volume_digits,
       curr_spread,
       GetAccountStopoutLevel(),
+      sep);
+  output += StringFormat("EA params: Risk margin: %g%%%s",
+      risk_margin,
       sep);
   output += StringFormat("Strategies: Active strategies: %d of %d, Max orders: %d (per type: %d)%s",
       GetNoOfStrategies(),
@@ -3799,9 +3803,8 @@ int GetNoOfStrategies() {
 double GetLotSizeAuto(bool smooth = true) {
   double avail_margin = MathMin(AccountFreeMargin(), AccountBalance());
   double leverage     = MathMax(AccountLeverage(), 100);
-  #ifdef __advanced__ double margin_risk = 0.02; #else double margin_risk = 0.01; #endif // Risk only 2%/1% (0.02/0.01) per order of total available margin.
-  // @todo: Improve the logic, especially margin_risk.
-  double new_lot_size = avail_margin / market_marginrequired * margin_risk * risk_ratio;
+  // @todo: Improve the logic, especially risk_margin.
+  double new_lot_size = avail_margin / market_marginrequired * risk_margin/100 * risk_ratio;
 
   #ifdef __advanced__
   if (Boosting_Enabled) {
@@ -3844,8 +3847,9 @@ double GetLotSize() {
  * Calculate size of the lot based on the free margin and account leverage automatically.
  */
 double GetRiskMarginAuto(bool smooth = true) {
-  double new_risk_margin = 0.01;
-  if (smooth) {
+  // Risk only 2%/1% (0.02/0.01) per order of total available margin.
+  double new_risk_margin = 1.0;
+  if (smooth && new_risk_margin > risk_margin) {
     // Increase only by average of the previous and new (which should prevent sudden increases).
     return (risk_margin + new_risk_margin) / 2;
   } else {
@@ -3855,11 +3859,11 @@ double GetRiskMarginAuto(bool smooth = true) {
 
 /**
  * Return risk margin.
- * @return
- *   Range: 0.01-1.00
+ * @return int
+ *   Range: 1-100
  */
 double GetRiskMargin() {
-  return RiskMargin == 0 ? GetRiskMarginAuto() : RiskMargin/100;
+  return RiskMargin == 0 ? GetRiskMarginAuto() : RiskMargin;
 }
 
 /**
@@ -5591,9 +5595,9 @@ string GetDailyReport() {
   //output += GetAccountTextDetails() + "; " + GetOrdersStats();
 
   key = Arrays::GetArrKey1ByHighestKey2ValueD(stats, DAILY_PROFIT);
-  if (key >= 0) output += "Best: " + sname[key] + " (" + stats[key][DAILY_PROFIT] + "p); ";
+  if (key >= 0) output += "Best: " + sname[key] + " (" + stats[key][DAILY_PROFIT] + "p); "; // @fixme: Correct float formatting.
   key = Arrays::GetArrKey1ByLowestKey2ValueD(stats, DAILY_PROFIT);
-  if (key >= 0) output += "Worse: " + sname[key] + " (" + stats[key][DAILY_PROFIT] + "p); ";
+  if (key >= 0) output += "Worse: " + sname[key] + " (" + stats[key][DAILY_PROFIT] + "p); "; // @fixme: Correct float formatting.
 
   return output;
 }
@@ -5617,9 +5621,9 @@ string GetWeeklyReport() {
   output += "Balance: "      + weekly[MAX_BALANCE] + "; ";
 
   key = Arrays::GetArrKey1ByHighestKey2ValueD(stats, WEEKLY_PROFIT);
-  if (key >= 0) output += "Best: " + sname[key] + " (" + stats[key][WEEKLY_PROFIT] + "p); ";
+  if (key >= 0) output += "Best: " + sname[key] + " (" + stats[key][WEEKLY_PROFIT] + "p); "; // @fixme: Correct float formatting.
   key = Arrays::GetArrKey1ByLowestKey2ValueD(stats, WEEKLY_PROFIT);
-  if (key >= 0) output += "Worse: " + sname[key] + " (" + stats[key][WEEKLY_PROFIT] + "p); ";
+  if (key >= 0) output += "Worse: " + sname[key] + " (" + stats[key][WEEKLY_PROFIT] + "p); "; // @fixme: Correct float formatting.
 
   return output;
 }
@@ -5643,9 +5647,9 @@ string GetMonthlyReport() {
   output += "Balance: "       + monthly[MAX_BALANCE] + "; ";
 
   key = Arrays::GetArrKey1ByHighestKey2ValueD(stats, MONTHLY_PROFIT);
-  if (key >= 0) output += "Best: " + sname[key] + " (" + stats[key][MONTHLY_PROFIT] + "p); ";
+  if (key >= 0) output += "Best: " + sname[key] + " (" + stats[key][MONTHLY_PROFIT] + "p); "; // @fixme: Correct float formatting.
   key = Arrays::GetArrKey1ByLowestKey2ValueD(stats, MONTHLY_PROFIT);
-  if (key >= 0) output += "Worse: " + sname[key] + " (" + stats[key][MONTHLY_PROFIT] + "p); ";
+  if (key >= 0) output += "Worse: " + sname[key] + " (" + stats[key][MONTHLY_PROFIT] + "p); "; // @fixme: Correct float formatting.
 
   return output;
 }

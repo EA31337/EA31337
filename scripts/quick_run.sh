@@ -18,4 +18,4 @@ cp -v "$EA_DIR"/*.ex? "$VM_DIR"/files
 
 make -C "$CWD" mt4-install
 
-TRACE=$TRACE $VM_DIR/scripts/run_backtest.sh -v -t -r "EA31337-$VER" -D5 -e EA31337 -d 2000 -m 1-12 -y 2014 ${@:2}
+TRACE=$TRACE $VM_DIR/scripts/run_backtest.sh -v -t -r "EA31337-$VER" -D5 -e EA31337 -d 2000 -m 1 -y 2014 ${@:2}

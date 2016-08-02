@@ -47,7 +47,7 @@ extern double TrailingStopAddPerMinute = 0.2; // Decrease trail stop per minute 
 extern string __EA_Risk_Parameters__ = "-- Risk management parameters --"; // >>> RISK <<
 extern bool TradeWithTrend = 1; // Trade with trend
 extern double RiskRatio = 0.00000000; // Risk ratio (0 = auto, 1.0 = normal)
-extern double RiskMargin = 1; // Risk margin (0-100, 0 = auto, 1 = 1%)
+extern double RiskMargin = 0; // Risk margin (0-100, 0 = auto, 1 = 1%)
 extern int CloseOrderAfterXHours = 0; // Close order after X hours (0 = disabled)
 
 //+------------------------------------------------------------------+
