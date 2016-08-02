@@ -929,16 +929,16 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
  * Execute trade order.
  *
  * @param
- *   cmd (int)
- *     trade order command to execute
- *   trade_volume (int)
- *     volue of the trade to execute (size)
- *   sid (int)
- *     strategy id
- *   order_comment (string)
- *     order comment
- *   retry (bool)
- *     if TRUE, re-try to open again after error/failure
+ *   cmd int
+ *     Trade order command to execute.
+ *   trade_volume int
+ *     Volume of the trade to execute (size).
+ *   sid int
+ *     Strategy ID.
+ *   order_comment string
+ *     Order comment.
+ *   retry bool
+ *     if TRUE, re-try to open again after error/failure.
  */
 int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_comment = "", bool retry = TRUE) {
    bool result = FALSE;
@@ -5230,8 +5230,8 @@ double GetStrategyLotSize(int sid, int cmd) {
 /**
  * Get strategy comment for opened order.
  */
-string GetStrategyComment(int sid, string sep = "|") {
-  return StringFormat("%s %s spread: %.1f pips", sname[sid], sep, curr_spread);
+string GetStrategyComment(int sid) {
+  return StringFormat("%s; %.1f pips spread; sid: %d", sname[sid], curr_spread, sid);
 }
 
 /**
@@ -5650,6 +5650,9 @@ string GetMonthlyReport() {
   return output;
 }
 
+/**
+ * Display info on chart.
+ */
 string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
   string output;
   // Prepare text for Stop Out.
@@ -6537,7 +6540,7 @@ bool TaskRun(int job_id) {
        // double volume = todo_queue[job_id][4]; // FIXME: Not used as we can't use double to integer array.
        sid = todo_queue[job_id][5];
        // string order_comment = todo_queue[job_id][6]; // FIXME: Not used as we can't use double to integer array.
-       result = ExecuteOrder(cmd, sid, EMPTY, EMPTY, FALSE);
+       result = ExecuteOrder(cmd, sid, EMPTY, "", FALSE);
       break;
     case TASK_ORDER_CLOSE:
         reason_id = todo_queue[job_id][3];
