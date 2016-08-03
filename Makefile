@@ -6,8 +6,8 @@
 MQL=mql.exe
 SRC=$(wildcard src/*.mq4)
 EA=EA31337
-EX4="src/$(EA).ex4"
-EX5="src/$(EA).ex5"
+EX4=src/$(EA).ex4
+EX5=src/$(EA).ex5
 VER=$(shell grep 'define ea_version' src/include/EA/ea-properties.mqh | grep -o '[0-9].*[0-9]')
 FILE=$(lastword $(MAKEFILE_LIST)) # Determine this Makefile's path.
 OUT=releases
