@@ -1987,18 +1987,18 @@ bool Trade_Fractals(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, doub
   switch (cmd) {
     case OP_BUY:
       result = lower;
-      if ((signal_method &   1) != 0) result &= !upper;
-      if ((signal_method &   2) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), fmax(index + 1, H1));
-      if ((signal_method &   4) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), fmax(index + 2, H1));
+      // if ((signal_method &   1) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), PERIOD_M30);
+      // if ((signal_method &   2) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), Convert::IndexToTf(fmax(index + 1, M30)));
+      // if ((signal_method &   4) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), Convert::IndexToTf(fmax(index + 2, M30)));
       //if ((signal_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
       // if ((signal_method &   2) != 0) result = result && !Fractals_On_Sell(tf);
       // if ((signal_method &   8) != 0) result = result && Fractals_On_Buy(M30);
       break;
     case OP_SELL:
       result = upper;
-      if ((signal_method &   1) != 0) result &= !lower;
-      if ((signal_method &   2) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), fmax(index + 1, H1));
-      if ((signal_method &   4) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), fmax(index + 2, H1));
+      // if ((signal_method &   1) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), PERIOD_M30);
+      // if ((signal_method &   2) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), Convert::IndexToTf(fmax(index + 1, M30)));
+      // if ((signal_method &   4) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), Convert::IndexToTf(fmax(index + 2, M30)));
       //if ((signal_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
       // if ((signal_method &   2) != 0) result = result && !Fractals_On_Buy(tf);
       // if ((signal_method &   8) != 0) result = result && Fractals_On_Sell(M30);
@@ -5321,7 +5321,7 @@ double GetStrategyProfitFactor(int sid) {
 double GetStrategySignalLevel(int indicator, int timeframe = PERIOD_M30, double default_value = 0.0) {
   int sid = GetStrategyViaIndicator(indicator, timeframe);
   // Message(StringFormat("%s(): indi = %d, timeframe = %d, sid = %d, signal_level = %f", __FUNCTION__, indicator, timeframe, sid, conf[sid][OPEN_LEVEL]));
-  return Misc::If(sid != EMPTY, conf[sid][OPEN_LEVEL], default_value);
+  return sid >= 0 ? conf[sid][OPEN_LEVEL] : default_value;
 }
 
 /**
@@ -5329,25 +5329,28 @@ double GetStrategySignalLevel(int indicator, int timeframe = PERIOD_M30, double 
  */
 int GetStrategySignalMethod(int indicator, int timeframe = PERIOD_M30, int default_value = 0) {
   int sid = GetStrategyViaIndicator(indicator, timeframe);
-  return Misc::If(sid != EMPTY, info[sid][OPEN_METHOD], default_value);
+  return sid >= 0 ? info[sid][OPEN_METHOD] : default_value;
 }
 
 /**
  * Fetch strategy timeframe based on the strategy type.
  */
 int GetStrategyTimeframe(int sid, int default_value = PERIOD_M1) {
-  return Misc::If(sid >= 0, info[sid][TIMEFRAME], default_value);
+  return sid >= 0 ? info[sid][TIMEFRAME] : default_value;
 }
 
 /**
- * Get strategy id based on the indicator and timeframe.
+ * Get strategy id based on the indicator and tf.
  */
-int GetStrategyViaIndicator(int indicator, int timeframe) {
+int GetStrategyViaIndicator(int indicator, int tf) {
   for (int sid = 0; sid < ArrayRange(info, 0); sid++) {
-    if (info[sid][INDICATOR] == indicator && info[sid][TIMEFRAME] == timeframe) {
+    if (info[sid][INDICATOR] == indicator && info[sid][TIMEFRAME] == tf) {
       return sid;
     }
   }
+  Msg::ShowText(
+    StringFormat("Cannot find indicator %d for timeframe: %d", indicator, tf),
+    "Error", __FUNCTION__, __LINE__, VerboseErrors);
   return EMPTY;
 }
 
@@ -5369,7 +5372,7 @@ void ApplyStrategyMultiplierFactor(int period = DAILY, int loss_or_profit = 0, d
   if (GetNoOfStrategies() <= 1 || factor == 1.0) return;
   int key = Misc::If(period == MONTHLY, MONTHLY_PROFIT, Misc::If(period == WEEKLY, (int)WEEKLY_PROFIT, (int)DAILY_PROFIT));
   string period_name = Misc::If(period == MONTHLY, "montly", Misc::If(period == WEEKLY, "weekly", "daily"));
-  int new_strategy = Misc::If(loss_or_profit > 0, Arrays::GetArrKey1ByHighestKey2ValueD(stats, key), Arrays::GetArrKey1ByLowestKey2ValueD(stats, key));
+  int new_strategy = loss_or_profit > 0 ? Arrays::GetArrKey1ByHighestKey2ValueD(stats, key) : Arrays::GetArrKey1ByLowestKey2ValueD(stats, key);
   if (new_strategy == EMPTY) return;
   int previous = Misc::If(loss_or_profit > 0, best_strategy[period], worse_strategy[period]);
   double new_factor = 1.0;
