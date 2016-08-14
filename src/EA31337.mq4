@@ -458,7 +458,7 @@ void OnDeinit(const int reason) {
     //if (reason == REASON_CHARTCHANGE)
     double ExtInitialDeposit = CalculateInitialDeposit();
     CalculateSummary(ExtInitialDeposit);
-    string filename = StringFormat("%s-v%s-%s-%.0f%s-s%d-%s-Report.txt", ea_name, ea_version, _Symbol, ExtInitialDeposit, AccCurrency, init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES));
+    string filename = StringFormat("%s-%s-%.0f%s-s%d-%s-Report.txt", ea_name, _Symbol, ExtInitialDeposit, AccCurrency, init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES));
     string data = GenerateReport();
     Report::WriteReport(filename, data, VerboseInfo); // Todo: Add: Errors::GetUninitReasonText(reason)
     Print(__FUNCTION__ + ": Saved report as: " + filename);
