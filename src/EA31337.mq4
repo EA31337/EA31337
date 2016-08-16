@@ -687,6 +687,7 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
     return (TRUE);
   }
 
+  double ratio = 1.0, ratio2 = 1.0;
   double envelopes_deviation;
   switch (type) {
 #ifdef __advanced__
@@ -709,12 +710,13 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
     case ALLIGATOR: // Calculates the Alligator indicator.
       // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        alligator[period][i][LIPS]  = iMA(symbol, tf, Alligator_Period_Lips,  Alligator_Shift_Lips,  Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
-        alligator[period][i][TEETH] = iMA(symbol, tf, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
-        alligator[period][i][JAW]   = iMA(symbol, tf, Alligator_Period_Jaw,   Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
+        alligator[period][i][LIPS]  = iMA(symbol, tf, Alligator_Period_Lips * ratio,  Alligator_Shift_Lips,  Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
+        alligator[period][i][TEETH] = iMA(symbol, tf, Alligator_Period_Teeth * ratio, Alligator_Shift_Teeth, Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
+        alligator[period][i][JAW]   = iMA(symbol, tf, Alligator_Period_Jaw * ratio,   Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
+        ratio += (Alligator_Period_Ratio - 1.0);
       }
       success = (bool)alligator[period][CURR][JAW];
-      if (VerboseDebug) PrintFormat("Alligator %d: %g/%g/%g", tf, alligator[period][CURR][LIPS], alligator[period][CURR][TEETH], alligator[period][CURR][JAW]);
+      // if (VerboseDebug) PrintFormat("Alligator %d: %g/%g/%g", tf, alligator[period][CURR][LIPS], alligator[period][CURR][TEETH], alligator[period][CURR][JAW]);
       /* Note: This is equivalent to:
         alligator[period][i][TEETH] = iAlligator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
         alligator[period][i][TEETH] = iAlligator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
@@ -724,8 +726,9 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
 #ifdef __advanced__
     case ATR: // Calculates the Average True Range indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        atr[period][i][FAST] = iATR(symbol, tf, ATR_Period_Fast, i);
-        atr[period][i][SLOW] = iATR(symbol, tf, ATR_Period_Slow, i);
+        atr[period][i][FAST] = iATR(symbol, tf, ATR_Period_Fast * ratio, i);
+        atr[period][i][SLOW] = iATR(symbol, tf, ATR_Period_Slow * ratio, i);
+        ratio += (ATR_Period_Ratio - 1.0);
       }
       break;
     case AWESOME: // Calculates the Awesome oscillator.
@@ -738,9 +741,11 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
       // int sid, bands_period = Bands_Period; // Not used at the moment.
       // sid = GetStrategyViaIndicator(BANDS, tf); bands_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        bands[period][i][BANDS_BASE]  = iBands(symbol, tf, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_BASE,  i + Bands_Shift);
-        bands[period][i][BANDS_UPPER] = iBands(symbol, tf, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_UPPER, i + Bands_Shift);
-        bands[period][i][BANDS_LOWER] = iBands(symbol, tf, Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price, BANDS_LOWER, i + Bands_Shift);
+        bands[period][i][BANDS_BASE]  = iBands(symbol, tf, Bands_Period * ratio, Bands_Deviation * ratio2, Bands_Shift, Bands_Applied_Price, BANDS_BASE,  i + Bands_Shift);
+        bands[period][i][BANDS_UPPER] = iBands(symbol, tf, Bands_Period * ratio, Bands_Deviation * ratio2, Bands_Shift, Bands_Applied_Price, BANDS_UPPER, i + Bands_Shift);
+        bands[period][i][BANDS_LOWER] = iBands(symbol, tf, Bands_Period * ratio, Bands_Deviation * ratio2, Bands_Shift, Bands_Applied_Price, BANDS_LOWER, i + Bands_Shift);
+        ratio += (Bands_Period_Ratio - 1.0);
+        ratio2 += (Bands_Deviation_Ratio - 1.0);
       }
       success = (bool)bands[period][CURR][BANDS_BASE];
       if (VerboseDebug) PrintFormat("Bands %d: %g/%g/%g", tf, bands[period][CURR][BANDS_LOWER], bands[period][CURR][BANDS_BASE], bands[period][CURR][BANDS_UPPER]);
@@ -769,13 +774,15 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
       break;
 #endif
     case DEMARKER: // Calculates the DeMarker indicator.
-      demarker[period][CURR] = iDeMarker(symbol, tf, DeMarker_Period, 0 + DeMarker_Shift);
-      demarker[period][PREV] = iDeMarker(symbol, tf, DeMarker_Period, 1 + DeMarker_Shift);
-      demarker[period][FAR]  = iDeMarker(symbol, tf, DeMarker_Period, 2 + DeMarker_Shift);
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
+        demarker[period][i] = iDeMarker(symbol, tf, DeMarker_Period * ratio, i + DeMarker_Shift);
+        ratio += (DeMarker_Period_Ratio - 1.0);
+      }
       success = (bool)demarker[period][CURR];
       // PrintFormat("Period: %d, DeMarker: %g", period, demarker[period][CURR]);
       break;
     case ENVELOPES: // Calculates the Envelopes indicator.
+      /*
       envelopes_deviation = Envelopes30_Deviation;
       switch (period) {
         case M1: envelopes_deviation = Envelopes1_Deviation; break;
@@ -783,10 +790,13 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
         case M15: envelopes_deviation = Envelopes15_Deviation; break;
         case M30: envelopes_deviation = Envelopes30_Deviation; break;
       }
+      */
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        envelopes[period][i][MODE_MAIN]  = iEnvelopes(symbol, tf, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, MODE_MAIN,  i + Envelopes_Shift);
-        envelopes[period][i][UPPER] = iEnvelopes(symbol, tf, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, UPPER, i + Envelopes_Shift);
-        envelopes[period][i][LOWER] = iEnvelopes(symbol, tf, Envelopes_MA_Period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, envelopes_deviation, LOWER, i + Envelopes_Shift);
+        envelopes[period][i][MODE_MAIN] = iEnvelopes(symbol, tf, Envelopes_MA_Period * ratio, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, MODE_MAIN,  i + Envelopes_Shift);
+        envelopes[period][i][UPPER] = iEnvelopes(symbol, tf, Envelopes_MA_Period * ratio, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, UPPER, i + Envelopes_Shift);
+        envelopes[period][i][LOWER] = iEnvelopes(symbol, tf, Envelopes_MA_Period * ratio, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, LOWER, i + Envelopes_Shift);
+        ratio += (Envelopes_MA_Period_Ratio - 1.0);
+        ratio2 += (Envelopes_Deviation_Ratio - 1.0);
       }
       success = (bool)envelopes[period][CURR][MODE_MAIN];
       break;
@@ -2915,10 +2925,10 @@ bool ValidTrailingValue(double value, int cmd, int loss_or_profit = -1, bool exi
   double delta = GetMarketGap(); // Calculate minimum market gap.
   double price = Market::GetOpenPrice();
   bool valid = (
-          (cmd == OP_BUY  && loss_or_profit < 0 && price - value > delta)
-       || (cmd == OP_BUY  && loss_or_profit > 0 && value - price > delta)
-       || (cmd == OP_SELL && loss_or_profit < 0 && value - price > delta)
-       || (cmd == OP_SELL && loss_or_profit > 0 && price - value > delta)
+          (cmd == OP_BUY  && loss_or_profit < 0 && price - value > delta + pip_size)
+       || (cmd == OP_BUY  && loss_or_profit > 0 && value - price > delta + pip_size)
+       || (cmd == OP_SELL && loss_or_profit < 0 && value - price > delta + pip_size)
+       || (cmd == OP_SELL && loss_or_profit > 0 && price - value > delta + pip_size)
        );
   valid &= (value >= 0); // Also must be zero or above.
   if (!valid && VerboseTrace) Print(__FUNCTION__ + ": Trailing value not valid: " + value);
@@ -2986,15 +2996,20 @@ void UpdateTrailingStops() {
         new_trailing_stop = NormalizeDouble(GetTrailingValue(OrderType(), -1, order_type, OrderStopLoss(), TRUE), Digits);
         new_profit_take   = NormalizeDouble(GetTrailingValue(OrderType(), +1, order_type, OrderTakeProfit(), TRUE), Digits);
         // if (fabs(OrderStopLoss() - new_trailing_stop) >= pip_size || fabs(OrderTakeProfit() - new_profit_take) >= pip_size) // Perform update on pip change.
+        // @todo
         if (new_trailing_stop != OrderStopLoss() || new_profit_take != OrderTakeProfit()) { // Perform update on change only.
            result = OrderModify(OrderTicket(), OrderOpenPrice(), new_trailing_stop, new_profit_take, 0, GetOrderColor());
            if (!result) {
              err_code = GetLastError();
              if (err_code > 1) {
-               if (VerboseErrors) Print(__FUNCTION__, ": Error: OrderModify(): ", ErrorDescription(err_code));
-               if (VerboseDebug)
-                 Print(__FUNCTION__ + ": Error: OrderModify(", OrderTicket(), ", ", OrderOpenPrice(), ", ", new_trailing_stop, ", ", new_profit_take, ", ", 0, ", ", GetOrderColor(), "); ", "Ask/Bid: ", Ask, "/", Bid);
+               Msg::ShowText(ErrorDescription(err_code), "Error", __FUNCTION__, __LINE__, VerboseErrors);
+               Msg::ShowText(
+                  StringFormat("OrderModify(%d, %g, %g, %g, %d, %d); Ask:%g/Bid:%g",
+                  OrderTicket(), OrderOpenPrice(), new_trailing_stop, new_profit_take, 0, GetOrderColor(), Ask, Bid),
+                  "Debug", __FUNCTION__, __LINE__, VerboseDebug
+               );
              }
+             // ExpertRemove();
            } else {
              // if (VerboseTrace) Print("UpdateTrailingStops(): OrderModify(): ", Order::GetOrderToText());
            }
