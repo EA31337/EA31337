@@ -239,8 +239,8 @@ Market market(string);
 // Market/session variables.
 double pip_size, lot_size;
 double market_minlot, market_maxlot, market_lotsize, market_lotstep, market_marginrequired, market_margininit;
-double market_stoplevel; // Market stop level in points.
-double order_freezelevel; // Order freeze level in points.
+int market_stoplevel; // Market stop level in points.
+int order_freezelevel; // Order freeze level in points.
 double curr_spread; // Broker current spread in pips.
 double risk_margin = 1.0; // Risk marigin in percent.
 int pip_digits, volume_digits;
@@ -500,19 +500,19 @@ string InitInfo(bool startup = False, string sep = "\n") {
     _Symbol, Bars, AccountInfoString(ACCOUNT_SERVER), (int)AccountInfoInteger(ACCOUNT_LOGIN), sep); // // FIXME: MQL5: Bars
   output += StringFormat("Broker info: Name: %s, Account type: %s, Leverage: 1:%d, Currency: %s%s",
       AccountCompany(), account_type, AccountLeverage(), AccCurrency, sep);
-  output += StringFormat("Market variables: Ask: %g, Bid: %g, Volume: %d%s",
+  output += StringFormat("Market predefined variables: Ask: %g, Bid: %g, Volume: %d%s",
       NormalizeDouble(Ask, Digits), NormalizeDouble(Bid, Digits), Volume[0], sep);
   output += StringFormat("Market constants: Digits: %d, Point: %g, Min Lot: %g, Max Lot: %g, Lot Step: %g, Lot Size: %g, Margin Required: %g, Margin Init: %g, Stop Level: %dpts, Freeze level: %dpts%s",
-      Digits,
-      NormalizeDouble(Point, Digits),
-      NormalizeDouble(market_minlot, pip_digits),
-      market_maxlot,
-      market_lotstep,
-      market_lotsize,
-      market_marginrequired,
-      market_margininit,
-      market_stoplevel,
-      order_freezelevel,
+      Market::GetDigits(),
+      Market::GetPoint(),
+      Market::GetMinLot(),
+      Market::GetMaxLot(),
+      Market::GetLotStep(),
+      Market::GetLotSize(),
+      Market::GetMarginRequired(),
+      Market::GetMarginInit(),
+      Market::GetStopLevel(),
+      Market::GetFreezeLevel(),
       sep);
   output += StringFormat("Contract specification for %s: Profit mode: %d, Margin mode: %d, Spread: %dpts, Tick size: %g, Point value: %g, Digits: %d, Trade stop level: %g, Trade contract size: %g%s",
       _Symbol,
@@ -531,7 +531,7 @@ string InitInfo(bool startup = False, string sep = "\n") {
       SymbolInfoDouble(_Symbol, SYMBOL_SWAP_LONG),
       SymbolInfoDouble(_Symbol, SYMBOL_SWAP_SHORT),
       sep);
-  output += StringFormat("Calculated variables: Pip size: %g, Lot size: %g, Points per pip: %d, Pip digits: %d, Volume digits: %d, Spread in pips: %.1f, Stop Out Level: %.1f%s",
+  output += StringFormat("Calculated variables: Pip size: %g, Lot size: %g, Points per pip: %d, Pip digits: %d, Volume digits: %d, Spread in pips: %.1f, Stop Out Level: %.1f, Market gap: %g (%d)%s",
       NormalizeDouble(pip_size, pip_digits),
       NormalizeDouble(lot_size, volume_digits),
       pts_per_pip,
@@ -539,6 +539,8 @@ string InitInfo(bool startup = False, string sep = "\n") {
       volume_digits,
       curr_spread,
       GetAccountStopoutLevel(),
+      Market::GetDistanceInPips(),
+      Market::GetDistanceInPts(),
       sep);
   output += StringFormat("EA params: Risk margin: %g%%%s",
       risk_margin,
@@ -2913,25 +2915,33 @@ bool CheckMinPipGap(int strategy_type) {
          }
        }
     } else if (VerboseDebug) {
-      // @fixme: warning 181: implicit conversion from 'number' to 'string'
-      Print(__FUNCTION__ + ": Error: Strategy type = " + strategy_type + ", pos: " + order + ", message: ", GetErrorText(err_code));
+      Msg::ShowText(
+          StringFormat("Cannot select order. Strategy type: %s, pos: %d, msg: %s.",
+            strategy_type, order, GetErrorText(err_code)),
+          "Error", __FUNCTION__, __LINE__, VerboseErrors
+      );
     }
   }
   return (TRUE);
 }
 
-// Validate value for trailing stop.
-bool ValidTrailingValue(double value, int cmd, int loss_or_profit = -1, bool existing = FALSE) {
-  double delta = GetMarketGap(); // Calculate minimum market gap.
+/**
+ * Validate value for trailing stop.
+ */
+bool ValidTrailingValue(double value, int cmd, int direction = -1, bool existing = FALSE) {
+  // Calculate minimum market gap.
   double price = Market::GetOpenPrice();
+  double gap = Market::GetDistanceInPips();
   bool valid = (
-          (cmd == OP_BUY  && loss_or_profit < 0 && price - value > delta + pip_size)
-       || (cmd == OP_BUY  && loss_or_profit > 0 && value - price > delta + pip_size)
-       || (cmd == OP_SELL && loss_or_profit < 0 && value - price > delta + pip_size)
-       || (cmd == OP_SELL && loss_or_profit > 0 && price - value > delta + pip_size)
+          (cmd == OP_BUY  && direction < 0 && price - value > gap)
+       || (cmd == OP_BUY  && direction > 0 && value - price > gap)
+       || (cmd == OP_SELL && direction < 0 && value - price > gap)
+       || (cmd == OP_SELL && direction > 0 && price - value > gap)
        );
   valid &= (value >= 0); // Also must be zero or above.
-  if (!valid && VerboseTrace) Print(__FUNCTION__ + ": Trailing value not valid: " + value);
+  if (!valid) {
+    Msg::ShowText(StringFormat("Trailing value not valid: %g.", value), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
+  }
   return valid;
 }
 
@@ -2956,10 +2966,12 @@ void CheckOrders() {
 /**
  * Update trailing stops for opened orders.
  */
-void UpdateTrailingStops() {
-   bool result; // Check result of executed orders.
-   double new_trailing_stop, new_profit_take;
-   int order_type;
+bool UpdateTrailingStops() {
+  // Check result of executed orders.
+  bool result;
+  // New StopLoss/TakeProfit.
+  double new_sl, new_tp;
+  int sid;
 
    // Check if bar time has been changed since last time.
    /*
@@ -2970,10 +2982,11 @@ void UpdateTrailingStops() {
      last_trail_update = bar_time;
    }*/
 
+   Market::RefreshRates();
    for (int i = 0; i < OrdersTotal(); i++) {
      if (!OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) { continue; }
       if (OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
-        order_type = OrderMagicNumber() - MagicNumber;
+        sid = OrderMagicNumber() - MagicNumber;
         // order_stop_loss = NormalizeDouble(Misc::If(Convert::OrderTypeToValue(OrderType()) > 0 || OrderStopLoss() != 0.0, OrderStopLoss(), 999999), pip_digits);
 
         // FIXME
@@ -2993,29 +3006,37 @@ void UpdateTrailingStops() {
           }
         }
 
-        new_trailing_stop = NormalizeDouble(GetTrailingValue(OrderType(), -1, order_type, OrderStopLoss(), TRUE), Digits);
-        new_profit_take   = NormalizeDouble(GetTrailingValue(OrderType(), +1, order_type, OrderTakeProfit(), TRUE), Digits);
-        // if (fabs(OrderStopLoss() - new_trailing_stop) >= pip_size || fabs(OrderTakeProfit() - new_profit_take) >= pip_size) // Perform update on pip change.
-        // @todo
-        if (new_trailing_stop != OrderStopLoss() || new_profit_take != OrderTakeProfit()) { // Perform update on change only.
-           result = OrderModify(OrderTicket(), OrderOpenPrice(), new_trailing_stop, new_profit_take, 0, GetOrderColor());
-           if (!result) {
-             err_code = GetLastError();
-             if (err_code > 1) {
-               Msg::ShowText(ErrorDescription(err_code), "Error", __FUNCTION__, __LINE__, VerboseErrors);
-               Msg::ShowText(
-                  StringFormat("OrderModify(%d, %g, %g, %g, %d, %d); Ask:%g/Bid:%g",
-                  OrderTicket(), OrderOpenPrice(), new_trailing_stop, new_profit_take, 0, GetOrderColor(), Ask, Bid),
-                  "Debug", __FUNCTION__, __LINE__, VerboseDebug
-               );
-             }
-             // ExpertRemove();
-           } else {
-             // if (VerboseTrace) Print("UpdateTrailingStops(): OrderModify(): ", Order::GetOrderToText());
-           }
+        new_sl = NormalizeDouble(GetTrailingValue(OrderType(), -1, sid, OrderStopLoss(), TRUE), Market::GetDigits());
+        new_tp = NormalizeDouble(GetTrailingValue(OrderType(), +1, sid, OrderTakeProfit(), TRUE), Market::GetDigits());
+        if (!Market::TradeOpAllowed(OrderType(), new_sl, new_tp)) {
+          return (False);
         }
-     }
+        else if (new_sl == OrderStopLoss() && new_tp == OrderTakeProfit()) {
+          return (False);
+        }
+        // @todo
+        // Perform update on pip change.
+        // if (fabs(OrderStopLoss() - new_sl) >= pip_size && fabs(OrderTakeProfit() - new_tp) >= pip_size) {
+        // Perform update on change only.
+        // MQL5: ORDER_TIME_GTC
+        // datetime expiration=TimeTradeServer()+PeriodSeconds(PERIOD_D1);
+        result = OrderModify(OrderTicket(), OrderOpenPrice(), new_sl, new_tp, 0, GetOrderColor());
+        if (!result) {
+          err_code = GetLastError();
+          if (err_code > 1) {
+            Msg::ShowText(ErrorDescription(err_code), "Error", __FUNCTION__, __LINE__, VerboseErrors);
+            Msg::ShowText(
+              StringFormat("OrderModify(%d, %g, %g, %g, %d, %d); Ask:%g/Bid:%g/StopLevel:%g",
+              OrderTicket(), OrderOpenPrice(), new_sl, new_tp, 0, GetOrderColor(), Ask, Bid, Market::GetDistanceInPips()),
+              "Debug", __FUNCTION__, __LINE__, VerboseDebug
+            );
+          }
+        } else {
+          // if (VerboseTrace) Print("UpdateTrailingStops(): OrderModify(): ", Order::GetOrderToText());
+        }
+      }
   } // end: for
+  return result;
 }
 
 /**
@@ -3024,7 +3045,7 @@ void UpdateTrailingStops() {
  * @params:
  *   cmd (int)
  *    Command for trade operation.
- *   loss_or_profit (int)
+ *   direction (int)
  *    Set -1 to calculate trailing stop or +1 for profit take.
  *   order_type (int)
  *    Value of strategy type. See: ENUM_STRATEGY_TYPE
@@ -3033,22 +3054,22 @@ void UpdateTrailingStops() {
  *   existing (bool)
  *    Set to TRUE if the calculation is for particular existing order, so additional local variables are available.
  */
-double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = 0, double previous = 0, bool existing = FALSE) {
-   double new_value = 0;
-   double delta = GetMarketGap(), diff;
-   int extra_trail = 0;
-   if (existing && TrailingStopAddPerMinute > 0 && OrderOpenTime() > 0) {
-     int min_elapsed = (TimeCurrent() - OrderOpenTime()) / 60;
-     extra_trail =+ min_elapsed * TrailingStopAddPerMinute;
-   }
-   int factor = (Convert::OrderTypeToValue(cmd) == loss_or_profit ? +1 : -1);
-   double trail = (TrailingStop + extra_trail) * pip_size;
-   double default_trail = (cmd == OP_BUY ? Bid : Ask) + trail * factor;
-   int method = GetTrailingMethod(order_type, loss_or_profit);
-   // if (loss_or_profit > 0) method = AC_TrailingProfitMethod; else if (loss_or_profit < 0) method = AC_TrailingStopMethod; // Testing.
-   int timeframe = GetStrategyTimeframe(order_type);
-   int period = Convert::TfToIndex(timeframe);
-   int symbol = existing ? OrderSymbol() : _Symbol;
+double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double previous = 0, bool existing = FALSE) {
+  double diff;
+  double new_value = 0;
+  int extra_trail = 0;
+  if (existing && TrailingStopAddPerMinute > 0 && OrderOpenTime() > 0) {
+    int min_elapsed = (TimeCurrent() - OrderOpenTime()) / 60;
+    extra_trail =+ min_elapsed * TrailingStopAddPerMinute;
+  }
+  int factor = (Convert::OrderTypeToValue(cmd) == direction ? +1 : -1);
+  double trail = (TrailingStop + extra_trail) * pip_size;
+  double default_trail = (cmd == OP_BUY ? Bid : Ask) + trail * factor;
+  int method = GetTrailingMethod(order_type, direction);
+  // if (direction > 0) method = AC_TrailingProfitMethod; else if (direction < 0) method = AC_TrailingStopMethod; // Testing.
+  int timeframe = GetStrategyTimeframe(order_type);
+  int period = Convert::TfToIndex(timeframe);
+  int symbol = existing ? OrderSymbol() : _Symbol;
 
 /**
   MA1+MA5+MA15+MA30 backtest log (auto,ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, 9,5mln ticks, quality 25%]:
@@ -3241,32 +3262,44 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = 0, do
        break;
      case T_SAR_PEAK: // 24: Lowest/highest SAR value.
        UpdateIndicator(SAR, timeframe);
-       new_value = Misc::If(Convert::OrderTypeToValue(cmd) == loss_or_profit, Arrays::HighestArrValue2(sar, period), Arrays::LowestArrValue2(sar, period));
+       new_value = Misc::If(Convert::OrderTypeToValue(cmd) == direction, Arrays::HighestArrValue2(sar, period), Arrays::LowestArrValue2(sar, period));
        break;
      case T_BANDS: // 25: Current Bands value.
        UpdateIndicator(BANDS, timeframe);
-       new_value = Misc::If(Convert::OrderTypeToValue(cmd) == loss_or_profit, bands[period][CURR][BANDS_UPPER], bands[period][CURR][BANDS_LOWER]);
+       new_value = Misc::If(Convert::OrderTypeToValue(cmd) == direction, bands[period][CURR][BANDS_UPPER], bands[period][CURR][BANDS_LOWER]);
        break;
      case T_BANDS_PEAK: // 26: Lowest/highest Bands value.
        UpdateIndicator(BANDS, timeframe);
-       new_value = (Convert::OrderTypeToValue(cmd) == loss_or_profit
+       new_value = (Convert::OrderTypeToValue(cmd) == direction
          ? fmax(fmax(bands[period][CURR][BANDS_UPPER], bands[period][PREV][BANDS_UPPER]), bands[period][FAR][BANDS_UPPER])
          : fmin(fmin(bands[period][CURR][BANDS_LOWER], bands[period][PREV][BANDS_LOWER]), bands[period][FAR][BANDS_LOWER])
          );
        break;
      case T_ENVELOPES: // 27: Current Envelopes value. // FIXME
        UpdateIndicator(ENVELOPES, timeframe);
-       new_value = Misc::If(Convert::OrderTypeToValue(cmd) == loss_or_profit, envelopes[period][CURR][UPPER], envelopes[period][CURR][LOWER]);
+       new_value = Convert::OrderTypeToValue(cmd) == direction ? envelopes[period][CURR][UPPER] : envelopes[period][CURR][LOWER];
        break;
      default:
        Msg::ShowText(StringFormat("Unknown trailing stop method: %d", method), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
    }
 
-   if (new_value > 0) new_value += delta * factor;
+   if (new_value > 0) new_value += Market::GetDistanceInPips() * factor;
 
-   if (!ValidTrailingValue(new_value, cmd, loss_or_profit, existing)) {
+   if (TrailingStopOneWay && direction < 0 && method > 0) { // If TRUE, move trailing stop only one direction.
+     if (previous == 0 && method > 0) previous = default_trail;
+     if (Convert::OrderTypeToValue(cmd) == direction) new_value = (new_value < previous || previous == 0) ? new_value : previous;
+     else new_value = (new_value > previous || previous == 0) ? new_value : previous;
+   }
+   if (TrailingProfitOneWay && direction > 0 && method > 0) { // If TRUE, move profit take only one direction.
+     if (Convert::OrderTypeToValue(cmd) == direction) new_value = (new_value > previous || previous == 0) ? new_value : previous;
+     else new_value = (new_value < previous || previous == 0) ? new_value : previous;
+   }
+
+   // if (!Market::TradeOpAllowed(cmd, new_value * -1, new_value * -1)) {
+   /*
+   if (!ValidTrailingValue(new_value, cmd, direction, existing)) {
      #ifndef __limited__
-       if (existing && previous == 0 && loss_or_profit == -1) previous = default_trail;
+       if (existing && previous == 0 && direction == -1) previous = default_trail;
      #else // If limited, then force the trailing value.
        if (existing && previous == 0) previous = default_trail;
      #endif
@@ -3274,16 +3307,6 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = 0, do
        Print(__FUNCTION__ + ": Error: method = " + method + ", ticket = #" + Misc::If(existing, OrderTicket(), 0) + ": Invalid Trailing Value: ", new_value, ", previous: ", previous, "; ", Order::GetOrderToText(), ", delta: ", DoubleToStr(delta, pip_digits));
      // If value is invalid, fallback to the previous one.
      return previous;
-   }
-
-   if (TrailingStopOneWay && loss_or_profit < 0 && method > 0) { // If TRUE, move trailing stop only one direction.
-     if (previous == 0 && method > 0) previous = default_trail;
-     if (Convert::OrderTypeToValue(cmd) == loss_or_profit) new_value = (new_value < previous || previous == 0) ? new_value : previous;
-     else new_value = (new_value > previous || previous == 0) ? new_value : previous;
-   }
-   if (TrailingProfitOneWay && loss_or_profit > 0 && method > 0) { // If TRUE, move profit take only one direction.
-     if (Convert::OrderTypeToValue(cmd) == loss_or_profit) new_value = (new_value > previous || previous == 0) ? new_value : previous;
-     else new_value = (new_value < previous || previous == 0) ? new_value : previous;
    }
 
    if (VerboseTrace) {
@@ -3294,9 +3317,10 @@ double GetTrailingValue(int cmd, int loss_or_profit = -1, int order_type = 0, do
            Arrays::HighestArrValue2(ma_fast, period), Arrays::HighestArrValue2(ma_medium, period), Arrays::HighestArrValue2(ma_slow, period))
          , "Trace", __FUNCTION__, __LINE__, VerboseTrace);
    }
-
    // if (VerboseDebug && Check::IsVisualMode()) Draw::ShowLine("trail_stop_" + OrderTicket(), new_value, GetOrderColor());
-   return NormalizeDouble(new_value, Digits);
+   */
+
+   return new_value;
 }
 
 // Get trailing method based on the strategy type.
@@ -3698,11 +3722,6 @@ double GetMarketSpread(bool in_points = False) {
   if (in_points) CheckStats(spread, MAX_SPREAD);
   // if (VerboseTrace) PrintFormat("%s(): Spread: %f (%s)", __FUNCTION__, spread, Misc::If(in_points, "pts", "pips"));
   return spread;
-}
-
-// Get current minimum marker gap (in points).
-double GetMarketGap(bool in_points = False) {
-  return in_points ? (market_stoplevel + GetMarketSpread(TRUE)) : ((market_stoplevel + GetMarketSpread(TRUE)) * Point);
 }
 
 /**
@@ -4238,16 +4257,16 @@ bool InitializeVariables() {
     market_maxlot = 100;
   }
 
-  market_marginrequired = MarketInfo(_Symbol, MODE_MARGINREQUIRED); // Free margin required to open 1 lot for buying.
+  market_marginrequired = Market::GetMarginRequired();
   if (market_marginrequired == 0) {
     init &= !ValidateSettings;
     Msg::ShowText(StringFormat("Invalid MODE_MARGINREQUIRED: %g", market_marginrequired), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
     market_marginrequired = 10; // Fix for 'zero divide' bug when MODE_MARGINREQUIRED is zero.
   }
 
-  market_margininit = MarketInfo(_Symbol, MODE_MARGININIT); // Initial margin requirements for 1 lot
-  market_stoplevel = MarketInfo(_Symbol, MODE_STOPLEVEL); // Market stop level in points.
-  order_freezelevel = MarketInfo(_Symbol, MODE_FREEZELEVEL); // Order freeze level in points. If the execution price lies within the range defined by the freeze level, the order cannot be modified, cancelled or closed.
+  market_margininit = Market::GetMarginInit();
+  market_stoplevel = Market::GetStopLevel();
+  order_freezelevel = Market::GetFreezeLevel();
 
   // market_stoplevel=(int)SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL);
   curr_spread = Convert::ValueToPips(GetMarketSpread());
@@ -4280,7 +4299,7 @@ bool InitializeVariables() {
   pip_size = Market::GetPipSize();
   pip_digits = Market::GetPipDigits();
   pts_per_pip = Market::GetPointsPerPip();
-  volume_digits = Market::GetVolumeDigits(TradeMicroLots);
+  volume_digits = Market::GetVolumeDigits();
 
   max_order_slippage = Convert::PipsToPoints(MaxOrderPriceSlippage); // Maximum price slippage for buy or sell orders (converted into points).
 
@@ -5383,15 +5402,15 @@ double GetTotalProfit() {
 /**
  * Apply strategy multiplier factor based on the strategy profit or loss.
  */
-void ApplyStrategyMultiplierFactor(int period = DAILY, int loss_or_profit = 0, double factor = 1.0) {
+void ApplyStrategyMultiplierFactor(int period = DAILY, int direction = 0, double factor = 1.0) {
   if (GetNoOfStrategies() <= 1 || factor == 1.0) return;
   int key = Misc::If(period == MONTHLY, MONTHLY_PROFIT, Misc::If(period == WEEKLY, (int)WEEKLY_PROFIT, (int)DAILY_PROFIT));
   string period_name = Misc::If(period == MONTHLY, "montly", Misc::If(period == WEEKLY, "weekly", "daily"));
-  int new_strategy = loss_or_profit > 0 ? Arrays::GetArrKey1ByHighestKey2ValueD(stats, key) : Arrays::GetArrKey1ByLowestKey2ValueD(stats, key);
+  int new_strategy = direction > 0 ? Arrays::GetArrKey1ByHighestKey2ValueD(stats, key) : Arrays::GetArrKey1ByLowestKey2ValueD(stats, key);
   if (new_strategy == EMPTY) return;
-  int previous = Misc::If(loss_or_profit > 0, best_strategy[period], worse_strategy[period]);
+  int previous = Misc::If(direction > 0, best_strategy[period], worse_strategy[period]);
   double new_factor = 1.0;
-  if (loss_or_profit > 0) { // Best strategy.
+  if (direction > 0) { // Best strategy.
     if (info[new_strategy][ACTIVE] && stats[new_strategy][key] > 10 && new_strategy != previous) { // Check if it's different than the previous one.
       if (previous != EMPTY) {
         if (!info[previous][ACTIVE]) info[previous][ACTIVE] = TRUE;
@@ -6608,7 +6627,7 @@ bool TaskProcessList(bool with_force = FALSE) {
      last_queue_process = bar_time; // Set bar time of last queue process.
    }
 
-   RefreshRates();
+   Market::RefreshRates();
    for (int job_id = 0; job_id < ArrayRange(todo_queue, 0); job_id++) {
       if (todo_queue[job_id][0] > 0) { // Find valid task.
         if (TaskRun(job_id)) {
