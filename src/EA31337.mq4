@@ -3011,28 +3011,31 @@ bool UpdateTrailingStops() {
         if (!Market::TradeOpAllowed(OrderType(), new_sl, new_tp)) {
           return (False);
         }
+        /*
         else if (new_sl == OrderStopLoss() && new_tp == OrderTakeProfit()) {
           return (False);
         }
+        */
         // @todo
         // Perform update on pip change.
-        // if (fabs(OrderStopLoss() - new_sl) >= pip_size && fabs(OrderTakeProfit() - new_tp) >= pip_size) {
         // Perform update on change only.
         // MQL5: ORDER_TIME_GTC
         // datetime expiration=TimeTradeServer()+PeriodSeconds(PERIOD_D1);
-        result = OrderModify(OrderTicket(), OrderOpenPrice(), new_sl, new_tp, 0, GetOrderColor());
-        if (!result) {
-          err_code = GetLastError();
-          if (err_code > 1) {
-            Msg::ShowText(ErrorDescription(err_code), "Error", __FUNCTION__, __LINE__, VerboseErrors);
-            Msg::ShowText(
-              StringFormat("OrderModify(%d, %g, %g, %g, %d, %d); Ask:%g/Bid:%g/StopLevel:%g",
-              OrderTicket(), OrderOpenPrice(), new_sl, new_tp, 0, GetOrderColor(), Ask, Bid, Market::GetDistanceInPips()),
-              "Debug", __FUNCTION__, __LINE__, VerboseDebug
-            );
+        if (fabs(OrderStopLoss() - new_sl) > MinPipChangeToTrade || fabs(OrderTakeProfit() - new_tp) > MinPipChangeToTrade) {
+          result = OrderModify(OrderTicket(), OrderOpenPrice(), new_sl, new_tp, 0, GetOrderColor());
+          if (!result) {
+            err_code = GetLastError();
+            if (err_code > 1) {
+              Msg::ShowText(ErrorDescription(err_code), "Error", __FUNCTION__, __LINE__, VerboseErrors);
+              Msg::ShowText(
+                StringFormat("OrderModify(%d, %g, %g, %g, %d, %d); Ask:%g/Bid:%g/StopLevel:%g",
+                OrderTicket(), OrderOpenPrice(), new_sl, new_tp, 0, GetOrderColor(), Ask, Bid, Market::GetDistanceInPips()),
+                "Debug", __FUNCTION__, __LINE__, VerboseDebug
+              );
+            }
+          } else {
+            // if (VerboseTrace) Print("UpdateTrailingStops(): OrderModify(): ", Order::GetOrderToText());
           }
-        } else {
-          // if (VerboseTrace) Print("UpdateTrailingStops(): OrderModify(): ", Order::GetOrderToText());
         }
       }
   } // end: for
