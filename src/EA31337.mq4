@@ -64,7 +64,9 @@
 #include <EA\public-classes\Misc.mqh>
 #include <EA\public-classes\Msg.mqh>
 #include <EA\public-classes\Report.mqh>
+#include <EA\public-classes\SummaryReport.mqh>
 #include <EA\public-classes\Terminal.mqh>
+#include <EA\public-classes\Tests.mqh>
 
 //#property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 
@@ -330,6 +332,9 @@ double stochastic[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_SLINE_ENTRY];
 double wpr[H1][FINAL_INDICATOR_INDEX_ENTRY];
 double zigzag[H1][FINAL_INDICATOR_INDEX_ENTRY];
 
+// Class variables.
+//SummaryReport summary; // For summary report.
+
 /* TODO:
  *   - add trailing stops/profit for support/resistence,
  *   - daily higher highs and lower lows,
@@ -454,20 +459,28 @@ void OnDeinit(const int reason) {
       "Info", __FUNCTION__, __LINE__, VerboseInfo);
   Msg::ShowText(GetSummaryText(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
 
+  string filename;
   if (WriteReport && !Check::IsOptimization() && session_initiated) {
-    //if (reason == REASON_CHARTCHANGE)
-    double ExtInitialDeposit = CalculateInitialDeposit();
-    CalculateSummary(ExtInitialDeposit);
-    string filename = StringFormat("%s-%s-%.0f%s-s%d-%s-Report.txt", ea_name, _Symbol, ExtInitialDeposit, AccCurrency, init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES));
+    if (reason == REASON_CHARTCHANGE)
+    // summary.CalculateSummary();
+    filename = StringFormat(
+        "%s-%s-%g%s-s%d-%s-Report.txt",
+        ea_name, _Symbol, init_balance, Account::AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES));
+        // ea_name, _Symbol, summary.init_deposit, Account::AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES));
     string data = GenerateReport();
     Report::WriteReport(filename, data, VerboseInfo); // Todo: Add: Errors::GetUninitReasonText(reason)
     Print(__FUNCTION__ + ": Saved report as: " + filename);
   }
+  // DeinitVars();
   // #ifdef _DEBUG
   // DEBUG("n=" + n + " : " +  DoubleToStrMorePrecision(val,19) );
   // DEBUG("CLOSEDEBUGFILE");
   // #endif
 } // end: OnDeinit()
+
+void DeinitVars() {
+  // delete summary;
+}
 
 // The init event handler for tester.
 // FIXME: Doesn't seems to work.
@@ -683,105 +696,115 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
   static datetime processed[FINAL_INDICATOR_TYPE_ENTRY][FINAL_PERIOD_TYPE_ENTRY];
   int i; string text = __FUNCTION__ + ": ";
   if (type == EMPTY) ArrayFill(processed, 0, ArraySize(processed), FALSE); // Reset processed if tf is EMPTY.
-  int period = Convert::TfToIndex(tf);
-  if (processed[type][period] == time_current) {
+  int index = Convert::TfToIndex(tf);
+  if (processed[type][index] == time_current) {
     // If it was already processed, ignore it.
     return (TRUE);
   }
 
   double ratio = 1.0, ratio2 = 1.0;
+  int shift;
   double envelopes_deviation;
+  double bands_upper, bands_base, bands_lower;
   switch (type) {
 #ifdef __advanced__
     case AC: // Calculates the Bill Williams' Accelerator/Decelerator oscillator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
-        ac[period][i] = iAC(symbol, tf, i);
+        ac[index][i] = iAC(symbol, tf, i);
       break;
     case AD: // Calculates the Accumulation/Distribution indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
-        ad[period][i] = iAD(symbol, tf, i);
+        ad[index][i] = iAD(symbol, tf, i);
       break;
     case ADX: // Calculates the Average Directional Movement Index indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        adx[period][i][MODE_MAIN]    = iADX(symbol, tf, ADX_Period, ADX_Applied_Price, MODE_MAIN, i);    // Base indicator line
-        adx[period][i][MODE_PLUSDI]  = iADX(symbol, tf, ADX_Period, ADX_Applied_Price, MODE_PLUSDI, i);  // +DI indicator line
-        adx[period][i][MODE_MINUSDI] = iADX(symbol, tf, ADX_Period, ADX_Applied_Price, MODE_MINUSDI, i); // -DI indicator line
+        adx[index][i][MODE_MAIN]    = iADX(symbol, tf, ADX_Period, ADX_Applied_Price, MODE_MAIN, i);    // Base indicator line
+        adx[index][i][MODE_PLUSDI]  = iADX(symbol, tf, ADX_Period, ADX_Applied_Price, MODE_PLUSDI, i);  // +DI indicator line
+        adx[index][i][MODE_MINUSDI] = iADX(symbol, tf, ADX_Period, ADX_Applied_Price, MODE_MINUSDI, i); // -DI indicator line
       }
       break;
 #endif
     case ALLIGATOR: // Calculates the Alligator indicator.
       // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        alligator[period][i][LIPS]  = iMA(symbol, tf, Alligator_Period_Lips * ratio,  Alligator_Shift_Lips,  Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
-        alligator[period][i][TEETH] = iMA(symbol, tf, Alligator_Period_Teeth * ratio, Alligator_Shift_Teeth, Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
-        alligator[period][i][JAW]   = iMA(symbol, tf, Alligator_Period_Jaw * ratio,   Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
+        alligator[index][i][LIPS]  = iMA(symbol, tf, Alligator_Period_Lips * ratio,  Alligator_Shift_Lips,  Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
+        alligator[index][i][TEETH] = iMA(symbol, tf, Alligator_Period_Teeth * ratio, Alligator_Shift_Teeth, Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
+        alligator[index][i][JAW]   = iMA(symbol, tf, Alligator_Period_Jaw * ratio,   Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
         ratio += (Alligator_Period_Ratio - 1.0);
       }
-      success = (bool)alligator[period][CURR][JAW];
-      // if (VerboseDebug) PrintFormat("Alligator %d: %g/%g/%g", tf, alligator[period][CURR][LIPS], alligator[period][CURR][TEETH], alligator[period][CURR][JAW]);
+      success = (bool)alligator[index][CURR][JAW];
       /* Note: This is equivalent to:
-        alligator[period][i][TEETH] = iAlligator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
-        alligator[period][i][TEETH] = iAlligator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
-        alligator[period][i][LIPS]  = iAlligator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
+        alligator[index][i][TEETH] = iAlligator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
+        alligator[index][i][TEETH] = iAlligator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
+        alligator[index][i][LIPS]  = iAlligator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
        */
+      if (VerboseDebug) PrintFormat("Alligator M%d: %s", tf, Arrays::ArrToString3D(alligator, ",", Digits));
       break;
 #ifdef __advanced__
     case ATR: // Calculates the Average True Range indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        atr[period][i][FAST] = iATR(symbol, tf, ATR_Period_Fast * ratio, i);
-        atr[period][i][SLOW] = iATR(symbol, tf, ATR_Period_Slow * ratio, i);
+        atr[index][i][FAST] = iATR(symbol, tf, ATR_Period_Fast * ratio, i);
+        atr[index][i][SLOW] = iATR(symbol, tf, ATR_Period_Slow * ratio, i);
         ratio += (ATR_Period_Ratio - 1.0);
       }
       break;
     case AWESOME: // Calculates the Awesome oscillator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        awesome[period][i] = iAO(symbol, tf, i);
+        awesome[index][i] = iAO(symbol, tf, i);
       }
       break;
 #endif // __advanced__
     case BANDS: // Calculates the Bollinger Bands indicator.
       // int sid, bands_period = Bands_Period; // Not used at the moment.
       // sid = GetStrategyViaIndicator(BANDS, tf); bands_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
+      /*
+      bands_upper = iBands(_Symbol, tf, 24, 2.6, 0, 0, MODE_UPPER, 0);
+      bands_base = iBands(_Symbol, tf, 24, 2.6, 0, 0, MODE_MAIN, 0);
+      bands_lower = iBands(_Symbol, tf, 24, 2.6, 0, 0, MODE_LOWER, 0);
+      if (VerboseDebug) PrintFormat("Bands New M%d: %g/%g/%g", tf, bands_upper, bands_base, bands_lower);
+      */
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        bands[period][i][BANDS_BASE]  = iBands(symbol, tf, Bands_Period * ratio, Bands_Deviation * ratio2, Bands_Shift, Bands_Applied_Price, BANDS_BASE,  i + Bands_Shift);
-        bands[period][i][BANDS_UPPER] = iBands(symbol, tf, Bands_Period * ratio, Bands_Deviation * ratio2, Bands_Shift, Bands_Applied_Price, BANDS_UPPER, i + Bands_Shift);
-        bands[period][i][BANDS_LOWER] = iBands(symbol, tf, Bands_Period * ratio, Bands_Deviation * ratio2, Bands_Shift, Bands_Applied_Price, BANDS_LOWER, i + Bands_Shift);
+        shift = i + Bands_Shift + (i == FINAL_INDICATOR_INDEX_ENTRY - 1 ? Bands_Shift_Far : 0);
+        bands[index][i][BANDS_BASE]  = iBands(symbol, tf, Bands_Period * ratio, Bands_Deviation * ratio2, 0, Bands_Applied_Price, BANDS_BASE,  shift);
+        bands[index][i][BANDS_UPPER] = iBands(symbol, tf, Bands_Period * ratio, Bands_Deviation * ratio2, 0, Bands_Applied_Price, BANDS_UPPER, shift);
+        bands[index][i][BANDS_LOWER] = iBands(symbol, tf, Bands_Period * ratio, Bands_Deviation * ratio2, 0, Bands_Applied_Price, BANDS_LOWER, shift);
         ratio += (Bands_Period_Ratio - 1.0);
         ratio2 += (Bands_Deviation_Ratio - 1.0);
       }
-      success = (bool)bands[period][CURR][BANDS_BASE];
-      if (VerboseDebug) PrintFormat("Bands %d: %g/%g/%g", tf, bands[period][CURR][BANDS_LOWER], bands[period][CURR][BANDS_BASE], bands[period][CURR][BANDS_UPPER]);
+      success = (bool)bands[index][CURR][BANDS_BASE];
+      if (VerboseDebug) PrintFormat("Bands M%d: %s", tf, Arrays::ArrToString3D(bands, ",", Digits));
       break;
 #ifdef __advanced__
     case BPOWER: // Calculates the Bears Power and Bulls Power indicators.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        bpower[period][i][OP_BUY]  = iBullsPower(symbol, tf, BPower_Period, BPower_Applied_Price, i);
-        bpower[period][i][OP_SELL] = iBearsPower(symbol, tf, BPower_Period, BPower_Applied_Price, i);
+        bpower[index][i][OP_BUY]  = iBullsPower(symbol, tf, BPower_Period, BPower_Applied_Price, i);
+        bpower[index][i][OP_SELL] = iBearsPower(symbol, tf, BPower_Period, BPower_Applied_Price, i);
       }
-      success = (bool)(bpower[period][CURR][OP_BUY] || bpower[period][CURR][OP_SELL]);
-      // Message("Bulls: " + bpower[period][CURR][OP_BUY] + ", Bears: " + bpower[period][CURR][OP_SELL]);
+      success = (bool)(bpower[index][CURR][OP_BUY] || bpower[index][CURR][OP_SELL]);
+      // Message("Bulls: " + bpower[index][CURR][OP_BUY] + ", Bears: " + bpower[index][CURR][OP_SELL]);
       break;
     case BWMFI: // Calculates the Market Facilitation Index indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        bwmfi[period][i] = iBWMFI(symbol, tf, i);
+        bwmfi[index][i] = iBWMFI(symbol, tf, i);
       }
-      success = (bool)bwmfi[period][CURR];
+      success = (bool)bwmfi[index][CURR];
       break;
     case CCI: // Calculates the Commodity Channel Index indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        cci[period][i][FAST] = iCCI(symbol, tf, CCI_Period_Fast, CCI_Applied_Price, i);
-        cci[period][i][SLOW] = iCCI(symbol, tf, CCI_Period_Slow, CCI_Applied_Price, i);
+        cci[index][i][FAST] = iCCI(symbol, tf, CCI_Period_Fast, CCI_Applied_Price, i);
+        cci[index][i][SLOW] = iCCI(symbol, tf, CCI_Period_Slow, CCI_Applied_Price, i);
       }
-      success = (bool)cci[period][CURR][SLOW];
+      success = (bool)cci[index][CURR][SLOW];
       break;
 #endif
     case DEMARKER: // Calculates the DeMarker indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        demarker[period][i] = iDeMarker(symbol, tf, DeMarker_Period * ratio, i + DeMarker_Shift);
+        demarker[index][i] = iDeMarker(symbol, tf, DeMarker_Period * ratio, i + DeMarker_Shift);
         ratio += (DeMarker_Period_Ratio - 1.0);
       }
-      success = (bool)demarker[period][CURR];
-      // PrintFormat("Period: %d, DeMarker: %g", period, demarker[period][CURR]);
+      success = (bool)demarker[index][CURR];
+      // PrintFormat("Period: %d, DeMarker: %g", period, demarker[index][CURR]);
+      if (VerboseDebug) PrintFormat("DeMarker M%d: %s", tf, Arrays::ArrToString2D(demarker, ",", Digits));
       break;
     case ENVELOPES: // Calculates the Envelopes indicator.
       /*
@@ -794,150 +817,161 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
       }
       */
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        envelopes[period][i][MODE_MAIN] = iEnvelopes(symbol, tf, Envelopes_MA_Period * ratio, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, MODE_MAIN,  i + Envelopes_Shift);
-        envelopes[period][i][UPPER] = iEnvelopes(symbol, tf, Envelopes_MA_Period * ratio, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, UPPER, i + Envelopes_Shift);
-        envelopes[period][i][LOWER] = iEnvelopes(symbol, tf, Envelopes_MA_Period * ratio, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, LOWER, i + Envelopes_Shift);
+        envelopes[index][i][MODE_MAIN] = iEnvelopes(symbol, tf, Envelopes_MA_Period * ratio, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, MODE_MAIN,  i + Envelopes_Shift);
+        envelopes[index][i][UPPER] = iEnvelopes(symbol, tf, Envelopes_MA_Period * ratio, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, UPPER, i + Envelopes_Shift);
+        envelopes[index][i][LOWER] = iEnvelopes(symbol, tf, Envelopes_MA_Period * ratio, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, LOWER, i + Envelopes_Shift);
         ratio += (Envelopes_MA_Period_Ratio - 1.0);
         ratio2 += (Envelopes_Deviation_Ratio - 1.0);
       }
-      success = (bool)envelopes[period][CURR][MODE_MAIN];
+      success = (bool)envelopes[index][CURR][MODE_MAIN];
+      if (VerboseDebug) PrintFormat("Envelopes M%d: %s", tf, Arrays::ArrToString3D(envelopes, ",", Digits));
       break;
 #ifdef __advanced__
     case FORCE: // Calculates the Force Index indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        force[period][i] = iForce(symbol, tf, Force_Period, Force_MA_Method, Force_Applied_price, i);
+        force[index][i] = iForce(symbol, tf, Force_Period, Force_MA_Method, Force_Applied_price, i);
       }
-      success = (bool)force[period][CURR];
+      success = (bool)force[index][CURR];
       break;
 #endif
     case FRACTALS: // Calculates the Fractals indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        fractals[period][i][LOWER] = iFractals(symbol, tf, LOWER, i);
-        fractals[period][i][UPPER] = iFractals(symbol, tf, UPPER, i);
+        fractals[index][i][LOWER] = iFractals(symbol, tf, LOWER, i);
+        fractals[index][i][UPPER] = iFractals(symbol, tf, UPPER, i);
       }
+      if (VerboseDebug) PrintFormat("Fractals M%d: %s", tf, Arrays::ArrToString3D(fractals, ",", Digits));
       break;
     case GATOR: // Calculates the Gator oscillator.
       // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        gator[period][i][LIPS]  = iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
-        gator[period][i][TEETH] = iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
-        gator[period][i][JAW] = iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
+        gator[index][i][LIPS]  = iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
+        gator[index][i][TEETH] = iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
+        gator[index][i][JAW] = iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
       }
-      success = (bool)gator[period][CURR][JAW];
+      success = (bool)gator[index][CURR][JAW];
       break;
     case ICHIMOKU: // Calculates the Ichimoku Kinko Hyo indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        ichimoku[period][i][MODE_TENKANSEN]   = iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_TENKANSEN, i);
-        ichimoku[period][i][MODE_KIJUNSEN]    = iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_KIJUNSEN, i);
-        ichimoku[period][i][MODE_SENKOUSPANA] = iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_SENKOUSPANA, i);
-        ichimoku[period][i][MODE_SENKOUSPANB] = iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_SENKOUSPANB, i);
-        ichimoku[period][i][MODE_CHIKOUSPAN]  = iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_CHIKOUSPAN, i);
+        ichimoku[index][i][MODE_TENKANSEN]   = iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_TENKANSEN, i);
+        ichimoku[index][i][MODE_KIJUNSEN]    = iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_KIJUNSEN, i);
+        ichimoku[index][i][MODE_SENKOUSPANA] = iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_SENKOUSPANA, i);
+        ichimoku[index][i][MODE_SENKOUSPANB] = iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_SENKOUSPANB, i);
+        ichimoku[index][i][MODE_CHIKOUSPAN]  = iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_CHIKOUSPAN, i);
       }
-      success = (bool)ichimoku[period][CURR][MODE_TENKANSEN];
+      success = (bool)ichimoku[index][CURR][MODE_TENKANSEN];
       break;
     case MA: // Calculates the Moving Average indicator.
       // Calculate MA Fast.
-      ma_fast[period][CURR] = iMA(symbol, tf, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, CURR); // Current
-      ma_fast[period][PREV] = iMA(symbol, tf, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, PREV + MA_Shift_Fast); // Previous
-      ma_fast[period][FAR]  = iMA(symbol, tf, MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Fast + MA_Shift_Far);
-      // Calculate MA Medium.
-      ma_medium[period][CURR] = iMA(symbol, tf, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, CURR); // Current
-      ma_medium[period][PREV] = iMA(symbol, tf, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, PREV + MA_Shift_Medium); // Previous
-      ma_medium[period][FAR]  = iMA(symbol, tf, MA_Period_Medium, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Medium + MA_Shift_Far);
-      // Calculate Ma Slow.
-      ma_slow[period][CURR] = iMA(symbol, tf, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, CURR); // Current
-      ma_slow[period][PREV] = iMA(symbol, tf, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, PREV + MA_Shift_Slow); // Previous
-      ma_slow[period][FAR]  = iMA(symbol, tf, MA_Period_Slow, MA_Shift, MA_Method, MA_Applied_Price, FAR + MA_Shift_Slow + MA_Shift_Far);
-      success = (bool)ma_slow[period][CURR];
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
+        shift = i + MA_Shift + (i == FINAL_INDICATOR_INDEX_ENTRY - 1 ? MA_Shift_Far : 0);
+        ma_fast[index][i]   = iMA(symbol, tf, MA_Period_Fast * ratio,   MA_Shift_Fast,   MA_Method, MA_Applied_Price, shift);
+        ma_medium[index][i] = iMA(symbol, tf, MA_Period_Medium * ratio, MA_Shift_Medium, MA_Method, MA_Applied_Price, shift);
+        ma_slow[index][i]   = iMA(symbol, tf, MA_Period_Slow * ratio,   MA_Shift_Slow,   MA_Method, MA_Applied_Price, shift);
+        ratio += (MA_Period_Ratio - 1.0);
+      }
+      success = (bool)ma_slow[index][CURR];
+      if (VerboseDebug) PrintFormat("MA Fast M%d: %s", tf, Arrays::ArrToString2D(ma_fast, ",", Digits));
+      if (VerboseDebug) PrintFormat("MA Medium M%d: %s", tf, Arrays::ArrToString2D(ma_medium, ",", Digits));
+      if (VerboseDebug) PrintFormat("MA Slow M%d: %s", tf, Arrays::ArrToString2D(ma_slow, ",", Digits));
       if (VerboseDebug && Check::IsVisualMode()) Draw::DrawMA(tf);
       break;
     case MACD: // Calculates the Moving Averages Convergence/Divergence indicator.
-      macd[period][CURR][MODE_MAIN]   = iMACD(symbol, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price, MODE_MAIN,   CURR); // Current
-      macd[period][PREV][MODE_MAIN]   = iMACD(symbol, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price, MODE_MAIN,   PREV + MACD_Shift); // Previous
-      macd[period][FAR][MODE_MAIN]    = iMACD(symbol, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price, MODE_MAIN,   FAR + MACD_Shift_Far); // TODO: + MACD_Shift
-      macd[period][CURR][MODE_SIGNAL] = iMACD(symbol, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price, MODE_SIGNAL, CURR); // Current
-      macd[period][PREV][MODE_SIGNAL] = iMACD(symbol, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price, MODE_SIGNAL, PREV + MACD_Shift); // Previous
-      macd[period][FAR][MODE_SIGNAL]  = iMACD(symbol, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price, MODE_SIGNAL, FAR + MACD_Shift_Far); // TODO: + MACD_Shift
-      success = (bool)macd[period][CURR][MODE_MAIN];
+      for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
+        shift = i + MACD_Shift + (i == FINAL_INDICATOR_INDEX_ENTRY - 1 ? MACD_Shift_Far : 0);
+        macd[index][CURR][MODE_MAIN]   = iMACD(symbol, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price, MODE_MAIN,   shift);
+        macd[index][CURR][MODE_SIGNAL] = iMACD(symbol, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price, MODE_SIGNAL, shift);
+        ratio += (MACD_Period_Ratio - 1.0);
+      }
+      if (VerboseDebug) PrintFormat("MACD M%d: %s", tf, Arrays::ArrToString3D(macd, ",", Digits));
+      success = (bool)macd[index][CURR][MODE_MAIN];
       break;
     case MFI: // Calculates the Money Flow Index indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        mfi[period][i] = iMFI(symbol, tf, MFI_Period, i);
+        mfi[index][i] = iMFI(symbol, tf, MFI_Period, i);
       }
-      success = (bool)mfi[period][CURR];
+      success = (bool)mfi[index][CURR];
       break;
     case MOMENTUM: // Calculates the Momentum indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        momentum[period][i][FAST] = iMomentum(symbol, tf, Momentum_Period_Fast, Momentum_Applied_Price, i);
-        momentum[period][i][SLOW] = iMomentum(symbol, tf, Momentum_Period_Slow, Momentum_Applied_Price, i);
+        momentum[index][i][FAST] = iMomentum(symbol, tf, Momentum_Period_Fast, Momentum_Applied_Price, i);
+        momentum[index][i][SLOW] = iMomentum(symbol, tf, Momentum_Period_Slow, Momentum_Applied_Price, i);
       }
-      success = (bool)momentum[period][CURR][SLOW];
+      success = (bool)momentum[index][CURR][SLOW];
       break;
     case OBV: // Calculates the On Balance Volume indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        obv[period][i] = iOBV(symbol, tf, OBV_Applied_Price, i);
+        obv[index][i] = iOBV(symbol, tf, OBV_Applied_Price, i);
       }
-      success = (bool)obv[period][CURR];
+      success = (bool)obv[index][CURR];
       break;
     case OSMA: // Calculates the Moving Average of Oscillator indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        osma[period][i] = iOsMA(symbol, tf, OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price, i);
+        osma[index][i] = iOsMA(symbol, tf, OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price, i);
       }
-      success = (bool)osma[period][CURR];
+      success = (bool)osma[index][CURR];
       break;
     case RSI: // Calculates the Relative Strength Index indicator.
       // int rsi_period = RSI_Period; // Not used at the moment.
       // sid = GetStrategyViaIndicator(RSI, tf); rsi_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        rsi[period][i] = iRSI(NULL, tf, RSI_Period, RSI_Applied_Price, i + RSI_Shift);
-        if (rsi[period][i] > rsi_stats[period][UPPER]) rsi_stats[period][UPPER] = rsi[period][i]; // Calculate maximum value.
-        if (rsi[period][i] < rsi_stats[period][LOWER] || rsi_stats[period][LOWER] == 0) rsi_stats[period][LOWER] = rsi[period][i]; // Calculate minimum value.
+        rsi[index][i] = iRSI(symbol, tf, RSI_Period * ratio, RSI_Applied_Price, i + RSI_Shift);
+        if (rsi[index][i] > rsi_stats[index][UPPER]) rsi_stats[index][UPPER] = rsi[index][i]; // Calculate maximum value.
+        if (rsi[index][i] < rsi_stats[index][LOWER] || rsi_stats[index][LOWER] == 0) rsi_stats[index][LOWER] = rsi[index][i]; // Calculate minimum value.
+        ratio += (RSI_Period_Ratio - 1.0);
       }
-      rsi_stats[period][0] = Misc::If(rsi_stats[period][0] > 0, (rsi_stats[period][0] + rsi[period][0] + rsi[period][1] + rsi[period][2]) / 4, (rsi[period][0] + rsi[period][1] + rsi[period][2]) / 3); // Calculate average value.
-      success = (bool)rsi[period][CURR];
+      // Calculate average value.
+      rsi_stats[index][0] = Misc::If(rsi_stats[index][0] > 0, (rsi_stats[index][0] + rsi[index][0] + rsi[index][1] + rsi[index][2]) / 4, (rsi[index][0] + rsi[index][1] + rsi[index][2]) / 3);
+      if (VerboseDebug) PrintFormat("RSI M%d: %s", tf, Arrays::ArrToString2D(rsi, ",", Digits));
+      success = (bool)rsi[index][CURR];
       break;
     case RVI: // Calculates the Relative Strength Index indicator.
-      rvi[period][CURR][MODE_MAIN]   = iRVI(symbol, tf, 10, MODE_MAIN, CURR);
-      rvi[period][PREV][MODE_MAIN]   = iRVI(symbol, tf, 10, MODE_MAIN, PREV + RVI_Shift);
-      rvi[period][FAR][MODE_MAIN]    = iRVI(symbol, tf, 10, MODE_MAIN, FAR + RVI_Shift + RVI_Shift_Far);
-      rvi[period][CURR][MODE_SIGNAL] = iRVI(symbol, tf, 10, MODE_SIGNAL, CURR);
-      rvi[period][PREV][MODE_SIGNAL] = iRVI(symbol, tf, 10, MODE_SIGNAL, PREV + RVI_Shift);
-      rvi[period][FAR][MODE_SIGNAL]  = iRVI(symbol, tf, 10, MODE_SIGNAL, FAR + RVI_Shift + RVI_Shift_Far);
-      success = (bool)rvi[period][CURR][MODE_MAIN];
+      rvi[index][CURR][MODE_MAIN]   = iRVI(symbol, tf, 10, MODE_MAIN, CURR);
+      rvi[index][PREV][MODE_MAIN]   = iRVI(symbol, tf, 10, MODE_MAIN, PREV + RVI_Shift);
+      rvi[index][FAR][MODE_MAIN]    = iRVI(symbol, tf, 10, MODE_MAIN, FAR + RVI_Shift + RVI_Shift_Far);
+      rvi[index][CURR][MODE_SIGNAL] = iRVI(symbol, tf, 10, MODE_SIGNAL, CURR);
+      rvi[index][PREV][MODE_SIGNAL] = iRVI(symbol, tf, 10, MODE_SIGNAL, PREV + RVI_Shift);
+      rvi[index][FAR][MODE_SIGNAL]  = iRVI(symbol, tf, 10, MODE_SIGNAL, FAR + RVI_Shift + RVI_Shift_Far);
+      success = (bool)rvi[index][CURR][MODE_MAIN];
       break;
     case SAR: // Calculates the Parabolic Stop and Reverse system indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        sar[period][i] = iSAR(NULL, tf, SAR_Step, SAR_Maximum_Stop, i + SAR_Shift);
+        sar[index][i] = iSAR(symbol, tf, SAR_Step * ratio, SAR_Maximum_Stop, i + SAR_Shift);
+        ratio += (SAR_Step_Ratio - 1.0);
       }
-      success = (bool)sar[period][CURR];
+      if (VerboseDebug) PrintFormat("SAR M%d: %s", tf, Arrays::ArrToString2D(sar, ",", Digits));
+      success = (bool)sar[index][CURR];
       break;
     case STDDEV: // Calculates the Standard Deviation indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        stddev[period][i] = iStdDev(symbol, tf, StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price, i);
+        stddev[index][i] = iStdDev(symbol, tf, StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price, i);
       }
-      success = stddev[period][CURR];
+      if (VerboseDebug) PrintFormat("StdDev M%d: %s", tf, Arrays::ArrToString2D(stddev, ",", Digits));
+      success = stddev[index][CURR];
       break;
     case STOCHASTIC: // Calculates the Stochastic Oscillator.
       // TODO
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        stochastic[period][i][MODE_MAIN]   = iStochastic(symbol, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, MODE_MAIN, i);
-        stochastic[period][i][MODE_SIGNAL] = iStochastic(symbol, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, MODE_SIGNAL, i);
+        stochastic[index][i][MODE_MAIN]   = iStochastic(symbol, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, MODE_MAIN, i);
+        stochastic[index][i][MODE_SIGNAL] = iStochastic(symbol, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, MODE_SIGNAL, i);
       }
-      success = stochastic[period][CURR][MODE_MAIN];
+      if (VerboseDebug) PrintFormat("Stochastic M%d: %s", tf, Arrays::ArrToString3D(stochastic, ",", Digits));
+      success = stochastic[index][CURR][MODE_MAIN];
       break;
     case WPR: // Calculates the  Larry Williams' Percent Range.
       // Update the Larry Williams' Percent Range indicator values.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        wpr[period][i] = -iWPR(symbol, tf, WPR_Period, i + WPR_Shift);
+        wpr[index][i] = -iWPR(symbol, tf, WPR_Period * ratio, i + WPR_Shift);
+        ratio += (WPR_Period_Ratio - 1.0);
       }
-      success = wpr[period][CURR];
+      if (VerboseDebug) PrintFormat("WPR M%d: %s", tf, Arrays::ArrToString2D(wpr, ",", Digits));
+      success = wpr[index][CURR];
       break;
     case ZIGZAG: // Calculates the custom ZigZag indicator.
       // TODO
       break;
   } // end: switch
 
-  processed[type][period] = time_current; // @fixme: warning 43: possible loss of data due to type conversion
+  processed[type][index] = time_current; // @fixme: warning 43: possible loss of data due to type conversion
   return (TRUE);
 }
 
@@ -978,7 +1012,8 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
 
    // Calculate take profit and stop loss.
    RefreshRates();
-   if (VerboseDebug) Print(__FUNCTION__ + ": " + GetMarketTextDetails()); // Print current market information before placing the order.
+   // Print current market information before placing the order.
+   if (VerboseDebug) Print(__FUNCTION__ + ": " + GetMarketTextDetails());
    double order_price = Market::GetOpenPrice(cmd);
    double stoploss = 0, takeprofit = 0;
    if (StopLoss > 0) stoploss = NormalizeDouble(Market::GetClosePrice(cmd) - (StopLoss + TrailingStop) * pip_size * Convert::OrderTypeToValue(cmd), Digits);
@@ -1129,7 +1164,7 @@ bool CheckProfitFactorLimits(int sid = EMPTY) {
     last_err = Msg::ShowText(
       StringFormat("%s: Minimum profit factor reached, disabling strategy. (pf = %.1f)",
         sname[sid], conf[sid][PROFIT_FACTOR]),
-      "Error", __FUNCTION__, __LINE__, VerboseErrors);
+      "Info", __FUNCTION__, __LINE__, VerboseInfo);
     info[sid][SUSPENDED] = TRUE;
     return (FALSE);
   }
@@ -1137,7 +1172,7 @@ bool CheckProfitFactorLimits(int sid = EMPTY) {
     last_err = Msg::ShowText(
       StringFormat("%s: Maximum profit factor reached, disabling strategy. (pf = %.1f)",
         sname[sid], conf[sid][PROFIT_FACTOR]),
-      "Error", __FUNCTION__, __LINE__, VerboseErrors);
+      "Info", __FUNCTION__, __LINE__, VerboseInfo);
     info[sid][SUSPENDED] = TRUE;
     return (FALSE);
   }
@@ -3006,22 +3041,27 @@ bool UpdateTrailingStops() {
           }
         }
 
-        new_sl = NormalizeDouble(GetTrailingValue(OrderType(), -1, sid, OrderStopLoss(), TRUE), Market::GetDigits());
-        new_tp = NormalizeDouble(GetTrailingValue(OrderType(), +1, sid, OrderTakeProfit(), TRUE), Market::GetDigits());
+        new_sl = GetTrailingValue(OrderType(), -1, sid, OrderStopLoss(), TRUE);
+        new_tp = GetTrailingValue(OrderType(), +1, sid, OrderTakeProfit(), TRUE);
         if (!Market::TradeOpAllowed(OrderType(), new_sl, new_tp)) {
+          if (VerboseDebug) {
+            PrintFormat("%s(): fabs(%g - %g) = %g > %g || fabs(%g - %g) = %g > %g",
+                __FUNCTION__,
+                OrderStopLoss(), new_sl, fabs(OrderStopLoss() - new_sl), MinPipChangeToTrade * pip_size,
+                OrderTakeProfit(), new_tp, fabs(OrderTakeProfit() - new_tp), MinPipChangeToTrade * pip_size);
+          }
           return (False);
         }
-        /*
         else if (new_sl == OrderStopLoss() && new_tp == OrderTakeProfit()) {
           return (False);
         }
-        */
         // @todo
         // Perform update on pip change.
         // Perform update on change only.
         // MQL5: ORDER_TIME_GTC
         // datetime expiration=TimeTradeServer()+PeriodSeconds(PERIOD_D1);
-        if (fabs(OrderStopLoss() - new_sl) > MinPipChangeToTrade || fabs(OrderTakeProfit() - new_tp) > MinPipChangeToTrade) {
+
+        if (fabs(OrderStopLoss() - new_sl) > MinPipChangeToTrade * pip_size || fabs(OrderTakeProfit() - new_tp) > MinPipChangeToTrade * pip_size) {
           result = OrderModify(OrderTicket(), OrderOpenPrice(), new_sl, new_tp, 0, GetOrderColor());
           if (!result) {
             err_code = GetLastError();
@@ -3032,6 +3072,12 @@ bool UpdateTrailingStops() {
                 OrderTicket(), OrderOpenPrice(), new_sl, new_tp, 0, GetOrderColor(), Ask, Bid, Market::GetDistanceInPips()),
                 "Debug", __FUNCTION__, __LINE__, VerboseDebug
               );
+              Msg::ShowText(
+                StringFormat("%s(): fabs(%g - %g) = %g > %g || fabs(%g - %g) = %g > %g",
+                __FUNCTION__,
+                OrderStopLoss(), new_sl, fabs(OrderStopLoss() - new_sl), MinPipChangeToTrade * pip_size,
+                OrderTakeProfit(), new_tp, fabs(OrderTakeProfit() - new_tp), MinPipChangeToTrade * pip_size),
+                "Debug", __FUNCTION__, __LINE__, VerboseDebug);
             }
           } else {
             // if (VerboseTrace) Print("UpdateTrailingStops(): OrderModify(): ", Order::GetOrderToText());
@@ -3064,15 +3110,24 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
   if (existing && TrailingStopAddPerMinute > 0 && OrderOpenTime() > 0) {
     int min_elapsed = (TimeCurrent() - OrderOpenTime()) / 60;
     extra_trail =+ min_elapsed * TrailingStopAddPerMinute;
+    if (VerboseDebug) {
+      PrintFormat("%s(): extra_trail += %d * %g => %d",
+        __FUNCTION__, min_elapsed, TrailingStopAddPerMinute, extra_trail);
+    }
   }
   int factor = (Convert::OrderTypeToValue(cmd) == direction ? +1 : -1);
   double trail = (TrailingStop + extra_trail) * pip_size;
   double default_trail = (cmd == OP_BUY ? Bid : Ask) + trail * factor;
   int method = GetTrailingMethod(order_type, direction);
   // if (direction > 0) method = AC_TrailingProfitMethod; else if (direction < 0) method = AC_TrailingStopMethod; // Testing.
-  int timeframe = GetStrategyTimeframe(order_type);
-  int period = Convert::TfToIndex(timeframe);
+  int tf = GetStrategyTimeframe(order_type);
+  int period = Convert::TfToIndex(tf);
   int symbol = existing ? OrderSymbol() : _Symbol;
+
+  if (VerboseDebug) {
+    PrintFormat("%s(): trail = (%d + %d) * %g = %g",
+      __FUNCTION__, TrailingStop, extra_trail, pip_size, trail);
+  }
 
 /**
   MA1+MA5+MA15+MA30 backtest log (auto,ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, 9,5mln ticks, quality 25%]:
@@ -3143,190 +3198,201 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
        new_value = default_trail;
        break;
      case T_CLOSE_PREV: // TODO
-       diff = fabs(Open[CURR] - iClose(symbol, timeframe, PREV));
+       diff = fabs(Open[CURR] - iClose(symbol, tf, PREV));
        new_value = Open[CURR] + diff * factor;
        break;
      case T_2_BARS_PEAK: // 3
-       diff = fmax(GetPeakPrice(timeframe, MODE_HIGH, 2) - Open[CURR], Open[CURR] - GetPeakPrice(timeframe, MODE_LOW, 2));
+       diff = fmax(GetPeakPrice(tf, MODE_HIGH, 2) - Open[CURR], Open[CURR] - GetPeakPrice(tf, MODE_LOW, 2));
        new_value = Open[CURR] + diff * factor;
        break;
      case T_5_BARS_PEAK: // 4
-       diff = fmax(GetPeakPrice(timeframe, MODE_HIGH, 5) - Open[CURR], Open[CURR] - GetPeakPrice(timeframe, MODE_LOW, 5));
+       diff = fmax(GetPeakPrice(tf, MODE_HIGH, 5) - Open[CURR], Open[CURR] - GetPeakPrice(tf, MODE_LOW, 5));
        new_value = Open[CURR] + diff * factor;
        break;
      case T_10_BARS_PEAK: // 5
-       diff = fmax(GetPeakPrice(timeframe, MODE_HIGH, 10) - Open[CURR], Open[CURR] - GetPeakPrice(timeframe, MODE_LOW, 10));
+       diff = fmax(GetPeakPrice(tf, MODE_HIGH, 10) - Open[CURR], Open[CURR] - GetPeakPrice(tf, MODE_LOW, 10));
        new_value = Open[CURR] + diff * factor;
        break;
-     case T_50_BARS_PEAK:
-       diff = fmax(GetPeakPrice(timeframe, MODE_HIGH, 50) - Open[CURR], Open[CURR] - GetPeakPrice(timeframe, MODE_LOW, 50));
+     case T_50_BARS_PEAK: // 6
+       diff = fmax(GetPeakPrice(tf, MODE_HIGH, 50) - Open[CURR], Open[CURR] - GetPeakPrice(tf, MODE_LOW, 50));
+       new_value = Open[CURR] + diff * factor;
+       // @todo: Text non-Open values.
+       break;
+     case T_150_BARS_PEAK: // 7
+       diff = fmax(GetPeakPrice(tf, MODE_HIGH, 150) - Open[CURR], Open[CURR] - GetPeakPrice(tf, MODE_LOW, 150));
        new_value = Open[CURR] + diff * factor;
        break;
-     case T_150_BARS_PEAK:
-       diff = fmax(GetPeakPrice(timeframe, MODE_HIGH, 150) - Open[CURR], Open[CURR] - GetPeakPrice(timeframe, MODE_LOW, 150));
-       new_value = Open[CURR] + diff * factor;
-       break;
-     case T_HALF_200_BARS:
-       diff = fmax(GetPeakPrice(timeframe, MODE_HIGH, 200) - Open[CURR], Open[CURR] - GetPeakPrice(timeframe, MODE_LOW, 200));
+     case T_HALF_200_BARS: // 8
+       diff = fmax(GetPeakPrice(tf, MODE_HIGH, 200) - Open[CURR], Open[CURR] - GetPeakPrice(tf, MODE_LOW, 200));
        new_value = Open[CURR] + diff/2 * factor;
        break;
      case T_HALF_PEAK_OPEN:
        if (existing) {
-         // Get the number of bars for the timeframe since open. Zero means that the order was opened during the current bar.
-         int BarShiftOfTradeOpen = iBarShift(symbol, timeframe, OrderOpenTime(), FALSE);
-         // Get the high price from the bar with the given timeframe index
-         double highest_open = GetPeakPrice(timeframe, MODE_HIGH, BarShiftOfTradeOpen + 1);
-         double lowest_open = GetPeakPrice(timeframe, MODE_LOW, BarShiftOfTradeOpen + 1);
+         // Get the number of bars for the tf since open. Zero means that the order was opened during the current bar.
+         int BarShiftOfTradeOpen = iBarShift(symbol, tf, OrderOpenTime(), FALSE);
+         // Get the high price from the bar with the given tf index
+         double highest_open = GetPeakPrice(tf, MODE_HIGH, BarShiftOfTradeOpen + 1);
+         double lowest_open = GetPeakPrice(tf, MODE_LOW, BarShiftOfTradeOpen + 1);
          diff = fmax(highest_open - Open[CURR], Open[CURR] - lowest_open);
          new_value = Open[CURR] + diff/2 * factor;
        }
        break;
      case T_MA_F_PREV: // 9: MA Small (Previous). The worse so far for MA.
-       UpdateIndicator(MA, timeframe);
+       UpdateIndicator(MA, tf);
        diff = fabs(Ask - ma_fast[period][PREV]);
        new_value = Ask + diff * factor;
        break;
      case T_MA_F_FAR: // 10: MA Small (Far) + trailing stop. Optimize together with: MA_Shift_Far.
-       UpdateIndicator(MA, timeframe);
+       UpdateIndicator(MA, tf);
        diff = fabs(Ask - ma_fast[period][FAR]);
        new_value = Ask + diff * factor;
        break;
      /*
      case T_MA_F_LOW: // 11: Lowest/highest value of MA Fast. Optimized (SL pf: 1.39 for MA).
-       UpdateIndicator(MA, timeframe);
+       UpdateIndicator(MA, tf);
        diff = fmax(Arrays::HighestArrValue2(ma_fast, period) - Open[CURR], Open[CURR] - Arrays::LowestArrValue2(ma_fast, period));
        new_value = Open[CURR] + diff * factor;
        break;
       */
      case T_MA_F_TRAIL: // 12: MA Fast (Current) + trailing stop. Works fine.
-       UpdateIndicator(MA, timeframe);
+       UpdateIndicator(MA, tf);
        diff = fabs(Ask - ma_fast[period][CURR]);
        new_value = Ask + (diff + trail) * factor;
        break;
      case T_MA_F_FAR_TRAIL: // 13: MA Fast (Far) + trailing stop. Works fine (SL pf: 1.26 for MA).
-       UpdateIndicator(MA, timeframe);
+       UpdateIndicator(MA, tf);
        diff = fabs(Open[CURR] - ma_fast[period][FAR]);
        new_value = Open[CURR] + (diff + trail) * factor;
        break;
      case T_MA_M: // 14: MA Medium (Current).
-       UpdateIndicator(MA, timeframe);
+       UpdateIndicator(MA, tf);
        diff = fabs(Ask - ma_medium[period][CURR]);
        new_value = Ask + diff * factor;
        break;
      case T_MA_M_FAR: // 15: MA Medium (Far)
-       UpdateIndicator(MA, timeframe);
+       UpdateIndicator(MA, tf);
        diff = fabs(Ask - ma_medium[period][FAR]);
        new_value = Ask + diff * factor;
        break;
      /*
      case T_MA_M_LOW: // 16: Lowest/highest value of MA Medium. Optimized (SL pf: 1.39 for MA).
-       UpdateIndicator(MA, timeframe);
+       UpdateIndicator(MA, tf);
        diff = fmax(Arrays::HighestArrValue2(ma_medium, period) - Open[CURR], Open[CURR] - Arrays::LowestArrValue2(ma_medium, period));
        new_value = Open[CURR] + diff * factor;
        break;
       */
      case T_MA_M_TRAIL: // 17: MA Small (Current) + trailing stop. Works fine (SL pf: 1.26 for MA).
-       UpdateIndicator(MA, timeframe);
+       UpdateIndicator(MA, tf);
        diff = fabs(Open[CURR] - ma_medium[period][CURR]);
        new_value = Open[CURR] + (diff + trail) * factor;
        break;
      case T_MA_M_FAR_TRAIL: // 18: MA Small (Far) + trailing stop. Optimized (SL pf: 1.29 for MA).
-       UpdateIndicator(MA, timeframe);
+       UpdateIndicator(MA, tf);
        diff = fabs(Open[CURR] - ma_medium[period][FAR]);
        new_value = Open[CURR] + (diff + trail) * factor;
+       if (VerboseDebug && new_value < 0) {
+         PrintFormat("%s(): diff = fabs(%g - %g); new_value = %g + (%g + %g) * %g => %g",
+             __FUNCTION__, Open[CURR], ma_medium[period][FAR], Open[CURR], diff, trail, factor, new_value);
+       }
        break;
      case T_MA_S: // 19: MA Slow (Current).
-       UpdateIndicator(MA, timeframe);
+       UpdateIndicator(MA, tf);
        diff = fabs(Ask - ma_slow[period][CURR]);
        // new_value = ma_slow[period][CURR];
        new_value = Ask + diff * factor;
        break;
      case T_MA_S_FAR: // 20: MA Slow (Far).
-       UpdateIndicator(MA, timeframe);
+       UpdateIndicator(MA, tf);
        diff = fabs(Ask - ma_slow[period][FAR]);
        // new_value = ma_slow[period][FAR];
        new_value = Ask + diff * factor;
        break;
      case T_MA_S_TRAIL: // 21: MA Slow (Current) + trailing stop. Optimized (SL pf: 1.29 for MA, PT pf: 1.23 for MA).
-       UpdateIndicator(MA, timeframe);
+       UpdateIndicator(MA, tf);
        diff = fabs(Open[CURR] - ma_slow[period][CURR]);
        new_value = Open[CURR] + (diff + trail) * factor;
        break;
      case T_MA_FMS_PEAK: // 22: Lowest/highest value of all MAs. Works fine (SL pf: 1.39 for MA, PT pf: 1.23 for MA).
-       UpdateIndicator(MA, timeframe);
+       UpdateIndicator(MA, tf);
        highest_ma = fabs(fmax(fmax(Arrays::HighestArrValue2(ma_fast, period), Arrays::HighestArrValue2(ma_medium, period)), Arrays::HighestArrValue2(ma_slow, period)));
        lowest_ma = fabs(fmin(fmin(Arrays::LowestArrValue2(ma_fast, period), Arrays::LowestArrValue2(ma_medium, period)), Arrays::LowestArrValue2(ma_slow, period)));
        diff = fmax(fabs(highest_ma - Open[CURR]), fabs(Open[CURR] - lowest_ma));
        new_value = Open[CURR] + diff * factor;
        break;
      case T_SAR: // 23: Current SAR value. Optimized.
-       UpdateIndicator(SAR, timeframe);
+       UpdateIndicator(SAR, tf);
        new_value = sar[period][CURR];
        break;
      case T_SAR_PEAK: // 24: Lowest/highest SAR value.
-       UpdateIndicator(SAR, timeframe);
+       UpdateIndicator(SAR, tf);
        new_value = Misc::If(Convert::OrderTypeToValue(cmd) == direction, Arrays::HighestArrValue2(sar, period), Arrays::LowestArrValue2(sar, period));
        break;
      case T_BANDS: // 25: Current Bands value.
-       UpdateIndicator(BANDS, timeframe);
-       new_value = Misc::If(Convert::OrderTypeToValue(cmd) == direction, bands[period][CURR][BANDS_UPPER], bands[period][CURR][BANDS_LOWER]);
+       UpdateIndicator(BANDS, tf);
+       new_value = Convert::OrderTypeToValue(cmd) == direction ? bands[period][CURR][BANDS_UPPER] : bands[period][CURR][BANDS_LOWER];
        break;
      case T_BANDS_PEAK: // 26: Lowest/highest Bands value.
-       UpdateIndicator(BANDS, timeframe);
+       UpdateIndicator(BANDS, tf);
        new_value = (Convert::OrderTypeToValue(cmd) == direction
          ? fmax(fmax(bands[period][CURR][BANDS_UPPER], bands[period][PREV][BANDS_UPPER]), bands[period][FAR][BANDS_UPPER])
          : fmin(fmin(bands[period][CURR][BANDS_LOWER], bands[period][PREV][BANDS_LOWER]), bands[period][FAR][BANDS_LOWER])
          );
        break;
      case T_ENVELOPES: // 27: Current Envelopes value. // FIXME
-       UpdateIndicator(ENVELOPES, timeframe);
+       UpdateIndicator(ENVELOPES, tf);
        new_value = Convert::OrderTypeToValue(cmd) == direction ? envelopes[period][CURR][UPPER] : envelopes[period][CURR][LOWER];
        break;
      default:
        Msg::ShowText(StringFormat("Unknown trailing stop method: %d", method), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
    }
 
-   if (new_value > 0) new_value += Market::GetDistanceInPips() * factor;
+  if (new_value > 0) new_value += Market::GetDistanceInPips() * factor;
 
-   if (TrailingStopOneWay && direction < 0 && method > 0) { // If TRUE, move trailing stop only one direction.
-     if (previous == 0 && method > 0) previous = default_trail;
-     if (Convert::OrderTypeToValue(cmd) == direction) new_value = (new_value < previous || previous == 0) ? new_value : previous;
-     else new_value = (new_value > previous || previous == 0) ? new_value : previous;
-   }
-   if (TrailingProfitOneWay && direction > 0 && method > 0) { // If TRUE, move profit take only one direction.
-     if (Convert::OrderTypeToValue(cmd) == direction) new_value = (new_value > previous || previous == 0) ? new_value : previous;
-     else new_value = (new_value < previous || previous == 0) ? new_value : previous;
-   }
+  if (!Market::TradeOpAllowed(cmd, new_value)) {
+    #ifndef __limited__
+      if (existing && previous == 0 && direction == -1) previous = default_trail;
+    #else // If limited, then force the trailing value.
+      if (existing && previous == 0) previous = default_trail;
+    #endif
+    Msg::ShowText(
+        StringFormat("#%d (d:%d/f:%d), method: %d, invalid value: %g, previous: %g, Ask/Bid/Gap: %g/%g/%g; %s",
+          existing ? OrderTicket() : 0, direction, factor,
+          method, new_value, previous, Ask, Bid, Market::GetDistanceInPips(), Order::GetOrderToText()),
+        "Debug", __FUNCTION__, __LINE__, VerboseDebug);
+    // If value is invalid, fallback to the previous one.
+    return previous;
+  }
 
-   // if (!Market::TradeOpAllowed(cmd, new_value * -1, new_value * -1)) {
-   /*
-   if (!ValidTrailingValue(new_value, cmd, direction, existing)) {
-     #ifndef __limited__
-       if (existing && previous == 0 && direction == -1) previous = default_trail;
-     #else // If limited, then force the trailing value.
-       if (existing && previous == 0) previous = default_trail;
-     #endif
-     if (VerboseTrace)
-       Print(__FUNCTION__ + ": Error: method = " + method + ", ticket = #" + Misc::If(existing, OrderTicket(), 0) + ": Invalid Trailing Value: ", new_value, ", previous: ", previous, "; ", Order::GetOrderToText(), ", delta: ", DoubleToStr(delta, pip_digits));
-     // If value is invalid, fallback to the previous one.
-     return previous;
-   }
+  if (TrailingStopOneWay && direction < 0 && method > 0) {
+    // Move trailing stop only one direction.
+    if (previous == 0 && method > 0) previous = default_trail;
+    if (Convert::OrderTypeToValue(cmd) == direction) new_value = (new_value < previous || previous == 0) ? new_value : previous;
+    else new_value = (new_value > previous || previous == 0) ? new_value : previous;
+  }
+  if (TrailingProfitOneWay && direction > 0 && method > 0) {
+    // Move profit take only one direction.
+    if (Convert::OrderTypeToValue(cmd) == direction) new_value = (new_value > previous || previous == 0) ? new_value : previous;
+    else new_value = (new_value < previous || previous == 0) ? new_value : previous;
+  }
 
-   if (VerboseTrace) {
-     Msg::ShowText(
-         StringFormat("Strategy: %s (%d), Method: %d, Tf: %d, Period: %d, Value: %g, Prev: %g, Delta: %g, Factor: %d, Trail: %g (%g), LMA/HMA: %g/%g (%g/%g/%g|%g/%g/%g)",
-           sname[order_type], order_type, method, period, timeframe, new_value, previous, delta, factor, trail, default_trail, lowest_ma, highest_ma,
-           Arrays::LowestArrValue2(ma_fast, period), Arrays::LowestArrValue2(ma_medium, period), Arrays::LowestArrValue2(ma_slow, period),
-           Arrays::HighestArrValue2(ma_fast, period), Arrays::HighestArrValue2(ma_medium, period), Arrays::HighestArrValue2(ma_slow, period))
-         , "Trace", __FUNCTION__, __LINE__, VerboseTrace);
-   }
-   // if (VerboseDebug && Check::IsVisualMode()) Draw::ShowLine("trail_stop_" + OrderTicket(), new_value, GetOrderColor());
-   */
+  if (VerboseTrace) {
+    Msg::ShowText(
+      StringFormat("Strategy: %s (%d), Method: %d, Tf: %d, Period: %d, Value: %g, Prev: %g, Factor: %d, Trail: %g (%g), LMA/HMA: %g/%g (%g/%g/%g|%g/%g/%g)",
+        sname[order_type], order_type, method, tf, period, new_value, previous, factor, trail, default_trail,
+        fabs(fmin(fmin(Arrays::LowestArrValue2(ma_fast, period), Arrays::LowestArrValue2(ma_medium, period)), Arrays::LowestArrValue2(ma_slow, period))),
+        fabs(fmax(fmax(Arrays::HighestArrValue2(ma_fast, period), Arrays::HighestArrValue2(ma_medium, period)), Arrays::HighestArrValue2(ma_slow, period))),
+        Arrays::LowestArrValue2(ma_fast, period), Arrays::LowestArrValue2(ma_medium, period), Arrays::LowestArrValue2(ma_slow, period),
+        Arrays::HighestArrValue2(ma_fast, period), Arrays::HighestArrValue2(ma_medium, period), Arrays::HighestArrValue2(ma_slow, period))
+      , "Trace", __FUNCTION__, __LINE__, VerboseTrace);
+  }
+  // if (VerboseDebug && Check::IsVisualMode()) Draw::ShowLine("trail_stop_" + OrderTicket(), new_value, GetOrderColor());
 
-   return new_value;
+  return NormalizeDouble(new_value, Market::GetDigits());
 }
 
-// Get trailing method based on the strategy type.
+/**
+ * Get trailing method based on the strategy type.
+ */
 int GetTrailingMethod(int order_type, int stop_or_profit) {
   int stop_method = DefaultTrailingStopMethod, profit_method = DefaultTrailingProfitMethod;
   switch (order_type) {
@@ -3631,7 +3697,9 @@ bool TradeAllowed() {
   return (TRUE);
 }
 
-// Check if EA parameters are valid.
+/**
+ * Check if EA parameters are valid.
+ */
 bool CheckSettings() {
   string err;
    // TODO: IsDllsAllowed(), IsLibrariesAllowed()
@@ -3643,6 +3711,11 @@ bool CheckSettings() {
   #ifdef __release__
   #endif
   */
+  if (ValidateSettings && !ValidateSettings()) {
+    last_err = Msg::ShowText("Market values are invalid!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
+    ea_active = FALSE;
+    return (FALSE);
+  }
   if (LotSize < 0.0) {
     Msg::ShowText("LotSize is less than 0.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
     return (FALSE);
@@ -3664,6 +3737,15 @@ bool CheckSettings() {
   E_Mail = StringTrimLeft(StringTrimRight(E_Mail));
   License = StringTrimLeft(StringTrimRight(License));
   return !StringCompare(ValidEmail(E_Mail), License) && StringLen(ea_file) == 11;
+}
+
+/**
+ * Validate market values.
+ */
+bool ValidateSettings() {
+  bool result = True;
+  result &= Tests::TestAllMarket(VerboseDebug);
+  return result;
 }
 
 void CheckStats(double value, int type, bool max = true) {
@@ -3757,7 +3839,7 @@ double NormalizePrice(double p, string pair=""){
    // Prices to open must be a multiple of ticksize
    if (pair == "") pair = Symbol();
    double ts = MarketInfo(pair, MODE_TICKSIZE);
-   return( MathRound(p/ts) * ts );
+   return( round(p/ts) * ts );
 }
 
 /**
@@ -4287,6 +4369,7 @@ bool InitializeVariables() {
     Msg::ShowText(StringFormat("Account free margin is %g!", Account::AccountFreeMargin()), "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
     return (FALSE);
   }
+  // SummaryReport *summary = new SummaryReport(init_balance);
   /* @fixme: https://travis-ci.org/EA31337-Tester/EA31337-Lite-Sets/builds/140302386
   if (Account::AccountMargin() <= 0) {
     Msg::ShowText(StringFormat("Account margin is %g!", Account::AccountMargin()), "Error", __FUNCTION__, __LINE__, VerboseErrors);
@@ -7075,8 +7158,7 @@ void ReportAdd(string msg) {
  */
 string GenerateReport(string sep = "\n") {
   string output = "";
-  int i;
-  output += StringFormat("Initial deposit:                            %.2f", ValueToCurrency(CalculateInitialDeposit())) + sep;
+  output += StringFormat("Initial deposit:                            %.2f", ValueToCurrency(init_balance)) + sep;
   output += StringFormat("Total net profit:                           %.2f", ValueToCurrency(SummaryProfit)) + sep;
   output += StringFormat("Gross profit:                               %.2f", ValueToCurrency(GrossProfit)) + sep;
   output += StringFormat("Gross loss:                                 %.2f", ValueToCurrency(GrossLoss))  + sep;
@@ -7112,7 +7194,7 @@ string GenerateReport(string sep = "\n") {
 
   // Write report log.
   if (ArraySize(log) > 0) output += "Report log:\n";
-  for (i = 0; i < ArraySize(log); i++)
+  for (int i = 0; i < ArraySize(log); i++)
    output += log[i] + sep;
 
   return output;

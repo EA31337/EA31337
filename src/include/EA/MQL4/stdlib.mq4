@@ -81,7 +81,7 @@ string ErrorDescription(int error_code)
       case 4029: error_string="invalid array";                                             break;
       case 4030: error_string="no reply from chart";                                       break;
       case 4050: error_string="invalid function parameters count";                         break;
-      case 4051: error_string="invalid function parameter value";                          break;
+      case 4051: error_string="invalid takeprofit for OrderModify function";               break;
       case 4052: error_string="string function internal error";                            break;
       case 4053: error_string="some array error";                                          break;
       case 4054: error_string="incorrect series array usage";                              break;
