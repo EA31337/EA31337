@@ -3068,7 +3068,7 @@ bool UpdateTrailingStops() {
             if (err_code > 1) {
               Msg::ShowText(ErrorDescription(err_code), "Error", __FUNCTION__, __LINE__, VerboseErrors);
               Msg::ShowText(
-                StringFormat("OrderModify(%d, %g, %g, %g, %d, %d); Ask:%g/Bid:%g/StopLevel:%g",
+                StringFormat("OrderModify(%d, %g, %g, %g, %d, %d); Ask:%g/Bid:%g/Gap:%g",
                 OrderTicket(), OrderOpenPrice(), new_sl, new_tp, 0, GetOrderColor(), Ask, Bid, Market::GetDistanceInPips()),
                 "Debug", __FUNCTION__, __LINE__, VerboseDebug
               );
