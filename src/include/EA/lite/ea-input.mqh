@@ -347,10 +347,10 @@ extern bool Fractals30_Active = 0; // Enable for M30
 extern ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = 14; // Trail stop method
 extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = 20; // Trail profit method
 /* @todo extern */ int Fractals_SignalLevel = 0; // Signal level
-int Fractals1_SignalMethod = 1; // Signal method for M1 (0-1)
-int Fractals5_SignalMethod = 7; // Signal method for M5 (0-1)
-int Fractals15_SignalMethod = 7; // Signal method for M15 (0-1)
-int Fractals30_SignalMethod = 7; // Signal method for M30 (0-1)
+extern int Fractals1_SignalMethod = 1; // Signal method for M1 (0-1)
+extern int Fractals5_SignalMethod = 7; // Signal method for M5 (0-1)
+extern int Fractals15_SignalMethod = 7; // Signal method for M15 (0-1)
+extern int Fractals30_SignalMethod = 7; // Signal method for M30 (0-1)
 
 //+------------------------------------------------------------------+
 string __Gator_Parameters__ = "-- Settings for the Gator oscillator --"; // >>> GATOR <<<

@@ -878,8 +878,8 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
     case MACD: // Calculates the Moving Averages Convergence/Divergence indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         shift = i + MACD_Shift + (i == FINAL_INDICATOR_INDEX_ENTRY - 1 ? MACD_Shift_Far : 0);
-        macd[index][CURR][MODE_MAIN]   = iMACD(symbol, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price, MODE_MAIN,   shift);
-        macd[index][CURR][MODE_SIGNAL] = iMACD(symbol, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price, MODE_SIGNAL, shift);
+        macd[index][CURR][MODE_MAIN]   = iMACD(symbol, tf, MACD_Period_Fast * ratio, MACD_Period_Slow * ratio, MACD_Period_Signal * ratio, MACD_Applied_Price, MODE_MAIN,   shift);
+        macd[index][CURR][MODE_SIGNAL] = iMACD(symbol, tf, MACD_Period_Fast * ratio, MACD_Period_Slow * ratio, MACD_Period_Signal * ratio, MACD_Applied_Price, MODE_SIGNAL, shift);
         ratio += (MACD_Period_Ratio - 1.0);
       }
       if (VerboseDebug) PrintFormat("MACD M%d: %s", tf, Arrays::ArrToString3D(macd, ",", Digits));
@@ -2034,19 +2034,21 @@ bool Trade_Fractals(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, doub
   switch (cmd) {
     case OP_BUY:
       result = lower;
+      if ((signal_method &   1) != 0) result = result && Open[CURR] > Close[PREV];
+      if ((signal_method &   2) != 0) result = result && Bid > Open[CURR];
       // if ((signal_method &   1) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), PERIOD_M30);
       // if ((signal_method &   2) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), Convert::IndexToTf(fmax(index + 1, M30)));
       // if ((signal_method &   4) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), Convert::IndexToTf(fmax(index + 2, M30)));
-      //if ((signal_method &   1) != 0) result = result && Open[CURR] > Close[CURR];
       // if ((signal_method &   2) != 0) result = result && !Fractals_On_Sell(tf);
       // if ((signal_method &   8) != 0) result = result && Fractals_On_Buy(M30);
       break;
     case OP_SELL:
       result = upper;
+      if ((signal_method &   1) != 0) result = result && Open[CURR] < Close[PREV];
+      if ((signal_method &   2) != 0) result = result && Ask < Open[CURR];
       // if ((signal_method &   1) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), PERIOD_M30);
       // if ((signal_method &   2) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), Convert::IndexToTf(fmax(index + 1, M30)));
       // if ((signal_method &   4) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), Convert::IndexToTf(fmax(index + 2, M30)));
-      //if ((signal_method &   1) != 0) result = result && Open[CURR] < Close[CURR];
       // if ((signal_method &   2) != 0) result = result && !Fractals_On_Buy(tf);
       // if ((signal_method &   8) != 0) result = result && Fractals_On_Sell(M30);
       break;
@@ -3711,11 +3713,13 @@ bool CheckSettings() {
   #ifdef __release__
   #endif
   */
+  /* // @todo
   if (ValidateSettings && !ValidateSettings()) {
     last_err = Msg::ShowText("Market values are invalid!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
     ea_active = FALSE;
     return (FALSE);
   }
+  */
   if (LotSize < 0.0) {
     Msg::ShowText("LotSize is less than 0.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
     return (FALSE);
