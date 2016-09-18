@@ -730,7 +730,7 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
         alligator[index][i][LIPS]  = iMA(symbol, tf, Alligator_Period_Lips * ratio,  Alligator_Shift_Lips,  Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
         alligator[index][i][TEETH] = iMA(symbol, tf, Alligator_Period_Teeth * ratio, Alligator_Shift_Teeth, Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
         alligator[index][i][JAW]   = iMA(symbol, tf, Alligator_Period_Jaw * ratio,   Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
-        ratio += (Alligator_Period_Ratio - 1.0);
+        ratio *= Alligator_Period_Ratio;
       }
       success = (bool)alligator[index][CURR][JAW];
       /* Note: This is equivalent to:
@@ -745,7 +745,7 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         atr[index][i][FAST] = iATR(symbol, tf, ATR_Period_Fast * ratio, i);
         atr[index][i][SLOW] = iATR(symbol, tf, ATR_Period_Slow * ratio, i);
-        ratio += (ATR_Period_Ratio - 1.0);
+        ratio *= ATR_Period_Ratio;
       }
       break;
     case AWESOME: // Calculates the Awesome oscillator.
@@ -768,8 +768,8 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
         bands[index][i][BANDS_BASE]  = iBands(symbol, tf, Bands_Period * ratio, Bands_Deviation * ratio2, 0, Bands_Applied_Price, BANDS_BASE,  shift);
         bands[index][i][BANDS_UPPER] = iBands(symbol, tf, Bands_Period * ratio, Bands_Deviation * ratio2, 0, Bands_Applied_Price, BANDS_UPPER, shift);
         bands[index][i][BANDS_LOWER] = iBands(symbol, tf, Bands_Period * ratio, Bands_Deviation * ratio2, 0, Bands_Applied_Price, BANDS_LOWER, shift);
-        ratio += (Bands_Period_Ratio - 1.0);
-        ratio2 += (Bands_Deviation_Ratio - 1.0);
+        ratio *= Bands_Period_Ratio;
+        ratio2 *= Bands_Deviation_Ratio;
       }
       success = (bool)bands[index][CURR][BANDS_BASE];
       if (VerboseDebug) PrintFormat("Bands M%d: %s", tf, Arrays::ArrToString3D(bands, ",", Digits));
@@ -800,7 +800,7 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
     case DEMARKER: // Calculates the DeMarker indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         demarker[index][i] = iDeMarker(symbol, tf, DeMarker_Period * ratio, i + DeMarker_Shift);
-        ratio += (DeMarker_Period_Ratio - 1.0);
+        ratio *= DeMarker_Period_Ratio;
       }
       success = (bool)demarker[index][CURR];
       // PrintFormat("Period: %d, DeMarker: %g", period, demarker[index][CURR]);
@@ -820,8 +820,8 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
         envelopes[index][i][MODE_MAIN] = iEnvelopes(symbol, tf, Envelopes_MA_Period * ratio, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, MODE_MAIN,  i + Envelopes_Shift);
         envelopes[index][i][UPPER] = iEnvelopes(symbol, tf, Envelopes_MA_Period * ratio, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, UPPER, i + Envelopes_Shift);
         envelopes[index][i][LOWER] = iEnvelopes(symbol, tf, Envelopes_MA_Period * ratio, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, LOWER, i + Envelopes_Shift);
-        ratio += (Envelopes_MA_Period_Ratio - 1.0);
-        ratio2 += (Envelopes_Deviation_Ratio - 1.0);
+        ratio *= Envelopes_MA_Period_Ratio;
+        ratio2 *= Envelopes_Deviation_Ratio;
       }
       success = (bool)envelopes[index][CURR][MODE_MAIN];
       if (VerboseDebug) PrintFormat("Envelopes M%d: %s", tf, Arrays::ArrToString3D(envelopes, ",", Digits));
@@ -867,7 +867,7 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
         ma_fast[index][i]   = iMA(symbol, tf, MA_Period_Fast * ratio,   MA_Shift_Fast,   MA_Method, MA_Applied_Price, shift);
         ma_medium[index][i] = iMA(symbol, tf, MA_Period_Medium * ratio, MA_Shift_Medium, MA_Method, MA_Applied_Price, shift);
         ma_slow[index][i]   = iMA(symbol, tf, MA_Period_Slow * ratio,   MA_Shift_Slow,   MA_Method, MA_Applied_Price, shift);
-        ratio += (MA_Period_Ratio - 1.0);
+        ratio *= MA_Period_Ratio;
       }
       success = (bool)ma_slow[index][CURR];
       if (VerboseDebug) PrintFormat("MA Fast M%d: %s", tf, Arrays::ArrToString2D(ma_fast, ",", Digits));
@@ -880,7 +880,7 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
         shift = i + MACD_Shift + (i == FINAL_INDICATOR_INDEX_ENTRY - 1 ? MACD_Shift_Far : 0);
         macd[index][CURR][MODE_MAIN]   = iMACD(symbol, tf, MACD_Period_Fast * ratio, MACD_Period_Slow * ratio, MACD_Period_Signal * ratio, MACD_Applied_Price, MODE_MAIN,   shift);
         macd[index][CURR][MODE_SIGNAL] = iMACD(symbol, tf, MACD_Period_Fast * ratio, MACD_Period_Slow * ratio, MACD_Period_Signal * ratio, MACD_Applied_Price, MODE_SIGNAL, shift);
-        ratio += (MACD_Period_Ratio - 1.0);
+        ratio *= MACD_Period_Ratio;
       }
       if (VerboseDebug) PrintFormat("MACD M%d: %s", tf, Arrays::ArrToString3D(macd, ",", Digits));
       success = (bool)macd[index][CURR][MODE_MAIN];
@@ -917,7 +917,7 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
         rsi[index][i] = iRSI(symbol, tf, RSI_Period * ratio, RSI_Applied_Price, i + RSI_Shift);
         if (rsi[index][i] > rsi_stats[index][UPPER]) rsi_stats[index][UPPER] = rsi[index][i]; // Calculate maximum value.
         if (rsi[index][i] < rsi_stats[index][LOWER] || rsi_stats[index][LOWER] == 0) rsi_stats[index][LOWER] = rsi[index][i]; // Calculate minimum value.
-        ratio += (RSI_Period_Ratio - 1.0);
+        ratio *= RSI_Period_Ratio;
       }
       // Calculate average value.
       rsi_stats[index][0] = Misc::If(rsi_stats[index][0] > 0, (rsi_stats[index][0] + rsi[index][0] + rsi[index][1] + rsi[index][2]) / 4, (rsi[index][0] + rsi[index][1] + rsi[index][2]) / 3);
@@ -936,7 +936,7 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
     case SAR: // Calculates the Parabolic Stop and Reverse system indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         sar[index][i] = iSAR(symbol, tf, SAR_Step * ratio, SAR_Maximum_Stop, i + SAR_Shift);
-        ratio += (SAR_Step_Ratio - 1.0);
+        ratio *= SAR_Step_Ratio;
       }
       if (VerboseDebug) PrintFormat("SAR M%d: %s", tf, Arrays::ArrToString2D(sar, ",", Digits));
       success = (bool)sar[index][CURR];
@@ -961,7 +961,7 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
       // Update the Larry Williams' Percent Range indicator values.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         wpr[index][i] = -iWPR(symbol, tf, WPR_Period * ratio, i + WPR_Shift);
-        ratio += (WPR_Period_Ratio - 1.0);
+        ratio *= WPR_Period_Ratio;
       }
       if (VerboseDebug) PrintFormat("WPR M%d: %s", tf, Arrays::ArrToString2D(wpr, ",", Digits));
       success = wpr[index][CURR];
