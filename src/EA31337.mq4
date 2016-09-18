@@ -878,8 +878,8 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
     case MACD: // Calculates the Moving Averages Convergence/Divergence indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         shift = i + MACD_Shift + (i == FINAL_INDICATOR_INDEX_ENTRY - 1 ? MACD_Shift_Far : 0);
-        macd[index][CURR][MODE_MAIN]   = iMACD(symbol, tf, MACD_Period_Fast * ratio, MACD_Period_Slow * ratio, MACD_Period_Signal * ratio, MACD_Applied_Price, MODE_MAIN,   shift);
-        macd[index][CURR][MODE_SIGNAL] = iMACD(symbol, tf, MACD_Period_Fast * ratio, MACD_Period_Slow * ratio, MACD_Period_Signal * ratio, MACD_Applied_Price, MODE_SIGNAL, shift);
+        macd[index][i][MODE_MAIN]   = iMACD(symbol, tf, MACD_Period_Fast * ratio, MACD_Period_Slow * ratio, MACD_Period_Signal * ratio, MACD_Applied_Price, MODE_MAIN,   shift);
+        macd[index][i][MODE_SIGNAL] = iMACD(symbol, tf, MACD_Period_Fast * ratio, MACD_Period_Slow * ratio, MACD_Period_Signal * ratio, MACD_Applied_Price, MODE_SIGNAL, shift);
         ratio *= MACD_Period_Ratio;
       }
       if (VerboseDebug) PrintFormat("MACD M%d: %s", tf, Arrays::ArrToString3D(macd, ",", Digits));
