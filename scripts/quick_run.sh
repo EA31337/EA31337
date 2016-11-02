@@ -8,6 +8,7 @@ CWD=$(git rev-parse --show-toplevel 2> /dev/null || (cd -P -- "$(dirname -- "$0"
 VM_DIR="$CWD/_VM"
 EA_DIR="$CWD/src"
 VER=${1:-$(echo "Lite-Backtest")}
+params="VerboseInfo=1,VerboseDebug=1"
 
 echo "Compiling..."
 [ -n "$VER" ] && make -C "$CWD" $MAKE_ARGS $VER
@@ -18,4 +19,4 @@ cp -v "$EA_DIR"/*.ex? "$VM_DIR"/files
 
 make -C "$CWD" mt4-install
 
-TRACE=$TRACE $VM_DIR/scripts/run_backtest.sh -v -t -r "EA31337-$VER" -D5 -e EA31337 -d 2000 -m 1 -y 2014 ${@:2}
+TRACE=$TRACE $VM_DIR/scripts/run_backtest.sh -v -t -r "EA31337-$VER" -D5 -e EA31337 -E $params -d 2000 -m 1 -y 2014 ${@:2}

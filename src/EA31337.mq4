@@ -64,6 +64,7 @@
 #include <EA\public-classes\Misc.mqh>
 #include <EA\public-classes\Msg.mqh>
 #include <EA\public-classes\Report.mqh>
+#include <EA\public-classes\Stats.mqh>
 #include <EA\public-classes\SummaryReport.mqh>
 #include <EA\public-classes\Terminal.mqh>
 #include <EA\public-classes\Tests.mqh>
@@ -265,6 +266,9 @@ int hour_of_day, day_of_week, day_of_month, day_of_year, month, year;
 int last_order_time = 0, last_action_time = 0;
 int last_history_check = 0; // Last ticket position processed.
 
+// Stats.
+Stats *total_stats, *hourly_stats;
+
 // Strategy variables.
 int info[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_INFO_ENTRY];
 double conf[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_VALUE_ENTRY], stats[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_STAT_ENTRY];
@@ -356,6 +360,12 @@ double zigzag[H1][FINAL_INDICATOR_INDEX_ENTRY];
 //+------------------------------------------------------------------+
 void OnTick() {
   if (!session_initiated) return;
+
+  if (VerboseDebug) {
+    // Update stats.
+    total_stats.OnTick();
+    hourly_stats.OnTick();
+  }
 
   // Check the last tick change.
   last_tick_change = fmax(Convert::GetPipDiff(Ask, LastAsk, TRUE), Convert::GetPipDiff(Bid, LastBid, TRUE));
@@ -461,17 +471,17 @@ void OnDeinit(const int reason) {
 
   string filename;
   if (WriteReport && !Check::IsOptimization() && session_initiated) {
-    if (reason == REASON_CHARTCHANGE)
+    // if (reason == REASON_CHARTCHANGE)
     // summary.CalculateSummary();
     filename = StringFormat(
-        "%s-%s-%g%s-s%d-%s-Report.txt",
-        ea_name, _Symbol, init_balance, Account::AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES));
+        "%s-%s-%g%s-s%d-%s-M%d-Report.txt",
+        ea_name, _Symbol, init_balance, Account::AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES), Period());
         // ea_name, _Symbol, summary.init_deposit, Account::AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES));
     string data = GenerateReport();
     Report::WriteReport(filename, data, VerboseInfo); // Todo: Add: Errors::GetUninitReasonText(reason)
     Print(__FUNCTION__ + ": Saved report as: " + filename);
   }
-  // DeinitVars();
+  DeinitVars();
   // #ifdef _DEBUG
   // DEBUG("n=" + n + " : " +  DoubleToStrMorePrecision(val,19) );
   // DEBUG("CLOSEDEBUGFILE");
@@ -479,6 +489,8 @@ void OnDeinit(const int reason) {
 } // end: OnDeinit()
 
 void DeinitVars() {
+  delete hourly_stats;
+  delete total_stats;
   // delete summary;
 }
 
@@ -564,6 +576,7 @@ string InitInfo(bool startup = False, string sep = "\n") {
       max_orders,
       GetMaxOrdersPerType(),
       sep);
+  output += ListModellingQuality() + sep;
   output += ListTimeframes() + sep;
   output += StringFormat("Datetime: Hour of day: %d, Day of week: %d, Day of month: %d, Day of year: %d, Month: %d, Year: %d%s",
       hour_of_day, day_of_week, day_of_month, day_of_year, month, year, sep);
@@ -592,6 +605,29 @@ string ListTimeframes(bool print = False) {
     CheckTf(PERIOD_D1)  ? "Active" : "Not active",
     CheckTf(PERIOD_W1)  ? "Active" : "Not active",
     CheckTf(PERIOD_MN1) ? "Active" : "Not active");
+  if (print) {
+    return Msg::ShowText(output, "Info", __FUNCTION__, __LINE__, VerboseInfo);
+  }
+  else {
+    return output;
+  }
+}
+
+/**
+ * Returns list of modelling quality for all periods.
+ */
+string ListModellingQuality(bool print = False) {
+  string output = StringFormat("Modelling Quality: M1: %.2f%%, M5: %.2f%%, M15: %.2f%%, M30: %.2f%%, H1: %.2f%%, H4: %.2f%%, D1: %.2f%%, W1: %.2f%%, MN1: %.2f%%;",
+    Backtest::CalculateModellingQuality(PERIOD_M1),
+    Backtest::CalculateModellingQuality(PERIOD_M5),
+    Backtest::CalculateModellingQuality(PERIOD_M15),
+    Backtest::CalculateModellingQuality(PERIOD_M30),
+    Backtest::CalculateModellingQuality(PERIOD_H1),
+    Backtest::CalculateModellingQuality(PERIOD_H4),
+    Backtest::CalculateModellingQuality(PERIOD_D1),
+    Backtest::CalculateModellingQuality(PERIOD_W1),
+    Backtest::CalculateModellingQuality(PERIOD_MN1)
+    );
   if (print) {
     return Msg::ShowText(output, "Info", __FUNCTION__, __LINE__, VerboseInfo);
   }
@@ -4078,10 +4114,21 @@ string ValidEmail(string text) {
  * Executed for every hour.
  */
 void StartNewHour() {
-  CheckHistory(); // Process closed orders for previous hour.
+  CheckHistory(); // Process closed orders for the previous hour.
 
   // Process actions.
   CheckAccConditions();
+
+  // Print stats.
+  if (VerboseDebug) {
+    Msg::ShowText(
+      StringFormat("Hourly stats: Ticks: %d/h (%d/min)",
+        hourly_stats.GetTotalTicks(),
+        hourly_stats.GetTotalTicks() / 60
+      ), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
+    // Reset variables.
+    hourly_stats.Reset();
+  }
 
   // Start the new hour.
   // Note: This needs to be after action processing.
@@ -4408,6 +4455,12 @@ bool InitializeVariables() {
   ArrayInitialize(worse_strategy, EMPTY); // Reset worse strategy pointer.
   ArrayInitialize(best_strategy, EMPTY); // Reset best strategy pointer.
   ArrayInitialize(order_queue, EMPTY); // Reset order queue.
+
+  // Initialize stats.
+  if (VerboseDebug) {
+    total_stats = new Stats();
+    hourly_stats = new Stats();
+  }
   return (init);
 }
 
@@ -7162,6 +7215,8 @@ void ReportAdd(string msg) {
  */
 string GenerateReport(string sep = "\n") {
   string output = "";
+  output += StringFormat("Currency pair symbol:                       %s", _Symbol) + sep;
+  output += StringFormat("Modelling quality:                          %.2f%%", Backtest::CalculateModellingQuality()) + sep;
   output += StringFormat("Initial deposit:                            %.2f", ValueToCurrency(init_balance)) + sep;
   output += StringFormat("Total net profit:                           %.2f", ValueToCurrency(SummaryProfit)) + sep;
   output += StringFormat("Gross profit:                               %.2f", ValueToCurrency(GrossProfit)) + sep;
@@ -7194,7 +7249,14 @@ string GenerateReport(string sep = "\n") {
   output += StringFormat("Maximum consecutive losses (loss in money): %d %.2f", ConLossTrades1, -ConLoss1) + sep;
   output += StringFormat("Maximal consecutive profit (count of wins): %.2f %d", ConProfit2, ConProfitTrades2) + sep;
   output += StringFormat("Maximal consecutive loss (count of losses): %.2f %d", ConLoss2, ConLossTrades2) + sep;
-  output += GetStrategyReport();
+  if (VerboseDebug) {
+    output += StringFormat("Total bars processed:                       %d", total_stats.GetTotalBars()) + sep;
+    output += StringFormat("Total ticks processed:                      %d", total_stats.GetTotalTicks()) + sep;
+    output += StringFormat("Bars per hour (avg):                        %d", total_stats.GetBarsPerPeriod(PERIOD_H1)) + sep;
+    output += StringFormat("Ticks per bar (avg):                        %d (bar=%dmins)", total_stats.GetTicksPerBar(), Period()) + sep;
+    output += StringFormat("Ticks per min (avg):                        %d", total_stats.GetTicksPerMin()) + sep;
+    output += GetStrategyReport();
+  }
 
   // Write report log.
   if (ArraySize(log) > 0) output += "Report log:\n";
