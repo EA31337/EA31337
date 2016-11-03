@@ -563,7 +563,7 @@ string InitInfo(bool startup = False, string sep = "\n") {
       pts_per_pip,
       pip_digits,
       volume_digits,
-      curr_spread,
+      Market::GetSpreadInPips(),
       GetAccountStopoutLevel(),
       Market::GetDistanceInPips(),
       Market::GetDistanceInPts(),
@@ -584,7 +584,7 @@ string InitInfo(bool startup = False, string sep = "\n") {
   output += GetAccountTextDetails() + sep;
   if (startup) {
     if (session_initiated && IsTradeAllowed()) {
-      output += sep + "Trading is allowed, please wait to start trading...";
+      output += sep + "Trading is allowed, waiting for ticks...";
     } else {
       output += sep + StringFormat("Error %d: Trading is not allowed, please check the settings and allow automated trading!", __LINE__);
     }
@@ -1365,6 +1365,7 @@ bool UpdateStats() {
   CheckStats(Account::AccountBalance(), MAX_BALANCE);
   CheckStats(Account::AccountEquity(), MAX_EQUITY);
   CheckStats(total_orders, MAX_ORDERS);
+  CheckStats(Market::GetSpreadInPts(), MAX_SPREAD);
   if (last_tick_change > MarketBigDropSize) {
     double diff1 = fmax(Convert::GetPipDiff(Ask, LastAsk), Convert::GetPipDiff(Bid, LastBid));
     Message(StringFormat("Market very big drop of %.1f pips detected!", diff1));
@@ -3825,32 +3826,6 @@ double GetMinStopLevel() {
 }
 
 /**
- * Add currency sign to the plain value.
- */
-string ValueToCurrency(double value, int digits = 2) {
-  ushort sign; bool prefix = TRUE;
-  if (AccCurrency == "USD") sign = '$';
-  else if (AccCurrency == "GBP") sign = '£';
-  else if (AccCurrency == "EUR") sign = '€';
-  else { sign = AccCurrency; prefix = FALSE; }
-  return prefix ? (CharToString(sign) + DoubleToStr(value, digits)) : (DoubleToStr(value, digits) + CharToString(sign));
-}
-
-/**
- * Current market spread value in pips.
- *
- * Note: Using Mode_SPREAD can return 20 on EURUSD (IBFX), but zero on some other pairs, so using Ask - Bid instead.
- * See: http://forum.mql4.com/42285
- */
-double GetMarketSpread(bool in_points = False) {
-  // return MarketInfo(Symbol(), MODE_SPREAD) / MathPow(10, Digits - pip_digits);
-  double spread = in_points ? SymbolInfoInteger(Symbol(), SYMBOL_SPREAD) : Ask - Bid;
-  if (in_points) CheckStats(spread, MAX_SPREAD);
-  // if (VerboseTrace) PrintFormat("%s(): Spread: %f (%s)", __FUNCTION__, spread, Misc::If(in_points, "pts", "pips"));
-  return spread;
-}
-
-/**
  * Normalize lot size.
  */
 double NormalizeLots(double lots, bool ceiling = False, string pair = "") {
@@ -4406,7 +4381,7 @@ bool InitializeVariables() {
   order_freezelevel = Market::GetFreezeLevel();
 
   // market_stoplevel=(int)SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL);
-  curr_spread = Convert::ValueToPips(GetMarketSpread());
+  curr_spread = Market::GetSpreadInPips();
   LastAsk = Ask; LastBid = Bid;
   init_balance = Account::AccountBalance();
   if (init_balance <= 0) {
@@ -4429,7 +4404,7 @@ bool InitializeVariables() {
   }
   */
 
-  init_spread = GetMarketSpread(TRUE); // @todo
+  init_spread = Market::GetSpreadInPts(); // @todo
   AccCurrency = AccountCurrency();
 
   // Calculate pip/volume/slippage size and precision.
@@ -5098,7 +5073,7 @@ void UpdateVariables() {
   time_current = TimeCurrent();
   last_close_profit = EMPTY;
   total_orders = GetTotalOrders();
-  curr_spread = Convert::ValueToPips(GetMarketSpread());
+  curr_spread = Market::GetSpreadInPips();
 }
 
 /* END: VARIABLE FUNCTIONS */
@@ -5785,9 +5760,13 @@ string GetDailyReport() {
   //output += GetAccountTextDetails() + "; " + GetOrdersStats();
 
   key = Arrays::GetArrKey1ByHighestKey2ValueD(stats, DAILY_PROFIT);
-  if (key >= 0) output += "Best: " + sname[key] + " (" + stats[key][DAILY_PROFIT] + "p); "; // @fixme: Correct float formatting.
+  if (key >= 0 && stats[key][DAILY_PROFIT] > 0) {
+    output += StringFormat("Best: %s (%.2fp)", sname[key], stats[key][DAILY_PROFIT]);
+  }
   key = Arrays::GetArrKey1ByLowestKey2ValueD(stats, DAILY_PROFIT);
-  if (key >= 0) output += "Worse: " + sname[key] + " (" + stats[key][DAILY_PROFIT] + "p); "; // @fixme: Correct float formatting.
+  if (key >= 0 && stats[key][DAILY_PROFIT] < 0) {
+    output += StringFormat("Worse: %s (%.2fp)", sname[key], stats[key][DAILY_PROFIT]);
+  }
 
   return output;
 }
@@ -5811,9 +5790,13 @@ string GetWeeklyReport() {
   output += "Balance: "      + weekly[MAX_BALANCE] + "; ";
 
   key = Arrays::GetArrKey1ByHighestKey2ValueD(stats, WEEKLY_PROFIT);
-  if (key >= 0) output += "Best: " + sname[key] + " (" + stats[key][WEEKLY_PROFIT] + "p); "; // @fixme: Correct float formatting.
+  if (key >= 0 && stats[key][WEEKLY_PROFIT] > 0) {
+    output += StringFormat("Best: %s (%.2fp)", sname[key], stats[key][WEEKLY_PROFIT]);
+  }
   key = Arrays::GetArrKey1ByLowestKey2ValueD(stats, WEEKLY_PROFIT);
-  if (key >= 0) output += "Worse: " + sname[key] + " (" + stats[key][WEEKLY_PROFIT] + "p); "; // @fixme: Correct float formatting.
+  if (key >= 0 && stats[key][WEEKLY_PROFIT] < 0) {
+    output += StringFormat("Worse: %s (%.2fp)", sname[key], stats[key][WEEKLY_PROFIT]);
+  }
 
   return output;
 }
@@ -5837,9 +5820,13 @@ string GetMonthlyReport() {
   output += "Balance: "       + monthly[MAX_BALANCE] + "; ";
 
   key = Arrays::GetArrKey1ByHighestKey2ValueD(stats, MONTHLY_PROFIT);
-  if (key >= 0) output += "Best: " + sname[key] + " (" + stats[key][MONTHLY_PROFIT] + "p); "; // @fixme: Correct float formatting.
+  if (key >= 0 && stats[key][MONTHLY_PROFIT] > 0) {
+    output += StringFormat("Best: %s (%.2fp)", sname[key], stats[key][MONTHLY_PROFIT]);
+  }
   key = Arrays::GetArrKey1ByLowestKey2ValueD(stats, MONTHLY_PROFIT);
-  if (key >= 0) output += "Worse: " + sname[key] + " (" + stats[key][MONTHLY_PROFIT] + "p); "; // @fixme: Correct float formatting.
+  if (key >= 0 && stats[key][MONTHLY_PROFIT] < 0) {
+    output += StringFormat("Worse: %s (%.2fp)", sname[key], stats[key][MONTHLY_PROFIT]);
+  }
 
   return output;
 }
@@ -5859,8 +5846,8 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
     if (MaxOrdersPerDay > 0) text_max_orders += StringFormat(" [Per day: %d]", MaxOrdersPerDay);
   #endif
   // Prepare text to display spread.
-  string text_spread = StringFormat("Spread: %g pips", curr_spread);
-  // string text_spread = "Spread (pips): " + DoubleToStr(GetMarketSpread(TRUE) / pts_per_pip, Digits - pip_digits) + " / Stop level (pips): " + DoubleToStr(market_stoplevel / pts_per_pip, Digits - pip_digits);
+  string text_spread = StringFormat("Spread: %.1f pips (%d pts)", Market::GetSpreadInPips(), Market::GetSpreadInPts());
+  // "Stop level (pips): " + DoubleToStr(market_stoplevel / pts_per_pip, Digits - pip_digits);
   // Check trend.
   string trend = "Neutral.";
   if (CheckTrend() == OP_BUY) trend = "Bullish";
@@ -5874,8 +5861,8 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
                   + indent + StringFormat("| Server Name: %s, Time: %s%s", AccountInfoString(ACCOUNT_SERVER), TimeToStr(time_current, TIME_DATE|TIME_MINUTES|TIME_SECONDS), sep)
                   + indent + "| Acc Number: " + IntegerToString(Account::AccountNumber()) + "; Acc Name: " + AccountName() + "; Broker: " + Account::AccountCompany() + " (Type: " + account_type + ")" + sep
                   + indent + StringFormat("| Stop Out Level: %s, Leverage: 1:%d %s", stop_out_level, AccountLeverage(), sep)
-                  + indent + "| Used Margin: " + ValueToCurrency(Account::AccountMargin()) + "; Free: " + ValueToCurrency(Account::AccountFreeMargin()) + sep
-                  + indent + "| Equity: " + ValueToCurrency(Account::AccountEquity()) + "; Balance: " + ValueToCurrency(Account::AccountBalance()) + sep
+                  + indent + "| Used Margin: " + Convert::ValueToCurrency(Account::AccountMargin()) + "; Free: " + Convert::ValueToCurrency(Account::AccountFreeMargin()) + sep
+                  + indent + "| Equity: " + Convert::ValueToCurrency(Account::AccountEquity()) + "; Balance: " + Convert::ValueToCurrency(Account::AccountBalance()) + sep
                   + indent + "| Lot size: " + DoubleToStr(lot_size, volume_digits) + "; " + text_max_orders + sep
                   + indent + "| Risk ratio: " + DoubleToStr(risk_ratio, 1) + " (" + GetRiskRatioText() + ")" + sep
                   + indent + "| " + GetOrdersStats("" + sep + indent + "| ") + "" + sep
@@ -5922,8 +5909,8 @@ void SendEmailExecuteOrder(string sep = "<br>\n") {
   body += sep + StringFormat("Price: %s", DoubleToStr(OrderOpenPrice(), Digits));
   body += sep + StringFormat("Lot size: %s", DoubleToStr(OrderLots(), volume_digits));
   body += sep + StringFormat("Comment: %s", OrderComment());
-  body += sep + StringFormat("Current Balance: %s", ValueToCurrency(Account::AccountBalance()));
-  body += sep + StringFormat("Current Equity: %s", ValueToCurrency(Account::AccountEquity()));
+  body += sep + StringFormat("Current Balance: %s", Convert::ValueToCurrency(Account::AccountBalance()));
+  body += sep + StringFormat("Current Equity: %s", Convert::ValueToCurrency(Account::AccountEquity()));
   SendMail(mail_title, body);
 }
 
@@ -5956,10 +5943,10 @@ string GetOrdersStats(string sep = "\n") {
 string GetAccountTextDetails(string sep = "; ") {
    return StringConcatenate("Account Details: ",
       "Time: ", TimeToStr(time_current, TIME_DATE|TIME_MINUTES|TIME_SECONDS), sep,
-      "Account Balance: ", ValueToCurrency(Account::AccountBalance()), sep,
-      "Account Equity: ", ValueToCurrency(Account::AccountEquity()), sep,
-      "Used Margin: ", ValueToCurrency(Account::AccountMargin()), sep,
-      "Free Margin: ", ValueToCurrency(Account::AccountFreeMargin()), sep,
+      "Account Balance: ", Convert::ValueToCurrency(Account::AccountBalance()), sep,
+      "Account Equity: ", Convert::ValueToCurrency(Account::AccountEquity()), sep,
+      "Used Margin: ", Convert::ValueToCurrency(Account::AccountMargin()), sep,
+      "Free Margin: ", Convert::ValueToCurrency(Account::AccountFreeMargin()), sep,
       "No of Orders: ", total_orders, " (BUY/SELL: ", CalculateOrdersByCmd(OP_BUY), "/", CalculateOrdersByCmd(OP_SELL), ")", sep,
       "Risk Ratio: ", DoubleToStr(risk_ratio, 1)
    );
@@ -5973,7 +5960,7 @@ string GetMarketTextDetails() {
      "Symbol: ", Symbol(), "; ",
      "Ask: ", DoubleToStr(Ask, Digits), "; ",
      "Bid: ", DoubleToStr(Bid, Digits), "; ",
-     StringFormat("Spread: %gpts = %.2f pips", GetMarketSpread(True), Convert::ValueToPips(GetMarketSpread()))
+     StringFormat("Spread: %gpts = %.2f pips", Market::GetSpreadInPts(), Market::GetSpreadInPips())
    );
 }
 
@@ -6283,14 +6270,14 @@ bool ActionExecute(int aid, int id = EMPTY) {
         StringFormat("Unknown action id: %d", aid),
         "Error", __FUNCTION__, __LINE__, VerboseErrors);
   }
-  // reason = "Account condition: " + acc_conditions[i][0] + ", Market condition: " + acc_conditions[i][1] + ", Action: " + acc_conditions[i][2] + " [E: " + ValueToCurrency(AccountEquity()) + "/B: " + ValueToCurrency(AccountBalance()) + "]";
+  // reason = "Account condition: " + acc_conditions[i][0] + ", Market condition: " + acc_conditions[i][1] + ", Action: " + acc_conditions[i][2] + " [E: " + Convert::ValueToCurrency(AccountEquity()) + "/B: " + Convert::ValueToCurrency(AccountBalance()) + "]";
 
   TaskProcessList(TRUE); // Process task list immediately after action has been taken.
   Msg::ShowText(GetAccountTextDetails() + "; " + GetOrdersStats(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
   if (result) {
     Msg::ShowText(
         StringFormat("Executed action: %s (id: %d), because of market condition: %s (id: %d) and account condition is: %s (id: %d) [E:%s/B:%s/P:%sp].",
-          ActionIdToText(aid), aid, MarketIdToText(mid), mid, ReasonIdToText(reason_id), reason_id, ValueToCurrency(Account::AccountEquity()), ValueToCurrency(AccountBalance()), DoubleToStr(last_close_profit, 1)),
+          ActionIdToText(aid), aid, MarketIdToText(mid), mid, ReasonIdToText(reason_id), reason_id, Convert::ValueToCurrency(Account::AccountEquity()), Convert::ValueToCurrency(AccountBalance()), DoubleToStr(last_close_profit, 1)),
         "Info", __FUNCTION__, __LINE__, VerboseInfo);
     Msg::ShowText(last_msg, "Debug", __FUNCTION__, __LINE__, VerboseDebug && aid != A_NONE);
     if (WriteReport && VerboseDebug) ReportAdd(GetLastMessage());
