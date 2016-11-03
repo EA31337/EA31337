@@ -359,11 +359,9 @@ double zigzag[H1][FINAL_INDICATOR_INDEX_ENTRY];
 void OnTick() {
   if (!session_initiated) return;
 
-  if (VerboseDebug) {
-    // Update stats.
-    total_stats.OnTick();
-    hourly_stats.OnTick();
-  }
+  // Update stats.
+  total_stats.OnTick();
+  hourly_stats.OnTick();
 
   // Check the last tick change.
   last_tick_change = fmax(Convert::GetPipDiff(Ask, LastAsk, TRUE), Convert::GetPipDiff(Bid, LastBid, TRUE));
@@ -4096,15 +4094,13 @@ void StartNewHour() {
   CheckAccConditions();
 
   // Print stats.
-  if (VerboseDebug) {
-    Msg::ShowText(
-      StringFormat("Hourly stats: Ticks: %d/h (%d/min)",
-        hourly_stats.GetTotalTicks(),
-        hourly_stats.GetTotalTicks() / 60
-      ), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
-    // Reset variables.
-    hourly_stats.Reset();
-  }
+  Msg::ShowText(
+    StringFormat("Hourly stats: Ticks: %d/h (%.2f/min)",
+      hourly_stats.GetTotalTicks(),
+      hourly_stats.GetTotalTicks() / 60
+    ), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
+  // Reset variables.
+  hourly_stats.Reset();
 
   // Start the new hour.
   // Note: This needs to be after action processing.
@@ -4433,10 +4429,8 @@ bool InitializeVariables() {
   ArrayInitialize(order_queue, EMPTY); // Reset order queue.
 
   // Initialize stats.
-  if (VerboseDebug) {
-    total_stats = new Stats();
-    hourly_stats = new Stats();
-  }
+  total_stats = new Stats();
+  hourly_stats = new Stats();
   return (init);
 }
 
@@ -5730,9 +5724,18 @@ void CalculateSupRes() {
 /* BEGIN: DISPLAYING FUNCTIONS */
 
 /**
+ * Get text output of hourly stats.
+ */
+string GetStats(string sep = ", ") {
+  string output = "Stats: ";
+  output += Minute() > 0 ? StringFormat("%.1f ticks/min", hourly_stats.GetTotalTicks() / Minute()) + sep : "";
+  return output;
+}
+
+/**
  * Get text output of hourly profit report.
  */
-string GetHourlyReport(string sep = ", ") {
+string GetHourlyProfit(string sep = ", ") {
   string output = StringFormat("Hourly profit (total: %.1fp): ", Arrays::GetArrSumKey1(hourly_profit, day_of_year));
   for (int h = 0; h < hour_of_day; h++) {
     output += StringFormat("%d: %.1fp%s", h, hourly_profit[day_of_year][h], Misc::If(h < hour_of_day, sep, ""));
@@ -5875,7 +5878,8 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
                   // + indent // + "Mini lot: " + MarketInfo(Symbol(), MODE_MINLOT) + "" + sep
                   + indent + "| ------------------------------------------------" + sep
                   + indent + "| STATISTICS:" + sep
-                  + indent + "| " + GetHourlyReport() + "" + sep
+                  + indent + "| " + GetStats() + "" + sep
+                  + indent + "| " + GetHourlyProfit() + "" + sep
                   + indent + "| " + GetDailyReport() + "" + sep
                   + indent + "| " + GetWeeklyReport() + "" + sep
                   + indent + "| " + GetMonthlyReport() + "" + sep
@@ -5928,7 +5932,7 @@ string GetOrdersStats(string sep = "\n") {
   if (total_orders > 0) {
     for (int i = 0; i < FINAL_STRATEGY_TYPE_ENTRY; i++) {
       if (open_orders[i] > 0) {
-        orders_per_type += StringFormat("%s: %.1f%%", sname[i], MathFloor(100 / total_orders * open_orders[i]));
+        orders_per_type += StringFormat("%s: %.1f%% ", sname[i], MathFloor(100 / total_orders * open_orders[i]));
       }
     }
   } else {
