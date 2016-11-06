@@ -30,8 +30,8 @@ extern int MinPipGap = 60; // Min gap between trades per type (in pips)
 
 //+------------------------------------------------------------------+
 extern string   __EA_Order_Parameters__ = "-- Profit and loss parameters --"; // >>> PROFIT/LOSS <<<
-extern int      TakeProfit = 140; // Take profit (in pips, 0 = none)
-extern int      StopLoss = 140; // Stop loss (in pips, 0 = none)
+extern int      TakeProfit = 140; // Take profit (in pips, 0 = auto)
+extern int      StopLoss = 140; // Stop loss (in pips, 0 = auto)
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
@@ -634,8 +634,13 @@ extern bool WriteReport = 1; // Write file report on exit
 extern bool PrintLogOnChart = 1; // Display info on chart
 extern bool VerboseErrors = 1; // Display errors
 extern bool VerboseInfo = 1; // Display info messages
-bool VerboseDebug = 0; // Display debug messages
-bool VerboseTrace = 0; // Display trace messages
+#ifdef __backtest__
+  extern bool VerboseDebug = 1; // Display debug messages
+  extern bool VerboseTrace = 0; // Display trace messages
+#else
+  bool VerboseDebug = 0;
+  bool VerboseTrace = 0;
+#endif
 
 //+------------------------------------------------------------------+
 extern string __UI_UX_Parameters__ = "-- Settings for User Interface & Experience --"; // >>> UI & UX <<<
