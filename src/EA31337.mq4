@@ -364,7 +364,7 @@ void OnTick() {
   hourly_stats.OnTick();
 
   // Check the last tick change.
-  last_tick_change = fmax(Convert::GetPipDiff(Ask, LastAsk, TRUE), Convert::GetPipDiff(Bid, LastBid, TRUE));
+  last_tick_change = fmax(Convert::GetValueDiffInPips(Ask, LastAsk, TRUE), Convert::GetValueDiffInPips(Bid, LastBid, TRUE));
   // if (VerboseDebug && last_tick_change > 1) Print("Tick change: " + tick_change + "; Ask" + Ask + ", Bid: " + Bid, ", LastAsk: " + LastAsk + ", LastBid: " + LastBid);
 
   // Check if we should ignore the tick.
@@ -526,7 +526,7 @@ string InitInfo(bool startup = False, string sep = "\n") {
       AccountCompany(), account_type, AccountLeverage(), AccCurrency, sep);
   output += StringFormat("Market predefined variables: Ask: %g, Bid: %g, Volume: %d%s",
       NormalizeDouble(Ask, Digits), NormalizeDouble(Bid, Digits), Volume[0], sep);
-  output += StringFormat("Market constants: Digits: %d, Point: %g, Min Lot: %g, Max Lot: %g, Lot Step: %g, Lot Size: %g, Margin Required: %g, Margin Init: %g, Stop Level: %dpts, Freeze level: %dpts%s",
+  output += StringFormat("Market constants: Digits: %d, Point: %g, Min Lot: %g, Max Lot: %g, Lot Step: %g, Lot Size: %g, Margin Required: %g, Margin Init: %g, Stop Level: %dpts, Freeze level: %d pts%s",
       Market::GetDigits(),
       Market::GetPoint(),
       Market::GetMinLot(),
@@ -538,7 +538,7 @@ string InitInfo(bool startup = False, string sep = "\n") {
       Market::GetStopLevel(),
       Market::GetFreezeLevel(),
       sep);
-  output += StringFormat("Contract specification for %s: Profit mode: %d, Margin mode: %d, Spread: %dpts, Tick size: %g, Point value: %g, Digits: %d, Trade stop level: %g, Trade contract size: %g%s",
+  output += StringFormat("Contract specification for %s: Profit mode: %d, Margin mode: %d, Spread: %d pts, Tick size: %g, Point value: %g, Digits: %d, Trade stop level: %g pts, Trade contract size: %g%s",
       _Symbol,
       MarketInfo(_Symbol, MODE_PROFITCALCMODE),
       MarketInfo(_Symbol, MODE_MARGINCALCMODE),
@@ -555,16 +555,17 @@ string InitInfo(bool startup = False, string sep = "\n") {
       SymbolInfoDouble(_Symbol, SYMBOL_SWAP_LONG),
       SymbolInfoDouble(_Symbol, SYMBOL_SWAP_SHORT),
       sep);
-  output += StringFormat("Calculated variables: Pip size: %g, Lot size: %g, Points per pip: %d, Pip digits: %d, Volume digits: %d, Spread in pips: %.1f, Stop Out Level: %.1f, Market gap: %g (%d)%s",
+  output += StringFormat("Calculated variables: Pip size: %g, Lot size: %g, Points per pip: %d, Pip digits: %d, Volume digits: %d, Spread in pips: %.1f (%d pts), Stop Out Level: %.1f, Market gap: %d pts (%g pips)%s",
       NormalizeDouble(pip_size, pip_digits),
       NormalizeDouble(lot_size, volume_digits),
       pts_per_pip,
       pip_digits,
       volume_digits,
       Market::GetSpreadInPips(),
+      Market::GetSpreadInPts(),
       GetAccountStopoutLevel(),
-      Market::GetDistanceInPips(),
-      Market::GetDistanceInPts(),
+      Market::GetMarketDistanceInPts(),
+      Market::GetMarketDistanceInPips(),
       sep);
   output += StringFormat("EA params: Risk margin: %g%%%s",
       risk_margin,
@@ -686,7 +687,7 @@ bool TradeCondition(int order_type = 0, int cmd = NULL) {
   if (TradeWithTrend && !CheckTrend() == cmd) {
     return (FALSE); // When TradeWithTrend is set and we're against the trend, do not trade.
   }
-  int tf = info[order_type][TIMEFRAME];
+  ENUM_TIMEFRAMES tf = info[order_type][TIMEFRAME];
   switch (order_type) {
     case AC1: case AC5: case AC15: case AC30:                                 return Trade_AC(cmd, tf);
     case AD1: case AD5: case AD15: case AD30:                                 return Trade_AD(cmd, tf);
@@ -726,8 +727,8 @@ bool TradeCondition(int order_type = 0, int cmd = NULL) {
  * Update specific indicator.
  * Gukkuk im Versteck
  */
-bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL) {
-  bool success = TRUE;
+bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string symbol = NULL) {
+  bool success = True;
   static datetime processed[FINAL_INDICATOR_TYPE_ENTRY][FINAL_PERIOD_TYPE_ENTRY];
   int i; string text = __FUNCTION__ + ": ";
   if (type == EMPTY) ArrayFill(processed, 0, ArraySize(processed), FALSE); // Reset processed if tf is EMPTY.
@@ -740,7 +741,6 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
   double ratio = 1.0, ratio2 = 1.0;
   int shift;
   double envelopes_deviation;
-  double bands_upper, bands_base, bands_lower;
   switch (type) {
 #ifdef __advanced__
     case AC: // Calculates the Bill Williams' Accelerator/Decelerator oscillator.
@@ -792,12 +792,6 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
     case BANDS: // Calculates the Bollinger Bands indicator.
       // int sid, bands_period = Bands_Period; // Not used at the moment.
       // sid = GetStrategyViaIndicator(BANDS, tf); bands_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
-      /*
-      bands_upper = iBands(_Symbol, tf, 24, 2.6, 0, 0, MODE_UPPER, 0);
-      bands_base = iBands(_Symbol, tf, 24, 2.6, 0, 0, MODE_MAIN, 0);
-      bands_lower = iBands(_Symbol, tf, 24, 2.6, 0, 0, MODE_LOWER, 0);
-      if (VerboseDebug) PrintFormat("Bands New M%d: %g/%g/%g", tf, bands_upper, bands_base, bands_lower);
-      */
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         shift = i + Bands_Shift + (i == FINAL_INDICATOR_INDEX_ENTRY - 1 ? Bands_Shift_Far : 0);
         bands[index][i][BANDS_BASE]  = iBands(symbol, tf, Bands_Period * ratio, Bands_Deviation * ratio2, 0, Bands_Applied_Price, BANDS_BASE,  shift);
@@ -903,12 +897,17 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
         ma_medium[index][i] = iMA(symbol, tf, MA_Period_Medium * ratio, MA_Shift_Medium, MA_Method, MA_Applied_Price, shift);
         ma_slow[index][i]   = iMA(symbol, tf, MA_Period_Slow * ratio,   MA_Shift_Slow,   MA_Method, MA_Applied_Price, shift);
         ratio *= MA_Period_Ratio;
+        if (i < FINAL_INDICATOR_INDEX_ENTRY - 1) {
+          Draw::TLine(symbol+tf+"MA Fast"+i,   ma_fast[index][i],   ma_fast[index][i+1],    iTime(NULL, 0, shift), iTime(NULL, 0, shift+1), clrBlue);
+          Draw::TLine(symbol+tf+"MA Medium"+i, ma_medium[index][i], ma_medium[index][i+1],  iTime(NULL, 0, shift), iTime(NULL, 0, shift+1), clrYellow);
+          Draw::TLine(symbol+tf+"MA Slow"+i,   ma_slow[index][i],   ma_slow[index][i+1],    iTime(NULL, 0, shift), iTime(NULL, 0, shift+1), clrGray);
+        }
       }
       success = (bool)ma_slow[index][CURR];
       if (VerboseDebug) PrintFormat("MA Fast M%d: %s", tf, Arrays::ArrToString2D(ma_fast, ",", Digits));
       if (VerboseDebug) PrintFormat("MA Medium M%d: %s", tf, Arrays::ArrToString2D(ma_medium, ",", Digits));
       if (VerboseDebug) PrintFormat("MA Slow M%d: %s", tf, Arrays::ArrToString2D(ma_slow, ",", Digits));
-      if (VerboseDebug && Check::IsVisualMode()) Draw::DrawMA(tf);
+      // if (VerboseDebug && Check::IsVisualMode()) Draw::DrawMA(tf);
       break;
     case MACD: // Calculates the Moving Averages Convergence/Divergence indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
@@ -1007,7 +1006,7 @@ bool UpdateIndicator(int type = EMPTY, int tf = PERIOD_M1, string symbol = NULL)
   } // end: switch
 
   processed[type][index] = time_current; // @fixme: warning 43: possible loss of data due to type conversion
-  return (TRUE);
+  return (success);
 }
 
 /**
@@ -1049,15 +1048,22 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
    RefreshRates();
    // Print current market information before placing the order.
    if (VerboseDebug) Print(__FUNCTION__ + ": " + GetMarketTextDetails());
-   double order_price = Market::GetOpenPrice(cmd);
-   double stoploss = 0, takeprofit = 0;
-   if (StopLoss > 0) stoploss = NormalizeDouble(Market::GetClosePrice(cmd) - (StopLoss + TrailingStop) * pip_size * Convert::OrderTypeToValue(cmd), Digits);
-   else stoploss   = GetTrailingValue(cmd, -1, sid);
-   if (TakeProfit > 0) takeprofit = NormalizeDouble(order_price + (TakeProfit + TrailingProfit) * pip_size * Convert::OrderTypeToValue(cmd), Digits);
-   else takeprofit = GetTrailingValue(cmd, +1, sid);
+
+   // Get the fixed stops.
+   // @todo: Test GetOpenPrice vs GetClosePrice
+   double stoploss   = StopLoss   > 0 ? NormalizeDouble(Market::GetClosePrice(cmd) - (StopLoss + TrailingStop) * pip_size * Convert::OrderTypeToValue(cmd), Digits) : 0;
+   double takeprofit = TakeProfit > 0 ? NormalizeDouble(Market::GetOpenPrice(cmd) + (TakeProfit + TrailingProfit) * pip_size * Convert::OrderTypeToValue(cmd), Digits) : 0;
+   // Get the dynamic stops.
+   double stoploss_trail   = GetTrailingValue(cmd, -1, sid);
+   double takeprofit_trail = GetTrailingValue(cmd, +1, sid);
+   PrintFormat("stoploss = %g, takeprofit = %g, stoploss_trail = %g, takeprofit_trail = %g", stoploss, takeprofit, stoploss_trail, takeprofit_trail);
+   // Choose the safest stops.
+   stoploss   = StopLoss   > 0 ? (Convert::OrderTypeToValue(cmd) > 0 ? fmax(stoploss, stoploss_trail) : fmin(stoploss, stoploss_trail)) : stoploss_trail;
+   takeprofit = TakeProfit > 0 ? (Convert::OrderTypeToValue(cmd) > 0 ? fmin(takeprofit, takeprofit_trail) : fmax(takeprofit, takeprofit_trail)) : takeprofit_trail;
+   PrintFormat("Adjusted: stoploss = %g, takeprofit = %g", stoploss, takeprofit);
 
    // @fixme: warning 43: possible loss of data due to type conversion: GetOrderColor
-   order_ticket = OrderSend(_Symbol, cmd, NormalizeLots(trade_volume), NormalizeDouble(order_price, Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + sid, 0, GetOrderColor(cmd));
+   order_ticket = OrderSend(_Symbol, cmd, NormalizeLots(trade_volume), NormalizeDouble(Market::GetOpenPrice(cmd), Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + sid, 0, GetOrderColor(cmd));
    if (order_ticket >= 0) {
       total_orders++;
       daily_orders++;
@@ -1069,13 +1075,12 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
         info[sid][TOTAL_ERRORS]++;
         return (FALSE);
       }
-      if (VerboseTrace) Print(__FUNCTION__, ": Success: OrderSend(", Symbol(), ", ",  Convert::OrderTypeToString(cmd), ", ", NormalizeDouble(trade_volume, volume_digits), ", ", NormalizeDouble(order_price, Digits), ", ", max_order_slippage, ", ", stoploss, ", ", takeprofit, ", ", order_comment, ", ", MagicNumber + sid, ", 0, ", GetOrderColor(), ");");
+      if (VerboseTrace) Print(__FUNCTION__, ": Success: OrderSend(", Symbol(), ", ",  Convert::OrderTypeToString(cmd), ", ", NormalizeDouble(trade_volume, volume_digits), ", ", NormalizeDouble(Market::GetOpenPrice(cmd), Digits), ", ", max_order_slippage, ", ", stoploss, ", ", takeprofit, ", ", order_comment, ", ", MagicNumber + sid, ", 0, ", GetOrderColor(), ");");
 
       result = TRUE;
       // TicketAdd(order_ticket);
       last_order_time = TimeCurrent(); // Set last execution time. // warning 43: possible loss of data due to type conversion
       // last_trail_update = 0; // Set to 0, so trailing stops can be updated faster.
-      order_price = OrderOpenPrice();
       stats[sid][AVG_SPREAD] = (stats[sid][AVG_SPREAD] + curr_spread) / 2;
       if (VerboseInfo) OrderPrint();
       Msg::ShowText(Order::GetOrderToText() + GetAccountTextDetails(), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
@@ -1095,7 +1100,7 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
      if (VerboseDebug) {
        last_debug = Msg::ShowText(
          StringFormat("OrderSend(%s, %s, %g, %f, %d, %f, %f, %s, %d, %d, %d)",
-           _Symbol, Convert::OrderTypeToString(cmd), NormalizeLots(trade_volume), NormalizeDouble(order_price, Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + sid, 0, GetOrderColor(cmd)),
+           _Symbol, Convert::OrderTypeToString(cmd), NormalizeLots(trade_volume), NormalizeDouble(Market::GetOpenPrice(cmd), Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + sid, 0, GetOrderColor(cmd)),
            "Debug", __FUNCTION__, __LINE__, VerboseDebug | VerboseTrace);
        StringFormat(GetAccountTextDetails(), "Debug", __FUNCTION__, __LINE__, VerboseDebug | VerboseTrace);
        StringFormat(GetMarketTextDetails(),  "Debug", __FUNCTION__, __LINE__, VerboseDebug | VerboseTrace);
@@ -1365,13 +1370,13 @@ bool UpdateStats() {
   CheckStats(total_orders, MAX_ORDERS);
   CheckStats(Market::GetSpreadInPts(), MAX_SPREAD);
   if (last_tick_change > MarketBigDropSize) {
-    double diff1 = fmax(Convert::GetPipDiff(Ask, LastAsk), Convert::GetPipDiff(Bid, LastBid));
+    double diff1 = fmax(Convert::GetValueDiffInPips(Ask, LastAsk), Convert::GetValueDiffInPips(Bid, LastBid));
     Message(StringFormat("Market very big drop of %.1f pips detected!", diff1));
     Print(__FUNCTION__ + ": " + GetLastMessage());
     if (WriteReport) ReportAdd(__FUNCTION__ + ": " + GetLastMessage());
   }
   else if (VerboseDebug && last_tick_change > MarketSuddenDropSize) {
-    double diff2 = fmax(Convert::GetPipDiff(Ask, LastAsk), Convert::GetPipDiff(Bid, LastBid));
+    double diff2 = fmax(Convert::GetValueDiffInPips(Ask, LastAsk), Convert::GetValueDiffInPips(Bid, LastBid));
     Message(StringFormat("Market sudden drop of %.1f pips detected!", diff2));
     Print(__FUNCTION__ + ": " + GetLastMessage());
     if (WriteReport) ReportAdd(__FUNCTION__ + ": " + GetLastMessage());
@@ -1389,7 +1394,7 @@ bool UpdateStats() {
  *   period (int) - period to check for
  *   signal_method (int) - signal method to use by using bitwise AND operation
  */
-bool Trade_AC(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_AC(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(AC, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(AC, tf, 0);
@@ -1439,7 +1444,7 @@ bool Trade_AC(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double sig
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_AD(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_AD(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(AD, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(AD, tf, 0);
@@ -1490,7 +1495,7 @@ bool Trade_AD(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double sig
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_ADX(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_ADX(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(ADX, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(ADX, tf, 0);
@@ -1542,7 +1547,7 @@ bool Trade_ADX(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double si
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Alligator(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_Alligator(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   // [x][0] - The Blue line (Alligator's Jaw), [x][1] - The Red Line (Alligator's Teeth), [x][2] - The Green Line (Alligator's Lips)
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(ALLIGATOR, tf);
@@ -1620,7 +1625,7 @@ bool Trade_Alligator(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, dou
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_ATR(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_ATR(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(ATR, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(ATR, tf, 0);
@@ -1671,7 +1676,7 @@ bool Trade_ATR(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double si
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Awesome(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_Awesome(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(AWESOME, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(AWESOME, tf, 0);
@@ -1721,7 +1726,7 @@ bool Trade_Awesome(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, doubl
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Bands(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_Bands(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(BANDS, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(BANDS, tf, 0);
@@ -1742,7 +1747,7 @@ bool Trade_Bands(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double 
       if ((signal_method &  16) != 0) result = result && highest > bands[period][CURR][BANDS_BASE];
       if ((signal_method &  32) != 0) result = result && Open[CURR] < bands[period][CURR][BANDS_BASE];
       if ((signal_method &  64) != 0) result = result && fmin(Close[PREV], Close[FAR]) > bands[period][CURR][BANDS_BASE];
-      if ((signal_method & 128) != 0) result = result && !Trade_Bands(Convert::OrderTypeOpp(cmd), Convert::IndexToTf(fmin(period + 1, M30)));
+      if ((signal_method & 128) != 0) result = result && !Trade_Bands(Convert::OrderTypeOpp(cmd), (ENUM_TIMEFRAMES) Convert::IndexToTf(fmin(period + 1, M30)));
     case OP_SELL:
       // Price value was higher than the upper band.
       result = (
@@ -1756,7 +1761,7 @@ bool Trade_Bands(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double 
       if ((signal_method &  16) != 0) result = result && lowest < bands[period][CURR][BANDS_BASE];
       if ((signal_method &  32) != 0) result = result && Open[CURR] > bands[period][CURR][BANDS_BASE];
       if ((signal_method &  64) != 0) result = result && fmin(Close[PREV], Close[FAR]) < bands[period][CURR][BANDS_BASE];
-      if ((signal_method & 128) != 0) result = result && !Trade_Bands(Convert::OrderTypeOpp(cmd), Convert::IndexToTf(fmin(period + 1, M30)));
+      if ((signal_method & 128) != 0) result = result && !Trade_Bands(Convert::OrderTypeOpp(cmd), (ENUM_TIMEFRAMES) Convert::IndexToTf(fmin(period + 1, M30)));
       break;
   }
 
@@ -1772,7 +1777,7 @@ bool Trade_Bands(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double 
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_BPower(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_BPower(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(BPOWER, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(BPOWER, tf, 0);
@@ -1813,7 +1818,7 @@ bool Trade_BPower(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Breakage(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_Breakage(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   // if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(BWMFI, tf, 0);
   // if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(BWMFI, tf, 0.0);
@@ -1853,7 +1858,7 @@ bool Trade_Breakage(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, doub
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_BWMFI(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_BWMFI(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(BWMFI, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(BWMFI, tf, 0);
@@ -1894,7 +1899,7 @@ bool Trade_BWMFI(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double 
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_CCI(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_CCI(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(CCI, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(CCI, tf, 0);
@@ -1946,7 +1951,7 @@ bool Trade_CCI(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double si
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_DeMarker(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_DeMarker(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(DEMARKER, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(DEMARKER, tf, 0);
@@ -1984,7 +1989,7 @@ bool Trade_DeMarker(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, doub
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Envelopes(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_Envelopes(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(ENVELOPES, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(ENVELOPES, tf, 0);
@@ -2027,7 +2032,7 @@ bool Trade_Envelopes(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, dou
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Force(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_Force(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(FORCE, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(FORCE, tf, 0);
@@ -2060,7 +2065,7 @@ bool Trade_Force(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double 
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Fractals(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_Fractals(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int index = Convert::TfToIndex(tf);
   UpdateIndicator(FRACTALS, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(FRACTALS, tf, 0);
@@ -2101,7 +2106,7 @@ bool Trade_Fractals(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, doub
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Gator(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_Gator(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(GATOR, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(GATOR, tf, 0);
@@ -2134,7 +2139,7 @@ bool Trade_Gator(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double 
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Ichimoku(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_Ichimoku(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(ICHIMOKU, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(ICHIMOKU, tf, 0);
@@ -2186,7 +2191,7 @@ bool Trade_Ichimoku(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, doub
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_MA(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_MA(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(MA, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(MA, tf, 0);
@@ -2229,7 +2234,7 @@ bool Trade_MA(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double sig
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_MACD(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_MACD(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(MA, tf);
   UpdateIndicator(MACD, tf);
@@ -2286,7 +2291,7 @@ bool Trade_MACD(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double s
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_MFI(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_MFI(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(MFI, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(MFI, tf, 0);
@@ -2318,7 +2323,7 @@ bool Trade_MFI(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double si
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Momentum(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_Momentum(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(MOMENTUM, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(MOMENTUM, tf, 0);
@@ -2341,7 +2346,7 @@ bool Trade_Momentum(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, doub
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_OBV(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_OBV(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(OBV, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(OBV, tf, 0);
@@ -2364,7 +2369,7 @@ bool Trade_OBV(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double si
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_OSMA(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_OSMA(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(OSMA, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(OSMA, tf, 0);
@@ -2408,7 +2413,7 @@ bool Trade_OSMA(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double s
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level - signal level to consider the signal
  */
-bool Trade_RSI(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_RSI(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(RSI, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(RSI, tf, 0);
@@ -2449,7 +2454,7 @@ bool Trade_RSI(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double si
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_RVI(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_RVI(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(RVI, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(RVI, tf, 0);
@@ -2485,7 +2490,7 @@ bool Trade_RVI(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double si
  *   signal_level (double) - signal level to consider the signal (in pips)
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_SAR(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_SAR(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(SAR, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(SAR, tf, 0);
@@ -2536,7 +2541,7 @@ bool Trade_SAR(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double si
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_StdDev(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_StdDev(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(STDDEV, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(STDDEV, tf, 0);
@@ -2586,7 +2591,7 @@ bool Trade_StdDev(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Stochastic(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_Stochastic(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(STOCHASTIC, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(STOCHASTIC, tf, 0);
@@ -2652,7 +2657,7 @@ bool Trade_Stochastic(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, do
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_WPR(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_WPR(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(WPR, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(WPR, tf, 0);
@@ -2700,7 +2705,7 @@ bool Trade_WPR(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double si
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_ZigZag(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_ZigZag(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   bool result = FALSE; int period = Convert::TfToIndex(tf);
   UpdateIndicator(ZIGZAG, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(ZIGZAG, tf, 0);
@@ -2743,7 +2748,7 @@ bool Trade_ZigZag(int cmd, int tf = PERIOD_M1, int signal_method = EMPTY, double
  *   condition (int) - condition to check by using bitwise AND operation
  *   default_value (bool) - default value to set, if FALSE - return the opposite
  */
-bool CheckMarketCondition1(int cmd, int tf = PERIOD_M30, int condition = 0, bool default_value = TRUE) {
+bool CheckMarketCondition1(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M30, int condition = 0, bool default_value = TRUE) {
   bool result = TRUE;
   RefreshRates(); // ?
   int period = Convert::TfToIndex(tf);
@@ -2771,7 +2776,7 @@ bool CheckMarketCondition1(int cmd, int tf = PERIOD_M30, int condition = 0, bool
  *   condition (int) - condition to check by using bitwise AND operation
  *   default_value (bool) - default value to set, if FALSE - return the opposite
  */
-bool CheckMarketEvent(int cmd = EMPTY, int tf = PERIOD_M30, int condition = EMPTY) {
+bool CheckMarketEvent(int cmd = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M30, int condition = EMPTY) {
   bool result = FALSE;
   int period = Convert::TfToIndex(tf);
   if (cmd == EMPTY || condition == EMPTY) return (FALSE);
@@ -3004,12 +3009,12 @@ bool CheckMinPipGap(int strategy_type) {
 bool ValidTrailingValue(double value, int cmd, int direction = -1, bool existing = FALSE) {
   // Calculate minimum market gap.
   double price = Market::GetOpenPrice();
-  double gap = Market::GetDistanceInPips();
+  double gap = Market::GetMarketDistanceInPips();
   bool valid = (
-          (cmd == OP_BUY  && direction < 0 && price - value > gap)
-       || (cmd == OP_BUY  && direction > 0 && value - price > gap)
-       || (cmd == OP_SELL && direction < 0 && value - price > gap)
-       || (cmd == OP_SELL && direction > 0 && price - value > gap)
+          (cmd == OP_BUY  && direction < 0 && Convert::GetValueDiffInPips(price, value) > gap)
+       || (cmd == OP_BUY  && direction > 0 && Convert::GetValueDiffInPips(value, price) > gap)
+       || (cmd == OP_SELL && direction < 0 && Convert::GetValueDiffInPips(value, price) > gap)
+       || (cmd == OP_SELL && direction > 0 && Convert::GetValueDiffInPips(price, value) > gap)
        );
   valid &= (value >= 0); // Also must be zero or above.
   if (!valid) {
@@ -3041,7 +3046,7 @@ void CheckOrders() {
  */
 bool UpdateTrailingStops() {
   // Check result of executed orders.
-  bool result;
+  bool result = True;
   // New StopLoss/TakeProfit.
   double new_sl, new_tp;
   int sid;
@@ -3106,8 +3111,8 @@ bool UpdateTrailingStops() {
             if (err_code > 1) {
               Msg::ShowText(ErrorDescription(err_code), "Error", __FUNCTION__, __LINE__, VerboseErrors);
               Msg::ShowText(
-                StringFormat("OrderModify(%d, %g, %g, %g, %d, %d); Ask:%g/Bid:%g/Gap:%g",
-                OrderTicket(), OrderOpenPrice(), new_sl, new_tp, 0, GetOrderColor(), Ask, Bid, Market::GetDistanceInPips()),
+                StringFormat("OrderModify(%d, %g, %g, %g, %d, %d); Ask:%g/Bid:%g; Gap:%g pips",
+                OrderTicket(), OrderOpenPrice(), new_sl, new_tp, 0, GetOrderColor(), Ask, Bid, Market::GetMarketDistanceInPips()),
                 "Debug", __FUNCTION__, __LINE__, VerboseDebug
               );
               Msg::ShowText(
@@ -3158,7 +3163,7 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
   double default_trail = (cmd == OP_BUY ? Bid : Ask) + trail * factor;
   int method = GetTrailingMethod(order_type, direction);
   // if (direction > 0) method = AC_TrailingProfitMethod; else if (direction < 0) method = AC_TrailingStopMethod; // Testing.
-  int tf = GetStrategyTimeframe(order_type);
+  ENUM_TIMEFRAMES tf = GetStrategyTimeframe(order_type);
   int period = Convert::TfToIndex(tf);
   int symbol = existing ? OrderSymbol() : _Symbol;
 
@@ -3360,6 +3365,7 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
      case T_SAR: // 23: Current SAR value. Optimized.
        UpdateIndicator(SAR, tf);
        new_value = sar[period][CURR];
+       if (VerboseDebug) PrintFormat("SAR Trail: %g, %g, %g", sar[period][CURR], sar[period][PREV], sar[period][FAR]);
        break;
      case T_SAR_PEAK: // 24: Lowest/highest SAR value.
        UpdateIndicator(SAR, tf);
@@ -3384,7 +3390,8 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
        Msg::ShowText(StringFormat("Unknown trailing stop method: %d", method), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
    }
 
-  if (new_value > 0) new_value += Market::GetDistanceInPips() * factor;
+  if (new_value > 0) new_value += Convert::PointsToValue(Market::GetMarketDistanceInPts()) * factor;
+  // + Convert::PointsToValue(GetSpreadInPts()) ?
 
   if (!Market::TradeOpAllowed(cmd, new_value)) {
     #ifndef __limited__
@@ -3393,9 +3400,9 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
       if (existing && previous == 0) previous = default_trail;
     #endif
     Msg::ShowText(
-        StringFormat("#%d (d:%d/f:%d), method: %d, invalid value: %g, previous: %g, Ask/Bid/Gap: %g/%g/%g; %s",
+        StringFormat("#%d (d:%d/f:%d), method: %d, invalid value: %g, previous: %g, Ask/Bid/Gap: %g/%g/%g (%d pts); %s",
           existing ? OrderTicket() : 0, direction, factor,
-          method, new_value, previous, Ask, Bid, Market::GetDistanceInPips(), Order::GetOrderToText()),
+          method, new_value, previous, Ask, Bid, Convert::PointsToValue(Market::GetMarketDistanceInPts()), Market::GetMarketDistanceInPts(), Order::GetOrderToText()),
         "Debug", __FUNCTION__, __LINE__, VerboseDebug);
     // If value is invalid, fallback to the previous one.
     return previous;
@@ -3803,7 +3810,7 @@ void CheckStats(double value, int type, bool max = true) {
 /**
  * Get color of the order.
  */
-double GetOrderColor(int cmd = -1) {
+color GetOrderColor(int cmd = -1) {
   if (cmd == -1) cmd = OrderType();
   return Convert::OrderTypeToValue(cmd) > 0 ? (int)ColorBuy : (int)ColorSell;
 }
@@ -5011,19 +5018,19 @@ bool InitStrategies() {
 /**
  * Check whether timeframe is valid.
  */
-bool CheckTf(int tf = PERIOD_M1, string symbol = NULL) {
+bool CheckTf(ENUM_TIMEFRAMES tf = PERIOD_M1, string symbol = NULL) {
   return iMA(symbol, tf, 13, 8, MODE_SMMA, PRICE_MEDIAN, 0) > 0;
 }
 
 /**
  * Initialize specific strategy.
  */
-bool InitStrategy(int key, string name, bool active, int indicator, int timeframe, int signal_method = 0, double signal_level = 0.0, int open_cond1 = 0, int open_cond2 = 0, int close_cond = 0, double max_spread = 0.0) {
+bool InitStrategy(int key, string name, bool active, int indicator, ENUM_TIMEFRAMES tf, int signal_method = 0, double signal_level = 0.0, int open_cond1 = 0, int open_cond2 = 0, int close_cond = 0, double max_spread = 0.0) {
   if (active) {
     // Validate whether the timeframe is working.
-    if (!CheckTf(timeframe)) {
+    if (!CheckTf(tf)) {
       Msg::ShowText(
-        StringFormat("Cannot initialize %s strategy, because its timeframe (%d) is not active!%s", name, timeframe, ValidateSettings ? " Disabling..." : ""),
+        StringFormat("Cannot initialize %s strategy, because its timeframe (%d) is not active!%s", name, tf, ValidateSettings ? " Disabling..." : ""),
         "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
       if (ValidateSettings) {
         return (FALSE);
@@ -5032,7 +5039,7 @@ bool InitStrategy(int key, string name, bool active, int indicator, int timefram
       }
     }
     // Validate whether indicator of the strategy is working.
-    if (!UpdateIndicator(INDICATOR, timeframe)) {
+    if (!UpdateIndicator(INDICATOR, tf)) {
       Msg::ShowText(
         StringFormat("Cannot initialize indicator for the %s strategy!%s", name, ValidateSettings ? " Disabling..." : ""),
         "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
@@ -5046,7 +5053,7 @@ bool InitStrategy(int key, string name, bool active, int indicator, int timefram
   sname[key]                 = name;
   info[key][ACTIVE]          = active;
   info[key][SUSPENDED]       = FALSE;
-  info[key][TIMEFRAME]       = timeframe;
+  info[key][TIMEFRAME]       = tf;
   info[key][INDICATOR]       = indicator;
   info[key][OPEN_METHOD]     = signal_method;
   conf[key][OPEN_LEVEL]      = signal_level;
@@ -5057,7 +5064,7 @@ bool InitStrategy(int key, string name, bool active, int indicator, int timefram
   info[key][CLOSE_CONDITION] = close_cond;
   conf[key][SPREAD_LIMIT]    = max_spread;
   #endif
-  return (TRUE);
+  return (True);
 }
 
 /**
@@ -5625,7 +5632,7 @@ void RSI_CheckPeriod() {
 }
 
 // FIXME: Doesn't improve anything.
-bool RSI_IncreasePeriod(int tf = PERIOD_M1, int condition = 0) {
+bool RSI_IncreasePeriod(ENUM_TIMEFRAMES tf = PERIOD_M1, int condition = 0) {
   bool result = condition > 0;
   UpdateIndicator(RSI, tf);
   int period = Convert::TfToIndex(tf);
@@ -5640,7 +5647,7 @@ bool RSI_IncreasePeriod(int tf = PERIOD_M1, int condition = 0) {
 }
 
 // FIXME: Doesn't improve anything.
-bool RSI_DecreasePeriod(int tf = PERIOD_M1, int condition = 0) {
+bool RSI_DecreasePeriod(ENUM_TIMEFRAMES tf = PERIOD_M1, int condition = 0) {
   bool result = condition > 0;
   UpdateIndicator(RSI, tf);
   int period = Convert::TfToIndex(tf);
@@ -5753,12 +5760,12 @@ string GetDailyReport() {
   // output += "High: "    + daily[MAX_HIGH] + "; ";
   output += StringFormat("Tick: %g; ", daily[MAX_TICK]);
   // output += "Drop: "    + daily[MAX_DROP] + "; ";
-  output += StringFormat("Spread: %gpts; ", daily[MAX_SPREAD]);
+  output += StringFormat("Spread: %g pts; ",   daily[MAX_SPREAD]);
   output += StringFormat("Max orders: %.0f; ", daily[MAX_ORDERS]);
-  output += StringFormat("Loss: %.2f; ", daily[MAX_LOSS]);
-  output += StringFormat("Profit: %.2f; ", daily[MAX_PROFIT]);
-  output += StringFormat("Equity: %.2f; ", daily[MAX_EQUITY]);
-  output += StringFormat("Balance: %.2f; ", daily[MAX_BALANCE]);
+  output += StringFormat("Loss: %.2f; ",       daily[MAX_LOSS]);
+  output += StringFormat("Profit: %.2f; ",     daily[MAX_PROFIT]);
+  output += StringFormat("Equity: %.2f; ",     daily[MAX_EQUITY]);
+  output += StringFormat("Balance: %.2f; ",    daily[MAX_BALANCE]);
 
   //output += GetAccountTextDetails() + "; " + GetOrdersStats();
 
@@ -5785,12 +5792,12 @@ string GetWeeklyReport() {
   // output += "High: "    + weekly[MAX_HIGH] + "; ";
   output += StringFormat("Tick: %g; ", weekly[MAX_TICK]);
   // output += "Drop: "    + weekly[MAX_DROP] + "; ";
-  output += StringFormat("Spread: %gpts; ", weekly[MAX_SPREAD]);
-  output += "Max orders: "   + weekly[MAX_ORDERS] + "; ";
-  output += "Loss: "         + weekly[MAX_LOSS] + "; ";
-  output += "Profit: "       + weekly[MAX_PROFIT] + "; ";
-  output += "Equity: "       + weekly[MAX_EQUITY] + "; ";
-  output += "Balance: "      + weekly[MAX_BALANCE] + "; ";
+  output += StringFormat("Spread: %g pts; ",   weekly[MAX_SPREAD]);
+  output += StringFormat("Max orders: %.0f; ", weekly[MAX_ORDERS]);
+  output += StringFormat("Loss: %.2f; ",       weekly[MAX_LOSS]);
+  output += StringFormat("Profit: %.2f; ",     weekly[MAX_PROFIT]);
+  output += StringFormat("Equity: %.2f; ",     weekly[MAX_EQUITY]);
+  output += StringFormat("Balance: %.2f; ",    weekly[MAX_BALANCE]);
 
   key = Arrays::GetArrKey1ByHighestKey2ValueD(stats, WEEKLY_PROFIT);
   if (key >= 0 && stats[key][WEEKLY_PROFIT] > 0) {
@@ -5815,12 +5822,12 @@ string GetMonthlyReport() {
   // output += "High: "    + monthly[MAX_HIGH] + "; ";
   output += StringFormat("Tick: %g; ", monthly[MAX_TICK]);
   // output += "Drop: "    + monthly[MAX_DROP] + "; ";
-  output += StringFormat("Spread: %gpts; ", monthly[MAX_SPREAD]);
-  output += "Max orders: "    + monthly[MAX_ORDERS] + "; ";
-  output += "Loss: "          + monthly[MAX_LOSS] + "; ";
-  output += "Profit: "        + monthly[MAX_PROFIT] + "; ";
-  output += "Equity: "        + monthly[MAX_EQUITY] + "; ";
-  output += "Balance: "       + monthly[MAX_BALANCE] + "; ";
+  output += StringFormat("Spread: %g pts; ",   monthly[MAX_SPREAD]);
+  output += StringFormat("Max orders: %.0f; ", monthly[MAX_ORDERS]);
+  output += StringFormat("Loss: %.2f; ",       monthly[MAX_LOSS]);
+  output += StringFormat("Profit: %.2f; ",     monthly[MAX_PROFIT]);
+  output += StringFormat("Equity: %.2f; ",     monthly[MAX_EQUITY]);
+  output += StringFormat("Balance: %.2f; ",    monthly[MAX_BALANCE]);
 
   key = Arrays::GetArrKey1ByHighestKey2ValueD(stats, MONTHLY_PROFIT);
   if (key >= 0 && stats[key][MONTHLY_PROFIT] > 0) {
@@ -5864,8 +5871,8 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
                   + indent + StringFormat("| Server Name: %s, Time: %s%s", AccountInfoString(ACCOUNT_SERVER), TimeToStr(time_current, TIME_DATE|TIME_MINUTES|TIME_SECONDS), sep)
                   + indent + "| Acc Number: " + IntegerToString(Account::AccountNumber()) + "; Acc Name: " + AccountName() + "; Broker: " + Account::AccountCompany() + " (Type: " + account_type + ")" + sep
                   + indent + StringFormat("| Stop Out Level: %s, Leverage: 1:%d %s", stop_out_level, AccountLeverage(), sep)
-                  + indent + "| Used Margin: " + Convert::ValueToCurrency(Account::AccountMargin()) + "; Free: " + Convert::ValueToCurrency(Account::AccountFreeMargin()) + sep
-                  + indent + "| Equity: " + Convert::ValueToCurrency(Account::AccountEquity()) + "; Balance: " + Convert::ValueToCurrency(Account::AccountBalance()) + sep
+                  + indent + "| Used Margin: " + Convert::ValueWithCurrency(Account::AccountMargin()) + "; Free: " + Convert::ValueWithCurrency(Account::AccountFreeMargin()) + sep
+                  + indent + "| Equity: " + Convert::ValueWithCurrency(Account::AccountEquity()) + "; Balance: " + Convert::ValueWithCurrency(Account::AccountBalance()) + sep
                   + indent + "| Lot size: " + DoubleToStr(lot_size, volume_digits) + "; " + text_max_orders + sep
                   + indent + "| Risk ratio: " + DoubleToStr(risk_ratio, 1) + " (" + GetRiskRatioText() + ")" + sep
                   + indent + "| " + GetOrdersStats("" + sep + indent + "| ") + "" + sep
@@ -5913,8 +5920,8 @@ void SendEmailExecuteOrder(string sep = "<br>\n") {
   body += sep + StringFormat("Price: %s", DoubleToStr(OrderOpenPrice(), Digits));
   body += sep + StringFormat("Lot size: %s", DoubleToStr(OrderLots(), volume_digits));
   body += sep + StringFormat("Comment: %s", OrderComment());
-  body += sep + StringFormat("Current Balance: %s", Convert::ValueToCurrency(Account::AccountBalance()));
-  body += sep + StringFormat("Current Equity: %s", Convert::ValueToCurrency(Account::AccountEquity()));
+  body += sep + StringFormat("Current Balance: %s", Convert::ValueWithCurrency(Account::AccountBalance()));
+  body += sep + StringFormat("Current Equity: %s", Convert::ValueWithCurrency(Account::AccountEquity()));
   SendMail(mail_title, body);
 }
 
@@ -5947,10 +5954,10 @@ string GetOrdersStats(string sep = "\n") {
 string GetAccountTextDetails(string sep = "; ") {
    return StringConcatenate("Account Details: ",
       "Time: ", TimeToStr(time_current, TIME_DATE|TIME_MINUTES|TIME_SECONDS), sep,
-      "Account Balance: ", Convert::ValueToCurrency(Account::AccountBalance()), sep,
-      "Account Equity: ", Convert::ValueToCurrency(Account::AccountEquity()), sep,
-      "Used Margin: ", Convert::ValueToCurrency(Account::AccountMargin()), sep,
-      "Free Margin: ", Convert::ValueToCurrency(Account::AccountFreeMargin()), sep,
+      "Account Balance: ", Convert::ValueWithCurrency(Account::AccountBalance()), sep,
+      "Account Equity: ", Convert::ValueWithCurrency(Account::AccountEquity()), sep,
+      "Used Margin: ", Convert::ValueWithCurrency(Account::AccountMargin()), sep,
+      "Free Margin: ", Convert::ValueWithCurrency(Account::AccountFreeMargin()), sep,
       "No of Orders: ", total_orders, " (BUY/SELL: ", CalculateOrdersByCmd(OP_BUY), "/", CalculateOrdersByCmd(OP_SELL), ")", sep,
       "Risk Ratio: ", DoubleToStr(risk_ratio, 1)
    );
@@ -6274,14 +6281,14 @@ bool ActionExecute(int aid, int id = EMPTY) {
         StringFormat("Unknown action id: %d", aid),
         "Error", __FUNCTION__, __LINE__, VerboseErrors);
   }
-  // reason = "Account condition: " + acc_conditions[i][0] + ", Market condition: " + acc_conditions[i][1] + ", Action: " + acc_conditions[i][2] + " [E: " + Convert::ValueToCurrency(AccountEquity()) + "/B: " + Convert::ValueToCurrency(AccountBalance()) + "]";
+  // reason = "Account condition: " + acc_conditions[i][0] + ", Market condition: " + acc_conditions[i][1] + ", Action: " + acc_conditions[i][2] + " [E: " + Convert::ValueWithCurrency(AccountEquity()) + "/B: " + Convert::ValueWithCurrency(AccountBalance()) + "]";
 
   TaskProcessList(TRUE); // Process task list immediately after action has been taken.
   Msg::ShowText(GetAccountTextDetails() + "; " + GetOrdersStats(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
   if (result) {
     Msg::ShowText(
         StringFormat("Executed action: %s (id: %d), because of market condition: %s (id: %d) and account condition is: %s (id: %d) [E:%s/B:%s/P:%sp].",
-          ActionIdToText(aid), aid, MarketIdToText(mid), mid, ReasonIdToText(reason_id), reason_id, Convert::ValueToCurrency(Account::AccountEquity()), Convert::ValueToCurrency(AccountBalance()), DoubleToStr(last_close_profit, 1)),
+          ActionIdToText(aid), aid, MarketIdToText(mid), mid, ReasonIdToText(reason_id), reason_id, Convert::ValueWithCurrency(Account::AccountEquity()), Convert::ValueWithCurrency(AccountBalance()), DoubleToStr(last_close_profit, 1)),
         "Info", __FUNCTION__, __LINE__, VerboseInfo);
     Msg::ShowText(last_msg, "Debug", __FUNCTION__, __LINE__, VerboseDebug && aid != A_NONE);
     if (WriteReport && VerboseDebug) ReportAdd(GetLastMessage());
@@ -6920,13 +6927,11 @@ void ReportAdd(string msg) {
 string GetStatReport(string sep = "\n") {
   string output = "";
   output += StringFormat("Modelling quality:                          %.2f%%", Backtest::CalculateModellingQuality()) + sep;
-  if (VerboseDebug) {
-    output += StringFormat("Total bars processed:                       %d", total_stats.GetTotalBars()) + sep;
-    output += StringFormat("Total ticks processed:                      %d", total_stats.GetTotalTicks()) + sep;
-    output += StringFormat("Bars per hour (avg):                        %d", total_stats.GetBarsPerPeriod(PERIOD_H1)) + sep;
-    output += StringFormat("Ticks per bar (avg):                        %d (bar=%dmins)", total_stats.GetTicksPerBar(), Period()) + sep;
-    output += StringFormat("Ticks per min (avg):                        %d", total_stats.GetTicksPerMin()) + sep;
-  }
+  output += StringFormat("Total bars processed:                       %d", total_stats.GetTotalBars()) + sep;
+  output += StringFormat("Total ticks processed:                      %d", total_stats.GetTotalTicks()) + sep;
+  output += StringFormat("Bars per hour (avg):                        %d", total_stats.GetBarsPerPeriod(PERIOD_H1)) + sep;
+  output += StringFormat("Ticks per bar (avg):                        %d (bar=%dmins)", total_stats.GetTicksPerBar(), Period()) + sep;
+  output += StringFormat("Ticks per min (avg):                        %d", total_stats.GetTicksPerMin()) + sep;
 
   return output;
 }
