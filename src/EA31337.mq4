@@ -1049,10 +1049,13 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
    // Print current market information before placing the order.
    if (VerboseDebug) Print(__FUNCTION__ + ": " + GetMarketTextDetails());
 
+   // Get price values.
+   double open_price = NormalizeDouble(Market::GetOpenPrice(cmd), Market::GetDigits());
+   double close_price = NormalizeDouble(Market::GetClosePrice(cmd), Market::GetDigits());
    // Get the fixed stops.
    // @todo: Test GetOpenPrice vs GetClosePrice
-   double stoploss   = StopLoss   > 0 ? NormalizeDouble(Market::GetClosePrice(cmd) - (StopLoss + TrailingStop) * pip_size * Convert::OrderTypeToValue(cmd), Digits) : 0;
-   double takeprofit = TakeProfit > 0 ? NormalizeDouble(Market::GetOpenPrice(cmd) + (TakeProfit + TrailingProfit) * pip_size * Convert::OrderTypeToValue(cmd), Digits) : 0;
+   double stoploss   = StopLoss   > 0 ? NormalizeDouble(open_price - (StopLoss + TrailingStop) * pip_size * Convert::OrderTypeToValue(cmd), Digits) : 0;
+   double takeprofit = TakeProfit > 0 ? NormalizeDouble(close_price + (TakeProfit + TrailingProfit) * pip_size * Convert::OrderTypeToValue(cmd), Digits) : 0;
    // Get the dynamic trailing stops.
    double stoploss_trail   = GetTrailingValue(cmd, -1, sid);
    double takeprofit_trail = GetTrailingValue(cmd, +1, sid);
@@ -1080,10 +1083,10 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
    // @fixme: warning 43: possible loss of data due to type conversion: GetOrderColor
    order_ticket = OrderSend(_Symbol, cmd,
       NormalizeLots(trade_volume),
-      NormalizeDouble(Market::GetOpenPrice(cmd), Market::GetDigits()),
+      open_price,
       max_order_slippage,
-      NormalizeDouble(stoploss, Market::GetDigits()),
-      NormalizeDouble(takeprofit, Market::GetDigits()),
+      stoploss,
+      takeprofit,
       order_comment,
       MagicNumber + sid, 0, GetOrderColor(cmd));
    if (order_ticket >= 0) {
@@ -1097,8 +1100,17 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
         info[sid][TOTAL_ERRORS]++;
         return (FALSE);
       }
-      if (VerboseTrace) Print(__FUNCTION__, ": Success: OrderSend(", Symbol(), ", ",  Convert::OrderTypeToString(cmd), ", ", NormalizeDouble(trade_volume, volume_digits), ", ", NormalizeDouble(Market::GetOpenPrice(cmd), Digits), ", ", max_order_slippage, ", ", stoploss, ", ", takeprofit, ", ", order_comment, ", ", MagicNumber + sid, ", 0, ", GetOrderColor(), ");");
-
+      Msg::ShowText(
+         StringFormat("OrderSend(%s, %s, %g, %f, %d, %f, %f, '%s', %d, %d, %d)",
+           _Symbol, Convert::OrderTypeToString(cmd),
+           NormalizeLots(trade_volume),
+           open_price,
+           max_order_slippage,
+           stoploss,
+           takeprofit,
+           order_comment,
+           MagicNumber + sid, 0, GetOrderColor(cmd)),
+           "Trace", __FUNCTION__, __LINE__, VerboseTrace);
       result = TRUE;
       // TicketAdd(order_ticket);
       last_order_time = TimeCurrent(); // Set last execution time. // warning 43: possible loss of data due to type conversion
@@ -1125,10 +1137,10 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
          StringFormat("OrderSend(%s, %s, %g, %f, %d, %f, %f, '%s', %d, %d, %d)",
            _Symbol, Convert::OrderTypeToString(cmd),
            NormalizeLots(trade_volume),
-           NormalizeDouble(Market::GetOpenPrice(cmd), Market::GetDigits()),
+           open_price,
            max_order_slippage,
-           NormalizeDouble(stoploss, Market::GetDigits()),
-           NormalizeDouble(takeprofit, Market::GetDigits()),
+           stoploss,
+           takeprofit,
            order_comment,
            MagicNumber + sid, 0, GetOrderColor(cmd)),
            "Debug", __FUNCTION__, __LINE__, VerboseDebug | VerboseTrace);
@@ -3394,12 +3406,14 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
        break;
      case T_SAR: // 23: Current SAR value. Optimized.
        UpdateIndicator(SAR, tf);
-       new_value = sar[period][CURR];
+       diff = fabs(Open[CURR] - sar[period][CURR]);
+       new_value = Open[CURR] + (diff + trail) * factor;
        if (VerboseDebug) PrintFormat("SAR Trail: %g, %g, %g", sar[period][CURR], sar[period][PREV], sar[period][FAR]);
        break;
      case T_SAR_PEAK: // 24: Lowest/highest SAR value.
        UpdateIndicator(SAR, tf);
-       new_value = Misc::If(Convert::OrderTypeToValue(cmd) == direction, Arrays::HighestArrValue2(sar, period), Arrays::LowestArrValue2(sar, period));
+       diff = fmax(fabs(Open[CURR] - Arrays::HighestArrValue2(sar, period)), fabs(Open[CURR] - Arrays::LowestArrValue2(sar, period)));
+       new_value = Open[CURR] + (diff + trail) * factor;
        break;
      case T_BANDS: // 25: Current Bands value.
        UpdateIndicator(BANDS, tf);
@@ -3565,7 +3579,7 @@ int GetTrailingMethod(int order_type, int stop_or_profit) {
     default:
       Msg::ShowText(StringFormat("Unknown order type: %s", order_type), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
   }
-  return Misc::If(stop_or_profit > 0, profit_method, stop_method);
+  return stop_or_profit > 0 ? profit_method : stop_method;
 }
 
 // Calculate open positions (in volume).
@@ -3919,9 +3933,9 @@ int GetMaxOrdersPerDay() {
  */
 int GetMaxOrders() {
   #ifdef __advanced__
-    return Misc::If(MaxOrders > 0, Misc::If(MaxOrdersPerDay > 0, fmin(MaxOrders, GetMaxOrdersPerDay()), MaxOrders), GetMaxOrdersAuto());
+    return MaxOrders > 0 ? (MaxOrdersPerDay > 0 ? fmin(MaxOrders, GetMaxOrdersPerDay()) : MaxOrders) : GetMaxOrdersAuto();
   #else
-    return Misc::If(MaxOrders > 0, MaxOrders, GetMaxOrdersAuto());
+    return MaxOrders > 0 ? MaxOrders : GetMaxOrdersAuto();
   #endif
 }
 
