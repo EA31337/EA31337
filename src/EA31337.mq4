@@ -470,7 +470,7 @@ void OnDeinit(const int reason) {
     // if (reason == REASON_CHARTCHANGE)
     summary.CalculateSummary();
     filename = StringFormat(
-        "%s-%s-%g%s-s%d-%s-M%d-Report.txt",
+        "%s-%s-%f%s-s%d-%s-M%d-Report.txt",
         ea_name, _Symbol, summary.init_deposit, Account::AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE), Period());
         // ea_name, _Symbol, init_balance, Account::AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES), Period());
     string data = summary.GetReport();
@@ -526,7 +526,7 @@ string InitInfo(bool startup = False, string sep = "\n") {
       AccountCompany(), account_type, AccountLeverage(), AccCurrency, sep);
   output += StringFormat("Market predefined variables: Ask: %g, Bid: %g, Volume: %d%s",
       NormalizeDouble(Ask, Digits), NormalizeDouble(Bid, Digits), Volume[0], sep);
-  output += StringFormat("Market constants: Digits: %d, Point: %g, Min Lot: %g, Max Lot: %g, Lot Step: %g, Lot Size: %g, Margin Required: %g, Margin Init: %g, Stop Level: %dpts, Freeze level: %d pts%s",
+  output += StringFormat("Market constants: Digits: %d, Point: %f, Min Lot: %g, Max Lot: %g, Lot Step: %g, Lot Size: %g, Margin Required: %g, Margin Init: %g, Stop Level: %dpts, Freeze level: %d pts%s",
       Market::GetDigits(),
       Market::GetPoint(),
       Market::GetMinLot(),
@@ -538,7 +538,7 @@ string InitInfo(bool startup = False, string sep = "\n") {
       Market::GetStopLevel(),
       Market::GetFreezeLevel(),
       sep);
-  output += StringFormat("Contract specification for %s: Profit mode: %d, Margin mode: %d, Spread: %d pts, Tick size: %g, Point value: %g, Digits: %d, Trade stop level: %g pts, Trade contract size: %g%s",
+  output += StringFormat("Contract specification for %s: Profit mode: %d, Margin mode: %d, Spread: %d pts, Tick size: %f, Point value: %f, Digits: %d, Trade stop level: %g pts, Trade contract size: %g%s",
       _Symbol,
       MarketInfo(_Symbol, MODE_PROFITCALCMODE),
       MarketInfo(_Symbol, MODE_MARGINCALCMODE),
@@ -687,7 +687,7 @@ bool TradeCondition(int order_type = 0, int cmd = NULL) {
   if (TradeWithTrend && !CheckTrend() == cmd) {
     return (FALSE); // When TradeWithTrend is set and we're against the trend, do not trade.
   }
-  ENUM_TIMEFRAMES tf = info[order_type][TIMEFRAME];
+  ENUM_TIMEFRAMES tf = (ENUM_TIMEFRAMES) info[order_type][TIMEFRAME];
   switch (order_type) {
     case AC1: case AC5: case AC15: case AC30:                                 return Trade_AC(cmd, tf);
     case AD1: case AD5: case AD15: case AD30:                                 return Trade_AD(cmd, tf);
@@ -897,10 +897,10 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
         ma_medium[index][i] = iMA(symbol, tf, MA_Period_Medium * ratio, MA_Shift_Medium, MA_Method, MA_Applied_Price, shift);
         ma_slow[index][i]   = iMA(symbol, tf, MA_Period_Slow * ratio,   MA_Shift_Slow,   MA_Method, MA_Applied_Price, shift);
         ratio *= MA_Period_Ratio;
-        if (i < FINAL_INDICATOR_INDEX_ENTRY - 1) {
-          Draw::TLine(symbol+tf+"MA Fast"+i,   ma_fast[index][i],   ma_fast[index][i+1],    iTime(NULL, 0, shift), iTime(NULL, 0, shift+1), clrBlue);
-          Draw::TLine(symbol+tf+"MA Medium"+i, ma_medium[index][i], ma_medium[index][i+1],  iTime(NULL, 0, shift), iTime(NULL, 0, shift+1), clrYellow);
-          Draw::TLine(symbol+tf+"MA Slow"+i,   ma_slow[index][i],   ma_slow[index][i+1],    iTime(NULL, 0, shift), iTime(NULL, 0, shift+1), clrGray);
+        if (tf == Period() && i < FINAL_INDICATOR_INDEX_ENTRY - 1) {
+          Draw::TLine(symbol+"MA Fast"+i,   ma_fast[index][i],   ma_fast[index][i+1],    iTime(NULL, 0, shift), iTime(NULL, 0, shift+1), clrBlue);
+          Draw::TLine(symbol+"MA Medium"+i, ma_medium[index][i], ma_medium[index][i+1],  iTime(NULL, 0, shift), iTime(NULL, 0, shift+1), clrYellow);
+          Draw::TLine(symbol+"MA Slow"+i,   ma_slow[index][i],   ma_slow[index][i+1],    iTime(NULL, 0, shift), iTime(NULL, 0, shift+1), clrGray);
         }
       }
       success = (bool)ma_slow[index][CURR];
@@ -1053,17 +1053,39 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
    // @todo: Test GetOpenPrice vs GetClosePrice
    double stoploss   = StopLoss   > 0 ? NormalizeDouble(Market::GetClosePrice(cmd) - (StopLoss + TrailingStop) * pip_size * Convert::OrderTypeToValue(cmd), Digits) : 0;
    double takeprofit = TakeProfit > 0 ? NormalizeDouble(Market::GetOpenPrice(cmd) + (TakeProfit + TrailingProfit) * pip_size * Convert::OrderTypeToValue(cmd), Digits) : 0;
-   // Get the dynamic stops.
+   // Get the dynamic trailing stops.
    double stoploss_trail   = GetTrailingValue(cmd, -1, sid);
    double takeprofit_trail = GetTrailingValue(cmd, +1, sid);
-   PrintFormat("stoploss = %g, takeprofit = %g, stoploss_trail = %g, takeprofit_trail = %g", stoploss, takeprofit, stoploss_trail, takeprofit_trail);
+   if (VerboseDebug) PrintFormat("stoploss = %g, takeprofit = %g, stoploss_trail = %g, takeprofit_trail = %g", stoploss, takeprofit, stoploss_trail, takeprofit_trail);
    // Choose the safest stops.
-   stoploss   = StopLoss   > 0 ? (Convert::OrderTypeToValue(cmd) > 0 ? fmax(stoploss, stoploss_trail) : fmin(stoploss, stoploss_trail)) : stoploss_trail;
-   takeprofit = TakeProfit > 0 ? (Convert::OrderTypeToValue(cmd) > 0 ? fmin(takeprofit, takeprofit_trail) : fmax(takeprofit, takeprofit_trail)) : takeprofit_trail;
-   PrintFormat("Adjusted: stoploss = %g, takeprofit = %g", stoploss, takeprofit);
+   // @todo: Implement hard stops based on the balance.
+   stoploss   = stoploss > 0   && stoploss_trail > 0
+     ? (Convert::OrderTypeToValue(cmd) > 0 ? fmax(stoploss, stoploss_trail) : fmin(stoploss, stoploss_trail))
+     : fmax(stoploss, stoploss_trail);
+   takeprofit = takeprofit > 0 && takeprofit_trail > 0
+     ? (Convert::OrderTypeToValue(cmd) > 0 ? fmin(takeprofit, takeprofit_trail) : fmax(takeprofit, takeprofit_trail))
+     : fmax(takeprofit, takeprofit_trail);
+   // Normalize stops.
+   stoploss = NormalizeDouble(stoploss, Market::GetDigits());
+   takeprofit = NormalizeDouble(takeprofit, Market::GetDigits());
+
+   if (VerboseDebug) PrintFormat("Adjusted: stoploss = %f, takeprofit = %f", stoploss, takeprofit);
+   if (VerboseDebug) PrintFormat("Normalized: stoploss = %f, takeprofit = %f",
+      NormalizeDouble(stoploss, Market::GetDigits()),
+      NormalizeDouble(takeprofit, Market::GetDigits()));
+   if (VerboseDebug) PrintFormat("Normalized2: stoploss = %f, takeprofit = %f",
+      NormalizeDouble(stoploss, Digits),
+      NormalizeDouble(takeprofit, Digits));
 
    // @fixme: warning 43: possible loss of data due to type conversion: GetOrderColor
-   order_ticket = OrderSend(_Symbol, cmd, NormalizeLots(trade_volume), NormalizeDouble(Market::GetOpenPrice(cmd), Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + sid, 0, GetOrderColor(cmd));
+   order_ticket = OrderSend(_Symbol, cmd,
+      NormalizeLots(trade_volume),
+      NormalizeDouble(Market::GetOpenPrice(cmd), Market::GetDigits()),
+      max_order_slippage,
+      NormalizeDouble(stoploss, Market::GetDigits()),
+      NormalizeDouble(takeprofit, Market::GetDigits()),
+      order_comment,
+      MagicNumber + sid, 0, GetOrderColor(cmd));
    if (order_ticket >= 0) {
       total_orders++;
       daily_orders++;
@@ -1098,9 +1120,17 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
        if (WriteReport) ReportAdd(last_err);
      }
      if (VerboseDebug) {
+        Print("Digits: " + Market::GetDigits());
        last_debug = Msg::ShowText(
-         StringFormat("OrderSend(%s, %s, %g, %f, %d, %f, %f, %s, %d, %d, %d)",
-           _Symbol, Convert::OrderTypeToString(cmd), NormalizeLots(trade_volume), NormalizeDouble(Market::GetOpenPrice(cmd), Digits), max_order_slippage, stoploss, takeprofit, order_comment, MagicNumber + sid, 0, GetOrderColor(cmd)),
+         StringFormat("OrderSend(%s, %s, %g, %f, %d, %f, %f, '%s', %d, %d, %d)",
+           _Symbol, Convert::OrderTypeToString(cmd),
+           NormalizeLots(trade_volume),
+           NormalizeDouble(Market::GetOpenPrice(cmd), Market::GetDigits()),
+           max_order_slippage,
+           NormalizeDouble(stoploss, Market::GetDigits()),
+           NormalizeDouble(takeprofit, Market::GetDigits()),
+           order_comment,
+           MagicNumber + sid, 0, GetOrderColor(cmd)),
            "Debug", __FUNCTION__, __LINE__, VerboseDebug | VerboseTrace);
        StringFormat(GetAccountTextDetails(), "Debug", __FUNCTION__, __LINE__, VerboseDebug | VerboseTrace);
        StringFormat(GetMarketTextDetails(),  "Debug", __FUNCTION__, __LINE__, VerboseDebug | VerboseTrace);
@@ -3088,7 +3118,7 @@ bool UpdateTrailingStops() {
         new_tp = GetTrailingValue(OrderType(), +1, sid, OrderTakeProfit(), TRUE);
         if (!Market::TradeOpAllowed(OrderType(), new_sl, new_tp)) {
           if (VerboseDebug) {
-            PrintFormat("%s(): fabs(%g - %g) = %g > %g || fabs(%g - %g) = %g > %g",
+            PrintFormat("%s(): fabs(%f - %f) = %f > %f || fabs(%f - %f) = %f > %f",
                 __FUNCTION__,
                 OrderStopLoss(), new_sl, fabs(OrderStopLoss() - new_sl), MinPipChangeToTrade * pip_size,
                 OrderTakeProfit(), new_tp, fabs(OrderTakeProfit() - new_tp), MinPipChangeToTrade * pip_size);
@@ -3163,9 +3193,9 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
   double default_trail = (cmd == OP_BUY ? Bid : Ask) + trail * factor;
   int method = GetTrailingMethod(order_type, direction);
   // if (direction > 0) method = AC_TrailingProfitMethod; else if (direction < 0) method = AC_TrailingStopMethod; // Testing.
-  ENUM_TIMEFRAMES tf = GetStrategyTimeframe(order_type);
+  ENUM_TIMEFRAMES tf = (ENUM_TIMEFRAMES) GetStrategyTimeframe(order_type);
   int period = Convert::TfToIndex(tf);
-  int symbol = existing ? OrderSymbol() : _Symbol;
+  string symbol = existing ? OrderSymbol() : _Symbol;
 
   if (VerboseDebug) {
     PrintFormat("%s(): trail = (%d + %d) * %g = %g",
@@ -3245,28 +3275,28 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
        new_value = Open[CURR] + diff * factor;
        break;
      case T_2_BARS_PEAK: // 3
-       diff = fmax(GetPeakPrice(tf, MODE_HIGH, 2) - Open[CURR], Open[CURR] - GetPeakPrice(tf, MODE_LOW, 2));
+       diff = fmax(Market::GetPeakPrice(tf, MODE_HIGH, 2) - Open[CURR], Open[CURR] - Market::GetPeakPrice(tf, MODE_LOW, 2));
        new_value = Open[CURR] + diff * factor;
        break;
      case T_5_BARS_PEAK: // 4
-       diff = fmax(GetPeakPrice(tf, MODE_HIGH, 5) - Open[CURR], Open[CURR] - GetPeakPrice(tf, MODE_LOW, 5));
+       diff = fmax(Market::GetPeakPrice(tf, MODE_HIGH, 5) - Open[CURR], Open[CURR] - Market::GetPeakPrice(tf, MODE_LOW, 5));
        new_value = Open[CURR] + diff * factor;
        break;
      case T_10_BARS_PEAK: // 5
-       diff = fmax(GetPeakPrice(tf, MODE_HIGH, 10) - Open[CURR], Open[CURR] - GetPeakPrice(tf, MODE_LOW, 10));
+       diff = fmax(Market::GetPeakPrice(tf, MODE_HIGH, 10) - Open[CURR], Open[CURR] - Market::GetPeakPrice(tf, MODE_LOW, 10));
        new_value = Open[CURR] + diff * factor;
        break;
      case T_50_BARS_PEAK: // 6
-       diff = fmax(GetPeakPrice(tf, MODE_HIGH, 50) - Open[CURR], Open[CURR] - GetPeakPrice(tf, MODE_LOW, 50));
+       diff = fmax(Market::GetPeakPrice(tf, MODE_HIGH, 50) - Open[CURR], Open[CURR] - Market::GetPeakPrice(tf, MODE_LOW, 50));
        new_value = Open[CURR] + diff * factor;
        // @todo: Text non-Open values.
        break;
      case T_150_BARS_PEAK: // 7
-       diff = fmax(GetPeakPrice(tf, MODE_HIGH, 150) - Open[CURR], Open[CURR] - GetPeakPrice(tf, MODE_LOW, 150));
+       diff = fmax(Market::GetPeakPrice(tf, MODE_HIGH, 150) - Open[CURR], Open[CURR] - Market::GetPeakPrice(tf, MODE_LOW, 150));
        new_value = Open[CURR] + diff * factor;
        break;
      case T_HALF_200_BARS: // 8
-       diff = fmax(GetPeakPrice(tf, MODE_HIGH, 200) - Open[CURR], Open[CURR] - GetPeakPrice(tf, MODE_LOW, 200));
+       diff = fmax(Market::GetPeakPrice(tf, MODE_HIGH, 200) - Open[CURR], Open[CURR] - Market::GetPeakPrice(tf, MODE_LOW, 200));
        new_value = Open[CURR] + diff/2 * factor;
        break;
      case T_HALF_PEAK_OPEN:
@@ -3274,8 +3304,8 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
          // Get the number of bars for the tf since open. Zero means that the order was opened during the current bar.
          int BarShiftOfTradeOpen = iBarShift(symbol, tf, OrderOpenTime(), FALSE);
          // Get the high price from the bar with the given tf index
-         double highest_open = GetPeakPrice(tf, MODE_HIGH, BarShiftOfTradeOpen + 1);
-         double lowest_open = GetPeakPrice(tf, MODE_LOW, BarShiftOfTradeOpen + 1);
+         double highest_open = Market::GetPeakPrice(tf, MODE_HIGH, BarShiftOfTradeOpen + 1);
+         double lowest_open = Market::GetPeakPrice(tf, MODE_LOW, BarShiftOfTradeOpen + 1);
          diff = fmax(highest_open - Open[CURR], Open[CURR] - lowest_open);
          new_value = Open[CURR] + diff/2 * factor;
        }
@@ -3400,7 +3430,7 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
       if (existing && previous == 0) previous = default_trail;
     #endif
     Msg::ShowText(
-        StringFormat("#%d (d:%d/f:%d), method: %d, invalid value: %g, previous: %g, Ask/Bid/Gap: %g/%g/%g (%d pts); %s",
+        StringFormat("#%d (d:%d/f:%d), method: %d, invalid value: %g, previous: %g, Ask/Bid/Gap: %f/%f/%f (%d pts); %s",
           existing ? OrderTicket() : 0, direction, factor,
           method, new_value, previous, Ask, Bid, Convert::PointsToValue(Market::GetMarketDistanceInPts()), Market::GetMarketDistanceInPts(), Order::GetOrderToText()),
         "Debug", __FUNCTION__, __LINE__, VerboseDebug);
@@ -3533,27 +3563,9 @@ int GetTrailingMethod(int order_type, int stop_or_profit) {
       if (ZigZag_TrailingProfitMethod > 0) profit_method = ZigZag_TrailingProfitMethod;
       break;
     default:
-      if (VerboseTrace) Print(__FUNCTION__ + ": Unknown order type: " + order_type);
+      Msg::ShowText(StringFormat("Unknown order type: %s", order_type), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
   }
   return Misc::If(stop_or_profit > 0, profit_method, stop_method);
-}
-
-/**
- * Get peak price at given number of bars.
- */
-double GetPeakPrice(int timeframe, int mode, int bars, int index = CURR) {
-  int ibar = -1;
-  double peak_price = Open[0];
-  if (mode == MODE_HIGH) ibar = iHighest(_Symbol, timeframe, MODE_HIGH, bars, index);
-  if (mode == MODE_LOW)  ibar =  iLowest(_Symbol, timeframe, MODE_LOW,  bars, index);
-  if (ibar == -1 && VerboseTrace) { err_code = GetLastError(); Print(__FUNCTION__ + ": " + ErrorDescription(err_code)); return FALSE; }
-  if (mode == MODE_HIGH) {
-    return iHigh(_Symbol, timeframe, ibar);
-  } else if (mode == MODE_LOW) {
-    return iLow(_Symbol, timeframe, ibar);
-  } else {
-    return FALSE;
-  }
 }
 
 // Calculate open positions (in volume).
@@ -3812,7 +3824,7 @@ void CheckStats(double value, int type, bool max = true) {
  */
 color GetOrderColor(int cmd = -1) {
   if (cmd == -1) cmd = OrderType();
-  return Convert::OrderTypeToValue(cmd) > 0 ? (int)ColorBuy : (int)ColorSell;
+  return Convert::OrderTypeToValue(cmd) > 0 ? ColorBuy : ColorSell;
 }
 
 /**
@@ -3846,21 +3858,6 @@ double NormalizeLots(double lots, bool ceiling = False, string pair = "") {
   if (lotsize < market_minlot) lotsize = market_minlot;
   if (lotsize > market_maxlot) lotsize = market_maxlot;
   return NormalizeDouble(lotsize, volume_digits);
-}
-
-/**
- * Normalize price value.
- */
-double NormalizePrice(double p, string pair=""){
-   // See: http://forum.mql4.com/47988
-   // http://forum.mql4.com/43064#515262 zzuegg reports for non-currency DE30:
-   // MarketInfo(chart.symbol,MODE_TICKSIZE) returns 0.5
-   // MarketInfo(chart.symbol,MODE_DIGITS) return 1
-   // Point = 0.1
-   // Prices to open must be a multiple of ticksize
-   if (pair == "") pair = Symbol();
-   double ts = MarketInfo(pair, MODE_TICKSIZE);
-   return( round(p/ts) * ts );
 }
 
 /**
@@ -5406,20 +5403,20 @@ string GetStrategyComment(int sid) {
  */
 string GetStrategyReport(string sep = "\n") {
   string output = "Strategy stats:" + sep;
-  double pc_loss = 0, pc_won = 0;
   for (int id = 0; id < FINAL_STRATEGY_TYPE_ENTRY; id++) {
     if (info[id][TOTAL_ORDERS] > 0) {
       output += StringFormat("Profit factor: %.2f, ",
                 GetStrategyProfitFactor(id));
       output += StringFormat("Total net profit: %.2fpips (%+.2f/%-.2f), ",
         stats[id][TOTAL_NET_PROFIT], stats[id][TOTAL_GROSS_PROFIT], stats[id][TOTAL_GROSS_LOSS]);
-      pc_loss = (100 / NormalizeDouble(info[id][TOTAL_ORDERS], 2)) * info[id][TOTAL_ORDERS_LOSS];
-      pc_won  = (100 / NormalizeDouble(info[id][TOTAL_ORDERS], 2)) * info[id][TOTAL_ORDERS_WON];
       output += StringFormat("Total orders: %d (Won: %.1f%% [%d] / Loss: %.1f%% [%d])",
-                info[id][TOTAL_ORDERS], pc_won, info[id][TOTAL_ORDERS_WON], pc_loss, info[id][TOTAL_ORDERS_LOSS]);
-      if (info[id][TOTAL_ERRORS] > 0) output += StringFormat(", Errors: %d", info[id][TOTAL_ERRORS]);
+                info[id][TOTAL_ORDERS],
+                (100 / NormalizeDouble(info[id][TOTAL_ORDERS], 2)) * info[id][TOTAL_ORDERS_WON],
+                info[id][TOTAL_ORDERS_WON],
+                (100 / NormalizeDouble(info[id][TOTAL_ORDERS], 2)) * info[id][TOTAL_ORDERS_LOSS],
+                info[id][TOTAL_ORDERS_LOSS]);
+      output += info[id][TOTAL_ERRORS] > 0 ? StringFormat(", Errors: %d", info[id][TOTAL_ERRORS]) : "";
       output += StringFormat(" - %s", sname[id]);
-      // output += "Total orders: " + info[id][TOTAL_ORDERS] + " (Won: " + DoubleToStr(pc_won, 1) + "% [" + info[id][TOTAL_ORDERS_WON] + "] | Loss: " + DoubleToStr(pc_loss, 1) + "% [" + info[id][TOTAL_ORDERS_LOSS] + "]); ";
       output += sep;
     }
   }
@@ -6505,8 +6502,8 @@ bool OpenOrderCondition(int cmd, int sid, int time, int method) {
   int qshift = iBarShift(_Symbol, tf, time, FALSE); // Get the number of bars for the tf since queued.
   double qopen = iOpen(_Symbol, tf, qshift);
   double qclose = iClose(_Symbol, tf, qshift);
-  double qhighest = GetPeakPrice(tf, MODE_HIGH, qshift); // Get the high price since queued.
-  double qlowest = GetPeakPrice(tf, MODE_LOW, qshift); // Get the lowest price since queued.
+  double qhighest = Market::GetPeakPrice(tf, MODE_HIGH, qshift); // Get the high price since queued.
+  double qlowest = Market::GetPeakPrice(tf, MODE_LOW, qshift); // Get the lowest price since queued.
   double diff = fmax(qhighest - Open[CURR], Open[CURR] - qlowest);
   if ((method &   1) != 0) result &= (cmd == OP_BUY && qopen < Open[CURR]) || (cmd == OP_SELL && qopen > Open[CURR]);
   if ((method &   2) != 0) result &= (cmd == OP_BUY && qclose < Close[CURR]) || (cmd == OP_SELL && qclose > Close[CURR]);
