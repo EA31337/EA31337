@@ -654,7 +654,11 @@ extern string SoundFileAtClose = "alert.wav"; // Sound: on order close
 
 //+------------------------------------------------------------------+
 extern string __Backtest_Parameters__ = "-- Backtest parameters --"; // >>> BACKTESTING <<<
-extern bool ValidateSettings = 1; // Validate startup settings
+#ifdef __backtest__
+  extern bool ValidateSettings = 1; // Validate startup settings
+#else
+  extern bool ValidateSettings = 0; // Validate startup settings
+#endif
 extern int DemoMarketStopLevel = 10; // Demo market stop level
 
 //+------------------------------------------------------------------+
