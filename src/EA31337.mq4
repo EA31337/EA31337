@@ -260,7 +260,8 @@ bool session_initiated = FALSE;
 bool session_active = FALSE;
 
 // Time-based variables.
-datetime bar_time, last_bar_time = (int)EMPTY_VALUE; // Bar time, current and last one to check if bar has been changed since the last time.
+// Bar time: initial, current and last one to check if bar has been changed since the last time.
+datetime init_bar_time, bar_time, last_bar_time = (int)EMPTY_VALUE;
 datetime time_current = (int)EMPTY_VALUE;
 int hour_of_day, day_of_week, day_of_month, day_of_year, month, year;
 int last_order_time = 0, last_action_time = 0;
@@ -469,9 +470,11 @@ void OnDeinit(const int reason) {
   if (WriteReport && !Check::IsOptimization() && session_initiated) {
     // if (reason == REASON_CHARTCHANGE)
     summary.CalculateSummary();
+    // @todo: Calculate average spread from stats[sid][AVG_SPREAD].
     filename = StringFormat(
-        "%s-%s-%f%s-s%d-%s-M%d-Report.txt",
-        ea_name, _Symbol, summary.init_deposit, Account::AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE), Period());
+        "%s-%.0f%s-%s-%s-%dspread-(%d)-M%d-report.txt",
+        _Symbol, summary.init_deposit, Account::AccountCurrency(), TimeToStr(init_bar_time, TIME_DATE), TimeToStr(time_current, TIME_DATE), init_spread, GetNoOfStrategies(), Period());
+        // ea_name, _Symbol, summary.init_deposit, Account::AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE), Period());
         // ea_name, _Symbol, init_balance, Account::AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES), Period());
     string data = summary.GetReport();
     data += GetStatReport();
@@ -4343,8 +4346,9 @@ bool InitializeVariables() {
   #ifdef __backtest__ init &= !Check::IsRealtime(); #endif
 
   // Check time of the week, month and year based on the trading bars.
+  init_bar_time = iTime(NULL, 0, 0);
   time_current = TimeCurrent();
-  bar_time = iTime(NULL, PERIOD_M1, 0);
+  bar_time = iTime(NULL, 0, 0);
   hour_of_day = DateTime::Hour(); // The hour (0,1,2,..23) of the last known server time by the moment of the program start.
   day_of_week = DateTime::DayOfWeek(); // The zero-based day of week (0 means Sunday,1,2,3,4,5,6) of the specified date. At the testing, the last known server time is modelled.
   day_of_month = DateTime::Day(); // The day of month (1 - 31) of the specified date. At the testing, the last known server time is modelled.
