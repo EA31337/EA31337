@@ -1079,9 +1079,6 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
    if (VerboseDebug) PrintFormat("Normalized: stoploss = %f, takeprofit = %f",
       NormalizeDouble(stoploss, Market::GetDigits()),
       NormalizeDouble(takeprofit, Market::GetDigits()));
-   if (VerboseDebug) PrintFormat("Normalized2: stoploss = %f, takeprofit = %f",
-      NormalizeDouble(stoploss, Digits),
-      NormalizeDouble(takeprofit, Digits));
 
    // @fixme: warning 43: possible loss of data due to type conversion: GetOrderColor
    order_ticket = OrderSend(_Symbol, cmd,
