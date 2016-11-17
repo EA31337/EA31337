@@ -1189,14 +1189,17 @@ bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
   if (volume < market_minlot) {
     last_trace = Msg::ShowText(StringFormat("%s: Lot size = %.2f", sname[sid], volume), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
     result = FALSE;
+  } else if (Orders::IsNewOrderAllowed()) {
+    last_msg = Msg::ShowText("Maximum open and pending orders has reached the limit set by the broker.", "Info", __FUNCTION__, __LINE__, VerboseInfo);
+    result = FALSE;
   } else if (total_orders >= max_orders) {
-    last_msg = Msg::ShowText("Maximum open and pending orders reached the limit (MaxOrders).", "Info", __FUNCTION__, __LINE__, VerboseInfo);
+    last_msg = Msg::ShowText("Maximum open and pending orders has reached the limit (MaxOrders).", "Info", __FUNCTION__, __LINE__, VerboseInfo);
     #ifdef __advanced__
     OrderQueueAdd(sid, cmd);
     #endif
     result = FALSE;
   } else if (GetTotalOrdersByType(sid) >= GetMaxOrdersPerType()) {
-    last_msg = Msg::ShowText(StringFormat("%s: Maximum open and pending orders per type reached the limit (MaxOrdersPerType).", sname[sid]), "Info", __FUNCTION__, __LINE__, VerboseInfo);
+    last_msg = Msg::ShowText(StringFormat("%s: Maximum open and pending orders per type has reached the limit (MaxOrdersPerType).", sname[sid]), "Info", __FUNCTION__, __LINE__, VerboseInfo);
     #ifdef __advanced__
     OrderQueueAdd(sid, cmd);
     #endif
@@ -1218,7 +1221,7 @@ bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
     last_trace = Msg::ShowText(StringFormat("%s: There must be a %d sec minimum interval between subsequent trade signals.", sname[sid], MinIntervalSec), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
     result = FALSE;
   } else if (MaxOrdersPerDay > 0 && daily_orders >= GetMaxOrdersPerDay()) {
-    last_err = Msg::ShowText("Maximum open and pending orders reached the daily limit (MaxOrdersPerDay).", "Info", __FUNCTION__, __LINE__, VerboseInfo);
+    last_err = Msg::ShowText("Maximum open and pending orders has reached the daily limit (MaxOrdersPerDay).", "Info", __FUNCTION__, __LINE__, VerboseInfo);
     OrderQueueAdd(sid, cmd);
     result = FALSE;
   }
@@ -1244,7 +1247,7 @@ bool CheckProfitFactorLimits(int sid = EMPTY) {
   conf[sid][PROFIT_FACTOR] = GetStrategyProfitFactor(sid);
   if (ProfitFactorMinToTrade > 0 && conf[sid][PROFIT_FACTOR] < ProfitFactorMinToTrade) {
     last_err = Msg::ShowText(
-      StringFormat("%s: Minimum profit factor reached, disabling strategy. (pf = %.1f)",
+      StringFormat("%s: Minimum profit factor has reached, disabling strategy. (pf = %.1f)",
         sname[sid], conf[sid][PROFIT_FACTOR]),
       "Info", __FUNCTION__, __LINE__, VerboseInfo);
     info[sid][SUSPENDED] = TRUE;
@@ -1252,7 +1255,7 @@ bool CheckProfitFactorLimits(int sid = EMPTY) {
   }
   if (ProfitFactorMaxToTrade > 0 && conf[sid][PROFIT_FACTOR] > ProfitFactorMaxToTrade) {
     last_err = Msg::ShowText(
-      StringFormat("%s: Maximum profit factor reached, disabling strategy. (pf = %.1f)",
+      StringFormat("%s: Maximum profit factor has reached, disabling strategy. (pf = %.1f)",
         sname[sid], conf[sid][PROFIT_FACTOR]),
       "Info", __FUNCTION__, __LINE__, VerboseInfo);
     info[sid][SUSPENDED] = TRUE;
