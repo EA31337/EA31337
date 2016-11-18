@@ -365,12 +365,18 @@ void OnTick() {
   hourly_stats.OnTick();
 
   // Check the last tick change.
-  last_tick_change = fmax(Convert::GetValueDiffInPips(Ask, LastAsk, TRUE), Convert::GetValueDiffInPips(Bid, LastBid, TRUE));
-  // if (VerboseDebug && last_tick_change > 1) Print("Tick change: " + tick_change + "; Ask" + Ask + ", Bid: " + Bid, ", LastAsk: " + LastAsk + ", LastBid: " + LastBid);
+  last_tick_change = fmax(Convert::GetValueDiffInPips(Ask, LastAsk, True), Convert::GetValueDiffInPips(Bid, LastBid, True));
 
   // Check if we should ignore the tick.
   bar_time = iTime(NULL, PERIOD_M1, 0);
   if (bar_time <= last_bar_time || last_tick_change < MinPipChangeToTrade) {
+    /*
+    if (VerboseDebug) {
+      PrintFormat("Last tick change: %f < %f (%g/%g), Bar time: %d, Ask: %g, Bid: %g, LastAsk: %g, LastBid: %g",
+        last_tick_change, MinPipChangeToTrade, Convert::GetValueDiffInPips(Ask, LastAsk, True), Convert::GetValueDiffInPips(Bid, LastBid, True),
+        bar_time, Ask, Bid, LastAsk, LastBid);
+    }
+    */
     LastAsk = Ask; LastBid = Bid;
     return;
   } else {
@@ -1189,7 +1195,7 @@ bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
   if (volume < market_minlot) {
     last_trace = Msg::ShowText(StringFormat("%s: Lot size = %.2f", sname[sid], volume), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
     result = FALSE;
-  } else if (Orders::IsNewOrderAllowed()) {
+  } else if (!Orders::IsNewOrderAllowed()) {
     last_msg = Msg::ShowText("Maximum open and pending orders has reached the limit set by the broker.", "Info", __FUNCTION__, __LINE__, VerboseInfo);
     result = FALSE;
   } else if (total_orders >= max_orders) {
