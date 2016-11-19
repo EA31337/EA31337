@@ -6318,7 +6318,7 @@ bool ActionExecute(int aid, int id = EMPTY) {
     Msg::ShowText(
       StringFormat("Failed to execute action: %s (id: %d), condition: %s (id: %d).",
         ActionIdToText(aid), aid, ReasonIdToText(reason_id), reason_id),
-      "Error", __FUNCTION__, __LINE__, VerboseErrors);
+      "Warning", __FUNCTION__, __LINE__, VerboseErrors);
   }
   return result;
 }
