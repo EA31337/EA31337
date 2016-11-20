@@ -3808,6 +3808,13 @@ bool CheckSettings() {
     Msg::ShowText("This version is compiled for backtest mode only.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
     return (FALSE);
   }
+  #else
+  if (Check::IsRealtime()) {
+    if (AccountInfoDouble(ACCOUNT_BALANCE) > 100000) {
+      Msg::ShowText("This version doesn't support balance above 100k for a real account.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, TRUE);
+      return (FALSE);
+    }
+  }
   #endif
   #endif
   if (!Check::IsRealtime() && ValidateSettings) {

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Req. Bash >=4.x.
 set -e
 CWD=$(git rev-parse --show-toplevel 2> /dev/null || (cd -P -- "$(dirname -- "$0")/.." && pwd -P))
 VM_DIR="$CWD/_VM"
@@ -26,11 +27,11 @@ echo "Cleaning previous reports..."
 find "$REP_DIR" -type f -print -delete
 
 echo "Running tests..."
-for year in {2013..2015}; do
+for year in {2014..2014}; do
   for month in {01..12}; do # Note: Leading zero syntax requires Bash >=4.x.
-    for deposit in {500..2000..500}; do
-      for spread in {10..20..10}; do
-        vagrant ssh -c "/vagrant/scripts/run_backtest.sh -v -t -r "EA31337-$VER-EURUSD-DS-${deposit}GBP-s${spread}-$year-$month" -e EA31337 -d $deposit -p EURUSD -m $month -y $year -s $spread -b DS -D5 -O /vagrant/files/reports"
+    for deposit in {2000..2000}; do
+      for spread in {10..10}; do
+        vagrant ssh -c "/vagrant/scripts/run_backtest.sh -v -t -r "EA31337-$VER-EURUSD-DS-${deposit}USD-${spread}spread-$year-$month" -e EA31337 -d $deposit -p EURUSD -m $month -y $year -s $spread -b DS -D5 -O /vagrant/files/reports -M4.0.0.1010"
         mkdir -p "$OUT"/$VER/$year
         mv -v "$REP_DIR"/*$VER* "$OUT"/$VER/$year
       done

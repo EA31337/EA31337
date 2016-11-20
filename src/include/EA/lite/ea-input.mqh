@@ -18,15 +18,15 @@
 //+------------------------------------------------------------------+
 extern string __Trade_Parameters__ = "-- Trade parameters --"; // >>> TRADE <<<
 extern int      MaxOrders = 0; // Max orders (0 = auto)
-extern int      MaxOrdersPerType = 35; // Max orders per type (0 = auto)
+extern int      MaxOrdersPerType = 0; // Max orders per type (0 = auto)
 extern double   LotSize = 0.00000000; // Lot size (0 = auto)
 extern bool     TradeMicroLots = 1; // Trade micro lots?
-extern int TrendMethod = 34; // Main trend method (0-255)
+extern int TrendMethod = 203; // Main trend method (0-255)
 extern int MinVolumeToTrade = 2; // Min volume to trade
 extern int MaxOrderPriceSlippage = 5; // Max price slippage (in pips)
 extern int MaxTries = 5; // Max retries for opening orders
-extern double MinPipChangeToTrade = 0.8; // Min pip change to trade (0 = every tick)
-extern int MinPipGap = 30; // Min gap between trades per type (in pips)
+extern double MinPipChangeToTrade = 0.4; // Min pip change to trade (0 = every tick)
+extern int MinPipGap = 10; // Min gap between trades per type (in pips)
 
 //+------------------------------------------------------------------+
 extern string   __EA_Order_Parameters__ = "-- Profit and loss parameters --"; // >>> PROFIT/LOSS <<<
@@ -41,42 +41,42 @@ extern int TrailingStop = 100; // Extra trailing stop (in pips)
 extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 17; // Default trail profit method
 extern bool TrailingProfitOneWay = 0; // Trailing profit one way?
 extern int TrailingProfit = 70; // Extra trailing profit (in pips)
-extern double TrailingStopAddPerMinute = 0.2; // Decrease trail stop per minute (pip/min)
+extern double TrailingStopAddPerMinute = 0; // Decrease trail stop per minute (pip/min)
 
 //+------------------------------------------------------------------+
 extern string __EA_Risk_Parameters__ = "-- Risk management parameters --"; // >>> RISK <<
 extern bool TradeWithTrend = 1; // Trade with trend
-extern double RiskRatio = 0.00000000; // Risk ratio (0 = auto, 1.0 = normal)
-extern double RiskMargin = 2; // Risk margin (0-100, 0 = auto, 1 = 1%)
-extern int CloseOrderAfterXHours = 0; // Close order after X hours (0 = disabled)
+extern double RiskRatio = 0; // Risk ratio (0 = auto, 1.0 = normal)
+extern double RiskMargin = 1.0; // Risk margin (0-100, 0 = auto, 1 = 1%)
+extern int CloseOrderAfterXHours = 72; // Close order after X hours (0 = disabled)
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Parameters__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGIES <<<
-extern double ProfitFactorMinToTrade = 0.7; // Min. profit factor per strategy to trade
+extern double ProfitFactorMinToTrade = 0.5; // Min. profit factor per strategy to trade
 extern double ProfitFactorMaxToTrade = 5.00000000; // Max. profit factor per strategy to trade
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameters (set 1.0 for default) --"; // >>> BOOSTING <<<
 extern bool Boosting_Enabled = 1; // Enable boosting
-extern double BoostTrendFactor = 1.50000000; // Boost by trend factor
-extern double BestDailyStrategyMultiplierFactor = 1.70000000; // Multiplier for the best daily strategy
-extern double BestWeeklyStrategyMultiplierFactor = 1.00000000; // Multiplier for the best weekly strategy
-extern double BestMonthlyStrategyMultiplierFactor = 1.00000000; // Multiplier for the best monthly strategy
-extern double WorseDailyStrategyDividerFactor = 0.80000000; // Divider for the worse daily strategy
-extern double WorseWeeklyStrategyDividerFactor = 0.80000000; // Divider for the worse weekly strategy
-extern double WorseMonthlyStrategyDividerFactor = 1.20000000; // Divider for the worse monthly strategy
+extern double BoostTrendFactor = 1.7; // Boost by trend factor
+extern double BestDailyStrategyMultiplierFactor = 1.5; // Multiplier for the best daily strategy
+extern double BestWeeklyStrategyMultiplierFactor = 0.8; // Multiplier for the best weekly strategy
+extern double BestMonthlyStrategyMultiplierFactor = 0.8; // Multiplier for the best monthly strategy
+extern double WorseDailyStrategyDividerFactor = 0.6; // Divider for the worse daily strategy
+extern double WorseWeeklyStrategyDividerFactor = 0.8; // Divider for the worse weekly strategy
+extern double WorseMonthlyStrategyDividerFactor = 1; // Divider for the worse monthly strategy
 
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions__ = "-- Account conditions --"; // >>> CONDITIONS & ACTIONS <<<
 // Note: It's not advice to use on accounts where multi bots are trading.
-extern bool Account_Conditions_Active = 0; // Enable account conditions
+extern bool Account_Conditions_Active = 1; // Enable account conditions
 extern ENUM_ACC_CONDITION Account_Condition_1 = 5; // 1. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_1 = 9; // 1. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_1 = 7; // 1. Action to take
+extern ENUM_MARKET_CONDITION Market_Condition_1 = 13; // 1. Market condition
+extern ENUM_ACTION_TYPE Action_On_Condition_1 = 9; // 1. Action to take
 
 extern ENUM_ACC_CONDITION Account_Condition_2 = 8; // 2. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_2 = 12; // 2. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_2 = 2; // 2. Action to take
+extern ENUM_MARKET_CONDITION Market_Condition_2 = 13; // 2. Market condition
+extern ENUM_ACTION_TYPE Action_On_Condition_2 = 10; // 2. Action to take
 
 extern ENUM_ACC_CONDITION Account_Condition_3 = 13; // 3. Account condition
 extern ENUM_MARKET_CONDITION Market_Condition_3 = 14; // 3. Market condition
@@ -87,15 +87,15 @@ extern ENUM_MARKET_CONDITION Market_Condition_4 = 13; // 4. Market condition
 extern ENUM_ACTION_TYPE Action_On_Condition_4 = 10; // 4. Action to take
 
 extern ENUM_ACC_CONDITION Account_Condition_5 = 18; // 5. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_5 = 7; // 5. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_5 = 7; // 5. Action to take
+extern ENUM_MARKET_CONDITION Market_Condition_5 = 13; // 5. Market condition
+extern ENUM_ACTION_TYPE Action_On_Condition_5 = 9; // 5. Action to take
 
 extern int Account_Condition_MinProfitCloseOrder = 20; // Min pip profit on action to close
 
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions_Params__ = "-- Account conditions parameters --"; // >>> CONDITIONS & ACTIONS PARAMS <<<
 extern int MarketSuddenDropSize = 20; // Drop in pips to react
-extern int MarketBigDropSize = 50; // Big drop in pips to react
+extern int MarketBigDropSize = 40; // Big drop in pips to react
 extern int TrendMethodAction = 238; // Trend method for actions (0-255)
 extern int MarketSpecificHour = 3; // Specific hour used for conditions (0-23)
 
@@ -146,9 +146,9 @@ int ADX30_SignalMethod = 15; // Signal method for M30 (0-?)
 //+------------------------------------------------------------------+
 extern string __Alligator_Parameters__ = "-- Settings for the Alligator indicator --"; // >>> ALLIGATOR <<<
 extern bool Alligator1_Active = 0; // Enable for M1
-extern bool Alligator5_Active = 0; // Enable for M5
+extern bool Alligator5_Active = 1; // Enable for M5
 extern bool Alligator15_Active = 0; // Enable for M15
-extern bool Alligator30_Active = 0; // Enable for M30
+extern bool Alligator30_Active = 1; // Enable for M30
 extern int Alligator_Period_Jaw = 14; // Jaw Period
 extern int Alligator_Period_Teeth = 12; // Teeth Period
 extern int Alligator_Period_Lips = 4; // Lips Period
@@ -316,7 +316,7 @@ int Envelopes_Shift_Far = 0; // Shift Far
 extern ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = 3; // Trail stop method
 extern ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = 9; // Trail profit method
 /* @todo extern */ int Envelopes_SignalLevel = 0; // Signal level
-extern int Envelopes1_SignalMethod = 30; // Signal method for M1 (0-127)
+extern int Envelopes1_SignalMethod = 48; // Signal method for M1 (0-127)
 extern int Envelopes5_SignalMethod = 63; // Signal method for M5 (0-127)
 extern int Envelopes15_SignalMethod = 0; // Signal method for M15 (0-127)
 extern int Envelopes30_SignalMethod = 0; // Signal method for M30 (0-127)
@@ -387,8 +387,8 @@ int Ichimoku30_SignalMethod = 0; // Signal method for M30 (0-
 extern string __MA_Parameters__ = "-- Settings for the Moving Average indicator --"; // >>> MA <<<
 extern bool MA1_Active = 1; // Enable for M1
 extern bool MA5_Active = 0; // Enable for M5
-extern bool MA15_Active = 0; // Enable for M15
-extern bool MA30_Active = 0; // Enable for M30
+extern bool MA15_Active = 1; // Enable for M15
+extern bool MA30_Active = 1; // Enable for M30
 extern int MA_Period_Fast = 15; // Period Fast
 extern int MA_Period_Medium = 22; // Period Medium
 extern int MA_Period_Slow = 38; // Period Slow
@@ -411,9 +411,9 @@ extern int MA30_SignalMethod = 51; // Signal method for M30 (0-127)
 //+------------------------------------------------------------------+
 extern string __MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --"; // >>> MACD <<<
 extern bool MACD1_Active = 0; // Enable for M1
-extern bool MACD5_Active = 0; // Enable for M5
+extern bool MACD5_Active = 1; // Enable for M5
 extern bool MACD15_Active = 0; // Enable for M15
-extern bool MACD30_Active = 0; // Enable for M30
+extern bool MACD30_Active = 1; // Enable for M30
 extern int MACD_Period_Fast = 12; // Period Fast
 extern int MACD_Period_Slow = 37; // Period Slow
 extern int MACD_Period_Signal = 9; // Period for signal
@@ -508,7 +508,7 @@ extern int RSI_Shift = 2; // Shift
 extern ENUM_TRAIL_TYPE RSI_TrailingStopMethod = 2; // Trail stop method
 extern ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = 24; // Trail profit method
 extern int RSI_SignalLevel = 2; // Signal level
-extern int RSI1_SignalMethod = 23; // Signal method for M1 (0-63)
+extern int RSI1_SignalMethod = 36; // Signal method for M1 (0-63)
 extern int RSI5_SignalMethod = 54; // Signal method for M5 (0-63)
 extern int RSI15_SignalMethod = 7; // Signal method for M15 (0-63)
 extern int RSI30_SignalMethod = 20; // Signal method for M30 (0-63)
@@ -531,10 +531,10 @@ int RVI30_SignalMethod = 0; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
 extern string __SAR_Parameters__ = "-- Settings for the the Parabolic Stop and Reverse system indicator --"; // >>> SAR <<<
-extern bool SAR1_Active = 0; // Enable for M1
-extern bool SAR5_Active = 0; // Enable for M5
+extern bool SAR1_Active = 1; // Enable for M1
+extern bool SAR5_Active = 1; // Enable for M5
 extern bool SAR15_Active = 0; // Enable for M15
-extern bool SAR30_Active = 1; // Enable for M30
+extern bool SAR30_Active = 0; // Enable for M30
 extern double SAR_Step = 0.02; // Step
 extern double SAR_Step_Ratio = 1; // Step ratio between timeframes (0.5-1.5)
 extern double SAR_Maximum_Stop = 0.3; // Maximum stop
@@ -542,7 +542,7 @@ extern int SAR_Shift = 0; // Shift
 extern ENUM_TRAIL_TYPE SAR_TrailingStopMethod = 3; // Trail stop method
 extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = 6; // Trail profit method
 extern double SAR_SignalLevel = 0.5; // Signal level
-extern int SAR1_SignalMethod = 24; // Signal method for M1 (0-127)
+extern int SAR1_SignalMethod = 21; // Signal method for M1 (0-127)
 extern int SAR5_SignalMethod = 9; // Signal method for M5 (0-127)
 extern int SAR15_SignalMethod = 111; // Signal method for M15 (0-127)
 extern int SAR30_SignalMethod = 3; // Signal method for M30 (0-127)
@@ -583,15 +583,15 @@ int Stochastic30_SignalMethod = 0; // Signal method for M30 (0-
 extern string __WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --"; // >>> WPR <<<
 extern bool WPR1_Active = 0; // Enable for M1
 extern bool WPR5_Active = 0; // Enable for M5
-extern bool WPR15_Active = 0; // Enable for M15
-extern bool WPR30_Active = 0; // Enable for M30
+extern bool WPR15_Active = 1; // Enable for M15
+extern bool WPR30_Active = 1; // Enable for M30
 extern int WPR_Period = 18; // Period
 extern double WPR_Period_Ratio = 1.3; // Period ratio between timeframes (0.5-1.5)
 extern int WPR_Shift = 0; // Shift
 extern int WPR_SignalLevel = 29; // Signal level
 extern ENUM_TRAIL_TYPE WPR_TrailingStopMethod = 2; // Trail stop method
 extern ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = 7; // Trail profit method
-extern int WPR1_SignalMethod = 36; // Signal method for M1 (0-63)
+extern int WPR1_SignalMethod = 32; // Signal method for M1 (0-63)
 extern int WPR5_SignalMethod = 9; // Signal method for M5 (0-63)
 extern int WPR15_SignalMethod = 16; // Signal method for M15 (0-63)
 extern int WPR30_SignalMethod = 0; // Signal method for M30 (0-63)
@@ -657,7 +657,7 @@ extern string __Backtest_Parameters__ = "-- Backtest parameters --"; // >>> BACK
 #ifdef __backtest__
   extern bool ValidateSettings = 1; // Validate startup settings
 #else
-  extern bool ValidateSettings = 0; // Validate startup settings
+  extern bool ValidateSettings = 1; // Validate startup settings
 #endif
 extern int DemoMarketStopLevel = 10; // Demo market stop level
 
