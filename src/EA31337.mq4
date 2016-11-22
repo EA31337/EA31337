@@ -171,7 +171,7 @@ int acc_conditions[30][3];
 string last_cname;
 
 // Order queue.
-int order_queue[100][FINAL_ORDER_QUEUE_ENTRY];
+long order_queue[100][FINAL_ORDER_QUEUE_ENTRY];
 
 // Indicator variables.
 double ac[H1][FINAL_INDICATOR_INDEX_ENTRY];
@@ -529,12 +529,11 @@ bool Trade() {
         if (CheckMarketEvent(OP_BUY,  PERIOD_M30, info[id][CLOSE_CONDITION])) CloseOrdersByType(OP_SELL, id, NULL, CloseConditionOnlyProfitable); // TODO: reason_id
         if (CheckMarketEvent(OP_SELL, PERIOD_M30, info[id][CLOSE_CONDITION])) CloseOrdersByType(OP_BUY,  id, NULL, CloseConditionOnlyProfitable); // TODO: reason_id
       }
-      if (trade_cmd == OP_BUY  && !CheckMarketCondition1(OP_BUY,  info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) trade_cmd = EMPTY;
-      if (trade_cmd == OP_SELL && !CheckMarketCondition1(OP_SELL, info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) trade_cmd = EMPTY;
+      if (trade_cmd == OP_BUY  && !CheckMarketCondition1(OP_BUY,  (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) trade_cmd = EMPTY;
+      if (trade_cmd == OP_SELL && !CheckMarketCondition1(OP_SELL, (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) trade_cmd = EMPTY;
       if (trade_cmd == OP_BUY  &&  CheckMarketCondition1(OP_SELL, PERIOD_M30, info[id][OPEN_CONDITION2], FALSE)) trade_cmd = EMPTY;
       if (trade_cmd == OP_SELL &&  CheckMarketCondition1(OP_BUY,  PERIOD_M30, info[id][OPEN_CONDITION2], FALSE)) trade_cmd = EMPTY;
       #endif
-
 
       if (trade_cmd != EMPTY) {
         order_placed &= ExecuteOrder(trade_cmd, id);
@@ -652,8 +651,8 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
 #ifdef __advanced__
     case ATR: // Calculates the Average True Range indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        atr[index][i][FAST] = iATR(symbol, tf, ATR_Period_Fast * ratio, i);
-        atr[index][i][SLOW] = iATR(symbol, tf, ATR_Period_Slow * ratio, i);
+        atr[index][i][FAST] = iATR(symbol, tf, (int) (ATR_Period_Fast * ratio), i);
+        atr[index][i][SLOW] = iATR(symbol, tf, (int) (ATR_Period_Slow * ratio), i);
         ratio *= ATR_Period_Ratio;
       }
       break;
@@ -3742,7 +3741,7 @@ int GetMaxOrdersAuto(bool smooth = true) {
 int GetMaxOrdersPerDay() {
   if (MaxOrdersPerDay <= 0) return TRUE;
   int hours_left = (24 - hour_of_day);
-  int curr_allowed_limit = floor((MaxOrdersPerDay - daily_orders) / hours_left);
+  int curr_allowed_limit = (int) floor((MaxOrdersPerDay - daily_orders) / hours_left);
   // Message(StringFormat("Hours left: (%d - %d) / %d= %d", MaxOrdersPerDay, daily_orders, hours_left, curr_allowed_limit));
   return fmin(fmax((total_orders - daily_orders), 1) + curr_allowed_limit, MaxOrdersPerDay);
 }
@@ -3859,8 +3858,8 @@ double GetAutoRiskRatio() {
   double new_risk_ratio = 1 / fmin(equity, balance) * fmin(fmin(free, balance), equity);
 
   #ifdef __advanced__
-    int margin_pc = 100 / equity * margin;
-    rr_text = Misc::If(new_risk_ratio < 1.0, StringFormat("-MarginUsed=%d%%|", margin_pc), ""); string s = "|";
+    int margin_pc = (int) (100 / equity * margin);
+    rr_text = new_risk_ratio < 1.0 ? StringFormat("-MarginUsed=%d%%|", margin_pc) : ""; string s = "|";
     if ((RiskRatioIncreaseMethod &   1) != 0) if (AccCondition(C_ACC_IN_PROFIT))      { new_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
     if ((RiskRatioIncreaseMethod &   2) != 0) if (AccCondition(C_EQUITY_10PC_LOW))    { new_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
     if ((RiskRatioIncreaseMethod &   4) != 0) if (AccCondition(C_EQUITY_20PC_LOW))    { new_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
@@ -3960,7 +3959,7 @@ void StartNewHour() {
 
   #ifdef __advanced__
   // Check if RSI period needs re-calculation.
-  if (RSI_DynamicPeriod) RSI_CheckPeriod();
+  // if (RSI_DynamicPeriod) RSI_CheckPeriod();
   // Check for dynamic spread configuration.
   if (DynamicSpreadConf) {
     // TODO: SpreadRatio, MinPipChangeToTrade, MinPipGap
@@ -4402,7 +4401,7 @@ void ToggleComponent(int component) {
       break;
     // Indicator specific
     case 29:
-      RSI_DynamicPeriod = !RSI_DynamicPeriod;
+      // RSI_DynamicPeriod = !RSI_DynamicPeriod;
       break;
     // Profit and loss
     case 30:
@@ -5321,8 +5320,8 @@ int GetStrategySignalMethod(int indicator, int timeframe = PERIOD_M30, int defau
 /**
  * Fetch strategy timeframe based on the strategy type.
  */
-int GetStrategyTimeframe(int sid, int default_value = PERIOD_M1) {
-  return sid >= 0 ? info[sid][TIMEFRAME] : default_value;
+ENUM_TIMEFRAMES GetStrategyTimeframe(int sid, int default_value = PERIOD_M1) {
+  return (ENUM_TIMEFRAMES) (sid >= 0 ? info[sid][TIMEFRAME] : default_value);
 }
 
 /**
@@ -5403,6 +5402,7 @@ void ApplyStrategyMultiplierFactor(int period = DAILY, int direction = 0, double
  *
  * FIXME: Doesn't improve much.
  */
+/*
 void RSI_CheckPeriod() {
 
   int period;
@@ -5460,8 +5460,9 @@ void RSI_CheckPeriod() {
   Print(__FUNCTION__ + ": M15: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][LOWER] + ", Max: " + rsi_stats[period][UPPER] + ", Diff: " + ( rsi_stats[period][UPPER] - rsi_stats[period][LOWER] ));
   period = M30;
   Print(__FUNCTION__ + ": M30: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][LOWER] + ", Max: " + rsi_stats[period][UPPER] + ", Diff: " + ( rsi_stats[period][UPPER] - rsi_stats[period][LOWER] ));
-  */
+  /
 }
+*/
 
 // FIXME: Doesn't improve anything.
 bool RSI_IncreasePeriod(ENUM_TIMEFRAMES tf = PERIOD_M1, int condition = 0) {
@@ -6299,8 +6300,10 @@ bool CheckHistory() {
 bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
   bool result = FALSE;
   int queue_size = OrderQueueCount();
-  int sorted_queue[][2];
-  int cmd, sid, time; double volume;
+  long sorted_queue[][2];
+  int sid, cmd;
+  datetime time;
+  double volume;
   if (method == EMPTY) method = SmartQueueMethod;
   if (filter == EMPTY) filter = SmartQueueFilter;
   if (queue_size > 1) {
@@ -6309,16 +6312,16 @@ bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
     for (int i = 0; i < queue_size; i++) {
       curr_qid = OrderQueueNext(curr_qid);
       if (curr_qid == EMPTY) break;
-      sorted_queue[i][0] = GetOrderQueueKeyValue(order_queue[curr_qid][Q_SID], method, curr_qid);
+      sorted_queue[i][0] = GetOrderQueueKeyValue((int) order_queue[curr_qid][Q_SID], method, curr_qid);
       sorted_queue[i][1] = curr_qid++;
     }
     // Sort array by first dimension (descending).
     ArraySort(sorted_queue, WHOLE_ARRAY, 0, MODE_DESCEND);
     for (int i = 0; i < queue_size; i++) {
-      selected_qid = sorted_queue[i][1];
-      cmd = order_queue[selected_qid][Q_CMD];
-      sid = order_queue[selected_qid][Q_SID];
-      time = order_queue[selected_qid][Q_TIME];
+      selected_qid = (int) sorted_queue[i][1];
+      cmd = (int) order_queue[selected_qid][Q_CMD];
+      sid = (int) order_queue[selected_qid][Q_SID];
+      time = (datetime) order_queue[selected_qid][Q_TIME];
       volume = GetStrategyLotSize(sid, cmd);
       if (!OpenOrderCondition(cmd, sid, time, filter)) continue;
       if (OpenOrderIsAllowed(cmd, sid, volume)) {
@@ -6334,9 +6337,9 @@ bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
 /**
  * Check for the market condition to filter out the order queue.
  */
-bool OpenOrderCondition(int cmd, int sid, int time, int method) {
+bool OpenOrderCondition(int cmd, int sid, datetime time, int method) {
   bool result = TRUE;
-  int tf = GetStrategyTimeframe(sid);
+  ENUM_TIMEFRAMES tf = GetStrategyTimeframe(sid);
   int period = Convert::TfToIndex(tf);
   int qshift = iBarShift(_Symbol, tf, time, FALSE); // Get the number of bars for the tf since queued.
   double qopen = iOpen(_Symbol, tf, qshift);
@@ -6361,22 +6364,22 @@ bool OpenOrderCondition(int cmd, int sid, int time, int method) {
 int GetOrderQueueKeyValue(int sid, int method, int qid) {
   int key = 0;
   switch (method) {
-    case  0: key = order_queue[qid][Q_TIME]; break; // 7867 OK (10k, 0.02)
-    case  1: key = stats[sid][DAILY_PROFIT] * 10; break;
-    case  2: key = stats[sid][WEEKLY_PROFIT] * 10; break;
-    case  3: key = stats[sid][MONTHLY_PROFIT] * 10; break; // Has good results.
-    case  4: key = stats[sid][TOTAL_NET_PROFIT] * 10; break; // Has good results.
-    case  5: key = conf[sid][SPREAD_LIMIT] * 10; break;
+    case  0: key = (int) order_queue[qid][Q_TIME]; break; // 7867 OK (10k, 0.02)
+    case  1: key = (int) (stats[sid][DAILY_PROFIT] * 10); break;
+    case  2: key = (int) (stats[sid][WEEKLY_PROFIT] * 10); break;
+    case  3: key = (int) (stats[sid][MONTHLY_PROFIT] * 10); break; // Has good results.
+    case  4: key = (int) (stats[sid][TOTAL_NET_PROFIT] * 10); break; // Has good results.
+    case  5: key = (int) (conf[sid][SPREAD_LIMIT] * 10); break;
     case  6: key = GetStrategyTimeframe(sid); break;
-    case  7: key = GetStrategyProfitFactor(sid) * 100; break;
-    case  8: key = GetStrategyLotSize(sid, order_queue[qid][Q_CMD]) * 100; break;
-    case  9: key = stats[sid][TOTAL_GROSS_PROFIT]; break;
+    case  7: key = (int) (GetStrategyProfitFactor(sid) * 100); break;
+    case  8: key = (int) (GetStrategyLotSize(sid, (int) order_queue[qid][Q_CMD]) * 100); break;
+    case  9: key = (int) stats[sid][TOTAL_GROSS_PROFIT]; break;
     case 10: key = info[sid][TOTAL_ORDERS]; break; // --7846
     case 11: key -= info[sid][TOTAL_ORDERS_LOSS]; break; // --7662 TODO: To test.
     case 12: key = info[sid][TOTAL_ORDERS_WON]; break; // --7515
-    case 13: key -= stats[sid][TOTAL_GROSS_LOSS]; break;
-    case 14: key = stats[sid][AVG_SPREAD] * 10; break; // --7396, TODO: To test.
-    case 15: key = conf[sid][FACTOR] * 10; break; // --6976
+    case 13: key -= (int) stats[sid][TOTAL_GROSS_LOSS]; break;
+    case 14: key = (int) (stats[sid][AVG_SPREAD] * 10); break; // --7396, TODO: To test.
+    case 15: key = (int) (conf[sid][FACTOR] * 10); break; // --6976
 
     // case  4: key = -info[sid][OPEN_ORDERS]; break; // TODO
   }

@@ -341,7 +341,6 @@ extern int Alligator_Period_Lips = 3; // Lips Period
 extern double Alligator_Period_Ratio = 1.0; // Period ratio between timeframes (0.5-1.5)
 extern int Alligator_Shift_Jaw = 2; // Jaw Shift
 extern int Alligator_Shift_Teeth = 4; // Teeth Shift
-extern int Alligator_Period_Lips = 7; // Lips Period
 extern int Alligator_Shift_Lips = 1; // Lips Shift
 extern ENUM_MA_METHOD Alligator_MA_Method = 3; // MA Method
 extern ENUM_APPLIED_PRICE Alligator_Applied_Price = 4; // Applied Price
@@ -1057,6 +1056,27 @@ int OSMA5_SignalMethod = 9; // Signal method for M5 (0-
 int OSMA15_SignalMethod = 24; // Signal method for M15 (0-
 int OSMA30_SignalMethod = 14; // Signal method for M30 (0-
 
+int OSMA1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int OSMA1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+ENUM_MARKET_EVENT OSMA1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
+
+int OSMA5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int OSMA5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+ENUM_MARKET_EVENT OSMA5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
+
+int OSMA15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int OSMA15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+ENUM_MARKET_EVENT OSMA15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
+
+int OSMA30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int OSMA30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+ENUM_MARKET_EVENT OSMA30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
+
+double OSMA1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+double OSMA5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+double OSMA15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+double OSMA30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+
 //+------------------------------------------------------------------+
 extern string __RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --"; // >>> RSI <<<
 extern bool RSI1_Active = 1; // Enable for M1
@@ -1074,6 +1094,28 @@ extern int RSI1_SignalMethod = 23; // Signal method for M1 (0-63)
 extern int RSI5_SignalMethod = 54; // Signal method for M5 (0-63)
 extern int RSI15_SignalMethod = 35; // Signal method for M15 (0-63)
 extern int RSI30_SignalMethod = 54; // Signal method for M30 (0-63)
+// bool RSI_DynamicPeriod = False;
+
+int RSI1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int RSI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+ENUM_MARKET_EVENT RSI1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
+
+int RSI5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int RSI5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+ENUM_MARKET_EVENT RSI5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
+
+int RSI15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int RSI15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+ENUM_MARKET_EVENT RSI15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
+
+int RSI30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int RSI30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+ENUM_MARKET_EVENT RSI30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
+
+double RSI1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+double RSI5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+double RSI15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+double RSI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __RVI_Parameters__ = "-- Settings for the Relative Vigor Index indicator --"; // >>> RVI <<<
