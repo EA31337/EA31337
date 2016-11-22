@@ -86,141 +86,6 @@ extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v"
   #include <EA\lite\ea-input.mqh>
 #endif
 
-//+------------------------------------------------------------------+
-/*
- * Summary backtest log:
- * All [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, spread 20, 9,5mln ticks, quality 25%]:
- *
- * Deposit: £10000 (default, spread 2)
- *   £1320256.86	24613	1.27	53.64	368389.08	47.44%	TradeWithTrend=1
- *   £886195.48	33338	1.19	26.58	212549.08	38.13%	TradeWithTrend=0
- *
- * Deposit: £10000 (default, spread 20)
- *
- *   £106725.03	23907	1.11	4.46	59839.20	54.59%	TradeWithTrend=1
- *   £17257.03	32496	1.04	0.53	23297.78	64.43%	TradeWithTrend=0
- *   TODO: (Rider mode)
- *
- * Deposit: £10000 (default, spread 40)
- *
- *   £-4606.56	23095	0.98	-0.20	15646.11	84.76%	TradeWithTrend=1
- *   £-8963.90	31510	0.92	-0.28	11160.88	96.20%	TradeWithTrend=0
- *
- *   spread 30: Prev: £13338.89	8725	1.10	1.53	5290.53	28.64% MinPipChangeToTrade=1 	MinPipGap=12 (d: £10k)
- *   spread 20: Prev: £29865.34	7686	1.19	3.89	7942.79	23.12% MinPipChangeToTrade=1.2 	MinPipGap=12 (d: £10k)
- * --
- * Deposit: £2000 (default, spread 2)
- *
- * Deposit: £2000 (default, spread 20)
- *   £59968.30	7334	1.46	8.18	24904.84	73.02% TradeWithTrend=0 (__rider__, auto)
- *   £2201.25	 7360	1.07	0.30	4608.56	76.53%	TradeWithTrend=1 (__rider__, auto)
- *   Prev: £77576.22	5258	1.44	14.75	24957.91	77.13%	Market_Condition_12=9 	Action_On_Condition_12=6 (__rider__, auto)
- *   £31634.22	5503	1.25	5.75	16191.08	67.12%	Market_Condition_7=6 (__rider__, auto)
- *   £1396.33	2361	1.40	0.59	615.42	25.54% (__limited__, auto)
- *
- * Deposit: £2000 (default, spread 40)
- * --
- * Deposit: £1000 (default, spread 2)
- *   £88416.35	33279	1.20	2.66	21051.43	37.86%	TradeWithTrend=0
- *   £68136.05	24563	1.26	2.77	19243.73	45.89%	TradeWithTrend=1
- *
- * Deposit: £1000 (default, spread 20)
- *
- *   £7242.02	23883	1.11	0.30	4013.08	52.91%	TradeWithTrend=1
- *   £1719.22	32541	1.04	0.05	1914.97	55.15%	TradeWithTrend=0
- *   £8505.73	5452	1.18	1.56	6310.19	79.89%	TradeWithTrend=0 (__rider__, auto)
- *   £5345.28	4571	1.09	1.17	15073.88	83.51%	TradeWithTrend=1 (__rider__, auto)
- *
- * Deposit: £1000 (default, spread 40)
- *   £281.07	23060	1.01	0.01	1802.54	81.01%	TradeWithTrend=1
- *   £-992.10	4038	0.77	-0.25	1125.68	99.23%	TradeWithTrend=0
- *
- *
- * Strategy stats (default, deposit £10000, spread: 20):
-    Bars in test	181968
-    Ticks modelled	9480514
-    Modelling quality	25.00%
-    Mismatched charts errors	0
-    Initial deposit	10000.00
-    Spread	20
-    Total net profit	106725.49
-    Gross profit	1056738.48
-    Gross loss	-950012.99
-    Profit factor	1.11
-    Expected payoff	4.46
-    Absolute drawdown	1232.37
-    Maximal drawdown	59857.65 (54.60%)
-    Relative drawdown	54.60% (59857.65)
-    Total trades	23907
-    Short positions (won %)	12101 (37.86%)
-    Long positions (won %)	11806 (39.13%)
-    Profit trades (% of total)	9202 (38.49%)
-    Loss trades (% of total)	14705 (61.51%)
-    	Largest
-    profit trade	1373.74
-    loss trade	-1263.49
-    	Average
-    profit trade	114.84
-    loss trade	-64.60
-    	Maximum
-    consecutive wins (profit in money)	71 (4348.10)
-    consecutive losses (loss in money)	55 (-2837.81)
-    	Maximal
-    consecutive profit (count of wins)	25125.50 (44)
-    consecutive loss (count of losses)	-5405.27 (40)
-    	Average
-    consecutive wins	3
-    consecutive losses	5
-
-    Profit factor: 1.00, Total net profit: -40.26pips (+0.00/-40.26), Total orders: 1 (Won: 0.0% [0] / Loss: 100.0% [1]) - MA M1
-    Profit factor: 1.00, Total net profit: -130.29pips (+9.24/-139.53), Total orders: 4 (Won: 25.0% [1] / Loss: 75.0% [3]) - MA M5
-    Profit factor: 1.17, Total net profit: 1471.92pips (+10143.80/-8671.88), Total orders: 311 (Won: 48.6% [151] / Loss: 51.4% [160]) - MACD M5
-    Profit factor: 1.35, Total net profit: 4258.53pips (+16446.34/-12187.81), Total orders: 259 (Won: 40.9% [106] / Loss: 59.1% [153]) - MACD M15
-    Profit factor: 1.16, Total net profit: 149.11pips (+1091.23/-942.12), Total orders: 17 (Won: 35.3% [6] / Loss: 64.7% [11]) - MACD M30
-    Profit factor: 0.83, Total net profit: -1505.35pips (+7323.43/-8828.78), Total orders: 689 (Won: 36.4% [251] / Loss: 63.6% [438]) - Alligator M1
-    Profit factor: 1.05, Total net profit: 346.08pips (+7610.28/-7264.20), Total orders: 392 (Won: 45.9% [180] / Loss: 54.1% [212]) - Alligator M5
-    Profit factor: 1.19, Total net profit: 850.18pips (+5401.14/-4550.96), Total orders: 210 (Won: 46.7% [98] / Loss: 53.3% [112]) - Alligator M15
-    Profit factor: 1.12, Total net profit: 804.50pips (+7643.42/-6838.92), Total orders: 183 (Won: 54.1% [99] / Loss: 45.9% [84]) - Alligator M30
-    Profit factor: 0.96, Total net profit: -177.08pips (+4627.06/-4804.14), Total orders: 243 (Won: 58.4% [142] / Loss: 41.6% [101]) - RSI M1
-    Profit factor: 1.00, Total net profit: -442.09pips (+291.51/-733.60), Total orders: 3 (Won: 66.7% [2] / Loss: 33.3% [1]) - RSI M5
-    Profit factor: 1.43, Total net profit: 1252.53pips (+4183.01/-2930.48), Total orders: 50 (Won: 32.0% [16] / Loss: 68.0% [34]) - RSI M15
-    Profit factor: 0.93, Total net profit: -715.76pips (+9928.22/-10643.98), Total orders: 159 (Won: 25.2% [40] / Loss: 74.8% [119]) - RSI M30
-    Profit factor: 1.10, Total net profit: 7184.44pips (+82467.85/-75283.41), Total orders: 1561 (Won: 40.7% [636] / Loss: 59.3% [925]) - SAR M1
-    Profit factor: 1.14, Total net profit: 9582.36pips (+76244.85/-66662.49), Total orders: 1300 (Won: 38.5% [500] / Loss: 61.5% [800]) - SAR M5
-    Profit factor: 1.16, Total net profit: 10908.96pips (+80138.08/-69229.12), Total orders: 1231 (Won: 38.2% [470] / Loss: 61.8% [761]) - SAR M15
-    Profit factor: 1.11, Total net profit: 8478.01pips (+86975.73/-78497.72), Total orders: 1305 (Won: 34.9% [455] / Loss: 65.1% [850]) - SAR M30
-    Profit factor: 1.22, Total net profit: 10033.48pips (+56251.34/-46217.86), Total orders: 1428 (Won: 53.6% [766] / Loss: 46.4% [662]) - Bands M1
-    Profit factor: 1.41, Total net profit: 4410.04pips (+15144.86/-10734.82), Total orders: 394 (Won: 57.1% [225] / Loss: 42.9% [169]) - Bands M5
-    Profit factor: 1.06, Total net profit: 144.05pips (+2577.73/-2433.68), Total orders: 78 (Won: 52.6% [41] / Loss: 47.4% [37]) - Bands M15
-    Profit factor: 0.95, Total net profit: -726.27pips (+12897.85/-13624.12), Total orders: 475 (Won: 40.0% [190] / Loss: 60.0% [285]) - Bands M30
-    Profit factor: 1.08, Total net profit: 5024.51pips (+70171.08/-65146.57), Total orders: 1543 (Won: 33.3% [514] / Loss: 66.7% [1029]) - Envelopes M1
-    Profit factor: 1.00, Total net profit: 92.93pips (+61306.42/-61213.49), Total orders: 1815 (Won: 28.3% [513] / Loss: 71.7% [1302]) - Envelopes M5
-    Profit factor: 1.20, Total net profit: 2677.35pips (+15758.60/-13081.25), Total orders: 286 (Won: 26.6% [76] / Loss: 73.4% [210]) - Envelopes M15
-    Profit factor: 1.39, Total net profit: 7823.43pips (+27670.90/-19847.47), Total orders: 709 (Won: 46.1% [327] / Loss: 53.9% [382]) - Envelopes M30
-    Profit factor: 1.01, Total net profit: 530.90pips (+42697.87/-42166.97), Total orders: 1134 (Won: 41.6% [472] / Loss: 58.4% [662]) - DeMarker M1
-    Profit factor: 0.93, Total net profit: -2343.02pips (+32605.81/-34948.83), Total orders: 1151 (Won: 28.2% [325] / Loss: 71.8% [826]) - DeMarker M5
-    Profit factor: 0.95, Total net profit: -1211.96pips (+23343.64/-24555.60), Total orders: 961 (Won: 30.6% [294] / Loss: 69.4% [667]) - DeMarker M15
-    Profit factor: 1.22, Total net profit: 3456.31pips (+19399.89/-15943.58), Total orders: 625 (Won: 42.4% [265] / Loss: 57.6% [360]) - DeMarker M30
-    Profit factor: 1.25, Total net profit: 9500.00pips (+47187.78/-37687.78), Total orders: 843 (Won: 44.6% [376] / Loss: 55.4% [467]) - WPR M1
-    Profit factor: 0.92, Total net profit: -3325.79pips (+36976.63/-40302.42), Total orders: 872 (Won: 36.6% [319] / Loss: 63.4% [553]) - WPR M5
-    Profit factor: 1.19, Total net profit: 4395.68pips (+28104.91/-23709.23), Total orders: 626 (Won: 33.5% [210] / Loss: 66.5% [416]) - WPR M15
-    Profit factor: 1.10, Total net profit: 2085.46pips (+22946.14/-20860.68), Total orders: 582 (Won: 30.1% [175] / Loss: 69.9% [407]) - WPR M30
-    Profit factor: 1.15, Total net profit: 6881.90pips (+51294.91/-44413.01), Total orders: 976 (Won: 37.1% [362] / Loss: 62.9% [614]) - Fractals M1
-    Profit factor: 1.06, Total net profit: 670.30pips (+12044.41/-11374.11), Total orders: 211 (Won: 38.9% [82] / Loss: 61.1% [129]) - Fractals M5
-    Profit factor: 1.13, Total net profit: 4359.07pips (+39057.04/-34697.97), Total orders: 711 (Won: 31.6% [225] / Loss: 68.4% [486]) - Fractals M15
-    Profit factor: 1.25, Total net profit: 6959.73pips (+34521.10/-27561.37), Total orders: 520 (Won: 43.8% [228] / Loss: 56.2% [292]) - Fractals M30
-
- * Rider mode backtest log
- * All [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, spread 20, 9,5mln ticks, quality 25%]:
- *
- */
-
-/*
- * All backtest log (ts:40,tp:35,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, spread 25, 9,5mln ticks, quality 25%]:
- *   £467.77  5351  1.09  0.09  355.59  22.88%
- */
-//+------------------------------------------------------------------+
-
 /*
  * Predefined constants:
  *   Ask (for buying)  - The latest known seller's price (ask price) of the current symbol.
@@ -344,13 +209,12 @@ double zigzag[H1][FINAL_INDICATOR_INDEX_ENTRY];
  *   - daily higher highs and lower lows,
  *   - check risky dates and times,
  *   - check for risky patterns,
- *   - implement condition to close all strategy orders, buy/sell, most profitable order, when to trade, skip the day or week, etc.
+ *   - implement condition to close all strategy orders: when to trade, skip the day or week, etc.
  *   - implement SendFTP,
  *   - implement SendNotification,
  *   - send daily, weekly reports (SendMail),
  *   - check TesterStatistics(),
  *   - check ResourceCreate/ResourceSave to store dynamic parameters
- *   - generate custom tick data for tester\history\EURUSD1_0.fxt
  *   - consider to use Donchian Channel (ihighest/ilowest) for detecting s/r levels
  *   - convert `ma_fast`, `ma_medium`, `ma_slow` into one `ma` variable.
  */
@@ -3222,66 +3086,6 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
     PrintFormat("%s(): trail = (%d + %d) * %g = %g",
       __FUNCTION__, TrailingStop, extra_trail, pip_size, trail);
   }
-
-/**
-  MA1+MA5+MA15+MA30 backtest log (auto,ts:40,tp:30,gap:10) [2015.01.01-2015.06.30 based on MT4 FXCM backtest data, 9,5mln ticks, quality 25%]:
-
-  Stop loss (d: GBP10k, lot size: 0.1, spread: 2, no boosting, no actions):
-    5599.51 3952  1.20  1.42  2256.22 13.95% MA_TrailingStopMethod=1
-    11218.40  9992  1.52  1.12  1929.00 10.02% MA_TrailingStopMethod=2
-    10159.11  8678  1.45  1.17  2093.62 10.66% MA_TrailingStopMethod=3
-    9749.82 6400  1.42  1.52  1998.58 12.64% MA_TrailingStopMethod=4
-    9439.25 5719  1.38  1.65  2181.95 13.17% MA_TrailingStopMethod=5
-    9114.61 4646  1.32  1.96  2668.78 13.98% MA_TrailingStopMethod=6
-    10633.63  4069  1.35  2.61  2375.31 15.31% MA_TrailingStopMethod=7
-    9842.04 4622  1.35  2.13  2334.60 14.56% MA_TrailingStopMethod=8
-    202.80  8027  1.01  0.03  1457.60 12.60% MA_TrailingStopMethod=9
-    1225.75 6081  1.06  0.20  1618.59 12.70% MA_TrailingStopMethod=10
-    16913.77  3453  1.52  4.90  3688.36 20.00% MA_TrailingStopMethod=11
-    10044.82  3781  1.34  2.66  2853.85 13.77% MA_TrailingStopMethod=12
-    11821.83  3727  1.39  3.17  2961.41 13.05% MA_TrailingStopMethod=13
-    791.21  6933  1.04  0.11  1575.28 12.84% MA_TrailingStopMethod=14
-    1974.87 6089  1.09  0.32  1779.42 13.08% MA_TrailingStopMethod=15
-    16913.77  3453  1.52  4.90  3688.36 20.00% MA_TrailingStopMethod=16
-    12038.54  3726  1.40  3.23  3046.36 13.29% MA_TrailingStopMethod=17
-    12932.29  3691  1.43  3.50  3210.92 13.56% MA_TrailingStopMethod=18
-    3963.23 6366  1.18  0.62  1926.07 14.04% MA_TrailingStopMethod=19
-    4846.24 6165  1.21  0.79  1855.02 11.98% MA_TrailingStopMethod=20
-    13348.87  3651  1.44  3.66  3015.02 13.03% MA_TrailingStopMethod=21
-    16913.77  3453  1.52  4.90  3688.36 20.00% MA_TrailingStopMethod=22
-    2128.81 5515  1.10  0.39  1796.71 13.10% MA_TrailingStopMethod=23
-    4391.11 4679  1.17  0.94  1247.45 10.56% MA_TrailingStopMethod=24
-    8038.24 5097  1.29  1.58  2556.58 13.94% MA_TrailingStopMethod=25
-    8016.87 5029  1.29  1.59  2510.72 13.66% MA_TrailingStopMethod=26
-    6787.85 4701  1.24  1.44  2238.46 12.68% MA_TrailingStopMethod=27
-
-  Profit take (d: GBP10k, lot size: 0.1, spread: 25, no boosting, no actions, trailing: T_MA_FMS_PEAK):
-    13761.58  2845  1.36  4.84  3960.10 30.33% MA_TrailingProfitMethod=1
-    10878.01  3491  1.31  3.12  4519.36 23.97% MA_TrailingProfitMethod=2
-    11012.71  3503  1.31  3.14  4738.17 23.04% MA_TrailingProfitMethod=3
-    12206.18  2955  1.33  4.13  3956.58 25.66% MA_TrailingProfitMethod=4
-    14089.18  2889  1.37  4.88  3901.52 29.04% MA_TrailingProfitMethod=5
-    13865.44  2843  1.37  4.88  3892.54 29.82% MA_TrailingProfitMethod=6
-    13861.94  2841  1.36  4.88  3924.26 30.06% MA_TrailingProfitMethod=7
-    13168.88  2869  1.35  4.59  4004.98 30.68% MA_TrailingProfitMethod=8
-    10713.75  2902  1.28  3.69  3846.19 28.34% MA_TrailingProfitMethod=9
-    13209.68  2870  1.35  4.60  3733.74 28.61% MA_TrailingProfitMethod=10
-    13742.21  2839  1.36  4.84  3825.94 29.31% MA_TrailingProfitMethod=12
-    13743.50  2839  1.36  4.84  3825.94 29.31% MA_TrailingProfitMethod=13
-    12640.84  2894  1.33  4.37  3736.01 28.59% MA_TrailingProfitMethod=14
-    12837.30  2857  1.34  4.49  3847.29 29.48% MA_TrailingProfitMethod=15
-    13740.98  2839  1.36  4.84  3825.94 29.31% MA_TrailingProfitMethod=17
-    13880.76  2839  1.36  4.89  3825.94 29.31% MA_TrailingProfitMethod=18
-    12901.85  2871  1.34  4.49  3914.54 30.00% MA_TrailingProfitMethod=19
-    13140.64  2865  1.35  4.59  3911.51 29.98% MA_TrailingProfitMethod=20
-    13880.76  2839  1.36  4.89  3825.94 29.31% MA_TrailingProfitMethod=21
-    13880.76  2839  1.36  4.89  3825.94 29.31% MA_TrailingProfitMethod=22
-    12365.53  3238  1.35  3.82  4348.87 23.32% MA_TrailingProfitMethod=23
-    11876.32  3245  1.34  3.66  4514.79 24.00% MA_TrailingProfitMethod=24
-    9146.42 3492  1.26  2.62  4847.98 25.24% MA_TrailingProfitMethod=25
-    9230.95 3484  1.27  2.65  4835.75 25.13% MA_TrailingProfitMethod=26
-    9371.17 3416  1.27  2.74  5098.83 23.51% MA_TrailingProfitMethod=27
-*/
   // TODO: Make starting point dynamic: Open[CURR], Open[PREV], Open[FAR], Close[PREV], Close[FAR], ma_fast[CURR], ma_medium[CURR], ma_slow[CURR]
    double highest_ma, lowest_ma;
    switch (method) {
