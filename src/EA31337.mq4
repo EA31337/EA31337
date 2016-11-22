@@ -242,7 +242,7 @@ Market market(string);
 // Market/session variables.
 double pip_size, lot_size;
 double market_minlot, market_maxlot, market_lotsize, market_lotstep, market_marginrequired, market_margininit;
-int market_stoplevel; // Market stop level in points.
+long  market_stoplevel; // Market stop level in points.
 int order_freezelevel; // Order freeze level in points.
 double curr_spread; // Broker current spread in pips.
 double risk_margin = 1.0; // Risk marigin in percent.
@@ -253,7 +253,7 @@ int gmt_offset = 0; // Current difference between GMT time and the local compute
 // Account variables.
 string account_type;
 double init_balance; // Initial account balance.
-int init_spread; // Initial spread.
+long init_spread; // Initial spread.
 
 // State variables.
 bool session_initiated = FALSE;
@@ -264,7 +264,7 @@ bool session_active = FALSE;
 datetime init_bar_time, bar_time, last_bar_time = (int)EMPTY_VALUE;
 datetime time_current = (int)EMPTY_VALUE;
 int hour_of_day, day_of_week, day_of_month, day_of_year, month, year;
-int last_order_time = 0, last_action_time = 0;
+datetime last_order_time = 0, last_action_time = 0;
 int last_history_check = 0; // Last ticket position processed.
 
 // Class variables.
@@ -292,7 +292,8 @@ string last_err, last_msg, last_debug, last_trace;
 double last_tick_change; // Last tick change in pips.
 double last_close_profit = EMPTY;
 // int last_trail_update = 0, last_indicators_update = 0, last_stats_update = 0;
-int todo_queue[100][8], last_queue_process = 0;
+int todo_queue[100][8];
+datetime last_queue_process = 0;
 int total_orders = 0; // Number of total orders currently open.
 double daily[FINAL_VALUE_TYPE_ENTRY], weekly[FINAL_VALUE_TYPE_ENTRY], monthly[FINAL_VALUE_TYPE_ENTRY];
 double hourly_profit[367][24]; // Keep track of hourly profit.
@@ -749,7 +750,7 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
 
   double ratio = 1.0, ratio2 = 1.0;
   int shift;
-  double envelopes_deviation;
+  // double envelopes_deviation;
   switch (type) {
 #ifdef __advanced__
     case AC: // Calculates the Bill Williams' Accelerator/Decelerator oscillator.
@@ -771,9 +772,9 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
     case ALLIGATOR: // Calculates the Alligator indicator.
       // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        alligator[index][i][LIPS]  = iMA(symbol, tf, Alligator_Period_Lips * ratio,  Alligator_Shift_Lips,  Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
-        alligator[index][i][TEETH] = iMA(symbol, tf, Alligator_Period_Teeth * ratio, Alligator_Shift_Teeth, Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
-        alligator[index][i][JAW]   = iMA(symbol, tf, Alligator_Period_Jaw * ratio,   Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
+        alligator[index][i][LIPS]  = iMA(symbol, tf, (int) (Alligator_Period_Lips * ratio),  Alligator_Shift_Lips,  Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
+        alligator[index][i][TEETH] = iMA(symbol, tf, (int) (Alligator_Period_Teeth * ratio), Alligator_Shift_Teeth, Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
+        alligator[index][i][JAW]   = iMA(symbol, tf, (int) (Alligator_Period_Jaw * ratio),   Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
         ratio *= Alligator_Period_Ratio;
       }
       success = (bool)alligator[index][CURR][JAW];
@@ -803,9 +804,9 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
       // sid = GetStrategyViaIndicator(BANDS, tf); bands_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         shift = i + Bands_Shift + (i == FINAL_INDICATOR_INDEX_ENTRY - 1 ? Bands_Shift_Far : 0);
-        bands[index][i][BANDS_BASE]  = iBands(symbol, tf, Bands_Period * ratio, Bands_Deviation * ratio2, 0, Bands_Applied_Price, BANDS_BASE,  shift);
-        bands[index][i][BANDS_UPPER] = iBands(symbol, tf, Bands_Period * ratio, Bands_Deviation * ratio2, 0, Bands_Applied_Price, BANDS_UPPER, shift);
-        bands[index][i][BANDS_LOWER] = iBands(symbol, tf, Bands_Period * ratio, Bands_Deviation * ratio2, 0, Bands_Applied_Price, BANDS_LOWER, shift);
+        bands[index][i][BANDS_BASE]  = iBands(symbol, tf, (int) (Bands_Period * ratio), Bands_Deviation * ratio2, 0, Bands_Applied_Price, BANDS_BASE,  shift);
+        bands[index][i][BANDS_UPPER] = iBands(symbol, tf, (int) (Bands_Period * ratio), Bands_Deviation * ratio2, 0, Bands_Applied_Price, BANDS_UPPER, shift);
+        bands[index][i][BANDS_LOWER] = iBands(symbol, tf, (int) (Bands_Period * ratio), Bands_Deviation * ratio2, 0, Bands_Applied_Price, BANDS_LOWER, shift);
         ratio *= Bands_Period_Ratio;
         ratio2 *= Bands_Deviation_Ratio;
       }
@@ -837,7 +838,7 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
 #endif
     case DEMARKER: // Calculates the DeMarker indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        demarker[index][i] = iDeMarker(symbol, tf, DeMarker_Period * ratio, i + DeMarker_Shift);
+        demarker[index][i] = iDeMarker(symbol, tf, (int) (DeMarker_Period * ratio), i + DeMarker_Shift);
         ratio *= DeMarker_Period_Ratio;
       }
       success = (bool)demarker[index][CURR];
@@ -855,9 +856,9 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
       }
       */
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        envelopes[index][i][MODE_MAIN] = iEnvelopes(symbol, tf, Envelopes_MA_Period * ratio, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, MODE_MAIN,  i + Envelopes_Shift);
-        envelopes[index][i][UPPER]     = iEnvelopes(symbol, tf, Envelopes_MA_Period * ratio, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, UPPER, i + Envelopes_Shift);
-        envelopes[index][i][LOWER]     = iEnvelopes(symbol, tf, Envelopes_MA_Period * ratio, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, LOWER, i + Envelopes_Shift);
+        envelopes[index][i][MODE_MAIN] = iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, MODE_MAIN,  i + Envelopes_Shift);
+        envelopes[index][i][UPPER]     = iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, UPPER, i + Envelopes_Shift);
+        envelopes[index][i][LOWER]     = iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, LOWER, i + Envelopes_Shift);
         ratio *= Envelopes_MA_Period_Ratio;
         ratio2 *= Envelopes_Deviation_Ratio;
       }
@@ -902,14 +903,14 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
       // Calculate MA Fast.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         shift = i + MA_Shift + (i == FINAL_INDICATOR_INDEX_ENTRY - 1 ? MA_Shift_Far : 0);
-        ma_fast[index][i]   = iMA(symbol, tf, MA_Period_Fast * ratio,   MA_Shift_Fast,   MA_Method, MA_Applied_Price, shift);
-        ma_medium[index][i] = iMA(symbol, tf, MA_Period_Medium * ratio, MA_Shift_Medium, MA_Method, MA_Applied_Price, shift);
-        ma_slow[index][i]   = iMA(symbol, tf, MA_Period_Slow * ratio,   MA_Shift_Slow,   MA_Method, MA_Applied_Price, shift);
+        ma_fast[index][i]   = iMA(symbol, tf, (int) (MA_Period_Fast * ratio),   MA_Shift_Fast,   MA_Method, MA_Applied_Price, shift);
+        ma_medium[index][i] = iMA(symbol, tf, (int) (MA_Period_Medium * ratio), MA_Shift_Medium, MA_Method, MA_Applied_Price, shift);
+        ma_slow[index][i]   = iMA(symbol, tf, (int) (MA_Period_Slow * ratio),   MA_Shift_Slow,   MA_Method, MA_Applied_Price, shift);
         ratio *= MA_Period_Ratio;
         if (tf == Period() && i < FINAL_INDICATOR_INDEX_ENTRY - 1) {
-          Draw::TLine(symbol+"MA Fast"+i,   ma_fast[index][i],   ma_fast[index][i+1],    iTime(NULL, 0, shift), iTime(NULL, 0, shift+1), clrBlue);
-          Draw::TLine(symbol+"MA Medium"+i, ma_medium[index][i], ma_medium[index][i+1],  iTime(NULL, 0, shift), iTime(NULL, 0, shift+1), clrYellow);
-          Draw::TLine(symbol+"MA Slow"+i,   ma_slow[index][i],   ma_slow[index][i+1],    iTime(NULL, 0, shift), iTime(NULL, 0, shift+1), clrGray);
+          Draw::TLine(StringFormat("%s%s%d", symbol, "MA Fast", i),   ma_fast[index][i],   ma_fast[index][i+1],    iTime(NULL, 0, shift), iTime(NULL, 0, shift+1), clrBlue);
+          Draw::TLine(StringFormat("%s%s%d", symbol, "MA Medium", i), ma_medium[index][i], ma_medium[index][i+1],  iTime(NULL, 0, shift), iTime(NULL, 0, shift+1), clrYellow);
+          Draw::TLine(StringFormat("%s%s%d", symbol, "MA Slow", i),   ma_slow[index][i],   ma_slow[index][i+1],    iTime(NULL, 0, shift), iTime(NULL, 0, shift+1), clrGray);
         }
       }
       success = (bool)ma_slow[index][CURR];
@@ -921,8 +922,8 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
     case MACD: // Calculates the Moving Averages Convergence/Divergence indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         shift = i + MACD_Shift + (i == FINAL_INDICATOR_INDEX_ENTRY - 1 ? MACD_Shift_Far : 0);
-        macd[index][i][MODE_MAIN]   = iMACD(symbol, tf, (int) MACD_Period_Fast * ratio, (int) MACD_Period_Slow * ratio, (int) MACD_Period_Signal * ratio, MACD_Applied_Price, MODE_MAIN,   shift);
-        macd[index][i][MODE_SIGNAL] = iMACD(symbol, tf, (int) MACD_Period_Fast * ratio, (int) MACD_Period_Slow * ratio, (int) MACD_Period_Signal * ratio, MACD_Applied_Price, MODE_SIGNAL, shift);
+        macd[index][i][MODE_MAIN]   = iMACD(symbol, tf, (int) (MACD_Period_Fast * ratio), (int) (MACD_Period_Slow * ratio), (int) (MACD_Period_Signal * ratio), MACD_Applied_Price, MODE_MAIN,   shift);
+        macd[index][i][MODE_SIGNAL] = iMACD(symbol, tf, (int) (MACD_Period_Fast * ratio), (int) (MACD_Period_Slow * ratio), (int) (MACD_Period_Signal * ratio), MACD_Applied_Price, MODE_SIGNAL, shift);
         ratio *= MACD_Period_Ratio;
       }
       if (VerboseDebug) PrintFormat("MACD M%d: %s", tf, Arrays::ArrToString3D(macd, ",", Digits));
@@ -957,7 +958,7 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
       // int rsi_period = RSI_Period; // Not used at the moment.
       // sid = GetStrategyViaIndicator(RSI, tf); rsi_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        rsi[index][i] = iRSI(symbol, tf, RSI_Period * ratio, RSI_Applied_Price, i + RSI_Shift);
+        rsi[index][i] = iRSI(symbol, tf, (int) (RSI_Period * ratio), RSI_Applied_Price, i + RSI_Shift);
         if (rsi[index][i] > rsi_stats[index][UPPER]) rsi_stats[index][UPPER] = rsi[index][i]; // Calculate maximum value.
         if (rsi[index][i] < rsi_stats[index][LOWER] || rsi_stats[index][LOWER] == 0) rsi_stats[index][LOWER] = rsi[index][i]; // Calculate minimum value.
         ratio *= RSI_Period_Ratio;
@@ -1003,7 +1004,7 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
     case WPR: // Calculates the  Larry Williams' Percent Range.
       // Update the Larry Williams' Percent Range indicator values.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        wpr[index][i] = -iWPR(symbol, tf, WPR_Period * ratio, i + WPR_Shift);
+        wpr[index][i] = -iWPR(symbol, tf, (int) (WPR_Period * ratio), i + WPR_Shift);
         ratio *= WPR_Period_Ratio;
       }
       if (VerboseDebug) PrintFormat("WPR M%d: %s", tf, Arrays::ArrToString2D(wpr, ",", Digits));
@@ -1101,8 +1102,7 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
       if (!OrderSelect(order_ticket, SELECT_BY_TICKET) && VerboseErrors) {
         Msg::ShowText(ErrorDescription(GetLastError()), "Error", __FUNCTION__, __LINE__, VerboseErrors);
         OrderPrint();
-        // @fixme: warning 43: possible loss of data due to type conversion: trade_volume
-        if (retry) TaskAddOrderOpen(cmd, trade_volume, sid); // Will re-try again. // warning 43: possible loss of data due to type conversion
+        if (retry) TaskAddOrderOpen(cmd, trade_volume, sid); // Will re-try again.
         info[sid][TOTAL_ERRORS]++;
         return (FALSE);
       }
@@ -1119,7 +1119,7 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
            "Trace", __FUNCTION__, __LINE__, VerboseTrace);
       result = TRUE;
       // TicketAdd(order_ticket);
-      last_order_time = TimeCurrent(); // Set last execution time. // warning 43: possible loss of data due to type conversion
+      last_order_time = TimeCurrent(); // Set last execution time.
       // last_trail_update = 0; // Set to 0, so trailing stops can be updated faster.
       stats[sid][AVG_SPREAD] = (stats[sid][AVG_SPREAD] + curr_spread) / 2;
       if (VerboseInfo) OrderPrint();
@@ -1138,7 +1138,6 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
        if (WriteReport) ReportAdd(last_err);
      }
      if (VerboseDebug) {
-        Print("Digits: " + Market::GetDigits());
        last_debug = Msg::ShowText(
          StringFormat("OrderSend(%s, %s, %g, %f, %d, %f, %f, '%s', %d, %d, %d)",
            _Symbol, Convert::OrderTypeToString(cmd),
@@ -3033,11 +3032,12 @@ bool CheckTrend(int method = EMPTY) {
  *   int strategy_type - type of order strategy to check for (see: ENUM STRATEGY TYPE)
  */
 bool CheckMinPipGap(int strategy_type) {
-  int diff;
+  double diff;
   for (int order = 0; order < OrdersTotal(); order++) {
     if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
        if (OrderMagicNumber() == MagicNumber + strategy_type && OrderSymbol() == Symbol()) {
-         diff = fabs((OrderOpenPrice() - Market::GetOpenPrice()) / pip_size); // @fixme: warning 43: possible loss of data due to type conversion
+         diff = Convert::GetValueDiffInPips(OrderOpenPrice(), Market::GetOpenPrice(), True); 
+         // diff = fabs((OrderOpenPrice() - Market::GetOpenPrice()) / pip_size); // @fixme: warning 43: possible loss of data due to type conversion
          // if (VerboseTrace) Print("Ticket: ", OrderTicket(), ", Order: ", OrderType(), ", Gap: ", diff);
          if (diff < MinPipGap) {
            return (FALSE);
@@ -3078,12 +3078,12 @@ bool ValidTrailingValue(double value, int cmd, int direction = -1, bool existing
  * Check orders for certain checks.
  */
 void CheckOrders() {
-  double elapsed_h;
+  int elapsed_h;
   for (int i = 0; i < OrdersTotal(); i++) {
     if (!OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) { continue; }
     if (CheckOurMagicNumber() && OrderOpenTime() > 0) {
       if (CloseOrderAfterXHours > 0) {
-        elapsed_h = (TimeCurrent() - OrderOpenTime()) / 60 / 60;
+        elapsed_h = (int) ((TimeCurrent() - OrderOpenTime()) / 60 / 60);
         if (elapsed_h >= CloseOrderAfterXHours) {
           TaskAddCloseOrder(OrderTicket(), R_ORDER_EXPIRED);
         }
@@ -3200,9 +3200,9 @@ bool UpdateTrailingStops() {
 double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double previous = 0, bool existing = FALSE) {
   double diff;
   double new_value = 0;
-  int extra_trail = 0;
+  double extra_trail = 0;
   if (existing && TrailingStopAddPerMinute > 0 && OrderOpenTime() > 0) {
-    int min_elapsed = (TimeCurrent() - OrderOpenTime()) / 60;
+    double min_elapsed = (double) ((TimeCurrent() - OrderOpenTime()) / 60);
     extra_trail =+ min_elapsed * TrailingStopAddPerMinute;
     if (VerboseDebug) {
       PrintFormat("%s(): extra_trail += %d * %g => %d",
@@ -3914,11 +3914,11 @@ double GetAccountStopoutLevel() {
  */
 int GetMaxOrdersAuto(bool smooth = true) {
   double avail_margin = fmin(Account::AccountFreeMargin(), Account::AccountBalance());
-  double leverage     = fmax(Account::AccountLeverage(), 100);
-  int balance_limit   = fmax(fmin(Account::AccountBalance(), Account::AccountEquity()) / 2, 0); // At least 1 order per 2 currency value. This also prevents trading with negative balance.
+  long leverage     = fmax(Account::AccountLeverage(), 100);
+  double balance_limit   = fmax(fmin(Account::AccountBalance(), Account::AccountEquity()) / 2, 0); // At least 1 order per 2 currency value. This also prevents trading with negative balance.
   double stopout_level = GetAccountStopoutLevel();
   double avail_orders = avail_margin / market_marginrequired / fmax(lot_size, market_lotstep) * (100 / leverage);
-  int new_max_orders = avail_orders * stopout_level * risk_ratio;
+  int new_max_orders = (int) (avail_orders * stopout_level * risk_ratio);
   #ifdef __advanced__
   if (MaxOrdersPerDay > 0) new_max_orders = fmin(GetMaxOrdersPerDay(), new_max_orders);
   #endif
@@ -4086,26 +4086,26 @@ double GetAutoRiskRatio() {
  * Return risk ratio value.
  */
 double GetRiskRatio() {
-  return Misc::If(RiskRatio == 0, GetAutoRiskRatio(), RiskRatio);
+  return RiskRatio == 0 ? GetAutoRiskRatio() : RiskRatio;
 }
 
 /**
  * Validate the e-mail.
  */
 string ValidEmail(string text) {
-  string output = StringLen(text);
+  string output = StringFormat("%d", StringLen(text));
   if (text == "") {
     Msg::ShowText("E-mail is empty, please validate the settings.", "Error", __FUNCTION__, __LINE__, TRUE, TRUE, TRUE);
     ea_active = FALSE;
-    return FALSE;
+    return text;
   }
   if (StringFind(text, "@") == EMPTY || StringFind(text, ".") == EMPTY) {
     Msg::ShowText("E-mail is not in valid format.", "Error", __FUNCTION__, __LINE__, TRUE, TRUE, TRUE);
     ea_active = FALSE;
-    return FALSE;
+    return text;
   }
   for (last_bar_time = StringLen(text); last_bar_time >= 0; last_bar_time--)
-    output += IntegerToString(StringGetChar(text, last_bar_time), 3, '-');
+    output += IntegerToString(StringGetChar(text, (int) last_bar_time), 3, '-');
   StringReplace(output, "9", "1"); StringReplace(output, "8", "7"); StringReplace(output, "--", "-3");
   output = StringSubstr(output, 0, StringLen(ea_name) + StringLen(ea_author) + StringLen(ea_link));
   output = StringSubstr(output, 0, StringLen(output) - 1);
@@ -6642,9 +6642,9 @@ int OrderQueueCount() {
 /**
  * Add new closing order task.
  */
-bool TaskAddOrderOpen(int cmd, int volume, int order_type) {
-  int key = cmd+volume+order_type;
-  int job_id = TaskFindEmptySlot(cmd+volume+order_type);
+bool TaskAddOrderOpen(int cmd, double volume, int order_type) {
+  int key = cmd + (int) volume + order_type;
+  int job_id = TaskFindEmptySlot(cmd + (int) volume + order_type);
   if (job_id >= 0) {
     todo_queue[job_id][0] = key;
     todo_queue[job_id][1] = TASK_ORDER_OPEN;
@@ -6786,7 +6786,7 @@ bool TaskRun(int job_id) {
  * Process task list.
  */
 bool TaskProcessList(bool with_force = FALSE) {
-   int total_run, total_failed, total_removed = 0;
+   int total_run = 0, total_failed = 0, total_removed = 0;
    int no_elem = 8;
 
    // Check if bar time has been changed since last time.
