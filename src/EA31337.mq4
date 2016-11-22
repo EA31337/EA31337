@@ -964,7 +964,7 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
         ratio *= RSI_Period_Ratio;
       }
       // Calculate average value.
-      rsi_stats[index][0] = Misc::If(rsi_stats[index][0] > 0, (rsi_stats[index][0] + rsi[index][0] + rsi[index][1] + rsi[index][2]) / 4, (rsi[index][0] + rsi[index][1] + rsi[index][2]) / 3);
+      rsi_stats[index][0] = (rsi_stats[index][0] > 0 ? (rsi_stats[index][0] + rsi[index][0] + rsi[index][1] + rsi[index][2]) / 4 : (rsi[index][0] + rsi[index][1] + rsi[index][2]) / 3);
       if (VerboseDebug) PrintFormat("RSI M%d: %s", tf, Arrays::ArrToString2D(rsi, ",", Digits));
       success = (bool)rsi[index][CURR];
       break;
@@ -4223,7 +4223,7 @@ void StartNewDay() {
   daily_orders = 0;
   string sar_stats = "Daily SAR stats: ";
   for (int i = 0; i < FINAL_PERIOD_TYPE_ENTRY; i++) {
-    sar_stats += "Period: " + i + ", Buy: " + signals[DAILY][SAR1][i][OP_BUY] + " / " + "Sell: " + signals[DAILY][SAR1][i][OP_SELL] + "; ";
+    sar_stats += StringFormat("Period: %d, Buy/Sell: %d/%d; ", i, signals[DAILY][SAR1][i][OP_BUY], signals[DAILY][SAR1][i][OP_SELL]);
     // sar_stats += "Buy M5: " + signals[DAILY][SAR5][i][OP_BUY] + " / " + "Sell M5: " + signals[DAILY][SAR5][i][OP_SELL] + "; ";
     // sar_stats += "Buy M15: " + signals[DAILY][SAR15][i][OP_BUY] + " / " + "Sell M15: " + signals[DAILY][SAR15][i][OP_SELL] + "; ";
     // sar_stats += "Buy M30: " + signals[DAILY][SAR30][i][OP_BUY] + " / " + "Sell M30: " + signals[DAILY][SAR30][i][OP_SELL] + "; ";
@@ -4239,7 +4239,7 @@ void StartNewDay() {
   // Print and reset strategy stats.
   string strategy_stats = "Daily strategy stats: ";
   for (int j = 0; j < FINAL_STRATEGY_TYPE_ENTRY; j++) {
-    if (stats[j][DAILY_PROFIT] != 0) strategy_stats += sname[j] + ": " + stats[j][DAILY_PROFIT] + "pips; ";
+    if (stats[j][DAILY_PROFIT] != 0) strategy_stats += StringFormat("%s: %.1f pips; ", sname[j], stats[j][DAILY_PROFIT]);
     stats[j][DAILY_PROFIT]  = 0;
   }
   if (VerboseInfo) Print(strategy_stats);
@@ -4265,7 +4265,7 @@ void StartNewWeek() {
   // Reset variables.
   string sar_stats = "Weekly SAR stats: ";
   for (int i = 0; i < FINAL_PERIOD_TYPE_ENTRY; i++) {
-    sar_stats += "Period: " + i + ", Buy: " + signals[WEEKLY][SAR1][i][OP_BUY] + " / " + "Sell: " + signals[WEEKLY][SAR1][i][OP_SELL] + "; ";
+    sar_stats += StringFormat("Period: %d, Buy/Sell: %d/%d; ", i, signals[WEEKLY][SAR1][i][OP_BUY], signals[WEEKLY][SAR1][i][OP_SELL]);
     //sar_stats += "Buy M1: " + signals[WEEKLY][SAR1][i][OP_BUY] + " / " + "Sell M1: " + signals[WEEKLY][SAR1][i][OP_SELL] + "; ";
     //sar_stats += "Buy M5: " + signals[WEEKLY][SAR5][i][OP_BUY] + " / " + "Sell M5: " + signals[WEEKLY][SAR5][i][OP_SELL] + "; ";
     //sar_stats += "Buy M15: " + signals[WEEKLY][SAR15][i][OP_BUY] + " / " + "Sell M15: " + signals[WEEKLY][SAR15][i][OP_SELL] + "; ";
@@ -4281,7 +4281,7 @@ void StartNewWeek() {
   // Reset strategy stats.
   string strategy_stats = "Weekly strategy stats: ";
   for (int j = 0; j < FINAL_STRATEGY_TYPE_ENTRY; j++) {
-    if (stats[j][WEEKLY_PROFIT] != 0) strategy_stats += sname[j] + ": " + stats[j][WEEKLY_PROFIT] + "pips; ";
+    if (stats[j][WEEKLY_PROFIT] != 0) strategy_stats += StringFormat("%s: %.1f pips; ", sname[j], stats[j][WEEKLY_PROFIT]);
     stats[j][WEEKLY_PROFIT] = 0;
   }
   if (VerboseInfo) Print(strategy_stats);
@@ -4303,7 +4303,7 @@ void StartNewMonth() {
   // Reset variables.
   string sar_stats = "Monthly SAR stats: ";
   for (int i = 0; i < FINAL_PERIOD_TYPE_ENTRY; i++) {
-    sar_stats += "Period: " + i + ", Buy: " + signals[MONTHLY][SAR1][i][OP_BUY] + " / " + "Sell: " + signals[MONTHLY][SAR1][i][OP_SELL] + "; ";
+    sar_stats += StringFormat("Period: %d, Buy/Sell: %d/%d; ", i, signals[MONTHLY][SAR1][i][OP_BUY], signals[MONTHLY][SAR1][i][OP_SELL]);
     // sar_stats += "Buy M1: " + signals[MONTHLY][SAR1][i][OP_BUY] + " / " + "Sell M1: " + signals[MONTHLY][SAR1][i][OP_SELL] + "; ";
     // sar_stats += "Buy M5: " + signals[MONTHLY][SAR5][i][OP_BUY] + " / " + "Sell M5: " + signals[MONTHLY][SAR5][i][OP_SELL] + "; ";
     // sar_stats += "Buy M15: " + signals[MONTHLY][SAR15][i][OP_BUY] + " / " + "Sell M15: " + signals[MONTHLY][SAR15][i][OP_SELL] + "; ";
@@ -4319,7 +4319,7 @@ void StartNewMonth() {
   // Reset strategy stats.
   string strategy_stats = "Monthly strategy stats: ";
   for (int j = 0; j < FINAL_STRATEGY_TYPE_ENTRY; j++) {
-    if (stats[j][MONTHLY_PROFIT] != 0) strategy_stats += sname[j] + ": " + stats[j][MONTHLY_PROFIT] + " pips; ";
+    if (stats[j][MONTHLY_PROFIT] != 0) strategy_stats += StringFormat("%s: %.1f pips; ", sname[j], stats[j][MONTHLY_PROFIT]);
     stats[j][MONTHLY_PROFIT] = fmin(0, stats[j][MONTHLY_PROFIT]);
   }
   if (VerboseInfo) Print(strategy_stats);
@@ -5552,8 +5552,8 @@ double GetTotalProfit() {
  */
 void ApplyStrategyMultiplierFactor(int period = DAILY, int direction = 0, double factor = 1.0) {
   if (GetNoOfStrategies() <= 1 || factor == 1.0) return;
-  int key = Misc::If(period == MONTHLY, MONTHLY_PROFIT, Misc::If(period == WEEKLY, (int)WEEKLY_PROFIT, (int)DAILY_PROFIT));
-  string period_name = Misc::If(period == MONTHLY, "montly", Misc::If(period == WEEKLY, "weekly", "daily"));
+  int key = period == MONTHLY ? MONTHLY_PROFIT : (period == WEEKLY ? (int)WEEKLY_PROFIT : (int)DAILY_PROFIT);
+  string period_name = period == MONTHLY ? "montly" : (period == WEEKLY ? "weekly" : "daily");
   int new_strategy = direction > 0 ? Arrays::GetArrKey1ByHighestKey2ValueD(stats, key) : Arrays::GetArrKey1ByLowestKey2ValueD(stats, key);
   if (new_strategy == EMPTY) return;
   int previous = Misc::If(direction > 0, best_strategy[period], worse_strategy[period]);
@@ -5563,31 +5563,31 @@ void ApplyStrategyMultiplierFactor(int period = DAILY, int direction = 0, double
       if (previous != EMPTY) {
         if (!info[previous][ACTIVE]) info[previous][ACTIVE] = TRUE;
         conf[previous][FACTOR] = GetDefaultProfitFactor(); // Set previous strategy multiplier factor to default.
-        if (VerboseDebug) Print(__FUNCTION__ + ": Setting multiplier factor to default for strategy: " + previous);
+        Msg::ShowText(StringFormat("Setting multiplier factor to default for strategy: %g", previous), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
       }
       best_strategy[period] = new_strategy; // Assign the new worse strategy.
       info[new_strategy][ACTIVE] = TRUE;
       new_factor = GetDefaultProfitFactor() * factor;
       conf[new_strategy][FACTOR] = new_factor; // Apply multiplier factor for the new strategy.
-      if (VerboseDebug) Print(__FUNCTION__ + ": Setting multiplier factor to " + new_factor + " for strategy: " + new_strategy + " (period: " + period_name + ")");
+     Msg::ShowText(StringFormat("Setting multiplier factor to %g for strategy: %d (period: %s)", new_factor, new_strategy, period_name), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
     }
   } else { // Worse strategy.
     if (info[new_strategy][ACTIVE] && stats[new_strategy][key] < 10 && new_strategy != previous) { // Check if it's different than the previous one.
       if (previous != EMPTY) {
         if (!info[previous][ACTIVE]) info[previous][ACTIVE] = TRUE;
         conf[previous][FACTOR] = GetDefaultProfitFactor(); // Set previous strategy multiplier factor to default.
-        if (VerboseDebug) Print(__FUNCTION__ + ": Setting multiplier factor to default for strategy: " + previous + " to default.");
+        Msg::ShowText(StringFormat("Setting multiplier factor to default for strategy: %g to default.", previous), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
       }
       worse_strategy[period] = new_strategy; // Assign the new worse strategy.
       if (factor > 0) {
         new_factor = NormalizeDouble(GetDefaultProfitFactor() / factor, Digits);
         info[new_strategy][ACTIVE] = TRUE;
         conf[new_strategy][FACTOR] = new_factor; // Apply multiplier factor for the new strategy.
-        if (VerboseDebug) Print(__FUNCTION__ + ": Setting multiplier factor to " + new_factor + " for strategy: " + new_strategy + " (period: " + period_name + ")");
+        Msg::ShowText(StringFormat("Setting multiplier factor to %g for strategy: %d (period: %s)", new_factor, new_strategy, period_name), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
       } else {
         info[new_strategy][ACTIVE] = FALSE;
         //conf[new_strategy][FACTOR] = GetDefaultProfitFactor();
-        if (VerboseDebug) Print(__FUNCTION__ + ": Disabling strategy: " + new_strategy);
+        Msg::ShowText(StringFormat("Disabling strategy: %d", new_strategy), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
       }
     }
   }
@@ -5773,7 +5773,7 @@ string GetStats(string sep = ", ") {
 string GetHourlyProfit(string sep = ", ") {
   string output = StringFormat("Hourly profit (total: %.1fp): ", Arrays::GetArrSumKey1(hourly_profit, day_of_year));
   for (int h = 0; h < hour_of_day; h++) {
-    output += StringFormat("%d: %.1fp%s", h, hourly_profit[day_of_year][h], Misc::If(h < hour_of_day, sep, ""));
+    output += StringFormat("%d: %.1fp%s", h, hourly_profit[day_of_year][h], h < hour_of_day ? sep : "");
   }
   return output;
 }
@@ -5875,11 +5875,11 @@ string GetMonthlyReport() {
 string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
   string output;
   // Prepare text for Stop Out.
-  string stop_out_level = AccountStopoutLevel();
+  string stop_out_level = StringFormat("%d", AccountStopoutLevel());
   if (AccountStopoutMode() == 0) stop_out_level += "%"; else stop_out_level += AccCurrency;
   stop_out_level += StringFormat(" (%.1f)", GetAccountStopoutLevel());
   // Prepare text to display max orders.
-  string text_max_orders = "Max orders: " + max_orders + " [Per type: " + GetMaxOrdersPerType() + "]";
+  string text_max_orders = StringFormat("Max orders: %d [Per type: %d]", max_orders, GetMaxOrdersPerType());
   #ifdef __advanced__
     if (MaxOrdersPerDay > 0) text_max_orders += StringFormat(" [Per day: %d]", MaxOrdersPerDay);
   #endif
@@ -5894,7 +5894,7 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
   string indent = "";
   indent = "                      "; // if (total_orders > 5)?
   output = indent + "------------------------------------------------" + sep
-                  + indent + StringFormat("| %s v%s (Status: %s)%s", ea_name, ea_version, Misc::If(ea_active, "ACTIVE", "NOT ACTIVE"), sep)
+                  + indent + StringFormat("| %s v%s (Status: %s)%s", ea_name, ea_version, (ea_active ? "ACTIVE" : "NOT ACTIVE"), sep)
                   + indent + StringFormat("| ACCOUNT INFORMATION:%s", sep)
                   + indent + StringFormat("| Server Name: %s, Time: %s%s", AccountInfoString(ACCOUNT_SERVER), TimeToStr(time_current, TIME_DATE|TIME_MINUTES|TIME_SECONDS), sep)
                   + indent + "| Acc Number: " + IntegerToString(Account::AccountNumber()) + "; Acc Name: " + AccountName() + "; Broker: " + Account::AccountCompany() + " (Type: " + account_type + ")" + sep
@@ -6127,7 +6127,8 @@ bool ActionCloseAllProfitableOrders(int reason_id = EMPTY){
 
   if (selected_orders > 0) {
     last_close_profit = total_profit;
-    if (VerboseInfo) Print(__FUNCTION__ + ": Queued " + selected_orders + " orders to close with expected profit of " + total_profit + " pips.");
+    Msg::ShowText(StringFormat("Queued %d orders to close with expected profit of %g pips.", selected_orders, total_profit)
+    , "Info", __FUNCTION__, __LINE__, VerboseInfo);
   }
   return (result);
 }
@@ -6151,7 +6152,8 @@ bool ActionCloseAllUnprofitableOrders(int reason_id = EMPTY){
 
   if (selected_orders > 0) {
     last_close_profit = total_profit;
-    if (VerboseInfo) Print(__FUNCTION__ + ": Queued " + selected_orders + " orders to close with expected loss of " + total_profit + " pips.");
+    Msg::ShowText(StringFormat("Queued %d orders to close with expected loss of %g pips.", selected_orders, total_profit)
+    , "Info", __FUNCTION__, __LINE__, VerboseInfo);
   }
   return (result);
 }
@@ -6174,7 +6176,8 @@ bool ActionCloseAllOrdersByType(int cmd = EMPTY, int reason_id = EMPTY){
 
   if (selected_orders > 0) {
     last_close_profit = total_profit;
-    if (VerboseInfo) Print(__FUNCTION__ + "(" + Convert::OrderTypeToString(cmd) + "): Queued " + selected_orders + " orders to close with expected profit of " + total_profit + " pips.");
+    Msg::ShowText(StringFormat("Queued %d orders to close with expected profit of %g pips.", selected_orders, total_profit)
+    , "Info", __FUNCTION__, __LINE__, VerboseInfo);
   }
   return (FALSE);
 }
@@ -6204,14 +6207,15 @@ int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = TRUE) {
          TaskAddCloseOrder(OrderTicket(), reason_id); // Add task to re-try.
          processed++;
       } else {
-        if (VerboseDebug)
-         Print(__FUNCTION__ + ": Error: Order Pos: " + order + "; Message: ", GetErrorText(GetLastError()));
+         Msg::ShowText(StringFormat("Error: Order Pos: %d; Message: %s", order, GetErrorText(GetLastError())),
+            "Debug", __FUNCTION__, __LINE__, VerboseDebug);
       }
    }
 
    if (processed > 0) {
     last_close_profit = total_profit;
-     if (VerboseInfo) Print(__FUNCTION__ + ": Queued " + processed + " orders out of " + total + " for closure.");
+    Msg::ShowText(StringFormat("Queued %d orders out of %d for closure.", processed, total),
+      "Info", __FUNCTION__, __LINE__, VerboseInfo);
    }
    return (processed > 0);
 }
@@ -6226,8 +6230,8 @@ int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = TRUE) {
  */
 bool ActionExecute(int aid, int id = EMPTY) {
   bool result = FALSE;
-  int reason_id = Misc::If(id != EMPTY, acc_conditions[id][0], EMPTY); // Account id condition.
-  int mid = Misc::If(id != EMPTY, acc_conditions[id][1], EMPTY); // Market id condition.
+  int reason_id = (id != EMPTY ? acc_conditions[id][0] : EMPTY); // Account id condition.
+  int mid = (id != EMPTY ? acc_conditions[id][1] : EMPTY); // Market id condition.
   int cmd;
   switch (aid) {
     case A_NONE: /* 0 */
@@ -6723,7 +6727,7 @@ int TaskFindEmptySlot(int key) {
   int taken = 0;
   if (!TaskExistByKey(key)) {
     for (int job_id = 0; job_id < ArrayRange(todo_queue, 0); job_id++) {
-      if (VerboseTrace) Print(__FUNCTION__ + ": job_id = " + job_id + "; key: " + todo_queue[job_id][0]);
+      // if (VerboseTrace) Print(__FUNCTION__ + ": job_id = " + job_id + "; key: " + todo_queue[job_id][0]);
       if (todo_queue[job_id][0] <= 0) { // Find empty slot.
         // if (VerboseTrace) Print(__FUNCTION__ + ": Found empty slot at: " + job_id);
         return job_id;
@@ -6733,11 +6737,13 @@ int TaskFindEmptySlot(int key) {
     int size = ArrayRange(todo_queue, 0);
     if (size < 1000) { // Set array hard limit.
       ArrayResize(todo_queue, size + 10);
-      if (VerboseDebug) Print(__FUNCTION__ + ": Couldn't allocate Task slot, re-sizing array. New size: ",  (size + 1), ", Old size: ", size);
+      Msg::ShowText(StringFormat("Couldn't allocate a task slot, re-sizing array. New size: %d, Old size: %d", (size + 1), size),
+         "Debug", __FUNCTION__, __LINE__, VerboseDebug);
       return size;
     } else {
       // Array exceeded hard limit, probably because of some memory leak.
-      if (VerboseDebug) Print(__FUNCTION__ + ": Couldn't allocate task slot, all are taken (" + taken + "). Size: " + size);
+      Msg::ShowText(StringFormat("Couldn't allocate a task slot, all are taken (%d of %d).", taken, size),
+         "Debug", __FUNCTION__, __LINE__, VerboseDebug);
     }
   }
   return EMPTY;
@@ -6773,11 +6779,13 @@ bool TaskRun(int job_id) {
         if (OrderSelect(key, SELECT_BY_TICKET, MODE_HISTORY)) {
           OrderCalc(key);
         } else {
-          if (VerboseDebug) Print(__FUNCTION__ + ": Access to history failed with error: (" + GetLastError() + ").");
+          Msg::ShowText(StringFormat("Access to history failed with error: (%d).", GetLastError()),
+            "Debug", __FUNCTION__, __LINE__, VerboseDebug);
         }
       break;
     default:
-      if (VerboseDebug) Print(__FUNCTION__ + ": Unknown task: ", task_type);
+      Msg::ShowText(StringFormat("Unknown task: %d", task_type),
+         "Debug", __FUNCTION__, __LINE__, VerboseDebug);
   };
   return result;
 }
