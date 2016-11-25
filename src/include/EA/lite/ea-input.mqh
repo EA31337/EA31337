@@ -659,6 +659,7 @@ extern string __Backtest_Parameters__ = "-- Backtest parameters --"; // >>> BACK
 #else
   extern bool ValidateSettings = 0; // Validate startup settings
 #endif
+extern bool RecordTicksToCSV = False; // Record ticks into CSV files
 extern int DemoMarketStopLevel = 10; // Demo market stop level
 
 //+------------------------------------------------------------------+

@@ -68,6 +68,7 @@
 #include <EA\public-classes\SummaryReport.mqh>
 #include <EA\public-classes\Terminal.mqh>
 #include <EA\public-classes\Tests.mqh>
+#include <EA\public-classes\Ticks.mqh>
 
 //#property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 
@@ -135,6 +136,7 @@ int last_history_check = 0; // Last ticket position processed.
 // Class variables.
 Stats *total_stats, *hourly_stats;
 SummaryReport *summary; // For summary report.
+Ticks *ticks; // For recording ticks.
 
 // Strategy variables.
 int info[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_INFO_ENTRY];
@@ -228,6 +230,9 @@ void OnTick() {
   // Update stats.
   total_stats.OnTick();
   hourly_stats.OnTick();
+  if (RecordTicksToCSV) {
+    ticks.OnTick();
+  }
 
   // Check the last tick change.
   last_tick_change = fmax(Convert::GetValueDiffInPips(Ask, LastAsk, True), Convert::GetValueDiffInPips(Bid, LastBid, True));
@@ -288,6 +293,7 @@ int OnInit() {
   }
 
   session_initiated &= InitializeVariables();
+  session_initiated &= InitClasses();
   session_initiated &= InitStrategies();
   session_initiated &= InitializeConditions();
   session_initiated &= CheckHistory();
@@ -328,13 +334,19 @@ int OnInit() {
 //| Expert deinitialization function                                 |
 //+------------------------------------------------------------------+
 void OnDeinit(const int reason) {
-  ea_active = TRUE;
+  ea_active = True;
   time_current = TimeCurrent();
   Msg::ShowText(StringFormat("reason = %d", reason), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
   // Also: _UninitReason.
   Msg::ShowText(
       StringFormat("EA deinitializing, reason: %s (code: %s)", Errors::GetUninitReasonText(reason), IntegerToString(reason)),
       "Info", __FUNCTION__, __LINE__, VerboseInfo);
+
+  // Save ticks if recorded.
+  if (RecordTicksToCSV) {
+    ticks.SaveToCSV();
+  }
+
   Msg::ShowText(GetSummaryText(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
 
   string filename;
@@ -361,10 +373,14 @@ void OnDeinit(const int reason) {
   // #endif
 } // end: OnDeinit()
 
+/**
+ * Deinitialize global variables.
+ */
 void DeinitVars() {
   delete hourly_stats;
   delete total_stats;
   delete summary;
+  delete ticks;
 }
 
 // The init event handler for tester.
@@ -4046,6 +4062,13 @@ void StartNewDay() {
     stats[j][DAILY_PROFIT]  = 0;
   }
   if (VerboseInfo) Print(strategy_stats);
+  
+  // Reset ticks
+  if (RecordTicksToCSV) {
+    ticks.SaveToCSV();
+    delete ticks;
+    ticks = new Ticks();
+  }
 }
 
 /**
@@ -4230,7 +4253,6 @@ bool InitializeVariables() {
     Msg::ShowText(StringFormat("Account free margin is %g!", Account::AccountFreeMargin()), "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
     return (FALSE);
   }
-  summary = new SummaryReport(init_balance);
   /* @fixme: https://travis-ci.org/EA31337-Tester/EA31337-Lite-Sets/builds/140302386
   if (Account::AccountMargin() <= 0) {
     Msg::ShowText(StringFormat("Account margin is %g!", Account::AccountMargin()), "Error", __FUNCTION__, __LINE__, VerboseErrors);
@@ -4851,6 +4873,15 @@ bool InitStrategies() {
  */
 bool CheckTf(ENUM_TIMEFRAMES tf = PERIOD_M1, string symbol = NULL) {
   return iMA(symbol, tf, 13, 8, MODE_SMMA, PRICE_MEDIAN, 0) > 0;
+}
+
+/**
+ * Init classes.
+ */
+bool InitClasses() {
+  summary = new SummaryReport(init_balance);
+  ticks = new Ticks();
+  return True;
 }
 
 /**
