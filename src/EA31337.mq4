@@ -153,7 +153,6 @@ double risk_ratio; string rr_text; // Vars for calculation risk ratio.
 int max_orders = 10, daily_orders; // Maximum orders available to open.
 int max_order_slippage; // Maximum price slippage for buy or sell orders (in points)
 double LastAsk, LastBid; // Keep the last ask and bid price.
-string AccCurrency; // Current account currency.
 int err_code; // Error code.
 string last_err, last_msg, last_debug, last_trace;
 double last_tick_change; // Last tick change in pips.
@@ -412,8 +411,10 @@ string InitInfo(bool startup = False, string sep = "\n") {
   string output = StringFormat("%s v%s by %s (%s)%s", ea_name, ea_version, ea_author, ea_link, sep);
   output += StringFormat("Platform variables: Symbol: %s, Bars: %d, Server: %s, Login: %d%s",
     _Symbol, Bars, AccountInfoString(ACCOUNT_SERVER), (int)AccountInfoInteger(ACCOUNT_LOGIN), sep); // // FIXME: MQL5: Bars
-  output += StringFormat("Broker info: Name: %s, Account type: %s, Leverage: 1:%d, Currency: %s%s",
-      AccountCompany(), account_type, AccountLeverage(), AccCurrency, sep);
+  output += StringFormat("Broker info: Name: %s%s",
+      Account::AccountCompany(), sep);
+  output += StringFormat("Account info: Account type: %s, Balance: %g, Equity: %g, Credit: %g, Leverage: 1:%d, Currency: %s%s",
+    account_type, Account::AccountBalance(), Account::AccountEquity(), Account::AccountCredit(), Account::AccountLeverage(), Account::AccountCurrency(), sep);
   output += StringFormat("Market predefined variables: Ask: %g, Bid: %g, Volume: %d%s",
       NormalizeDouble(Ask, Digits), NormalizeDouble(Bid, Digits), Volume[0], sep);
   output += StringFormat("Market constants: Digits: %d, Point: %f, Min Lot: %g, Max Lot: %g, Lot Step: %g, Lot Size: %g, Margin Required: %g, Margin Init: %g, Stop Level: %dpts, Freeze level: %d pts%s",
@@ -3734,7 +3735,7 @@ double GetAccountStopoutLevel() {
 int GetMaxOrdersAuto(bool smooth = true) {
   double avail_margin = fmin(Account::AccountFreeMargin(), Account::AccountBalance());
   long leverage     = fmax(Account::AccountLeverage(), 100);
-  double balance_limit   = fmax(fmin(Account::AccountBalance(), Account::AccountEquity()) / 2, 0); // At least 1 order per 2 currency value. This also prevents trading with negative balance.
+  double balance_limit   = fmax(fmin(Account::AccountBalance() + Account::AccountCredit(), Account::AccountEquity()) / 2, 0); // At least 1 order per 2 currency value. This also prevents trading with negative balance.
   double stopout_level = GetAccountStopoutLevel();
   double avail_orders = avail_margin / market_marginrequired / fmax(lot_size, market_lotstep) * (100 / leverage);
   int new_max_orders = (int) (avail_orders * stopout_level * risk_ratio);
@@ -3796,7 +3797,8 @@ int GetNoOfStrategies() {
  * Calculate size of the lot based on the free margin and account leverage automatically.
  */
 double GetLotSizeAuto(bool smooth = true) {
-  double avail_margin = fmin(AccountFreeMargin(), AccountBalance());
+  double avail_margin = fmin(AccountFreeMargin(), Account::AccountBalance() + Account::AccountCredit());
+  // double avail_margin = fmin(AccountFreeMargin(), AccountBalance()); // @todo
   double leverage     = fmax(AccountLeverage(), 100);
   // @todo: Improve the logic, especially risk_margin.
   double new_lot_size = avail_margin / market_marginrequired * risk_margin/100 * risk_ratio;
@@ -3867,6 +3869,7 @@ double GetRiskMargin() {
 double GetAutoRiskRatio() {
   double equity  = Account::AccountEquity();
   double balance = Account::AccountBalance();
+  double credit  = Account::AccountCredit(); // @todo
   // Used when you open/close new positions. It can increase decrease during the price movement in favor and vice versa.
   double free    = Account::AccountFreeMargin();
   // Taken from your depo as a guarantee to maintain your current positions opened. It stays the same untill you open or close positions.
@@ -4261,7 +4264,6 @@ bool InitializeVariables() {
   */
 
   init_spread = Market::GetSpreadInPts(); // @todo
-  AccCurrency = AccountCurrency();
 
   // Calculate pip/volume/slippage size and precision.
   // Market *market = new Market(_Symbol);
@@ -5061,28 +5063,28 @@ bool AccCondition(int condition = C_ACC_NONE) {
       return TRUE;
     case C_EQUITY_LOWER:
       last_cname = "Equ<Bal";
-      return Account::AccountEquity() < Account::AccountBalance();
+      return Account::AccountEquity() < Account::AccountBalance() + Account::AccountCredit();
     case C_EQUITY_HIGHER:
       last_cname = "Equ>Bal";
-      return Account::AccountEquity() > Account::AccountBalance();
+      return Account::AccountEquity() > Account::AccountBalance() + Account::AccountCredit();
     case C_EQUITY_50PC_HIGH: // Equity 50% high
       last_cname = "Equ>50%";
-      return Account::AccountEquity() > Account::AccountBalance() * 2;
+      return Account::AccountEquity() > (Account::AccountBalance() + Account::AccountCredit()) * 2;
     case C_EQUITY_20PC_HIGH: // Equity 20% high
       last_cname = "Equ>20%";
-      return Account::AccountEquity() > Account::AccountBalance()/100 * 120;
+      return Account::AccountEquity() > (Account::AccountBalance() + Account::AccountCredit()) / 100 * 120;
     case C_EQUITY_10PC_HIGH: // Equity 10% high
       last_cname = "Equ>10%";
-      return Account::AccountEquity() > Account::AccountBalance()/100 * 110;
+      return Account::AccountEquity() > (Account::AccountBalance() + Account::AccountCredit()) / 100 * 110;
     case C_EQUITY_10PC_LOW:  // Equity 10% low
       last_cname = "Equ<10%";
-      return Account::AccountEquity() < Account::AccountBalance()/100 * 90;
+      return Account::AccountEquity() < (Account::AccountBalance() + Account::AccountCredit()) / 100 * 90;
     case C_EQUITY_20PC_LOW:  // Equity 20% low
       last_cname = "Equ<20%";
-      return Account::AccountEquity() < Account::AccountBalance()/100 * 80;
+      return Account::AccountEquity() < (Account::AccountBalance() + Account::AccountCredit()) / 100 * 80;
     case C_EQUITY_50PC_LOW:  // Equity 50% low
       last_cname = "Equ<50%";
-      return Account::AccountEquity() <= Account::AccountBalance() / 2;
+      return Account::AccountEquity() <= (Account::AccountBalance() + Account::AccountCredit()) / 2;
     case C_MARGIN_USED_50PC: // 50% Margin Used
       last_cname = "Margin>50%";
       return Account::AccountMargin() >= Account::AccountEquity() /100 * 50;
@@ -5712,7 +5714,7 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
   string output;
   // Prepare text for Stop Out.
   string stop_out_level = StringFormat("%d", AccountStopoutLevel());
-  if (AccountStopoutMode() == 0) stop_out_level += "%"; else stop_out_level += AccCurrency;
+  if (AccountStopoutMode() == 0) stop_out_level += "%"; else stop_out_level += Account::AccountCurrency();
   stop_out_level += StringFormat(" (%.1f)", GetAccountStopoutLevel());
   // Prepare text to display max orders.
   string text_max_orders = StringFormat("Max orders: %d [Per type: %d]", max_orders, GetMaxOrdersPerType());
@@ -5736,7 +5738,10 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
                   + indent + "| Acc Number: " + IntegerToString(Account::AccountNumber()) + "; Acc Name: " + AccountName() + "; Broker: " + Account::AccountCompany() + " (Type: " + account_type + ")" + sep
                   + indent + StringFormat("| Stop Out Level: %s, Leverage: 1:%d %s", stop_out_level, AccountLeverage(), sep)
                   + indent + "| Used Margin: " + Convert::ValueWithCurrency(Account::AccountMargin()) + "; Free: " + Convert::ValueWithCurrency(Account::AccountFreeMargin()) + sep
-                  + indent + "| Equity: " + Convert::ValueWithCurrency(Account::AccountEquity()) + "; Balance: " + Convert::ValueWithCurrency(Account::AccountBalance()) + sep
+                  + indent + "| Equity: " + Convert::ValueWithCurrency(Account::AccountEquity())
+                     + "; Balance: " + Convert::ValueWithCurrency(Account::AccountBalance())
+                     + (Account::AccountCredit() > 0 ? "; Credit: " + Convert::ValueWithCurrency(Account::AccountCredit()) : "")
+                     + sep
                   + indent + "| Lot size: " + DoubleToStr(lot_size, volume_digits) + "; " + text_max_orders + sep
                   + indent + "| Risk ratio: " + DoubleToStr(risk_ratio, 1) + " (" + GetRiskRatioText() + ")" + sep
                   + indent + "| " + GetOrdersStats("" + sep + indent + "| ") + "" + sep
@@ -5784,8 +5789,11 @@ void SendEmailExecuteOrder(string sep = "<br>\n") {
   body += sep + StringFormat("Price: %s", DoubleToStr(OrderOpenPrice(), Digits));
   body += sep + StringFormat("Lot size: %s", DoubleToStr(OrderLots(), volume_digits));
   body += sep + StringFormat("Comment: %s", OrderComment());
-  body += sep + StringFormat("Current Balance: %s", Convert::ValueWithCurrency(Account::AccountBalance()));
-  body += sep + StringFormat("Current Equity: %s", Convert::ValueWithCurrency(Account::AccountEquity()));
+  body += sep + StringFormat("Account Balance: %s", Convert::ValueWithCurrency(Account::AccountBalance()));
+  body += sep + StringFormat("Account Equity: %s", Convert::ValueWithCurrency(Account::AccountEquity()));
+  if (Account::AccountCredit() > 0) {
+    body += sep + StringFormat("Account Credit: %s", Convert::ValueWithCurrency(Account::AccountCredit()));
+  }
   SendMail(mail_title, body);
 }
 
@@ -5820,6 +5828,7 @@ string GetAccountTextDetails(string sep = "; ") {
       "Time: ", TimeToStr(time_current, TIME_DATE|TIME_MINUTES|TIME_SECONDS), sep,
       "Account Balance: ", Convert::ValueWithCurrency(Account::AccountBalance()), sep,
       "Account Equity: ", Convert::ValueWithCurrency(Account::AccountEquity()), sep,
+      "Account Credit: ", Convert::ValueWithCurrency(Account::AccountCredit()), sep,
       "Used Margin: ", Convert::ValueWithCurrency(Account::AccountMargin()), sep,
       "Free Margin: ", Convert::ValueWithCurrency(Account::AccountFreeMargin()), sep,
       "No of Orders: ", total_orders, " (BUY/SELL: ", CalculateOrdersByCmd(OP_BUY), "/", CalculateOrdersByCmd(OP_SELL), ")", sep,
@@ -6155,8 +6164,8 @@ bool ActionExecute(int aid, int id = EMPTY) {
   Msg::ShowText(GetAccountTextDetails() + "; " + GetOrdersStats(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
   if (result) {
     Msg::ShowText(
-        StringFormat("Executed action: %s (id: %d), because of market condition: %s (id: %d) and account condition is: %s (id: %d) [E:%s/B:%s/P:%sp].",
-          ActionIdToText(aid), aid, MarketIdToText(mid), mid, ReasonIdToText(reason_id), reason_id, Convert::ValueWithCurrency(Account::AccountEquity()), Convert::ValueWithCurrency(AccountBalance()), DoubleToStr(last_close_profit, 1)),
+        StringFormat("Executed action: %s (id: %d), because of market condition: %s (id: %d) and account condition is: %s (id: %d) [E:%s/B:%s/C:%s/P:%sp].",
+          ActionIdToText(aid), aid, MarketIdToText(mid), mid, ReasonIdToText(reason_id), reason_id, Convert::ValueWithCurrency(Account::AccountEquity()), Convert::ValueWithCurrency(AccountBalance()), Convert::ValueWithCurrency(AccountCredit()), DoubleToStr(last_close_profit, 1)),
         "Info", __FUNCTION__, __LINE__, VerboseInfo);
     Msg::ShowText(last_msg, "Debug", __FUNCTION__, __LINE__, VerboseDebug && aid != A_NONE);
     if (WriteReport && VerboseDebug) ReportAdd(GetLastMessage());
