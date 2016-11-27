@@ -926,7 +926,7 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
 
    // Check the limits.
    if (!OpenOrderIsAllowed(cmd, sid, trade_volume)) {
-     return (FALSE);
+     return (False);
    }
 
    // Check the order comment.
@@ -966,6 +966,10 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
    if (VerboseDebug) PrintFormat("Normalized: stoploss = %f, takeprofit = %f",
       NormalizeDouble(stoploss, Market::GetDigits()),
       NormalizeDouble(takeprofit, Market::GetDigits()));
+
+  if (Boosting_Enabled && (ConWinsIncreaseFactor != 0 || ConLossesIncreaseFactor != 0)) {
+    trade_volume = Order::OptimizeLotSize(trade_volume, ConWinsIncreaseFactor, ConLossesIncreaseFactor, ConFactorOrdersLimit);
+  }
 
    // @fixme: warning 43: possible loss of data due to type conversion: GetOrderColor
    order_ticket = OrderSend(_Symbol, cmd,

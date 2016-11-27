@@ -75,6 +75,9 @@ extern double BestMonthlyStrategyMultiplierFactor = 0.8; // Multiplier for the b
 extern double WorseDailyStrategyDividerFactor = 0.6; // Divider for the worse daily strategy
 extern double WorseWeeklyStrategyDividerFactor = 0.8; // Divider for the worse weekly strategy
 extern double WorseMonthlyStrategyDividerFactor = 1; // Divider for the worse monthly strategy
+extern double ConWinsIncreaseFactor = -1.0; // Increase lot factor on consequent wins (in %, 0 - off)
+extern double ConLossesIncreaseFactor = 2.0; // Increase lot factor on consequent loses (in %, 0 - off)
+extern uint ConFactorOrdersLimit = 200; // No of orders to check on consequent wins/loses
 
 //+------------------------------------------------------------------+
 extern string __SmartQueue_Parameters__ = "-- Smart queue parameters --"; // >>> SMART QUEUE <<<

@@ -48,7 +48,7 @@ extern string __EA_Risk_Parameters__ = "-- Risk management parameters --"; // >>
 extern bool TradeWithTrend = 1; // Trade with trend
 extern double RiskRatio = 0; // Risk ratio (0 = auto, 1.0 = normal)
 extern double RiskMargin = 1.0; // Risk margin (0-100, 0 = auto, 1 = 1%)
-extern int CloseOrderAfterXHours = 72; // Close order after X hours (0 = disabled)
+extern int CloseOrderAfterXHours = 72; // Close order after X hours (0 - off)
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Parameters__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGIES <<<
@@ -65,6 +65,9 @@ extern double BestMonthlyStrategyMultiplierFactor = 0.8; // Multiplier for the b
 extern double WorseDailyStrategyDividerFactor = 0.6; // Divider for the worse daily strategy
 extern double WorseWeeklyStrategyDividerFactor = 0.8; // Divider for the worse weekly strategy
 extern double WorseMonthlyStrategyDividerFactor = 1; // Divider for the worse monthly strategy
+extern double ConWinsIncreaseFactor = -1.0; // Increase lot factor on consequent wins (in %, 0 - off)
+extern double ConLossesIncreaseFactor = 2.0; // Increase lot factor on consequent loses (in %, 0 - off)
+extern uint ConFactorOrdersLimit = 200; // No of orders to check on consequent wins/loses
 
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions__ = "-- Account conditions --"; // >>> CONDITIONS & ACTIONS <<<
