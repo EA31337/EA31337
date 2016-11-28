@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                                      ea-mode.mqh |
-//|                                           Copyright 2015, kenorb |
+//|                            Copyright 2016, 31337 Investments Ltd |
 //|                                       https://github.com/EA31337 |
 //+------------------------------------------------------------------+
 //+------------------------------------------------------------------+
@@ -13,9 +13,9 @@
 
 // Other modes.
 //#define __testing__      // Mode for testing each component.
-#define __nolicense__    // Disable licensing.
-#define __backtest__     // For backtest only.
+//#define __nolicense__    // Disable licensing.
+//#define __backtest__     // For backtest only.
 //#define __limited__      // Define safe options.
-#define __release__      // Enable release settings.
+//#define __release__      // Enable release settings.
 //#define __debug__        // Enable debugging.
 //#define __experimental__ // Enable experimental options.
