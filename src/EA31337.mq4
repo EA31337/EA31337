@@ -960,20 +960,26 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
    double takeprofit_trail = GetTrailingValue(cmd, +1, sid);
    // Choose the safest stops.
    // @todo: Implement hard stops based on the balance.
+   /*
    stoploss   = stoploss > 0   && stoploss_trail > 0
      ? (Convert::OrderTypeToValue(cmd) > 0 ? fmax(stoploss, stoploss_trail) : fmin(stoploss, stoploss_trail))
      : fmax(stoploss, stoploss_trail);
    takeprofit = takeprofit > 0 && takeprofit_trail > 0
      ? (Convert::OrderTypeToValue(cmd) > 0 ? fmin(takeprofit, takeprofit_trail) : fmax(takeprofit, takeprofit_trail))
      : fmax(takeprofit, takeprofit_trail);
+   */
+   if (Market::TradeOpAllowed(cmd, stoploss_trail, takeprofit_trail, _Symbol)) {
+     stoploss = stoploss_trail;
+     takeprofit = takeprofit_trail;
+   }
    // Normalize stops.
    stoploss = NormalizeDouble(stoploss, Market::GetDigits());
    takeprofit = NormalizeDouble(takeprofit, Market::GetDigits());
 
-   if (VerboseDebug) PrintFormat("Adjusted: stoploss = %f, takeprofit = %f", stoploss, takeprofit);
-   if (VerboseDebug) PrintFormat("Normalized: stoploss = %f, takeprofit = %f",
-      NormalizeDouble(stoploss, Market::GetDigits()),
-      NormalizeDouble(takeprofit, Market::GetDigits()));
+  if (VerboseDebug) PrintFormat("Adjusted: stoploss = %f, takeprofit = %f", stoploss, takeprofit);
+  if (VerboseDebug) PrintFormat("Normalized: stoploss = %f, takeprofit = %f",
+    NormalizeDouble(stoploss, Market::GetDigits()),
+    NormalizeDouble(takeprofit, Market::GetDigits()));
 
   if (Boosting_Enabled && (ConWinsIncreaseFactor != 0 || ConLossesIncreaseFactor != 0)) {
     trade_volume = Order::OptimizeLotSize(trade_volume, ConWinsIncreaseFactor, ConLossesIncreaseFactor, ConFactorOrdersLimit);
@@ -1053,8 +1059,9 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
        // Invalid stops can happen when the open price is too close to the market prices.
        // Therefore the minimal distance of the pending price from the current market is invalid.
        if (WriteReport) ReportAdd(last_debug);
-       Msg::ShowText(StringFormat("sid = %d, stoploss = %g, takeprofit = %g, openprice = %g, stoplevel = %g pts",
-         stoploss, takeprofit, open_price, SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL)),
+       Msg::ShowText(StringFormat("sid = %d, stoploss(%d) = %g, takeprofit(%d) = %g, openprice = %g, stoplevel = %g pts",
+         sid, GetTrailingMethod(sid, -1), stoploss, GetTrailingMethod(sid, +1), takeprofit,
+         open_price, SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL)),
          "Debug", __FUNCTION__, __LINE__, VerboseErrors | VerboseDebug | VerboseTrace);
        Msg::ShowText(GetMarketTextDetails(),  "Debug", __FUNCTION__, __LINE__, VerboseErrors | VerboseDebug | VerboseTrace);
        retry = FALSE;
@@ -3132,15 +3139,19 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
   // TODO: Make starting point dynamic: Open[CURR], Open[PREV], Open[FAR], Close[PREV], Close[FAR], ma_fast[CURR], ma_medium[CURR], ma_slow[CURR]
    double highest_ma, lowest_ma;
    switch (method) {
-     case T_NONE: // None
+     case T_NONE: // None.
        new_value = previous;
        break;
      case T_FIXED: // Dynamic fixed.
        new_value = default_trail;
        break;
-     case T_CLOSE_PREV: // TODO
-       diff = fabs(Open[CURR] - iClose(symbol, tf, PREV));
+     case T_OPEN_PREV: // Previous open price.
+       diff = fabs(Open[CURR] - iOpen(symbol, tf, PREV));
        new_value = Open[CURR] + diff * factor;
+       if (VerboseDebug) {
+          PrintFormat("%s: T_OPEN_PREV: open = %g, prev_open = %g, diff = %g, new_value = %g",
+            __FUNCTION__, Open[CURR], iOpen(symbol, tf, PREV), diff, new_value);
+       }
        break;
      case T_2_BARS_PEAK: // 3
        diff = fmax(Market::GetPeakPrice(tf, MODE_HIGH, 2) - Open[CURR], Open[CURR] - Market::GetPeakPrice(tf, MODE_LOW, 2));
@@ -3764,10 +3775,10 @@ int GetMaxOrdersAuto(bool smooth = true) {
   long leverage     = fmax(Account::AccountLeverage(), 100);
   double balance_limit   = fmax(fmin(Account::AccountBalance() + Account::AccountCredit(), Account::AccountEquity()) / 2, 0); // At least 1 order per 2 currency value. This also prevents trading with negative balance.
   double stopout_level = GetAccountStopoutLevel();
-  double avail_orders = avail_margin / market_marginrequired / market_lotstep * (100 / leverage);
+  double avail_orders = avail_margin / (market_marginrequired * market_lotstep) / lot_size;
   int new_max_orders = (int) (avail_orders * stopout_level * risk_ratio);
-  if (VerboseDebug) PrintFormat("avail_orders = %g / %g / fmax(%g, %g) * (100 / %d) = %g",
-    avail_margin, market_marginrequired, lot_size, market_lotstep, leverage, avail_orders);
+  if (VerboseDebug) PrintFormat("avail_orders = %g / (%g * %g) / %g = %g",
+    avail_margin, market_marginrequired, market_lotstep, lot_size, avail_orders);
   if (VerboseDebug) PrintFormat("new_max_orders = (int) (%g * %g * %g) = %d",
     avail_orders, stopout_level, risk_ratio, new_max_orders);
   #ifdef __advanced__

@@ -272,7 +272,7 @@ enum ENUM_ORDER_QUEUE_ENTRY { // Define order queue.
 enum ENUM_TRAIL_TYPE { // Define type of trailing types.
   T_NONE              =  0, // None
   T_FIXED             =  1, // Fixed
-  T_CLOSE_PREV        =  2, // Previous close
+  T_OPEN_PREV         =  2, // Previous open
   T_2_BARS_PEAK       =  3, // 2 bars peak
   T_5_BARS_PEAK       =  4, // 5 bars peak
   T_10_BARS_PEAK      =  5, // 10 bars peak
