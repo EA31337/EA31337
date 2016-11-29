@@ -958,7 +958,6 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
    // Get the dynamic trailing stops.
    double stoploss_trail   = GetTrailingValue(cmd, -1, sid);
    double takeprofit_trail = GetTrailingValue(cmd, +1, sid);
-   if (VerboseDebug) PrintFormat("stoploss = %g, takeprofit = %g, stoploss_trail = %g, takeprofit_trail = %g", stoploss, takeprofit, stoploss_trail, takeprofit_trail);
    // Choose the safest stops.
    // @todo: Implement hard stops based on the balance.
    stoploss   = stoploss > 0   && stoploss_trail > 0
@@ -1051,8 +1050,13 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
 
      /* Post-process the errors. */
      if (err_code == ERR_INVALID_STOPS) {
-       // Invalid stops.
+       // Invalid stops can happen when the open price is too close to the market prices.
+       // Therefore the minimal distance of the pending price from the current market is invalid.
        if (WriteReport) ReportAdd(last_debug);
+       Msg::ShowText(StringFormat("sid = %d, stoploss = %g, takeprofit = %g, openprice = %g, stoplevel = %g pts",
+         stoploss, takeprofit, open_price, SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL)),
+         "Debug", __FUNCTION__, __LINE__, VerboseErrors | VerboseDebug | VerboseTrace);
+       Msg::ShowText(GetMarketTextDetails(),  "Debug", __FUNCTION__, __LINE__, VerboseErrors | VerboseDebug | VerboseTrace);
        retry = FALSE;
      }
      if (err_code == ERR_TRADE_TOO_MANY_ORDERS) {
@@ -5871,7 +5875,7 @@ string GetMarketTextDetails() {
      "Symbol: ", Symbol(), "; ",
      "Ask: ", DoubleToStr(Ask, Digits), "; ",
      "Bid: ", DoubleToStr(Bid, Digits), "; ",
-     StringFormat("Spread: %gpts = %.2f pips", Market::GetSpreadInPts(), Market::GetSpreadInPips())
+     StringFormat("Spread: %gpts (%.2f pips)", Market::GetSpreadInPts(), Market::GetSpreadInPips())
    );
 }
 
