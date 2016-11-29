@@ -9,7 +9,7 @@
 //+------------------------------------------------------------------+
 
 #define ea_version "1.071"
-#define ea_desc    "Multi-strategy advanced trading robot operating on multiple time frames at the same time."
+#define ea_desc    "Multi-strategy advanced trading robot operating on multiple timeframes at the same time."
 #define ea_link    "https://github.com/EA31337"
 #define ea_author  "kenorb"
 #define ea_copy    "Copyright 2016, 31337 Investments Ltd"

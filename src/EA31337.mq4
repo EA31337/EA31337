@@ -65,6 +65,7 @@
 #include <EA\public-classes\Msg.mqh>
 #include <EA\public-classes\Report.mqh>
 #include <EA\public-classes\Stats.mqh>
+#include <EA\public-classes\Strategy.mqh>
 #include <EA\public-classes\SummaryReport.mqh>
 #include <EA\public-classes\Terminal.mqh>
 #include <EA\public-classes\Tests.mqh>
@@ -276,9 +277,10 @@ int OnInit() {
   string err;
   if (VerboseInfo) PrintFormat("%s v%s (%s) initializing...", ea_name, ea_version, ea_link);
   if (!session_initiated) {
-    if (!CheckSettings()) {
+    err_code = CheckSettings();
+    if (err_code <= 0) {
       // Incorrect set of input parameters occured.
-      Msg::ShowText("EA parameters are not valid, please correct.", "Error", __FUNCTION__, __LINE__, VerboseErrors, TRUE, TRUE);
+      Msg::ShowText(StringFormat("EA parameters are not valid, please correct (code: %d).", -err_code), "Error", __FUNCTION__, __LINE__, VerboseErrors, TRUE, TRUE);
       return (INIT_PARAMETERS_INCORRECT);
     }
     #ifdef __release__
@@ -3581,7 +3583,7 @@ bool TradeAllowed() {
     return (FALSE);
   }
   if (Check::IsRealtime() && !MarketInfo(Symbol(), MODE_TRADEALLOWED)) {
-    last_err = Msg::ShowText("Trade is not allowed, because market is closed.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
+    last_err = Msg::ShowText("Trade is not allowed. Market may be closed.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
     if (PrintLogOnChart) DisplayInfoOnChart();
     ea_active = FALSE;
     return (FALSE);
@@ -3604,7 +3606,7 @@ bool TradeAllowed() {
 /**
  * Check if EA parameters are valid.
  */
-bool CheckSettings() {
+int CheckSettings() {
   string err;
    // TODO: IsDllsAllowed(), IsLibrariesAllowed()
   /* @todo
@@ -3623,20 +3625,20 @@ bool CheckSettings() {
   }
   */
   if (LotSize < 0.0) {
-    Msg::ShowText("LotSize is less than 0.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
-    return (FALSE);
+    Msg::ShowText("LotSize is less than 0.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, True);
+    return -__LINE__;
   }
   #ifdef __release__
   #ifdef __backtest__
   if (Check::IsRealtime()) {
-    Msg::ShowText("This version is compiled for backtest mode only.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
-    return (FALSE);
+    Msg::ShowText("This version is compiled for backtest mode only.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, True);
+    return -__LINE__;
   }
   #else
   if (Check::IsRealtime()) {
     if (AccountInfoDouble(ACCOUNT_BALANCE) > 100000) {
-      Msg::ShowText("This version doesn't support balance above 100k for a real account.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, TRUE);
-      return (FALSE);
+      Msg::ShowText("This version doesn't support balance above 100k for a real account.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, True);
+      return -__LINE__;
     }
   }
   #endif
@@ -3644,7 +3646,7 @@ bool CheckSettings() {
   if (!Check::IsRealtime() && ValidateSettings) {
     if (!Backtest::ValidSpread() || !Backtest::ValidLotstep()) {
       Msg::ShowText("Backtest market settings are invalid!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
-      return (FALSE);
+      return -__LINE__;
     }
   }
   E_Mail = StringTrimLeft(StringTrimRight(E_Mail));
@@ -3737,12 +3739,16 @@ double GetAccountStopoutLevel() {
  * Calculate number of order allowed given risk ratio.
  */
 int GetMaxOrdersAuto(bool smooth = true) {
-  double avail_margin = fmin(Account::AccountFreeMargin(), Account::AccountBalance());
+  double avail_margin = fmin(Account::AccountFreeMargin(), Account::AccountBalance() + Account::AccountCredit());
   long leverage     = fmax(Account::AccountLeverage(), 100);
   double balance_limit   = fmax(fmin(Account::AccountBalance() + Account::AccountCredit(), Account::AccountEquity()) / 2, 0); // At least 1 order per 2 currency value. This also prevents trading with negative balance.
   double stopout_level = GetAccountStopoutLevel();
-  double avail_orders = avail_margin / market_marginrequired / fmax(lot_size, market_lotstep) * (100 / leverage);
+  double avail_orders = avail_margin / market_marginrequired / market_lotstep * (100 / leverage);
   int new_max_orders = (int) (avail_orders * stopout_level * risk_ratio);
+  if (VerboseDebug) PrintFormat("avail_orders = %g / %g / fmax(%g, %g) * (100 / %d) = %g",
+    avail_margin, market_marginrequired, lot_size, market_lotstep, leverage, avail_orders);
+  if (VerboseDebug) PrintFormat("new_max_orders = (int) (%g * %g * %g) = %d",
+    avail_orders, stopout_level, risk_ratio, new_max_orders);
   #ifdef __advanced__
   if (MaxOrdersPerDay > 0) new_max_orders = fmin(GetMaxOrdersPerDay(), new_max_orders);
   #endif
