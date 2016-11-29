@@ -415,8 +415,15 @@ string InitInfo(bool startup = False, string sep = "\n") {
     _Symbol, Bars, AccountInfoString(ACCOUNT_SERVER), (int)AccountInfoInteger(ACCOUNT_LOGIN), sep); // // FIXME: MQL5: Bars
   output += StringFormat("Broker info: Name: %s%s",
       Account::AccountCompany(), sep);
-  output += StringFormat("Account info: Account type: %s, Balance: %g, Equity: %g, Credit: %g, Leverage: 1:%d, Currency: %s%s",
-    account_type, Account::AccountBalance(), Account::AccountEquity(), Account::AccountCredit(), Account::AccountLeverage(), Account::AccountCurrency(), sep);
+  output += StringFormat("Account info: Account type: %s, Balance: %g, Equity: %g, Credit: %g, Order limit: %d, Leverage: 1:%d, Currency: %s%s",
+    account_type,
+    Account::AccountBalance(),
+    Account::AccountEquity(),
+    Account::AccountCredit(),
+    AccountInfoInteger(ACCOUNT_LIMIT_ORDERS),
+    Account::AccountLeverage(),
+    Account::AccountCurrency(),
+    sep);
   output += StringFormat("Market predefined variables: Ask: %g, Bid: %g, Volume: %d%s",
       NormalizeDouble(Ask, Digits), NormalizeDouble(Bid, Digits), Volume[0], sep);
   output += StringFormat("Market constants: Digits: %d, Point: %f, Min Lot: %g, Max Lot: %g, Lot Step: %g, Lot Size: %g, Margin Required: %g, Margin Init: %g, Stop Level: %dpts, Freeze level: %d pts%s",
@@ -973,7 +980,6 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
     trade_volume = Order::OptimizeLotSize(trade_volume, ConWinsIncreaseFactor, ConLossesIncreaseFactor, ConFactorOrdersLimit);
   }
 
-   // @fixme: warning 43: possible loss of data due to type conversion: GetOrderColor
    order_ticket = OrderSend(_Symbol, cmd,
       NormalizeLots(trade_volume),
       open_price,
@@ -986,11 +992,11 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
       total_orders++;
       daily_orders++;
       if (!OrderSelect(order_ticket, SELECT_BY_TICKET) && VerboseErrors) {
-        Msg::ShowText(ErrorDescription(GetLastError()), "Error", __FUNCTION__, __LINE__, VerboseErrors);
+        Msg::ShowText(StringFormat("%s (err_code=%d, sid=%d)", ErrorDescription(GetLastError()), err_code, sid), "Error", __FUNCTION__, __LINE__, VerboseErrors);
         OrderPrint();
         if (retry) TaskAddOrderOpen(cmd, trade_volume, sid); // Will re-try again.
         info[sid][TOTAL_ERRORS]++;
-        return (FALSE);
+        return (False);
       }
       Msg::ShowText(
          StringFormat("OrderSend(%s, %s, %g, %f, %d, %f, %f, '%s', %d, %d, %d)",
@@ -1017,39 +1023,50 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
       if (SmartQueueActive && total_orders >= max_orders) OrderQueueClear(); // Clear queue if we're reached the limit again, so we can start fresh.
       #endif
    } else {
-     result = FALSE;
+     result = False;
+     info[sid][TOTAL_ERRORS]++;
      err_code = GetLastError();
-     last_err = Msg::ShowText(ErrorDescription(err_code), "Error", __FUNCTION__, __LINE__, VerboseInfo | VerboseErrors);
+     last_err = Msg::ShowText(StringFormat("%s (err_code=%d, sid=%d)", ErrorDescription(err_code), err_code, sid), "Error", __FUNCTION__, __LINE__, VerboseErrors);
+     last_debug = Msg::ShowText(
+       StringFormat("OrderSend(%s, %s, %g, %f, %d, %f, %f, '%s', %d, %d, %d)",
+         _Symbol, Convert::OrderTypeToString(cmd),
+         NormalizeLots(trade_volume),
+         open_price,
+         max_order_slippage,
+         stoploss,
+         takeprofit,
+         order_comment,
+         MagicNumber + sid, 0, GetOrderColor(cmd)),
+         "Debug", __FUNCTION__, __LINE__, VerboseErrors | VerboseDebug | VerboseTrace);
      if (VerboseErrors) {
        if (WriteReport) ReportAdd(last_err);
      }
      if (VerboseDebug) {
-       last_debug = Msg::ShowText(
-         StringFormat("OrderSend(%s, %s, %g, %f, %d, %f, %f, '%s', %d, %d, %d)",
-           _Symbol, Convert::OrderTypeToString(cmd),
-           NormalizeLots(trade_volume),
-           open_price,
-           max_order_slippage,
-           stoploss,
-           takeprofit,
-           order_comment,
-           MagicNumber + sid, 0, GetOrderColor(cmd)),
-           "Debug", __FUNCTION__, __LINE__, VerboseDebug | VerboseTrace);
-       StringFormat(GetAccountTextDetails(), "Debug", __FUNCTION__, __LINE__, VerboseDebug | VerboseTrace);
-       StringFormat(GetMarketTextDetails(),  "Debug", __FUNCTION__, __LINE__, VerboseDebug | VerboseTrace);
+       Msg::ShowText(GetAccountTextDetails(), "Debug", __FUNCTION__, __LINE__, VerboseDebug | VerboseTrace);
+       Msg::ShowText(GetMarketTextDetails(),  "Debug", __FUNCTION__, __LINE__, VerboseDebug | VerboseTrace);
+     }
+     if (VerboseInfo) {
        OrderPrint();
      }
 
-     // Process the errors.
+     /* Post-process the errors. */
+     if (err_code == ERR_INVALID_STOPS) {
+       // Invalid stops.
+       if (WriteReport) ReportAdd(last_debug);
+       retry = FALSE;
+     }
      if (err_code == ERR_TRADE_TOO_MANY_ORDERS) {
        // On some trade servers, the total amount of open and pending orders can be limited. If this limit has been exceeded, no new order will be opened.
        MaxOrders = total_orders; // So we're setting new fixed limit for total orders which is allowed.
+       Msg::ShowText(StringFormat("Total orders: %d, Max orders: %d, Broker Limit: %d", OrdersTotal(), total_orders, AccountInfoInteger(ACCOUNT_LIMIT_ORDERS)), "Error", __FUNCTION__, __LINE__, VerboseErrors);
        retry = FALSE;
      }
      if (err_code == ERR_INVALID_TRADE_VOLUME) { // OrderSend error 131
         // Invalid trade volume.
         // Usually happens when volume is not normalized, or on invalid volume value.
-        retry = FALSE;
+       if (WriteReport) ReportAdd(last_debug);
+       Msg::ShowText(StringFormat("Volume: %g", NormalizeLots(trade_volume)), "Error", __FUNCTION__, __LINE__, VerboseErrors);
+       retry = FALSE;
      }
      if (err_code == ERR_TRADE_EXPIRATION_DENIED) {
        // Applying of pending order expiration time can be disabled in some trade servers.
@@ -3645,7 +3662,7 @@ int CheckSettings() {
   #endif
   if (!Check::IsRealtime() && ValidateSettings) {
     if (!Backtest::ValidSpread() || !Backtest::ValidLotstep()) {
-      Msg::ShowText("Backtest market settings are invalid!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
+      Msg::ShowText("Backtest market settings are invalid! Connect to broker to fix it!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
       return -__LINE__;
     }
   }
