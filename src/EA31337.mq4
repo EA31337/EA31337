@@ -3775,12 +3775,12 @@ int GetMaxOrdersAuto(bool smooth = true) {
   long leverage     = fmax(Account::AccountLeverage(), 100);
   double balance_limit   = fmax(fmin(Account::AccountBalance() + Account::AccountCredit(), Account::AccountEquity()) / 2, 0); // At least 1 order per 2 currency value. This also prevents trading with negative balance.
   double stopout_level = GetAccountStopoutLevel();
-  double avail_orders = avail_margin / (market_marginrequired * market_lotstep) / lot_size;
-  int new_max_orders = (int) (avail_orders * stopout_level * risk_ratio);
-  if (VerboseDebug) PrintFormat("avail_orders = %g / (%g * %g) / %g = %g",
-    avail_margin, market_marginrequired, market_lotstep, lot_size, avail_orders);
-  if (VerboseDebug) PrintFormat("new_max_orders = (int) (%g * %g * %g) = %d",
-    avail_orders, stopout_level, risk_ratio, new_max_orders);
+  double avail_orders = avail_margin / market_marginrequired / lot_size;
+  int new_max_orders = (int) (avail_orders * risk_ratio);
+  if (VerboseDebug) PrintFormat("avail_orders = %g / %g / %g = %g",
+    avail_margin, market_marginrequired, lot_size, avail_orders);
+  if (VerboseDebug) PrintFormat("new_max_orders = (int) (%g * %g) = %d",
+    avail_orders, risk_ratio, new_max_orders);
   #ifdef __advanced__
   if (MaxOrdersPerDay > 0) new_max_orders = fmin(GetMaxOrdersPerDay(), new_max_orders);
   #endif
