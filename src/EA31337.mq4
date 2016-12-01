@@ -3768,32 +3768,6 @@ double GetAccountStopoutLevel() {
 }
 
 /**
- * Calculate number of order allowed given risk ratio.
- */
-int GetMaxOrdersAuto(bool smooth = true) {
-  double avail_margin = fmin(Account::AccountFreeMargin(), Account::AccountBalance() + Account::AccountCredit());
-  long leverage     = fmax(Account::AccountLeverage(), 100);
-  double balance_limit   = fmax(fmin(Account::AccountBalance() + Account::AccountCredit(), Account::AccountEquity()) / 2, 0); // At least 1 order per 2 currency value. This also prevents trading with negative balance.
-  double stopout_level = GetAccountStopoutLevel();
-  double avail_orders = avail_margin / market_marginrequired / lot_size;
-  int new_max_orders = (int) (avail_orders * risk_ratio);
-  if (VerboseDebug) PrintFormat("avail_orders = %g / %g / %g = %g",
-    avail_margin, market_marginrequired, lot_size, avail_orders);
-  if (VerboseDebug) PrintFormat("new_max_orders = (int) (%g * %g) = %d",
-    avail_orders, risk_ratio, new_max_orders);
-  #ifdef __advanced__
-  if (MaxOrdersPerDay > 0) new_max_orders = fmin(GetMaxOrdersPerDay(), new_max_orders);
-  #endif
-  if (VerboseTrace) PrintFormat("%s(): %f / %f / %f * (100/%d)", __FUNCTION__, avail_margin, market_marginrequired, fmax(lot_size, market_lotstep), leverage);
-  if (smooth && new_max_orders > max_orders) {
-    max_orders = (max_orders + new_max_orders) / 2; // Increase the limit smoothly.
-  } else {
-    max_orders = new_max_orders;
-  }
-  return max_orders;
-}
-
-/**
  * Get daily total available orders. It can dynamically change during the day.
  */
 #ifdef __advanced__
@@ -3811,9 +3785,9 @@ int GetMaxOrdersPerDay() {
  */
 int GetMaxOrders() {
   #ifdef __advanced__
-    return MaxOrders > 0 ? (MaxOrdersPerDay > 0 ? fmin(MaxOrders, GetMaxOrdersPerDay()) : MaxOrders) : GetMaxOrdersAuto();
+    return MaxOrders > 0 ? (MaxOrdersPerDay > 0 ? fmin(MaxOrders, GetMaxOrdersPerDay()) : MaxOrders) : Orders::CalcMaxOrders(lot_size, risk_ratio, max_orders, GetMaxOrdersPerDay());
   #else
-    return MaxOrders > 0 ? MaxOrders : GetMaxOrdersAuto();
+    return MaxOrders > 0 ? MaxOrders : Orders::CalcMaxOrders(lot_size, risk_ratio, max_orders);
   #endif
 }
 
