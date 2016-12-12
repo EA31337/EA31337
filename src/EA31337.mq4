@@ -5716,7 +5716,7 @@ string GetMonthlyReport() {
 string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
   string output;
   // Prepare text for Stop Out.
-  string stop_out_level = StringFormat("%d", AccountStopoutLevel());
+  string stop_out_level = StringFormat("%d", Account::AccountStopoutLevel());
   if (AccountStopoutMode() == 0) stop_out_level += "%"; else stop_out_level += Account::AccountCurrency();
   stop_out_level += StringFormat(" (%.1f)", Account::GetAccountStopoutLevel(VerboseErrors));
   // Prepare text to display max orders.
@@ -6104,41 +6104,36 @@ bool ActionExecute(int aid, int id = EMPTY) {
     case A_CLOSE_ALL_PROFIT_SIDE: /* 6 */
       // TODO
       cmd = GetProfitableSide();
-      if (cmd != EMPTY) {
-        result = ActionCloseAllOrdersByType(cmd, reason_id);
-      }
+      result = cmd != EMPTY ? ActionCloseAllOrdersByType(cmd, reason_id) : True;
       break;
     case A_CLOSE_ALL_LOSS_SIDE: /* 7 */
       cmd = GetProfitableSide();
-      if (cmd != EMPTY) {
-        result = ActionCloseAllOrdersByType(Convert::OrderTypeOpp(cmd), reason_id);
-      }
+      result = cmd != EMPTY ? ActionCloseAllOrdersByType(Convert::OrderTypeOpp(cmd), reason_id) : True;
       break;
     case A_CLOSE_ALL_TREND: /* 8 */
       cmd = CheckTrend(TrendMethodAction);
-      if (cmd != EMPTY) {
-        result = ActionCloseAllOrdersByType(cmd, reason_id);
-      }
+      result = cmd != EMPTY ? ActionCloseAllOrdersByType(cmd, reason_id) : True;
       break;
     case A_CLOSE_ALL_NON_TREND: /* 9 */
       cmd = CheckTrend(TrendMethodAction);
-      if (cmd != EMPTY) {
-        result = ActionCloseAllOrdersByType(Convert::OrderTypeOpp(cmd), reason_id);
-      }
+      result = cmd != EMPTY ? ActionCloseAllOrdersByType(Convert::OrderTypeOpp(cmd), reason_id) : True;
       break;
     case A_CLOSE_ALL_ORDERS: /* 10 */
       result = ActionCloseAllOrders(reason_id);
       break;
     case A_SUSPEND_STRATEGIES: /* 11 */
-      Arrays::ArrSetValueI(info, SUSPENDED, (int)TRUE);
+      Arrays::ArrSetValueI(info, SUSPENDED, (int) TRUE);
+      result = True;
       break;
     case A_UNSUSPEND_STRATEGIES: /* 12 */
-      Arrays::ArrSetValueI(info, SUSPENDED, (int)FALSE);
+      Arrays::ArrSetValueI(info, SUSPENDED, (int) FALSE);
+      result = True;
       break;
     case A_RESET_STRATEGY_STATS: /* 13 */
       Arrays::ArrSetValueD(conf, PROFIT_FACTOR, GetDefaultProfitFactor());
       Arrays::ArrSetValueD(stats, TOTAL_GROSS_LOSS,   0.0);
       Arrays::ArrSetValueD(stats, TOTAL_GROSS_PROFIT, 0.0);
+      result = True;
       break;
       /*
     case A_RISK_REDUCE:
