@@ -583,7 +583,7 @@ bool Trade() {
  * Check if strategy is on trade conditionl.
  */
 bool TradeCondition(int order_type = 0, int cmd = NULL) {
-  if (TradeWithTrend && !CheckTrend() == cmd) {
+  if (TradeWithTrend && !Market::GetTrendOp(TrendMethod) == cmd) {
     return (FALSE); // When TradeWithTrend is set and we're against the trend, do not trade.
   }
   ENUM_TIMEFRAMES tf = (ENUM_TIMEFRAMES) info[order_type][TIMEFRAME];
@@ -2726,7 +2726,7 @@ bool CheckMarketCondition1(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M30, int conditi
   if ((condition &  64) != 0) result = result && UpdateIndicator(ENVELOPES, tf) && ((cmd == OP_BUY && Open[CURR] < envelopes[period][CURR][MODE_MAIN]) || (cmd == OP_SELL && Open[CURR] > envelopes[period][CURR][MODE_MAIN]));
   if ((condition & 128) != 0) result = result && UpdateIndicator(DEMARKER, tf)  && ((cmd == OP_BUY && demarker[period][CURR] < 0.5) || (cmd == OP_SELL && demarker[period][CURR] > 0.5));
   if ((condition & 256) != 0) result = result && UpdateIndicator(WPR, tf)       && ((cmd == OP_BUY && wpr[period][CURR] > 50) || (cmd == OP_SELL && wpr[period][CURR] < 50));
-  if ((condition & 512) != 0) result = result && cmd == CheckTrend();
+  if ((condition & 512) != 0) result = result && cmd == Market::GetTrendOp(TrendMethod);
   if (!default_value) result = !result;
   return result;
 }
@@ -2879,87 +2879,6 @@ bool CheckMarketEvent(int cmd = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M30, int cond
       result = FALSE;
   }
   return result;
-}
-
-/**
- * Check for the trend.
- * // @todo: To improve number of increases for bull/bear variables.
- *
- * @param
- *   method (int) - condition to check by using bitwise AND operation
- * @return
- *   return TRUE if trend is valid for given trade command
- */
-int CheckTrend(int method = EMPTY) {
-  static datetime _last_trend_check = 0;
-  static int _last_trend = EMPTY; // Set -1 by default.
-  if (_last_trend_check == iTime(NULL, 0, 0)) {
-    return _last_trend;
-  }
-  double bull = 0, bear = 0;
-  int _counter = 0;
-  if (method == EMPTY) method = TrendMethod;
-
-  if ((method &   1) != 0)  {
-    for (_counter = 0; _counter < 3; _counter++) {
-      if (iOpen(NULL, PERIOD_MN1, _counter) > iClose(NULL, PERIOD_MN1, _counter + 1)) bull += 30;
-      else if (iOpen(NULL, PERIOD_MN1, _counter) < iClose(NULL, PERIOD_MN1, _counter + 1)) bear += 30;
-    }
-  }
-  if ((method &   2) != 0)  {
-    for (_counter = 0; _counter < 8; _counter++) {
-      if (iOpen(NULL, PERIOD_W1, _counter) > iClose(NULL, PERIOD_W1, _counter + 1)) bull += 7;
-      else if (iOpen(NULL, PERIOD_W1, _counter) < iClose(NULL, PERIOD_W1, _counter + 1)) bear += 7;
-    }
-  }
-  if ((method &   4) != 0)  {
-    for (_counter = 0; _counter < 7; _counter++) {
-      if (iOpen(NULL, PERIOD_D1, _counter) > iClose(NULL, PERIOD_D1, _counter + 1)) bull += 1440/1440;
-      else if (iOpen(NULL, PERIOD_D1, _counter) < iClose(NULL, PERIOD_D1, _counter + 1)) bear += 1440/1440;
-    }
-  }
-  if ((method &   8) != 0)  {
-    for (_counter = 0; _counter < 24; _counter++) {
-      if (iOpen(NULL, PERIOD_H4, _counter) > iClose(NULL, PERIOD_H4, _counter + 1)) bull += 240/1440;
-      else if (iOpen(NULL, PERIOD_H4, _counter) < iClose(NULL, PERIOD_H4, _counter + 1)) bear += 240/1440;
-    }
-  }
-  if ((method &   16) != 0)  {
-    for (_counter = 0; _counter < 24; _counter++) {
-      if (iOpen(NULL, PERIOD_H1, _counter) > iClose(NULL, PERIOD_H1, _counter + 1)) bull += 60/1440;
-      else if (iOpen(NULL, PERIOD_H1, _counter) < iClose(NULL, PERIOD_H1, _counter + 1)) bear += 60/1440;
-    }
-  }
-  if ((method &   32) != 0)  {
-    for (_counter = 0; _counter < 48; _counter++) {
-      if (iOpen(NULL, PERIOD_M30, _counter) > iClose(NULL, PERIOD_M30, _counter + 1)) bull += 30/1440;
-      else if (iOpen(NULL, PERIOD_M30, _counter) < iClose(NULL, PERIOD_M30, _counter + 1)) bear += 30/1440;
-    }
-  }
-  if ((method &   64) != 0)  {
-    for (_counter = 0; _counter < 96; _counter++) {
-      if (iOpen(NULL, PERIOD_M15, _counter) > iClose(NULL, PERIOD_M15, _counter + 1)) bull += 15/1440;
-      else if (iOpen(NULL, PERIOD_M15, _counter) < iClose(NULL, PERIOD_M15, _counter + 1)) bear += 15/1440;
-    }
-  }
-  if ((method &  128) != 0)  {
-    for (_counter = 0; _counter < 288; _counter++) {
-      if (iOpen(NULL, PERIOD_M5, _counter) > iClose(NULL, PERIOD_M5, _counter + 1)) bull += 5/1440;
-      else if (iOpen(NULL, PERIOD_M5, _counter) < iClose(NULL, PERIOD_M5, _counter + 1)) bear += 5/1440;
-    }
-  }
-  //if (iOpen(NULL, PERIOD_H12, CURR) > iClose(NULL, PERIOD_H12, PREV)) bull++;
-  //if (iOpen(NULL, PERIOD_H12, CURR) < iClose(NULL, PERIOD_H12, PREV)) bear++;
-  //if (iOpen(NULL, PERIOD_H8, CURR) > iClose(NULL, PERIOD_H8, PREV)) bull++;
-  //if (iOpen(NULL, PERIOD_H8, CURR) < iClose(NULL, PERIOD_H8, PREV)) bear++;
-  //if (iOpen(NULL, PERIOD_H6, CURR) > iClose(NULL, PERIOD_H6, PREV)) bull++;
-  //if (iOpen(NULL, PERIOD_H6, CURR) < iClose(NULL, PERIOD_H6, PREV)) bear++;
-  //if (iOpen(NULL, PERIOD_H2, CURR) > iClose(NULL, PERIOD_H2, PREV)) bull++;
-  //if (iOpen(NULL, PERIOD_H2, CURR) < iClose(NULL, PERIOD_H2, PREV)) bear++;
-
-  _last_trend = bull > bear ? OP_BUY : (bull < bear ? OP_SELL : EMPTY);
-  _last_trend_check = iTime(NULL, 0, 0);
-  return _last_trend;
 }
 
 /**
@@ -5124,8 +5043,8 @@ bool AccCondition(int condition = C_ACC_NONE) {
       return weekly[MAX_BALANCE] > monthly[MAX_BALANCE];
     case C_ACC_IN_TREND:
       last_cname = "InTrend";
-      return (CheckTrend() == OP_BUY  && CalculateOrdersByCmd(OP_BUY)  > CalculateOrdersByCmd(OP_SELL))
-          || (CheckTrend() == OP_SELL && CalculateOrdersByCmd(OP_SELL) > CalculateOrdersByCmd(OP_BUY));
+      return (Market::GetTrend(TrendMethod) > 0 && CalculateOrdersByCmd(OP_BUY)  > CalculateOrdersByCmd(OP_SELL))
+          || (Market::GetTrend(TrendMethod) < 0 && CalculateOrdersByCmd(OP_SELL) > CalculateOrdersByCmd(OP_BUY));
     case C_ACC_IN_NON_TREND:
       last_cname = "InNonTrend";
       return !AccCondition(C_ACC_IN_TREND);
@@ -5166,13 +5085,13 @@ bool MarketCondition(int condition = C_MARKET_NONE) {
     case C_MARKET_TRUE:
       return TRUE;
     case C_MA1_FS_TREND_OPP: // MA Fast and Slow M1 are in opposite directions.
-      return CheckMarketEvent(CheckTrend(TrendMethodAction), PERIOD_M1, C_MA_FAST_SLOW_OPP);
+      return CheckMarketEvent(Market::GetTrend(TrendMethodAction) > 0 ? OP_BUY : OP_SELL, PERIOD_M1, C_MA_FAST_SLOW_OPP);
     case C_MA5_FS_TREND_OPP: // MA Fast and Slow M5 are in opposite directions.
-      return CheckMarketEvent(CheckTrend(TrendMethodAction), PERIOD_M5, C_MA_FAST_SLOW_OPP);
+      return CheckMarketEvent(Market::GetTrend(TrendMethodAction) > 0 ? OP_BUY : OP_SELL, PERIOD_M5, C_MA_FAST_SLOW_OPP);
     case C_MA15_FS_TREND_OPP:
-      return CheckMarketEvent(CheckTrend(TrendMethodAction), PERIOD_M15, C_MA_FAST_SLOW_OPP);
+      return CheckMarketEvent(Market::GetTrend(TrendMethodAction) > 0 ? OP_BUY : OP_SELL, PERIOD_M15, C_MA_FAST_SLOW_OPP);
     case C_MA30_FS_TREND_OPP:
-      return CheckMarketEvent(CheckTrend(TrendMethodAction), PERIOD_M30, C_MA_FAST_SLOW_OPP);
+      return CheckMarketEvent(Market::GetTrend(TrendMethodAction) > 0 ? OP_BUY : OP_SELL, PERIOD_M30, C_MA_FAST_SLOW_OPP);
     case C_MA1_FS_ORDERS_OPP: // MA Fast and Slow M1 are in opposite directions.
       return CheckMarketEvent(GetCmdByOrders(), PERIOD_M1, C_MA_FAST_SLOW_OPP);
     case C_MA5_FS_ORDERS_OPP: // MA Fast and Slow M5 are in opposite directions.
@@ -5255,7 +5174,7 @@ double GetStrategyLotSize(int sid, int cmd) {
     else if (HandicapByProfitFactor && pf < 1.0) trade_lot *= fmin(GetStrategyProfitFactor(sid), 1.0);
   }
   #endif
-  if (Boosting_Enabled && CheckTrend() == cmd && BoostTrendFactor != 1.0) {
+  if (Boosting_Enabled && Market::GetTrendOp(TrendMethod) == cmd && BoostTrendFactor != 1.0) {
     trade_lot *= BoostTrendFactor;
   }
   return NormalizeLots(trade_lot);
@@ -5728,8 +5647,8 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
   string text_spread = StringFormat("Spread: %.1f pips (%d pts)", Market::GetSpreadInPips(), Market::GetSpreadInPts());
   // Check trend.
   string trend = "Neutral.";
-  if (CheckTrend() == OP_BUY) trend = "Bullish";
-  if (CheckTrend() == OP_SELL) trend = "Bearish";
+  if (Market::GetTrendOp(TrendMethod) == OP_BUY) trend = "Bullish";
+  if (Market::GetTrendOp(TrendMethod) == OP_SELL) trend = "Bearish";
   // Print actual info.
   string indent = "";
   indent = "                      "; // if (total_orders > 5)?
@@ -6111,11 +6030,11 @@ bool ActionExecute(int aid, int id = EMPTY) {
       result = cmd != EMPTY ? ActionCloseAllOrdersByType(Convert::OrderTypeOpp(cmd), reason_id) : True;
       break;
     case A_CLOSE_ALL_TREND: /* 8 */
-      cmd = CheckTrend(TrendMethodAction);
+      cmd = Market::GetTrendOp(TrendMethodAction);
       result = cmd != EMPTY ? ActionCloseAllOrdersByType(cmd, reason_id) : True;
       break;
     case A_CLOSE_ALL_NON_TREND: /* 9 */
-      cmd = CheckTrend(TrendMethodAction);
+      cmd = Market::GetTrendOp(TrendMethodAction);
       result = cmd != EMPTY ? ActionCloseAllOrdersByType(Convert::OrderTypeOpp(cmd), reason_id) : True;
       break;
     case A_CLOSE_ALL_ORDERS: /* 10 */
