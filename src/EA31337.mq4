@@ -109,7 +109,6 @@ Market market(string);
 // Market/session variables.
 double pip_size, lot_size;
 double market_minlot, market_maxlot, market_lotsize, market_lotstep, market_marginrequired, market_margininit;
-long  market_stoplevel; // Market stop level in points.
 int order_freezelevel; // Order freeze level in points.
 double curr_spread; // Broker current spread in pips.
 double risk_margin = 1.0; // Risk marigin in percent.
@@ -308,7 +307,7 @@ int OnInit() {
     SoundAlert = FALSE;
     if (!Check::IsVisualMode()) PrintLogOnChart = FALSE;
     // When testing, we need to simulate real MODE_STOPLEVEL = 30 (as it's in real account), in demo it's 0.
-    if (market_stoplevel == 0) market_stoplevel = DemoMarketStopLevel;
+    // if (market_stoplevel == 0) market_stoplevel = DemoMarketStopLevel;
     if (Check::IsOptimization()) {
       VerboseErrors = FALSE;
       VerboseInfo   = FALSE;
@@ -411,22 +410,24 @@ void start() {
  */
 string InitInfo(bool startup = False, string sep = "\n") {
   string output = StringFormat("%s v%s by %s (%s)%s", ea_name, ea_version, ea_author, ea_link, sep);
-  output += StringFormat("Platform variables: Symbol: %s, Bars: %d, Server: %s, Login: %d%s",
+  output += StringFormat("PLATFORM: Symbol: %s, Bars: %d, Server: %s, Login: %d%s",
     _Symbol, Bars, AccountInfoString(ACCOUNT_SERVER), (int)AccountInfoInteger(ACCOUNT_LOGIN), sep); // // FIXME: MQL5: Bars
-  output += StringFormat("Broker info: Name: %s%s",
+  output += StringFormat("BROKER: Name: %s%s",
       Account::AccountCompany(), sep);
-  output += StringFormat("Account info: Account type: %s, Balance: %g, Equity: %g, Credit: %g, Order limit: %d, Leverage: 1:%d, Currency: %s%s",
+  output += StringFormat("ACCOUNT: Type: %s, Currency: %s, Balance: %g, Equity: %g, Credit: %g, Order limit: %d, Leverage: 1:%d, Stopout Mode: %d, Stopout Level: %d%s",
     account_type,
+    Account::AccountCurrency(),
     Account::AccountBalance(),
     Account::AccountEquity(),
     Account::AccountCredit(),
     AccountInfoInteger(ACCOUNT_LIMIT_ORDERS),
     Account::AccountLeverage(),
-    Account::AccountCurrency(),
+    Account::AccountStopoutMode(),
+    Account::AccountStopoutLevel(),
     sep);
   output += StringFormat("Market predefined variables: Ask: %g, Bid: %g, Volume: %d%s",
       NormalizeDouble(Ask, Digits), NormalizeDouble(Bid, Digits), Volume[0], sep);
-  output += StringFormat("Market constants: Digits: %d, Point: %f, Min Lot: %g, Max Lot: %g, Lot Step: %g, Lot Size: %g, Margin Required: %g, Margin Init: %g, Stop Level: %dpts, Freeze level: %d pts%s",
+  output += StringFormat("Market constants: Digits: %d, Point: %f, Min Lot: %g, Max Lot: %g, Lot Step: %g, Lot Size: %g, Margin Required: %g, Margin Init: %g, Trade Freeze Level: %d pts%s",
       Market::GetDigits(),
       Market::GetPoint(),
       Market::GetMinLot(),
@@ -435,10 +436,9 @@ string InitInfo(bool startup = False, string sep = "\n") {
       Market::GetLotSize(),
       Market::GetMarginRequired(),
       Market::GetMarginInit(),
-      Market::GetStopLevel(),
       Market::GetFreezeLevel(),
       sep);
-  output += StringFormat("Contract specification for %s: Profit mode: %d, Margin mode: %d, Spread: %d pts, Tick size: %f, Point value: %f, Digits: %d, Trade stop level: %g pts, Trade contract size: %g%s",
+  output += StringFormat("Contract specification for %s: Profit mode: %d, Margin mode: %d, Spread: %d pts, Tick size: %f, Point value: %f, Digits: %d, Trade stops level: %dpts, Trade contract size: %g%s",
       _Symbol,
       MarketInfo(_Symbol, MODE_PROFITCALCMODE),
       MarketInfo(_Symbol, MODE_MARGINCALCMODE),
@@ -446,7 +446,7 @@ string InitInfo(bool startup = False, string sep = "\n") {
       SymbolInfoDouble(_Symbol, SYMBOL_TRADE_TICK_SIZE),
       SymbolInfoDouble(_Symbol, SYMBOL_POINT),
       (int)SymbolInfoInteger(_Symbol, SYMBOL_DIGITS),
-      (int)SymbolInfoInteger(_Symbol,SYMBOL_TRADE_STOPS_LEVEL),
+      Market::GetTradeStopsLevel(),
       SymbolInfoDouble(_Symbol, SYMBOL_TRADE_CONTRACT_SIZE),
       sep);
   output += StringFormat("Swap specification for %s: Mode: %d, Long/buy order value: %g, Short/sell order value: %g%s",
@@ -463,7 +463,7 @@ string InitInfo(bool startup = False, string sep = "\n") {
       volume_digits,
       Market::GetSpreadInPips(),
       Market::GetSpreadInPts(),
-      GetAccountStopoutLevel(),
+      Account::GetAccountStopoutLevel(VerboseErrors),
       Market::GetMarketDistanceInPts(),
       Market::GetMarketDistanceInPips(),
       sep);
@@ -1922,7 +1922,7 @@ bool Trade_DeMarker(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method =
   if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(DEMARKER, tf, 0.0);
   switch (cmd) {
     case OP_BUY:
-      result = demarker[period][CURR] <= 0.5 - signal_level;
+      result = demarker[period][CURR] < 0.5 - signal_level;
       if ((signal_method &   1) != 0) result = result && demarker[period][PREV] < 0.5 - signal_level;
       if ((signal_method &   2) != 0) result = result && demarker[period][FAR] < 0.5 - signal_level;
       if ((signal_method &   4) != 0) result = result && demarker[period][CURR] < demarker[period][PREV];
@@ -1931,7 +1931,7 @@ bool Trade_DeMarker(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method =
       // PrintFormat("DeMarker buy: %g <= %g", demarker[period][CURR], 0.5 - signal_level);
       break;
     case OP_SELL:
-      result = demarker[period][CURR] >= 0.5 + signal_level;
+      result = demarker[period][CURR] > 0.5 + signal_level;
       if ((signal_method &   1) != 0) result = result && demarker[period][PREV] > 0.5 + signal_level;
       if ((signal_method &   2) != 0) result = result && demarker[period][FAR] > 0.5 + signal_level;
       if ((signal_method &   4) != 0) result = result && demarker[period][CURR] > demarker[period][PREV];
@@ -2883,47 +2883,70 @@ bool CheckMarketEvent(int cmd = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M30, int cond
 
 /**
  * Check for the trend.
+ * // @todo: To improve number of increases for bull/bear variables.
  *
  * @param
  *   method (int) - condition to check by using bitwise AND operation
  * @return
  *   return TRUE if trend is valid for given trade command
  */
-bool CheckTrend(int method = EMPTY) {
-  int bull = 0, bear = 0;
+int CheckTrend(int method = EMPTY) {
+  static datetime _last_trend_check = 0;
+  static int _last_trend = EMPTY; // Set -1 by default.
+  if (_last_trend_check == iTime(NULL, 0, 0)) {
+    return _last_trend;
+  }
+  double bull = 0, bear = 0;
+  int _counter = 0;
   if (method == EMPTY) method = TrendMethod;
 
   if ((method &   1) != 0)  {
-    if (iOpen(NULL, PERIOD_MN1, CURR) > iClose(NULL, PERIOD_MN1, PREV)) bull++;
-    if (iOpen(NULL, PERIOD_MN1, CURR) < iClose(NULL, PERIOD_MN1, PREV)) bear++;
+    for (_counter = 0; _counter < 3; _counter++) {
+      if (iOpen(NULL, PERIOD_MN1, _counter) > iClose(NULL, PERIOD_MN1, _counter + 1)) bull += 30;
+      else if (iOpen(NULL, PERIOD_MN1, _counter) < iClose(NULL, PERIOD_MN1, _counter + 1)) bear += 30;
+    }
   }
   if ((method &   2) != 0)  {
-    if (iOpen(NULL, PERIOD_W1, CURR) > iClose(NULL, PERIOD_W1, PREV)) bull++;
-    if (iOpen(NULL, PERIOD_W1, CURR) < iClose(NULL, PERIOD_W1, PREV)) bear++;
+    for (_counter = 0; _counter < 8; _counter++) {
+      if (iOpen(NULL, PERIOD_W1, _counter) > iClose(NULL, PERIOD_W1, _counter + 1)) bull += 7;
+      else if (iOpen(NULL, PERIOD_W1, _counter) < iClose(NULL, PERIOD_W1, _counter + 1)) bear += 7;
+    }
   }
   if ((method &   4) != 0)  {
-    if (iOpen(NULL, PERIOD_D1, CURR) > iClose(NULL, PERIOD_D1, PREV)) bull++;
-    if (iOpen(NULL, PERIOD_D1, CURR) < iClose(NULL, PERIOD_D1, PREV)) bear++;
+    for (_counter = 0; _counter < 7; _counter++) {
+      if (iOpen(NULL, PERIOD_D1, _counter) > iClose(NULL, PERIOD_D1, _counter + 1)) bull += 1440/1440;
+      else if (iOpen(NULL, PERIOD_D1, _counter) < iClose(NULL, PERIOD_D1, _counter + 1)) bear += 1440/1440;
+    }
   }
   if ((method &   8) != 0)  {
-    if (iOpen(NULL, PERIOD_H4, CURR) > iClose(NULL, PERIOD_H4, PREV)) bull++;
-    if (iOpen(NULL, PERIOD_H4, CURR) < iClose(NULL, PERIOD_H4, PREV)) bear++;
+    for (_counter = 0; _counter < 24; _counter++) {
+      if (iOpen(NULL, PERIOD_H4, _counter) > iClose(NULL, PERIOD_H4, _counter + 1)) bull += 240/1440;
+      else if (iOpen(NULL, PERIOD_H4, _counter) < iClose(NULL, PERIOD_H4, _counter + 1)) bear += 240/1440;
+    }
   }
   if ((method &   16) != 0)  {
-    if (iOpen(NULL, PERIOD_H1, CURR) > iClose(NULL, PERIOD_H1, PREV)) bull++;
-    if (iOpen(NULL, PERIOD_H1, CURR) < iClose(NULL, PERIOD_H1, PREV)) bear++;
+    for (_counter = 0; _counter < 24; _counter++) {
+      if (iOpen(NULL, PERIOD_H1, _counter) > iClose(NULL, PERIOD_H1, _counter + 1)) bull += 60/1440;
+      else if (iOpen(NULL, PERIOD_H1, _counter) < iClose(NULL, PERIOD_H1, _counter + 1)) bear += 60/1440;
+    }
   }
   if ((method &   32) != 0)  {
-    if (iOpen(NULL, PERIOD_M30, CURR) > iClose(NULL, PERIOD_M30, PREV)) bull++;
-    if (iOpen(NULL, PERIOD_M30, CURR) < iClose(NULL, PERIOD_M30, PREV)) bear++;
+    for (_counter = 0; _counter < 48; _counter++) {
+      if (iOpen(NULL, PERIOD_M30, _counter) > iClose(NULL, PERIOD_M30, _counter + 1)) bull += 30/1440;
+      else if (iOpen(NULL, PERIOD_M30, _counter) < iClose(NULL, PERIOD_M30, _counter + 1)) bear += 30/1440;
+    }
   }
   if ((method &   64) != 0)  {
-    if (iOpen(NULL, PERIOD_M15, CURR) > iClose(NULL, PERIOD_M15, PREV)) bull++;
-    if (iOpen(NULL, PERIOD_M15, CURR) < iClose(NULL, PERIOD_M15, PREV)) bear++;
+    for (_counter = 0; _counter < 96; _counter++) {
+      if (iOpen(NULL, PERIOD_M15, _counter) > iClose(NULL, PERIOD_M15, _counter + 1)) bull += 15/1440;
+      else if (iOpen(NULL, PERIOD_M15, _counter) < iClose(NULL, PERIOD_M15, _counter + 1)) bear += 15/1440;
+    }
   }
   if ((method &  128) != 0)  {
-    if (iOpen(NULL, PERIOD_M5, CURR) > iClose(NULL, PERIOD_M5, PREV)) bull++;
-    if (iOpen(NULL, PERIOD_M5, CURR) < iClose(NULL, PERIOD_M5, PREV)) bear++;
+    for (_counter = 0; _counter < 288; _counter++) {
+      if (iOpen(NULL, PERIOD_M5, _counter) > iClose(NULL, PERIOD_M5, _counter + 1)) bull += 5/1440;
+      else if (iOpen(NULL, PERIOD_M5, _counter) < iClose(NULL, PERIOD_M5, _counter + 1)) bear += 5/1440;
+    }
   }
   //if (iOpen(NULL, PERIOD_H12, CURR) > iClose(NULL, PERIOD_H12, PREV)) bull++;
   //if (iOpen(NULL, PERIOD_H12, CURR) < iClose(NULL, PERIOD_H12, PREV)) bear++;
@@ -2934,9 +2957,9 @@ bool CheckTrend(int method = EMPTY) {
   //if (iOpen(NULL, PERIOD_H2, CURR) > iClose(NULL, PERIOD_H2, PREV)) bull++;
   //if (iOpen(NULL, PERIOD_H2, CURR) < iClose(NULL, PERIOD_H2, PREV)) bear++;
 
-  if (bull > bear) return OP_BUY;
-  else if (bull < bear) return OP_SELL;
-  else return EMPTY;
+  _last_trend = bull > bear ? OP_BUY : (bull < bear ? OP_SELL : EMPTY);
+  _last_trend_check = iTime(NULL, 0, 0);
+  return _last_trend;
 }
 
 /**
@@ -3031,11 +3054,11 @@ bool UpdateTrailingStops() {
       if (OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
         sid = OrderMagicNumber() - MagicNumber;
         // order_stop_loss = NormalizeDouble(Misc::If(Convert::OrderTypeToValue(OrderType()) > 0 || OrderStopLoss() != 0.0, OrderStopLoss(), 999999), pip_digits);
-
         // FIXME
         // Make sure we get the minimum distance to StopLevel and freezing distance.
         // See: https://book.mql4.com/appendix/limits
-        if (MinimalizeLosses && Order::GetOrderProfit() > GetMinStopLevel()) {
+        if (MinimalizeLosses) {
+        // if (MinimalizeLosses && Order::GetOrderProfit() > GetMinStopLevel()) {
           if ((OrderType() == OP_BUY && OrderStopLoss() < Bid) ||
              (OrderType() == OP_SELL && OrderStopLoss() > Ask)) {
             result = OrderModify(OrderTicket(), OrderOpenPrice(), OrderOpenPrice() - OrderCommission() * Point, OrderTakeProfit(), 0, GetOrderColor());
@@ -3716,21 +3739,6 @@ color GetOrderColor(int cmd = -1) {
 }
 
 /**
- * This function returns the minimal permissible distance value in points for StopLoss/TakeProfit.
- *
- * This is due that at placing of a pending order, the open price cannot be too close to the market.
- * The minimal distance of the pending price from the current market one in points can be obtained
- * using the MarketInfo() function with the MODE_STOPLEVEL parameter.
- * Related error messages:
- *   Error 130 (ERR_INVALID_STOPS) happens In case of false open price of a pending order.
- *   Error 145 (ERR_TRADE_MODIFY_DENIED) happens when modification of order was too close to market.
- *
- */
-double GetMinStopLevel() {
-  return fmax((market_stoplevel + 1) * Point, (order_freezelevel + 1) * Point);
-}
-
-/**
  * Normalize lot size.
  */
 double NormalizeLots(double lots, bool ceiling = False, string pair = "") {
@@ -3746,25 +3754,6 @@ double NormalizeLots(double lots, bool ceiling = False, string pair = "") {
   if (lotsize < market_minlot) lotsize = market_minlot;
   if (lotsize > market_maxlot) lotsize = market_maxlot;
   return NormalizeDouble(lotsize, volume_digits);
-}
-
-/**
- * Get account stopout level in range: 0.0 - 1.0 where 1.0 is 100%.
- *
- * Notes:
- *  - if(AccountEquity()/AccountMargin()*100 < AccountStopoutLevel()) { BrokerClosesOrders(); }
- */
-double GetAccountStopoutLevel() {
-  int mode = AccountStopoutMode();
-  int level = AccountStopoutLevel();
-  if (mode == 0 && level > 0) { // Calculation of percentage ratio between margin and equity.
-     return (double)level / 100;
-  } else if (mode == 1) { // Comparison of the free margin level to the absolute value.
-    return 1.0;
-  } else {
-   if (VerboseErrors) PrintFormat("%s(): Not supported mode (%d).", __FUNCTION__, mode);
-  }
-  return 1.0;
 }
 
 /**
@@ -4253,10 +4242,8 @@ bool InitializeVariables() {
   }
 
   market_margininit = Market::GetMarginInit();
-  market_stoplevel = Market::GetStopLevel();
   order_freezelevel = Market::GetFreezeLevel();
 
-  // market_stoplevel=(int)SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL);
   curr_spread = Market::GetSpreadInPips();
   LastAsk = Ask; LastBid = Bid;
   init_balance = Account::AccountBalance();
@@ -5731,7 +5718,7 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
   // Prepare text for Stop Out.
   string stop_out_level = StringFormat("%d", AccountStopoutLevel());
   if (AccountStopoutMode() == 0) stop_out_level += "%"; else stop_out_level += Account::AccountCurrency();
-  stop_out_level += StringFormat(" (%.1f)", GetAccountStopoutLevel());
+  stop_out_level += StringFormat(" (%.1f)", Account::GetAccountStopoutLevel(VerboseErrors));
   // Prepare text to display max orders.
   string text_max_orders = StringFormat("Max orders: %d [Per type: %d]", max_orders, GetMaxOrdersPerType());
   #ifdef __advanced__
@@ -5739,7 +5726,6 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
   #endif
   // Prepare text to display spread.
   string text_spread = StringFormat("Spread: %.1f pips (%d pts)", Market::GetSpreadInPips(), Market::GetSpreadInPts());
-  // "Stop level (pips): " + DoubleToStr(market_stoplevel / pts_per_pip, Digits - pip_digits);
   // Check trend.
   string trend = "Neutral.";
   if (CheckTrend() == OP_BUY) trend = "Bullish";

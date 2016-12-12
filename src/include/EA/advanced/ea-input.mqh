@@ -1384,7 +1384,7 @@ extern string __Backtest_Parameters__ = "-- Backtest & troubleshooting parameter
   extern bool ValidateSettings = 0; // Validate startup settings
 #endif
 extern bool RecordTicksToCSV = False; // Record ticks into CSV files
-extern int DemoMarketStopLevel = 10; // Demo market stop level
+// extern int DemoMarketStopLevel = 10; // Demo market stop level
 extern int SmartToggleComponent = 0; // Override: Toggle different components (0-43)
 extern int Account_Condition_To_Disable = 0; // Override: Disable specific n action
 extern bool DisableCloseConditions = FALSE; // Override: Disable all close conditions
