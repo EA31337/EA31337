@@ -150,7 +150,7 @@ int worse_strategy[FINAL_STAT_PERIOD_TYPE_ENTRY], best_strategy[FINAL_STAT_PERIO
 // EA variables.
 bool ea_active = FALSE;
 double risk_ratio; string rr_text; // Vars for calculation risk ratio.
-int max_orders = 10, daily_orders; // Maximum orders available to open.
+uint max_orders = 10, daily_orders; // Maximum orders available to open.
 int max_order_slippage; // Maximum price slippage for buy or sell orders (in points)
 double LastAsk, LastBid; // Keep the last ask and bid price.
 int err_code; // Error code.
@@ -160,7 +160,7 @@ double last_close_profit = EMPTY;
 // int last_trail_update = 0, last_indicators_update = 0, last_stats_update = 0;
 int todo_queue[100][8];
 datetime last_queue_process = 0;
-int total_orders = 0; // Number of total orders currently open.
+uint total_orders = 0; // Number of total orders currently open.
 double daily[FINAL_VALUE_TYPE_ENTRY], weekly[FINAL_VALUE_TYPE_ENTRY], monthly[FINAL_VALUE_TYPE_ENTRY];
 double hourly_profit[367][24]; // Keep track of hourly profit.
 
@@ -3691,19 +3691,21 @@ int GetMaxOrdersPerDay() {
 /**
  * Calculate number of maximum of orders allowed to open.
  */
-int GetMaxOrders() {
+uint GetMaxOrders() {
+  uint _result, _limit = Account::AccountLimitOrders();
   #ifdef __advanced__
-    return MaxOrders > 0 ? (MaxOrdersPerDay > 0 ? fmin(MaxOrders, GetMaxOrdersPerDay()) : MaxOrders) : Orders::CalcMaxOrders(lot_size, risk_ratio, max_orders, GetMaxOrdersPerDay());
+    _result = MaxOrders > 0 ? (MaxOrdersPerDay > 0 ? fmin(MaxOrders, GetMaxOrdersPerDay()) : MaxOrders) : Orders::CalcMaxOrders(lot_size, risk_ratio, max_orders, GetMaxOrdersPerDay());
   #else
-    return MaxOrders > 0 ? MaxOrders : Orders::CalcMaxOrders(lot_size, risk_ratio, max_orders);
+    _result = MaxOrders > 0 ? MaxOrders : Orders::CalcMaxOrders(lot_size, risk_ratio, max_orders);
   #endif
+  return _limit > 0 ? fmin(_result, _limit) : _result;
 }
 
 /**
  * Calculate the limit of maximum orders to open per each strategy.
  */
 int GetMaxOrdersPerType() {
-  return Misc::If(MaxOrdersPerType > 0, (int)MaxOrdersPerType, (int)fmax(MathFloor(max_orders / fmax(GetNoOfStrategies(), 1) ), 1) * 2);
+  return MaxOrdersPerType > 0  ? (int)MaxOrdersPerType : (int) fmin(fmax(MathFloor(max_orders / fmax(GetNoOfStrategies(), 1) ), 1) * 2, max_orders);
 }
 
 /**

@@ -17,9 +17,9 @@
 
 //+------------------------------------------------------------------+
 extern string   __Trade_Parameters__ = "-- Trade parameters --"; // >>> TRADE <<<
-extern int      MaxOrders = 0; // Max orders (0 = auto)
-extern int      MaxOrdersPerType = 0; // Max orders per type (0 = auto)
-extern int      MaxOrdersPerDay = 0; // Max orders per day
+extern uint     MaxOrders = 0; // Max orders (0 = auto)
+extern uint     MaxOrdersPerType = 0; // Max orders per type (0 = auto)
+extern uint     MaxOrdersPerDay = 0; // Max orders per day
 extern double   LotSize = 0.00000000; // Lot size (0 = auto)
 extern int      LotSizeIncreaseMethod = 202; // Lot size increase method (0-255)
 extern int      LotSizeDecreaseMethod = 167; // Lot size decrease method (0-255)
