@@ -10,6 +10,7 @@
 
 #include <EA\ea-mode.mqh>
 #include <EA\ea-code-conf.mqh>
+#include <EA\ea-defaults.mqh>
 #include <EA\ea-properties.mqh>
 #include <EA\ea-enums.mqh>
 #ifdef __advanced__
@@ -541,15 +542,14 @@ string ListModellingQuality(bool print = False) {
  */
 bool Trade() {
   bool order_placed = FALSE;
-  int trade_cmd;
-  // if (VerboseTrace) Print("Calling " + __FUNCTION__ + ".");
-  // vdigits = MarketInfo(Symbol(), MODE_DIGITS);
+  int trade_cmd = EMPTY;
 
   for (int id = 0; id < FINAL_STRATEGY_TYPE_ENTRY; id++) {
     trade_cmd = EMPTY;
     if (info[id][ACTIVE] && !info[id][SUSPENDED]) {
       if (TradeCondition(id, OP_BUY))  trade_cmd = OP_BUY;
       else if (TradeCondition(id, OP_SELL)) trade_cmd = OP_SELL;
+
       #ifdef __advanced__
       if (!DisableCloseConditions) {
         if (CheckMarketEvent(OP_BUY,  PERIOD_M30, info[id][CLOSE_CONDITION])) CloseOrdersByType(OP_SELL, id, NULL, CloseConditionOnlyProfitable); // TODO: reason_id
@@ -567,6 +567,7 @@ bool Trade() {
 
     } // end: if
   } // end: for
+  if (VerboseTrace) PrintFormat("%s (%d), traded=%d, cmd=%d", __FUNCTION__, bar_time, order_placed, trade_cmd);
 
   #ifdef __advanced__
   if (SmartQueueActive && !order_placed && total_orders < max_orders) {
@@ -583,8 +584,9 @@ bool Trade() {
  * Check if strategy is on trade conditionl.
  */
 bool TradeCondition(int order_type = 0, int cmd = NULL) {
+  if (VerboseTrace) PrintFormat("%s:%d: %d/%d", __FUNCTION__, __LINE__, order_type, cmd);
   if (TradeWithTrend && !Market::GetTrendOp(TrendMethod) == cmd) {
-    return (FALSE); // When TradeWithTrend is set and we're against the trend, do not trade.
+    return (False); // When TradeWithTrend is set and we're against the trend, do not trade.
   }
   ENUM_TIMEFRAMES tf = (ENUM_TIMEFRAMES) info[order_type][TIMEFRAME];
   switch (order_type) {
@@ -660,7 +662,7 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, bool no_s
 #endif
     case ALLIGATOR: // Calculates the Alligator indicator.
       // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
-      ratio = 30 / fmax(Alligator_Period_Ratio, 0.1) / 30 / 30 * tf;
+      ratio = 30 / fmax(Alligator_Period_Ratio, NEAR_ZERO) / 30 / 30 * tf;
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         shift = i + Alligator_Shift + (i == FINAL_INDICATOR_INDEX_ENTRY - 1 ? Alligator_Shift_Far : 0);
         alligator[index][i][LIPS]  = iMA(symbol, tf, (int) (Alligator_Period_Lips * ratio),  Alligator_Shift_Lips,  Alligator_MA_Method, Alligator_Applied_Price, shift);
@@ -694,8 +696,8 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, bool no_s
     case BANDS: // Calculates the Bollinger Bands indicator.
       // int sid, bands_period = Bands_Period; // Not used at the moment.
       // sid = GetStrategyViaIndicator(BANDS, tf); bands_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
-      ratio = 30 / fmax(Bands_Period_Ratio, 0.1) / 30 / 30 * tf;
-      ratio2 = 30 / fmax(Bands_Deviation_Ratio, 0.1) / 30 / 30 * tf;
+      ratio = 30 / fmax(Bands_Period_Ratio, NEAR_ZERO) / 30 / 30 * tf;
+      ratio2 = 30 / fmax(Bands_Deviation_Ratio, NEAR_ZERO) / 30 / 30 * tf;
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         shift = i + Bands_Shift + (i == FINAL_INDICATOR_INDEX_ENTRY - 1 ? Bands_Shift_Far : 0);
         bands[index][i][BANDS_BASE]  = iBands(symbol, tf, (int) (Bands_Period * ratio), Bands_Deviation * ratio2, 0, Bands_Applied_Price, BANDS_BASE,  shift);
@@ -729,7 +731,7 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, bool no_s
       break;
 #endif
     case DEMARKER: // Calculates the DeMarker indicator.
-      ratio = 30 / fmax(DeMarker_Period_Ratio, 0.1) / 30 / 30 * tf;
+      ratio = 30 / fmax(DeMarker_Period_Ratio, NEAR_ZERO) / 30 / 30 * tf;
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         demarker[index][i] = iDeMarker(symbol, tf, (int) (DeMarker_Period * ratio), i + DeMarker_Shift);
       }
@@ -747,8 +749,8 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, bool no_s
         case M30: envelopes_deviation = Envelopes30_Deviation; break;
       }
       */
-      ratio = 30 / fmax(Envelopes_MA_Period_Ratio, 0.1) / 30 / 30 * tf;
-      ratio2 = 30 / fmax(Envelopes_Deviation_Ratio, 0.1) / 30 / 30 * tf;
+      ratio = 30 / fmax(Envelopes_MA_Period_Ratio, NEAR_ZERO) / 30 / 30 * tf;
+      ratio2 = 30 / fmax(Envelopes_Deviation_Ratio, NEAR_ZERO) / 30 / 30 * tf;
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         envelopes[index][i][MODE_MAIN] = iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, MODE_MAIN,  i + Envelopes_Shift);
         envelopes[index][i][UPPER]     = iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, UPPER, i + Envelopes_Shift);
@@ -793,7 +795,7 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, bool no_s
       break;
     case MA: // Calculates the Moving Average indicator.
       // Calculate MA Fast.
-      ratio = 30 / fmax(MA_Period_Ratio, 0.1) / 30 / 30 * tf;
+      ratio = 30 / fmax(MA_Period_Ratio, NEAR_ZERO) / 30 / 30 * tf;
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         shift = i + MA_Shift + (i == FINAL_INDICATOR_INDEX_ENTRY - 1 ? MA_Shift_Far : 0);
         ma_fast[index][i]   = iMA(symbol, tf, (int) (MA_Period_Fast * ratio),   MA_Shift_Fast,   MA_Method, MA_Applied_Price, shift);
@@ -812,7 +814,7 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, bool no_s
       // if (VerboseDebug && Check::IsVisualMode()) Draw::DrawMA(tf);
       break;
     case MACD: // Calculates the Moving Averages Convergence/Divergence indicator.
-      ratio = 30 / fmax(MACD_Period_Ratio, 0.1) / 30 / 30 * tf;
+      ratio = 30 / fmax(MACD_Period_Ratio, NEAR_ZERO) / 30 / 30 * tf;
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         shift = i + MACD_Shift + (i == FINAL_INDICATOR_INDEX_ENTRY - 1 ? MACD_Shift_Far : 0);
         macd[index][i][MODE_MAIN]   = iMACD(symbol, tf, (int) (MACD_Period_Fast * ratio), (int) (MACD_Period_Slow * ratio), (int) (MACD_Period_Signal * ratio), MACD_Applied_Price, MODE_MAIN,   shift);
@@ -849,7 +851,7 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, bool no_s
     case RSI: // Calculates the Relative Strength Index indicator.
       // int rsi_period = RSI_Period; // Not used at the moment.
       // sid = GetStrategyViaIndicator(RSI, tf); rsi_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
-      ratio = 30 / fmax(RSI_Period_Ratio, 0.1) / 30 / 30 * tf;
+      ratio = 30 / fmax(RSI_Period_Ratio, NEAR_ZERO) / 30 / 30 * tf;
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         rsi[index][i] = iRSI(symbol, tf, (int) (RSI_Period * ratio), RSI_Applied_Price, i + RSI_Shift);
         if (rsi[index][i] > rsi_stats[index][UPPER]) rsi_stats[index][UPPER] = rsi[index][i]; // Calculate maximum value.
@@ -870,7 +872,7 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, bool no_s
       success = (bool)rvi[index][CURR][MODE_MAIN];
       break;
     case SAR: // Calculates the Parabolic Stop and Reverse system indicator.
-      ratio = 30 / fmax(SAR_Step_Ratio, 0.1) / 30 / 30 * tf;
+      ratio = 30 / fmax(SAR_Step_Ratio, NEAR_ZERO) / 30 / 30 * tf;
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         sar[index][i] = iSAR(symbol, tf, SAR_Step * ratio, SAR_Maximum_Stop, i + SAR_Shift);
       }
@@ -895,7 +897,7 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, bool no_s
       break;
     case WPR: // Calculates the  Larry Williams' Percent Range.
       // Update the Larry Williams' Percent Range indicator values.
-      ratio = 30 / fmax(WPR_Period_Ratio, 0.1) / 30 / 30 * tf;
+      ratio = 30 / fmax(WPR_Period_Ratio, NEAR_ZERO) / 30 / 30 * tf;
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         wpr[index][i] = -iWPR(symbol, tf, (int) (WPR_Period * ratio), i + WPR_Shift);
       }
@@ -930,6 +932,7 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
    bool result = FALSE;
    int order_ticket;
 
+  if (VerboseTrace) Print(__FUNCTION__);
    if (trade_volume == EMPTY) {
      trade_volume = GetStrategyLotSize(sid, cmd);
    } else {
@@ -1108,6 +1111,7 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
 bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
   int result = TRUE;
   string err;
+  if (VerboseTrace) Print(__FUNCTION__);
   if (volume < market_minlot) {
     last_trace = Msg::ShowText(StringFormat("%s: Lot size = %.2f", sname[sid], volume), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
     result = FALSE;
@@ -1161,6 +1165,7 @@ bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
  *   If TRUE, the profit factor is fine, otherwise return FALSE.
  */
 bool CheckProfitFactorLimits(int sid = EMPTY) {
+  if (VerboseTrace) Print(__FUNCTION__);
   if (sid == EMPTY) {
     // If sid is empty, unsuspend all strategies.
     ActionExecute(A_UNSUSPEND_STRATEGIES);
@@ -1169,7 +1174,7 @@ bool CheckProfitFactorLimits(int sid = EMPTY) {
   conf[sid][PROFIT_FACTOR] = GetStrategyProfitFactor(sid);
   if (ProfitFactorMinToTrade > 0 && conf[sid][PROFIT_FACTOR] < ProfitFactorMinToTrade) {
     last_err = Msg::ShowText(
-      StringFormat("%s: Minimum profit factor has reached, disabling strategy. (pf = %.1f)",
+      StringFormat("%s: Minimum profit factor has been reached, disabling strategy. (pf = %.1f)",
         sname[sid], conf[sid][PROFIT_FACTOR]),
       "Info", __FUNCTION__, __LINE__, VerboseInfo);
     info[sid][SUSPENDED] = TRUE;
@@ -1177,7 +1182,7 @@ bool CheckProfitFactorLimits(int sid = EMPTY) {
   }
   if (ProfitFactorMaxToTrade > 0 && conf[sid][PROFIT_FACTOR] > ProfitFactorMaxToTrade) {
     last_err = Msg::ShowText(
-      StringFormat("%s: Maximum profit factor has reached, disabling strategy. (pf = %.1f)",
+      StringFormat("%s: Maximum profit factor has been reached, disabling strategy. (pf = %.1f)",
         sname[sid], conf[sid][PROFIT_FACTOR]),
       "Info", __FUNCTION__, __LINE__, VerboseInfo);
     info[sid][SUSPENDED] = TRUE;
@@ -1580,6 +1585,9 @@ bool Trade_Alligator(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method 
         );
       break;
   }
+  if (VerboseTrace && result) {
+    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
+  }
   return result;
 }
 
@@ -1732,6 +1740,9 @@ bool Trade_Bands(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EM
       break;
   }
 
+  if (VerboseTrace && result) {
+    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
+  }
   return result;
 }
 
@@ -1943,7 +1954,9 @@ bool Trade_DeMarker(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method =
       // PrintFormat("DeMarker sell: %g >= %g", demarker[period][CURR], 0.5 + signal_level);
       break;
   }
-
+  if (VerboseTrace && result) {
+    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
+  }
   return result;
 }
 
@@ -1986,6 +1999,9 @@ bool Trade_Envelopes(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method 
       if ((signal_method &  64) != 0) result = result && Close[CURR] > envelopes[period][CURR][UPPER];
       //if ((signal_method & 128) != 0) result = result && Ask < Close[PREV];
       break;
+  }
+  if (VerboseTrace && result) {
+    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
   }
   return result;
 }
@@ -2060,6 +2076,9 @@ bool Trade_Fractals(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method =
       // if ((signal_method &   2) != 0) result = result && !Fractals_On_Buy(tf);
       // if ((signal_method &   8) != 0) result = result && Fractals_On_Sell(M30);
       break;
+  }
+  if (VerboseTrace && result) {
+    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
   }
   return result;
 }
@@ -2189,6 +2208,9 @@ bool Trade_MA(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY
       if ((signal_method &  64) != 0) result &= (ma_fast[period][PREV] > ma_medium[period][PREV] || ma_fast[period][FAR] > ma_medium[period][FAR]);
       break;
   }
+  if (VerboseTrace && result) {
+    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
+  }
   return result;
 }
 
@@ -2245,6 +2267,9 @@ bool Trade_MACD(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMP
       if ((signal_method &   8) != 0) result = result && ma_fast[period][CURR] < ma_fast[period][PREV];
       if ((signal_method &  16) != 0) result = result && ma_fast[period][CURR] < ma_medium[period][CURR];
       break;
+  }
+  if (VerboseTrace && result) {
+    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
   }
   return result;
 }
@@ -2409,6 +2434,9 @@ bool Trade_RSI(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPT
       //if ((signal_method & 128) != 0) result = result && !RSI_On_Buy(M30);
       break;
   }
+  if (VerboseTrace && result) {
+    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
+  }
   return result;
 }
 
@@ -2496,6 +2524,9 @@ bool Trade_SAR(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPT
       break;
   }
 
+  if (VerboseTrace && result) {
+    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
+  }
   return result;
 }
 
@@ -2660,6 +2691,9 @@ bool Trade_WPR(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPT
       if ((signal_method &  32) != 0) result = result && wpr[period][PREV] > 50 - signal_level - signal_level / 2;
       break;
   }
+  if (VerboseTrace && result) {
+    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
+  }
   return result;
 }
 
@@ -2746,6 +2780,7 @@ bool CheckMarketCondition1(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M30, int conditi
 bool CheckMarketEvent(int cmd = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M30, int condition = EMPTY) {
   bool result = FALSE;
   int period = Convert::TfToIndex(tf);
+  if (VerboseTrace) Print(__FUNCTION__);
   if (cmd == EMPTY || condition == EMPTY) return (FALSE);
   switch (condition) {
     case C_AC_BUY_SELL:
@@ -2888,13 +2923,13 @@ bool CheckMarketEvent(int cmd = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M30, int cond
  * Check if order match has minimum gap in pips configured by MinPipGap parameter.
  *
  * @param
- *   int strategy_type - type of order strategy to check for (see: ENUM STRATEGY TYPE)
+ *   int sid - type of order strategy to check for (see: ENUM STRATEGY TYPE)
  */
-bool CheckMinPipGap(int strategy_type) {
+bool CheckMinPipGap(int sid) {
   double diff;
   for (int order = 0; order < OrdersTotal(); order++) {
     if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
-       if (OrderMagicNumber() == MagicNumber + strategy_type && OrderSymbol() == Symbol()) {
+       if (OrderMagicNumber() == MagicNumber + sid && OrderSymbol() == Symbol()) {
          diff = Convert::GetValueDiffInPips(OrderOpenPrice(), Market::GetOpenPrice(), True); 
          // diff = fabs((OrderOpenPrice() - Market::GetOpenPrice()) / pip_size); // @fixme: warning 43: possible loss of data due to type conversion
          // if (VerboseTrace) Print("Ticket: ", OrderTicket(), ", Order: ", OrderType(), ", Gap: ", diff);
@@ -2905,7 +2940,7 @@ bool CheckMinPipGap(int strategy_type) {
     } else if (VerboseDebug) {
       Msg::ShowText(
           StringFormat("Cannot select order. Strategy type: %s, pos: %d, msg: %s.",
-            strategy_type, order, GetErrorText(err_code)),
+            sid, order, GetErrorText(err_code)),
           "Error", __FUNCTION__, __LINE__, VerboseErrors
       );
     }
@@ -4881,15 +4916,19 @@ bool InitializeConditions() {
   acc_conditions[0][0] = Account_Condition_1;
   acc_conditions[0][1] = Market_Condition_1;
   acc_conditions[0][2] = Action_On_Condition_1;
+
   acc_conditions[1][0] = Account_Condition_2;
   acc_conditions[1][1] = Market_Condition_2;
   acc_conditions[1][2] = Action_On_Condition_2;
+
   acc_conditions[2][0] = Account_Condition_3;
   acc_conditions[2][1] = Market_Condition_3;
   acc_conditions[2][2] = Action_On_Condition_3;
+
   acc_conditions[3][0] = Account_Condition_4;
   acc_conditions[3][1] = Market_Condition_4;
   acc_conditions[3][2] = Action_On_Condition_4;
+
   acc_conditions[4][0] = Account_Condition_5;
   acc_conditions[4][1] = Market_Condition_5;
   acc_conditions[4][2] = Action_On_Condition_5;
@@ -5088,6 +5127,7 @@ bool AccCondition(int condition = C_ACC_NONE) {
  */
 bool MarketCondition(int condition = C_MARKET_NONE) {
   static int counter = 0;
+  if (VerboseTrace) Print(__FUNCTION__);
   switch(condition) {
     case C_MARKET_TRUE:
       return TRUE;
@@ -6002,13 +6042,13 @@ int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = TRUE) {
  * Note: Executing random actions can be potentially dangerous for the account if not used wisely.
  */
 bool ActionExecute(int aid, int id = EMPTY) {
-  bool result = FALSE;
+  bool result = False;
   int reason_id = (id != EMPTY ? acc_conditions[id][0] : EMPTY); // Account id condition.
   int mid = (id != EMPTY ? acc_conditions[id][1] : EMPTY); // Market id condition.
   int cmd;
   switch (aid) {
     case A_NONE: /* 0 */
-      result = TRUE;
+      result = True;
       if (VerboseTrace) PrintFormat("%s(): No action taken. Reason (id: %d): %s", __FUNCTION__, reason_id, ReasonIdToText(reason_id));
       // Nothing.
       break;
