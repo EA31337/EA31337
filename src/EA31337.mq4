@@ -626,7 +626,7 @@ bool TradeCondition(int order_type = 0, int cmd = NULL) {
  * Update specific indicator.
  * Gukkuk im Versteck
  */
-bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string symbol = NULL) {
+bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, bool no_shift = False, string symbol = NULL) {
   bool success = True;
   static datetime processed[FINAL_INDICATOR_TYPE_ENTRY][FINAL_PERIOD_TYPE_ENTRY];
   int i; string text = __FUNCTION__ + ": ";
@@ -660,13 +660,16 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
 #endif
     case ALLIGATOR: // Calculates the Alligator indicator.
       // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
+      ratio = 30 / fmax(Alligator_Period_Ratio, 0.1) / 30 / 30 * tf;
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        alligator[index][i][LIPS]  = iMA(symbol, tf, (int) (Alligator_Period_Lips * ratio),  Alligator_Shift_Lips,  Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
-        alligator[index][i][TEETH] = iMA(symbol, tf, (int) (Alligator_Period_Teeth * ratio), Alligator_Shift_Teeth, Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
-        alligator[index][i][JAW]   = iMA(symbol, tf, (int) (Alligator_Period_Jaw * ratio),   Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, i + Alligator_Shift);
-        ratio *= Alligator_Period_Ratio;
+        shift = i + Alligator_Shift + (i == FINAL_INDICATOR_INDEX_ENTRY - 1 ? Alligator_Shift_Far : 0);
+        alligator[index][i][LIPS]  = iMA(symbol, tf, (int) (Alligator_Period_Lips * ratio),  Alligator_Shift_Lips,  Alligator_MA_Method, Alligator_Applied_Price, shift);
+        alligator[index][i][TEETH] = iMA(symbol, tf, (int) (Alligator_Period_Teeth * ratio), Alligator_Shift_Teeth, Alligator_MA_Method, Alligator_Applied_Price, shift);
+        alligator[index][i][JAW]   = iMA(symbol, tf, (int) (Alligator_Period_Jaw * ratio),   Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, shift);
+        if (VerboseDebug) PrintFormat("%d: iMA(%s, %d, %d (%g), %d, %d, %d, %d) = %g",
+          i, symbol, tf, (int) (Alligator_Period_Jaw * ratio), ratio, Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, shift, alligator[index][i][JAW]);
       }
-      success = (bool)alligator[index][CURR][JAW];
+      success = (bool) alligator[index][CURR][JAW] + alligator[index][PREV][JAW] + alligator[index][FAR][JAW];
       /* Note: This is equivalent to:
         alligator[index][i][TEETH] = iAlligator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
         alligator[index][i][TEETH] = iAlligator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
@@ -676,10 +679,10 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
       break;
 #ifdef __advanced__
     case ATR: // Calculates the Average True Range indicator.
+      ratio = 30 / fmax(ATR_Period_Ratio / 30 / 30 * tf;
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         atr[index][i][FAST] = iATR(symbol, tf, (int) (ATR_Period_Fast * ratio), i);
         atr[index][i][SLOW] = iATR(symbol, tf, (int) (ATR_Period_Slow * ratio), i);
-        ratio *= ATR_Period_Ratio;
       }
       break;
     case AWESOME: // Calculates the Awesome oscillator.
@@ -691,13 +694,13 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
     case BANDS: // Calculates the Bollinger Bands indicator.
       // int sid, bands_period = Bands_Period; // Not used at the moment.
       // sid = GetStrategyViaIndicator(BANDS, tf); bands_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
+      ratio = 30 / fmax(Bands_Period_Ratio, 0.1) / 30 / 30 * tf;
+      ratio2 = 30 / fmax(Bands_Deviation_Ratio, 0.1) / 30 / 30 * tf;
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         shift = i + Bands_Shift + (i == FINAL_INDICATOR_INDEX_ENTRY - 1 ? Bands_Shift_Far : 0);
         bands[index][i][BANDS_BASE]  = iBands(symbol, tf, (int) (Bands_Period * ratio), Bands_Deviation * ratio2, 0, Bands_Applied_Price, BANDS_BASE,  shift);
         bands[index][i][BANDS_UPPER] = iBands(symbol, tf, (int) (Bands_Period * ratio), Bands_Deviation * ratio2, 0, Bands_Applied_Price, BANDS_UPPER, shift);
         bands[index][i][BANDS_LOWER] = iBands(symbol, tf, (int) (Bands_Period * ratio), Bands_Deviation * ratio2, 0, Bands_Applied_Price, BANDS_LOWER, shift);
-        ratio *= Bands_Period_Ratio;
-        ratio2 *= Bands_Deviation_Ratio;
       }
       success = (bool)bands[index][CURR][BANDS_BASE];
       if (VerboseDebug) PrintFormat("Bands M%d: %s", tf, Arrays::ArrToString3D(bands, ",", Digits));
@@ -726,11 +729,11 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
       break;
 #endif
     case DEMARKER: // Calculates the DeMarker indicator.
+      ratio = 30 / fmax(DeMarker_Period_Ratio, 0.1) / 30 / 30 * tf;
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         demarker[index][i] = iDeMarker(symbol, tf, (int) (DeMarker_Period * ratio), i + DeMarker_Shift);
-        ratio *= DeMarker_Period_Ratio;
       }
-      success = (bool)demarker[index][CURR];
+      // success = (bool) demarker[index][CURR] + demarker[index][PREV] + demarker[index][FAR];
       // PrintFormat("Period: %d, DeMarker: %g", period, demarker[index][CURR]);
       if (VerboseDebug) PrintFormat("DeMarker M%d: %s", tf, Arrays::ArrToString2D(demarker, ",", Digits));
       break;
@@ -744,14 +747,14 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
         case M30: envelopes_deviation = Envelopes30_Deviation; break;
       }
       */
+      ratio = 30 / fmax(Envelopes_MA_Period_Ratio, 0.1) / 30 / 30 * tf;
+      ratio2 = 30 / fmax(Envelopes_Deviation_Ratio, 0.1) / 30 / 30 * tf;
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         envelopes[index][i][MODE_MAIN] = iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, MODE_MAIN,  i + Envelopes_Shift);
         envelopes[index][i][UPPER]     = iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, UPPER, i + Envelopes_Shift);
         envelopes[index][i][LOWER]     = iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, LOWER, i + Envelopes_Shift);
-        ratio *= Envelopes_MA_Period_Ratio;
-        ratio2 *= Envelopes_Deviation_Ratio;
       }
-      success = (bool)envelopes[index][CURR][MODE_MAIN];
+      success = (bool) envelopes[index][CURR][MODE_MAIN];
       if (VerboseDebug) PrintFormat("Envelopes M%d: %s", tf, Arrays::ArrToString3D(envelopes, ",", Digits));
       break;
 #ifdef __advanced__
@@ -790,12 +793,12 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
       break;
     case MA: // Calculates the Moving Average indicator.
       // Calculate MA Fast.
+      ratio = 30 / fmax(MA_Period_Ratio, 0.1) / 30 / 30 * tf;
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         shift = i + MA_Shift + (i == FINAL_INDICATOR_INDEX_ENTRY - 1 ? MA_Shift_Far : 0);
         ma_fast[index][i]   = iMA(symbol, tf, (int) (MA_Period_Fast * ratio),   MA_Shift_Fast,   MA_Method, MA_Applied_Price, shift);
         ma_medium[index][i] = iMA(symbol, tf, (int) (MA_Period_Medium * ratio), MA_Shift_Medium, MA_Method, MA_Applied_Price, shift);
         ma_slow[index][i]   = iMA(symbol, tf, (int) (MA_Period_Slow * ratio),   MA_Shift_Slow,   MA_Method, MA_Applied_Price, shift);
-        ratio *= MA_Period_Ratio;
         if (tf == Period() && i < FINAL_INDICATOR_INDEX_ENTRY - 1) {
           Draw::TLine(StringFormat("%s%s%d", symbol, "MA Fast", i),   ma_fast[index][i],   ma_fast[index][i+1],    iTime(NULL, 0, shift), iTime(NULL, 0, shift+1), clrBlue);
           Draw::TLine(StringFormat("%s%s%d", symbol, "MA Medium", i), ma_medium[index][i], ma_medium[index][i+1],  iTime(NULL, 0, shift), iTime(NULL, 0, shift+1), clrYellow);
@@ -809,11 +812,11 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
       // if (VerboseDebug && Check::IsVisualMode()) Draw::DrawMA(tf);
       break;
     case MACD: // Calculates the Moving Averages Convergence/Divergence indicator.
+      ratio = 30 / fmax(MACD_Period_Ratio, 0.1) / 30 / 30 * tf;
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         shift = i + MACD_Shift + (i == FINAL_INDICATOR_INDEX_ENTRY - 1 ? MACD_Shift_Far : 0);
         macd[index][i][MODE_MAIN]   = iMACD(symbol, tf, (int) (MACD_Period_Fast * ratio), (int) (MACD_Period_Slow * ratio), (int) (MACD_Period_Signal * ratio), MACD_Applied_Price, MODE_MAIN,   shift);
         macd[index][i][MODE_SIGNAL] = iMACD(symbol, tf, (int) (MACD_Period_Fast * ratio), (int) (MACD_Period_Slow * ratio), (int) (MACD_Period_Signal * ratio), MACD_Applied_Price, MODE_SIGNAL, shift);
-        ratio *= MACD_Period_Ratio;
       }
       if (VerboseDebug) PrintFormat("MACD M%d: %s", tf, Arrays::ArrToString3D(macd, ",", Digits));
       success = (bool)macd[index][CURR][MODE_MAIN];
@@ -846,16 +849,16 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
     case RSI: // Calculates the Relative Strength Index indicator.
       // int rsi_period = RSI_Period; // Not used at the moment.
       // sid = GetStrategyViaIndicator(RSI, tf); rsi_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
+      ratio = 30 / fmax(RSI_Period_Ratio, 0.1) / 30 / 30 * tf;
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         rsi[index][i] = iRSI(symbol, tf, (int) (RSI_Period * ratio), RSI_Applied_Price, i + RSI_Shift);
         if (rsi[index][i] > rsi_stats[index][UPPER]) rsi_stats[index][UPPER] = rsi[index][i]; // Calculate maximum value.
         if (rsi[index][i] < rsi_stats[index][LOWER] || rsi_stats[index][LOWER] == 0) rsi_stats[index][LOWER] = rsi[index][i]; // Calculate minimum value.
-        ratio *= RSI_Period_Ratio;
       }
       // Calculate average value.
       rsi_stats[index][0] = (rsi_stats[index][0] > 0 ? (rsi_stats[index][0] + rsi[index][0] + rsi[index][1] + rsi[index][2]) / 4 : (rsi[index][0] + rsi[index][1] + rsi[index][2]) / 3);
       if (VerboseDebug) PrintFormat("RSI M%d: %s", tf, Arrays::ArrToString2D(rsi, ",", Digits));
-      success = (bool)rsi[index][CURR];
+      success = (bool) rsi[index][CURR] + rsi[index][PREV] + rsi[index][FAR];
       break;
     case RVI: // Calculates the Relative Strength Index indicator.
       rvi[index][CURR][MODE_MAIN]   = iRVI(symbol, tf, 10, MODE_MAIN, CURR);
@@ -867,12 +870,12 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
       success = (bool)rvi[index][CURR][MODE_MAIN];
       break;
     case SAR: // Calculates the Parabolic Stop and Reverse system indicator.
+      ratio = 30 / fmax(SAR_Step_Ratio, 0.1) / 30 / 30 * tf;
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         sar[index][i] = iSAR(symbol, tf, SAR_Step * ratio, SAR_Maximum_Stop, i + SAR_Shift);
-        ratio *= SAR_Step_Ratio;
       }
       if (VerboseDebug) PrintFormat("SAR M%d: %s", tf, Arrays::ArrToString2D(sar, ",", Digits));
-      success = (bool)sar[index][CURR];
+      success = (bool) sar[index][CURR] + sar[index][PREV] + sar[index][FAR];
       break;
     case STDDEV: // Calculates the Standard Deviation indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
@@ -892,12 +895,12 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
       break;
     case WPR: // Calculates the  Larry Williams' Percent Range.
       // Update the Larry Williams' Percent Range indicator values.
+      ratio = 30 / fmax(WPR_Period_Ratio, 0.1) / 30 / 30 * tf;
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
         wpr[index][i] = -iWPR(symbol, tf, (int) (WPR_Period * ratio), i + WPR_Shift);
-        ratio *= WPR_Period_Ratio;
       }
       if (VerboseDebug) PrintFormat("WPR M%d: %s", tf, Arrays::ArrToString2D(wpr, ",", Digits));
-      success = wpr[index][CURR];
+      success = (bool) wpr[index][CURR] + wpr[index][PREV] + wpr[index][FAR];
       break;
     case ZIGZAG: // Calculates the custom ZigZag indicator.
       // TODO
@@ -4798,7 +4801,9 @@ bool InitStrategies() {
  * Check whether timeframe is valid.
  */
 bool CheckTf(ENUM_TIMEFRAMES tf = PERIOD_M1, string symbol = NULL) {
-  return iMA(symbol, tf, 13, 8, MODE_SMMA, PRICE_MEDIAN, 0) > 0;
+  double _ima = iMA(symbol, tf, 13, 8, MODE_SMMA, PRICE_MEDIAN, 0);
+  if (VerboseDebug) PrintFormat("%s: Tf: %d, MA: %g", __FUNCTION__, tf, _ima);
+  return (iMA(symbol, tf, 13, 8, MODE_SMMA, PRICE_MEDIAN, 0) > 0);
 }
 
 /**
@@ -4827,7 +4832,7 @@ bool InitStrategy(int key, string name, bool active, int indicator, ENUM_TIMEFRA
       }
     }
     // Validate whether indicator of the strategy is working.
-    if (!UpdateIndicator(INDICATOR, tf)) {
+    if (!UpdateIndicator(indicator, tf, True)) {
       Msg::ShowText(
         StringFormat("Cannot initialize indicator for the %s strategy!%s", name, ValidateSettings ? " Disabling..." : ""),
         "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
