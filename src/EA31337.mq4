@@ -188,7 +188,7 @@ double bpower[H1][FINAL_INDICATOR_INDEX_ENTRY][OP_SELL+1];
 double cci[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_MA_ENTRY];
 double demarker[H1][FINAL_INDICATOR_INDEX_ENTRY];
 double envelopes[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_LINE_ENTRY];
-double force[H1][FINAL_INDICATOR_INDEX_ENTRY];
+double iforce[H1][FINAL_INDICATOR_INDEX_ENTRY];
 double fractals[H4][FINAL_INDICATOR_INDEX_ENTRY][FINAL_LINE_ENTRY];
 double gator[H1][FINAL_INDICATOR_INDEX_ENTRY][LIPS+1];
 double ichimoku[H1][FINAL_INDICATOR_INDEX_ENTRY][CHIKOUSPAN_LINE+1];
@@ -542,32 +542,42 @@ string ListModellingQuality(bool print = False) {
  */
 bool Trade() {
   bool order_placed = FALSE;
-  int trade_cmd = EMPTY;
+  int buy_cmd, sell_cmd;
+
+  double trend = Market::GetTrendOp(TrendMethod, TrendMethod < 0);
 
   for (int id = 0; id < FINAL_STRATEGY_TYPE_ENTRY; id++) {
-    trade_cmd = EMPTY;
+    buy_cmd = EMPTY;
+    sell_cmd = EMPTY;
     if (info[id][ACTIVE] && !info[id][SUSPENDED]) {
-      if (TradeCondition(id, OP_BUY))  trade_cmd = OP_BUY;
-      else if (TradeCondition(id, OP_SELL)) trade_cmd = OP_SELL;
+      // Note: When TradeWithTrend is set and we're against the trend, do not trade.
+      if (TradeCondition(id, OP_BUY) && (!TradeWithTrend || trend == OP_BUY)) {
+        buy_cmd = OP_BUY;
+      } else if (TradeCondition(id, OP_SELL) && (!TradeWithTrend || trend == OP_SELL)) {
+        sell_cmd = OP_SELL;
+      }
 
       #ifdef __advanced__
       if (!DisableCloseConditions) {
         if (CheckMarketEvent(OP_BUY,  PERIOD_M30, info[id][CLOSE_CONDITION])) CloseOrdersByType(OP_SELL, id, NULL, CloseConditionOnlyProfitable); // TODO: reason_id
         if (CheckMarketEvent(OP_SELL, PERIOD_M30, info[id][CLOSE_CONDITION])) CloseOrdersByType(OP_BUY,  id, NULL, CloseConditionOnlyProfitable); // TODO: reason_id
       }
-      if (trade_cmd == OP_BUY  && !CheckMarketCondition1(OP_BUY,  (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) trade_cmd = EMPTY;
-      if (trade_cmd == OP_SELL && !CheckMarketCondition1(OP_SELL, (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) trade_cmd = EMPTY;
-      if (trade_cmd == OP_BUY  &&  CheckMarketCondition1(OP_SELL, PERIOD_M30, info[id][OPEN_CONDITION2], FALSE)) trade_cmd = EMPTY;
-      if (trade_cmd == OP_SELL &&  CheckMarketCondition1(OP_BUY,  PERIOD_M30, info[id][OPEN_CONDITION2], FALSE)) trade_cmd = EMPTY;
+      if (buy_cmd == OP_BUY  && !CheckMarketCondition1(OP_BUY,  (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) buy_cmd = EMPTY;
+      if (sell_cmd == OP_SELL && !CheckMarketCondition1(OP_SELL, (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) sell_cmd = EMPTY;
+      if (buy_cmd == OP_BUY  &&  CheckMarketCondition1(OP_SELL, PERIOD_M30, info[id][OPEN_CONDITION2], FALSE)) buy_cmd = EMPTY;
+      if (sell_cmd == OP_SELL &&  CheckMarketCondition1(OP_BUY,  PERIOD_M30, info[id][OPEN_CONDITION2], FALSE)) sell_cmd = EMPTY;
       #endif
 
-      if (trade_cmd != EMPTY) {
-        order_placed &= ExecuteOrder(trade_cmd, id);
+      if (buy_cmd != EMPTY) {
+        order_placed &= ExecuteOrder(buy_cmd, id);
+      }
+      if (sell_cmd != EMPTY) {
+        order_placed &= ExecuteOrder(sell_cmd, id);
       }
 
     } // end: if
   } // end: for
-  if (VerboseTrace) PrintFormat("%s (%d), traded=%d, cmd=%d", __FUNCTION__, bar_time, order_placed, trade_cmd);
+  if (VerboseTrace) PrintFormat("%s (%d), traded=%d, buy=%d/sell=%d", __FUNCTION__, bar_time, order_placed, buy_cmd, sell_cmd);
 
   #ifdef __advanced__
   if (SmartQueueActive && !order_placed && total_orders < max_orders) {
@@ -585,9 +595,6 @@ bool Trade() {
  */
 bool TradeCondition(int order_type = 0, int cmd = NULL) {
   if (VerboseTrace) PrintFormat("%s:%d: %d/%d", __FUNCTION__, __LINE__, order_type, cmd);
-  if (TradeWithTrend && !Market::GetTrendOp(TrendMethod) == cmd) {
-    return (False); // When TradeWithTrend is set and we're against the trend, do not trade.
-  }
   ENUM_TIMEFRAMES tf = (ENUM_TIMEFRAMES) info[order_type][TIMEFRAME];
   switch (order_type) {
     case AC1: case AC5: case AC15: case AC30:                                 return Trade_AC(cmd, tf);
@@ -762,9 +769,9 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, bool no_s
 #ifdef __advanced__
     case FORCE: // Calculates the Force Index indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++) {
-        force[index][i] = iForce(symbol, tf, Force_Period, Force_MA_Method, Force_Applied_price, i);
+        iforce[index][i] = iForce(symbol, tf, Force_Period, Force_MA_Method, Force_Applied_price, i);
       }
-      success = (bool)force[index][CURR];
+      success = (bool) iforce[index][CURR];
       break;
 #endif
     case FRACTALS: // Calculates the Fractals indicator.
@@ -2780,7 +2787,7 @@ bool CheckMarketCondition1(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M30, int conditi
 bool CheckMarketEvent(int cmd = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M30, int condition = EMPTY) {
   bool result = FALSE;
   int period = Convert::TfToIndex(tf);
-  if (VerboseTrace) Print(__FUNCTION__);
+  // if (VerboseTrace) Print(__FUNCTION__);
   if (cmd == EMPTY || condition == EMPTY) return (FALSE);
   switch (condition) {
     case C_AC_BUY_SELL:
@@ -5127,7 +5134,7 @@ bool AccCondition(int condition = C_ACC_NONE) {
  */
 bool MarketCondition(int condition = C_MARKET_NONE) {
   static int counter = 0;
-  if (VerboseTrace) Print(__FUNCTION__);
+  // if (VerboseTrace) Print(__FUNCTION__);
   switch(condition) {
     case C_MARKET_TRUE:
       return TRUE;
