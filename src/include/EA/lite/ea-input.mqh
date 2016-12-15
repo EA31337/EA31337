@@ -21,43 +21,43 @@ extern uint     MaxOrders = 0; // Max orders (0 = auto)
 extern uint      MaxOrdersPerType = 0; // Max orders per type (0 = auto)
 extern double   LotSize = 0.00000000; // Lot size (0 = auto)
 extern bool     TradeMicroLots = 1; // Trade micro lots?
-extern int TrendMethod = 86; // Main trend method (0-255)
+extern int TrendMethod = 206; // Main trend method (0-255)
 extern int MinVolumeToTrade = 2; // Min volume to trade
 extern int MaxOrderPriceSlippage = 5; // Max price slippage (in pips)
 extern int MaxTries = 5; // Max retries for opening orders
 extern double MinPipChangeToTrade = 0.2; // Min pip change to trade (0 = every tick)
-extern int MinPipGap = 0; // Min gap between trades per type (in pips)
+extern int MinPipGap = 20; // Min gap between trades per type (in pips)
 
 //+------------------------------------------------------------------+
 extern string   __EA_Order_Parameters__ = "-- Profit and loss parameters --"; // >>> PROFIT/LOSS <<<
-extern int      TakeProfit = 100; // Take profit (in pips, 0 = auto)
+extern int      TakeProfit = 80; // Take profit (in pips, 0 = auto)
 extern int      StopLoss = 100; // Stop loss (in pips, 0 = auto)
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
-extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 6; // Default trail stop method (0 = none)
+extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 9; // Default trail stop method (0 = none)
 extern bool TrailingStopOneWay = 0; // Trailing stop one way?
-extern int TrailingStop = 90; // Extra trailing stop (in pips)
-extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 9; // Default trail profit method
+extern int TrailingStop = 80; // Extra trailing stop (in pips)
+extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 23; // Default trail profit method
 extern bool TrailingProfitOneWay = 1; // Trailing profit one way?
-extern int TrailingProfit = 60; // Extra trailing profit (in pips)
-extern double TrailingStopAddPerMinute = 0.3; // Decrease trail stop per minute (pip/min)
+extern int TrailingProfit = 40; // Extra trailing profit (in pips)
+extern double TrailingStopAddPerMinute = 0.1; // Decrease trail stop per minute (pip/min)
 
 //+------------------------------------------------------------------+
 extern string __EA_Risk_Parameters__ = "-- Risk management parameters --"; // >>> RISK <<
-extern bool TradeWithTrend = 0; // Trade with trend
+extern bool TradeWithTrend = 1; // Trade with trend
 extern double RiskRatio = 0; // Risk ratio (0 = auto, 1.0 = normal)
 extern double RiskMargin = 1.0; // Risk margin (0-100, 0 = auto, 1 = 1%)
-extern int CloseOrderAfterXHours = 96; // Close order after X hours (0 - off)
+extern int CloseOrderAfterXHours = 72; // Close order after X hours (0 - off)
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Parameters__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGIES <<<
-extern double ProfitFactorMinToTrade = 0.5; // Min. profit factor per strategy to trade
-extern double ProfitFactorMaxToTrade = 4.6; // Max. profit factor per strategy to trade
+extern double ProfitFactorMinToTrade = 0.7; // Min. profit factor per strategy to trade
+extern double ProfitFactorMaxToTrade = 5; // Max. profit factor per strategy to trade
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameters (set 1.0 for default) --"; // >>> BOOSTING <<<
-extern bool Boosting_Enabled = 0; // Enable boosting
+extern bool Boosting_Enabled = 1; // Enable boosting
 extern double BoostTrendFactor = 1.7; // Boost by trend factor
 extern double BestDailyStrategyMultiplierFactor = 0.6; // Multiplier for the best daily strategy
 extern double BestWeeklyStrategyMultiplierFactor = 1.8; // Multiplier for the best weekly strategy
@@ -150,12 +150,12 @@ int ADX30_SignalMethod = 15; // Signal method for M30 (0-?)
 extern string __Alligator_Parameters__ = "-- Settings for the Alligator indicator --"; // >>> ALLIGATOR <<<
 extern bool Alligator1_Active = 0; // Enable for M1
 extern bool Alligator5_Active = 0; // Enable for M5
-extern bool Alligator15_Active = 1; // Enable for M15
+extern bool Alligator15_Active = 0; // Enable for M15
 extern bool Alligator30_Active = 1; // Enable for M30
 extern int Alligator_Period_Jaw = 12; // Jaw Period
 extern int Alligator_Period_Teeth = 10; // Teeth Period
 extern int Alligator_Period_Lips = 2; // Lips Period
-extern double Alligator_Period_Ratio = 0.4; // Period ratio between timeframes (0.5-1.5)
+extern double Alligator_Period_Ratio = 1; // Period ratio between timeframes (0.5-1.5)
 extern int Alligator_Shift_Jaw = 2; // Jaw Shift
 extern int Alligator_Shift_Teeth = 3; // Teeth Shift
 extern int Alligator_Shift_Lips = 4; // Lips Shift
@@ -163,12 +163,12 @@ extern ENUM_MA_METHOD Alligator_MA_Method = 3; // MA Method
 extern ENUM_APPLIED_PRICE Alligator_Applied_Price = 2; // Applied Price
 extern int Alligator_Shift = 0; // Shift
 extern int Alligator_Shift_Far = 8; // Shift Far
-extern ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = 1; // Trail stop method
-extern ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = 0; // Trail profit method
+extern ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = 9; // Trail stop method
+extern ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = 23; // Trail profit method
 extern double Alligator_SignalLevel = -0.31; // Signal level
 extern int Alligator1_SignalMethod = 24; // Signal method for M1 (0-63)
-extern int Alligator5_SignalMethod = 4; // Signal method for M5 (0-63)
-extern int Alligator15_SignalMethod = 0; // Signal method for M15 (0-63)
+extern int Alligator5_SignalMethod = 17; // Signal method for M5 (0-63)
+extern int Alligator15_SignalMethod = 17; // Signal method for M15 (0-63)
 extern int Alligator30_SignalMethod = 21; // Signal method for M30 (0-63)
 
 //+------------------------------------------------------------------+
@@ -204,23 +204,23 @@ int Awesome30_SignalMethod = 31; // Signal method for M30 (0-31)
 
 //+------------------------------------------------------------------+
 extern string __Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --"; // >>> BANDS <<<
-extern bool Bands1_Active = 1; // Enable for M1
+extern bool Bands1_Active = 0; // Enable for M1
 extern bool Bands5_Active = 0; // Enable for M5
 extern bool Bands15_Active = 0; // Enable for M15
-extern bool Bands30_Active = 0; // Enable for M30
-extern int Bands_Period = 22; // Period
-extern double Bands_Period_Ratio = 2; // Period ratio between timeframes (0.5-1.5)
+extern bool Bands30_Active = 1; // Enable for M30
+extern int Bands_Period = 26; // Period
+extern double Bands_Period_Ratio = 1; // Period ratio between timeframes (0.5-1.5)
 extern ENUM_APPLIED_PRICE Bands_Applied_Price = 2; // Applied Price
 extern double Bands_Deviation = 3.2; // Deviation
-extern double Bands_Deviation_Ratio = 0.4; // Deviation ratio between timeframes (0.5-1.5)
+extern double Bands_Deviation_Ratio = 1; // Deviation ratio between timeframes (0.5-1.5)
 extern int Bands_Shift = 0; // Shift
 extern int Bands_Shift_Far = 0; // Shift Far
-extern ENUM_TRAIL_TYPE Bands_TrailingStopMethod = 26; // Trail stop method
-extern ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = 17; // Trail profit method
+extern ENUM_TRAIL_TYPE Bands_TrailingStopMethod = 8; // Trail stop method
+extern ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = 23; // Trail profit method
 /* @todo extern */ int Bands_SignalLevel = 0; // Signal level
 extern int Bands1_SignalMethod = 0; // Signal method for M1 (0-255)
-extern int Bands5_SignalMethod = 35; // Signal method for M5 (0-255)
-extern int Bands15_SignalMethod = 16; // Signal method for M15 (0-255)
+extern int Bands5_SignalMethod = 152; // Signal method for M5 (0-255)
+extern int Bands15_SignalMethod = 36; // Signal method for M15 (0-255)
 extern int Bands30_SignalMethod = 0; // Signal method for M30 (0-255)
 
 //+------------------------------------------------------------------+
@@ -286,42 +286,42 @@ int CCI30_SignalMethod = 0; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
 extern string __DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --"; // >>> DEMARKER <<<
-extern bool DeMarker1_Active = 1; // Enable for M1
+extern bool DeMarker1_Active = 0; // Enable for M1
 extern bool DeMarker5_Active = 0; // Enable for M5
-extern bool DeMarker15_Active = 1; // Enable for M15
-extern bool DeMarker30_Active = 1; // Enable for M30
+extern bool DeMarker15_Active = 0; // Enable for M15
+extern bool DeMarker30_Active = 0; // Enable for M30
 extern int DeMarker_Period = 11; // Period
-extern double DeMarker_Period_Ratio = 1.6; // Period ratio between timeframes (0.5-1.5)
+extern double DeMarker_Period_Ratio = 0.2; // Period ratio between timeframes (0.5-1.5)
 extern int DeMarker_Shift = 0; // Shift
 extern double DeMarker_SignalLevel = 0.1; // Signal level (0.0-0.4)
-extern ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = 25; // Trail stop method
-extern ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = 0; // Trail profit method
-extern int DeMarker1_SignalMethod = 28; // Signal method for M1 (0-
+extern ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = 7; // Trail stop method
+extern ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = 27; // Trail profit method
+extern int DeMarker1_SignalMethod = 30; // Signal method for M1 (0-
 extern int DeMarker5_SignalMethod = 15; // Signal method for M5 (0-
 extern int DeMarker15_SignalMethod = 0; // Signal method for M15 (0-
 extern int DeMarker30_SignalMethod = 2; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
 extern string __Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --"; // >>> ENVELOPES <<<
-extern bool Envelopes1_Active = 1; // Enable for M1
+extern bool Envelopes1_Active = 0; // Enable for M1
 extern bool Envelopes5_Active = 0; // Enable for M5
-extern bool Envelopes15_Active = 1; // Enable for M15
+extern bool Envelopes15_Active = 0; // Enable for M15
 extern bool Envelopes30_Active = 1; // Enable for M30
 extern int Envelopes_MA_Period = 24; // Period
-extern double Envelopes_MA_Period_Ratio = 1.8; // Period ratio between timeframes (0.5-1.5)
+extern double Envelopes_MA_Period_Ratio = 1; // Period ratio between timeframes (0.5-1.5)
 extern ENUM_MA_METHOD Envelopes_MA_Method = 2; // MA Method
 extern int Envelopes_MA_Shift = 1; // MA Shift
 extern ENUM_APPLIED_PRICE Envelopes_Applied_Price = 6; // Applied Price
-extern double Envelopes_Deviation = 0.15; // Deviation for M1
-extern double Envelopes_Deviation_Ratio = 0.9; // Deviation ratio between timeframes (0.5-1.5)
+extern double Envelopes_Deviation = 0.3; // Deviation for M1
+extern double Envelopes_Deviation_Ratio = 1; // Deviation ratio between timeframes (0.5-1.5)
 extern int Envelopes_Shift = 4; // Shift
 int Envelopes_Shift_Far = 0; // Shift Far
-extern ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = 27; // Trail stop method
-extern ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = 9; // Trail profit method
+extern ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = 1; // Trail stop method
+extern ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = 20; // Trail profit method
 /* @todo extern */ int Envelopes_SignalLevel = 0; // Signal level
 extern int Envelopes1_SignalMethod = 48; // Signal method for M1 (0-127)
 extern int Envelopes5_SignalMethod = 63; // Signal method for M5 (0-127)
-extern int Envelopes15_SignalMethod = 0; // Signal method for M15 (0-127)
+extern int Envelopes15_SignalMethod = 65; // Signal method for M15 (0-127)
 extern int Envelopes30_SignalMethod = 64; // Signal method for M30 (0-127)
 
 //+------------------------------------------------------------------+
@@ -343,16 +343,16 @@ int Force30_SignalMethod = 31; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
 extern string __Fractals_Parameters__ = "-- Settings for the Fractals indicator --"; // >>> FRACTALS <<<
-extern bool Fractals1_Active = 1; // Enable for M1
+extern bool Fractals1_Active = 0; // Enable for M1
 extern bool Fractals5_Active = 0; // Enable for M5
-extern bool Fractals15_Active = 1; // Enable for M15
-extern bool Fractals30_Active = 1; // Enable for M30
-extern ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = 1; // Trail stop method
-extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = 4; // Trail profit method
+extern bool Fractals15_Active = 0; // Enable for M15
+extern bool Fractals30_Active = 0; // Enable for M30
+extern ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = 4; // Trail stop method
+extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = 27; // Trail profit method
 /* @todo extern */ int Fractals_SignalLevel = 0; // Signal level
-extern int Fractals1_SignalMethod = 1; // Signal method for M1 (0-3)
+extern int Fractals1_SignalMethod = 2; // Signal method for M1 (0-3)
 extern int Fractals5_SignalMethod = 1; // Signal method for M5 (0-3)
-extern int Fractals15_SignalMethod = 2; // Signal method for M15 (0-3)
+extern int Fractals15_SignalMethod = 1; // Signal method for M15 (0-3)
 extern int Fractals30_SignalMethod = 0; // Signal method for M30 (0-3)
 
 //+------------------------------------------------------------------+
@@ -388,14 +388,14 @@ int Ichimoku30_SignalMethod = 0; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
 extern string __MA_Parameters__ = "-- Settings for the Moving Average indicator --"; // >>> MA <<<
-extern bool MA1_Active = 1; // Enable for M1
+extern bool MA1_Active = 0; // Enable for M1
 extern bool MA5_Active = 0; // Enable for M5
-extern bool MA15_Active = 1; // Enable for M15
+extern bool MA15_Active = 0; // Enable for M15
 extern bool MA30_Active = 0; // Enable for M30
-extern int MA_Period_Fast = 17; // Period Fast
-extern int MA_Period_Medium = 20; // Period Medium
-extern int MA_Period_Slow = 40; // Period Slow
-extern double MA_Period_Ratio = 0.8; // Period ratio between timeframes (0.5-1.5)
+extern int MA_Period_Fast = 19; // Period Fast
+extern int MA_Period_Medium = 18; // Period Medium
+extern int MA_Period_Slow = 42; // Period Slow
+extern double MA_Period_Ratio = 1; // Period ratio between timeframes (0.5-1.5)
 extern int MA_Shift = 2; // Shift
 extern int MA_Shift_Fast = -1; // Shift Fast (+1)
 extern int MA_Shift_Medium = 0; // Shift Medium (+1)
@@ -404,31 +404,31 @@ extern int MA_Shift_Far = 2; // Shift Far (+2)
 extern ENUM_MA_METHOD MA_Method = 3; // MA Method
 extern ENUM_APPLIED_PRICE MA_Applied_Price = 0; // Applied Price
 extern ENUM_TRAIL_TYPE MA_TrailingStopMethod = 9; // Trail stop method
-extern ENUM_TRAIL_TYPE MA_TrailingProfitMethod = 9; // Trail profit method
+extern ENUM_TRAIL_TYPE MA_TrailingProfitMethod = 23; // Trail profit method
 extern double MA_SignalLevel = 1.5; // Signal level
-extern int MA1_SignalMethod = 120; // Signal method for M1 (0-127)
+extern int MA1_SignalMethod = 52; // Signal method for M1 (0-127)
 extern int MA5_SignalMethod = 8; // Signal method for M5 (0-127)
 extern int MA15_SignalMethod = 72; // Signal method for M15 (0-127)
 extern int MA30_SignalMethod = 0; // Signal method for M30 (0-127)
 
 //+------------------------------------------------------------------+
 extern string __MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --"; // >>> MACD <<<
-extern bool MACD1_Active = 1; // Enable for M1
+extern bool MACD1_Active = 0; // Enable for M1
 extern bool MACD5_Active = 0; // Enable for M5
-extern bool MACD15_Active = 1; // Enable for M15
-extern bool MACD30_Active = 1; // Enable for M30
-extern int MACD_Period_Fast = 14; // Period Fast
-extern int MACD_Period_Slow = 32; // Period Slow
-extern int MACD_Period_Signal = 10; // Period for signal
-extern double MACD_Period_Ratio = 1.9; // Period ratio between timeframes (0.5-1.5)
+extern bool MACD15_Active = 0; // Enable for M15
+extern bool MACD30_Active = 0; // Enable for M30
+extern int MACD_Period_Fast = 16; // Period Fast
+extern int MACD_Period_Slow = 30; // Period Slow
+extern int MACD_Period_Signal = 12; // Period for signal
+extern double MACD_Period_Ratio = 1; // Period ratio between timeframes (0.5-1.5)
 extern ENUM_APPLIED_PRICE MACD_Applied_Price = 0; // Applied Price
 extern int MACD_Shift = 3; // Shift
 extern int MACD_Shift_Far = 7; // Shift Far
-extern ENUM_TRAIL_TYPE MACD_TrailingStopMethod = 23; // Trail stop method
-extern ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = 26; // Trail profit method
+extern ENUM_TRAIL_TYPE MACD_TrailingStopMethod = 9; // Trail stop method
+extern ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = 23; // Trail profit method
 extern double MACD_SignalLevel = 0.4; // Signal level
 extern int MACD1_SignalMethod = 13; // Signal method for M1 (0-31)
-extern int MACD5_SignalMethod = 21; // Signal method for M5 (0-31)
+extern int MACD5_SignalMethod = 2; // Signal method for M5 (0-31)
 extern int MACD15_SignalMethod = 6; // Signal method for M15 (0-31)
 extern int MACD30_SignalMethod = 0; // Signal method for M30 (0-31)
 
@@ -500,21 +500,21 @@ int OSMA30_SignalMethod = 14; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
 extern string __RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --"; // >>> RSI <<<
-extern bool RSI1_Active = 1; // Enable for M1
+extern bool RSI1_Active = 0; // Enable for M1
 extern bool RSI5_Active = 0; // Enable for M5
-extern bool RSI15_Active = 1; // Enable for M15
+extern bool RSI15_Active = 0; // Enable for M15
 extern bool RSI30_Active = 1; // Enable for M30
-extern int RSI_Period = 21; // Period
-extern double RSI_Period_Ratio = 1.7; // Period ratio between timeframes (0.5-1.5)
-extern ENUM_APPLIED_PRICE RSI_Applied_Price = 5; // Applied Price
-extern int RSI_Shift = 1; // Shift
-extern ENUM_TRAIL_TYPE RSI_TrailingStopMethod = 26; // Trail stop method
-extern ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = 7; // Trail profit method
+extern int RSI_Period = 22; // Period
+extern double RSI_Period_Ratio = 0.3; // Period ratio between timeframes (0.5-1.5)
+extern ENUM_APPLIED_PRICE RSI_Applied_Price = 4; // Applied Price
+extern int RSI_Shift = 0; // Shift
+extern ENUM_TRAIL_TYPE RSI_TrailingStopMethod = 18; // Trail stop method
+extern ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = 23; // Trail profit method
 extern int RSI_SignalLevel = 6; // Signal level
 extern int RSI1_SignalMethod = 36; // Signal method for M1 (0-63)
-extern int RSI5_SignalMethod = 54; // Signal method for M5 (0-63)
+extern int RSI5_SignalMethod = 36; // Signal method for M5 (0-63)
 extern int RSI15_SignalMethod = 36; // Signal method for M15 (0-63)
-extern int RSI30_SignalMethod = 8; // Signal method for M30 (0-63)
+extern int RSI30_SignalMethod = 1; // Signal method for M30 (0-63)
 
 //+------------------------------------------------------------------+
 string __RVI_Parameters__ = "-- Settings for the Relative Vigor Index indicator --"; // >>> RVI <<<
@@ -536,14 +536,14 @@ int RVI30_SignalMethod = 0; // Signal method for M30 (0-
 extern string __SAR_Parameters__ = "-- Settings for the the Parabolic Stop and Reverse system indicator --"; // >>> SAR <<<
 extern bool SAR1_Active = 0; // Enable for M1
 extern bool SAR5_Active = 0; // Enable for M5
-extern bool SAR15_Active = 1; // Enable for M15
-extern bool SAR30_Active = 0; // Enable for M30
+extern bool SAR15_Active = 0; // Enable for M15
+extern bool SAR30_Active = 1; // Enable for M30
 extern double SAR_Step = 0.06; // Step
-extern double SAR_Step_Ratio = 0.8; // Step ratio between timeframes (0.5-1.5)
+extern double SAR_Step_Ratio = 1; // Step ratio between timeframes (0.5-1.5)
 extern double SAR_Maximum_Stop = 0.4; // Maximum stop
-extern int SAR_Shift = -2; // Shift
+extern int SAR_Shift = 0; // Shift
 extern ENUM_TRAIL_TYPE SAR_TrailingStopMethod = 22; // Trail stop method
-extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = 0; // Trail profit method
+extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = 3; // Trail profit method
 extern double SAR_SignalLevel = 0.4; // Signal level
 extern int SAR1_SignalMethod = 3; // Signal method for M1 (0-127)
 extern int SAR5_SignalMethod = 17; // Signal method for M5 (0-127)
@@ -584,20 +584,20 @@ int Stochastic30_SignalMethod = 0; // Signal method for M30 (0-
 
 //+------------------------------------------------------------------+
 extern string __WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --"; // >>> WPR <<<
-extern bool WPR1_Active = 1; // Enable for M1
+extern bool WPR1_Active = 0; // Enable for M1
 extern bool WPR5_Active = 0; // Enable for M5
-extern bool WPR15_Active = 1; // Enable for M15
-extern bool WPR30_Active = 0; // Enable for M30
+extern bool WPR15_Active = 0; // Enable for M15
+extern bool WPR30_Active = 1; // Enable for M30
 extern int WPR_Period = 8; // Period
-extern double WPR_Period_Ratio = 0.8; // Period ratio between timeframes (0.5-1.5)
+extern double WPR_Period_Ratio = 1; // Period ratio between timeframes (0.5-1.5)
 extern int WPR_Shift = 0; // Shift
-extern int WPR_SignalLevel = 37; // Signal level
-extern ENUM_TRAIL_TYPE WPR_TrailingStopMethod = 9; // Trail stop method
-extern ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = 22; // Trail profit method
-extern int WPR1_SignalMethod = 57; // Signal method for M1 (0-63)
+extern int WPR_SignalLevel = 0; // Signal level
+extern ENUM_TRAIL_TYPE WPR_TrailingStopMethod = 22; // Trail stop method
+extern ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = 23; // Trail profit method
+extern int WPR1_SignalMethod = 36; // Signal method for M1 (0-63)
 extern int WPR5_SignalMethod = 32; // Signal method for M5 (0-63)
-extern int WPR15_SignalMethod = 40; // Signal method for M15 (0-63)
-extern int WPR30_SignalMethod = 48; // Signal method for M30 (0-63)
+extern int WPR15_SignalMethod = 38; // Signal method for M15 (0-63)
+extern int WPR30_SignalMethod = 44; // Signal method for M30 (0-63)
 
 //+------------------------------------------------------------------+
 string __ZigZag_Parameters__ = "-- Settings for the ZigZag indicator --"; // >>> ZIGZAG <<<
