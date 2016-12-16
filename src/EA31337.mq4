@@ -4325,10 +4325,9 @@ void ToggleComponent(int component) {
       TradeWithTrend = !TradeWithTrend;
       break;
     case 11:
-      if (TrendMethod > 0) TrendMethod = 0; else TrendMethod = 181;
+      // if (TrendMethod > 0) TrendMethod = 0; else TrendMethod = 181;
       break;
     case 12:
-      if (TrendMethodAction > 0) TrendMethodAction = 0; else TrendMethodAction = 17;
       break;
     // Risk
     case 13:
@@ -4911,7 +4910,7 @@ void UpdateVariables() {
   last_close_profit = EMPTY;
   total_orders = GetTotalOrders();
   curr_spread = Market::GetSpreadInPips();
-  curr_trend = Market::GetTrend(TrendMethod, TrendMethod < 0 ? PERIOD_M1 : (ENUM_TIMEFRAMES) NULL, _Symbol);
+  curr_trend = Market::GetTrend(fabs(TrendMethod), TrendMethod < 0 ? PERIOD_M1 : (ENUM_TIMEFRAMES) NULL, _Symbol);
 }
 
 /* END: VARIABLE FUNCTIONS */
