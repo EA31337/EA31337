@@ -18,4 +18,5 @@
 //#define __limited__      // Define safe options.
 //#define __release__      // Enable release settings.
 //#define __debug__        // Enable debugging.
+//#define __trace__        // Enable tracing.
 //#define __experimental__ // Enable experimental options.
