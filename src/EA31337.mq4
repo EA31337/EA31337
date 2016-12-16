@@ -112,6 +112,7 @@ double pip_size, lot_size;
 double market_minlot, market_maxlot, market_lotsize, market_lotstep, market_marginrequired, market_margininit;
 int order_freezelevel; // Order freeze level in points.
 double curr_spread; // Broker current spread in pips.
+double curr_trend; // Current trend.
 double risk_margin = 1.0; // Risk marigin in percent.
 int pip_digits, volume_digits;
 int pts_per_pip; // Number points per pip.
@@ -343,29 +344,31 @@ void OnDeinit(const int reason) {
       StringFormat("EA deinitializing, reason: %s (code: %s)", Errors::GetUninitReasonText(reason), IntegerToString(reason)),
       "Info", __FUNCTION__, __LINE__, VerboseInfo);
 
-  // Save ticks if recorded.
-  if (RecordTicksToCSV) {
-    ticks.SaveToCSV();
-  }
+  if (session_initiated) {
+    // Save ticks if recorded.
+    if (RecordTicksToCSV) {
+      ticks.SaveToCSV();
+    }
 
-  Msg::ShowText(GetSummaryText(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
+    Msg::ShowText(GetSummaryText(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
 
-  string filename;
-  if (WriteReport && !Check::IsOptimization() && session_initiated) {
-    // if (reason == REASON_CHARTCHANGE)
-    summary.CalculateSummary();
-    // @todo: Calculate average spread from stats[sid][AVG_SPREAD].
-    filename = StringFormat(
-        "%s-%.0f%s-%s-%s-%dspread-(%d)-M%d-report.txt",
-        _Symbol, summary.init_deposit, Account::AccountCurrency(), TimeToStr(init_bar_time, TIME_DATE), TimeToStr(time_current, TIME_DATE), init_spread, GetNoOfStrategies(), Period());
-        // ea_name, _Symbol, summary.init_deposit, Account::AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE), Period());
-        // ea_name, _Symbol, init_balance, Account::AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES), Period());
-    string data = summary.GetReport();
-    data += GetStatReport();
-    data += GetStrategyReport();
-    data += GetLogReport();
-    Report::WriteReport(filename, data, VerboseInfo); // Todo: Add: Errors::GetUninitReasonText(reason)
-    Print(__FUNCTION__ + ": Saved report as: " + filename);
+    string filename;
+    if (WriteReport && !Check::IsOptimization()) {
+      // if (reason == REASON_CHARTCHANGE)
+      summary.CalculateSummary();
+      // @todo: Calculate average spread from stats[sid][AVG_SPREAD].
+      filename = StringFormat(
+          "%s-%.0f%s-%s-%s-%dspread-(%d)-M%d-report.txt",
+          _Symbol, summary.init_deposit, Account::AccountCurrency(), TimeToStr(init_bar_time, TIME_DATE), TimeToStr(time_current, TIME_DATE), init_spread, GetNoOfStrategies(), Period());
+          // ea_name, _Symbol, summary.init_deposit, Account::AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE), Period());
+          // ea_name, _Symbol, init_balance, Account::AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES), Period());
+      string data = summary.GetReport();
+      data += GetStatReport();
+      data += GetStrategyReport();
+      data += GetLogReport();
+      Report::WriteReport(filename, data, VerboseInfo); // Todo: Add: Errors::GetUninitReasonText(reason)
+      Print(__FUNCTION__ + ": Saved report as: " + filename);
+    }
   }
   DeinitVars();
   // #ifdef _DEBUG
@@ -544,16 +547,14 @@ bool Trade() {
   bool order_placed = FALSE;
   int buy_cmd, sell_cmd;
 
-  double trend = Market::GetTrendOp(TrendMethod, TrendMethod < 0);
-
   for (int id = 0; id < FINAL_STRATEGY_TYPE_ENTRY; id++) {
     buy_cmd = EMPTY;
     sell_cmd = EMPTY;
     if (info[id][ACTIVE] && !info[id][SUSPENDED]) {
       // Note: When TradeWithTrend is set and we're against the trend, do not trade.
-      if (TradeCondition(id, OP_BUY) && (!TradeWithTrend || trend == OP_BUY)) {
+      if (TradeCondition(id, OP_BUY) && (!TradeWithTrend || Convert::ValueToOp(curr_trend) == OP_BUY)) {
         buy_cmd = OP_BUY;
-      } else if (TradeCondition(id, OP_SELL) && (!TradeWithTrend || trend == OP_SELL)) {
+      } else if (TradeCondition(id, OP_SELL) && (!TradeWithTrend || Convert::ValueToOp(curr_trend) == OP_SELL)) {
         sell_cmd = OP_SELL;
       }
 
@@ -1729,7 +1730,7 @@ bool Trade_Bands(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EM
       if ((signal_method &  16) != 0) result = result && highest > bands[period][CURR][BANDS_BASE];
       if ((signal_method &  32) != 0) result = result && Open[CURR] < bands[period][CURR][BANDS_BASE];
       if ((signal_method &  64) != 0) result = result && fmin(Close[PREV], Close[FAR]) > bands[period][CURR][BANDS_BASE];
-      if ((signal_method & 128) != 0) result = result && !Trade_Bands(Convert::OrderTypeOpp(cmd), (ENUM_TIMEFRAMES) Convert::IndexToTf(fmin(period + 1, M30)));
+      if ((signal_method & 128) != 0) result = result && !Trade_Bands(Convert::NegateOrderType(cmd), (ENUM_TIMEFRAMES) Convert::IndexToTf(fmin(period + 1, M30)));
     case OP_SELL:
       // Price value was higher than the upper band.
       result = (
@@ -1743,7 +1744,7 @@ bool Trade_Bands(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EM
       if ((signal_method &  16) != 0) result = result && lowest < bands[period][CURR][BANDS_BASE];
       if ((signal_method &  32) != 0) result = result && Open[CURR] > bands[period][CURR][BANDS_BASE];
       if ((signal_method &  64) != 0) result = result && fmin(Close[PREV], Close[FAR]) < bands[period][CURR][BANDS_BASE];
-      if ((signal_method & 128) != 0) result = result && !Trade_Bands(Convert::OrderTypeOpp(cmd), (ENUM_TIMEFRAMES) Convert::IndexToTf(fmin(period + 1, M30)));
+      if ((signal_method & 128) != 0) result = result && !Trade_Bands(Convert::NegateOrderType(cmd), (ENUM_TIMEFRAMES) Convert::IndexToTf(fmin(period + 1, M30)));
       break;
   }
 
@@ -2067,9 +2068,9 @@ bool Trade_Fractals(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method =
       result = lower;
       if ((signal_method &   1) != 0) result = result && Open[CURR] > Close[PREV];
       if ((signal_method &   2) != 0) result = result && Bid > Open[CURR];
-      // if ((signal_method &   1) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), PERIOD_M30);
-      // if ((signal_method &   2) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), Convert::IndexToTf(fmax(index + 1, M30)));
-      // if ((signal_method &   4) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), Convert::IndexToTf(fmax(index + 2, M30)));
+      // if ((signal_method &   1) != 0) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), PERIOD_M30);
+      // if ((signal_method &   2) != 0) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), Convert::IndexToTf(fmax(index + 1, M30)));
+      // if ((signal_method &   4) != 0) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), Convert::IndexToTf(fmax(index + 2, M30)));
       // if ((signal_method &   2) != 0) result = result && !Fractals_On_Sell(tf);
       // if ((signal_method &   8) != 0) result = result && Fractals_On_Buy(M30);
       break;
@@ -2077,9 +2078,9 @@ bool Trade_Fractals(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method =
       result = upper;
       if ((signal_method &   1) != 0) result = result && Open[CURR] < Close[PREV];
       if ((signal_method &   2) != 0) result = result && Ask < Open[CURR];
-      // if ((signal_method &   1) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), PERIOD_M30);
-      // if ((signal_method &   2) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), Convert::IndexToTf(fmax(index + 1, M30)));
-      // if ((signal_method &   4) != 0) result &= !Trade_Fractals(Convert::OrderTypeOpp(cmd), Convert::IndexToTf(fmax(index + 2, M30)));
+      // if ((signal_method &   1) != 0) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), PERIOD_M30);
+      // if ((signal_method &   2) != 0) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), Convert::IndexToTf(fmax(index + 1, M30)));
+      // if ((signal_method &   4) != 0) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), Convert::IndexToTf(fmax(index + 2, M30)));
       // if ((signal_method &   2) != 0) result = result && !Fractals_On_Buy(tf);
       // if ((signal_method &   8) != 0) result = result && Fractals_On_Sell(M30);
       break;
@@ -2770,7 +2771,7 @@ bool CheckMarketCondition1(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M30, int conditi
   if ((condition &  64) != 0) result = result && UpdateIndicator(ENVELOPES, tf) && ((cmd == OP_BUY && Open[CURR] < envelopes[period][CURR][MODE_MAIN]) || (cmd == OP_SELL && Open[CURR] > envelopes[period][CURR][MODE_MAIN]));
   if ((condition & 128) != 0) result = result && UpdateIndicator(DEMARKER, tf)  && ((cmd == OP_BUY && demarker[period][CURR] < 0.5) || (cmd == OP_SELL && demarker[period][CURR] > 0.5));
   if ((condition & 256) != 0) result = result && UpdateIndicator(WPR, tf)       && ((cmd == OP_BUY && wpr[period][CURR] > 50) || (cmd == OP_SELL && wpr[period][CURR] < 50));
-  if ((condition & 512) != 0) result = result && cmd == Market::GetTrendOp(TrendMethod);
+  if ((condition & 512) != 0) result = result && cmd == Convert::ValueToOp(curr_trend);
   if (!default_value) result = !result;
   return result;
 }
@@ -4036,7 +4037,7 @@ void StartNewDay() {
     stats[j][DAILY_PROFIT]  = 0;
   }
   if (VerboseInfo) Print(strategy_stats);
-  
+
   // Reset ticks
   if (RecordTicksToCSV) {
     ticks.SaveToCSV();
@@ -4910,6 +4911,7 @@ void UpdateVariables() {
   last_close_profit = EMPTY;
   total_orders = GetTotalOrders();
   curr_spread = Market::GetSpreadInPips();
+  curr_trend = Market::GetTrend(TrendMethod, TrendMethod < 0 ? PERIOD_M1 : (ENUM_TIMEFRAMES) NULL, _Symbol);
 }
 
 /* END: VARIABLE FUNCTIONS */
@@ -5096,8 +5098,8 @@ bool AccCondition(int condition = C_ACC_NONE) {
       return weekly[MAX_BALANCE] > monthly[MAX_BALANCE];
     case C_ACC_IN_TREND:
       last_cname = "InTrend";
-      return (Market::GetTrend(TrendMethod) > 0 && CalculateOrdersByCmd(OP_BUY)  > CalculateOrdersByCmd(OP_SELL))
-          || (Market::GetTrend(TrendMethod) < 0 && CalculateOrdersByCmd(OP_SELL) > CalculateOrdersByCmd(OP_BUY));
+      return (Convert::ValueToOp(curr_trend) == OP_BUY && CalculateOrdersByCmd(OP_BUY)  > CalculateOrdersByCmd(OP_SELL))
+          || (Convert::ValueToOp(curr_trend) == OP_SELL && CalculateOrdersByCmd(OP_SELL) > CalculateOrdersByCmd(OP_BUY));
     case C_ACC_IN_NON_TREND:
       last_cname = "InNonTrend";
       return !AccCondition(C_ACC_IN_TREND);
@@ -5139,13 +5141,13 @@ bool MarketCondition(int condition = C_MARKET_NONE) {
     case C_MARKET_TRUE:
       return TRUE;
     case C_MA1_FS_TREND_OPP: // MA Fast and Slow M1 are in opposite directions.
-      return CheckMarketEvent(Market::GetTrend(TrendMethodAction) > 0 ? OP_BUY : OP_SELL, PERIOD_M1, C_MA_FAST_SLOW_OPP);
+      return CheckMarketEvent(Convert::ValueToOp(curr_trend), PERIOD_M1, C_MA_FAST_SLOW_OPP);
     case C_MA5_FS_TREND_OPP: // MA Fast and Slow M5 are in opposite directions.
-      return CheckMarketEvent(Market::GetTrend(TrendMethodAction) > 0 ? OP_BUY : OP_SELL, PERIOD_M5, C_MA_FAST_SLOW_OPP);
+      return CheckMarketEvent(Convert::ValueToOp(curr_trend), PERIOD_M5, C_MA_FAST_SLOW_OPP);
     case C_MA15_FS_TREND_OPP:
-      return CheckMarketEvent(Market::GetTrend(TrendMethodAction) > 0 ? OP_BUY : OP_SELL, PERIOD_M15, C_MA_FAST_SLOW_OPP);
+      return CheckMarketEvent(Convert::ValueToOp(curr_trend), PERIOD_M15, C_MA_FAST_SLOW_OPP);
     case C_MA30_FS_TREND_OPP:
-      return CheckMarketEvent(Market::GetTrend(TrendMethodAction) > 0 ? OP_BUY : OP_SELL, PERIOD_M30, C_MA_FAST_SLOW_OPP);
+      return CheckMarketEvent(Convert::ValueToOp(curr_trend), PERIOD_M30, C_MA_FAST_SLOW_OPP);
     case C_MA1_FS_ORDERS_OPP: // MA Fast and Slow M1 are in opposite directions.
       return CheckMarketEvent(GetCmdByOrders(), PERIOD_M1, C_MA_FAST_SLOW_OPP);
     case C_MA5_FS_ORDERS_OPP: // MA Fast and Slow M5 are in opposite directions.
@@ -5228,7 +5230,7 @@ double GetStrategyLotSize(int sid, int cmd) {
     else if (HandicapByProfitFactor && pf < 1.0) trade_lot *= fmin(GetStrategyProfitFactor(sid), 1.0);
   }
   #endif
-  if (Boosting_Enabled && Market::GetTrendOp(TrendMethod) == cmd && BoostTrendFactor != 1.0) {
+  if (Boosting_Enabled && Convert::ValueToOp(curr_trend) == cmd && BoostTrendFactor != 1.0) {
     trade_lot *= BoostTrendFactor;
   }
   return NormalizeLots(trade_lot);
@@ -5701,8 +5703,8 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
   string text_spread = StringFormat("Spread: %.1f pips (%d pts)", Market::GetSpreadInPips(), Market::GetSpreadInPts());
   // Check trend.
   string trend = "Neutral.";
-  if (Market::GetTrendOp(TrendMethod) == OP_BUY) trend = "Bullish";
-  if (Market::GetTrendOp(TrendMethod) == OP_SELL) trend = "Bearish";
+  if (Convert::ValueToOp(curr_trend) == OP_BUY) trend = "Bullish";
+  if (Convert::ValueToOp(curr_trend) == OP_SELL) trend = "Bearish";
   // Print actual info.
   string indent = "";
   indent = "                      "; // if (total_orders > 5)?
@@ -6081,15 +6083,15 @@ bool ActionExecute(int aid, int id = EMPTY) {
       break;
     case A_CLOSE_ALL_LOSS_SIDE: /* 7 */
       cmd = GetProfitableSide();
-      result = cmd != EMPTY ? ActionCloseAllOrdersByType(Convert::OrderTypeOpp(cmd), reason_id) : True;
+      result = cmd != EMPTY ? ActionCloseAllOrdersByType(Convert::NegateOrderType(cmd), reason_id) : True;
       break;
     case A_CLOSE_ALL_TREND: /* 8 */
-      cmd = Market::GetTrendOp(TrendMethodAction);
+      cmd = Convert::ValueToOp(curr_trend);
       result = cmd != EMPTY ? ActionCloseAllOrdersByType(cmd, reason_id) : True;
       break;
     case A_CLOSE_ALL_NON_TREND: /* 9 */
-      cmd = Market::GetTrendOp(TrendMethodAction);
-      result = cmd != EMPTY ? ActionCloseAllOrdersByType(Convert::OrderTypeOpp(cmd), reason_id) : True;
+      cmd = Convert::ValueToOp(curr_trend);
+      result = cmd != EMPTY ? ActionCloseAllOrdersByType(Convert::NegateOrderType(cmd), reason_id) : True;
       break;
     case A_CLOSE_ALL_ORDERS: /* 10 */
       result = ActionCloseAllOrders(reason_id);
