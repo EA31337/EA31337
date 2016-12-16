@@ -36,10 +36,8 @@ extern int      StopLoss = 60; // Stop loss (in pips, 0 = auto)
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
 extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 25; // Default trail stop method (0 = none)
-extern bool TrailingStopOneWay = 1; // Trailing stop one way?
 extern int TrailingStop = 60; // Extra trailing stop (in pips)
 extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 15; // Default trail profit method
-extern bool TrailingProfitOneWay = 0; // Trailing profit one way?
 extern int TrailingProfit = 10; // Extra trailing profit (in pips)
 extern double TrailingStopAddPerMinute = 0.1; // Decrease trail stop per minute (pip/min)
 

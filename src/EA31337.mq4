@@ -578,7 +578,7 @@ bool Trade() {
 
     } // end: if
   } // end: for
-  if (VerboseTrace) PrintFormat("%s (%d), traded=%d, buy=%d/sell=%d", __FUNCTION__, bar_time, order_placed, buy_cmd, sell_cmd);
+  // if (VerboseTrace) PrintFormat("%s (%d), traded=%d, buy=%d/sell=%d", __FUNCTION__, bar_time, order_placed, buy_cmd, sell_cmd);
 
   #ifdef __advanced__
   if (SmartQueueActive && !order_placed && total_orders < max_orders) {
@@ -940,7 +940,7 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
    bool result = FALSE;
    int order_ticket;
 
-  if (VerboseTrace) Print(__FUNCTION__);
+  // if (VerboseTrace) Print(__FUNCTION__);
    if (trade_volume == EMPTY) {
      trade_volume = GetStrategyLotSize(sid, cmd);
    } else {
@@ -967,8 +967,8 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
    double close_price = NormalizeDouble(Market::GetClosePrice(cmd), Market::GetDigits());
    // Get the fixed stops.
    // @todo: Test GetOpenPrice vs GetClosePrice
-   double stoploss   = StopLoss   > 0 ? NormalizeDouble(open_price - (StopLoss + TrailingStop) * pip_size * Convert::OrderTypeToValue(cmd), Digits) : 0;
-   double takeprofit = TakeProfit > 0 ? NormalizeDouble(close_price + (TakeProfit + TrailingProfit) * pip_size * Convert::OrderTypeToValue(cmd), Digits) : 0;
+   double stoploss   = StopLoss   > 0 ? NormalizeDouble(open_price - (StopLoss + TrailingStop) * pip_size * Convert::OpToValue(cmd), Digits) : 0;
+   double takeprofit = TakeProfit > 0 ? NormalizeDouble(close_price + (TakeProfit + TrailingProfit) * pip_size * Convert::OpToValue(cmd), Digits) : 0;
    // Get the dynamic trailing stops.
    double stoploss_trail   = GetTrailingValue(cmd, -1, sid);
    double takeprofit_trail = GetTrailingValue(cmd, +1, sid);
@@ -976,10 +976,10 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
    // @todo: Implement hard stops based on the balance.
    /*
    stoploss   = stoploss > 0   && stoploss_trail > 0
-     ? (Convert::OrderTypeToValue(cmd) > 0 ? fmax(stoploss, stoploss_trail) : fmin(stoploss, stoploss_trail))
+     ? (Convert::OpToValue(cmd) > 0 ? fmax(stoploss, stoploss_trail) : fmin(stoploss, stoploss_trail))
      : fmax(stoploss, stoploss_trail);
    takeprofit = takeprofit > 0 && takeprofit_trail > 0
-     ? (Convert::OrderTypeToValue(cmd) > 0 ? fmin(takeprofit, takeprofit_trail) : fmax(takeprofit, takeprofit_trail))
+     ? (Convert::OpToValue(cmd) > 0 ? fmin(takeprofit, takeprofit_trail) : fmax(takeprofit, takeprofit_trail))
      : fmax(takeprofit, takeprofit_trail);
    */
    if (Market::TradeOpAllowed(cmd, stoploss_trail, takeprofit_trail, _Symbol)) {
@@ -1119,7 +1119,7 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
 bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
   int result = TRUE;
   string err;
-  if (VerboseTrace) Print(__FUNCTION__);
+  // if (VerboseTrace) Print(__FUNCTION__);
   if (volume < market_minlot) {
     last_trace = Msg::ShowText(StringFormat("%s: Lot size = %.2f", sname[sid], volume), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
     result = FALSE;
@@ -3018,7 +3018,7 @@ bool UpdateTrailingStops() {
      if (!OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) { continue; }
       if (OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
         sid = OrderMagicNumber() - MagicNumber;
-        // order_stop_loss = NormalizeDouble(Misc::If(Convert::OrderTypeToValue(OrderType()) > 0 || OrderStopLoss() != 0.0, OrderStopLoss(), 999999), pip_digits);
+        // order_stop_loss = NormalizeDouble(Misc::If(Convert::OpToValue(OrderType()) > 0 || OrderStopLoss() != 0.0, OrderStopLoss(), 999999), pip_digits);
         // FIXME
         // Make sure we get the minimum distance to StopLevel and freezing distance.
         // See: https://book.mql4.com/appendix/limits
@@ -3101,6 +3101,7 @@ bool UpdateTrailingStops() {
  */
 double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double previous = 0, bool existing = FALSE) {
   double diff;
+  bool one_way; // Move trailing stop only in one direction.
   double new_value = 0;
   double extra_trail = 0;
   if (existing && TrailingStopAddPerMinute > 0 && OrderOpenTime() > 0) {
@@ -3111,11 +3112,11 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
         __FUNCTION__, min_elapsed, TrailingStopAddPerMinute, extra_trail);
     }
   }
-  int factor = (Convert::OrderTypeToValue(cmd) == direction ? +1 : -1);
+  int factor = (Convert::OpToValue(cmd) == direction ? +1 : -1);
   double trail = (TrailingStop + extra_trail) * pip_size;
   double default_trail = (cmd == OP_BUY ? Bid : Ask) + trail * factor;
   int method = GetTrailingMethod(order_type, direction);
-  // if (direction > 0) method = AC_TrailingProfitMethod; else if (direction < 0) method = AC_TrailingStopMethod; // Testing.
+  one_way = method > 0;
   ENUM_TIMEFRAMES tf = (ENUM_TIMEFRAMES) GetStrategyTimeframe(order_type);
   int period = Convert::TfToIndex(tf);
   string symbol = existing ? OrderSymbol() : _Symbol;
@@ -3127,13 +3128,15 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
   // TODO: Make starting point dynamic: Open[CURR], Open[PREV], Open[FAR], Close[PREV], Close[FAR], ma_fast[CURR], ma_medium[CURR], ma_slow[CURR]
    double highest_ma, lowest_ma;
    switch (method) {
-     case T_NONE: // None.
+     case T_NONE: // 0: None.
        new_value = previous;
        break;
-     case T_FIXED: // Dynamic fixed.
+     case T1_FIXED: // 1: Dynamic fixed.
+     case T2_FIXED:
        new_value = default_trail;
        break;
-     case T_OPEN_PREV: // Previous open price.
+     case T1_OPEN_PREV: // 2: Previous open price.
+     case T2_OPEN_PREV:
        diff = fabs(Open[CURR] - iOpen(symbol, tf, PREV));
        new_value = Open[CURR] + diff * factor;
        if (VerboseDebug) {
@@ -3141,32 +3144,39 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
             __FUNCTION__, Open[CURR], iOpen(symbol, tf, PREV), diff, new_value);
        }
        break;
-     case T_2_BARS_PEAK: // 3
+     case T1_2_BARS_PEAK: // 3: Two bars peak.
+     case T2_2_BARS_PEAK:
        diff = fmax(Market::GetPeakPrice(tf, MODE_HIGH, 2) - Open[CURR], Open[CURR] - Market::GetPeakPrice(tf, MODE_LOW, 2));
        new_value = Open[CURR] + diff * factor;
        break;
-     case T_5_BARS_PEAK: // 4
+     case T1_5_BARS_PEAK: // 4: Five bars peak.
+     case T2_5_BARS_PEAK:
        diff = fmax(Market::GetPeakPrice(tf, MODE_HIGH, 5) - Open[CURR], Open[CURR] - Market::GetPeakPrice(tf, MODE_LOW, 5));
        new_value = Open[CURR] + diff * factor;
        break;
-     case T_10_BARS_PEAK: // 5
+     case T1_10_BARS_PEAK: // 5: Ten bars peak.
+     case T2_10_BARS_PEAK:
        diff = fmax(Market::GetPeakPrice(tf, MODE_HIGH, 10) - Open[CURR], Open[CURR] - Market::GetPeakPrice(tf, MODE_LOW, 10));
        new_value = Open[CURR] + diff * factor;
        break;
-     case T_50_BARS_PEAK: // 6
+     case T1_50_BARS_PEAK: // 6: 50 bars peak.
+     case T2_50_BARS_PEAK:
        diff = fmax(Market::GetPeakPrice(tf, MODE_HIGH, 50) - Open[CURR], Open[CURR] - Market::GetPeakPrice(tf, MODE_LOW, 50));
        new_value = Open[CURR] + diff * factor;
        // @todo: Text non-Open values.
        break;
-     case T_150_BARS_PEAK: // 7
+     case T1_150_BARS_PEAK: // 7: 150 bars peak.
+     case T2_150_BARS_PEAK:
        diff = fmax(Market::GetPeakPrice(tf, MODE_HIGH, 150) - Open[CURR], Open[CURR] - Market::GetPeakPrice(tf, MODE_LOW, 150));
        new_value = Open[CURR] + diff * factor;
        break;
-     case T_HALF_200_BARS: // 8
+     case T1_HALF_200_BARS: // 8: 200 bars peak.
+     case T2_HALF_200_BARS:
        diff = fmax(Market::GetPeakPrice(tf, MODE_HIGH, 200) - Open[CURR], Open[CURR] - Market::GetPeakPrice(tf, MODE_LOW, 200));
        new_value = Open[CURR] + diff/2 * factor;
        break;
-     case T_HALF_PEAK_OPEN:
+     case T1_HALF_PEAK_OPEN: // 9: Half price peak.
+     case T2_HALF_PEAK_OPEN:
        if (existing) {
          // Get the number of bars for the tf since open. Zero means that the order was opened during the current bar.
          int BarShiftOfTradeOpen = iBarShift(symbol, tf, OrderOpenTime(), FALSE);
@@ -3177,56 +3187,56 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
          new_value = Open[CURR] + diff/2 * factor;
        }
        break;
-     case T_MA_F_PREV: // 9: MA Small (Previous). The worse so far for MA.
+     case T1_MA_F_PREV: // 10: MA Small (Previous).
+     case T2_MA_F_PREV:
        UpdateIndicator(MA, tf);
        diff = fabs(Ask - ma_fast[period][PREV]);
        new_value = Ask + diff * factor;
        break;
-     case T_MA_F_FAR: // 10: MA Small (Far) + trailing stop. Optimize together with: MA_Shift_Far.
+     case T1_MA_F_FAR: // 11: MA Small (Far) + trailing stop. Optimize together with: MA_Shift_Far.
+     case T2_MA_F_FAR:
        UpdateIndicator(MA, tf);
        diff = fabs(Ask - ma_fast[period][FAR]);
        new_value = Ask + diff * factor;
        break;
-     /*
-     case T_MA_F_LOW: // 11: Lowest/highest value of MA Fast. Optimized (SL pf: 1.39 for MA).
-       UpdateIndicator(MA, tf);
-       diff = fmax(Arrays::HighestArrValue2(ma_fast, period) - Open[CURR], Open[CURR] - Arrays::LowestArrValue2(ma_fast, period));
-       new_value = Open[CURR] + diff * factor;
-       break;
-      */
-     case T_MA_F_TRAIL: // 12: MA Fast (Current) + trailing stop. Works fine.
+     case T1_MA_F_TRAIL: // 12: MA Fast (Current) + trailing stop. Works fine.
+     case T2_MA_F_TRAIL:
        UpdateIndicator(MA, tf);
        diff = fabs(Ask - ma_fast[period][CURR]);
        new_value = Ask + (diff + trail) * factor;
        break;
-     case T_MA_F_FAR_TRAIL: // 13: MA Fast (Far) + trailing stop. Works fine (SL pf: 1.26 for MA).
+     case T1_MA_F_FAR_TRAIL: // 13: MA Fast (Far) + trailing stop. Works fine (SL pf: 1.26 for MA).
+     case T2_MA_F_FAR_TRAIL:
        UpdateIndicator(MA, tf);
        diff = fabs(Open[CURR] - ma_fast[period][FAR]);
        new_value = Open[CURR] + (diff + trail) * factor;
        break;
-     case T_MA_M: // 14: MA Medium (Current).
+     case T1_MA_M: // 14: MA Medium (Current).
+     case T2_MA_M:
        UpdateIndicator(MA, tf);
        diff = fabs(Ask - ma_medium[period][CURR]);
        new_value = Ask + diff * factor;
        break;
-     case T_MA_M_FAR: // 15: MA Medium (Far)
+     case T1_MA_M_FAR: // 15: MA Medium (Far)
+     case T2_MA_M_FAR:
        UpdateIndicator(MA, tf);
        diff = fabs(Ask - ma_medium[period][FAR]);
        new_value = Ask + diff * factor;
        break;
-     /*
-     case T_MA_M_LOW: // 16: Lowest/highest value of MA Medium. Optimized (SL pf: 1.39 for MA).
+     case T1_MA_M_LOW: // 16: Lowest/highest value of MA Medium. Optimized (SL pf: 1.39 for MA).
+     case T2_MA_M_LOW:
        UpdateIndicator(MA, tf);
        diff = fmax(Arrays::HighestArrValue2(ma_medium, period) - Open[CURR], Open[CURR] - Arrays::LowestArrValue2(ma_medium, period));
        new_value = Open[CURR] + diff * factor;
        break;
-      */
-     case T_MA_M_TRAIL: // 17: MA Small (Current) + trailing stop. Works fine (SL pf: 1.26 for MA).
+     case T1_MA_M_TRAIL: // 17: MA Small (Current) + trailing stop. Works fine (SL pf: 1.26 for MA).
+     case T2_MA_M_TRAIL:
        UpdateIndicator(MA, tf);
        diff = fabs(Open[CURR] - ma_medium[period][CURR]);
        new_value = Open[CURR] + (diff + trail) * factor;
        break;
-     case T_MA_M_FAR_TRAIL: // 18: MA Small (Far) + trailing stop. Optimized (SL pf: 1.29 for MA).
+     case T1_MA_M_FAR_TRAIL: // 18: MA Small (Far) + trailing stop. Optimized (SL pf: 1.29 for MA).
+     case T2_MA_M_FAR_TRAIL:
        UpdateIndicator(MA, tf);
        diff = fabs(Open[CURR] - ma_medium[period][FAR]);
        new_value = Open[CURR] + (diff + trail) * factor;
@@ -3235,55 +3245,64 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
              __FUNCTION__, Open[CURR], ma_medium[period][FAR], Open[CURR], diff, trail, factor, new_value);
        }
        break;
-     case T_MA_S: // 19: MA Slow (Current).
+     case T1_MA_S: // 19: MA Slow (Current).
+     case T2_MA_S:
        UpdateIndicator(MA, tf);
        diff = fabs(Ask - ma_slow[period][CURR]);
        // new_value = ma_slow[period][CURR];
        new_value = Ask + diff * factor;
        break;
-     case T_MA_S_FAR: // 20: MA Slow (Far).
+     case T1_MA_S_FAR: // 20: MA Slow (Far).
+     case T2_MA_S_FAR:
        UpdateIndicator(MA, tf);
        diff = fabs(Ask - ma_slow[period][FAR]);
        // new_value = ma_slow[period][FAR];
        new_value = Ask + diff * factor;
        break;
-     case T_MA_S_TRAIL: // 21: MA Slow (Current) + trailing stop. Optimized (SL pf: 1.29 for MA, PT pf: 1.23 for MA).
+     case T1_MA_S_TRAIL: // 21: MA Slow (Current) + trailing stop. Optimized (SL pf: 1.29 for MA, PT pf: 1.23 for MA).
+     case T2_MA_S_TRAIL:
        UpdateIndicator(MA, tf);
        diff = fabs(Open[CURR] - ma_slow[period][CURR]);
        new_value = Open[CURR] + (diff + trail) * factor;
        break;
-     case T_MA_FMS_PEAK: // 22: Lowest/highest value of all MAs. Works fine (SL pf: 1.39 for MA, PT pf: 1.23 for MA).
+     case T1_MA_FMS_PEAK: // 22: Lowest/highest value of all MAs. Works fine (SL pf: 1.39 for MA, PT pf: 1.23 for MA).
+     case T2_MA_FMS_PEAK:
        UpdateIndicator(MA, tf);
        highest_ma = fabs(fmax(fmax(Arrays::HighestArrValue2(ma_fast, period), Arrays::HighestArrValue2(ma_medium, period)), Arrays::HighestArrValue2(ma_slow, period)));
        lowest_ma = fabs(fmin(fmin(Arrays::LowestArrValue2(ma_fast, period), Arrays::LowestArrValue2(ma_medium, period)), Arrays::LowestArrValue2(ma_slow, period)));
        diff = fmax(fabs(highest_ma - Open[CURR]), fabs(Open[CURR] - lowest_ma));
        new_value = Open[CURR] + diff * factor;
        break;
-     case T_SAR: // 23: Current SAR value. Optimized.
+     case T1_SAR: // 23: Current SAR value. Optimized.
+     case T2_SAR:
        UpdateIndicator(SAR, tf);
        diff = fabs(Open[CURR] - sar[period][CURR]);
        new_value = Open[CURR] + (diff + trail) * factor;
        if (VerboseDebug) PrintFormat("SAR Trail: %g, %g, %g", sar[period][CURR], sar[period][PREV], sar[period][FAR]);
        break;
-     case T_SAR_PEAK: // 24: Lowest/highest SAR value.
+     case T1_SAR_PEAK: // 24: Lowest/highest SAR value.
+     case T2_SAR_PEAK:
        UpdateIndicator(SAR, tf);
        diff = fmax(fabs(Open[CURR] - Arrays::HighestArrValue2(sar, period)), fabs(Open[CURR] - Arrays::LowestArrValue2(sar, period)));
        new_value = Open[CURR] + (diff + trail) * factor;
        break;
-     case T_BANDS: // 25: Current Bands value.
+     case T1_BANDS: // 25: Current Bands value.
+     case T2_BANDS:
        UpdateIndicator(BANDS, tf);
-       new_value = Convert::OrderTypeToValue(cmd) == direction ? bands[period][CURR][BANDS_UPPER] : bands[period][CURR][BANDS_LOWER];
+       new_value = Convert::OpToValue(cmd) == direction ? bands[period][CURR][BANDS_UPPER] : bands[period][CURR][BANDS_LOWER];
        break;
-     case T_BANDS_PEAK: // 26: Lowest/highest Bands value.
+     case T1_BANDS_PEAK: // 26: Lowest/highest Bands value.
+     case T2_BANDS_PEAK:
        UpdateIndicator(BANDS, tf);
-       new_value = (Convert::OrderTypeToValue(cmd) == direction
+       new_value = (Convert::OpToValue(cmd) == direction
          ? fmax(fmax(bands[period][CURR][BANDS_UPPER], bands[period][PREV][BANDS_UPPER]), bands[period][FAR][BANDS_UPPER])
          : fmin(fmin(bands[period][CURR][BANDS_LOWER], bands[period][PREV][BANDS_LOWER]), bands[period][FAR][BANDS_LOWER])
          );
        break;
-     case T_ENVELOPES: // 27: Current Envelopes value. // FIXME
+     case T1_ENVELOPES: // 27: Current Envelopes value. // FIXME
+     case T2_ENVELOPES:
        UpdateIndicator(ENVELOPES, tf);
-       new_value = Convert::OrderTypeToValue(cmd) == direction ? envelopes[period][CURR][UPPER] : envelopes[period][CURR][LOWER];
+       new_value = Convert::OpToValue(cmd) == direction ? envelopes[period][CURR][UPPER] : envelopes[period][CURR][LOWER];
        break;
      default:
        Msg::ShowText(StringFormat("Unknown trailing stop method: %d", method), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
@@ -3307,16 +3326,18 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
     return previous;
   }
 
-  if (TrailingStopOneWay && direction < 0 && method > 0) {
-    // Move trailing stop only one direction.
-    if (previous == 0 && method > 0) previous = default_trail;
-    if (Convert::OrderTypeToValue(cmd) == direction) new_value = (new_value < previous || previous == 0) ? new_value : previous;
-    else new_value = (new_value > previous || previous == 0) ? new_value : previous;
-  }
-  if (TrailingProfitOneWay && direction > 0 && method > 0) {
-    // Move profit take only one direction.
-    if (Convert::OrderTypeToValue(cmd) == direction) new_value = (new_value > previous || previous == 0) ? new_value : previous;
-    else new_value = (new_value < previous || previous == 0) ? new_value : previous;
+  if (one_way) {
+    if (direction < 0) {
+      // Move trailing stop only one direction.
+      if (previous == 0) previous = default_trail;
+      if (Convert::OpToValue(cmd) == direction) new_value = (new_value < previous || previous == 0) ? new_value : previous;
+      else new_value = (new_value > previous || previous == 0) ? new_value : previous;
+    }
+    else if (direction > 0) {
+      // Move profit take only one direction.
+      if (Convert::OpToValue(cmd) == direction) new_value = (new_value > previous || previous == 0) ? new_value : previous;
+      else new_value = (new_value < previous || previous == 0) ? new_value : previous;
+    }
   }
 
   if (VerboseTrace) {
@@ -3344,92 +3365,92 @@ int GetTrailingMethod(int order_type, int stop_or_profit) {
     case MA5:
     case MA15:
     case MA30:
-      if (MA_TrailingStopMethod > 0)   stop_method   = MA_TrailingStopMethod;
-      if (MA_TrailingProfitMethod > 0) profit_method = MA_TrailingProfitMethod;
+      stop_method   = MA_TrailingStopMethod;
+      profit_method = MA_TrailingProfitMethod;
       break;
     case MACD1:
     case MACD5:
     case MACD15:
     case MACD30:
-      if (MACD_TrailingStopMethod > 0)   stop_method   = MACD_TrailingStopMethod;
-      if (MACD_TrailingProfitMethod > 0) profit_method = MACD_TrailingProfitMethod;
+      stop_method   = MACD_TrailingStopMethod;
+      profit_method = MACD_TrailingProfitMethod;
       break;
     case ALLIGATOR1:
     case ALLIGATOR5:
     case ALLIGATOR15:
     case ALLIGATOR30:
-      if (Alligator_TrailingStopMethod > 0)   stop_method   = Alligator_TrailingStopMethod;
-      if (Alligator_TrailingProfitMethod > 0) profit_method = Alligator_TrailingProfitMethod;
+      stop_method   = Alligator_TrailingStopMethod;
+      profit_method = Alligator_TrailingProfitMethod;
       break;
     case RSI1:
     case RSI5:
     case RSI15:
     case RSI30:
-      if (RSI_TrailingStopMethod > 0)   stop_method   = RSI_TrailingStopMethod;
-      if (RSI_TrailingProfitMethod > 0) profit_method = RSI_TrailingProfitMethod;
+      stop_method   = RSI_TrailingStopMethod;
+      profit_method = RSI_TrailingProfitMethod;
       break;
     case SAR1:
     case SAR5:
     case SAR15:
     case SAR30:
-      if (SAR_TrailingStopMethod > 0)   stop_method   = SAR_TrailingStopMethod;
-      if (SAR_TrailingProfitMethod > 0) profit_method = SAR_TrailingProfitMethod;
+      stop_method   = SAR_TrailingStopMethod;
+      profit_method = SAR_TrailingProfitMethod;
       break;
     case BANDS1:
     case BANDS5:
     case BANDS15:
     case BANDS30:
-      if (Bands_TrailingStopMethod > 0)   stop_method   = Bands_TrailingStopMethod;
-      if (Bands_TrailingProfitMethod > 0) profit_method = Bands_TrailingProfitMethod;
+      stop_method   = Bands_TrailingStopMethod;
+      profit_method = Bands_TrailingProfitMethod;
       break;
     case ENVELOPES1:
     case ENVELOPES5:
     case ENVELOPES15:
     case ENVELOPES30:
-      if (Envelopes_TrailingStopMethod > 0)   stop_method   = Envelopes_TrailingStopMethod;
-      if (Envelopes_TrailingProfitMethod > 0) profit_method = Envelopes_TrailingProfitMethod;
+      stop_method   = Envelopes_TrailingStopMethod;
+      profit_method = Envelopes_TrailingProfitMethod;
       break;
     case DEMARKER1:
     case DEMARKER5:
     case DEMARKER15:
     case DEMARKER30:
-      if (DeMarker_TrailingStopMethod > 0)   stop_method   = DeMarker_TrailingStopMethod;
-      if (DeMarker_TrailingProfitMethod > 0) profit_method = DeMarker_TrailingProfitMethod;
+      stop_method   = DeMarker_TrailingStopMethod;
+      profit_method = DeMarker_TrailingProfitMethod;
       break;
     case WPR1:
     case WPR5:
     case WPR15:
     case WPR30:
-      if (WPR_TrailingStopMethod > 0)   stop_method   = WPR_TrailingStopMethod;
-      if (WPR_TrailingProfitMethod > 0) profit_method = WPR_TrailingProfitMethod;
+      stop_method   = WPR_TrailingStopMethod;
+      profit_method = WPR_TrailingProfitMethod;
       break;
     case FRACTALS1:
     case FRACTALS5:
     case FRACTALS15:
     case FRACTALS30:
-      if (Fractals_TrailingStopMethod > 0)   stop_method   = Fractals_TrailingStopMethod;
-      if (Fractals_TrailingProfitMethod > 0) profit_method = Fractals_TrailingProfitMethod;
+      stop_method   = Fractals_TrailingStopMethod;
+      profit_method = Fractals_TrailingProfitMethod;
       break;
     case STOCHASTIC1:
     case STOCHASTIC5:
     case STOCHASTIC15:
     case STOCHASTIC30:
-      if (Stochastic_TrailingStopMethod > 0)   stop_method   = Stochastic_TrailingStopMethod;
-      if (Stochastic_TrailingProfitMethod > 0) profit_method = Stochastic_TrailingProfitMethod;
+      stop_method   = Stochastic_TrailingStopMethod;
+      profit_method = Stochastic_TrailingProfitMethod;
       break;
     case BPOWER1:
     case BPOWER5:
     case BPOWER15:
     case BPOWER30:
-      if (BPower_TrailingStopMethod > 0)   stop_method   = BPower_TrailingStopMethod;
-      if (BPower_TrailingProfitMethod > 0) profit_method = BPower_TrailingProfitMethod;
+      stop_method   = BPower_TrailingStopMethod;
+      profit_method = BPower_TrailingProfitMethod;
       break;
     case ZIGZAG1:
     case ZIGZAG5:
     case ZIGZAG15:
     case ZIGZAG30:
-      if (ZigZag_TrailingStopMethod > 0)   stop_method   = ZigZag_TrailingStopMethod;
-      if (ZigZag_TrailingProfitMethod > 0) profit_method = ZigZag_TrailingProfitMethod;
+      stop_method   = ZigZag_TrailingStopMethod;
+      profit_method = ZigZag_TrailingProfitMethod;
       break;
     default:
       Msg::ShowText(StringFormat("Unknown order type: %s", order_type), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
@@ -3700,7 +3721,7 @@ void CheckStats(double value, int type, bool max = true) {
  */
 color GetOrderColor(int cmd = -1) {
   if (cmd == -1) cmd = OrderType();
-  return Convert::OrderTypeToValue(cmd) > 0 ? ColorBuy : ColorSell;
+  return Convert::OpToValue(cmd) > 0 ? ColorBuy : ColorSell;
 }
 
 /**
@@ -4419,10 +4440,8 @@ void ToggleComponent(int component) {
       else TrailingProfit = 40;
       break;
     case 35:
-      TrailingStopOneWay = !TrailingStopOneWay;
       break;
     case 36:
-      TrailingProfitOneWay = !TrailingProfitOneWay;
       break;
     // Strategies
     case 37:
