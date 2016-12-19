@@ -113,7 +113,7 @@ double market_minlot, market_maxlot, market_lotsize, market_lotstep, market_marg
 int order_freezelevel; // Order freeze level in points.
 double curr_spread; // Broker current spread in pips.
 double curr_trend; // Current trend.
-double risk_margin = 1.0; // Risk marigin in percent.
+double ea_risk_margin = 1.0; // Risk marigin in percent.
 int pip_digits, volume_digits;
 int pts_per_pip; // Number points per pip.
 int gmt_offset = 0; // Current difference between GMT time and the local computer time in seconds, taking into account switch to winter or summer time. Depends on the time settings of your computer.
@@ -474,7 +474,7 @@ string InitInfo(bool startup = False, string sep = "\n") {
       Market::GetMarketDistanceInPips(),
       sep);
   output += StringFormat("EA params: Risk margin: %g%%%s",
-      risk_margin,
+      ea_risk_margin,
       sep);
   output += StringFormat("Strategies: Active strategies: %d of %d, Max orders: %d (per type: %d)%s",
       GetNoOfStrategies(),
@@ -597,8 +597,8 @@ bool Trade() {
  * Check if strategy is on trade conditionl.
  */
 bool TradeCondition(int order_type = 0, int cmd = NULL) {
-  if (VerboseTrace) PrintFormat("%s:%d: %d/%d", __FUNCTION__, __LINE__, order_type, cmd);
   ENUM_TIMEFRAMES tf = (ENUM_TIMEFRAMES) info[order_type][TIMEFRAME];
+  if (VerboseTrace) PrintFormat("%s:%d: %s (%d), cmd=%d", __FUNCTION__, __LINE__, sname[order_type], tf, Convert::OrderTypeToString(cmd));
   switch (order_type) {
     case AC1: case AC5: case AC15: case AC30:                                 return Trade_AC(cmd, tf);
     case AD1: case AD5: case AD15: case AD30:                                 return Trade_AD(cmd, tf);
@@ -608,7 +608,7 @@ bool TradeCondition(int order_type = 0, int cmd = NULL) {
     case AWESOME1: case AWESOME5: case AWESOME15: case AWESOME30:             return Trade_Awesome(cmd, tf);
     case BANDS1: case BANDS5: case BANDS15: case BANDS30:                     return Trade_Bands(cmd, tf);
     case BPOWER1: case BPOWER5: case BPOWER15: case BPOWER30:                 return Trade_BPower(cmd, tf);
-    case BWMFI1: case BWMFI5: case BWMFI15: case BWMFI30:                     return Trade_BPower(cmd, tf);
+    case BWMFI1: case BWMFI5: case BWMFI15: case BWMFI30:                     return Trade_BWMFI(cmd, tf);
     case BREAKAGE1: case BREAKAGE5: case BREAKAGE15: case BREAKAGE30:         return Trade_Breakage(cmd, tf);
     case CCI1: case CCI5: case CCI15: case CCI30:                             return Trade_CCI(cmd, tf);
     case DEMARKER1: case DEMARKER5: case DEMARKER15: case DEMARKER30:         return Trade_DeMarker(cmd, tf);
@@ -3138,7 +3138,7 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
     double min_elapsed = (double) ((TimeCurrent() - OrderOpenTime()) / 60);
     extra_trail =+ min_elapsed * TrailingStopAddPerMinute;
     if (VerboseDebug) {
-      PrintFormat("%s(): extra_trail += %d * %g => %d",
+      PrintFormat("%s: extra_trail += %g * %g => %g",
         __FUNCTION__, min_elapsed, TrailingStopAddPerMinute, extra_trail);
     }
   }
@@ -3824,7 +3824,7 @@ double GetLotSizeAuto(bool smooth = true) {
   // double avail_margin = fmin(AccountFreeMargin(), AccountBalance()); // @todo
   double leverage     = fmax(AccountLeverage(), 100);
   // @todo: Improve the logic, especially risk_margin.
-  double new_lot_size = avail_margin / market_marginrequired * risk_margin/100 * risk_ratio;
+  double new_lot_size = avail_margin / market_marginrequired * ea_risk_margin/100 * risk_ratio;
 
   #ifdef __advanced__
   if (Boosting_Enabled) {
@@ -3869,9 +3869,9 @@ double GetLotSize() {
 double GetRiskMarginAuto(bool smooth = true) {
   // Risk only 2%/1% (0.02/0.01) per order of total available margin.
   double new_risk_margin = 1.0;
-  if (smooth && new_risk_margin > risk_margin) {
+  if (smooth && new_risk_margin > ea_risk_margin) {
     // Increase only by average of the previous and new (which should prevent sudden increases).
-    return (risk_margin + new_risk_margin) / 2;
+    return (ea_risk_margin + new_risk_margin) / 2;
   } else {
     return new_risk_margin;
   }
@@ -4109,7 +4109,7 @@ void StartNewWeek() {
   CheckAccConditions();
 
   // Calculate lot size, orders and risk.
-  risk_margin = GetRiskMargin(); // Re-calculate risk margin.
+  ea_risk_margin = GetRiskMargin(); // Re-calculate risk margin.
   lot_size = GetLotSize(); // Re-calculate lot size.
   UpdateStrategyLotSize(); // Update strategy lot size.
   if (Boosting_Enabled) UpdateStrategyFactor(MONTHLY);
@@ -4297,7 +4297,7 @@ bool InitializeVariables() {
 
   // Calculate lot size, orders, risk ratio and margin risk.
   risk_ratio = GetRiskRatio();   // Re-calculate risk ratio.
-  risk_margin = GetRiskMargin(); // Re-calculate risk margin.
+  ea_risk_margin = GetRiskMargin(); // Re-calculate risk margin.
   lot_size = GetLotSize();       // Re-calculate lot size.
   max_orders = GetMaxOrders();
 
@@ -5354,7 +5354,7 @@ void UpdateStrategyLotSize() {
  * Calculate strategy profit factor.
  */
 double GetStrategyProfitFactor(int sid) {
-  if (info[sid][TOTAL_ORDERS] > 10 && stats[sid][TOTAL_GROSS_LOSS] < 0) {
+  if (info[sid][TOTAL_ORDERS] > 20 && stats[sid][TOTAL_GROSS_LOSS] < 0) {
     return (double)(stats[sid][TOTAL_GROSS_PROFIT] / -stats[sid][TOTAL_GROSS_LOSS]);
   } else {
     return 1.0;
