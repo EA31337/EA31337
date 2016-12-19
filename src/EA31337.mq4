@@ -3891,38 +3891,42 @@ double GetRiskMargin() {
  */
 double GetAutoRiskRatio() {
   double equity  = Account::AccountEquity();
-  double balance = Account::AccountBalance();
-  double credit  = Account::AccountCredit(); // @todo
-  // Used when you open/close new positions. It can increase decrease during the price movement in favor and vice versa.
+  double balance = Account::AccountBalance() + Account::AccountCredit();
+  // Used when you open/close new positions. It can increase decrease during the price movement
+  // in favor and vice versa.
   double free    = Account::AccountFreeMargin();
-  // Taken from your depo as a guarantee to maintain your current positions opened. It stays the same untill you open or close positions.
+  // Taken from your depo as a guarantee to maintain your current positions opened.
+  // It stays the same until you open or close positions.
   double margin  = Account::AccountMargin();
   double new_risk_ratio = 1 / fmin(equity, balance) * fmin(fmin(free, balance), equity);
+  // --
+  int margin_pc = (int) (100 / equity * margin);
+  rr_text = new_risk_ratio < 1.0 ? StringFormat("-MarginUsed=%d%%|", margin_pc) : ""; string s = "|";
+  if ((RiskRatioIncreaseMethod &   1) != 0) if (AccCondition(C_ACC_IN_PROFIT))      { new_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod &   2) != 0) if (AccCondition(C_EQUITY_10PC_LOW))    { new_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod &   4) != 0) if (AccCondition(C_EQUITY_20PC_LOW))    { new_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod &   8) != 0) if (AccCondition(C_DBAL_LT_WEEKLY))     { new_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod &  16) != 0) if (AccCondition(C_WBAL_GT_MONTHLY))    { new_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod &  32) != 0) if (AccCondition(C_ACC_IN_TREND))       { new_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod &  64) != 0) if (AccCondition(C_ACC_CDAY_IN_PROFIT)) { new_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod & 128) != 0) if (AccCondition(C_ACC_PDAY_IN_PROFIT)) { new_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
+  // --
+  if ((RiskRatioDecreaseMethod &   1) != 0) if (AccCondition(C_ACC_IN_LOSS))        { new_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod &   2) != 0) if (AccCondition(C_EQUITY_10PC_HIGH))   { new_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod &   4) != 0) if (AccCondition(C_EQUITY_20PC_HIGH))   { new_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod &   8) != 0) if (AccCondition(C_DBAL_GT_WEEKLY))     { new_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod &  16) != 0) if (AccCondition(C_WBAL_LT_MONTHLY))    { new_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod &  32) != 0) if (AccCondition(C_ACC_IN_NON_TREND))   { new_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod &  64) != 0) if (AccCondition(C_ACC_CDAY_IN_LOSS))   { new_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod & 128) != 0) if (AccCondition(C_ACC_PDAY_IN_LOSS))   { new_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
+  TxtRemoveSepChar(rr_text, s);
 
+  /*
   #ifdef __advanced__
-    int margin_pc = (int) (100 / equity * margin);
-    rr_text = new_risk_ratio < 1.0 ? StringFormat("-MarginUsed=%d%%|", margin_pc) : ""; string s = "|";
-    if ((RiskRatioIncreaseMethod &   1) != 0) if (AccCondition(C_ACC_IN_PROFIT))      { new_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
-    if ((RiskRatioIncreaseMethod &   2) != 0) if (AccCondition(C_EQUITY_10PC_LOW))    { new_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
-    if ((RiskRatioIncreaseMethod &   4) != 0) if (AccCondition(C_EQUITY_20PC_LOW))    { new_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
-    if ((RiskRatioIncreaseMethod &   8) != 0) if (AccCondition(C_DBAL_LT_WEEKLY))     { new_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
-    if ((RiskRatioIncreaseMethod &  16) != 0) if (AccCondition(C_WBAL_GT_MONTHLY))    { new_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
-    if ((RiskRatioIncreaseMethod &  32) != 0) if (AccCondition(C_ACC_IN_TREND))       { new_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
-    if ((RiskRatioIncreaseMethod &  64) != 0) if (AccCondition(C_ACC_CDAY_IN_PROFIT)) { new_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
-    if ((RiskRatioIncreaseMethod & 128) != 0) if (AccCondition(C_ACC_PDAY_IN_PROFIT)) { new_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
-
-    if ((RiskRatioDecreaseMethod &   1) != 0) if (AccCondition(C_ACC_IN_LOSS))        { new_risk_ratio *= 0.9; rr_text += "-"+last_cname+s; }
-    if ((RiskRatioDecreaseMethod &   2) != 0) if (AccCondition(C_EQUITY_10PC_HIGH))   { new_risk_ratio *= 0.9; rr_text += "-"+last_cname+s; }
-    if ((RiskRatioDecreaseMethod &   4) != 0) if (AccCondition(C_EQUITY_20PC_HIGH))   { new_risk_ratio *= 0.9; rr_text += "-"+last_cname+s; }
-    if ((RiskRatioDecreaseMethod &   8) != 0) if (AccCondition(C_DBAL_GT_WEEKLY))     { new_risk_ratio *= 0.9; rr_text += "-"+last_cname+s; }
-    if ((RiskRatioDecreaseMethod &  16) != 0) if (AccCondition(C_WBAL_LT_MONTHLY))    { new_risk_ratio *= 0.9; rr_text += "-"+last_cname+s; }
-    if ((RiskRatioDecreaseMethod &  32) != 0) if (AccCondition(C_ACC_IN_NON_TREND))   { new_risk_ratio *= 0.9; rr_text += "-"+last_cname+s; }
-    if ((RiskRatioDecreaseMethod &  64) != 0) if (AccCondition(C_ACC_CDAY_IN_LOSS))   { new_risk_ratio *= 0.9; rr_text += "-"+last_cname+s; }
-    if ((RiskRatioDecreaseMethod & 128) != 0) if (AccCondition(C_ACC_PDAY_IN_LOSS))   { new_risk_ratio *= 0.9; rr_text += "-"+last_cname+s; }
-    TxtRemoveSepChar(rr_text, s);
   #else
     if (GetTotalProfit() < 0) new_risk_ratio /= 2; // Half risk if we're in overall loss.
   #endif
+  */
 
   return new_risk_ratio;
 }

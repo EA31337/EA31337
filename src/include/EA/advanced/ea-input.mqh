@@ -47,13 +47,13 @@ extern double TrailingStopAddPerMinute = 0; // Decrease trail stop per minute (p
 
 //+------------------------------------------------------------------+
 extern string __EA_Risk_Parameters__ = "-- Risk management parameters --"; // >>> RISK <<
-extern double RiskRatio = 0; // Risk ratio (0 = auto, 1.0 = normal)
-extern double RiskMargin = 1.0; // Risk margin (0-100, 0 = auto, 1 = 1%)
 extern bool ApplySpreadLimits = TRUE; // Apply strategy spread limits
-extern int RiskRatioIncreaseMethod = 112; // Risk ratio increase method (0-255)
-extern int RiskRatioDecreaseMethod = 216; // Risk ratio decrease method (0-255)
+extern double RiskMargin = 1.0; // Risk margin (0-100, 0 = auto, 1 = 1%)
 extern double MaxSpreadToTrade = 10.0; // Max spread to trade (in pips), 0 - disable limit
 extern int CloseOrderAfterXHours = 72; // Close order after X hours (0 = disabled)
+extern double RiskRatio = 0; // Risk ratio (0 = auto, 1.0 = normal)
+extern int RiskRatioIncreaseMethod = 112; // Risk ratio increase method (0-255)
+extern int RiskRatioDecreaseMethod = 216; // Risk ratio decrease method (0-255)
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Parameters__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGIES <<<
