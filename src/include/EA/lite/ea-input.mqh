@@ -54,13 +54,13 @@ extern double ProfitFactorMaxToTrade = 4.4; // Max. profit factor per strategy t
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameters (set 1.0 for default) --"; // >>> BOOSTING <<<
-extern bool Boosting_Enabled = 1; // Enable boosting
+extern bool Boosting_Enabled = 0; // Enable boosting
 extern double BoostTrendFactor = 1.6; // Boost by trend factor
-extern double BestDailyStrategyMultiplierFactor = 0.6; // Multiplier for the best daily strategy
+extern double BestDailyStrategyMultiplierFactor = 1.5; // Multiplier for the best daily strategy
 extern double BestWeeklyStrategyMultiplierFactor = 1; // Multiplier for the best weekly strategy
 extern double BestMonthlyStrategyMultiplierFactor = 1; // Multiplier for the best monthly strategy
-extern double WorseDailyStrategyDividerFactor = 0.5; // Divider for the worse daily strategy
-extern double WorseWeeklyStrategyDividerFactor = 0.3; // Divider for the worse weekly strategy
+extern double WorseDailyStrategyDividerFactor = 0.8; // Divider for the worse daily strategy
+extern double WorseWeeklyStrategyDividerFactor = 1.1; // Divider for the worse weekly strategy
 extern double WorseMonthlyStrategyDividerFactor = 1; // Divider for the worse monthly strategy
 extern double ConWinsIncreaseFactor = 0.5; // Increase lot factor on consequent wins (in %, 0 - off)
 extern double ConLossesIncreaseFactor = 1.2; // Increase lot factor on consequent loses (in %, 0 - off)
@@ -389,23 +389,23 @@ extern bool MA1_Active = 0; // Enable for M1
 extern bool MA5_Active = 0; // Enable for M5
 extern bool MA15_Active = 0; // Enable for M15
 extern bool MA30_Active = 0; // Enable for M30
-extern int MA_Period_Fast = 18; // Period Fast
-extern int MA_Period_Medium = 16; // Period Medium
-extern int MA_Period_Slow = 46; // Period Slow
+extern int MA_Period_Fast = 17; // Period Fast
+extern int MA_Period_Medium = 15; // Period Medium
+extern int MA_Period_Slow = 48; // Period Slow
 extern double MA_Period_Ratio = 1.0; // Period ratio between timeframes (0.5-1.5)
 extern int MA_Shift = 0; // Shift
 extern int MA_Shift_Fast = 0; // Shift Fast (+1)
 extern int MA_Shift_Medium = 0; // Shift Medium (+1)
-extern int MA_Shift_Slow = 2; // Shift Slow (+1)
+extern int MA_Shift_Slow = 1; // Shift Slow (+1)
 extern int MA_Shift_Far = 4; // Shift Far (+2)
 extern ENUM_MA_METHOD MA_Method = 1; // MA Method
-extern ENUM_APPLIED_PRICE MA_Applied_Price = 6; // Applied Price
+extern ENUM_APPLIED_PRICE MA_Applied_Price = 3; // Applied Price
 extern ENUM_TRAIL_TYPE MA_TrailingStopMethod = 27; // Trail stop method
 extern ENUM_TRAIL_TYPE MA_TrailingProfitMethod = 26; // Trail profit method
 extern double MA_SignalLevel = 1.2; // Signal level
 extern int MA1_SignalMethod = -98; // Signal method for M1 (-127-127)
 extern int MA5_SignalMethod = 1; // Signal method for M5 (-127-127)
-extern int MA15_SignalMethod = 1; // Signal method for M15 (-127-127)
+extern int MA15_SignalMethod = -126; // Signal method for M15 (-127-127)
 extern int MA30_SignalMethod = -111; // Signal method for M30 (-127-127)
 
 //+------------------------------------------------------------------+
@@ -538,7 +538,7 @@ extern bool SAR30_Active = 1; // Enable for M30
 extern double SAR_Step = 0.15; // Step
 extern double SAR_Step_Ratio = 0.3; // Step ratio between timeframes (0.5-1.5)
 extern double SAR_Maximum_Stop = 0.40000000; // Maximum stop
-extern int SAR_Shift = 0; // Shift
+extern int SAR_Shift = -4; // Shift
 extern ENUM_TRAIL_TYPE SAR_TrailingStopMethod = 2; // Trail stop method
 extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = 23; // Trail profit method
 extern double SAR_SignalLevel = 0.00000000; // Signal level
@@ -586,9 +586,9 @@ extern bool WPR5_Active = 0; // Enable for M5
 extern bool WPR15_Active = 0; // Enable for M15
 extern bool WPR30_Active = 1; // Enable for M30
 extern int WPR_Period = 9; // Period
-extern double WPR_Period_Ratio = 1.0; // Period ratio between timeframes (0.5-1.5)
+extern double WPR_Period_Ratio = 0.2; // Period ratio between timeframes (0.5-1.5)
 extern int WPR_Shift = -2; // Shift
-extern int WPR_SignalLevel = -2; // Signal level
+extern int WPR_SignalLevel = -7; // Signal level
 extern ENUM_TRAIL_TYPE WPR_TrailingStopMethod = -23; // Trail stop method
 extern ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = -7; // Trail profit method
 extern int WPR1_SignalMethod = 36; // Signal method for M1 (-63-63)
@@ -655,7 +655,7 @@ extern string SoundFileAtClose = "alert.wav"; // Sound: on order close
 //+------------------------------------------------------------------+
 extern string __Backtest_Parameters__ = "-- Backtest parameters --"; // >>> BACKTESTING <<<
 #ifndef __backtest__
-  extern bool ValidateSettings = 0; // Validate startup settings
+  extern bool ValidateSettings = 1; // Validate startup settings
 #else
   extern bool ValidateSettings = 1; // Validate startup settings
 #endif
