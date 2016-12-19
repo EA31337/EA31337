@@ -54,17 +54,17 @@ extern double ProfitFactorMaxToTrade = 4.4; // Max. profit factor per strategy t
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameters (set 1.0 for default) --"; // >>> BOOSTING <<<
-extern bool Boosting_Enabled = 0; // Enable boosting
-extern double BoostTrendFactor = 1.6; // Boost by trend factor
-extern double BestDailyStrategyMultiplierFactor = 1.5; // Multiplier for the best daily strategy
+extern bool Boosting_Enabled = 1; // Enable boosting
+extern double BoostTrendFactor = 1.5; // Boost by trend factor
+extern double BestDailyStrategyMultiplierFactor = 1.1; // Multiplier for the best daily strategy
 extern double BestWeeklyStrategyMultiplierFactor = 1; // Multiplier for the best weekly strategy
 extern double BestMonthlyStrategyMultiplierFactor = 1; // Multiplier for the best monthly strategy
 extern double WorseDailyStrategyDividerFactor = 0.8; // Divider for the worse daily strategy
 extern double WorseWeeklyStrategyDividerFactor = 1.1; // Divider for the worse weekly strategy
 extern double WorseMonthlyStrategyDividerFactor = 1; // Divider for the worse monthly strategy
-extern double ConWinsIncreaseFactor = 0.5; // Increase lot factor on consequent wins (in %, 0 - off)
+extern double ConWinsIncreaseFactor = 0.4; // Increase lot factor on consequent wins (in %, 0 - off)
 extern double ConLossesIncreaseFactor = 1.2; // Increase lot factor on consequent loses (in %, 0 - off)
-extern uint ConFactorOrdersLimit = 100; // No of orders to check on consequent wins/loses
+extern uint ConFactorOrdersLimit = 200; // No of orders to check on consequent wins/loses
 
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions__ = "-- Account conditions --"; // >>> CONDITIONS & ACTIONS <<<
@@ -148,7 +148,7 @@ extern string __Alligator_Parameters__ = "-- Settings for the Alligator indicato
 extern bool Alligator1_Active = 0; // Enable for M1
 extern bool Alligator5_Active = 0; // Enable for M5
 extern bool Alligator15_Active = 0; // Enable for M15
-extern bool Alligator30_Active = 1; // Enable for M30
+extern bool Alligator30_Active = 0; // Enable for M30
 extern int Alligator_Period_Jaw = 10; // Jaw Period
 extern int Alligator_Period_Teeth = 2; // Teeth Period
 extern int Alligator_Period_Lips = 4; // Lips Period
@@ -303,7 +303,7 @@ extern string __Envelopes_Parameters__ = "-- Settings for the Envelopes indicato
 extern bool Envelopes1_Active = 0; // Enable for M1
 extern bool Envelopes5_Active = 1; // Enable for M5
 extern bool Envelopes15_Active = 0; // Enable for M15
-extern bool Envelopes30_Active = 1; // Enable for M30
+extern bool Envelopes30_Active = 0; // Enable for M30
 extern int Envelopes_MA_Period = 32; // Period
 extern double Envelopes_MA_Period_Ratio = 1.0; // Period ratio between timeframes (0.5-1.5)
 extern ENUM_MA_METHOD Envelopes_MA_Method = 2; // MA Method
@@ -498,7 +498,7 @@ int OSMA30_SignalMethod = 14; // Signal method for M30 (0-
 //+------------------------------------------------------------------+
 extern string __RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --"; // >>> RSI <<<
 extern bool RSI1_Active = 0; // Enable for M1
-extern bool RSI5_Active = 1; // Enable for M5
+extern bool RSI5_Active = 0; // Enable for M5
 extern bool RSI15_Active = 0; // Enable for M15
 extern bool RSI30_Active = 1; // Enable for M30
 extern int RSI_Period = 21; // Period
@@ -532,13 +532,13 @@ int RVI30_SignalMethod = 0; // Signal method for M30 (0-
 //+------------------------------------------------------------------+
 extern string __SAR_Parameters__ = "-- Settings for the the Parabolic Stop and Reverse system indicator --"; // >>> SAR <<<
 extern bool SAR1_Active = 0; // Enable for M1
-extern bool SAR5_Active = 1; // Enable for M5
+extern bool SAR5_Active = 0; // Enable for M5
 extern bool SAR15_Active = 0; // Enable for M15
 extern bool SAR30_Active = 1; // Enable for M30
 extern double SAR_Step = 0.15; // Step
 extern double SAR_Step_Ratio = 0.3; // Step ratio between timeframes (0.5-1.5)
 extern double SAR_Maximum_Stop = 0.40000000; // Maximum stop
-extern int SAR_Shift = -4; // Shift
+extern int SAR_Shift = 0; // Shift
 extern ENUM_TRAIL_TYPE SAR_TrailingStopMethod = 2; // Trail stop method
 extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = 23; // Trail profit method
 extern double SAR_SignalLevel = 0.00000000; // Signal level
