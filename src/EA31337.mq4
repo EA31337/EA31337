@@ -1384,7 +1384,7 @@ bool Trade_AC(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY
   if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(AC, tf, 0.0);
   switch (cmd) {
     /*
-      //1. Acceleration/Deceleration — AC
+      //1. Acceleration/Deceleration â€” AC
       //Buy: if the indicator is above zero and 2 consecutive columns are green or if the indicator is below zero and 3 consecutive columns are green
       //Sell: if the indicator is below zero and 2 consecutive columns are red or if the indicator is above zero and 3 consecutive columns are red
       if ((iAC(NULL,piac,0)>=0&&iAC(NULL,piac,0)>iAC(NULL,piac,1)&&iAC(NULL,piac,1)>iAC(NULL,piac,2))||(iAC(NULL,piac,0)<=0
@@ -3788,12 +3788,12 @@ int GetMaxOrdersPerDay() {
 /**
  * Calculate number of maximum of orders allowed to open.
  */
-uint GetMaxOrders() {
+uint GetMaxOrders(double volume_size) {
   uint _result, _limit = Account::AccountLimitOrders();
   #ifdef __advanced__
-    _result = MaxOrders > 0 ? (MaxOrdersPerDay > 0 ? fmin(MaxOrders, GetMaxOrdersPerDay()) : MaxOrders) : Orders::CalcMaxOrders(lot_size, risk_ratio, max_orders, GetMaxOrdersPerDay());
+    _result = MaxOrders > 0 ? (MaxOrdersPerDay > 0 ? fmin(MaxOrders, GetMaxOrdersPerDay()) : MaxOrders) : Orders::CalcMaxOrders(volume_size, risk_ratio, max_orders, GetMaxOrdersPerDay());
   #else
-    _result = MaxOrders > 0 ? MaxOrders : Orders::CalcMaxOrders(lot_size, risk_ratio, max_orders);
+    _result = MaxOrders > 0 ? MaxOrders : Orders::CalcMaxOrders(volume_size, risk_ratio, max_orders);
   #endif
   return _limit > 0 ? fmin(_result, _limit) : _result;
 }
@@ -3822,7 +3822,6 @@ int GetNoOfStrategies() {
 double GetLotSizeAuto(bool smooth = true) {
   double avail_margin = fmin(AccountFreeMargin(), Account::AccountBalance() + Account::AccountCredit());
   // double avail_margin = fmin(AccountFreeMargin(), AccountBalance()); // @todo
-  double leverage     = fmax(AccountLeverage(), 100);
   // @todo: Improve the logic, especially risk_margin.
   double new_lot_size = avail_margin / market_marginrequired * ea_risk_margin/100 * risk_ratio;
 
@@ -3836,7 +3835,7 @@ double GetLotSizeAuto(bool smooth = true) {
     if ((LotSizeIncreaseMethod &  32) != 0) if (AccCondition(C_ACC_IN_TREND))       new_lot_size *= 1.1;
     if ((LotSizeIncreaseMethod &  64) != 0) if (AccCondition(C_ACC_CDAY_IN_PROFIT)) new_lot_size *= 1.1;
     if ((LotSizeIncreaseMethod & 128) != 0) if (AccCondition(C_ACC_PDAY_IN_PROFIT)) new_lot_size *= 1.1;
-
+    // --
     if ((LotSizeDecreaseMethod &   1) != 0) if (AccCondition(C_ACC_IN_LOSS))        new_lot_size *= 0.9;
     if ((LotSizeDecreaseMethod &   2) != 0) if (AccCondition(C_EQUITY_10PC_LOW))    new_lot_size *= 0.9;
     if ((LotSizeDecreaseMethod &   4) != 0) if (AccCondition(C_EQUITY_20PC_LOW))    new_lot_size *= 0.9;
@@ -3848,7 +3847,7 @@ double GetLotSizeAuto(bool smooth = true) {
   }
   #endif
 
-  if (smooth) {
+  if (smooth && lot_size > 0) {
     // Increase only by average of the previous and new (which should prevent sudden increases).
     return (lot_size + new_lot_size) / 2;
   } else {
@@ -3860,7 +3859,7 @@ double GetLotSizeAuto(bool smooth = true) {
  * Return current lot size to trade.
  */
 double GetLotSize() {
-  return NormalizeLots(Misc::If(LotSize == 0, GetLotSizeAuto(), LotSize));
+  return NormalizeLots(LotSize == 0 ? GetLotSizeAuto() : LotSize);
 }
 
 /**
@@ -3993,7 +3992,7 @@ void StartNewHour() {
 
   // Update variables.
   risk_ratio = GetRiskRatio();
-  max_orders = GetMaxOrders();
+  max_orders = GetMaxOrders(lot_size);
 
   // Check if new day has been started.
   if (day_of_week != DayOfWeek()) {
@@ -4050,6 +4049,9 @@ void StartNewDay() {
   // Process actions.
   CheckAccConditions();
 
+  // Update boosting values.
+  if (Boosting_Enabled) UpdateStrategyFactor(WEEKLY);
+
   // Check if day started another week.
   if (DayOfWeek() < day_of_week) {
     StartNewWeek();
@@ -4061,15 +4063,13 @@ void StartNewDay() {
     StartNewYear();
   }
 
-  // Update boosting values.
-  if (Boosting_Enabled) UpdateStrategyFactor(WEEKLY);
-
   // Store new data.
   day_of_week = DayOfWeek(); // The zero-based day of week (0 means Sunday,1,2,3,4,5,6) of the specified date. At the testing, the last known server time is modelled.
   day_of_month = Day(); // The day of month (1 - 31) of the specified date. At the testing, the last known server time is modelled.
   day_of_year = DayOfYear(); // Day (1 means 1 January,..,365(6) does 31 December) of year. At the testing, the last known server time is modelled.
   // Print and reset variables.
   daily_orders = 0;
+  /*
   string sar_stats = "Daily SAR stats: ";
   for (int i = 0; i < FINAL_PERIOD_TYPE_ENTRY; i++) {
     sar_stats += StringFormat("Period: %d, Buy/Sell: %d/%d; ", i, signals[DAILY][SAR1][i][OP_BUY], signals[DAILY][SAR1][i][OP_SELL]);
@@ -4082,6 +4082,7 @@ void StartNewDay() {
     // signals[DAILY][SAR30][i][OP_BUY] = 0; signals[DAILY][SAR30][i][OP_SELL] = 0;
   }
   if (VerboseInfo) Print(sar_stats);
+  */
 
   // Reset previous data.
   ArrayFill(daily, 0, ArraySize(daily), 0);
@@ -4116,6 +4117,8 @@ void StartNewWeek() {
   ea_risk_margin = GetRiskMargin(); // Re-calculate risk margin.
   lot_size = GetLotSize(); // Re-calculate lot size.
   UpdateStrategyLotSize(); // Update strategy lot size.
+
+  // Update boosting values.
   if (Boosting_Enabled) UpdateStrategyFactor(MONTHLY);
 
   // Reset variables.
@@ -4240,7 +4243,7 @@ bool InitializeVariables() {
     market_lotstep = 0.01;
   }
 
-  market_minlot = MarketInfo(_Symbol, MODE_MINLOT); // Minimum permitted amount of a lot
+  market_minlot = MarketInfo(_Symbol, MODE_MINLOT); // Minimum permitted amount of a lot.
   // @todo: Move to method.
   if (market_minlot <= 0.0) {
     init &= !ValidateSettings;
@@ -4248,7 +4251,7 @@ bool InitializeVariables() {
     market_minlot = market_lotstep;
   }
 
-  market_maxlot = MarketInfo(_Symbol, MODE_MAXLOT); // Maximum permitted amount of a lot
+  market_maxlot = MarketInfo(_Symbol, MODE_MAXLOT); // Maximum permitted amount of a lot.
   // @todo: Move to method.
   if (market_maxlot <= 0.0) {
     init &= !ValidateSettings;
@@ -4302,8 +4305,17 @@ bool InitializeVariables() {
   // Calculate lot size, orders, risk ratio and margin risk.
   risk_ratio = GetRiskRatio();   // Re-calculate risk ratio.
   ea_risk_margin = GetRiskMargin(); // Re-calculate risk margin.
-  lot_size = GetLotSize();       // Re-calculate lot size.
-  max_orders = GetMaxOrders();
+  lot_size = GetLotSize();       // Re-calculate lot size (dependent on risk_ratio).
+  if (lot_size <= 0) {
+    Msg::ShowText(StringFormat("Lot size is %g!", lot_size), "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
+    if (ValidateSettings) {
+      // @fixme: Fails on Gold H1.
+      return (False);
+    } else {
+      lot_size = Market::GetMinLot(_Symbol);
+    }
+  }
+  max_orders = GetMaxOrders(lot_size);
 
   gmt_offset = TimeGMTOffset();
   ArrayInitialize(todo_queue, 0); // Reset queue list.
