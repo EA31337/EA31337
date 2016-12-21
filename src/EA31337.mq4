@@ -66,11 +66,13 @@
 #include <EA\public-classes\Msg.mqh>
 #include <EA\public-classes\Report.mqh>
 #include <EA\public-classes\Stats.mqh>
+#include <EA\public-classes\Strings.mqh>
 #include <EA\public-classes\Strategy.mqh>
 #include <EA\public-classes\SummaryReport.mqh>
 #include <EA\public-classes\Terminal.mqh>
 #include <EA\public-classes\Tests.mqh>
 #include <EA\public-classes\Ticks.mqh>
+//#include <EA\public-classes\Trade.mqh>
 
 //#property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 
@@ -108,7 +110,7 @@ extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v"
 Market market(string);
 
 // Market/session variables.
-double pip_size, lot_size;
+double pip_size, ea_lot_size;
 double market_minlot, market_maxlot, market_lotsize, market_lotstep, market_marginrequired, market_margininit;
 int order_freezelevel; // Order freeze level in points.
 double curr_spread; // Broker current spread in pips.
@@ -144,14 +146,14 @@ Ticks *ticks; // For recording ticks.
 int info[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_INFO_ENTRY];
 double conf[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_VALUE_ENTRY], stats[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_STAT_ENTRY];
 int open_orders[FINAL_STRATEGY_TYPE_ENTRY], closed_orders[FINAL_STRATEGY_TYPE_ENTRY];
-int signals[FINAL_STAT_PERIOD_TYPE_ENTRY][FINAL_STRATEGY_TYPE_ENTRY][FINAL_PERIOD_TYPE_ENTRY][2]; // Count signals to buy and sell per period and strategy.
+int signals[FINAL_STAT_PERIOD_TYPE_ENTRY][FINAL_STRATEGY_TYPE_ENTRY][FINAL_ENUM_TIMEFRAMES_INDEX_ENTRY][2]; // Count signals to buy and sell per period and strategy.
 int tickets[200]; // List of tickets to process.
 string sname[FINAL_STRATEGY_TYPE_ENTRY];
-int worse_strategy[FINAL_STAT_PERIOD_TYPE_ENTRY], best_strategy[FINAL_STAT_PERIOD_TYPE_ENTRY];
+int worse_strategy[FINAL_STAT_PERIOD_TYPE_ENTRY], best_strategy[FINAL_ENUM_TIMEFRAMES_INDEX_ENTRY];
 
 // EA variables.
 bool ea_active = FALSE;
-double risk_ratio; string rr_text; // Vars for calculation risk ratio.
+double ea_risk_ratio; string rr_text; // Vars for calculation risk ratio.
 uint max_orders = 10, daily_orders; // Maximum orders available to open.
 int max_order_slippage; // Maximum price slippage for buy or sell orders (in points)
 double LastAsk, LastBid; // Keep the last ask and bid price.
@@ -323,7 +325,7 @@ int OnInit() {
 
   if (session_initiated && VerboseInfo) {
     string output = InitInfo(TRUE);
-    PrintText(output);
+    Strings::PrintText(output);
     Comment(output);
     ReportAdd(InitInfo());
   }
@@ -367,7 +369,7 @@ void OnDeinit(const int reason) {
       string data = summary.GetReport();
       data += GetStatReport();
       data += GetStrategyReport();
-      data += GetLogReport();
+      data += Arrays::ArrToString(log, "\n", "Report log:\n");
       Report::WriteReport(filename, data, VerboseInfo); // Todo: Add: Errors::GetUninitReasonText(reason)
       Print(__FUNCTION__ + ": Saved report as: " + filename);
     }
@@ -433,12 +435,13 @@ string InitInfo(bool startup = False, string sep = "\n") {
     sep);
   output += StringFormat("Market predefined variables: Ask: %g, Bid: %g, Volume: %d%s",
       NormalizeDouble(Ask, Digits), NormalizeDouble(Bid, Digits), Volume[0], sep);
-  output += StringFormat("Market constants: Digits: %d, Point: %f, Min Lot: %g, Max Lot: %g, Lot Step: %g, Lot Size: %g, Margin Required: %g, Margin Init: %g, Trade Freeze Level: %d pts%s",
+  output += StringFormat("Market constants: Digits: %d, Point: %f, Min Lot: %g, Max Lot: %g, Lot Step: %g pts (%g pips), Lot Size: %g, Margin Required: %g, Margin Init: %g, Trade Freeze Level: %d pts%s",
       Market::GetDigits(),
       Market::GetPoint(),
       Market::GetMinLot(),
       Market::GetMaxLot(),
-      Market::GetLotStep(),
+      Market::GetLotStepInPts(),
+      Market::GetLotStepInPips(),
       Market::GetLotSize(),
       Market::GetMarginRequired(),
       Market::GetMarginInit(),
@@ -463,7 +466,7 @@ string InitInfo(bool startup = False, string sep = "\n") {
       sep);
   output += StringFormat("Calculated variables: Pip size: %g, Lot size: %g, Points per pip: %d, Pip digits: %d, Volume digits: %d, Spread in pips: %.1f (%d pts), Stop Out Level: %.1f, Market gap: %d pts (%g pips)%s",
       NormalizeDouble(pip_size, pip_digits),
-      NormalizeDouble(lot_size, volume_digits),
+      NormalizeDouble(ea_lot_size, volume_digits),
       pts_per_pip,
       pip_digits,
       volume_digits,
@@ -482,8 +485,8 @@ string InitInfo(bool startup = False, string sep = "\n") {
       max_orders,
       GetMaxOrdersPerType(),
       sep);
-  output += ListModellingQuality() + sep;
-  output += ListTimeframes() + sep;
+  output += Msg::ShowText(Backtest::GetModellingQuality(), "Info", __FUNCTION__, __LINE__, VerboseInfo) + sep;
+  output += Backtest::ListTimeframes() + sep;
   output += StringFormat("Datetime: Hour of day: %d, Day of week: %d, Day of month: %d, Day of year: %d, Month: %d, Year: %d%s",
       hour_of_day, day_of_week, day_of_month, day_of_year, month, year, sep);
   output += GetAccountTextDetails() + sep;
@@ -495,51 +498,6 @@ string InitInfo(bool startup = False, string sep = "\n") {
     }
   }
   return output;
-}
-
-/**
- * Check whether timeframes are active.
- */
-string ListTimeframes(bool print = False) {
-  string output = StringFormat("Timeframes: M1: %s, M5: %s, M15: %s, M30: %s, H1: %s, H4: %s, D1: %s, W1: %s, MN1: %s;",
-    CheckTf(PERIOD_M1)  ? "Active" : "Not active",
-    CheckTf(PERIOD_M5)  ? "Active" : "Not active",
-    CheckTf(PERIOD_M15) ? "Active" : "Not active",
-    CheckTf(PERIOD_M30) ? "Active" : "Not active",
-    CheckTf(PERIOD_H1)  ? "Active" : "Not active",
-    CheckTf(PERIOD_H4)  ? "Active" : "Not active",
-    CheckTf(PERIOD_D1)  ? "Active" : "Not active",
-    CheckTf(PERIOD_W1)  ? "Active" : "Not active",
-    CheckTf(PERIOD_MN1) ? "Active" : "Not active");
-  if (print) {
-    return Msg::ShowText(output, "Info", __FUNCTION__, __LINE__, VerboseInfo);
-  }
-  else {
-    return output;
-  }
-}
-
-/**
- * Returns list of modelling quality for all periods.
- */
-string ListModellingQuality(bool print = False) {
-  string output = StringFormat("Modelling Quality: M1: %.2f%%, M5: %.2f%%, M15: %.2f%%, M30: %.2f%%, H1: %.2f%%, H4: %.2f%%, D1: %.2f%%, W1: %.2f%%, MN1: %.2f%%;",
-    Backtest::CalculateModellingQuality(PERIOD_M1),
-    Backtest::CalculateModellingQuality(PERIOD_M5),
-    Backtest::CalculateModellingQuality(PERIOD_M15),
-    Backtest::CalculateModellingQuality(PERIOD_M30),
-    Backtest::CalculateModellingQuality(PERIOD_H1),
-    Backtest::CalculateModellingQuality(PERIOD_H4),
-    Backtest::CalculateModellingQuality(PERIOD_D1),
-    Backtest::CalculateModellingQuality(PERIOD_W1),
-    Backtest::CalculateModellingQuality(PERIOD_MN1)
-    );
-  if (print) {
-    return Msg::ShowText(output, "Info", __FUNCTION__, __LINE__, VerboseInfo);
-  }
-  else {
-    return output;
-  }
 }
 
 /**
@@ -640,7 +598,7 @@ bool TradeCondition(int order_type = 0, int cmd = NULL) {
  */
 bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string symbol = NULL) {
   bool success = True;
-  static datetime processed[FINAL_INDICATOR_TYPE_ENTRY][FINAL_PERIOD_TYPE_ENTRY];
+  static datetime processed[FINAL_INDICATOR_TYPE_ENTRY][FINAL_ENUM_TIMEFRAMES_INDEX_ENTRY];
   int i; string text = __FUNCTION__ + ": ";
   if (type == EMPTY) ArrayFill(processed, 0, ArraySize(processed), FALSE); // Reset processed if tf is EMPTY.
   int index = Convert::TfToIndex(tf);
@@ -946,7 +904,7 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
    if (trade_volume == EMPTY) {
      trade_volume = GetStrategyLotSize(sid, cmd);
    } else {
-     trade_volume = NormalizeLots(trade_volume);
+     trade_volume = Market::NormalizeLots(trade_volume);
    }
 
    // Check the limits.
@@ -1002,7 +960,7 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
   }
 
    order_ticket = OrderSend(_Symbol, cmd,
-      NormalizeLots(trade_volume),
+      Market::NormalizeLots(trade_volume),
       open_price,
       max_order_slippage,
       stoploss,
@@ -1022,7 +980,7 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
       Msg::ShowText(
          StringFormat("OrderSend(%s, %s, %g, %f, %d, %f, %f, '%s', %d, %d, %d)",
            _Symbol, Convert::OrderTypeToString(cmd),
-           NormalizeLots(trade_volume),
+           Market::NormalizeLots(trade_volume),
            open_price,
            max_order_slippage,
            stoploss,
@@ -1051,7 +1009,7 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
      last_debug = Msg::ShowText(
        StringFormat("OrderSend(%s, %s, %g, %f, %d, %f, %f, '%s', %d, %d, %d)",
          _Symbol, Convert::OrderTypeToString(cmd),
-         NormalizeLots(trade_volume),
+         Market::NormalizeLots(trade_volume),
          open_price,
          max_order_slippage,
          stoploss,
@@ -1092,7 +1050,7 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
         // Invalid trade volume.
         // Usually happens when volume is not normalized, or on invalid volume value.
        if (WriteReport) ReportAdd(last_debug);
-       Msg::ShowText(StringFormat("Volume: %g", NormalizeLots(trade_volume)), "Error", __FUNCTION__, __LINE__, VerboseErrors);
+       Msg::ShowText(StringFormat("Volume: %g", Market::NormalizeLots(trade_volume)), "Error", __FUNCTION__, __LINE__, VerboseErrors);
        retry = FALSE;
      }
      if (err_code == ERR_TRADE_EXPIRATION_DENIED) {
@@ -1254,7 +1212,7 @@ bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = TRUE)
     #endif
   } else {
     err_code = GetLastError();
-    if (VerboseErrors) Print(__FUNCTION__, ": Error: Ticket: ", ticket_no, "; Error: ", GetErrorText(err_code));
+    if (VerboseErrors) Print(__FUNCTION__, ": Error: Ticket: ", ticket_no, "; Error: ", Errors::GetErrorText(err_code));
     if (VerboseDebug) PrintFormat("Error: OrderClose(%d, %f, %f, %f, %d);", ticket_no, OrderLots(), close_price, max_order_slippage, GetOrderColor());
     if (VerboseDebug) Print(__FUNCTION__ + ": " + GetMarketTextDetails());
     OrderPrint();
@@ -1330,7 +1288,7 @@ int CloseOrdersByType(int cmd, int strategy_id, int reason_id, bool only_profita
         }
       } else {
         if (VerboseDebug)
-          Print(__FUNCTION__ + "(" + Convert::OrderTypeToString(cmd) + ", " + IntegerToString(strategy_id) + "): Error: Order: " + IntegerToString(order) + "; Message: ", GetErrorText(err_code));
+          Print(__FUNCTION__ + "(" + Convert::OrderTypeToString(cmd) + ", " + IntegerToString(strategy_id) + "): Error: Order: " + IntegerToString(order) + "; Message: ", Errors::GetErrorText(err_code));
         // TaskAddCloseOrder(OrderTicket(), reason_id); // Add task to re-try.
       }
    }
@@ -2978,7 +2936,7 @@ bool CheckMinPipGap(int sid) {
     } else if (VerboseDebug) {
       Msg::ShowText(
           StringFormat("Cannot select order. Strategy type: %s, pos: %d, msg: %s.",
-            sid, order, GetErrorText(err_code)),
+            sid, order, Errors::GetErrorText(err_code)),
           "Error", __FUNCTION__, __LINE__, VerboseErrors
       );
     }
@@ -3586,18 +3544,6 @@ int GetCmdByOrders() {
   return EMPTY;
 }
 
-// Calculate open positions.
-double CalculateOpenLots() {
-  double total_lots = 0;
-   for (int i=0; i<OrdersTotal(); i++) {
-      if (OrderSelect(i, SELECT_BY_POS, MODE_TRADES) == FALSE) break;
-      if (OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
-        total_lots += OrderLots(); // This gives the total no of lots opened in current orders.
-       }
-   }
-  return total_lots;
-}
-
 // For given magic number, check if it is ours.
 bool CheckOurMagicNumber(int magic_number = NULL) {
   if (magic_number == NULL) magic_number = OrderMagicNumber();
@@ -3755,24 +3701,6 @@ color GetOrderColor(int cmd = -1) {
 }
 
 /**
- * Normalize lot size.
- */
-double NormalizeLots(double lots, bool ceiling = False, string pair = "") {
-  // See: http://forum.mql4.com/47988
-  double lotsize;
-  double precision;
-  if (market_lotstep > 0.0) precision = 1 / market_lotstep;
-  else precision = 1 / market_minlot;
-
-  if (ceiling) lotsize = MathCeil(lots * precision) / precision;
-  else lotsize = MathFloor(lots * precision) / precision;
-
-  if (lotsize < market_minlot) lotsize = market_minlot;
-  if (lotsize > market_maxlot) lotsize = market_maxlot;
-  return NormalizeDouble(lotsize, volume_digits);
-}
-
-/**
  * Get daily total available orders. It can dynamically change during the day.
  */
 #ifdef __advanced__
@@ -3791,9 +3719,9 @@ int GetMaxOrdersPerDay() {
 uint GetMaxOrders(double volume_size) {
   uint _result, _limit = Account::AccountLimitOrders();
   #ifdef __advanced__
-    _result = MaxOrders > 0 ? (MaxOrdersPerDay > 0 ? fmin(MaxOrders, GetMaxOrdersPerDay()) : MaxOrders) : Orders::CalcMaxOrders(volume_size, risk_ratio, max_orders, GetMaxOrdersPerDay());
+    _result = MaxOrders > 0 ? (MaxOrdersPerDay > 0 ? fmin(MaxOrders, GetMaxOrdersPerDay()) : MaxOrders) : Orders::CalcMaxOrders(volume_size, ea_risk_ratio, max_orders, GetMaxOrdersPerDay());
   #else
-    _result = MaxOrders > 0 ? MaxOrders : Orders::CalcMaxOrders(volume_size, risk_ratio, max_orders);
+    _result = MaxOrders > 0 ? MaxOrders : Orders::CalcMaxOrders(volume_size, ea_risk_ratio, max_orders);
   #endif
   return _limit > 0 ? fmin(_result, _limit) : _result;
 }
@@ -3820,10 +3748,7 @@ int GetNoOfStrategies() {
  * Calculate size of the lot based on the free margin and account leverage automatically.
  */
 double GetLotSizeAuto(bool smooth = true) {
-  double avail_margin = fmin(AccountFreeMargin(), Account::AccountBalance() + Account::AccountCredit());
-  // double avail_margin = fmin(AccountFreeMargin(), AccountBalance()); // @todo
-  // @todo: Improve the logic, especially risk_margin.
-  double new_lot_size = avail_margin / market_marginrequired * ea_risk_margin/100 * risk_ratio;
+  double new_lot_size = Account::CalcLotSize(ea_risk_margin, ea_risk_ratio, _Symbol);
 
   #ifdef __advanced__
   if (Boosting_Enabled) {
@@ -3847,9 +3772,9 @@ double GetLotSizeAuto(bool smooth = true) {
   }
   #endif
 
-  if (smooth && lot_size > 0) {
+  if (smooth && ea_lot_size > 0) {
     // Increase only by average of the previous and new (which should prevent sudden increases).
-    return (lot_size + new_lot_size) / 2;
+    return (ea_lot_size + new_lot_size) / 2;
   } else {
     return new_lot_size;
   }
@@ -3859,7 +3784,7 @@ double GetLotSizeAuto(bool smooth = true) {
  * Return current lot size to trade.
  */
 double GetLotSize() {
-  return NormalizeLots(LotSize == 0 ? GetLotSizeAuto() : LotSize);
+  return Market::NormalizeLots(LotSize == 0 ? GetLotSizeAuto() : LotSize);
 }
 
 /**
@@ -3897,37 +3822,37 @@ double GetAutoRiskRatio() {
   // Taken from your depo as a guarantee to maintain your current positions opened.
   // It stays the same until you open or close positions.
   double margin  = Account::AccountMargin();
-  double new_risk_ratio = 1 / fmin(equity, balance) * fmin(fmin(free, balance), equity);
+  double new_ea_risk_ratio = 1 / fmin(equity, balance) * fmin(fmin(free, balance), equity);
   // --
   int margin_pc = (int) (100 / equity * margin);
-  rr_text = new_risk_ratio < 1.0 ? StringFormat("-MarginUsed=%d%%|", margin_pc) : ""; string s = "|";
-  if ((RiskRatioIncreaseMethod &   1) != 0) if (AccCondition(C_ACC_IN_PROFIT))      { new_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod &   2) != 0) if (AccCondition(C_EQUITY_10PC_LOW))    { new_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod &   4) != 0) if (AccCondition(C_EQUITY_20PC_LOW))    { new_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod &   8) != 0) if (AccCondition(C_DBAL_LT_WEEKLY))     { new_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod &  16) != 0) if (AccCondition(C_WBAL_GT_MONTHLY))    { new_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod &  32) != 0) if (AccCondition(C_ACC_IN_TREND))       { new_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod &  64) != 0) if (AccCondition(C_ACC_CDAY_IN_PROFIT)) { new_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod & 128) != 0) if (AccCondition(C_ACC_PDAY_IN_PROFIT)) { new_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
+  rr_text = new_ea_risk_ratio < 1.0 ? StringFormat("-MarginUsed=%d%%|", margin_pc) : ""; string s = "|";
+  if ((RiskRatioIncreaseMethod &   1) != 0) if (AccCondition(C_ACC_IN_PROFIT))      { new_ea_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod &   2) != 0) if (AccCondition(C_EQUITY_10PC_LOW))    { new_ea_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod &   4) != 0) if (AccCondition(C_EQUITY_20PC_LOW))    { new_ea_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod &   8) != 0) if (AccCondition(C_DBAL_LT_WEEKLY))     { new_ea_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod &  16) != 0) if (AccCondition(C_WBAL_GT_MONTHLY))    { new_ea_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod &  32) != 0) if (AccCondition(C_ACC_IN_TREND))       { new_ea_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod &  64) != 0) if (AccCondition(C_ACC_CDAY_IN_PROFIT)) { new_ea_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod & 128) != 0) if (AccCondition(C_ACC_PDAY_IN_PROFIT)) { new_ea_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
   // --
-  if ((RiskRatioDecreaseMethod &   1) != 0) if (AccCondition(C_ACC_IN_LOSS))        { new_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod &   2) != 0) if (AccCondition(C_EQUITY_10PC_HIGH))   { new_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod &   4) != 0) if (AccCondition(C_EQUITY_20PC_HIGH))   { new_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod &   8) != 0) if (AccCondition(C_DBAL_GT_WEEKLY))     { new_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod &  16) != 0) if (AccCondition(C_WBAL_LT_MONTHLY))    { new_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod &  32) != 0) if (AccCondition(C_ACC_IN_NON_TREND))   { new_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod &  64) != 0) if (AccCondition(C_ACC_CDAY_IN_LOSS))   { new_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod & 128) != 0) if (AccCondition(C_ACC_PDAY_IN_LOSS))   { new_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
-  TxtRemoveSepChar(rr_text, s);
+  if ((RiskRatioDecreaseMethod &   1) != 0) if (AccCondition(C_ACC_IN_LOSS))        { new_ea_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod &   2) != 0) if (AccCondition(C_EQUITY_10PC_HIGH))   { new_ea_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod &   4) != 0) if (AccCondition(C_EQUITY_20PC_HIGH))   { new_ea_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod &   8) != 0) if (AccCondition(C_DBAL_GT_WEEKLY))     { new_ea_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod &  16) != 0) if (AccCondition(C_WBAL_LT_MONTHLY))    { new_ea_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod &  32) != 0) if (AccCondition(C_ACC_IN_NON_TREND))   { new_ea_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod &  64) != 0) if (AccCondition(C_ACC_CDAY_IN_LOSS))   { new_ea_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod & 128) != 0) if (AccCondition(C_ACC_PDAY_IN_LOSS))   { new_ea_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
+  Strings::RemoveSepChar(rr_text, s);
 
   /*
   #ifdef __advanced__
   #else
-    if (GetTotalProfit() < 0) new_risk_ratio /= 2; // Half risk if we're in overall loss.
+    if (GetTotalProfit() < 0) new_ea_risk_ratio /= 2; // Half risk if we're in overall loss.
   #endif
   */
 
-  return new_risk_ratio;
+  return new_ea_risk_ratio;
 }
 
 /**
@@ -3991,8 +3916,8 @@ void StartNewHour() {
   if (VerboseDebug) PrintFormat("== New hour: %d", hour_of_day);
 
   // Update variables.
-  risk_ratio = GetRiskRatio();
-  max_orders = GetMaxOrders(lot_size);
+  ea_risk_ratio = GetRiskRatio();
+  max_orders = GetMaxOrders(ea_lot_size);
 
   // Check if new day has been started.
   if (day_of_week != DayOfWeek()) {
@@ -4115,7 +4040,7 @@ void StartNewWeek() {
 
   // Calculate lot size, orders and risk.
   ea_risk_margin = GetRiskMargin(); // Re-calculate risk margin.
-  lot_size = GetLotSize(); // Re-calculate lot size.
+  ea_lot_size = GetLotSize(); // Re-calculate lot size.
   UpdateStrategyLotSize(); // Update strategy lot size.
 
   // Update boosting values.
@@ -4123,7 +4048,7 @@ void StartNewWeek() {
 
   // Reset variables.
   string sar_stats = "Weekly SAR stats: ";
-  for (int i = 0; i < FINAL_PERIOD_TYPE_ENTRY; i++) {
+  for (int i = 0; i < FINAL_ENUM_TIMEFRAMES_INDEX_ENTRY; i++) {
     sar_stats += StringFormat("Period: %d, Buy/Sell: %d/%d; ", i, signals[WEEKLY][SAR1][i][OP_BUY], signals[WEEKLY][SAR1][i][OP_SELL]);
     //sar_stats += "Buy M1: " + signals[WEEKLY][SAR1][i][OP_BUY] + " / " + "Sell M1: " + signals[WEEKLY][SAR1][i][OP_SELL] + "; ";
     //sar_stats += "Buy M5: " + signals[WEEKLY][SAR5][i][OP_BUY] + " / " + "Sell M5: " + signals[WEEKLY][SAR5][i][OP_SELL] + "; ";
@@ -4161,7 +4086,7 @@ void StartNewMonth() {
 
   // Reset variables.
   string sar_stats = "Monthly SAR stats: ";
-  for (int i = 0; i < FINAL_PERIOD_TYPE_ENTRY; i++) {
+  for (int i = 0; i < FINAL_ENUM_TIMEFRAMES_INDEX_ENTRY; i++) {
     sar_stats += StringFormat("Period: %d, Buy/Sell: %d/%d; ", i, signals[MONTHLY][SAR1][i][OP_BUY], signals[MONTHLY][SAR1][i][OP_SELL]);
     // sar_stats += "Buy M1: " + signals[MONTHLY][SAR1][i][OP_BUY] + " / " + "Sell M1: " + signals[MONTHLY][SAR1][i][OP_SELL] + "; ";
     // sar_stats += "Buy M5: " + signals[MONTHLY][SAR5][i][OP_BUY] + " / " + "Sell M5: " + signals[MONTHLY][SAR5][i][OP_SELL] + "; ";
@@ -4195,7 +4120,7 @@ void StartNewYear() {
   year = DateTime::Year(); // Returns the current year, i.e., the year of the last known server time.
 
   // Reset variables.
-  for (int i = 0; i < FINAL_PERIOD_TYPE_ENTRY; i++) {
+  for (int i = 0; i < FINAL_ENUM_TIMEFRAMES_INDEX_ENTRY; i++) {
     signals[YEARLY][SAR1][i][OP_BUY] = 0;
     signals[YEARLY][SAR1][i][OP_SELL] = 0;
   }
@@ -4259,7 +4184,7 @@ bool InitializeVariables() {
     market_maxlot = 100;
   }
 
-  market_marginrequired = Market::GetMarginRequired();
+  market_marginrequired = Market::GetMarginRequired(_Symbol);
   if (market_marginrequired == 0) {
     init &= !ValidateSettings;
     Msg::ShowText(StringFormat("Invalid MODE_MARGINREQUIRED: %g", market_marginrequired), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
@@ -4303,19 +4228,19 @@ bool InitializeVariables() {
   max_order_slippage = Convert::PipsToPoints(MaxOrderPriceSlippage); // Maximum price slippage for buy or sell orders (converted into points).
 
   // Calculate lot size, orders, risk ratio and margin risk.
-  risk_ratio = GetRiskRatio();   // Re-calculate risk ratio.
+  ea_risk_ratio = GetRiskRatio();   // Re-calculate risk ratio.
   ea_risk_margin = GetRiskMargin(); // Re-calculate risk margin.
-  lot_size = GetLotSize();       // Re-calculate lot size (dependent on risk_ratio).
-  if (lot_size <= 0) {
-    Msg::ShowText(StringFormat("Lot size is %g!", lot_size), "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
+  ea_lot_size = GetLotSize();       // Re-calculate lot size (dependent on ea_risk_ratio).
+  if (ea_lot_size <= 0) {
+    Msg::ShowText(StringFormat("Lot size is %g!", ea_lot_size), "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
     if (ValidateSettings) {
       // @fixme: Fails on Gold H1.
       return (False);
     } else {
-      lot_size = Market::GetMinLot(_Symbol);
+      ea_lot_size = Market::GetMinLot(_Symbol);
     }
   }
-  max_orders = GetMaxOrders(lot_size);
+  max_orders = GetMaxOrders(ea_lot_size);
 
   gmt_offset = TimeGMTOffset();
   ArrayInitialize(todo_queue, 0); // Reset queue list.
@@ -4893,24 +4818,15 @@ bool InitStrategies() {
   #endif
 
   if (!init && ValidateSettings) {
-    ListTimeframes(True);
+    Msg::ShowText(Backtest::ListTimeframes(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
     Msg::ShowText("Initiation of strategies failed!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
     return (FALSE);
   }
 
   Arrays::ArrSetValueD(conf, FACTOR, 1.0);
-  Arrays::ArrSetValueD(conf, LOT_SIZE, lot_size);
+  Arrays::ArrSetValueD(conf, LOT_SIZE, ea_lot_size);
 
   return (TRUE);
-}
-
-/**
- * Check whether timeframe is valid.
- */
-bool CheckTf(ENUM_TIMEFRAMES tf = PERIOD_M1, string symbol = NULL) {
-  double _ima = iMA(symbol, tf, 13, 8, MODE_SMMA, PRICE_MEDIAN, 0);
-  if (VerboseDebug) PrintFormat("%s: Tf: %d, MA: %g", __FUNCTION__, tf, _ima);
-  return (iMA(symbol, tf, 13, 8, MODE_SMMA, PRICE_MEDIAN, 0) > 0);
 }
 
 /**
@@ -4928,7 +4844,7 @@ bool InitClasses() {
 bool InitStrategy(int key, string name, bool active, int indicator, ENUM_TIMEFRAMES tf, int signal_method = 0, double signal_level = 0.0, int open_cond1 = 0, int open_cond2 = 0, int close_cond = 0, double max_spread = 0.0) {
   if (active) {
     // Validate whether the timeframe is working.
-    if (!CheckTf(tf)) {
+    if (!Backtest::ValidTf(tf)) {
       Msg::ShowText(
         StringFormat("Cannot initialize %s strategy, because its timeframe (%d) is not active!%s", name, tf, ValidateSettings ? " Disabling..." : ""),
         "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
@@ -5286,7 +5202,7 @@ double GetDefaultProfitFactor() {
  * Calculate lot size for specific strategy.
  */
 double GetStrategyLotSize(int sid, int cmd) {
-  double trade_lot = (conf[sid][LOT_SIZE] > 0 ? conf[sid][LOT_SIZE] : lot_size) * (conf[sid][FACTOR] > 0 ? conf[sid][FACTOR] : 1.0);
+  double trade_lot = (conf[sid][LOT_SIZE] > 0 ? conf[sid][LOT_SIZE] : ea_lot_size) * (conf[sid][FACTOR] > 0 ? conf[sid][FACTOR] : 1.0);
   #ifdef __advanced__
   if (Boosting_Enabled) {
     double pf = GetStrategyProfitFactor(sid);
@@ -5299,7 +5215,7 @@ double GetStrategyLotSize(int sid, int cmd) {
       __FUNCTION__, __LINE__, sname[sid], conf[sid][FACTOR], trade_lot, trade_lot * BoostTrendFactor);
     trade_lot *= BoostTrendFactor;
   }
-  return NormalizeLots(trade_lot);
+  return Market::NormalizeLots(trade_lot);
 }
 
 /**
@@ -5362,7 +5278,7 @@ void UpdateStrategyFactor(int period) {
  */
 void UpdateStrategyLotSize() {
   for (int i = 0; i < ArrayRange(conf, 0); i++) {
-    conf[i][LOT_SIZE] = lot_size * conf[i][FACTOR];
+    conf[i][LOT_SIZE] = ea_lot_size * conf[i][FACTOR];
   }
 }
 
@@ -5785,8 +5701,8 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
                      + "; Balance: " + Convert::ValueWithCurrency(Account::AccountBalance())
                      + (Account::AccountCredit() > 0 ? "; Credit: " + Convert::ValueWithCurrency(Account::AccountCredit()) : "")
                      + sep
-                  + indent + "| Lot size: " + DoubleToStr(lot_size, volume_digits) + "; " + text_max_orders + sep
-                  + indent + "| Risk ratio: " + DoubleToStr(risk_ratio, 1) + " (" + GetRiskRatioText() + ")" + sep
+                  + indent + "| Lot size: " + DoubleToStr(ea_lot_size, volume_digits) + "; " + text_max_orders + sep
+                  + indent + "| Risk ratio: " + DoubleToStr(ea_risk_ratio, 1) + " (" + GetRiskRatioText() + ")" + sep
                   + indent + "| " + GetOrdersStats("" + sep + indent + "| ") + "" + sep
                   + indent + "| Last error: " + last_err + "" + sep
                   + indent + "| Last message: " + last_msg + "" + sep
@@ -5847,7 +5763,7 @@ string GetOrdersStats(string sep = "\n") {
   // Prepare text for Total Orders.
   string total_orders_text = StringFormat("Open Orders: %d", total_orders);
   total_orders_text += StringFormat(" +%d/-%d", CalculateOrdersByCmd(OP_BUY),  CalculateOrdersByCmd(OP_SELL));
-  total_orders_text += StringFormat(" [%.2f lots]", CalculateOpenLots());
+  total_orders_text += StringFormat(" [%.2f lots]", Orders::GetOpenLots(_Symbol, MagicNumber, FINAL_STRATEGY_TYPE_ENTRY));
   total_orders_text += StringFormat(" (other: %d)", GetTotalOrders(FALSE));
   // Prepare data about open orders per strategy type.
   string orders_per_type = "Stats: "; // Display open orders per type.
@@ -5875,7 +5791,7 @@ string GetAccountTextDetails(string sep = "; ") {
       "Used Margin: ", Convert::ValueWithCurrency(Account::AccountMargin()), sep,
       "Free Margin: ", Convert::ValueWithCurrency(Account::AccountFreeMargin()), sep,
       "No of Orders: ", total_orders, " (BUY/SELL: ", CalculateOrdersByCmd(OP_BUY), "/", CalculateOrdersByCmd(OP_SELL), ")", sep,
-      "Risk Ratio: ", DoubleToStr(risk_ratio, 1)
+      "Risk Ratio: ", DoubleToStr(ea_risk_ratio, 1)
    );
 }
 
@@ -5903,43 +5819,21 @@ string GetSummaryText() {
  */
 string GetRiskRatioText() {
   string text = "Normal";
-  if (RiskRatio != 0.0 && risk_ratio < 0.9) text = "Set low manually";
-  else if (risk_ratio < 0.2) text = "Extremely risky!";
-  else if (risk_ratio < 0.3) text = "Very risky!";
-  else if (risk_ratio < 0.5) text = "Risky!";
-  else if (risk_ratio < 0.9) text = "Below normal, but ok";
-  else if (risk_ratio > 5.0) text = "Extremely high (risky!)";
-  else if (risk_ratio > 2.0) text = "Very high";
-  else if (risk_ratio > 1.4) text = "High";
+  if (RiskRatio != 0.0 && ea_risk_ratio < 0.9) text = "Set low manually";
+  else if (ea_risk_ratio < 0.2) text = "Extremely risky!";
+  else if (ea_risk_ratio < 0.3) text = "Very risky!";
+  else if (ea_risk_ratio < 0.5) text = "Risky!";
+  else if (ea_risk_ratio < 0.9) text = "Below normal, but ok";
+  else if (ea_risk_ratio > 5.0) text = "Extremely high (risky!)";
+  else if (ea_risk_ratio > 2.0) text = "Very high";
+  else if (ea_risk_ratio > 1.4) text = "High";
   #ifdef __advanced__
     if (StringLen(rr_text) > 0) text += " - reason: " + rr_text;
   #endif
   return text;
 }
 
-/**
- * Print multi-line text.
- */
-void PrintText(string text) {
-  string result[];
-  ushort usep = StringGetCharacter("\n", 0);
-  for (int i = StringSplit(text, usep, result)-1; i >= 0; i--) {
-    Print(result[i]);
-  }
-}
-
 /* END: DISPLAYING FUNCTIONS */
-
-/* BEGIN: STRING FUNCTIONS */
-
-/**
- * Remove separator character from the end of the string.
- */
-void TxtRemoveSepChar(string& text, string sep) {
-  if (StringSubstr(text, StringLen(text)-1) == sep) text = StringSubstr(text, 0, StringLen(text)-1);
-}
-
-/* END: STRING FUNCTIONS */
 
 /* BEGIN: ACTION FUNCTIONS */
 
@@ -6095,7 +5989,7 @@ int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = TRUE) {
          TaskAddCloseOrder(OrderTicket(), reason_id); // Add task to re-try.
          processed++;
       } else {
-         Msg::ShowText(StringFormat("Error: Order Pos: %d; Message: %s", order, GetErrorText(GetLastError())),
+         Msg::ShowText(StringFormat("Error: Order Pos: %d; Message: %s", order, Errors::GetErrorText(GetLastError())),
             "Debug", __FUNCTION__, __LINE__, VerboseDebug);
       }
    }
@@ -6847,24 +6741,13 @@ void ReportAdd(string msg) {
  */
 string GetStatReport(string sep = "\n") {
   string output = "";
-  output += StringFormat("Modelling quality:                          %.2f%%", Backtest::CalculateModellingQuality()) + sep;
+  output += StringFormat("Modelling quality:                          %.2f%%", Backtest::CalcModellingQuality()) + sep;
   output += StringFormat("Total bars processed:                       %d", total_stats.GetTotalBars()) + sep;
   output += StringFormat("Total ticks processed:                      %d", total_stats.GetTotalTicks()) + sep;
   output += StringFormat("Bars per hour (avg):                        %d", total_stats.GetBarsPerPeriod(PERIOD_H1)) + sep;
   output += StringFormat("Ticks per bar (avg):                        %d (bar=%dmins)", total_stats.GetTicksPerBar(), Period()) + sep;
   output += StringFormat("Ticks per min (avg):                        %d", total_stats.GetTicksPerMin()) + sep;
 
-  return output;
-}
-
-/**
- * Get log report.
- */
-string GetLogReport(string sep = "\n") {
-  string output = "";
-  if (ArraySize(log) > 0) output += "Report log:\n";
-  for (int i = 0; i < ArraySize(log); i++)
-    output += log[i] + sep;
   return output;
 }
 
