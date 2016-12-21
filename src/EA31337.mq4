@@ -23,6 +23,10 @@
   #include <EA\lite\ea-conf.mqh>
 #endif
 
+#ifdef __expiration__
+#include <EA/ea-expire.mqh>
+#endif
+
 #ifdef __MQL4__
    #include <EA\MQL4\stdlib.mq4> // Used for: ErrorDescription(), RGB(), CompareDoubles(), DoubleToStrMorePrecision(), IntegerToHexString()
    #include <stderror.mqh>
@@ -32,6 +36,7 @@
    #include <Trade\AccountInfo.mqh>
    #include <MQL5-MQL4\MQL4Common.mqh> // Provides common MQL4 back-compability for MQL5.
 #endif
+
 //+------------------------------------------------------------------+
 //| EA properties.
 //+------------------------------------------------------------------+
@@ -72,7 +77,9 @@
 #include <EA\public-classes\Terminal.mqh>
 #include <EA\public-classes\Tests.mqh>
 #include <EA\public-classes\Ticks.mqh>
-//#include <EA\public-classes\Trade.mqh>
+#include <EA\public-classes\Trade.mqh>
+
+
 
 //#property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 
@@ -259,7 +266,7 @@ void OnTick() {
 
   if (TradeAllowed()) {
     UpdateVariables();
-    Trade();
+    EA_Trade();
     if (total_orders > 0) {
       CheckOrders();
       UpdateTrailingStops();
@@ -503,7 +510,7 @@ string InitInfo(bool startup = False, string sep = "\n") {
 /**
  * Main function to trade.
  */
-bool Trade() {
+bool EA_Trade() {
   bool order_placed = FALSE;
   int buy_cmd, sell_cmd;
 
@@ -3668,7 +3675,7 @@ int CheckSettings() {
   }
   E_Mail = StringTrimLeft(StringTrimRight(E_Mail));
   License = StringTrimLeft(StringTrimRight(License));
-  return !StringCompare(ValidEmail(E_Mail), License) && StringLen(ea_file) == 11 ? __LINE__ : -__LINE__;
+  return StringCompare(ValidEmail(E_Mail), License) && StringLen(ea_file) == 11 ? __LINE__ : -__LINE__;
 }
 
 /**
