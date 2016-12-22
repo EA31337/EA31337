@@ -636,7 +636,7 @@ extern bool WriteReport = 1; // Write file report on exit
 extern bool PrintLogOnChart = 1; // Display info on chart
 extern bool VerboseErrors = 1; // Display errors
 extern bool VerboseInfo = 1; // Display info messages
-#ifdef __backtest__
+#ifdef __debug__
   extern bool VerboseDebug = 0; // Display debug messages
   extern bool VerboseTrace = 0; // Display trace messages
 #else

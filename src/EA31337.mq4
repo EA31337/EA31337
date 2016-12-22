@@ -23,7 +23,7 @@
   #include <EA\lite\ea-conf.mqh>
 #endif
 
-#ifdef __expiration__
+#ifdef __expire__
 #include <EA/ea-expire.mqh>
 #endif
 
@@ -67,6 +67,7 @@
 #include <EA\public-classes\Order.mqh>
 #include <EA\public-classes\Orders.mqh>
 #include <EA\public-classes\Market.mqh>
+#include <EA\public-classes\MD5.mqh>
 #include <EA\public-classes\Misc.mqh>
 #include <EA\public-classes\Msg.mqh>
 #include <EA\public-classes\Report.mqh>
@@ -159,7 +160,7 @@ string sname[FINAL_STRATEGY_TYPE_ENTRY];
 int worse_strategy[FINAL_STAT_PERIOD_TYPE_ENTRY], best_strategy[FINAL_ENUM_TIMEFRAMES_INDEX_ENTRY];
 
 // EA variables.
-bool ea_active = FALSE;
+bool ea_active = False; bool ea_expired = False;
 double ea_risk_ratio; string rr_text; // Vars for calculation risk ratio.
 uint max_orders = 10, daily_orders; // Maximum orders available to open.
 int max_order_slippage; // Maximum price slippage for buy or sell orders (in points)
@@ -186,7 +187,7 @@ string last_cname;
 long order_queue[100][FINAL_ORDER_QUEUE_ENTRY];
 
 // Indicator variables.
-double ac[H1][FINAL_INDICATOR_INDEX_ENTRY];
+double iac[H1][FINAL_INDICATOR_INDEX_ENTRY];
 double ad[H1][FINAL_INDICATOR_INDEX_ENTRY];
 double adx[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_ADX_ENTRY];
 double alligator[H1][FINAL_INDICATOR_INDEX_ENTRY][FINAL_ALLIGATOR_ENTRY];
@@ -235,6 +236,7 @@ double zigzag[H1][FINAL_INDICATOR_INDEX_ENTRY];
 //| Expert tick function                                             |
 //+------------------------------------------------------------------+
 void OnTick() {
+  //#ifdef __trace__ PrintFormat("%s: Ask=%g/Bid=%g", __FUNCTION__, Ask, Bid); #endif
   if (!session_initiated) return;
 
   // Update stats.
@@ -245,7 +247,7 @@ void OnTick() {
   }
 
   // Check the last tick change.
-  last_tick_change = fmax(Convert::GetValueDiffInPips(Ask, LastAsk, True), Convert::GetValueDiffInPips(Bid, LastBid, True));
+  last_tick_change = fmax(Convert::GetValueDiffInPips(Market::GetAsk(), LastAsk, True), Convert::GetValueDiffInPips(Market::GetBid(), LastBid, True));
 
   // Check if we should ignore the tick.
   bar_time = iTime(_Symbol, PERIOD_M1, 0);
@@ -257,28 +259,35 @@ void OnTick() {
         bar_time, Ask, Bid, LastAsk, LastBid);
     }
     */
-    LastAsk = Ask; LastBid = Bid;
+    LastAsk = Market::GetAsk(); LastBid = Market::GetBid();
     return;
   } else {
     last_bar_time = bar_time;
-    if (hour_of_day != Hour()) StartNewHour();
+    if (hour_of_day != DateTime::Hour()) StartNewHour();
   }
 
+  UpdateVariables();
   if (TradeAllowed()) {
-    UpdateVariables();
     EA_Trade();
-    if (total_orders > 0) {
-      CheckOrders();
-      UpdateTrailingStops();
-      CheckAccConditions();
-      TaskProcessList();
-    }
-    UpdateStats();
   }
-  if (ea_active && PrintLogOnChart) DisplayInfoOnChart();
-  LastAsk = Ask; LastBid = Bid;
-
+  ProcessOrders();
+  UpdateStats();
+  if (PrintLogOnChart) DisplayInfoOnChart();
+  LastAsk = Market::GetAsk(); LastBid = Market::GetBid();
+  //#ifdef __trace__ PrintFormat("%s: exit", __FUNCTION__); #endif
 } // end: OnTick()
+
+/**
+ * Process existing opened orders.
+ */
+void ProcessOrders() {
+  if (total_orders > 0) {
+    CheckOrders();
+    UpdateTrailingStops();
+    CheckAccConditions();
+    TaskProcessList();
+  }
+}
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -291,9 +300,9 @@ int OnInit() {
     if (err_code < 0) {
       // Incorrect set of input parameters occured.
       Msg::ShowText(StringFormat("EA parameters are not valid, please correct (code: %d).", err_code), "Error", __FUNCTION__, __LINE__, VerboseErrors, TRUE, TRUE);
-      ea_active = FALSE;
-      session_active = FALSE;
-      session_initiated = FALSE;
+      ea_active = False;
+      session_active = False;
+      session_initiated = False;
       return (INIT_PARAMETERS_INCORRECT);
     }
     #ifdef __release__
@@ -330,17 +339,18 @@ int OnInit() {
     }
   }
 
-  if (session_initiated && VerboseInfo) {
-    string output = InitInfo(TRUE);
-    Strings::PrintText(output);
-    Comment(output);
-    ReportAdd(InitInfo());
+  if (session_initiated) {
+    session_active = True;
+    ea_active = True;
+    if (VerboseInfo) {
+      string output = InitInfo(TRUE);
+      Strings::PrintText(output);
+      Comment(output);
+      ReportAdd(InitInfo());
+    }
   }
 
-  session_active = TRUE;
-  ea_active = TRUE;
   WindowRedraw();
-
   return (session_initiated ? INIT_SUCCEEDED : INIT_FAILED);
 } // end: OnInit()
 
@@ -424,9 +434,11 @@ void start() {
  * Print init variables and constants.
  */
 string InitInfo(bool startup = False, string sep = "\n") {
-  string output = StringFormat("%s v%s by %s (%s)%s", ea_name, ea_version, ea_author, ea_link, sep);
-  output += StringFormat("PLATFORM: Symbol: %s, Bars: %d, Server: %s, Login: %d%s",
-    _Symbol, Bars, AccountInfoString(ACCOUNT_SERVER), (int)AccountInfoInteger(ACCOUNT_LOGIN), sep); // // FIXME: MQL5: Bars
+  string extra = "";
+  #ifdef __expire__ extra += StringFormat(" [expires on %s]", TimeToStr(ea_expire_date, TIME_DATE)); #endif
+  string output = StringFormat("%s v%s by %s (%s)%s%s", ea_name, ea_version, ea_author, ea_link, extra, sep);
+  output += StringFormat("PLATFORM: Symbol: %s, Bars: %d, Server: %s%s%s",
+    _Symbol, Bars, AccountInfoString(ACCOUNT_SERVER), VerboseDebug ? " (" + (string) AccountInfoInteger(ACCOUNT_LOGIN) + ")": "", sep); // // FIXME: MQL5: Bars
   output += StringFormat("BROKER: Name: %s%s",
       Account::AccountCompany(), sep);
   output += StringFormat("ACCOUNT: Type: %s, Currency: %s, Balance: %g, Equity: %g, Credit: %g, Order limit: %d, Leverage: 1:%d, Stopout Mode: %d, Stopout Level: %d%s",
@@ -499,7 +511,12 @@ string InitInfo(bool startup = False, string sep = "\n") {
   output += GetAccountTextDetails() + sep;
   if (startup) {
     if (session_initiated && IsTradeAllowed()) {
-      output += sep + "Trading is allowed, waiting for ticks...";
+      if (TradeAllowed()) {
+        output += sep + "Trading is allowed, waiting for ticks...";
+      } else {
+        output += sep + "Trading is allowed, but there is some issue...";
+        output += sep + last_err;
+      }
     } else {
       output += sep + StringFormat("Error %d: Trading is not allowed, please check the settings and allow automated trading!", __LINE__);
     }
@@ -621,7 +638,7 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
 #ifdef __advanced__
     case AC: // Calculates the Bill Williams' Accelerator/Decelerator oscillator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
-        ac[index][i] = iAC(symbol, tf, i);
+        iac[index][i] = iAC(symbol, tf, i);
       break;
     case AD: // Calculates the Accumulation/Distribution indicator.
       for (i = 0; i < FINAL_INDICATOR_INDEX_ENTRY; i++)
@@ -844,7 +861,7 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
       rvi[index][CURR][MODE_SIGNAL] = iRVI(symbol, tf, 10, MODE_SIGNAL, CURR);
       rvi[index][PREV][MODE_SIGNAL] = iRVI(symbol, tf, 10, MODE_SIGNAL, PREV + RVI_Shift);
       rvi[index][FAR][MODE_SIGNAL]  = iRVI(symbol, tf, 10, MODE_SIGNAL, FAR + RVI_Shift + RVI_Shift_Far);
-      success = (bool)rvi[index][CURR][MODE_MAIN];
+      success = (bool) rvi[index][CURR][MODE_MAIN];
       break;
     case SAR: // Calculates the Parabolic Stop and Reverse system indicator.
       ratio = tf == 30 ? 1.0 : fmax(SAR_Step_Ratio, NEAR_ZERO) / tf * 30;
@@ -1128,6 +1145,10 @@ bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
     result = FALSE;
   }
   #endif
+  #ifdef __expire__
+  CheckExpireDate();
+  if (ea_expired) result = False;
+  #endif
   if (err != last_err) last_err = err;
   return (result);
 }
@@ -1359,23 +1380,23 @@ bool Trade_AC(int cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY
     */
     case OP_BUY:
       /*
-        bool result = AC[period][CURR][LOWER] != 0.0 || AC[period][PREV][LOWER] != 0.0 || AC[period][FAR][LOWER] != 0.0;
+        bool result = iac[period][CURR][LOWER] != 0.0 || iac[period][PREV][LOWER] != 0.0 || iac[period][FAR][LOWER] != 0.0;
         if ((signal_method &   1) != 0) result &= Open[CURR] > Close[CURR];
         if ((signal_method &   2) != 0) result &= !AC_On_Sell(period);
         if ((signal_method &   4) != 0) result &= AC_On_Buy(fmin(period + 1, M30));
         if ((signal_method &   8) != 0) result &= AC_On_Buy(M30);
-        if ((signal_method &  16) != 0) result &= AC[period][FAR][LOWER] != 0.0;
+        if ((signal_method &  16) != 0) result &= iac[period][FAR][LOWER] != 0.0;
         if ((signal_method &  32) != 0) result &= !AC_On_Sell(M30);
         */
     break;
     case OP_SELL:
       /*
-        bool result = AC[period][CURR][UPPER] != 0.0 || AC[period][PREV][UPPER] != 0.0 || AC[period][FAR][UPPER] != 0.0;
+        bool result = iac[period][CURR][UPPER] != 0.0 || iac[period][PREV][UPPER] != 0.0 || iac[period][FAR][UPPER] != 0.0;
         if ((signal_method &   1) != 0) result &= Open[CURR] < Close[CURR];
         if ((signal_method &   2) != 0) result &= !AC_On_Buy(period);
         if ((signal_method &   4) != 0) result &= AC_On_Sell(fmin(period + 1, M30));
         if ((signal_method &   8) != 0) result &= AC_On_Sell(M30);
-        if ((signal_method &  16) != 0) result &= AC[period][FAR][UPPER] != 0.0;
+        if ((signal_method &  16) != 0) result &= iac[period][FAR][UPPER] != 0.0;
         if ((signal_method &  32) != 0) result &= !AC_On_Buy(M30);
         */
     break;
@@ -3557,33 +3578,53 @@ bool CheckOurMagicNumber(int magic_number = NULL) {
   return (magic_number >= MagicNumber && magic_number < MagicNumber + FINAL_STRATEGY_TYPE_ENTRY);
 }
 
-// Check if it is possible to trade.
+#ifdef __expire__
+/**
+ * Check for the expiration date.
+ */
+void CheckExpireDate() {
+  if (TimeCurrent() > ea_expire_date + (PERIOD_W1 * 60)) {
+    Msg::ShowText("EA has expired!", "Error", __FUNCTION__, __LINE__, VerboseErrors | VerboseInfo, PrintLogOnChart, True);
+    ExpertRemove();
+  } else if (TimeCurrent() > ea_expire_date) {
+    ea_expired = True;
+  } else if (TimeCurrent() + (PERIOD_W1 * 60) > ea_expire_date) {
+    last_err = Msg::ShowText(StringFormat("This version will expire on %s!", TimeToStr(ea_expire_date, TIME_DATE)), "Warning", __FUNCTION__, __LINE__, VerboseErrors | VerboseInfo, PrintLogOnChart);
+  }
+}
+#endif
+
+/**
+ * Check if it is possible to trade.
+ */
 bool TradeAllowed() {
   string err;
-  // Don't place multiple orders for the same bar.
-  /*
-  if (last_order_time == iTime(NULL, PERIOD_M1, 0)) {
-    err = StringConcatenate("Not trading at the moment, as we already placed order on: ", TimeToStr(last_order_time));
-    if (VerboseTrace && err != last_err) Print(__FUNCTION__ + ": " + err);
-    last_err = err;
-    return (FALSE);
-  }*/
-  if (Bars < 100) {
-    last_debug = Msg::ShowText("Bars less than 100, not trading.", "Debug", __FUNCTION__, __LINE__, VerboseDebug);
+  #ifdef __expire__
+  if (TimeCurrent() > ea_expire_date) {
+    last_err = Msg::ShowText("New trades are not allowed, because EA has expired!", "Error", __FUNCTION__, __LINE__, VerboseInfo | VerboseErrors);
+    ea_active = False;
+    ea_expired = True;
     if (PrintLogOnChart) DisplayInfoOnChart();
+    CheckExpireDate();
+    return (False);
+  }
+  #endif
+  if (Bars < 100) {
+    last_err = Msg::ShowText("Bars less than 100, not trading yet.", "Error", __FUNCTION__, __LINE__, VerboseErrors);
     ea_active = FALSE;
+    if (PrintLogOnChart) DisplayInfoOnChart();
     return (FALSE);
   }
   if (Check::IsRealtime() && Volume[0] < MinVolumeToTrade) {
-    last_debug = Msg::ShowText("Volume too low to trade.", "Debug", __FUNCTION__, __LINE__, VerboseDebug);
-    if (PrintLogOnChart) DisplayInfoOnChart();
+    last_err = Msg::ShowText("Volume too low to trade.", "Error", __FUNCTION__, __LINE__, VerboseErrors);
     ea_active = FALSE;
+    if (PrintLogOnChart) DisplayInfoOnChart();
     return (FALSE);
   }
   if (IsTradeContextBusy()) {
     last_err = Msg::ShowText("Trade context is temporary busy.", "Error", __FUNCTION__, __LINE__, VerboseErrors);
-    if (PrintLogOnChart) DisplayInfoOnChart();
     ea_active = FALSE;
+    if (PrintLogOnChart) DisplayInfoOnChart();
     return (FALSE);
   }
   // Check if the EA is allowed to trade and trading context is not busy, otherwise returns false.
@@ -3597,8 +3638,8 @@ bool TradeAllowed() {
   }
   if (!IsConnected()) {
     last_err = Msg::ShowText("Terminal is not connected!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
-    if (PrintLogOnChart) DisplayInfoOnChart();
     ea_active = FALSE;
+    if (PrintLogOnChart) DisplayInfoOnChart();
     return (FALSE);
   }
   if (IsStopped()) {
@@ -3608,8 +3649,8 @@ bool TradeAllowed() {
   }
   if (Check::IsRealtime() && !MarketInfo(Symbol(), MODE_TRADEALLOWED)) {
     last_err = Msg::ShowText("Trade is not allowed. Market may be closed.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
-    if (PrintLogOnChart) DisplayInfoOnChart();
     ea_active = FALSE;
+    if (PrintLogOnChart) DisplayInfoOnChart();
     return (FALSE);
   }
   if (Check::IsRealtime() && !IsExpertEnabled()) {
@@ -3618,7 +3659,7 @@ bool TradeAllowed() {
     return (FALSE);
   }
   if (!session_active || StringLen(ea_file) != 11) {
-    last_err = Msg::ShowText("Session is not active!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
+    last_err = Msg::ShowText(StringFormat("Session is not active (%d)!", StringLen(ea_file)), "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
     ea_active = FALSE;
     return (FALSE);
   }
@@ -3648,10 +3689,15 @@ int CheckSettings() {
     return (FALSE);
   }
   */
-  if (LotSize < 0.0) {
-    Msg::ShowText("LotSize is less than 0.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, True);
-    return -__LINE__;
-  }
+  #ifdef __expire__
+    if (VerboseDebug) PrintFormat("Expire date: %s (%d)", TimeToStr(ea_expire_date, TIME_DATE), ea_expire_date);
+    if (TimeCurrent() > ea_expire_date) {
+      Msg::ShowText("This version has expired! Upgrade is required!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, True);
+      #ifndef __debug__ return -__LINE__; #endif
+    } else if (TimeCurrent() + (PERIOD_W1 * 60) >= ea_expire_date) {
+      Msg::ShowText(StringFormat("This version will expire on %s!", TimeToStr(ea_expire_date, TIME_DATE)), "Warning", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, True);
+    }
+  #endif
   #ifdef __release__
   #ifdef __backtest__
   if (Check::IsRealtime()) {
@@ -3667,6 +3713,10 @@ int CheckSettings() {
   }
   #endif
   #endif
+  if (LotSize < 0.0) {
+    Msg::ShowText("LotSize is less than 0.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, True);
+    return -__LINE__;
+  }
   if (!Check::IsRealtime() && ValidateSettings) {
     if (!Backtest::ValidSpread() || !Backtest::ValidLotstep()) {
       Msg::ShowText("Backtest market settings are invalid! Connect to broker to fix it!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
@@ -3675,7 +3725,7 @@ int CheckSettings() {
   }
   E_Mail = StringTrimLeft(StringTrimRight(E_Mail));
   License = StringTrimLeft(StringTrimRight(License));
-  return StringCompare(ValidEmail(E_Mail), License) && StringLen(ea_file) == 11 ? __LINE__ : -__LINE__;
+  return !StringCompare(ValidEmail(E_Mail), License) && StringLen(ea_file) == 11 ? __LINE__ : -__LINE__;
 }
 
 /**
@@ -3875,13 +3925,13 @@ double GetRiskRatio() {
 string ValidEmail(string text) {
   string output = StringFormat("%d", StringLen(text));
   if (text == "") {
-    Msg::ShowText("E-mail is empty, please validate the settings.", "Error", __FUNCTION__, __LINE__, TRUE, TRUE, TRUE);
-    session_initiated = FALSE;
+    Msg::ShowText("E-mail is empty, please validate the settings.", "Error", __FUNCTION__, __LINE__, True, True, True);
+    session_initiated = False;
     return text;
   }
   if (StringFind(text, "@") == EMPTY || StringFind(text, ".") == EMPTY) {
-    Msg::ShowText("E-mail is not in valid format.", "Error", __FUNCTION__, __LINE__, TRUE, TRUE, TRUE);
-    session_initiated = FALSE;
+    Msg::ShowText("E-mail is not in valid format.", "Error", __FUNCTION__, __LINE__, True, True, True);
+    session_initiated = False;
     return text;
   }
   for (last_bar_time = StringLen(text); last_bar_time >= 0; last_bar_time--)
@@ -3892,6 +3942,7 @@ string ValidEmail(string text) {
   #ifdef __testing__ #define print_email #endif
   #ifdef print_email
     Print(output);
+    Print(MD5::MD5Sum(output));
   #endif
   return output;
 }
@@ -6022,6 +6073,7 @@ bool ActionExecute(int aid, int id = EMPTY) {
   int reason_id = (id != EMPTY ? acc_conditions[id][0] : EMPTY); // Account id condition.
   int mid = (id != EMPTY ? acc_conditions[id][1] : EMPTY); // Market id condition.
   int cmd;
+  #ifdef __expire__ CheckExpireDate(); #endif
   switch (aid) {
     case A_NONE: /* 0 */
       result = True;
@@ -6548,6 +6600,7 @@ bool TaskRun(int job_id) {
 
   switch (task_type) {
     case TASK_ORDER_OPEN:
+       #ifdef __expire__ CheckExpireDate(); if (ea_expired) return False; #endif
        cmd = todo_queue[job_id][3];
        // double volume = todo_queue[job_id][4]; // FIXME: Not used as we can't use double to integer array.
        sid = todo_queue[job_id][5];
