@@ -123,10 +123,11 @@ double market_minlot, market_maxlot, market_lotsize, market_lotstep, market_marg
 int order_freezelevel; // Order freeze level in points.
 double curr_spread; // Broker current spread in pips.
 double curr_trend; // Current trend.
-double ea_risk_margin = 1.0; // Risk marigin in percent.
+double ea_risk_margin_per_order, ea_risk_margin_total; // Risk marigin in percent.
 int pip_digits, volume_digits;
 int pts_per_pip; // Number points per pip.
 int gmt_offset = 0; // Current difference between GMT time and the local computer time in seconds, taking into account switch to winter or summer time. Depends on the time settings of your computer.
+// double total_sl, total_tp; // Total SL/TP points.
 
 // Account variables.
 string account_type;
@@ -162,6 +163,7 @@ int worse_strategy[FINAL_STAT_PERIOD_TYPE_ENTRY], best_strategy[FINAL_ENUM_TIMEF
 // EA variables.
 bool ea_active = False; bool ea_expired = False;
 double ea_risk_ratio; string rr_text; // Vars for calculation risk ratio.
+double ea_margin_risk_level[3]; // For margin risk (all/buy/sell);
 uint max_orders = 10, daily_orders; // Maximum orders available to open.
 int max_order_slippage; // Maximum price slippage for buy or sell orders (in points)
 double LastAsk, LastBid; // Keep the last ask and bid price.
@@ -270,7 +272,7 @@ void OnTick() {
   if (TradeAllowed()) {
     EA_Trade();
   }
-  ProcessOrders();
+  UpdateOrders();
   UpdateStats();
   if (PrintLogOnChart) DisplayInfoOnChart();
   LastAsk = Market::GetAsk(); LastBid = Market::GetBid();
@@ -278,15 +280,33 @@ void OnTick() {
 } // end: OnTick()
 
 /**
- * Process existing opened orders.
+ * Update existing opened orders.
  */
-void ProcessOrders() {
+void UpdateOrders() {
   if (total_orders > 0) {
     CheckOrders();
     UpdateTrailingStops();
     CheckAccConditions();
     TaskProcessList();
   }
+}
+
+/**
+ * Process orders.
+ *
+ * This is invoked after order being placed or each hour.
+ */
+void ProcessOrders() {
+  UpdateMarginRiskLevel();
+}
+
+/**
+ * Update margin risk level.
+ */
+void UpdateMarginRiskLevel() {
+  ea_margin_risk_level[OP_BUY] = Account::GetRiskMarginLevel(OP_BUY); // Get current risk margin level for buy orders.
+  ea_margin_risk_level[OP_SELL] = Account::GetRiskMarginLevel(OP_SELL); // Get current risk margin level for sell orders.
+  ea_margin_risk_level[2] = Account::GetRiskMarginLevel(); // Get current risk margin level for all orders.
 }
 
 //+------------------------------------------------------------------+
@@ -364,14 +384,15 @@ void OnDeinit(const int reason) {
   Msg::ShowText(
       StringFormat("EA deinitializing, reason: %s (code: %s)", Errors::GetUninitReasonText(reason), IntegerToString(reason)),
       "Info", __FUNCTION__, __LINE__, VerboseInfo);
-
   if (session_initiated) {
+
+    // Show final account details.
+    Msg::ShowText(GetSummaryText(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
+
     // Save ticks if recorded.
     if (RecordTicksToCSV) {
       ticks.SaveToCSV();
     }
-
-    Msg::ShowText(GetSummaryText(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
 
     string filename;
     if (WriteReport && !Check::IsOptimization()) {
@@ -495,8 +516,8 @@ string InitInfo(bool startup = False, string sep = "\n") {
       Market::GetMarketDistanceInPts(),
       Market::GetMarketDistanceInPips(),
       sep);
-  output += StringFormat("EA params: Risk margin: %g%%%s",
-      ea_risk_margin,
+  output += StringFormat("EA params: Risk ratio: %g, Risk margin per order: %g%%, Risk margin in total: %g%%%s",
+      ea_risk_ratio, ea_risk_margin_per_order, ea_risk_margin_total,
       sep);
   output += StringFormat("Strategies: Active strategies: %d of %d, Max orders: %d (per type: %d)%s",
       GetNoOfStrategies(),
@@ -518,7 +539,7 @@ string InitInfo(bool startup = False, string sep = "\n") {
         output += sep + last_err;
       }
     } else {
-      output += sep + StringFormat("Error %d: Trading is not allowed, please check the settings and allow automated trading!", __LINE__);
+      output += sep + StringFormat("Error %d: Trading is not allowed for this symbol, please enable automated trading or check the settings!", __LINE__);
     }
   }
   return output;
@@ -571,6 +592,10 @@ bool EA_Trade() {
     }
   }
   #endif
+
+  if (order_placed) {
+    ProcessOrders();
+  }
 
   return order_placed;
 }
@@ -951,24 +976,36 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
    double close_price = NormalizeDouble(Market::GetClosePrice(cmd), Market::GetDigits());
    // Get the fixed stops.
    // @todo: Test GetOpenPrice vs GetClosePrice
-   double stoploss   = StopLoss   > 0 ? NormalizeDouble(open_price - (StopLoss + TrailingStop) * pip_size * Convert::OpToValue(cmd), Digits) : 0;
-   double takeprofit = TakeProfit > 0 ? NormalizeDouble(close_price + (TakeProfit + TrailingProfit) * pip_size * Convert::OpToValue(cmd), Digits) : 0;
+   double stoploss   = StopLoss   > 0 ? NormalizeDouble(open_price - (StopLoss + TrailingStop) * pip_size * Order::OrderDirection(cmd), Digits) : 0;
+   double takeprofit = TakeProfit > 0 ? NormalizeDouble(close_price + (TakeProfit + TrailingProfit) * pip_size * Order::OrderDirection(cmd), Digits) : 0;
    // Get the dynamic trailing stops.
    double stoploss_trail   = GetTrailingValue(cmd, -1, sid);
    double takeprofit_trail = GetTrailingValue(cmd, +1, sid);
+   // Get maximal stop loss based on the margin risk.
+   double stoploss_max = Trade::GetMaxStopLoss(cmd, trade_volume, GetRiskMarginPerOrder(), _Symbol);
    // Choose the safest stops.
    // @todo: Implement hard stops based on the balance.
    /*
    stoploss   = stoploss > 0   && stoploss_trail > 0
-     ? (Convert::OpToValue(cmd) > 0 ? fmax(stoploss, stoploss_trail) : fmin(stoploss, stoploss_trail))
+     ? (Order::OrderDirection(cmd) > 0 ? fmax(stoploss, stoploss_trail) : fmin(stoploss, stoploss_trail))
      : fmax(stoploss, stoploss_trail);
    takeprofit = takeprofit > 0 && takeprofit_trail > 0
-     ? (Convert::OpToValue(cmd) > 0 ? fmin(takeprofit, takeprofit_trail) : fmax(takeprofit, takeprofit_trail))
+     ? (Order::OrderDirection(cmd) > 0 ? fmin(takeprofit, takeprofit_trail) : fmax(takeprofit, takeprofit_trail))
      : fmax(takeprofit, takeprofit_trail);
    */
    if (Market::TradeOpAllowed(cmd, stoploss_trail, takeprofit_trail, _Symbol)) {
      stoploss = stoploss_trail;
      takeprofit = takeprofit_trail;
+   }
+   if (
+     (Order::OrderDirection(cmd) > 0 && stoploss < stoploss_max) ||
+     (Order::OrderDirection(cmd) < 0 && (stoploss > stoploss_max || stoploss == 0))) {
+     Msg::ShowText(
+       StringFormat("%s: Max stop loss has reached, Current SL: %g, Max SL: %g (%g)",
+       __FUNCTION__, stoploss, stoploss_max, Convert::MoneyToValue(Account::AccountRealBalance() / 100 * GetRiskMarginPerOrder(), trade_volume)),
+       "Debug", __FUNCTION__, __LINE__, VerboseDebug);
+     // @todo: Implement different methods of action.
+     stoploss = stoploss_max;
    }
    // Normalize stops.
    stoploss = NormalizeDouble(stoploss, Market::GetDigits());
@@ -1104,6 +1141,8 @@ bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
   int result = TRUE;
   string err;
   // if (VerboseTrace) Print(__FUNCTION__);
+  // total_sl = Orders::TotalSL(); // Convert::ValueToMoney(Orders::TotalSL(OP_BUY)), Convert::ValueToMoney(Orders::TotalSL(OP_SELL)
+  // total_tp = Orders::TotalTP(); // Convert::ValueToMoney(Orders::TotalSL(OP_BUY)), Convert::ValueToMoney(Orders::TotalSL(OP_SELL)
   if (volume < market_minlot) {
     last_trace = Msg::ShowText(StringFormat("%s: Lot size = %.2f", sname[sid], volume), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
     result = FALSE;
@@ -1131,7 +1170,15 @@ bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
     result = FALSE;
   } else if (!CheckProfitFactorLimits(sid)) {
     result = FALSE;
+  } else if (ea_margin_risk_level[Convert::OpToBuyOrSell(cmd)] > GetRiskMarginInTotal() / 100) {
+    last_msg = Msg::ShowText(
+      StringFormat("Maximum margin risk for %s orders has reached the limit [RiskMarginTotal].",
+      Convert::OrderTypeToString(cmd, True)),
+      "Info", __FUNCTION__, __LINE__, VerboseInfo
+    );
+    result = False;
   }
+
   #ifdef __advanced__
   if (ApplySpreadLimits && !CheckSpreadLimit(sid)) {
     last_trace = Msg::ShowText(StringFormat("%s: Not executing order, because the spread is too high. (spread = %.1f pips).", sname[sid], curr_spread), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
@@ -1350,7 +1397,15 @@ bool UpdateStats() {
     Print(__FUNCTION__ + ": " + GetLastMessage());
     if (WriteReport) ReportAdd(__FUNCTION__ + ": " + GetLastMessage());
   }
-  return (TRUE);
+  /*
+  PrintFormat("Orders: %d/%d (OP_BUY:%d/OP_SELL:%d), Balance: %g (Eq: %g), Total SL: %g (B:%g/S:%g), Total TP: %g (B:%g/S:%g), Calc Money: SL:%g/TP:%g",
+    GetTotalOrders(), OrdersTotal(), CalculateOrdersByCmd(OP_BUY), CalculateOrdersByCmd(OP_SELL),
+    AccountBalance(), AccountEquity(),
+    total_sl, Convert::ValueToMoney(Orders::TotalSL(OP_BUY)), Convert::ValueToMoney(Orders::TotalSL(OP_SELL)),
+    total_tp, Convert::ValueToMoney(Orders::TotalTP(OP_BUY)), Convert::ValueToMoney(Orders::TotalTP(OP_SELL)),
+    Convert::ValueToMoney(total_sl), Convert::ValueToMoney(total_tp));
+  */
+  return (True);
 }
 
 /* INDICATOR FUNCTIONS */
@@ -3034,7 +3089,7 @@ bool UpdateTrailingStops() {
      if (!OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) { continue; }
       if (OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
         sid = OrderMagicNumber() - MagicNumber;
-        // order_stop_loss = NormalizeDouble(Misc::If(Convert::OpToValue(OrderType()) > 0 || OrderStopLoss() != 0.0, OrderStopLoss(), 999999), pip_digits);
+        // order_stop_loss = NormalizeDouble(Misc::If(Order::OrderDirection(OrderType()) > 0 || OrderStopLoss() != 0.0, OrderStopLoss(), 999999), pip_digits);
         // FIXME
         // Make sure we get the minimum distance to StopLevel and freezing distance.
         // See: https://book.mql4.com/appendix/limits
@@ -3128,7 +3183,7 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
         __FUNCTION__, min_elapsed, TrailingStopAddPerMinute, extra_trail);
     }
   }
-  int factor = (Convert::OpToValue(cmd) == direction ? +1 : -1);
+  int factor = (Order::OrderDirection(cmd) == direction ? +1 : -1);
   double trail = (TrailingStop + extra_trail) * pip_size;
   double default_trail = (cmd == OP_BUY ? Bid : Ask) + trail * factor;
   int method = GetTrailingMethod(order_type, direction);
@@ -3305,12 +3360,12 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
      case T1_BANDS: // 25: Current Bands value.
      case T2_BANDS:
        UpdateIndicator(BANDS, tf);
-       new_value = Convert::OpToValue(cmd) == direction ? bands[period][CURR][BANDS_UPPER] : bands[period][CURR][BANDS_LOWER];
+       new_value = Order::OrderDirection(cmd) == direction ? bands[period][CURR][BANDS_UPPER] : bands[period][CURR][BANDS_LOWER];
        break;
      case T1_BANDS_PEAK: // 26: Lowest/highest Bands value.
      case T2_BANDS_PEAK:
        UpdateIndicator(BANDS, tf);
-       new_value = (Convert::OpToValue(cmd) == direction
+       new_value = (Order::OrderDirection(cmd) == direction
          ? fmax(fmax(bands[period][CURR][BANDS_UPPER], bands[period][PREV][BANDS_UPPER]), bands[period][FAR][BANDS_UPPER])
          : fmin(fmin(bands[period][CURR][BANDS_LOWER], bands[period][PREV][BANDS_LOWER]), bands[period][FAR][BANDS_LOWER])
          );
@@ -3318,7 +3373,7 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
      case T1_ENVELOPES: // 27: Current Envelopes value. // FIXME
      case T2_ENVELOPES:
        UpdateIndicator(ENVELOPES, tf);
-       new_value = Convert::OpToValue(cmd) == direction ? envelopes[period][CURR][UPPER] : envelopes[period][CURR][LOWER];
+       new_value = Order::OrderDirection(cmd) == direction ? envelopes[period][CURR][UPPER] : envelopes[period][CURR][LOWER];
        break;
      default:
        Msg::ShowText(StringFormat("Unknown trailing stop method: %d", method), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
@@ -3346,12 +3401,12 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
     if (direction < 0) {
       // Move trailing stop only one direction.
       if (previous == 0) previous = default_trail;
-      if (Convert::OpToValue(cmd) == direction) new_value = (new_value < previous || previous == 0) ? new_value : previous;
+      if (Order::OrderDirection(cmd) == direction) new_value = (new_value < previous || previous == 0) ? new_value : previous;
       else new_value = (new_value > previous || previous == 0) ? new_value : previous;
     }
     else if (direction > 0) {
       // Move profit take only one direction.
-      if (Convert::OpToValue(cmd) == direction) new_value = (new_value > previous || previous == 0) ? new_value : previous;
+      if (Order::OrderDirection(cmd) == direction) new_value = (new_value > previous || previous == 0) ? new_value : previous;
       else new_value = (new_value < previous || previous == 0) ? new_value : previous;
     }
   }
@@ -3648,7 +3703,7 @@ bool TradeAllowed() {
     return (FALSE);
   }
   if (Check::IsRealtime() && !MarketInfo(Symbol(), MODE_TRADEALLOWED)) {
-    last_err = Msg::ShowText("Trade is not allowed. Market may be closed.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
+    last_err = Msg::ShowText("Trading is not allowed. Market may be closed or choose the right symbol. Otherwise contact your broker.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
     ea_active = FALSE;
     if (PrintLogOnChart) DisplayInfoOnChart();
     return (FALSE);
@@ -3754,7 +3809,7 @@ void CheckStats(double value, int type, bool max = true) {
  */
 color GetOrderColor(int cmd = -1) {
   if (cmd == -1) cmd = OrderType();
-  return Convert::OpToValue(cmd) > 0 ? ColorBuy : ColorSell;
+  return Order::OrderDirection(cmd) > 0 ? ColorBuy : ColorSell;
 }
 
 /**
@@ -3805,7 +3860,7 @@ int GetNoOfStrategies() {
  * Calculate size of the lot based on the free margin and account leverage automatically.
  */
 double GetLotSizeAuto(bool smooth = true) {
-  double new_lot_size = Account::CalcLotSize(ea_risk_margin, ea_risk_ratio, _Symbol);
+  double new_lot_size = Account::CalcLotSize(ea_risk_margin_per_order, ea_risk_ratio, _Symbol);
 
   #ifdef __advanced__
   if (Boosting_Enabled) {
@@ -3845,26 +3900,44 @@ double GetLotSize() {
 }
 
 /**
- * Calculate size of the lot based on the free margin and account leverage automatically.
+ * Calculate risk of margin per each order.
+ *
+ * Risk only certain % of total available margin for each order.
  */
-double GetRiskMarginAuto(bool smooth = true) {
-  // Risk only 2%/1% (0.02/0.01) per order of total available margin.
-  double new_risk_margin = 1.0;
-  if (smooth && new_risk_margin > ea_risk_margin) {
-    // Increase only by average of the previous and new (which should prevent sudden increases).
-    return (ea_risk_margin + new_risk_margin) / 2;
-  } else {
-    return new_risk_margin;
-  }
+double GetRiskMarginAutoPerOrder() {
+  // @todo: Add different methods (e.g. violity level).
+  return ea_risk_ratio;
 }
 
 /**
- * Return risk margin.
+ * Calculate risk of margin for all orders.
+ *
+ * Risk only certain % of total available margin for all orders.
+ */
+double GetRiskMarginAutoInTotal() {
+  // @todo: Add different methods (e.g. violity level).
+  return fmin(20, 20 * ea_risk_ratio);
+}
+
+/**
+ * Return risk margin per order.
+ *
  * @return int
  *   Range: 1-100
  */
-double GetRiskMargin() {
-  return RiskMargin == 0 ? GetRiskMarginAuto() : RiskMargin;
+double GetRiskMarginPerOrder() {
+  return RiskMarginPerOrder == 0 ? GetRiskMarginAutoPerOrder() : RiskMarginPerOrder;
+}
+
+
+/**
+ * Return risk margin for total orders.
+ *
+ * @return int
+ *   Range: 1-100
+ */
+double GetRiskMarginInTotal() {
+  return RiskMarginTotal == 0 ? GetRiskMarginAutoInTotal() : RiskMarginTotal;
 }
 
 /**
@@ -3883,23 +3956,25 @@ double GetAutoRiskRatio() {
   // --
   int margin_pc = (int) (100 / equity * margin);
   rr_text = new_ea_risk_ratio < 1.0 ? StringFormat("-MarginUsed=%d%%|", margin_pc) : ""; string s = "|";
-  if ((RiskRatioIncreaseMethod &   1) != 0) if (AccCondition(C_ACC_IN_PROFIT))      { new_ea_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod &   2) != 0) if (AccCondition(C_EQUITY_10PC_LOW))    { new_ea_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod &   4) != 0) if (AccCondition(C_EQUITY_20PC_LOW))    { new_ea_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod &   8) != 0) if (AccCondition(C_DBAL_LT_WEEKLY))     { new_ea_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod &  16) != 0) if (AccCondition(C_WBAL_GT_MONTHLY))    { new_ea_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod &  32) != 0) if (AccCondition(C_ACC_IN_TREND))       { new_ea_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod &  64) != 0) if (AccCondition(C_ACC_CDAY_IN_PROFIT)) { new_ea_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod & 128) != 0) if (AccCondition(C_ACC_PDAY_IN_PROFIT)) { new_ea_risk_ratio *= 1.2; rr_text += "+"+last_cname+s; }
+  // ea_margin_risk_level
+  // @todo: Add Account::GetRiskMarginLevel(), GetTrend(), ConWin/ConLoss, violity level.
+  if ((RiskRatioIncreaseMethod &   1) != 0) if (AccCondition(C_ACC_IN_PROFIT))      { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod &   2) != 0) if (AccCondition(C_EQUITY_20PC_HIGH))   { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod &   4) != 0) if (AccCondition(C_EQUITY_20PC_LOW))    { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod &   8) != 0) if (AccCondition(C_DBAL_LT_WEEKLY))     { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod &  16) != 0) if (AccCondition(C_WBAL_GT_MONTHLY))    { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod &  32) != 0) if (AccCondition(C_ACC_IN_TREND))       { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod &  64) != 0) if (AccCondition(C_ACC_CDAY_IN_PROFIT)) { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod & 128) != 0) if (AccCondition(C_ACC_PDAY_IN_PROFIT)) { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
   // --
-  if ((RiskRatioDecreaseMethod &   1) != 0) if (AccCondition(C_ACC_IN_LOSS))        { new_ea_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod &   2) != 0) if (AccCondition(C_EQUITY_10PC_HIGH))   { new_ea_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod &   4) != 0) if (AccCondition(C_EQUITY_20PC_HIGH))   { new_ea_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod &   8) != 0) if (AccCondition(C_DBAL_GT_WEEKLY))     { new_ea_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod &  16) != 0) if (AccCondition(C_WBAL_LT_MONTHLY))    { new_ea_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod &  32) != 0) if (AccCondition(C_ACC_IN_NON_TREND))   { new_ea_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod &  64) != 0) if (AccCondition(C_ACC_CDAY_IN_LOSS))   { new_ea_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod & 128) != 0) if (AccCondition(C_ACC_PDAY_IN_LOSS))   { new_ea_risk_ratio *= 0.8; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod &   1) != 0) if (AccCondition(C_ACC_IN_LOSS))        { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod &   2) != 0) if (AccCondition(C_EQUITY_20PC_LOW))    { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod &   4) != 0) if (AccCondition(C_EQUITY_20PC_HIGH))   { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod &   8) != 0) if (AccCondition(C_DBAL_GT_WEEKLY))     { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod &  16) != 0) if (AccCondition(C_WBAL_LT_MONTHLY))    { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod &  32) != 0) if (AccCondition(C_ACC_IN_NON_TREND))   { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod &  64) != 0) if (AccCondition(C_ACC_CDAY_IN_LOSS))   { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod & 128) != 0) if (AccCondition(C_ACC_PDAY_IN_LOSS))   { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
   Strings::RemoveSepChar(rr_text, s);
 
   /*
@@ -3957,6 +4032,9 @@ void StartNewHour() {
 
   // Process actions.
   CheckAccConditions();
+
+  // Process orders.
+  ProcessOrders();
 
   // Print stats.
   Msg::ShowText(
@@ -4097,7 +4175,8 @@ void StartNewWeek() {
   CheckAccConditions();
 
   // Calculate lot size, orders and risk.
-  ea_risk_margin = GetRiskMargin(); // Re-calculate risk margin.
+  ea_risk_margin_per_order = GetRiskMarginPerOrder(); // Re-calculate risk margin per order.
+  ea_risk_margin_total = GetRiskMarginInTotal(); // Re-calculate risk margin in total.
   ea_lot_size = GetLotSize(); // Re-calculate lot size.
   UpdateStrategyLotSize(); // Update strategy lot size.
 
@@ -4286,8 +4365,10 @@ bool InitializeVariables() {
   max_order_slippage = Convert::PipsToPoints(MaxOrderPriceSlippage); // Maximum price slippage for buy or sell orders (converted into points).
 
   // Calculate lot size, orders, risk ratio and margin risk.
+  UpdateMarginRiskLevel();
   ea_risk_ratio = GetRiskRatio();   // Re-calculate risk ratio.
-  ea_risk_margin = GetRiskMargin(); // Re-calculate risk margin.
+  ea_risk_margin_per_order = GetRiskMarginPerOrder(); // Calculate the risk margin per order.
+  ea_risk_margin_total = GetRiskMarginInTotal(); // Calculate the risk margin for all orders.
   ea_lot_size = GetLotSize();       // Re-calculate lot size (dependent on ea_risk_ratio).
   if (ea_lot_size <= 0) {
     Msg::ShowText(StringFormat("Lot size is %g!", ea_lot_size), "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
@@ -5761,6 +5842,7 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
                      + sep
                   + indent + "| Lot size: " + DoubleToStr(ea_lot_size, volume_digits) + "; " + text_max_orders + sep
                   + indent + "| Risk ratio: " + DoubleToStr(ea_risk_ratio, 1) + " (" + GetRiskRatioText() + ")" + sep
+                  + indent + StringFormat("| Risk margin level: Total: %g (Buy:%g, Sell:%g)", ea_margin_risk_level[2], ea_margin_risk_level[OP_BUY], ea_margin_risk_level[OP_SELL]) + sep
                   + indent + "| " + GetOrdersStats("" + sep + indent + "| ") + "" + sep
                   + indent + "| Last error: " + last_err + "" + sep
                   + indent + "| Last message: " + last_msg + "" + sep
