@@ -17,7 +17,7 @@
 	path = releases/Lite
 	url = git@github.com:EA31337/EA31337-Lite-Releases.git
 [submodule "EA31337-classes"]
-	path = src/include/EA/public-classes
+	path = src/include/EA31337-classes
 	url = git@github.com:EA31337/EA31337-classes.git
 [submodule "EA31337-strategies"]
 	path = src/include/EA/public-strategies
