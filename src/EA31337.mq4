@@ -13,6 +13,11 @@
 #include <EA31337\ea-defaults.mqh>
 #include <EA31337\ea-properties.mqh>
 #include <EA31337\ea-enums.mqh>
+
+#ifdef __expire__
+#include <EA31337/ea-expire.mqh>
+#endif
+
 #ifdef __advanced__
   #ifdef __rider__
     #include <EA31337\rider\ea-conf.mqh>
@@ -21,20 +26,6 @@
   #endif
 #else
   #include <EA31337\lite\ea-conf.mqh>
-#endif
-
-#ifdef __expire__
-#include <EA31337/ea-expire.mqh>
-#endif
-
-#ifdef __MQL4__
-   #include <EA31337\MQL4\stdlib.mq4> // Used for: ErrorDescription(), RGB(), CompareDoubles(), DoubleToStrMorePrecision(), IntegerToHexString()
-   #include <stderror.mqh>
-   // #include "debug.mqh"
-#else
-   #include <StdLibErr.mqh>
-   #include <Trade\AccountInfo.mqh>
-   #include <MQL5-MQL4\MQL4Common.mqh> // Provides common MQL4 back-compability for MQL5.
 #endif
 
 //+------------------------------------------------------------------+
@@ -80,8 +71,6 @@
 #include <EA31337-classes\Ticks.mqh>
 #include <EA31337-classes\Trade.mqh>
 
-
-
 //#property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 
 //+------------------------------------------------------------------+
@@ -98,6 +87,7 @@ extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v"
 #else
   #include <EA31337\lite\ea-input.mqh>
 #endif
+
 
 /*
  * Predefined constants:
@@ -127,12 +117,10 @@ Trade *trade;
 
 // Market/session variables.
 double pip_size, ea_lot_size;
-double market_minlot, market_maxlot, market_lotsize, market_lotstep, market_marginrequired, market_margininit;
 uint order_freezelevel; // Order freeze level in points.
 double curr_spread; // Broker current spread in pips.
 double curr_trend; // Current trend.
 double ea_risk_margin_per_order, ea_risk_margin_total; // Risk marigin in percent.
-int pip_digits, volume_digits;
 int pts_per_pip; // Number points per pip.
 int gmt_offset = 0; // Current difference between GMT time and the local computer time in seconds, taking into account switch to winter or summer time. Depends on the time settings of your computer.
 // double total_sl, total_tp; // Total SL/TP points.
@@ -406,7 +394,9 @@ void OnDeinit(const int reason) {
       // @todo: Calculate average spread from stats[sid][AVG_SPREAD].
       filename = StringFormat(
           "%s-%.0f%s-%s-%s-%dspread-(%d)-M%d-report.txt",
-          _Symbol, summary_report.init_deposit, account.AccountCurrency(), TimeToStr(init_bar_time, TIME_DATE), TimeToStr(time_current, TIME_DATE), init_spread, GetNoOfStrategies(), Period());
+          market.GetSymbol(), summary_report.init_deposit, account.GetCurrency(),
+          TimeToStr(init_bar_time, TIME_DATE), TimeToStr(time_current, TIME_DATE),
+          init_spread, GetNoOfStrategies(), chart.GetTf());
           // ea_name, _Symbol, summary.init_deposit, account.AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE), Period());
           // ea_name, _Symbol, init_balance, account.AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES), Period());
       string data = summary_report.GetReport();
@@ -468,37 +458,10 @@ string InitInfo(bool startup = false, string sep = "\n") {
   string extra = "";
   #ifdef __expire__ extra += StringFormat(" [expires on %s]", TimeToStr(ea_expire_date, TIME_DATE)); #endif
   string output = StringFormat("%s v%s by %s (%s)%s%s", ea_name, ea_version, ea_author, ea_link, extra, sep);
-  output += StringFormat("PLATFORM: Symbol: %s, Bars: %d, Server: %s%s%s",
-    _Symbol, Bars, AccountInfoString(ACCOUNT_SERVER), VerboseDebug ? " (" + (string) AccountInfoInteger(ACCOUNT_LOGIN) + ")": "", sep); // // FIXME: MQL5: Bars
-  output += StringFormat("BROKER: Name: %s%s",
-      account.AccountCompany(), sep);
-  output += StringFormat("ACCOUNT: Type: %s, Currency: %s, Balance: %g, Equity: %g, Credit: %g, Order limit: %d, Leverage: 1:%d, Stopout Mode: %d, Stopout Level: %d%s",
-    account_type,
-    account.AccountCurrency(),
-    account.AccountBalance(),
-    account.AccountEquity(),
-    account.AccountCredit(),
-    AccountInfoInteger(ACCOUNT_LIMIT_ORDERS),
-    account.AccountLeverage(),
-    account.AccountStopoutMode(),
-    account.AccountStopoutLevel(),
-    sep);
-  output += StringFormat("Market predefined variables: Ask: %g, Bid: %g, Volume: %d%s",
-      NormalizeDouble(Ask, Digits), NormalizeDouble(Bid, Digits), Volume[0], sep);
-  output += StringFormat("Market constants: Digits: %d, Point: %f, Tick size: %f, Tick value: %f, Min Lot: %g, Max Lot: %g, Lot Step: %g pts (%g pips), Lot Size: %g, Margin Required: %g, Margin Init: %g, Trade Freeze Level: %d pts%s",
-      market.GetSymbolDigits(),
-      market.GetPointSize(),
-      market.GetTickSize(), // The smallest digit of price quote.
-      market.GetTickValue(),
-      market.GetMinLot(),
-      market.GetMaxLot(),
-      market.GetLotStepInPts(),
-      market.GetLotStepInPips(),
-      market.GetLotSize(),
-      market.GetMarginRequired(),
-      market.GetMarginInit(),
-      market.GetFreezeLevel(),
-      sep);
+  output += "ACCOUNT: " + account.ToString() + sep;
+  output += "SYMBOL: " + ((SymbolInfo *)market).ToString() + sep;
+  output += "MARKET: " + market.ToString() + sep;
+  /*
   output += StringFormat("Contract specification for %s: Profit mode: %d, Margin mode: %d, Spread: %d pts, Trade tick size: %f, Point value: %f, Digits: %d, Trade stops level: %dpts, Trade contract size: %g%s",
       _Symbol,
       MarketInfo(_Symbol, MODE_PROFITCALCMODE),
@@ -510,18 +473,20 @@ string InitInfo(bool startup = false, string sep = "\n") {
       market.GetTradeStopsLevel(),
       SymbolInfoDouble(_Symbol, SYMBOL_TRADE_CONTRACT_SIZE),
       sep);
+      */
+  // @todo: Move to SymbolInfo.
   output += StringFormat("Swap specification for %s: Mode: %d, Long/buy order value: %g, Short/sell order value: %g%s",
       _Symbol,
       (int)SymbolInfoInteger(_Symbol, SYMBOL_SWAP_MODE),
       SymbolInfoDouble(_Symbol, SYMBOL_SWAP_LONG),
       SymbolInfoDouble(_Symbol, SYMBOL_SWAP_SHORT),
       sep);
-  output += StringFormat("Calculated variables: Pip size: %g, Lot size: %g, Points per pip: %d, Pip digits: %d, Volume digits: %d, Spread in pips: %.1f (%d pts), Stop Out Level: %.1f, Market gap: %d pts (%g pips)%s",
-      NormalizeDouble(pip_size, pip_digits),
-      NormalizeDouble(ea_lot_size, volume_digits),
+  output += StringFormat("Calculated variables: Pip size: %g, EA lot size: %g, Points per pip: %d, Pip digits: %d, Volume digits: %d, Spread in pips: %.1f (%d pts), Stop Out Level: %.1f, Market gap: %d pts (%g pips)%s",
+      market.GetPipSize(),
+      NormalizeDouble(ea_lot_size, market.GetVolumeDigits()),
       pts_per_pip,
-      pip_digits,
-      volume_digits,
+      market.GetPipDigits(),
+      market.GetVolumeDigits(),
       market.GetSpreadInPips(),
       market.GetSpreadInPts(),
       account.GetAccountStopoutLevel(VerboseErrors),
@@ -538,7 +503,7 @@ string InitInfo(bool startup = false, string sep = "\n") {
       GetMaxOrdersPerType(),
       sep);
   output += Msg::ShowText(Backtest::GetModellingQuality(), "Info", __FUNCTION__, __LINE__, VerboseInfo) + sep;
-  output += Backtest::ListTimeframes() + sep;
+  output += Chart::ListTimeframes() + sep;
   output += StringFormat("Datetime: Hour of day: %d, Day of week: %d, Day of month: %d, Day of year: %d, Month: %d, Year: %d%s",
       hour_of_day, day_of_week, day_of_month, day_of_year, month, year, sep);
   output += GetAccountTextDetails() + sep;
@@ -1048,7 +1013,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = EMPTY, stri
       total_orders++;
       daily_orders++;
       if (!OrderSelect(order_ticket, SELECT_BY_TICKET) && VerboseErrors) {
-        Msg::ShowText(StringFormat("%s (err_code=%d, sid=%d)", ErrorDescription(GetLastError()), err_code, sid), "Error", __FUNCTION__, __LINE__, VerboseErrors);
+        Msg::ShowText(StringFormat("%s (err_code=%d, sid=%d)", terminal.GetLastErrorText(), err_code, sid), "Error", __FUNCTION__, __LINE__, VerboseErrors);
         OrderPrint();
         if (retry) TaskAddOrderOpen(cmd, trade_volume, sid); // Will re-try again.
         info[sid][TOTAL_ERRORS]++;
@@ -1092,7 +1057,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = EMPTY, stri
      result = false;
      info[sid][TOTAL_ERRORS]++;
      err_code = GetLastError();
-     last_err = Msg::ShowText(StringFormat("%s (err_code=%d, sid=%d)", ErrorDescription(err_code), err_code, sid), "Error", __FUNCTION__, __LINE__, VerboseErrors);
+     last_err = Msg::ShowText(StringFormat("%s (err_code=%d, sid=%d)", terminal.GetLastErrorText(), err_code, sid), "Error", __FUNCTION__, __LINE__, VerboseErrors);
      last_debug = Msg::ShowText(
        StringFormat("OrderSend(%s, %s, %g, %f, %d, %f, %f, '%s', %d, %d, %d)",
          _Symbol, Order::OrderTypeToString(cmd),
@@ -1169,7 +1134,7 @@ bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, int sid = EMPTY, double volume = EM
   // if (VerboseTrace) Print(__FUNCTION__);
   // total_sl = Orders::TotalSL(); // Convert::ValueToMoney(Orders::TotalSL(ORDER_TYPE_BUY)), Convert::ValueToMoney(Orders::TotalSL(ORDER_TYPE_SELL)
   // total_tp = Orders::TotalTP(); // Convert::ValueToMoney(Orders::TotalSL(ORDER_TYPE_BUY)), Convert::ValueToMoney(Orders::TotalSL(ORDER_TYPE_SELL)
-  if (volume < market_minlot) {
+  if (volume < market.GetMinLot()) {
     last_trace = Msg::ShowText(StringFormat("%s: Lot size = %.2f", sname[sid], volume), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
     result = false;
   } else if (!account.Trades().IsNewOrderAllowed()) {
@@ -3105,7 +3070,7 @@ bool UpdateTrailingStops() {
              (OrderType() == ORDER_TYPE_SELL && OrderStopLoss() > Ask)) {
             result = OrderModify(OrderTicket(), OrderOpenPrice(), OrderOpenPrice() - OrderCommission() * Point, OrderTakeProfit(), 0, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell));
             if (!result && err_code > 1) {
-             if (VerboseErrors) Print(__FUNCTION__, ": Error: OrderModify(): [MinimalizeLosses] ", ErrorDescription(err_code));
+             if (VerboseErrors) Print(__FUNCTION__, ": Error: OrderModify(): [MinimalizeLosses] ", Terminal::GetErrorText(err_code));
                if (VerboseDebug)
                  Print(__FUNCTION__ + ": Error: OrderModify(", OrderTicket(), ", ", OrderOpenPrice(), ", ", OrderOpenPrice() - OrderCommission() * Point, ", ", OrderTakeProfit(), ", ", 0, ", ", Order::GetOrderColor(EMPTY, ColorBuy, ColorSell), "); ", "Ask/Bid: ", Ask, "/", Bid);
             } else {
@@ -3139,7 +3104,7 @@ bool UpdateTrailingStops() {
           if (!result) {
             err_code = GetLastError();
             if (err_code > 1) {
-              Msg::ShowText(ErrorDescription(err_code), "Error", __FUNCTION__, __LINE__, VerboseErrors);
+              Msg::ShowText(Terminal::GetErrorText(err_code), "Error", __FUNCTION__, __LINE__, VerboseErrors);
               Msg::ShowText(
                 StringFormat("OrderModify(%d, %g, %g, %g, %d, %d); Ask:%g/Bid:%g; Gap:%g pips",
                 OrderTicket(), OrderOpenPrice(), new_sl, new_tp, 0, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell), Ask, Bid, market.GetTradeDistanceInPips()),
@@ -3429,7 +3394,7 @@ double GetTrailingValue(ENUM_ORDER_TYPE cmd, int direction = -1, int order_type 
   }
   // if (VerboseDebug && Terminal::IsVisualMode()) Draw::ShowLine("trail_stop_" + OrderTicket(), new_value, GetOrderColor(EMPTY, ColorBuy, ColorSell));
 
-  return NormalizeDouble(new_value, market.GetSymbolDigits());
+  return NormalizeDouble(new_value, market.GetDigits());
 }
 
 /**
@@ -3781,7 +3746,7 @@ int CheckSettings() {
   }
   E_Mail = StringTrimLeft(StringTrimRight(E_Mail));
   License = StringTrimLeft(StringTrimRight(License));
-  return !StringCompare(ValidEmail(E_Mail), License) && StringLen(ea_file) == 11 ? __LINE__ : -__LINE__;
+  return StringCompare(ValidEmail(E_Mail), License) && StringLen(ea_file) == 11 ? __LINE__ : -__LINE__;
 }
 
 /**
@@ -4267,8 +4232,7 @@ bool InitVariables() {
   bool init = true;
 
   // Get type of account.
-  if (IsDemo()) account_type = "Demo"; else account_type = "Live";
-  if (!Terminal::IsRealtime()) account_type = "Backtest on " + account_type;
+  if (!Terminal::IsRealtime()) account_type = "Backtest on " + account.GetType();
   #ifdef __backtest__ init &= !Terminal::IsRealtime(); #endif
 
   // Check time of the week, month and year based on the trading bars.
@@ -4282,46 +4246,42 @@ bool InitVariables() {
   month = DateTime::Month(); // Returns the current month as number (1-January,2,3,4,5,6,7,8,9,10,11,12), i.e., the number of month of the last known server time.
   year = DateTime::Year(); // Returns the current year, i.e., the year of the last known server time.
 
-  market = new  Market(_Symbol);
+  market = new Market(_Symbol);
+
   // @todo Move to method.
-  market_lotsize = MarketInfo(_Symbol, MODE_LOTSIZE); // Lot size in the base currency.
-  if (market_lotsize <= 0.0) {
+  if (market.GetLotSize() <= 0.0) {
     init &= !ValidateSettings;
-    Msg::ShowText(StringFormat("Invalid MODE_LOTSIZE: %g", market_lotsize), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
+    Msg::ShowText(StringFormat("Invalid MODE_LOTSIZE: %g", market.GetLotSize()), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
   }
 
-  market_lotstep = MarketInfo(_Symbol, MODE_LOTSTEP); // Step for changing lots.
   // @todo: Move to method.
-  if (market_lotstep <= 0.0) {
+  if (market.GetLotStepInPts() <= 0.0) {
     init &= !ValidateSettings;
-    Msg::ShowText(StringFormat("Invalid MODE_LOTSTEP: %g", market_lotstep), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
-    market_lotstep = 0.01;
+    Msg::ShowText(StringFormat("Invalid MODE_LOTSTEP: %g", market.GetLotStepInPts()), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
+    // market.GetLotStepInPts() = 0.01;
   }
 
-  market_minlot = MarketInfo(_Symbol, MODE_MINLOT); // Minimum permitted amount of a lot.
   // @todo: Move to method.
-  if (market_minlot <= 0.0) {
+  // Check the minimum permitted amount of a lot.
+  if (market.GetMinLot() <= 0.0) {
     init &= !ValidateSettings;
-    Msg::ShowText(StringFormat("Invalid MODE_MINLOT: %g", market_minlot), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
-    market_minlot = market_lotstep;
+    Msg::ShowText(StringFormat("Invalid MODE_MINLOT: %g", market.GetMinLot()), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
+    // market.GetMinLot() = market.GetLotStepInPts();
   }
 
-  market_maxlot = MarketInfo(_Symbol, MODE_MAXLOT); // Maximum permitted amount of a lot.
   // @todo: Move to method.
-  if (market_maxlot <= 0.0) {
+  // Check the maximum permitted amount of a lot.
+  if (market.GetMaxLot() <= 0.0) {
     init &= !ValidateSettings;
-    Msg::ShowText(StringFormat("Invalid MODE_MAXLOT: %g", market_maxlot), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
-    market_maxlot = 100;
+    Msg::ShowText(StringFormat("Invalid MODE_MAXLOT: %g", market.GetMaxLot()), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
   }
 
-  market_marginrequired = market.GetMarginRequired(_Symbol);
-  if (market_marginrequired == 0) {
+  if (market.GetMarginRequired() == 0) {
     init &= !ValidateSettings;
-    Msg::ShowText(StringFormat("Invalid MODE_MARGINREQUIRED: %g", market_marginrequired), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
-    market_marginrequired = 10; // Fix for 'zero divide' bug when MODE_MARGINREQUIRED is zero.
+    Msg::ShowText(StringFormat("Invalid MODE_MARGINREQUIRED: %g", market.GetMarginRequired()), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
+    // market.GetMarginRequired() = 10; // Fix for 'zero divide' bug when MODE_MARGINREQUIRED is zero.
   }
 
-  market_margininit = market.GetMarginInit();
   order_freezelevel = market.GetFreezeLevel();
 
   curr_spread = market.GetSpreadInPips();
@@ -4351,9 +4311,7 @@ bool InitVariables() {
   // Calculate pip/volume/slippage size and precision.
   // Market *market = new Market(_Symbol);
   pip_size = market.GetPipSize();
-  pip_digits = market.GetPipDigits();
   pts_per_pip = market.GetPointsPerPip();
-  volume_digits = market.GetVolumeDigits();
 
   max_order_slippage = Convert::PipsToPoints(MaxOrderPriceSlippage); // Maximum price slippage for buy or sell orders (converted into points).
 
@@ -4369,7 +4327,7 @@ bool InitVariables() {
       // @fixme: Fails on Gold H1.
       return (false);
     } else {
-      ea_lot_size = market.GetMinLot(_Symbol);
+      ea_lot_size = market.GetMinLot();
     }
   }
   max_orders = GetMaxOrders(ea_lot_size);
@@ -4478,7 +4436,7 @@ void ToggleComponent(int component) {
     // Lot size
     case 19:
       if (LotSize > 0) LotSize = 0.0;
-      else LotSize = market_minlot;
+      else LotSize = market.GetMinLot();
       break;
     case 20:
       if (LotSizeIncreaseMethod > 0) LotSizeIncreaseMethod = 0; else LotSizeIncreaseMethod = 255;
@@ -4950,7 +4908,7 @@ bool InitStrategies() {
   #endif
 
   if (!init && ValidateSettings) {
-    Msg::ShowText(Backtest::ListTimeframes(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
+    Msg::ShowText(Chart::ListTimeframes(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
     Msg::ShowText("Initiation of strategies failed!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
     return (false);
   }
@@ -5842,7 +5800,7 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
                      + "; Balance: " + Convert::ValueWithCurrency(account.AccountBalance())
                      + (account.AccountCredit() > 0 ? "; Credit: " + Convert::ValueWithCurrency(account.AccountCredit()) : "")
                      + sep
-                  + indent + "| Lot size: " + DoubleToStr(ea_lot_size, volume_digits) + "; " + text_max_orders + sep
+                  + indent + "| Lot size: " + DoubleToStr(ea_lot_size, market.GetVolumeDigits()) + "; " + text_max_orders + sep
                   + indent + "| Risk ratio: " + DoubleToStr(ea_risk_ratio, 1) + " (" + GetRiskRatioText() + ")" + sep
                   + indent + (RiskMarginTotal >= 0 ? StringFormat("| Risk margin level: Total: %g (Buy:%g, Sell:%g)", ea_margin_risk_level[2], ea_margin_risk_level[ORDER_TYPE_BUY], ea_margin_risk_level[ORDER_TYPE_SELL]) : "| Risk margin level: Disabled") + sep
                   + indent + "| " + GetOrdersStats("" + sep + indent + "| ") + "" + sep
@@ -5872,7 +5830,7 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
     // ObjectDelete(ea_name);
     */
     Comment(output);
-    WindowRedraw(); // Redraws the current chart forcedly.
+    Chart::ChartRedraw(); // Redraws the current chart forcedly.
   }
   return output;
 }
@@ -5888,7 +5846,7 @@ void SendEmailExecuteOrder(string sep = "<br>\n") {
   body += sep + StringFormat("Time: %s", TimeToStr(time_current, TIME_DATE|TIME_MINUTES|TIME_SECONDS));
   body += sep + StringFormat("Order Type: %s", Order::OrderTypeToString((ENUM_ORDER_TYPE) OrderType()));
   body += sep + StringFormat("Price: %s", DoubleToStr(OrderOpenPrice(), Digits));
-  body += sep + StringFormat("Lot size: %s", DoubleToStr(OrderLots(), volume_digits));
+  body += sep + StringFormat("Lot size: %g", Order::OrderLots());
   body += sep + StringFormat("Comment: %s", OrderComment());
   body += sep + StringFormat("Account Balance: %s", Convert::ValueWithCurrency(account.AccountBalance()));
   body += sep + StringFormat("Account Equity: %s", Convert::ValueWithCurrency(account.AccountEquity()));
@@ -6027,7 +5985,7 @@ bool ActionCloseMostUnprofitableOrder(int reason_id = EMPTY){
     last_close_profit = ticket_profit;
     return TaskAddCloseOrder(selected_ticket, reason_id);
   } else if (VerboseDebug) {
-    Print(__FUNCTION__ + ": Can't find any unprofitable order as requested.");
+    logger.Error("Can't find any unprofitable order as requested.", __FUNCTION__);
   }
   return (false);
 }
