@@ -19,10 +19,13 @@
 #endif
 
 #ifdef __backtest__
-   #define __debug__
-   #ifndef __nolicense__
-     #define __nolicense__    // Disable licensing.
-   #endif
+  #ifndef __input__
+    #define __input__
+  #endif
+  #define __debug__
+  #ifndef __nolicense__
+    #define __nolicense__    // Disable licensing.
+  #endif
 #endif
 
 #ifdef __rider__
@@ -45,6 +48,9 @@
 #endif
 
 #ifdef __release__
+  #ifndef __input__
+    #define __input__
+  #endif
   #undef __disabled__     // Enable all strategies by default.
   #undef __noboost__      // Enable boosting by default.
   #undef __nospreads__    // Enable spread limitation by default.

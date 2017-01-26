@@ -3,7 +3,7 @@
 //|                            Copyright 2016, 31337 Investments Ltd |
 //|                                       https://github.com/EA31337 |
 //+------------------------------------------------------------------+
-#property copyright "Copyright 2016, kenorb"
+#property copyright "Copyright 2016-2017, 31337 Investments Ltd"
 #property link      "https://github.com/EA31337"
 
 /*
@@ -169,35 +169,35 @@ enum ENUM_STRATEGY_TYPE { // Define type of strategies.
 };
 
 enum ENUM_INDICATOR_TYPE { // Define type of indicator.
-  AC         =  0,
-  AD         =  1,
-  ADX        =  2,
-  ALLIGATOR  =  3,
-  ATR        =  4,
-  AWESOME    =  5,
-  BANDS      =  6,
-  BPOWER     =  7,
-  BWMFI      =  8,
-  CCI        =  9,
-  DEMARKER   = 10,
-  ENVELOPES  = 11,
-  FORCE      = 12,
-  FRACTALS   = 13,
-  GATOR      = 14,
-  ICHIMOKU   = 15,
-  MA         = 16,
-  MACD       = 17,
-  MFI        = 18,
-  MOMENTUM   = 19,
-  OBV        = 20,
-  OSMA       = 21,
-  RSI        = 22,
-  RVI        = 23,
-  SAR        = 24,
-  STDDEV     = 25,
-  STOCHASTIC = 26,
-  WPR        = 27,
-  ZIGZAG     = 28,
+  S_AC         =  0,
+  S_AD         =  1,
+  S_ADX        =  2,
+  S_ALLIGATOR  =  3,
+  S_ATR        =  4,
+  S_AWESOME    =  5,
+  S_BANDS      =  6,
+  S_BPOWER     =  7,
+  S_BWMFI      =  8,
+  S_CCI        =  9,
+  S_DEMARKER   = 10,
+  S_ENVELOPES  = 11,
+  S_FORCE      = 12,
+  S_FRACTALS   = 13,
+  S_GATOR      = 14,
+  S_ICHIMOKU   = 15,
+  S_MA         = 16,
+  S_MACD       = 17,
+  S_MFI        = 18,
+  S_MOMENTUM   = 19,
+  S_OBV        = 20,
+  S_OSMA       = 21,
+  S_RSI        = 22,
+  S_RVI        = 23,
+  S_SAR        = 24,
+  S_STDDEV     = 25,
+  S_STOCHASTIC = 26,
+  S_WPR        = 27,
+  S_ZIGZAG     = 28,
   FINAL_INDICATOR_TYPE_ENTRY
 };
 
@@ -488,13 +488,6 @@ enum ENUM_STAT_PERIOD_TYPE { // Define type of tasks.
   MONTHLY = 2, // Monthly
   YEARLY  = 3, // Yearly
   FINAL_STAT_PERIOD_TYPE_ENTRY // Should be the last one. Used to calculate the number of enum items.
-};
-
-enum ENUM_INDICATOR_INDEX { // Define indicator constants.
-  CURR = 0,
-  PREV = 1,
-  FAR  = 2,
-  FINAL_INDICATOR_INDEX_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };
 
 // Indicator enumerations.

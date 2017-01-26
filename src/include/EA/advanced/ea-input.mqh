@@ -47,8 +47,8 @@ extern double TrailingStopAddPerMinute = 0; // Decrease trail stop per minute (p
 
 //+------------------------------------------------------------------+
 extern string __EA_Risk_Parameters__ = "-- Risk management parameters --"; // >>> RISK <<
-extern double RiskMarginPerOrder = 1.00000000; // Risk margin per order (in %, 0-100, 0 for auto)
-extern double RiskMarginTotal = 15.00000000; // Risk margin in total (in %, 0-100, 0 for auto)
+extern double RiskMarginPerOrder = 1.00000000; // Risk margin per order (in %, 0-100, 0 - auto, -1 - off)
+extern double RiskMarginTotal = 15.00000000; // Risk margin in total (in %, 0-100, 0 - auto, -1 - off)
 extern bool ApplySpreadLimits = TRUE; // Apply strategy spread limits
 extern double MaxSpreadToTrade = 10.0; // Max spread to trade (in pips), 0 - disable limit
 extern int CloseOrderAfterXHours = 72; // Close order after X hours (0 = disabled)
@@ -1154,7 +1154,7 @@ double RVI15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
 double RVI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
-extern string __SAR_Parameters__ = "-- Settings for the the Parabolic Stop and Reverse system indicator --"; // >>> SAR <<<
+extern string __SAR_Parameters__ = "-- Settings for the Parabolic Stop and Reverse system indicator --"; // >>> SAR <<<
 extern bool SAR1_Active = 1; // Enable for M1
 extern bool SAR5_Active = 1; // Enable for M5
 extern bool SAR15_Active = 0; // Enable for M15
@@ -1226,7 +1226,7 @@ double StdDev15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
 double StdDev30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
-string __Stochastic_Parameters__ = "-- Settings for the the Stochastic Oscillator --"; // >>> STOCHASTIC <<<
+string __Stochastic_Parameters__ = "-- Settings for the Stochastic Oscillator --"; // >>> STOCHASTIC <<<
 bool Stochastic1_Active = 0; // Enable for M1
 bool Stochastic5_Active = 0; // Enable for M5
 bool Stochastic15_Active = 0; // Enable for M15

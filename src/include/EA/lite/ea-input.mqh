@@ -9,7 +9,7 @@
 //+------------------------------------------------------------------+
 //| Includes.
 //+------------------------------------------------------------------+
-#include <EA\ea-enums.mqh>
+#include <EA31337\ea-enums.mqh>
 
 //+------------------------------------------------------------------+
 //| User input variables.
@@ -43,8 +43,8 @@ extern double TrailingStopAddPerMinute = 0.5; // Decrease trail stop per minute 
 
 //+------------------------------------------------------------------+
 extern string __EA_Risk_Parameters__ = "-- Risk management parameters --"; // >>> RISK <<
-extern double RiskMarginPerOrder = 1.00000000; // Risk margin per order (in %, 0-100, 0 for auto)
-extern double RiskMarginTotal = 15.00000000; // Risk margin in total (in %, 0-100, 0 for auto)
+extern double RiskMarginPerOrder = 1.00000000; // Risk margin per order (in %, 0-100, 0 - auto, -1 - off)
+extern double RiskMarginTotal = 15.00000000; // Risk margin in total (in %, 0-100, 0 - auto, -1 - off)
 extern int CloseOrderAfterXHours = 96; // Close order after X hours (0 - off)
 extern double RiskRatio = 0; // Risk ratio (0 = auto, 1.0 = normal)
 extern int RiskRatioIncreaseMethod = 0; // Risk ratio increase method (0-255)
@@ -633,7 +633,7 @@ int JobProcessDelay = 1; // Job process delay
 
 //+------------------------------------------------------------------+
 extern string __Logging_Parameters__ = "-- Settings for logging & messages --"; // >>> LOGS & MESSAGES <<<
-extern bool WriteReport = 1; // Write file report on exit
+extern bool WriteReport = 1; // Write summary report on finish
 extern bool PrintLogOnChart = 1; // Display info on chart
 extern bool VerboseErrors = 1; // Display errors
 extern bool VerboseInfo = 1; // Display info messages
@@ -666,8 +666,8 @@ extern bool RecordTicksToCSV = 0; // Record ticks into CSV files
 // extern int DemoMarketStopLevel = 10; // Demo market stop level
 
 //+------------------------------------------------------------------+
-extern string __Constants__ = "-- Constants --"; // >>> CONSTANTS <<<
-extern int MagicNumber = 31337; // Unique magic number (+40)
+extern string __EA_Constants__ = "-- Constants --"; // >>> CONSTANTS <<<
+extern int MagicNumber = 31337; // Starting EA magic number (+40)
 
 //+------------------------------------------------------------------+
 extern string __Other_Parameters__ = "-- Other parameters --"; // >>> OTHER <<<
