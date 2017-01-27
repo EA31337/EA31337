@@ -951,8 +951,8 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = EMPTY, stri
    if (VerboseDebug) Print(__FUNCTION__ + ": " + GetMarketTextDetails());
 
    // Get price values.
-   double open_price = NormalizeDouble(market.GetOpenPrice(cmd), market.GetPipDigits());
-   double close_price = NormalizeDouble(market.GetClosePrice(cmd), market.GetPipDigits());
+   double open_price = NormalizeDouble(market.GetOpenPrice(cmd), market.GetDigits());
+   double close_price = NormalizeDouble(market.GetClosePrice(cmd), market.GetDigits());
    // Get the fixed stops.
    // @todo: Test GetOpenPrice vs GetClosePrice
    double stoploss   = StopLoss   > 0 ? NormalizeDouble(open_price - (StopLoss + TrailingStop) * pip_size * Order::OrderDirection(cmd), Digits) : 0;
@@ -989,13 +989,13 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = EMPTY, stri
      }
    }
    // Normalize stops.
-   stoploss = NormalizeDouble(stoploss, market.GetPipDigits());
-   takeprofit = NormalizeDouble(takeprofit, market.GetPipDigits());
+   stoploss = NormalizeDouble(stoploss, market.GetDigits());
+   takeprofit = NormalizeDouble(takeprofit, market.GetDigits());
 
   if (VerboseDebug) PrintFormat("Adjusted: stoploss = %f, takeprofit = %f", stoploss, takeprofit);
   if (VerboseDebug) PrintFormat("Normalized: stoploss = %f, takeprofit = %f",
-    NormalizeDouble(stoploss, market.GetPipDigits()),
-    NormalizeDouble(takeprofit, market.GetPipDigits()));
+    NormalizeDouble(stoploss, market.GetDigits()),
+    NormalizeDouble(takeprofit, market.GetDigits()));
 
   if (Boosting_Enabled && (ConWinsIncreaseFactor != 0 || ConLossesIncreaseFactor != 0)) {
     trade_volume = trade.OptimizeLotSize(trade_volume, ConWinsIncreaseFactor, ConLossesIncreaseFactor, ConFactorOrdersLimit);
@@ -1057,7 +1057,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = EMPTY, stri
      result = false;
      info[sid][TOTAL_ERRORS]++;
      err_code = GetLastError();
-     last_err = Msg::ShowText(StringFormat("%s (err_code=%d, sid=%d)", terminal.GetLastErrorText(), err_code, sid), "Error", __FUNCTION__, __LINE__, VerboseErrors);
+     last_err = Msg::ShowText(StringFormat("%s (err_code=%d, sid=%d)", terminal.GetErrorText(err_code), err_code, sid), "Error", __FUNCTION__, __LINE__, VerboseErrors);
      last_debug = Msg::ShowText(
        StringFormat("OrderSend(%s, %s, %g, %f, %d, %f, %f, '%s', %d, %d, %d)",
          _Symbol, Order::OrderTypeToString(cmd),
