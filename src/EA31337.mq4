@@ -924,12 +924,13 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
  *   retry bool
  *     if true, re-try to open again after error/failure.
  */
-int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = EMPTY, string order_comment = "", bool retry = true) {
+int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string order_comment = "", bool retry = true) {
    bool result = false;
    int order_ticket;
+   double trade_volume_max = market.GetMaxLot();
 
   // if (VerboseTrace) Print(__FUNCTION__);
-   if (trade_volume == EMPTY) {
+   if (trade_volume <= market.GetMinLot()) {
      trade_volume = GetStrategyLotSize(sid, cmd);
    } else {
      trade_volume = market.NormalizeLots(trade_volume);
@@ -976,6 +977,8 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = EMPTY, stri
      takeprofit = takeprofit_trail;
    }
    if (RiskMarginPerOrder >= 0) {
+     trade_volume_max = trade.GetMaxLotSize(cmd, stoploss, GetRiskMarginPerOrder());
+     trade_volume = fmin(trade_volume, trade_volume_max);
      double stoploss_max = trade.GetMaxStopLoss(cmd, trade_volume, GetRiskMarginPerOrder());
      if (
        (Order::OrderDirection(cmd) > 0 && stoploss < stoploss_max) ||
@@ -4249,9 +4252,9 @@ bool InitVariables() {
   market = new Market(_Symbol);
 
   // @todo Move to method.
-  if (market.GetLotSize() <= 0.0) {
+  if (market.GetTradeContractSize() <= 0.0) {
     init &= !ValidateSettings;
-    Msg::ShowText(StringFormat("Invalid MODE_LOTSIZE: %g", market.GetLotSize()), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
+    Msg::ShowText(StringFormat("Invalid MODE_LOTSIZE: %g", market.GetTradeContractSize()), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
   }
 
   // @todo: Move to method.
