@@ -157,10 +157,9 @@ double ea_risk_ratio; string rr_text; // Vars for calculation risk ratio.
 double ea_margin_risk_level[3]; // For margin risk (all/buy/sell);
 uint max_orders = 10, daily_orders; // Maximum orders available to open.
 uint max_order_slippage; // Maximum price slippage for buy or sell orders (in points)
-double LastAsk, LastBid; // Keep the last ask and bid price.
 int err_code; // Error code.
 string last_err, last_msg, last_debug, last_trace;
-double last_tick_change; // Last tick change in pips.
+double last_pip_change; // Last tick change in pips.
 double last_close_profit = EMPTY;
 // int last_trail_update = 0, last_indicators_update = 0, last_stats_update = 0;
 int todo_queue[100][8];
@@ -232,6 +231,11 @@ void OnTick() {
   //#ifdef __trace__ PrintFormat("%s: Ask=%g/Bid=%g", __FUNCTION__, Ask, Bid); #endif
   if (!session_initiated) return;
 
+  double last_ask = market.GetLastAsk();
+  double last_bid = market.GetLastBid();
+  bar_time = chart.GetBarTime(PERIOD_M1);
+  last_pip_change = fmax(Convert::GetValueDiffInPips(market.GetAsk(), last_ask, true), Convert::GetValueDiffInPips(market.GetBid(), last_bid, true));
+
   // Update stats.
   total_stats.OnTick();
   hourly_stats.OnTick();
@@ -239,12 +243,8 @@ void OnTick() {
     ticks.OnTick();
   }
 
-  // Check the last tick change.
-  last_tick_change = fmax(Convert::GetValueDiffInPips(market.GetAsk(), LastAsk, true), Convert::GetValueDiffInPips(market.GetBid(), LastBid, true));
-
   // Check if we should ignore the tick.
-  bar_time = iTime(_Symbol, PERIOD_M1, 0);
-  if (bar_time <= last_bar_time || last_tick_change < MinPipChangeToTrade) {
+  if (bar_time <= last_bar_time || last_pip_change < MinPipChangeToTrade) {
     /*
     if (VerboseDebug) {
       PrintFormat("Last tick change: %f < %f (%g/%g), Bar time: %d, Ask: %g, Bid: %g, LastAsk: %g, LastBid: %g",
@@ -252,7 +252,6 @@ void OnTick() {
         bar_time, Ask, Bid, LastAsk, LastBid);
     }
     */
-    LastAsk = market.GetAsk(); LastBid = market.GetBid();
     return;
   } else {
     last_bar_time = bar_time;
@@ -266,8 +265,6 @@ void OnTick() {
   UpdateOrders();
   UpdateStats();
   if (PrintLogOnChart) DisplayInfoOnChart();
-  LastAsk = market.GetAsk(); LastBid = market.GetBid();
-  //#ifdef __trace__ PrintFormat("%s: exit", __FUNCTION__); #endif
 } // end: OnTick()
 
 /**
@@ -528,6 +525,7 @@ string InitInfo(bool startup = false, string sep = "\n") {
 bool EA_Trade() {
   bool order_placed = false;
   ENUM_ORDER_TYPE buy_cmd, sell_cmd;
+  if (VerboseTrace) PrintFormat("%s:%d: %s", __FUNCTION__, __LINE__, DateTime::TimeToStr(chart.GetBarTime()));
 
   for (int id = 0; id < FINAL_STRATEGY_TYPE_ENTRY; id++) {
     buy_cmd = EMPTY;
@@ -560,7 +558,7 @@ bool EA_Trade() {
 
     } // end: if
   } // end: for
-  // if (VerboseTrace) PrintFormat("%s (%d), traded=%d, buy=%d/sell=%d", __FUNCTION__, bar_time, order_placed, buy_cmd, sell_cmd);
+  if (VerboseTrace) PrintFormat("%s:%d (%d), traded=%d, buy=%d/sell=%d", __FUNCTION__, __LINE__, bar_time, order_placed, buy_cmd, sell_cmd);
 
   #ifdef __advanced__
   if (SmartQueueActive && !order_placed && total_orders < max_orders) {
@@ -580,10 +578,10 @@ bool EA_Trade() {
 /**
  * Check if strategy is on trade conditionl.
  */
-bool TradeCondition(int order_type = 0, ENUM_ORDER_TYPE cmd = NULL) {
-  ENUM_TIMEFRAMES tf = (ENUM_TIMEFRAMES) info[order_type][TIMEFRAME];
-  if (VerboseTrace) PrintFormat("%s:%d: %s (%d), cmd=%d", __FUNCTION__, __LINE__, sname[order_type], tf, Order::OrderTypeToString(cmd));
-  switch (order_type) {
+bool TradeCondition(int sid = 0, ENUM_ORDER_TYPE cmd = NULL) {
+  ENUM_TIMEFRAMES tf = (ENUM_TIMEFRAMES) info[sid][TIMEFRAME];
+  if (VerboseTrace) PrintFormat("%s:%d: %s (%s), cmd=%d", __FUNCTION__, __LINE__, sname[sid], EnumToString(tf), Order::OrderTypeToString(cmd));
+  switch (sid) {
     case AC1: case AC5: case AC15: case AC30:                                 return Trade_AC(cmd, tf);
     case AD1: case AD5: case AD15: case AD30:                                 return Trade_AD(cmd, tf);
     case ADX1: case ADX5: case ADX15: case ADX30:                             return Trade_ADX(cmd, tf);
@@ -622,14 +620,17 @@ bool TradeCondition(int order_type = 0, ENUM_ORDER_TYPE cmd = NULL) {
  * Update specific indicator.
  * Gukkuk im Versteck
  */
-bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string symbol = NULL) {
+bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string symbol = NULL) {
   bool success = true;
   static datetime processed[FINAL_INDICATOR_TYPE_ENTRY][FINAL_ENUM_TIMEFRAMES_INDEX];
   int i; string text = __FUNCTION__ + ": ";
   if (type == EMPTY) ArrayFill(processed, 0, ArraySize(processed), false); // Reset processed if tf is EMPTY.
   uint index = chart.TfToIndex(tf);
-  if (processed[type][index] == time_current) {
+  if (processed[type][index] == chart.GetBarTime(tf)) {
     // If it was already processed, ignore it.
+    if (VerboseDebug) {
+      PrintFormat("Skipping %s (%s) at %s", EnumToString(type), EnumToString(tf), DateTime::TimeToStr(chart.GetBarTime(tf)));
+    }
     return (true);
   }
 
@@ -905,7 +906,7 @@ bool UpdateIndicator(int type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string sy
       break;
   } // end: switch
 
-  processed[type][index] = time_current;
+  processed[type][index] = chart.GetBarTime(tf);
   return (success);
 }
 
@@ -1039,7 +1040,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
       // last_trail_update = 0; // Set to 0, so trailing stops can be updated faster.
       stats[sid][AVG_SPREAD] = (stats[sid][AVG_SPREAD] + curr_spread) / 2;
       if (VerboseInfo) OrderPrint();
-      Msg::ShowText(Order::OrderTypeToString(Order::OrderType()) + GetAccountTextDetails(), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
+      Msg::ShowText(StringFormat("%s: %s", Order::OrderTypeToString(Order::OrderType()), GetAccountTextDetails()), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
       if (SoundAlert) PlaySound(SoundFileAtOpen);
       if (SendEmailEachOrder) SendEmailExecuteOrder();
 
@@ -1372,22 +1373,20 @@ int CloseOrdersByType(ENUM_ORDER_TYPE cmd, int strategy_id, int reason_id, bool 
 bool UpdateStats() {
   // Check if bar time has been changed since last check.
   // int bar_time = iTime(NULL, PERIOD_M1, 0);
-  CheckStats(last_tick_change, MAX_TICK);
+  CheckStats(last_pip_change, MAX_TICK);
   CheckStats(Low[0],  MAX_LOW);
   CheckStats(High[0], MAX_HIGH);
   CheckStats(account.AccountBalance(), MAX_BALANCE);
   CheckStats(account.AccountEquity(), MAX_EQUITY);
   CheckStats(total_orders, MAX_ORDERS);
   CheckStats(market.GetSpreadInPts(), MAX_SPREAD);
-  if (last_tick_change > MarketBigDropSize) {
-    double diff1 = fmax(Convert::GetValueDiffInPips(Ask, LastAsk), Convert::GetValueDiffInPips(Bid, LastBid));
-    Message(StringFormat("Market very big drop of %.1f pips detected!", diff1));
+  if (last_pip_change > MarketBigDropSize) {
+    Message(StringFormat("Market very big drop of %.1f pips detected!", last_pip_change));
     Print(__FUNCTION__ + ": " + GetLastMessage());
     if (WriteReport) ReportAdd(__FUNCTION__ + ": " + GetLastMessage());
   }
-  else if (VerboseDebug && last_tick_change > MarketSuddenDropSize) {
-    double diff2 = fmax(Convert::GetValueDiffInPips(Ask, LastAsk), Convert::GetValueDiffInPips(Bid, LastBid));
-    Message(StringFormat("Market sudden drop of %.1f pips detected!", diff2));
+  else if (VerboseDebug && last_pip_change > MarketSuddenDropSize) {
+    Message(StringFormat("Market sudden drop of %.1f pips detected!", last_pip_change));
     Print(__FUNCTION__ + ": " + GetLastMessage());
     if (WriteReport) ReportAdd(__FUNCTION__ + ": " + GetLastMessage());
   }
@@ -2824,8 +2823,9 @@ bool Trade_ZigZag(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signa
  */
 bool CheckMarketCondition1(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M30, int condition = 0, bool default_value = true) {
   bool result = true;
-  RefreshRates(); // ?
   uint period = chart.TfToIndex(tf);
+  if (VerboseTrace) PrintFormat("%s(%s, %s, %d)", EnumToString(cmd), EnumToString(tf), condition);
+  Market::RefreshRates(); // ?
   if ((condition &   1) != 0) result &= ((cmd == ORDER_TYPE_BUY && Open[CURR] > Close[PREV]) || (cmd == ORDER_TYPE_SELL && Open[CURR] < Close[PREV]));
   if ((condition &   2) != 0) result &= UpdateIndicator(S_SAR, tf)       && ((cmd == ORDER_TYPE_BUY && sar[period][CURR] < Open[0]) || (cmd == ORDER_TYPE_SELL && sar[period][CURR] > Open[0]));
   if ((condition &   4) != 0) result &= UpdateIndicator(S_RSI, tf)       && ((cmd == ORDER_TYPE_BUY && rsi[period][CURR] < 50) || (cmd == ORDER_TYPE_SELL && rsi[period][CURR] > 50));
@@ -2853,8 +2853,8 @@ bool CheckMarketCondition1(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M30,
 bool CheckMarketEvent(ENUM_ORDER_TYPE cmd = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M30, int condition = EMPTY) {
   bool result = false;
   uint period = chart.TfToIndex(tf);
-  // if (VerboseTrace) Print(__FUNCTION__);
   if (cmd == EMPTY || condition == EMPTY) return (false);
+  if (VerboseTrace) PrintFormat("%s(%s, %s, %d)", EnumToString(cmd), EnumToString(tf), condition);
   switch (condition) {
     case C_AC_BUY_SELL:
       result = Trade_AC(cmd, tf);
@@ -3153,8 +3153,8 @@ double GetTrailingValue(ENUM_ORDER_TYPE cmd, int direction = -1, int order_type 
     double min_elapsed = (double) ((TimeCurrent() - OrderOpenTime()) / 60);
     extra_trail =+ min_elapsed * TrailingStopAddPerMinute;
     if (VerboseDebug) {
-      PrintFormat("%s: extra_trail += %g * %g => %g",
-        __FUNCTION__, min_elapsed, TrailingStopAddPerMinute, extra_trail);
+      PrintFormat("%s:%d: extra_trail += %g * %g => %g",
+        __FUNCTION__, __LINE__, min_elapsed, TrailingStopAddPerMinute, extra_trail);
     }
   }
   int factor = (Order::OrderDirection(cmd) == direction ? +1 : -1);
@@ -3167,8 +3167,9 @@ double GetTrailingValue(ENUM_ORDER_TYPE cmd, int direction = -1, int order_type 
   string symbol = existing ? OrderSymbol() : _Symbol;
 
   if (VerboseDebug) {
-    PrintFormat("%s(): trail = (%d + %d) * %g = %g",
-      __FUNCTION__, TrailingStop, extra_trail, pip_size, trail);
+    PrintFormat("%s:%d(%s, %d, %d, %g): trail = (%d + %d) * %g = %g",
+      __FUNCTION__, __LINE__, Order::OrderTypeToString(cmd), direction, order_type, previous,
+      TrailingStop, extra_trail, pip_size, trail);
   }
   // TODO: Make starting point dynamic: Open[CURR], Open[PREV], Open[FAR], Close[PREV], Close[FAR], ma_fast[CURR], ma_medium[CURR], ma_slow[CURR]
    double highest_ma, lowest_ma;
@@ -4288,7 +4289,6 @@ bool InitVariables() {
   order_freezelevel = market.GetFreezeLevel();
 
   curr_spread = market.GetSpreadInPips();
-  LastAsk = Ask; LastBid = Bid;
   init_balance = account.AccountBalance();
   if (init_balance <= 0) {
     Msg::ShowText(StringFormat("Account balance is %g!", init_balance), "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
@@ -4943,7 +4943,7 @@ bool InitClasses() {
 /**
  * Initialize specific strategy.
  */
-bool InitStrategy(int key, string name, bool active, int indicator, ENUM_TIMEFRAMES _tf, int signal_method = 0, double signal_level = 0.0, int open_cond1 = 0, int open_cond2 = 0, int close_cond = 0, double max_spread = 0.0) {
+bool InitStrategy(int key, string name, bool active, ENUM_INDICATOR_TYPE indicator, ENUM_TIMEFRAMES _tf, int signal_method = 0, double signal_level = 0.0, int open_cond1 = 0, int open_cond2 = 0, int close_cond = 0, double max_spread = 0.0) {
   if (active) {
     // Validate whether the timeframe is working.
     if (!chart.ValidTf(_tf)) {
@@ -5245,9 +5245,9 @@ bool MarketCondition(int condition = C_MARKET_NONE) {
     case C_MONTHLY_PEAK:
       return hour_of_day >= HourAfterPeak && (Ask >= iHigh(_Symbol, PERIOD_MN1, CURR) || Ask <= iLow(_Symbol, PERIOD_MN1, CURR));
     case C_MARKET_BIG_DROP:
-      return last_tick_change > MarketSuddenDropSize;
+      return last_pip_change > MarketSuddenDropSize;
     case C_MARKET_VBIG_DROP:
-      return last_tick_change > MarketBigDropSize;
+      return last_pip_change > MarketBigDropSize;
     case C_MARKET_AT_HOUR:
       {
         static int hour_invoked = -1;
@@ -6425,6 +6425,7 @@ bool OpenOrderCondition(ENUM_ORDER_TYPE cmd, int sid, datetime time, int method)
   double qhighest = market.GetPeakPrice(tf, MODE_HIGH, qshift); // Get the high price since queued.
   double qlowest = market.GetPeakPrice(tf, MODE_LOW, qshift); // Get the lowest price since queued.
   double diff = fmax(qhighest - Open[CURR], Open[CURR] - qlowest);
+  if (VerboseTrace) PrintFormat("%s(%s, %d, %s, %d)", __FUNCTION__, EnumToString(cmd), sid, DateTime:TimeToStr(time), method);
   if ((method &   1) != 0) result &= (cmd == ORDER_TYPE_BUY && qopen < Open[CURR]) || (cmd == ORDER_TYPE_SELL && qopen > Open[CURR]);
   if ((method &   2) != 0) result &= (cmd == ORDER_TYPE_BUY && qclose < Close[CURR]) || (cmd == ORDER_TYPE_SELL && qclose > Close[CURR]);
   if ((method &   4) != 0) result &= (cmd == ORDER_TYPE_BUY && qlowest < Low[CURR]) || (cmd == ORDER_TYPE_SELL && qlowest > Low[CURR]);
@@ -6559,7 +6560,7 @@ bool TaskAddCloseOrder(int ticket_no, int reason = EMPTY) {
     todo_queue[job_id][1] = TASK_ORDER_CLOSE;
     todo_queue[job_id][2] = MaxTries; // Set number of retries.
     todo_queue[job_id][3] = reason;
-    // if (VerboseTrace) Print("TaskAddCloseOrder(): Allocated task (id: ", job_id, ") for ticket: ", todo_queue[job_id][0], ".");
+    if (VerboseTrace) Print("TaskAddCloseOrder(): Allocated task (id: ", job_id, ") for ticket: ", todo_queue[job_id][0], ".");
     return true;
   } else {
     if (VerboseTrace) PrintFormat("%s(): Failed to allocate close task for ticket: %d", __FUNCTION__, ticket_no);
@@ -6577,7 +6578,7 @@ bool TaskAddCalcStats(int ticket_no, int order_type = EMPTY) {
     todo_queue[job_id][1] = TASK_CALC_STATS;
     todo_queue[job_id][2] = MaxTries; // Set number of retries.
     todo_queue[job_id][3] = order_type;
-    // if (VerboseTrace) Print(__FUNCTION__ + ": Allocated task (id: ", job_id, ") for ticket: ", todo_queue[job_id][0], ".");
+    if (VerboseTrace) Print(__FUNCTION__ + ": Allocated task (id: ", job_id, ") for ticket: ", todo_queue[job_id][0], ".");
     return true;
   } else {
     if (VerboseTrace) PrintFormat("%s(): Failed to allocate close task for ticket: %d", __FUNCTION__, ticket_no);
@@ -6592,7 +6593,7 @@ bool TaskAddCalcStats(int ticket_no, int order_type = EMPTY) {
 bool TaskRemove(int job_id) {
   todo_queue[job_id][0] = 0;
   todo_queue[job_id][2] = 0;
-  // if (VerboseTrace) Print(__FUNCTION__ + ": Task removed for id: " + job_id);
+  if (VerboseTrace) PrintFormat("%: Task removed for id: %d", __FUNCTION__, job_id);
   return true;
 }
 
