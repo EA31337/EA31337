@@ -524,18 +524,18 @@ string InitInfo(bool startup = false, string sep = "\n") {
  */
 bool EA_Trade() {
   bool order_placed = false;
-  ENUM_ORDER_TYPE buy_cmd, sell_cmd;
+  ENUM_ORDER_TYPE _cmd = EMPTY;
   if (VerboseTrace) PrintFormat("%s:%d: %s", __FUNCTION__, __LINE__, DateTime::TimeToStr(chart.GetBarTime()));
 
-  for (int id = 0; id < FINAL_STRATEGY_TYPE_ENTRY; id++) {
-    buy_cmd = EMPTY;
-    sell_cmd = EMPTY;
+  for (ENUM_STRATEGY_TYPE id = 0; id < FINAL_STRATEGY_TYPE_ENTRY; id++) {
     if (info[id][ACTIVE] && !info[id][SUSPENDED]) {
       // Note: When TradeWithTrend is set and we're against the trend, do not trade.
       if (TradeCondition(id, ORDER_TYPE_BUY)) {
-        buy_cmd = ORDER_TYPE_BUY;
+        _cmd = ORDER_TYPE_BUY;
       } else if (TradeCondition(id, ORDER_TYPE_SELL)) {
-        sell_cmd = ORDER_TYPE_SELL;
+        _cmd = ORDER_TYPE_SELL;
+      } else {
+        _cmd = EMPTY;
       }
 
       #ifdef __advanced__
@@ -543,22 +543,19 @@ bool EA_Trade() {
         if (CheckMarketEvent(ORDER_TYPE_BUY,  PERIOD_M30, info[id][CLOSE_CONDITION])) CloseOrdersByType(ORDER_TYPE_SELL, id, NULL, CloseConditionOnlyProfitable); // TODO: reason_id
         if (CheckMarketEvent(ORDER_TYPE_SELL, PERIOD_M30, info[id][CLOSE_CONDITION])) CloseOrdersByType(ORDER_TYPE_BUY,  id, NULL, CloseConditionOnlyProfitable); // TODO: reason_id
       }
-      if (buy_cmd == ORDER_TYPE_BUY  && !CheckMarketCondition1(ORDER_TYPE_BUY,  (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) buy_cmd = EMPTY;
-      if (sell_cmd == ORDER_TYPE_SELL && !CheckMarketCondition1(ORDER_TYPE_SELL, (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) sell_cmd = EMPTY;
-      if (buy_cmd == ORDER_TYPE_BUY  &&  CheckMarketCondition1(ORDER_TYPE_SELL, PERIOD_M30, info[id][OPEN_CONDITION2], false)) buy_cmd = EMPTY;
-      if (sell_cmd == ORDER_TYPE_SELL &&  CheckMarketCondition1(ORDER_TYPE_BUY,  PERIOD_M30, info[id][OPEN_CONDITION2], false)) sell_cmd = EMPTY;
+      if (_cmd == ORDER_TYPE_BUY  && !CheckMarketCondition1(ORDER_TYPE_BUY,  (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) _cmd = EMPTY;
+      if (_cmd == ORDER_TYPE_SELL && !CheckMarketCondition1(ORDER_TYPE_SELL, (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) _cmd = EMPTY;
+      if (_cmd == ORDER_TYPE_BUY  &&  CheckMarketCondition1(ORDER_TYPE_SELL, PERIOD_M30, info[id][OPEN_CONDITION2], false)) _cmd = EMPTY;
+      if (_cmd == ORDER_TYPE_SELL &&  CheckMarketCondition1(ORDER_TYPE_BUY,  PERIOD_M30, info[id][OPEN_CONDITION2], false)) _cmd = EMPTY;
       #endif
 
-      if (buy_cmd != EMPTY) {
-        order_placed &= ExecuteOrder(buy_cmd, id);
-      }
-      if (sell_cmd != EMPTY) {
-        order_placed &= ExecuteOrder(sell_cmd, id);
+      if (_cmd != EMPTY) {
+        order_placed &= ExecuteOrder(_cmd, id);
       }
 
     } // end: if
   } // end: for
-  if (VerboseTrace) PrintFormat("%s:%d (%d), traded=%d, buy=%d/sell=%d", __FUNCTION__, __LINE__, bar_time, order_placed, buy_cmd, sell_cmd);
+  if (VerboseTrace) PrintFormat("%s:%d (%d), traded=%d, OP: %s", __FUNCTION__, __LINE__, bar_time, order_placed, Order::OrderTypeToString(_cmd));
 
   #ifdef __advanced__
   if (SmartQueueActive && !order_placed && total_orders < max_orders) {
@@ -578,7 +575,7 @@ bool EA_Trade() {
 /**
  * Check if strategy is on trade conditionl.
  */
-bool TradeCondition(int sid = 0, ENUM_ORDER_TYPE cmd = NULL) {
+bool TradeCondition(ENUM_STRATEGY_TYPE sid = 0, ENUM_ORDER_TYPE cmd = NULL) {
   ENUM_TIMEFRAMES tf = (ENUM_TIMEFRAMES) info[sid][TIMEFRAME];
   if (VerboseTrace) PrintFormat("%s:%d: %s (%s), cmd=%d", __FUNCTION__, __LINE__, sname[sid], EnumToString(tf), Order::OrderTypeToString(cmd));
   switch (sid) {
