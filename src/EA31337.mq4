@@ -117,6 +117,7 @@ Trade *trade;
 
 // Market/session variables.
 double pip_size, ea_lot_size;
+double last_ask, last_bid;
 uint order_freezelevel; // Order freeze level in points.
 double curr_spread; // Broker current spread in pips.
 double curr_trend; // Current trend.
@@ -136,11 +137,12 @@ bool session_active = false;
 
 // Time-based variables.
 // Bar time: initial, current and last one to check if bar has been changed since the last time.
-datetime init_bar_time, bar_time, last_bar_time = (int)EMPTY_VALUE;
+datetime init_bar_time, last_bar_time = (int) EMPTY_VALUE;
 datetime time_current = (int)EMPTY_VALUE;
 int hour_of_day, day_of_week, day_of_month, day_of_year, month, year;
 datetime last_order_time = 0, last_action_time = 0;
 int last_history_check = 0; // Last ticket position processed.
+datetime last_traded;
 
 // Strategy variables.
 int info[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_INFO_ENTRY];
@@ -230,34 +232,38 @@ double zigzag[H1][FINAL_ENUM_INDICATOR_INDEX];
 void OnTick() {
   //#ifdef __trace__ PrintFormat("%s: Ask=%g/Bid=%g", __FUNCTION__, Ask, Bid); #endif
   if (!session_initiated) return;
-
-  double last_ask = market.GetLastAsk();
-  double last_bid = market.GetLastBid();
-  bar_time = chart.GetBarTime(PERIOD_M1);
-  last_pip_change = fmax(Convert::GetValueDiffInPips(market.GetAsk(), last_ask, true), Convert::GetValueDiffInPips(market.GetBid(), last_bid, true));
+  last_ask = market.GetLastAsk();
+  last_bid = market.GetLastBid();
+  last_pip_change = market.GetLastPriceChangeInPips();
 
   // Update stats.
+  /*
   total_stats.OnTick();
   hourly_stats.OnTick();
   if (RecordTicksToCSV) {
     ticks.OnTick();
   }
+  */
+
+  if (last_pip_change < MinPipChangeToTrade || ShouldIgnoreTick(TickIgnoreMethod, MinPipChangeToTrade, PERIOD_M1)) {
+    return;
+  }
 
   // Check if we should ignore the tick.
+  /*
   if (bar_time <= last_bar_time || last_pip_change < MinPipChangeToTrade) {
-    /*
     if (VerboseDebug) {
       PrintFormat("Last tick change: %f < %f (%g/%g), Bar time: %d, Ask: %g, Bid: %g, LastAsk: %g, LastBid: %g",
         last_tick_change, MinPipChangeToTrade, Convert::GetValueDiffInPips(Ask, LastAsk, true), Convert::GetValueDiffInPips(Bid, LastBid, true),
         bar_time, Ask, Bid, LastAsk, LastBid);
     }
-    */
     return;
   } else {
     last_bar_time = bar_time;
-    if (hour_of_day != DateTime::Hour()) StartNewHour();
   }
+  */
 
+  if (hour_of_day != DateTime::Hour()) StartNewHour();
   UpdateVariables();
   if (TradeAllowed()) {
     EA_Trade();
@@ -266,6 +272,25 @@ void OnTick() {
   UpdateStats();
   if (PrintLogOnChart) DisplayInfoOnChart();
 } // end: OnTick()
+
+bool ShouldIgnoreTick(uint _method, double _min_pip_change, ENUM_TIMEFRAMES _tf = PERIOD_CURRENT) {
+  bool _res = false;
+  if (_method == 0) {
+    return _res;
+  }
+  // datetime _bar_time = Chart::iTime(_Symbol, _tf);
+  // static datetime _last_bar_time = Chart::iTime(_Symbol, PERIOD_M1);
+  _res |= (_method % 1 == 0) ? last_traded >= Chart::iTime(_Symbol, _tf) : false;
+  _res |= (_method % 2 == 0) ? last_ask < Chart::iLow(_Symbol, _tf) && last_bid > Chart::iHigh(_Symbol, _tf): false;
+  _res |= (_method % 4 == 0) ? fmin(last_ask, last_bid) > Chart::iLow(_Symbol, _tf) && fmin(last_ask, last_bid) < Chart::iHigh(_Symbol, _tf): false;
+  _res |= (_method % 8 == 0) ? Chart::iTime(_Symbol, _tf) != TimeCurrent() : false;
+  /*
+  if (!_res) {
+    UpdateIndicator(EMPTY);
+  }
+  */
+  return _res;
+}
 
 /**
  * Update existing opened orders.
@@ -319,6 +344,9 @@ int OnInit() {
     if (Terminal::IsRealtime() && AccountNumber() <= 1) {
       // @todo: Fails when debugging.
       Msg::ShowText("EA requires on-line Terminal.", "Error", __FUNCTION__, __LINE__, VerboseErrors, true);
+      ea_active = false;
+      session_active = false;
+      session_initiated = false;
       return (INIT_FAILED);
      }
      #endif
@@ -526,9 +554,13 @@ bool EA_Trade() {
   bool order_placed = false;
   ENUM_ORDER_TYPE _cmd = EMPTY;
   if (VerboseTrace) PrintFormat("%s:%d: %s", __FUNCTION__, __LINE__, DateTime::TimeToStr(chart.GetBarTime()));
-
+  // UpdateIndicator(EMPTY);
   for (ENUM_STRATEGY_TYPE id = 0; id < FINAL_STRATEGY_TYPE_ENTRY; id++) {
-    if (info[id][ACTIVE] && !info[id][SUSPENDED]) {
+    if (
+      info[id][ACTIVE] &&
+      !info[id][SUSPENDED] &&
+      !ShouldIgnoreTick(TickIgnoreMethod, MinPipChangeToTrade, (ENUM_TIMEFRAMES) info[id][TIMEFRAME])
+    ) {
       // Note: When TradeWithTrend is set and we're against the trend, do not trade.
       if (TradeCondition(id, ORDER_TYPE_BUY)) {
         _cmd = ORDER_TYPE_BUY;
@@ -551,11 +583,18 @@ bool EA_Trade() {
 
       if (_cmd != EMPTY) {
         order_placed &= ExecuteOrder(_cmd, id);
+        if (order_placed) {
+          if (VerboseDebug) {
+            PrintFormat("%s:%d: %s%s on %s at %s",
+              __FUNCTION__, __LINE__, sname[id], info[id][TIMEFRAME], Order::OrderTypeToString(_cmd),
+              DateTime::TimeToStr(TimeCurrent())
+            );
+          }
+        }
       }
 
     } // end: if
   } // end: for
-  if (VerboseTrace) PrintFormat("%s:%d (%d), traded=%d, OP: %s", __FUNCTION__, __LINE__, bar_time, order_placed, Order::OrderTypeToString(_cmd));
 
   #ifdef __advanced__
   if (SmartQueueActive && !order_placed && total_orders < max_orders) {
@@ -569,6 +608,7 @@ bool EA_Trade() {
     ProcessOrders();
   }
 
+  last_traded = TimeCurrent();
   return order_placed;
 }
 
@@ -621,7 +661,10 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
   bool success = true;
   static datetime processed[FINAL_INDICATOR_TYPE_ENTRY][FINAL_ENUM_TIMEFRAMES_INDEX];
   int i; string text = __FUNCTION__ + ": ";
-  if (type == EMPTY) ArrayFill(processed, 0, ArraySize(processed), false); // Reset processed if tf is EMPTY.
+  if (type == EMPTY) {
+    ArrayFill(processed, 0, ArraySize(processed), false); // Reset processed if tf is EMPTY.
+    return true;
+  }
   uint index = chart.TfToIndex(tf);
   if (processed[type][index] == chart.GetBarTime(tf)) {
     // If it was already processed, ignore it.
@@ -729,7 +772,7 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
       }
       // success = (bool) demarker[index][CURR] + demarker[index][PREV] + demarker[index][FAR];
       // PrintFormat("Period: %d, DeMarker: %g", period, demarker[index][CURR]);
-      if (VerboseDebug) PrintFormat("DeMarker M%d: %s", tf, Array::ArrToString2D(demarker, ",", Digits));
+      if (VerboseDebug) PrintFormat("%s: DeMarker M%d: %s", DateTime::TimeToStr(chart.GetBarTime(tf)), tf, Array::ArrToString2D(demarker, ",", Digits));
       break;
     case S_ENVELOPES: // Calculates the Envelopes indicator.
       /*
@@ -853,7 +896,7 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
       }
       // Calculate average value.
       rsi_stats[index][0] = (rsi_stats[index][0] > 0 ? (rsi_stats[index][0] + rsi[index][0] + rsi[index][1] + rsi[index][2]) / 4 : (rsi[index][0] + rsi[index][1] + rsi[index][2]) / 3);
-      if (VerboseDebug) PrintFormat("RSI M%d: %s", tf, Array::ArrToString2D(rsi, ",", Digits));
+      if (VerboseDebug) PrintFormat("%s: RSI M%d: %s", DateTime::TimeToStr(chart.GetBarTime(tf)), tf, Array::ArrToString2D(rsi, ",", Digits));
       success = (bool) rsi[index][CURR] + rsi[index][PREV] + rsi[index][FAR];
       break;
     case S_RVI: // Calculates the Relative Strength Index indicator.
@@ -895,7 +938,7 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         wpr[index][i] = -iWPR(symbol, tf, (int) (WPR_Period * ratio), i + WPR_Shift);
       }
-      if (VerboseDebug) PrintFormat("WPR M%d: %s", tf, Array::ArrToString2D(wpr, ",", Digits));
+      if (VerboseDebug) PrintFormat("%s: WPR M%d: %s", DateTime::TimeToStr(chart.GetBarTime(tf)), tf, Array::ArrToString2D(wpr, ",", Digits));
       success = (bool) wpr[index][CURR] + wpr[index][PREV] + wpr[index][FAR];
       break;
     case S_ZIGZAG: // Calculates the custom ZigZag indicator.
@@ -1370,7 +1413,7 @@ int CloseOrdersByType(ENUM_ORDER_TYPE cmd, int strategy_id, int reason_id, bool 
 bool UpdateStats() {
   // Check if bar time has been changed since last check.
   // int bar_time = iTime(NULL, PERIOD_M1, 0);
-  CheckStats(last_pip_change, MAX_TICK);
+  // CheckStats(last_pip_change, MAX_TICK);
   CheckStats(Low[0],  MAX_LOW);
   CheckStats(High[0], MAX_HIGH);
   CheckStats(account.AccountBalance(), MAX_BALANCE);
@@ -4239,7 +4282,7 @@ bool InitVariables() {
   // Check time of the week, month and year based on the trading bars.
   init_bar_time = iTime(_Symbol, 0, 0);
   time_current = TimeCurrent();
-  bar_time = iTime(_Symbol, 0, 0);
+  // bar_time = iTime(_Symbol, 0, 0);
   hour_of_day = DateTime::Hour(); // The hour (0,1,2,..23) of the last known server time by the moment of the program start.
   day_of_week = DateTime::DayOfWeek(); // The zero-based day of week (0 means Sunday,1,2,3,4,5,6) of the specified date. At the testing, the last known server time is modelled.
   day_of_month = DateTime::Day(); // The day of month (1 - 31) of the specified date. At the testing, the last known server time is modelled.
@@ -4934,7 +4977,7 @@ bool InitClasses() {
   summary_report = new SummaryReport(init_balance);
   ticks = new Ticks(market);
   terminal = chart.TerminalInfo();
-  return true;
+  return market.GetSymbol() == _Symbol;
 }
 
 /**
@@ -5279,7 +5322,7 @@ bool MarketCondition(int condition = C_MARKET_NONE) {
 void CheckAccConditions() {
   // if (VerboseTrace) Print("Calling " + __FUNCTION__ + ".");
   if (!Account_Conditions_Active) return;
-  if (bar_time == last_action_time) return; // If action was already executed in the same bar, do not check again.
+  if (chart.GetBarTime() == last_action_time) return; // If action was already executed in the same bar, do not check again.
 
   for (int i = 0; i < ArrayRange(acc_conditions, 0); i++) {
     if (AccCondition(acc_conditions[i][0]) && MarketCondition(acc_conditions[i][1]) && acc_conditions[i][2] != A_NONE) {
@@ -5683,7 +5726,7 @@ string GetDailyReport() {
   int key;
   // output += "Low: "     + daily[MAX_LOW] + "; ";
   // output += "High: "    + daily[MAX_HIGH] + "; ";
-  output += StringFormat("Tick: %g; ", daily[MAX_TICK]);
+  // output += StringFormat("Tick: %g; ", daily[MAX_TICK]);
   // output += "Drop: "    + daily[MAX_DROP] + "; ";
   output += StringFormat("Spread: %g pts; ",   daily[MAX_SPREAD]);
   output += StringFormat("Max orders: %.0f; ", daily[MAX_ORDERS]);
@@ -5715,7 +5758,7 @@ string GetWeeklyReport() {
   // output =+ GetAccountTextDetails() + "; " + GetOrdersStats();
   // output += "Low: "     + weekly[MAX_LOW] + "; ";
   // output += "High: "    + weekly[MAX_HIGH] + "; ";
-  output += StringFormat("Tick: %g; ", weekly[MAX_TICK]);
+  // output += StringFormat("Tick: %g; ", weekly[MAX_TICK]);
   // output += "Drop: "    + weekly[MAX_DROP] + "; ";
   output += StringFormat("Spread: %g pts; ",   weekly[MAX_SPREAD]);
   output += StringFormat("Max orders: %.0f; ", weekly[MAX_ORDERS]);
@@ -5745,7 +5788,7 @@ string GetMonthlyReport() {
   // output =+ GetAccountTextDetails() + "; " + GetOrdersStats();
   // output += "Low: "     + monthly[MAX_LOW] + "; ";
   // output += "High: "    + monthly[MAX_HIGH] + "; ";
-  output += StringFormat("Tick: %g; ", monthly[MAX_TICK]);
+  // output += StringFormat("Tick: %g; ", monthly[MAX_TICK]);
   // output += "Drop: "    + monthly[MAX_DROP] + "; ";
   output += StringFormat("Spread: %g pts; ",   monthly[MAX_SPREAD]);
   output += StringFormat("Max orders: %.0f; ", monthly[MAX_ORDERS]);
@@ -6689,11 +6732,11 @@ bool TaskProcessList(bool with_force = false) {
    int no_elem = 8;
 
    // Check if bar time has been changed since last time.
-   if (bar_time == last_queue_process && !with_force) {
+   if (chart.GetBarTime() == last_queue_process && !with_force) {
      // if (VerboseTrace) Print("TaskProcessList(): Not executed. Bar time: " + bar_time + " == " + last_queue_process);
      return (false); // Do not process job list more often than per each minute bar.
    } else {
-     last_queue_process = bar_time; // Set bar time of last queue process.
+     last_queue_process = chart.GetBarTime(); // Set bar time of last queue process.
    }
 
    market.RefreshRates();

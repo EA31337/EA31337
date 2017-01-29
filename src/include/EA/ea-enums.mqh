@@ -252,7 +252,7 @@ enum ENUM_VALUE_TYPE { // Define type of values in order to store.
   MAX_HIGH,
   MAX_SPREAD,
   MAX_DROP,
-  MAX_TICK,
+  // MAX_TICK,
   MAX_LOSS,
   MAX_PROFIT,
   MAX_BALANCE,
