@@ -236,14 +236,14 @@ void OnTick() {
   last_bid = market.GetLastBid();
   last_pip_change = market.GetLastPriceChangeInPips();
 
-  // Update stats.
-  /*
-  total_stats.OnTick();
-  hourly_stats.OnTick();
-  if (RecordTicksToCSV) {
-    ticks.OnTick();
+  if (!terminal.IsOptimization()) {
+    // Update stats.
+    total_stats.OnTick();
+    hourly_stats.OnTick();
+    if (RecordTicksToCSV) {
+      ticks.OnTick();
+    }
   }
-  */
 
   if (last_pip_change < MinPipChangeToTrade || ShouldIgnoreTick(TickIgnoreMethod, MinPipChangeToTrade, PERIOD_M1)) {
     return;
@@ -268,6 +268,7 @@ void OnTick() {
   if (TradeAllowed()) {
     EA_Trade();
   }
+
   UpdateOrders();
   UpdateStats();
   if (PrintLogOnChart) DisplayInfoOnChart();
@@ -278,17 +279,19 @@ bool ShouldIgnoreTick(uint _method, double _min_pip_change, ENUM_TIMEFRAMES _tf 
   if (_method == 0) {
     return _res;
   }
-  // datetime _bar_time = Chart::iTime(_Symbol, _tf);
-  // static datetime _last_bar_time = Chart::iTime(_Symbol, PERIOD_M1);
-  _res |= (_method % 1 == 0) ? last_traded >= Chart::iTime(_Symbol, _tf) : false;
-  _res |= (_method % 2 == 0) ? last_ask < Chart::iLow(_Symbol, _tf) && last_bid > Chart::iHigh(_Symbol, _tf): false;
-  _res |= (_method % 4 == 0) ? fmin(last_ask, last_bid) > Chart::iLow(_Symbol, _tf) && fmin(last_ask, last_bid) < Chart::iHigh(_Symbol, _tf): false;
-  _res |= (_method % 8 == 0) ? Chart::iTime(_Symbol, _tf) != TimeCurrent() : false;
+
+  _res |= (_method == 1) ? last_bid >= Chart::iLow(_Symbol, _tf) && last_bid <= Chart::iHigh(_Symbol, _tf): false;
+  _res |= (_method == 2) ? Chart::iTime(_Symbol, _tf) != TimeCurrent() : false;
+  _res |= (_method == 3) ? (Chart::iOpen(_Symbol, _tf) != Bid || Chart::iLow(_Symbol, _tf) != Bid || Chart::iHigh(_Symbol, _tf) != Bid) : false;
+  _res |= (_method == 4) ? last_traded >= Chart::iTime(_Symbol, _tf) : false;
+  _res |= (_method == 5) ? last_bid >= Chart::iLow(_Symbol, _tf, 1) && last_bid <= Chart::iHigh(_Symbol, _tf, 1): false;
+
   /*
   if (!_res) {
     UpdateIndicator(EMPTY);
   }
   */
+
   return _res;
 }
 
@@ -3041,11 +3044,17 @@ bool CheckMarketEvent(ENUM_ORDER_TYPE cmd = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M
 bool CheckMinPipGap(int sid) {
   double diff;
   for (int order = 0; order < OrdersTotal(); order++) {
-    if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
-       if (OrderMagicNumber() == MagicNumber + sid && OrderSymbol() == Symbol()) {
-         diff = Convert::GetValueDiffInPips(OrderOpenPrice(), market.GetOpenPrice(), true); 
-         // diff = fabs((OrderOpenPrice() - market.GetOpenPrice()) / pip_size); // @fixme: warning 43: possible loss of data due to type conversion
-         // if (VerboseTrace) Print("Ticket: ", OrderTicket(), ", Order: ", OrderType(), ", Gap: ", diff);
+    if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
+       if (Order::OrderMagicNumber() == MagicNumber + sid && Order::OrderSymbol() == market.GetSymbol()) {
+         diff = Convert::GetValueDiffInPips(Order::OrderOpenPrice(), market.GetOpenPrice(), true);
+         /*
+         if (VerboseDebug) {
+           PrintFormat("Ticket: #%d, %s, Gap: %g (%g-%g)",
+              Order::OrderTicket(), Order::OrderTypeToString(Order::OrderType()), diff,
+              Order::OrderOpenPrice(), market.GetOpenPrice()
+            );
+         }
+         */
          if (diff < MinPipGap) {
            return (false);
          }
@@ -4038,13 +4047,16 @@ void StartNewHour() {
   ProcessOrders();
 
   // Print stats.
-  Msg::ShowText(
-    StringFormat("Hourly stats: Ticks: %d/h (%.2f/min)",
-      hourly_stats.GetTotalTicks(),
-      hourly_stats.GetTotalTicks() / 60
-    ), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
-  // Reset variables.
-  hourly_stats.Reset();
+  if (!terminal.IsOptimization()) {
+    Msg::ShowText(
+      StringFormat("Hourly stats: Ticks: %d/h (%.2f/min)",
+        hourly_stats.GetTotalTicks(),
+        hourly_stats.GetTotalTicks() / 60
+      ), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
+
+    // Reset variables.
+    hourly_stats.Reset();
+  }
 
   // Start the new hour.
   // Note: This needs to be after action processing.
@@ -4386,8 +4398,10 @@ bool InitVariables() {
   ArrayInitialize(order_queue, EMPTY); // Reset order queue.
 
   // Initialize stats.
-  total_stats = new Stats();
-  hourly_stats = new Stats();
+  if (!terminal.IsOptimization()) {
+    total_stats = new Stats();
+    hourly_stats = new Stats();
+  }
   return (init);
 }
 

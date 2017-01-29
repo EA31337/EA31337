@@ -16,21 +16,22 @@
 //+------------------------------------------------------------------+
 
 //+------------------------------------------------------------------+
-extern string   __Trade_Parameters__ = "-- Trade parameters --"; // >>> TRADE <<<
-extern uint     MaxOrders = 0; // Max orders (0 = auto)
-extern uint     MaxOrdersPerType = 0; // Max orders per type (0 = auto)
-extern uint     MaxOrdersPerDay = 0; // Max orders per day
-extern double   LotSize = 0.00000000; // Lot size (0 = auto)
-extern int      LotSizeIncreaseMethod = 202; // Lot size increase method (0-255)
-extern int      LotSizeDecreaseMethod = 167; // Lot size decrease method (0-255)
-extern bool     TradeMicroLots = 1; // Trade micro lots?
-extern int      TrendMethod = 135; // Main trend method (0-255)
-extern int      MinVolumeToTrade = 2; // Min volume to trade
-extern int      MaxOrderPriceSlippage = 5; // Max price slippage (in pips)
-extern int      MaxTries = 5; // Max retries for opening orders
-extern double   MinPipChangeToTrade = 0.70000000; // Min pip change to trade (0 = every tick)
-extern int      MinPipGap = 80; // Min gap between trades per type (in pips)
-extern int      MinIntervalSec = 0; // Min interval between subsequent trade signals (in sec)
+extern string __Trade_Parameters__ = "-- Trade parameters --"; // >>> TRADE <<<
+extern uint   MaxOrders = 0; // Max orders (0 = auto)
+extern uint   MaxOrdersPerType = 0; // Max orders per type (0 = auto)
+extern uint   MaxOrdersPerDay = 0; // Max orders per day
+extern double LotSize = 0.00000000; // Lot size (0 = auto)
+extern int    LotSizeIncreaseMethod = 202; // Lot size increase method (0-255)
+extern int    LotSizeDecreaseMethod = 167; // Lot size decrease method (0-255)
+extern bool   TradeMicroLots = 1; // Trade micro lots?
+extern int    TrendMethod = 135; // Main trend method (0-255)
+extern int    MinVolumeToTrade = 2; // Min volume to trade
+extern int    MaxOrderPriceSlippage = 5; // Max price slippage (in pips)
+extern int    MaxTries = 5; // Max retries for opening orders
+extern double MinPipChangeToTrade = 0.70000000; // Min pip change to trade (0 = every tick)
+extern int    MinPipGap = 80; // Min gap between trades per type (in pips)
+extern int    MinIntervalSec = 0; // Min interval between subsequent trade signals (in sec)
+extern uint   TickIgnoreMethod = 1; // Tick ignore method (0-5, 0 - off)
 
 //+------------------------------------------------------------------+
 extern string   __EA_Order_Parameters__ = "-- Profit and loss parameters --"; // >>> PROFIT/LOSS <<<
