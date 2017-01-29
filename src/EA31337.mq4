@@ -280,11 +280,11 @@ bool ShouldIgnoreTick(uint _method, double _min_pip_change, ENUM_TIMEFRAMES _tf 
     return _res;
   }
 
-  _res |= (_method == 1) ? last_bid >= Chart::iLow(_Symbol, _tf) && last_bid <= Chart::iHigh(_Symbol, _tf): false;
-  _res |= (_method == 2) ? Chart::iTime(_Symbol, _tf) != TimeCurrent() : false;
-  _res |= (_method == 3) ? (Chart::iOpen(_Symbol, _tf) != Bid || Chart::iLow(_Symbol, _tf) != Bid || Chart::iHigh(_Symbol, _tf) != Bid) : false;
-  _res |= (_method == 4) ? last_traded >= Chart::iTime(_Symbol, _tf) : false;
-  _res |= (_method == 5) ? last_bid >= Chart::iLow(_Symbol, _tf, 1) && last_bid <= Chart::iHigh(_Symbol, _tf, 1): false;
+  _res |= (_method == 1) ? (Chart::iOpen(_Symbol, _tf) != Bid) : false;
+  _res |= (_method == 2) ? (Chart::iOpen(_Symbol, _tf) != Bid || Chart::iLow(_Symbol, _tf) != Bid || Chart::iHigh(_Symbol, _tf) != Bid) : false;
+  _res |= (_method == 3) ? Chart::iTime(_Symbol, _tf) != TimeCurrent() : false;
+  _res |= (_method == 4) ? last_bid >= Chart::iLow(_Symbol, _tf) && last_bid <= Chart::iHigh(_Symbol, _tf): false;
+  _res |= (_method == 5) ? last_traded >= Chart::iTime(_Symbol, _tf) : false;
 
   /*
   if (!_res) {
