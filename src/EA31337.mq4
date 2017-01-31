@@ -46,13 +46,13 @@
 //+------------------------------------------------------------------+
 //| Include public classes.
 //+------------------------------------------------------------------+
-#include <EA31337-classes\Account.mqh>
+// #include <EA31337-classes\Account.mqh>
 #include <EA31337-classes\Array.mqh>
 #include <EA31337-classes\Backtest.mqh>
-#include <EA31337-classes\Chart.mqh>
+// #include <EA31337-classes\Chart.mqh>
 #include <EA31337-classes\Convert.mqh>
 #include <EA31337-classes\DateTime.mqh>
-#include <EA31337-classes\Draw.mqh>
+// #include <EA31337-classes\Draw.mqh>
 #include <EA31337-classes\File.mqh>
 #include <EA31337-classes\Indicator.mqh>
 #include <EA31337-classes\Order.mqh>
@@ -421,8 +421,8 @@ void OnDeinit(const int reason) {
       summary_report.CalculateSummary();
       // @todo: Calculate average spread from stats[sid][AVG_SPREAD].
       filename = StringFormat(
-          "%s-%.0f%s-%s-%s-%dspread-(%d)-M%d-report.txt",
-          market.GetSymbol(), summary_report.init_deposit, account.GetCurrency(),
+          "%s-%.f%s-%s-%s-%dspread-(%d)-M%d-report.txt",
+          market.GetSymbol(), summary_report.GetInitDeposit(), account.GetCurrency(),
           TimeToStr(init_bar_time, TIME_DATE), TimeToStr(time_current, TIME_DATE),
           init_spread, GetNoOfStrategies(), chart.GetTf());
           // ea_name, _Symbol, summary.init_deposit, account.AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE), Period());
@@ -3216,7 +3216,7 @@ double GetTrailingValue(ENUM_ORDER_TYPE cmd, int direction = -1, int order_type 
   string symbol = existing ? OrderSymbol() : _Symbol;
 
   if (VerboseDebug) {
-    PrintFormat("%s:%d(%s, %d, %d, %g): trail = (%d + %d) * %g = %g",
+    PrintFormat("%s:%d(%s, %d, %d, %g): trail = (%d + %g) * %g = %g",
       __FUNCTION__, __LINE__, Order::OrderTypeToString(cmd), direction, order_type, previous,
       TrailingStop, extra_trail, pip_size, trail);
   }
@@ -4438,14 +4438,14 @@ void ToggleComponent(int component) {
       }
       break;
     case 6:
-      if (WorseDailyStrategyDividerFactor != 1.0 || WorseWeeklyStrategyDividerFactor != 1.0 || WorseMonthlyStrategyDividerFactor != 1.0) {
-        WorseDailyStrategyDividerFactor = 1.0;
-        WorseWeeklyStrategyDividerFactor = 1.0;
-        WorseMonthlyStrategyDividerFactor = 1.0;
+      if (WorseDailyStrategyMultiplierFactor != 1.0 || WorseWeeklyStrategyMultiplierFactor != 1.0 || WorseMonthlyStrategyMultiplierFactor != 1.0) {
+        WorseDailyStrategyMultiplierFactor = 1.0;
+        WorseWeeklyStrategyMultiplierFactor = 1.0;
+        WorseMonthlyStrategyMultiplierFactor = 1.0;
       } else {
-        WorseDailyStrategyDividerFactor = 2;
-        WorseWeeklyStrategyDividerFactor = 2;
-        WorseMonthlyStrategyDividerFactor = 0;
+        WorseDailyStrategyMultiplierFactor = 1.0;
+        WorseWeeklyStrategyMultiplierFactor = 1.0;
+        WorseMonthlyStrategyMultiplierFactor = 1.0;
       }
       break;
     case 7:
@@ -4988,7 +4988,7 @@ bool InitClasses() {
   trade = new Trade(trade_params);
   logger = trade.Logger();
   market = trade.MarketInfo();
-  summary_report = new SummaryReport(init_balance);
+  summary_report = new SummaryReport();
   ticks = new Ticks(market);
   terminal = chart.TerminalInfo();
   return market.GetSymbol() == _Symbol;
@@ -5413,18 +5413,18 @@ void UpdateStrategyFactor(uint period) {
   switch (period) {
     case DAILY:
       ApplyStrategyMultiplierFactor(DAILY, 1, BestDailyStrategyMultiplierFactor);
-      ApplyStrategyMultiplierFactor(DAILY, -1, WorseDailyStrategyDividerFactor);
+      ApplyStrategyMultiplierFactor(DAILY, -1, WorseDailyStrategyMultiplierFactor);
       break;
     case WEEKLY:
       if (day_of_week > 1) {
         // FIXME: When commented out with 1.0, the profit is different.
         ApplyStrategyMultiplierFactor(WEEKLY, 1, BestWeeklyStrategyMultiplierFactor);
-        ApplyStrategyMultiplierFactor(WEEKLY, -1, WorseWeeklyStrategyDividerFactor);
+        ApplyStrategyMultiplierFactor(WEEKLY, -1, WorseWeeklyStrategyMultiplierFactor);
       }
     break;
     case MONTHLY:
       ApplyStrategyMultiplierFactor(MONTHLY, 1, BestMonthlyStrategyMultiplierFactor);
-      ApplyStrategyMultiplierFactor(MONTHLY, -1, WorseMonthlyStrategyDividerFactor);
+      ApplyStrategyMultiplierFactor(MONTHLY, -1, WorseMonthlyStrategyMultiplierFactor);
     break;
   }
 }
@@ -5508,7 +5508,7 @@ void ApplyStrategyMultiplierFactor(uint period = DAILY, int direction = 0, doubl
   string period_name = period == MONTHLY ? "montly" : (period == WEEKLY ? "weekly" : "daily");
   int new_strategy = direction > 0 ? Array::GetArrKey1ByHighestKey2ValueD(stats, key) : Array::GetArrKey1ByLowestKey2ValueD(stats, key);
   if (new_strategy == EMPTY) return;
-  int previous = Misc::If(direction > 0, best_strategy[period], worse_strategy[period]);
+  int previous = direction > 0 ? best_strategy[period] : worse_strategy[period];
   double new_factor = 1.0;
   if (direction > 0) { // Best strategy.
     if (info[new_strategy][ACTIVE] && stats[new_strategy][key] > 10 && new_strategy != previous) { // Check if it's different than the previous one.
@@ -5532,7 +5532,7 @@ void ApplyStrategyMultiplierFactor(uint period = DAILY, int direction = 0, doubl
       }
       worse_strategy[period] = new_strategy; // Assign the new worse strategy.
       if (factor > 0) {
-        new_factor = NormalizeDouble(GetDefaultProfitFactor() / factor, Digits);
+        new_factor = GetDefaultProfitFactor() * factor;
         info[new_strategy][ACTIVE] = true;
         conf[new_strategy][FACTOR] = new_factor; // Apply multiplier factor for the new strategy.
         Msg::ShowText(StringFormat("Setting multiplier factor to %g for strategy: %d (period: %s)", new_factor, new_strategy, period_name), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
