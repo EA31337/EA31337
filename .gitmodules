@@ -16,9 +16,6 @@
 [submodule "EA31337-classes"]
 	path = src/include/EA31337-classes
 	url = git@github.com:EA31337/EA31337-classes.git
-[submodule "EA31337-strategies"]
-	path = src/include/EA/public-strategies
-	url = git@github.com:EA31337/EA31337-strategies.git
 [submodule "EA31337-Advanced-Sets"]
 	path = sets/Advanced
 	url = git@github.com:EA31337/EA31337-Advanced-Sets.git

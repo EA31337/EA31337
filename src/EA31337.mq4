@@ -489,6 +489,7 @@ string InitInfo(bool startup = false, string sep = "\n") {
   output += "ACCOUNT: " + account.ToString() + sep;
   output += "SYMBOL: " + ((SymbolInfo *)market).ToString() + sep;
   output += "MARKET: " + market.ToString() + sep;
+  output += "CHART: " + chart.ToString() + sep;
   /*
   output += StringFormat("Contract specification for %s: Profit mode: %d, Margin mode: %d, Spread: %d pts, Trade tick size: %f, Point value: %f, Digits: %d, Trade stops level: %dpts, Trade contract size: %g%s",
       _Symbol,
@@ -573,11 +574,12 @@ bool EA_Trade() {
         _cmd = EMPTY;
       }
 
-      #ifdef __advanced__
       if (!DisableCloseConditions) {
         if (CheckMarketEvent(ORDER_TYPE_BUY,  PERIOD_M30, info[id][CLOSE_CONDITION])) CloseOrdersByType(ORDER_TYPE_SELL, id, NULL, CloseConditionOnlyProfitable); // TODO: reason_id
         if (CheckMarketEvent(ORDER_TYPE_SELL, PERIOD_M30, info[id][CLOSE_CONDITION])) CloseOrdersByType(ORDER_TYPE_BUY,  id, NULL, CloseConditionOnlyProfitable); // TODO: reason_id
       }
+
+      #ifdef __advanced__
       if (_cmd == ORDER_TYPE_BUY  && !CheckMarketCondition1(ORDER_TYPE_BUY,  (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) _cmd = EMPTY;
       if (_cmd == ORDER_TYPE_SELL && !CheckMarketCondition1(ORDER_TYPE_SELL, (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) _cmd = EMPTY;
       if (_cmd == ORDER_TYPE_BUY  &&  CheckMarketCondition1(ORDER_TYPE_SELL, PERIOD_M30, info[id][OPEN_CONDITION2], false)) _cmd = EMPTY;
@@ -1386,7 +1388,7 @@ int CloseOrdersByType(ENUM_ORDER_TYPE cmd, int strategy_id, int reason_id, bool 
    int orders_total = 0;
    int order_failed = 0;
    double profit_total = 0.0;
-   RefreshRates();
+   Market::RefreshRates();
    int order;
    for (order = 0; order < OrdersTotal(); order++) {
       if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
@@ -1472,23 +1474,23 @@ bool Trade_AC(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_me
     case ORDER_TYPE_BUY:
       /*
         bool result = iac[period][CURR][LOWER] != 0.0 || iac[period][PREV][LOWER] != 0.0 || iac[period][FAR][LOWER] != 0.0;
-        if ((signal_method &   1) != 0) result &= Open[CURR] > Close[CURR];
-        if ((signal_method &   2) != 0) result &= !AC_On_Sell(period);
-        if ((signal_method &   4) != 0) result &= AC_On_Buy(fmin(period + 1, M30));
-        if ((signal_method &   8) != 0) result &= AC_On_Buy(M30);
-        if ((signal_method &  16) != 0) result &= iac[period][FAR][LOWER] != 0.0;
-        if ((signal_method &  32) != 0) result &= !AC_On_Sell(M30);
+        if ((signal_method %   1) == 0) result &= Open[CURR] > Close[CURR];
+        if ((signal_method %   2) == 0) result &= !AC_On_Sell(period);
+        if ((signal_method %   4) == 0) result &= AC_On_Buy(fmin(period + 1, M30));
+        if ((signal_method %   8) == 0) result &= AC_On_Buy(M30);
+        if ((signal_method %  16) == 0) result &= iac[period][FAR][LOWER] != 0.0;
+        if ((signal_method %  32) == 0) result &= !AC_On_Sell(M30);
         */
     break;
     case ORDER_TYPE_SELL:
       /*
         bool result = iac[period][CURR][UPPER] != 0.0 || iac[period][PREV][UPPER] != 0.0 || iac[period][FAR][UPPER] != 0.0;
-        if ((signal_method &   1) != 0) result &= Open[CURR] < Close[CURR];
-        if ((signal_method &   2) != 0) result &= !AC_On_Buy(period);
-        if ((signal_method &   4) != 0) result &= AC_On_Sell(fmin(period + 1, M30));
-        if ((signal_method &   8) != 0) result &= AC_On_Sell(M30);
-        if ((signal_method &  16) != 0) result &= iac[period][FAR][UPPER] != 0.0;
-        if ((signal_method &  32) != 0) result &= !AC_On_Buy(M30);
+        if ((signal_method %   1) == 0) result &= Open[CURR] < Close[CURR];
+        if ((signal_method %   2) == 0) result &= !AC_On_Buy(period);
+        if ((signal_method %   4) == 0) result &= AC_On_Sell(fmin(period + 1, M30));
+        if ((signal_method %   8) == 0) result &= AC_On_Sell(M30);
+        if ((signal_method %  16) == 0) result &= iac[period][FAR][UPPER] != 0.0;
+        if ((signal_method %  32) == 0) result &= !AC_On_Buy(M30);
         */
     break;
   }
@@ -1524,23 +1526,23 @@ bool Trade_AD(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_me
     case ORDER_TYPE_BUY:
       /*
         bool result = AD[period][CURR][LOWER] != 0.0 || AD[period][PREV][LOWER] != 0.0 || AD[period][FAR][LOWER] != 0.0;
-        if ((signal_method &   1) != 0) result &= Open[CURR] > Close[CURR];
-        if ((signal_method &   2) != 0) result &= !AD_On_Sell(period);
-        if ((signal_method &   4) != 0) result &= AD_On_Buy(fmin(period + 1, M30));
-        if ((signal_method &   8) != 0) result &= AD_On_Buy(M30);
-        if ((signal_method &  16) != 0) result &= AD[period][FAR][LOWER] != 0.0;
-        if ((signal_method &  32) != 0) result &= !AD_On_Sell(M30);
+        if ((signal_method %   1) == 0) result &= Open[CURR] > Close[CURR];
+        if ((signal_method %   2) == 0) result &= !AD_On_Sell(period);
+        if ((signal_method %   4) == 0) result &= AD_On_Buy(fmin(period + 1, M30));
+        if ((signal_method %   8) == 0) result &= AD_On_Buy(M30);
+        if ((signal_method %  16) == 0) result &= AD[period][FAR][LOWER] != 0.0;
+        if ((signal_method %  32) == 0) result &= !AD_On_Sell(M30);
         */
     break;
     case ORDER_TYPE_SELL:
       /*
         bool result = AD[period][CURR][UPPER] != 0.0 || AD[period][PREV][UPPER] != 0.0 || AD[period][FAR][UPPER] != 0.0;
-        if ((signal_method &   1) != 0) result &= Open[CURR] < Close[CURR];
-        if ((signal_method &   2) != 0) result &= !AD_On_Buy(period);
-        if ((signal_method &   4) != 0) result &= AD_On_Sell(fmin(period + 1, M30));
-        if ((signal_method &   8) != 0) result &= AD_On_Sell(M30);
-        if ((signal_method &  16) != 0) result &= AD[period][FAR][UPPER] != 0.0;
-        if ((signal_method &  32) != 0) result &= !AD_On_Buy(M30);
+        if ((signal_method %   1) == 0) result &= Open[CURR] < Close[CURR];
+        if ((signal_method %   2) == 0) result &= !AD_On_Buy(period);
+        if ((signal_method %   4) == 0) result &= AD_On_Sell(fmin(period + 1, M30));
+        if ((signal_method %   8) == 0) result &= AD_On_Sell(M30);
+        if ((signal_method %  16) == 0) result &= AD[period][FAR][UPPER] != 0.0;
+        if ((signal_method %  32) == 0) result &= !AD_On_Buy(M30);
         */
     break;
   }
@@ -1576,23 +1578,23 @@ bool Trade_ADX(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
     case ORDER_TYPE_BUY:
       /*
         bool result = ADX[period][CURR][LOWER] != 0.0 || ADX[period][PREV][LOWER] != 0.0 || ADX[period][FAR][LOWER] != 0.0;
-        if ((signal_method &   1) != 0) result &= Open[CURR] > Close[CURR];
-        if ((signal_method &   2) != 0) result &= !ADX_On_Sell(period);
-        if ((signal_method &   4) != 0) result &= ADX_On_Buy(fmin(period + 1, M30));
-        if ((signal_method &   8) != 0) result &= ADX_On_Buy(M30);
-        if ((signal_method &  16) != 0) result &= ADX[period][FAR][LOWER] != 0.0;
-        if ((signal_method &  32) != 0) result &= !ADX_On_Sell(M30);
+        if ((signal_method %   1) == 0) result &= Open[CURR] > Close[CURR];
+        if ((signal_method %   2) == 0) result &= !ADX_On_Sell(period);
+        if ((signal_method %   4) == 0) result &= ADX_On_Buy(fmin(period + 1, M30));
+        if ((signal_method %   8) == 0) result &= ADX_On_Buy(M30);
+        if ((signal_method %  16) == 0) result &= ADX[period][FAR][LOWER] != 0.0;
+        if ((signal_method %  32) == 0) result &= !ADX_On_Sell(M30);
         */
     break;
     case ORDER_TYPE_SELL:
       /*
         bool result = ADX[period][CURR][UPPER] != 0.0 || ADX[period][PREV][UPPER] != 0.0 || ADX[period][FAR][UPPER] != 0.0;
-        if ((signal_method &   1) != 0) result &= Open[CURR] < Close[CURR];
-        if ((signal_method &   2) != 0) result &= !ADX_On_Buy(period);
-        if ((signal_method &   4) != 0) result &= ADX_On_Sell(fmin(period + 1, M30));
-        if ((signal_method &   8) != 0) result &= ADX_On_Sell(M30);
-        if ((signal_method &  16) != 0) result &= ADX[period][FAR][UPPER] != 0.0;
-        if ((signal_method &  32) != 0) result &= !ADX_On_Buy(M30);
+        if ((signal_method %   1) == 0) result &= Open[CURR] < Close[CURR];
+        if ((signal_method %   2) == 0) result &= !ADX_On_Buy(period);
+        if ((signal_method %   4) == 0) result &= ADX_On_Sell(fmin(period + 1, M30));
+        if ((signal_method %   8) == 0) result &= ADX_On_Sell(M30);
+        if ((signal_method %  16) == 0) result &= ADX[period][FAR][UPPER] != 0.0;
+        if ((signal_method %  32) == 0) result &= !ADX_On_Buy(M30);
         */
     break;
   }
@@ -1625,12 +1627,12 @@ bool Trade_Alligator(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int si
         alligator[period][CURR][LIPS] > alligator[period][CURR][JAW] + gap && // ... Lips are above Jaw ...
         alligator[period][CURR][TEETH] > alligator[period][CURR][JAW] + gap // ... Teeth are above Jaw ...
         );
-      if ((signal_method &   1) != 0) result &= alligator[period][PREV][LIPS] > alligator[period][PREV][TEETH]; // Check if previous Lips were above Teeth.
-      if ((signal_method &   2) != 0) result &= alligator[period][PREV][LIPS] > alligator[period][PREV][JAW]; // Check if previous Lips were above Jaw.
-      if ((signal_method &   4) != 0) result &= alligator[period][PREV][TEETH] > alligator[period][PREV][JAW]; // Check if previous Teeth were above Jaw.
-      if ((signal_method &   8) != 0) result &= alligator[period][CURR][LIPS] < alligator[period][PREV][LIPS]; // Check if Lips decreased since last bar.
-      if ((signal_method &  16) != 0) result &= alligator[period][CURR][LIPS] - alligator[period][PREV][TEETH] > alligator[period][PREV][TEETH] - alligator[period][PREV][JAW];
-      if ((signal_method &  32) != 0) result &= (
+      if ((signal_method %   1) == 0) result &= alligator[period][PREV][LIPS] > alligator[period][PREV][TEETH]; // Check if previous Lips were above Teeth.
+      if ((signal_method %   2) == 0) result &= alligator[period][PREV][LIPS] > alligator[period][PREV][JAW]; // Check if previous Lips were above Jaw.
+      if ((signal_method %   4) == 0) result &= alligator[period][PREV][TEETH] > alligator[period][PREV][JAW]; // Check if previous Teeth were above Jaw.
+      if ((signal_method %   8) == 0) result &= alligator[period][CURR][LIPS] < alligator[period][PREV][LIPS]; // Check if Lips decreased since last bar.
+      if ((signal_method %  16) == 0) result &= alligator[period][CURR][LIPS] - alligator[period][PREV][TEETH] > alligator[period][PREV][TEETH] - alligator[period][PREV][JAW];
+      if ((signal_method %  32) == 0) result &= (
         alligator[period][FAR][LIPS] < alligator[period][FAR][TEETH] || // Check if Lips are below Teeth and ...
         alligator[period][FAR][LIPS] < alligator[period][FAR][JAW] || // ... Lips are below Jaw and ...
         alligator[period][FAR][TEETH] < alligator[period][FAR][JAW] // ... Teeth are below Jaw ...
@@ -1664,12 +1666,12 @@ bool Trade_Alligator(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int si
         alligator[period][CURR][LIPS] + gap < alligator[period][CURR][JAW] && // ... Lips are below Jaw and ...
         alligator[period][CURR][TEETH] + gap < alligator[period][CURR][JAW] // ... Teeth are below Jaw ...
         );
-      if ((signal_method &   1) != 0) result &= alligator[period][PREV][LIPS] < alligator[period][PREV][TEETH]; // Check if previous Lips were below Teeth.
-      if ((signal_method &   2) != 0) result &= alligator[period][PREV][LIPS] < alligator[period][PREV][JAW]; // Previous Lips were below Jaw.
-      if ((signal_method &   4) != 0) result &= alligator[period][PREV][TEETH] < alligator[period][PREV][JAW]; // Previous Teeth were below Jaw.
-      if ((signal_method &   8) != 0) result &= alligator[period][CURR][LIPS] > alligator[period][PREV][LIPS]; // Check if Lips increased since last bar.
-      if ((signal_method &  16) != 0) result &= alligator[period][PREV][TEETH] - alligator[period][CURR][LIPS] > alligator[period][PREV][JAW] - alligator[period][PREV][TEETH];
-      if ((signal_method &  32) != 0) result &= (
+      if ((signal_method %   1) == 0) result &= alligator[period][PREV][LIPS] < alligator[period][PREV][TEETH]; // Check if previous Lips were below Teeth.
+      if ((signal_method %   2) == 0) result &= alligator[period][PREV][LIPS] < alligator[period][PREV][JAW]; // Previous Lips were below Jaw.
+      if ((signal_method %   4) == 0) result &= alligator[period][PREV][TEETH] < alligator[period][PREV][JAW]; // Previous Teeth were below Jaw.
+      if ((signal_method %   8) == 0) result &= alligator[period][CURR][LIPS] > alligator[period][PREV][LIPS]; // Check if Lips increased since last bar.
+      if ((signal_method %  16) == 0) result &= alligator[period][PREV][TEETH] - alligator[period][CURR][LIPS] > alligator[period][PREV][JAW] - alligator[period][PREV][TEETH];
+      if ((signal_method %  32) == 0) result &= (
         alligator[period][FAR][LIPS] > alligator[period][FAR][TEETH] || // Check if Lips are above Teeth ...
         alligator[period][FAR][LIPS] > alligator[period][FAR][JAW] || // ... Lips are above Jaw ...
         alligator[period][FAR][TEETH] > alligator[period][FAR][JAW] // ... Teeth are above Jaw ...
@@ -1711,23 +1713,23 @@ bool Trade_ATR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
     case ORDER_TYPE_BUY:
       /*
         bool result = ATR[period][CURR][LOWER] != 0.0 || ATR[period][PREV][LOWER] != 0.0 || ATR[period][FAR][LOWER] != 0.0;
-        if ((signal_method &   1) != 0) result &= Open[CURR] > Close[CURR];
-        if ((signal_method &   2) != 0) result &= !ATR_On_Sell(tf);
-        if ((signal_method &   4) != 0) result &= ATR_On_Buy(fmin(period + 1, M30));
-        if ((signal_method &   8) != 0) result &= ATR_On_Buy(M30);
-        if ((signal_method &  16) != 0) result &= ATR[period][FAR][LOWER] != 0.0;
-        if ((signal_method &  32) != 0) result &= !ATR_On_Sell(M30);
+        if ((signal_method %   1) == 0) result &= Open[CURR] > Close[CURR];
+        if ((signal_method %   2) == 0) result &= !ATR_On_Sell(tf);
+        if ((signal_method %   4) == 0) result &= ATR_On_Buy(fmin(period + 1, M30));
+        if ((signal_method %   8) == 0) result &= ATR_On_Buy(M30);
+        if ((signal_method %  16) == 0) result &= ATR[period][FAR][LOWER] != 0.0;
+        if ((signal_method %  32) == 0) result &= !ATR_On_Sell(M30);
         */
     break;
     case ORDER_TYPE_SELL:
       /*
         bool result = ATR[period][CURR][UPPER] != 0.0 || ATR[period][PREV][UPPER] != 0.0 || ATR[period][FAR][UPPER] != 0.0;
-        if ((signal_method &   1) != 0) result &= Open[CURR] < Close[CURR];
-        if ((signal_method &   2) != 0) result &= !ATR_On_Buy(tf);
-        if ((signal_method &   4) != 0) result &= ATR_On_Sell(fmin(period + 1, M30));
-        if ((signal_method &   8) != 0) result &= ATR_On_Sell(M30);
-        if ((signal_method &  16) != 0) result &= ATR[period][FAR][UPPER] != 0.0;
-        if ((signal_method &  32) != 0) result &= !ATR_On_Buy(M30);
+        if ((signal_method %   1) == 0) result &= Open[CURR] < Close[CURR];
+        if ((signal_method %   2) == 0) result &= !ATR_On_Buy(tf);
+        if ((signal_method %   4) == 0) result &= ATR_On_Sell(fmin(period + 1, M30));
+        if ((signal_method %   8) == 0) result &= ATR_On_Sell(M30);
+        if ((signal_method %  16) == 0) result &= ATR[period][FAR][UPPER] != 0.0;
+        if ((signal_method %  32) == 0) result &= !ATR_On_Buy(M30);
         */
     break;
   }
@@ -1762,23 +1764,23 @@ bool Trade_Awesome(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sign
     case ORDER_TYPE_BUY:
       /*
         bool result = Awesome[period][CURR][LOWER] != 0.0 || Awesome[period][PREV][LOWER] != 0.0 || Awesome[period][FAR][LOWER] != 0.0;
-        if ((signal_method &   1) != 0) result &= Open[CURR] > Close[CURR];
-        if ((signal_method &   2) != 0) result &= !Awesome_On_Sell(tf);
-        if ((signal_method &   4) != 0) result &= Awesome_On_Buy(fmin(period + 1, M30));
-        if ((signal_method &   8) != 0) result &= Awesome_On_Buy(M30);
-        if ((signal_method &  16) != 0) result &= Awesome[period][FAR][LOWER] != 0.0;
-        if ((signal_method &  32) != 0) result &= !Awesome_On_Sell(M30);
+        if ((signal_method %   1) == 0) result &= Open[CURR] > Close[CURR];
+        if ((signal_method %   2) == 0) result &= !Awesome_On_Sell(tf);
+        if ((signal_method %   4) == 0) result &= Awesome_On_Buy(fmin(period + 1, M30));
+        if ((signal_method %   8) == 0) result &= Awesome_On_Buy(M30);
+        if ((signal_method %  16) == 0) result &= Awesome[period][FAR][LOWER] != 0.0;
+        if ((signal_method %  32) == 0) result &= !Awesome_On_Sell(M30);
         */
     break;
     case ORDER_TYPE_SELL:
       /*
         bool result = Awesome[period][CURR][UPPER] != 0.0 || Awesome[period][PREV][UPPER] != 0.0 || Awesome[period][FAR][UPPER] != 0.0;
-        if ((signal_method &   1) != 0) result &= Open[CURR] < Close[CURR];
-        if ((signal_method &   2) != 0) result &= !Awesome_On_Buy(tf);
-        if ((signal_method &   4) != 0) result &= Awesome_On_Sell(fmin(period + 1, M30));
-        if ((signal_method &   8) != 0) result &= Awesome_On_Sell(M30);
-        if ((signal_method &  16) != 0) result &= Awesome[period][FAR][UPPER] != 0.0;
-        if ((signal_method &  32) != 0) result &= !Awesome_On_Buy(M30);
+        if ((signal_method %   1) == 0) result &= Open[CURR] < Close[CURR];
+        if ((signal_method %   2) == 0) result &= !Awesome_On_Buy(tf);
+        if ((signal_method %   4) == 0) result &= Awesome_On_Sell(fmin(period + 1, M30));
+        if ((signal_method %   8) == 0) result &= Awesome_On_Sell(M30);
+        if ((signal_method %  16) == 0) result &= Awesome[period][FAR][UPPER] != 0.0;
+        if ((signal_method %  32) == 0) result &= !Awesome_On_Buy(M30);
         */
     break;
   }
@@ -1809,28 +1811,28 @@ bool Trade_Bands(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal
           lowest < fmax(fmax(bands[period][CURR][BANDS_LOWER], bands[period][PREV][BANDS_LOWER]), bands[period][FAR][BANDS_LOWER])
           );
       // Buy: price crossed lower line upwards (returned to it from below).
-      if ((signal_method &   1) != 0) result &= fmin(Close[PREV], Close[FAR]) < bands[period][CURR][BANDS_LOWER];
-      if ((signal_method &   2) != 0) result &= (bands[period][CURR][BANDS_LOWER] > bands[period][FAR][BANDS_LOWER]);
-      if ((signal_method &   4) != 0) result &= (bands[period][CURR][BANDS_BASE] > bands[period][FAR][BANDS_BASE]);
-      if ((signal_method &   8) != 0) result &= (bands[period][CURR][BANDS_UPPER] > bands[period][FAR][BANDS_UPPER]);
-      if ((signal_method &  16) != 0) result &= highest > bands[period][CURR][BANDS_BASE];
-      if ((signal_method &  32) != 0) result &= Open[CURR] < bands[period][CURR][BANDS_BASE];
-      if ((signal_method &  64) != 0) result &= fmin(Close[PREV], Close[FAR]) > bands[period][CURR][BANDS_BASE];
-      // if ((signal_method & 128) != 0) result &= !Trade_Bands(Convert::NegateOrderType(cmd), (ENUM_TIMEFRAMES) Convert::IndexToTf(fmin(period + 1, M30)));
+      if ((signal_method %   1) == 0) result &= fmin(Close[PREV], Close[FAR]) < bands[period][CURR][BANDS_LOWER];
+      if ((signal_method %   2) == 0) result &= (bands[period][CURR][BANDS_LOWER] > bands[period][FAR][BANDS_LOWER]);
+      if ((signal_method %   4) == 0) result &= (bands[period][CURR][BANDS_BASE] > bands[period][FAR][BANDS_BASE]);
+      if ((signal_method %   8) == 0) result &= (bands[period][CURR][BANDS_UPPER] > bands[period][FAR][BANDS_UPPER]);
+      if ((signal_method %  16) == 0) result &= highest > bands[period][CURR][BANDS_BASE];
+      if ((signal_method %  32) == 0) result &= Open[CURR] < bands[period][CURR][BANDS_BASE];
+      if ((signal_method %  64) == 0) result &= fmin(Close[PREV], Close[FAR]) > bands[period][CURR][BANDS_BASE];
+      // if ((signal_method % 128) == 0) result &= !Trade_Bands(Convert::NegateOrderType(cmd), (ENUM_TIMEFRAMES) Convert::IndexToTf(fmin(period + 1, M30)));
     case ORDER_TYPE_SELL:
       // Price value was higher than the upper band.
       result = (
           highest > fmin(fmin(bands[period][CURR][BANDS_UPPER], bands[period][PREV][BANDS_UPPER]), bands[period][FAR][BANDS_UPPER])
           );
       // Sell: price crossed upper line downwards (returned to it from above).
-      if ((signal_method &   1) != 0) result &= fmin(Close[PREV], Close[FAR]) > bands[period][CURR][BANDS_UPPER];
-      if ((signal_method &   2) != 0) result &= (bands[period][CURR][BANDS_LOWER] < bands[period][FAR][BANDS_LOWER]);
-      if ((signal_method &   4) != 0) result &= (bands[period][CURR][BANDS_BASE] < bands[period][FAR][BANDS_BASE]);
-      if ((signal_method &   8) != 0) result &= (bands[period][CURR][BANDS_UPPER] < bands[period][FAR][BANDS_UPPER]);
-      if ((signal_method &  16) != 0) result &= lowest < bands[period][CURR][BANDS_BASE];
-      if ((signal_method &  32) != 0) result &= Open[CURR] > bands[period][CURR][BANDS_BASE];
-      if ((signal_method &  64) != 0) result &= fmin(Close[PREV], Close[FAR]) < bands[period][CURR][BANDS_BASE];
-      // if ((signal_method & 128) != 0) result &= !Trade_Bands(Convert::NegateOrderType(cmd), (ENUM_TIMEFRAMES) Convert::IndexToTf(fmin(period + 1, M30)));
+      if ((signal_method %   1) == 0) result &= fmin(Close[PREV], Close[FAR]) > bands[period][CURR][BANDS_UPPER];
+      if ((signal_method %   2) == 0) result &= (bands[period][CURR][BANDS_LOWER] < bands[period][FAR][BANDS_LOWER]);
+      if ((signal_method %   4) == 0) result &= (bands[period][CURR][BANDS_BASE] < bands[period][FAR][BANDS_BASE]);
+      if ((signal_method %   8) == 0) result &= (bands[period][CURR][BANDS_UPPER] < bands[period][FAR][BANDS_UPPER]);
+      if ((signal_method %  16) == 0) result &= lowest < bands[period][CURR][BANDS_BASE];
+      if ((signal_method %  32) == 0) result &= Open[CURR] > bands[period][CURR][BANDS_BASE];
+      if ((signal_method %  64) == 0) result &= fmin(Close[PREV], Close[FAR]) < bands[period][CURR][BANDS_BASE];
+      // if ((signal_method % 128) == 0) result &= !Trade_Bands(Convert::NegateOrderType(cmd), (ENUM_TIMEFRAMES) Convert::IndexToTf(fmin(period + 1, M30)));
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
@@ -1858,23 +1860,23 @@ bool Trade_BPower(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signa
     case ORDER_TYPE_BUY:
       /*
         bool result = BPower[period][CURR][LOWER] != 0.0 || BPower[period][PREV][LOWER] != 0.0 || BPower[period][FAR][LOWER] != 0.0;
-        if ((signal_method &   1) != 0) result &= Open[CURR] > Close[CURR];
-        if ((signal_method &   2) != 0) result &= !BPower_On_Sell(tf);
-        if ((signal_method &   4) != 0) result &= BPower_On_Buy(fmin(period + 1, M30));
-        if ((signal_method &   8) != 0) result &= BPower_On_Buy(M30);
-        if ((signal_method &  16) != 0) result &= BPower[period][FAR][LOWER] != 0.0;
-        if ((signal_method &  32) != 0) result &= !BPower_On_Sell(M30);
+        if ((signal_method %   1) == 0) result &= Open[CURR] > Close[CURR];
+        if ((signal_method %   2) == 0) result &= !BPower_On_Sell(tf);
+        if ((signal_method %   4) == 0) result &= BPower_On_Buy(fmin(period + 1, M30));
+        if ((signal_method %   8) == 0) result &= BPower_On_Buy(M30);
+        if ((signal_method %  16) == 0) result &= BPower[period][FAR][LOWER] != 0.0;
+        if ((signal_method %  32) == 0) result &= !BPower_On_Sell(M30);
         */
     break;
     case ORDER_TYPE_SELL:
       /*
         bool result = BPower[period][CURR][UPPER] != 0.0 || BPower[period][PREV][UPPER] != 0.0 || BPower[period][FAR][UPPER] != 0.0;
-        if ((signal_method &   1) != 0) result &= Open[CURR] < Close[CURR];
-        if ((signal_method &   2) != 0) result &= !BPower_On_Buy(tf);
-        if ((signal_method &   4) != 0) result &= BPower_On_Sell(fmin(period + 1, M30));
-        if ((signal_method &   8) != 0) result &= BPower_On_Sell(M30);
-        if ((signal_method &  16) != 0) result &= BPower[period][FAR][UPPER] != 0.0;
-        if ((signal_method &  32) != 0) result &= !BPower_On_Buy(M30);
+        if ((signal_method %   1) == 0) result &= Open[CURR] < Close[CURR];
+        if ((signal_method %   2) == 0) result &= !BPower_On_Buy(tf);
+        if ((signal_method %   4) == 0) result &= BPower_On_Sell(fmin(period + 1, M30));
+        if ((signal_method %   8) == 0) result &= BPower_On_Sell(M30);
+        if ((signal_method %  16) == 0) result &= BPower[period][FAR][UPPER] != 0.0;
+        if ((signal_method %  32) == 0) result &= !BPower_On_Buy(M30);
         */
     break;
   }
@@ -1899,23 +1901,23 @@ bool Trade_Breakage(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sig
     case ORDER_TYPE_BUY:
       /*
         bool result = Breakage[period][CURR][LOWER] != 0.0 || Breakage[period][PREV][LOWER] != 0.0 || Breakage[period][FAR][LOWER] != 0.0;
-        if ((signal_method &   1) != 0) result &= Open[CURR] > Close[CURR];
-        if ((signal_method &   2) != 0) result &= !Breakage_On_Sell(tf);
-        if ((signal_method &   4) != 0) result &= Breakage_On_Buy(fmin(period + 1, M30));
-        if ((signal_method &   8) != 0) result &= Breakage_On_Buy(M30);
-        if ((signal_method &  16) != 0) result &= Breakage[period][FAR][LOWER] != 0.0;
-        if ((signal_method &  32) != 0) result &= !Breakage_On_Sell(M30);
+        if ((signal_method %   1) == 0) result &= Open[CURR] > Close[CURR];
+        if ((signal_method %   2) == 0) result &= !Breakage_On_Sell(tf);
+        if ((signal_method %   4) == 0) result &= Breakage_On_Buy(fmin(period + 1, M30));
+        if ((signal_method %   8) == 0) result &= Breakage_On_Buy(M30);
+        if ((signal_method %  16) == 0) result &= Breakage[period][FAR][LOWER] != 0.0;
+        if ((signal_method %  32) == 0) result &= !Breakage_On_Sell(M30);
         */
     break;
     case ORDER_TYPE_SELL:
       /*
         bool result = Breakage[period][CURR][UPPER] != 0.0 || Breakage[period][PREV][UPPER] != 0.0 || Breakage[period][FAR][UPPER] != 0.0;
-        if ((signal_method &   1) != 0) result &= Open[CURR] < Close[CURR];
-        if ((signal_method &   2) != 0) result &= !Breakage_On_Buy(tf);
-        if ((signal_method &   4) != 0) result &= Breakage_On_Sell(fmin(period + 1, M30));
-        if ((signal_method &   8) != 0) result &= Breakage_On_Sell(M30);
-        if ((signal_method &  16) != 0) result &= Breakage[period][FAR][UPPER] != 0.0;
-        if ((signal_method &  32) != 0) result &= !Breakage_On_Buy(M30);
+        if ((signal_method %   1) == 0) result &= Open[CURR] < Close[CURR];
+        if ((signal_method %   2) == 0) result &= !Breakage_On_Buy(tf);
+        if ((signal_method %   4) == 0) result &= Breakage_On_Sell(fmin(period + 1, M30));
+        if ((signal_method %   8) == 0) result &= Breakage_On_Sell(M30);
+        if ((signal_method %  16) == 0) result &= Breakage[period][FAR][UPPER] != 0.0;
+        if ((signal_method %  32) == 0) result &= !Breakage_On_Buy(M30);
         */
     break;
   }
@@ -1941,23 +1943,23 @@ bool Trade_BWMFI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal
     case ORDER_TYPE_BUY:
       /*
         bool result = BWMFI[period][CURR][LOWER] != 0.0 || BWMFI[period][PREV][LOWER] != 0.0 || BWMFI[period][FAR][LOWER] != 0.0;
-        if ((signal_method &   1) != 0) result &= Open[CURR] > Close[CURR];
-        if ((signal_method &   2) != 0) result &= !BWMFI_On_Sell(tf);
-        if ((signal_method &   4) != 0) result &= BWMFI_On_Buy(fmin(period + 1, M30));
-        if ((signal_method &   8) != 0) result &= BWMFI_On_Buy(M30);
-        if ((signal_method &  16) != 0) result &= BWMFI[period][FAR][LOWER] != 0.0;
-        if ((signal_method &  32) != 0) result &= !BWMFI_On_Sell(M30);
+        if ((signal_method %   1) == 0) result &= Open[CURR] > Close[CURR];
+        if ((signal_method %   2) == 0) result &= !BWMFI_On_Sell(tf);
+        if ((signal_method %   4) == 0) result &= BWMFI_On_Buy(fmin(period + 1, M30));
+        if ((signal_method %   8) == 0) result &= BWMFI_On_Buy(M30);
+        if ((signal_method %  16) == 0) result &= BWMFI[period][FAR][LOWER] != 0.0;
+        if ((signal_method %  32) == 0) result &= !BWMFI_On_Sell(M30);
         */
     break;
     case ORDER_TYPE_SELL:
       /*
         bool result = BWMFI[period][CURR][UPPER] != 0.0 || BWMFI[period][PREV][UPPER] != 0.0 || BWMFI[period][FAR][UPPER] != 0.0;
-        if ((signal_method &   1) != 0) result &= Open[CURR] < Close[CURR];
-        if ((signal_method &   2) != 0) result &= !BWMFI_On_Buy(tf);
-        if ((signal_method &   4) != 0) result &= BWMFI_On_Sell(fmin(period + 1, M30));
-        if ((signal_method &   8) != 0) result &= BWMFI_On_Sell(M30);
-        if ((signal_method &  16) != 0) result &= BWMFI[period][FAR][UPPER] != 0.0;
-        if ((signal_method &  32) != 0) result &= !BWMFI_On_Buy(M30);
+        if ((signal_method %   1) == 0) result &= Open[CURR] < Close[CURR];
+        if ((signal_method %   2) == 0) result &= !BWMFI_On_Buy(tf);
+        if ((signal_method %   4) == 0) result &= BWMFI_On_Sell(fmin(period + 1, M30));
+        if ((signal_method %   8) == 0) result &= BWMFI_On_Sell(M30);
+        if ((signal_method %  16) == 0) result &= BWMFI[period][FAR][UPPER] != 0.0;
+        if ((signal_method %  32) == 0) result &= !BWMFI_On_Buy(M30);
         */
     break;
   }
@@ -1993,23 +1995,23 @@ bool Trade_CCI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
     case ORDER_TYPE_BUY:
       /*
         bool result = CCI[period][CURR][LOWER] != 0.0 || CCI[period][PREV][LOWER] != 0.0 || CCI[period][FAR][LOWER] != 0.0;
-        if ((signal_method &   1) != 0) result &= Open[CURR] > Close[CURR];
-        if ((signal_method &   2) != 0) result &= !CCI_On_Sell(tf);
-        if ((signal_method &   4) != 0) result &= CCI_On_Buy(fmin(period + 1, M30));
-        if ((signal_method &   8) != 0) result &= CCI_On_Buy(M30);
-        if ((signal_method &  16) != 0) result &= CCI[period][FAR][LOWER] != 0.0;
-        if ((signal_method &  32) != 0) result &= !CCI_On_Sell(M30);
+        if ((signal_method %   1) == 0) result &= Open[CURR] > Close[CURR];
+        if ((signal_method %   2) == 0) result &= !CCI_On_Sell(tf);
+        if ((signal_method %   4) == 0) result &= CCI_On_Buy(fmin(period + 1, M30));
+        if ((signal_method %   8) == 0) result &= CCI_On_Buy(M30);
+        if ((signal_method %  16) == 0) result &= CCI[period][FAR][LOWER] != 0.0;
+        if ((signal_method %  32) == 0) result &= !CCI_On_Sell(M30);
         */
     break;
     case ORDER_TYPE_SELL:
       /*
         bool result = CCI[period][CURR][UPPER] != 0.0 || CCI[period][PREV][UPPER] != 0.0 || CCI[period][FAR][UPPER] != 0.0;
-        if ((signal_method &   1) != 0) result &= Open[CURR] < Close[CURR];
-        if ((signal_method &   2) != 0) result &= !CCI_On_Buy(tf);
-        if ((signal_method &   4) != 0) result &= CCI_On_Sell(fmin(period + 1, M30));
-        if ((signal_method &   8) != 0) result &= CCI_On_Sell(M30);
-        if ((signal_method &  16) != 0) result &= CCI[period][FAR][UPPER] != 0.0;
-        if ((signal_method &  32) != 0) result &= !CCI_On_Buy(M30);
+        if ((signal_method %   1) == 0) result &= Open[CURR] < Close[CURR];
+        if ((signal_method %   2) == 0) result &= !CCI_On_Buy(tf);
+        if ((signal_method %   4) == 0) result &= CCI_On_Sell(fmin(period + 1, M30));
+        if ((signal_method %   8) == 0) result &= CCI_On_Sell(M30);
+        if ((signal_method %  16) == 0) result &= CCI[period][FAR][UPPER] != 0.0;
+        if ((signal_method %  32) == 0) result &= !CCI_On_Buy(M30);
         */
     break;
   }
@@ -2035,20 +2037,20 @@ bool Trade_DeMarker(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sig
   switch (cmd) {
     case ORDER_TYPE_BUY:
       result = demarker[period][CURR] < 0.5 - signal_level;
-      if ((signal_method &   1) != 0) result &= demarker[period][PREV] < 0.5 - signal_level;
-      if ((signal_method &   2) != 0) result &= demarker[period][FAR] < 0.5 - signal_level;
-      if ((signal_method &   4) != 0) result &= demarker[period][CURR] < demarker[period][PREV];
-      if ((signal_method &   8) != 0) result &= demarker[period][PREV] < demarker[period][FAR];
-      if ((signal_method &  16) != 0) result &= demarker[period][PREV] < 0.5 - signal_level - signal_level/2;
+      if ((signal_method %   1) == 0) result &= demarker[period][PREV] < 0.5 - signal_level;
+      if ((signal_method %   2) == 0) result &= demarker[period][FAR] < 0.5 - signal_level;
+      if ((signal_method %   4) == 0) result &= demarker[period][CURR] < demarker[period][PREV];
+      if ((signal_method %   8) == 0) result &= demarker[period][PREV] < demarker[period][FAR];
+      if ((signal_method %  16) == 0) result &= demarker[period][PREV] < 0.5 - signal_level - signal_level/2;
       // PrintFormat("DeMarker buy: %g <= %g", demarker[period][CURR], 0.5 - signal_level);
       break;
     case ORDER_TYPE_SELL:
       result = demarker[period][CURR] > 0.5 + signal_level;
-      if ((signal_method &   1) != 0) result &= demarker[period][PREV] > 0.5 + signal_level;
-      if ((signal_method &   2) != 0) result &= demarker[period][FAR] > 0.5 + signal_level;
-      if ((signal_method &   4) != 0) result &= demarker[period][CURR] > demarker[period][PREV];
-      if ((signal_method &   8) != 0) result &= demarker[period][PREV] > demarker[period][FAR];
-      if ((signal_method &  16) != 0) result &= demarker[period][PREV] > 0.5 + signal_level + signal_level/2;
+      if ((signal_method %   1) == 0) result &= demarker[period][PREV] > 0.5 + signal_level;
+      if ((signal_method %   2) == 0) result &= demarker[period][FAR] > 0.5 + signal_level;
+      if ((signal_method %   4) == 0) result &= demarker[period][CURR] > demarker[period][PREV];
+      if ((signal_method %   8) == 0) result &= demarker[period][PREV] > demarker[period][FAR];
+      if ((signal_method %  16) == 0) result &= demarker[period][PREV] > 0.5 + signal_level + signal_level/2;
       // PrintFormat("DeMarker sell: %g >= %g", demarker[period][CURR], 0.5 + signal_level);
       break;
   }
@@ -2077,26 +2079,26 @@ bool Trade_Envelopes(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int si
     case ORDER_TYPE_BUY:
       result = Low[CURR] < envelopes[period][CURR][LOWER] || Low[PREV] < envelopes[period][CURR][LOWER]; // price low was below the lower band
       // result = result || (envelopes[period][CURR][MODE_MAIN] > envelopes[period][FAR][MODE_MAIN] && Open[CURR] > envelopes[period][CURR][UPPER]);
-      if ((signal_method &   1) != 0) result &= Open[CURR] > envelopes[period][CURR][LOWER]; // FIXME
-      if ((signal_method &   2) != 0) result &= envelopes[period][CURR][MODE_MAIN] < envelopes[period][PREV][MODE_MAIN];
-      if ((signal_method &   4) != 0) result &= envelopes[period][CURR][LOWER] < envelopes[period][PREV][LOWER];
-      if ((signal_method &   8) != 0) result &= envelopes[period][CURR][UPPER] < envelopes[period][PREV][UPPER];
-      if ((signal_method &  16) != 0) result &= envelopes[period][CURR][UPPER] - envelopes[period][CURR][LOWER] > envelopes[period][PREV][UPPER] - envelopes[period][PREV][LOWER];
-      if ((signal_method &  32) != 0) result &= Ask < envelopes[period][CURR][MODE_MAIN];
-      if ((signal_method &  64) != 0) result &= Close[CURR] < envelopes[period][CURR][UPPER];
-      //if ((signal_method & 128) != 0) result &= Ask > Close[PREV];
+      if ((signal_method %   1) == 0) result &= Open[CURR] > envelopes[period][CURR][LOWER]; // FIXME
+      if ((signal_method %   2) == 0) result &= envelopes[period][CURR][MODE_MAIN] < envelopes[period][PREV][MODE_MAIN];
+      if ((signal_method %   4) == 0) result &= envelopes[period][CURR][LOWER] < envelopes[period][PREV][LOWER];
+      if ((signal_method %   8) == 0) result &= envelopes[period][CURR][UPPER] < envelopes[period][PREV][UPPER];
+      if ((signal_method %  16) == 0) result &= envelopes[period][CURR][UPPER] - envelopes[period][CURR][LOWER] > envelopes[period][PREV][UPPER] - envelopes[period][PREV][LOWER];
+      if ((signal_method %  32) == 0) result &= Ask < envelopes[period][CURR][MODE_MAIN];
+      if ((signal_method %  64) == 0) result &= Close[CURR] < envelopes[period][CURR][UPPER];
+      //if ((signal_method % 128) == 0) result &= Ask > Close[PREV];
       break;
     case ORDER_TYPE_SELL:
       result = High[CURR] > envelopes[period][CURR][UPPER] || High[PREV] > envelopes[period][CURR][UPPER]; // price high was above the upper band
       // result = result || (envelopes[period][CURR][MODE_MAIN] < envelopes[period][FAR][MODE_MAIN] && Open[CURR] < envelopes[period][CURR][LOWER]);
-      if ((signal_method &   1) != 0) result &= Open[CURR] < envelopes[period][CURR][UPPER]; // FIXME
-      if ((signal_method &   2) != 0) result &= envelopes[period][CURR][MODE_MAIN] > envelopes[period][PREV][MODE_MAIN];
-      if ((signal_method &   4) != 0) result &= envelopes[period][CURR][LOWER] > envelopes[period][PREV][LOWER];
-      if ((signal_method &   8) != 0) result &= envelopes[period][CURR][UPPER] > envelopes[period][PREV][UPPER];
-      if ((signal_method &  16) != 0) result &= envelopes[period][CURR][UPPER] - envelopes[period][CURR][LOWER] > envelopes[period][PREV][UPPER] - envelopes[period][PREV][LOWER];
-      if ((signal_method &  32) != 0) result &= Ask > envelopes[period][CURR][MODE_MAIN];
-      if ((signal_method &  64) != 0) result &= Close[CURR] > envelopes[period][CURR][UPPER];
-      //if ((signal_method & 128) != 0) result &= Ask < Close[PREV];
+      if ((signal_method %   1) == 0) result &= Open[CURR] < envelopes[period][CURR][UPPER]; // FIXME
+      if ((signal_method %   2) == 0) result &= envelopes[period][CURR][MODE_MAIN] > envelopes[period][PREV][MODE_MAIN];
+      if ((signal_method %   4) == 0) result &= envelopes[period][CURR][LOWER] > envelopes[period][PREV][LOWER];
+      if ((signal_method %   8) == 0) result &= envelopes[period][CURR][UPPER] > envelopes[period][PREV][UPPER];
+      if ((signal_method %  16) == 0) result &= envelopes[period][CURR][UPPER] - envelopes[period][CURR][LOWER] > envelopes[period][PREV][UPPER] - envelopes[period][PREV][LOWER];
+      if ((signal_method %  32) == 0) result &= Ask > envelopes[period][CURR][MODE_MAIN];
+      if ((signal_method %  64) == 0) result &= Close[CURR] > envelopes[period][CURR][UPPER];
+      //if ((signal_method % 128) == 0) result &= Ask < Close[PREV];
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
@@ -2159,23 +2161,23 @@ bool Trade_Fractals(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sig
   switch (cmd) {
     case ORDER_TYPE_BUY:
       result = lower;
-      if ((signal_method &   1) != 0) result &= Open[CURR] > Close[PREV];
-      if ((signal_method &   2) != 0) result &= Bid > Open[CURR];
-      // if ((signal_method &   1) != 0) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), PERIOD_M30);
-      // if ((signal_method &   2) != 0) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), Convert::IndexToTf(fmax(index + 1, M30)));
-      // if ((signal_method &   4) != 0) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), Convert::IndexToTf(fmax(index + 2, M30)));
-      // if ((signal_method &   2) != 0) result &= !Fractals_On_Sell(tf);
-      // if ((signal_method &   8) != 0) result &= Fractals_On_Buy(M30);
+      if ((signal_method %   1) == 0) result &= Open[CURR] > Close[PREV];
+      if ((signal_method %   2) == 0) result &= Bid > Open[CURR];
+      // if ((signal_method %   1) == 0) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), PERIOD_M30);
+      // if ((signal_method %   2) == 0) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), Convert::IndexToTf(fmax(index + 1, M30)));
+      // if ((signal_method %   4) == 0) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), Convert::IndexToTf(fmax(index + 2, M30)));
+      // if ((signal_method %   2) == 0) result &= !Fractals_On_Sell(tf);
+      // if ((signal_method %   8) == 0) result &= Fractals_On_Buy(M30);
       break;
     case ORDER_TYPE_SELL:
       result = upper;
-      if ((signal_method &   1) != 0) result &= Open[CURR] < Close[PREV];
-      if ((signal_method &   2) != 0) result &= Ask < Open[CURR];
-      // if ((signal_method &   1) != 0) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), PERIOD_M30);
-      // if ((signal_method &   2) != 0) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), Convert::IndexToTf(fmax(index + 1, M30)));
-      // if ((signal_method &   4) != 0) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), Convert::IndexToTf(fmax(index + 2, M30)));
-      // if ((signal_method &   2) != 0) result &= !Fractals_On_Buy(tf);
-      // if ((signal_method &   8) != 0) result &= Fractals_On_Sell(M30);
+      if ((signal_method %   1) == 0) result &= Open[CURR] < Close[PREV];
+      if ((signal_method %   2) == 0) result &= Ask < Open[CURR];
+      // if ((signal_method %   1) == 0) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), PERIOD_M30);
+      // if ((signal_method %   2) == 0) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), Convert::IndexToTf(fmax(index + 1, M30)));
+      // if ((signal_method %   4) == 0) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), Convert::IndexToTf(fmax(index + 2, M30)));
+      // if ((signal_method %   2) == 0) result &= !Fractals_On_Buy(tf);
+      // if ((signal_method %   8) == 0) result &= Fractals_On_Sell(M30);
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
@@ -2292,24 +2294,24 @@ bool Trade_MA(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_me
     case ORDER_TYPE_BUY:
       result  = ma_fast[period][CURR]   > ma_medium[period][CURR] + gap;
       result &= ma_medium[period][CURR] > ma_slow[period][CURR];
-      if ((signal_method &   1) != 0) result &= ma_fast[period][CURR] > ma_slow[period][CURR] + gap;
-      if ((signal_method &   2) != 0) result &= ma_medium[period][CURR] > ma_slow[period][CURR];
-      if ((signal_method &   4) != 0) result &= ma_slow[period][CURR] > ma_slow[period][PREV];
-      if ((signal_method &   8) != 0) result &= ma_fast[period][CURR] > ma_fast[period][PREV];
-      if ((signal_method &  16) != 0) result &= ma_fast[period][CURR] - ma_medium[period][CURR] > ma_medium[period][CURR] - ma_slow[period][CURR];
-      if ((signal_method &  32) != 0) result &= (ma_medium[period][PREV] < ma_slow[period][PREV] || ma_medium[period][FAR] < ma_slow[period][FAR]);
-      if ((signal_method &  64) != 0) result &= (ma_fast[period][PREV] < ma_medium[period][PREV] || ma_fast[period][FAR] < ma_medium[period][FAR]);
+      if ((signal_method %   1) == 0) result &= ma_fast[period][CURR] > ma_slow[period][CURR] + gap;
+      if ((signal_method %   2) == 0) result &= ma_medium[period][CURR] > ma_slow[period][CURR];
+      if ((signal_method %   4) == 0) result &= ma_slow[period][CURR] > ma_slow[period][PREV];
+      if ((signal_method %   8) == 0) result &= ma_fast[period][CURR] > ma_fast[period][PREV];
+      if ((signal_method %  16) == 0) result &= ma_fast[period][CURR] - ma_medium[period][CURR] > ma_medium[period][CURR] - ma_slow[period][CURR];
+      if ((signal_method %  32) == 0) result &= (ma_medium[period][PREV] < ma_slow[period][PREV] || ma_medium[period][FAR] < ma_slow[period][FAR]);
+      if ((signal_method %  64) == 0) result &= (ma_fast[period][PREV] < ma_medium[period][PREV] || ma_fast[period][FAR] < ma_medium[period][FAR]);
       break;
     case ORDER_TYPE_SELL:
       result  = ma_fast[period][CURR]   < ma_medium[period][CURR] - gap;
       result &= ma_medium[period][CURR] < ma_slow[period][CURR];
-      if ((signal_method &   1) != 0) result &= ma_fast[period][CURR] < ma_slow[period][CURR] - gap;
-      if ((signal_method &   2) != 0) result &= ma_medium[period][CURR] < ma_slow[period][CURR];
-      if ((signal_method &   4) != 0) result &= ma_slow[period][CURR] < ma_slow[period][PREV];
-      if ((signal_method &   8) != 0) result &= ma_fast[period][CURR] < ma_fast[period][PREV];
-      if ((signal_method &  16) != 0) result &= ma_medium[period][CURR] - ma_fast[period][CURR] > ma_slow[period][CURR] - ma_medium[period][CURR];
-      if ((signal_method &  32) != 0) result &= (ma_medium[period][PREV] > ma_slow[period][PREV] || ma_medium[period][FAR] > ma_slow[period][FAR]);
-      if ((signal_method &  64) != 0) result &= (ma_fast[period][PREV] > ma_medium[period][PREV] || ma_fast[period][FAR] > ma_medium[period][FAR]);
+      if ((signal_method %   1) == 0) result &= ma_fast[period][CURR] < ma_slow[period][CURR] - gap;
+      if ((signal_method %   2) == 0) result &= ma_medium[period][CURR] < ma_slow[period][CURR];
+      if ((signal_method %   4) == 0) result &= ma_slow[period][CURR] < ma_slow[period][PREV];
+      if ((signal_method %   8) == 0) result &= ma_fast[period][CURR] < ma_fast[period][PREV];
+      if ((signal_method %  16) == 0) result &= ma_medium[period][CURR] - ma_fast[period][CURR] > ma_slow[period][CURR] - ma_medium[period][CURR];
+      if ((signal_method %  32) == 0) result &= (ma_medium[period][PREV] > ma_slow[period][PREV] || ma_medium[period][FAR] > ma_slow[period][FAR]);
+      if ((signal_method %  64) == 0) result &= (ma_fast[period][PREV] > ma_medium[period][PREV] || ma_fast[period][FAR] > ma_medium[period][FAR]);
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
@@ -2358,19 +2360,19 @@ bool Trade_MACD(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_
     */
     case ORDER_TYPE_BUY:
       result = macd[period][CURR][MODE_MAIN] > macd[period][CURR][MODE_SIGNAL] + gap; // MACD rises above the signal line.
-      if ((signal_method &   1) != 0) result &= macd[period][FAR][MODE_MAIN] < macd[period][FAR][MODE_SIGNAL];
-      if ((signal_method &   2) != 0) result &= macd[period][CURR][MODE_MAIN] >= 0;
-      if ((signal_method &   4) != 0) result &= macd[period][PREV][MODE_MAIN] < 0;
-      if ((signal_method &   8) != 0) result &= ma_fast[period][CURR] > ma_fast[period][PREV];
-      if ((signal_method &  16) != 0) result &= ma_fast[period][CURR] > ma_medium[period][CURR];
+      if ((signal_method %   1) == 0) result &= macd[period][FAR][MODE_MAIN] < macd[period][FAR][MODE_SIGNAL];
+      if ((signal_method %   2) == 0) result &= macd[period][CURR][MODE_MAIN] >= 0;
+      if ((signal_method %   4) == 0) result &= macd[period][PREV][MODE_MAIN] < 0;
+      if ((signal_method %   8) == 0) result &= ma_fast[period][CURR] > ma_fast[period][PREV];
+      if ((signal_method %  16) == 0) result &= ma_fast[period][CURR] > ma_medium[period][CURR];
       break;
     case ORDER_TYPE_SELL:
       result = macd[period][CURR][MODE_MAIN] < macd[period][CURR][MODE_SIGNAL] - gap; // MACD falls below the signal line.
-      if ((signal_method &   1) != 0) result &= macd[period][FAR][MODE_MAIN] > macd[period][FAR][MODE_SIGNAL];
-      if ((signal_method &   2) != 0) result &= macd[period][CURR][MODE_MAIN] <= 0;
-      if ((signal_method &   4) != 0) result &= macd[period][PREV][MODE_MAIN] > 0;
-      if ((signal_method &   8) != 0) result &= ma_fast[period][CURR] < ma_fast[period][PREV];
-      if ((signal_method &  16) != 0) result &= ma_fast[period][CURR] < ma_medium[period][CURR];
+      if ((signal_method %   1) == 0) result &= macd[period][FAR][MODE_MAIN] > macd[period][FAR][MODE_SIGNAL];
+      if ((signal_method %   2) == 0) result &= macd[period][CURR][MODE_MAIN] <= 0;
+      if ((signal_method %   4) == 0) result &= macd[period][PREV][MODE_MAIN] > 0;
+      if ((signal_method %   8) == 0) result &= ma_fast[period][CURR] < ma_fast[period][PREV];
+      if ((signal_method %  16) == 0) result &= ma_fast[period][CURR] < ma_medium[period][CURR];
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
@@ -2523,25 +2525,25 @@ bool Trade_RSI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
   switch (cmd) {
     case ORDER_TYPE_BUY:
       result = rsi[period][CURR] <= (50 - signal_level);
-      if ((signal_method &   1) != 0) result &= rsi[period][CURR] < rsi[period][PREV];
-      if ((signal_method &   2) != 0) result &= rsi[period][PREV] < rsi[period][FAR];
-      if ((signal_method &   4) != 0) result &= rsi[period][PREV] < (50 - signal_level);
-      if ((signal_method &   8) != 0) result &= rsi[period][FAR]  < (50 - signal_level);
-      if ((signal_method &  16) != 0) result &= rsi[period][CURR] - rsi[period][PREV] > rsi[period][PREV] - rsi[period][FAR];
-      if ((signal_method &  32) != 0) result &= rsi[period][FAR] > 50;
-      //if ((signal_method &  32) != 0) result &= Open[CURR] > Close[PREV];
-      //if ((signal_method & 128) != 0) result &= !RSI_On_Sell(M30);
+      if ((signal_method %   1) == 0) result &= rsi[period][CURR] < rsi[period][PREV];
+      if ((signal_method %   2) == 0) result &= rsi[period][PREV] < rsi[period][FAR];
+      if ((signal_method %   4) == 0) result &= rsi[period][PREV] < (50 - signal_level);
+      if ((signal_method %   8) == 0) result &= rsi[period][FAR]  < (50 - signal_level);
+      if ((signal_method %  16) == 0) result &= rsi[period][CURR] - rsi[period][PREV] > rsi[period][PREV] - rsi[period][FAR];
+      if ((signal_method %  32) == 0) result &= rsi[period][FAR] > 50;
+      //if ((signal_method %  32) == 0) result &= Open[CURR] > Close[PREV];
+      //if ((signal_method % 128) == 0) result &= !RSI_On_Sell(M30);
       break;
     case ORDER_TYPE_SELL:
       result = rsi[period][CURR] >= (50 + signal_level);
-      if ((signal_method &   1) != 0) result &= rsi[period][CURR] > rsi[period][PREV];
-      if ((signal_method &   2) != 0) result &= rsi[period][PREV] > rsi[period][FAR];
-      if ((signal_method &   4) != 0) result &= rsi[period][PREV] > (50 + signal_level);
-      if ((signal_method &   8) != 0) result &= rsi[period][FAR]  > (50 + signal_level);
-      if ((signal_method &  16) != 0) result &= rsi[period][PREV] - rsi[period][CURR] > rsi[period][FAR] - rsi[period][PREV];
-      if ((signal_method &  32) != 0) result &= rsi[period][FAR] < 50;
-      //if ((signal_method &  32) != 0) result &= Open[CURR] < Close[PREV];
-      //if ((signal_method & 128) != 0) result &= !RSI_On_Buy(M30);
+      if ((signal_method %   1) == 0) result &= rsi[period][CURR] > rsi[period][PREV];
+      if ((signal_method %   2) == 0) result &= rsi[period][PREV] > rsi[period][FAR];
+      if ((signal_method %   4) == 0) result &= rsi[period][PREV] > (50 + signal_level);
+      if ((signal_method %   8) == 0) result &= rsi[period][FAR]  > (50 + signal_level);
+      if ((signal_method %  16) == 0) result &= rsi[period][PREV] - rsi[period][CURR] > rsi[period][FAR] - rsi[period][PREV];
+      if ((signal_method %  32) == 0) result &= rsi[period][FAR] < 50;
+      //if ((signal_method %  32) == 0) result &= Open[CURR] < Close[PREV];
+      //if ((signal_method % 128) == 0) result &= !RSI_On_Buy(M30);
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
@@ -2606,13 +2608,13 @@ bool Trade_SAR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
   switch (cmd) {
     case ORDER_TYPE_BUY:
       result = sar[period][CURR] + gap < Open[CURR] || sar[period][PREV] + gap < Open[PREV];
-      if ((signal_method &   1) != 0) result &= sar[period][PREV] - gap > Ask;
-      if ((signal_method &   2) != 0) result &= sar[period][CURR] < sar[period][PREV];
-      if ((signal_method &   4) != 0) result &= sar[period][CURR] - sar[period][PREV] <= sar[period][PREV] - sar[period][FAR];
-      if ((signal_method &   8) != 0) result &= sar[period][FAR] > Ask;
-      if ((signal_method &  16) != 0) result &= sar[period][CURR] <= Close[CURR];
-      if ((signal_method &  32) != 0) result &= sar[period][PREV] > Close[PREV];
-      if ((signal_method &  64) != 0) result &= sar[period][PREV] > Open[PREV];
+      if ((signal_method %   1) == 0) result &= sar[period][PREV] - gap > Ask;
+      if ((signal_method %   2) == 0) result &= sar[period][CURR] < sar[period][PREV];
+      if ((signal_method %   4) == 0) result &= sar[period][CURR] - sar[period][PREV] <= sar[period][PREV] - sar[period][FAR];
+      if ((signal_method %   8) == 0) result &= sar[period][FAR] > Ask;
+      if ((signal_method %  16) == 0) result &= sar[period][CURR] <= Close[CURR];
+      if ((signal_method %  32) == 0) result &= sar[period][PREV] > Close[PREV];
+      if ((signal_method %  64) == 0) result &= sar[period][PREV] > Open[PREV];
       if (result) {
         // FIXME: Convert into more flexible way.
         signals[DAILY][SAR1][period][ORDER_TYPE_BUY]++; signals[WEEKLY][SAR1][period][ORDER_TYPE_BUY]++;
@@ -2621,13 +2623,13 @@ bool Trade_SAR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
       break;
     case ORDER_TYPE_SELL:
       result = sar[period][CURR] - gap > Open[CURR] || sar[period][PREV] - gap > Open[PREV];
-      if ((signal_method &   1) != 0) result &= sar[period][PREV] + gap < Ask;
-      if ((signal_method &   2) != 0) result &= sar[period][CURR] > sar[period][PREV];
-      if ((signal_method &   4) != 0) result &= sar[period][PREV] - sar[period][CURR] <= sar[period][FAR] - sar[period][PREV];
-      if ((signal_method &   8) != 0) result &= sar[period][FAR] < Ask;
-      if ((signal_method &  16) != 0) result &= sar[period][CURR] >= Close[CURR];
-      if ((signal_method &  32) != 0) result &= sar[period][PREV] < Close[PREV];
-      if ((signal_method &  64) != 0) result &= sar[period][PREV] < Open[PREV];
+      if ((signal_method %   1) == 0) result &= sar[period][PREV] + gap < Ask;
+      if ((signal_method %   2) == 0) result &= sar[period][CURR] > sar[period][PREV];
+      if ((signal_method %   4) == 0) result &= sar[period][PREV] - sar[period][CURR] <= sar[period][FAR] - sar[period][PREV];
+      if ((signal_method %   8) == 0) result &= sar[period][FAR] < Ask;
+      if ((signal_method %  16) == 0) result &= sar[period][CURR] >= Close[CURR];
+      if ((signal_method %  32) == 0) result &= sar[period][PREV] < Close[PREV];
+      if ((signal_method %  64) == 0) result &= sar[period][PREV] < Open[PREV];
       if (result) {
         // FIXME: Convert into more flexible way.
         signals[DAILY][SAR1][period][ORDER_TYPE_SELL]++; signals[WEEKLY][SAR1][period][ORDER_TYPE_SELL]++;
@@ -2669,23 +2671,23 @@ bool Trade_StdDev(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signa
     case ORDER_TYPE_BUY:
       /*
         bool result = StdDev[period][CURR][LOWER] != 0.0 || StdDev[period][PREV][LOWER] != 0.0 || StdDev[period][FAR][LOWER] != 0.0;
-        if ((signal_method &   1) != 0) result &= Open[CURR] > Close[CURR];
-        if ((signal_method &   2) != 0) result &= !StdDev_On_Sell(tf);
-        if ((signal_method &   4) != 0) result &= StdDev_On_Buy(fmin(period + 1, M30));
-        if ((signal_method &   8) != 0) result &= StdDev_On_Buy(M30);
-        if ((signal_method &  16) != 0) result &= StdDev[period][FAR][LOWER] != 0.0;
-        if ((signal_method &  32) != 0) result &= !StdDev_On_Sell(M30);
+        if ((signal_method %   1) == 0) result &= Open[CURR] > Close[CURR];
+        if ((signal_method %   2) == 0) result &= !StdDev_On_Sell(tf);
+        if ((signal_method %   4) == 0) result &= StdDev_On_Buy(fmin(period + 1, M30));
+        if ((signal_method %   8) == 0) result &= StdDev_On_Buy(M30);
+        if ((signal_method %  16) == 0) result &= StdDev[period][FAR][LOWER] != 0.0;
+        if ((signal_method %  32) == 0) result &= !StdDev_On_Sell(M30);
         */
     break;
     case ORDER_TYPE_SELL:
       /*
         bool result = StdDev[period][CURR][UPPER] != 0.0 || StdDev[period][PREV][UPPER] != 0.0 || StdDev[period][FAR][UPPER] != 0.0;
-        if ((signal_method &   1) != 0) result &= Open[CURR] < Close[CURR];
-        if ((signal_method &   2) != 0) result &= !StdDev_On_Buy(tf);
-        if ((signal_method &   4) != 0) result &= StdDev_On_Sell(fmin(period + 1, M30));
-        if ((signal_method &   8) != 0) result &= StdDev_On_Sell(M30);
-        if ((signal_method &  16) != 0) result &= StdDev[period][FAR][UPPER] != 0.0;
-        if ((signal_method &  32) != 0) result &= !StdDev_On_Buy(M30);
+        if ((signal_method %   1) == 0) result &= Open[CURR] < Close[CURR];
+        if ((signal_method %   2) == 0) result &= !StdDev_On_Buy(tf);
+        if ((signal_method %   4) == 0) result &= StdDev_On_Sell(fmin(period + 1, M30));
+        if ((signal_method %   8) == 0) result &= StdDev_On_Sell(M30);
+        if ((signal_method %  16) == 0) result &= StdDev[period][FAR][UPPER] != 0.0;
+        if ((signal_method %  32) == 0) result &= !StdDev_On_Buy(M30);
         */
     break;
   }
@@ -2736,23 +2738,23 @@ bool Trade_Stochastic(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int s
     case ORDER_TYPE_BUY:
       /*
         bool result = Stochastic[period][CURR][LOWER] != 0.0 || Stochastic[period][PREV][LOWER] != 0.0 || Stochastic[period][FAR][LOWER] != 0.0;
-        if ((signal_method &   1) != 0) result &= Open[CURR] > Close[CURR];
-        if ((signal_method &   2) != 0) result &= !Stochastic_On_Sell(tf);
-        if ((signal_method &   4) != 0) result &= Stochastic_On_Buy(fmin(period + 1, M30));
-        if ((signal_method &   8) != 0) result &= Stochastic_On_Buy(M30);
-        if ((signal_method &  16) != 0) result &= Stochastic[period][FAR][LOWER] != 0.0;
-        if ((signal_method &  32) != 0) result &= !Stochastic_On_Sell(M30);
+        if ((signal_method %   1) == 0) result &= Open[CURR] > Close[CURR];
+        if ((signal_method %   2) == 0) result &= !Stochastic_On_Sell(tf);
+        if ((signal_method %   4) == 0) result &= Stochastic_On_Buy(fmin(period + 1, M30));
+        if ((signal_method %   8) == 0) result &= Stochastic_On_Buy(M30);
+        if ((signal_method %  16) == 0) result &= Stochastic[period][FAR][LOWER] != 0.0;
+        if ((signal_method %  32) == 0) result &= !Stochastic_On_Sell(M30);
         */
     break;
     case ORDER_TYPE_SELL:
       /*
         bool result = Stochastic[period][CURR][UPPER] != 0.0 || Stochastic[period][PREV][UPPER] != 0.0 || Stochastic[period][FAR][UPPER] != 0.0;
-        if ((signal_method &   1) != 0) result &= Open[CURR] < Close[CURR];
-        if ((signal_method &   2) != 0) result &= !Stochastic_On_Buy(tf);
-        if ((signal_method &   4) != 0) result &= Stochastic_On_Sell(fmin(period + 1, M30));
-        if ((signal_method &   8) != 0) result &= Stochastic_On_Sell(M30);
-        if ((signal_method &  16) != 0) result &= Stochastic[period][FAR][UPPER] != 0.0;
-        if ((signal_method &  32) != 0) result &= !Stochastic_On_Buy(M30);
+        if ((signal_method %   1) == 0) result &= Open[CURR] < Close[CURR];
+        if ((signal_method %   2) == 0) result &= !Stochastic_On_Buy(tf);
+        if ((signal_method %   4) == 0) result &= Stochastic_On_Sell(fmin(period + 1, M30));
+        if ((signal_method %   8) == 0) result &= Stochastic_On_Sell(M30);
+        if ((signal_method %  16) == 0) result &= Stochastic[period][FAR][UPPER] != 0.0;
+        if ((signal_method %  32) == 0) result &= !Stochastic_On_Buy(M30);
         */
     break;
   }
@@ -2778,12 +2780,12 @@ bool Trade_WPR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
   switch (cmd) {
     case ORDER_TYPE_BUY:
       result = wpr[period][CURR] > 50 + signal_level;
-      if ((signal_method &   1) != 0) result &= wpr[period][CURR] < wpr[period][PREV];
-      if ((signal_method &   2) != 0) result &= wpr[period][PREV] < wpr[period][FAR];
-      if ((signal_method &   4) != 0) result &= wpr[period][PREV] > 50 + signal_level;
-      if ((signal_method &   8) != 0) result &= wpr[period][FAR]  > 50 + signal_level;
-      if ((signal_method &  16) != 0) result &= wpr[period][PREV] - wpr[period][CURR] > wpr[period][FAR] - wpr[period][PREV];
-      if ((signal_method &  32) != 0) result &= wpr[period][PREV] > 50 + signal_level + signal_level / 2;
+      if ((signal_method %   1) == 0) result &= wpr[period][CURR] < wpr[period][PREV];
+      if ((signal_method %   2) == 0) result &= wpr[period][PREV] < wpr[period][FAR];
+      if ((signal_method %   4) == 0) result &= wpr[period][PREV] > 50 + signal_level;
+      if ((signal_method %   8) == 0) result &= wpr[period][FAR]  > 50 + signal_level;
+      if ((signal_method %  16) == 0) result &= wpr[period][PREV] - wpr[period][CURR] > wpr[period][FAR] - wpr[period][PREV];
+      if ((signal_method %  32) == 0) result &= wpr[period][PREV] > 50 + signal_level + signal_level / 2;
       /* TODO:
 
             //30. Williams Percent Range
@@ -2797,12 +2799,12 @@ bool Trade_WPR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
       break;
     case ORDER_TYPE_SELL:
       result = wpr[period][CURR] < 50 - signal_level;
-      if ((signal_method &   1) != 0) result &= wpr[period][CURR] > wpr[period][PREV];
-      if ((signal_method &   2) != 0) result &= wpr[period][PREV] > wpr[period][FAR];
-      if ((signal_method &   4) != 0) result &= wpr[period][PREV] < 50 - signal_level;
-      if ((signal_method &   8) != 0) result &= wpr[period][FAR]  < 50 - signal_level;
-      if ((signal_method &  16) != 0) result &= wpr[period][CURR] - wpr[period][PREV] > wpr[period][PREV] - wpr[period][FAR];
-      if ((signal_method &  32) != 0) result &= wpr[period][PREV] > 50 - signal_level - signal_level / 2;
+      if ((signal_method %   1) == 0) result &= wpr[period][CURR] > wpr[period][PREV];
+      if ((signal_method %   2) == 0) result &= wpr[period][PREV] > wpr[period][FAR];
+      if ((signal_method %   4) == 0) result &= wpr[period][PREV] < 50 - signal_level;
+      if ((signal_method %   8) == 0) result &= wpr[period][FAR]  < 50 - signal_level;
+      if ((signal_method %  16) == 0) result &= wpr[period][CURR] - wpr[period][PREV] > wpr[period][PREV] - wpr[period][FAR];
+      if ((signal_method %  32) == 0) result &= wpr[period][PREV] > 50 - signal_level - signal_level / 2;
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
@@ -2830,23 +2832,23 @@ bool Trade_ZigZag(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signa
     case ORDER_TYPE_BUY:
       /*
         bool result = ZigZag[period][CURR][LOWER] != 0.0 || ZigZag[period][PREV][LOWER] != 0.0 || ZigZag[period][FAR][LOWER] != 0.0;
-        if ((signal_method &   1) != 0) result &= Open[CURR] > Close[CURR];
-        if ((signal_method &   2) != 0) result &= !ZigZag_On_Sell(tf);
-        if ((signal_method &   4) != 0) result &= ZigZag_On_Buy(fmin(period + 1, M30));
-        if ((signal_method &   8) != 0) result &= ZigZag_On_Buy(M30);
-        if ((signal_method &  16) != 0) result &= ZigZag[period][FAR][LOWER] != 0.0;
-        if ((signal_method &  32) != 0) result &= !ZigZag_On_Sell(M30);
+        if ((signal_method %   1) == 0) result &= Open[CURR] > Close[CURR];
+        if ((signal_method %   2) == 0) result &= !ZigZag_On_Sell(tf);
+        if ((signal_method %   4) == 0) result &= ZigZag_On_Buy(fmin(period + 1, M30));
+        if ((signal_method %   8) == 0) result &= ZigZag_On_Buy(M30);
+        if ((signal_method %  16) == 0) result &= ZigZag[period][FAR][LOWER] != 0.0;
+        if ((signal_method %  32) == 0) result &= !ZigZag_On_Sell(M30);
         */
     break;
     case ORDER_TYPE_SELL:
       /*
         bool result = ZigZag[period][CURR][UPPER] != 0.0 || ZigZag[period][PREV][UPPER] != 0.0 || ZigZag[period][FAR][UPPER] != 0.0;
-        if ((signal_method &   1) != 0) result &= Open[CURR] < Close[CURR];
-        if ((signal_method &   2) != 0) result &= !ZigZag_On_Buy(tf);
-        if ((signal_method &   4) != 0) result &= ZigZag_On_Sell(fmin(period + 1, M30));
-        if ((signal_method &   8) != 0) result &= ZigZag_On_Sell(M30);
-        if ((signal_method &  16) != 0) result &= ZigZag[period][FAR][UPPER] != 0.0;
-        if ((signal_method &  32) != 0) result &= !ZigZag_On_Buy(M30);
+        if ((signal_method %   1) == 0) result &= Open[CURR] < Close[CURR];
+        if ((signal_method %   2) == 0) result &= !ZigZag_On_Buy(tf);
+        if ((signal_method %   4) == 0) result &= ZigZag_On_Sell(fmin(period + 1, M30));
+        if ((signal_method %   8) == 0) result &= ZigZag_On_Sell(M30);
+        if ((signal_method %  16) == 0) result &= ZigZag[period][FAR][UPPER] != 0.0;
+        if ((signal_method %  32) == 0) result &= !ZigZag_On_Buy(M30);
         */
     break;
   }
@@ -2869,17 +2871,17 @@ bool CheckMarketCondition1(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M30,
   uint period = chart.TfToIndex(tf);
   if (VerboseTrace) PrintFormat("%s(%s, %s, %d)", EnumToString(cmd), EnumToString(tf), condition);
   Market::RefreshRates(); // ?
-  if ((condition &   1) != 0) result &= ((cmd == ORDER_TYPE_BUY && Open[CURR] > Close[PREV]) || (cmd == ORDER_TYPE_SELL && Open[CURR] < Close[PREV]));
-  if ((condition &   2) != 0) result &= UpdateIndicator(S_SAR, tf)       && ((cmd == ORDER_TYPE_BUY && sar[period][CURR] < Open[0]) || (cmd == ORDER_TYPE_SELL && sar[period][CURR] > Open[0]));
-  if ((condition &   4) != 0) result &= UpdateIndicator(S_RSI, tf)       && ((cmd == ORDER_TYPE_BUY && rsi[period][CURR] < 50) || (cmd == ORDER_TYPE_SELL && rsi[period][CURR] > 50));
-  if ((condition &   8) != 0) result &= UpdateIndicator(S_MA, tf)        && ((cmd == ORDER_TYPE_BUY && Ask > ma_slow[period][CURR]) || (cmd == ORDER_TYPE_SELL && Ask < ma_slow[period][CURR]));
-//if ((condition &   8) != 0) result &= UpdateIndicator(S_MA, tf)        && ((cmd == ORDER_TYPE_BUY && ma_slow[period][CURR] > ma_slow[period][PREV]) || (cmd == ORDER_TYPE_SELL && ma_slow[period][CURR] < ma_slow[period][PREV]));
-  if ((condition &  16) != 0) result &= ((cmd == ORDER_TYPE_BUY && Ask < Open[CURR]) || (cmd == ORDER_TYPE_SELL && Ask > Open[CURR]));
-  if ((condition &  32) != 0) result &= UpdateIndicator(S_BANDS, tf)     && ((cmd == ORDER_TYPE_BUY && Open[CURR] < bands[period][CURR][BANDS_BASE]) || (cmd == ORDER_TYPE_SELL && Open[CURR] > bands[period][CURR][BANDS_BASE]));
-  if ((condition &  64) != 0) result &= UpdateIndicator(S_ENVELOPES, tf) && ((cmd == ORDER_TYPE_BUY && Open[CURR] < envelopes[period][CURR][MODE_MAIN]) || (cmd == ORDER_TYPE_SELL && Open[CURR] > envelopes[period][CURR][MODE_MAIN]));
-  if ((condition & 128) != 0) result &= UpdateIndicator(S_DEMARKER, tf)  && ((cmd == ORDER_TYPE_BUY && demarker[period][CURR] < 0.5) || (cmd == ORDER_TYPE_SELL && demarker[period][CURR] > 0.5));
-  if ((condition & 256) != 0) result &= UpdateIndicator(S_WPR, tf)       && ((cmd == ORDER_TYPE_BUY && wpr[period][CURR] > 50) || (cmd == ORDER_TYPE_SELL && wpr[period][CURR] < 50));
-  if ((condition & 512) != 0) result &= cmd == Convert::ValueToOp(curr_trend);
+  if ((condition %   1) == 0) result &= ((cmd == ORDER_TYPE_BUY && Open[CURR] > Close[PREV]) || (cmd == ORDER_TYPE_SELL && Open[CURR] < Close[PREV]));
+  if ((condition %   2) == 0) result &= UpdateIndicator(S_SAR, tf)       && ((cmd == ORDER_TYPE_BUY && sar[period][CURR] < Open[0]) || (cmd == ORDER_TYPE_SELL && sar[period][CURR] > Open[0]));
+  if ((condition %   4) == 0) result &= UpdateIndicator(S_RSI, tf)       && ((cmd == ORDER_TYPE_BUY && rsi[period][CURR] < 50) || (cmd == ORDER_TYPE_SELL && rsi[period][CURR] > 50));
+  if ((condition %   8) == 0) result &= UpdateIndicator(S_MA, tf)        && ((cmd == ORDER_TYPE_BUY && Ask > ma_slow[period][CURR]) || (cmd == ORDER_TYPE_SELL && Ask < ma_slow[period][CURR]));
+//if ((condition %   8) == 0) result &= UpdateIndicator(S_MA, tf)        && ((cmd == ORDER_TYPE_BUY && ma_slow[period][CURR] > ma_slow[period][PREV]) || (cmd == ORDER_TYPE_SELL && ma_slow[period][CURR] < ma_slow[period][PREV]));
+  if ((condition %  16) == 0) result &= ((cmd == ORDER_TYPE_BUY && Ask < Open[CURR]) || (cmd == ORDER_TYPE_SELL && Ask > Open[CURR]));
+  if ((condition %  32) == 0) result &= UpdateIndicator(S_BANDS, tf)     && ((cmd == ORDER_TYPE_BUY && Open[CURR] < bands[period][CURR][BANDS_BASE]) || (cmd == ORDER_TYPE_SELL && Open[CURR] > bands[period][CURR][BANDS_BASE]));
+  if ((condition %  64) == 0) result &= UpdateIndicator(S_ENVELOPES, tf) && ((cmd == ORDER_TYPE_BUY && Open[CURR] < envelopes[period][CURR][MODE_MAIN]) || (cmd == ORDER_TYPE_SELL && Open[CURR] > envelopes[period][CURR][MODE_MAIN]));
+  if ((condition % 128) == 0) result &= UpdateIndicator(S_DEMARKER, tf)  && ((cmd == ORDER_TYPE_BUY && demarker[period][CURR] < 0.5) || (cmd == ORDER_TYPE_SELL && demarker[period][CURR] > 0.5));
+  if ((condition % 256) == 0) result &= UpdateIndicator(S_WPR, tf)       && ((cmd == ORDER_TYPE_BUY && wpr[period][CURR] > 50) || (cmd == ORDER_TYPE_SELL && wpr[period][CURR] < 50));
+  if ((condition % 512) == 0) result &= cmd == Convert::ValueToOp(curr_trend);
   if (!default_value) result = !result;
   return result;
 }
@@ -3006,16 +3008,16 @@ bool CheckMarketEvent(ENUM_ORDER_TYPE cmd = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M
       if (condition == C_CUSTOM2_BUY_SELL) condition = CloseConditionCustom2Method;
       if (condition == C_CUSTOM3_BUY_SELL) condition = CloseConditionCustom3Method;
       result = false;
-      if ((condition &   1) != 0) result |= CheckMarketEvent(cmd, tf, C_MA_BUY_SELL);
-      if ((condition &   2) != 0) result |= CheckMarketEvent(cmd, tf, C_MACD_BUY_SELL);
-      if ((condition &   4) != 0) result |= CheckMarketEvent(cmd, tf, C_ALLIGATOR_BUY_SELL);
-      if ((condition &   8) != 0) result |= CheckMarketEvent(cmd, tf, C_RSI_BUY_SELL);
-      if ((condition &  16) != 0) result |= CheckMarketEvent(cmd, tf, C_SAR_BUY_SELL);
-      if ((condition &  32) != 0) result |= CheckMarketEvent(cmd, tf, C_BANDS_BUY_SELL);
-      if ((condition &  64) != 0) result |= CheckMarketEvent(cmd, tf, C_ENVELOPES_BUY_SELL);
-      if ((condition & 128) != 0) result |= CheckMarketEvent(cmd, tf, C_DEMARKER_BUY_SELL);
-      if ((condition & 256) != 0) result |= CheckMarketEvent(cmd, tf, C_WPR_BUY_SELL);
-      if ((condition & 512) != 0) result |= CheckMarketEvent(cmd, tf, C_FRACTALS_BUY_SELL);
+      if ((condition %   1) == 0) result |= CheckMarketEvent(cmd, tf, C_MA_BUY_SELL);
+      if ((condition %   2) == 0) result |= CheckMarketEvent(cmd, tf, C_MACD_BUY_SELL);
+      if ((condition %   4) == 0) result |= CheckMarketEvent(cmd, tf, C_ALLIGATOR_BUY_SELL);
+      if ((condition %   8) == 0) result |= CheckMarketEvent(cmd, tf, C_RSI_BUY_SELL);
+      if ((condition %  16) == 0) result |= CheckMarketEvent(cmd, tf, C_SAR_BUY_SELL);
+      if ((condition %  32) == 0) result |= CheckMarketEvent(cmd, tf, C_BANDS_BUY_SELL);
+      if ((condition %  64) == 0) result |= CheckMarketEvent(cmd, tf, C_ENVELOPES_BUY_SELL);
+      if ((condition % 128) == 0) result |= CheckMarketEvent(cmd, tf, C_DEMARKER_BUY_SELL);
+      if ((condition % 256) == 0) result |= CheckMarketEvent(cmd, tf, C_WPR_BUY_SELL);
+      if ((condition % 512) == 0) result |= CheckMarketEvent(cmd, tf, C_FRACTALS_BUY_SELL);
       // Message("Condition: " + condition + ", result: " + result);
       break;
     case C_CUSTOM4_MARKET_COND:
@@ -3875,23 +3877,23 @@ double GetLotSizeAuto(bool smooth = true) {
 
   #ifdef __advanced__
   if (Boosting_Enabled) {
-    if ((LotSizeIncreaseMethod &   1) != 0) if (AccCondition(C_ACC_IN_PROFIT))      new_lot_size *= 1.1;
-    if ((LotSizeIncreaseMethod &   2) != 0) if (AccCondition(C_EQUITY_10PC_HIGH))   new_lot_size *= 1.1;
-    if ((LotSizeIncreaseMethod &   4) != 0) if (AccCondition(C_EQUITY_20PC_HIGH))   new_lot_size *= 1.1;
-    if ((LotSizeIncreaseMethod &   8) != 0) if (AccCondition(C_DBAL_LT_WEEKLY))     new_lot_size *= 1.1;
-    if ((LotSizeIncreaseMethod &  16) != 0) if (AccCondition(C_WBAL_GT_MONTHLY))    new_lot_size *= 1.1;
-    if ((LotSizeIncreaseMethod &  32) != 0) if (AccCondition(C_ACC_IN_TREND))       new_lot_size *= 1.1;
-    if ((LotSizeIncreaseMethod &  64) != 0) if (AccCondition(C_ACC_CDAY_IN_PROFIT)) new_lot_size *= 1.1;
-    if ((LotSizeIncreaseMethod & 128) != 0) if (AccCondition(C_ACC_PDAY_IN_PROFIT)) new_lot_size *= 1.1;
+    if ((LotSizeIncreaseMethod %   1) == 0) if (AccCondition(C_ACC_IN_PROFIT))      new_lot_size *= 1.1;
+    if ((LotSizeIncreaseMethod %   2) == 0) if (AccCondition(C_EQUITY_10PC_HIGH))   new_lot_size *= 1.1;
+    if ((LotSizeIncreaseMethod %   4) == 0) if (AccCondition(C_EQUITY_20PC_HIGH))   new_lot_size *= 1.1;
+    if ((LotSizeIncreaseMethod %   8) == 0) if (AccCondition(C_DBAL_LT_WEEKLY))     new_lot_size *= 1.1;
+    if ((LotSizeIncreaseMethod %  16) == 0) if (AccCondition(C_WBAL_GT_MONTHLY))    new_lot_size *= 1.1;
+    if ((LotSizeIncreaseMethod %  32) == 0) if (AccCondition(C_ACC_IN_TREND))       new_lot_size *= 1.1;
+    if ((LotSizeIncreaseMethod %  64) == 0) if (AccCondition(C_ACC_CDAY_IN_PROFIT)) new_lot_size *= 1.1;
+    if ((LotSizeIncreaseMethod % 128) == 0) if (AccCondition(C_ACC_PDAY_IN_PROFIT)) new_lot_size *= 1.1;
     // --
-    if ((LotSizeDecreaseMethod &   1) != 0) if (AccCondition(C_ACC_IN_LOSS))        new_lot_size *= 0.9;
-    if ((LotSizeDecreaseMethod &   2) != 0) if (AccCondition(C_EQUITY_10PC_LOW))    new_lot_size *= 0.9;
-    if ((LotSizeDecreaseMethod &   4) != 0) if (AccCondition(C_EQUITY_20PC_LOW))    new_lot_size *= 0.9;
-    if ((LotSizeDecreaseMethod &   8) != 0) if (AccCondition(C_DBAL_GT_WEEKLY))     new_lot_size *= 0.9;
-    if ((LotSizeDecreaseMethod &  16) != 0) if (AccCondition(C_WBAL_LT_MONTHLY))    new_lot_size *= 0.9;
-    if ((LotSizeDecreaseMethod &  32) != 0) if (AccCondition(C_ACC_IN_NON_TREND))   new_lot_size *= 0.9;
-    if ((LotSizeDecreaseMethod &  64) != 0) if (AccCondition(C_ACC_CDAY_IN_LOSS))   new_lot_size *= 0.9;
-    if ((LotSizeDecreaseMethod & 128) != 0) if (AccCondition(C_ACC_PDAY_IN_LOSS))   new_lot_size *= 0.9;
+    if ((LotSizeDecreaseMethod %   1) == 0) if (AccCondition(C_ACC_IN_LOSS))        new_lot_size *= 0.9;
+    if ((LotSizeDecreaseMethod %   2) == 0) if (AccCondition(C_EQUITY_10PC_LOW))    new_lot_size *= 0.9;
+    if ((LotSizeDecreaseMethod %   4) == 0) if (AccCondition(C_EQUITY_20PC_LOW))    new_lot_size *= 0.9;
+    if ((LotSizeDecreaseMethod %   8) == 0) if (AccCondition(C_DBAL_GT_WEEKLY))     new_lot_size *= 0.9;
+    if ((LotSizeDecreaseMethod %  16) == 0) if (AccCondition(C_WBAL_LT_MONTHLY))    new_lot_size *= 0.9;
+    if ((LotSizeDecreaseMethod %  32) == 0) if (AccCondition(C_ACC_IN_NON_TREND))   new_lot_size *= 0.9;
+    if ((LotSizeDecreaseMethod %  64) == 0) if (AccCondition(C_ACC_CDAY_IN_LOSS))   new_lot_size *= 0.9;
+    if ((LotSizeDecreaseMethod % 128) == 0) if (AccCondition(C_ACC_PDAY_IN_LOSS))   new_lot_size *= 0.9;
   }
   #endif
 
@@ -3968,23 +3970,23 @@ double GetAutoRiskRatio() {
   rr_text = new_ea_risk_ratio < 1.0 ? StringFormat("-MarginUsed=%d%%|", margin_pc) : ""; string s = "|";
   // ea_margin_risk_level
   // @todo: Add account.GetRiskMarginLevel(), GetTrend(), ConWin/ConLoss, violity level.
-  if ((RiskRatioIncreaseMethod &   1) != 0) if (AccCondition(C_ACC_IN_PROFIT))      { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod &   2) != 0) if (AccCondition(C_EQUITY_20PC_HIGH))   { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod &   4) != 0) if (AccCondition(C_EQUITY_20PC_LOW))    { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod &   8) != 0) if (AccCondition(C_DBAL_LT_WEEKLY))     { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod &  16) != 0) if (AccCondition(C_WBAL_GT_MONTHLY))    { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod &  32) != 0) if (AccCondition(C_ACC_IN_TREND))       { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod &  64) != 0) if (AccCondition(C_ACC_CDAY_IN_PROFIT)) { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod & 128) != 0) if (AccCondition(C_ACC_PDAY_IN_PROFIT)) { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod %   1) == 0) if (AccCondition(C_ACC_IN_PROFIT))      { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod %   2) == 0) if (AccCondition(C_EQUITY_20PC_HIGH))   { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod %   4) == 0) if (AccCondition(C_EQUITY_20PC_LOW))    { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod %   8) == 0) if (AccCondition(C_DBAL_LT_WEEKLY))     { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod %  16) == 0) if (AccCondition(C_WBAL_GT_MONTHLY))    { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod %  32) == 0) if (AccCondition(C_ACC_IN_TREND))       { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod %  64) == 0) if (AccCondition(C_ACC_CDAY_IN_PROFIT)) { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
+  if ((RiskRatioIncreaseMethod % 128) == 0) if (AccCondition(C_ACC_PDAY_IN_PROFIT)) { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
   // --
-  if ((RiskRatioDecreaseMethod &   1) != 0) if (AccCondition(C_ACC_IN_LOSS))        { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod &   2) != 0) if (AccCondition(C_EQUITY_20PC_LOW))    { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod &   4) != 0) if (AccCondition(C_EQUITY_20PC_HIGH))   { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod &   8) != 0) if (AccCondition(C_DBAL_GT_WEEKLY))     { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod &  16) != 0) if (AccCondition(C_WBAL_LT_MONTHLY))    { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod &  32) != 0) if (AccCondition(C_ACC_IN_NON_TREND))   { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod &  64) != 0) if (AccCondition(C_ACC_CDAY_IN_LOSS))   { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod & 128) != 0) if (AccCondition(C_ACC_PDAY_IN_LOSS))   { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod %   1) == 0) if (AccCondition(C_ACC_IN_LOSS))        { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod %   2) == 0) if (AccCondition(C_EQUITY_20PC_LOW))    { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod %   4) == 0) if (AccCondition(C_EQUITY_20PC_HIGH))   { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod %   8) == 0) if (AccCondition(C_DBAL_GT_WEEKLY))     { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod %  16) == 0) if (AccCondition(C_WBAL_LT_MONTHLY))    { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod %  32) == 0) if (AccCondition(C_ACC_IN_NON_TREND))   { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod %  64) == 0) if (AccCondition(C_ACC_CDAY_IN_LOSS))   { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+  if ((RiskRatioDecreaseMethod % 128) == 0) if (AccCondition(C_ACC_PDAY_IN_LOSS))   { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
   String::RemoveSepChar(rr_text, s);
 
   /*
@@ -4604,365 +4606,155 @@ bool InitStrategies() {
   ArrayInitialize(stats, 0); // Reset strategy statistics.
 
   // Initialize strategy array variables.
-  #ifdef __advanced__
   init &= InitStrategy(AC1,  "AC M1",  AC1_Active,  S_AC, PERIOD_M1,  AC1_SignalMethod,  AC_SignalLevel, AC1_OpenCondition1,  AC1_OpenCondition2,  AC1_CloseCondition,  AC1_MaxSpread);
   init &= InitStrategy(AC5,  "AC M5",  AC5_Active,  S_AC, PERIOD_M5,  AC5_SignalMethod,  AC_SignalLevel, AC5_OpenCondition1,  AC5_OpenCondition2,  AC5_CloseCondition,  AC5_MaxSpread);
   init &= InitStrategy(AC15, "AC M15", AC15_Active, S_AC, PERIOD_M15, AC15_SignalMethod, AC_SignalLevel, AC15_OpenCondition1, AC15_OpenCondition2, AC15_CloseCondition, AC15_MaxSpread);
   init &= InitStrategy(AC30, "AC M30", AC30_Active, S_AC, PERIOD_M30, AC30_SignalMethod, AC_SignalLevel, AC30_OpenCondition1, AC30_OpenCondition2, AC30_CloseCondition, AC30_MaxSpread);
-  #else
-  init &= InitStrategy(AC1,  "AC M1",  AC1_Active,  S_AC, PERIOD_M1,  AC1_SignalMethod,  AC_SignalLevel);
-  init &= InitStrategy(AC5,  "AC M5",  AC5_Active,  S_AC, PERIOD_M5,  AC5_SignalMethod,  AC_SignalLevel);
-  init &= InitStrategy(AC15, "AC M15", AC15_Active, S_AC, PERIOD_M15, AC15_SignalMethod, AC_SignalLevel);
-  init &= InitStrategy(AC30, "AC M30", AC30_Active, S_AC, PERIOD_M30, AC30_SignalMethod, AC_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(AD1,  "AD M1",  AD1_Active,  S_AD, PERIOD_M1,  AD1_SignalMethod,  AD_SignalLevel, AD1_OpenCondition1,  AD1_OpenCondition2,  AD1_CloseCondition,  AD1_MaxSpread);
   init &= InitStrategy(AD5,  "AD M5",  AD5_Active,  S_AD, PERIOD_M5,  AD5_SignalMethod,  AD_SignalLevel, AD5_OpenCondition1,  AD5_OpenCondition2,  AD5_CloseCondition,  AD5_MaxSpread);
   init &= InitStrategy(AD15, "AD M15", AD15_Active, S_AD, PERIOD_M15, AD15_SignalMethod, AD_SignalLevel, AD15_OpenCondition1, AD15_OpenCondition2, AD15_CloseCondition, AD15_MaxSpread);
   init &= InitStrategy(AD30, "AD M30", AD30_Active, S_AD, PERIOD_M30, AD30_SignalMethod, AD_SignalLevel, AD30_OpenCondition1, AD30_OpenCondition2, AD30_CloseCondition, AD30_MaxSpread);
-  #else
-  init &= InitStrategy(AD1,  "AD M1",  AD1_Active,  S_AD, PERIOD_M1,  AD1_SignalMethod,  AD_SignalLevel);
-  init &= InitStrategy(AD5,  "AD M5",  AD5_Active,  S_AD, PERIOD_M5,  AD5_SignalMethod,  AD_SignalLevel);
-  init &= InitStrategy(AD15, "AD M15", AD15_Active, S_AD, PERIOD_M15, AD15_SignalMethod, AD_SignalLevel);
-  init &= InitStrategy(AD30, "AD M30", AD30_Active, S_AD, PERIOD_M30, AD30_SignalMethod, AD_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(ADX1,  "ADX M1",  ADX1_Active,  S_ADX, PERIOD_M1,  ADX1_SignalMethod,  ADX_SignalLevel, ADX1_OpenCondition1,  ADX1_OpenCondition2,  ADX1_CloseCondition,  ADX1_MaxSpread);
   init &= InitStrategy(ADX5,  "ADX M5",  ADX5_Active,  S_ADX, PERIOD_M5,  ADX5_SignalMethod,  ADX_SignalLevel, ADX5_OpenCondition1,  ADX5_OpenCondition2,  ADX5_CloseCondition,  ADX5_MaxSpread);
   init &= InitStrategy(ADX15, "ADX M15", ADX15_Active, S_ADX, PERIOD_M15, ADX15_SignalMethod, ADX_SignalLevel, ADX15_OpenCondition1, ADX15_OpenCondition2, ADX15_CloseCondition, ADX15_MaxSpread);
   init &= InitStrategy(ADX30, "ADX M30", ADX30_Active, S_ADX, PERIOD_M30, ADX30_SignalMethod, ADX_SignalLevel, ADX30_OpenCondition1, ADX30_OpenCondition2, ADX30_CloseCondition, ADX30_MaxSpread);
-  #else
-  init &= InitStrategy(ADX1,  "ADX M1",  ADX1_Active,  S_ADX, PERIOD_M1,  ADX1_SignalMethod,  ADX_SignalLevel);
-  init &= InitStrategy(ADX5,  "ADX M5",  ADX5_Active,  S_ADX, PERIOD_M5,  ADX5_SignalMethod,  ADX_SignalLevel);
-  init &= InitStrategy(ADX15, "ADX M15", ADX15_Active, S_ADX, PERIOD_M15, ADX15_SignalMethod, ADX_SignalLevel);
-  init &= InitStrategy(ADX30, "ADX M30", ADX30_Active, S_ADX, PERIOD_M30, ADX30_SignalMethod, ADX_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(ALLIGATOR1,  "Alligator M1",  Alligator1_Active,  S_ALLIGATOR, PERIOD_M1,  Alligator1_SignalMethod,  Alligator_SignalLevel, Alligator1_OpenCondition1,  Alligator1_OpenCondition2,  Alligator1_CloseCondition,  Alligator1_MaxSpread);
   init &= InitStrategy(ALLIGATOR5,  "Alligator M5",  Alligator5_Active,  S_ALLIGATOR, PERIOD_M5,  Alligator5_SignalMethod,  Alligator_SignalLevel, Alligator5_OpenCondition1,  Alligator5_OpenCondition2,  Alligator5_CloseCondition,  Alligator5_MaxSpread);
   init &= InitStrategy(ALLIGATOR15, "Alligator M15", Alligator15_Active, S_ALLIGATOR, PERIOD_M15, Alligator15_SignalMethod, Alligator_SignalLevel, Alligator15_OpenCondition1, Alligator15_OpenCondition2, Alligator15_CloseCondition, Alligator15_MaxSpread);
   init &= InitStrategy(ALLIGATOR30, "Alligator M30", Alligator30_Active, S_ALLIGATOR, PERIOD_M30, Alligator30_SignalMethod, Alligator_SignalLevel, Alligator30_OpenCondition1, Alligator30_OpenCondition2, Alligator30_CloseCondition, Alligator30_MaxSpread);
-  #else
-  init &= InitStrategy(ALLIGATOR1,  "Alligator M1",  Alligator1_Active,  S_ALLIGATOR, PERIOD_M1,  Alligator1_SignalMethod,  Alligator_SignalLevel);
-  init &= InitStrategy(ALLIGATOR5,  "Alligator M5",  Alligator5_Active,  S_ALLIGATOR, PERIOD_M5,  Alligator5_SignalMethod,  Alligator_SignalLevel);
-  init &= InitStrategy(ALLIGATOR15, "Alligator M15", Alligator15_Active, S_ALLIGATOR, PERIOD_M15, Alligator15_SignalMethod, Alligator_SignalLevel);
-  init &= InitStrategy(ALLIGATOR30, "Alligator M30", Alligator30_Active, S_ALLIGATOR, PERIOD_M30, Alligator30_SignalMethod, Alligator_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(ATR1,  "ATR M1",  ATR1_Active,  S_ATR, PERIOD_M1,  ATR1_SignalMethod,  ATR_SignalLevel, ATR1_OpenCondition1,  ATR1_OpenCondition2,  ATR1_CloseCondition,  ATR1_MaxSpread);
   init &= InitStrategy(ATR5,  "ATR M5",  ATR5_Active,  S_ATR, PERIOD_M5,  ATR5_SignalMethod,  ATR_SignalLevel, ATR5_OpenCondition1,  ATR5_OpenCondition2,  ATR5_CloseCondition,  ATR5_MaxSpread);
   init &= InitStrategy(ATR15, "ATR M15", ATR15_Active, S_ATR, PERIOD_M15, ATR15_SignalMethod, ATR_SignalLevel, ATR15_OpenCondition1, ATR15_OpenCondition2, ATR15_CloseCondition, ATR15_MaxSpread);
   init &= InitStrategy(ATR30, "ATR M30", ATR30_Active, S_ATR, PERIOD_M30, ATR30_SignalMethod, ATR_SignalLevel, ATR30_OpenCondition1, ATR30_OpenCondition2, ATR30_CloseCondition, ATR30_MaxSpread);
-  #else
-  init &= InitStrategy(ATR1,  "ATR M1",  ATR1_Active,  S_ATR, PERIOD_M1,  ATR1_SignalMethod,  ATR_SignalLevel);
-  init &= InitStrategy(ATR5,  "ATR M5",  ATR5_Active,  S_ATR, PERIOD_M5,  ATR5_SignalMethod,  ATR_SignalLevel);
-  init &= InitStrategy(ATR15, "ATR M15", ATR15_Active, S_ATR, PERIOD_M15, ATR15_SignalMethod, ATR_SignalLevel);
-  init &= InitStrategy(ATR30, "ATR M30", ATR30_Active, S_ATR, PERIOD_M30, ATR30_SignalMethod, ATR_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(AWESOME1,  "Awesome M1",  Awesome1_Active,  S_AWESOME, PERIOD_M1,  Awesome1_SignalMethod,  Awesome_SignalLevel, Awesome1_OpenCondition1,  Awesome1_OpenCondition2,  Awesome1_CloseCondition,  Awesome1_MaxSpread);
   init &= InitStrategy(AWESOME5,  "Awesome M5",  Awesome5_Active,  S_AWESOME, PERIOD_M5,  Awesome5_SignalMethod,  Awesome_SignalLevel, Awesome5_OpenCondition1,  Awesome5_OpenCondition2,  Awesome5_CloseCondition,  Awesome5_MaxSpread);
   init &= InitStrategy(AWESOME15, "Awesome M15", Awesome15_Active, S_AWESOME, PERIOD_M15, Awesome15_SignalMethod, Awesome_SignalLevel, Awesome15_OpenCondition1, Awesome15_OpenCondition2, Awesome15_CloseCondition, Awesome15_MaxSpread);
   init &= InitStrategy(AWESOME30, "Awesome M30", Awesome30_Active, S_AWESOME, PERIOD_M30, Awesome30_SignalMethod, Awesome_SignalLevel, Awesome30_OpenCondition1, Awesome30_OpenCondition2, Awesome30_CloseCondition, Awesome30_MaxSpread);
-  #else
-  init &= InitStrategy(AWESOME1,  "Awesome M1",  Awesome1_Active,  S_AWESOME, PERIOD_M1,  Awesome1_SignalMethod,  Awesome_SignalLevel);
-  init &= InitStrategy(AWESOME5,  "Awesome M5",  Awesome5_Active,  S_AWESOME, PERIOD_M5,  Awesome5_SignalMethod,  Awesome_SignalLevel);
-  init &= InitStrategy(AWESOME15, "Awesome M15", Awesome15_Active, S_AWESOME, PERIOD_M15, Awesome15_SignalMethod, Awesome_SignalLevel);
-  init &= InitStrategy(AWESOME30, "Awesome M30", Awesome30_Active, S_AWESOME, PERIOD_M30, Awesome30_SignalMethod, Awesome_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(BANDS1,  "Bands M1",  Bands1_Active,  S_BANDS, PERIOD_M1,  Bands1_SignalMethod,  Bands_SignalLevel, Bands1_OpenCondition1,  Bands1_OpenCondition2,  Bands1_CloseCondition,  Bands1_MaxSpread);
   init &= InitStrategy(BANDS5,  "Bands M5",  Bands5_Active,  S_BANDS, PERIOD_M5,  Bands5_SignalMethod,  Bands_SignalLevel, Bands5_OpenCondition1,  Bands5_OpenCondition2,  Bands5_CloseCondition,  Bands5_MaxSpread);
   init &= InitStrategy(BANDS15, "Bands M15", Bands15_Active, S_BANDS, PERIOD_M15, Bands15_SignalMethod, Bands_SignalLevel, Bands15_OpenCondition1, Bands15_OpenCondition2, Bands15_CloseCondition, Bands15_MaxSpread);
   init &= InitStrategy(BANDS30, "Bands M30", Bands30_Active, S_BANDS, PERIOD_M30, Bands30_SignalMethod, Bands_SignalLevel, Bands30_OpenCondition1, Bands30_OpenCondition2, Bands30_CloseCondition, Bands30_MaxSpread);
-  #else
-  init &= InitStrategy(BANDS1,  "Bands M1",  Bands1_Active,  S_BANDS, PERIOD_M1,  Bands1_SignalMethod,  Bands_SignalLevel);
-  init &= InitStrategy(BANDS5,  "Bands M5",  Bands5_Active,  S_BANDS, PERIOD_M5,  Bands5_SignalMethod,  Bands_SignalLevel);
-  init &= InitStrategy(BANDS15, "Bands M15", Bands15_Active, S_BANDS, PERIOD_M15, Bands15_SignalMethod, Bands_SignalLevel);
-  init &= InitStrategy(BANDS30, "Bands M30", Bands30_Active, S_BANDS, PERIOD_M30, Bands30_SignalMethod, Bands_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(BPOWER1,  "BPower M1",  BPower1_Active,  S_BPOWER, PERIOD_M1,  BPower1_SignalMethod,  BPower_SignalLevel, BPower1_OpenCondition1,  BPower1_OpenCondition2,  BPower1_CloseCondition,  BPower1_MaxSpread);
   init &= InitStrategy(BPOWER5,  "BPower M5",  BPower5_Active,  S_BPOWER, PERIOD_M5,  BPower5_SignalMethod,  BPower_SignalLevel, BPower5_OpenCondition1,  BPower5_OpenCondition2,  BPower5_CloseCondition,  BPower5_MaxSpread);
   init &= InitStrategy(BPOWER15, "BPower M15", BPower15_Active, S_BPOWER, PERIOD_M15, BPower15_SignalMethod, BPower_SignalLevel, BPower15_OpenCondition1, BPower15_OpenCondition2, BPower15_CloseCondition, BPower15_MaxSpread);
   init &= InitStrategy(BPOWER30, "BPower M30", BPower30_Active, S_BPOWER, PERIOD_M30, BPower30_SignalMethod, BPower_SignalLevel, BPower30_OpenCondition1, BPower30_OpenCondition2, BPower30_CloseCondition, BPower30_MaxSpread);
-  #else
-  init &= InitStrategy(BPOWER1,  "BPower M1",  BPower1_Active,  S_BPOWER, PERIOD_M1,  BPower1_SignalMethod,  BPower_SignalLevel);
-  init &= InitStrategy(BPOWER5,  "BPower M5",  BPower5_Active,  S_BPOWER, PERIOD_M5,  BPower5_SignalMethod,  BPower_SignalLevel);
-  init &= InitStrategy(BPOWER15, "BPower M15", BPower15_Active, S_BPOWER, PERIOD_M15, BPower15_SignalMethod, BPower_SignalLevel);
-  init &= InitStrategy(BPOWER30, "BPower M30", BPower30_Active, S_BPOWER, PERIOD_M30, BPower30_SignalMethod, BPower_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(BREAKAGE1,  "Breakage M1",  Breakage1_Active,  EMPTY, PERIOD_M1,  Breakage1_SignalMethod,  Breakage_SignalLevel, Breakage1_OpenCondition1,  Breakage1_OpenCondition2,  Breakage1_CloseCondition,  Breakage1_MaxSpread);
   init &= InitStrategy(BREAKAGE5,  "Breakage M5",  Breakage5_Active,  EMPTY, PERIOD_M5,  Breakage5_SignalMethod,  Breakage_SignalLevel, Breakage5_OpenCondition1,  Breakage5_OpenCondition2,  Breakage5_CloseCondition,  Breakage5_MaxSpread);
   init &= InitStrategy(BREAKAGE15, "Breakage M15", Breakage15_Active, EMPTY, PERIOD_M15, Breakage15_SignalMethod, Breakage_SignalLevel, Breakage15_OpenCondition1, Breakage15_OpenCondition2, Breakage15_CloseCondition, Breakage15_MaxSpread);
   init &= InitStrategy(BREAKAGE30, "Breakage M30", Breakage30_Active, EMPTY, PERIOD_M30, Breakage30_SignalMethod, Breakage_SignalLevel, Breakage30_OpenCondition1, Breakage30_OpenCondition2, Breakage30_CloseCondition, Breakage30_MaxSpread);
-  #else
-  init &= InitStrategy(BREAKAGE1,  "Breakage M1",  Breakage1_Active,  EMPTY, PERIOD_M1,  Breakage1_SignalMethod,  Breakage_SignalLevel);
-  init &= InitStrategy(BREAKAGE5,  "Breakage M5",  Breakage5_Active,  EMPTY, PERIOD_M5,  Breakage5_SignalMethod,  Breakage_SignalLevel);
-  init &= InitStrategy(BREAKAGE15, "Breakage M15", Breakage15_Active, EMPTY, PERIOD_M15, Breakage15_SignalMethod, Breakage_SignalLevel);
-  init &= InitStrategy(BREAKAGE30, "Breakage M30", Breakage30_Active, EMPTY, PERIOD_M30, Breakage30_SignalMethod, Breakage_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(BWMFI1,  "BWMFI M1",  BWMFI1_Active,  EMPTY, PERIOD_M1,  BWMFI1_SignalMethod,  BWMFI_SignalLevel, BWMFI1_OpenCondition1,  BWMFI1_OpenCondition2,  BWMFI1_CloseCondition,  BWMFI1_MaxSpread);
   init &= InitStrategy(BWMFI5,  "BWMFI M5",  BWMFI5_Active,  EMPTY, PERIOD_M5,  BWMFI5_SignalMethod,  BWMFI_SignalLevel, BWMFI5_OpenCondition1,  BWMFI5_OpenCondition2,  BWMFI5_CloseCondition,  BWMFI5_MaxSpread);
   init &= InitStrategy(BWMFI15, "BWMFI M15", BWMFI15_Active, EMPTY, PERIOD_M15, BWMFI15_SignalMethod, BWMFI_SignalLevel, BWMFI15_OpenCondition1, BWMFI15_OpenCondition2, BWMFI15_CloseCondition, BWMFI15_MaxSpread);
   init &= InitStrategy(BWMFI30, "BWMFI M30", BWMFI30_Active, EMPTY, PERIOD_M30, BWMFI30_SignalMethod, BWMFI_SignalLevel, BWMFI30_OpenCondition1, BWMFI30_OpenCondition2, BWMFI30_CloseCondition, BWMFI30_MaxSpread);
-  #else
-  init &= InitStrategy(BWMFI1,  "BWMFI M1",  BWMFI1_Active,  EMPTY, PERIOD_M1,  BWMFI1_SignalMethod,  BWMFI_SignalLevel);
-  init &= InitStrategy(BWMFI5,  "BWMFI M5",  BWMFI5_Active,  EMPTY, PERIOD_M5,  BWMFI5_SignalMethod,  BWMFI_SignalLevel);
-  init &= InitStrategy(BWMFI15, "BWMFI M15", BWMFI15_Active, EMPTY, PERIOD_M15, BWMFI15_SignalMethod, BWMFI_SignalLevel);
-  init &= InitStrategy(BWMFI30, "BWMFI M30", BWMFI30_Active, EMPTY, PERIOD_M30, BWMFI30_SignalMethod, BWMFI_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(CCI1,  "CCI M1",  CCI1_Active,  S_CCI, PERIOD_M1,  CCI1_SignalMethod,  CCI_SignalLevel, CCI1_OpenCondition1,  CCI1_OpenCondition2,  CCI1_CloseCondition,  CCI1_MaxSpread);
   init &= InitStrategy(CCI5,  "CCI M5",  CCI5_Active,  S_CCI, PERIOD_M5,  CCI5_SignalMethod,  CCI_SignalLevel, CCI5_OpenCondition1,  CCI5_OpenCondition2,  CCI5_CloseCondition,  CCI5_MaxSpread);
   init &= InitStrategy(CCI15, "CCI M15", CCI15_Active, S_CCI, PERIOD_M15, CCI15_SignalMethod, CCI_SignalLevel, CCI15_OpenCondition1, CCI15_OpenCondition2, CCI15_CloseCondition, CCI15_MaxSpread);
   init &= InitStrategy(CCI30, "CCI M30", CCI30_Active, S_CCI, PERIOD_M30, CCI30_SignalMethod, CCI_SignalLevel, CCI30_OpenCondition1, CCI30_OpenCondition2, CCI30_CloseCondition, CCI30_MaxSpread);
-  #else
-  init &= InitStrategy(CCI1,  "CCI M1",  CCI1_Active,  S_CCI, PERIOD_M1,  CCI1_SignalMethod,  CCI_SignalLevel);
-  init &= InitStrategy(CCI5,  "CCI M5",  CCI5_Active,  S_CCI, PERIOD_M5,  CCI5_SignalMethod,  CCI_SignalLevel);
-  init &= InitStrategy(CCI15, "CCI M15", CCI15_Active, S_CCI, PERIOD_M15, CCI15_SignalMethod, CCI_SignalLevel);
-  init &= InitStrategy(CCI30, "CCI M30", CCI30_Active, S_CCI, PERIOD_M30, CCI30_SignalMethod, CCI_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(DEMARKER1,  "DeMarker M1",  DeMarker1_Active,  S_DEMARKER, PERIOD_M1,  DeMarker1_SignalMethod,  DeMarker_SignalLevel, DeMarker1_OpenCondition1,  DeMarker1_OpenCondition2,  DeMarker1_CloseCondition,  DeMarker1_MaxSpread);
   init &= InitStrategy(DEMARKER5,  "DeMarker M5",  DeMarker5_Active,  S_DEMARKER, PERIOD_M5,  DeMarker5_SignalMethod,  DeMarker_SignalLevel, DeMarker5_OpenCondition1,  DeMarker5_OpenCondition2,  DeMarker5_CloseCondition,  DeMarker5_MaxSpread);
   init &= InitStrategy(DEMARKER15, "DeMarker M15", DeMarker15_Active, S_DEMARKER, PERIOD_M15, DeMarker15_SignalMethod, DeMarker_SignalLevel, DeMarker15_OpenCondition1, DeMarker15_OpenCondition2, DeMarker15_CloseCondition, DeMarker15_MaxSpread);
   init &= InitStrategy(DEMARKER30, "DeMarker M30", DeMarker30_Active, S_DEMARKER, PERIOD_M30, DeMarker30_SignalMethod, DeMarker_SignalLevel, DeMarker30_OpenCondition1, DeMarker30_OpenCondition2, DeMarker30_CloseCondition, DeMarker30_MaxSpread);
-  #else
-  init &= InitStrategy(DEMARKER1,  "DeMarker M1",  DeMarker1_Active,  S_DEMARKER, PERIOD_M1,  DeMarker1_SignalMethod,  DeMarker_SignalLevel);
-  init &= InitStrategy(DEMARKER5,  "DeMarker M5",  DeMarker5_Active,  S_DEMARKER, PERIOD_M5,  DeMarker5_SignalMethod,  DeMarker_SignalLevel);
-  init &= InitStrategy(DEMARKER15, "DeMarker M15", DeMarker15_Active, S_DEMARKER, PERIOD_M15, DeMarker15_SignalMethod, DeMarker_SignalLevel);
-  init &= InitStrategy(DEMARKER30, "DeMarker M30", DeMarker30_Active, S_DEMARKER, PERIOD_M30, DeMarker30_SignalMethod, DeMarker_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(ENVELOPES1,  "Envelopes M1",  Envelopes1_Active,  S_ENVELOPES, PERIOD_M1,  Envelopes1_SignalMethod,  Envelopes_SignalLevel, Envelopes1_OpenCondition1,  Envelopes1_OpenCondition2,  Envelopes1_CloseCondition,  Envelopes1_MaxSpread);
   init &= InitStrategy(ENVELOPES5,  "Envelopes M5",  Envelopes5_Active,  S_ENVELOPES, PERIOD_M5,  Envelopes5_SignalMethod,  Envelopes_SignalLevel, Envelopes5_OpenCondition1,  Envelopes5_OpenCondition2,  Envelopes5_CloseCondition,  Envelopes5_MaxSpread);
   init &= InitStrategy(ENVELOPES15, "Envelopes M15", Envelopes15_Active, S_ENVELOPES, PERIOD_M15, Envelopes15_SignalMethod, Envelopes_SignalLevel, Envelopes15_OpenCondition1, Envelopes15_OpenCondition2, Envelopes15_CloseCondition, Envelopes15_MaxSpread);
   init &= InitStrategy(ENVELOPES30, "Envelopes M30", Envelopes30_Active, S_ENVELOPES, PERIOD_M30, Envelopes30_SignalMethod, Envelopes_SignalLevel, Envelopes30_OpenCondition1, Envelopes30_OpenCondition2, Envelopes30_CloseCondition, Envelopes30_MaxSpread);
-  #else
-  init &= InitStrategy(ENVELOPES1,  "Envelopes M1",  Envelopes1_Active,  S_ENVELOPES, PERIOD_M1,  Envelopes1_SignalMethod,  Envelopes_SignalLevel);
-  init &= InitStrategy(ENVELOPES5,  "Envelopes M5",  Envelopes5_Active,  S_ENVELOPES, PERIOD_M5,  Envelopes5_SignalMethod,  Envelopes_SignalLevel);
-  init &= InitStrategy(ENVELOPES15, "Envelopes M15", Envelopes15_Active, S_ENVELOPES, PERIOD_M15, Envelopes15_SignalMethod, Envelopes_SignalLevel);
-  init &= InitStrategy(ENVELOPES30, "Envelopes M30", Envelopes30_Active, S_ENVELOPES, PERIOD_M30, Envelopes30_SignalMethod, Envelopes_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(FORCE1,  "Force M1",  Force1_Active,  S_FORCE, PERIOD_M1,  Force1_SignalMethod,  Force_SignalLevel, Force1_OpenCondition1,  Force1_OpenCondition2,  Force1_CloseCondition,  Force1_MaxSpread);
   init &= InitStrategy(FORCE5,  "Force M5",  Force5_Active,  S_FORCE, PERIOD_M5,  Force5_SignalMethod,  Force_SignalLevel, Force5_OpenCondition1,  Force5_OpenCondition2,  Force5_CloseCondition,  Force5_MaxSpread);
   init &= InitStrategy(FORCE15, "Force M15", Force15_Active, S_FORCE, PERIOD_M15, Force15_SignalMethod, Force_SignalLevel, Force15_OpenCondition1, Force15_OpenCondition2, Force15_CloseCondition, Force15_MaxSpread);
   init &= InitStrategy(FORCE30, "Force M30", Force30_Active, S_FORCE, PERIOD_M30, Force30_SignalMethod, Force_SignalLevel, Force30_OpenCondition1, Force30_OpenCondition2, Force30_CloseCondition, Force30_MaxSpread);
-  #else
-  init &= InitStrategy(FORCE1,  "Force M1",  Force1_Active,  S_FORCE, PERIOD_M1,  Force1_SignalMethod,  Force_SignalLevel);
-  init &= InitStrategy(FORCE5,  "Force M5",  Force5_Active,  S_FORCE, PERIOD_M5,  Force5_SignalMethod,  Force_SignalLevel);
-  init &= InitStrategy(FORCE15, "Force M15", Force15_Active, S_FORCE, PERIOD_M15, Force15_SignalMethod, Force_SignalLevel);
-  init &= InitStrategy(FORCE30, "Force M30", Force30_Active, S_FORCE, PERIOD_M30, Force30_SignalMethod, Force_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(FRACTALS1,  "Fractals M1",  Fractals1_Active,  S_FRACTALS, PERIOD_M1,  Fractals1_SignalMethod,  Fractals_SignalLevel, Fractals1_OpenCondition1,  Fractals1_OpenCondition2,  Fractals1_CloseCondition,  Fractals1_MaxSpread);
   init &= InitStrategy(FRACTALS5,  "Fractals M5",  Fractals5_Active,  S_FRACTALS, PERIOD_M5,  Fractals5_SignalMethod,  Fractals_SignalLevel, Fractals5_OpenCondition1,  Fractals5_OpenCondition2,  Fractals5_CloseCondition,  Fractals5_MaxSpread);
   init &= InitStrategy(FRACTALS15, "Fractals M15", Fractals15_Active, S_FRACTALS, PERIOD_M15, Fractals15_SignalMethod, Fractals_SignalLevel, Fractals15_OpenCondition1, Fractals15_OpenCondition2, Fractals15_CloseCondition, Fractals15_MaxSpread);
   init &= InitStrategy(FRACTALS30, "Fractals M30", Fractals30_Active, S_FRACTALS, PERIOD_M30, Fractals30_SignalMethod, Fractals_SignalLevel, Fractals30_OpenCondition1, Fractals30_OpenCondition2, Fractals30_CloseCondition, Fractals30_MaxSpread);
-  #else
-  init &= InitStrategy(FRACTALS1,  "Fractals M1",  Fractals1_Active,  S_FRACTALS, PERIOD_M1,  Fractals1_SignalMethod,  Fractals_SignalLevel);
-  init &= InitStrategy(FRACTALS5,  "Fractals M5",  Fractals5_Active,  S_FRACTALS, PERIOD_M5,  Fractals5_SignalMethod,  Fractals_SignalLevel);
-  init &= InitStrategy(FRACTALS15, "Fractals M15", Fractals15_Active, S_FRACTALS, PERIOD_M15, Fractals15_SignalMethod, Fractals_SignalLevel);
-  init &= InitStrategy(FRACTALS30, "Fractals M30", Fractals30_Active, S_FRACTALS, PERIOD_M30, Fractals30_SignalMethod, Fractals_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(GATOR1,  "Gator M1",  Gator1_Active,  S_GATOR, PERIOD_M1,  Gator1_SignalMethod,  Gator_SignalLevel, Gator1_OpenCondition1,  Gator1_OpenCondition2,  Gator1_CloseCondition,  Gator1_MaxSpread);
   init &= InitStrategy(GATOR5,  "Gator M5",  Gator5_Active,  S_GATOR, PERIOD_M5,  Gator5_SignalMethod,  Gator_SignalLevel, Gator5_OpenCondition1,  Gator5_OpenCondition2,  Gator5_CloseCondition,  Gator5_MaxSpread);
   init &= InitStrategy(GATOR15, "Gator M15", Gator15_Active, S_GATOR, PERIOD_M15, Gator15_SignalMethod, Gator_SignalLevel, Gator15_OpenCondition1, Gator15_OpenCondition2, Gator15_CloseCondition, Gator15_MaxSpread);
   init &= InitStrategy(GATOR30, "Gator M30", Gator30_Active, S_GATOR, PERIOD_M30, Gator30_SignalMethod, Gator_SignalLevel, Gator30_OpenCondition1, Gator30_OpenCondition2, Gator30_CloseCondition, Gator30_MaxSpread);
-  #else
-  init &= InitStrategy(GATOR1,  "Gator M1",  Gator1_Active,  S_GATOR, PERIOD_M1,  Gator1_SignalMethod,  Gator_SignalLevel);
-  init &= InitStrategy(GATOR5,  "Gator M5",  Gator5_Active,  S_GATOR, PERIOD_M5,  Gator5_SignalMethod,  Gator_SignalLevel);
-  init &= InitStrategy(GATOR15, "Gator M15", Gator15_Active, S_GATOR, PERIOD_M15, Gator15_SignalMethod, Gator_SignalLevel);
-  init &= InitStrategy(GATOR30, "Gator M30", Gator30_Active, S_GATOR, PERIOD_M30, Gator30_SignalMethod, Gator_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(ICHIMOKU1,  "Ichimoku M1",  Ichimoku1_Active,  S_ICHIMOKU, PERIOD_M1,  Ichimoku1_SignalMethod,  Ichimoku_SignalLevel, Ichimoku1_OpenCondition1,  Ichimoku1_OpenCondition2,  Ichimoku1_CloseCondition,  Ichimoku1_MaxSpread);
   init &= InitStrategy(ICHIMOKU5,  "Ichimoku M5",  Ichimoku5_Active,  S_ICHIMOKU, PERIOD_M5,  Ichimoku5_SignalMethod,  Ichimoku_SignalLevel, Ichimoku5_OpenCondition1,  Ichimoku5_OpenCondition2,  Ichimoku5_CloseCondition,  Ichimoku5_MaxSpread);
   init &= InitStrategy(ICHIMOKU15, "Ichimoku M15", Ichimoku15_Active, S_ICHIMOKU, PERIOD_M15, Ichimoku15_SignalMethod, Ichimoku_SignalLevel, Ichimoku15_OpenCondition1, Ichimoku15_OpenCondition2, Ichimoku15_CloseCondition, Ichimoku15_MaxSpread);
   init &= InitStrategy(ICHIMOKU30, "Ichimoku M30", Ichimoku30_Active, S_ICHIMOKU, PERIOD_M30, Ichimoku30_SignalMethod, Ichimoku_SignalLevel, Ichimoku30_OpenCondition1, Ichimoku30_OpenCondition2, Ichimoku30_CloseCondition, Ichimoku30_MaxSpread);
-  #else
-  init &= InitStrategy(ICHIMOKU1,  "Ichimoku M1",  Ichimoku1_Active,  S_ICHIMOKU, PERIOD_M1,  Ichimoku1_SignalMethod,  Ichimoku_SignalLevel);
-  init &= InitStrategy(ICHIMOKU5,  "Ichimoku M5",  Ichimoku5_Active,  S_ICHIMOKU, PERIOD_M5,  Ichimoku5_SignalMethod,  Ichimoku_SignalLevel);
-  init &= InitStrategy(ICHIMOKU15, "Ichimoku M15", Ichimoku15_Active, S_ICHIMOKU, PERIOD_M15, Ichimoku15_SignalMethod, Ichimoku_SignalLevel);
-  init &= InitStrategy(ICHIMOKU30, "Ichimoku M30", Ichimoku30_Active, S_ICHIMOKU, PERIOD_M30, Ichimoku30_SignalMethod, Ichimoku_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(MA1,  "MA M1",  MA1_Active,  S_MA, PERIOD_M1,  MA1_SignalMethod,  MA_SignalLevel,  MA1_OpenCondition1, MA1_OpenCondition2,  MA1_CloseCondition,  MA1_MaxSpread);
   init &= InitStrategy(MA5,  "MA M5",  MA5_Active,  S_MA, PERIOD_M5,  MA5_SignalMethod,  MA_SignalLevel,  MA5_OpenCondition1, MA5_OpenCondition2,  MA5_CloseCondition,  MA5_MaxSpread);
   init &= InitStrategy(MA15, "MA M15", MA15_Active, S_MA, PERIOD_M15, MA15_SignalMethod, MA_SignalLevel, MA15_OpenCondition1, MA15_OpenCondition2, MA15_CloseCondition, MA15_MaxSpread);
   init &= InitStrategy(MA30, "MA M30", MA30_Active, S_MA, PERIOD_M30, MA30_SignalMethod, MA_SignalLevel, MA30_OpenCondition1, MA30_OpenCondition2, MA30_CloseCondition, MA30_MaxSpread);
-  #else
-  init &= InitStrategy(MA1,  "MA M1",  MA1_Active,  S_MA, PERIOD_M1,  MA1_SignalMethod,  MA_SignalLevel);
-  init &= InitStrategy(MA5,  "MA M5",  MA5_Active,  S_MA, PERIOD_M5,  MA5_SignalMethod,  MA_SignalLevel);
-  init &= InitStrategy(MA15, "MA M15", MA15_Active, S_MA, PERIOD_M15, MA15_SignalMethod, MA_SignalLevel);
-  init &= InitStrategy(MA30, "MA M30", MA30_Active, S_MA, PERIOD_M30, MA30_SignalMethod, MA_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(MACD1,  "MACD M1",  MACD1_Active,  S_MACD, PERIOD_M1,  MACD1_SignalMethod,  MACD_SignalLevel, MACD1_OpenCondition1,  MACD1_OpenCondition2,  MACD1_CloseCondition,  MACD1_MaxSpread);
   init &= InitStrategy(MACD5,  "MACD M5",  MACD5_Active,  S_MACD, PERIOD_M5,  MACD5_SignalMethod,  MACD_SignalLevel, MACD5_OpenCondition1,  MACD5_OpenCondition2,  MACD5_CloseCondition,  MACD5_MaxSpread);
   init &= InitStrategy(MACD15, "MACD M15", MACD15_Active, S_MACD, PERIOD_M15, MACD15_SignalMethod, MACD_SignalLevel, MACD15_OpenCondition1, MACD15_OpenCondition2, MACD15_CloseCondition, MACD15_MaxSpread);
   init &= InitStrategy(MACD30, "MACD M30", MACD30_Active, S_MACD, PERIOD_M30, MACD30_SignalMethod, MACD_SignalLevel, MACD30_OpenCondition1, MACD30_OpenCondition2, MACD30_CloseCondition, MACD30_MaxSpread);
-  #else
-  init &= InitStrategy(MACD1,  "MACD M1",  MACD1_Active,  S_MACD, PERIOD_M1,  MACD1_SignalMethod,  MACD_SignalLevel);
-  init &= InitStrategy(MACD5,  "MACD M5",  MACD5_Active,  S_MACD, PERIOD_M5,  MACD5_SignalMethod,  MACD_SignalLevel);
-  init &= InitStrategy(MACD15, "MACD M15", MACD15_Active, S_MACD, PERIOD_M15, MACD15_SignalMethod, MACD_SignalLevel);
-  init &= InitStrategy(MACD30, "MACD M30", MACD30_Active, S_MACD, PERIOD_M30, MACD30_SignalMethod, MACD_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(MFI1,  "MFI M1",  MFI1_Active,  S_MFI, PERIOD_M1,  MFI1_SignalMethod,  MFI_SignalLevel, MFI1_OpenCondition1,  MFI1_OpenCondition2,  MFI1_CloseCondition,  MFI1_MaxSpread);
   init &= InitStrategy(MFI5,  "MFI M5",  MFI5_Active,  S_MFI, PERIOD_M5,  MFI5_SignalMethod,  MFI_SignalLevel, MFI5_OpenCondition1,  MFI5_OpenCondition2,  MFI5_CloseCondition,  MFI5_MaxSpread);
   init &= InitStrategy(MFI15, "MFI M15", MFI15_Active, S_MFI, PERIOD_M15, MFI15_SignalMethod, MFI_SignalLevel, MFI15_OpenCondition1, MFI15_OpenCondition2, MFI15_CloseCondition, MFI15_MaxSpread);
   init &= InitStrategy(MFI30, "MFI M30", MFI30_Active, S_MFI, PERIOD_M30, MFI30_SignalMethod, MFI_SignalLevel, MFI30_OpenCondition1, MFI30_OpenCondition2, MFI30_CloseCondition, MFI30_MaxSpread);
-  #else
-  init &= InitStrategy(MFI1,  "MFI M1",  MFI1_Active,  S_MFI, PERIOD_M1,  MFI1_SignalMethod,  MFI_SignalLevel);
-  init &= InitStrategy(MFI5,  "MFI M5",  MFI5_Active,  S_MFI, PERIOD_M5,  MFI5_SignalMethod,  MFI_SignalLevel);
-  init &= InitStrategy(MFI15, "MFI M15", MFI15_Active, S_MFI, PERIOD_M15, MFI15_SignalMethod, MFI_SignalLevel);
-  init &= InitStrategy(MFI30, "MFI M30", MFI30_Active, S_MFI, PERIOD_M30, MFI30_SignalMethod, MFI_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(MOMENTUM1,  "Momentum M1",  Momentum1_Active,  S_MOMENTUM, PERIOD_M1,  Momentum1_SignalMethod,  Momentum_SignalLevel, Momentum1_OpenCondition1,  Momentum1_OpenCondition2,  Momentum1_CloseCondition,  Momentum1_MaxSpread);
   init &= InitStrategy(MOMENTUM5,  "Momentum M5",  Momentum5_Active,  S_MOMENTUM, PERIOD_M5,  Momentum5_SignalMethod,  Momentum_SignalLevel, Momentum5_OpenCondition1,  Momentum5_OpenCondition2,  Momentum5_CloseCondition,  Momentum5_MaxSpread);
   init &= InitStrategy(MOMENTUM15, "Momentum M15", Momentum15_Active, S_MOMENTUM, PERIOD_M15, Momentum15_SignalMethod, Momentum_SignalLevel, Momentum15_OpenCondition1, Momentum15_OpenCondition2, Momentum15_CloseCondition, Momentum15_MaxSpread);
   init &= InitStrategy(MOMENTUM30, "Momentum M30", Momentum30_Active, S_MOMENTUM, PERIOD_M30, Momentum30_SignalMethod, Momentum_SignalLevel, Momentum30_OpenCondition1, Momentum30_OpenCondition2, Momentum30_CloseCondition, Momentum30_MaxSpread);
-  #else
-  init &= InitStrategy(MOMENTUM1,  "Momentum M1",  Momentum1_Active,  S_MOMENTUM, PERIOD_M1,  Momentum1_SignalMethod,  Momentum_SignalLevel);
-  init &= InitStrategy(MOMENTUM5,  "Momentum M5",  Momentum5_Active,  S_MOMENTUM, PERIOD_M5,  Momentum5_SignalMethod,  Momentum_SignalLevel);
-  init &= InitStrategy(MOMENTUM15, "Momentum M15", Momentum15_Active, S_MOMENTUM, PERIOD_M15, Momentum15_SignalMethod, Momentum_SignalLevel);
-  init &= InitStrategy(MOMENTUM30, "Momentum M30", Momentum30_Active, S_MOMENTUM, PERIOD_M30, Momentum30_SignalMethod, Momentum_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(OBV1,  "OBV M1",  OBV1_Active,  S_OBV, PERIOD_M1,  OBV1_SignalMethod,  OBV_SignalLevel,  OBV1_OpenCondition1, OBV1_OpenCondition2,  OBV1_CloseCondition,  OBV1_MaxSpread);
   init &= InitStrategy(OBV5,  "OBV M5",  OBV5_Active,  S_OBV, PERIOD_M5,  OBV5_SignalMethod,  OBV_SignalLevel,  OBV5_OpenCondition1, OBV5_OpenCondition2,  OBV5_CloseCondition,  OBV5_MaxSpread);
   init &= InitStrategy(OBV15, "OBV M15", OBV15_Active, S_OBV, PERIOD_M15, OBV15_SignalMethod, OBV_SignalLevel, OBV15_OpenCondition1, OBV15_OpenCondition2, OBV15_CloseCondition, OBV15_MaxSpread);
   init &= InitStrategy(OBV30, "OBV M30", OBV30_Active, S_OBV, PERIOD_M30, OBV30_SignalMethod, OBV_SignalLevel, OBV30_OpenCondition1, OBV30_OpenCondition2, OBV30_CloseCondition, OBV30_MaxSpread);
-  #else
-  init &= InitStrategy(OBV1,  "OBV M1",  OBV1_Active,  S_OBV, PERIOD_M1,  OBV1_SignalMethod,  OBV_SignalLevel);
-  init &= InitStrategy(OBV5,  "OBV M5",  OBV5_Active,  S_OBV, PERIOD_M5,  OBV5_SignalMethod,  OBV_SignalLevel);
-  init &= InitStrategy(OBV15, "OBV M15", OBV15_Active, S_OBV, PERIOD_M15, OBV15_SignalMethod, OBV_SignalLevel);
-  init &= InitStrategy(OBV30, "OBV M30", OBV30_Active, S_OBV, PERIOD_M30, OBV30_SignalMethod, OBV_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(OSMA1,  "OSMA M1",  OSMA1_Active,  S_OSMA, PERIOD_M1,  OSMA1_SignalMethod,  OSMA_SignalLevel, OSMA1_OpenCondition1,  OSMA1_OpenCondition2,  OSMA1_CloseCondition,  OSMA1_MaxSpread);
   init &= InitStrategy(OSMA5,  "OSMA M5",  OSMA5_Active,  S_OSMA, PERIOD_M5,  OSMA5_SignalMethod,  OSMA_SignalLevel, OSMA5_OpenCondition1,  OSMA5_OpenCondition2,  OSMA5_CloseCondition,  OSMA5_MaxSpread);
   init &= InitStrategy(OSMA15, "OSMA M15", OSMA15_Active, S_OSMA, PERIOD_M15, OSMA15_SignalMethod, OSMA_SignalLevel, OSMA15_OpenCondition1, OSMA15_OpenCondition2, OSMA15_CloseCondition, OSMA15_MaxSpread);
   init &= InitStrategy(OSMA30, "OSMA M30", OSMA30_Active, S_OSMA, PERIOD_M30, OSMA30_SignalMethod, OSMA_SignalLevel, OSMA30_OpenCondition1, OSMA30_OpenCondition2, OSMA30_CloseCondition, OSMA30_MaxSpread);
-  #else
-  init &= InitStrategy(OSMA1,  "OSMA M1",  OSMA1_Active,  S_OSMA, PERIOD_M1,  OSMA1_SignalMethod,  OSMA_SignalLevel);
-  init &= InitStrategy(OSMA5,  "OSMA M5",  OSMA5_Active,  S_OSMA, PERIOD_M5,  OSMA5_SignalMethod,  OSMA_SignalLevel);
-  init &= InitStrategy(OSMA15, "OSMA M15", OSMA15_Active, S_OSMA, PERIOD_M15, OSMA15_SignalMethod, OSMA_SignalLevel);
-  init &= InitStrategy(OSMA30, "OSMA M30", OSMA30_Active, S_OSMA, PERIOD_M30, OSMA30_SignalMethod, OSMA_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(RSI1,  "RSI M1",  RSI1_Active,  S_RSI, PERIOD_M1,  RSI1_SignalMethod,  RSI_SignalLevel, RSI1_OpenCondition1,  RSI1_OpenCondition2,  RSI1_CloseCondition,  RSI1_MaxSpread);
   init &= InitStrategy(RSI5,  "RSI M5",  RSI5_Active,  S_RSI, PERIOD_M5,  RSI5_SignalMethod,  RSI_SignalLevel, RSI5_OpenCondition1,  RSI5_OpenCondition2,  RSI5_CloseCondition,  RSI5_MaxSpread);
   init &= InitStrategy(RSI15, "RSI M15", RSI15_Active, S_RSI, PERIOD_M15, RSI15_SignalMethod, RSI_SignalLevel, RSI15_OpenCondition1, RSI15_OpenCondition2, RSI15_CloseCondition, RSI15_MaxSpread);
   init &= InitStrategy(RSI30, "RSI M30", RSI30_Active, S_RSI, PERIOD_M30, RSI30_SignalMethod, RSI_SignalLevel, RSI30_OpenCondition1, RSI30_OpenCondition2, RSI30_CloseCondition, RSI30_MaxSpread);
-  #else
-  init &= InitStrategy(RSI1,  "RSI M1",  RSI1_Active,  S_RSI, PERIOD_M1,  RSI1_SignalMethod,  RSI_SignalLevel);
-  init &= InitStrategy(RSI5,  "RSI M5",  RSI5_Active,  S_RSI, PERIOD_M5,  RSI5_SignalMethod,  RSI_SignalLevel);
-  init &= InitStrategy(RSI15, "RSI M15", RSI15_Active, S_RSI, PERIOD_M15, RSI15_SignalMethod, RSI_SignalLevel);
-  init &= InitStrategy(RSI30, "RSI M30", RSI30_Active, S_RSI, PERIOD_M30, RSI30_SignalMethod, RSI_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(RVI1,  "RVI M1",  RVI1_Active,  S_RVI, PERIOD_M1,  RVI1_SignalMethod,  RVI_SignalLevel, RVI1_OpenCondition1,  RVI1_OpenCondition2,  RVI1_CloseCondition,  RVI1_MaxSpread);
   init &= InitStrategy(RVI5,  "RVI M5",  RVI5_Active,  S_RVI, PERIOD_M5,  RVI5_SignalMethod,  RVI_SignalLevel, RVI5_OpenCondition1,  RVI5_OpenCondition2,  RVI5_CloseCondition,  RVI5_MaxSpread);
   init &= InitStrategy(RVI15, "RVI M15", RVI15_Active, S_RVI, PERIOD_M15, RVI15_SignalMethod, RVI_SignalLevel, RVI15_OpenCondition1, RVI15_OpenCondition2, RVI15_CloseCondition, RVI15_MaxSpread);
   init &= InitStrategy(RVI30, "RVI M30", RVI30_Active, S_RVI, PERIOD_M30, RVI30_SignalMethod, RVI_SignalLevel, RVI30_OpenCondition1, RVI30_OpenCondition2, RVI30_CloseCondition, RVI30_MaxSpread);
-  #else
-  init &= InitStrategy(RVI1,  "RVI M1",  RVI1_Active,  S_RVI, PERIOD_M1,  RVI1_SignalMethod,  RVI_SignalLevel);
-  init &= InitStrategy(RVI5,  "RVI M5",  RVI5_Active,  S_RVI, PERIOD_M5,  RVI5_SignalMethod,  RVI_SignalLevel);
-  init &= InitStrategy(RVI15, "RVI M15", RVI15_Active, S_RVI, PERIOD_M15, RVI15_SignalMethod, RVI_SignalLevel);
-  init &= InitStrategy(RVI30, "RVI M30", RVI30_Active, S_RVI, PERIOD_M30, RVI30_SignalMethod, RVI_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(SAR1,  "SAR M1",  SAR1_Active,  S_SAR, PERIOD_M1,  SAR1_SignalMethod,  SAR_SignalLevel, SAR1_OpenCondition1,  SAR1_OpenCondition2,  SAR1_CloseCondition,  SAR1_MaxSpread);
   init &= InitStrategy(SAR5,  "SAR M5",  SAR5_Active,  S_SAR, PERIOD_M5,  SAR5_SignalMethod,  SAR_SignalLevel, SAR5_OpenCondition1,  SAR5_OpenCondition2,  SAR5_CloseCondition,  SAR5_MaxSpread);
   init &= InitStrategy(SAR15, "SAR M15", SAR15_Active, S_SAR, PERIOD_M15, SAR15_SignalMethod, SAR_SignalLevel, SAR15_OpenCondition1, SAR15_OpenCondition2, SAR15_CloseCondition, SAR15_MaxSpread);
   init &= InitStrategy(SAR30, "SAR M30", SAR30_Active, S_SAR, PERIOD_M30, SAR30_SignalMethod, SAR_SignalLevel, SAR30_OpenCondition1, SAR30_OpenCondition2, SAR30_CloseCondition, SAR30_MaxSpread);
-  #else
-  init &= InitStrategy(SAR1,  "SAR M1",  SAR1_Active,  S_SAR, PERIOD_M1,  SAR1_SignalMethod,  SAR_SignalLevel);
-  init &= InitStrategy(SAR5,  "SAR M5",  SAR5_Active,  S_SAR, PERIOD_M5,  SAR5_SignalMethod,  SAR_SignalLevel);
-  init &= InitStrategy(SAR15, "SAR M15", SAR15_Active, S_SAR, PERIOD_M15, SAR15_SignalMethod, SAR_SignalLevel);
-  init &= InitStrategy(SAR30, "SAR M30", SAR30_Active, S_SAR, PERIOD_M30, SAR30_SignalMethod, SAR_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(STDDEV1,  "StdDev M1",  StdDev1_Active,  S_STDDEV, PERIOD_M1,  StdDev1_SignalMethod,  StdDev_SignalLevel,  StdDev1_OpenCondition1,  StdDev1_OpenCondition2,  StdDev1_CloseCondition,  StdDev1_MaxSpread);
   init &= InitStrategy(STDDEV5,  "StdDev M5",  StdDev5_Active,  S_STDDEV, PERIOD_M5,  StdDev5_SignalMethod,  StdDev_SignalLevel,  StdDev5_OpenCondition1,  StdDev5_OpenCondition2,  StdDev5_CloseCondition,  StdDev5_MaxSpread);
   init &= InitStrategy(STDDEV15, "StdDev M15", StdDev15_Active, S_STDDEV, PERIOD_M15, StdDev15_SignalMethod, StdDev_SignalLevel, StdDev15_OpenCondition1, StdDev15_OpenCondition2, StdDev15_CloseCondition, StdDev15_MaxSpread);
   init &= InitStrategy(STDDEV30, "StdDev M30", StdDev30_Active, S_STDDEV, PERIOD_M30, StdDev30_SignalMethod, StdDev_SignalLevel, StdDev30_OpenCondition1, StdDev30_OpenCondition2, StdDev30_CloseCondition, StdDev30_MaxSpread);
-  #else
-  init &= InitStrategy(STDDEV1,  "StdDev M1",  StdDev1_Active,  S_STDDEV, PERIOD_M1,  StdDev1_SignalMethod,  StdDev_SignalLevel);
-  init &= InitStrategy(STDDEV5,  "StdDev M5",  StdDev5_Active,  S_STDDEV, PERIOD_M5,  StdDev5_SignalMethod,  StdDev_SignalLevel);
-  init &= InitStrategy(STDDEV15, "StdDev M15", StdDev15_Active, S_STDDEV, PERIOD_M15, StdDev15_SignalMethod, StdDev_SignalLevel);
-  init &= InitStrategy(STDDEV30, "StdDev M30", StdDev30_Active, S_STDDEV, PERIOD_M30, StdDev30_SignalMethod, StdDev_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(STOCHASTIC1,  "Stochastic M1",  Stochastic1_Active,  S_STOCHASTIC, PERIOD_M1,  Stochastic1_SignalMethod,  Stochastic_SignalLevel,  Stochastic1_OpenCondition1,  Stochastic1_OpenCondition2,  Stochastic1_CloseCondition,  Stochastic1_MaxSpread);
   init &= InitStrategy(STOCHASTIC5,  "Stochastic M5",  Stochastic5_Active,  S_STOCHASTIC, PERIOD_M5,  Stochastic5_SignalMethod,  Stochastic_SignalLevel,  Stochastic5_OpenCondition1,  Stochastic5_OpenCondition2,  Stochastic5_CloseCondition,  Stochastic5_MaxSpread);
   init &= InitStrategy(STOCHASTIC15, "Stochastic M15", Stochastic15_Active, S_STOCHASTIC, PERIOD_M15, Stochastic15_SignalMethod, Stochastic_SignalLevel, Stochastic15_OpenCondition1, Stochastic15_OpenCondition2, Stochastic15_CloseCondition, Stochastic15_MaxSpread);
   init &= InitStrategy(STOCHASTIC30, "Stochastic M30", Stochastic30_Active, S_STOCHASTIC, PERIOD_M30, Stochastic30_SignalMethod, Stochastic_SignalLevel, Stochastic30_OpenCondition1, Stochastic30_OpenCondition2, Stochastic30_CloseCondition, Stochastic30_MaxSpread);
-  #else
-  init &= InitStrategy(STOCHASTIC1,  "Stochastic M1",  Stochastic1_Active,  S_STOCHASTIC, PERIOD_M1,  Stochastic1_SignalMethod,  Stochastic_SignalLevel);
-  init &= InitStrategy(STOCHASTIC5,  "Stochastic M5",  Stochastic5_Active,  S_STOCHASTIC, PERIOD_M5,  Stochastic5_SignalMethod,  Stochastic_SignalLevel);
-  init &= InitStrategy(STOCHASTIC15, "Stochastic M15", Stochastic15_Active, S_STOCHASTIC, PERIOD_M15, Stochastic15_SignalMethod, Stochastic_SignalLevel);
-  init &= InitStrategy(STOCHASTIC30, "Stochastic M30", Stochastic30_Active, S_STOCHASTIC, PERIOD_M30, Stochastic30_SignalMethod, Stochastic_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(WPR1,  "WPR M1",  WPR1_Active,  S_WPR, PERIOD_M1,  WPR1_SignalMethod,  WPR_SignalLevel, WPR1_OpenCondition1,  WPR1_OpenCondition2,  WPR1_CloseCondition,  WPR1_MaxSpread);
   init &= InitStrategy(WPR5,  "WPR M5",  WPR5_Active,  S_WPR, PERIOD_M5,  WPR5_SignalMethod,  WPR_SignalLevel, WPR5_OpenCondition1,  WPR5_OpenCondition2,  WPR5_CloseCondition,  WPR5_MaxSpread);
   init &= InitStrategy(WPR15, "WPR M15", WPR15_Active, S_WPR, PERIOD_M15, WPR15_SignalMethod, WPR_SignalLevel, WPR15_OpenCondition1, WPR15_OpenCondition2, WPR15_CloseCondition, WPR15_MaxSpread);
   init &= InitStrategy(WPR30, "WPR M30", WPR30_Active, S_WPR, PERIOD_M30, WPR30_SignalMethod, WPR_SignalLevel, WPR30_OpenCondition1, WPR30_OpenCondition2, WPR30_CloseCondition, WPR30_MaxSpread);
-  #else
-  init &= InitStrategy(WPR1,  "WPR M1",  WPR1_Active,  S_WPR, PERIOD_M1,  WPR1_SignalMethod,  WPR_SignalLevel);
-  init &= InitStrategy(WPR5,  "WPR M5",  WPR5_Active,  S_WPR, PERIOD_M5,  WPR5_SignalMethod,  WPR_SignalLevel);
-  init &= InitStrategy(WPR15, "WPR M15", WPR15_Active, S_WPR, PERIOD_M15, WPR15_SignalMethod, WPR_SignalLevel);
-  init &= InitStrategy(WPR30, "WPR M30", WPR30_Active, S_WPR, PERIOD_M30, WPR30_SignalMethod, WPR_SignalLevel);
-  #endif
 
-  #ifdef __advanced__
   init &= InitStrategy(ZIGZAG1,  "ZigZag M1",  ZigZag1_Active,  S_ZIGZAG, PERIOD_M1,  ZigZag1_SignalMethod,  ZigZag_SignalLevel, ZigZag1_OpenCondition1,  ZigZag1_OpenCondition2,  ZigZag1_CloseCondition,  ZigZag1_MaxSpread);
   init &= InitStrategy(ZIGZAG5,  "ZigZag M5",  ZigZag5_Active,  S_ZIGZAG, PERIOD_M5,  ZigZag5_SignalMethod,  ZigZag_SignalLevel, ZigZag5_OpenCondition1,  ZigZag5_OpenCondition2,  ZigZag5_CloseCondition,  ZigZag5_MaxSpread);
   init &= InitStrategy(ZIGZAG15, "ZigZag M15", ZigZag15_Active, S_ZIGZAG, PERIOD_M15, ZigZag15_SignalMethod, ZigZag_SignalLevel, ZigZag15_OpenCondition1, ZigZag15_OpenCondition2, ZigZag15_CloseCondition, ZigZag15_MaxSpread);
   init &= InitStrategy(ZIGZAG30, "ZigZag M30", ZigZag30_Active, S_ZIGZAG, PERIOD_M30, ZigZag30_SignalMethod, ZigZag_SignalLevel, ZigZag30_OpenCondition1, ZigZag30_OpenCondition2, ZigZag30_CloseCondition, ZigZag30_MaxSpread);
-  #else
-  init &= InitStrategy(ZIGZAG1,  "ZigZag M1",  ZigZag1_Active,  S_ZIGZAG, PERIOD_M1,  ZigZag1_SignalMethod,  ZigZag_SignalLevel);
-  init &= InitStrategy(ZIGZAG5,  "ZigZag M5",  ZigZag5_Active,  S_ZIGZAG, PERIOD_M5,  ZigZag5_SignalMethod,  ZigZag_SignalLevel);
-  init &= InitStrategy(ZIGZAG15, "ZigZag M15", ZigZag15_Active, S_ZIGZAG, PERIOD_M15, ZigZag15_SignalMethod, ZigZag_SignalLevel);
-  init &= InitStrategy(ZIGZAG30, "ZigZag M30", ZigZag30_Active, S_ZIGZAG, PERIOD_M30, ZigZag30_SignalMethod, ZigZag_SignalLevel);
-  #endif
 
   if (!init && ValidateSettings) {
     Msg::ShowText(Chart::ListTimeframes(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
@@ -5030,10 +4822,10 @@ bool InitStrategy(int key, string name, bool active, ENUM_INDICATOR_TYPE indicat
   info[key][OPEN_METHOD]     = signal_method;
   conf[key][OPEN_LEVEL]      = signal_level;
   conf[key][PROFIT_FACTOR]   = GetDefaultProfitFactor();
+  info[key][CLOSE_CONDITION] = close_cond;
   #ifdef __advanced__
   info[key][OPEN_CONDITION1] = open_cond1;
   info[key][OPEN_CONDITION2] = open_cond2;
-  info[key][CLOSE_CONDITION] = close_cond;
   conf[key][SPREAD_LIMIT]    = max_spread;
   #endif
   return (true);
@@ -5047,7 +4839,7 @@ void UpdateVariables() {
   last_close_profit = EMPTY;
   total_orders = GetTotalOrders();
   curr_spread = market.GetSpreadInPips();
-  curr_trend = market.GetTrend(fabs(TrendMethod), TrendMethod < 0 ? PERIOD_M1 : (ENUM_TIMEFRAMES) NULL);
+  curr_trend = trade.GetTrend(fabs(TrendMethod), TrendMethod < 0 ? PERIOD_M1 : (ENUM_TIMEFRAMES) NULL);
 }
 
 /* END: VARIABLE FUNCTIONS */
@@ -5156,13 +4948,11 @@ bool InitializeConditions() {
   acc_conditions[29][2] = Action_On_Condition_30;
   #endif
 
-  #ifdef __advanced__
-  if (Account_Condition_To_Disable > 0 && Account_Condition_To_Disable < ArraySize(acc_conditions)) {
-    acc_conditions[Account_Condition_To_Disable - 1][0] = C_ACC_NONE;
-    acc_conditions[Account_Condition_To_Disable - 1][1] = C_MARKET_NONE;
-    acc_conditions[Account_Condition_To_Disable - 1][2] = A_NONE;
+  if (AccountConditionToDisable > 0 && AccountConditionToDisable < ArraySize(acc_conditions)) {
+    acc_conditions[AccountConditionToDisable - 1][0] = C_ACC_NONE;
+    acc_conditions[AccountConditionToDisable - 1][1] = C_MARKET_NONE;
+    acc_conditions[AccountConditionToDisable - 1][2] = A_NONE;
   }
-  #endif
   return true;
 }
 
@@ -5618,13 +5408,13 @@ bool RSI_IncreasePeriod(ENUM_TIMEFRAMES tf = PERIOD_M1, int condition = 0) {
   bool result = condition > 0;
   UpdateIndicator(RSI, tf);
   uint period = Timeframe::TfToIndex(tf);
-  if ((condition &   1) != 0) result &= (rsi_stats[period][UPPER] > 50 + RSI_SignalLevel + RSI_SignalLevel / 2 && rsi_stats[period][LOWER] < 50 - RSI_SignalLevel - RSI_SignalLevel / 2);
-  if ((condition &   2) != 0) result &= (rsi_stats[period][UPPER] > 50 + RSI_SignalLevel + RSI_SignalLevel / 2 || rsi_stats[period][LOWER] < 50 - RSI_SignalLevel - RSI_SignalLevel / 2);
-  if ((condition &   4) != 0) result &= (rsi_stats[period][0] < 50 + RSI_SignalLevel + RSI_SignalLevel / 3 && rsi_stats[period][0] > 50 - RSI_SignalLevel - RSI_SignalLevel / 3);
-  // if ((condition &   4) != 0) result = result || rsi_stats[period][0] < 50 + RSI_SignalLevel;
-  if ((condition &   8) != 0) result &= rsi_stats[period][UPPER] - rsi_stats[period][LOWER] < 50;
-  // if ((condition &  16) != 0) result &= rsi[period][CURR] - rsi[period][PREV] > rsi[period][PREV] - rsi[period][FAR];
-  // if ((condition &  32) != 0) result &= Open[CURR] > Close[PREV];
+  if ((condition %   1) == 0) result &= (rsi_stats[period][UPPER] > 50 + RSI_SignalLevel + RSI_SignalLevel / 2 && rsi_stats[period][LOWER] < 50 - RSI_SignalLevel - RSI_SignalLevel / 2);
+  if ((condition %   2) == 0) result &= (rsi_stats[period][UPPER] > 50 + RSI_SignalLevel + RSI_SignalLevel / 2 || rsi_stats[period][LOWER] < 50 - RSI_SignalLevel - RSI_SignalLevel / 2);
+  if ((condition %   4) == 0) result &= (rsi_stats[period][0] < 50 + RSI_SignalLevel + RSI_SignalLevel / 3 && rsi_stats[period][0] > 50 - RSI_SignalLevel - RSI_SignalLevel / 3);
+  // if ((condition %   4) == 0) result = result || rsi_stats[period][0] < 50 + RSI_SignalLevel;
+  if ((condition %   8) == 0) result &= rsi_stats[period][UPPER] - rsi_stats[period][LOWER] < 50;
+  // if ((condition %  16) == 0) result &= rsi[period][CURR] - rsi[period][PREV] > rsi[period][PREV] - rsi[period][FAR];
+  // if ((condition %  32) == 0) result &= Open[CURR] > Close[PREV];
   return result;
 }
 
@@ -5633,13 +5423,13 @@ bool RSI_DecreasePeriod(ENUM_TIMEFRAMES tf = PERIOD_M1, int condition = 0) {
   bool result = condition > 0;
   UpdateIndicator(RSI, tf);
   uint period = Timeframe::TfToIndex(tf);
-  if ((condition &   1) != 0) result &= (rsi_stats[period][UPPER] <= 50 + RSI_SignalLevel && rsi_stats[period][LOWER] >= 50 - RSI_SignalLevel);
-  if ((condition &   2) != 0) result &= (rsi_stats[period][UPPER] <= 50 + RSI_SignalLevel || rsi_stats[period][LOWER] >= 50 - RSI_SignalLevel);
-  // if ((condition &   4) != 0) result &= (rsi_stats[period][0] > 50 + RSI_SignalLevel / 3 || rsi_stats[period][0] < 50 - RSI_SignalLevel / 3);
-  // if ((condition &   4) != 0) result &= rsi_stats[period][UPPER] > 50 + (RSI_SignalLevel / 3);
-  // if ((condition &   8) != 0) result &= && rsi_stats[period][UPPER] < 50 - (RSI_SignalLevel / 3);
-  // if ((condition &  16) != 0) result &= rsi[period][CURR] - rsi[period][PREV] > rsi[period][PREV] - rsi[period][FAR];
-  // if ((condition &  32) != 0) result &= Open[CURR] > Close[PREV];
+  if ((condition %   1) == 0) result &= (rsi_stats[period][UPPER] <= 50 + RSI_SignalLevel && rsi_stats[period][LOWER] >= 50 - RSI_SignalLevel);
+  if ((condition %   2) == 0) result &= (rsi_stats[period][UPPER] <= 50 + RSI_SignalLevel || rsi_stats[period][LOWER] >= 50 - RSI_SignalLevel);
+  // if ((condition %   4) == 0) result &= (rsi_stats[period][0] > 50 + RSI_SignalLevel / 3 || rsi_stats[period][0] < 50 - RSI_SignalLevel / 3);
+  // if ((condition %   4) == 0) result &= rsi_stats[period][UPPER] > 50 + (RSI_SignalLevel / 3);
+  // if ((condition %   8) == 0) result &= && rsi_stats[period][UPPER] < 50 - (RSI_SignalLevel / 3);
+  // if ((condition %  16) == 0) result &= rsi[period][CURR] - rsi[period][PREV] > rsi[period][PREV] - rsi[period][FAR];
+  // if ((condition %  32) == 0) result &= Open[CURR] > Close[PREV];
   return result;
 }
 #endif
@@ -6480,14 +6270,14 @@ bool OpenOrderCondition(ENUM_ORDER_TYPE cmd, int sid, datetime time, int method)
   double qlowest = market.GetPeakPrice(tf, MODE_LOW, qshift); // Get the lowest price since queued.
   double diff = fmax(qhighest - Open[CURR], Open[CURR] - qlowest);
   if (VerboseTrace) PrintFormat("%s(%s, %d, %s, %d)", __FUNCTION__, EnumToString(cmd), sid, DateTime:TimeToStr(time), method);
-  if ((method &   1) != 0) result &= (cmd == ORDER_TYPE_BUY && qopen < Open[CURR]) || (cmd == ORDER_TYPE_SELL && qopen > Open[CURR]);
-  if ((method &   2) != 0) result &= (cmd == ORDER_TYPE_BUY && qclose < Close[CURR]) || (cmd == ORDER_TYPE_SELL && qclose > Close[CURR]);
-  if ((method &   4) != 0) result &= (cmd == ORDER_TYPE_BUY && qlowest < Low[CURR]) || (cmd == ORDER_TYPE_SELL && qlowest > Low[CURR]);
-  if ((method &   8) != 0) result &= (cmd == ORDER_TYPE_BUY && qhighest > High[CURR]) || (cmd == ORDER_TYPE_SELL && qhighest < High[CURR]);
-  if ((method &  16) != 0) result &= UpdateIndicator(SAR, tf) && Trade_SAR(cmd, tf, 0, 0);
-  if ((method &  32) != 0) result &= UpdateIndicator(DEMARKER, tf) && Trade_DeMarker(cmd, tf, 0, 0);
-  if ((method &  64) != 0) result &= UpdateIndicator(RSI, tf) && Trade_RSI(cmd, tf, 0, 0);
-  if ((method & 128) != 0) result &= UpdateIndicator(MA, tf) && Trade_MA(cmd, tf, 0, 0);
+  if ((method %   1) == 0) result &= (cmd == ORDER_TYPE_BUY && qopen < Open[CURR]) || (cmd == ORDER_TYPE_SELL && qopen > Open[CURR]);
+  if ((method %   2) == 0) result &= (cmd == ORDER_TYPE_BUY && qclose < Close[CURR]) || (cmd == ORDER_TYPE_SELL && qclose > Close[CURR]);
+  if ((method %   4) == 0) result &= (cmd == ORDER_TYPE_BUY && qlowest < Low[CURR]) || (cmd == ORDER_TYPE_SELL && qlowest > Low[CURR]);
+  if ((method %   8) == 0) result &= (cmd == ORDER_TYPE_BUY && qhighest > High[CURR]) || (cmd == ORDER_TYPE_SELL && qhighest < High[CURR]);
+  if ((method %  16) == 0) result &= UpdateIndicator(SAR, tf) && Trade_SAR(cmd, tf, 0, 0);
+  if ((method %  32) == 0) result &= UpdateIndicator(DEMARKER, tf) && Trade_DeMarker(cmd, tf, 0, 0);
+  if ((method %  64) == 0) result &= UpdateIndicator(RSI, tf) && Trade_RSI(cmd, tf, 0, 0);
+  if ((method % 128) == 0) result &= UpdateIndicator(MA, tf) && Trade_MA(cmd, tf, 0, 0);
   return (result);
 }
 

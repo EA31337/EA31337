@@ -218,7 +218,7 @@ extern string __EA_Account_Conditions_Params__ = "-- Account conditions paramete
 extern int MarketSuddenDropSize = 20; // Drop in pips to react
 extern int MarketBigDropSize = 40; // Big drop in pips to react
 extern int MarketSpecificHour = 3; // Specific hour used for conditions (0-23)
-extern bool CloseConditionOnlyProfitable = TRUE; // Apply close condition only for profitable orders
+extern bool CloseConditionOnlyProfitable = true; // Apply close condition only for profitable orders
 extern int CloseConditionCustom1Method = 0; // Custom 1 indicator-based close condition (0-1023)
 extern int CloseConditionCustom2Method = 0; // Custom 2 indicator-based close condition (0-1023)
 extern int CloseConditionCustom3Method = 0; // Custom 3 indicator-based close condition (0-1023)
@@ -1382,10 +1382,10 @@ extern string __Backtest_Parameters__ = "-- Backtest & troubleshooting parameter
   extern bool ValidateSettings = 0; // Validate startup settings
 #endif
 extern bool RecordTicksToCSV = False; // Record ticks into CSV files
-// extern int DemoMarketStopLevel = 10; // Demo market stop level
 extern int SmartToggleComponent = 0; // Override: Toggle different components (0-43)
-extern int Account_Condition_To_Disable = 0; // Override: Disable specific n action
+extern int AccountConditionToDisable = 0; // Override: Disable specific n action
 extern bool DisableCloseConditions = FALSE; // Override: Disable all close conditions
+// extern int DemoMarketStopLevel = 10; // Demo market stop level
 
 //+------------------------------------------------------------------+
 extern string __Constants__ = "-- Constants --"; // >>> CONSTANTS <<<
