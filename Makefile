@@ -8,7 +8,7 @@ SRC=$(wildcard src/*.mq4)
 EA=EA31337
 EX4=src/$(EA).ex4
 EX5=src/$(EA).ex5
-VER=$(shell grep 'define ea_version' src/include/EA/ea-properties.mqh | grep -o '[0-9].*[0-9]')
+VER=$(shell grep 'define ea_version' src/include/EA31337/ea-properties.mqh | grep -o '[0-9].*[0-9]')
 FILE=$(lastword $(MAKEFILE_LIST)) # Determine this Makefile's path.
 OUT=releases
 MKFILE=$(abspath $(lastword $(MAKEFILE_LIST)))
@@ -46,14 +46,14 @@ test: requirements set-mode $(MQL)
 # E.g.: make set-mode MODE="__advanced__"
 set-mode:
 ifdef MODE
-	git checkout -- src/include/EA/ea-mode.mqh
-	ex -s +"%s@^\zs.*\ze#define \($(MODE)\)@@g" -cwq src/include/EA/ea-mode.mqh
+	git checkout -- src/include/EA31337/ea-mode.mqh
+	ex -s +"%s@^\zs.*\ze#define \($(MODE)\)@@g" -cwq src/include/EA31337/ea-mode.mqh
 endif
 
 set-none:
 	@echo Reverting modes.
-	git checkout -- src/include/EA/ea-mode.mqh
-	ex -s +":g@^#define@s@^@//" -cwq src/include/EA/ea-mode.mqh
+	git checkout -- src/include/EA31337/ea-mode.mqh
+	ex -s +":g@^#define@s@^@//" -cwq src/include/EA31337/ea-mode.mqh
 
 set-lite: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__release__"
@@ -161,10 +161,10 @@ $(OUT)/$(EA)-Rider-%.ex4: \
 		set-none
 	cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-v$(VER).ex4"
 
-$(OUT)/$(EA).ex4: src/$(EA).mq4 src/include/EA/ea-mode.mqh
+$(OUT)/$(EA).ex4: src/$(EA).mq4 src/include/EA31337/ea-mode.mqh
 	wine mql.exe /o /i:src /mql4 $(SRC)
 
-$(OUT)/$(EA).ex5: src/$(EA).mq4 src/include/EA/ea-mode.mqh
+$(OUT)/$(EA).ex5: src/$(EA).mq4 src/include/EA31337/ea-mode.mqh
 	wine mql.exe /o /i:src /mql5 $(SRC)
 
 mt4-install:
