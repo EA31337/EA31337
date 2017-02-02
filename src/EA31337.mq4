@@ -575,8 +575,8 @@ bool EA_Trade() {
       }
 
       if (!DisableCloseConditions) {
-        if (CheckMarketEvent(ORDER_TYPE_BUY,  PERIOD_M30, info[id][CLOSE_CONDITION])) CloseOrdersByType(ORDER_TYPE_SELL, id, NULL, CloseConditionOnlyProfitable); // TODO: reason_id
-        if (CheckMarketEvent(ORDER_TYPE_SELL, PERIOD_M30, info[id][CLOSE_CONDITION])) CloseOrdersByType(ORDER_TYPE_BUY,  id, NULL, CloseConditionOnlyProfitable); // TODO: reason_id
+        if (CheckMarketEvent(ORDER_TYPE_BUY,  (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][CLOSE_CONDITION])) CloseOrdersByType(ORDER_TYPE_SELL, id, NULL, CloseConditionOnlyProfitable); // TODO: reason_id
+        if (CheckMarketEvent(ORDER_TYPE_SELL, (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][CLOSE_CONDITION])) CloseOrdersByType(ORDER_TYPE_BUY,  id, NULL, CloseConditionOnlyProfitable); // TODO: reason_id
       }
 
       #ifdef __advanced__
