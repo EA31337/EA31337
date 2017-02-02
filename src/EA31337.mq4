@@ -588,13 +588,12 @@ bool EA_Trade() {
 
       if (_cmd != EMPTY) {
         order_placed &= ExecuteOrder(_cmd, id);
-        if (order_placed) {
-          if (VerboseDebug) {
-            PrintFormat("%s:%d: %s%s on %s at %s",
-              __FUNCTION__, __LINE__, sname[id], info[id][TIMEFRAME], Order::OrderTypeToString(_cmd),
-              DateTime::TimeToStr(TimeCurrent())
-            );
-          }
+        if (VerboseDebug) {
+          PrintFormat("%s:%d: %s%s on %s at %s: %s",
+            __FUNCTION__, __LINE__, sname[id], info[id][TIMEFRAME], Order::OrderTypeToString(_cmd),
+            DateTime::TimeToStr(TimeCurrent()),
+            order_placed ? "SUCCESS" : "IGNORE"
+          );
         }
       }
 
@@ -1320,10 +1319,10 @@ bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = true)
     Msg::ShowText(last_msg, "Info", __FUNCTION__, __LINE__, VerboseInfo);
     last_debug = Msg::ShowText(Order::OrderTypeToString((ENUM_ORDER_TYPE) Order::OrderType()), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
     #ifdef __advanced__
-      if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(Order::GetOrderProfit()) + " pips, reason: " + ReasonIdToText(reason_id) + "; " + Order::GetOrderToText());
+      if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(Order::GetOrderProfit(), 0) + " pips, reason: " + ReasonIdToText(reason_id) + "; " + Order::GetOrderToText());
       if (SmartQueueActive) OrderQueueProcess();
     #else
-      if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(Order::GetOrderProfit()) + " pips; " + Order::OrderTypeToString((ENUM_ORDER_TYPE) Order::OrderType()));
+      if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(Order::GetOrderProfit(), 0) + " pips; " + Order::OrderTypeToString((ENUM_ORDER_TYPE) Order::OrderType()));
     #endif
   } else {
     err_code = GetLastError();
@@ -1627,16 +1626,18 @@ bool Trade_Alligator(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int si
         alligator[period][CURR][LIPS] > alligator[period][CURR][JAW] + gap && // ... Lips are above Jaw ...
         alligator[period][CURR][TEETH] > alligator[period][CURR][JAW] + gap // ... Teeth are above Jaw ...
         );
-      if ((signal_method %   1) == 0) result &= alligator[period][PREV][LIPS] > alligator[period][PREV][TEETH]; // Check if previous Lips were above Teeth.
-      if ((signal_method %   2) == 0) result &= alligator[period][PREV][LIPS] > alligator[period][PREV][JAW]; // Check if previous Lips were above Jaw.
-      if ((signal_method %   4) == 0) result &= alligator[period][PREV][TEETH] > alligator[period][PREV][JAW]; // Check if previous Teeth were above Jaw.
-      if ((signal_method %   8) == 0) result &= alligator[period][CURR][LIPS] < alligator[period][PREV][LIPS]; // Check if Lips decreased since last bar.
-      if ((signal_method %  16) == 0) result &= alligator[period][CURR][LIPS] - alligator[period][PREV][TEETH] > alligator[period][PREV][TEETH] - alligator[period][PREV][JAW];
-      if ((signal_method %  32) == 0) result &= (
-        alligator[period][FAR][LIPS] < alligator[period][FAR][TEETH] || // Check if Lips are below Teeth and ...
-        alligator[period][FAR][LIPS] < alligator[period][FAR][JAW] || // ... Lips are below Jaw and ...
-        alligator[period][FAR][TEETH] < alligator[period][FAR][JAW] // ... Teeth are below Jaw ...
-        );
+      if (signal_method != 0) {
+        if ((signal_method %   1) == 0) result &= alligator[period][PREV][LIPS] > alligator[period][PREV][TEETH]; // Check if previous Lips were above Teeth.
+        if ((signal_method %   2) == 0) result &= alligator[period][PREV][LIPS] > alligator[period][PREV][JAW]; // Check if previous Lips were above Jaw.
+        if ((signal_method %   4) == 0) result &= alligator[period][PREV][TEETH] > alligator[period][PREV][JAW]; // Check if previous Teeth were above Jaw.
+        if ((signal_method %   8) == 0) result &= alligator[period][CURR][LIPS] < alligator[period][PREV][LIPS]; // Check if Lips decreased since last bar.
+        if ((signal_method %  16) == 0) result &= alligator[period][CURR][LIPS] - alligator[period][PREV][TEETH] > alligator[period][PREV][TEETH] - alligator[period][PREV][JAW];
+        if ((signal_method %  32) == 0) result &= (
+          alligator[period][FAR][LIPS] < alligator[period][FAR][TEETH] || // Check if Lips are below Teeth and ...
+          alligator[period][FAR][LIPS] < alligator[period][FAR][JAW] || // ... Lips are below Jaw and ...
+          alligator[period][FAR][TEETH] < alligator[period][FAR][JAW] // ... Teeth are below Jaw ...
+          );
+      }
       /* TODO:
             //3. Alligator & Fractals
             //Buy: all 3 Alligator lines grow/ don't fall/ (3 periods in succession) and fractal (upper line) is above teeth
@@ -1666,16 +1667,18 @@ bool Trade_Alligator(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int si
         alligator[period][CURR][LIPS] + gap < alligator[period][CURR][JAW] && // ... Lips are below Jaw and ...
         alligator[period][CURR][TEETH] + gap < alligator[period][CURR][JAW] // ... Teeth are below Jaw ...
         );
-      if ((signal_method %   1) == 0) result &= alligator[period][PREV][LIPS] < alligator[period][PREV][TEETH]; // Check if previous Lips were below Teeth.
-      if ((signal_method %   2) == 0) result &= alligator[period][PREV][LIPS] < alligator[period][PREV][JAW]; // Previous Lips were below Jaw.
-      if ((signal_method %   4) == 0) result &= alligator[period][PREV][TEETH] < alligator[period][PREV][JAW]; // Previous Teeth were below Jaw.
-      if ((signal_method %   8) == 0) result &= alligator[period][CURR][LIPS] > alligator[period][PREV][LIPS]; // Check if Lips increased since last bar.
-      if ((signal_method %  16) == 0) result &= alligator[period][PREV][TEETH] - alligator[period][CURR][LIPS] > alligator[period][PREV][JAW] - alligator[period][PREV][TEETH];
-      if ((signal_method %  32) == 0) result &= (
-        alligator[period][FAR][LIPS] > alligator[period][FAR][TEETH] || // Check if Lips are above Teeth ...
-        alligator[period][FAR][LIPS] > alligator[period][FAR][JAW] || // ... Lips are above Jaw ...
-        alligator[period][FAR][TEETH] > alligator[period][FAR][JAW] // ... Teeth are above Jaw ...
-        );
+      if (signal_method != 0) {
+        if ((signal_method %   1) == 0) result &= alligator[period][PREV][LIPS] < alligator[period][PREV][TEETH]; // Check if previous Lips were below Teeth.
+        if ((signal_method %   2) == 0) result &= alligator[period][PREV][LIPS] < alligator[period][PREV][JAW]; // Previous Lips were below Jaw.
+        if ((signal_method %   4) == 0) result &= alligator[period][PREV][TEETH] < alligator[period][PREV][JAW]; // Previous Teeth were below Jaw.
+        if ((signal_method %   8) == 0) result &= alligator[period][CURR][LIPS] > alligator[period][PREV][LIPS]; // Check if Lips increased since last bar.
+        if ((signal_method %  16) == 0) result &= alligator[period][PREV][TEETH] - alligator[period][CURR][LIPS] > alligator[period][PREV][JAW] - alligator[period][PREV][TEETH];
+        if ((signal_method %  32) == 0) result &= (
+          alligator[period][FAR][LIPS] > alligator[period][FAR][TEETH] || // Check if Lips are above Teeth ...
+          alligator[period][FAR][LIPS] > alligator[period][FAR][JAW] || // ... Lips are above Jaw ...
+          alligator[period][FAR][TEETH] > alligator[period][FAR][JAW] // ... Teeth are above Jaw ...
+          );
+      }
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
@@ -1811,28 +1814,33 @@ bool Trade_Bands(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal
           lowest < fmax(fmax(bands[period][CURR][BANDS_LOWER], bands[period][PREV][BANDS_LOWER]), bands[period][FAR][BANDS_LOWER])
           );
       // Buy: price crossed lower line upwards (returned to it from below).
-      if ((signal_method %   1) == 0) result &= fmin(Close[PREV], Close[FAR]) < bands[period][CURR][BANDS_LOWER];
-      if ((signal_method %   2) == 0) result &= (bands[period][CURR][BANDS_LOWER] > bands[period][FAR][BANDS_LOWER]);
-      if ((signal_method %   4) == 0) result &= (bands[period][CURR][BANDS_BASE] > bands[period][FAR][BANDS_BASE]);
-      if ((signal_method %   8) == 0) result &= (bands[period][CURR][BANDS_UPPER] > bands[period][FAR][BANDS_UPPER]);
-      if ((signal_method %  16) == 0) result &= highest > bands[period][CURR][BANDS_BASE];
-      if ((signal_method %  32) == 0) result &= Open[CURR] < bands[period][CURR][BANDS_BASE];
-      if ((signal_method %  64) == 0) result &= fmin(Close[PREV], Close[FAR]) > bands[period][CURR][BANDS_BASE];
-      // if ((signal_method % 128) == 0) result &= !Trade_Bands(Convert::NegateOrderType(cmd), (ENUM_TIMEFRAMES) Convert::IndexToTf(fmin(period + 1, M30)));
+      if (signal_method != 0) {
+        if ((signal_method %   1) == 0) result &= fmin(Close[PREV], Close[FAR]) < bands[period][CURR][BANDS_LOWER];
+        if ((signal_method %   2) == 0) result &= (bands[period][CURR][BANDS_LOWER] > bands[period][FAR][BANDS_LOWER]);
+        if ((signal_method %   4) == 0) result &= (bands[period][CURR][BANDS_BASE] > bands[period][FAR][BANDS_BASE]);
+        if ((signal_method %   8) == 0) result &= (bands[period][CURR][BANDS_UPPER] > bands[period][FAR][BANDS_UPPER]);
+        if ((signal_method %  16) == 0) result &= highest > bands[period][CURR][BANDS_BASE];
+        if ((signal_method %  32) == 0) result &= Open[CURR] < bands[period][CURR][BANDS_BASE];
+        if ((signal_method %  64) == 0) result &= fmin(Close[PREV], Close[FAR]) > bands[period][CURR][BANDS_BASE];
+        // if ((signal_method % 128) == 0) result &= !Trade_Bands(Convert::NegateOrderType(cmd), (ENUM_TIMEFRAMES) Convert::IndexToTf(fmin(period + 1, M30)));
+      }
+      break;
     case ORDER_TYPE_SELL:
       // Price value was higher than the upper band.
       result = (
           highest > fmin(fmin(bands[period][CURR][BANDS_UPPER], bands[period][PREV][BANDS_UPPER]), bands[period][FAR][BANDS_UPPER])
           );
       // Sell: price crossed upper line downwards (returned to it from above).
-      if ((signal_method %   1) == 0) result &= fmin(Close[PREV], Close[FAR]) > bands[period][CURR][BANDS_UPPER];
-      if ((signal_method %   2) == 0) result &= (bands[period][CURR][BANDS_LOWER] < bands[period][FAR][BANDS_LOWER]);
-      if ((signal_method %   4) == 0) result &= (bands[period][CURR][BANDS_BASE] < bands[period][FAR][BANDS_BASE]);
-      if ((signal_method %   8) == 0) result &= (bands[period][CURR][BANDS_UPPER] < bands[period][FAR][BANDS_UPPER]);
-      if ((signal_method %  16) == 0) result &= lowest < bands[period][CURR][BANDS_BASE];
-      if ((signal_method %  32) == 0) result &= Open[CURR] > bands[period][CURR][BANDS_BASE];
-      if ((signal_method %  64) == 0) result &= fmin(Close[PREV], Close[FAR]) < bands[period][CURR][BANDS_BASE];
-      // if ((signal_method % 128) == 0) result &= !Trade_Bands(Convert::NegateOrderType(cmd), (ENUM_TIMEFRAMES) Convert::IndexToTf(fmin(period + 1, M30)));
+      if (signal_method != 0) {
+        if ((signal_method %   1) == 0) result &= fmin(Close[PREV], Close[FAR]) > bands[period][CURR][BANDS_UPPER];
+        if ((signal_method %   2) == 0) result &= (bands[period][CURR][BANDS_LOWER] < bands[period][FAR][BANDS_LOWER]);
+        if ((signal_method %   4) == 0) result &= (bands[period][CURR][BANDS_BASE] < bands[period][FAR][BANDS_BASE]);
+        if ((signal_method %   8) == 0) result &= (bands[period][CURR][BANDS_UPPER] < bands[period][FAR][BANDS_UPPER]);
+        if ((signal_method %  16) == 0) result &= lowest < bands[period][CURR][BANDS_BASE];
+        if ((signal_method %  32) == 0) result &= Open[CURR] > bands[period][CURR][BANDS_BASE];
+        if ((signal_method %  64) == 0) result &= fmin(Close[PREV], Close[FAR]) < bands[period][CURR][BANDS_BASE];
+        // if ((signal_method % 128) == 0) result &= !Trade_Bands(Convert::NegateOrderType(cmd), (ENUM_TIMEFRAMES) Convert::IndexToTf(fmin(period + 1, M30)));
+      }
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
@@ -2037,20 +2045,24 @@ bool Trade_DeMarker(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sig
   switch (cmd) {
     case ORDER_TYPE_BUY:
       result = demarker[period][CURR] < 0.5 - signal_level;
-      if ((signal_method %   1) == 0) result &= demarker[period][PREV] < 0.5 - signal_level;
-      if ((signal_method %   2) == 0) result &= demarker[period][FAR] < 0.5 - signal_level;
-      if ((signal_method %   4) == 0) result &= demarker[period][CURR] < demarker[period][PREV];
-      if ((signal_method %   8) == 0) result &= demarker[period][PREV] < demarker[period][FAR];
-      if ((signal_method %  16) == 0) result &= demarker[period][PREV] < 0.5 - signal_level - signal_level/2;
+      if (signal_method != 0) {
+        if ((signal_method %   1) == 0) result &= demarker[period][PREV] < 0.5 - signal_level;
+        if ((signal_method %   2) == 0) result &= demarker[period][FAR] < 0.5 - signal_level;
+        if ((signal_method %   4) == 0) result &= demarker[period][CURR] < demarker[period][PREV];
+        if ((signal_method %   8) == 0) result &= demarker[period][PREV] < demarker[period][FAR];
+        if ((signal_method %  16) == 0) result &= demarker[period][PREV] < 0.5 - signal_level - signal_level/2;
+      }
       // PrintFormat("DeMarker buy: %g <= %g", demarker[period][CURR], 0.5 - signal_level);
       break;
     case ORDER_TYPE_SELL:
       result = demarker[period][CURR] > 0.5 + signal_level;
-      if ((signal_method %   1) == 0) result &= demarker[period][PREV] > 0.5 + signal_level;
-      if ((signal_method %   2) == 0) result &= demarker[period][FAR] > 0.5 + signal_level;
-      if ((signal_method %   4) == 0) result &= demarker[period][CURR] > demarker[period][PREV];
-      if ((signal_method %   8) == 0) result &= demarker[period][PREV] > demarker[period][FAR];
-      if ((signal_method %  16) == 0) result &= demarker[period][PREV] > 0.5 + signal_level + signal_level/2;
+      if (signal_method != 0) {
+        if ((signal_method %   1) == 0) result &= demarker[period][PREV] > 0.5 + signal_level;
+        if ((signal_method %   2) == 0) result &= demarker[period][FAR] > 0.5 + signal_level;
+        if ((signal_method %   4) == 0) result &= demarker[period][CURR] > demarker[period][PREV];
+        if ((signal_method %   8) == 0) result &= demarker[period][PREV] > demarker[period][FAR];
+        if ((signal_method %  16) == 0) result &= demarker[period][PREV] > 0.5 + signal_level + signal_level/2;
+      }
       // PrintFormat("DeMarker sell: %g >= %g", demarker[period][CURR], 0.5 + signal_level);
       break;
   }
@@ -2079,26 +2091,30 @@ bool Trade_Envelopes(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int si
     case ORDER_TYPE_BUY:
       result = Low[CURR] < envelopes[period][CURR][LOWER] || Low[PREV] < envelopes[period][CURR][LOWER]; // price low was below the lower band
       // result = result || (envelopes[period][CURR][MODE_MAIN] > envelopes[period][FAR][MODE_MAIN] && Open[CURR] > envelopes[period][CURR][UPPER]);
-      if ((signal_method %   1) == 0) result &= Open[CURR] > envelopes[period][CURR][LOWER]; // FIXME
-      if ((signal_method %   2) == 0) result &= envelopes[period][CURR][MODE_MAIN] < envelopes[period][PREV][MODE_MAIN];
-      if ((signal_method %   4) == 0) result &= envelopes[period][CURR][LOWER] < envelopes[period][PREV][LOWER];
-      if ((signal_method %   8) == 0) result &= envelopes[period][CURR][UPPER] < envelopes[period][PREV][UPPER];
-      if ((signal_method %  16) == 0) result &= envelopes[period][CURR][UPPER] - envelopes[period][CURR][LOWER] > envelopes[period][PREV][UPPER] - envelopes[period][PREV][LOWER];
-      if ((signal_method %  32) == 0) result &= Ask < envelopes[period][CURR][MODE_MAIN];
-      if ((signal_method %  64) == 0) result &= Close[CURR] < envelopes[period][CURR][UPPER];
-      //if ((signal_method % 128) == 0) result &= Ask > Close[PREV];
+      if (signal_method != 0) {
+        if ((signal_method %   1) == 0) result &= Open[CURR] > envelopes[period][CURR][LOWER]; // FIXME
+        if ((signal_method %   2) == 0) result &= envelopes[period][CURR][MODE_MAIN] < envelopes[period][PREV][MODE_MAIN];
+        if ((signal_method %   4) == 0) result &= envelopes[period][CURR][LOWER] < envelopes[period][PREV][LOWER];
+        if ((signal_method %   8) == 0) result &= envelopes[period][CURR][UPPER] < envelopes[period][PREV][UPPER];
+        if ((signal_method %  16) == 0) result &= envelopes[period][CURR][UPPER] - envelopes[period][CURR][LOWER] > envelopes[period][PREV][UPPER] - envelopes[period][PREV][LOWER];
+        if ((signal_method %  32) == 0) result &= Ask < envelopes[period][CURR][MODE_MAIN];
+        if ((signal_method %  64) == 0) result &= Close[CURR] < envelopes[period][CURR][UPPER];
+        //if ((signal_method % 128) == 0) result &= Ask > Close[PREV];
+      }
       break;
     case ORDER_TYPE_SELL:
       result = High[CURR] > envelopes[period][CURR][UPPER] || High[PREV] > envelopes[period][CURR][UPPER]; // price high was above the upper band
       // result = result || (envelopes[period][CURR][MODE_MAIN] < envelopes[period][FAR][MODE_MAIN] && Open[CURR] < envelopes[period][CURR][LOWER]);
-      if ((signal_method %   1) == 0) result &= Open[CURR] < envelopes[period][CURR][UPPER]; // FIXME
-      if ((signal_method %   2) == 0) result &= envelopes[period][CURR][MODE_MAIN] > envelopes[period][PREV][MODE_MAIN];
-      if ((signal_method %   4) == 0) result &= envelopes[period][CURR][LOWER] > envelopes[period][PREV][LOWER];
-      if ((signal_method %   8) == 0) result &= envelopes[period][CURR][UPPER] > envelopes[period][PREV][UPPER];
-      if ((signal_method %  16) == 0) result &= envelopes[period][CURR][UPPER] - envelopes[period][CURR][LOWER] > envelopes[period][PREV][UPPER] - envelopes[period][PREV][LOWER];
-      if ((signal_method %  32) == 0) result &= Ask > envelopes[period][CURR][MODE_MAIN];
-      if ((signal_method %  64) == 0) result &= Close[CURR] > envelopes[period][CURR][UPPER];
-      //if ((signal_method % 128) == 0) result &= Ask < Close[PREV];
+      if (signal_method != 0) {
+        if ((signal_method %   1) == 0) result &= Open[CURR] < envelopes[period][CURR][UPPER]; // FIXME
+        if ((signal_method %   2) == 0) result &= envelopes[period][CURR][MODE_MAIN] > envelopes[period][PREV][MODE_MAIN];
+        if ((signal_method %   4) == 0) result &= envelopes[period][CURR][LOWER] > envelopes[period][PREV][LOWER];
+        if ((signal_method %   8) == 0) result &= envelopes[period][CURR][UPPER] > envelopes[period][PREV][UPPER];
+        if ((signal_method %  16) == 0) result &= envelopes[period][CURR][UPPER] - envelopes[period][CURR][LOWER] > envelopes[period][PREV][UPPER] - envelopes[period][PREV][LOWER];
+        if ((signal_method %  32) == 0) result &= Ask > envelopes[period][CURR][MODE_MAIN];
+        if ((signal_method %  64) == 0) result &= Close[CURR] > envelopes[period][CURR][UPPER];
+        //if ((signal_method % 128) == 0) result &= Ask < Close[PREV];
+      }
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
@@ -2294,24 +2310,28 @@ bool Trade_MA(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_me
     case ORDER_TYPE_BUY:
       result  = ma_fast[period][CURR]   > ma_medium[period][CURR] + gap;
       result &= ma_medium[period][CURR] > ma_slow[period][CURR];
-      if ((signal_method %   1) == 0) result &= ma_fast[period][CURR] > ma_slow[period][CURR] + gap;
-      if ((signal_method %   2) == 0) result &= ma_medium[period][CURR] > ma_slow[period][CURR];
-      if ((signal_method %   4) == 0) result &= ma_slow[period][CURR] > ma_slow[period][PREV];
-      if ((signal_method %   8) == 0) result &= ma_fast[period][CURR] > ma_fast[period][PREV];
-      if ((signal_method %  16) == 0) result &= ma_fast[period][CURR] - ma_medium[period][CURR] > ma_medium[period][CURR] - ma_slow[period][CURR];
-      if ((signal_method %  32) == 0) result &= (ma_medium[period][PREV] < ma_slow[period][PREV] || ma_medium[period][FAR] < ma_slow[period][FAR]);
-      if ((signal_method %  64) == 0) result &= (ma_fast[period][PREV] < ma_medium[period][PREV] || ma_fast[period][FAR] < ma_medium[period][FAR]);
+      if (signal_method != 0) {
+        if ((signal_method %   1) == 0) result &= ma_fast[period][CURR] > ma_slow[period][CURR] + gap;
+        if ((signal_method %   2) == 0) result &= ma_medium[period][CURR] > ma_slow[period][CURR];
+        if ((signal_method %   4) == 0) result &= ma_slow[period][CURR] > ma_slow[period][PREV];
+        if ((signal_method %   8) == 0) result &= ma_fast[period][CURR] > ma_fast[period][PREV];
+        if ((signal_method %  16) == 0) result &= ma_fast[period][CURR] - ma_medium[period][CURR] > ma_medium[period][CURR] - ma_slow[period][CURR];
+        if ((signal_method %  32) == 0) result &= (ma_medium[period][PREV] < ma_slow[period][PREV] || ma_medium[period][FAR] < ma_slow[period][FAR]);
+        if ((signal_method %  64) == 0) result &= (ma_fast[period][PREV] < ma_medium[period][PREV] || ma_fast[period][FAR] < ma_medium[period][FAR]);
+      }
       break;
     case ORDER_TYPE_SELL:
       result  = ma_fast[period][CURR]   < ma_medium[period][CURR] - gap;
       result &= ma_medium[period][CURR] < ma_slow[period][CURR];
-      if ((signal_method %   1) == 0) result &= ma_fast[period][CURR] < ma_slow[period][CURR] - gap;
-      if ((signal_method %   2) == 0) result &= ma_medium[period][CURR] < ma_slow[period][CURR];
-      if ((signal_method %   4) == 0) result &= ma_slow[period][CURR] < ma_slow[period][PREV];
-      if ((signal_method %   8) == 0) result &= ma_fast[period][CURR] < ma_fast[period][PREV];
-      if ((signal_method %  16) == 0) result &= ma_medium[period][CURR] - ma_fast[period][CURR] > ma_slow[period][CURR] - ma_medium[period][CURR];
-      if ((signal_method %  32) == 0) result &= (ma_medium[period][PREV] > ma_slow[period][PREV] || ma_medium[period][FAR] > ma_slow[period][FAR]);
-      if ((signal_method %  64) == 0) result &= (ma_fast[period][PREV] > ma_medium[period][PREV] || ma_fast[period][FAR] > ma_medium[period][FAR]);
+      if (signal_method != 0) {
+        if ((signal_method %   1) == 0) result &= ma_fast[period][CURR] < ma_slow[period][CURR] - gap;
+        if ((signal_method %   2) == 0) result &= ma_medium[period][CURR] < ma_slow[period][CURR];
+        if ((signal_method %   4) == 0) result &= ma_slow[period][CURR] < ma_slow[period][PREV];
+        if ((signal_method %   8) == 0) result &= ma_fast[period][CURR] < ma_fast[period][PREV];
+        if ((signal_method %  16) == 0) result &= ma_medium[period][CURR] - ma_fast[period][CURR] > ma_slow[period][CURR] - ma_medium[period][CURR];
+        if ((signal_method %  32) == 0) result &= (ma_medium[period][PREV] > ma_slow[period][PREV] || ma_medium[period][FAR] > ma_slow[period][FAR]);
+        if ((signal_method %  64) == 0) result &= (ma_fast[period][PREV] > ma_medium[period][PREV] || ma_fast[period][FAR] > ma_medium[period][FAR]);
+      }
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
@@ -2360,19 +2380,23 @@ bool Trade_MACD(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_
     */
     case ORDER_TYPE_BUY:
       result = macd[period][CURR][MODE_MAIN] > macd[period][CURR][MODE_SIGNAL] + gap; // MACD rises above the signal line.
-      if ((signal_method %   1) == 0) result &= macd[period][FAR][MODE_MAIN] < macd[period][FAR][MODE_SIGNAL];
-      if ((signal_method %   2) == 0) result &= macd[period][CURR][MODE_MAIN] >= 0;
-      if ((signal_method %   4) == 0) result &= macd[period][PREV][MODE_MAIN] < 0;
-      if ((signal_method %   8) == 0) result &= ma_fast[period][CURR] > ma_fast[period][PREV];
-      if ((signal_method %  16) == 0) result &= ma_fast[period][CURR] > ma_medium[period][CURR];
+      if (signal_method != 0) {
+        if ((signal_method %   1) == 0) result &= macd[period][FAR][MODE_MAIN] < macd[period][FAR][MODE_SIGNAL];
+        if ((signal_method %   2) == 0) result &= macd[period][CURR][MODE_MAIN] >= 0;
+        if ((signal_method %   4) == 0) result &= macd[period][PREV][MODE_MAIN] < 0;
+        if ((signal_method %   8) == 0) result &= ma_fast[period][CURR] > ma_fast[period][PREV];
+        if ((signal_method %  16) == 0) result &= ma_fast[period][CURR] > ma_medium[period][CURR];
+      }
       break;
     case ORDER_TYPE_SELL:
       result = macd[period][CURR][MODE_MAIN] < macd[period][CURR][MODE_SIGNAL] - gap; // MACD falls below the signal line.
-      if ((signal_method %   1) == 0) result &= macd[period][FAR][MODE_MAIN] > macd[period][FAR][MODE_SIGNAL];
-      if ((signal_method %   2) == 0) result &= macd[period][CURR][MODE_MAIN] <= 0;
-      if ((signal_method %   4) == 0) result &= macd[period][PREV][MODE_MAIN] > 0;
-      if ((signal_method %   8) == 0) result &= ma_fast[period][CURR] < ma_fast[period][PREV];
-      if ((signal_method %  16) == 0) result &= ma_fast[period][CURR] < ma_medium[period][CURR];
+      if (signal_method != 0) {
+        if ((signal_method %   1) == 0) result &= macd[period][FAR][MODE_MAIN] > macd[period][FAR][MODE_SIGNAL];
+        if ((signal_method %   2) == 0) result &= macd[period][CURR][MODE_MAIN] <= 0;
+        if ((signal_method %   4) == 0) result &= macd[period][PREV][MODE_MAIN] > 0;
+        if ((signal_method %   8) == 0) result &= ma_fast[period][CURR] < ma_fast[period][PREV];
+        if ((signal_method %  16) == 0) result &= ma_fast[period][CURR] < ma_medium[period][CURR];
+      }
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
@@ -2518,35 +2542,41 @@ bool Trade_OSMA(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_
  *   signal_level - signal level to consider the signal
  */
 bool Trade_RSI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
+  bool result = false; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_RSI, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_RSI, tf, 0);
   if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(S_RSI, tf, 20);
   switch (cmd) {
     case ORDER_TYPE_BUY:
       result = rsi[period][CURR] <= (50 - signal_level);
-      if ((signal_method %   1) == 0) result &= rsi[period][CURR] < rsi[period][PREV];
-      if ((signal_method %   2) == 0) result &= rsi[period][PREV] < rsi[period][FAR];
-      if ((signal_method %   4) == 0) result &= rsi[period][PREV] < (50 - signal_level);
-      if ((signal_method %   8) == 0) result &= rsi[period][FAR]  < (50 - signal_level);
-      if ((signal_method %  16) == 0) result &= rsi[period][CURR] - rsi[period][PREV] > rsi[period][PREV] - rsi[period][FAR];
-      if ((signal_method %  32) == 0) result &= rsi[period][FAR] > 50;
-      //if ((signal_method %  32) == 0) result &= Open[CURR] > Close[PREV];
-      //if ((signal_method % 128) == 0) result &= !RSI_On_Sell(M30);
+      PrintFormat("%s: %s: %.1f <= %1.f = %d", __FUNCTION__, EnumToString(cmd), rsi[period][CURR], (50 - signal_level), result);
+      if (signal_method != 0) {
+        if ((signal_method %   1) == 0) result &= rsi[period][CURR] < rsi[period][PREV];
+        if ((signal_method %   2) == 0) result &= rsi[period][PREV] < rsi[period][FAR];
+        if ((signal_method %   4) == 0) result &= rsi[period][PREV] < (50 - signal_level);
+        if ((signal_method %   8) == 0) result &= rsi[period][FAR]  < (50 - signal_level);
+        if ((signal_method %  16) == 0) result &= rsi[period][CURR] - rsi[period][PREV] > rsi[period][PREV] - rsi[period][FAR];
+        if ((signal_method %  32) == 0) result &= rsi[period][FAR] > 50;
+        //if ((signal_method %  32) == 0) result &= Open[CURR] > Close[PREV];
+        //if ((signal_method % 128) == 0) result &= !RSI_On_Sell(M30);
+      }
       break;
     case ORDER_TYPE_SELL:
       result = rsi[period][CURR] >= (50 + signal_level);
-      if ((signal_method %   1) == 0) result &= rsi[period][CURR] > rsi[period][PREV];
-      if ((signal_method %   2) == 0) result &= rsi[period][PREV] > rsi[period][FAR];
-      if ((signal_method %   4) == 0) result &= rsi[period][PREV] > (50 + signal_level);
-      if ((signal_method %   8) == 0) result &= rsi[period][FAR]  > (50 + signal_level);
-      if ((signal_method %  16) == 0) result &= rsi[period][PREV] - rsi[period][CURR] > rsi[period][FAR] - rsi[period][PREV];
-      if ((signal_method %  32) == 0) result &= rsi[period][FAR] < 50;
-      //if ((signal_method %  32) == 0) result &= Open[CURR] < Close[PREV];
-      //if ((signal_method % 128) == 0) result &= !RSI_On_Buy(M30);
+      PrintFormat("%s: %.1f >= %1.f = %d", EnumToString(cmd), rsi[period][CURR], (50 + signal_level), result);
+      if (signal_method != 0) {
+        if ((signal_method %   1) == 0) result &= rsi[period][CURR] > rsi[period][PREV];
+        if ((signal_method %   2) == 0) result &= rsi[period][PREV] > rsi[period][FAR];
+        if ((signal_method %   4) == 0) result &= rsi[period][PREV] > (50 + signal_level);
+        if ((signal_method %   8) == 0) result &= rsi[period][FAR]  > (50 + signal_level);
+        if ((signal_method %  16) == 0) result &= rsi[period][PREV] - rsi[period][CURR] > rsi[period][FAR] - rsi[period][PREV];
+        if ((signal_method %  32) == 0) result &= rsi[period][FAR] < 50;
+        //if ((signal_method %  32) == 0) result &= Open[CURR] < Close[PREV];
+        //if ((signal_method % 128) == 0) result &= !RSI_On_Buy(M30);
+      }
       break;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method < 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
     PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
   }
@@ -2608,13 +2638,15 @@ bool Trade_SAR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
   switch (cmd) {
     case ORDER_TYPE_BUY:
       result = sar[period][CURR] + gap < Open[CURR] || sar[period][PREV] + gap < Open[PREV];
-      if ((signal_method %   1) == 0) result &= sar[period][PREV] - gap > Ask;
-      if ((signal_method %   2) == 0) result &= sar[period][CURR] < sar[period][PREV];
-      if ((signal_method %   4) == 0) result &= sar[period][CURR] - sar[period][PREV] <= sar[period][PREV] - sar[period][FAR];
-      if ((signal_method %   8) == 0) result &= sar[period][FAR] > Ask;
-      if ((signal_method %  16) == 0) result &= sar[period][CURR] <= Close[CURR];
-      if ((signal_method %  32) == 0) result &= sar[period][PREV] > Close[PREV];
-      if ((signal_method %  64) == 0) result &= sar[period][PREV] > Open[PREV];
+      if (signal_method != 0) {
+        if ((signal_method %   1) == 0) result &= sar[period][PREV] - gap > Ask;
+        if ((signal_method %   2) == 0) result &= sar[period][CURR] < sar[period][PREV];
+        if ((signal_method %   4) == 0) result &= sar[period][CURR] - sar[period][PREV] <= sar[period][PREV] - sar[period][FAR];
+        if ((signal_method %   8) == 0) result &= sar[period][FAR] > Ask;
+        if ((signal_method %  16) == 0) result &= sar[period][CURR] <= Close[CURR];
+        if ((signal_method %  32) == 0) result &= sar[period][PREV] > Close[PREV];
+        if ((signal_method %  64) == 0) result &= sar[period][PREV] > Open[PREV];
+      }
       if (result) {
         // FIXME: Convert into more flexible way.
         signals[DAILY][SAR1][period][ORDER_TYPE_BUY]++; signals[WEEKLY][SAR1][period][ORDER_TYPE_BUY]++;
@@ -2623,13 +2655,15 @@ bool Trade_SAR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
       break;
     case ORDER_TYPE_SELL:
       result = sar[period][CURR] - gap > Open[CURR] || sar[period][PREV] - gap > Open[PREV];
-      if ((signal_method %   1) == 0) result &= sar[period][PREV] + gap < Ask;
-      if ((signal_method %   2) == 0) result &= sar[period][CURR] > sar[period][PREV];
-      if ((signal_method %   4) == 0) result &= sar[period][PREV] - sar[period][CURR] <= sar[period][FAR] - sar[period][PREV];
-      if ((signal_method %   8) == 0) result &= sar[period][FAR] < Ask;
-      if ((signal_method %  16) == 0) result &= sar[period][CURR] >= Close[CURR];
-      if ((signal_method %  32) == 0) result &= sar[period][PREV] < Close[PREV];
-      if ((signal_method %  64) == 0) result &= sar[period][PREV] < Open[PREV];
+      if (signal_method != 0) {
+        if ((signal_method %   1) == 0) result &= sar[period][PREV] + gap < Ask;
+        if ((signal_method %   2) == 0) result &= sar[period][CURR] > sar[period][PREV];
+        if ((signal_method %   4) == 0) result &= sar[period][PREV] - sar[period][CURR] <= sar[period][FAR] - sar[period][PREV];
+        if ((signal_method %   8) == 0) result &= sar[period][FAR] < Ask;
+        if ((signal_method %  16) == 0) result &= sar[period][CURR] >= Close[CURR];
+        if ((signal_method %  32) == 0) result &= sar[period][PREV] < Close[PREV];
+        if ((signal_method %  64) == 0) result &= sar[period][PREV] < Open[PREV];
+      }
       if (result) {
         // FIXME: Convert into more flexible way.
         signals[DAILY][SAR1][period][ORDER_TYPE_SELL]++; signals[WEEKLY][SAR1][period][ORDER_TYPE_SELL]++;
@@ -2780,12 +2814,14 @@ bool Trade_WPR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
   switch (cmd) {
     case ORDER_TYPE_BUY:
       result = wpr[period][CURR] > 50 + signal_level;
-      if ((signal_method %   1) == 0) result &= wpr[period][CURR] < wpr[period][PREV];
-      if ((signal_method %   2) == 0) result &= wpr[period][PREV] < wpr[period][FAR];
-      if ((signal_method %   4) == 0) result &= wpr[period][PREV] > 50 + signal_level;
-      if ((signal_method %   8) == 0) result &= wpr[period][FAR]  > 50 + signal_level;
-      if ((signal_method %  16) == 0) result &= wpr[period][PREV] - wpr[period][CURR] > wpr[period][FAR] - wpr[period][PREV];
-      if ((signal_method %  32) == 0) result &= wpr[period][PREV] > 50 + signal_level + signal_level / 2;
+      if (signal_method != 0) {
+        if ((signal_method %   1) == 0) result &= wpr[period][CURR] < wpr[period][PREV];
+        if ((signal_method %   2) == 0) result &= wpr[period][PREV] < wpr[period][FAR];
+        if ((signal_method %   4) == 0) result &= wpr[period][PREV] > 50 + signal_level;
+        if ((signal_method %   8) == 0) result &= wpr[period][FAR]  > 50 + signal_level;
+        if ((signal_method %  16) == 0) result &= wpr[period][PREV] - wpr[period][CURR] > wpr[period][FAR] - wpr[period][PREV];
+        if ((signal_method %  32) == 0) result &= wpr[period][PREV] > 50 + signal_level + signal_level / 2;
+      }
       /* TODO:
 
             //30. Williams Percent Range
@@ -2799,12 +2835,14 @@ bool Trade_WPR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
       break;
     case ORDER_TYPE_SELL:
       result = wpr[period][CURR] < 50 - signal_level;
-      if ((signal_method %   1) == 0) result &= wpr[period][CURR] > wpr[period][PREV];
-      if ((signal_method %   2) == 0) result &= wpr[period][PREV] > wpr[period][FAR];
-      if ((signal_method %   4) == 0) result &= wpr[period][PREV] < 50 - signal_level;
-      if ((signal_method %   8) == 0) result &= wpr[period][FAR]  < 50 - signal_level;
-      if ((signal_method %  16) == 0) result &= wpr[period][CURR] - wpr[period][PREV] > wpr[period][PREV] - wpr[period][FAR];
-      if ((signal_method %  32) == 0) result &= wpr[period][PREV] > 50 - signal_level - signal_level / 2;
+      if (signal_method != 0) {
+        if ((signal_method %   1) == 0) result &= wpr[period][CURR] > wpr[period][PREV];
+        if ((signal_method %   2) == 0) result &= wpr[period][PREV] > wpr[period][FAR];
+        if ((signal_method %   4) == 0) result &= wpr[period][PREV] < 50 - signal_level;
+        if ((signal_method %   8) == 0) result &= wpr[period][FAR]  < 50 - signal_level;
+        if ((signal_method %  16) == 0) result &= wpr[period][CURR] - wpr[period][PREV] > wpr[period][PREV] - wpr[period][FAR];
+        if ((signal_method %  32) == 0) result &= wpr[period][PREV] > 50 - signal_level - signal_level / 2;
+      }
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
@@ -2868,8 +2906,11 @@ bool Trade_ZigZag(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signa
  */
 bool CheckMarketCondition1(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M30, int condition = 0, bool default_value = true) {
   bool result = true;
+  if (condition == 0) {
+    return result;
+  }
   uint period = chart.TfToIndex(tf);
-  if (VerboseTrace) PrintFormat("%s(%s, %s, %d)", EnumToString(cmd), EnumToString(tf), condition);
+  if (VerboseTrace) PrintFormat("%s: %s(%s, %s, %d)", __FUNCTION__, EnumToString(cmd), EnumToString(tf), condition);
   Market::RefreshRates(); // ?
   if ((condition %   1) == 0) result &= ((cmd == ORDER_TYPE_BUY && Open[CURR] > Close[PREV]) || (cmd == ORDER_TYPE_SELL && Open[CURR] < Close[PREV]));
   if ((condition %   2) == 0) result &= UpdateIndicator(S_SAR, tf)       && ((cmd == ORDER_TYPE_BUY && sar[period][CURR] < Open[0]) || (cmd == ORDER_TYPE_SELL && sar[period][CURR] > Open[0]));
@@ -2899,7 +2940,7 @@ bool CheckMarketEvent(ENUM_ORDER_TYPE cmd = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M
   bool result = false;
   uint period = chart.TfToIndex(tf);
   if (cmd == EMPTY || condition == EMPTY) return (false);
-  if (VerboseTrace) PrintFormat("%s(%s, %s, %d)", EnumToString(cmd), EnumToString(tf), condition);
+  if (VerboseTrace) PrintFormat("%s: %s(%s, %s, %d)", __FUNCTION__, EnumToString(cmd), EnumToString(tf), condition);
   switch (condition) {
     case C_AC_BUY_SELL:
       result = Trade_AC(cmd, tf);
@@ -3008,16 +3049,18 @@ bool CheckMarketEvent(ENUM_ORDER_TYPE cmd = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M
       if (condition == C_CUSTOM2_BUY_SELL) condition = CloseConditionCustom2Method;
       if (condition == C_CUSTOM3_BUY_SELL) condition = CloseConditionCustom3Method;
       result = false;
-      if ((condition %   1) == 0) result |= CheckMarketEvent(cmd, tf, C_MA_BUY_SELL);
-      if ((condition %   2) == 0) result |= CheckMarketEvent(cmd, tf, C_MACD_BUY_SELL);
-      if ((condition %   4) == 0) result |= CheckMarketEvent(cmd, tf, C_ALLIGATOR_BUY_SELL);
-      if ((condition %   8) == 0) result |= CheckMarketEvent(cmd, tf, C_RSI_BUY_SELL);
-      if ((condition %  16) == 0) result |= CheckMarketEvent(cmd, tf, C_SAR_BUY_SELL);
-      if ((condition %  32) == 0) result |= CheckMarketEvent(cmd, tf, C_BANDS_BUY_SELL);
-      if ((condition %  64) == 0) result |= CheckMarketEvent(cmd, tf, C_ENVELOPES_BUY_SELL);
-      if ((condition % 128) == 0) result |= CheckMarketEvent(cmd, tf, C_DEMARKER_BUY_SELL);
-      if ((condition % 256) == 0) result |= CheckMarketEvent(cmd, tf, C_WPR_BUY_SELL);
-      if ((condition % 512) == 0) result |= CheckMarketEvent(cmd, tf, C_FRACTALS_BUY_SELL);
+      if (condition != 0) {
+        if ((condition %   1) == 0) result |= CheckMarketEvent(cmd, tf, C_MA_BUY_SELL);
+        if ((condition %   2) == 0) result |= CheckMarketEvent(cmd, tf, C_MACD_BUY_SELL);
+        if ((condition %   4) == 0) result |= CheckMarketEvent(cmd, tf, C_ALLIGATOR_BUY_SELL);
+        if ((condition %   8) == 0) result |= CheckMarketEvent(cmd, tf, C_RSI_BUY_SELL);
+        if ((condition %  16) == 0) result |= CheckMarketEvent(cmd, tf, C_SAR_BUY_SELL);
+        if ((condition %  32) == 0) result |= CheckMarketEvent(cmd, tf, C_BANDS_BUY_SELL);
+        if ((condition %  64) == 0) result |= CheckMarketEvent(cmd, tf, C_ENVELOPES_BUY_SELL);
+        if ((condition % 128) == 0) result |= CheckMarketEvent(cmd, tf, C_DEMARKER_BUY_SELL);
+        if ((condition % 256) == 0) result |= CheckMarketEvent(cmd, tf, C_WPR_BUY_SELL);
+        if ((condition % 512) == 0) result |= CheckMarketEvent(cmd, tf, C_FRACTALS_BUY_SELL);
+      }
       // Message("Condition: " + condition + ", result: " + result);
       break;
     case C_CUSTOM4_MARKET_COND:
@@ -3877,23 +3920,27 @@ double GetLotSizeAuto(bool smooth = true) {
 
   #ifdef __advanced__
   if (Boosting_Enabled) {
-    if ((LotSizeIncreaseMethod %   1) == 0) if (AccCondition(C_ACC_IN_PROFIT))      new_lot_size *= 1.1;
-    if ((LotSizeIncreaseMethod %   2) == 0) if (AccCondition(C_EQUITY_10PC_HIGH))   new_lot_size *= 1.1;
-    if ((LotSizeIncreaseMethod %   4) == 0) if (AccCondition(C_EQUITY_20PC_HIGH))   new_lot_size *= 1.1;
-    if ((LotSizeIncreaseMethod %   8) == 0) if (AccCondition(C_DBAL_LT_WEEKLY))     new_lot_size *= 1.1;
-    if ((LotSizeIncreaseMethod %  16) == 0) if (AccCondition(C_WBAL_GT_MONTHLY))    new_lot_size *= 1.1;
-    if ((LotSizeIncreaseMethod %  32) == 0) if (AccCondition(C_ACC_IN_TREND))       new_lot_size *= 1.1;
-    if ((LotSizeIncreaseMethod %  64) == 0) if (AccCondition(C_ACC_CDAY_IN_PROFIT)) new_lot_size *= 1.1;
-    if ((LotSizeIncreaseMethod % 128) == 0) if (AccCondition(C_ACC_PDAY_IN_PROFIT)) new_lot_size *= 1.1;
+    if (LotSizeIncreaseMethod != 0) {
+      if ((LotSizeIncreaseMethod %   1) == 0) if (AccCondition(C_ACC_IN_PROFIT))      new_lot_size *= 1.1;
+      if ((LotSizeIncreaseMethod %   2) == 0) if (AccCondition(C_EQUITY_10PC_HIGH))   new_lot_size *= 1.1;
+      if ((LotSizeIncreaseMethod %   4) == 0) if (AccCondition(C_EQUITY_20PC_HIGH))   new_lot_size *= 1.1;
+      if ((LotSizeIncreaseMethod %   8) == 0) if (AccCondition(C_DBAL_LT_WEEKLY))     new_lot_size *= 1.1;
+      if ((LotSizeIncreaseMethod %  16) == 0) if (AccCondition(C_WBAL_GT_MONTHLY))    new_lot_size *= 1.1;
+      if ((LotSizeIncreaseMethod %  32) == 0) if (AccCondition(C_ACC_IN_TREND))       new_lot_size *= 1.1;
+      if ((LotSizeIncreaseMethod %  64) == 0) if (AccCondition(C_ACC_CDAY_IN_PROFIT)) new_lot_size *= 1.1;
+      if ((LotSizeIncreaseMethod % 128) == 0) if (AccCondition(C_ACC_PDAY_IN_PROFIT)) new_lot_size *= 1.1;
+    }
     // --
-    if ((LotSizeDecreaseMethod %   1) == 0) if (AccCondition(C_ACC_IN_LOSS))        new_lot_size *= 0.9;
-    if ((LotSizeDecreaseMethod %   2) == 0) if (AccCondition(C_EQUITY_10PC_LOW))    new_lot_size *= 0.9;
-    if ((LotSizeDecreaseMethod %   4) == 0) if (AccCondition(C_EQUITY_20PC_LOW))    new_lot_size *= 0.9;
-    if ((LotSizeDecreaseMethod %   8) == 0) if (AccCondition(C_DBAL_GT_WEEKLY))     new_lot_size *= 0.9;
-    if ((LotSizeDecreaseMethod %  16) == 0) if (AccCondition(C_WBAL_LT_MONTHLY))    new_lot_size *= 0.9;
-    if ((LotSizeDecreaseMethod %  32) == 0) if (AccCondition(C_ACC_IN_NON_TREND))   new_lot_size *= 0.9;
-    if ((LotSizeDecreaseMethod %  64) == 0) if (AccCondition(C_ACC_CDAY_IN_LOSS))   new_lot_size *= 0.9;
-    if ((LotSizeDecreaseMethod % 128) == 0) if (AccCondition(C_ACC_PDAY_IN_LOSS))   new_lot_size *= 0.9;
+    if (LotSizeDecreaseMethod != 0) {
+      if ((LotSizeDecreaseMethod %   1) == 0) if (AccCondition(C_ACC_IN_LOSS))        new_lot_size *= 0.9;
+      if ((LotSizeDecreaseMethod %   2) == 0) if (AccCondition(C_EQUITY_10PC_LOW))    new_lot_size *= 0.9;
+      if ((LotSizeDecreaseMethod %   4) == 0) if (AccCondition(C_EQUITY_20PC_LOW))    new_lot_size *= 0.9;
+      if ((LotSizeDecreaseMethod %   8) == 0) if (AccCondition(C_DBAL_GT_WEEKLY))     new_lot_size *= 0.9;
+      if ((LotSizeDecreaseMethod %  16) == 0) if (AccCondition(C_WBAL_LT_MONTHLY))    new_lot_size *= 0.9;
+      if ((LotSizeDecreaseMethod %  32) == 0) if (AccCondition(C_ACC_IN_NON_TREND))   new_lot_size *= 0.9;
+      if ((LotSizeDecreaseMethod %  64) == 0) if (AccCondition(C_ACC_CDAY_IN_LOSS))   new_lot_size *= 0.9;
+      if ((LotSizeDecreaseMethod % 128) == 0) if (AccCondition(C_ACC_PDAY_IN_LOSS))   new_lot_size *= 0.9;
+    }
   }
   #endif
 
@@ -3970,23 +4017,27 @@ double GetAutoRiskRatio() {
   rr_text = new_ea_risk_ratio < 1.0 ? StringFormat("-MarginUsed=%d%%|", margin_pc) : ""; string s = "|";
   // ea_margin_risk_level
   // @todo: Add account.GetRiskMarginLevel(), GetTrend(), ConWin/ConLoss, violity level.
-  if ((RiskRatioIncreaseMethod %   1) == 0) if (AccCondition(C_ACC_IN_PROFIT))      { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod %   2) == 0) if (AccCondition(C_EQUITY_20PC_HIGH))   { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod %   4) == 0) if (AccCondition(C_EQUITY_20PC_LOW))    { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod %   8) == 0) if (AccCondition(C_DBAL_LT_WEEKLY))     { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod %  16) == 0) if (AccCondition(C_WBAL_GT_MONTHLY))    { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod %  32) == 0) if (AccCondition(C_ACC_IN_TREND))       { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod %  64) == 0) if (AccCondition(C_ACC_CDAY_IN_PROFIT)) { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
-  if ((RiskRatioIncreaseMethod % 128) == 0) if (AccCondition(C_ACC_PDAY_IN_PROFIT)) { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
+  if (RiskRatioIncreaseMethod != 0) {
+    if ((RiskRatioIncreaseMethod %   1) == 0) if (AccCondition(C_ACC_IN_PROFIT))      { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
+    if ((RiskRatioIncreaseMethod %   2) == 0) if (AccCondition(C_EQUITY_20PC_HIGH))   { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
+    if ((RiskRatioIncreaseMethod %   4) == 0) if (AccCondition(C_EQUITY_20PC_LOW))    { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
+    if ((RiskRatioIncreaseMethod %   8) == 0) if (AccCondition(C_DBAL_LT_WEEKLY))     { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
+    if ((RiskRatioIncreaseMethod %  16) == 0) if (AccCondition(C_WBAL_GT_MONTHLY))    { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
+    if ((RiskRatioIncreaseMethod %  32) == 0) if (AccCondition(C_ACC_IN_TREND))       { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
+    if ((RiskRatioIncreaseMethod %  64) == 0) if (AccCondition(C_ACC_CDAY_IN_PROFIT)) { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
+    if ((RiskRatioIncreaseMethod % 128) == 0) if (AccCondition(C_ACC_PDAY_IN_PROFIT)) { new_ea_risk_ratio *= 1.1; rr_text += "+"+last_cname+s; }
+  }
   // --
-  if ((RiskRatioDecreaseMethod %   1) == 0) if (AccCondition(C_ACC_IN_LOSS))        { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod %   2) == 0) if (AccCondition(C_EQUITY_20PC_LOW))    { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod %   4) == 0) if (AccCondition(C_EQUITY_20PC_HIGH))   { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod %   8) == 0) if (AccCondition(C_DBAL_GT_WEEKLY))     { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod %  16) == 0) if (AccCondition(C_WBAL_LT_MONTHLY))    { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod %  32) == 0) if (AccCondition(C_ACC_IN_NON_TREND))   { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod %  64) == 0) if (AccCondition(C_ACC_CDAY_IN_LOSS))   { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
-  if ((RiskRatioDecreaseMethod % 128) == 0) if (AccCondition(C_ACC_PDAY_IN_LOSS))   { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+  if (RiskRatioDecreaseMethod != 0) {
+    if ((RiskRatioDecreaseMethod %   1) == 0) if (AccCondition(C_ACC_IN_LOSS))        { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+    if ((RiskRatioDecreaseMethod %   2) == 0) if (AccCondition(C_EQUITY_20PC_LOW))    { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+    if ((RiskRatioDecreaseMethod %   4) == 0) if (AccCondition(C_EQUITY_20PC_HIGH))   { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+    if ((RiskRatioDecreaseMethod %   8) == 0) if (AccCondition(C_DBAL_GT_WEEKLY))     { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+    if ((RiskRatioDecreaseMethod %  16) == 0) if (AccCondition(C_WBAL_LT_MONTHLY))    { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+    if ((RiskRatioDecreaseMethod %  32) == 0) if (AccCondition(C_ACC_IN_NON_TREND))   { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+    if ((RiskRatioDecreaseMethod %  64) == 0) if (AccCondition(C_ACC_CDAY_IN_LOSS))   { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+    if ((RiskRatioDecreaseMethod % 128) == 0) if (AccCondition(C_ACC_PDAY_IN_LOSS))   { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+  }
   String::RemoveSepChar(rr_text, s);
 
   /*
