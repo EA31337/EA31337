@@ -72,6 +72,12 @@ extern double ConLossesIncreaseFactor = 1.2; // Increase lot factor on consequen
 extern uint ConFactorOrdersLimit = 200; // No of orders to check on consequent wins/loses
 
 //+------------------------------------------------------------------+
+string __SmartQueue_Parameters__ = "-- Smart queue parameters --"; // >>> SMART QUEUE <<<
+bool SmartQueueActive = false; // Activate QueueAI
+int SmartQueueMethod = 3; // QueueAI: Method for selecting the best order (0-15)
+int SmartQueueFilter = 27; // QueueAI: Method for filtering the orders (0-255)
+
+//+------------------------------------------------------------------+
 extern string __EA_Account_Conditions__ = "-- Account conditions --"; // >>> CONDITIONS & ACTIONS <<<
 // Note: It's not advice to use on accounts where multi bots are trading.
 extern bool Account_Conditions_Active = 0; // Enable account conditions

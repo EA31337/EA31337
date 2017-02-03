@@ -600,13 +600,11 @@ bool EA_Trade() {
     } // end: if
   } // end: for
 
-  #ifdef __advanced__
-  if (SmartQueueActive && !order_placed && total_orders < max_orders) {
+  if (SmartQueueActive && !order_placed && total_orders <= max_orders) {
     if (OrderQueueProcess()) {
       return (true);
     }
   }
-  #endif
 
   if (order_placed) {
     ProcessOrders();
@@ -1088,9 +1086,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
       if (SoundAlert) PlaySound(SoundFileAtOpen);
       if (SendEmailEachOrder) SendEmailExecuteOrder();
 
-      #ifdef __advanced__
       if (SmartQueueActive && total_orders >= max_orders) OrderQueueClear(); // Clear queue if we're reached the limit again, so we can start fresh.
-      #endif
    } else {
      /* On ECN brokers you must open first and THEN set stops
      int ticket = OrderSend(..., 0,0,...)
@@ -1320,13 +1316,13 @@ bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = true)
     last_debug = Msg::ShowText(Order::OrderTypeToString((ENUM_ORDER_TYPE) Order::OrderType()), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
     #ifdef __advanced__
       if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(Order::GetOrderProfit(), 0) + " pips, reason: " + ReasonIdToText(reason_id) + "; " + Order::GetOrderToText());
-      if (SmartQueueActive) OrderQueueProcess();
     #else
       if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(Order::GetOrderProfit(), 0) + " pips; " + Order::OrderTypeToString((ENUM_ORDER_TYPE) Order::OrderType()));
     #endif
+    if (SmartQueueActive) OrderQueueProcess();
   } else {
     err_code = GetLastError();
-    if (VerboseErrors) Print(__FUNCTION__, ": Error: Ticket: ", ticket_no, "; Error: ", terminal.GetErrorText(err_code));
+    if (VerboseErrors) Print(__FUNCTION__, ": Error: Ticket: ", ticket_no, "; Error: ", terminal.GetErrorText(err_code)); // @fixme: CloseOrder: Error: Ticket: 10958; Error: Invalid ticket. OrderClose error 4108.
     if (VerboseDebug) PrintFormat("Error: OrderClose(%d, %f, %f, %f, %d);", ticket_no, OrderLots(), close_price, max_order_slippage, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell));
     if (VerboseDebug) Print(__FUNCTION__ + ": " + GetMarketTextDetails());
     OrderPrint();
@@ -2549,7 +2545,6 @@ bool Trade_RSI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
   switch (cmd) {
     case ORDER_TYPE_BUY:
       result = rsi[period][CURR] <= (50 - signal_level);
-      PrintFormat("%s: %s: %.1f <= %1.f = %d", __FUNCTION__, EnumToString(cmd), rsi[period][CURR], (50 - signal_level), result);
       if (signal_method != 0) {
         if ((signal_method %   1) == 0) result &= rsi[period][CURR] < rsi[period][PREV];
         if ((signal_method %   2) == 0) result &= rsi[period][PREV] < rsi[period][FAR];
@@ -2563,7 +2558,6 @@ bool Trade_RSI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
       break;
     case ORDER_TYPE_SELL:
       result = rsi[period][CURR] >= (50 + signal_level);
-      PrintFormat("%s: %.1f >= %1.f = %d", EnumToString(cmd), rsi[period][CURR], (50 + signal_level), result);
       if (signal_method != 0) {
         if ((signal_method %   1) == 0) result &= rsi[period][CURR] > rsi[period][PREV];
         if ((signal_method %   2) == 0) result &= rsi[period][PREV] > rsi[period][FAR];
@@ -6252,8 +6246,8 @@ bool CheckHistory() {
   double total_profit = 0;
   int pos;
   for (pos = last_history_check; pos < HistoryTotal(); pos++) {
-    if (!OrderSelect(pos, SELECT_BY_POS, MODE_HISTORY)) continue;
-    if (OrderCloseTime() > last_history_check && CheckOurMagicNumber()) {
+    if (!Order::OrderSelect(pos, SELECT_BY_POS, MODE_HISTORY)) continue;
+    if (Order::OrderCloseTime() > last_history_check && CheckOurMagicNumber()) {
       total_profit =+ OrderCalc();
     }
   }
@@ -6266,22 +6260,22 @@ bool CheckHistory() {
 
 /* BEGIN: ORDER QUEUE FUNCTIONS */
 
-#ifdef __advanced__
 /**
  * Process AI queue of orders to see if we can open any trades.
  */
 bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
-  bool result = false;
+  bool result = true;
   int queue_size = OrderQueueCount();
   long sorted_queue[][2];
-  int sid, cmd;
+  int sid;
+  ENUM_ORDER_TYPE cmd;
   datetime time;
   double volume;
   if (method == EMPTY) method = SmartQueueMethod;
   if (filter == EMPTY) filter = SmartQueueFilter;
   if (queue_size > 1) {
     int selected_qid = EMPTY, curr_qid = EMPTY;
-    ArrayResize(sorted_queue, queue_size);
+    ArrayResize(sorted_queue, queue_size, 100);
     for (int i = 0; i < queue_size; i++) {
       curr_qid = OrderQueueNext(curr_qid);
       if (curr_qid == EMPTY) break;
@@ -6292,14 +6286,14 @@ bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
     ArraySort(sorted_queue, WHOLE_ARRAY, 0, MODE_DESCEND);
     for (int i = 0; i < queue_size; i++) {
       selected_qid = (int) sorted_queue[i][1];
-      cmd = (int) order_queue[selected_qid][Q_CMD];
+      cmd = (ENUM_ORDER_TYPE) order_queue[selected_qid][Q_CMD];
       sid = (int) order_queue[selected_qid][Q_SID];
       time = (datetime) order_queue[selected_qid][Q_TIME];
       volume = GetStrategyLotSize(sid, cmd);
       if (!OpenOrderCondition(cmd, sid, time, filter)) continue;
       if (OpenOrderIsAllowed(cmd, sid, volume)) {
         string comment = GetStrategyComment(sid) + " [AIQueued]";
-        result = ExecuteOrder(cmd, sid, volume);
+        result &= ExecuteOrder(cmd, sid, volume);
         break;
       }
     }
@@ -6313,22 +6307,24 @@ bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
 bool OpenOrderCondition(ENUM_ORDER_TYPE cmd, int sid, datetime time, int method) {
   bool result = true;
   ENUM_TIMEFRAMES tf = GetStrategyTimeframe(sid);
-  uint period = Timeframe::TfToIndex(tf);
-  int qshift = iBarShift(_Symbol, tf, time, false); // Get the number of bars for the tf since queued.
-  double qopen = iOpen(_Symbol, tf, qshift);
-  double qclose = iClose(_Symbol, tf, qshift);
-  double qhighest = market.GetPeakPrice(tf, MODE_HIGH, qshift); // Get the high price since queued.
-  double qlowest = market.GetPeakPrice(tf, MODE_LOW, qshift); // Get the lowest price since queued.
-  double diff = fmax(qhighest - Open[CURR], Open[CURR] - qlowest);
-  if (VerboseTrace) PrintFormat("%s(%s, %d, %s, %d)", __FUNCTION__, EnumToString(cmd), sid, DateTime:TimeToStr(time), method);
-  if ((method %   1) == 0) result &= (cmd == ORDER_TYPE_BUY && qopen < Open[CURR]) || (cmd == ORDER_TYPE_SELL && qopen > Open[CURR]);
-  if ((method %   2) == 0) result &= (cmd == ORDER_TYPE_BUY && qclose < Close[CURR]) || (cmd == ORDER_TYPE_SELL && qclose > Close[CURR]);
-  if ((method %   4) == 0) result &= (cmd == ORDER_TYPE_BUY && qlowest < Low[CURR]) || (cmd == ORDER_TYPE_SELL && qlowest > Low[CURR]);
-  if ((method %   8) == 0) result &= (cmd == ORDER_TYPE_BUY && qhighest > High[CURR]) || (cmd == ORDER_TYPE_SELL && qhighest < High[CURR]);
-  if ((method %  16) == 0) result &= UpdateIndicator(SAR, tf) && Trade_SAR(cmd, tf, 0, 0);
-  if ((method %  32) == 0) result &= UpdateIndicator(DEMARKER, tf) && Trade_DeMarker(cmd, tf, 0, 0);
-  if ((method %  64) == 0) result &= UpdateIndicator(RSI, tf) && Trade_RSI(cmd, tf, 0, 0);
-  if ((method % 128) == 0) result &= UpdateIndicator(MA, tf) && Trade_MA(cmd, tf, 0, 0);
+  uint period = Chart::TfToIndex(tf);
+  uint qshift = chart.GetBarShift(tf, time, false); // Get the number of bars for the tf since queued.
+  double qopen = chart.GetOpen(tf, qshift);
+  double qclose = chart.GetClose(tf, qshift);
+  double qhighest = chart.GetPeakPrice(MODE_HIGH, qshift); // Get the high price since queued.
+  double qlowest = chart.GetPeakPrice(MODE_LOW, qshift); // Get the lowest price since queued.
+  double diff = fmax(qhighest - market.GetOpen(), market.GetOpen() - qlowest);
+  if (VerboseTrace) PrintFormat("%s(%s, %d, %s, %d)", __FUNCTION__, EnumToString(cmd), sid, DateTime::TimeToStr(time), method);
+  if (method != 0) {
+    if ((method %   1) == 0) result &= (cmd == ORDER_TYPE_BUY && qopen < market.GetOpen()) || (cmd == ORDER_TYPE_SELL && qopen > market.GetOpen());
+    if ((method %   2) == 0) result &= (cmd == ORDER_TYPE_BUY && qclose < market.GetClose()) || (cmd == ORDER_TYPE_SELL && qclose > market.GetClose());
+    if ((method %   4) == 0) result &= (cmd == ORDER_TYPE_BUY && qlowest < market.GetLow()) || (cmd == ORDER_TYPE_SELL && qlowest > market.GetLow());
+    if ((method %   8) == 0) result &= (cmd == ORDER_TYPE_BUY && qhighest > market.GetHigh()) || (cmd == ORDER_TYPE_SELL && qhighest < market.GetHigh());
+    if ((method %  16) == 0) result &= UpdateIndicator(S_SAR, tf) && Trade_SAR(cmd, tf, 0, 0);
+    if ((method %  32) == 0) result &= UpdateIndicator(S_DEMARKER, tf) && Trade_DeMarker(cmd, tf, 0, 0);
+    if ((method %  64) == 0) result &= UpdateIndicator(S_RSI, tf) && Trade_RSI(cmd, tf, 0, 0);
+    if ((method % 128) == 0) result &= UpdateIndicator(S_MA, tf) && Trade_MA(cmd, tf, 0, 0);
+  }
   return (result);
 }
 
@@ -6346,7 +6342,7 @@ int GetOrderQueueKeyValue(int sid, int method, int qid) {
     case  5: key = (int) (conf[sid][SPREAD_LIMIT] * 10); break;
     case  6: key = GetStrategyTimeframe(sid); break;
     case  7: key = (int) (GetStrategyProfitFactor(sid) * 100); break;
-    case  8: key = (int) (GetStrategyLotSize(sid, (int) order_queue[qid][Q_CMD]) * 100); break;
+    case  8: key = (int) (GetStrategyLotSize(sid, (ENUM_ORDER_TYPE) order_queue[qid][Q_CMD]) * 100); break;
     case  9: key = (int) stats[sid][TOTAL_GROSS_PROFIT]; break;
     case 10: key = info[sid][TOTAL_ORDERS]; break; // --7846
     case 11: key -= info[sid][TOTAL_ORDERS_LOSS]; break; // --7662 TODO: To test.
@@ -6417,8 +6413,6 @@ int OrderQueueCount() {
     if (order_queue[i][Q_SID] != EMPTY) counter++;
   return (counter);
 }
-
-#endif
 
 /* END: ORDER QUEUE FUNCTIONS */
 
