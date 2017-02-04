@@ -589,8 +589,10 @@ bool EA_Trade() {
       if (_cmd != EMPTY) {
         order_placed &= ExecuteOrder(_cmd, id);
         if (VerboseDebug) {
-          PrintFormat("%s:%d: %s%s on %s at %s: %s",
-            __FUNCTION__, __LINE__, sname[id], info[id][TIMEFRAME], Order::OrderTypeToString(_cmd),
+          PrintFormat("%s:%d: %s %s on %s at %s: %s",
+            __FUNCTION__, __LINE__, sname[id],
+            Chart::TfToString((ENUM_TIMEFRAMES) info[id][TIMEFRAME]),
+            Order::OrderTypeToString(_cmd),
             DateTime::TimeToStr(TimeCurrent()),
             order_placed ? "SUCCESS" : "IGNORE"
           );
@@ -990,34 +992,43 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
    }
 
    // Calculate take profit and stop loss.
-   RefreshRates();
+   Chart::RefreshRates();
    // Print current market information before placing the order.
    if (VerboseDebug) Print(__FUNCTION__ + ": " + GetMarketTextDetails());
 
    // Get price values.
-   double open_price = NormalizeDouble(market.GetOpenPrice(cmd), market.GetDigits());
-   double close_price = NormalizeDouble(market.GetClosePrice(cmd), market.GetDigits());
+   // double open_price = market.GetOpenOffer(cmd);
+   // double close_price = market.GetCloseOffer(cmd);
    // Get the fixed stops.
-   // @todo: Test GetOpenPrice vs GetClosePrice
-   double stoploss   = StopLoss   > 0 ? NormalizeDouble(open_price - (StopLoss + TrailingStop) * pip_size * Order::OrderDirection(cmd), Digits) : 0;
-   double takeprofit = TakeProfit > 0 ? NormalizeDouble(close_price + (TakeProfit + TrailingProfit) * pip_size * Order::OrderDirection(cmd), Digits) : 0;
+   // double stoploss   = StopLoss   > 0 ? open_price - StopLoss * pip_size * Order::OrderDirection(cmd) : 0;
+   // double takeprofit = TakeProfit > 0 ? close_price + TakeProfit * pip_size * Order::OrderDirection(cmd) : 0;
+   /*
+   if (stoploss_new != stoploss || takeprofit_new != takeprofit) {
+     Print("SL ", StopLoss, "; TP ", TakeProfit);
+     PrintFormat("price: %g; SL/TP: %g/%g (new), %g/%g (new)", open_price, stoploss, stoploss_new, takeprofit, takeprofit_new);
+     ExpertRemove();
+   }
+   */
    // Get the dynamic trailing stops.
+   double stoploss   = trade.CalcOrderStopLoss(cmd, StopLossMax);
+   double takeprofit = trade.CalcOrderTakeProfit(cmd, TakeProfitMax);
    double stoploss_trail   = GetTrailingValue(cmd, -1, sid);
    double takeprofit_trail = GetTrailingValue(cmd, +1, sid);
    // Get maximal stop loss based on the margin risk.
-   // Choose the safest stops.
    // @todo: Implement hard stops based on the balance.
+   // @todo: Simplify it.
    /*
-   stoploss   = stoploss > 0   && stoploss_trail > 0
-     ? (Order::OrderDirection(cmd) > 0 ? fmax(stoploss, stoploss_trail) : fmin(stoploss, stoploss_trail))
-     : fmax(stoploss, stoploss_trail);
-   takeprofit = takeprofit > 0 && takeprofit_trail > 0
-     ? (Order::OrderDirection(cmd) > 0 ? fmin(takeprofit, takeprofit_trail) : fmax(takeprofit, takeprofit_trail))
-     : fmax(takeprofit, takeprofit_trail);
-   */
    if (market.TradeOpAllowed(cmd, stoploss_trail, takeprofit_trail)) {
      stoploss = stoploss_trail;
      takeprofit = takeprofit_trail;
+   }
+   */
+   // Choose the safest stops.
+   if (market.TradeOpAllowed(cmd, stoploss_trail, takeprofit)) {
+     stoploss = trade.GetSaferSL(stoploss, stoploss_trail, cmd);
+   }
+   if (market.TradeOpAllowed(cmd, stoploss, takeprofit_trail)) {
+     takeprofit = trade.GetSaferTP(takeprofit, takeprofit_trail, cmd);
    }
    if (RiskMarginPerOrder >= 0) {
      trade_volume_max = trade.GetMaxLotSize(cmd, stoploss, GetRiskMarginPerOrder());
@@ -1034,9 +1045,10 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
        stoploss = stoploss_max;
      }
    }
+
    // Normalize stops.
-   stoploss = NormalizeDouble(stoploss, market.GetDigits());
-   takeprofit = NormalizeDouble(takeprofit, market.GetDigits());
+   // stoploss = NormalizeDouble(stoploss, market.GetDigits());
+   // takeprofit = NormalizeDouble(takeprofit, market.GetDigits());
 
   if (VerboseDebug) PrintFormat("Adjusted: stoploss = %f, takeprofit = %f", stoploss, takeprofit);
   if (VerboseDebug) PrintFormat("Normalized: stoploss = %f, takeprofit = %f",
@@ -1047,12 +1059,13 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
     trade_volume = trade.OptimizeLotSize(trade_volume, ConWinsIncreaseFactor, ConLossesIncreaseFactor, ConFactorOrdersLimit);
   }
 
-   order_ticket = OrderSend(_Symbol, cmd,
+   order_ticket = OrderSend(
+      market.GetSymbol(), cmd,
       market.NormalizeLots(trade_volume),
-      open_price,
+      market.GetOpenOffer(cmd),
       max_order_slippage,
-      stoploss,
-      takeprofit,
+      market.NormalizePrice(stoploss),
+      market.NormalizePrice(takeprofit),
       order_comment,
       MagicNumber + sid, 0, Order::GetOrderColor(cmd));
    if (order_ticket >= 0) {
@@ -1067,12 +1080,13 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
       }
       Msg::ShowText(
          StringFormat("OrderSend(%s, %s, %g, %f, %d, %f, %f, '%s', %d, %d, %d)",
-           _Symbol, Order::OrderTypeToString(cmd),
+           market.GetSymbol(),
+           Order::OrderTypeToString(cmd),
            market.NormalizeLots(trade_volume),
-           open_price,
+           market.GetOpenOffer(cmd),
            max_order_slippage,
-           stoploss,
-           takeprofit,
+           market.NormalizePrice(stoploss),
+           market.NormalizePrice(takeprofit),
            order_comment,
            MagicNumber + sid, 0, Order::GetOrderColor(cmd)),
            "Trace", __FUNCTION__, __LINE__, VerboseTrace);
@@ -1104,12 +1118,13 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
      last_err = Msg::ShowText(StringFormat("%s (err_code=%d, sid=%d)", terminal.GetErrorText(err_code), err_code, sid), "Error", __FUNCTION__, __LINE__, VerboseErrors);
      last_debug = Msg::ShowText(
        StringFormat("OrderSend(%s, %s, %g, %f, %d, %f, %f, '%s', %d, %d, %d)",
-         _Symbol, Order::OrderTypeToString(cmd),
+         market.GetSymbol(),
+         Order::OrderTypeToString(cmd),
          market.NormalizeLots(trade_volume),
-         open_price,
+         market.GetOpenOffer(cmd),
          max_order_slippage,
-         stoploss,
-         takeprofit,
+         market.NormalizePrice(stoploss),
+         market.NormalizePrice(takeprofit),
          order_comment,
          MagicNumber + sid, 0, Order::GetOrderColor(cmd)),
          "Debug", __FUNCTION__, __LINE__, VerboseErrors | VerboseDebug | VerboseTrace);
@@ -1131,7 +1146,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
        if (WriteReport) ReportAdd(last_debug);
        Msg::ShowText(StringFormat("sid = %d, stoploss(%d) = %g, takeprofit(%d) = %g, openprice = %g, stoplevel = %g pts",
          sid, GetTrailingMethod(sid, -1), stoploss, GetTrailingMethod(sid, +1), takeprofit,
-         open_price, SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL)),
+         market.GetOpenOffer(cmd), SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL)),
          "Debug", __FUNCTION__, __LINE__, VerboseErrors | VerboseDebug | VerboseTrace);
        Msg::ShowText(GetMarketTextDetails(),  "Debug", __FUNCTION__, __LINE__, VerboseErrors | VerboseDebug | VerboseTrace);
        retry = false;
@@ -1302,7 +1317,7 @@ bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = true)
   } else {
     ticket_no = OrderTicket();
   }
-  double close_price = NormalizeDouble(market.GetClosePrice(), Digits);
+  double close_price = NormalizeDouble(market.GetCloseOffer(), market.GetDigits());
   result = OrderClose(ticket_no, OrderLots(), close_price, max_order_slippage, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell)); // @fixme: warning 43: possible loss of data due to type conversion
   // if (VerboseTrace) Print(__FUNCTION__ + ": CloseOrder request. Reason: " + reason + "; Result=" + result + " @ " + TimeCurrent() + "(" + TimeToStr(TimeCurrent()) + "), ticket# " + ticket_no);
   if (result) {
@@ -1310,14 +1325,14 @@ bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = true)
     last_close_profit = Order::GetOrderProfit();
     if (SoundAlert) PlaySound(SoundFileAtClose);
     // TaskAddCalcStats(ticket_no); // Already done on CheckHistory().
-    last_msg = StringFormat("Closed order %d with profit %g pips (%s)", ticket_no, Order::GetOrderProfit(), ReasonIdToText(reason_id));
+    last_msg = StringFormat("Closed order %d with profit %g pips (%s)", ticket_no, Order::GetOrderProfitInPips(), ReasonIdToText(reason_id));
     Message(last_msg);
     Msg::ShowText(last_msg, "Info", __FUNCTION__, __LINE__, VerboseInfo);
     last_debug = Msg::ShowText(Order::OrderTypeToString((ENUM_ORDER_TYPE) Order::OrderType()), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
     #ifdef __advanced__
-      if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(Order::GetOrderProfit(), 0) + " pips, reason: " + ReasonIdToText(reason_id) + "; " + Order::GetOrderToText());
+      if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(Order::GetOrderProfitInPips(), 0) + " pips, reason: " + ReasonIdToText(reason_id) + "; " + Order::GetOrderToText());
     #else
-      if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(Order::GetOrderProfit(), 0) + " pips; " + Order::OrderTypeToString((ENUM_ORDER_TYPE) Order::OrderType()));
+      if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(Order::GetOrderProfitInPips(), 0) + " pips; " + Order::OrderTypeToString((ENUM_ORDER_TYPE) Order::OrderType()));
     #endif
     if (SmartQueueActive) OrderQueueProcess();
   } else {
@@ -3085,7 +3100,7 @@ bool CheckMinPipGap(int sid) {
   for (int order = 0; order < OrdersTotal(); order++) {
     if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
        if (Order::OrderMagicNumber() == MagicNumber + sid && Order::OrderSymbol() == market.GetSymbol()) {
-         diff = Convert::GetValueDiffInPips(Order::OrderOpenPrice(), market.GetOpenPrice(), true);
+         diff = Convert::GetValueDiffInPips(Order::OrderOpenPrice(), market.GetOpenOffer(Order::OrderType()), true);
          /*
          if (VerboseDebug) {
            PrintFormat("Ticket: #%d, %s, Gap: %g (%g-%g)",
@@ -3114,15 +3129,19 @@ bool CheckMinPipGap(int sid) {
  */
 void CheckOrders() {
   int elapsed_h;
-  for (int i = 0; i < OrdersTotal(); i++) {
-    if (!OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) { continue; }
-    if (CheckOurMagicNumber() && OrderOpenTime() > 0) {
+  for (uint i = 0; i < Orders::OrdersTotal(); i++) {
+    if (!Order::OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) { continue; }
+    if (CheckOurMagicNumber() && Order::OrderOpenTime() > 0) {
       if (CloseOrderAfterXHours > 0) {
         elapsed_h = (int) ((TimeCurrent() - OrderOpenTime()) / 60 / 60);
         if (elapsed_h >= CloseOrderAfterXHours) {
           TaskAddCloseOrder(OrderTicket(), R_ORDER_EXPIRED);
         }
       }
+      /*
+      if (Order::OrderTakeProfit()) {
+      }
+      */
     }
   } // end: for
 }
@@ -3135,6 +3154,8 @@ bool UpdateTrailingStops() {
   bool result = true;
   // New StopLoss/TakeProfit.
   double new_sl, new_tp;
+  double max_sl, max_tp;
+  double trail_sl, trail_tp;
   int sid;
 
    // Check if bar time has been changed since last time.
@@ -3170,18 +3191,26 @@ bool UpdateTrailingStops() {
           }
         }
 
-        new_sl = GetTrailingValue(Order::OrderType(), -1, sid, OrderStopLoss(), true);
-        new_tp = GetTrailingValue(Order::OrderType(), +1, sid, OrderTakeProfit(), true);
+        // Get the fixed stops.
+        max_sl   = trade.CalcOrderStopLoss(Order::OrderType(), StopLossMax);
+        max_tp = trade.CalcOrderTakeProfit(Order::OrderType(), TakeProfitMax);
+        // Get dynamic stops.
+        trail_sl = GetTrailingValue(Order::OrderType(), -1, sid, Order::OrderStopLoss(), true);
+        trail_tp = GetTrailingValue(Order::OrderType(), +1, sid, Order::OrderTakeProfit(), true);
+        // Choose the better one.
+        new_sl = trade.GetSaferSL(max_sl, trail_sl, Order::OrderType());
+        new_tp = trade.GetSaferSL(max_tp, trail_tp, Order::OrderType());
+
         if (!market.TradeOpAllowed(Order::OrderType(), new_sl, new_tp)) {
           if (VerboseDebug) {
             PrintFormat("%s(): fabs(%f - %f) = %f > %f || fabs(%f - %f) = %f > %f",
                 __FUNCTION__,
-                OrderStopLoss(), new_sl, fabs(OrderStopLoss() - new_sl), MinPipChangeToTrade * pip_size,
-                OrderTakeProfit(), new_tp, fabs(OrderTakeProfit() - new_tp), MinPipChangeToTrade * pip_size);
+                Order::OrderStopLoss(), new_sl, fabs(Order::OrderStopLoss() - new_sl), MinPipChangeToTrade * pip_size,
+                Order::OrderTakeProfit(), new_tp, fabs(Order::OrderTakeProfit() - new_tp), MinPipChangeToTrade * pip_size);
           }
           return (false);
         }
-        else if (new_sl == OrderStopLoss() && new_tp == OrderTakeProfit()) {
+        else if (new_sl == Order::OrderStopLoss() && new_tp == Order::OrderTakeProfit()) {
           return (false);
         }
         // @todo
@@ -3255,15 +3284,16 @@ double GetTrailingValue(ENUM_ORDER_TYPE cmd, int direction = -1, int order_type 
   string symbol = existing ? OrderSymbol() : _Symbol;
 
   if (VerboseDebug) {
-    PrintFormat("%s:%d(%s, %d, %d, %g): trail = (%d + %g) * %g = %g",
+    PrintFormat("%s:%d: %s, %d, %d, %g): method = %d, trail = (%d + %g) * %g = %g",
       __FUNCTION__, __LINE__, Order::OrderTypeToString(cmd), direction, order_type, previous,
+      method,
       TrailingStop, extra_trail, pip_size, trail);
   }
   // TODO: Make starting point dynamic: Open[CURR], Open[PREV], Open[FAR], Close[PREV], Close[FAR], ma_fast[CURR], ma_medium[CURR], ma_slow[CURR]
    double highest_ma, lowest_ma;
    switch (method) {
      case T_NONE: // 0: None.
-       new_value = previous;
+       new_value = trade.CalcOrderTakeProfit(cmd, factor > 0 ? TakeProfitMax : StopLossMax);
        break;
      case T1_FIXED: // 1: Dynamic fixed.
      case T2_FIXED:
@@ -3474,7 +3504,7 @@ double GetTrailingValue(ENUM_ORDER_TYPE cmd, int direction = -1, int order_type 
     }
   }
 
-  if (VerboseTrace) {
+  if (VerboseDebug) {
     Msg::ShowText(
       StringFormat("Strategy: %s (%d), Method: %d, Tf: %d, Period: %d, Value: %g, Prev: %g, Factor: %d, Trail: %g (%g), LMA/HMA: %g/%g (%g/%g/%g|%g/%g/%g)",
         sname[order_type], order_type, method, tf, period, new_value, previous, factor, trail, default_trail,
@@ -4023,14 +4053,14 @@ double GetAutoRiskRatio() {
   }
   // --
   if (RiskRatioDecreaseMethod != 0) {
-    if ((RiskRatioDecreaseMethod %   1) == 0) if (AccCondition(C_ACC_IN_LOSS))        { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
-    if ((RiskRatioDecreaseMethod %   2) == 0) if (AccCondition(C_EQUITY_20PC_LOW))    { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
-    if ((RiskRatioDecreaseMethod %   4) == 0) if (AccCondition(C_EQUITY_20PC_HIGH))   { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
-    if ((RiskRatioDecreaseMethod %   8) == 0) if (AccCondition(C_DBAL_GT_WEEKLY))     { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
-    if ((RiskRatioDecreaseMethod %  16) == 0) if (AccCondition(C_WBAL_LT_MONTHLY))    { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
-    if ((RiskRatioDecreaseMethod %  32) == 0) if (AccCondition(C_ACC_IN_NON_TREND))   { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
-    if ((RiskRatioDecreaseMethod %  64) == 0) if (AccCondition(C_ACC_CDAY_IN_LOSS))   { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
-    if ((RiskRatioDecreaseMethod % 128) == 0) if (AccCondition(C_ACC_PDAY_IN_LOSS))   { new_ea_risk_ratio *= 0.1; rr_text += "-"+last_cname+s; }
+    if ((RiskRatioDecreaseMethod %   1) == 0) if (AccCondition(C_ACC_IN_LOSS))        { new_ea_risk_ratio *= 0.9; rr_text += "-"+last_cname+s; }
+    if ((RiskRatioDecreaseMethod %   2) == 0) if (AccCondition(C_EQUITY_20PC_LOW))    { new_ea_risk_ratio *= 0.9; rr_text += "-"+last_cname+s; }
+    if ((RiskRatioDecreaseMethod %   4) == 0) if (AccCondition(C_EQUITY_20PC_HIGH))   { new_ea_risk_ratio *= 0.9; rr_text += "-"+last_cname+s; }
+    if ((RiskRatioDecreaseMethod %   8) == 0) if (AccCondition(C_DBAL_GT_WEEKLY))     { new_ea_risk_ratio *= 0.9; rr_text += "-"+last_cname+s; }
+    if ((RiskRatioDecreaseMethod %  16) == 0) if (AccCondition(C_WBAL_LT_MONTHLY))    { new_ea_risk_ratio *= 0.9; rr_text += "-"+last_cname+s; }
+    if ((RiskRatioDecreaseMethod %  32) == 0) if (AccCondition(C_ACC_IN_NON_TREND))   { new_ea_risk_ratio *= 0.9; rr_text += "-"+last_cname+s; }
+    if ((RiskRatioDecreaseMethod %  64) == 0) if (AccCondition(C_ACC_CDAY_IN_LOSS))   { new_ea_risk_ratio *= 0.9; rr_text += "-"+last_cname+s; }
+    if ((RiskRatioDecreaseMethod % 128) == 0) if (AccCondition(C_ACC_PDAY_IN_LOSS))   { new_ea_risk_ratio *= 0.9; rr_text += "-"+last_cname+s; }
   }
   String::RemoveSepChar(rr_text, s);
 
@@ -4109,11 +4139,14 @@ void StartNewHour() {
   // Note: This needs to be after action processing.
   hour_of_day = Hour();
 
-  if (VerboseDebug) PrintFormat("== New hour: %d", hour_of_day);
-
   // Update variables.
   ea_risk_ratio = GetRiskRatio();
   max_orders = GetMaxOrders(ea_lot_size);
+
+  if (VerboseDebug) {
+    PrintFormat("== New hour at %s (risk ratio: %g, max orders: %d)",
+      DateTime::TimeToStr(TimeCurrent()), ea_risk_ratio, max_orders);
+  }
 
   // Check if new day has been started.
   if (day_of_week != DayOfWeek()) {
@@ -4339,7 +4372,7 @@ bool InitVariables() {
   #ifdef __backtest__ init &= !Terminal::IsRealtime(); #endif
 
   // Check time of the week, month and year based on the trading bars.
-  init_bar_time = iTime(_Symbol, 0, 0);
+  init_bar_time = chart.GetBarTime();
   time_current = TimeCurrent();
   // bar_time = iTime(_Symbol, 0, 0);
   hour_of_day = DateTime::Hour(); // The hour (0,1,2,..23) of the last known server time by the moment of the program start.
@@ -5812,6 +5845,7 @@ string GetSummaryText() {
 string GetRiskRatioText() {
   string text = "Normal";
   if (RiskRatio != 0.0 && ea_risk_ratio < 0.9) text = "Set low manually";
+  else if (RiskRatio != 0.0 && ea_risk_ratio > 1.9) text = "Set high manually";
   else if (ea_risk_ratio < 0.2) text = "Extremely risky!";
   else if (ea_risk_ratio < 0.3) text = "Very risky!";
   else if (ea_risk_ratio < 0.5) text = "Risky!";

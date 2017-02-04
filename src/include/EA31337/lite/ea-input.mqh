@@ -32,8 +32,8 @@ extern uint   TickIgnoreMethod = 2; // Tick ignore method (0-5, 0 - off)
 
 //+------------------------------------------------------------------+
 extern string   __EA_Order_Parameters__ = "-- Profit and loss parameters --"; // >>> PROFIT/LOSS <<<
-extern int      TakeProfit = 120; // Take profit (in pips, 0 = auto)
-extern int      StopLoss = 60; // Stop loss (in pips, 0 = auto)
+extern uint     TakeProfitMax = 80; // Max Take profit (in pips, 0 = auto)
+extern uint     StopLossMax = 40; // Max Stop loss (in pips, 0 = auto)
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
