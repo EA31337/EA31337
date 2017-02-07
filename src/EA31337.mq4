@@ -5294,7 +5294,7 @@ void UpdateStrategyLotSize() {
  * Calculate strategy profit factor.
  */
 double GetStrategyProfitFactor(int sid) {
-  if (info[sid][TOTAL_ORDERS] > 20 && stats[sid][TOTAL_GROSS_PROFIT] > 0 && stats[sid][TOTAL_GROSS_LOSS] < 0) {
+  if (info[sid][TOTAL_ORDERS] > 20 && stats[sid][TOTAL_GROSS_LOSS] < 0) {
     return (double) (stats[sid][TOTAL_GROSS_PROFIT] / -stats[sid][TOTAL_GROSS_LOSS]);
   } else {
     return 1.0;
