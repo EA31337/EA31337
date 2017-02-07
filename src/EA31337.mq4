@@ -991,81 +991,46 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
      order_comment = GetStrategyComment(sid);
    }
 
-   // Calculate take profit and stop loss.
-   Chart::RefreshRates();
-   // Print current market information before placing the order.
-   if (VerboseDebug) Print(__FUNCTION__ + ": " + GetMarketTextDetails());
+    // Calculate take profit and stop loss.
+    Chart::RefreshRates();
+    // Print current market information before placing the order.
+    if (VerboseDebug) Print(__FUNCTION__ + ": " + GetMarketTextDetails());
 
-   // Get price values.
-   // double open_price = market.GetOpenOffer(cmd);
-   // double close_price = market.GetCloseOffer(cmd);
-   // Get the fixed stops.
-   // double stoploss   = StopLoss   > 0 ? open_price - StopLoss * pip_size * Order::OrderDirection(cmd) : 0;
-   // double takeprofit = TakeProfit > 0 ? close_price + TakeProfit * pip_size * Order::OrderDirection(cmd) : 0;
-   /*
-   if (stoploss_new != stoploss || takeprofit_new != takeprofit) {
-     Print("SL ", StopLoss, "; TP ", TakeProfit);
-     PrintFormat("price: %g; SL/TP: %g/%g (new), %g/%g (new)", open_price, stoploss, stoploss_new, takeprofit, takeprofit_new);
-     ExpertRemove();
-   }
-   */
-   // Get the dynamic trailing stops.
-   double stoploss   = trade.CalcOrderStopLoss(cmd, StopLossMax);
-   double takeprofit = trade.CalcOrderTakeProfit(cmd, TakeProfitMax);
-   double stoploss_trail   = GetTrailingValue(cmd, -1, sid);
-   double takeprofit_trail = GetTrailingValue(cmd, +1, sid);
-   // Get maximal stop loss based on the margin risk.
-   // @todo: Implement hard stops based on the balance.
-   // @todo: Simplify it.
-   /*
-   if (market.TradeOpAllowed(cmd, stoploss_trail, takeprofit_trail)) {
-     stoploss = stoploss_trail;
-     takeprofit = takeprofit_trail;
-   }
-   */
-   // Choose the safest stops.
-   if (market.TradeOpAllowed(cmd, stoploss_trail, takeprofit)) {
-     stoploss = trade.GetSaferSL(stoploss, stoploss_trail, cmd);
-   }
-   if (market.TradeOpAllowed(cmd, stoploss, takeprofit_trail)) {
-     takeprofit = trade.GetSaferTP(takeprofit, takeprofit_trail, cmd);
-   }
-   if (RiskMarginPerOrder >= 0) {
-     trade_volume_max = trade.GetMaxLotSize(cmd, stoploss, GetRiskMarginPerOrder());
-     trade_volume = fmin(trade_volume, trade_volume_max);
-     double stoploss_max = trade.GetMaxStopLoss(cmd, trade_volume, GetRiskMarginPerOrder());
-     if (
-       (Order::OrderDirection(cmd) > 0 && stoploss < stoploss_max) ||
-       (Order::OrderDirection(cmd) < 0 && (stoploss > stoploss_max || stoploss == 0))) {
-       Msg::ShowText(
-         StringFormat("%s: Max stop loss has reached, Current SL: %g, Max SL: %g (%g)",
-         __FUNCTION__, stoploss, stoploss_max, Convert::MoneyToValue(account.AccountRealBalance() / 100 * GetRiskMarginPerOrder(), trade_volume)),
-         "Debug", __FUNCTION__, __LINE__, VerboseDebug);
-       // @todo: Implement different methods of action.
-       stoploss = stoploss_max;
-     }
-   }
+    double sl_trail = GetTrailingValue(cmd, ORDER_SL, sid);
+    double stoploss = trade.CalcBestSLTP(sl_trail, StopLossMax, RiskMarginPerOrder, ORDER_SL, cmd, market.GetMinLot());
+    double takeprofit = GetTrailingValue(cmd, ORDER_TP, sid);
+    if (sl_trail != stoploss) {
+      // @todo: Raise the condition on reaching the max stop loss.
+      // @todo: Implement different methods of action.
+      Msg::ShowText(
+        StringFormat("%s: Max stop loss has reached, Current SL: %g, Max SL: %g (%g)",
+        __FUNCTION__, sl_trail, stoploss, Convert::MoneyToValue(account.AccountRealBalance() / 100 * GetRiskMarginPerOrder(), trade_volume)),
+        "Debug", __FUNCTION__, __LINE__, VerboseDebug);
+    }
 
-   // Normalize stops.
-   // stoploss = NormalizeDouble(stoploss, market.GetDigits());
-   // takeprofit = NormalizeDouble(takeprofit, market.GetDigits());
+    if (Boosting_Enabled && (ConWinsIncreaseFactor != 0 || ConLossesIncreaseFactor != 0)) {
+      trade_volume = trade.OptimizeLotSize(trade_volume, ConWinsIncreaseFactor, ConLossesIncreaseFactor, ConFactorOrdersLimit);
+    }
 
-  if (VerboseDebug) PrintFormat("Adjusted: stoploss = %f, takeprofit = %f", stoploss, takeprofit);
-  if (VerboseDebug) PrintFormat("Normalized: stoploss = %f, takeprofit = %f",
-    NormalizeDouble(stoploss, market.GetDigits()),
-    NormalizeDouble(takeprofit, market.GetDigits()));
-
-  if (Boosting_Enabled && (ConWinsIncreaseFactor != 0 || ConLossesIncreaseFactor != 0)) {
-    trade_volume = trade.OptimizeLotSize(trade_volume, ConWinsIncreaseFactor, ConLossesIncreaseFactor, ConFactorOrdersLimit);
-  }
+    if (RiskMarginPerOrder >= 0) {
+      trade_volume_max = trade.GetMaxLotSize((uint) StopLossMax, GetRiskMarginPerOrder(), cmd);
+      if (trade_volume > trade_volume_max) {
+        trade_volume = trade_volume_max;
+        Msg::ShowText(
+          StringFormat("%s: Max volume has reached, Current lot size: %g, Max lot size: %g",
+          __FUNCTION__, trade_volume, trade_volume_max),
+          "Debug", __FUNCTION__, __LINE__, VerboseDebug);
+        // @todo: Convert lot size into money worth.
+      }
+    }
 
    order_ticket = OrderSend(
       market.GetSymbol(), cmd,
       market.NormalizeLots(trade_volume),
       market.GetOpenOffer(cmd),
       max_order_slippage,
-      market.NormalizePrice(stoploss),
-      market.NormalizePrice(takeprofit),
+      NormalizeDouble(market.NormalizePrice(stoploss), market.GetDigits()),
+      NormalizeDouble(market.NormalizePrice(takeprofit), market.GetDigits()),
       order_comment,
       MagicNumber + sid, 0, Order::GetOrderColor(cmd));
    if (order_ticket >= 0) {
@@ -1085,8 +1050,8 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
            market.NormalizeLots(trade_volume),
            market.GetOpenOffer(cmd),
            max_order_slippage,
-           market.NormalizePrice(stoploss),
-           market.NormalizePrice(takeprofit),
+           NormalizeDouble(market.NormalizePrice(stoploss), market.GetDigits()),
+           NormalizeDouble(market.NormalizePrice(takeprofit), market.GetDigits()),
            order_comment,
            MagicNumber + sid, 0, Order::GetOrderColor(cmd)),
            "Trace", __FUNCTION__, __LINE__, VerboseTrace);
@@ -1123,8 +1088,8 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
          market.NormalizeLots(trade_volume),
          market.GetOpenOffer(cmd),
          max_order_slippage,
-         market.NormalizePrice(stoploss),
-         market.NormalizePrice(takeprofit),
+         NormalizeDouble(market.NormalizePrice(stoploss), market.GetDigits()),
+         NormalizeDouble(market.NormalizePrice(takeprofit), market.GetDigits()),
          order_comment,
          MagicNumber + sid, 0, Order::GetOrderColor(cmd)),
          "Debug", __FUNCTION__, __LINE__, VerboseErrors | VerboseDebug | VerboseTrace);
@@ -1145,7 +1110,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
        // Therefore the minimal distance of the pending price from the current market is invalid.
        if (WriteReport) ReportAdd(last_debug);
        Msg::ShowText(StringFormat("sid = %d, stoploss(%d) = %g, takeprofit(%d) = %g, openprice = %g, stoplevel = %g pts",
-         sid, GetTrailingMethod(sid, -1), stoploss, GetTrailingMethod(sid, +1), takeprofit,
+         sid, GetTrailingMethod(sid, ORDER_SL), stoploss, GetTrailingMethod(sid, ORDER_TP), takeprofit,
          market.GetOpenOffer(cmd), SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL)),
          "Debug", __FUNCTION__, __LINE__, VerboseErrors | VerboseDebug | VerboseTrace);
        Msg::ShowText(GetMarketTextDetails(),  "Debug", __FUNCTION__, __LINE__, VerboseErrors | VerboseDebug | VerboseTrace);
@@ -1216,7 +1181,7 @@ bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, int sid = EMPTY, double volume = EM
     if (VerboseDebug) PrintFormat("%s:%d: %s: Volume: %g", __FUNCTION__, __LINE__, sname[sid], volume);
     result = false;
   } else if (!CheckMinPipGap(sid)) {
-    last_trace = Msg::ShowText(StringFormat("%s: Not executing order, because the gap is too small [MinPipGap].", sname[sid]), "Info", __FUNCTION__, __LINE__, VerboseInfo);
+    last_trace = Msg::ShowText(StringFormat("%s: Not executing order, because the gap is too small [MinPipGap].", sname[sid]), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
     result = false;
   } else if (!CheckProfitFactorLimits(sid)) {
     result = false;
@@ -1266,6 +1231,13 @@ bool CheckProfitFactorLimits(int sid = EMPTY) {
     return (true);
   }
   conf[sid][PROFIT_FACTOR] = GetStrategyProfitFactor(sid);
+  if (conf[sid][PROFIT_FACTOR] <= 0) {
+    last_err = Msg::ShowText(
+      StringFormat("%s: Profit factor is zero. (pf = %.1f)",
+        sname[sid], conf[sid][PROFIT_FACTOR]),
+      "Warning", __FUNCTION__, __LINE__, VerboseErrors);
+    return (true);
+  }
   if (ProfitFactorMinToTrade > 0 && conf[sid][PROFIT_FACTOR] < ProfitFactorMinToTrade) {
     last_err = Msg::ShowText(
       StringFormat("%s: Minimum profit factor has been reached, disabling strategy. (pf = %.1f)",
@@ -2058,9 +2030,9 @@ bool Trade_DeMarker(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sig
       result = demarker[period][CURR] < 0.5 - signal_level;
       if (signal_method != 0) {
         if ((signal_method %   1) == 0) result &= demarker[period][PREV] < 0.5 - signal_level;
-        if ((signal_method %   2) == 0) result &= demarker[period][FAR] < 0.5 - signal_level;
-        if ((signal_method %   4) == 0) result &= demarker[period][CURR] < demarker[period][PREV];
-        if ((signal_method %   8) == 0) result &= demarker[period][PREV] < demarker[period][FAR];
+        if ((signal_method %   2) == 0) result &= demarker[period][FAR] < 0.5 - signal_level; // @to-remove?
+        if ((signal_method %   4) == 0) result &= demarker[period][CURR] < demarker[period][PREV]; // @to-remove?
+        if ((signal_method %   8) == 0) result &= demarker[period][PREV] < demarker[period][FAR]; // @to-remove?
         if ((signal_method %  16) == 0) result &= demarker[period][PREV] < 0.5 - signal_level - signal_level/2;
       }
       // PrintFormat("DeMarker buy: %g <= %g", demarker[period][CURR], 0.5 - signal_level);
@@ -2559,7 +2531,7 @@ bool Trade_RSI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
   if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(S_RSI, tf, 20);
   switch (cmd) {
     case ORDER_TYPE_BUY:
-      result = rsi[period][CURR] <= (50 - signal_level);
+      result = rsi[period][CURR] < (50 - signal_level);
       if (signal_method != 0) {
         if ((signal_method %   1) == 0) result &= rsi[period][CURR] < rsi[period][PREV];
         if ((signal_method %   2) == 0) result &= rsi[period][PREV] < rsi[period][FAR];
@@ -2572,7 +2544,7 @@ bool Trade_RSI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
       }
       break;
     case ORDER_TYPE_SELL:
-      result = rsi[period][CURR] >= (50 + signal_level);
+      result = rsi[period][CURR] > (50 + signal_level);
       if (signal_method != 0) {
         if ((signal_method %   1) == 0) result &= rsi[period][CURR] > rsi[period][PREV];
         if ((signal_method %   2) == 0) result &= rsi[period][PREV] > rsi[period][FAR];
@@ -3153,9 +3125,9 @@ bool UpdateTrailingStops() {
   // Check result of executed orders.
   bool result = true;
   // New StopLoss/TakeProfit.
+  double prev_sl, prev_tp;
   double new_sl, new_tp;
-  double max_sl, max_tp;
-  double trail_sl, trail_tp;
+  double trail_sl;
   int sid;
 
    // Check if bar time has been changed since last time.
@@ -3191,15 +3163,27 @@ bool UpdateTrailingStops() {
           }
         }
 
-        // Get the fixed stops.
-        max_sl   = trade.CalcOrderStopLoss(Order::OrderType(), StopLossMax);
-        max_tp = trade.CalcOrderTakeProfit(Order::OrderType(), TakeProfitMax);
+        // Get previous stops.
+        prev_sl = Order::OrderStopLoss();
+        prev_tp = Order::OrderTakeProfit();
+        // @todo: Use RiskMarginPerOrder with equity?
         // Get dynamic stops.
-        trail_sl = GetTrailingValue(Order::OrderType(), -1, sid, Order::OrderStopLoss(), true);
-        trail_tp = GetTrailingValue(Order::OrderType(), +1, sid, Order::OrderTakeProfit(), true);
-        // Choose the better one.
-        new_sl = trade.GetSaferSL(max_sl, trail_sl, Order::OrderType());
-        new_tp = trade.GetSaferSL(max_tp, trail_tp, Order::OrderType());
+        trail_sl = GetTrailingValue(Order::OrderType(), ORDER_SL, sid, Order::OrderStopLoss(), true);
+        // Get new stops.
+        if (
+          (prev_sl == 0) ||
+          (Order::OrderType() == ORDER_TYPE_BUY && trail_sl < prev_sl) ||
+          (Order::OrderType() == ORDER_TYPE_SELL && trail_sl > prev_sl)
+        ) {
+          new_sl = trade.CalcBestSLTP(trail_sl, StopLossMax, RiskMarginPerOrder, ORDER_SL);
+        }
+        else {
+          new_sl = trail_sl;
+        }
+        if (new_sl != prev_sl) {
+          // Re-calculate TP only when SL is changed.
+          new_tp = GetTrailingValue(Order::OrderType(), ORDER_TP, sid, Order::OrderTakeProfit(), true);
+        }
 
         if (!market.TradeOpAllowed(Order::OrderType(), new_sl, new_tp)) {
           if (VerboseDebug) {
@@ -3219,7 +3203,7 @@ bool UpdateTrailingStops() {
         // MQL5: ORDER_TIME_GTC
         // datetime expiration=TimeTradeServer()+PeriodSeconds(PERIOD_D1);
 
-        if (fabs(OrderStopLoss() - new_sl) > MinPipChangeToTrade * pip_size || fabs(OrderTakeProfit() - new_tp) > MinPipChangeToTrade * pip_size) {
+        if (fabs(prev_sl - new_sl) > MinPipChangeToTrade * pip_size || fabs(prev_tp - new_tp) > MinPipChangeToTrade * pip_size) {
           result = OrderModify(OrderTicket(), OrderOpenPrice(), new_sl, new_tp, 0, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell));
           if (!result) {
             err_code = GetLastError();
@@ -3252,8 +3236,8 @@ bool UpdateTrailingStops() {
  * @params:
  *   cmd (int)
  *    Command for trade operation.
- *   direction (int)
- *    Set -1 to calculate trailing stop or +1 for profit take.
+ *   mode (ENUM_ORDER_PROPERTY_DOUBLE)
+ *    Type of value (ORDER_SL or ORDER_TP).
  *   order_type (int)
  *    Value of strategy type. See: ENUM_STRATEGY_TYPE
  *   previous (double)
@@ -3261,9 +3245,9 @@ bool UpdateTrailingStops() {
  *   existing (bool)
  *    Set to true if the calculation is for particular existing order, so additional local variables are available.
  */
-double GetTrailingValue(ENUM_ORDER_TYPE cmd, int direction = -1, int order_type = 0, double previous = 0, bool existing = false) {
+double GetTrailingValue(ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_DOUBLE mode = ORDER_SL, int order_type = 0, double previous = 0, bool existing = false) {
   double diff;
-  bool one_way; // Move trailing stop only in one direction.
+  bool one_way; // Move trailing stop only in one mode.
   double new_value = 0;
   double extra_trail = 0;
   if (existing && TrailingStopAddPerMinute > 0 && OrderOpenTime() > 0) {
@@ -3274,18 +3258,18 @@ double GetTrailingValue(ENUM_ORDER_TYPE cmd, int direction = -1, int order_type 
         __FUNCTION__, __LINE__, min_elapsed, TrailingStopAddPerMinute, extra_trail);
     }
   }
-  int factor = (Order::OrderDirection(cmd) == direction ? +1 : -1);
+  int direction = Order::OrderDirection(cmd, mode);
   double trail = (TrailingStop + extra_trail) * pip_size;
-  double default_trail = (cmd == ORDER_TYPE_BUY ? Bid : Ask) + trail * factor;
-  int method = GetTrailingMethod(order_type, direction);
+  double default_trail = (cmd == ORDER_TYPE_BUY ? Bid : Ask) + trail * direction;
+  int method = GetTrailingMethod(order_type, mode);
   one_way = method > 0;
   ENUM_TIMEFRAMES tf = (ENUM_TIMEFRAMES) GetStrategyTimeframe(order_type);
   uint period = chart.TfToIndex(tf);
   string symbol = existing ? OrderSymbol() : _Symbol;
 
   if (VerboseDebug) {
-    PrintFormat("%s:%d: %s, %d, %d, %g): method = %d, trail = (%d + %g) * %g = %g",
-      __FUNCTION__, __LINE__, Order::OrderTypeToString(cmd), direction, order_type, previous,
+    PrintFormat("%s:%d: %s, %s, %d, %g): method = %d, trail = (%d + %g) * %g = %g",
+      __FUNCTION__, __LINE__, Order::OrderTypeToString(cmd), EnumToString(mode), order_type, previous,
       method,
       TrailingStop, extra_trail, pip_size, trail);
   }
@@ -3293,7 +3277,7 @@ double GetTrailingValue(ENUM_ORDER_TYPE cmd, int direction = -1, int order_type 
    double highest_ma, lowest_ma;
    switch (method) {
      case T_NONE: // 0: None.
-       new_value = trade.CalcOrderTakeProfit(cmd, factor > 0 ? TakeProfitMax : StopLossMax);
+       new_value = trade.CalcOrderSLTP(mode == ORDER_TP ? TakeProfitMax : StopLossMax, cmd, mode);
        break;
      case T1_FIXED: // 1: Dynamic fixed.
      case T2_FIXED:
@@ -3302,7 +3286,7 @@ double GetTrailingValue(ENUM_ORDER_TYPE cmd, int direction = -1, int order_type 
      case T1_OPEN_PREV: // 2: Previous open price.
      case T2_OPEN_PREV:
        diff = fabs(Open[CURR] - iOpen(symbol, tf, PREV));
-       new_value = Open[CURR] + diff * factor;
+       new_value = Open[CURR] + diff * direction;
        if (VerboseDebug) {
           PrintFormat("%s: T_OPEN_PREV: open = %g, prev_open = %g, diff = %g, new_value = %g",
             __FUNCTION__, Open[CURR], iOpen(symbol, tf, PREV), diff, new_value);
@@ -3311,33 +3295,33 @@ double GetTrailingValue(ENUM_ORDER_TYPE cmd, int direction = -1, int order_type 
      case T1_2_BARS_PEAK: // 3: Two bars peak.
      case T2_2_BARS_PEAK:
        diff = fmax(chart.GetPeakPrice(2, MODE_HIGH) - Open[CURR], Open[CURR] - chart.GetPeakPrice(2, MODE_LOW));
-       new_value = Open[CURR] + diff * factor;
+       new_value = Open[CURR] + diff * direction;
        break;
      case T1_5_BARS_PEAK: // 4: Five bars peak.
      case T2_5_BARS_PEAK:
        diff = fmax(chart.GetPeakPrice(5, MODE_HIGH) - Open[CURR], Open[CURR] - chart.GetPeakPrice(5, MODE_LOW));
-       new_value = Open[CURR] + diff * factor;
+       new_value = Open[CURR] + diff * direction;
        break;
      case T1_10_BARS_PEAK: // 5: Ten bars peak.
      case T2_10_BARS_PEAK:
        diff = fmax(chart.GetPeakPrice(10, MODE_HIGH) - Open[CURR], Open[CURR] - chart.GetPeakPrice(10, MODE_LOW));
-       new_value = Open[CURR] + diff * factor;
+       new_value = Open[CURR] + diff * direction;
        break;
      case T1_50_BARS_PEAK: // 6: 50 bars peak.
      case T2_50_BARS_PEAK:
        diff = fmax(chart.GetPeakPrice(50, MODE_HIGH) - Open[CURR], Open[CURR] - chart.GetPeakPrice(50, MODE_LOW));
-       new_value = Open[CURR] + diff * factor;
+       new_value = Open[CURR] + diff * direction;
        // @todo: Text non-Open values.
        break;
      case T1_150_BARS_PEAK: // 7: 150 bars peak.
      case T2_150_BARS_PEAK:
        diff = fmax(chart.GetPeakPrice(150, MODE_HIGH) - Open[CURR], Open[CURR] - chart.GetPeakPrice(150, MODE_LOW));
-       new_value = Open[CURR] + diff * factor;
+       new_value = Open[CURR] + diff * direction;
        break;
      case T1_HALF_200_BARS: // 8: 200 bars peak.
      case T2_HALF_200_BARS:
        diff = fmax(chart.GetPeakPrice(200, MODE_HIGH) - Open[CURR], Open[CURR] - chart.GetPeakPrice(200, MODE_LOW));
-       new_value = Open[CURR] + diff/2 * factor;
+       new_value = Open[CURR] + diff/2 * direction;
        break;
      case T1_HALF_PEAK_OPEN: // 9: Half price peak.
      case T2_HALF_PEAK_OPEN:
@@ -3348,65 +3332,65 @@ double GetTrailingValue(ENUM_ORDER_TYPE cmd, int direction = -1, int order_type 
          double highest_open = chart.GetPeakPrice(BarShiftOfTradeOpen + 1, MODE_HIGH);
          double lowest_open = chart.GetPeakPrice(BarShiftOfTradeOpen + 1, MODE_LOW);
          diff = fmax(highest_open - Open[CURR], Open[CURR] - lowest_open);
-         new_value = Open[CURR] + diff/2 * factor;
+         new_value = Open[CURR] + diff/2 * direction;
        }
        break;
      case T1_MA_F_PREV: // 10: MA Small (Previous).
      case T2_MA_F_PREV:
        UpdateIndicator(S_MA, tf);
        diff = fabs(Ask - ma_fast[period][PREV]);
-       new_value = Ask + diff * factor;
+       new_value = Ask + diff * direction;
        break;
      case T1_MA_F_FAR: // 11: MA Small (Far) + trailing stop. Optimize together with: MA_Shift_Far.
      case T2_MA_F_FAR:
        UpdateIndicator(S_MA, tf);
        diff = fabs(Ask - ma_fast[period][FAR]);
-       new_value = Ask + diff * factor;
+       new_value = Ask + diff * direction;
        break;
      case T1_MA_F_TRAIL: // 12: MA Fast (Current) + trailing stop. Works fine.
      case T2_MA_F_TRAIL:
        UpdateIndicator(S_MA, tf);
        diff = fabs(Ask - ma_fast[period][CURR]);
-       new_value = Ask + (diff + trail) * factor;
+       new_value = Ask + (diff + trail) * direction;
        break;
      case T1_MA_F_FAR_TRAIL: // 13: MA Fast (Far) + trailing stop. Works fine (SL pf: 1.26 for MA).
      case T2_MA_F_FAR_TRAIL:
        UpdateIndicator(S_MA, tf);
        diff = fabs(Open[CURR] - ma_fast[period][FAR]);
-       new_value = Open[CURR] + (diff + trail) * factor;
+       new_value = Open[CURR] + (diff + trail) * direction;
        break;
      case T1_MA_M: // 14: MA Medium (Current).
      case T2_MA_M:
        UpdateIndicator(S_MA, tf);
        diff = fabs(Ask - ma_medium[period][CURR]);
-       new_value = Ask + diff * factor;
+       new_value = Ask + diff * direction;
        break;
      case T1_MA_M_FAR: // 15: MA Medium (Far)
      case T2_MA_M_FAR:
        UpdateIndicator(S_MA, tf);
        diff = fabs(Ask - ma_medium[period][FAR]);
-       new_value = Ask + diff * factor;
+       new_value = Ask + diff * direction;
        break;
      case T1_MA_M_LOW: // 16: Lowest/highest value of MA Medium. Optimized (SL pf: 1.39 for MA).
      case T2_MA_M_LOW:
        UpdateIndicator(S_MA, tf);
        diff = fmax(Array::HighestArrValue2(ma_medium, period) - Open[CURR], Open[CURR] - Array::LowestArrValue2(ma_medium, period));
-       new_value = Open[CURR] + diff * factor;
+       new_value = Open[CURR] + diff * direction;
        break;
      case T1_MA_M_TRAIL: // 17: MA Small (Current) + trailing stop. Works fine (SL pf: 1.26 for MA).
      case T2_MA_M_TRAIL:
        UpdateIndicator(S_MA, tf);
        diff = fabs(Open[CURR] - ma_medium[period][CURR]);
-       new_value = Open[CURR] + (diff + trail) * factor;
+       new_value = Open[CURR] + (diff + trail) * direction;
        break;
      case T1_MA_M_FAR_TRAIL: // 18: MA Small (Far) + trailing stop. Optimized (SL pf: 1.29 for MA).
      case T2_MA_M_FAR_TRAIL:
        UpdateIndicator(S_MA, tf);
        diff = fabs(Open[CURR] - ma_medium[period][FAR]);
-       new_value = Open[CURR] + (diff + trail) * factor;
+       new_value = Open[CURR] + (diff + trail) * direction;
        if (VerboseDebug && new_value < 0) {
          PrintFormat("%s(): diff = fabs(%g - %g); new_value = %g + (%g + %g) * %g => %g",
-             __FUNCTION__, Open[CURR], ma_medium[period][FAR], Open[CURR], diff, trail, factor, new_value);
+             __FUNCTION__, Open[CURR], ma_medium[period][FAR], Open[CURR], diff, trail, direction, new_value);
        }
        break;
      case T1_MA_S: // 19: MA Slow (Current).
@@ -3414,20 +3398,20 @@ double GetTrailingValue(ENUM_ORDER_TYPE cmd, int direction = -1, int order_type 
        UpdateIndicator(S_MA, tf);
        diff = fabs(Ask - ma_slow[period][CURR]);
        // new_value = ma_slow[period][CURR];
-       new_value = Ask + diff * factor;
+       new_value = Ask + diff * direction;
        break;
      case T1_MA_S_FAR: // 20: MA Slow (Far).
      case T2_MA_S_FAR:
        UpdateIndicator(S_MA, tf);
        diff = fabs(Ask - ma_slow[period][FAR]);
        // new_value = ma_slow[period][FAR];
-       new_value = Ask + diff * factor;
+       new_value = Ask + diff * direction;
        break;
      case T1_MA_S_TRAIL: // 21: MA Slow (Current) + trailing stop. Optimized (SL pf: 1.29 for MA, PT pf: 1.23 for MA).
      case T2_MA_S_TRAIL:
        UpdateIndicator(S_MA, tf);
        diff = fabs(Open[CURR] - ma_slow[period][CURR]);
-       new_value = Open[CURR] + (diff + trail) * factor;
+       new_value = Open[CURR] + (diff + trail) * direction;
        break;
      case T1_MA_FMS_PEAK: // 22: Lowest/highest value of all MAs. Works fine (SL pf: 1.39 for MA, PT pf: 1.23 for MA).
      case T2_MA_FMS_PEAK:
@@ -3435,30 +3419,30 @@ double GetTrailingValue(ENUM_ORDER_TYPE cmd, int direction = -1, int order_type 
        highest_ma = fabs(fmax(fmax(Array::HighestArrValue2(ma_fast, period), Array::HighestArrValue2(ma_medium, period)), Array::HighestArrValue2(ma_slow, period)));
        lowest_ma = fabs(fmin(fmin(Array::LowestArrValue2(ma_fast, period), Array::LowestArrValue2(ma_medium, period)), Array::LowestArrValue2(ma_slow, period)));
        diff = fmax(fabs(highest_ma - Open[CURR]), fabs(Open[CURR] - lowest_ma));
-       new_value = Open[CURR] + diff * factor;
+       new_value = Open[CURR] + diff * direction;
        break;
      case T1_SAR: // 23: Current SAR value. Optimized.
      case T2_SAR:
        UpdateIndicator(S_SAR, tf);
        diff = fabs(Open[CURR] - sar[period][CURR]);
-       new_value = Open[CURR] + (diff + trail) * factor;
+       new_value = Open[CURR] + (diff + trail) * direction;
        if (VerboseDebug) PrintFormat("SAR Trail: %g, %g, %g", sar[period][CURR], sar[period][PREV], sar[period][FAR]);
        break;
      case T1_SAR_PEAK: // 24: Lowest/highest SAR value.
      case T2_SAR_PEAK:
        UpdateIndicator(S_SAR, tf);
        diff = fmax(fabs(Open[CURR] - Array::HighestArrValue2(sar, period)), fabs(Open[CURR] - Array::LowestArrValue2(sar, period)));
-       new_value = Open[CURR] + (diff + trail) * factor;
+       new_value = Open[CURR] + (diff + trail) * direction;
        break;
      case T1_BANDS: // 25: Current Bands value.
      case T2_BANDS:
        UpdateIndicator(S_BANDS, tf);
-       new_value = Order::OrderDirection(cmd) == direction ? bands[period][CURR][BANDS_UPPER] : bands[period][CURR][BANDS_LOWER];
+       new_value = direction > 0 ? bands[period][CURR][BANDS_UPPER] : bands[period][CURR][BANDS_LOWER];
        break;
      case T1_BANDS_PEAK: // 26: Lowest/highest Bands value.
      case T2_BANDS_PEAK:
        UpdateIndicator(S_BANDS, tf);
-       new_value = (Order::OrderDirection(cmd) == direction
+       new_value = (Order::OrderDirection(cmd) == mode
          ? fmax(fmax(bands[period][CURR][BANDS_UPPER], bands[period][PREV][BANDS_UPPER]), bands[period][FAR][BANDS_UPPER])
          : fmin(fmin(bands[period][CURR][BANDS_LOWER], bands[period][PREV][BANDS_LOWER]), bands[period][FAR][BANDS_LOWER])
          );
@@ -3466,24 +3450,24 @@ double GetTrailingValue(ENUM_ORDER_TYPE cmd, int direction = -1, int order_type 
      case T1_ENVELOPES: // 27: Current Envelopes value. // FIXME
      case T2_ENVELOPES:
        UpdateIndicator(S_ENVELOPES, tf);
-       new_value = Order::OrderDirection(cmd) == direction ? envelopes[period][CURR][UPPER] : envelopes[period][CURR][LOWER];
+       new_value = direction > 0 ? envelopes[period][CURR][UPPER] : envelopes[period][CURR][LOWER];
        break;
      default:
        Msg::ShowText(StringFormat("Unknown trailing stop method: %d", method), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
    }
 
-  if (new_value > 0) new_value += Convert::PointsToValue(market.GetTradeDistanceInPts()) * factor;
+  if (new_value > 0) new_value += Convert::PointsToValue(market.GetTradeDistanceInPts()) * direction;
   // + Convert::PointsToValue(GetSpreadInPts()) ?
 
   if (!market.TradeOpAllowed(cmd, new_value)) {
     #ifndef __limited__
-      if (existing && previous == 0 && direction == -1) previous = default_trail;
+      if (existing && previous == 0 && mode == -1) previous = default_trail;
     #else // If limited, then force the trailing value.
       if (existing && previous == 0) previous = default_trail;
     #endif
     Msg::ShowText(
-        StringFormat("#%d (d:%d/f:%d), method: %d, invalid value: %g, previous: %g, Ask/Bid/Gap: %f/%f/%f (%d pts); %s",
-          existing ? OrderTicket() : 0, direction, factor,
+        StringFormat("#%d (%s;d:%d), method: %d, invalid value: %g, previous: %g, Ask/Bid/Gap: %f/%f/%f (%d pts); %s",
+          existing ? OrderTicket() : 0, EnumToString(mode), direction,
           method, new_value, previous, Ask, Bid, Convert::PointsToValue(market.GetTradeDistanceInPts()), market.GetTradeDistanceInPts(), Order::OrderTypeToString(Order::OrderType())),
         "Debug", __FUNCTION__, __LINE__, VerboseDebug);
     // If value is invalid, fallback to the previous one.
@@ -3491,23 +3475,23 @@ double GetTrailingValue(ENUM_ORDER_TYPE cmd, int direction = -1, int order_type 
   }
 
   if (one_way) {
-    if (direction < 0) {
-      // Move trailing stop only one direction.
+    if (mode < 0) {
+      // Move trailing stop only one mode.
       if (previous == 0) previous = default_trail;
-      if (Order::OrderDirection(cmd) == direction) new_value = (new_value < previous || previous == 0) ? new_value : previous;
+      if (Order::OrderDirection(cmd) == mode) new_value = (new_value < previous || previous == 0) ? new_value : previous;
       else new_value = (new_value > previous || previous == 0) ? new_value : previous;
     }
-    else if (direction > 0) {
-      // Move profit take only one direction.
-      if (Order::OrderDirection(cmd) == direction) new_value = (new_value > previous || previous == 0) ? new_value : previous;
+    else if (mode > 0) {
+      // Move profit take only one mode.
+      if (Order::OrderDirection(cmd) == mode) new_value = (new_value > previous || previous == 0) ? new_value : previous;
       else new_value = (new_value < previous || previous == 0) ? new_value : previous;
     }
   }
 
   if (VerboseDebug) {
     Msg::ShowText(
-      StringFormat("Strategy: %s (%d), Method: %d, Tf: %d, Period: %d, Value: %g, Prev: %g, Factor: %d, Trail: %g (%g), LMA/HMA: %g/%g (%g/%g/%g|%g/%g/%g)",
-        sname[order_type], order_type, method, tf, period, new_value, previous, factor, trail, default_trail,
+      StringFormat("Strategy: %s (%d), Method: %d, Tf: %d, Period: %d, Value: %g, Prev: %g, Direction: %d, Trail: %g (%g), LMA/HMA: %g/%g (%g/%g/%g|%g/%g/%g)",
+        sname[order_type], order_type, method, tf, period, new_value, previous, direction, trail, default_trail,
         fabs(fmin(fmin(Array::LowestArrValue2(ma_fast, period), Array::LowestArrValue2(ma_medium, period)), Array::LowestArrValue2(ma_slow, period))),
         fabs(fmax(fmax(Array::HighestArrValue2(ma_fast, period), Array::HighestArrValue2(ma_medium, period)), Array::HighestArrValue2(ma_slow, period))),
         Array::LowestArrValue2(ma_fast, period), Array::LowestArrValue2(ma_medium, period), Array::LowestArrValue2(ma_slow, period),
@@ -3516,13 +3500,13 @@ double GetTrailingValue(ENUM_ORDER_TYPE cmd, int direction = -1, int order_type 
   }
   // if (VerboseDebug && Terminal::IsVisualMode()) Draw::ShowLine("trail_stop_" + OrderTicket(), new_value, GetOrderColor(EMPTY, ColorBuy, ColorSell));
 
-  return NormalizeDouble(new_value, market.GetDigits());
+  return market.NormalizeSLTP(new_value, cmd, mode);
 }
 
 /**
  * Get trailing method based on the strategy type.
  */
-int GetTrailingMethod(int order_type, int stop_or_profit) {
+int GetTrailingMethod(int order_type, ENUM_ORDER_PROPERTY_DOUBLE mode) {
   int stop_method = DefaultTrailingStopMethod, profit_method = DefaultTrailingProfitMethod;
   switch (order_type) {
     case MA1:
@@ -3619,7 +3603,7 @@ int GetTrailingMethod(int order_type, int stop_or_profit) {
     default:
       Msg::ShowText(StringFormat("Unknown order type: %s", order_type), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
   }
-  return stop_or_profit > 0 ? profit_method : stop_method;
+  return mode == ORDER_TP ? profit_method : stop_method;
 }
 
 /**
@@ -4195,7 +4179,7 @@ string GetLastErrMsg() {
  * Executed for every new day.
  */
 void StartNewDay() {
-  if (VerboseInfo) PrintFormat("== New day (day of month: %d; day of year: %d ==",  Day(), DayOfYear());
+  if (VerboseInfo) PrintFormat("== New day at %s ==", DateTime::TimeToStr(TimeCurrent()));
 
   // Print daily report at end of each day.
   if (VerboseInfo) Print(GetDailyReport());
@@ -4261,7 +4245,7 @@ void StartNewDay() {
  */
 void StartNewWeek() {
   if (StringLen(__FILE__) != 11) { ExpertRemove(); }
-  if (VerboseInfo) Print("== New week ==");
+  if (VerboseInfo) PrintFormat("== New week at %s ==", DateTime::TimeToStr(TimeCurrent()));
   if (VerboseInfo) Print(GetWeeklyReport()); // Print weekly report at end of each week.
 
   // Process actions.
@@ -4305,7 +4289,7 @@ void StartNewWeek() {
  * Executed for every new month.
  */
 void StartNewMonth() {
-  if (VerboseInfo) Print("== New month ==");
+  if (VerboseInfo) PrintFormat("== New month at %s ==", DateTime::TimeToStr(TimeCurrent()));
   if (VerboseInfo) Print(GetMonthlyReport()); // Print monthly report at end of each month.
 
   // Process actions.
@@ -5227,17 +5211,17 @@ double GetDefaultProfitFactor() {
  */
 double GetStrategyLotSize(int sid, ENUM_ORDER_TYPE cmd) {
   double trade_lot = (conf[sid][LOT_SIZE] > 0 ? conf[sid][LOT_SIZE] : ea_lot_size) * (conf[sid][FACTOR] > 0 ? conf[sid][FACTOR] : 1.0);
-  #ifdef __advanced__
   if (Boosting_Enabled) {
     double pf = GetStrategyProfitFactor(sid);
-    if (BoostByProfitFactor && pf > 1.0) trade_lot *= fmax(GetStrategyProfitFactor(sid), 1.0);
-    else if (HandicapByProfitFactor && pf < 1.0) trade_lot *= fmin(GetStrategyProfitFactor(sid), 1.0);
-  }
-  #endif
-  if (Boosting_Enabled && Convert::ValueToOp(curr_trend) == cmd && BoostTrendFactor != 1.0) {
-    if (VerboseDebug) PrintFormat("%s:%d: %s: Factor: %g, Trade lot: %g, Final trade lot: %g",
-      __FUNCTION__, __LINE__, sname[sid], conf[sid][FACTOR], trade_lot, trade_lot * BoostTrendFactor);
-    trade_lot *= BoostTrendFactor;
+    if (pf > 0) {
+      if (StrategyBoostByPF && pf > 1.0) trade_lot *= fmax(GetStrategyProfitFactor(sid), 1.0);
+      else if (StrategyHandicapByPF && pf < 1.0) trade_lot *= fmin(GetStrategyProfitFactor(sid), 1.0);
+    }
+    if (Convert::ValueToOp(curr_trend) == cmd && BoostTrendFactor != 1.0) {
+      if (VerboseDebug) PrintFormat("%s:%d: %s: Factor: %g, Trade lot: %g, Final trade lot: %g",
+        __FUNCTION__, __LINE__, sname[sid], conf[sid][FACTOR], trade_lot, trade_lot * BoostTrendFactor);
+      trade_lot *= BoostTrendFactor;
+    }
   }
   return market.NormalizeLots(trade_lot);
 }
@@ -5310,8 +5294,8 @@ void UpdateStrategyLotSize() {
  * Calculate strategy profit factor.
  */
 double GetStrategyProfitFactor(int sid) {
-  if (info[sid][TOTAL_ORDERS] > 20 && stats[sid][TOTAL_GROSS_LOSS] < 0) {
-    return (double)(stats[sid][TOTAL_GROSS_PROFIT] / -stats[sid][TOTAL_GROSS_LOSS]);
+  if (info[sid][TOTAL_ORDERS] > 20 && stats[sid][TOTAL_GROSS_PROFIT] > 0 && stats[sid][TOTAL_GROSS_LOSS] < 0) {
+    return (double) (stats[sid][TOTAL_GROSS_PROFIT] / -stats[sid][TOTAL_GROSS_LOSS]);
   } else {
     return 1.0;
   }
