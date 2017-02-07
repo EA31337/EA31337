@@ -11,12 +11,9 @@
 #include <EA31337\ea-mode.mqh>
 #include <EA31337\ea-code-conf.mqh>
 #include <EA31337\ea-defaults.mqh>
+#include <EA31337\ea-expire.mqh>
 #include <EA31337\ea-properties.mqh>
 #include <EA31337\ea-enums.mqh>
-
-#ifdef __expire__
-#include <EA31337/ea-expire.mqh>
-#endif
 
 #ifdef __advanced__
   #ifdef __rider__
@@ -334,6 +331,7 @@ int OnInit() {
   string err;
   if (VerboseInfo) PrintFormat("%s v%s (%s) initializing...", ea_name, ea_version, ea_link);
   if (!session_initiated) {
+    CheckExpireDate();
     err_code = CheckSettings();
     if (err_code < 0) {
       // Incorrect set of input parameters occured.
@@ -484,7 +482,7 @@ void start() {
  */
 string InitInfo(bool startup = false, string sep = "\n") {
   string extra = "";
-  #ifdef __expire__ extra += StringFormat(" [expires on %s]", TimeToStr(ea_expire_date, TIME_DATE)); #endif
+  #ifdef __expire__ CheckExpireDate(); extra += StringFormat(" [expires on %s]", TimeToStr(ea_expire_date, TIME_DATE)); #endif
   string output = StringFormat("%s v%s by %s (%s)%s%s", ea_name, ea_version, ea_author, ea_link, extra, sep);
   output += "ACCOUNT: " + account.ToString() + sep;
   output += "SYMBOL: " + ((SymbolInfo *)market).ToString() + sep;
@@ -5695,11 +5693,14 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
   string trend = "Neutral.";
   if (Convert::ValueToOp(curr_trend) == ORDER_TYPE_BUY) trend = "Bullish";
   if (Convert::ValueToOp(curr_trend) == ORDER_TYPE_SELL) trend = "Bearish";
+  // EA text.
+  string ea_text = StringFormat("%s v%s", ea_name, ea_version);
+  #ifdef __expire__ CheckExpireDate(); ea_text += StringFormat(" [expires on %s]", TimeToStr(ea_expire_date, TIME_DATE)); #endif
   // Print actual info.
   string indent = "";
   indent = "                      "; // if (total_orders > 5)?
   output = indent + "------------------------------------------------" + sep
-                  + indent + StringFormat("| %s v%s (Status: %s)%s", ea_name, ea_version, (ea_active ? "ACTIVE" : "NOT ACTIVE"), sep)
+                  + indent + StringFormat("| %s (Status: %s)%s", ea_text, (ea_active ? "ACTIVE" : "NOT ACTIVE"), sep)
                   + indent + StringFormat("| ACCOUNT INFORMATION:%s", sep)
                   + indent + StringFormat("| Server Name: %s, Time: %s%s", AccountInfoString(ACCOUNT_SERVER), TimeToStr(time_current, TIME_DATE|TIME_MINUTES|TIME_SECONDS), sep)
                   + indent + "| Acc Number: " + IntegerToString(account.AccountNumber()) + "; Acc Name: " + AccountName() + "; Broker: " + account.AccountCompany() + " (Type: " + account_type + ")" + sep
