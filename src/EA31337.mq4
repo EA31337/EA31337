@@ -331,7 +331,7 @@ int OnInit() {
   string err;
   if (VerboseInfo) PrintFormat("%s v%s (%s) initializing...", ea_name, ea_version, ea_link);
   if (!session_initiated) {
-    CheckExpireDate();
+    #ifdef __expire__ CheckExpireDate(); #endif
     err_code = CheckSettings();
     if (err_code < 0) {
       // Incorrect set of input parameters occured.
@@ -573,8 +573,8 @@ bool EA_Trade() {
       }
 
       if (!DisableCloseConditions) {
-        if (CheckMarketEvent(ORDER_TYPE_BUY,  (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][CLOSE_CONDITION])) CloseOrdersByType(ORDER_TYPE_SELL, id, NULL, CloseConditionOnlyProfitable); // TODO: reason_id
-        if (CheckMarketEvent(ORDER_TYPE_SELL, (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][CLOSE_CONDITION])) CloseOrdersByType(ORDER_TYPE_BUY,  id, NULL, CloseConditionOnlyProfitable); // TODO: reason_id
+        if (CheckMarketEvent(ORDER_TYPE_BUY,  (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][CLOSE_CONDITION])) CloseOrdersByType(ORDER_TYPE_SELL, id, R_OPPOSITE_SIGNAL, CloseConditionOnlyProfitable);
+        if (CheckMarketEvent(ORDER_TYPE_SELL, (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][CLOSE_CONDITION])) CloseOrdersByType(ORDER_TYPE_BUY,  id, R_OPPOSITE_SIGNAL, CloseConditionOnlyProfitable);
       }
 
       #ifdef __advanced__
@@ -705,8 +705,10 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
         alligator[index][i][LIPS]  = iMA(symbol, tf, (int) (Alligator_Period_Lips * ratio),  Alligator_Shift_Lips,  Alligator_MA_Method, Alligator_Applied_Price, shift);
         alligator[index][i][TEETH] = iMA(symbol, tf, (int) (Alligator_Period_Teeth * ratio), Alligator_Shift_Teeth, Alligator_MA_Method, Alligator_Applied_Price, shift);
         alligator[index][i][JAW]   = iMA(symbol, tf, (int) (Alligator_Period_Jaw * ratio),   Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, shift);
+        /**
         if (VerboseDebug) PrintFormat("%d: iMA(%s, %d, %d (%g), %d, %d, %d, %d) = %g",
           i, symbol, tf, (int) (Alligator_Period_Jaw * ratio), ratio, Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, shift, alligator[index][i][JAW]);
+        */
       }
       success = (bool) alligator[index][CURR][JAW] + alligator[index][PREV][JAW] + alligator[index][FAR][JAW];
       /* Note: This is equivalent to:
@@ -970,10 +972,10 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
 int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string order_comment = "", bool retry = true) {
    bool result = false;
    int order_ticket;
-   double trade_volume_max = market.GetMaxLot();
+   double trade_volume_max = market.GetVolumeMax();
 
   // if (VerboseTrace) Print(__FUNCTION__);
-   if (trade_volume <= market.GetMinLot()) {
+   if (trade_volume <= market.GetVolumeMin()) {
      trade_volume = GetStrategyLotSize(sid, cmd);
    } else {
      trade_volume = market.NormalizeLots(trade_volume);
@@ -995,8 +997,9 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
     if (VerboseDebug) Print(__FUNCTION__ + ": " + GetMarketTextDetails());
 
     double sl_trail = GetTrailingValue(cmd, ORDER_SL, sid);
-    double stoploss = trade.CalcBestSLTP(sl_trail, StopLossMax, RiskMarginPerOrder, ORDER_SL, cmd, market.GetMinLot());
-    double takeprofit = GetTrailingValue(cmd, ORDER_TP, sid);
+    double tp_trail = GetTrailingValue(cmd, ORDER_TP, sid);
+    double stoploss = trade.CalcBestSLTP(sl_trail, StopLossMax, RiskMarginPerOrder, ORDER_SL, cmd, market.GetVolumeMin());
+    double takeprofit = TakeProfitMax > 0 ? trade.CalcBestSLTP(tp_trail, TakeProfitMax, 0, ORDER_TP, cmd, market.GetVolumeMin()) : tp_trail;
     if (sl_trail != stoploss) {
       // @todo: Raise the condition on reaching the max stop loss.
       // @todo: Implement different methods of action.
@@ -1022,9 +1025,10 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
       }
     }
 
+  trade_volume = market.NormalizeLots(trade_volume);
    order_ticket = OrderSend(
       market.GetSymbol(), cmd,
-      market.NormalizeLots(trade_volume),
+      trade_volume,
       market.GetOpenOffer(cmd),
       max_order_slippage,
       NormalizeDouble(market.NormalizePrice(stoploss), market.GetDigits()),
@@ -1045,7 +1049,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
          StringFormat("OrderSend(%s, %s, %g, %f, %d, %f, %f, '%s', %d, %d, %d)",
            market.GetSymbol(),
            Order::OrderTypeToString(cmd),
-           market.NormalizeLots(trade_volume),
+           trade_volume,
            market.GetOpenOffer(cmd),
            max_order_slippage,
            NormalizeDouble(market.NormalizePrice(stoploss), market.GetDigits()),
@@ -1083,7 +1087,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
        StringFormat("OrderSend(%s, %s, %g, %f, %d, %f, %f, '%s', %d, %d, %d)",
          market.GetSymbol(),
          Order::OrderTypeToString(cmd),
-         market.NormalizeLots(trade_volume),
+         trade_volume,
          market.GetOpenOffer(cmd),
          max_order_slippage,
          NormalizeDouble(market.NormalizePrice(stoploss), market.GetDigits()),
@@ -1124,8 +1128,12 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
         // Invalid trade volume.
         // Usually happens when volume is not normalized, or on invalid volume value.
        if (WriteReport) ReportAdd(last_debug);
-       Msg::ShowText(StringFormat("Volume: %g", market.NormalizeLots(trade_volume)), "Error", __FUNCTION__, __LINE__, VerboseErrors);
+       Msg::ShowText(
+         StringFormat("Volume: %g (Min: %g, Max: %g, Step: %g)",
+           trade_volume, market.GetVolumeMin(), market.GetVolumeMax(), market.GetVolumeStep()),
+           "Error", __FUNCTION__, __LINE__, VerboseErrors);
        retry = false;
+       ExpertRemove();
      }
      if (err_code == ERR_TRADE_EXPIRATION_DENIED) {
        // Applying of pending order expiration time can be disabled in some trade servers.
@@ -1156,7 +1164,7 @@ bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, int sid = EMPTY, double volume = EM
   // if (VerboseTrace) Print(__FUNCTION__);
   // total_sl = Orders::TotalSL(); // Convert::ValueToMoney(Orders::TotalSL(ORDER_TYPE_BUY)), Convert::ValueToMoney(Orders::TotalSL(ORDER_TYPE_SELL)
   // total_tp = Orders::TotalTP(); // Convert::ValueToMoney(Orders::TotalSL(ORDER_TYPE_BUY)), Convert::ValueToMoney(Orders::TotalSL(ORDER_TYPE_SELL)
-  if (volume < market.GetMinLot()) {
+  if (volume < market.GetVolumeMin()) {
     last_trace = Msg::ShowText(StringFormat("%s: Lot size = %.2f", sname[sid], volume), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
     result = false;
   } else if (!account.Trades().IsNewOrderAllowed()) {
@@ -3125,7 +3133,7 @@ bool UpdateTrailingStops() {
   // New StopLoss/TakeProfit.
   double prev_sl, prev_tp;
   double new_sl, new_tp;
-  double trail_sl;
+  double trail_sl, trail_tp;
   int sid;
 
    // Check if bar time has been changed since last time.
@@ -3180,7 +3188,8 @@ bool UpdateTrailingStops() {
         }
         if (new_sl != prev_sl) {
           // Re-calculate TP only when SL is changed.
-          new_tp = GetTrailingValue(Order::OrderType(), ORDER_TP, sid, Order::OrderTakeProfit(), true);
+          trail_tp = GetTrailingValue(Order::OrderType(), ORDER_TP, sid, Order::OrderTakeProfit(), true);
+          new_tp = TakeProfitMax > 0 ? trade.CalcBestSLTP(trail_tp, TakeProfitMax, 0, ORDER_TP) : trail_tp;
         }
 
         if (!market.TradeOpAllowed(Order::OrderType(), new_sl, new_tp)) {
@@ -3921,8 +3930,8 @@ int GetNoOfStrategies() {
 /**
  * Calculate size of the lot based on the free margin and account leverage automatically.
  */
-double GetLotSizeAuto(bool smooth = true) {
-  double new_lot_size = trade.CalcLotSize(ea_risk_margin_per_order, ea_risk_ratio);
+double GetLotSizeAuto(uint _method = 0, bool smooth = true) {
+  double new_lot_size = trade.CalcLotSize(ea_risk_margin_per_order, ea_risk_ratio, _method);
 
   #ifdef __advanced__
   if (Boosting_Enabled) {
@@ -3962,7 +3971,7 @@ double GetLotSizeAuto(bool smooth = true) {
  * Return current lot size to trade.
  */
 double GetLotSize() {
-  return market.NormalizeLots(LotSize == 0 ? GetLotSizeAuto() : LotSize);
+  return market.NormalizeLots(LotSize <= 0 ? GetLotSizeAuto((uint) fabs(LotSize)) : LotSize);
 }
 
 /**
@@ -4126,7 +4135,7 @@ void StartNewHour() {
   max_orders = GetMaxOrders(ea_lot_size);
 
   if (VerboseDebug) {
-    PrintFormat("== New hour at %s (risk ratio: %g, max orders: %d)",
+    PrintFormat("== New hour at %s (risk ratio: %.2f, max orders: %d)",
       DateTime::TimeToStr(TimeCurrent()), ea_risk_ratio, max_orders);
   }
 
@@ -4373,25 +4382,31 @@ bool InitVariables() {
   }
 
   // @todo: Move to method.
-  if (market.GetLotStepInPts() <= 0.0) {
+  if (market.GetVolumeStep() <= 0.0) {
     init &= !ValidateSettings;
-    Msg::ShowText(StringFormat("Invalid MODE_LOTSTEP: %g", market.GetLotStepInPts()), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
+    Msg::ShowText(StringFormat("Invalid SYMBOL_VOLUME_STEP: %g", market.GetVolumeStep()), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
     // market.GetLotStepInPts() = 0.01;
   }
 
   // @todo: Move to method.
   // Check the minimum permitted amount of a lot.
-  if (market.GetMinLot() <= 0.0) {
+  if (market.GetVolumeMin() <= 0.0) {
     init &= !ValidateSettings;
-    Msg::ShowText(StringFormat("Invalid MODE_MINLOT: %g", market.GetMinLot()), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
+    Msg::ShowText(StringFormat("Invalid SYMBOL_VOLUME_MIN: %g", market.GetVolumeMin()), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
     // market.GetMinLot() = market.GetLotStepInPts();
   }
 
   // @todo: Move to method.
   // Check the maximum permitted amount of a lot.
-  if (market.GetMaxLot() <= 0.0) {
+  if (market.GetVolumeMax() <= 0.0) {
     init &= !ValidateSettings;
-    Msg::ShowText(StringFormat("Invalid MODE_MAXLOT: %g", market.GetMaxLot()), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
+    Msg::ShowText(StringFormat("Invalid SYMBOL_VOLUME_MAX: %g", market.GetVolumeMax()), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
+  }
+
+  // @todo: Move to method.
+  if (market.GetVolumeStep() > market.GetVolumeMin()) {
+    init &= !ValidateSettings;
+    Msg::ShowText(StringFormat("Step lot is higher than min lot (%g > %g)", market.GetVolumeStep(), market.GetVolumeMin()), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
   }
 
   if (market.GetMarginRequired() == 0) {
@@ -4437,14 +4452,14 @@ bool InitVariables() {
   ea_risk_ratio = GetRiskRatio();   // Re-calculate risk ratio.
   ea_risk_margin_per_order = GetRiskMarginPerOrder(); // Calculate the risk margin per order.
   ea_risk_margin_total = GetRiskMarginInTotal(); // Calculate the risk margin for all orders.
-  ea_lot_size = GetLotSize();       // Re-calculate lot size (dependent on ea_risk_ratio).
+  ea_lot_size = GetLotSize();       // Calculate lot size (dependent on ea_risk_ratio).
   if (ea_lot_size <= 0) {
     Msg::ShowText(StringFormat("Lot size is %g!", ea_lot_size), "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
     if (ValidateSettings) {
       // @fixme: Fails on Gold H1.
       return (false);
     } else {
-      ea_lot_size = market.GetMinLot();
+      ea_lot_size = market.GetVolumeMin();
     }
   }
   max_orders = GetMaxOrders(ea_lot_size);
@@ -5293,7 +5308,7 @@ void UpdateStrategyLotSize() {
  */
 double GetStrategyProfitFactor(int sid) {
   if (info[sid][TOTAL_ORDERS] > 20 && stats[sid][TOTAL_GROSS_LOSS] < 0) {
-    return (double) (stats[sid][TOTAL_GROSS_PROFIT] / -stats[sid][TOTAL_GROSS_LOSS]);
+    return stats[sid][TOTAL_GROSS_PROFIT] / -stats[sid][TOTAL_GROSS_LOSS];
   } else {
     return 1.0;
   }
@@ -5712,7 +5727,7 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
                      + sep
                   + indent + "| Lot size: " + DoubleToStr(ea_lot_size, market.GetVolumeDigits()) + "; " + text_max_orders + sep
                   + indent + "| Risk ratio: " + DoubleToStr(ea_risk_ratio, 1) + " (" + GetRiskRatioText() + ")" + sep
-                  + indent + (RiskMarginTotal >= 0 ? StringFormat("| Risk margin level: Total: %g (Buy:%g, Sell:%g)", ea_margin_risk_level[2], ea_margin_risk_level[ORDER_TYPE_BUY], ea_margin_risk_level[ORDER_TYPE_SELL]) : "| Risk margin level: Disabled") + sep
+                  + indent + (RiskMarginTotal >= 0 ? StringFormat("| Risk margin level: Total: %.2f (Buy:%.2f, Sell:%.2f)", ea_margin_risk_level[2], ea_margin_risk_level[ORDER_TYPE_BUY], ea_margin_risk_level[ORDER_TYPE_SELL]) : "| Risk margin level: Disabled") + sep
                   + indent + "| " + GetOrdersStats("" + sep + indent + "| ") + "" + sep
                   + indent + "| Last error: " + last_err + "" + sep
                   + indent + "| Last message: " + last_msg + "" + sep
@@ -6180,6 +6195,7 @@ string ReasonIdToText(int rid) {
     case R_ACC_PDAY_IN_LOSS: output = "Previous day in loss"; break;
     case R_ACC_MAX_ORDERS: output = "Maximum orders opened"; break;
     case R_ORDER_EXPIRED: output = "Order expired (CloseOrderAfterXHours)"; break;
+    case R_OPPOSITE_SIGNAL: output = "Opposite signal"; break;
   }
   return output;
 }

@@ -32,7 +32,7 @@ extern uint   TickIgnoreMethod = 0; // Tick ignore method (0-5, 0 - off)
 
 //+------------------------------------------------------------------+
 extern string   __EA_Order_Parameters__ = "-- Profit and loss parameters --"; // >>> PROFIT/LOSS <<<
-extern uint     TakeProfitMax = 200; // Max Take profit (in pips, 0 = auto)
+extern uint     TakeProfitMax = 0; // Max Take profit (in pips, 0 = auto)
 extern uint     StopLossMax = 40; // Max Stop loss (in pips, 0 = auto)
 
 //+------------------------------------------------------------------+
