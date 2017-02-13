@@ -699,7 +699,7 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
 #endif
     case S_ALLIGATOR: // Calculates the Alligator indicator.
       // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
-      ratio = tf == 30 ? 1.0 : fmax(Alligator_Period_Ratio, NEAR_ZERO) / tf * 30;
+      ratio = tf == 30 ? 1.0 : pow(Alligator_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         shift = i + Alligator_Shift + (i == FINAL_ENUM_INDICATOR_INDEX - 1 ? Alligator_Shift_Far : 0);
         alligator[index][i][LIPS]  = iMA(symbol, tf, (int) (Alligator_Period_Lips * ratio),  Alligator_Shift_Lips,  Alligator_MA_Method, Alligator_Applied_Price, shift);
@@ -720,7 +720,7 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
       break;
 #ifdef __advanced__
     case S_ATR: // Calculates the Average True Range indicator.
-      ratio = tf == 30 ? 1.0 : fmax(ATR_Period_Ratio, NEAR_ZERO) / tf * 30;
+      ratio = tf == 30 ? 1.0 : pow(ATR_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         atr[index][i][FAST] = iATR(symbol, tf, (int) (ATR_Period_Fast * ratio), i);
         atr[index][i][SLOW] = iATR(symbol, tf, (int) (ATR_Period_Slow * ratio), i);
@@ -735,8 +735,8 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
     case S_BANDS: // Calculates the Bollinger Bands indicator.
       // int sid, bands_period = Bands_Period; // Not used at the moment.
       // sid = GetStrategyViaIndicator(BANDS, tf); bands_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
-      ratio = tf == 30 ? 1.0 : fmax(Bands_Period_Ratio, NEAR_ZERO) / tf * 30;
-      ratio2 = tf == 30 ? 1.0 : fmax(Bands_Deviation_Ratio, NEAR_ZERO) / tf * 30;
+      ratio = tf == 30 ? 1.0 : pow(Bands_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
+      ratio2 = tf == 30 ? 1.0 : pow(Bands_Deviation_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         shift = i + Bands_Shift + (i == FINAL_ENUM_INDICATOR_INDEX - 1 ? Bands_Shift_Far : 0);
         bands[index][i][BANDS_BASE]  = iBands(symbol, tf, (int) (Bands_Period * ratio), Bands_Deviation * ratio2, 0, Bands_Applied_Price, BANDS_BASE,  shift);
@@ -748,9 +748,10 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
       break;
 #ifdef __advanced__
     case S_BPOWER: // Calculates the Bears Power and Bulls Power indicators.
+      ratio = tf == 30 ? 1.0 : pow(BPower_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        bpower[index][i][ORDER_TYPE_BUY]  = iBullsPower(symbol, tf, BPower_Period, BPower_Applied_Price, i);
-        bpower[index][i][ORDER_TYPE_SELL] = iBearsPower(symbol, tf, BPower_Period, BPower_Applied_Price, i);
+        bpower[index][i][ORDER_TYPE_BUY]  = iBullsPower(symbol, tf, BPower_Period * ratio, BPower_Applied_Price, i);
+        bpower[index][i][ORDER_TYPE_SELL] = iBearsPower(symbol, tf, BPower_Period * ratio, BPower_Applied_Price, i);
       }
       success = (bool)(bpower[index][CURR][ORDER_TYPE_BUY] || bpower[index][CURR][ORDER_TYPE_SELL]);
       // Message("Bulls: " + bpower[index][CURR][ORDER_TYPE_BUY] + ", Bears: " + bpower[index][CURR][ORDER_TYPE_SELL]);
@@ -770,7 +771,7 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
       break;
 #endif
     case S_DEMARKER: // Calculates the DeMarker indicator.
-      ratio = tf == 30 ? 1.0 : fmax(DeMarker_Period_Ratio, NEAR_ZERO) / tf * 30;
+      ratio = tf == 30 ? 1.0 : pow(DeMarker_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         demarker[index][i] = iDeMarker(symbol, tf, (int) (DeMarker_Period * ratio), i + DeMarker_Shift);
       }
@@ -788,8 +789,8 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
         case M30: envelopes_deviation = Envelopes30_Deviation; break;
       }
       */
-      ratio = 30 / fmax(Envelopes_MA_Period_Ratio, NEAR_ZERO) / 30 / 30 * tf;
-      ratio2 = 30 / fmax(Envelopes_Deviation_Ratio, NEAR_ZERO) / 30 / 30 * tf;
+      ratio = tf == 30 ? 1.0 : pow(Envelopes_MA_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
+      ratio2 = tf == 30 ? 1.0 : pow(Envelopes_Deviation_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         envelopes[index][i][MODE_MAIN] = iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, MODE_MAIN,  i + Envelopes_Shift);
         envelopes[index][i][UPPER]     = iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, UPPER, i + Envelopes_Shift);
@@ -834,7 +835,7 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
       break;
     case S_MA: // Calculates the Moving Average indicator.
       // Calculate MA Fast.
-      ratio = tf == 30 ? 1.0 : fmax(MA_Period_Ratio, NEAR_ZERO) / tf * 30;
+      ratio = tf == 30 ? 1.0 : pow(MA_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         shift = i + MA_Shift + (i == FINAL_ENUM_INDICATOR_INDEX - 1 ? MA_Shift_Far : 0);
         ma_fast[index][i]   = iMA(symbol, tf, (int) (MA_Period_Fast * ratio),   MA_Shift_Fast,   MA_Method, MA_Applied_Price, shift);
@@ -855,7 +856,7 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
       // if (VerboseDebug && Check::IsVisualMode()) Draw::DrawMA(tf);
       break;
     case S_MACD: // Calculates the Moving Averages Convergence/Divergence indicator.
-      ratio = tf == 30 ? 1.0 : fmax(MACD_Period_Ratio, NEAR_ZERO) / tf * 30;
+      ratio = tf == 30 ? 1.0 : pow(MACD_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));      ratio = tf == 30 ? 1.0 : fmax(MACD_Period_Ratio, NEAR_ZERO) / tf * 30;
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         shift = i + MACD_Shift + (i == FINAL_ENUM_INDICATOR_INDEX - 1 ? MACD_Shift_Far : 0);
         macd[index][i][MODE_MAIN]   = iMACD(symbol, tf, (int) (MACD_Period_Fast * ratio), (int) (MACD_Period_Slow * ratio), (int) (MACD_Period_Signal * ratio), MACD_Applied_Price, MODE_MAIN,   shift);
@@ -892,7 +893,7 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
     case S_RSI: // Calculates the Relative Strength Index indicator.
       // int rsi_period = RSI_Period; // Not used at the moment.
       // sid = GetStrategyViaIndicator(RSI, tf); rsi_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
-      ratio = tf == 30 ? 1.0 : fmax(RSI_Period_Ratio, NEAR_ZERO) / tf * 30;
+      ratio = tf == 30 ? 1.0 : pow(RSI_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));      ratio = tf == 30 ? 1.0 : fmax(MACD_Period_Ratio, NEAR_ZERO) / tf * 30;
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         rsi[index][i] = iRSI(symbol, tf, (int) (RSI_Period * ratio), RSI_Applied_Price, i + RSI_Shift);
         if (rsi[index][i] > rsi_stats[index][UPPER]) rsi_stats[index][UPPER] = rsi[index][i]; // Calculate maximum value.
@@ -913,7 +914,7 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
       success = (bool) rvi[index][CURR][MODE_MAIN];
       break;
     case S_SAR: // Calculates the Parabolic Stop and Reverse system indicator.
-      ratio = tf == 30 ? 1.0 : fmax(SAR_Step_Ratio, NEAR_ZERO) / tf * 30;
+      ratio = tf == 30 ? 1.0 : pow(SAR_Step_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));      ratio = tf == 30 ? 1.0 : fmax(MACD_Period_Ratio, NEAR_ZERO) / tf * 30;
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         sar[index][i] = iSAR(symbol, tf, SAR_Step * ratio, SAR_Maximum_Stop, i + SAR_Shift);
       }
@@ -938,7 +939,7 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
       break;
     case S_WPR: // Calculates the  Larry Williams' Percent Range.
       // Update the Larry Williams' Percent Range indicator values.
-      ratio = tf == 30 ? 1.0 : fmax(WPR_Period_Ratio, NEAR_ZERO) / tf * 30;
+      ratio = tf == 30 ? 1.0 : pow(WPR_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));      ratio = tf == 30 ? 1.0 : fmax(MACD_Period_Ratio, NEAR_ZERO) / tf * 30;
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         wpr[index][i] = -iWPR(symbol, tf, (int) (WPR_Period * ratio), i + WPR_Shift);
       }
@@ -1590,7 +1591,6 @@ bool Trade_ADX(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
   return result;
 }
 
-
 /**
  * Check if Alligator indicator is on buy or sell.
  *
@@ -1602,7 +1602,7 @@ bool Trade_ADX(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
  */
 bool Trade_Alligator(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   // [x][0] - The Blue line (Alligator's Jaw), [x][1] - The Red Line (Alligator's Teeth), [x][2] - The Green Line (Alligator's Lips)
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
+  bool result = false; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_ALLIGATOR, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_ALLIGATOR, tf, 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(S_ALLIGATOR, tf, 0.0);
@@ -1612,67 +1612,57 @@ bool Trade_Alligator(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int si
     case ORDER_TYPE_BUY:
       result = (
         alligator[period][CURR][LIPS] > alligator[period][CURR][TEETH] + gap && // Check if Lips are above Teeth ...
-        alligator[period][CURR][LIPS] > alligator[period][CURR][JAW] + gap && // ... Lips are above Jaw ...
         alligator[period][CURR][TEETH] > alligator[period][CURR][JAW] + gap // ... Teeth are above Jaw ...
         );
       if (signal_method != 0) {
-        if ((signal_method %   1) == 0) result &= alligator[period][PREV][LIPS] > alligator[period][PREV][TEETH]; // Check if previous Lips were above Teeth.
-        if ((signal_method %   2) == 0) result &= alligator[period][PREV][LIPS] > alligator[period][PREV][JAW]; // Check if previous Lips were above Jaw.
-        if ((signal_method %   4) == 0) result &= alligator[period][PREV][TEETH] > alligator[period][PREV][JAW]; // Check if previous Teeth were above Jaw.
-        if ((signal_method %   8) == 0) result &= alligator[period][CURR][LIPS] < alligator[period][PREV][LIPS]; // Check if Lips decreased since last bar.
-        if ((signal_method %  16) == 0) result &= alligator[period][CURR][LIPS] - alligator[period][PREV][TEETH] > alligator[period][PREV][TEETH] - alligator[period][PREV][JAW];
-        if ((signal_method %  32) == 0) result &= (
-          alligator[period][FAR][LIPS] < alligator[period][FAR][TEETH] || // Check if Lips are below Teeth and ...
-          alligator[period][FAR][LIPS] < alligator[period][FAR][JAW] || // ... Lips are below Jaw and ...
-          alligator[period][FAR][TEETH] < alligator[period][FAR][JAW] // ... Teeth are below Jaw ...
+        if ((signal_method %  1) == 0) result &= (
+          alligator[period][CURR][LIPS] > alligator[period][PREV][LIPS] && // Check if Lips increased.
+          alligator[period][CURR][TEETH] > alligator[period][PREV][TEETH] && // Check if Teeth increased.
+          alligator[period][CURR][JAW] > alligator[period][PREV][JAW] // // Check if Jaw increased.
+          );
+        if ((signal_method %  2) == 0) result &= (
+          alligator[period][PREV][LIPS] > alligator[period][FAR][LIPS] && // Check if Lips increased.
+          alligator[period][PREV][TEETH] > alligator[period][FAR][TEETH] && // Check if Teeth increased.
+          alligator[period][PREV][JAW] > alligator[period][FAR][JAW] // // Check if Jaw increased.
+          );
+        if ((signal_method %  4) == 0) result &= alligator[period][CURR][LIPS] > alligator[period][FAR][LIPS]; // Check if Lips increased.
+        if ((signal_method %  8) == 0) result &= alligator[period][CURR][LIPS] - alligator[period][CURR][TEETH] > alligator[period][CURR][TEETH] - alligator[period][CURR][JAW];
+        if ((signal_method % 16) == 0) result &= (
+          alligator[period][FAR][LIPS] <= alligator[period][FAR][TEETH] || // Check if Lips are below Teeth and ...
+          alligator[period][FAR][LIPS] <= alligator[period][FAR][JAW] || // ... Lips are below Jaw and ...
+          alligator[period][FAR][TEETH] <= alligator[period][FAR][JAW] // ... Teeth are below Jaw ...
           );
       }
-      /* TODO:
-            //3. Alligator & Fractals
-            //Buy: all 3 Alligator lines grow/ don't fall/ (3 periods in succession) and fractal (upper line) is above teeth
-            //Sell: all 3 Alligator lines fall/don't grow/ (3 periods in succession) and fractal (lower line) is below teeth
-            //Fracal shift=2 because of the indicator nature
-            if (iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORLIPS,2)<=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORLIPS,1)
-            && iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORLIPS,1)<=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORLIPS,0)
-            && iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORJAW,2)<=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORJAW,1)
-            && iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORJAW,1)<=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORJAW,0)
-            && iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORTEETH,2)<=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORTEETH,1)
-            && iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORTEETH,1)<=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORTEETH,0)
-            && iFractals(NULL,pifr,UPPER,2)>=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORTEETH,0))
-            {f3=1;}
-            if (iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORLIPS,2)>=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORLIPS,1)
-            && iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORLIPS,1)>=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORLIPS,0)
-            && iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORJAW,2)>=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORJAW,1)
-            && iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORJAW,1)>=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORJAW,0)
-            && iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORTEETH,2)>=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORTEETH,1)
-            && iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORTEETH,1)>=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORTEETH,0)
-            && iFractals(NULL,pifr,LOWER,2)<=iAlligator(NULL,piall,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,MODE_GATORTEETH,0))
-            {f3=-1;}
-      */
       break;
     case ORDER_TYPE_SELL:
       result = (
         alligator[period][CURR][LIPS] + gap < alligator[period][CURR][TEETH] && // Check if Lips are below Teeth and ...
-        alligator[period][CURR][LIPS] + gap < alligator[period][CURR][JAW] && // ... Lips are below Jaw and ...
         alligator[period][CURR][TEETH] + gap < alligator[period][CURR][JAW] // ... Teeth are below Jaw ...
         );
       if (signal_method != 0) {
-        if ((signal_method %   1) == 0) result &= alligator[period][PREV][LIPS] < alligator[period][PREV][TEETH]; // Check if previous Lips were below Teeth.
-        if ((signal_method %   2) == 0) result &= alligator[period][PREV][LIPS] < alligator[period][PREV][JAW]; // Previous Lips were below Jaw.
-        if ((signal_method %   4) == 0) result &= alligator[period][PREV][TEETH] < alligator[period][PREV][JAW]; // Previous Teeth were below Jaw.
-        if ((signal_method %   8) == 0) result &= alligator[period][CURR][LIPS] > alligator[period][PREV][LIPS]; // Check if Lips increased since last bar.
-        if ((signal_method %  16) == 0) result &= alligator[period][PREV][TEETH] - alligator[period][CURR][LIPS] > alligator[period][PREV][JAW] - alligator[period][PREV][TEETH];
-        if ((signal_method %  32) == 0) result &= (
-          alligator[period][FAR][LIPS] > alligator[period][FAR][TEETH] || // Check if Lips are above Teeth ...
-          alligator[period][FAR][LIPS] > alligator[period][FAR][JAW] || // ... Lips are above Jaw ...
-          alligator[period][FAR][TEETH] > alligator[period][FAR][JAW] // ... Teeth are above Jaw ...
+        if ((signal_method %  1) == 0) result &= (
+          alligator[period][CURR][LIPS] < alligator[period][PREV][LIPS] && // Check if Lips decreased.
+          alligator[period][CURR][TEETH] < alligator[period][PREV][TEETH] && // Check if Teeth decreased.
+          alligator[period][CURR][JAW] < alligator[period][PREV][JAW] // // Check if Jaw decreased.
+          );
+        if ((signal_method %  2) == 0) result &= (
+          alligator[period][PREV][LIPS] < alligator[period][FAR][LIPS] && // Check if Lips decreased.
+          alligator[period][PREV][TEETH] < alligator[period][FAR][TEETH] && // Check if Teeth decreased.
+          alligator[period][PREV][JAW] < alligator[period][FAR][JAW] // // Check if Jaw decreased.
+          );
+        if ((signal_method %  4) == 0) result &= alligator[period][CURR][LIPS] < alligator[period][FAR][LIPS]; // Check if Lips decreased.
+        if ((signal_method %  8) == 0) result &= alligator[period][CURR][TEETH] - alligator[period][CURR][LIPS] > alligator[period][CURR][JAW] - alligator[period][CURR][TEETH];
+        if ((signal_method % 16) == 0) result &= (
+          alligator[period][FAR][LIPS] >= alligator[period][FAR][TEETH] || // Check if Lips are above Teeth ...
+          alligator[period][FAR][LIPS] >= alligator[period][FAR][JAW] || // ... Lips are above Jaw ...
+          alligator[period][FAR][TEETH] >= alligator[period][FAR][JAW] // ... Teeth are above Jaw ...
           );
       }
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
-    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
+    PrintFormat("%s:%d: Signal: %d/%d/%d/%g; Trend: %g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level, curr_trend);
   }
   return result;
 }
