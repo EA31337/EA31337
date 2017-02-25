@@ -1,9 +1,11 @@
+SHELL:=/usr/bin/env bash
+
 .PHONY: all test compile-mql4 compile-mql5 requirements set-none \
 		clean clean-src clean-releases \
 		Lite-Backtest Advanced-Backtest Rider-Backtest \
 		Lite Advanced Rider
 
-MQL=mql.exe
+MQL=metaeditor.exe
 SRC=$(wildcard src/*.mq4)
 EA=EA31337
 EX4=src/$(EA).ex4
@@ -37,11 +39,11 @@ compile-mql5: requirements $(MQL) clean-src $(OUT)/$(EA).ex5
 	@echo MQL5 compiled.
 
 test: requirements set-mode $(MQL)
-	wine mql.exe /s /i:src /mql4 $(SRC)
-	wine mql.exe /s /i:src /mql5 $(SRC)
+	wine metaeditor.exe /s /i:src /mql4 $(SRC)
+	wine metaeditor.exe /s /i:src /mql5 $(SRC)
 
-#mql.exe:
-#  curl -O http://files.metaquotes.net/metaquotes.software.corp/mt5/mql.exe
+metaeditor.exe:
+	curl -LO https://github.com/EA31337/FX-MT-VM/releases/download/4.x/metaeditor.exe
 
 # E.g.: make set-mode MODE="__advanced__"
 set-mode:
@@ -95,7 +97,7 @@ clean-releases: set-none
 	@echo Cleaning releases...
 	find "$(OUT)" '(' -name '*.ex4' -or -name '*.ex5' ')' -delete
 
-release: mql.exe \
+release: metaeditor.exe \
 		clean-all \
 		$(OUT)/$(EA)-Lite-%.ex4 \
 		$(OUT)/$(EA)-Advanced-%.ex4 \
@@ -161,11 +163,11 @@ $(OUT)/$(EA)-Rider-%.ex4: \
 		set-none
 	cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-v$(VER).ex4"
 
-$(OUT)/$(EA).ex4: src/$(EA).mq4 src/include/EA31337/ea-mode.mqh
-	wine mql.exe /o /i:src /mql4 $(SRC)
+$(OUT)/$(EA).ex4: metaeditor.exe src/$(EA).mq4 src/include/EA31337/ea-mode.mqh
+	SRC='$(SRC)'; wine metaeditor.exe /log:CON /compile:"$${SRC//\//\\}" /inc:"src" || true
 
-$(OUT)/$(EA).ex5: src/$(EA).mq4 src/include/EA31337/ea-mode.mqh
-	wine mql.exe /o /i:src /mql5 $(SRC)
+$(OUT)/$(EA).ex5: metaeditor.exe src/$(EA).mq4 src/include/EA31337/ea-mode.mqh
+	SRC='$(SRC)'; wine metaeditor.exe /log:CON /compile:"$${SRC//\//\\}" /inc:"src" || true
 
 mt4-install:
 		install -v "$(EX4)" "$(shell find ~/.wine -name terminal.exe -execdir pwd ';' -quit)/MQL4/Experts"
