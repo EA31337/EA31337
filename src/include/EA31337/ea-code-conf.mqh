@@ -26,6 +26,9 @@
   #ifndef __nolicense__
     #define __nolicense__    // Disable licensing.
   #endif
+  #ifndef __profiler__
+    #define __profiler__
+  #endif
 #endif
 
 #ifdef __rider__

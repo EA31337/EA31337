@@ -45,7 +45,6 @@
 //+------------------------------------------------------------------+
 // #include <EA31337-classes\Account.mqh>
 #include <EA31337-classes\Array.mqh>
-#include <EA31337-classes\Backtest.mqh>
 // #include <EA31337-classes\Chart.mqh>
 #include <EA31337-classes\Convert.mqh>
 #include <EA31337-classes\DateTime.mqh>
@@ -64,10 +63,13 @@
 #include <EA31337-classes\String.mqh>
 #include <EA31337-classes\SummaryReport.mqh>
 #include <EA31337-classes\Terminal.mqh>
+#include <EA31337-classes\Tester.mqh>
 #include <EA31337-classes\Tests.mqh>
 #include <EA31337-classes\Ticks.mqh>
 #include <EA31337-classes\Trade.mqh>
-
+#ifdef __profiler__
+#include <EA31337-classes\Profiler.mqh>
+#endif
 //#property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 
 //+------------------------------------------------------------------+
@@ -259,6 +261,7 @@ void OnTick() {
     last_bar_time = bar_time;
   }
   */
+  #ifdef __profiler__ PROFILER_START #endif
 
   if (hour_of_day != DateTime::Hour()) StartNewHour();
   UpdateVariables();
@@ -269,6 +272,7 @@ void OnTick() {
   UpdateOrders();
   UpdateStats();
   if (PrintLogOnChart) DisplayInfoOnChart();
+  #ifdef __profiler__ PROFILER_STOP #endif
 } // end: OnTick()
 
 bool ShouldIgnoreTick(uint _method, double _min_pip_change, ENUM_TIMEFRAMES _tf = PERIOD_CURRENT) {
@@ -296,12 +300,14 @@ bool ShouldIgnoreTick(uint _method, double _min_pip_change, ENUM_TIMEFRAMES _tf 
  * Update existing opened orders.
  */
 void UpdateOrders() {
+  #ifdef __profiler__ PROFILER_START #endif
   if (total_orders > 0) {
     CheckOrders();
     UpdateTrailingStops();
     CheckAccConditions();
     TaskProcessList();
   }
+  #ifdef __profiler__ PROFILER_STOP #endif
 }
 
 /**
@@ -354,6 +360,8 @@ int OnInit() {
      session_initiated = true;
   }
 
+  #ifdef __profiler__ PROFILER_START #endif
+
   session_initiated &= InitClasses();
   session_initiated &= InitVariables();
   session_initiated &= InitStrategies();
@@ -389,7 +397,8 @@ int OnInit() {
     }
   }
 
-  WindowRedraw();
+  ChartRedraw();
+  #ifdef __profiler__ PROFILER_STOP_MAX #endif
   return (session_initiated ? INIT_SUCCEEDED : INIT_FAILED);
 } // end: OnInit()
 
@@ -405,33 +414,44 @@ void OnDeinit(const int reason) {
       "Info", __FUNCTION__, __LINE__, VerboseInfo);
   if (session_initiated) {
 
-    // Show final account details.
-    Msg::ShowText(GetSummaryText(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
+    if (!terminal.IsOptimization()) {
+      // Show final account details.
+      Msg::ShowText(GetSummaryText(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
 
-    // Save ticks if recorded.
-    if (RecordTicksToCSV) {
-      ticks.SaveToCSV();
+      #ifdef __profiler__
+      if (ProfilingMinTime >= 1) {
+        PROFILER_PRINT(ProfilingMinTime);
+      }
+      #endif
+
+      // Save ticks if recorded.
+      if (RecordTicksToCSV) {
+        ticks.SaveToCSV();
+      }
+
+      if (WriteReport) {
+        // if (reason == REASON_CHARTCHANGE)
+        string filename;
+        summary_report.CalculateSummary();
+        // @todo: Calculate average spread from stats[sid][AVG_SPREAD].
+        filename = StringFormat(
+            "%s-%.f%s-%s-%s-%dspread-(%d)-M%d-report.txt",
+            market.GetSymbol(), summary_report.GetInitDeposit(), account.GetCurrency(),
+            TimeToStr(init_bar_time, TIME_DATE), TimeToStr(time_current, TIME_DATE),
+            init_spread, GetNoOfStrategies(), chart.GetTf());
+            // ea_name, _Symbol, summary.init_deposit, account.AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE), Period());
+            // ea_name, _Symbol, init_balance, account.AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES), Period());
+        string data = summary_report.GetReport();
+        data += GetStatReport();
+        data += GetStrategyReport();
+        data += Array::ArrToString(log, "\n", "Report log:\n");
+        Report::WriteReport(filename, data, VerboseInfo); // Todo: Add: Errors::GetUninitReasonText(reason)
+        Print(__FUNCTION__ + ": Saved report as: " + filename);
+      }
+
     }
 
-    string filename;
-    if (WriteReport && !Terminal::IsOptimization()) {
-      // if (reason == REASON_CHARTCHANGE)
-      summary_report.CalculateSummary();
-      // @todo: Calculate average spread from stats[sid][AVG_SPREAD].
-      filename = StringFormat(
-          "%s-%.f%s-%s-%s-%dspread-(%d)-M%d-report.txt",
-          market.GetSymbol(), summary_report.GetInitDeposit(), account.GetCurrency(),
-          TimeToStr(init_bar_time, TIME_DATE), TimeToStr(time_current, TIME_DATE),
-          init_spread, GetNoOfStrategies(), chart.GetTf());
-          // ea_name, _Symbol, summary.init_deposit, account.AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE), Period());
-          // ea_name, _Symbol, init_balance, account.AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES), Period());
-      string data = summary_report.GetReport();
-      data += GetStatReport();
-      data += GetStrategyReport();
-      data += Array::ArrToString(log, "\n", "Report log:\n");
-      Report::WriteReport(filename, data, VerboseInfo); // Todo: Add: Errors::GetUninitReasonText(reason)
-      Print(__FUNCTION__ + ": Saved report as: " + filename);
-    }
+
   }
   DeinitVars();
   // #ifdef _DEBUG
@@ -444,31 +464,74 @@ void OnDeinit(const int reason) {
  * Deinitialize global variables.
  */
 void DeinitVars() {
-  delete account;
-  delete hourly_stats;
-  delete logger;
-  delete market;
-  delete total_stats;
-  delete summary_report;
-  delete ticks;
-  delete trade;
-  delete terminal;
+  Object::Delete(account);
+  Object::Delete(hourly_stats);
+  Object::Delete(logger);
+  Object::Delete(market);
+  Object::Delete(total_stats);
+  Object::Delete(summary_report);
+  Object::Delete(ticks);
+  Object::Delete(trade);
+  Object::Delete(terminal);
+  #ifdef __profiler__ PROFILER_DEINIT #endif
 }
 
-// The init event handler for tester.
-// FIXME: Doesn't seems to work.
+/**
+ * Test completion event handler.
+ *
+ * Returns calculated value that is used as the Custom max criterion in the genetic optimization of input parameters.
+ *
+ * @see: https://www.mql5.com/en/docs/basis/function/events
+ */
+/*
+double OnTester() {
+  if (ProfilingMinTime > 0) {
+  }
+}
+*/
+
+/**
+ * Implements handler of the TesterPass event (MQL5 only).
+ *
+ * Invoked when a frame is received during EA optimization in the strategy tester.
+ *
+ * @see: https://www.mql5.com/en/docs/basis/function/events
+ */
+void OnTesterPass() {
+  Print("Calling ", __FUNCTION__, ".");
+  if (ProfilingMinTime > 0) {
+    // Print("PROFILER: ", timers.ToString(0));
+  }
+}
+
+/**
+ * Implements handler of the TesterInit event (MQL5 only).
+ *
+ * Invoked with the start of optimization in the strategy tester.
+ *
+ * @see: https://www.mql5.com/en/docs/basis/function/events
+ */
 void OnTesterInit() {
-  if (VerboseDebug) Print("Calling " + __FUNCTION__ + ".");
+  //if (VerboseDebug)
+  Print("Calling ", __FUNCTION__, ".");
   #ifdef __MQL5__
     ParameterSetRange(LotSize, 0, 0.0, 0.01, 0.01, 0.1);
   #endif
 }
 
-// The init event handler for tester.
-// FIXME: Doesn't seems to work.
+/**
+ * Implements handler of the TesterDeinit event (MQL5 only).
+ *
+ * Invoked after the end of optimization of an Expert Advisor in the strategy tester.
+ *
+ * @see: https://www.mql5.com/en/docs/basis/function/events
+ */
 void OnTesterDeinit() {
-  if (VerboseDebug) Print("Calling " + __FUNCTION__ + ".");
+  //if (VerboseDebug)
+  Print("Calling ", __FUNCTION__, ".");
 }
+
+// @todo: OnTradeTransaction (https://www.mql5.com/en/docs/basis/function/events).
 
 // The Start event handler, which is automatically generated only for running scripts.
 // FIXME: Doesn't seems to be called, however MT4 doesn't want to execute EA without it.
@@ -529,7 +592,7 @@ string InitInfo(bool startup = false, string sep = "\n") {
       max_orders,
       GetMaxOrdersPerType(),
       sep);
-  output += Msg::ShowText(Backtest::GetModellingQuality(), "Info", __FUNCTION__, __LINE__, VerboseInfo) + sep;
+  output += Msg::ShowText(Chart::GetModellingQuality(), "Info", __FUNCTION__, __LINE__, VerboseInfo) + sep;
   output += Chart::ListTimeframes() + sep;
   output += StringFormat("Datetime: Hour of day: %d, Day of week: %d, Day of month: %d, Day of year: %d, Month: %d, Year: %d%s",
       hour_of_day, day_of_week, day_of_month, day_of_year, month, year, sep);
@@ -553,6 +616,7 @@ string InitInfo(bool startup = false, string sep = "\n") {
  * Main function to trade.
  */
 bool EA_Trade() {
+  #ifdef __profiler__ PROFILER_START #endif
   bool order_placed = false;
   ENUM_ORDER_TYPE _cmd = EMPTY;
   if (VerboseTrace) PrintFormat("%s:%d: %s", __FUNCTION__, __LINE__, DateTime::TimeToStr(chart.GetBarTime()));
@@ -601,9 +665,7 @@ bool EA_Trade() {
   } // end: for
 
   if (SmartQueueActive && !order_placed && total_orders <= max_orders) {
-    if (OrderQueueProcess()) {
-      return (true);
-    }
+    order_placed &= OrderQueueProcess();
   }
 
   if (order_placed) {
@@ -611,6 +673,7 @@ bool EA_Trade() {
   }
 
   last_traded = TimeCurrent();
+  #ifdef __profiler__ PROFILER_STOP #endif
   return order_placed;
 }
 
@@ -618,41 +681,44 @@ bool EA_Trade() {
  * Check if strategy is on trade conditionl.
  */
 bool TradeCondition(ENUM_STRATEGY_TYPE sid = 0, ENUM_ORDER_TYPE cmd = NULL) {
+  bool _result = false;
+  #ifdef __profiler__ PROFILER_START #endif
   ENUM_TIMEFRAMES tf = (ENUM_TIMEFRAMES) info[sid][TIMEFRAME];
   if (VerboseTrace) PrintFormat("%s:%d: %s (%s), cmd=%d", __FUNCTION__, __LINE__, sname[sid], EnumToString(tf), Order::OrderTypeToString(cmd));
   switch (sid) {
-    case AC1: case AC5: case AC15: case AC30:                                 return Trade_AC(cmd, tf);
-    case AD1: case AD5: case AD15: case AD30:                                 return Trade_AD(cmd, tf);
-    case ADX1: case ADX5: case ADX15: case ADX30:                             return Trade_ADX(cmd, tf);
-    case ALLIGATOR1: case ALLIGATOR5: case ALLIGATOR15: case ALLIGATOR30:     return Trade_Alligator(cmd, tf);
-    case ATR1: case ATR5: case ATR15: case ATR30:                             return Trade_ATR(cmd, tf);
-    case AWESOME1: case AWESOME5: case AWESOME15: case AWESOME30:             return Trade_Awesome(cmd, tf);
-    case BANDS1: case BANDS5: case BANDS15: case BANDS30:                     return Trade_Bands(cmd, tf);
-    case BPOWER1: case BPOWER5: case BPOWER15: case BPOWER30:                 return Trade_BPower(cmd, tf);
-    case BWMFI1: case BWMFI5: case BWMFI15: case BWMFI30:                     return Trade_BWMFI(cmd, tf);
-    case BREAKAGE1: case BREAKAGE5: case BREAKAGE15: case BREAKAGE30:         return Trade_Breakage(cmd, tf);
-    case CCI1: case CCI5: case CCI15: case CCI30:                             return Trade_CCI(cmd, tf);
-    case DEMARKER1: case DEMARKER5: case DEMARKER15: case DEMARKER30:         return Trade_DeMarker(cmd, tf);
-    case ENVELOPES1: case ENVELOPES5: case ENVELOPES15: case ENVELOPES30:     return Trade_Envelopes(cmd, tf);
-    case FORCE1: case FORCE5: case FORCE15: case FORCE30:                     return Trade_Force(cmd, tf);
-    case FRACTALS1: case FRACTALS5: case FRACTALS15: case FRACTALS30:         return Trade_Fractals(cmd, tf);
-    case GATOR1: case GATOR5: case GATOR15: case GATOR30:                     return Trade_Gator(cmd, tf);
-    case ICHIMOKU1: case ICHIMOKU5: case ICHIMOKU15: case ICHIMOKU30:         return Trade_Ichimoku(cmd, tf);
-    case MA1: case MA5: case MA15: case MA30:                                 return Trade_MA(cmd, tf);
-    case MACD1: case MACD5: case MACD15: case MACD30:                         return Trade_MACD(cmd, tf);
-    case MFI1: case MFI5: case MFI15: case MFI30:                             return Trade_MFI(cmd, tf);
-    case MOMENTUM1: case MOMENTUM5: case MOMENTUM15: case MOMENTUM30:         return Trade_Momentum(cmd, tf);
-    case OBV1: case OBV5: case OBV15: case OBV30:                             return Trade_OBV(cmd, tf);
-    case OSMA1: case OSMA5: case OSMA15: case OSMA30:                         return Trade_OSMA(cmd, tf);
-    case RSI1: case RSI5: case RSI15: case RSI30:                             return Trade_RSI(cmd, tf);
-    case RVI1: case RVI5: case RVI15: case RVI30:                             return Trade_RVI(cmd, tf);
-    case SAR1: case SAR5: case SAR15: case SAR30:                             return Trade_SAR(cmd, tf);
-    case STDDEV1: case STDDEV5: case STDDEV15: case STDDEV30:                 return Trade_StdDev(cmd, tf);
-    case STOCHASTIC1: case STOCHASTIC5: case STOCHASTIC15: case STOCHASTIC30: return Trade_Stochastic(cmd, tf);
-    case WPR1: case WPR5: case WPR15: case WPR30:                             return Trade_WPR(cmd, tf);
-    case ZIGZAG1: case ZIGZAG5: case ZIGZAG15: case ZIGZAG30:                 return Trade_ZigZag(cmd, tf);
+    case AC1: case AC5: case AC15: case AC30:                                 _result = Trade_AC(cmd, tf); break;
+    case AD1: case AD5: case AD15: case AD30:                                 _result = Trade_AD(cmd, tf); break;
+    case ADX1: case ADX5: case ADX15: case ADX30:                             _result = Trade_ADX(cmd, tf); break;
+    case ALLIGATOR1: case ALLIGATOR5: case ALLIGATOR15: case ALLIGATOR30:     _result = Trade_Alligator(cmd, tf); break;
+    case ATR1: case ATR5: case ATR15: case ATR30:                             _result = Trade_ATR(cmd, tf); break;
+    case AWESOME1: case AWESOME5: case AWESOME15: case AWESOME30:             _result = Trade_Awesome(cmd, tf); break;
+    case BANDS1: case BANDS5: case BANDS15: case BANDS30:                     _result = Trade_Bands(cmd, tf); break;
+    case BPOWER1: case BPOWER5: case BPOWER15: case BPOWER30:                 _result = Trade_BPower(cmd, tf); break;
+    case BWMFI1: case BWMFI5: case BWMFI15: case BWMFI30:                     _result = Trade_BWMFI(cmd, tf); break;
+    case BREAKAGE1: case BREAKAGE5: case BREAKAGE15: case BREAKAGE30:         _result = Trade_Breakage(cmd, tf); break;
+    case CCI1: case CCI5: case CCI15: case CCI30:                             _result = Trade_CCI(cmd, tf); break;
+    case DEMARKER1: case DEMARKER5: case DEMARKER15: case DEMARKER30:         _result = Trade_DeMarker(cmd, tf); break;
+    case ENVELOPES1: case ENVELOPES5: case ENVELOPES15: case ENVELOPES30:     _result = Trade_Envelopes(cmd, tf); break;
+    case FORCE1: case FORCE5: case FORCE15: case FORCE30:                     _result = Trade_Force(cmd, tf); break;
+    case FRACTALS1: case FRACTALS5: case FRACTALS15: case FRACTALS30:         _result = Trade_Fractals(cmd, tf); break;
+    case GATOR1: case GATOR5: case GATOR15: case GATOR30:                     _result = Trade_Gator(cmd, tf); break;
+    case ICHIMOKU1: case ICHIMOKU5: case ICHIMOKU15: case ICHIMOKU30:         _result = Trade_Ichimoku(cmd, tf); break;
+    case MA1: case MA5: case MA15: case MA30:                                 _result = Trade_MA(cmd, tf); break;
+    case MACD1: case MACD5: case MACD15: case MACD30:                         _result = Trade_MACD(cmd, tf); break;
+    case MFI1: case MFI5: case MFI15: case MFI30:                             _result = Trade_MFI(cmd, tf); break;
+    case MOMENTUM1: case MOMENTUM5: case MOMENTUM15: case MOMENTUM30:         _result = Trade_Momentum(cmd, tf); break;
+    case OBV1: case OBV5: case OBV15: case OBV30:                             _result = Trade_OBV(cmd, tf); break;
+    case OSMA1: case OSMA5: case OSMA15: case OSMA30:                         _result = Trade_OSMA(cmd, tf); break;
+    case RSI1: case RSI5: case RSI15: case RSI30:                             _result = Trade_RSI(cmd, tf); break;
+    case RVI1: case RVI5: case RVI15: case RVI30:                             _result = Trade_RVI(cmd, tf); break;
+    case SAR1: case SAR5: case SAR15: case SAR30:                             _result = Trade_SAR(cmd, tf); break;
+    case STDDEV1: case STDDEV5: case STDDEV15: case STDDEV30:                 _result = Trade_StdDev(cmd, tf); break;
+    case STOCHASTIC1: case STOCHASTIC5: case STOCHASTIC15: case STOCHASTIC30: _result = Trade_Stochastic(cmd, tf); break;
+    case WPR1: case WPR5: case WPR15: case WPR30:                             _result = Trade_WPR(cmd, tf); break;
+    case ZIGZAG1: case ZIGZAG5: case ZIGZAG15: case ZIGZAG30:                 _result = Trade_ZigZag(cmd, tf); break;
   }
-  return false;
+  #ifdef __profiler__ PROFILER_STOP #endif
+  return _result;
 }
 
 /**
@@ -675,6 +741,8 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
     }
     return (true);
   }
+
+  #ifdef __profiler__ PROFILER_START #endif
 
   double ratio = 1.0, ratio2 = 1.0;
   int shift;
@@ -952,6 +1020,7 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
   } // end: switch
 
   processed[type][index] = chart.GetBarTime(tf);
+  #ifdef __profiler__ PROFILER_STOP #endif
   return (success);
 }
 
@@ -974,6 +1043,8 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
    bool result = false;
    int order_ticket;
    double trade_volume_max = market.GetVolumeMax();
+
+  #ifdef __profiler__ PROFILER_START #endif
 
   // if (VerboseTrace) Print(__FUNCTION__);
    if (trade_volume <= market.GetVolumeMin()) {
@@ -1134,7 +1205,6 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
            trade_volume, market.GetVolumeMin(), market.GetVolumeMax(), market.GetVolumeStep()),
            "Error", __FUNCTION__, __LINE__, VerboseErrors);
        retry = false;
-       ExpertRemove();
      }
      if (err_code == ERR_TRADE_EXPIRATION_DENIED) {
        // Applying of pending order expiration time can be disabled in some trade servers.
@@ -1153,7 +1223,8 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
      info[sid][TOTAL_ERRORS]++;
    } // end-if: order_ticket
 
-   return (result);
+  #ifdef __profiler__ PROFILER_STOP #endif
+  return (result);
 }
 
 /**
@@ -1296,6 +1367,7 @@ bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = true)
   } else {
     ticket_no = OrderTicket();
   }
+  #ifdef __profiler__ PROFILER_START #endif
   double close_price = NormalizeDouble(market.GetCloseOffer(), market.GetDigits());
   result = OrderClose(ticket_no, OrderLots(), close_price, max_order_slippage, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell)); // @fixme: warning 43: possible loss of data due to type conversion
   // if (VerboseTrace) Print(__FUNCTION__ + ": CloseOrder request. Reason: " + reason + "; Result=" + result + " @ " + TimeCurrent() + "(" + TimeToStr(TimeCurrent()) + "), ticket# " + ticket_no);
@@ -1324,6 +1396,7 @@ bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = true)
     int id = GetIdByMagic();
     if (id < 0) info[id][TOTAL_ERRORS]++;
   } // end-if: !result
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -1408,7 +1481,7 @@ bool UpdateStats() {
   // Check if bar time has been changed since last check.
   // int bar_time = iTime(NULL, PERIOD_M1, 0);
   // CheckStats(last_pip_change, MAX_TICK);
-  CheckStats(Low[0],  MAX_LOW);
+  #ifdef __profiler__ PROFILER_START #endif
   CheckStats(High[0], MAX_HIGH);
   CheckStats(account.AccountBalance(), MAX_BALANCE);
   CheckStats(account.AccountEquity(), MAX_EQUITY);
@@ -1432,6 +1505,7 @@ bool UpdateStats() {
     total_tp, Convert::ValueToMoney(Orders::TotalTP(ORDER_TYPE_BUY)), Convert::ValueToMoney(Orders::TotalTP(ORDER_TYPE_SELL)),
     Convert::ValueToMoney(total_sl), Convert::ValueToMoney(total_tp));
   */
+  #ifdef __profiler__ PROFILER_STOP #endif
   return (true);
 }
 
@@ -1446,6 +1520,7 @@ bool UpdateStats() {
  *   signal_method (int) - signal method to use by using bitwise AND operation
  */
 bool Trade_AC(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_AC, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_AC, tf, 0);
@@ -1484,6 +1559,7 @@ bool Trade_AC(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_me
     break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -1497,6 +1573,7 @@ bool Trade_AC(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_me
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_AD(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_AD, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_AD, tf, 0);
@@ -1536,6 +1613,7 @@ bool Trade_AD(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_me
     break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -1549,6 +1627,7 @@ bool Trade_AD(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_me
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_ADX(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_ADX, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_ADX, tf, 0);
@@ -1588,6 +1667,7 @@ bool Trade_ADX(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
     break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -1601,6 +1681,7 @@ bool Trade_ADX(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_Alligator(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   // [x][0] - The Blue line (Alligator's Jaw), [x][1] - The Red Line (Alligator's Teeth), [x][2] - The Green Line (Alligator's Lips)
   bool result = false; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_ALLIGATOR, tf);
@@ -1664,6 +1745,7 @@ bool Trade_Alligator(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int si
   if (VerboseTrace && result) {
     PrintFormat("%s:%d: Signal: %d/%d/%d/%g; Trend: %g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level, curr_trend);
   }
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -1677,6 +1759,7 @@ bool Trade_Alligator(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int si
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_ATR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_ATR, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_ATR, tf, 0);
@@ -1716,6 +1799,7 @@ bool Trade_ATR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
     break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -1729,6 +1813,7 @@ bool Trade_ATR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_Awesome(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_AWESOME, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_AWESOME, tf, 0);
@@ -1767,6 +1852,7 @@ bool Trade_Awesome(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sign
     break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -1780,6 +1866,7 @@ bool Trade_Awesome(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sign
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_Bands(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_BANDS, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_BANDS, tf, 0);
@@ -1826,6 +1913,7 @@ bool Trade_Bands(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal
   if (VerboseTrace && result) {
     PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
   }
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -1839,6 +1927,7 @@ bool Trade_Bands(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_BPower(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_BPOWER, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_BPOWER, tf, 0);
@@ -1868,6 +1957,7 @@ bool Trade_BPower(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signa
     break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -1881,6 +1971,7 @@ bool Trade_BPower(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signa
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_Breakage(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   // if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(BWMFI, tf, 0);
   // if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(BWMFI, tf, 0.0);
@@ -1909,6 +2000,7 @@ bool Trade_Breakage(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sig
     break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -1922,6 +2014,7 @@ bool Trade_Breakage(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sig
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_BWMFI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_BWMFI, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_BWMFI, tf, 0);
@@ -1951,6 +2044,7 @@ bool Trade_BWMFI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal
     break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -1964,6 +2058,7 @@ bool Trade_BWMFI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_CCI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_CCI, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_CCI, tf, 0);
@@ -2003,6 +2098,7 @@ bool Trade_CCI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
     break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -2017,6 +2113,7 @@ bool Trade_CCI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_DeMarker(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_DEMARKER, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_DEMARKER, tf, 0);
@@ -2049,6 +2146,7 @@ bool Trade_DeMarker(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sig
   if (VerboseTrace && result) {
     PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
   }
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -2062,6 +2160,7 @@ bool Trade_DeMarker(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sig
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_Envelopes(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_ENVELOPES, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_ENVELOPES, tf, 0);
@@ -2100,6 +2199,7 @@ bool Trade_Envelopes(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int si
   if (VerboseTrace && result) {
     PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
   }
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -2113,6 +2213,7 @@ bool Trade_Envelopes(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int si
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_Force(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_FORCE, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_FORCE, tf, 0);
@@ -2134,6 +2235,7 @@ bool Trade_Force(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -2147,6 +2249,7 @@ bool Trade_Force(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_Fractals(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint index = chart.TfToIndex(tf);
   UpdateIndicator(S_FRACTALS, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_FRACTALS, tf, 0);
@@ -2179,6 +2282,7 @@ bool Trade_Fractals(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sig
   if (VerboseTrace && result) {
     PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
   }
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -2192,6 +2296,7 @@ bool Trade_Fractals(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sig
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_Gator(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_GATOR, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_GATOR, tf, 0);
@@ -2213,6 +2318,7 @@ bool Trade_Gator(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -2226,6 +2332,7 @@ bool Trade_Gator(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_Ichimoku(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_ICHIMOKU, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_ICHIMOKU, tf, 0);
@@ -2266,6 +2373,7 @@ bool Trade_Ichimoku(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sig
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -2279,6 +2387,7 @@ bool Trade_Ichimoku(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sig
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_MA(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_MA, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_MA, tf, 0);
@@ -2317,6 +2426,7 @@ bool Trade_MA(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_me
   if (VerboseTrace && result) {
     PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
   }
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -2330,6 +2440,7 @@ bool Trade_MA(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_me
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_MACD(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_MA, tf);
   UpdateIndicator(S_MACD, tf);
@@ -2382,6 +2493,7 @@ bool Trade_MACD(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_
   if (VerboseTrace && result) {
     PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
   }
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -2395,6 +2507,7 @@ bool Trade_MACD(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_MFI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_MFI, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_MFI, tf, 0);
@@ -2415,6 +2528,7 @@ bool Trade_MFI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -2428,6 +2542,7 @@ bool Trade_MFI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_Momentum(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_MOMENTUM, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_MOMENTUM, tf, 0);
@@ -2439,6 +2554,7 @@ bool Trade_Momentum(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sig
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -2452,6 +2568,7 @@ bool Trade_Momentum(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sig
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_OBV(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_OBV, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_OBV, tf, 0);
@@ -2463,6 +2580,7 @@ bool Trade_OBV(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -2476,6 +2594,7 @@ bool Trade_OBV(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_OSMA(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_OSMA, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_OSMA, tf, 0);
@@ -2508,6 +2627,7 @@ bool Trade_OSMA(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -2521,6 +2641,7 @@ bool Trade_OSMA(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_
  *   signal_level - signal level to consider the signal
  */
 bool Trade_RSI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_RSI, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_RSI, tf, 0);
@@ -2557,6 +2678,7 @@ bool Trade_RSI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
   if (VerboseTrace && result) {
     PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
   }
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -2570,6 +2692,7 @@ bool Trade_RSI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_RVI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_RVI, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_RVI, tf, 0);
@@ -2593,6 +2716,7 @@ bool Trade_RVI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -2607,6 +2731,7 @@ bool Trade_RVI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_SAR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_SAR, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_SAR, tf, 0);
@@ -2652,6 +2777,7 @@ bool Trade_SAR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
   if (VerboseTrace && result) {
     PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
   }
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -2665,6 +2791,7 @@ bool Trade_SAR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_StdDev(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_STDDEV, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_STDDEV, tf, 0);
@@ -2703,6 +2830,7 @@ bool Trade_StdDev(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signa
     break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -2716,6 +2844,7 @@ bool Trade_StdDev(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signa
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_Stochastic(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_STOCHASTIC, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_STOCHASTIC, tf, 0);
@@ -2770,6 +2899,7 @@ bool Trade_Stochastic(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int s
     break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -2783,6 +2913,7 @@ bool Trade_Stochastic(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int s
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_WPR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_WPR, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_WPR, tf, 0);
@@ -2826,6 +2957,7 @@ bool Trade_WPR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
   if (VerboseTrace && result) {
     PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
   }
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -2839,6 +2971,7 @@ bool Trade_WPR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_ZigZag(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = FALSE; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_ZIGZAG, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_ZIGZAG, tf, 0);
@@ -2867,6 +3000,7 @@ bool Trade_ZigZag(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signa
         */
     break;
   }
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -3135,6 +3269,8 @@ bool UpdateTrailingStops() {
      last_trail_update = bar_time;
    }*/
 
+  #ifdef __profiler__ PROFILER_START #endif
+
    market.RefreshRates();
    for (int i = 0; i < OrdersTotal(); i++) {
      if (!OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) { continue; }
@@ -3224,6 +3360,7 @@ bool UpdateTrailingStops() {
         }
       }
   } // end: for
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -3722,7 +3859,7 @@ void CheckExpireDate() {
  * Check if it is possible to trade.
  */
 bool TradeAllowed() {
-  string err;
+  bool _result = true;
   #ifdef __expire__
   if (TimeCurrent() > ea_expire_date) {
     last_err = Msg::ShowText("New trades are not allowed, because EA has expired!", "Error", __FUNCTION__, __LINE__, VerboseInfo | VerboseErrors);
@@ -3733,63 +3870,57 @@ bool TradeAllowed() {
     return (false);
   }
   #endif
+  #ifdef __profiler__ PROFILER_START #endif
   if (Bars < 100) {
     last_err = Msg::ShowText("Bars less than 100, not trading yet.", "Error", __FUNCTION__, __LINE__, VerboseErrors);
-    ea_active = false;
     if (PrintLogOnChart) DisplayInfoOnChart();
-    return (false);
+    _result = false;
   }
-  if (Terminal::IsRealtime() && Volume[0] < MinVolumeToTrade) {
+  else if (Terminal::IsRealtime() && Volume[0] < MinVolumeToTrade) {
     last_err = Msg::ShowText("Volume too low to trade.", "Error", __FUNCTION__, __LINE__, VerboseErrors);
-    ea_active = false;
     if (PrintLogOnChart) DisplayInfoOnChart();
-    return (false);
+    _result = false;
   }
-  if (IsTradeContextBusy()) {
+  else if (IsTradeContextBusy()) {
     last_err = Msg::ShowText("Trade context is temporary busy.", "Error", __FUNCTION__, __LINE__, VerboseErrors);
-    ea_active = false;
     if (PrintLogOnChart) DisplayInfoOnChart();
-    return (false);
+    _result = false;
   }
   // Check if the EA is allowed to trade and trading context is not busy, otherwise returns false.
   // OrderSend(), OrderClose(), OrderCloseBy(), OrderModify(), OrderDelete() trading functions
   //   changing the state of a trading account can be called only if trading by Expert Advisors
   //   is allowed (the "Allow live trading" checkbox is enabled in the Expert Advisor or script properties).
-  if (!IsTradeAllowed()) {
+  else if (!IsTradeAllowed()) {
     last_err = Msg::ShowText("Trade is not allowed at the moment, check the settings!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
-    ea_active = false;
-    return (false);
+    _result = false;
   }
-  if (!IsConnected()) {
+  else if (!IsConnected()) {
     last_err = Msg::ShowText("Terminal is not connected!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
-    ea_active = false;
     if (PrintLogOnChart) DisplayInfoOnChart();
-    return (false);
+    _result = false;
   }
-  if (IsStopped()) {
+  else if (IsStopped()) {
     last_err = Msg::ShowText("Terminal is stopping!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
-    ea_active = false;
-    return (false);
+    _result = false;
   }
-  if (Terminal::IsRealtime() && !MarketInfo(Symbol(), MODE_TRADEALLOWED)) {
+  else if (Terminal::IsRealtime() && !MarketInfo(Symbol(), MODE_TRADEALLOWED)) {
     last_err = Msg::ShowText("Trading is not allowed. Market may be closed or choose the right symbol. Otherwise contact your broker.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
-    ea_active = false;
     if (PrintLogOnChart) DisplayInfoOnChart();
-    return (false);
+    _result = false;
   }
-  if (Terminal::IsRealtime() && !IsExpertEnabled()) {
+  else if (Terminal::IsRealtime() && !IsExpertEnabled()) {
     last_err = Msg::ShowText("You need to enable: 'Enable Expert Advisor'/'AutoTrading'.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
-    ea_active = false;
-    return (false);
+    _result = false;
   }
-  if (!session_active || StringLen(ea_file) != 11) {
+  else if (!session_active || StringLen(ea_file) != 11) {
     last_err = Msg::ShowText(StringFormat("Session is not active (%d)!", StringLen(ea_file)), "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
     ea_active = false;
-    return (false);
+    _result = false;
   }
 
-  ea_active = true;
-  return (true);
+  ea_active = _result;
+  #ifdef __profiler__ PROFILER_STOP #endif
+  return (_result);
 }
 
 /**
@@ -3842,7 +3973,7 @@ int CheckSettings() {
     return -__LINE__;
   }
   if (!Terminal::IsRealtime() && ValidateSettings) {
-    if (!Backtest::ValidSpread() || !Backtest::ValidLotstep()) {
+    if (!Tester::ValidSpread() || !Tester::ValidLotstep()) {
       Msg::ShowText("Backtest market settings are invalid! Connect to broker to fix it!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
       return -__LINE__;
     }
@@ -4096,6 +4227,8 @@ string ValidEmail(string text) {
  * Executed for every hour.
  */
 void StartNewHour() {
+  #ifdef __profiler__ PROFILER_START #endif
+
   CheckHistory(); // Process closed orders for the previous hour.
 
   // Process actions.
@@ -4148,6 +4281,7 @@ void StartNewHour() {
 
   // Reset messages and errors.
   // Message(NULL);
+  #ifdef __profiler__ PROFILER_STOP #endif
 }
 
 /**
@@ -4664,6 +4798,7 @@ void ToggleComponent(int component) {
  */
 bool InitStrategies() {
   bool init = true;
+  #ifdef __profiler__ PROFILER_START #endif
 
   // Initialize/reset strategy arrays.
   ArrayInitialize(info, 0);  // Reset strategy info.
@@ -4824,19 +4959,20 @@ bool InitStrategies() {
   if (!init && ValidateSettings) {
     Msg::ShowText(Chart::ListTimeframes(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
     Msg::ShowText("Initiation of strategies failed!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
-    return (false);
   }
 
   Array::ArrSetValueD(conf, FACTOR, 1.0);
   Array::ArrSetValueD(conf, LOT_SIZE, ea_lot_size);
 
-  return (true);
+  #ifdef __profiler__ PROFILER_STOP #endif
+  return init || !ValidateSettings;
 }
 
 /**
  * Init classes.
  */
 bool InitClasses() {
+  #ifdef __profiler__ PROFILER_START #endif
   account = new Account();
   chart = new Chart(PERIOD_CURRENT);
   TradeParams trade_params;
@@ -4848,6 +4984,7 @@ bool InitClasses() {
   summary_report = new SummaryReport();
   ticks = new Ticks(market);
   terminal = chart.TerminalInfo();
+  #ifdef __profiler__ PROFILER_STOP #endif
   return market.GetSymbol() == _Symbol;
 }
 
@@ -4861,22 +4998,14 @@ bool InitStrategy(int key, string name, bool active, ENUM_INDICATOR_TYPE indicat
       Msg::ShowText(
         StringFormat("Cannot initialize %s strategy, because its timeframe (%d) is not active!%s", name, _tf, ValidateSettings ? " Disabling..." : ""),
         "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
-      if (ValidateSettings) {
-        return (false);
-      } else {
-        active = false;
-      }
+      active = false;
     }
     // Validate whether indicator of the strategy is working.
     if (!UpdateIndicator(indicator, _tf)) {
       Msg::ShowText(
         StringFormat("Cannot initialize indicator for the %s strategy!%s", name, ValidateSettings ? " Disabling..." : ""),
         "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
-      if (ValidateSettings) {
-        return (false);
-      } else {
-        active = false;
-      }
+      active = false;
     }
   }
   sname[key]                 = name;
@@ -4893,18 +5022,20 @@ bool InitStrategy(int key, string name, bool active, ENUM_INDICATOR_TYPE indicat
   info[key][OPEN_CONDITION2] = open_cond2;
   conf[key][SPREAD_LIMIT]    = max_spread;
   #endif
-  return (true);
+  return active || !ValidateSettings;
 }
 
 /**
  * Update global variables.
  */
 void UpdateVariables() {
+  #ifdef __profiler__ PROFILER_START #endif
   time_current = TimeCurrent();
   last_close_profit = EMPTY;
   total_orders = GetTotalOrders();
   curr_spread = market.GetSpreadInPips();
   curr_trend = trade.GetTrend(fabs(TrendMethod), TrendMethod < 0 ? PERIOD_M1 : (ENUM_TIMEFRAMES) NULL);
+  #ifdef __profiler__ PROFILER_STOP #endif
 }
 
 /* END: VARIABLE FUNCTIONS */
@@ -5193,11 +5324,14 @@ void CheckAccConditions() {
   if (!Account_Conditions_Active) return;
   if (chart.GetBarTime() == last_action_time) return; // If action was already executed in the same bar, do not check again.
 
+  #ifdef __profiler__ PROFILER_START #endif
+
   for (int i = 0; i < ArrayRange(acc_conditions, 0); i++) {
     if (AccCondition(acc_conditions[i][0]) && MarketCondition(acc_conditions[i][1]) && acc_conditions[i][2] != A_NONE) {
       ActionExecute(acc_conditions[i][2], i);
     }
   } // end: for
+  #ifdef __profiler__ PROFILER_STOP #endif
 }
 
 /**
@@ -5745,7 +5879,7 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
     // ObjectDelete(ea_name);
     */
     Comment(output);
-    Chart::ChartRedraw(); // Redraws the current chart forcedly.
+    ChartRedraw(); // Redraws the current chart forcedly.
   }
   return output;
 }
@@ -6270,6 +6404,7 @@ bool TicketRemove(int ticket_no) {
 bool CheckHistory() {
   double total_profit = 0;
   int pos;
+  #ifdef __profiler__ PROFILER_START #endif
   for (pos = last_history_check; pos < HistoryTotal(); pos++) {
     if (!Order::OrderSelect(pos, SELECT_BY_POS, MODE_HISTORY)) continue;
     if (Order::OrderCloseTime() > last_history_check && CheckOurMagicNumber()) {
@@ -6278,6 +6413,7 @@ bool CheckHistory() {
   }
   hourly_profit[day_of_year][hour_of_day] = total_profit; // Update hourly profit.
   last_history_check = pos;
+  #ifdef __profiler__ PROFILER_STOP #endif
   return (true);
 }
 
@@ -6602,8 +6738,9 @@ bool TaskRun(int job_id) {
  * Process task list.
  */
 bool TaskProcessList(bool with_force = false) {
-   int total_run = 0, total_failed = 0, total_removed = 0;
-   int no_elem = 8;
+  int total_run = 0, total_failed = 0, total_removed = 0;
+  int no_elem = 8;
+  #ifdef __profiler__ PROFILER_START #endif
 
    // Check if bar time has been changed since last time.
    if (chart.GetBarTime() == last_queue_process && !with_force) {
@@ -6630,6 +6767,7 @@ bool TaskProcessList(bool with_force = false) {
    } // end: for
    if (VerboseDebug && total_run+total_failed > 0)
      Print(__FUNCTION__, ": Processed ", total_run+total_failed, " jobs (", total_run, " run, ", total_failed, " failed (", total_removed, " removed)).");
+  #ifdef __profiler__ PROFILER_STOP #endif
   return true;
 }
 
@@ -6649,7 +6787,7 @@ void ReportAdd(string msg) {
  */
 string GetStatReport(string sep = "\n") {
   string output = "";
-  output += StringFormat("Modelling quality:                          %.2f%%", Backtest::CalcModellingQuality()) + sep;
+  output += StringFormat("Modelling quality:                          %.2f%%", Chart::CalcModellingQuality()) + sep;
   output += StringFormat("Total bars processed:                       %d", total_stats.GetTotalBars()) + sep;
   output += StringFormat("Total ticks processed:                      %d", total_stats.GetTotalTicks()) + sep;
   output += StringFormat("Bars per hour (avg):                        %d", total_stats.GetBarsPerPeriod(PERIOD_H1)) + sep;

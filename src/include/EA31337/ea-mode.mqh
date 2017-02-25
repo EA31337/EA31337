@@ -14,6 +14,7 @@
 // Other modes.
 //#define __nolicense__    // Disable licensing.
 //#define __backtest__     // For backtest only.
+//#define __profiler__     // Activate profiler.
 //#define __expire__       // Activates expiration date.
 //#define __limited__      // Define safe options.
 //#define __release__      // Enable release settings.
