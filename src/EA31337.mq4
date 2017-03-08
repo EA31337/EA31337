@@ -1470,8 +1470,7 @@ int CloseOrdersByType(ENUM_ORDER_TYPE cmd, int strategy_id, int reason_id, bool 
       }
    }
    if (orders_total > 0 && VerboseInfo) {
-     // FIXME: EnumToString(order_type) doesn't work here.
-     Print(__FUNCTION__ + "():" + "Closed ", orders_total, " orders (", cmd, ", ", strategy_id, ") on market change with total profit of : ", profit_total, " pips (", order_failed, " failed)");
+     Print(__FUNCTION__ + "(): Closed ", orders_total, " orders (", cmd, ", ", strategy_id, ") on market change with total profit of : ", profit_total, " pips (", order_failed, " failed)");
    }
    return (orders_total);
 }
