@@ -210,7 +210,8 @@ double stochastic[H1][FINAL_ENUM_INDICATOR_INDEX][FINAL_SLINE_ENTRY];
 double wpr[H1][FINAL_ENUM_INDICATOR_INDEX];
 double zigzag[H1][FINAL_ENUM_INDICATOR_INDEX];
 
-/* TODO:
+/*
+ * TODO:
  *   - add trailing stops/profit for support/resistence,
  *   - daily higher highs and lower lows,
  *   - check risky dates and times,
@@ -227,6 +228,7 @@ double zigzag[H1][FINAL_ENUM_INDICATOR_INDEX];
  *   - trend calculated based on RSI
  *   - calculate support and resistance levels
  *   - calculate pivot levels
+ *   - action to close the order after X hours when all orders of strategy are profitable
  */
 
 //+------------------------------------------------------------------+
@@ -3237,13 +3239,18 @@ bool CheckMinPipGap(int sid) {
  * Check orders for certain checks.
  */
 void CheckOrders() {
-  int elapsed_h;
+  double elapsed_h;
   for (uint i = 0; i < Orders::OrdersTotal(); i++) {
     if (!Order::OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) { continue; }
     if (CheckOurMagicNumber() && Order::OrderOpenTime() > 0) {
-      if (CloseOrderAfterXHours > 0) {
-        elapsed_h = (int) ((TimeCurrent() - OrderOpenTime()) / 60 / 60);
-        if (elapsed_h >= CloseOrderAfterXHours) {
+      if (CloseOrderAfterXHours != 0) {
+        elapsed_h = ((double) (TimeCurrent() - Order::OrderOpenTime()) / 60 / 60);
+        if (elapsed_h > CloseOrderAfterXHours) {
+          if (Order::GetOrderProfit() > 0) {
+            TaskAddCloseOrder(OrderTicket(), R_ORDER_EXPIRED);
+          }
+        }
+        else if (CloseOrderAfterXHours < 0 && elapsed_h > -CloseOrderAfterXHours) {
           TaskAddCloseOrder(OrderTicket(), R_ORDER_EXPIRED);
         }
       }
