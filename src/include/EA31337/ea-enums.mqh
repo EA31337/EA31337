@@ -237,6 +237,7 @@ enum ENUM_STRATEGY_STAT_VALUE { // Define strategy statistics entries.
   TOTAL_GROSS_PROFIT,
   TOTAL_GROSS_LOSS,
   TOTAL_NET_PROFIT,
+  TOTAL_PIP_PROFIT,
   AVG_SPREAD,
   FINAL_STRATEGY_STAT_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };

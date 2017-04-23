@@ -229,6 +229,7 @@ double zigzag[H1][FINAL_ENUM_INDICATOR_INDEX];
  *   - calculate support and resistance levels
  *   - calculate pivot levels
  *   - action to close the order after X hours when all orders of strategy are profitable
+ *   - strategy flags: PP, S1-S3, R1-R3, trend
  */
 
 //+------------------------------------------------------------------+
@@ -1418,7 +1419,7 @@ double OrderCalc(int ticket_no = 0) {
   if (ticket_no == 0) ticket_no = OrderTicket();
   int id = GetIdByMagic();
   if (id < 0) return false;
-  datetime close_time = OrderCloseTime();
+  datetime close_time = Order::OrderCloseTime();
   double profit = Order::GetOrderProfit();
   info[id][TOTAL_ORDERS]++;
   if (profit > 0) {
@@ -1435,6 +1436,7 @@ double OrderCalc(int ticket_no = 0) {
     if (profit < monthly[MAX_LOSS])   monthly[MAX_LOSS] = profit;
   }
   stats[id][TOTAL_NET_PROFIT] += profit;
+  stats[id][TOTAL_PIP_PROFIT] += Convert::ValueToPips(Convert::MoneyToValue(profit, Order::OrderLots(), Order::OrderSymbol()), Order::OrderSymbol());
 
   if (DateTime::TimeDayOfYear(close_time) == DayOfYear()) {
     stats[id][DAILY_PROFIT] += profit;
@@ -5393,8 +5395,10 @@ string GetStrategyReport(string sep = "\n") {
     if (info[id][TOTAL_ORDERS] > 0) {
       output += StringFormat("Profit factor: %.2f, ",
                 GetStrategyProfitFactor(id));
-      output += StringFormat("Total net profit: %.2fpips (%+.2f/%-.2f), ",
-        stats[id][TOTAL_NET_PROFIT], stats[id][TOTAL_GROSS_PROFIT], stats[id][TOTAL_GROSS_LOSS]);
+      output += StringFormat("Total net profit: %.2f%s [%+.2f/%-.2f] (%.2fpips), ",
+        stats[id][TOTAL_NET_PROFIT], account.GetCurrency(),
+        stats[id][TOTAL_GROSS_PROFIT], stats[id][TOTAL_GROSS_LOSS],
+        stats[id][TOTAL_PIP_PROFIT]);
       output += StringFormat("Total orders: %d (Won: %.1f%% [%d] / Loss: %.1f%% [%d])",
                 info[id][TOTAL_ORDERS],
                 (100 / NormalizeDouble(info[id][TOTAL_ORDERS], 2)) * info[id][TOTAL_ORDERS_WON],
