@@ -121,7 +121,7 @@ uint order_freezelevel; // Order freeze level in points.
 double curr_spread; // Broker current spread in pips.
 double curr_trend; // Current trend.
 double ea_risk_margin_per_order, ea_risk_margin_total; // Risk marigin in percent.
-int pts_per_pip; // Number points per pip.
+uint pts_per_pip; // Number points per pip.
 int gmt_offset = 0; // Current difference between GMT time and the local computer time in seconds, taking into account switch to winter or summer time. Depends on the time settings of your computer.
 // double total_sl, total_tp; // Total SL/TP points.
 
@@ -223,6 +223,10 @@ double zigzag[H1][FINAL_ENUM_INDICATOR_INDEX];
  *   - check ResourceCreate/ResourceSave to store dynamic parameters
  *   - consider to use Donchian Channel (ihighest/ilowest) for detecting s/r levels
  *   - convert `ma_fast`, `ma_medium`, `ma_slow` into one `ma` variable.
+ *   - add RSI threshold param
+ *   - trend calculated based on RSI
+ *   - calculate support and resistance levels
+ *   - calculate pivot levels
  */
 
 //+------------------------------------------------------------------+
@@ -641,12 +645,16 @@ bool EA_Trade() {
         if (CheckMarketEvent(ORDER_TYPE_SELL, (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][CLOSE_CONDITION])) CloseOrdersByType(ORDER_TYPE_BUY,  id, R_OPPOSITE_SIGNAL, CloseConditionOnlyProfitable);
       }
 
-      #ifdef __advanced__
-      if (_cmd == ORDER_TYPE_BUY  && !CheckMarketCondition1(ORDER_TYPE_BUY,  (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) _cmd = EMPTY;
-      if (_cmd == ORDER_TYPE_SELL && !CheckMarketCondition1(ORDER_TYPE_SELL, (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) _cmd = EMPTY;
-      if (_cmd == ORDER_TYPE_BUY  &&  CheckMarketCondition1(ORDER_TYPE_SELL, PERIOD_M30, info[id][OPEN_CONDITION2], false)) _cmd = EMPTY;
-      if (_cmd == ORDER_TYPE_SELL &&  CheckMarketCondition1(ORDER_TYPE_BUY,  PERIOD_M30, info[id][OPEN_CONDITION2], false)) _cmd = EMPTY;
-      #endif
+      // #ifdef __advanced__
+      if (info[id][OPEN_CONDITION1] != 0) {
+        if (_cmd == ORDER_TYPE_BUY  && !CheckMarketCondition1(ORDER_TYPE_BUY,  (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) _cmd = EMPTY;
+        if (_cmd == ORDER_TYPE_SELL && !CheckMarketCondition1(ORDER_TYPE_SELL, (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) _cmd = EMPTY;
+      }
+      if (info[id][OPEN_CONDITION2] != 0) {
+        if (_cmd == ORDER_TYPE_BUY  && CheckMarketCondition1(ORDER_TYPE_SELL, PERIOD_M30, info[id][OPEN_CONDITION2], false)) _cmd = EMPTY;
+        if (_cmd == ORDER_TYPE_SELL && CheckMarketCondition1(ORDER_TYPE_BUY,  PERIOD_M30, info[id][OPEN_CONDITION2], false)) _cmd = EMPTY;
+      }
+      // #endif
 
       if (_cmd != EMPTY) {
         order_placed &= ExecuteOrder(_cmd, id);
@@ -3022,17 +3030,17 @@ bool CheckMarketCondition1(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M30,
   uint period = chart.TfToIndex(tf);
   if (VerboseTrace) PrintFormat("%s: %s(%s, %s, %d)", __FUNCTION__, EnumToString(cmd), EnumToString(tf), condition);
   Market::RefreshRates(); // ?
-  if ((condition %   1) == 0) result &= ((cmd == ORDER_TYPE_BUY && Open[CURR] > Close[PREV]) || (cmd == ORDER_TYPE_SELL && Open[CURR] < Close[PREV]));
-  if ((condition %   2) == 0) result &= UpdateIndicator(S_SAR, tf)       && ((cmd == ORDER_TYPE_BUY && sar[period][CURR] < Open[0]) || (cmd == ORDER_TYPE_SELL && sar[period][CURR] > Open[0]));
-  if ((condition %   4) == 0) result &= UpdateIndicator(S_RSI, tf)       && ((cmd == ORDER_TYPE_BUY && rsi[period][CURR] < 50) || (cmd == ORDER_TYPE_SELL && rsi[period][CURR] > 50));
-  if ((condition %   8) == 0) result &= UpdateIndicator(S_MA, tf)        && ((cmd == ORDER_TYPE_BUY && Ask > ma_slow[period][CURR]) || (cmd == ORDER_TYPE_SELL && Ask < ma_slow[period][CURR]));
-//if ((condition %   8) == 0) result &= UpdateIndicator(S_MA, tf)        && ((cmd == ORDER_TYPE_BUY && ma_slow[period][CURR] > ma_slow[period][PREV]) || (cmd == ORDER_TYPE_SELL && ma_slow[period][CURR] < ma_slow[period][PREV]));
-  if ((condition %  16) == 0) result &= ((cmd == ORDER_TYPE_BUY && Ask < Open[CURR]) || (cmd == ORDER_TYPE_SELL && Ask > Open[CURR]));
-  if ((condition %  32) == 0) result &= UpdateIndicator(S_BANDS, tf)     && ((cmd == ORDER_TYPE_BUY && Open[CURR] < bands[period][CURR][BANDS_BASE]) || (cmd == ORDER_TYPE_SELL && Open[CURR] > bands[period][CURR][BANDS_BASE]));
-  if ((condition %  64) == 0) result &= UpdateIndicator(S_ENVELOPES, tf) && ((cmd == ORDER_TYPE_BUY && Open[CURR] < envelopes[period][CURR][MODE_MAIN]) || (cmd == ORDER_TYPE_SELL && Open[CURR] > envelopes[period][CURR][MODE_MAIN]));
-  if ((condition % 128) == 0) result &= UpdateIndicator(S_DEMARKER, tf)  && ((cmd == ORDER_TYPE_BUY && demarker[period][CURR] < 0.5) || (cmd == ORDER_TYPE_SELL && demarker[period][CURR] > 0.5));
-  if ((condition % 256) == 0) result &= UpdateIndicator(S_WPR, tf)       && ((cmd == ORDER_TYPE_BUY && wpr[period][CURR] > 50) || (cmd == ORDER_TYPE_SELL && wpr[period][CURR] < 50));
-  if ((condition % 512) == 0) result &= cmd == Convert::ValueToOp(curr_trend);
+  if (condition ==  1) result &= ((cmd == ORDER_TYPE_BUY && Open[CURR] > Close[PREV]) || (cmd == ORDER_TYPE_SELL && Open[CURR] < Close[PREV]));
+  if (condition ==  2) result &= UpdateIndicator(S_SAR, tf)       && ((cmd == ORDER_TYPE_BUY && sar[period][CURR] < Open[0]) || (cmd == ORDER_TYPE_SELL && sar[period][CURR] > Open[0]));
+  if (condition ==  3) result &= UpdateIndicator(S_RSI, tf)       && ((cmd == ORDER_TYPE_BUY && rsi[period][CURR] < 50) || (cmd == ORDER_TYPE_SELL && rsi[period][CURR] > 50));
+  if (condition ==  4) result &= UpdateIndicator(S_MA, tf)        && ((cmd == ORDER_TYPE_BUY && Ask > ma_slow[period][CURR]) || (cmd == ORDER_TYPE_SELL && Ask < ma_slow[period][CURR]));
+  if (condition ==  5) result &= UpdateIndicator(S_MA, tf)        && ((cmd == ORDER_TYPE_BUY && ma_slow[period][CURR] > ma_slow[period][PREV]) || (cmd == ORDER_TYPE_SELL && ma_slow[period][CURR] < ma_slow[period][PREV]));
+  if (condition ==  6) result &= ((cmd == ORDER_TYPE_BUY && Ask < Open[CURR]) || (cmd == ORDER_TYPE_SELL && Ask > Open[CURR]));
+  if (condition ==  7) result &= UpdateIndicator(S_BANDS, tf)     && ((cmd == ORDER_TYPE_BUY && Open[CURR] < bands[period][CURR][BANDS_BASE]) || (cmd == ORDER_TYPE_SELL && Open[CURR] > bands[period][CURR][BANDS_BASE]));
+  if (condition ==  8) result &= UpdateIndicator(S_ENVELOPES, tf) && ((cmd == ORDER_TYPE_BUY && Open[CURR] < envelopes[period][CURR][MODE_MAIN]) || (cmd == ORDER_TYPE_SELL && Open[CURR] > envelopes[period][CURR][MODE_MAIN]));
+  if (condition ==  9) result &= UpdateIndicator(S_DEMARKER, tf)  && ((cmd == ORDER_TYPE_BUY && demarker[period][CURR] < 0.5) || (cmd == ORDER_TYPE_SELL && demarker[period][CURR] > 0.5));
+  if (condition == 10) result &= UpdateIndicator(S_WPR, tf)       && ((cmd == ORDER_TYPE_BUY && wpr[period][CURR] > 50) || (cmd == ORDER_TYPE_SELL && wpr[period][CURR] < 50));
+  if (condition == 11) result &= cmd == Convert::ValueToOp(curr_trend);
   if (!default_value) result = !result;
   return result;
 }
@@ -5016,11 +5024,11 @@ bool InitStrategy(int key, string name, bool active, ENUM_INDICATOR_TYPE indicat
   conf[key][OPEN_LEVEL]      = signal_level;
   conf[key][PROFIT_FACTOR]   = GetDefaultProfitFactor();
   info[key][CLOSE_CONDITION] = close_cond;
-  #ifdef __advanced__
+  // #ifdef __advanced__
   info[key][OPEN_CONDITION1] = open_cond1;
   info[key][OPEN_CONDITION2] = open_cond2;
   conf[key][SPREAD_LIMIT]    = max_spread;
-  #endif
+  // #endif
   return active || !ValidateSettings;
 }
 
@@ -5731,7 +5739,7 @@ string GetDailyReport() {
   // output += StringFormat("Tick: %g; ", daily[MAX_TICK]);
   // output += "Drop: "    + daily[MAX_DROP] + "; ";
   output += StringFormat("Spread: %g pts; ",   daily[MAX_SPREAD]);
-  output += StringFormat("Max orders: %.0f; ", daily[MAX_ORDERS]);
+  output += StringFormat("Max opened orders: %.0f; ", daily[MAX_ORDERS]);
   output += StringFormat("Loss: %.2f; ",       daily[MAX_LOSS]);
   output += StringFormat("Profit: %.2f; ",     daily[MAX_PROFIT]);
   output += StringFormat("Equity: %.2f; ",     daily[MAX_EQUITY]);
@@ -5763,7 +5771,7 @@ string GetWeeklyReport() {
   // output += StringFormat("Tick: %g; ", weekly[MAX_TICK]);
   // output += "Drop: "    + weekly[MAX_DROP] + "; ";
   output += StringFormat("Spread: %g pts; ",   weekly[MAX_SPREAD]);
-  output += StringFormat("Max orders: %.0f; ", weekly[MAX_ORDERS]);
+  output += StringFormat("Max opened orders: %.0f; ", weekly[MAX_ORDERS]);
   output += StringFormat("Loss: %.2f; ",       weekly[MAX_LOSS]);
   output += StringFormat("Profit: %.2f; ",     weekly[MAX_PROFIT]);
   output += StringFormat("Equity: %.2f; ",     weekly[MAX_EQUITY]);
@@ -5793,7 +5801,7 @@ string GetMonthlyReport() {
   // output += StringFormat("Tick: %g; ", monthly[MAX_TICK]);
   // output += "Drop: "    + monthly[MAX_DROP] + "; ";
   output += StringFormat("Spread: %g pts; ",   monthly[MAX_SPREAD]);
-  output += StringFormat("Max orders: %.0f; ", monthly[MAX_ORDERS]);
+  output += StringFormat("Max opened orders: %.0f; ", monthly[MAX_ORDERS]);
   output += StringFormat("Loss: %.2f; ",       monthly[MAX_LOSS]);
   output += StringFormat("Profit: %.2f; ",     monthly[MAX_PROFIT]);
   output += StringFormat("Equity: %.2f; ",     monthly[MAX_EQUITY]);
