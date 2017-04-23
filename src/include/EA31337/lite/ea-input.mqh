@@ -47,7 +47,7 @@ extern double TrailingStopAddPerMinute = 0.1; // Decrease trail stop per minute 
 extern string __EA_Risk_Parameters__ = "-- Risk management parameters --"; // >>> RISK <<
 extern double RiskMarginPerOrder = 0.6; // Risk margin per order (in %, 0-100, 0 - auto, -1 - off)
 extern double RiskMarginTotal = 8; // Risk margin in total (in %, 0-100, 0 - auto, -1 - off)
-extern int CloseOrderAfterXHours = 0; // Close order after X hours (>0 - only profitable, <0 - all, 0 - off)
+extern int CloseOrderAfterXHours = 48; // Close order after X hours (>0 - only profitable, <0 - all, 0 - off)
 extern double RiskRatio = 0.00000000; // Risk ratio (0 = auto, 1.0 = normal)
 extern int RiskRatioIncreaseMethod = 0; // Risk ratio increase method (0-255)
 extern int RiskRatioDecreaseMethod = 0; // Risk ratio decrease method (0-255)
@@ -56,6 +56,7 @@ extern int RiskRatioDecreaseMethod = 0; // Risk ratio decrease method (0-255)
 extern string __Strategy_Parameters__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGIES <<<
 extern double ProfitFactorMinToTrade = 0.5; // Min. profit factor per strategy to trade
 extern double ProfitFactorMaxToTrade = 0; // Max. profit factor per strategy to trade
+extern int InitNoOfOrdersToCalcPF = 10; // Initial number of orders to calculate profit factor
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameters (set 1.0 for default) --"; // >>> BOOSTING <<<
@@ -66,9 +67,9 @@ extern bool StrategyHandicapByPF = 0; // Handicap by its low profit factor
 extern double BestDailyStrategyMultiplierFactor = 2.10000000; // Multiplier for the best daily strategy
 extern double BestWeeklyStrategyMultiplierFactor = 1.7; // Multiplier for the best weekly strategy
 extern double BestMonthlyStrategyMultiplierFactor = 3.1; // Multiplier for the best monthly strategy
-extern double WorseDailyStrategyMultiplierFactor = 0.8; // Divider for the worse daily strategy
-extern double WorseWeeklyStrategyMultiplierFactor = 1; // Divider for the worse weekly strategy
-extern double WorseMonthlyStrategyMultiplierFactor = 1; // Divider for the worse monthly strategy
+extern double WorseDailyStrategyMultiplierFactor = 0.8; // Multiplier for the worse daily strategy
+extern double WorseWeeklyStrategyMultiplierFactor = 1; // Multiplier for the worse weekly strategy
+extern double WorseMonthlyStrategyMultiplierFactor = 1; // Multiplier for the worse monthly strategy
 extern double ConWinsIncreaseFactor = -1.2; // Increase lot factor on consequent wins (in %, 0 - off)
 extern double ConLossesIncreaseFactor = 1.3; // Increase lot factor on consequent loses (in %, 0 - off)
 extern uint ConFactorOrdersLimit = 200; // No of orders to check on consequent wins/loses
