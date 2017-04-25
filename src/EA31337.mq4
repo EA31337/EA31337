@@ -1232,6 +1232,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
      }
      if (retry) TaskAddOrderOpen(cmd, trade_volume, sid); // Will re-try again. // warning 43: possible loss of data due to type conversion
      info[sid][TOTAL_ERRORS]++;
+     //ExpertRemove();
    } // end-if: order_ticket
 
   #ifdef __profiler__ PROFILER_STOP #endif
@@ -4070,6 +4071,25 @@ int GetNoOfStrategies() {
 double GetLotSizeAuto(uint _method = 0, bool smooth = true) {
   double new_lot_size = trade.CalcLotSize(ea_risk_margin_per_order, ea_risk_ratio, _method);
 
+  // Lot size warm-up.
+  static bool is_warm_up = InitNoOfDaysToWarmUp != 0;
+  if (is_warm_up) {
+    long warmup_days = ((TimeCurrent() - init_bar_time) / 60 / 60 / 24);
+    if (warmup_days < InitNoOfDaysToWarmUp) {
+      PrintFormat("%s: %d of %d, lot: %g of %g",
+        __FUNCTION__,
+        warmup_days, InitNoOfDaysToWarmUp,
+        market.NormalizeLots(new_lot_size * 1 / (double) InitNoOfDaysToWarmUp * warmup_days),
+        new_lot_size
+        );
+      new_lot_size *= market.NormalizeLots(new_lot_size * 1 / (double) InitNoOfDaysToWarmUp * warmup_days);
+      PrintFormat("%s: new_lot_size: %g", __FUNCTION__, new_lot_size);
+    }
+    else {
+      is_warm_up = false;
+    }
+  }
+
   #ifdef __advanced__
   if (Boosting_Enabled) {
     if (LotSizeIncreaseMethod != 0) {
@@ -4098,9 +4118,9 @@ double GetLotSizeAuto(uint _method = 0, bool smooth = true) {
 
   if (smooth && ea_lot_size > 0) {
     // Increase only by average of the previous and new (which should prevent sudden increases).
-    return (ea_lot_size + new_lot_size) / 2;
+    return market.NormalizeLots((ea_lot_size + new_lot_size) / 2);
   } else {
-    return new_lot_size;
+    return market.NormalizeLots(new_lot_size);
   }
 }
 
@@ -4333,6 +4353,14 @@ void StartNewDay() {
 
   // Process actions.
   CheckAccConditions();
+
+  // Calculate lot size if required.
+  if (InitNoOfDaysToWarmUp != 0) {
+    long warmup_days = ((TimeCurrent() - init_bar_time) / 60 / 60 / 24);
+    if (warmup_days <= InitNoOfDaysToWarmUp) {
+      ea_lot_size = GetLotSize();
+    }
+  }
 
   // Update boosting values.
   if (Boosting_Enabled) UpdateStrategyFactor(WEEKLY);

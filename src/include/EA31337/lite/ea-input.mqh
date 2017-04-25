@@ -47,6 +47,7 @@ extern double TrailingStopAddPerMinute = 0.1; // Decrease trail stop per minute 
 extern string __EA_Risk_Parameters__ = "-- Risk management parameters --"; // >>> RISK <<
 extern double RiskMarginPerOrder = 0.6; // Risk margin per order (in %, 0-100, 0 - auto, -1 - off)
 extern double RiskMarginTotal = 8; // Risk margin in total (in %, 0-100, 0 - auto, -1 - off)
+extern int InitNoOfDaysToWarmUp = 21; // Initial warm-up period (in days)
 extern int CloseOrderAfterXHours = 48; // Close order after X hours (>0 - only profitable, <0 - all, 0 - off)
 extern double RiskRatio = 0.00000000; // Risk ratio (0 = auto, 1.0 = normal)
 extern int RiskRatioIncreaseMethod = 0; // Risk ratio increase method (0-255)
@@ -63,7 +64,7 @@ extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameter
 extern bool Boosting_Enabled = 0; // Enable boosting
 extern double BoostTrendFactor = 1.5; // Boost by trend factor
 extern bool StrategyBoostByPF = 0; // Boost strategy by its profit factor
-extern bool StrategyHandicapByPF = 0; // Handicap by its low profit factor
+extern bool StrategyHandicapByPF = 1; // Handicap by its low profit factor
 extern double BestDailyStrategyMultiplierFactor = 2.10000000; // Multiplier for the best daily strategy
 extern double BestWeeklyStrategyMultiplierFactor = 1.7; // Multiplier for the best weekly strategy
 extern double BestMonthlyStrategyMultiplierFactor = 3.1; // Multiplier for the best monthly strategy
