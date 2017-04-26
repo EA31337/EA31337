@@ -136,7 +136,7 @@ bool session_active = false;
 
 // Time-based variables.
 // Bar time: initial, current and last one to check if bar has been changed since the last time.
-datetime init_bar_time, last_bar_time = (int) EMPTY_VALUE;
+datetime init_bar_time, curr_bar_time, last_bar_time = (int) EMPTY_VALUE;
 datetime time_current = (int)EMPTY_VALUE;
 int hour_of_day, day_of_week, day_of_month, day_of_year, month, year;
 datetime last_order_time = 0, last_action_time = 0;
@@ -189,7 +189,7 @@ double awesome[H1][FINAL_ENUM_INDICATOR_INDEX];
 double bands[H1][FINAL_ENUM_INDICATOR_INDEX][FINAL_BANDS_ENTRY];
 double bwmfi[H1][FINAL_ENUM_INDICATOR_INDEX];
 double bpower[H1][FINAL_ENUM_INDICATOR_INDEX][ORDER_TYPE_SELL+1];
-double cci[H1][FINAL_ENUM_INDICATOR_INDEX][FINAL_MA_ENTRY];
+double cci[H1][FINAL_ENUM_INDICATOR_INDEX];
 double demarker[H1][FINAL_ENUM_INDICATOR_INDEX];
 double envelopes[H1][FINAL_ENUM_INDICATOR_INDEX][FINAL_LINE_ENTRY];
 double iforce[H1][FINAL_ENUM_INDICATOR_INDEX];
@@ -827,7 +827,7 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
       break;
 #ifdef __advanced__
     case S_BPOWER: // Calculates the Bears Power and Bulls Power indicators.
-      ratio = tf == 30 ? 1.0 : pow(BPower_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
+      ratio = tf == 30 ? 1.0 : pow(BPower_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         bpower[index][i][ORDER_TYPE_BUY]  = iBullsPower(symbol, tf, BPower_Period * ratio, BPower_Applied_Price, i);
         bpower[index][i][ORDER_TYPE_SELL] = iBearsPower(symbol, tf, BPower_Period * ratio, BPower_Applied_Price, i);
@@ -841,14 +841,14 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
       }
       success = (bool)bwmfi[index][CURR];
       break;
-    case S_CCI: // Calculates the Commodity Channel Index indicator.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        cci[index][i][FAST] = iCCI(symbol, tf, CCI_Period_Fast, CCI_Applied_Price, i);
-        cci[index][i][SLOW] = iCCI(symbol, tf, CCI_Period_Slow, CCI_Applied_Price, i);
-      }
-      success = (bool)cci[index][CURR][SLOW];
-      break;
 #endif
+    case S_CCI: // Calculates the Commodity Channel Index indicator.
+      ratio = tf == 30 ? 1.0 : pow(CCI_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
+      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
+        cci[index][i] = iCCI(symbol, tf, (int) (CCI_Period * ratio), CCI_Applied_Price, i);
+      }
+      success = (bool) cci[index][CURR];
+      break;
     case S_DEMARKER: // Calculates the DeMarker indicator.
       ratio = tf == 30 ? 1.0 : pow(DeMarker_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
@@ -2071,47 +2071,41 @@ bool Trade_BWMFI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal
  */
 bool Trade_CCI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
+  bool result = false; uint period = chart.TfToIndex(tf);
   UpdateIndicator(S_CCI, tf);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(S_CCI, tf, 0);
-  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(S_CCI, tf, 0.0);
+  if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(S_CCI, tf, 100);
   switch (cmd) {
-    //   if(iCCI(Symbol(),0,12,PRICE_TYPICAL,0)>iCCI(Symbol(),0,20,PRICE_TYPICAL,0)) return(0);
-    /*
-      //11. Commodity Channel Index
-      //Buy: 1. indicator crosses +100 from below upwards. 2. Crossing -100 from below upwards. 3.
-      //Sell: 1. indicator crosses -100 from above downwards. 2. Crossing +100 downwards. 3.
-      if ((iCCI(NULL,picci,picciu,PRICE_TYPICAL,1)<100&&iCCI(NULL,picci,picciu,PRICE_TYPICAL,0)>=100)||(iCCI(NULL,picci,picciu,PRICE_TYPICAL,1)<-100&&iCCI(NULL,picci,picciu,PRICE_TYPICAL,0)>=-100))
-      {f11=1;}
-      if ((iCCI(NULL,picci,picciu,PRICE_TYPICAL,1)>-100&&iCCI(NULL,picci,picciu,PRICE_TYPICAL,0)<=-100)||(iCCI(NULL,picci,picciu,PRICE_TYPICAL,1)>100&&iCCI(NULL,picci,picciu,PRICE_TYPICAL,0)<=100))
-      {f11=-1;}
-    */
     case ORDER_TYPE_BUY:
-      /*
-        bool result = CCI[period][CURR][LOWER] != 0.0 || CCI[period][PREV][LOWER] != 0.0 || CCI[period][FAR][LOWER] != 0.0;
-        if ((signal_method %   1) == 0) result &= Open[CURR] > Close[CURR];
-        if ((signal_method %   2) == 0) result &= !CCI_On_Sell(tf);
-        if ((signal_method %   4) == 0) result &= CCI_On_Buy(fmin(period + 1, M30));
-        if ((signal_method %   8) == 0) result &= CCI_On_Buy(M30);
-        if ((signal_method %  16) == 0) result &= CCI[period][FAR][LOWER] != 0.0;
-        if ((signal_method %  32) == 0) result &= !CCI_On_Sell(M30);
-        */
-    break;
+      result = cci[period][CURR] < -signal_level;
+      if (signal_method != 0) {
+        if ((signal_method %   1) == 0) result &= cci[period][CURR] > cci[period][PREV];
+        if ((signal_method %   2) == 0) result &= cci[period][PREV] > cci[period][FAR];
+        if ((signal_method %   4) == 0) result &= cci[period][PREV] < -signal_level;
+        if ((signal_method %   8) == 0) result &= cci[period][FAR]  < -signal_level;
+        if ((signal_method %  16) == 0) result &= cci[period][CURR] - cci[period][PREV] > cci[period][PREV] - cci[period][FAR];
+        if ((signal_method %  32) == 0) result &= cci[period][FAR] > 0;
+      }
+      break;
     case ORDER_TYPE_SELL:
-      /*
-        bool result = CCI[period][CURR][UPPER] != 0.0 || CCI[period][PREV][UPPER] != 0.0 || CCI[period][FAR][UPPER] != 0.0;
-        if ((signal_method %   1) == 0) result &= Open[CURR] < Close[CURR];
-        if ((signal_method %   2) == 0) result &= !CCI_On_Buy(tf);
-        if ((signal_method %   4) == 0) result &= CCI_On_Sell(fmin(period + 1, M30));
-        if ((signal_method %   8) == 0) result &= CCI_On_Sell(M30);
-        if ((signal_method %  16) == 0) result &= CCI[period][FAR][UPPER] != 0.0;
-        if ((signal_method %  32) == 0) result &= !CCI_On_Buy(M30);
-        */
-    break;
+      result = cci[period][CURR] > signal_level;
+      if (signal_method != 0) {
+        if ((signal_method %   1) == 0) result &= cci[period][CURR] < cci[period][PREV];
+        if ((signal_method %   2) == 0) result &= cci[period][PREV] < cci[period][FAR];
+        if ((signal_method %   4) == 0) result &= cci[period][PREV] > signal_level;
+        if ((signal_method %   8) == 0) result &= cci[period][FAR]  > signal_level;
+        if ((signal_method %  16) == 0) result &= cci[period][PREV] - cci[period][CURR] > cci[period][FAR] - cci[period][PREV];
+        if ((signal_method %  32) == 0) result &= cci[period][FAR] < 0;
+      }
+      break;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method < 0 || Convert::ValueToOp(curr_trend) == cmd;
+  if (VerboseTrace && result) {
+    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
+  }
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
+
 }
 
 /**
@@ -3716,6 +3710,13 @@ int GetTrailingMethod(int order_type, ENUM_ORDER_PROPERTY_DOUBLE mode) {
       stop_method   = DeMarker_TrailingStopMethod;
       profit_method = DeMarker_TrailingProfitMethod;
       break;
+    case CCI1:
+    case CCI5:
+    case CCI15:
+    case CCI30:
+      stop_method   = CCI_TrailingStopMethod;
+      profit_method = CCI_TrailingProfitMethod;
+      break;
     case WPR1:
     case WPR5:
     case WPR15:
@@ -4076,14 +4077,15 @@ double GetLotSizeAuto(uint _method = 0, bool smooth = true) {
   if (is_warm_up) {
     long warmup_days = ((TimeCurrent() - init_bar_time) / 60 / 60 / 24);
     if (warmup_days < InitNoOfDaysToWarmUp) {
+      /*
       PrintFormat("%s: %d of %d, lot: %g of %g",
         __FUNCTION__,
         warmup_days, InitNoOfDaysToWarmUp,
         market.NormalizeLots(new_lot_size * 1 / (double) InitNoOfDaysToWarmUp * warmup_days),
         new_lot_size
         );
+      */
       new_lot_size *= market.NormalizeLots(new_lot_size * 1 / (double) InitNoOfDaysToWarmUp * warmup_days);
-      PrintFormat("%s: new_lot_size: %g", __FUNCTION__, new_lot_size);
     }
     else {
       is_warm_up = false;
@@ -4533,7 +4535,6 @@ bool InitVariables() {
   // Check time of the week, month and year based on the trading bars.
   init_bar_time = chart.GetBarTime();
   time_current = TimeCurrent();
-  // bar_time = iTime(_Symbol, 0, 0);
   hour_of_day = DateTime::Hour(); // The hour (0,1,2,..23) of the last known server time by the moment of the program start.
   day_of_week = DateTime::DayOfWeek(); // The zero-based day of week (0 means Sunday,1,2,3,4,5,6) of the specified date. At the testing, the last known server time is modelled.
   day_of_month = DateTime::Day(); // The day of month (1 - 31) of the specified date. At the testing, the last known server time is modelled.
@@ -4617,6 +4618,7 @@ bool InitVariables() {
 
   // Calculate lot size, orders, risk ratio and margin risk.
   UpdateMarginRiskLevel();
+  UpdateVariables();
   ea_risk_ratio = GetRiskRatio();   // Re-calculate risk ratio.
   ea_risk_margin_per_order = GetRiskMarginPerOrder(); // Calculate the risk margin per order.
   ea_risk_margin_total = GetRiskMarginInTotal(); // Calculate the risk margin for all orders.
@@ -5074,11 +5076,19 @@ bool InitStrategy(int key, string name, bool active, ENUM_INDICATOR_TYPE indicat
  */
 void UpdateVariables() {
   #ifdef __profiler__ PROFILER_START #endif
+  // static datetime last_bar_time
   time_current = TimeCurrent();
+  last_bar_time = curr_bar_time;
+  curr_bar_time = chart.GetBarTime();
   last_close_profit = EMPTY;
   total_orders = GetTotalOrders();
   curr_spread = market.GetSpreadInPips();
-  curr_trend = trade.GetTrend(fabs(TrendMethod), TrendMethod < 0 ? PERIOD_M1 : (ENUM_TIMEFRAMES) NULL);
+  if (curr_bar_time != last_bar_time) {
+    // curr_trend = trade.GetTrend(fabs(TrendMethod), TrendMethod < 0 ? PERIOD_M1 : (ENUM_TIMEFRAMES) NULL);
+    double curr_rsi = iRSI(chart.GetSymbol(), TrendPeriod, RSI_Period, RSI_Applied_Price, 0);
+    curr_trend = fabs(curr_rsi - 50) > 10 ? (double) (1.0 / 50) * (curr_rsi - 50) : 0;
+    // PrintFormat("Curr Trend: %g (%g: %g/%g), RSI: %g", curr_trend, (double) (1.0 / 50) * (curr_rsi - 50), 1 / 50, curr_rsi - 50, curr_rsi);
+  }
   #ifdef __profiler__ PROFILER_STOP #endif
 }
 
@@ -5875,9 +5885,11 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
   // Prepare text to display spread.
   string text_spread = StringFormat("Spread: %.1f pips (%d pts)", market.GetSpreadInPips(), market.GetSpreadInPts());
   // Check trend.
-  string trend = "Neutral.";
+  string trend = "Neutral";
   if (Convert::ValueToOp(curr_trend) == ORDER_TYPE_BUY) trend = "Bullish";
   if (Convert::ValueToOp(curr_trend) == ORDER_TYPE_SELL) trend = "Bearish";
+  if (fabs(curr_trend) > 0.3) trend = "Strong " + trend;
+  trend += StringFormat(" (%-.1f)", curr_trend);
   // EA text.
   string ea_text = StringFormat("%s v%s", ea_name, ea_version);
   #ifdef __expire__ CheckExpireDate(); ea_text += StringFormat(" [expires on %s]", TimeToStr(ea_expire_date, TIME_DATE)); #endif
