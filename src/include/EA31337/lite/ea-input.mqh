@@ -22,7 +22,8 @@ extern uint   MaxOrders = 0; // Max orders (0 = auto)
 extern uint   MaxOrdersPerType = 0; // Max orders per type (0 = auto)
 extern double LotSize = 0.00000000; // Lot size (0 = auto)
 extern bool   TradeMicroLots = 1; // Trade micro lots?
-extern int    TrendMethod = 192; // Main trend method (0-255)
+ENUM_TIMEFRAMES TrendPeriod = PERIOD_H1; // Period for trend calculation
+int    TrendMethod = 192; // Main trend method (0-255)
 extern int    MinVolumeToTrade = 2; // Min volume to trade
 extern int    MaxOrderPriceSlippage = 5; // Max price slippage (in pips)
 extern int    MaxTries = 5; // Max retries for opening orders
@@ -441,21 +442,21 @@ double BWMFI15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
 double BWMFI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
-string __CCI_Parameters__ = "-- Settings for the Commodity Channel Index indicator --"; // >>> CCI <<<
-bool CCI1_Active = 0; // Enable for M1
-bool CCI5_Active = 0; // Enable for M5
-bool CCI15_Active = 0; // Enable for M15
-bool CCI30_Active = 0; // Enable for M30
-ENUM_TRAIL_TYPE CCI_TrailingStopMethod = 22; // Trail stop method
-ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = 1; // Trail profit method
-int CCI_Period_Fast = 12; // Period Fast
-int CCI_Period_Slow = 20; // Period Slow
-ENUM_APPLIED_PRICE CCI_Applied_Price = 0; // Applied Price
-double CCI_SignalLevel = 0.00000000; // Signal level
-int CCI1_SignalMethod = 0; // Signal method for M1 (0-
-int CCI5_SignalMethod = 0; // Signal method for M5 (0-
-int CCI15_SignalMethod = 0; // Signal method for M15 (0-
-int CCI30_SignalMethod = 0; // Signal method for M30 (0-
+extern string __CCI_Parameters__ = "-- Settings for the Commodity Channel Index indicator --"; // >>> CCI <<<
+extern bool CCI1_Active = 0; // Enable for M1
+extern bool CCI5_Active = 0; // Enable for M5
+extern bool CCI15_Active = 0; // Enable for M15
+extern bool CCI30_Active = 0; // Enable for M30
+extern double CCI_Period_Ratio = 1.2; // Period ratio between timeframes (1.0 - default)
+extern ENUM_TRAIL_TYPE CCI_TrailingStopMethod = -7; // Trail stop method
+extern ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = 1; // Trail profit method
+extern int CCI_Period = 16; // Period Fast
+extern ENUM_APPLIED_PRICE CCI_Applied_Price = 0; // Applied Price
+extern double CCI_SignalLevel = 80; // Signal level (100 by default)
+extern int CCI1_SignalMethod = 0; // Signal method for M1 (0-
+extern int CCI5_SignalMethod = 0; // Signal method for M5 (0-
+extern int CCI15_SignalMethod = 0; // Signal method for M15 (0-
+extern int CCI30_SignalMethod = 0; // Signal method for M30 (0-
 int CCI1_OpenCondition1 = 7; // Open condition 1 for M1 (0-1023)
 int CCI1_OpenCondition2 = 5; // Open condition 2 for M1 (0-)
 ENUM_MARKET_EVENT CCI1_CloseCondition = C_CCI_BUY_SELL; // Close condition for M1
@@ -480,7 +481,7 @@ extern bool DeMarker5_Active = 0; // Enable for M5
 extern bool DeMarker15_Active = 0; // Enable for M15
 extern bool DeMarker30_Active = 0; // Enable for M30
 extern int DeMarker_Period = 24; // Period
-extern double DeMarker_Period_Ratio = 3; // Period ratio between timeframes (0.5-1.5)
+extern double DeMarker_Period_Ratio = 3; // Period ratio between timeframes (1.0 - default)
 extern int DeMarker_Shift = 2; // Shift
 extern double DeMarker_SignalLevel = 0.2; // Signal level (0.0-0.4)
 extern ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = 1; // Trail stop method
