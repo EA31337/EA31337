@@ -8,7 +8,7 @@
 //| EA defines.
 //+------------------------------------------------------------------+
 
-#define ea_version "1.074"
+#define ea_version "1.075"
 #define ea_desc    "Multi-strategy advanced trading robot operating on multiple timeframes at the same time."
 #define ea_link    "https://github.com/EA31337"
 #define ea_author  "kenorb"
