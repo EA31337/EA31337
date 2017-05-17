@@ -1372,12 +1372,11 @@ bool CheckSpreadLimit(int sid) {
  */
 bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = true) {
   bool result = false;
-  if (ticket_no > 0) {
-    if (!OrderSelect(ticket_no, SELECT_BY_TICKET)) {
-      return (false);
-    }
-  } else {
+  if (ticket_no == EMPTY) {
     ticket_no = OrderTicket();
+  }
+  if (!Order::OrderSelect(ticket_no, SELECT_BY_TICKET, MODE_TRADES)) {
+    return (false);
   }
   #ifdef __profiler__ PROFILER_START #endif
   double close_price = NormalizeDouble(market.GetCloseOffer(), market.GetDigits());
