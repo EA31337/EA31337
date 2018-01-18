@@ -355,7 +355,7 @@ int OnInit() {
       return (INIT_PARAMETERS_INCORRECT);
     }
     #ifdef __release__
-    if (Terminal::IsRealtime() && AccountNumber() <= 1) {
+    if (Terminal::IsRealtime() && account.GetLogin() <= 1) {
       // @todo: Fails when debugging.
       Msg::ShowText("EA requires on-line Terminal.", "Error", __FUNCTION__, __LINE__, VerboseErrors, true);
       ea_active = false;
