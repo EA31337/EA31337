@@ -182,31 +182,31 @@ long order_queue[100][FINAL_ORDER_QUEUE_ENTRY];
 // Indicator variables.
 double iac[H1][FINAL_ENUM_INDICATOR_INDEX];
 double ad[H1][FINAL_ENUM_INDICATOR_INDEX];
-double adx[H1][FINAL_ENUM_INDICATOR_INDEX][FINAL_ADX_ENTRY];
-double alligator[H1][FINAL_ENUM_INDICATOR_INDEX][FINAL_ALLIGATOR_ENTRY];
-double atr[H1][FINAL_ENUM_INDICATOR_INDEX][FINAL_MA_ENTRY];
+double adx[H1][FINAL_ENUM_INDICATOR_INDEX][FINAL_ADX_LINE_ENTRY];
+double alligator[H1][FINAL_ENUM_INDICATOR_INDEX][FINAL_ALLIGATOR_LINE_ENTRY];
+double atr[H1][FINAL_ENUM_INDICATOR_INDEX][MA_SLOW+1];
 double awesome[H1][FINAL_ENUM_INDICATOR_INDEX];
-double bands[H1][FINAL_ENUM_INDICATOR_INDEX][FINAL_BANDS_ENTRY];
+double bands[H1][FINAL_ENUM_INDICATOR_INDEX][FINAL_BANDS_LINE_ENTRY];
 double bwmfi[H1][FINAL_ENUM_INDICATOR_INDEX];
 double bpower[H1][FINAL_ENUM_INDICATOR_INDEX][ORDER_TYPE_SELL+1];
 double cci[H1][FINAL_ENUM_INDICATOR_INDEX];
 double demarker[H1][FINAL_ENUM_INDICATOR_INDEX];
-double envelopes[H1][FINAL_ENUM_INDICATOR_INDEX][FINAL_LINE_ENTRY];
+double envelopes[H1][FINAL_ENUM_INDICATOR_INDEX][FINAL_LO_UP_LINE_ENTRY];
 double iforce[H1][FINAL_ENUM_INDICATOR_INDEX];
-double fractals[H4][FINAL_ENUM_INDICATOR_INDEX][FINAL_LINE_ENTRY];
-double gator[H1][FINAL_ENUM_INDICATOR_INDEX][LIPS+1];
-double ichimoku[H1][FINAL_ENUM_INDICATOR_INDEX][CHIKOUSPAN_LINE+1];
+double fractals[H4][FINAL_ENUM_INDICATOR_INDEX][FINAL_LO_UP_LINE_ENTRY];
+double gator[H1][FINAL_ENUM_INDICATOR_INDEX][FINAL_ALLIGATOR_LINE_ENTRY];
+double ichimoku[H1][FINAL_ENUM_INDICATOR_INDEX][FINAL_ICHIMOKU_LINE_ENTRY];
 double ma_fast[H1][FINAL_ENUM_INDICATOR_INDEX], ma_medium[H1][FINAL_ENUM_INDICATOR_INDEX], ma_slow[H1][FINAL_ENUM_INDICATOR_INDEX];
-double macd[H1][FINAL_ENUM_INDICATOR_INDEX][FINAL_SLINE_ENTRY];
+double macd[H1][FINAL_ENUM_INDICATOR_INDEX][FINAL_SIGNAL_LINE_ENTRY];
 double mfi[H1][FINAL_ENUM_INDICATOR_INDEX];
-double momentum[H1][FINAL_ENUM_INDICATOR_INDEX][FINAL_MA_ENTRY];
+double momentum[H1][FINAL_ENUM_INDICATOR_INDEX][MA_SLOW+1];
 double obv[H1][FINAL_ENUM_INDICATOR_INDEX];
 double osma[H1][FINAL_ENUM_INDICATOR_INDEX];
 double rsi[H1][FINAL_ENUM_INDICATOR_INDEX], rsi_stats[H1][3];
-double rvi[H1][FINAL_ENUM_INDICATOR_INDEX][FINAL_SLINE_ENTRY];
+double rvi[H1][FINAL_ENUM_INDICATOR_INDEX][FINAL_SIGNAL_LINE_ENTRY];
 double sar[H1][FINAL_ENUM_INDICATOR_INDEX]; int sar_week[H1][7][2];
 double stddev[H1][FINAL_ENUM_INDICATOR_INDEX];
-double stochastic[H1][FINAL_ENUM_INDICATOR_INDEX][FINAL_SLINE_ENTRY];
+double stochastic[H1][FINAL_ENUM_INDICATOR_INDEX][FINAL_SIGNAL_LINE_ENTRY];
 double wpr[H1][FINAL_ENUM_INDICATOR_INDEX];
 double zigzag[H1][FINAL_ENUM_INDICATOR_INDEX];
 
@@ -738,7 +738,7 @@ bool TradeCondition(ENUM_STRATEGY_TYPE sid = 0, ENUM_ORDER_TYPE cmd = NULL) {
  */
 bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string symbol = NULL) {
   bool success = true;
-  static datetime processed[FINAL_INDICATOR_TYPE_ENTRY][FINAL_ENUM_TIMEFRAMES_INDEX];
+  static datetime processed[S_IND_NONE][FINAL_ENUM_TIMEFRAMES_INDEX];
   int i; string text = __FUNCTION__ + ": ";
   if (type == EMPTY) {
     ArrayFill(processed, 0, ArraySize(processed), false); // Reset processed if tf is EMPTY.
@@ -781,15 +781,15 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
       ratio = tf == 30 ? 1.0 : pow(Alligator_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         shift = i + Alligator_Shift + (i == FINAL_ENUM_INDICATOR_INDEX - 1 ? Alligator_Shift_Far : 0);
-        alligator[index][i][LIPS]  = iMA(symbol, tf, (int) (Alligator_Period_Lips * ratio),  Alligator_Shift_Lips,  Alligator_MA_Method, Alligator_Applied_Price, shift);
-        alligator[index][i][TEETH] = iMA(symbol, tf, (int) (Alligator_Period_Teeth * ratio), Alligator_Shift_Teeth, Alligator_MA_Method, Alligator_Applied_Price, shift);
-        alligator[index][i][JAW]   = iMA(symbol, tf, (int) (Alligator_Period_Jaw * ratio),   Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, shift);
+        alligator[index][i][LINE_LIPS]  = iMA(symbol, tf, (int) (Alligator_Period_Lips * ratio),  Alligator_Shift_Lips,  Alligator_MA_Method, Alligator_Applied_Price, shift);
+        alligator[index][i][LINE_TEETH] = iMA(symbol, tf, (int) (Alligator_Period_Teeth * ratio), Alligator_Shift_Teeth, Alligator_MA_Method, Alligator_Applied_Price, shift);
+        alligator[index][i][LINE_JAW]   = iMA(symbol, tf, (int) (Alligator_Period_Jaw * ratio),   Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, shift);
         /**
         if (VerboseDebug) PrintFormat("%d: iMA(%s, %d, %d (%g), %d, %d, %d, %d) = %g",
           i, symbol, tf, (int) (Alligator_Period_Jaw * ratio), ratio, Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, shift, alligator[index][i][JAW]);
         */
       }
-      success = (bool) alligator[index][CURR][JAW] + alligator[index][PREV][JAW] + alligator[index][FAR][JAW];
+      success = (bool) alligator[index][CURR][LINE_JAW] + alligator[index][PREV][LINE_JAW] + alligator[index][FAR][LINE_JAW];
       /* Note: This is equivalent to:
         alligator[index][i][TEETH] = iAlligator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
         alligator[index][i][TEETH] = iAlligator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);

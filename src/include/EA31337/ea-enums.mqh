@@ -141,6 +141,7 @@ enum ENUM_STRATEGY_TYPE { // Define type of strategies.
   FINAL_STRATEGY_TYPE_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };
 
+/*
 enum ENUM_INDICATOR_TYPE { // Define type of indicator.
   S_AC         =  0,
   S_AD         =  1,
@@ -173,6 +174,7 @@ enum ENUM_INDICATOR_TYPE { // Define type of indicator.
   S_ZIGZAG     = 28,
   FINAL_INDICATOR_TYPE_ENTRY
 };
+*/
 
 enum ENUM_STRATEGY_INFO { // Define type of strategy information entry.
   ACTIVE,
