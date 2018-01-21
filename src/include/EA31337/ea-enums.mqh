@@ -6,33 +6,6 @@
 #property copyright "Copyright 2016-2017, 31337 Investments Ltd"
 #property link      "https://github.com/EA31337"
 
-/*
- * Default enumerations:
- *
- * ENUM_MA_METHOD values:
- *   0: MODE_SMA (Simple averaging)
- *   1: MODE_EMA (Exponential averaging)
- *   2: MODE_SMMA (Smoothed averaging)
- *   3: MODE_LWMA (Linear-weighted averaging)
- *
- * ENUM_APPLIED_PRICE values:
- *   0: PRICE_CLOSE (Close price)
- *   1: PRICE_OPEN (Open price)
- *   2: PRICE_HIGH (The maximum price for the period)
- *   3: PRICE_LOW (The minimum price for the period)
- *   4: PRICE_MEDIAN (Median price) = (high + low)/2
- *   5: PRICE_TYPICAL (Typical price) = (high + low + close)/3
- *   6: PRICE_WEIGHTED (Average price) = (high + low + close + close)/4
- *
- * Trade operation:
- *   0: OP_BUY (Buy operation)
- *   1: OP_SELL (Sell operation)
- *   2: OP_BUYLIMIT (Buy limit pending order)
- *   3: OP_SELLLIMIT (Sell limit pending order)
- *   4: OP_BUYSTOP (Buy stop pending order)
- *   5: OP_SELLSTOP (Sell stop pending order)
- */
-
 //+------------------------------------------------------------------+
 //| EA enumerations.
 //+------------------------------------------------------------------+
@@ -493,34 +466,3 @@ enum ENUM_STAT_PERIOD_TYPE { // Define type of tasks.
   YEARLY  = 3, // Yearly
   FINAL_STAT_PERIOD_TYPE_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };
-
-// Indicator enumerations.
-enum ENUM_MA { FAST = 0, MEDIUM = 1, SLOW = 2, FINAL_MA_ENTRY };
-#ifdef __MQL4__
-   enum ENUM_LINE { UPPER = MODE_UPPER, LOWER = MODE_LOWER, FINAL_LINE_ENTRY };
-#else
-   enum ENUM_LINE { UPPER = UPPER_LINE, LOWER = LOWER_LINE, FINAL_LINE_ENTRY };
-#endif
-#ifdef __MQL4__
-   enum ENUM_ALLIGATOR { JAW = MODE_GATORJAW, TEETH = MODE_GATORTEETH, LIPS = MODE_GATORLIPS, FINAL_ALLIGATOR_ENTRY };
-#else
-   enum ENUM_ALLIGATOR { JAW = GATORJAW_LINE, TEETH = GATORTEETH_LINE, LIPS = GATORLIPS_LINE, FINAL_ALLIGATOR_ENTRY };
-#endif
-#ifdef __MQL4__
-   enum ENUM_ADX { ADX_MAIN = MODE_MAIN, ADX_PLUSDI = MODE_PLUSDI, ADX_MINUSDI = MODE_MINUSDI, FINAL_ADX_ENTRY };
-#else
-   enum ENUM_ADX { ADX_MAIN = MAIN_LINE, ADX_PLUSDI = PLUSDI_LINE, ADX_MINUSDI = MINUSDI_LINE, FINAL_ADX_ENTRY };
-#endif
-#ifdef __MQL4__
-   enum ENUM_BANDS { BANDS_BASE = MODE_MAIN, BANDS_UPPER = MODE_UPPER, BANDS_LOWER = MODE_LOWER, FINAL_BANDS_ENTRY };
-#else
-   enum ENUM_BANDS { BANDS_BASE = BASE_LINE, BANDS_UPPER = UPPER_BAND, BANDS_LOWER = LOWER_BAND, FINAL_BANDS_ENTRY };
-#endif
-#ifdef __MQL4__
-  enum ENUM_SLINE { MAIN = MODE_MAIN, SIGNAL_LINE = MODE_SIGNAL, FINAL_SLINE_ENTRY };
-#else
-  enum ENUM_SLINE { MAIN = MAIN_LINE, SIGNAL = SIGNAL_LINE, FINAL_SLINE_ENTRY };
-#endif
-#ifdef __MQL4__
-   enum ENUM_ICHIMOKU { TENKANSEN_LINE = MODE_TENKANSEN, KIJUNSEN_LINE = MODE_KIJUNSEN, SENKOUSPANA_LINE = MODE_SENKOUSPANA, SENKOUSPANB_LINE = MODE_SENKOUSPANB, CHIKOUSPAN_LINE = MODE_CHIKOUSPAN };
-#endif
