@@ -1,10 +1,12 @@
 # Introduction
 
+[![Join the chat at Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/EA31337/EA31337)
+
 Introducing EA31337, an advanced trading robot on the market written in MQL.
 
 It takes the currency trading on the next level by implementing the coordinated algorithm which prioritising and managing multi-timeframe strategies. With fully user customizable parameters, it makes real-time trading a hassle-free experience.
 
-Please follow [Wiki link](https://github.com/EA31337/EA31337-Wiki/wiki) for the available documentation pages.
+Please follow [Wiki Home page](https://github.com/EA31337/EA31337-Wiki/wiki) for the available documentation pages.
 
 ## About the project
 
@@ -198,7 +200,9 @@ Documentation can be found at the [wiki page](https://github.com/EA31337/EA31337
 
 # Support
 
-If you having any problems or questions, please [raise a support ticket](https://github.com/EA31337/EA3133-Support/issues/new) or join our channel at [Gitter](https://gitter.im/EA31337/EA3133-Support) or [Telegram](https://t.me/EA31337).
+If you having any problems or questions, please [raise a support ticket](https://github.com/EA31337/EA3133-Support/issues/new) or join our channel at [Gitter](https://gitter.im/EA31337/EA31337) or [Telegram](https://t.me/EA31337).
+
+[![Join the chat at Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/EA31337/EA31337)
 
 # Terms of Use
 
