@@ -952,7 +952,7 @@ double RVI15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
 double RVI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
-extern string __SAR_Parameters__ = "-- Settings for the the Parabolic Stop and Reverse system indicator --"; // >>> SAR <<<
+extern string __SAR_Parameters__ = "-- Settings for the Parabolic Stop and Reverse system indicator --"; // >>> SAR <<<
 extern bool SAR1_Active = 0; // Enable for M1
 extern bool SAR5_Active = 0; // Enable for M5
 extern bool SAR15_Active = 0; // Enable for M15
@@ -1020,7 +1020,7 @@ double StdDev15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
 double StdDev30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
-string __Stochastic_Parameters__ = "-- Settings for the the Stochastic Oscillator --"; // >>> STOCHASTIC <<<
+string __Stochastic_Parameters__ = "-- Settings for the Stochastic Oscillator --"; // >>> STOCHASTIC <<<
 bool Stochastic1_Active = 0; // Enable for M1
 bool Stochastic5_Active = 0; // Enable for M5
 bool Stochastic15_Active = 0; // Enable for M15
