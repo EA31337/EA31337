@@ -5,5 +5,3 @@
 //+------------------------------------------------------------------+
 //#import "MT4EA2DLL.dll"
 //#resource "<path_to_resource_file>"
-
-#define NEAR_ZERO 0.00001
