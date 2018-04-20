@@ -1,18 +1,18 @@
 [submodule "VM"]
 	path = _VM
-	url = git@github.com:EA31337/FX-MT-VM.git
+	url = https://github.com/EA31337/FX-MT-VM.git
 [submodule "test_results"]
 	path = _test_results
-	url = git@github.com:EA31337/EA31337-Dev-Test-Results.git
+	url = https://github.com/EA31337/EA31337-Dev-Test-Results.git
 [submodule "EA31337-Lite-Sets"]
 	path = sets/Lite
-	url = git@github.com:EA31337/EA31337-Lite-Sets.git
+	url = https://github.com/EA31337/EA31337-Lite-Sets.git
 [submodule "EA31337-classes"]
 	path = src/include/EA31337-classes
-	url = git@github.com:EA31337/EA31337-classes.git
+	url = https://github.com/EA31337/EA31337-classes.git
 [submodule "EA31337-Advanced-Sets"]
 	path = sets/Advanced
-	url = git@github.com:EA31337/EA31337-Advanced-Sets.git
+	url = https://github.com/EA31337/EA31337-Advanced-Sets.git
 [submodule "Jenkins-config"]
 	path = conf/Jenkins
 	url = git@github.com:EA31337/Jenkins-config.git
