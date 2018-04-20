@@ -1,0 +1,7 @@
+# .travis.yml - configuration file for the travis continuous integration service
+# see http://about.travis-ci.org/docs/user/languages/php for more hints
+#
+language: generic
+sudo: required
+script:
+- find . -name "*.sh" -exec bash -n {} ';'
