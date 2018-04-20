@@ -16,3 +16,6 @@
 [submodule "Jenkins-config"]
 	path = conf/Jenkins
 	url = git@github.com:EA31337/Jenkins-config.git
+[submodule "wiki"]
+	path = wiki
+	url = https://github.com/EA31337/EA31337.wiki.git
