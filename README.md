@@ -6,7 +6,7 @@ Introducing EA31337, an advanced trading robot on the market written in MQL.
 
 It takes the currency trading on the next level by implementing the coordinated algorithm which prioritising and managing multi-timeframe strategies. With fully user customizable parameters, it makes real-time trading a hassle-free experience.
 
-Please follow [Wiki Home page](https://github.com/EA31337/EA31337-Wiki/wiki) for the available documentation pages.
+Please follow [Wiki Home page](https://github.com/EA31337/EA31337/wiki) for the available documentation pages.
 
 ## About the project
 
@@ -196,7 +196,7 @@ By default, EA provides the best optimized settings for EURUSD symbol pair based
 
 # Documentation
 
-Documentation can be found at the [wiki page](https://github.com/EA31337/EA31337-Wiki/wiki). If you believe some information is outdated, you can propose new changes.
+Documentation can be found at the [wiki page](https://github.com/EA31337/EA31337/wiki). If you believe some information is outdated, you can propose new changes.
 
 # Support
 
