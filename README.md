@@ -139,21 +139,7 @@ If you decide to use this EA for the trading purposes, please use it responsivel
 
 ## Compilation
 
-To compile the project, follow these steps:
-
-1. Clone or download this repository into platform's _MQL4/Experts_ folder.
-
-  <sup>Note: To open that folder, run platform and select *File, Open Data Folder* from the menu.</sup>
-
-1. Symlink or copy _src/include/EA_ folder into _MQL4/Include_ folder.
-1. Clone [EA31337-classes](https://github.com/EA31337/EA31337-classes) repository into _MQL4/Include_ folder.
-1. Open the main `EA31337.mq4` file in *MetaEditor* and compile.
-
-  <sup>Note: For MQL5, rename or copy the file to have `.mq5` extension.</sup>
-
-1. In some cases (different branches/versions), you may also need to clone [EA31337-strategies](https://github.com/EA31337/EA31337-strategies) into _src/include/EA_ folder.
-
-  <sup>Note: When downloading a ZIP file, it's missing the git submodules, so you need to clone it recursively.</sup>
+For compilation steps, refer to [Compilation](https://github.com/EA31337/EA31337/wiki/Compilation) wiki page.
 
 # Configuration
 
