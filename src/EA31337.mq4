@@ -1271,7 +1271,7 @@ bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, int sid = EMPTY, double volume = EM
     if (VerboseDebug) PrintFormat("%s:%d: %s: Volume: %g", __FUNCTION__, __LINE__, sname[sid], volume);
     result = false;
   } else if (!CheckMinPipGap(sid)) {
-    last_trace = Msg::ShowText(StringFormat("%s: Not executing order, because the gap is too small [MinPipGap].", sname[sid]), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
+    last_trace = Msg::ShowText(StringFormat("%s: Ignoring the executing order, because the distance between orders is too close [MinPipGap].", sname[sid]), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
     result = false;
   } else if (!CheckProfitFactorLimits(sid)) {
     result = false;
