@@ -717,7 +717,7 @@ bool TradeCondition(ENUM_STRATEGY_TYPE sid = 0, ENUM_ORDER_TYPE cmd = NULL) {
     case MA1: case MA5: case MA15: case MA30:                                 _result = Trade_MA(cmd, tf); break;
     case MACD1: case MACD5: case MACD15: case MACD30:                         _result = Trade_MACD(cmd, tf); break;
     case MFI1: case MFI5: case MFI15: case MFI30:                             _result = Trade_MFI(cmd, tf); break;
-    case MOMENTUM1: case MOMENTUM5: case MOMENTUM15: case MOMENTUM30:         _result = Trade_Momentum(cmd, tf); break;
+    case MOM1: case MOM5: case MOM15: case MOM30:                             _result = Trade_Momentum(cmd, tf); break;
     case OBV1: case OBV5: case OBV15: case OBV30:                             _result = Trade_OBV(cmd, tf); break;
     case OSMA1: case OSMA5: case OSMA15: case OSMA30:                         _result = Trade_OSMA(cmd, tf); break;
     case RSI1: case RSI5: case RSI15: case RSI30:                             _result = Trade_RSI(cmd, tf); break;
@@ -4951,10 +4951,10 @@ bool InitStrategies() {
   init &= InitStrategy(MFI15, "MFI M15", MFI15_Active, S_MFI, PERIOD_M15, MFI15_SignalMethod, MFI_SignalLevel, MFI15_OpenCondition1, MFI15_OpenCondition2, MFI15_CloseCondition, MFI15_MaxSpread);
   init &= InitStrategy(MFI30, "MFI M30", MFI30_Active, S_MFI, PERIOD_M30, MFI30_SignalMethod, MFI_SignalLevel, MFI30_OpenCondition1, MFI30_OpenCondition2, MFI30_CloseCondition, MFI30_MaxSpread);
 
-  init &= InitStrategy(MOMENTUM1,  "Momentum M1",  Momentum1_Active,  S_MOMENTUM, PERIOD_M1,  Momentum1_SignalMethod,  Momentum_SignalLevel, Momentum1_OpenCondition1,  Momentum1_OpenCondition2,  Momentum1_CloseCondition,  Momentum1_MaxSpread);
-  init &= InitStrategy(MOMENTUM5,  "Momentum M5",  Momentum5_Active,  S_MOMENTUM, PERIOD_M5,  Momentum5_SignalMethod,  Momentum_SignalLevel, Momentum5_OpenCondition1,  Momentum5_OpenCondition2,  Momentum5_CloseCondition,  Momentum5_MaxSpread);
-  init &= InitStrategy(MOMENTUM15, "Momentum M15", Momentum15_Active, S_MOMENTUM, PERIOD_M15, Momentum15_SignalMethod, Momentum_SignalLevel, Momentum15_OpenCondition1, Momentum15_OpenCondition2, Momentum15_CloseCondition, Momentum15_MaxSpread);
-  init &= InitStrategy(MOMENTUM30, "Momentum M30", Momentum30_Active, S_MOMENTUM, PERIOD_M30, Momentum30_SignalMethod, Momentum_SignalLevel, Momentum30_OpenCondition1, Momentum30_OpenCondition2, Momentum30_CloseCondition, Momentum30_MaxSpread);
+  init &= InitStrategy(MOM1,  "Momentum M1",  Momentum1_Active,  S_MOMENTUM, PERIOD_M1,  Momentum1_SignalMethod,  Momentum_SignalLevel, Momentum1_OpenCondition1,  Momentum1_OpenCondition2,  Momentum1_CloseCondition,  Momentum1_MaxSpread);
+  init &= InitStrategy(MOM5,  "Momentum M5",  Momentum5_Active,  S_MOMENTUM, PERIOD_M5,  Momentum5_SignalMethod,  Momentum_SignalLevel, Momentum5_OpenCondition1,  Momentum5_OpenCondition2,  Momentum5_CloseCondition,  Momentum5_MaxSpread);
+  init &= InitStrategy(MOM15, "Momentum M15", Momentum15_Active, S_MOMENTUM, PERIOD_M15, Momentum15_SignalMethod, Momentum_SignalLevel, Momentum15_OpenCondition1, Momentum15_OpenCondition2, Momentum15_CloseCondition, Momentum15_MaxSpread);
+  init &= InitStrategy(MOM30, "Momentum M30", Momentum30_Active, S_MOMENTUM, PERIOD_M30, Momentum30_SignalMethod, Momentum_SignalLevel, Momentum30_OpenCondition1, Momentum30_OpenCondition2, Momentum30_CloseCondition, Momentum30_MaxSpread);
 
   init &= InitStrategy(OBV1,  "OBV M1",  OBV1_Active,  S_OBV, PERIOD_M1,  OBV1_SignalMethod,  OBV_SignalLevel,  OBV1_OpenCondition1, OBV1_OpenCondition2,  OBV1_CloseCondition,  OBV1_MaxSpread);
   init &= InitStrategy(OBV5,  "OBV M5",  OBV5_Active,  S_OBV, PERIOD_M5,  OBV5_SignalMethod,  OBV_SignalLevel,  OBV5_OpenCondition1, OBV5_OpenCondition2,  OBV5_CloseCondition,  OBV5_MaxSpread);
