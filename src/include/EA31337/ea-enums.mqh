@@ -141,41 +141,6 @@ enum ENUM_STRATEGY_TYPE { // Define type of strategies.
   FINAL_STRATEGY_TYPE_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };
 
-/*
-enum ENUM_INDICATOR_TYPE { // Define type of indicator.
-  S_AC         =  0,
-  S_AD         =  1,
-  S_ADX        =  2,
-  S_ALLIGATOR  =  3,
-  S_ATR        =  4,
-  S_AWESOME    =  5,
-  S_BANDS      =  6,
-  S_BPOWER     =  7,
-  S_BWMFI      =  8,
-  S_CCI        =  9,
-  S_DEMARKER   = 10,
-  S_ENVELOPES  = 11,
-  S_FORCE      = 12,
-  S_FRACTALS   = 13,
-  S_GATOR      = 14,
-  S_ICHIMOKU   = 15,
-  S_MA         = 16,
-  S_MACD       = 17,
-  S_MFI        = 18,
-  S_MOMENTUM   = 19,
-  S_OBV        = 20,
-  S_OSMA       = 21,
-  S_RSI        = 22,
-  S_RVI        = 23,
-  S_SAR        = 24,
-  S_STDDEV     = 25,
-  S_STOCHASTIC = 26,
-  S_WPR        = 27,
-  S_ZIGZAG     = 28,
-  FINAL_INDICATOR_TYPE_ENTRY
-};
-*/
-
 enum ENUM_STRATEGY_INFO { // Define type of strategy information entry.
   ACTIVE,
   SUSPENDED,
