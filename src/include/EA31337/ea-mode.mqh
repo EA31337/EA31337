@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                                      ea-mode.mqh |
-//|                       Copyright 2016-2017, 31337 Investments Ltd |
+//|                       Copyright 2016-2018, 31337 Investments Ltd |
 //|                                       https://github.com/EA31337 |
 //+------------------------------------------------------------------+
 //+------------------------------------------------------------------+
@@ -12,7 +12,6 @@
 //#define __rider__     // Activate rider strategy.
 
 // Other modes.
-//#define __nolicense__    // Disable licensing.
 //#define __backtest__     // For backtest only.
 //#define __profiler__     // Activate profiler.
 //#define __expire__       // Activates expiration date.

@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                                 ea-code-conf.mqh |
-//|                       Copyright 2016-2017, 31337 Investments Ltd |
+//|                       Copyright 2016-2018, 31337 Investments Ltd |
 //|                                       https://github.com/EA31337 |
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, kenorb"
@@ -15,7 +15,6 @@
   #define __noboost__   // Disable boosting by default.
   #define __nospreads__ // Disable spread limits.
   #define __nodebug__   // Disable debug messages by default.
-  #define __nolicense__ // Disable licensing.
 #endif
 
 #ifdef __backtest__
@@ -23,9 +22,6 @@
     #define __input__
   #endif
   #define __debug__
-  #ifndef __nolicense__
-    #define __nolicense__    // Disable licensing.
-  #endif
   #ifndef __profiler__
     #define __profiler__
   #endif
@@ -45,9 +41,6 @@
 
 #ifdef __expire__
   #define __release__     // Enable release if expiration is enabled.
-  #ifndef __nolicense__
-    #define __nolicense__   // Disable licence when there is an expire date.
-  #endif
 #endif
 
 #ifdef __release__

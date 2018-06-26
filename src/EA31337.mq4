@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                 EA31337 - multi-strategy advanced trading robot. |
-//|                       Copyright 2016-2017, 31337 Investments Ltd |
+//|                       Copyright 2016-2018, 31337 Investments Ltd |
 //|                                       https://github.com/EA31337 |
 //+------------------------------------------------------------------+
 
@@ -3997,9 +3997,7 @@ int CheckSettings() {
       return -__LINE__;
     }
   }
-  E_Mail = StringTrimLeft(StringTrimRight(E_Mail));
-  License = StringTrimLeft(StringTrimRight(License));
-  return StringCompare(ValidEmail(E_Mail), License) && StringLen(ea_file) == 11 ? __LINE__ : -__LINE__;
+  return StringLen(ea_file) == 11 ? __LINE__ : -__LINE__;
 }
 
 /**
@@ -4230,34 +4228,6 @@ double GetAutoRiskRatio() {
  */
 double GetRiskRatio() {
   return RiskRatio == 0 ? GetAutoRiskRatio() : RiskRatio;
-}
-
-/**
- * Validate the e-mail.
- */
-string ValidEmail(string text) {
-  string output = StringFormat("%d", StringLen(text));
-  if (text == "") {
-    Msg::ShowText("E-mail is empty, please validate the settings.", "Error", __FUNCTION__, __LINE__, true, true, true);
-    session_initiated = false;
-    return text;
-  }
-  if (StringFind(text, "@") == EMPTY || StringFind(text, ".") == EMPTY) {
-    Msg::ShowText("E-mail is not in valid format.", "Error", __FUNCTION__, __LINE__, true, true, true);
-    session_initiated = false;
-    return text;
-  }
-  for (last_bar_time = StringLen(text); last_bar_time >= 0; last_bar_time--)
-    output += IntegerToString(StringGetChar(text, (int) last_bar_time), 3, '-');
-  StringReplace(output, "9", "1"); StringReplace(output, "8", "7"); StringReplace(output, "--", "-3");
-  output = StringSubstr(output, 0, StringLen(ea_name) + StringLen(ea_author) + StringLen(ea_link));
-  output = StringSubstr(output, 0, StringLen(output) - 1);
-  #ifdef __testing__ #define print_email #endif
-  #ifdef print_email
-    Print(output);
-    Print(MD5::MD5Sum(output));
-  #endif
-  return output;
 }
 
 /* BEGIN: PERIODIC FUNCTIONS */

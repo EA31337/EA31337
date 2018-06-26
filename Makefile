@@ -76,13 +76,13 @@ set-rider-backtest: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__backtest__\|__rider__"
 
 set-lite-full: set-none
-	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__nolicense__"
+	@$(MAKE) -f $(FILE) set-mode MODE="__release__"
 
 set-advanced-full: set-none
-	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__nolicense__\|__advanced__"
+	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__advanced__"
 
 set-rider-full: set-none
-	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__nolicense__\|__rider__"
+	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__rider__"
 
 set-testing:
 	@$(MAKE) -f $(FILE) set-mode MODE="__testing__"
