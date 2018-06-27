@@ -1053,18 +1053,18 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
  *     if true, re-try to open again after error/failure.
  */
 int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string order_comment = "", bool retry = true) {
-   bool result = false;
-   int order_ticket;
-   double trade_volume_max = market.GetVolumeMax();
+  bool result = false;
+  int order_ticket;
+  double trade_volume_max = market.GetVolumeMax();
 
   #ifdef __profiler__ PROFILER_START #endif
 
   // if (VerboseTrace) Print(__FUNCTION__);
-   if (trade_volume <= market.GetVolumeMin()) {
-     trade_volume = GetStrategyLotSize(sid, cmd);
-   } else {
-     trade_volume = market.NormalizeLots(trade_volume);
-   }
+  if (trade_volume <= market.GetVolumeMin()) {
+    trade_volume = GetStrategyLotSize(sid, cmd);
+  } else {
+    trade_volume = market.NormalizeLots(trade_volume);
+  }
 
    // Check the limits.
    if (!OpenOrderIsAllowed(cmd, sid, trade_volume)) {
@@ -1076,11 +1076,11 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
      order_comment = GetStrategyComment(sid);
    }
 
-    // Calculate take profit and stop loss.
-    Chart::RefreshRates();
     // Print current market information before placing the order.
     if (VerboseDebug) Print(__FUNCTION__ + ": " + GetMarketTextDetails());
 
+    // Calculate take profit and stop loss.
+    Chart::RefreshRates();
     double sl_trail = GetTrailingValue(cmd, ORDER_SL, sid);
     double tp_trail = GetTrailingValue(cmd, ORDER_TP, sid);
     double stoploss = trade.CalcBestSLTP(sl_trail, StopLossMax, RiskMarginPerOrder, ORDER_SL, cmd, market.GetVolumeMin());
@@ -1111,8 +1111,9 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
     }
 
   trade_volume = market.NormalizeLots(trade_volume);
-   order_ticket = OrderSend(
-      market.GetSymbol(), cmd,
+  order_ticket = OrderSend(
+      market.GetSymbol(),
+      cmd,
       trade_volume,
       market.GetOpenOffer(cmd),
       max_order_slippage,
@@ -1180,15 +1181,10 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
          order_comment,
          MagicNumber + sid, 0, Order::GetOrderColor(cmd)),
          "Debug", __FUNCTION__, __LINE__, VerboseErrors | VerboseDebug | VerboseTrace);
+     Msg::ShowText(GetAccountTextDetails(), "Debug", __FUNCTION__, __LINE__, VerboseErrors | VerboseDebug | VerboseTrace);
+     Msg::ShowText(GetMarketTextDetails(),  "Debug", __FUNCTION__, __LINE__, VerboseErrors | VerboseDebug | VerboseTrace);
      if (VerboseErrors) {
        if (WriteReport) ReportAdd(last_err);
-     }
-     if (VerboseDebug) {
-       Msg::ShowText(GetAccountTextDetails(), "Debug", __FUNCTION__, __LINE__, VerboseDebug | VerboseTrace);
-       Msg::ShowText(GetMarketTextDetails(),  "Debug", __FUNCTION__, __LINE__, VerboseDebug | VerboseTrace);
-     }
-     if (VerboseInfo) {
-       OrderPrint();
      }
 
      /* Post-process the errors. */
@@ -1210,8 +1206,8 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
        retry = false;
      }
      if (err_code == ERR_INVALID_TRADE_VOLUME) { // OrderSend error 131
-        // Invalid trade volume.
-        // Usually happens when volume is not normalized, or on invalid volume value.
+       // Invalid trade volume.
+       // Usually happens when volume is not normalized, or on invalid volume value.
        if (WriteReport) ReportAdd(last_debug);
        Msg::ShowText(
          StringFormat("Volume: %g (Min: %g, Max: %g, Step: %g)",
@@ -1229,8 +1225,12 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
        Sleep(200); // Wait 200ms.
      }
      if (err_code == ERR_OFF_QUOTES) { /* error code: 136 */
-        // Price changed, so we should consider whether to execute order or not.
-        retry = false; // ?
+        // Price changed, so we should re-consider whether to execute order or not.
+        retry = false;
+     }
+     if (err_code == ERR_REQUOTE) { /* error code: 138 */
+       // Price re-quoted by broker.
+       // If this happens too often, consider increasing slippage (MaxOrderPriceSlippage).
      }
      if (retry) TaskAddOrderOpen(cmd, trade_volume, sid); // Will re-try again. // warning 43: possible loss of data due to type conversion
      info[sid][TOTAL_ERRORS]++;
