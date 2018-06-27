@@ -137,7 +137,7 @@ bool session_active = false;
 // Time-based variables.
 // Bar time: initial, current and last one to check if bar has been changed since the last time.
 datetime init_bar_time, curr_bar_time, last_bar_time = (int) EMPTY_VALUE;
-datetime time_current = (int)EMPTY_VALUE;
+datetime time_current = (int) EMPTY_VALUE;
 int hour_of_day, day_of_week, day_of_month, day_of_year, month, year;
 datetime last_order_time = 0, last_action_time = 0;
 int last_history_check = 0; // Last ticket position processed.
@@ -242,6 +242,18 @@ void OnTick() {
   last_bid = market.GetLastBid();
   last_pip_change = market.GetLastPriceChangeInPips();
 
+  // Check if we should ignore the tick.
+  if (last_pip_change < MinPipChangeToTrade || ShouldIgnoreTick(TickIgnoreMethod, MinPipChangeToTrade, PERIOD_M1)) {
+    if (last_bar_time == chart.GetBarTime(PERIOD_M1)) {
+      return;
+    }
+  }
+  else {
+    last_bar_time = chart.GetBarTime(PERIOD_M1);
+  }
+
+  #ifdef __profiler__ PROFILER_START #endif
+
   if (!terminal.IsOptimization()) {
     // Update stats.
     total_stats.OnTick();
@@ -251,25 +263,6 @@ void OnTick() {
     }
   }
 
-  if (last_pip_change < MinPipChangeToTrade || ShouldIgnoreTick(TickIgnoreMethod, MinPipChangeToTrade, PERIOD_M1)) {
-    return;
-  }
-
-  // Check if we should ignore the tick.
-  /*
-  if (bar_time <= last_bar_time || last_pip_change < MinPipChangeToTrade) {
-    if (VerboseDebug) {
-      PrintFormat("Last tick change: %f < %f (%g/%g), Bar time: %d, Ask: %g, Bid: %g, LastAsk: %g, LastBid: %g",
-        last_tick_change, MinPipChangeToTrade, Convert::GetValueDiffInPips(Ask, LastAsk, true), Convert::GetValueDiffInPips(Bid, LastBid, true),
-        bar_time, Ask, Bid, LastAsk, LastBid);
-    }
-    return;
-  } else {
-    last_bar_time = bar_time;
-  }
-  */
-  #ifdef __profiler__ PROFILER_START #endif
-
   if (hour_of_day != DateTime::Hour()) StartNewHour();
   UpdateVariables();
   if (TradeAllowed()) {
@@ -278,6 +271,7 @@ void OnTick() {
 
   UpdateOrders();
   UpdateStats();
+
   if (PrintLogOnChart) DisplayInfoOnChart();
   #ifdef __profiler__ PROFILER_STOP #endif
 } // end: OnTick()
@@ -5049,8 +5043,7 @@ void UpdateVariables() {
   #ifdef __profiler__ PROFILER_START #endif
   // static datetime last_bar_time
   time_current = TimeCurrent();
-  last_bar_time = curr_bar_time;
-  curr_bar_time = chart.GetBarTime();
+  curr_bar_time = chart.GetBarTime(PERIOD_M1);
   last_close_profit = EMPTY;
   total_orders = GetTotalOrders();
   curr_spread = market.GetSpreadInPips();
