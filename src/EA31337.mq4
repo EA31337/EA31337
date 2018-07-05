@@ -486,9 +486,11 @@ double OnTester() {
  */
 void OnTesterPass() {
   Print("Calling ", __FUNCTION__, ".");
+  /*
   if (ProfilingMinTime > 0) {
     // Print("PROFILER: ", timers.ToString(0));
   }
+  */
 }
 
 /**
@@ -777,6 +779,7 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
       if (VerboseDebug) PrintFormat("Alligator M%d: %s", tf, Array::ArrToString3D(alligator, ",", Digits));
       break;
 #ifdef __advanced__
+/*
     case INDI_ATR: // Calculates the Average True Range indicator.
       ratio = tf == 30 ? 1.0 : pow(ATR_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
@@ -789,6 +792,7 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
         awesome[index][i] = iAO(symbol, tf, i);
       }
       break;
+*/
 #endif // __advanced__
     case INDI_BANDS: // Calculates the Bollinger Bands indicator.
       // int sid, bands_period = Bands_Period; // Not used at the moment.
@@ -808,8 +812,8 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
     case INDI_BEARS: // Calculates the Bears Power and Bulls Power indicators.
       ratio = tf == 30 ? 1.0 : pow(BPower_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        bpower[index][i][ORDER_TYPE_BUY]  = iBullsPower(symbol, tf, BPower_Period * ratio, BPower_Applied_Price, i);
-        bpower[index][i][ORDER_TYPE_SELL] = iBearsPower(symbol, tf, BPower_Period * ratio, BPower_Applied_Price, i);
+        bpower[index][i][ORDER_TYPE_BUY]  = iBullsPower(symbol, tf, (int) (BPower_Period * ratio), BPower_Applied_Price, i);
+        bpower[index][i][ORDER_TYPE_SELL] = iBearsPower(symbol, tf, (int) (BPower_Period * ratio), BPower_Applied_Price, i);
       }
       success = (bool)(bpower[index][CURR][ORDER_TYPE_BUY] || bpower[index][CURR][ORDER_TYPE_SELL]);
       // Message("Bulls: " + bpower[index][CURR][ORDER_TYPE_BUY] + ", Bears: " + bpower[index][CURR][ORDER_TYPE_SELL]);
@@ -1373,7 +1377,7 @@ bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = true)
     Msg::ShowText(last_msg, "Info", __FUNCTION__, __LINE__, VerboseInfo);
     last_debug = Msg::ShowText(Order::OrderTypeToString((ENUM_ORDER_TYPE) Order::OrderType()), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
     #ifdef __advanced__
-      if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(Order::GetOrderProfitInPips(), 0) + " pips, reason: " + ReasonIdToText(reason_id) + "; " + Order::GetOrderToText());
+      if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(Order::GetOrderProfitInPips(), 0) + " pips, reason: " + ReasonIdToText(reason_id) + "; " + Order::OrderTypeToString((ENUM_ORDER_TYPE) Order::OrderType()));
     #else
       if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(Order::GetOrderProfitInPips(), 0) + " pips; " + Order::OrderTypeToString((ENUM_ORDER_TYPE) Order::OrderType()));
     #endif
@@ -4004,7 +4008,7 @@ void CheckStats(double value, int type, bool max = true) {
  * Get daily total available orders. It can dynamically change during the day.
  */
 #ifdef __advanced__
-int GetMaxOrdersPerDay() {
+uint GetMaxOrdersPerDay() {
   if (MaxOrdersPerDay <= 0) return true;
   int hours_left = (24 - hour_of_day);
   int curr_allowed_limit = (int) floor((MaxOrdersPerDay - daily_orders) / hours_left);
@@ -4019,7 +4023,7 @@ int GetMaxOrdersPerDay() {
 uint GetMaxOrders(double volume_size) {
   uint _result, _limit = account.AccountLimitOrders();
   #ifdef __advanced__
-    _result = MaxOrders > 0 ? (MaxOrdersPerDay > 0 ? fmin(MaxOrders, GetMaxOrdersPerDay()) : MaxOrders) : Orders::CalcMaxOrders(volume_size, ea_risk_ratio, max_orders, GetMaxOrdersPerDay());
+    _result = MaxOrders > 0 ? (MaxOrdersPerDay > 0 ? fmin(MaxOrders, GetMaxOrdersPerDay()) : MaxOrders) : trade.CalcMaxOrders(volume_size, ea_risk_ratio, max_orders, GetMaxOrdersPerDay());
   #else
     _result = MaxOrders > 0 ? MaxOrders : trade.CalcMaxOrders(volume_size, ea_risk_ratio, max_orders);
   #endif
@@ -4620,7 +4624,7 @@ void ToggleComponent(int component) {
       Boosting_Enabled = !Boosting_Enabled;
       break;
     case 4:
-      BoostByProfitFactor = !BoostByProfitFactor;
+      StrategyBoostByPF = !StrategyBoostByPF;
       break;
     case 5:
       if (BestDailyStrategyMultiplierFactor != 1.0 || BestWeeklyStrategyMultiplierFactor != 1.0 || BestMonthlyStrategyMultiplierFactor != 1.0) {
@@ -4649,7 +4653,7 @@ void ToggleComponent(int component) {
       else BoostTrendFactor = 1.2;
       break;
     case 8:
-      HandicapByProfitFactor = !HandicapByProfitFactor;
+      StrategyHandicapByPF = !StrategyHandicapByPF;
       break;
     // Smart order queue
     case 9:
@@ -4657,7 +4661,7 @@ void ToggleComponent(int component) {
       break;
     // Trend
     case 10:
-      TradeWithTrend = !TradeWithTrend;
+      //TradeWithTrend = !TradeWithTrend;
       break;
     case 11:
       // if (TrendMethod > 0) TrendMethod = 0; else TrendMethod = 181;
@@ -4689,7 +4693,7 @@ void ToggleComponent(int component) {
     // Lot size
     case 19:
       if (LotSize > 0) LotSize = 0.0;
-      else LotSize = market.GetMinLot();
+      else LotSize = market.GetVolumeMin();
       break;
     case 20:
       if (LotSizeIncreaseMethod > 0) LotSizeIncreaseMethod = 0; else LotSizeIncreaseMethod = 255;
@@ -4737,12 +4741,12 @@ void ToggleComponent(int component) {
       else Account_Condition_MinProfitCloseOrder = 20;
       break;
     case 31:
-      if (TakeProfit > 0) TakeProfit = 0;
-      else TakeProfit = 40;
+      if (TakeProfitMax > 0) TakeProfitMax = 0;
+      else TakeProfitMax = 40;
       break;
     case 32:
-      if (StopLoss > 0) StopLoss = 0;
-      else StopLoss = 40;
+      if (StopLossMax > 0) StopLossMax = 0;
+      else StopLossMax = 40;
       break;
     // Trailing values
     case 33:
@@ -5609,8 +5613,8 @@ void RSI_CheckPeriod() {
 // FIXME: Doesn't improve anything.
 bool RSI_IncreasePeriod(ENUM_TIMEFRAMES tf = PERIOD_M1, int condition = 0) {
   bool result = condition > 0;
-  UpdateIndicator(RSI, tf);
-  uint period = Timeframe::TfToIndex(tf);
+  UpdateIndicator(INDI_RSI, tf);
+  uint period = Chart::TfToIndex(tf);
   if ((condition %   1) == 0) result &= (rsi_stats[period][LINE_UPPER] > 50 + RSI_SignalLevel + RSI_SignalLevel / 2 && rsi_stats[period][LINE_LOWER] < 50 - RSI_SignalLevel - RSI_SignalLevel / 2);
   if ((condition %   2) == 0) result &= (rsi_stats[period][LINE_UPPER] > 50 + RSI_SignalLevel + RSI_SignalLevel / 2 || rsi_stats[period][LINE_LOWER] < 50 - RSI_SignalLevel - RSI_SignalLevel / 2);
   if ((condition %   4) == 0) result &= (rsi_stats[period][0] < 50 + RSI_SignalLevel + RSI_SignalLevel / 3 && rsi_stats[period][0] > 50 - RSI_SignalLevel - RSI_SignalLevel / 3);
@@ -5624,8 +5628,8 @@ bool RSI_IncreasePeriod(ENUM_TIMEFRAMES tf = PERIOD_M1, int condition = 0) {
 // FIXME: Doesn't improve anything.
 bool RSI_DecreasePeriod(ENUM_TIMEFRAMES tf = PERIOD_M1, int condition = 0) {
   bool result = condition > 0;
-  UpdateIndicator(RSI, tf);
-  uint period = Timeframe::TfToIndex(tf);
+  UpdateIndicator(INDI_RSI, tf);
+  uint period = Chart::TfToIndex(tf);
   if ((condition %   1) == 0) result &= (rsi_stats[period][LINE_UPPER] <= 50 + RSI_SignalLevel && rsi_stats[period][LINE_LOWER] >= 50 - RSI_SignalLevel);
   if ((condition %   2) == 0) result &= (rsi_stats[period][LINE_UPPER] <= 50 + RSI_SignalLevel || rsi_stats[period][LINE_LOWER] >= 50 - RSI_SignalLevel);
   // if ((condition %   4) == 0) result &= (rsi_stats[period][0] > 50 + RSI_SignalLevel / 3 || rsi_stats[period][0] < 50 - RSI_SignalLevel / 3);

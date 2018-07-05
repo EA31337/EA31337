@@ -2,7 +2,7 @@
 //|                 EA31337 - multi-strategy advanced trading robot. |
 //|                       Copyright 2016-2018, 31337 Investments Ltd |
 //|                                       https://github.com/EA31337 |
-//|                                                ea-input-lite.mqh |
+//|                                                     ea-input.mqh |
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, kenorb" // ©
 #property link      "https://github.com/EA31337"
@@ -48,11 +48,11 @@ extern double TrailingStopAddPerMinute = 0.1; // Decrease trail stop per minute 
 extern string __EA_Risk_Parameters__ = "-- Risk management parameters --"; // >>> RISK <<
 extern double RiskMarginPerOrder = 0.6; // Risk margin per order (in %, 0-100, 0 - auto, -1 - off)
 extern double RiskMarginTotal = 8; // Risk margin in total (in %, 0-100, 0 - auto, -1 - off)
-extern int InitNoOfDaysToWarmUp = 21; // Initial warm-up period (in days)
-extern int CloseOrderAfterXHours = 24; // Close order after X hours (>0 - only profitable, <0 - all, 0 - off)
 extern double RiskRatio = 0.00000000; // Risk ratio (0 = auto, 1.0 = normal)
 extern int RiskRatioIncreaseMethod = 0; // Risk ratio increase method (0-255)
 extern int RiskRatioDecreaseMethod = 0; // Risk ratio decrease method (0-255)
+extern int InitNoOfDaysToWarmUp = 21; // Initial warm-up period (in days)
+extern int CloseOrderAfterXHours = 24; // Close order after X hours (>0 - only profitable, <0 - all, 0 - off)
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Parameters__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGIES <<<
@@ -66,12 +66,12 @@ extern bool Boosting_Enabled = 0; // Enable boosting
 extern double BoostTrendFactor = 1.5; // Boost by trend factor
 extern bool StrategyBoostByPF = 0; // Boost strategy by its profit factor
 extern bool StrategyHandicapByPF = 1; // Handicap by its low profit factor
-extern double BestDailyStrategyMultiplierFactor = 2.10000000; // Multiplier for the best daily strategy
-extern double BestWeeklyStrategyMultiplierFactor = 1.7; // Multiplier for the best weekly strategy
-extern double BestMonthlyStrategyMultiplierFactor = 3.1; // Multiplier for the best monthly strategy
-extern double WorseDailyStrategyMultiplierFactor = 0.8; // Multiplier for the worse daily strategy
-extern double WorseWeeklyStrategyMultiplierFactor = 1; // Multiplier for the worse weekly strategy
-extern double WorseMonthlyStrategyMultiplierFactor = 1; // Multiplier for the worse monthly strategy
+extern double BestDailyStrategyMultiplierFactor = 1.2; // Multiplier for the best daily strategy
+extern double BestWeeklyStrategyMultiplierFactor = 1.5; // Multiplier for the best weekly strategy
+extern double BestMonthlyStrategyMultiplierFactor = 1.5; // Multiplier for the best monthly strategy
+extern double WorseDailyStrategyMultiplierFactor = 0.9; // Multiplier for the worse daily strategy
+extern double WorseWeeklyStrategyMultiplierFactor = 0.8; // Multiplier for the worse weekly strategy
+extern double WorseMonthlyStrategyMultiplierFactor = 0.7; // Multiplier for the worse monthly strategy
 extern double ConWinsIncreaseFactor = -1.2; // Increase lot factor on consequent wins (in %, 0 - off)
 extern double ConLossesIncreaseFactor = 1.3; // Increase lot factor on consequent loses (in %, 0 - off)
 extern uint ConFactorOrdersLimit = 200; // No of orders to check on consequent wins/loses
@@ -358,6 +358,7 @@ bool BPower30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE BPower_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE BPower_TrailingProfitMethod = 1; // Trail profit method
 int BPower_Period = 13; // Period
+double BPower_Period_Ratio = 1.00000000; // Period ratio between timeframes (0.5-1.5)
 ENUM_APPLIED_PRICE BPower_Applied_Price = 0; // Applied Price
 double BPower_SignalLevel = 0.00000000; // Signal level
 int BPower1_SignalMethod = 15; // Signal method for M1 (0-
@@ -450,7 +451,7 @@ extern bool CCI30_Active = 1; // Enable for M30
 extern double CCI_Period_Ratio = 1; // Period ratio between timeframes (1.0 - default)
 extern ENUM_TRAIL_TYPE CCI_TrailingStopMethod = 10; // Trail stop method
 extern ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = 8; // Trail profit method
-extern int CCI_Period = 14; // Period Fast
+extern int CCI_Period = 14; // Period
 extern ENUM_APPLIED_PRICE CCI_Applied_Price = 1; // Applied Price
 extern double CCI_SignalLevel = 80; // Signal level (100 by default)
 extern int CCI1_SignalMethod = 0; // Signal method for M1 (0-
