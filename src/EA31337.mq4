@@ -65,7 +65,7 @@
 #include <EA31337-classes\Terminal.mqh>
 #include <EA31337-classes\Tester.mqh>
 #include <EA31337-classes\Tests.mqh>
-#include <EA31337-classes\Ticks.mqh>
+#include <EA31337-classes\Ticker.mqh>
 #include <EA31337-classes\Trade.mqh>
 #ifdef __profiler__
 #include <EA31337-classes\Profiler.mqh>
@@ -110,7 +110,7 @@ Log *logger;
 Market *market;
 Stats *total_stats, *hourly_stats;
 SummaryReport *summary_report; // For summary report.
-Ticks *ticks; // For recording ticks.
+Ticker *ticker; // For parsing ticks.
 Terminal *terminal;
 Trade *trade;
 
@@ -238,12 +238,21 @@ double zigzag[H1][FINAL_ENUM_INDICATOR_INDEX];
 void OnTick() {
   //#ifdef __trace__ PrintFormat("%s: Ask=%g/Bid=%g", __FUNCTION__, Ask, Bid); #endif
   if (!session_initiated) return;
+
+  // Parse a tick.
+  if (!ticker.Process(TickIgnoreMethod, PERIOD_M1)) {
+    // Ignore a tick according to the method.
+    return;
+  }
+
+  #ifdef __profiler__ PROFILER_START #endif
+
   last_ask = market.GetLastAsk();
   last_bid = market.GetLastBid();
   last_pip_change = market.GetLastPriceChangeInPips();
 
-  // Check if we should ignore the tick.
-  if (last_pip_change < MinPipChangeToTrade || ShouldIgnoreTick(TickIgnoreMethod, MinPipChangeToTrade, PERIOD_M1)) {
+  // Check if we should ignore the tick based on the price change.
+  if (last_pip_change < MinPipChangeToTrade) {
     if (last_bar_time == chart.GetBarTime(PERIOD_M1)) {
       return;
     }
@@ -252,14 +261,12 @@ void OnTick() {
     last_bar_time = chart.GetBarTime(PERIOD_M1);
   }
 
-  #ifdef __profiler__ PROFILER_START #endif
-
   if (!terminal.IsOptimization()) {
     // Update stats.
     total_stats.OnTick();
     hourly_stats.OnTick();
     if (RecordTicksToCSV) {
-      ticks.OnTick();
+      ticker.Add();
     }
   }
 
@@ -275,27 +282,6 @@ void OnTick() {
   if (PrintLogOnChart) DisplayInfoOnChart();
   #ifdef __profiler__ PROFILER_STOP #endif
 } // end: OnTick()
-
-bool ShouldIgnoreTick(uint _method, double _min_pip_change, ENUM_TIMEFRAMES _tf = PERIOD_CURRENT) {
-  bool _res = false;
-  if (_method == 0) {
-    return _res;
-  }
-
-  _res |= (_method == 1) ? (Chart::iOpen(_Symbol, _tf) != Bid) : false;
-  _res |= (_method == 2) ? (Chart::iOpen(_Symbol, _tf) != Bid || Chart::iLow(_Symbol, _tf) != Bid || Chart::iHigh(_Symbol, _tf) != Bid) : false;
-  _res |= (_method == 3) ? Chart::iTime(_Symbol, _tf) != TimeCurrent() : false;
-  _res |= (_method == 4) ? last_bid >= Chart::iLow(_Symbol, _tf) && last_bid <= Chart::iHigh(_Symbol, _tf): false;
-  _res |= (_method == 5) ? last_traded >= Chart::iTime(_Symbol, _tf) : false;
-
-  /*
-  if (!_res) {
-    UpdateIndicator(EMPTY);
-  }
-  */
-
-  return _res;
-}
 
 /**
  * Update existing opened orders.
@@ -427,7 +413,7 @@ void OnDeinit(const int reason) {
 
       // Save ticks if recorded.
       if (RecordTicksToCSV) {
-        ticks.SaveToCSV();
+        ticker.SaveToCSV();
       }
 
       if (WriteReport) {
@@ -471,7 +457,7 @@ void DeinitVars() {
   Object::Delete(market);
   Object::Delete(total_stats);
   Object::Delete(summary_report);
-  Object::Delete(ticks);
+  Object::Delete(ticker);
   Object::Delete(trade);
   Object::Delete(terminal);
   #ifdef __profiler__ PROFILER_DEINIT #endif
@@ -625,8 +611,7 @@ bool EA_Trade() {
   for (ENUM_STRATEGY_TYPE id = 0; id < FINAL_STRATEGY_TYPE_ENTRY; id++) {
     if (
       info[id][ACTIVE] &&
-      !info[id][SUSPENDED] &&
-      !ShouldIgnoreTick(TickIgnoreMethod, MinPipChangeToTrade, (ENUM_TIMEFRAMES) info[id][TIMEFRAME])
+      !info[id][SUSPENDED]
     ) {
       // Note: When TradeWithTrend is set and we're against the trend, do not trade.
       if (TradeCondition(id, ORDER_TYPE_BUY)) {
@@ -922,7 +907,7 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
         }
         */
       }
-      success = (bool)ma_slow[index][CURR];
+      success = (bool) ma_fast[index][CURR] || ma_medium[index][CURR] || ma_slow[index][CURR];
       if (VerboseDebug) PrintFormat("MA Fast M%d: %s", tf, Array::ArrToString2D(ma_fast, ",", Digits));
       if (VerboseDebug) PrintFormat("MA Medium M%d: %s", tf, Array::ArrToString2D(ma_medium, ",", Digits));
       if (VerboseDebug) PrintFormat("MA Slow M%d: %s", tf, Array::ArrToString2D(ma_slow, ",", Digits));
@@ -4376,9 +4361,8 @@ void StartNewDay() {
 
   // Reset ticks
   if (RecordTicksToCSV) {
-    ticks.SaveToCSV();
-    delete ticks;
-    ticks = new Ticks(market);
+    ticker.SaveToCSV();
+    ticker.Reset();
   }
 }
 
@@ -4993,7 +4977,7 @@ bool InitClasses() {
   logger = trade.Logger();
   market = trade.MarketInfo();
   summary_report = new SummaryReport();
-  ticks = new Ticks(market);
+  ticker = new Ticker(market);
   terminal = chart.TerminalInfo();
   #ifdef __profiler__ PROFILER_STOP #endif
   return market.GetSymbol() == _Symbol;
@@ -6811,7 +6795,8 @@ string GetStatReport(string sep = "\n") {
   string output = "";
   output += StringFormat("Modelling quality:                          %.2f%%", Chart::CalcModellingQuality()) + sep;
   output += StringFormat("Total bars processed:                       %d", total_stats.GetTotalBars()) + sep;
-  output += StringFormat("Total ticks processed:                      %d", total_stats.GetTotalTicks()) + sep;
+  output += StringFormat("Total ticks processed:                      %d", ticker.GetTotalProcessed()) + sep;
+  output += StringFormat("Total ticks ignored:                        %d", ticker.GetTotalIgnored()) + sep;
   output += StringFormat("Bars per hour (avg):                        %d", total_stats.GetBarsPerPeriod(PERIOD_H1)) + sep;
   output += StringFormat("Ticks per bar (avg):                        %d (bar=%dmins)", total_stats.GetTicksPerBar(), Period()) + sep;
   output += StringFormat("Ticks per min (avg):                        %d", total_stats.GetTicksPerMin()) + sep;
