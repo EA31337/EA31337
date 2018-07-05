@@ -240,7 +240,7 @@ void OnTick() {
   if (!session_initiated) return;
 
   // Parse a tick.
-  if (!ticker.Process(TickIgnoreMethod, PERIOD_M1)) {
+  if (!ticker.Process(TickProcessMethod, PERIOD_M1)) {
     // Ignore a tick according to the method.
     return;
   }

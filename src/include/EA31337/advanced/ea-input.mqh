@@ -33,7 +33,7 @@ extern int    MaxTries = 5; // Max retries for opening orders
 extern double MinPipChangeToTrade = 0.4; // Min pip change to trade (0 = every tick)
 extern int    MinPipGap = 10; // Min gap between trades per type (in pips)
 extern int    MinIntervalSec = 0; // Min interval between subsequent trade signals (in sec)
-extern uint   TickIgnoreMethod = 1; // Tick ignore method (0-5, 0 - off)
+extern uint   TickProcessMethod = 4; // Tick process method (0-8, 0 - all)
 
 //+------------------------------------------------------------------+
 extern string   __EA_Order_Parameters__ = "-- Profit and loss parameters --"; // >>> PROFIT/LOSS <<<
