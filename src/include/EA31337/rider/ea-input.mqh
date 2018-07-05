@@ -1,15 +1,15 @@
 //+------------------------------------------------------------------+
 //|                                                ea-input-lite.mqh |
-//|                                           Copyright 2016, kenorb |
+//|                       Copyright 2016-2018, 31337 Investments Ltd |
 //|                                       https://github.com/EA31337 |
 //+------------------------------------------------------------------+
-#property copyright "Copyright 2016, kenorb" // ©
+#property copyright "Copyright 2018, kenorb" // ©
 #property link      "https://github.com/EA31337"
 
 //+------------------------------------------------------------------+
 //| Includes.
 //+------------------------------------------------------------------+
-#include <EA\ea-enums.mqh>
+#include "..\ea-enums.mqh"
 
 //+------------------------------------------------------------------+
 //| User input variables.

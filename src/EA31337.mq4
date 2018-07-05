@@ -8,21 +8,21 @@
 //| EA includes.
 //+------------------------------------------------------------------+
 
-#include <EA31337\ea-mode.mqh>
-#include <EA31337\ea-code-conf.mqh>
-#include <EA31337\ea-defaults.mqh>
-#include <EA31337\ea-expire.mqh>
-#include <EA31337\ea-properties.mqh>
-#include <EA31337\ea-enums.mqh>
+#include "include\EA31337\ea-mode.mqh"
+#include "include\EA31337\ea-code-conf.mqh"
+#include "include\EA31337\ea-defaults.mqh"
+#include "include\EA31337\ea-expire.mqh"
+#include "include\EA31337\ea-properties.mqh"
+#include "include\EA31337\ea-enums.mqh"
 
 #ifdef __advanced__
   #ifdef __rider__
-    #include <EA31337\rider\ea-conf.mqh>
+    #include "include\EA31337\rider\ea-conf.mqh"
   #else
-    #include <EA31337\advanced\ea-conf.mqh>
+    #include "include\EA31337\advanced\ea-conf.mqh"
   #endif
 #else
-  #include <EA31337\lite\ea-conf.mqh>
+  #include "include\EA31337\lite\ea-conf.mqh"
 #endif
 
 //+------------------------------------------------------------------+
@@ -43,32 +43,32 @@
 //+------------------------------------------------------------------+
 //| Include public classes.
 //+------------------------------------------------------------------+
-// #include <EA31337-classes\Account.mqh>
-#include <EA31337-classes\Array.mqh>
-// #include <EA31337-classes\Chart.mqh>
-#include <EA31337-classes\Convert.mqh>
-#include <EA31337-classes\DateTime.mqh>
-// #include <EA31337-classes\Draw.mqh>
-#include <EA31337-classes\File.mqh>
-#include <EA31337-classes\Indicator.mqh>
-#include <EA31337-classes\Order.mqh>
-#include <EA31337-classes\Orders.mqh>
-#include <EA31337-classes\Market.mqh>
-#include <EA31337-classes\MD5.mqh>
-#include <EA31337-classes\Misc.mqh>
-#include <EA31337-classes\Msg.mqh>
-#include <EA31337-classes\Report.mqh>
-#include <EA31337-classes\Stats.mqh>
-//#include <EA31337-classes\Strategies.mqh>
-#include <EA31337-classes\String.mqh>
-#include <EA31337-classes\SummaryReport.mqh>
-#include <EA31337-classes\Terminal.mqh>
-#include <EA31337-classes\Tester.mqh>
-#include <EA31337-classes\Tests.mqh>
-#include <EA31337-classes\Ticker.mqh>
-#include <EA31337-classes\Trade.mqh>
+// #include "include\EA31337-classes\Account.mqh"
+#include "include\EA31337-classes\Array.mqh"
+// #include "include\EA31337-classes\Chart.mqh"
+#include "include\EA31337-classes\Convert.mqh"
+#include "include\EA31337-classes\DateTime.mqh"
+// #include "include\EA31337-classes\Draw.mqh"
+#include "include\EA31337-classes\File.mqh"
+#include "include\EA31337-classes\Indicator.mqh"
+#include "include\EA31337-classes\Order.mqh"
+#include "include\EA31337-classes\Orders.mqh"
+#include "include\EA31337-classes\Market.mqh"
+#include "include\EA31337-classes\MD5.mqh"
+#include "include\EA31337-classes\Misc.mqh"
+#include "include\EA31337-classes\Msg.mqh"
+#include "include\EA31337-classes\Report.mqh"
+#include "include\EA31337-classes\Stats.mqh"
+//#include "include\EA31337-classes\Strategies.mqh"
+#include "include\EA31337-classes\String.mqh"
+#include "include\EA31337-classes\SummaryReport.mqh"
+#include "include\EA31337-classes\Terminal.mqh"
+#include "include\EA31337-classes\Tester.mqh"
+#include "include\EA31337-classes\Tests.mqh"
+#include "include\EA31337-classes\Ticker.mqh"
+#include "include\EA31337-classes\Trade.mqh"
 #ifdef __profiler__
-#include <EA31337-classes\Profiler.mqh>
+#include "include\EA31337-classes\Profiler.mqh"
 #endif
 //#property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 
@@ -79,12 +79,12 @@ extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v"
 
 #ifdef __advanced__ // Include default input settings based on the mode.
   #ifdef __rider__
-    #include <EA31337\rider\ea-input.mqh>
+    #include "include\EA31337\rider\ea-input.mqh"
   #else
-    #include <EA31337\advanced\ea-input.mqh>
+    #include "include\EA31337\advanced\ea-input.mqh"
   #endif
 #else
-  #include <EA31337\lite\ea-input.mqh>
+  #include "include\EA31337\lite\ea-input.mqh"
 #endif
 
 
