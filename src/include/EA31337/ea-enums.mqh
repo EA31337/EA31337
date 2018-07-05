@@ -300,31 +300,6 @@ enum ENUM_ACC_CONDITION {
   C_ACC_MAX_ORDERS     = 27, // Max orders opened
 };
 
-// Define market conditions.
-enum ENUM_MARKET_CONDITION {
-  C_MARKET_NONE        =  0, // None (false).
-  C_MARKET_TRUE        =  1, // Always true
-  C_MA1_FS_ORDERS_OPP  =  2, // MA1 Fast&Slow orders-based opposite
-  C_MA5_FS_ORDERS_OPP  =  3, // MA5 Fast&Slow orders-based opposite
-  C_MA15_FS_ORDERS_OPP =  4, // MA15 Fast&Slow orders-based opposite
-  C_MA30_FS_ORDERS_OPP =  5, // MA30 Fast&Slow orders-based opposite
-  C_MA1_FS_TREND_OPP   =  6, // MA1 Fast&Slow trend-based opposite
-  C_MA5_FS_TREND_OPP   =  7, // MA5 Fast&Slow trend-based opposite
-  C_MA15_FS_TREND_OPP  =  8, // MA15 Fast&Slow trend-based opposite
-  C_MA30_FS_TREND_OPP  =  9, // MA30 Fast&Slow trend-based opposite
-  C_DAILY_PEAK         = 10, // Daily peak price
-  C_WEEKLY_PEAK        = 11, // Weekly peak price
-  C_MONTHLY_PEAK       = 12, // Monthly peak price
-  C_MARKET_BIG_DROP    = 13, // Sudden price drop
-  C_MARKET_VBIG_DROP   = 14, // Very big price drop
-  C_MARKET_AT_HOUR     = 15, // At specific hour
-  C_NEW_HOUR           = 16, // New hour
-  C_NEW_DAY            = 17, // New day
-  C_NEW_WEEK           = 18, // New week
-  C_NEW_MONTH          = 19, // New month
-};
-// Note: Trend-based closures are using TrendMethodAction.
-
 // Define type of actions which can be executed.
 enum ENUM_ACTION_TYPE {
   A_NONE                   =  0, // None

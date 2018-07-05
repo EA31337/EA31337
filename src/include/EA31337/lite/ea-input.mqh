@@ -444,9 +444,9 @@ double BWMFI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __CCI_Parameters__ = "-- Settings for the Commodity Channel Index indicator --"; // >>> CCI <<<
-extern bool CCI1_Active = 1; // Enable for M1
+extern bool CCI1_Active = 0; // Enable for M1
 extern bool CCI5_Active = 1; // Enable for M5
-extern bool CCI15_Active = 1; // Enable for M15
+extern bool CCI15_Active = 0; // Enable for M15
 extern bool CCI30_Active = 1; // Enable for M30
 extern double CCI_Period_Ratio = 1; // Period ratio between timeframes (1.0 - default)
 extern ENUM_TRAIL_TYPE CCI_TrailingStopMethod = 10; // Trail stop method
@@ -1055,7 +1055,7 @@ extern string __WPR_Parameters__ = "-- Settings for the Larry Williams' Percent 
 extern bool WPR1_Active = 0; // Enable for M1
 extern bool WPR5_Active = 0; // Enable for M5
 extern bool WPR15_Active = 0; // Enable for M15
-extern bool WPR30_Active = 1; // Enable for M30
+extern bool WPR30_Active = 0; // Enable for M30
 extern int WPR_Period = 9; // Period
 extern double WPR_Period_Ratio = 0.2; // Period ratio between timeframes (0.5-1.5)
 extern int WPR_Shift = -2; // Shift
