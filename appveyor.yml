@@ -1,10 +1,15 @@
 environment:
   EAFILE: src/EA31337.mq4
   FILELOG: metaeditor.log
+  matrix:
+  - MODE: __lite__
+  - MODE: __advanced__
+  - MODE: __rider__
 install:
 - appveyor DownloadFile https://github.com/EA31337/MetaEditor/raw/master/metaeditor.exe
 before_test:
 - git submodule update --init
+- echo ^#define %MODE% >> src/include/EA31337/ea-mode.mqh
 test_script:
 - |-
   metaeditor /s /compile:%EAFILE% /inc:"src/include" /log:%FILELOG% || exit /b 0

@@ -605,7 +605,6 @@ extern ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = 8; // Trail profit method
 extern int CCI_Period = 14; // Period
 extern ENUM_APPLIED_PRICE CCI_Applied_Price = 1; // Applied Price
 extern double CCI_SignalLevel = 80; // Signal level (100 by default)
-extern double CCI_SignalLevel = 80; // Signal level (100 by default)
 extern int CCI1_SignalMethod = 0; // Signal method for M1 (0-
 extern int CCI5_SignalMethod = 0; // Signal method for M5 (0-
 extern int CCI15_SignalMethod = 0; // Signal method for M15 (0-
