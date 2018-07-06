@@ -1,0 +1,14 @@
+environment:
+  EAFILE: src/EA31337.mq4
+  FILELOG: metaeditor.log
+install:
+- appveyor DownloadFile https://github.com/EA31337/MetaEditor/raw/master/metaeditor.exe
+before_test:
+- git submodule update --init
+test_script:
+- |-
+  metaeditor /s /compile:%EAFILE% /inc:"src/include" /log:%FILELOG% || exit /b 0
+  type %FILELOG%
+  find "Result" %FILELOG% | findstr /C:"Result 0 error(s), 0 warning(s)"
+build: off
+platform: x86
