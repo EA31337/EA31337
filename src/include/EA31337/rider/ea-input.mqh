@@ -28,7 +28,7 @@ extern bool   TradeMicroLots = 1; // Trade micro lots?
 ENUM_TIMEFRAMES TrendPeriod = PERIOD_H1; // Period for trend calculation
 extern int    TrendMethod = 203; // Main trend method (0-255)
 extern int    MinVolumeToTrade = 2; // Min volume to trade
-extern int    MaxOrderPriceSlippage = 5; // Max price slippage (in pips)
+extern int    MaxOrderPriceSlippage = 50; // Max price slippage (in pts)
 extern int    MaxTries = 5; // Max retries for opening orders
 extern double MinPipChangeToTrade = 0.4; // Min pip change to trade (0 = every tick)
 extern int    MinPipGap = 10; // Min gap between trades per type (in pips)

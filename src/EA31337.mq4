@@ -1219,7 +1219,6 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
      }
      if (retry) TaskAddOrderOpen(cmd, trade_volume, sid); // Will re-try again. // warning 43: possible loss of data due to type conversion
      info[sid][TOTAL_ERRORS]++;
-     //ExpertRemove();
    } // end-if: order_ticket
 
   #ifdef __profiler__ PROFILER_STOP #endif
