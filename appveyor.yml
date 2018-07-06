@@ -5,6 +5,13 @@ environment:
   - MODE: __lite__
   - MODE: __advanced__
   - MODE: __rider__
+# - MODE: __backtest__
+# - MODE: __profiler__
+  - MODE: __limited__
+  - MODE: __release__
+  - MODE: __debug__
+  - MODE: __trace__
+  - MODE: __experimental__
 install:
 - appveyor DownloadFile https://github.com/EA31337/MetaEditor/raw/master/metaeditor.exe
 before_test:
