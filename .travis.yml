@@ -1,7 +1,48 @@
-# .travis.yml - configuration file for the travis continuous integration service
-# see http://about.travis-ci.org/docs/user/languages/php for more hints
-#
 language: generic
 sudo: required
+group: deprecated-2017Q4
+services:
+  - docker
+addons:
+  apt:
+    packages:
+    - shellcheck
+env:
+  global:
+  - |
+    EA_NAME=EA31337
+    CWD=$TRAVIS_BUILD_DIR
+    DOCKER_IMAGE=ea-tester
+    DOCKER_TAG=${DOCKER_TAG:-latest}
+    DOCKER_REPO=ea31337/$DOCKER_IMAGE:$DOCKER_TAG
+    BOOT_CODE="${BOOT_CODE:-pwd}"
+    FINAL_CODE="${FINAL_CODE:-find /opt -maxdepth 2 -ls}"
+    DOCKER_ENV="-e BOOT_CODE=\"$BOOT_CODE\" -e FINAL_CODE=\"$FINAL_CODE\""
+    DOCKER_VOL="-v $CWD/src:/opt/EA31337:rw"
+    DOCKER_RUN="docker run $DOCKER_ENV $DOCKER_VOL $DOCKER_REPO"
+    WINETRICKS_DOWNLOADER_RETRIES=20
+  matrix:
+  - CMD="bash -n scripts/*.sh; shellcheck scripts/*.sh conf/*/*.sh"
+  - CMD="$DOCKER_RUN 'run_backtest -v -t -T M15 -b DS -p EURUSD -y 2017 -m 1 -S 20 -D 4 -e $EA_NAME'"
+  - CMD="$DOCKER_RUN 'run_backtest -v -t -T M15 -b DS -p EURUSD -y 2017 -m 1 -S 20 -D 5 -e $EA_NAME'"
+matrix:
+  fast_finish: true
+notifications:
+  email:
+    on_success: change
+    on_failure: always
+    on_start: never
+before_install:
+- ulimit -a && free -m
+install:
+before_script:
+- docker images
 script:
-- find . -name "*.sh" -exec bash -n {} ';'
+- set -e
+- echo $CMD
+- eval $CMD
+after_script:
+- set +x
+after_success:
+after_failure:
+- docker history -H --no-trunc $DOCKER_REPO
