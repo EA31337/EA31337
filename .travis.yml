@@ -9,22 +9,25 @@ addons:
     - shellcheck
 env:
   global:
-  - |
-    EA_NAME=EA31337
-    CWD=$TRAVIS_BUILD_DIR
-    DOCKER_IMAGE=ea-tester
-    DOCKER_TAG=${DOCKER_TAG:-latest}
-    DOCKER_REPO=ea31337/$DOCKER_IMAGE:$DOCKER_TAG
-    BOOT_CODE="${BOOT_CODE:-pwd}"
-    FINAL_CODE="${FINAL_CODE:-find /opt -maxdepth 2 -ls}"
-    DOCKER_ENV="-e BOOT_CODE=\"$BOOT_CODE\" -e FINAL_CODE=\"$FINAL_CODE\""
-    DOCKER_VOL="-v $CWD/src:/opt/EA31337:rw"
-    DOCKER_RUN="docker run $DOCKER_ENV $DOCKER_VOL $DOCKER_REPO"
-    WINETRICKS_DOWNLOADER_RETRIES=20
+  - EA_NAME=EA31337
+  - CWD=$TRAVIS_BUILD_DIR
+  - WINETRICKS_DOWNLOADER_RETRIES=20
+  - BOOT_CODE="${BOOT_CODE:-free -m}"
+  - FINAL_CODE="${FINAL_CODE:-find /opt -maxdepth 2 -ls}"
+  - DOCKER_IMAGE=ea-tester
+  - DOCKER_TAG=${DOCKER_TAG:-latest}
+  - DOCKER_REPO=ea31337/$DOCKER_IMAGE:$DOCKER_TAG
+  - DOCKER_ENV="-e BOOT_CODE=\"$BOOT_CODE\" -e FINAL_CODE=\"$FINAL_CODE\""
+  - DOCKER_VOL="-v $CWD/src:/opt/src:rw"
+  - DOCKER_RUN="docker run $DOCKER_ENV $DOCKER_VOL $DOCKER_REPO"
   matrix:
   - CMD="bash -n scripts/*.sh; shellcheck scripts/*.sh conf/*/*.sh"
-  - CMD="$DOCKER_RUN 'run_backtest -v -t -T M15 -b DS -p EURUSD -y 2017 -m 1 -S 20 -D 4 -e $EA_NAME'"
-  - CMD="$DOCKER_RUN 'run_backtest -v -t -T M15 -b DS -p EURUSD -y 2017 -m 1 -S 20 -D 5 -e $EA_NAME'"
+  - |
+    MODE="__lite__"
+    CMD="$DOCKER_RUN 'run_backtest -v -t -T M15 -b DS -p EURUSD -y 2017 -m 1 -S 20 -D 4 -e $EA_NAME'"
+  - |
+    MODE="__advanced__"
+    CMD="$DOCKER_RUN 'run_backtest -v -t -T M15 -b DS -p EURUSD -y 2017 -m 1 -S 20 -D 5 -e $EA_NAME'"
 matrix:
   fast_finish: true
 notifications:
@@ -37,8 +40,8 @@ before_install:
 install:
 before_script:
 - docker images
+- test -n "$MODE" && ( echo ^#define $MODE | tee -a $CWD/src/include/EA31337/ea-mode.mqh ) || true
 script:
-- set -e
 - echo $CMD
 - eval $CMD
 after_script:
