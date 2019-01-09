@@ -6,14 +6,15 @@ type ex > /dev/null
 [ $# -lt 2 ] && { echo "Usage: $0 (set-file) (mqh-file)"; exit 1; }
 SET=$1
 MQH=$2
-ROOT="$(git rev-parse --show-toplevel)"
-CWD=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 echo Converting...
-grep "^[[:alnum:]][0-9A-Za-z_]\+=" "$SET" | while read opt; do
+# shellcheck disable=SC1117 # @fixme
+grep "^[[:alnum:]][0-9A-Za-z_]\+=" "$SET" | while read -r opt; do
+  # shellcheck disable=SC2154 # @see: https://github.com/koalaman/shellcheck/issues/1419
   name=${opt%=*}
-  eval $opt
+  eval "$opt"
   value=${!name}
   ! [[ $value == ?(-)+([0-9.]) ]] && value="\"$value\""
+  # shellcheck disable=SC1117 # @fixme
   ex "+%s/ $name\s\+=.*;/ $name = $value;/" -scwq "$MQH"
 done
-echo $0 done.
+echo "$0 done".

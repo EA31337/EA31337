@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # Script to update parameters from set into mqh files.
 ROOT="$(git rev-parse --show-toplevel)"
-CWD=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 
 # Backtest
 cp -v "$ROOT"/src/include/EA/ea-enums.mqh "$ROOT"/releases/Backtest/includes/
