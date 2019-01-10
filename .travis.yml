@@ -20,6 +20,7 @@ env:
   - DOCKER_ENV="-e BOOT_CODE=\"$BOOT_CODE\" -e FINAL_CODE=\"$FINAL_CODE\""
   - DOCKER_VOL="-v $CWD/src:/opt/src:rw"
   - DOCKER_RUN="docker run $DOCKER_ENV $DOCKER_VOL $DOCKER_REPO"
+  - FAIL_CMD="$DOCKER_RUN \"ea_copy $EA_NAME; compile_ea $EA_NAME\""
   matrix:
   - CMD="bash -n scripts/*.sh; shellcheck scripts/*.sh conf/*/*.sh"
   - |
@@ -40,7 +41,7 @@ before_install:
 install:
 before_script:
 - docker images
-- test -n "$MODE" && ( echo ^#define $MODE | tee -a $CWD/src/include/EA31337/ea-mode.mqh ) || true
+- test -n "$MODE" && ( echo "#define $MODE" | tee -a $CWD/src/include/EA31337/ea-mode.mqh ) || true
 script:
 - echo $CMD
 - eval $CMD
@@ -48,4 +49,4 @@ after_script:
 - set +x
 after_success:
 after_failure:
-- docker history -H --no-trunc $DOCKER_REPO
+- test -n "$MODE" && eval $FAIL_CMD
