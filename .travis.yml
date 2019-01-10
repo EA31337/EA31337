@@ -35,12 +35,12 @@ env:
   - |
     MODE="__advanced__"
     CMD="$DOCKER_RUN 'run_backtest -v -t -T M15 -b DS -p EURUSD -y 2017 -m 1 -S 20 -D 5 -e $EA_NAME'"
-  - |
-    MODE="__rider__"
-    CMD="$DOCKER_RUN 'run_backtest -v -t -T M15 -b DS -p EURUSD -y 2017 -m 1 -S 20 -D 4 -e $EA_NAME'"
-  - |
-    MODE="__rider__"
-    CMD="$DOCKER_RUN 'run_backtest -v -t -T M15 -b DS -p EURUSD -y 2017 -m 1 -S 20 -D 5 -e $EA_NAME'"
+# - |
+#   MODE="__rider__"
+#   CMD="$DOCKER_RUN 'run_backtest -v -t -T M15 -b DS -p EURUSD -y 2017 -m 1 -S 20 -D 4 -e $EA_NAME'"
+# - |
+#   MODE="__rider__"
+#   CMD="$DOCKER_RUN 'run_backtest -v -t -T M15 -b DS -p EURUSD -y 2017 -m 1 -S 20 -D 5 -e $EA_NAME'"
 matrix:
   fast_finish: true
 notifications:
