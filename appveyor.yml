@@ -21,6 +21,6 @@ test_script:
 - |-
   metaeditor /s /compile:%EAFILE% /inc:"src/include" /log:%FILELOG% || exit /b 0
   type %FILELOG%
-  find "Result" %FILELOG% | findstr /C:"Result 0 error(s), 0 warning(s)"
+  find /I "result" %FILELOG% | findstr /I /C:"result 0 error(s), 0 warning(s)"
 build: off
 platform: x86

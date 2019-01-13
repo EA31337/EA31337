@@ -6,13 +6,13 @@ VM_DIR="$CWD/_VM"
 EA_DIR="$CWD/src"
 REP_DIR="$VM_DIR/files/reports"
 OUT="$CWD/_test_results"
-VER=${1:-$(echo "Lite-Backtest")}
+VER=${1:-"Lite-Backtest"}
 
 echo "Checking dependencies..."
 type vagrant
 
 echo "Compiling..."
-[ -n "$VER" ] && make -C "$CWD" $VER
+[ -n "$VER" ] && make -C "$CWD" "$VER"
 
 echo "Initializing VM..."
 cd "$VM_DIR"
@@ -31,9 +31,9 @@ for year in {2014..2014}; do
   for month in {01..12}; do # Note: Leading zero syntax requires Bash >=4.x.
     for deposit in {2000..2000}; do
       for spread in {10..10}; do
-        vagrant ssh -c "/vagrant/scripts/run_backtest.sh -v -t -r "EA31337-$VER-EURUSD-DS-${deposit}USD-${spread}spread-$year-$month" -e EA31337 -d $deposit -p EURUSD -m $month -y $year -s $spread -b DS -D5 -O /vagrant/files/reports -M4.0.0.1010"
-        mkdir -p "$OUT"/$VER/$year
-        mv -v "$REP_DIR"/*$VER* "$OUT"/$VER/$year
+        vagrant ssh -c "/vagrant/scripts/run_backtest.sh -v -t -r EA31337-$VER-EURUSD-DS-${deposit}USD-${spread}spread-$year-$month -e EA31337 -d $deposit -p EURUSD -m $month -y $year -s $spread -b DS -D5 -O /vagrant/files/reports -M4.0.0.1010"
+        mkdir -p "$OUT/$VER/$year"
+        mv -v "$REP_DIR/*$VER*" "$OUT/$VER/$year"
       done
     done
   done
