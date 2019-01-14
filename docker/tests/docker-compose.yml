@@ -1,0 +1,12 @@
+version: '3'
+services:
+  backtest_2018:
+    command: "run_backtest -v -t"
+    volumes:
+    - ../../src:/opt/src
+#   - ./results:/opt/results:rw
+    tty: true
+    image: ea31337/ea-tester:dev
+    env_file: .env
+    environment:
+      BT_MONTHS: 1
