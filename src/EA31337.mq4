@@ -106,14 +106,14 @@ extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v"
 
 // Class variables.
 Account *account;
-Chart *chart;
+//Chart *chart[FINAL_ENUM_TIMEFRAMES_INDEX];
 Log *logger;
 Market *market;
 Stats *total_stats, *hourly_stats;
 SummaryReport *summary_report; // For summary report.
 Ticker *ticker; // For parsing ticks.
 Terminal *terminal;
-Trade *trade;
+Trade *trade[FINAL_ENUM_TIMEFRAMES_INDEX];
 
 // Market/session variables.
 double pip_size, ea_lot_size;
@@ -137,7 +137,7 @@ bool session_active = false;
 
 // Time-based variables.
 // Bar time: initial, current and last one to check if bar has been changed since the last time.
-datetime init_bar_time, curr_bar_time, last_bar_time = (int) EMPTY_VALUE;
+datetime curr_bar_time, last_bar_time = (int) EMPTY_VALUE;
 datetime time_current = (int) EMPTY_VALUE;
 int hour_of_day, day_of_week, day_of_month, day_of_year, month, year;
 datetime last_order_time = 0, last_action_time = 0;
@@ -240,60 +240,88 @@ double zigzag[H1][FINAL_ENUM_INDICATOR_INDEX];
 void OnTick() {
   //#ifdef __trace__ PrintFormat("%s: Ask=%g/Bid=%g", __FUNCTION__, Ask, Bid); #endif
   if (!session_initiated) return;
-
-  // Parse a tick.
-  if (!ticker.Process(TickProcessMethod, PERIOD_M1)) {
-    // Ignore a tick according to the method.
-    return;
-  }
-
   #ifdef __profiler__ PROFILER_START #endif
 
-  last_ask = market.GetLastAsk();
-  last_bid = market.GetLastBid();
-  last_pip_change = market.GetLastPriceChangeInPips();
-
-  // Check if we should ignore the tick based on the price change.
-  if (last_pip_change < MinPipChangeToTrade) {
-    if (last_bar_time == chart.GetBarTime(PERIOD_M1)) {
-      return;
+  MqlTick _tick = market.GetTick();
+  bool _tick_procesed = false;
+  for (ENUM_TIMEFRAMES_INDEX tfi = 0; tfi < FINAL_ENUM_TIMEFRAMES_INDEX; tfi++) {
+    if (Object::IsDynamic(trade[tfi]) && trade[tfi].Chart().IsValidTf()) {
+      if (trade[tfi].Chart().IsNewBar()) {
+        trade[tfi].Market().SetTick(_tick);
+        ProcessBar(trade[tfi]);
+        _tick_procesed = true;
+      }
     }
   }
-  else {
-    last_bar_time = chart.GetBarTime(PERIOD_M1);
+  if (_tick_procesed) {
+    UpdateTicks();
   }
-
-  if (!terminal.IsOptimization()) {
-    // Update stats.
-    total_stats.OnTick();
-    hourly_stats.OnTick();
-    if (RecordTicksToCSV) {
-      ticker.Add();
-    }
-  }
-
-  if (hour_of_day != DateTime::Hour()) StartNewHour();
-  UpdateVariables();
-  if (TradeAllowed()) {
-    EA_Trade();
-  }
-
-  UpdateOrders();
-  UpdateStats();
-
+  terminal.Logger().Flush(false);
   if (PrintLogOnChart) DisplayInfoOnChart();
   #ifdef __profiler__ PROFILER_STOP #endif
 } // end: OnTick()
 
 /**
+ * Process a new bar.
+ */
+void ProcessBar(Trade *_trade) {
+  last_ask = market.GetLastAsk();
+  last_bid = market.GetLastBid();
+  //last_pip_change = market.GetLastPriceChangeInPips();
+
+  // Parse a tick.
+  /*
+  if (!ticker.Process(_trade.Chart(), TickProcessMethod)) {
+    // Ignore a tick according to the method.
+    return;
+  }
+  */
+
+  /* @fixme: Disabled.
+  // Check if we should ignore the tick based on the price change.
+  if (last_pip_change < MinPipChangeToTrade) {
+    if (last_bar_time == trade.GetBarTime(PERIOD_M1)) {
+      return;
+    }
+  }
+  else {
+    last_bar_time = trade.GetBarTime(PERIOD_M1);
+  }
+  */
+
+  if (hour_of_day != DateTime::Hour()) StartNewHour(_trade);
+  UpdateVariables();
+  if (TradeAllowed()) {
+    EA_Trade(_trade);
+  }
+
+  UpdateOrders(_trade);
+  UpdateStats();
+}
+
+/**
+ * Update ticks.
+ */
+void UpdateTicks() {
+  if (!terminal.IsOptimization()) {
+    // Update stats.
+    total_stats.OnTick();
+    hourly_stats.OnTick();
+    if (RecordTicksToCSV) {
+      ticker.Add(market.GetLastTick());
+    }
+  }
+}
+
+/**
  * Update existing opened orders.
  */
-void UpdateOrders() {
+void UpdateOrders(Trade *_trade) {
   #ifdef __profiler__ PROFILER_START #endif
   if (total_orders > 0) {
     CheckOrders();
-    UpdateTrailingStops();
-    CheckAccConditions();
+    UpdateTrailingStops(_trade);
+    CheckAccConditions(_trade.Chart());
     TaskProcessList();
   }
   #ifdef __profiler__ PROFILER_STOP #endif
@@ -396,16 +424,14 @@ int OnInit() {
 //+------------------------------------------------------------------+
 void OnDeinit(const int reason) {
   time_current = TimeCurrent();
-  Msg::ShowText(StringFormat("reason = %d", reason), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
+  terminal.Logger().Debug(StringFormat("reason = %d", reason), __FUNCTION_LINE__);
   // Also: _UninitReason.
-  Msg::ShowText(
-      StringFormat("EA deinitializing, reason: %s (code: %s)", Terminal::GetUninitReasonText(reason), IntegerToString(reason)),
-      "Info", __FUNCTION__, __LINE__, VerboseInfo);
-  if (session_initiated) {
+  terminal.Logger().Info(StringFormat("EA deinitializing, reason: %s (code: %s)", Terminal::GetUninitReasonText(reason), IntegerToString(reason)), __FUNCTION_LINE__);
 
+  if (session_initiated) {
     if (!terminal.IsOptimization()) {
       // Show final account details.
-      Msg::ShowText(GetSummaryText(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
+      terminal.Logger().Info(GetSummaryText(), __FUNCTION_LINE__);
 
       #ifdef __profiler__
       if (ProfilingMinTime >= 1) {
@@ -421,13 +447,15 @@ void OnDeinit(const int reason) {
       if (WriteReport) {
         // if (reason == REASON_CHARTCHANGE)
         string filename;
+        Chart *_chart = trade[Chart::TfToIndex(PERIOD_CURRENT)].Chart();
+        OHLC first_bar = _chart.LoadOHLC();
         summary_report.CalculateSummary();
         // @todo: Calculate average spread from stats[sid][AVG_SPREAD].
         filename = StringFormat(
-            "%s-%.f%s-%s-%s-%dspread-(%d)-M%d-report.txt",
+            "%s-%.f%s-%s-%s-%dspread-(%d)-%s-report.txt",
             market.GetSymbol(), summary_report.GetInitDeposit(), account.GetCurrency(),
-            TimeToStr(init_bar_time, TIME_DATE), TimeToStr(time_current, TIME_DATE),
-            init_spread, GetNoOfStrategies(), chart.GetTf());
+            DateTime::TimeToStr(first_bar.time, TIME_DATE), DateTime::TimeToStr(_chart.iTime(), TIME_DATE),
+            init_spread, GetNoOfStrategies(), Chart::TfToString(PERIOD_CURRENT));
             // ea_name, _Symbol, summary.init_deposit, account.AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE), Period());
             // ea_name, _Symbol, init_balance, account.AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES), Period());
         string data = summary_report.GetReport();
@@ -435,13 +463,13 @@ void OnDeinit(const int reason) {
         data += GetStrategyReport();
         data += Array::ArrToString(log, "\n", "Report log:\n");
         Report::WriteReport(filename, data, VerboseInfo); // Todo: Add: Errors::GetUninitReasonText(reason)
-        Print(__FUNCTION__ + ": Saved report as: " + filename);
+        terminal.Logger().Info("Saved report as: " + filename, __FUNCTION__);
       }
 
     }
 
-
   }
+  terminal.Logger().Flush(false);
   DeinitVars();
   // #ifdef _DEBUG
   // DEBUG("n=" + n + " : " +  DoubleToStrMorePrecision(val,19) );
@@ -456,12 +484,14 @@ void DeinitVars() {
   Object::Delete(account);
   Object::Delete(hourly_stats);
   Object::Delete(logger);
-  Object::Delete(market);
   Object::Delete(total_stats);
   Object::Delete(summary_report);
   Object::Delete(ticker);
-  Object::Delete(trade);
   Object::Delete(terminal);
+  Object::Delete(market);
+  for (int tfi = 0; tfi < FINAL_ENUM_TIMEFRAMES_INDEX; tfi++) {
+    Object::Delete(trade[tfi]);
+  }
   #ifdef __profiler__ PROFILER_DEINIT #endif
 }
 
@@ -541,7 +571,14 @@ string InitInfo(bool startup = false, string sep = "\n") {
   output += "ACCOUNT: " + account.ToString() + sep;
   output += "SYMBOL: " + ((SymbolInfo *)market).ToString() + sep;
   output += "MARKET: " + market.ToString() + sep;
-  output += "CHART: " + chart.ToString() + sep;
+  for (int tfi = 0; tfi < FINAL_ENUM_TIMEFRAMES_INDEX; tfi++) {
+    if (Object::IsValid(trade[tfi].Chart()) && trade[tfi].Chart().IsValidTf()) {
+      output += StringFormat("CHART: %s%s", trade[tfi].Chart().ToString(), sep);
+    }
+    else {
+      output += StringFormat("CHART: %s not active.%s", Chart::IndexToString(tfi), sep);
+    }
+  }
   /*
   output += StringFormat("Contract specification for %s: Profit mode: %d, Margin mode: %d, Spread: %d pts, Trade tick size: %f, Point value: %f, Digits: %d, Trade stops level: %dpts, Trade contract size: %g%s",
       _Symbol,
@@ -606,52 +643,53 @@ string InitInfo(bool startup = false, string sep = "\n") {
 /**
  * Main function to trade.
  */
-bool EA_Trade() {
+bool EA_Trade(Trade *_trade) {
   #ifdef __profiler__ PROFILER_START #endif
   bool order_placed = false;
   ENUM_ORDER_TYPE _cmd = EMPTY;
-  if (VerboseTrace) PrintFormat("%s:%d: %s", __FUNCTION__, __LINE__, DateTime::TimeToStr(chart.GetBarTime()));
-  // UpdateIndicator(EMPTY);
+  ENUM_TIMEFRAMES tf = _trade.Chart().GetTf();
+  if (VerboseTrace) _trade.Logger().Trace(StringFormat("%s:%d: %s", __FUNCTION__, __LINE__, DateTime::TimeToStr(_trade.Chart().GetBarTime())));
   for (ENUM_STRATEGY_TYPE id = 0; id < FINAL_STRATEGY_TYPE_ENTRY; id++) {
     if (
+      (ENUM_TIMEFRAMES) info[id][TIMEFRAME] == tf &&
       info[id][ACTIVE] &&
       !info[id][SUSPENDED]
     ) {
       // Note: When TradeWithTrend is set and we're against the trend, do not trade.
-      if (TradeCondition(id, ORDER_TYPE_BUY)) {
+      if (TradeCondition(_trade, id, ORDER_TYPE_BUY)) {
         _cmd = ORDER_TYPE_BUY;
-      } else if (TradeCondition(id, ORDER_TYPE_SELL)) {
+      } else if (TradeCondition(_trade, id, ORDER_TYPE_SELL)) {
         _cmd = ORDER_TYPE_SELL;
       } else {
         _cmd = EMPTY;
       }
 
       if (!DisableCloseConditions) {
-        if (CheckMarketEvent(ORDER_TYPE_BUY,  (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][CLOSE_CONDITION])) CloseOrdersByType(ORDER_TYPE_SELL, id, R_OPPOSITE_SIGNAL, CloseConditionOnlyProfitable);
-        if (CheckMarketEvent(ORDER_TYPE_SELL, (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][CLOSE_CONDITION])) CloseOrdersByType(ORDER_TYPE_BUY,  id, R_OPPOSITE_SIGNAL, CloseConditionOnlyProfitable);
+        if (CheckMarketEvent(_trade.Chart(), ORDER_TYPE_BUY,  info[id][CLOSE_CONDITION])) CloseOrdersByType(ORDER_TYPE_SELL, id, R_OPPOSITE_SIGNAL, CloseConditionOnlyProfitable);
+        if (CheckMarketEvent(_trade.Chart(), ORDER_TYPE_SELL, info[id][CLOSE_CONDITION])) CloseOrdersByType(ORDER_TYPE_BUY,  id, R_OPPOSITE_SIGNAL, CloseConditionOnlyProfitable);
       }
 
       // #ifdef __advanced__
       if (info[id][OPEN_CONDITION1] != 0) {
-        if (_cmd == ORDER_TYPE_BUY  && !CheckMarketCondition1(ORDER_TYPE_BUY,  (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) _cmd = EMPTY;
-        if (_cmd == ORDER_TYPE_SELL && !CheckMarketCondition1(ORDER_TYPE_SELL, (ENUM_TIMEFRAMES) info[id][TIMEFRAME], info[id][OPEN_CONDITION1])) _cmd = EMPTY;
+        if (_cmd == ORDER_TYPE_BUY  && !CheckMarketCondition1(_trade.Chart(), ORDER_TYPE_BUY,  info[id][OPEN_CONDITION1])) _cmd = EMPTY;
+        if (_cmd == ORDER_TYPE_SELL && !CheckMarketCondition1(_trade.Chart(), ORDER_TYPE_SELL, info[id][OPEN_CONDITION1])) _cmd = EMPTY;
       }
-      if (info[id][OPEN_CONDITION2] != 0) {
-        if (_cmd == ORDER_TYPE_BUY  && CheckMarketCondition1(ORDER_TYPE_SELL, PERIOD_M30, info[id][OPEN_CONDITION2], false)) _cmd = EMPTY;
-        if (_cmd == ORDER_TYPE_SELL && CheckMarketCondition1(ORDER_TYPE_BUY,  PERIOD_M30, info[id][OPEN_CONDITION2], false)) _cmd = EMPTY;
+      if (Object::IsValid(trade[M30]) && info[id][OPEN_CONDITION2] != 0) {
+        if (_cmd == ORDER_TYPE_BUY  && CheckMarketCondition1(trade[M30].Chart(), ORDER_TYPE_SELL, info[id][OPEN_CONDITION2], false)) _cmd = EMPTY;
+        if (_cmd == ORDER_TYPE_SELL && CheckMarketCondition1(trade[M30].Chart(), ORDER_TYPE_BUY,  info[id][OPEN_CONDITION2], false)) _cmd = EMPTY;
       }
       // #endif
 
       if (_cmd != EMPTY) {
         order_placed &= ExecuteOrder(_cmd, id);
         if (VerboseDebug) {
-          PrintFormat("%s:%d: %s %s on %s at %s: %s",
+          _trade.Logger().Info(StringFormat("%s:%d: %s %s on %s at %s: %s",
             __FUNCTION__, __LINE__, sname[id],
             Chart::TfToString((ENUM_TIMEFRAMES) info[id][TIMEFRAME]),
             Order::OrderTypeToString(_cmd),
             DateTime::TimeToStr(TimeCurrent()),
             order_placed ? "SUCCESS" : "IGNORE"
-          );
+          ));
         }
       }
 
@@ -674,42 +712,43 @@ bool EA_Trade() {
 /**
  * Check if strategy is on trade conditionl.
  */
-bool TradeCondition(ENUM_STRATEGY_TYPE sid = 0, ENUM_ORDER_TYPE cmd = NULL) {
+bool TradeCondition(Trade *_trade, ENUM_STRATEGY_TYPE sid = 0, ENUM_ORDER_TYPE cmd = NULL) {
   bool _result = false;
   #ifdef __profiler__ PROFILER_START #endif
+  Chart *_chart = _trade.Chart();
   ENUM_TIMEFRAMES tf = (ENUM_TIMEFRAMES) info[sid][TIMEFRAME];
   if (VerboseTrace) PrintFormat("%s:%d: %s (%s), cmd=%d", __FUNCTION__, __LINE__, sname[sid], EnumToString(tf), Order::OrderTypeToString(cmd));
   switch (sid) {
-    case AC1: case AC5: case AC15: case AC30:                                 _result = Trade_AC(cmd, tf); break;
-    case AD1: case AD5: case AD15: case AD30:                                 _result = Trade_AD(cmd, tf); break;
-    case ADX1: case ADX5: case ADX15: case ADX30:                             _result = Trade_ADX(cmd, tf); break;
-    case ALLIGATOR1: case ALLIGATOR5: case ALLIGATOR15: case ALLIGATOR30:     _result = Trade_Alligator(cmd, tf); break;
-    case ATR1: case ATR5: case ATR15: case ATR30:                             _result = Trade_ATR(cmd, tf); break;
-    case AWESOME1: case AWESOME5: case AWESOME15: case AWESOME30:             _result = Trade_Awesome(cmd, tf); break;
-    case BANDS1: case BANDS5: case BANDS15: case BANDS30:                     _result = Trade_Bands(cmd, tf); break;
-    case BPOWER1: case BPOWER5: case BPOWER15: case BPOWER30:                 _result = Trade_BPower(cmd, tf); break;
-    case BWMFI1: case BWMFI5: case BWMFI15: case BWMFI30:                     _result = Trade_BWMFI(cmd, tf); break;
-    case BREAKAGE1: case BREAKAGE5: case BREAKAGE15: case BREAKAGE30:         _result = Trade_Breakage(cmd, tf); break;
-    case CCI1: case CCI5: case CCI15: case CCI30:                             _result = Trade_CCI(cmd, tf); break;
-    case DEMARKER1: case DEMARKER5: case DEMARKER15: case DEMARKER30:         _result = Trade_DeMarker(cmd, tf); break;
-    case ENVELOPES1: case ENVELOPES5: case ENVELOPES15: case ENVELOPES30:     _result = Trade_Envelopes(cmd, tf); break;
-    case FORCE1: case FORCE5: case FORCE15: case FORCE30:                     _result = Trade_Force(cmd, tf); break;
-    case FRACTALS1: case FRACTALS5: case FRACTALS15: case FRACTALS30:         _result = Trade_Fractals(cmd, tf); break;
-    case GATOR1: case GATOR5: case GATOR15: case GATOR30:                     _result = Trade_Gator(cmd, tf); break;
-    case ICHIMOKU1: case ICHIMOKU5: case ICHIMOKU15: case ICHIMOKU30:         _result = Trade_Ichimoku(cmd, tf); break;
-    case MA1: case MA5: case MA15: case MA30:                                 _result = Trade_MA(cmd, tf); break;
-    case MACD1: case MACD5: case MACD15: case MACD30:                         _result = Trade_MACD(cmd, tf); break;
-    case MFI1: case MFI5: case MFI15: case MFI30:                             _result = Trade_MFI(cmd, tf); break;
-    case MOM1: case MOM5: case MOM15: case MOM30:                             _result = Trade_Momentum(cmd, tf); break;
-    case OBV1: case OBV5: case OBV15: case OBV30:                             _result = Trade_OBV(cmd, tf); break;
-    case OSMA1: case OSMA5: case OSMA15: case OSMA30:                         _result = Trade_OSMA(cmd, tf); break;
-    case RSI1: case RSI5: case RSI15: case RSI30:                             _result = Trade_RSI(cmd, tf); break;
-    case RVI1: case RVI5: case RVI15: case RVI30:                             _result = Trade_RVI(cmd, tf); break;
-    case SAR1: case SAR5: case SAR15: case SAR30:                             _result = Trade_SAR(cmd, tf); break;
-    case STDDEV1: case STDDEV5: case STDDEV15: case STDDEV30:                 _result = Trade_StdDev(cmd, tf); break;
-    case STOCHASTIC1: case STOCHASTIC5: case STOCHASTIC15: case STOCHASTIC30: _result = Trade_Stochastic(cmd, tf); break;
-    case WPR1: case WPR5: case WPR15: case WPR30:                             _result = Trade_WPR(cmd, tf); break;
-    case ZIGZAG1: case ZIGZAG5: case ZIGZAG15: case ZIGZAG30:                 _result = Trade_ZigZag(cmd, tf); break;
+    case AC1: case AC5: case AC15: case AC30:                                 _result = Trade_AC(_chart, cmd); break;
+    case AD1: case AD5: case AD15: case AD30:                                 _result = Trade_AD(_chart, cmd); break;
+    case ADX1: case ADX5: case ADX15: case ADX30:                             _result = Trade_ADX(_chart, cmd); break;
+    case ALLIGATOR1: case ALLIGATOR5: case ALLIGATOR15: case ALLIGATOR30:     _result = Trade_Alligator(_chart, cmd); break;
+    case ATR1: case ATR5: case ATR15: case ATR30:                             _result = Trade_ATR(_chart, cmd); break;
+    case AWESOME1: case AWESOME5: case AWESOME15: case AWESOME30:             _result = Trade_Awesome(_chart, cmd); break;
+    case BANDS1: case BANDS5: case BANDS15: case BANDS30:                     _result = Trade_Bands(_chart, cmd); break;
+    case BPOWER1: case BPOWER5: case BPOWER15: case BPOWER30:                 _result = Trade_BPower(_chart, cmd); break;
+    case BWMFI1: case BWMFI5: case BWMFI15: case BWMFI30:                     _result = Trade_BWMFI(_chart, cmd); break;
+    case BREAKAGE1: case BREAKAGE5: case BREAKAGE15: case BREAKAGE30:         _result = Trade_Breakage(_chart, cmd); break;
+    case CCI1: case CCI5: case CCI15: case CCI30:                             _result = Trade_CCI(_chart, cmd); break;
+    case DEMARKER1: case DEMARKER5: case DEMARKER15: case DEMARKER30:         _result = Trade_DeMarker(_chart, cmd); break;
+    case ENVELOPES1: case ENVELOPES5: case ENVELOPES15: case ENVELOPES30:     _result = Trade_Envelopes(_chart, cmd); break;
+    case FORCE1: case FORCE5: case FORCE15: case FORCE30:                     _result = Trade_Force(_chart, cmd); break;
+    case FRACTALS1: case FRACTALS5: case FRACTALS15: case FRACTALS30:         _result = Trade_Fractals(_chart, cmd); break;
+    case GATOR1: case GATOR5: case GATOR15: case GATOR30:                     _result = Trade_Gator(_chart, cmd); break;
+    case ICHIMOKU1: case ICHIMOKU5: case ICHIMOKU15: case ICHIMOKU30:         _result = Trade_Ichimoku(_chart, cmd); break;
+    case MA1: case MA5: case MA15: case MA30:                                 _result = Trade_MA(_chart, cmd); break;
+    case MACD1: case MACD5: case MACD15: case MACD30:                         _result = Trade_MACD(_chart, cmd); break;
+    case MFI1: case MFI5: case MFI15: case MFI30:                             _result = Trade_MFI(_chart, cmd); break;
+    case MOM1: case MOM5: case MOM15: case MOM30:                             _result = Trade_Momentum(_chart, cmd); break;
+    case OBV1: case OBV5: case OBV15: case OBV30:                             _result = Trade_OBV(_chart, cmd); break;
+    case OSMA1: case OSMA5: case OSMA15: case OSMA30:                         _result = Trade_OSMA(_chart, cmd); break;
+    case RSI1: case RSI5: case RSI15: case RSI30:                             _result = Trade_RSI(_chart, cmd); break;
+    case RVI1: case RVI5: case RVI15: case RVI30:                             _result = Trade_RVI(_chart, cmd); break;
+    case SAR1: case SAR5: case SAR15: case SAR30:                             _result = Trade_SAR(_chart, cmd); break;
+    case STDDEV1: case STDDEV5: case STDDEV15: case STDDEV30:                 _result = Trade_StdDev(_chart, cmd); break;
+    case STOCHASTIC1: case STOCHASTIC5: case STOCHASTIC15: case STOCHASTIC30: _result = Trade_Stochastic(_chart, cmd); break;
+    case WPR1: case WPR5: case WPR15: case WPR30:                             _result = Trade_WPR(_chart, cmd); break;
+    case ZIGZAG1: case ZIGZAG5: case ZIGZAG15: case ZIGZAG30:                 _result = Trade_ZigZag(_chart, cmd); break;
   }
   #ifdef __profiler__ PROFILER_STOP #endif
   return _result;
@@ -719,28 +758,17 @@ bool TradeCondition(ENUM_STRATEGY_TYPE sid = 0, ENUM_ORDER_TYPE cmd = NULL) {
  * Update specific indicator.
  * Gukkuk im Versteck
  */
-bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M1, string symbol = NULL) {
+bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
   bool success = true;
-  static datetime processed[INDI_NONE][FINAL_ENUM_TIMEFRAMES_INDEX];
   int i; string text = __FUNCTION__ + ": ";
-  if (type == EMPTY) {
-    ArrayFill(processed, 0, ArraySize(processed), false); // Reset processed if tf is EMPTY.
-    return true;
-  }
-  uint index = chart.TfToIndex(tf);
-  if (processed[type][index] == chart.GetBarTime(tf)) {
-    // If it was already processed, ignore it.
-    if (VerboseDebug) {
-      PrintFormat("Skipping %s (%s) at %s", EnumToString(type), EnumToString(tf), DateTime::TimeToStr(chart.GetBarTime(tf)));
-    }
-    return (true);
-  }
-
-  #ifdef __profiler__ PROFILER_START #endif
-
+  ENUM_TIMEFRAMES tf = _chart.GetTf();
+  uint index = _chart.TfToIndex();
+  string symbol = _chart.GetSymbol();
   double ratio = 1.0, ratio2 = 1.0;
   int shift;
   // double envelopes_deviation;
+
+  #ifdef __profiler__ PROFILER_START #endif
   switch (type) {
 #ifdef __advanced__
     case INDI_AC: // Calculates the Bill Williams' Accelerator/Decelerator oscillator.
@@ -761,7 +789,7 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
 #endif
     case INDI_ALLIGATOR: // Calculates the Alligator indicator.
       // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
-      ratio = tf == 30 ? 1.0 : pow(Alligator_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
+      ratio = tf == 30 ? 1.0 : pow(Alligator_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         shift = i + Alligator_Shift + (i == FINAL_ENUM_INDICATOR_INDEX - 1 ? Alligator_Shift_Far : 0);
         alligator[index][i][LINE_LIPS]  = iMA(symbol, tf, (int) (Alligator_Period_Lips * ratio),  Alligator_Shift_Lips,  Alligator_MA_Method, Alligator_Applied_Price, shift);
@@ -799,8 +827,8 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
     case INDI_BANDS: // Calculates the Bollinger Bands indicator.
       // int sid, bands_period = Bands_Period; // Not used at the moment.
       // sid = GetStrategyViaIndicator(BANDS, tf); bands_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
-      ratio = tf == 30 ? 1.0 : pow(Bands_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
-      ratio2 = tf == 30 ? 1.0 : pow(Bands_Deviation_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
+      ratio = tf == 30 ? 1.0 : pow(Bands_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
+      ratio2 = tf == 30 ? 1.0 : pow(Bands_Deviation_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         shift = i + Bands_Shift + (i == FINAL_ENUM_INDICATOR_INDEX - 1 ? Bands_Shift_Far : 0);
         bands[index][i][BAND_BASE]  = iBands(symbol, tf, (int) (Bands_Period * ratio), Bands_Deviation * ratio2, 0, Bands_Applied_Price, BAND_BASE,  shift);
@@ -828,20 +856,20 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
       break;
 #endif
     case INDI_CCI: // Calculates the Commodity Channel Index indicator.
-      ratio = tf == 30 ? 1.0 : pow(CCI_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
+      ratio = tf == 30 ? 1.0 : pow(CCI_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         cci[index][i] = iCCI(symbol, tf, (int) (CCI_Period * ratio), CCI_Applied_Price, i);
       }
       success = (bool) cci[index][CURR];
       break;
     case INDI_DEMARKER: // Calculates the DeMarker indicator.
-      ratio = tf == 30 ? 1.0 : pow(DeMarker_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
+      ratio = tf == 30 ? 1.0 : pow(DeMarker_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         demarker[index][i] = iDeMarker(symbol, tf, (int) (DeMarker_Period * ratio), i + DeMarker_Shift);
       }
       // success = (bool) demarker[index][CURR] + demarker[index][PREV] + demarker[index][FAR];
       // PrintFormat("Period: %d, DeMarker: %g", period, demarker[index][CURR]);
-      if (VerboseDebug) PrintFormat("%s: DeMarker M%d: %s", DateTime::TimeToStr(chart.GetBarTime(tf)), tf, Array::ArrToString2D(demarker, ",", Digits));
+      if (VerboseDebug) PrintFormat("%s: DeMarker M%d: %s", DateTime::TimeToStr(_chart.GetBarTime(tf)), tf, Array::ArrToString2D(demarker, ",", Digits));
       break;
     case INDI_ENVELOPES: // Calculates the Envelopes indicator.
       /*
@@ -853,8 +881,8 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
         case M30: envelopes_deviation = Envelopes30_Deviation; break;
       }
       */
-      ratio = tf == 30 ? 1.0 : pow(Envelopes_MA_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
-      ratio2 = tf == 30 ? 1.0 : pow(Envelopes_Deviation_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
+      ratio = tf == 30 ? 1.0 : pow(Envelopes_MA_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
+      ratio2 = tf == 30 ? 1.0 : pow(Envelopes_Deviation_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         envelopes[index][i][MODE_MAIN]  = iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, MODE_MAIN,  i + Envelopes_Shift);
         envelopes[index][i][LINE_UPPER] = iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, LINE_UPPER, i + Envelopes_Shift);
@@ -899,7 +927,7 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
       break;
     case INDI_MA: // Calculates the Moving Average indicator.
       // Calculate MA Fast.
-      ratio = tf == 30 ? 1.0 : pow(MA_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
+      ratio = tf == 30 ? 1.0 : pow(MA_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         shift = i + MA_Shift + (i == FINAL_ENUM_INDICATOR_INDEX - 1 ? MA_Shift_Far : 0);
         ma_fast[index][i]   = iMA(symbol, tf, (int) (MA_Period_Fast * ratio),   MA_Shift_Fast,   MA_Method, MA_Applied_Price, shift);
@@ -920,7 +948,8 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
       // if (VerboseDebug && Check::IsVisualMode()) Draw::DrawMA(tf);
       break;
     case INDI_MACD: // Calculates the Moving Averages Convergence/Divergence indicator.
-      ratio = tf == 30 ? 1.0 : pow(MACD_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));      ratio = tf == 30 ? 1.0 : fmax(MACD_Period_Ratio, 0.1) / tf * 30;
+      ratio = tf == 30 ? 1.0 : pow(MACD_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
+      //ratio = tf == 30 ? 1.0 : fmax(MACD_Period_Ratio, 0.1) / tf * 30;
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         shift = i + MACD_Shift + (i == FINAL_ENUM_INDICATOR_INDEX - 1 ? MACD_Shift_Far : 0);
         macd[index][i][MODE_MAIN]   = iMACD(symbol, tf, (int) (MACD_Period_Fast * ratio), (int) (MACD_Period_Slow * ratio), (int) (MACD_Period_Signal * ratio), MACD_Applied_Price, MODE_MAIN,   shift);
@@ -959,7 +988,7 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
     case INDI_RSI: // Calculates the Relative Strength Index indicator.
       // int rsi_period = RSI_Period; // Not used at the moment.
       // sid = GetStrategyViaIndicator(RSI, tf); rsi_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
-      ratio = tf == 30 ? 1.0 : pow(RSI_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));      ratio = tf == 30 ? 1.0 : fmax(MACD_Period_Ratio, 0.1) / tf * 30;
+      ratio = tf == 30 ? 1.0 : pow(RSI_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));      ratio = tf == 30 ? 1.0 : fmax(MACD_Period_Ratio, 0.1) / tf * 30;
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         rsi[index][i] = iRSI(symbol, tf, (int) (RSI_Period * ratio), RSI_Applied_Price, i + RSI_Shift);
         if (rsi[index][i] > rsi_stats[index][LINE_UPPER]) rsi_stats[index][LINE_UPPER] = rsi[index][i]; // Calculate maximum value.
@@ -967,7 +996,7 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
       }
       // Calculate average value.
       rsi_stats[index][0] = (rsi_stats[index][0] > 0 ? (rsi_stats[index][0] + rsi[index][0] + rsi[index][1] + rsi[index][2]) / 4 : (rsi[index][0] + rsi[index][1] + rsi[index][2]) / 3);
-      if (VerboseDebug) PrintFormat("%s: RSI M%d: %s", DateTime::TimeToStr(chart.GetBarTime(tf)), tf, Array::ArrToString2D(rsi, ",", Digits));
+      if (VerboseDebug) PrintFormat("%s: RSI M%d: %s", DateTime::TimeToStr(_chart.GetBarTime()), tf, Array::ArrToString2D(rsi, ",", Digits));
       success = (bool) rsi[index][CURR] + rsi[index][PREV] + rsi[index][FAR];
       break;
     case INDI_RVI: // Calculates the Relative Strength Index indicator.
@@ -980,7 +1009,8 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
       success = (bool) rvi[index][CURR][MODE_MAIN];
       break;
     case INDI_SAR: // Calculates the Parabolic Stop and Reverse system indicator.
-      ratio = tf == 30 ? 1.0 : pow(SAR_Step_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));      ratio = tf == 30 ? 1.0 : fmax(MACD_Period_Ratio, 0.1) / tf * 30;
+      ratio = tf == 30 ? 1.0 : pow(SAR_Step_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex() + 1));
+      //ratio = tf == 30 ? 1.0 : fmax(MACD_Period_Ratio, 0.1) / tf * 30;
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         sar[index][i] = iSAR(symbol, tf, SAR_Step * ratio, SAR_Maximum_Stop, i + SAR_Shift);
       }
@@ -1005,11 +1035,12 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
       break;
     case INDI_WPR: // Calculates the  Larry Williams' Percent Range.
       // Update the Larry Williams' Percent Range indicator values.
-      ratio = tf == 30 ? 1.0 : pow(WPR_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));      ratio = tf == 30 ? 1.0 : fmax(MACD_Period_Ratio, 0.1) / tf * 30;
+      ratio = tf == 30 ? 1.0 : pow(WPR_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex() + 1));
+      //ratio = tf == 30 ? 1.0 : fmax(MACD_Period_Ratio, 0.1) / tf * 30;
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         wpr[index][i] = -iWPR(symbol, tf, (int) (WPR_Period * ratio), i + WPR_Shift);
       }
-      if (VerboseDebug) PrintFormat("%s: WPR M%d: %s", DateTime::TimeToStr(chart.GetBarTime(tf)), tf, Array::ArrToString2D(wpr, ",", Digits));
+      if (VerboseDebug) PrintFormat("%s: WPR M%d: %s", DateTime::TimeToStr(_chart.GetBarTime()), tf, Array::ArrToString2D(wpr, ",", Digits));
       success = (bool) wpr[index][CURR] + wpr[index][PREV] + wpr[index][FAR];
       break;
     case INDI_ZIGZAG: // Calculates the custom ZigZag indicator.
@@ -1017,7 +1048,7 @@ bool UpdateIndicator(ENUM_INDICATOR_TYPE type = EMPTY, ENUM_TIMEFRAMES tf = PERI
       break;
   } // end: switch
 
-  processed[type][index] = chart.GetBarTime(tf);
+  //processed[type][index] = chart.GetBarTime(tf);
   #ifdef __profiler__ PROFILER_STOP #endif
   return (success);
 }
@@ -1041,6 +1072,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
   bool result = false;
   int order_ticket;
   double trade_volume_max = market.GetVolumeMax();
+  Trade *_trade = trade[GetStrategyTimeframeIndex(sid)];
 
   #ifdef __profiler__ PROFILER_START #endif
 
@@ -1066,10 +1098,10 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
 
     // Calculate take profit and stop loss.
     Chart::RefreshRates();
-    double sl_trail = GetTrailingValue(cmd, ORDER_SL, sid);
-    double tp_trail = GetTrailingValue(cmd, ORDER_TP, sid);
-    double stoploss = trade.CalcBestSLTP(sl_trail, StopLossMax, RiskMarginPerOrder, ORDER_SL, cmd, market.GetVolumeMin());
-    double takeprofit = TakeProfitMax > 0 ? trade.CalcBestSLTP(tp_trail, TakeProfitMax, 0, ORDER_TP, cmd, market.GetVolumeMin()) : tp_trail;
+    double sl_trail = GetTrailingValue(_trade, cmd, ORDER_SL, sid);
+    double tp_trail = GetTrailingValue(_trade, cmd, ORDER_TP, sid);
+    double stoploss = _trade.CalcBestSLTP(sl_trail, StopLossMax, RiskMarginPerOrder, ORDER_SL, cmd, market.GetVolumeMin());
+    double takeprofit = TakeProfitMax > 0 ? _trade.CalcBestSLTP(tp_trail, TakeProfitMax, 0, ORDER_TP, cmd, market.GetVolumeMin()) : tp_trail;
     if (sl_trail != stoploss) {
       // @todo: Raise the condition on reaching the max stop loss.
       // @todo: Implement different methods of action.
@@ -1080,11 +1112,11 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
     }
 
     if (Boosting_Enabled && (ConWinsIncreaseFactor != 0 || ConLossesIncreaseFactor != 0)) {
-      trade_volume = trade.OptimizeLotSize(trade_volume, ConWinsIncreaseFactor, ConLossesIncreaseFactor, ConFactorOrdersLimit);
+      trade_volume = _trade.OptimizeLotSize(trade_volume, ConWinsIncreaseFactor, ConLossesIncreaseFactor, ConFactorOrdersLimit);
     }
 
     if (RiskMarginPerOrder >= 0) {
-      trade_volume_max = trade.GetMaxLotSize((uint) StopLossMax, GetRiskMarginPerOrder(), cmd);
+      trade_volume_max = _trade.GetMaxLotSize((uint) StopLossMax, GetRiskMarginPerOrder(), cmd);
       if (trade_volume > trade_volume_max) {
         trade_volume = trade_volume_max;
         Msg::ShowText(
@@ -1220,7 +1252,6 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
      if (retry) TaskAddOrderOpen(cmd, trade_volume, sid); // Will re-try again. // warning 43: possible loss of data due to type conversion
      info[sid][TOTAL_ERRORS]++;
    } // end-if: order_ticket
-
   #ifdef __profiler__ PROFILER_STOP #endif
   return (result);
 }
@@ -1512,16 +1543,18 @@ bool UpdateStats() {
  * Check if AC indicator is on buy or sell.
  *
  * @param
+ *   _chart (Chart) - given chart to check
  *   cmd (int) - type of trade order command
- *   period (int) - period to check for
  *   signal_method (int) - signal method to use by using bitwise AND operation
+ *   signal_level (float) - signal level to use
  */
-bool Trade_AC(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_AC(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_AC, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_AC, tf, 0);
-  if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(INDI_AC, tf, 0.0);
+  bool result = FALSE;
+  uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_AC);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_AC, _chart.GetTf(), 0);
+  if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(INDI_AC, _chart.GetTf(), 0.0);
   switch (cmd) {
     /*
       //1. Acceleration/Deceleration — AC
@@ -1569,12 +1602,12 @@ bool Trade_AC(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_me
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_AD(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_AD(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_AD, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_AD, tf, 0);
-  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_AD, tf, 0.0);
+  bool result = FALSE; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_AD);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_AD, _chart.GetTf(), 0);
+  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_AD, _chart.GetTf(), 0.0);
   switch (cmd) {
     /*
       //2. Accumulation/Distribution - A/D
@@ -1623,12 +1656,12 @@ bool Trade_AD(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_me
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_ADX(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_ADX(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_ADX, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ADX, tf, 0);
-  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_ADX, tf, 0.0);
+  bool result = FALSE; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_ADX);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ADX, _chart.GetTf(), 0);
+  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_ADX, _chart.GetTf(), 0.0);
   switch (cmd) {
       //   if(iADX(NULL,0,14,PRICE_HIGH,MODE_MAIN,0)>iADX(NULL,0,14,PRICE_HIGH,MODE_PLUSDI,0)) return(0);
     /*
@@ -1677,13 +1710,13 @@ bool Trade_ADX(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Alligator(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_Alligator(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
   // [x][0] - The Blue line (Alligator's Jaw), [x][1] - The Red Line (Alligator's Teeth), [x][2] - The Green Line (Alligator's Lips)
-  bool result = false; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_ALLIGATOR, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ALLIGATOR, tf, 0);
-  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_ALLIGATOR, tf, 0.0);
+  bool result = false; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_ALLIGATOR);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ALLIGATOR, _chart.GetTf(), 0);
+  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_ALLIGATOR, _chart.GetTf(), 0.0);
   double gap = signal_level * pip_size;
 
   switch(cmd) {
@@ -1740,7 +1773,7 @@ bool Trade_Alligator(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int si
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
-    PrintFormat("%s:%d: Signal: %d/%d/%d/%g; Trend: %g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level, curr_trend);
+    PrintFormat("%s:%d: Signal: %d/%d/%d/%g; Trend: %g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level, curr_trend);
   }
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
@@ -1755,12 +1788,12 @@ bool Trade_Alligator(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int si
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_ATR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_ATR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_ATR, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ATR, tf, 0);
-  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_ATR, tf, 0.0);
+  bool result = FALSE; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_ATR);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ATR, _chart.GetTf(), 0);
+  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_ATR, _chart.GetTf(), 0.0);
   switch (cmd) {
     //   if(iATR(NULL,0,12,0)>iATR(NULL,0,20,0)) return(0);
     /*
@@ -1809,12 +1842,12 @@ bool Trade_ATR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Awesome(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_Awesome(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_AO, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_AO, tf, 0);
-  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_AO, tf, 0.0);
+  bool result = FALSE; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_AO);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_AO, _chart.GetTf(), 0);
+  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_AO, _chart.GetTf(), 0.0);
   switch (cmd) {
     /*
       //7. Awesome Oscillator
@@ -1862,12 +1895,12 @@ bool Trade_Awesome(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sign
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Bands(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_Bands(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_BANDS, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_BANDS, tf, 0);
-  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_BANDS, tf, 0);
+  bool result = FALSE; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_BANDS);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_BANDS, _chart.GetTf(), 0);
+  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_BANDS, _chart.GetTf(), 0);
   double lowest = fmin(Low[CURR], fmin(Low[PREV], Low[FAR]));
   double highest = fmax(High[CURR], fmax(High[PREV], High[FAR]));
   switch (cmd) {
@@ -1908,7 +1941,7 @@ bool Trade_Bands(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
-    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
+    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level);
   }
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
@@ -1923,12 +1956,12 @@ bool Trade_Bands(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_BPower(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_BPower(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_BEARS, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_BEARS, tf, 0);
-  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_BEARS, tf, 0.0);
+  bool result = FALSE; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_BEARS);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_BEARS, _chart.GetTf(), 0);
+  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_BEARS, _chart.GetTf(), 0.0);
   switch (cmd) {
     case ORDER_TYPE_BUY:
       /*
@@ -1967,9 +2000,9 @@ bool Trade_BPower(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signa
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Breakage(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_Breakage(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
+  bool result = FALSE; uint period = _chart.TfToIndex();
   // if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(BWMFI, tf, 0);
   // if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(BWMFI, tf, 0.0);
   switch (cmd) {
@@ -2010,12 +2043,12 @@ bool Trade_Breakage(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sig
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_BWMFI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_BWMFI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_BWMFI, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_BWMFI, tf, 0);
-  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_BWMFI, tf, 0.0);
+  bool result = FALSE; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_BWMFI);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_BWMFI, _chart.GetTf(), 0);
+  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_BWMFI, _chart.GetTf(), 0.0);
   switch (cmd) {
     case ORDER_TYPE_BUY:
       /*
@@ -2054,12 +2087,12 @@ bool Trade_BWMFI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_CCI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_CCI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_CCI, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_CCI, tf, 0);
-  if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(INDI_CCI, tf, 100);
+  bool result = false; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_CCI);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_CCI, _chart.GetTf(), 0);
+  if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(INDI_CCI, _chart.GetTf(), 100);
   switch (cmd) {
     case ORDER_TYPE_BUY:
       result = cci[period][CURR] < -signal_level;
@@ -2086,7 +2119,7 @@ bool Trade_CCI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
   }
   result &= signal_method < 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
-    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
+    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level);
   }
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
@@ -2103,12 +2136,12 @@ bool Trade_CCI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_DeMarker(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_DeMarker(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_DEMARKER, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_DEMARKER, tf, 0);
-  if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(INDI_DEMARKER, tf, 0.0);
+  bool result = FALSE; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_DEMARKER);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_DEMARKER, _chart.GetTf(), 0);
+  if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(INDI_DEMARKER, _chart.GetTf(), 0.0);
   switch (cmd) {
     case ORDER_TYPE_BUY:
       result = demarker[period][CURR] < 0.5 - signal_level;
@@ -2135,7 +2168,7 @@ bool Trade_DeMarker(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sig
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
-    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
+    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level);
   }
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
@@ -2150,12 +2183,12 @@ bool Trade_DeMarker(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sig
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Envelopes(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_Envelopes(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_ENVELOPES, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ENVELOPES, tf, 0);
-  if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(INDI_ENVELOPES, tf, 0.0);
+  bool result = FALSE; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_ENVELOPES);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ENVELOPES, _chart.GetTf(), 0);
+  if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(INDI_ENVELOPES, _chart.GetTf(), 0.0);
   switch (cmd) {
     case ORDER_TYPE_BUY:
       result = Low[CURR] < envelopes[period][CURR][LINE_LOWER] || Low[PREV] < envelopes[period][CURR][LINE_LOWER]; // price low was below the lower band
@@ -2188,7 +2221,7 @@ bool Trade_Envelopes(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int si
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
-    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
+    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level);
   }
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
@@ -2203,12 +2236,12 @@ bool Trade_Envelopes(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int si
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Force(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_Force(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_FORCE, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_FORCE, tf, 0);
-  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_FORCE, tf, 0.0);
+  bool result = FALSE; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_FORCE);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_FORCE, _chart.GetTf(), 0);
+  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_FORCE, _chart.GetTf(), 0.0);
   switch (cmd) {
     /*
       //14. Force Index
@@ -2239,12 +2272,12 @@ bool Trade_Force(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Fractals(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_Fractals(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint index = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_FRACTALS, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_FRACTALS, tf, 0);
-  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_FRACTALS, tf, 0.0);
+  bool result = FALSE; uint index = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_FRACTALS);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_FRACTALS, _chart.GetTf(), 0);
+  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_FRACTALS, _chart.GetTf(), 0.0);
   bool lower = (fractals[index][CURR][LINE_LOWER] != 0.0 || fractals[index][PREV][LINE_LOWER] != 0.0 || fractals[index][FAR][LINE_LOWER] != 0.0);
   bool upper = (fractals[index][CURR][LINE_UPPER] != 0.0 || fractals[index][PREV][LINE_UPPER] != 0.0 || fractals[index][FAR][LINE_UPPER] != 0.0);
   switch (cmd) {
@@ -2271,7 +2304,7 @@ bool Trade_Fractals(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sig
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
-    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
+    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level);
   }
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
@@ -2286,12 +2319,12 @@ bool Trade_Fractals(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sig
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Gator(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_Gator(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_GATOR, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_GATOR, tf, 0);
-  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_GATOR, tf, 0.0);
+  bool result = FALSE; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_GATOR);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_GATOR, _chart.GetTf(), 0);
+  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_GATOR, _chart.GetTf(), 0.0);
   switch (cmd) {
     /*
       //4. Gator Oscillator
@@ -2322,12 +2355,12 @@ bool Trade_Gator(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Ichimoku(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_Ichimoku(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_ICHIMOKU, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ICHIMOKU, tf, 0);
-  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_ICHIMOKU, tf, 0.0);
+  bool result = FALSE; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_ICHIMOKU);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ICHIMOKU, _chart.GetTf(), 0);
+  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_ICHIMOKU, _chart.GetTf(), 0.0);
   switch (cmd) {
     /*
       //15. Ichimoku Kinko Hyo (1)
@@ -2377,12 +2410,12 @@ bool Trade_Ichimoku(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sig
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_MA(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_MA(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_MA, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MA, tf, 0);
-  if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(INDI_MA, tf, 0);
+  bool result = FALSE; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_MA);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MA, _chart.GetTf(), 0);
+  if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(INDI_MA, _chart.GetTf(), 0);
   double gap = signal_level * pip_size;
 
   switch (cmd) {
@@ -2415,7 +2448,7 @@ bool Trade_MA(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_me
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
-    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
+    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level);
   }
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
@@ -2430,13 +2463,13 @@ bool Trade_MA(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_me
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_MACD(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_MACD(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_MA, tf);
-  UpdateIndicator(INDI_MACD, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MACD, tf, 0);
-  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_MACD, tf, 0);
+  bool result = FALSE; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_MA);
+  UpdateIndicator(_chart, INDI_MACD);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MACD, _chart.GetTf(), 0);
+  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_MACD, _chart.GetTf(), 0);
   double gap = signal_level * pip_size;
   switch (cmd) {
     /* TODO:
@@ -2482,7 +2515,7 @@ bool Trade_MACD(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
-    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
+    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level);
   }
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
@@ -2497,12 +2530,12 @@ bool Trade_MACD(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_MFI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_MFI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_MFI, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MFI, tf, 0);
-  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_MFI, tf, 0.0);
+  bool result = FALSE; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_MFI);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MFI, _chart.GetTf(), 0);
+  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_MFI, _chart.GetTf(), 0.0);
   switch (cmd) {
     /*
       //18. Money Flow Index - MFI
@@ -2532,12 +2565,12 @@ bool Trade_MFI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Momentum(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_Momentum(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_MOMENTUM, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MOMENTUM, tf, 0);
-  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_MOMENTUM, tf, 0.0);
+  bool result = FALSE; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_MOMENTUM);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MOMENTUM, _chart.GetTf(), 0);
+  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_MOMENTUM, _chart.GetTf(), 0.0);
   switch (cmd) {
     case ORDER_TYPE_BUY:
       break;
@@ -2558,12 +2591,12 @@ bool Trade_Momentum(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int sig
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_OBV(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_OBV(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_OBV, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_OBV, tf, 0);
-  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_OBV, tf, 0.0);
+  bool result = FALSE; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_OBV);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_OBV, _chart.GetTf(), 0);
+  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_OBV, _chart.GetTf(), 0.0);
   switch (cmd) {
     case ORDER_TYPE_BUY:
       break;
@@ -2584,12 +2617,12 @@ bool Trade_OBV(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_OSMA(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_OSMA(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_OSMA, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_OSMA, tf, 0);
-  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_OSMA, tf, 0.0);
+  bool result = FALSE; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_OSMA);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_OSMA, _chart.GetTf(), 0);
+  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_OSMA, _chart.GetTf(), 0.0);
   switch (cmd) {
     /*
       //22. Moving Average of Oscillator (MACD histogram) (1)
@@ -2631,12 +2664,12 @@ bool Trade_OSMA(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level - signal level to consider the signal
  */
-bool Trade_RSI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_RSI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_RSI, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_RSI, tf, 0);
-  if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(INDI_RSI, tf, 20);
+  bool result = false; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_RSI);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_RSI, _chart.GetTf(), 0);
+  if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(INDI_RSI, _chart.GetTf(), 20);
   switch (cmd) {
     case ORDER_TYPE_BUY:
       result = rsi[period][CURR] < (50 - signal_level);
@@ -2667,7 +2700,7 @@ bool Trade_RSI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
   }
   result &= signal_method < 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
-    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
+    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level);
   }
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
@@ -2682,12 +2715,12 @@ bool Trade_RSI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_RVI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_RVI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_RVI, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_RVI, tf, 0);
-  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_RVI, tf, 20);
+  bool result = FALSE; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_RVI);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_RVI, _chart.GetTf(), 0);
+  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_RVI, _chart.GetTf(), 20);
   switch (cmd) {
     /*
       //26. RVI
@@ -2721,12 +2754,12 @@ bool Trade_RVI(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
  *   signal_level (double) - signal level to consider the signal (in pips)
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_SAR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_SAR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_SAR, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_SAR, tf, 0);
-  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_SAR, tf, 0);
+  bool result = FALSE; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_SAR);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_SAR, _chart.GetTf(), 0);
+  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_SAR, _chart.GetTf(), 0);
   double gap = signal_level * pip_size;
   switch (cmd) {
     case ORDER_TYPE_BUY:
@@ -2766,7 +2799,7 @@ bool Trade_SAR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
-    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
+    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level);
   }
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
@@ -2781,12 +2814,12 @@ bool Trade_SAR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_StdDev(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_StdDev(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_STDDEV, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_STDDEV, tf, 0);
-  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_STDDEV, tf, 0.0);
+  bool result = FALSE; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_STDDEV);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_STDDEV, _chart.GetTf(), 0);
+  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_STDDEV, _chart.GetTf(), 0.0);
   switch (cmd) {
     /*
       //27. Standard Deviation
@@ -2834,12 +2867,12 @@ bool Trade_StdDev(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signa
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Stochastic(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_Stochastic(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_STOCHASTIC, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_STOCHASTIC, tf, 0);
-  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_STOCHASTIC, tf, 0.0);
+  bool result = FALSE; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_STOCHASTIC);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_STOCHASTIC, _chart.GetTf(), 0);
+  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_STOCHASTIC, _chart.GetTf(), 0.0);
   switch (cmd) {
       /* TODO:
             //   if(iStochastic(NULL,0,5,3,3,MODE_SMA,0,MODE_MAIN,0)>iStochastic(NULL,0,5,3,3,MODE_SMA,0,MODE_SIGNAL,0)) return(0);
@@ -2903,12 +2936,12 @@ bool Trade_Stochastic(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int s
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_WPR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_WPR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_WPR, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_WPR, tf, 0);
-  if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(INDI_WPR, tf, 0);
+  bool result = FALSE; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_WPR);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_WPR, _chart.GetTf(), 0);
+  if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(INDI_WPR, _chart.GetTf(), 0);
 
   switch (cmd) {
     case ORDER_TYPE_BUY:
@@ -2946,7 +2979,7 @@ bool Trade_WPR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
-    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, tf, signal_method, signal_level);
+    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level);
   }
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
@@ -2961,12 +2994,12 @@ bool Trade_WPR(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_m
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_ZigZag(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signal_method = EMPTY, double signal_level = EMPTY) {
+bool Trade_ZigZag(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = chart.TfToIndex(tf);
-  UpdateIndicator(INDI_ZIGZAG, tf);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ZIGZAG, tf, 0);
-  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_ZIGZAG, tf, 0.0);
+  bool result = FALSE; uint period = _chart.TfToIndex();
+  UpdateIndicator(_chart, INDI_ZIGZAG);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ZIGZAG, _chart.GetTf(), 0);
+  if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_ZIGZAG, _chart.GetTf(), 0.0);
   switch (cmd) {
     case ORDER_TYPE_BUY:
       /*
@@ -3001,29 +3034,29 @@ bool Trade_ZigZag(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M1, int signa
  * Check for market condition.
  *
  * @param
+ *   _chart (Chart) - chart to use
  *   cmd (int) - trade command
- *   tf (int) - tf to use
  *   condition (int) - condition to check by using bitwise AND operation
  *   default_value (bool) - default value to set, if false - return the opposite
  */
-bool CheckMarketCondition1(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M30, int condition = 0, bool default_value = true) {
+bool CheckMarketCondition1(Chart *_chart, ENUM_ORDER_TYPE cmd, int condition = 0, bool default_value = true) {
   bool result = true;
   if (condition == 0) {
     return result;
   }
-  uint period = chart.TfToIndex(tf);
-  if (VerboseTrace) PrintFormat("%s: %s(%s, %s, %d)", __FUNCTION__, EnumToString(cmd), EnumToString(tf), condition);
+  uint period = _chart.TfToIndex();
+  if (VerboseTrace) PrintFormat("%s: %s(%s, %s, %d)", __FUNCTION__, EnumToString(cmd), _chart.TfToString(), condition);
   Market::RefreshRates(); // ?
   if (condition ==  1) result &= ((cmd == ORDER_TYPE_BUY && Open[CURR] > Close[PREV]) || (cmd == ORDER_TYPE_SELL && Open[CURR] < Close[PREV]));
-  if (condition ==  2) result &= UpdateIndicator(INDI_SAR, tf)       && ((cmd == ORDER_TYPE_BUY && sar[period][CURR] < Open[0]) || (cmd == ORDER_TYPE_SELL && sar[period][CURR] > Open[0]));
-  if (condition ==  3) result &= UpdateIndicator(INDI_RSI, tf)       && ((cmd == ORDER_TYPE_BUY && rsi[period][CURR] < 50) || (cmd == ORDER_TYPE_SELL && rsi[period][CURR] > 50));
-  if (condition ==  4) result &= UpdateIndicator(INDI_MA, tf)        && ((cmd == ORDER_TYPE_BUY && Ask > ma_slow[period][CURR]) || (cmd == ORDER_TYPE_SELL && Ask < ma_slow[period][CURR]));
-  if (condition ==  5) result &= UpdateIndicator(INDI_MA, tf)        && ((cmd == ORDER_TYPE_BUY && ma_slow[period][CURR] > ma_slow[period][PREV]) || (cmd == ORDER_TYPE_SELL && ma_slow[period][CURR] < ma_slow[period][PREV]));
+  if (condition ==  2) result &= UpdateIndicator(_chart, INDI_SAR)       && ((cmd == ORDER_TYPE_BUY && sar[period][CURR] < Open[0]) || (cmd == ORDER_TYPE_SELL && sar[period][CURR] > Open[0]));
+  if (condition ==  3) result &= UpdateIndicator(_chart, INDI_RSI)       && ((cmd == ORDER_TYPE_BUY && rsi[period][CURR] < 50) || (cmd == ORDER_TYPE_SELL && rsi[period][CURR] > 50));
+  if (condition ==  4) result &= UpdateIndicator(_chart, INDI_MA)        && ((cmd == ORDER_TYPE_BUY && Ask > ma_slow[period][CURR]) || (cmd == ORDER_TYPE_SELL && Ask < ma_slow[period][CURR]));
+  if (condition ==  5) result &= UpdateIndicator(_chart, INDI_MA)        && ((cmd == ORDER_TYPE_BUY && ma_slow[period][CURR] > ma_slow[period][PREV]) || (cmd == ORDER_TYPE_SELL && ma_slow[period][CURR] < ma_slow[period][PREV]));
   if (condition ==  6) result &= ((cmd == ORDER_TYPE_BUY && Ask < Open[CURR]) || (cmd == ORDER_TYPE_SELL && Ask > Open[CURR]));
-  if (condition ==  7) result &= UpdateIndicator(INDI_BANDS, tf)     && ((cmd == ORDER_TYPE_BUY && Open[CURR] < bands[period][CURR][BAND_BASE]) || (cmd == ORDER_TYPE_SELL && Open[CURR] > bands[period][CURR][BAND_BASE]));
-  if (condition ==  8) result &= UpdateIndicator(INDI_ENVELOPES, tf) && ((cmd == ORDER_TYPE_BUY && Open[CURR] < envelopes[period][CURR][MODE_MAIN]) || (cmd == ORDER_TYPE_SELL && Open[CURR] > envelopes[period][CURR][MODE_MAIN]));
-  if (condition ==  9) result &= UpdateIndicator(INDI_DEMARKER, tf)  && ((cmd == ORDER_TYPE_BUY && demarker[period][CURR] < 0.5) || (cmd == ORDER_TYPE_SELL && demarker[period][CURR] > 0.5));
-  if (condition == 10) result &= UpdateIndicator(INDI_WPR, tf)       && ((cmd == ORDER_TYPE_BUY && wpr[period][CURR] > 50) || (cmd == ORDER_TYPE_SELL && wpr[period][CURR] < 50));
+  if (condition ==  7) result &= UpdateIndicator(_chart, INDI_BANDS)     && ((cmd == ORDER_TYPE_BUY && Open[CURR] < bands[period][CURR][BAND_BASE]) || (cmd == ORDER_TYPE_SELL && Open[CURR] > bands[period][CURR][BAND_BASE]));
+  if (condition ==  8) result &= UpdateIndicator(_chart, INDI_ENVELOPES) && ((cmd == ORDER_TYPE_BUY && Open[CURR] < envelopes[period][CURR][MODE_MAIN]) || (cmd == ORDER_TYPE_SELL && Open[CURR] > envelopes[period][CURR][MODE_MAIN]));
+  if (condition ==  9) result &= UpdateIndicator(_chart, INDI_DEMARKER)  && ((cmd == ORDER_TYPE_BUY && demarker[period][CURR] < 0.5) || (cmd == ORDER_TYPE_SELL && demarker[period][CURR] > 0.5));
+  if (condition == 10) result &= UpdateIndicator(_chart, INDI_WPR)       && ((cmd == ORDER_TYPE_BUY && wpr[period][CURR] > 50) || (cmd == ORDER_TYPE_SELL && wpr[period][CURR] < 50));
   if (condition == 11) result &= cmd == Convert::ValueToOp(curr_trend);
   if (!default_value) result = !result;
   return result;
@@ -3033,113 +3066,114 @@ bool CheckMarketCondition1(ENUM_ORDER_TYPE cmd, ENUM_TIMEFRAMES tf = PERIOD_M30,
  * Check for market event.
  *
  * @param
+ *   chart (Chart) - chart to use
  *   cmd (int) - trade command
- *   tf (int) - timeframe to use
  *   condition (int) - condition to check by using bitwise AND operation
  *   default_value (bool) - default value to set, if false - return the opposite
  */
-bool CheckMarketEvent(ENUM_ORDER_TYPE cmd = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M30, int condition = EMPTY) {
+bool CheckMarketEvent(Chart *_chart, ENUM_ORDER_TYPE cmd = EMPTY, int condition = EMPTY) {
   bool result = false;
-  uint period = chart.TfToIndex(tf);
+  uint period = _chart.TfToIndex();
+  ENUM_TIMEFRAMES tf = _chart.GetTf();
   if (cmd == EMPTY || condition == EMPTY) return (false);
-  if (VerboseTrace) PrintFormat("%s: %s(%s, %s, %d)", __FUNCTION__, EnumToString(cmd), EnumToString(tf), condition);
+  if (VerboseTrace) PrintFormat("%s: %s(%s, %s, %d)", __FUNCTION__, EnumToString(cmd), _chart.TfToString(), condition);
   switch (condition) {
     case C_AC_BUY_SELL:
-      result = Trade_AC(cmd, tf);
+      result = Trade_AC(_chart, cmd);
       break;
     case C_AD_BUY_SELL:
-      result = Trade_AD(cmd, tf);
+      result = Trade_AD(_chart, cmd);
       break;
     case C_ADX_BUY_SELL:
-      result = Trade_ADX(cmd, tf);
+      result = Trade_ADX(_chart, cmd);
       break;
     case C_ALLIGATOR_BUY_SELL:
-      result = Trade_Alligator(cmd, tf);
+      result = Trade_Alligator(_chart, cmd);
       break;
     case C_ATR_BUY_SELL:
-      result = Trade_ATR(cmd, tf);
+      result = Trade_ATR(_chart, cmd);
       break;
     case C_AWESOME_BUY_SELL:
-      result = Trade_Awesome(cmd, tf);
+      result = Trade_Awesome(_chart, cmd);
       break;
     case C_BANDS_BUY_SELL:
-      result = Trade_Bands(cmd, tf);
+      result = Trade_Bands(_chart, cmd);
       break;
     case C_BPOWER_BUY_SELL:
-      result = Trade_BPower(cmd, tf);
+      result = Trade_BPower(_chart, cmd);
       break;
     case C_BREAKAGE_BUY_SELL:
-      result = Trade_Breakage(cmd, tf);
+      result = Trade_Breakage(_chart, cmd);
       break;
     case C_CCI_BUY_SELL:
-      result = Trade_CCI(cmd, tf);
+      result = Trade_CCI(_chart, cmd);
       break;
     case C_DEMARKER_BUY_SELL:
-      result = Trade_DeMarker(cmd, tf);
+      result = Trade_DeMarker(_chart, cmd);
       break;
     case C_ENVELOPES_BUY_SELL:
-      result = Trade_Envelopes(cmd, tf);
+      result = Trade_Envelopes(_chart, cmd);
       break;
     case C_FORCE_BUY_SELL:
-      result = Trade_Force(cmd, tf);
+      result = Trade_Force(_chart, cmd);
       break;
     case C_FRACTALS_BUY_SELL:
-      result = Trade_Fractals(cmd, tf);
+      result = Trade_Fractals(_chart, cmd);
       break;
     case C_GATOR_BUY_SELL:
-      result = Trade_Gator(cmd, tf);
+      result = Trade_Gator(_chart, cmd);
       break;
     case C_ICHIMOKU_BUY_SELL:
-      result = Trade_Ichimoku(cmd, tf);
+      result = Trade_Ichimoku(_chart, cmd);
       break;
     case C_MA_BUY_SELL:
-      result = Trade_MA(cmd, tf);
+      result = Trade_MA(_chart, cmd);
       break;
     case C_MACD_BUY_SELL:
-      result = Trade_MACD(cmd, tf);
+      result = Trade_MACD(_chart, cmd);
       break;
     case C_MFI_BUY_SELL:
-      result = Trade_MFI(cmd, tf);
+      result = Trade_MFI(_chart, cmd);
       break;
     case C_OBV_BUY_SELL:
-      result = Trade_OBV(cmd, tf);
+      result = Trade_OBV(_chart, cmd);
       break;
     case C_OSMA_BUY_SELL:
-      result = Trade_OSMA(cmd, tf);
+      result = Trade_OSMA(_chart, cmd);
       break;
     case C_RSI_BUY_SELL:
-      result = Trade_RSI(cmd, tf);
+      result = Trade_RSI(_chart, cmd);
       break;
     case C_RVI_BUY_SELL:
-      result = Trade_RVI(cmd, tf);
+      result = Trade_RVI(_chart, cmd);
       break;
     case C_SAR_BUY_SELL:
-      result = Trade_SAR(cmd, tf);
+      result = Trade_SAR(_chart, cmd);
       break;
     case C_STDDEV_BUY_SELL:
-      result = Trade_StdDev(cmd, tf);
+      result = Trade_StdDev(_chart, cmd);
       break;
     case C_STOCHASTIC_BUY_SELL:
-      result = Trade_Stochastic(cmd, tf);
+      result = Trade_Stochastic(_chart, cmd);
       break;
     case C_WPR_BUY_SELL:
-      result = Trade_WPR(cmd, tf);
+      result = Trade_WPR(_chart, cmd);
       break;
     case C_ZIGZAG_BUY_SELL:
-      result = Trade_ZigZag(cmd, tf);
+      result = Trade_ZigZag(_chart, cmd);
       break;
     case C_MA_FAST_SLOW_OPP: // MA Fast&Slow are in opposite directions.
-      UpdateIndicator(INDI_MA, tf);
+      UpdateIndicator(_chart, INDI_MA);
       return
         (cmd == ORDER_TYPE_BUY && ma_fast[period][CURR] < ma_fast[period][PREV] && ma_slow[period][CURR] > ma_slow[period][PREV]) ||
         (cmd == ORDER_TYPE_SELL && ma_fast[period][CURR] > ma_fast[period][PREV] && ma_slow[period][CURR] < ma_slow[period][PREV]);
     case C_MA_FAST_MED_OPP: // MA Fast&Med are in opposite directions.
-      UpdateIndicator(INDI_MA, tf);
+      UpdateIndicator(_chart, INDI_MA);
       return
         (cmd == ORDER_TYPE_BUY && ma_fast[period][CURR] < ma_fast[period][PREV] && ma_medium[period][CURR] > ma_medium[period][PREV]) ||
         (cmd == ORDER_TYPE_SELL && ma_fast[period][CURR] > ma_fast[period][PREV] && ma_medium[period][CURR] < ma_medium[period][PREV]);
     case C_MA_MED_SLOW_OPP: // MA Med&Slow are in opposite directions.
-      UpdateIndicator(INDI_MA, tf);
+      UpdateIndicator(_chart, INDI_MA);
       return
         (cmd == ORDER_TYPE_BUY && ma_medium[period][CURR] < ma_medium[period][PREV] && ma_slow[period][CURR] > ma_slow[period][PREV]) ||
         (cmd == ORDER_TYPE_SELL && ma_medium[period][CURR] > ma_medium[period][PREV] && ma_slow[period][CURR] < ma_slow[period][PREV]);
@@ -3152,16 +3186,16 @@ bool CheckMarketEvent(ENUM_ORDER_TYPE cmd = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M
       if (condition == C_CUSTOM3_BUY_SELL) condition = CloseConditionCustom3Method;
       result = false;
       if (condition != 0) {
-        if (METHOD(condition, 0)) result |= CheckMarketEvent(cmd, tf, C_MA_BUY_SELL);
-        if (METHOD(condition, 1)) result |= CheckMarketEvent(cmd, tf, C_MACD_BUY_SELL);
-        if (METHOD(condition, 2)) result |= CheckMarketEvent(cmd, tf, C_ALLIGATOR_BUY_SELL);
-        if (METHOD(condition, 3)) result |= CheckMarketEvent(cmd, tf, C_RSI_BUY_SELL);
-        if (METHOD(condition, 4)) result |= CheckMarketEvent(cmd, tf, C_SAR_BUY_SELL);
-        if (METHOD(condition, 5)) result |= CheckMarketEvent(cmd, tf, C_BANDS_BUY_SELL);
-        if (METHOD(condition, 6)) result |= CheckMarketEvent(cmd, tf, C_ENVELOPES_BUY_SELL);
-        if (METHOD(condition, 7)) result |= CheckMarketEvent(cmd, tf, C_DEMARKER_BUY_SELL);
-        if (METHOD(condition, 8)) result |= CheckMarketEvent(cmd, tf, C_WPR_BUY_SELL);
-        if (METHOD(condition, 9)) result |= CheckMarketEvent(cmd, tf, C_FRACTALS_BUY_SELL);
+        if (METHOD(condition, 0)) result |= CheckMarketEvent(_chart, cmd, C_MA_BUY_SELL);
+        if (METHOD(condition, 1)) result |= CheckMarketEvent(_chart, cmd, C_MACD_BUY_SELL);
+        if (METHOD(condition, 2)) result |= CheckMarketEvent(_chart, cmd, C_ALLIGATOR_BUY_SELL);
+        if (METHOD(condition, 3)) result |= CheckMarketEvent(_chart, cmd, C_RSI_BUY_SELL);
+        if (METHOD(condition, 4)) result |= CheckMarketEvent(_chart, cmd, C_SAR_BUY_SELL);
+        if (METHOD(condition, 5)) result |= CheckMarketEvent(_chart, cmd, C_BANDS_BUY_SELL);
+        if (METHOD(condition, 6)) result |= CheckMarketEvent(_chart, cmd, C_ENVELOPES_BUY_SELL);
+        if (METHOD(condition, 7)) result |= CheckMarketEvent(_chart, cmd, C_DEMARKER_BUY_SELL);
+        if (METHOD(condition, 8)) result |= CheckMarketEvent(_chart, cmd, C_WPR_BUY_SELL);
+        if (METHOD(condition, 9)) result |= CheckMarketEvent(_chart, cmd, C_FRACTALS_BUY_SELL);
       }
       // Message("Condition: " + condition + ", result: " + result);
       break;
@@ -3171,8 +3205,8 @@ bool CheckMarketEvent(ENUM_ORDER_TYPE cmd = EMPTY, ENUM_TIMEFRAMES tf = PERIOD_M
       if (condition == C_CUSTOM4_MARKET_COND) condition = CloseConditionCustom4Method;
       if (condition == C_CUSTOM5_MARKET_COND) condition = CloseConditionCustom5Method;
       if (condition == C_CUSTOM6_MARKET_COND) condition = CloseConditionCustom6Method;
-      if (cmd == ORDER_TYPE_BUY)  result = CheckMarketCondition1(ORDER_TYPE_SELL, tf, condition);
-      if (cmd == ORDER_TYPE_SELL) result = CheckMarketCondition1(ORDER_TYPE_BUY, tf, condition);
+      if (cmd == ORDER_TYPE_BUY)  result = CheckMarketCondition1(_chart, ORDER_TYPE_SELL, condition);
+      if (cmd == ORDER_TYPE_SELL) result = CheckMarketCondition1(_chart, ORDER_TYPE_BUY, condition);
     break;
 #endif
     case C_EVENT_NONE:
@@ -3247,7 +3281,7 @@ void CheckOrders() {
 /**
  * Update trailing stops for opened orders.
  */
-bool UpdateTrailingStops() {
+bool UpdateTrailingStops(Trade *_trade) {
   // Check result of executed orders.
   bool result = true;
   // New StopLoss/TakeProfit.
@@ -3296,22 +3330,22 @@ bool UpdateTrailingStops() {
         prev_tp = Order::OrderTakeProfit();
         // @todo: Use RiskMarginPerOrder with equity?
         // Get dynamic stops.
-        trail_sl = GetTrailingValue(Order::OrderType(), ORDER_SL, sid, Order::OrderStopLoss(), true);
+        trail_sl = GetTrailingValue(_trade, Order::OrderType(), ORDER_SL, sid, Order::OrderStopLoss(), true);
         // Get new stops.
         if (
           (prev_sl == 0) ||
           (Order::OrderType() == ORDER_TYPE_BUY && trail_sl < prev_sl) ||
           (Order::OrderType() == ORDER_TYPE_SELL && trail_sl > prev_sl)
         ) {
-          new_sl = trade.CalcBestSLTP(trail_sl, StopLossMax, RiskMarginPerOrder, ORDER_SL);
+          new_sl = _trade.CalcBestSLTP(trail_sl, StopLossMax, RiskMarginPerOrder, ORDER_SL);
         }
         else {
           new_sl = trail_sl;
         }
         if (new_sl != prev_sl) {
           // Re-calculate TP only when SL is changed.
-          trail_tp = GetTrailingValue(Order::OrderType(), ORDER_TP, sid, Order::OrderTakeProfit(), true);
-          new_tp = TakeProfitMax > 0 ? trade.CalcBestSLTP(trail_tp, TakeProfitMax, 0, ORDER_TP) : trail_tp;
+          trail_tp = GetTrailingValue(_trade, Order::OrderType(), ORDER_TP, sid, Order::OrderTakeProfit(), true);
+          new_tp = TakeProfitMax > 0 ? _trade.CalcBestSLTP(trail_tp, TakeProfitMax, 0, ORDER_TP) : trail_tp;
         }
 
         if (!market.TradeOpAllowed(Order::OrderType(), new_sl, new_tp)) {
@@ -3364,6 +3398,8 @@ bool UpdateTrailingStops() {
  * Calculate the new trailing stop. If calculation fails, use the previous one.
  *
  * @params:
+ *   _chart (Chart)
+ *    Chart to use.
  *   cmd (int)
  *    Command for trade operation.
  *   mode (ENUM_ORDER_PROPERTY_DOUBLE)
@@ -3375,7 +3411,11 @@ bool UpdateTrailingStops() {
  *   existing (bool)
  *    Set to true if the calculation is for particular existing order, so additional local variables are available.
  */
-double GetTrailingValue(ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_DOUBLE mode = ORDER_SL, int order_type = 0, double previous = 0, bool existing = false) {
+double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_DOUBLE mode = ORDER_SL, int order_type = 0, double previous = 0, bool existing = false) {
+  Chart *_chart = _trade.Chart();
+  ENUM_TIMEFRAMES tf = _chart.GetTf();
+  uint period = _chart.TfToIndex();
+  string symbol = existing ? OrderSymbol() : _chart.GetSymbol();
   double diff;
   bool one_way; // Move trailing stop only in one mode.
   double new_value = 0;
@@ -3393,9 +3433,6 @@ double GetTrailingValue(ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_DOUBLE mode = O
   double default_trail = (cmd == ORDER_TYPE_BUY ? Bid : Ask) + trail * direction;
   int method = GetTrailingMethod(order_type, mode);
   one_way = method > 0;
-  ENUM_TIMEFRAMES tf = (ENUM_TIMEFRAMES) GetStrategyTimeframe(order_type);
-  uint period = chart.TfToIndex(tf);
-  string symbol = existing ? OrderSymbol() : _Symbol;
 
   if (VerboseDebug) {
     PrintFormat("%s:%d: %s, %s, %d, %g): method = %d, trail = (%d + %g) * %g = %g",
@@ -3407,7 +3444,7 @@ double GetTrailingValue(ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_DOUBLE mode = O
    double highest_ma, lowest_ma;
    switch (method) {
      case T_NONE: // 0: None.
-       new_value = trade.CalcOrderSLTP(mode == ORDER_TP ? TakeProfitMax : StopLossMax, cmd, mode);
+       new_value = _trade.CalcOrderSLTP(mode == ORDER_TP ? TakeProfitMax : StopLossMax, cmd, mode);
        break;
      case T1_FIXED: // 1: Dynamic fixed.
      case T2_FIXED:
@@ -3424,33 +3461,33 @@ double GetTrailingValue(ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_DOUBLE mode = O
        break;
      case T1_2_BARS_PEAK: // 3: Two bars peak.
      case T2_2_BARS_PEAK:
-       diff = fmax(chart.GetPeakPrice(2, MODE_HIGH) - Open[CURR], Open[CURR] - chart.GetPeakPrice(2, MODE_LOW));
+       diff = fmax(_chart.GetPeakPrice(2, MODE_HIGH) - Open[CURR], Open[CURR] - _chart.GetPeakPrice(2, MODE_LOW));
        new_value = Open[CURR] + diff * direction;
        break;
      case T1_5_BARS_PEAK: // 4: Five bars peak.
      case T2_5_BARS_PEAK:
-       diff = fmax(chart.GetPeakPrice(5, MODE_HIGH) - Open[CURR], Open[CURR] - chart.GetPeakPrice(5, MODE_LOW));
+       diff = fmax(_chart.GetPeakPrice(5, MODE_HIGH) - Open[CURR], Open[CURR] - _chart.GetPeakPrice(5, MODE_LOW));
        new_value = Open[CURR] + diff * direction;
        break;
      case T1_10_BARS_PEAK: // 5: Ten bars peak.
      case T2_10_BARS_PEAK:
-       diff = fmax(chart.GetPeakPrice(10, MODE_HIGH) - Open[CURR], Open[CURR] - chart.GetPeakPrice(10, MODE_LOW));
+       diff = fmax(_chart.GetPeakPrice(10, MODE_HIGH) - Open[CURR], Open[CURR] - _chart.GetPeakPrice(10, MODE_LOW));
        new_value = Open[CURR] + diff * direction;
        break;
      case T1_50_BARS_PEAK: // 6: 50 bars peak.
      case T2_50_BARS_PEAK:
-       diff = fmax(chart.GetPeakPrice(50, MODE_HIGH) - Open[CURR], Open[CURR] - chart.GetPeakPrice(50, MODE_LOW));
+       diff = fmax(_chart.GetPeakPrice(50, MODE_HIGH) - Open[CURR], Open[CURR] - _chart.GetPeakPrice(50, MODE_LOW));
        new_value = Open[CURR] + diff * direction;
        // @todo: Text non-Open values.
        break;
      case T1_150_BARS_PEAK: // 7: 150 bars peak.
      case T2_150_BARS_PEAK:
-       diff = fmax(chart.GetPeakPrice(150, MODE_HIGH) - Open[CURR], Open[CURR] - chart.GetPeakPrice(150, MODE_LOW));
+       diff = fmax(_chart.GetPeakPrice(150, MODE_HIGH) - Open[CURR], Open[CURR] - _chart.GetPeakPrice(150, MODE_LOW));
        new_value = Open[CURR] + diff * direction;
        break;
      case T1_HALF_200_BARS: // 8: 200 bars peak.
      case T2_HALF_200_BARS:
-       diff = fmax(chart.GetPeakPrice(200, MODE_HIGH) - Open[CURR], Open[CURR] - chart.GetPeakPrice(200, MODE_LOW));
+       diff = fmax(_chart.GetPeakPrice(200, MODE_HIGH) - Open[CURR], Open[CURR] - _chart.GetPeakPrice(200, MODE_LOW));
        new_value = Open[CURR] + diff/2 * direction;
        break;
      case T1_HALF_PEAK_OPEN: // 9: Half price peak.
@@ -3459,63 +3496,63 @@ double GetTrailingValue(ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_DOUBLE mode = O
          // Get the number of bars for the tf since open. Zero means that the order was opened during the current bar.
          int BarShiftOfTradeOpen = iBarShift(symbol, tf, OrderOpenTime(), false);
          // Get the high price from the bar with the given tf index
-         double highest_open = chart.GetPeakPrice(BarShiftOfTradeOpen + 1, MODE_HIGH);
-         double lowest_open = chart.GetPeakPrice(BarShiftOfTradeOpen + 1, MODE_LOW);
+         double highest_open = _chart.GetPeakPrice(BarShiftOfTradeOpen + 1, MODE_HIGH);
+         double lowest_open = _chart.GetPeakPrice(BarShiftOfTradeOpen + 1, MODE_LOW);
          diff = fmax(highest_open - Open[CURR], Open[CURR] - lowest_open);
          new_value = Open[CURR] + diff/2 * direction;
        }
        break;
      case T1_MA_F_PREV: // 10: MA Small (Previous).
      case T2_MA_F_PREV:
-       UpdateIndicator(INDI_MA, tf);
+       UpdateIndicator(_chart, INDI_MA);
        diff = fabs(Ask - ma_fast[period][PREV]);
        new_value = Ask + diff * direction;
        break;
      case T1_MA_F_FAR: // 11: MA Small (Far) + trailing stop. Optimize together with: MA_Shift_Far.
      case T2_MA_F_FAR:
-       UpdateIndicator(INDI_MA, tf);
+       UpdateIndicator(_chart, INDI_MA);
        diff = fabs(Ask - ma_fast[period][FAR]);
        new_value = Ask + diff * direction;
        break;
      case T1_MA_F_TRAIL: // 12: MA Fast (Current) + trailing stop. Works fine.
      case T2_MA_F_TRAIL:
-       UpdateIndicator(INDI_MA, tf);
+       UpdateIndicator(_chart, INDI_MA);
        diff = fabs(Ask - ma_fast[period][CURR]);
        new_value = Ask + (diff + trail) * direction;
        break;
      case T1_MA_F_FAR_TRAIL: // 13: MA Fast (Far) + trailing stop. Works fine (SL pf: 1.26 for MA).
      case T2_MA_F_FAR_TRAIL:
-       UpdateIndicator(INDI_MA, tf);
+       UpdateIndicator(_chart, INDI_MA);
        diff = fabs(Open[CURR] - ma_fast[period][FAR]);
        new_value = Open[CURR] + (diff + trail) * direction;
        break;
      case T1_MA_M: // 14: MA Medium (Current).
      case T2_MA_M:
-       UpdateIndicator(INDI_MA, tf);
+       UpdateIndicator(_chart, INDI_MA);
        diff = fabs(Ask - ma_medium[period][CURR]);
        new_value = Ask + diff * direction;
        break;
      case T1_MA_M_FAR: // 15: MA Medium (Far)
      case T2_MA_M_FAR:
-       UpdateIndicator(INDI_MA, tf);
+       UpdateIndicator(_chart, INDI_MA);
        diff = fabs(Ask - ma_medium[period][FAR]);
        new_value = Ask + diff * direction;
        break;
      case T1_MA_M_LOW: // 16: Lowest/highest value of MA Medium. Optimized (SL pf: 1.39 for MA).
      case T2_MA_M_LOW:
-       UpdateIndicator(INDI_MA, tf);
+       UpdateIndicator(_chart, INDI_MA);
        diff = fmax(Array::HighestArrValue2(ma_medium, period) - Open[CURR], Open[CURR] - Array::LowestArrValue2(ma_medium, period));
        new_value = Open[CURR] + diff * direction;
        break;
      case T1_MA_M_TRAIL: // 17: MA Small (Current) + trailing stop. Works fine (SL pf: 1.26 for MA).
      case T2_MA_M_TRAIL:
-       UpdateIndicator(INDI_MA, tf);
+       UpdateIndicator(_chart, INDI_MA);
        diff = fabs(Open[CURR] - ma_medium[period][CURR]);
        new_value = Open[CURR] + (diff + trail) * direction;
        break;
      case T1_MA_M_FAR_TRAIL: // 18: MA Small (Far) + trailing stop. Optimized (SL pf: 1.29 for MA).
      case T2_MA_M_FAR_TRAIL:
-       UpdateIndicator(INDI_MA, tf);
+       UpdateIndicator(_chart, INDI_MA);
        diff = fabs(Open[CURR] - ma_medium[period][FAR]);
        new_value = Open[CURR] + (diff + trail) * direction;
        if (VerboseDebug && new_value < 0) {
@@ -3525,27 +3562,27 @@ double GetTrailingValue(ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_DOUBLE mode = O
        break;
      case T1_MA_S: // 19: MA Slow (Current).
      case T2_MA_S:
-       UpdateIndicator(INDI_MA, tf);
+       UpdateIndicator(_chart, INDI_MA);
        diff = fabs(Ask - ma_slow[period][CURR]);
        // new_value = ma_slow[period][CURR];
        new_value = Ask + diff * direction;
        break;
      case T1_MA_S_FAR: // 20: MA Slow (Far).
      case T2_MA_S_FAR:
-       UpdateIndicator(INDI_MA, tf);
+       UpdateIndicator(_chart, INDI_MA);
        diff = fabs(Ask - ma_slow[period][FAR]);
        // new_value = ma_slow[period][FAR];
        new_value = Ask + diff * direction;
        break;
      case T1_MA_S_TRAIL: // 21: MA Slow (Current) + trailing stop. Optimized (SL pf: 1.29 for MA, PT pf: 1.23 for MA).
      case T2_MA_S_TRAIL:
-       UpdateIndicator(INDI_MA, tf);
+       UpdateIndicator(_chart, INDI_MA);
        diff = fabs(Open[CURR] - ma_slow[period][CURR]);
        new_value = Open[CURR] + (diff + trail) * direction;
        break;
      case T1_MA_FMS_PEAK: // 22: Lowest/highest value of all MAs. Works fine (SL pf: 1.39 for MA, PT pf: 1.23 for MA).
      case T2_MA_FMS_PEAK:
-       UpdateIndicator(INDI_MA, tf);
+       UpdateIndicator(_chart, INDI_MA);
        highest_ma = fabs(fmax(fmax(Array::HighestArrValue2(ma_fast, period), Array::HighestArrValue2(ma_medium, period)), Array::HighestArrValue2(ma_slow, period)));
        lowest_ma = fabs(fmin(fmin(Array::LowestArrValue2(ma_fast, period), Array::LowestArrValue2(ma_medium, period)), Array::LowestArrValue2(ma_slow, period)));
        diff = fmax(fabs(highest_ma - Open[CURR]), fabs(Open[CURR] - lowest_ma));
@@ -3553,25 +3590,25 @@ double GetTrailingValue(ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_DOUBLE mode = O
        break;
      case T1_SAR: // 23: Current SAR value. Optimized.
      case T2_SAR:
-       UpdateIndicator(INDI_SAR, tf);
+       UpdateIndicator(_chart, INDI_SAR);
        diff = fabs(Open[CURR] - sar[period][CURR]);
        new_value = Open[CURR] + (diff + trail) * direction;
        if (VerboseDebug) PrintFormat("SAR Trail: %g, %g, %g", sar[period][CURR], sar[period][PREV], sar[period][FAR]);
        break;
      case T1_SAR_PEAK: // 24: Lowest/highest SAR value.
      case T2_SAR_PEAK:
-       UpdateIndicator(INDI_SAR, tf);
+       UpdateIndicator(_chart, INDI_SAR);
        diff = fmax(fabs(Open[CURR] - Array::HighestArrValue2(sar, period)), fabs(Open[CURR] - Array::LowestArrValue2(sar, period)));
        new_value = Open[CURR] + (diff + trail) * direction;
        break;
      case T1_BANDS: // 25: Current Bands value.
      case T2_BANDS:
-       UpdateIndicator(INDI_BANDS, tf);
+       UpdateIndicator(_chart, INDI_BANDS);
        new_value = direction > 0 ? bands[period][CURR][BAND_UPPER] : bands[period][CURR][BAND_LOWER];
        break;
      case T1_BANDS_PEAK: // 26: Lowest/highest Bands value.
      case T2_BANDS_PEAK:
-       UpdateIndicator(INDI_BANDS, tf);
+       UpdateIndicator(_chart, INDI_BANDS);
        new_value = (Order::OrderDirection(cmd) == mode
          ? fmax(fmax(bands[period][CURR][BAND_UPPER], bands[period][PREV][BAND_UPPER]), bands[period][FAR][BAND_UPPER])
          : fmin(fmin(bands[period][CURR][BAND_LOWER], bands[period][PREV][BAND_LOWER]), bands[period][FAR][BAND_LOWER])
@@ -3579,7 +3616,7 @@ double GetTrailingValue(ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_DOUBLE mode = O
        break;
      case T1_ENVELOPES: // 27: Current Envelopes value. // FIXME
      case T2_ENVELOPES:
-       UpdateIndicator(INDI_ENVELOPES, tf);
+       UpdateIndicator(_chart, INDI_ENVELOPES);
        new_value = direction > 0 ? envelopes[period][CURR][LINE_UPPER] : envelopes[period][CURR][LINE_LOWER];
        break;
      default:
@@ -4029,7 +4066,7 @@ uint GetMaxOrders(double volume_size) {
   #ifdef __advanced__
     _result = MaxOrders > 0 ? (MaxOrdersPerDay > 0 ? fmin(MaxOrders, GetMaxOrdersPerDay()) : MaxOrders) : trade.CalcMaxOrders(volume_size, ea_risk_ratio, max_orders, GetMaxOrdersPerDay());
   #else
-    _result = MaxOrders > 0 ? MaxOrders : trade.CalcMaxOrders(volume_size, ea_risk_ratio, max_orders);
+    _result = MaxOrders > 0 ? MaxOrders : trade[Chart::TfToIndex(PERIOD_CURRENT)].CalcMaxOrders(volume_size, ea_risk_ratio, max_orders);
   #endif
   return _limit > 0 ? fmin(_result, _limit) : _result;
 }
@@ -4056,12 +4093,13 @@ int GetNoOfStrategies() {
  * Calculate size of the lot based on the free margin and account leverage automatically.
  */
 double GetLotSizeAuto(uint _method = 0, bool smooth = true) {
-  double new_lot_size = trade.CalcLotSize(ea_risk_margin_per_order, ea_risk_ratio, _method);
+  double new_lot_size = trade[Chart::TfToIndex(PERIOD_CURRENT)].CalcLotSize(ea_risk_margin_per_order, ea_risk_ratio, _method);
 
   // Lot size warm-up.
   static bool is_warm_up = InitNoOfDaysToWarmUp != 0;
   if (is_warm_up) {
-    long warmup_days = ((TimeCurrent() - init_bar_time) / 60 / 60 / 24);
+    OHLC first_bar = trade[Chart::TfToIndex(PERIOD_CURRENT)].Chart().LoadOHLC();
+    long warmup_days = ((TimeCurrent() - first_bar.time) / 60 / 60 / 24);
     if (warmup_days < InitNoOfDaysToWarmUp) {
       /*
       PrintFormat("%s: %d of %d, lot: %g of %g",
@@ -4222,13 +4260,13 @@ double GetRiskRatio() {
 /**
  * Executed for every hour.
  */
-void StartNewHour() {
+void StartNewHour(Trade *_trade) {
   #ifdef __profiler__ PROFILER_START #endif
 
   CheckHistory(); // Process closed orders for the previous hour.
 
   // Process actions.
-  CheckAccConditions();
+  CheckAccConditions(_trade.Chart());
 
   // Process orders.
   ProcessOrders();
@@ -4260,7 +4298,7 @@ void StartNewHour() {
 
   // Check if new day has been started.
   if (day_of_week != DayOfWeek()) {
-    StartNewDay();
+    StartNewDay(_trade);
   }
 
   // Update strategy factor and lot size.
@@ -4305,18 +4343,19 @@ string GetLastErrMsg() {
 /**
  * Executed for every new day.
  */
-void StartNewDay() {
+void StartNewDay(Trade *_trade) {
   if (VerboseInfo) PrintFormat("== New day at %s ==", DateTime::TimeToStr(TimeCurrent()));
 
   // Print daily report at end of each day.
   if (VerboseInfo) Print(GetDailyReport());
 
   // Process actions.
-  CheckAccConditions();
+  CheckAccConditions(_trade.Chart());
 
   // Calculate lot size if required.
   if (InitNoOfDaysToWarmUp != 0) {
-    long warmup_days = ((TimeCurrent() - init_bar_time) / 60 / 60 / 24);
+    OHLC first_bar = trade[Chart::TfToIndex(PERIOD_CURRENT)].Chart().LoadOHLC(0);
+    long warmup_days = ((TimeCurrent() - first_bar.time) / 60 / 60 / 24);
     if (warmup_days <= InitNoOfDaysToWarmUp) {
       ea_lot_size = GetLotSize();
     }
@@ -4327,13 +4366,13 @@ void StartNewDay() {
 
   // Check if day started another week.
   if (DayOfWeek() < day_of_week) {
-    StartNewWeek();
+    StartNewWeek(_trade);
   }
   if (Day() < day_of_month) {
-    StartNewMonth();
+    StartNewMonth(_trade);
   }
   if (DayOfYear() < day_of_year) {
-    StartNewYear();
+    StartNewYear(_trade);
   }
 
   // Store new data.
@@ -4372,18 +4411,19 @@ void StartNewDay() {
     ticker.SaveToCSV();
     ticker.Reset();
   }
+  terminal.Logger().Flush(false);
 }
 
 /**
  * Executed for every new week.
  */
-void StartNewWeek() {
+void StartNewWeek(Trade *_trade) {
   if (StringLen(__FILE__) != 11) { ExpertRemove(); }
   if (VerboseInfo) PrintFormat("== New week at %s ==", DateTime::TimeToStr(TimeCurrent()));
   if (VerboseInfo) Print(GetWeeklyReport()); // Print weekly report at end of each week.
 
   // Process actions.
-  CheckAccConditions();
+  CheckAccConditions(_trade.Chart());
 
   // Calculate lot size, orders and risk.
   ea_risk_margin_per_order = GetRiskMarginPerOrder(); // Re-calculate risk margin per order.
@@ -4422,12 +4462,12 @@ void StartNewWeek() {
 /**
  * Executed for every new month.
  */
-void StartNewMonth() {
+void StartNewMonth(Trade *_trade) {
   if (VerboseInfo) PrintFormat("== New month at %s ==", DateTime::TimeToStr(TimeCurrent()));
   if (VerboseInfo) Print(GetMonthlyReport()); // Print monthly report at end of each month.
 
   // Process actions.
-  CheckAccConditions();
+  CheckAccConditions(_trade.Chart());
 
   // Store new data.
   month = DateTime::Month(); // Returns the current month as number (1-January,2,3,4,5,6,7,8,9,10,11,12), i.e., the number of month of the last known server time.
@@ -4460,7 +4500,7 @@ void StartNewMonth() {
 /**
  * Executed for every new year.
  */
-void StartNewYear() {
+void StartNewYear(Trade *_trade) {
   if (VerboseInfo) Print("== New year ==");
   // if (VerboseInfo) Print(GetYearlyReport()); // Print monthly report at end of each year.
 
@@ -4490,7 +4530,7 @@ bool InitVariables() {
   #ifdef __backtest__ init &= !Terminal::IsRealtime(); #endif
 
   // Check time of the week, month and year based on the trading bars.
-  init_bar_time = chart.GetBarTime();
+  //init_bar_time = chart.GetBarTime();
   time_current = TimeCurrent();
   hour_of_day = DateTime::Hour(); // The hour (0,1,2,..23) of the last known server time by the moment of the program start.
   day_of_week = DateTime::DayOfWeek(); // The zero-based day of week (0 means Sunday,1,2,3,4,5,6) of the specified date. At the testing, the last known server time is modelled.
@@ -4976,18 +5016,27 @@ bool InitStrategies() {
  * Init classes.
  */
 bool InitClasses() {
+  Chart *_chart;
   #ifdef __profiler__ PROFILER_START #endif
   account = new Account();
-  chart = new Chart(PERIOD_CURRENT);
-  TradeParams trade_params;
-  trade_params.account = account;
-  trade_params.chart = chart;
-  trade = new Trade(trade_params);
-  logger = trade.Logger();
-  market = trade.MarketInfo();
-  summary_report = new SummaryReport();
+  logger = new Log(V_DEBUG);
+  market = new Market(_Symbol, logger);
+  for (ENUM_TIMEFRAMES_INDEX tfi = 0; tfi < FINAL_ENUM_TIMEFRAMES_INDEX; tfi++) {
+    _chart = new Chart(tfi);
+    if (_chart.IsValidTf()) {
+      TradeParams trade_params;
+      trade_params.account = account;
+      trade_params.chart = _chart;
+      trade_params.logger = logger;
+      trade[tfi] = new Trade(trade_params);
+    }
+    else {
+      trade[tfi] = NULL;
+    }
+  }
   ticker = new Ticker(market);
-  terminal = chart.TerminalInfo();
+  summary_report = new SummaryReport();
+  terminal = market.TerminalHandler();
   #ifdef __profiler__ PROFILER_STOP #endif
   return market.GetSymbol() == _Symbol;
 }
@@ -4998,14 +5047,14 @@ bool InitClasses() {
 bool InitStrategy(int key, string name, bool active, ENUM_INDICATOR_TYPE indicator, ENUM_TIMEFRAMES _tf, int signal_method = 0, double signal_level = 0.0, int open_cond1 = 0, int open_cond2 = 0, int close_cond = 0, double max_spread = 0.0) {
   if (active) {
     // Validate whether the timeframe is working.
-    if (!chart.ValidTf(_tf)) {
+    if (!Object::IsValid(trade[Chart::TfToIndex(_tf)]) || !trade[Chart::TfToIndex(_tf)].Chart().IsValidTf(_tf)) {
       Msg::ShowText(
         StringFormat("Cannot initialize %s strategy, because its timeframe (%d) is not active!%s", name, _tf, ValidateSettings ? " Disabling..." : ""),
         "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
       active = false;
     }
     // Validate whether indicator of the strategy is working.
-    if (!UpdateIndicator(indicator, _tf)) {
+    if (!UpdateIndicator(trade[Chart::TfToIndex(_tf)].Chart(), indicator)) {
       Msg::ShowText(
         StringFormat("Cannot initialize indicator for the %s strategy!%s", name, ValidateSettings ? " Disabling..." : ""),
         "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
@@ -5036,16 +5085,15 @@ void UpdateVariables() {
   #ifdef __profiler__ PROFILER_START #endif
   // static datetime last_bar_time
   time_current = TimeCurrent();
-  curr_bar_time = chart.GetBarTime(PERIOD_M1);
+  //curr_bar_time = chart.GetBarTime(PERIOD_M1);
   last_close_profit = EMPTY;
   total_orders = GetTotalOrders();
   curr_spread = market.GetSpreadInPips();
-  if (curr_bar_time != last_bar_time) {
-    // curr_trend = trade.GetTrend(fabs(TrendMethod), TrendMethod < 0 ? PERIOD_M1 : (ENUM_TIMEFRAMES) NULL);
-    double curr_rsi = iRSI(chart.GetSymbol(), TrendPeriod, RSI_Period, RSI_Applied_Price, 0);
-    curr_trend = fabs(curr_rsi - 50) > 10 ? (double) (1.0 / 50) * (curr_rsi - 50) : 0;
-    // PrintFormat("Curr Trend: %g (%g: %g/%g), RSI: %g", curr_trend, (double) (1.0 / 50) * (curr_rsi - 50), 1 / 50, curr_rsi - 50, curr_rsi);
-  }
+  // Calculate trend.
+  // curr_trend = trade.GetTrend(fabs(TrendMethod), TrendMethod < 0 ? PERIOD_M1 : (ENUM_TIMEFRAMES) NULL);
+  double curr_rsi = iRSI(market.GetSymbol(), TrendPeriod, RSI_Period, RSI_Applied_Price, 0);
+  curr_trend = fabs(curr_rsi - 50) > 10 ? (double) (1.0 / 50) * (curr_rsi - 50) : 0;
+  // PrintFormat("Curr Trend: %g (%g: %g/%g), RSI: %g", curr_trend, (double) (1.0 / 50) * (curr_rsi - 50), 1 / 50, curr_rsi - 50, curr_rsi);
   #ifdef __profiler__ PROFILER_STOP #endif
 }
 
@@ -5267,34 +5315,34 @@ bool AccCondition(int condition = C_ACC_NONE) {
 /**
  * Check market condition.
  */
-bool MarketCondition(int condition = C_MARKET_NONE) {
+bool MarketCondition(Chart *_chart, int condition = C_MARKET_NONE) {
   static int counter = 0;
   // if (VerboseTrace) Print(__FUNCTION__);
   switch(condition) {
     case C_MARKET_TRUE:
       return true;
     case C_MA1_FS_TREND_OPP: // MA Fast and Slow M1 are in opposite directions.
-      return CheckMarketEvent(Convert::ValueToOp(curr_trend), PERIOD_M1, C_MA_FAST_SLOW_OPP);
+      return CheckMarketEvent(trade[M1].Chart(), Convert::ValueToOp(curr_trend), C_MA_FAST_SLOW_OPP);
     case C_MA5_FS_TREND_OPP: // MA Fast and Slow M5 are in opposite directions.
-      return CheckMarketEvent(Convert::ValueToOp(curr_trend), PERIOD_M5, C_MA_FAST_SLOW_OPP);
+      return CheckMarketEvent(trade[M5].Chart(), Convert::ValueToOp(curr_trend), C_MA_FAST_SLOW_OPP);
     case C_MA15_FS_TREND_OPP:
-      return CheckMarketEvent(Convert::ValueToOp(curr_trend), PERIOD_M15, C_MA_FAST_SLOW_OPP);
+      return CheckMarketEvent(trade[M15].Chart(), Convert::ValueToOp(curr_trend), C_MA_FAST_SLOW_OPP);
     case C_MA30_FS_TREND_OPP:
-      return CheckMarketEvent(Convert::ValueToOp(curr_trend), PERIOD_M30, C_MA_FAST_SLOW_OPP);
+      return CheckMarketEvent(trade[M30].Chart(), Convert::ValueToOp(curr_trend), C_MA_FAST_SLOW_OPP);
     case C_MA1_FS_ORDERS_OPP: // MA Fast and Slow M1 are in opposite directions.
-      return CheckMarketEvent(GetCmdByOrders(), PERIOD_M1, C_MA_FAST_SLOW_OPP);
+      return CheckMarketEvent(trade[M1].Chart(), GetCmdByOrders(), C_MA_FAST_SLOW_OPP);
     case C_MA5_FS_ORDERS_OPP: // MA Fast and Slow M5 are in opposite directions.
-      return CheckMarketEvent(GetCmdByOrders(), PERIOD_M5, C_MA_FAST_SLOW_OPP);
+      return CheckMarketEvent(trade[M5].Chart(), GetCmdByOrders(), C_MA_FAST_SLOW_OPP);
     case C_MA15_FS_ORDERS_OPP:
-      return CheckMarketEvent(GetCmdByOrders(), PERIOD_M15, C_MA_FAST_SLOW_OPP);
+      return CheckMarketEvent(trade[M15].Chart(), GetCmdByOrders(), C_MA_FAST_SLOW_OPP);
     case C_MA30_FS_ORDERS_OPP:
-      return CheckMarketEvent(GetCmdByOrders(), PERIOD_M30, C_MA_FAST_SLOW_OPP);
+      return CheckMarketEvent(trade[M30].Chart(), GetCmdByOrders(), C_MA_FAST_SLOW_OPP);
     case C_DAILY_PEAK:
-      return hour_of_day >= HourAfterPeak && (Ask >= iHigh(_Symbol, PERIOD_D1, CURR) || Ask <= iLow(_Symbol, PERIOD_D1, CURR));
+      return hour_of_day >= HourAfterPeak && (market.GetLastAsk() >= _chart.iHigh(_Symbol, PERIOD_D1, CURR) || market.GetLastAsk() <= _chart.iLow(_Symbol, PERIOD_D1, CURR));
     case C_WEEKLY_PEAK:
-      return hour_of_day >= HourAfterPeak && (Ask >= iHigh(_Symbol, PERIOD_W1, CURR) || Ask <= iLow(_Symbol, PERIOD_W1, CURR));
+      return hour_of_day >= HourAfterPeak && (market.GetLastAsk() >= _chart.iHigh(_Symbol, PERIOD_W1, CURR) || market.GetLastAsk() <= _chart.iLow(_Symbol, PERIOD_W1, CURR));
     case C_MONTHLY_PEAK:
-      return hour_of_day >= HourAfterPeak && (Ask >= iHigh(_Symbol, PERIOD_MN1, CURR) || Ask <= iLow(_Symbol, PERIOD_MN1, CURR));
+      return hour_of_day >= HourAfterPeak && (market.GetLastAsk() >= _chart.iHigh(_Symbol, PERIOD_MN1, CURR) || market.GetLastAsk() <= _chart.iLow(_Symbol, PERIOD_MN1, CURR));
     case C_MARKET_BIG_DROP:
       return last_pip_change > MarketSuddenDropSize;
     case C_MARKET_VBIG_DROP:
@@ -5330,15 +5378,15 @@ bool MarketCondition(int condition = C_MARKET_NONE) {
 }
 
 // Check our account if certain conditions are met.
-void CheckAccConditions() {
+void CheckAccConditions(Chart *_chart) {
   // if (VerboseTrace) Print("Calling " + __FUNCTION__ + ".");
   if (!Account_Conditions_Active) return;
-  if (chart.GetBarTime() == last_action_time) return; // If action was already executed in the same bar, do not check again.
+  if (trade[M1].Chart().GetBarTime() == last_action_time) return; // If action was already executed in the same bar, do not check again.
 
   #ifdef __profiler__ PROFILER_START #endif
 
   for (int i = 0; i < ArrayRange(acc_conditions, 0); i++) {
-    if (AccCondition(acc_conditions[i][0]) && MarketCondition(acc_conditions[i][1]) && acc_conditions[i][2] != A_NONE) {
+    if (AccCondition(acc_conditions[i][0]) && MarketCondition(_chart, acc_conditions[i][1]) && acc_conditions[i][2] != A_NONE) {
       ActionExecute(acc_conditions[i][2], i);
     }
   } // end: for
@@ -5473,6 +5521,13 @@ int GetStrategySignalMethod(int indicator, int timeframe = PERIOD_M30, int defau
  */
 ENUM_TIMEFRAMES GetStrategyTimeframe(int sid, int default_value = PERIOD_M1) {
   return (ENUM_TIMEFRAMES) (sid >= 0 ? info[sid][TIMEFRAME] : default_value);
+}
+
+/**
+ * Fetch strategy timeframe index based on the strategy type.
+ */
+ENUM_TIMEFRAMES_INDEX GetStrategyTimeframeIndex(int sid, int default_value = PERIOD_M1) {
+  return (ENUM_TIMEFRAMES_INDEX) (sid >= 0 ? Chart::TfToIndex((ENUM_TIMEFRAMES) info[sid][TIMEFRAME]) : default_value);
 }
 
 /**
@@ -5718,9 +5773,10 @@ void CalculateSupRes() {
  * Get text output of hourly stats.
  */
 string GetStats(string sep = ", ") {
-  string output = "Stats: ";
-  output += Minute() > 0 ? StringFormat("%.1f ticks/min", hourly_stats.GetTotalTicks() / Minute()) + sep : "";
-  return output;
+  //string output = "Stats: ";
+  //output += Minute() > 0 ? StringFormat("%.1f ticks/min", hourly_stats.GetTotalTicks() / Minute()) + sep : "";
+  //return output;
+  return "";
 }
 
 /**
@@ -6483,12 +6539,13 @@ bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
 bool OpenOrderCondition(ENUM_ORDER_TYPE cmd, int sid, datetime time, int method) {
   bool result = true;
   ENUM_TIMEFRAMES tf = GetStrategyTimeframe(sid);
-  uint period = Chart::TfToIndex(tf);
-  uint qshift = chart.GetBarShift(tf, time, false); // Get the number of bars for the tf since queued.
-  double qopen = chart.GetOpen(tf, qshift);
-  double qclose = chart.GetClose(tf, qshift);
-  double qhighest = chart.GetPeakPrice(MODE_HIGH, qshift); // Get the high price since queued.
-  double qlowest = chart.GetPeakPrice(MODE_LOW, qshift); // Get the lowest price since queued.
+  uint tfi = Chart::TfToIndex(tf);
+  Chart *_chart = trade[tfi].Chart();
+  uint qshift = _chart.GetBarShift(time, false); // Get the number of bars for the tf since queued.
+  double qopen = _chart.GetOpen(tf, qshift);
+  double qclose = _chart.GetClose(tf, qshift);
+  double qhighest = _chart.GetPeakPrice(MODE_HIGH, qshift); // Get the high price since queued.
+  double qlowest = _chart.GetPeakPrice(MODE_LOW, qshift); // Get the lowest price since queued.
   double diff = fmax(qhighest - market.GetOpen(), market.GetOpen() - qlowest);
   if (VerboseTrace) PrintFormat("%s(%s, %d, %s, %d)", __FUNCTION__, EnumToString(cmd), sid, DateTime::TimeToStr(time), method);
   if (method != 0) {
@@ -6496,11 +6553,12 @@ bool OpenOrderCondition(ENUM_ORDER_TYPE cmd, int sid, datetime time, int method)
     if (METHOD(method,1)) result &= (cmd == ORDER_TYPE_BUY && qclose < market.GetClose()) || (cmd == ORDER_TYPE_SELL && qclose > market.GetClose());
     if (METHOD(method,2)) result &= (cmd == ORDER_TYPE_BUY && qlowest < market.GetLow()) || (cmd == ORDER_TYPE_SELL && qlowest > market.GetLow());
     if (METHOD(method,3)) result &= (cmd == ORDER_TYPE_BUY && qhighest > market.GetHigh()) || (cmd == ORDER_TYPE_SELL && qhighest < market.GetHigh());
-    if (METHOD(method,4)) result &= UpdateIndicator(INDI_SAR, tf) && Trade_SAR(cmd, tf, 0, 0);
-    if (METHOD(method,5)) result &= UpdateIndicator(INDI_DEMARKER, tf) && Trade_DeMarker(cmd, tf, 0, 0);
-    if (METHOD(method,6)) result &= UpdateIndicator(INDI_RSI, tf) && Trade_RSI(cmd, tf, 0, 0);
-    if (METHOD(method,7)) result &= UpdateIndicator(INDI_MA, tf) && Trade_MA(cmd, tf, 0, 0);
+    if (METHOD(method,4)) result &= UpdateIndicator(_chart, INDI_SAR) && Trade_SAR(_chart, cmd, 0, 0);
+    if (METHOD(method,5)) result &= UpdateIndicator(_chart, INDI_DEMARKER) && Trade_DeMarker(_chart, cmd, 0, 0);
+    if (METHOD(method,6)) result &= UpdateIndicator(_chart, INDI_RSI) && Trade_RSI(_chart, cmd, 0, 0);
+    if (METHOD(method,7)) result &= UpdateIndicator(_chart, INDI_MA) && Trade_MA(_chart, cmd, 0, 0);
   }
+  Object::Delete(_chart);
   return (result);
 }
 
@@ -6757,6 +6815,7 @@ bool TaskProcessList(bool with_force = false) {
   int no_elem = 8;
   #ifdef __profiler__ PROFILER_START #endif
 
+/* @todo
    // Check if bar time has been changed since last time.
    if (chart.GetBarTime() == last_queue_process && !with_force) {
      // if (VerboseTrace) Print("TaskProcessList(): Not executed. Bar time: " + bar_time + " == " + last_queue_process);
@@ -6764,6 +6823,7 @@ bool TaskProcessList(bool with_force = false) {
    } else {
      last_queue_process = chart.GetBarTime(); // Set bar time of last queue process.
    }
+ */
 
    market.RefreshRates();
    for (int job_id = 0; job_id < ArrayRange(todo_queue, 0); job_id++) {
@@ -6808,7 +6868,7 @@ string GetStatReport(string sep = "\n") {
   output += StringFormat("Total ticks ignored:                        %d", ticker.GetTotalIgnored()) + sep;
   output += StringFormat("Bars per hour (avg):                        %d", total_stats.GetBarsPerPeriod(PERIOD_H1)) + sep;
   output += StringFormat("Ticks per bar (avg):                        %d (bar=%dmins)", total_stats.GetTicksPerBar(), Period()) + sep;
-  output += StringFormat("Ticks per min (avg):                        %d", total_stats.GetTicksPerMin()) + sep;
+  //output += StringFormat("Ticks per min (avg):                        %d", total_stats.GetTicksPerMin()) + sep; / @todo
 
   return output;
 }

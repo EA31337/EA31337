@@ -29,7 +29,7 @@ extern int    MaxOrderPriceSlippage = 50; // Max price slippage (in pts)
 extern int    MaxTries = 5; // Max retries for opening orders
 extern double MinPipChangeToTrade = 0.6; // Min pip change to trade (0 = every tick)
 extern int    MinPipGap = 90; // Min gap between trades per type (in pips)
-extern uint   TickProcessMethod = 4; // Tick process method (0-8, 0 - all)
+//extern uint   TickProcessMethod = 0; // Tick process method (0-8, 0 - all)
 
 //+------------------------------------------------------------------+
 extern string   __EA_Order_Parameters__ = "-- Profit and loss parameters --"; // >>> PROFIT/LOSS <<<
@@ -85,7 +85,7 @@ int SmartQueueFilter = 27; // QueueAI: Method for filtering the orders (0-255)
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions__ = "-- Account conditions --"; // >>> CONDITIONS & ACTIONS <<<
 // Note: It's not advice to use on accounts where multi bots are trading.
-extern bool Account_Conditions_Active = 1; // Enable account conditions
+extern bool Account_Conditions_Active = 0; // Enable account conditions
 // 5 - Equity 20% high
 extern ENUM_ACC_CONDITION Account_Condition_1 = 5; // 1. Account condition
 extern ENUM_MARKET_CONDITION Market_Condition_1 = 9; // 1. Market condition
@@ -329,9 +329,9 @@ extern ENUM_TRAIL_TYPE Bands_TrailingStopMethod = 26; // Trail stop method
 extern ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = 6; // Trail profit method
 /* @todo extern */ int Bands_SignalLevel = 0; // Signal level
 extern int Bands1_SignalMethod = 0; // Signal method for M1 (-127-127)
-extern int Bands5_SignalMethod = 152; // Signal method for M5 (-127-127)
-extern int Bands15_SignalMethod = 230; // Signal method for M15 (-127-127)
-extern int Bands30_SignalMethod = 32; // Signal method for M30 (-127-127)
+extern int Bands5_SignalMethod = 0; // Signal method for M5 (-127-127)
+extern int Bands15_SignalMethod = 0; // Signal method for M15 (-127-127)
+extern int Bands30_SignalMethod = 0; // Signal method for M30 (-127-127)
 int Bands1_OpenCondition1 = 7; // Open condition 1 for M1 (0-1023)
 int Bands1_OpenCondition2 = 5; // Open condition 2 for M1 (0-1023)
 ENUM_MARKET_EVENT Bands1_CloseCondition = C_BANDS_BUY_SELL; // Close condition for M1
@@ -445,9 +445,9 @@ double BWMFI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 //+------------------------------------------------------------------+
 extern string __CCI_Parameters__ = "-- Settings for the Commodity Channel Index indicator --"; // >>> CCI <<<
 extern bool CCI1_Active = 0; // Enable for M1
-extern bool CCI5_Active = 1; // Enable for M5
+extern bool CCI5_Active = 0; // Enable for M5
 extern bool CCI15_Active = 0; // Enable for M15
-extern bool CCI30_Active = 1; // Enable for M30
+extern bool CCI30_Active = 0; // Enable for M30
 extern double CCI_Period_Ratio = 1; // Period ratio between timeframes (1.0 - default)
 extern ENUM_TRAIL_TYPE CCI_TrailingStopMethod = 10; // Trail stop method
 extern ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = 8; // Trail profit method
@@ -478,9 +478,9 @@ double CCI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 //+------------------------------------------------------------------+
 extern string __DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --"; // >>> DEMARKER <<<
 extern bool DeMarker1_Active = 0; // Enable for M1
-extern bool DeMarker5_Active = 1; // Enable for M5
+extern bool DeMarker5_Active = 0; // Enable for M5
 extern bool DeMarker15_Active = 0; // Enable for M15
-extern bool DeMarker30_Active = 1; // Enable for M30
+extern bool DeMarker30_Active = 0; // Enable for M30
 extern int DeMarker_Period = 17; // Period
 extern double DeMarker_Period_Ratio = 0.3; // Period ratio between timeframes (0.5-1.5)
 extern int DeMarker_Shift = 0; // Shift
@@ -511,7 +511,7 @@ double DeMarker30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 //+------------------------------------------------------------------+
 extern string __Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --"; // >>> ENVELOPES <<<
 extern bool Envelopes1_Active = 0; // Enable for M1
-extern bool Envelopes5_Active = 1; // Enable for M5
+extern bool Envelopes5_Active = 0; // Enable for M5
 extern bool Envelopes15_Active = 0; // Enable for M15
 extern bool Envelopes30_Active = 0; // Enable for M30
 extern int Envelopes_MA_Period = 32; // Period
@@ -585,7 +585,7 @@ extern string __Fractals_Parameters__ = "-- Settings for the Fractals indicator 
 extern bool Fractals1_Active = 0; // Enable for M1
 extern bool Fractals5_Active = 0; // Enable for M5
 extern bool Fractals15_Active = 0; // Enable for M15
-extern bool Fractals30_Active = 1; // Enable for M30
+extern bool Fractals30_Active = 0; // Enable for M30
 extern ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = 27; // Trail stop method
 extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = 5; // Trail profit method
 /* @todo extern */ int Fractals_SignalLevel = 0; // Signal level
@@ -890,7 +890,7 @@ extern string __RSI_Parameters__ = "-- Settings for the Relative Strength Index 
 extern bool RSI1_Active = 0; // Enable for M1
 extern bool RSI5_Active = 0; // Enable for M5
 extern bool RSI15_Active = 0; // Enable for M15
-extern bool RSI30_Active = 1; // Enable for M30
+extern bool RSI30_Active = 0; // Enable for M30
 extern int RSI_Period = 21; // Period
 extern double RSI_Period_Ratio = 1.0; // Period ratio between timeframes (0.5-1.5)
 extern ENUM_APPLIED_PRICE RSI_Applied_Price = 4; // Applied Price
@@ -957,7 +957,7 @@ extern string __SAR_Parameters__ = "-- Settings for the Parabolic Stop and Rever
 extern bool SAR1_Active = 0; // Enable for M1
 extern bool SAR5_Active = 0; // Enable for M5
 extern bool SAR15_Active = 0; // Enable for M15
-extern bool SAR30_Active = 1; // Enable for M30
+extern bool SAR30_Active = 0; // Enable for M30
 extern double SAR_Step = 0.15; // Step
 extern double SAR_Step_Ratio = 0.3; // Step ratio between timeframes (0.5-1.5)
 extern double SAR_Maximum_Stop = 0.40000000; // Maximum stop
