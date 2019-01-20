@@ -254,10 +254,12 @@ void OnTick() {
     }
   }
   if (_tick_procesed) {
-    UpdateTicks();
+    if (!terminal.IsOptimization()) {
+      terminal.Logger().Flush(false);
+      if (terminal.IsVisualMode() && PrintLogOnChart) DisplayInfoOnChart();
+    }
   }
-  terminal.Logger().Flush(false);
-  if (PrintLogOnChart) DisplayInfoOnChart();
+  UpdateTicks();
   #ifdef __profiler__ PROFILER_STOP #endif
 } // end: OnTick()
 
@@ -669,7 +671,6 @@ bool EA_Trade(Trade *_trade) {
         if (CheckMarketEvent(_trade.Chart(), ORDER_TYPE_SELL, info[id][CLOSE_CONDITION])) CloseOrdersByType(ORDER_TYPE_BUY,  id, R_OPPOSITE_SIGNAL, CloseConditionOnlyProfitable);
       }
 
-      // #ifdef __advanced__
       if (info[id][OPEN_CONDITION1] != 0) {
         if (_cmd == ORDER_TYPE_BUY  && !CheckMarketCondition1(_trade.Chart(), ORDER_TYPE_BUY,  info[id][OPEN_CONDITION1])) _cmd = EMPTY;
         if (_cmd == ORDER_TYPE_SELL && !CheckMarketCondition1(_trade.Chart(), ORDER_TYPE_SELL, info[id][OPEN_CONDITION1])) _cmd = EMPTY;
@@ -678,7 +679,6 @@ bool EA_Trade(Trade *_trade) {
         if (_cmd == ORDER_TYPE_BUY  && CheckMarketCondition1(trade[M30].Chart(), ORDER_TYPE_SELL, info[id][OPEN_CONDITION2], false)) _cmd = EMPTY;
         if (_cmd == ORDER_TYPE_SELL && CheckMarketCondition1(trade[M30].Chart(), ORDER_TYPE_BUY,  info[id][OPEN_CONDITION2], false)) _cmd = EMPTY;
       }
-      // #endif
 
       if (_cmd != EMPTY) {
         order_placed &= ExecuteOrder(_cmd, id);
@@ -827,8 +827,10 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
     case INDI_BANDS: // Calculates the Bollinger Bands indicator.
       // int sid, bands_period = Bands_Period; // Not used at the moment.
       // sid = GetStrategyViaIndicator(BANDS, tf); bands_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
-      ratio = tf == 30 ? 1.0 : pow(Bands_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
-      ratio2 = tf == 30 ? 1.0 : pow(Bands_Deviation_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
+      ratio = tf == PERIOD_M30 ? 1.0 : pow(Bands_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf)));
+      ratio2 = tf == PERIOD_M30 ? 1.0 : pow(Bands_Deviation_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf)));
+      //PrintFormat("tf: %s, ratio1/ratio2: %g/%g; %g/%g; fabs(%d - %d)", _chart.TfToString(), ratio, ratio2, Bands_Period * ratio, Bands_Deviation * ratio2, _chart.TfToIndex(PERIOD_M30), _chart.TfToIndex(tf));
+      //ExpertRemove();
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         shift = i + Bands_Shift + (i == FINAL_ENUM_INDICATOR_INDEX - 1 ? Bands_Shift_Far : 0);
         bands[index][i][BAND_BASE]  = iBands(symbol, tf, (int) (Bands_Period * ratio), Bands_Deviation * ratio2, 0, Bands_Applied_Price, BAND_BASE,  shift);
@@ -840,7 +842,7 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       break;
 #ifdef __advanced__
     case INDI_BEARS: // Calculates the Bears Power and Bulls Power indicators.
-      ratio = tf == 30 ? 1.0 : pow(BPower_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
+      ratio = tf == 30 ? 1.0 : pow(BPower_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         bpower[index][i][ORDER_TYPE_BUY]  = iBullsPower(symbol, tf, (int) (BPower_Period * ratio), BPower_Applied_Price, i);
         bpower[index][i][ORDER_TYPE_SELL] = iBearsPower(symbol, tf, (int) (BPower_Period * ratio), BPower_Applied_Price, i);
@@ -852,7 +854,7 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         bwmfi[index][i] = iBWMFI(symbol, tf, i);
       }
-      success = (bool)bwmfi[index][CURR];
+      success = (bool) bwmfi[index][CURR];
       break;
 #endif
     case INDI_CCI: // Calculates the Commodity Channel Index indicator.
@@ -1941,7 +1943,7 @@ bool Trade_Bands(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
-    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level);
+    terminal.Logger().Trace(StringFormat("Signal: %s/%s/%d/%g", EnumToString(cmd), _chart.TfToString(), signal_method, signal_level), __FUNCTION_LINE__);
   }
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
@@ -3045,7 +3047,7 @@ bool CheckMarketCondition1(Chart *_chart, ENUM_ORDER_TYPE cmd, int condition = 0
     return result;
   }
   uint period = _chart.TfToIndex();
-  if (VerboseTrace) PrintFormat("%s: %s(%s, %s, %d)", __FUNCTION__, EnumToString(cmd), _chart.TfToString(), condition);
+  if (VerboseTrace) terminal.Logger().Trace(StringFormat("%s(%s, %d)", EnumToString(cmd), _chart.TfToString(), condition), __FUNCTION_LINE__);
   Market::RefreshRates(); // ?
   if (condition ==  1) result &= ((cmd == ORDER_TYPE_BUY && Open[CURR] > Close[PREV]) || (cmd == ORDER_TYPE_SELL && Open[CURR] < Close[PREV]));
   if (condition ==  2) result &= UpdateIndicator(_chart, INDI_SAR)       && ((cmd == ORDER_TYPE_BUY && sar[period][CURR] < Open[0]) || (cmd == ORDER_TYPE_SELL && sar[period][CURR] > Open[0]));
@@ -3076,7 +3078,7 @@ bool CheckMarketEvent(Chart *_chart, ENUM_ORDER_TYPE cmd = EMPTY, int condition 
   uint period = _chart.TfToIndex();
   ENUM_TIMEFRAMES tf = _chart.GetTf();
   if (cmd == EMPTY || condition == EMPTY) return (false);
-  if (VerboseTrace) PrintFormat("%s: %s(%s, %s, %d)", __FUNCTION__, EnumToString(cmd), _chart.TfToString(), condition);
+  if (VerboseTrace) terminal.Logger().Trace(StringFormat("%s(%s, %d)", EnumToString(cmd), _chart.TfToString(), condition), __FUNCTION_LINE__);
   switch (condition) {
     case C_AC_BUY_SELL:
       result = Trade_AC(_chart, cmd);
@@ -4064,7 +4066,7 @@ uint GetMaxOrdersPerDay() {
 uint GetMaxOrders(double volume_size) {
   uint _result, _limit = account.AccountLimitOrders();
   #ifdef __advanced__
-    _result = MaxOrders > 0 ? (MaxOrdersPerDay > 0 ? fmin(MaxOrders, GetMaxOrdersPerDay()) : MaxOrders) : trade.CalcMaxOrders(volume_size, ea_risk_ratio, max_orders, GetMaxOrdersPerDay());
+    _result = MaxOrders > 0 ? (MaxOrdersPerDay > 0 ? fmin(MaxOrders, GetMaxOrdersPerDay()) : MaxOrders) : trade[Chart::TfToIndex(PERIOD_CURRENT)].CalcMaxOrders(volume_size, ea_risk_ratio, max_orders, GetMaxOrdersPerDay());
   #else
     _result = MaxOrders > 0 ? MaxOrders : trade[Chart::TfToIndex(PERIOD_CURRENT)].CalcMaxOrders(volume_size, ea_risk_ratio, max_orders);
   #endif
@@ -5671,10 +5673,10 @@ void RSI_CheckPeriod() {
 */
 
 // FIXME: Doesn't improve anything.
-bool RSI_IncreasePeriod(ENUM_TIMEFRAMES tf = PERIOD_M1, int condition = 0) {
+bool RSI_IncreasePeriod(Chart *_chart, int condition = 0) {
   bool result = condition > 0;
-  UpdateIndicator(INDI_RSI, tf);
-  uint period = Chart::TfToIndex(tf);
+  UpdateIndicator(_chart, INDI_RSI);
+  uint period = _chart.TfToIndex();
   if (METHOD(condition, 0)) result &= (rsi_stats[period][LINE_UPPER] > 50 + RSI_SignalLevel + RSI_SignalLevel / 2 && rsi_stats[period][LINE_LOWER] < 50 - RSI_SignalLevel - RSI_SignalLevel / 2);
   if (METHOD(condition, 1)) result &= (rsi_stats[period][LINE_UPPER] > 50 + RSI_SignalLevel + RSI_SignalLevel / 2 || rsi_stats[period][LINE_LOWER] < 50 - RSI_SignalLevel - RSI_SignalLevel / 2);
   if (METHOD(condition, 2)) result &= (rsi_stats[period][0] < 50 + RSI_SignalLevel + RSI_SignalLevel / 3 && rsi_stats[period][0] > 50 - RSI_SignalLevel - RSI_SignalLevel / 3);
@@ -5686,10 +5688,10 @@ bool RSI_IncreasePeriod(ENUM_TIMEFRAMES tf = PERIOD_M1, int condition = 0) {
 }
 
 // FIXME: Doesn't improve anything.
-bool RSI_DecreasePeriod(ENUM_TIMEFRAMES tf = PERIOD_M1, int condition = 0) {
+bool RSI_DecreasePeriod(Chart *_chart, int condition = 0) {
   bool result = condition > 0;
-  UpdateIndicator(INDI_RSI, tf);
-  uint period = Chart::TfToIndex(tf);
+  UpdateIndicator(_chart, INDI_RSI);
+  uint period = _chart.TfToIndex();
   if (METHOD(condition, 0)) result &= (rsi_stats[period][LINE_UPPER] <= 50 + RSI_SignalLevel && rsi_stats[period][LINE_LOWER] >= 50 - RSI_SignalLevel);
   if (METHOD(condition, 1)) result &= (rsi_stats[period][LINE_UPPER] <= 50 + RSI_SignalLevel || rsi_stats[period][LINE_LOWER] >= 50 - RSI_SignalLevel);
   // if (METHOD(condition, 0)) result &= (rsi_stats[period][0] > 50 + RSI_SignalLevel / 3 || rsi_stats[period][0] < 50 - RSI_SignalLevel / 3);
