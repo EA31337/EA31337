@@ -2119,7 +2119,7 @@ bool Trade_CCI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
       }
       break;
   }
-  result &= signal_method < 0 || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
     PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level);
   }
@@ -2706,7 +2706,7 @@ bool Trade_RSI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
       }
       break;
   }
-  result &= signal_method < 0 || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
     PrintFormat("%s: Signal: %s/%s/%d/%g", __FUNCTION_LINE__, EnumToString(cmd), _chart.TfToString(), signal_method, signal_level);
     PrintFormat("RSI %s: %s", _chart.TfToString(), Array::ArrToString2D(rsi, ",", Digits));
