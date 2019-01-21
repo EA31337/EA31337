@@ -998,7 +998,7 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       }
       // Calculate average value.
       rsi_stats[index][0] = (rsi_stats[index][0] > 0 ? (rsi_stats[index][0] + rsi[index][0] + rsi[index][1] + rsi[index][2]) / 4 : (rsi[index][0] + rsi[index][1] + rsi[index][2]) / 3);
-      if (VerboseDebug) PrintFormat("%s: RSI M%d: %s", DateTime::TimeToStr(_chart.GetBarTime()), tf, Array::ArrToString2D(rsi, ",", Digits));
+      if (VerboseDebug) PrintFormat("%s: RSI %s: %s", DateTime::TimeToStr(_chart.GetBarTime()), _chart.TfToString(), Array::ArrToString2D(rsi, ",", Digits));
       success = (bool) rsi[index][CURR] + rsi[index][PREV] + rsi[index][FAR];
       break;
     case INDI_RVI: // Calculates the Relative Strength Index indicator.
@@ -2674,7 +2674,10 @@ bool Trade_RSI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
   if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(INDI_RSI, _chart.GetTf(), 20);
   switch (cmd) {
     case ORDER_TYPE_BUY:
-      result = rsi[period][CURR] < (50 - signal_level);
+      result = rsi[period][CURR] > 0 && rsi[period][CURR] < (50 - signal_level);
+      if (result && VerboseTrace) {
+        PrintFormat("RSI %s: %g vs %g", _chart.TfToString(), rsi[period][CURR], 50 - signal_level);
+      }
       if (signal_method != 0) {
         if (METHOD(signal_method, 0)) result &= rsi[period][CURR] < rsi[period][PREV];
         if (METHOD(signal_method, 1)) result &= rsi[period][PREV] < rsi[period][FAR];
@@ -2687,7 +2690,10 @@ bool Trade_RSI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
       }
       break;
     case ORDER_TYPE_SELL:
-      result = rsi[period][CURR] > (50 + signal_level);
+      result = rsi[period][CURR] > 0 && rsi[period][CURR] > (50 + signal_level);
+      if (result && VerboseTrace) {
+        PrintFormat("RSI %s: %g vs %g", _chart.TfToString(), rsi[period][CURR], 50 - signal_level);
+      }
       if (signal_method != 0) {
         if (METHOD(signal_method, 0)) result &= rsi[period][CURR] > rsi[period][PREV];
         if (METHOD(signal_method, 1)) result &= rsi[period][PREV] > rsi[period][FAR];
@@ -2702,7 +2708,8 @@ bool Trade_RSI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
   }
   result &= signal_method < 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
-    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level);
+    PrintFormat("%s: Signal: %s/%s/%d/%g", __FUNCTION_LINE__, EnumToString(cmd), _chart.TfToString(), signal_method, signal_level);
+    PrintFormat("RSI %s: %s", _chart.TfToString(), Array::ArrToString2D(rsi, ",", Digits));
   }
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
