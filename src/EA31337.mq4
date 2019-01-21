@@ -256,10 +256,10 @@ void OnTick() {
   if (_tick_procesed) {
     if (!terminal.IsOptimization()) {
       terminal.Logger().Flush(false);
-      if (terminal.IsVisualMode() && PrintLogOnChart) DisplayInfoOnChart();
     }
   }
   UpdateTicks();
+  if (terminal.IsVisualMode() && PrintLogOnChart) DisplayInfoOnChart();
   #ifdef __profiler__ PROFILER_STOP #endif
 } // end: OnTick()
 
