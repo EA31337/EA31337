@@ -4080,7 +4080,7 @@ uint GetMaxOrdersPerDay() {
  * Calculate number of maximum of orders allowed to open.
  */
 uint GetMaxOrders(double volume_size) {
-  uint _result, _limit = account.AccountLimitOrders();
+  uint _result, _limit = account.GetLimitOrders();
   #ifdef __advanced__
     _result = MaxOrders > 0 ? (MaxOrdersPerDay > 0 ? fmin(MaxOrders, GetMaxOrdersPerDay()) : MaxOrders) : trade[Chart::TfToIndex(PERIOD_CURRENT)].CalcMaxOrders(volume_size, ea_risk_ratio, max_orders, GetMaxOrdersPerDay());
   #else
