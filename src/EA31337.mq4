@@ -1596,7 +1596,7 @@ bool Trade_AC(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, dou
         */
     break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
@@ -1650,7 +1650,7 @@ bool Trade_AD(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, dou
         */
     break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
@@ -1704,7 +1704,7 @@ bool Trade_ADX(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
         */
     break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
@@ -1779,7 +1779,7 @@ bool Trade_Alligator(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMP
       }
       break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
     PrintFormat("%s:%d: Signal: %d/%d/%d/%g; Trend: %g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level, curr_trend);
   }
@@ -1836,7 +1836,7 @@ bool Trade_ATR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
         */
     break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
@@ -1889,7 +1889,7 @@ bool Trade_Awesome(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY
         */
     break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
@@ -1947,7 +1947,7 @@ bool Trade_Bands(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
       }
       break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
     terminal.Logger().Trace(StringFormat("Signal: %s/%s/%d/%g", EnumToString(cmd), _chart.TfToString(), signal_method, signal_level), __FUNCTION_LINE__);
   }
@@ -1994,7 +1994,7 @@ bool Trade_BPower(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY,
         */
     break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
@@ -2037,7 +2037,7 @@ bool Trade_Breakage(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
         */
     break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
@@ -2081,7 +2081,7 @@ bool Trade_BWMFI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
         */
     break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
@@ -2125,7 +2125,7 @@ bool Trade_CCI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
       }
       break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
     PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level);
   }
@@ -2174,7 +2174,7 @@ bool Trade_DeMarker(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
       // PrintFormat("DeMarker sell: %g >= %g", demarker[period][CURR], 0.5 + signal_level);
       break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
     PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level);
   }
@@ -2227,7 +2227,7 @@ bool Trade_Envelopes(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMP
       }
       break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
     PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level);
   }
@@ -2266,7 +2266,7 @@ bool Trade_Force(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
     case ORDER_TYPE_SELL:
       break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
@@ -2310,7 +2310,7 @@ bool Trade_Fractals(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
       // if (METHOD(signal_method, 3)) result &= Fractals_On_Sell(M30);
       break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
     PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level);
   }
@@ -2349,7 +2349,7 @@ bool Trade_Gator(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
     case ORDER_TYPE_SELL:
       break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
@@ -2404,7 +2404,7 @@ bool Trade_Ichimoku(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
     case ORDER_TYPE_SELL:
       break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
@@ -2454,7 +2454,7 @@ bool Trade_MA(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, dou
       }
       break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
     PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level);
   }
@@ -2521,7 +2521,7 @@ bool Trade_MACD(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, d
       }
       break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
     PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level);
   }
@@ -2559,7 +2559,7 @@ bool Trade_MFI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
     case ORDER_TYPE_SELL:
       break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
@@ -2585,7 +2585,7 @@ bool Trade_Momentum(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
     case ORDER_TYPE_SELL:
       break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
@@ -2611,7 +2611,7 @@ bool Trade_OBV(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
     case ORDER_TYPE_SELL:
       break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
@@ -2658,7 +2658,7 @@ bool Trade_OSMA(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, d
     case ORDER_TYPE_SELL:
       break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
@@ -2712,7 +2712,7 @@ bool Trade_RSI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
       }
       break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
     PrintFormat("%s: Signal: %s/%s/%d/%g", __FUNCTION_LINE__, EnumToString(cmd), _chart.TfToString(), signal_method, signal_level);
     PrintFormat("RSI %s: %s", _chart.TfToString(), Array::ArrToString2D(rsi, ",", Digits));
@@ -2754,7 +2754,7 @@ bool Trade_RVI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
     case ORDER_TYPE_SELL:
       break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
@@ -2812,7 +2812,7 @@ bool Trade_SAR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
       }
       break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
     PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level);
   }
@@ -2868,7 +2868,7 @@ bool Trade_StdDev(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY,
         */
     break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
@@ -2937,7 +2937,7 @@ bool Trade_Stochastic(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EM
         */
     break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
@@ -2992,7 +2992,7 @@ bool Trade_WPR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
       }
       break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
+  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
     PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level);
   }
@@ -3039,7 +3039,6 @@ bool Trade_ZigZag(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY,
         */
     break;
   }
-  result &= signal_method <= 0 || _chart.TfToIndex() >= _chart.TfToIndex(TrendPeriod) || Convert::ValueToOp(curr_trend) == cmd;
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
