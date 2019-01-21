@@ -55,6 +55,7 @@
 #include "include\EA31337-classes\Order.mqh"
 #include "include\EA31337-classes\Orders.mqh"
 #include "include\EA31337-classes\Market.mqh"
+#include "include\EA31337-classes\Math.mqh"
 #include "include\EA31337-classes\MD5.mqh"
 #include "include\EA31337-classes\Misc.mqh"
 #include "include\EA31337-classes\Msg.mqh"
@@ -4226,9 +4227,10 @@ double GetAutoRiskRatio() {
   // Taken from your depo as a guarantee to maintain your current positions opened.
   // It stays the same until you open or close positions.
   double margin  = account.AccountMargin();
-  double new_ea_risk_ratio = 1 / fmin(equity, balance) * fmin(fmin(free, balance), equity);
+  double min_amount = fmin(equity, balance) * fmin(fmin(free, balance), equity);
+  double new_ea_risk_ratio = 1 / fmax(NEAR_ZERO, min_amount);
   // --
-  int margin_pc = (int) (100 / equity * margin);
+  int margin_pc = (int) (100 / fmax(NEAR_ZERO, equity * margin));
   rr_text = new_ea_risk_ratio < 1.0 ? StringFormat("-MarginUsed=%d%%|", margin_pc) : ""; string s = "|";
   // ea_margin_risk_level
   // @todo: Add account.GetRiskMarginLevel(), GetTrend(), ConWin/ConLoss, violity level.
