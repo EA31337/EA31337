@@ -290,6 +290,12 @@ void ProcessBar(Trade *_trade) {
     last_bar_time = trade.GetBarTime(PERIOD_M1);
   }
   */
+  if (!Object::IsValid(_trade)) {
+    PrintFormat("%s: Error: Trade object not valid!", __FUNCTION_LINE__);
+  }
+  else if (!Object::IsValid(_trade.Chart())) {
+    PrintFormat("%s: Error: Chart object not valid!", __FUNCTION_LINE__);
+  }
 
   if (hour_of_day != DateTime::Hour()) StartNewHour(_trade);
   UpdateVariables();
