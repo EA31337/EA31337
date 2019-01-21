@@ -2677,6 +2677,7 @@ bool Trade_RSI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
   UpdateIndicator(_chart, INDI_RSI);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_RSI, _chart.GetTf(), 0);
   if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(INDI_RSI, _chart.GetTf(), 20);
+  bool is_valid = fmin(fmin(rsi[period][CURR], rsi[period][PREV]), rsi[period][FAR]) > 0;
   switch (cmd) {
     case ORDER_TYPE_BUY:
       result = rsi[period][CURR] > 0 && rsi[period][CURR] < (50 - signal_level);
@@ -2684,6 +2685,7 @@ bool Trade_RSI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
         PrintFormat("RSI %s: %g vs %g", _chart.TfToString(), rsi[period][CURR], 50 - signal_level);
       }
       if (signal_method != 0) {
+        result &= is_valid;
         if (METHOD(signal_method, 0)) result &= rsi[period][CURR] < rsi[period][PREV];
         if (METHOD(signal_method, 1)) result &= rsi[period][PREV] < rsi[period][FAR];
         if (METHOD(signal_method, 2)) result &= rsi[period][PREV] < (50 - signal_level);
@@ -2700,6 +2702,7 @@ bool Trade_RSI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
         PrintFormat("RSI %s: %g vs %g", _chart.TfToString(), rsi[period][CURR], 50 - signal_level);
       }
       if (signal_method != 0) {
+        result &= is_valid;
         if (METHOD(signal_method, 0)) result &= rsi[period][CURR] > rsi[period][PREV];
         if (METHOD(signal_method, 1)) result &= rsi[period][PREV] > rsi[period][FAR];
         if (METHOD(signal_method, 2)) result &= rsi[period][PREV] > (50 + signal_level);
