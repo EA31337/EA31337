@@ -313,9 +313,9 @@ void ProcessBar(Trade *_trade) {
 void UpdateTicks() {
   if (!terminal.IsOptimization()) {
     // Update stats.
-    total_stats.OnTick();
-    hourly_stats.OnTick();
     if (RecordTicksToCSV) {
+      total_stats.OnTick();
+      hourly_stats.OnTick();
       ticker.Add(market.GetLastTick());
     }
   }
@@ -1915,7 +1915,7 @@ bool Trade_Bands(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
     case ORDER_TYPE_BUY:
       // Price value was lower than the lower band.
       result = (
-          lowest < fmax(fmax(bands[period][CURR][BAND_LOWER], bands[period][PREV][BAND_LOWER]), bands[period][FAR][BAND_LOWER])
+          lowest > 0 && lowest < fmax(fmax(bands[period][CURR][BAND_LOWER], bands[period][PREV][BAND_LOWER]), bands[period][FAR][BAND_LOWER])
           );
       // Buy: price crossed lower line upwards (returned to it from below).
       if (signal_method != 0) {
@@ -1932,7 +1932,7 @@ bool Trade_Bands(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
     case ORDER_TYPE_SELL:
       // Price value was higher than the upper band.
       result = (
-          highest > fmin(fmin(bands[period][CURR][BAND_UPPER], bands[period][PREV][BAND_UPPER]), bands[period][FAR][BAND_UPPER])
+          lowest > 0 && highest > fmin(fmin(bands[period][CURR][BAND_UPPER], bands[period][PREV][BAND_UPPER]), bands[period][FAR][BAND_UPPER])
           );
       // Sell: price crossed upper line downwards (returned to it from above).
       if (signal_method != 0) {
@@ -2103,7 +2103,7 @@ bool Trade_CCI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
   if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(INDI_CCI, _chart.GetTf(), 100);
   switch (cmd) {
     case ORDER_TYPE_BUY:
-      result = cci[period][CURR] < -signal_level;
+      result = cci[period][CURR] > 0 && cci[period][CURR] < -signal_level;
       if (signal_method != 0) {
         if (METHOD(signal_method, 0)) result &= cci[period][CURR] > cci[period][PREV];
         if (METHOD(signal_method, 1)) result &= cci[period][PREV] > cci[period][FAR];
@@ -2114,7 +2114,7 @@ bool Trade_CCI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
       }
       break;
     case ORDER_TYPE_SELL:
-      result = cci[period][CURR] > signal_level;
+      result = cci[period][CURR] > 0 && cci[period][CURR] > signal_level;
       if (signal_method != 0) {
         if (METHOD(signal_method, 0)) result &= cci[period][CURR] < cci[period][PREV];
         if (METHOD(signal_method, 1)) result &= cci[period][PREV] < cci[period][FAR];
@@ -2131,7 +2131,6 @@ bool Trade_CCI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
   }
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
-
 }
 
 /**
@@ -6878,11 +6877,13 @@ void ReportAdd(string msg) {
 string GetStatReport(string sep = "\n") {
   string output = "";
   output += StringFormat("Modelling quality:                          %.2f%%", Chart::CalcModellingQuality()) + sep;
-  output += StringFormat("Total bars processed:                       %d", total_stats.GetTotalBars()) + sep;
-  output += StringFormat("Total ticks processed:                      %d", ticker.GetTotalProcessed()) + sep;
-  output += StringFormat("Total ticks ignored:                        %d", ticker.GetTotalIgnored()) + sep;
-  output += StringFormat("Bars per hour (avg):                        %d", total_stats.GetBarsPerPeriod(PERIOD_H1)) + sep;
-  output += StringFormat("Ticks per bar (avg):                        %d (bar=%dmins)", total_stats.GetTicksPerBar(), Period()) + sep;
+  if (RecordTicksToCSV) {
+    output += StringFormat("Total bars processed:                       %d", total_stats.GetTotalBars()) + sep;
+    output += StringFormat("Total ticks processed:                      %d", ticker.GetTotalProcessed()) + sep;
+    output += StringFormat("Total ticks ignored:                        %d", ticker.GetTotalIgnored()) + sep;
+    output += StringFormat("Bars per hour (avg):                        %d", total_stats.GetBarsPerPeriod(PERIOD_H1)) + sep;
+    output += StringFormat("Ticks per bar (avg):                        %d (bar=%dmins)", total_stats.GetTicksPerBar(), Period()) + sep;
+  }
   //output += StringFormat("Ticks per min (avg):                        %d", total_stats.GetTicksPerMin()) + sep; / @todo
 
   return output;
