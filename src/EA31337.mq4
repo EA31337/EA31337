@@ -837,7 +837,6 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       ratio = tf == PERIOD_M30 ? 1.0 : pow(Bands_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf)));
       ratio2 = tf == PERIOD_M30 ? 1.0 : pow(Bands_Deviation_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf)));
       //PrintFormat("tf: %s, ratio1/ratio2: %g/%g; %g/%g; fabs(%d - %d)", _chart.TfToString(), ratio, ratio2, Bands_Period * ratio, Bands_Deviation * ratio2, _chart.TfToIndex(PERIOD_M30), _chart.TfToIndex(tf));
-      //ExpertRemove();
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         shift = i + Bands_Shift + (i == FINAL_ENUM_INDICATOR_INDEX - 1 ? Bands_Shift_Far : 0);
         bands[index][i][BAND_BASE]  = iBands(symbol, tf, (int) (Bands_Period * ratio), Bands_Deviation * ratio2, 0, Bands_Applied_Price, BAND_BASE,  shift);
@@ -1303,8 +1302,8 @@ bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, int sid = EMPTY, double volume = EM
     result = false;
   } else if (RiskMarginTotal >= 0 && ea_margin_risk_level[Convert::OrderTypeBuyOrSell(cmd)] > GetRiskMarginInTotal() / 100) {
     last_msg = Msg::ShowText(
-      StringFormat("Maximum margin risk for %s orders has reached the limit [RiskMarginTotal].",
-      Order::OrderTypeToString(cmd, true)),
+      StringFormat("Maximum margin risk for %s orders has reached the limit [%.2f>%.2f/100][RiskMarginTotal].",
+      Order::OrderTypeToString(cmd, true), ea_margin_risk_level[Convert::OrderTypeBuyOrSell(cmd)], GetRiskMarginInTotal()),
       "Info", __FUNCTION__, __LINE__, VerboseInfo
     );
     result = false;
@@ -4080,7 +4079,8 @@ uint GetMaxOrdersPerDay() {
  * Calculate number of maximum of orders allowed to open.
  */
 uint GetMaxOrders(double volume_size) {
-  uint _result, _limit = account.GetLimitOrders();
+  uint _result = 0;
+  static uint _limit = account.GetLimitOrders();
   #ifdef __advanced__
     _result = MaxOrders > 0 ? (MaxOrdersPerDay > 0 ? fmin(MaxOrders, GetMaxOrdersPerDay()) : MaxOrders) : trade[Chart::TfToIndex(PERIOD_CURRENT)].CalcMaxOrders(volume_size, ea_risk_ratio, max_orders, GetMaxOrdersPerDay());
   #else
@@ -4227,8 +4227,7 @@ double GetAutoRiskRatio() {
   // Taken from your depo as a guarantee to maintain your current positions opened.
   // It stays the same until you open or close positions.
   double margin  = account.AccountMargin();
-  double min_amount = fmin(equity, balance) * fmin(fmin(free, balance), equity);
-  double new_ea_risk_ratio = 1 / fmax(NEAR_ZERO, min_amount);
+  double new_ea_risk_ratio = 1 / fmax(NEAR_ZERO, fmin(equity, balance)) * fmin(fmin(free, balance), equity);
   // --
   int margin_pc = (int) (100 / fmax(NEAR_ZERO, equity * margin));
   rr_text = new_ea_risk_ratio < 1.0 ? StringFormat("-MarginUsed=%d%%|", margin_pc) : ""; string s = "|";
