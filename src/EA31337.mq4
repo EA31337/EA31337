@@ -5065,15 +5065,16 @@ bool InitClasses() {
  */
 bool InitStrategy(int key, string name, bool active, ENUM_INDICATOR_TYPE indicator, ENUM_TIMEFRAMES _tf, int signal_method = 0, double signal_level = 0.0, int open_cond1 = 0, int open_cond2 = 0, int close_cond = 0, double max_spread = 0.0) {
   if (active) {
+    uint _tfi = Chart::TfToIndex(_tf);
     // Validate whether the timeframe is working.
-    if (!Object::IsValid(trade[Chart::TfToIndex(_tf)]) || !trade[Chart::TfToIndex(_tf)].Chart().IsValidTf(_tf)) {
+    if (!Object::IsValid(trade[_tfi]) || !trade[_tfi].Chart().IsValidTf(_tf)) {
       Msg::ShowText(
         StringFormat("Cannot initialize %s strategy, because its timeframe (%d) is not active!%s", name, _tf, ValidateSettings ? " Disabling..." : ""),
         "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
       active = false;
     }
     // Validate whether indicator of the strategy is working.
-    if (!UpdateIndicator(trade[Chart::TfToIndex(_tf)].Chart(), indicator)) {
+    else if (!UpdateIndicator(trade[_tfi].Chart(), indicator)) {
       Msg::ShowText(
         StringFormat("Cannot initialize indicator for the %s strategy!%s", name, ValidateSettings ? " Disabling..." : ""),
         "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
