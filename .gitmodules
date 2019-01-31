@@ -16,3 +16,6 @@
 [submodule "wiki"]
 	path = docs
 	url = https://github.com/EA31337/EA31337.wiki.git
+[submodule "rules"]
+	path = docker/optimization/_rules
+	url = https://github.com/EA31337/EA31337-optimization-rules.git

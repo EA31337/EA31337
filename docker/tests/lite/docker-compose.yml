@@ -1,10 +1,12 @@
 version: '3'
 services:
-  backtest_2018:
+  backtest_2018_01:
     command: run_backtest -v
     volumes:
-    - ../../src:/opt/src
-#   - ./results:/opt/results:rw
+    - ../../../src:/opt/src
+    - ./results:/opt/results:rw
     tty: true
     image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
+    environment:
+      BT_MONTHS: 1
