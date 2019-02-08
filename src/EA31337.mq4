@@ -5036,9 +5036,13 @@ bool InitStrategies() {
 bool InitClasses() {
   Chart *_chart;
   #ifdef __profiler__ PROFILER_START #endif
+
+  // Initialize main classes.
   account = new Account();
   logger = new Log(V_DEBUG);
   market = new Market(_Symbol, logger);
+
+  // Initialize trade classes per each available chart.
   for (ENUM_TIMEFRAMES_INDEX tfi = 0; tfi < FINAL_ENUM_TIMEFRAMES_INDEX; tfi++) {
     _chart = new Chart(tfi);
     if (_chart.IsValidTf()) {
@@ -5052,6 +5056,16 @@ bool InitClasses() {
       trade[tfi] = NULL;
     }
   }
+
+  // Verify that the current chart has been initialized correctly.
+  uint _tfi = Chart::TfToIndex(PERIOD_CURRENT);
+  if (!Object::IsDynamic(trade[_tfi]) || !trade[_tfi].Chart().IsValidTf()) {
+    Msg::ShowText(
+      StringFormat("Cannot initialize the current timeframe (%s)!", Chart::IndexToString(_tfi)),
+      "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
+    return false;
+  }
+
   ticker = new Ticker(market);
   summary_report = new SummaryReport();
   terminal = market.TerminalHandler();
