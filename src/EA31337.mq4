@@ -291,10 +291,10 @@ void ProcessBar(Trade *_trade) {
     last_bar_time = trade.GetBarTime(PERIOD_M1);
   }
   */
-  if (!Object::IsValid(_trade)) {
+  if (!Object::IsDynamic(_trade)) {
     PrintFormat("%s: Error: Trade object not valid!", __FUNCTION_LINE__);
   }
-  else if (!Object::IsValid(_trade.Chart())) {
+  else if (!Object::IsDynamic(_trade.Chart())) {
     PrintFormat("%s: Error: Chart object not valid!", __FUNCTION_LINE__);
   }
 
@@ -581,7 +581,7 @@ string InitInfo(bool startup = false, string sep = "\n") {
   output += "SYMBOL: " + ((SymbolInfo *)market).ToString() + sep;
   output += "MARKET: " + market.ToString() + sep;
   for (int tfi = 0; tfi < FINAL_ENUM_TIMEFRAMES_INDEX; tfi++) {
-    if (Object::IsValid(trade[tfi].Chart()) && trade[tfi].Chart().IsValidTf()) {
+    if (Object::IsDynamic(trade[tfi].Chart()) && trade[tfi].Chart().IsValidTf()) {
       output += StringFormat("CHART: %s%s", trade[tfi].Chart().ToString(), sep);
     }
     else {
@@ -682,7 +682,7 @@ bool EA_Trade(Trade *_trade) {
         if (_cmd == ORDER_TYPE_BUY  && !CheckMarketCondition1(_trade.Chart(), ORDER_TYPE_BUY,  info[id][OPEN_CONDITION1])) _cmd = EMPTY;
         if (_cmd == ORDER_TYPE_SELL && !CheckMarketCondition1(_trade.Chart(), ORDER_TYPE_SELL, info[id][OPEN_CONDITION1])) _cmd = EMPTY;
       }
-      if (Object::IsValid(trade[M30]) && info[id][OPEN_CONDITION2] != 0) {
+      if (Object::IsDynamic(trade[M30]) && info[id][OPEN_CONDITION2] != 0) {
         if (_cmd == ORDER_TYPE_BUY  && CheckMarketCondition1(trade[M30].Chart(), ORDER_TYPE_SELL, info[id][OPEN_CONDITION2], false)) _cmd = EMPTY;
         if (_cmd == ORDER_TYPE_SELL && CheckMarketCondition1(trade[M30].Chart(), ORDER_TYPE_BUY,  info[id][OPEN_CONDITION2], false)) _cmd = EMPTY;
       }
@@ -5080,7 +5080,7 @@ bool InitStrategy(int key, string name, bool active, ENUM_INDICATOR_TYPE indicat
   if (active) {
     uint _tfi = Chart::TfToIndex(_tf);
     // Validate whether the timeframe is working.
-    if (!Object::IsValid(trade[_tfi]) || !trade[_tfi].Chart().IsValidTf(_tf)) {
+    if (!Object::IsDynamic(trade[_tfi]) || !trade[_tfi].Chart().IsValidTf(_tf)) {
       Msg::ShowText(
         StringFormat("Cannot initialize %s strategy, because its timeframe (%d) is not active!%s", name, _tf, ValidateSettings ? " Disabling..." : ""),
         "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
