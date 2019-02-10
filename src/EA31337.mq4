@@ -107,7 +107,7 @@ extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v"
 
 // Class variables.
 Account *account;
-//Chart *chart[FINAL_ENUM_TIMEFRAMES_INDEX];
+Chart *chart;
 Log *logger;
 Market *market;
 Stats *total_stats, *hourly_stats;
@@ -5059,7 +5059,11 @@ bool InitClasses() {
 
   // Verify that the current chart has been initialized correctly.
   uint _tfi = Chart::TfToIndex(PERIOD_CURRENT);
-  if (!Object::IsDynamic(trade[_tfi]) || !trade[_tfi].Chart().IsValidTf()) {
+  if (Object::IsDynamic(trade[_tfi]) && trade[_tfi].Chart().IsValidTf()) {
+    // Assign to the current chart.
+    chart = trade[_tfi].Chart();
+  }
+  else {
     Msg::ShowText(
       StringFormat("Cannot initialize the current timeframe (%s)!", Chart::IndexToString(_tfi)),
       "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
