@@ -92,8 +92,6 @@ extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v"
 
 /*
  * Predefined constants:
- *   Ask (for buying)  - The latest known seller's price (ask price) of the current symbol.
- *   Bid (for selling) - The latest known buyer's price (offer price, bid price) of the current symbol.
  *   Point - The current symbol point value in the quote currency.
  *   Digits - Number of digits after decimal point for the current symbol prices.
  *   Bars - Number of bars in the current chart.
@@ -399,17 +397,8 @@ int OnInit() {
   #endif
 
   if (!Terminal::IsRealtime()) {
-    SendEmailEachOrder = false;
-    SoundAlert = false;
-    if (!Terminal::IsVisualMode()) PrintLogOnChart = false;
     // When testing, we need to simulate real MODE_STOPLEVEL = 30 (as it's in real account), in demo it's 0.
     // if (market_stoplevel == 0) market_stoplevel = DemoMarketStopLevel;
-    if (Terminal::IsOptimization()) {
-      VerboseErrors = false;
-      VerboseInfo   = false;
-      VerboseDebug  = false;
-      VerboseTrace  = false;
-    }
   }
 
   if (session_initiated) {
@@ -545,7 +534,9 @@ void OnTesterInit() {
   //if (VerboseDebug)
   Print("Calling ", __FUNCTION__, ".");
   #ifdef __MQL5__
-    ParameterSetRange(LotSize, 0, 0.0, 0.01, 0.01, 0.1);
+    // Specifies the use of input variable when optimizing: value, change step, initial and final values.
+    // @see: https://www.mql5.com/en/docs/optimization_frames/parametersetrange
+    //ParameterSetRange(LotSize, 0, 0.0, 0.01, 0.01, 0.1);
   #endif
 }
 
@@ -635,7 +626,7 @@ string InitInfo(bool startup = false, string sep = "\n") {
       hour_of_day, day_of_week, day_of_month, day_of_year, month, year, sep);
   output += GetAccountTextDetails() + sep;
   if (startup) {
-    if (session_initiated && IsTradeAllowed()) {
+    if (session_initiated && terminal.IsTradeAllowed()) {
       if (TradeAllowed()) {
         output += sep + "Trading is allowed, waiting for ticks...";
       } else {
@@ -1175,7 +1166,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
       stats[sid][AVG_SPREAD] = (stats[sid][AVG_SPREAD] + curr_spread) / 2;
       if (VerboseInfo) OrderPrint();
       Msg::ShowText(StringFormat("%s: %s", Order::OrderTypeToString(Order::OrderType()), GetAccountTextDetails()), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
-      if (SoundAlert) PlaySound(SoundFileAtOpen);
+      if (SoundAlert && Terminal::IsRealtime()) PlaySound(SoundFileAtOpen);
       if (SendEmailEachOrder) SendEmailExecuteOrder();
 
       if (SmartQueueActive && total_orders >= max_orders) OrderQueueClear(); // Clear queue if we're reached the limit again, so we can start fresh.
@@ -1226,7 +1217,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
      }
      if (err_code == ERR_TRADE_TOO_MANY_ORDERS) {
        // On some trade servers, the total amount of open and pending orders can be limited. If this limit has been exceeded, no new order will be opened.
-       MaxOrders = total_orders; // So we're setting new fixed limit for total orders which is allowed.
+       //MaxOrders = total_orders; // So we're setting new fixed limit for total orders which is allowed. // @fixme
        Msg::ShowText(StringFormat("Total orders: %d, Max orders: %d, Broker Limit: %d", OrdersTotal(), total_orders, AccountInfoInteger(ACCOUNT_LIMIT_ORDERS)), "Error", __FUNCTION__, __LINE__, VerboseErrors);
        retry = false;
      }
@@ -1463,13 +1454,13 @@ double OrderCalc(int ticket_no = 0) {
   stats[id][TOTAL_NET_PROFIT] += profit;
   stats[id][TOTAL_PIP_PROFIT] += Convert::ValueToPips(Convert::MoneyToValue(profit, Order::OrderLots(), Order::OrderSymbol()), Order::OrderSymbol());
 
-  if (DateTime::TimeDayOfYear(close_time) == DayOfYear()) {
+  if (DateTime::TimeDayOfYear(close_time) == DateTime::DayOfYear()) {
     stats[id][DAILY_PROFIT] += profit;
   }
-  if (DateTime::TimeDayOfWeek(close_time) <= DayOfWeek()) {
+  if (DateTime::TimeDayOfWeek(close_time) <= DateTime::DayOfWeek()) {
     stats[id][WEEKLY_PROFIT] += profit;
   }
-  if (DateTime::TimeDay(close_time) <= Day()) {
+  if (DateTime::TimeDay(close_time) <= DateTime::Day()) {
     stats[id][MONTHLY_PROFIT] += profit;
   }
   //TicketRemove(ticket_no);
@@ -1558,7 +1549,7 @@ bool UpdateStats() {
  */
 bool Trade_AC(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE;
+  bool result = false;
   uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_AC);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_AC, _chart.GetTf(), 0);
@@ -1612,7 +1603,7 @@ bool Trade_AC(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, dou
  */
 bool Trade_AD(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_AD);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_AD, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_AD, _chart.GetTf(), 0.0);
@@ -1666,7 +1657,7 @@ bool Trade_AD(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, dou
  */
 bool Trade_ADX(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_ADX);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ADX, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_ADX, _chart.GetTf(), 0.0);
@@ -1798,7 +1789,7 @@ bool Trade_Alligator(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMP
  */
 bool Trade_ATR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_ATR);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ATR, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_ATR, _chart.GetTf(), 0.0);
@@ -1852,7 +1843,7 @@ bool Trade_ATR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  */
 bool Trade_Awesome(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_AO);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_AO, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_AO, _chart.GetTf(), 0.0);
@@ -1905,7 +1896,7 @@ bool Trade_Awesome(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY
  */
 bool Trade_Bands(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_BANDS);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_BANDS, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_BANDS, _chart.GetTf(), 0);
@@ -1966,7 +1957,7 @@ bool Trade_Bands(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
  */
 bool Trade_BPower(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_BEARS);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_BEARS, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_BEARS, _chart.GetTf(), 0.0);
@@ -2010,7 +2001,7 @@ bool Trade_BPower(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY,
  */
 bool Trade_Breakage(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   // if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(BWMFI, tf, 0);
   // if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(BWMFI, tf, 0.0);
   switch (cmd) {
@@ -2053,7 +2044,7 @@ bool Trade_Breakage(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
  */
 bool Trade_BWMFI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_BWMFI);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_BWMFI, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_BWMFI, _chart.GetTf(), 0.0);
@@ -2145,7 +2136,7 @@ bool Trade_CCI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  */
 bool Trade_DeMarker(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_DEMARKER);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_DEMARKER, _chart.GetTf(), 0);
   if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(INDI_DEMARKER, _chart.GetTf(), 0.0);
@@ -2192,7 +2183,7 @@ bool Trade_DeMarker(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
  */
 bool Trade_Envelopes(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_ENVELOPES);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ENVELOPES, _chart.GetTf(), 0);
   if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(INDI_ENVELOPES, _chart.GetTf(), 0.0);
@@ -2206,9 +2197,9 @@ bool Trade_Envelopes(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMP
         if (METHOD(signal_method, 2)) result &= envelopes[period][CURR][LINE_LOWER] < envelopes[period][PREV][LINE_LOWER];
         if (METHOD(signal_method, 3)) result &= envelopes[period][CURR][LINE_UPPER] < envelopes[period][PREV][LINE_UPPER];
         if (METHOD(signal_method, 4)) result &= envelopes[period][CURR][LINE_UPPER] - envelopes[period][CURR][LINE_LOWER] > envelopes[period][PREV][LINE_UPPER] - envelopes[period][PREV][LINE_LOWER];
-        if (METHOD(signal_method, 5)) result &= Ask < envelopes[period][CURR][MODE_MAIN];
+        if (METHOD(signal_method, 5)) result &= _chart.GetAsk() < envelopes[period][CURR][MODE_MAIN];
         if (METHOD(signal_method, 6)) result &= Close[CURR] < envelopes[period][CURR][LINE_UPPER];
-        //if (METHOD(signal_method, 7)) result &= Ask > Close[PREV];
+        //if (METHOD(signal_method, 7)) result &= _chart.GetAsk() > Close[PREV];
       }
       break;
     case ORDER_TYPE_SELL:
@@ -2220,9 +2211,9 @@ bool Trade_Envelopes(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMP
         if (METHOD(signal_method, 2)) result &= envelopes[period][CURR][LINE_LOWER] > envelopes[period][PREV][LINE_LOWER];
         if (METHOD(signal_method, 3)) result &= envelopes[period][CURR][LINE_UPPER] > envelopes[period][PREV][LINE_UPPER];
         if (METHOD(signal_method, 4)) result &= envelopes[period][CURR][LINE_UPPER] - envelopes[period][CURR][LINE_LOWER] > envelopes[period][PREV][LINE_UPPER] - envelopes[period][PREV][LINE_LOWER];
-        if (METHOD(signal_method, 5)) result &= Ask > envelopes[period][CURR][MODE_MAIN];
+        if (METHOD(signal_method, 5)) result &= _chart.GetAsk() > envelopes[period][CURR][MODE_MAIN];
         if (METHOD(signal_method, 6)) result &= Close[CURR] > envelopes[period][CURR][LINE_UPPER];
-        //if (METHOD(signal_method, 7)) result &= Ask < Close[PREV];
+        //if (METHOD(signal_method, 7)) result &= _chart.GetAsk() < Close[PREV];
       }
       break;
   }
@@ -2245,7 +2236,7 @@ bool Trade_Envelopes(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMP
  */
 bool Trade_Force(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_FORCE);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_FORCE, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_FORCE, _chart.GetTf(), 0.0);
@@ -2281,7 +2272,7 @@ bool Trade_Force(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
  */
 bool Trade_Fractals(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint index = _chart.TfToIndex();
+  bool result = false; uint index = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_FRACTALS);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_FRACTALS, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_FRACTALS, _chart.GetTf(), 0.0);
@@ -2291,7 +2282,7 @@ bool Trade_Fractals(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
     case ORDER_TYPE_BUY:
       result = lower;
       if (METHOD(signal_method, 0)) result &= Open[CURR] > Close[PREV];
-      if (METHOD(signal_method, 1)) result &= Bid > Open[CURR];
+      if (METHOD(signal_method, 1)) result &= _chart.GetBid() > Open[CURR];
       // if (METHOD(signal_method, 0)) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), PERIOD_M30);
       // if (METHOD(signal_method, 1)) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), Convert::IndexToTf(fmax(index + 1, M30)));
       // if (METHOD(signal_method, 2)) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), Convert::IndexToTf(fmax(index + 2, M30)));
@@ -2301,7 +2292,7 @@ bool Trade_Fractals(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
     case ORDER_TYPE_SELL:
       result = upper;
       if (METHOD(signal_method, 0)) result &= Open[CURR] < Close[PREV];
-      if (METHOD(signal_method, 1)) result &= Ask < Open[CURR];
+      if (METHOD(signal_method, 1)) result &= _chart.GetAsk() < Open[CURR];
       // if (METHOD(signal_method, 0)) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), PERIOD_M30);
       // if (METHOD(signal_method, 1)) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), Convert::IndexToTf(fmax(index + 1, M30)));
       // if (METHOD(signal_method, 2)) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), Convert::IndexToTf(fmax(index + 2, M30)));
@@ -2328,7 +2319,7 @@ bool Trade_Fractals(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
  */
 bool Trade_Gator(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_GATOR);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_GATOR, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_GATOR, _chart.GetTf(), 0.0);
@@ -2364,7 +2355,7 @@ bool Trade_Gator(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
  */
 bool Trade_Ichimoku(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_ICHIMOKU);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ICHIMOKU, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_ICHIMOKU, _chart.GetTf(), 0.0);
@@ -2419,7 +2410,7 @@ bool Trade_Ichimoku(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
  */
 bool Trade_MA(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_MA);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MA, _chart.GetTf(), 0);
   if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(INDI_MA, _chart.GetTf(), 0);
@@ -2472,7 +2463,7 @@ bool Trade_MA(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, dou
  */
 bool Trade_MACD(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_MA);
   UpdateIndicator(_chart, INDI_MACD);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MACD, _chart.GetTf(), 0);
@@ -2539,7 +2530,7 @@ bool Trade_MACD(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, d
  */
 bool Trade_MFI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_MFI);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MFI, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_MFI, _chart.GetTf(), 0.0);
@@ -2574,7 +2565,7 @@ bool Trade_MFI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  */
 bool Trade_Momentum(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_MOMENTUM);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MOMENTUM, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_MOMENTUM, _chart.GetTf(), 0.0);
@@ -2600,7 +2591,7 @@ bool Trade_Momentum(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
  */
 bool Trade_OBV(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_OBV);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_OBV, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_OBV, _chart.GetTf(), 0.0);
@@ -2626,7 +2617,7 @@ bool Trade_OBV(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  */
 bool Trade_OSMA(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_OSMA);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_OSMA, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_OSMA, _chart.GetTf(), 0.0);
@@ -2734,7 +2725,7 @@ bool Trade_RSI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  */
 bool Trade_RVI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_RVI);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_RVI, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_RVI, _chart.GetTf(), 20);
@@ -2773,7 +2764,7 @@ bool Trade_RVI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  */
 bool Trade_SAR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_SAR);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_SAR, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_SAR, _chart.GetTf(), 0);
@@ -2782,10 +2773,10 @@ bool Trade_SAR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
     case ORDER_TYPE_BUY:
       result = sar[period][CURR] + gap < Open[CURR] || sar[period][PREV] + gap < Open[PREV];
       if (signal_method != 0) {
-        if (METHOD(signal_method, 0)) result &= sar[period][PREV] - gap > Ask;
+        if (METHOD(signal_method, 0)) result &= sar[period][PREV] - gap > _chart.GetAsk();
         if (METHOD(signal_method, 1)) result &= sar[period][CURR] < sar[period][PREV];
         if (METHOD(signal_method, 2)) result &= sar[period][CURR] - sar[period][PREV] <= sar[period][PREV] - sar[period][FAR];
-        if (METHOD(signal_method, 3)) result &= sar[period][FAR] > Ask;
+        if (METHOD(signal_method, 3)) result &= sar[period][FAR] > _chart.GetAsk();
         if (METHOD(signal_method, 4)) result &= sar[period][CURR] <= Close[CURR];
         if (METHOD(signal_method, 5)) result &= sar[period][PREV] > Close[PREV];
         if (METHOD(signal_method, 6)) result &= sar[period][PREV] > Open[PREV];
@@ -2799,10 +2790,10 @@ bool Trade_SAR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
     case ORDER_TYPE_SELL:
       result = sar[period][CURR] - gap > Open[CURR] || sar[period][PREV] - gap > Open[PREV];
       if (signal_method != 0) {
-        if (METHOD(signal_method, 0)) result &= sar[period][PREV] + gap < Ask;
+        if (METHOD(signal_method, 0)) result &= sar[period][PREV] + gap < _chart.GetAsk();
         if (METHOD(signal_method, 1)) result &= sar[period][CURR] > sar[period][PREV];
         if (METHOD(signal_method, 2)) result &= sar[period][PREV] - sar[period][CURR] <= sar[period][FAR] - sar[period][PREV];
-        if (METHOD(signal_method, 3)) result &= sar[period][FAR] < Ask;
+        if (METHOD(signal_method, 3)) result &= sar[period][FAR] < _chart.GetAsk();
         if (METHOD(signal_method, 4)) result &= sar[period][CURR] >= Close[CURR];
         if (METHOD(signal_method, 5)) result &= sar[period][PREV] < Close[PREV];
         if (METHOD(signal_method, 6)) result &= sar[period][PREV] < Open[PREV];
@@ -2833,7 +2824,7 @@ bool Trade_SAR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  */
 bool Trade_StdDev(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_STDDEV);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_STDDEV, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_STDDEV, _chart.GetTf(), 0.0);
@@ -2886,7 +2877,7 @@ bool Trade_StdDev(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY,
  */
 bool Trade_Stochastic(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_STOCHASTIC);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_STOCHASTIC, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_STOCHASTIC, _chart.GetTf(), 0.0);
@@ -2955,7 +2946,7 @@ bool Trade_Stochastic(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EM
  */
 bool Trade_WPR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_WPR);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_WPR, _chart.GetTf(), 0);
   if (signal_level == EMPTY)  signal_level  = GetStrategySignalLevel(INDI_WPR, _chart.GetTf(), 0);
@@ -3013,7 +3004,7 @@ bool Trade_WPR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  */
 bool Trade_ZigZag(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = FALSE; uint period = _chart.TfToIndex();
+  bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_ZIGZAG);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ZIGZAG, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_ZIGZAG, _chart.GetTf(), 0.0);
@@ -3067,9 +3058,9 @@ bool CheckMarketCondition1(Chart *_chart, ENUM_ORDER_TYPE cmd, int condition = 0
   if (condition ==  1) result &= ((cmd == ORDER_TYPE_BUY && Open[CURR] > Close[PREV]) || (cmd == ORDER_TYPE_SELL && Open[CURR] < Close[PREV]));
   if (condition ==  2) result &= UpdateIndicator(_chart, INDI_SAR)       && ((cmd == ORDER_TYPE_BUY && sar[period][CURR] < Open[0]) || (cmd == ORDER_TYPE_SELL && sar[period][CURR] > Open[0]));
   if (condition ==  3) result &= UpdateIndicator(_chart, INDI_RSI)       && ((cmd == ORDER_TYPE_BUY && rsi[period][CURR] < 50) || (cmd == ORDER_TYPE_SELL && rsi[period][CURR] > 50));
-  if (condition ==  4) result &= UpdateIndicator(_chart, INDI_MA)        && ((cmd == ORDER_TYPE_BUY && Ask > ma_slow[period][CURR]) || (cmd == ORDER_TYPE_SELL && Ask < ma_slow[period][CURR]));
+  if (condition ==  4) result &= UpdateIndicator(_chart, INDI_MA)        && ((cmd == ORDER_TYPE_BUY && _chart.GetAsk() > ma_slow[period][CURR]) || (cmd == ORDER_TYPE_SELL && _chart.GetAsk() < ma_slow[period][CURR]));
   if (condition ==  5) result &= UpdateIndicator(_chart, INDI_MA)        && ((cmd == ORDER_TYPE_BUY && ma_slow[period][CURR] > ma_slow[period][PREV]) || (cmd == ORDER_TYPE_SELL && ma_slow[period][CURR] < ma_slow[period][PREV]));
-  if (condition ==  6) result &= ((cmd == ORDER_TYPE_BUY && Ask < Open[CURR]) || (cmd == ORDER_TYPE_SELL && Ask > Open[CURR]));
+  if (condition ==  6) result &= ((cmd == ORDER_TYPE_BUY && _chart.GetAsk() < Open[CURR]) || (cmd == ORDER_TYPE_SELL && _chart.GetAsk() > Open[CURR]));
   if (condition ==  7) result &= UpdateIndicator(_chart, INDI_BANDS)     && ((cmd == ORDER_TYPE_BUY && Open[CURR] < bands[period][CURR][BAND_BASE]) || (cmd == ORDER_TYPE_SELL && Open[CURR] > bands[period][CURR][BAND_BASE]));
   if (condition ==  8) result &= UpdateIndicator(_chart, INDI_ENVELOPES) && ((cmd == ORDER_TYPE_BUY && Open[CURR] < envelopes[period][CURR][MODE_MAIN]) || (cmd == ORDER_TYPE_SELL && Open[CURR] > envelopes[period][CURR][MODE_MAIN]));
   if (condition ==  9) result &= UpdateIndicator(_chart, INDI_DEMARKER)  && ((cmd == ORDER_TYPE_BUY && demarker[period][CURR] < 0.5) || (cmd == ORDER_TYPE_SELL && demarker[period][CURR] > 0.5));
@@ -3329,13 +3320,13 @@ bool UpdateTrailingStops(Trade *_trade) {
         // See: https://book.mql4.com/appendix/limits
         if (MinimalizeLosses) {
         // if (MinimalizeLosses && Order::GetOrderProfit() > GetMinStopLevel()) {
-          if ((OrderType() == ORDER_TYPE_BUY && OrderStopLoss() < Bid) ||
-             (OrderType() == ORDER_TYPE_SELL && OrderStopLoss() > Ask)) {
+          if ((OrderType() == ORDER_TYPE_BUY && OrderStopLoss() < market.GetBid()) ||
+             (OrderType() == ORDER_TYPE_SELL && OrderStopLoss() > market.GetAsk())) {
             result = OrderModify(OrderTicket(), OrderOpenPrice(), OrderOpenPrice() - OrderCommission() * Point, OrderTakeProfit(), 0, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell));
             if (!result && err_code > 1) {
              if (VerboseErrors) Print(__FUNCTION__, ": Error: OrderModify(): [MinimalizeLosses] ", Terminal::GetErrorText(err_code));
                if (VerboseDebug)
-                 Print(__FUNCTION__ + ": Error: OrderModify(", OrderTicket(), ", ", OrderOpenPrice(), ", ", OrderOpenPrice() - OrderCommission() * Point, ", ", OrderTakeProfit(), ", ", 0, ", ", Order::GetOrderColor(EMPTY, ColorBuy, ColorSell), "); ", "Ask/Bid: ", Ask, "/", Bid);
+                 Print(__FUNCTION__ + ": Error: OrderModify(", OrderTicket(), ", ", OrderOpenPrice(), ", ", OrderOpenPrice() - OrderCommission() * Point, ", ", OrderTakeProfit(), ", ", 0, ", ", Order::GetOrderColor(EMPTY, ColorBuy, ColorSell), "); ");
             } else {
               if (VerboseTrace) Print(__FUNCTION__ + ": MinimalizeLosses: ", Order::OrderTypeToString((ENUM_ORDER_TYPE) OrderType()));
             }
@@ -3391,7 +3382,7 @@ bool UpdateTrailingStops(Trade *_trade) {
               Msg::ShowText(Terminal::GetErrorText(err_code), "Error", __FUNCTION__, __LINE__, VerboseErrors);
               Msg::ShowText(
                 StringFormat("OrderModify(%d, %g, %g, %g, %d, %d); Ask:%g/Bid:%g; Gap:%g pips",
-                OrderTicket(), OrderOpenPrice(), new_sl, new_tp, 0, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell), Ask, Bid, market.GetTradeDistanceInPips()),
+                OrderTicket(), OrderOpenPrice(), new_sl, new_tp, 0, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell), market.GetAsk(), market.GetBid(), market.GetTradeDistanceInPips()),
                 "Debug", __FUNCTION__, __LINE__, VerboseDebug
               );
               Msg::ShowText(
@@ -3447,7 +3438,7 @@ double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_
   }
   int direction = Order::OrderDirection(cmd, mode);
   double trail = (TrailingStop + extra_trail) * pip_size;
-  double default_trail = (cmd == ORDER_TYPE_BUY ? Bid : Ask) + trail * direction;
+  double default_trail = (cmd == ORDER_TYPE_BUY ? _chart.GetBid() : _chart.GetAsk()) + trail * direction;
   int method = GetTrailingMethod(order_type, mode);
   one_way = method > 0;
 
@@ -3459,6 +3450,8 @@ double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_
   }
   // TODO: Make starting point dynamic: Open[CURR], Open[PREV], Open[FAR], Close[PREV], Close[FAR], ma_fast[CURR], ma_medium[CURR], ma_slow[CURR]
    double highest_ma, lowest_ma;
+   double ask = _chart.GetAsk();
+   double bid = _chart.GetBid();
    switch (method) {
      case T_NONE: // 0: None.
        new_value = _trade.CalcOrderSLTP(mode == ORDER_TP ? TakeProfitMax : StopLossMax, cmd, mode);
@@ -3522,20 +3515,20 @@ double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_
      case T1_MA_F_PREV: // 10: MA Small (Previous).
      case T2_MA_F_PREV:
        UpdateIndicator(_chart, INDI_MA);
-       diff = fabs(Ask - ma_fast[period][PREV]);
-       new_value = Ask + diff * direction;
+       diff = fabs(ask - ma_fast[period][PREV]);
+       new_value = ask + diff * direction;
        break;
      case T1_MA_F_FAR: // 11: MA Small (Far) + trailing stop. Optimize together with: MA_Shift_Far.
      case T2_MA_F_FAR:
        UpdateIndicator(_chart, INDI_MA);
-       diff = fabs(Ask - ma_fast[period][FAR]);
-       new_value = Ask + diff * direction;
+       diff = fabs(ask - ma_fast[period][FAR]);
+       new_value = ask + diff * direction;
        break;
      case T1_MA_F_TRAIL: // 12: MA Fast (Current) + trailing stop. Works fine.
      case T2_MA_F_TRAIL:
        UpdateIndicator(_chart, INDI_MA);
-       diff = fabs(Ask - ma_fast[period][CURR]);
-       new_value = Ask + (diff + trail) * direction;
+       diff = fabs(ask - ma_fast[period][CURR]);
+       new_value = ask + (diff + trail) * direction;
        break;
      case T1_MA_F_FAR_TRAIL: // 13: MA Fast (Far) + trailing stop. Works fine (SL pf: 1.26 for MA).
      case T2_MA_F_FAR_TRAIL:
@@ -3546,14 +3539,14 @@ double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_
      case T1_MA_M: // 14: MA Medium (Current).
      case T2_MA_M:
        UpdateIndicator(_chart, INDI_MA);
-       diff = fabs(Ask - ma_medium[period][CURR]);
-       new_value = Ask + diff * direction;
+       diff = fabs(ask - ma_medium[period][CURR]);
+       new_value = ask + diff * direction;
        break;
      case T1_MA_M_FAR: // 15: MA Medium (Far)
      case T2_MA_M_FAR:
        UpdateIndicator(_chart, INDI_MA);
-       diff = fabs(Ask - ma_medium[period][FAR]);
-       new_value = Ask + diff * direction;
+       diff = fabs(ask - ma_medium[period][FAR]);
+       new_value = ask + diff * direction;
        break;
      case T1_MA_M_LOW: // 16: Lowest/highest value of MA Medium. Optimized (SL pf: 1.39 for MA).
      case T2_MA_M_LOW:
@@ -3580,16 +3573,16 @@ double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_
      case T1_MA_S: // 19: MA Slow (Current).
      case T2_MA_S:
        UpdateIndicator(_chart, INDI_MA);
-       diff = fabs(Ask - ma_slow[period][CURR]);
+       diff = fabs(ask - ma_slow[period][CURR]);
        // new_value = ma_slow[period][CURR];
-       new_value = Ask + diff * direction;
+       new_value = ask + diff * direction;
        break;
      case T1_MA_S_FAR: // 20: MA Slow (Far).
      case T2_MA_S_FAR:
        UpdateIndicator(_chart, INDI_MA);
-       diff = fabs(Ask - ma_slow[period][FAR]);
+       diff = fabs(ask - ma_slow[period][FAR]);
        // new_value = ma_slow[period][FAR];
-       new_value = Ask + diff * direction;
+       new_value = ask + diff * direction;
        break;
      case T1_MA_S_TRAIL: // 21: MA Slow (Current) + trailing stop. Optimized (SL pf: 1.29 for MA, PT pf: 1.23 for MA).
      case T2_MA_S_TRAIL:
@@ -3650,9 +3643,9 @@ double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_
       if (existing && previous == 0) previous = default_trail;
     #endif
     Msg::ShowText(
-        StringFormat("#%d (%s;d:%d), method: %d, invalid value: %g, previous: %g, Ask/Bid/Gap: %f/%f/%f (%d pts); %s",
+        StringFormat("#%d (%s;d:%d), method: %d, invalid value: %g, previous: %g, ask/bid/Gap: %f/%f/%f (%d pts); %s",
           existing ? OrderTicket() : 0, EnumToString(mode), direction,
-          method, new_value, previous, Ask, Bid, Convert::PointsToValue(market.GetTradeDistanceInPts()), market.GetTradeDistanceInPts(), Order::OrderTypeToString(Order::OrderType())),
+          method, new_value, previous, ask, bid, Convert::PointsToValue(market.GetTradeDistanceInPts()), market.GetTradeDistanceInPts(), Order::OrderTypeToString(Order::OrderType())),
         "Debug", __FUNCTION__, __LINE__, VerboseDebug);
     // If value is invalid, fallback to the previous one.
     return previous;
@@ -5922,6 +5915,9 @@ string GetMonthlyReport() {
  * Display info on chart.
  */
 string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
+  if (!Terminal::IsVisualMode()) {
+    return NULL;
+  }
   string output;
   // Prepare text for Stop Out.
   string stop_out_level = StringFormat("%d", account.AccountStopoutLevel());
@@ -5995,7 +5991,11 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
 /**
  * Send e-mail about the order.
  */
-void SendEmailExecuteOrder(string sep = "<br>\n") {
+bool SendEmailExecuteOrder(string sep = "<br>\n") {
+  bool _res = false;
+  if (!Terminal::IsRealtime()) {
+    return _res;
+  }
   string mail_title = "Trading Info - " + ea_name;
   string body = "Trade Information" + sep;
   body += sep + StringFormat("Event: %s", "Trade Opened");
@@ -6010,7 +6010,7 @@ void SendEmailExecuteOrder(string sep = "<br>\n") {
   if (account.AccountCredit() > 0) {
     body += sep + StringFormat("Account Credit: %s", Convert::ValueWithCurrency(account.AccountCredit()));
   }
-  SendMail(mail_title, body);
+  return SendMail(mail_title, body);
 }
 
 /**

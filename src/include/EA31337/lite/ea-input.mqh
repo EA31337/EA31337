@@ -359,7 +359,7 @@ ENUM_TRAIL_TYPE BPower_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE BPower_TrailingProfitMethod = 1; // Trail profit method
 int BPower_Period = 13; // Period
 double BPower_Period_Ratio = 1.00000000; // Period ratio between timeframes (0.5-1.5)
-ENUM_APPLIED_PRICE BPower_Applied_Price = 0; // Applied Price
+ENUM_APPLIED_PRICE BPower_Applied_Price = PRICE_CLOSE; // Applied Price
 double BPower_SignalLevel = 0.00000000; // Signal level
 int BPower1_SignalMethod = 0; // Signal method for M1 (0-
 int BPower5_SignalMethod = 0; // Signal method for M5 (0-
@@ -557,7 +557,7 @@ ENUM_TRAIL_TYPE Force_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE Force_TrailingProfitMethod = 1; // Trail profit method
 int Force_Period = 13; // Period
 ENUM_MA_METHOD Force_MA_Method = 0; // MA Method
-ENUM_APPLIED_PRICE Force_Applied_price = 0; // Applied Price
+ENUM_APPLIED_PRICE Force_Applied_price = PRICE_CLOSE; // Applied Price
 double Force_SignalLevel = 0.00000000; // Signal level
 int Force1_SignalMethod = 0; // Signal method for M1 (0-
 int Force5_SignalMethod = 0; // Signal method for M5 (0-
@@ -796,7 +796,7 @@ ENUM_TRAIL_TYPE Momentum_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE Momentum_TrailingProfitMethod = 1; // Trail profit method
 int Momentum_Period_Fast = 12; // Period Fast
 int Momentum_Period_Slow = 20; // Period Slow
-ENUM_APPLIED_PRICE Momentum_Applied_Price = 0; // Applied Price
+ENUM_APPLIED_PRICE Momentum_Applied_Price = PRICE_CLOSE; // Applied Price
 double Momentum_SignalLevel = 0.00000000; // Signal level
 int Momentum1_SignalMethod = 0; // Signal method for M1 (0-
 int Momentum5_SignalMethod = 0; // Signal method for M5 (0-
@@ -827,7 +827,7 @@ bool OBV15_Active = 0; // Enable for M15
 bool OBV30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE OBV_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE OBV_TrailingProfitMethod = 1; // Trail profit method
-ENUM_APPLIED_PRICE OBV_Applied_Price = 0; // Applied Price
+ENUM_APPLIED_PRICE OBV_Applied_Price = PRICE_CLOSE; // Applied Price
 double OBV_SignalLevel = 0.00000000; // Signal level
 int OBV1_SignalMethod = 0; // Signal method for M1 (0-
 int OBV5_SignalMethod = 0; // Signal method for M5 (0-
@@ -862,7 +862,7 @@ int OSMA_Period_Fast = 11; // Period Fast
 int OSMA_Period_Slow = 42; // Period Slow
 int OSMA_Period_Signal = 9; // Period for signal
 double OSMA_Period_Ratio = 1.0; // Period ratio between timeframes (0.5-1.5)
-ENUM_APPLIED_PRICE OSMA_Applied_Price = 0; // Applied Price
+ENUM_APPLIED_PRICE OSMA_Applied_Price = PRICE_CLOSE; // Applied Price
 double OSMA_SignalLevel = 1.20000000; // Signal level
 int OSMA1_SignalMethod = 0; // Signal method for M1 (0-
 int OSMA5_SignalMethod = 0; // Signal method for M5 (0-
@@ -994,7 +994,7 @@ bool StdDev15_Active = 0; // Enable for M15
 bool StdDev30_Active = 0; // Enable for M30
 ENUM_TRAIL_TYPE StdDev_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE StdDev_TrailingProfitMethod = 1; // Trail profit method
-ENUM_APPLIED_PRICE StdDev_Applied_Price = 0; // Applied Price
+ENUM_APPLIED_PRICE StdDev_Applied_Price = PRICE_CLOSE; // Applied Price
 int StdDev_MA_Period = 10; // Period
 ENUM_MA_METHOD StdDev_MA_Method = 0; // MA Method
 int StdDev_MA_Shift = 0; // Shift
@@ -1126,9 +1126,9 @@ int JobProcessDelay = 1; // Job process delay
 
 // Cache some calculated variables for better performance. FIXME: Needs some work.
 #ifdef __experimental__
-  extern bool Cache = FALSE; // Cache
+  extern bool Cache = false; // Cache
 #else
-  const bool Cache = FALSE; // Cache
+  const bool Cache = false; // Cache
 #endif
 
 //+------------------------------------------------------------------+
