@@ -258,7 +258,7 @@ void OnTick() {
     }
   }
   UpdateTicks();
-  if (terminal.IsVisualMode() && PrintLogOnChart) DisplayInfoOnChart();
+  if (PrintLogOnChart && !terminal.IsOptimization()) DisplayInfoOnChart();
   #ifdef __profiler__ PROFILER_STOP #endif
 } // end: OnTick()
 
