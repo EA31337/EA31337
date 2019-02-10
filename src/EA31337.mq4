@@ -456,7 +456,7 @@ void OnDeinit(const int reason) {
       if (WriteReport) {
         // if (reason == REASON_CHARTCHANGE)
         string filename;
-        Chart *_chart = trade[Chart::TfToIndex(PERIOD_CURRENT)].Chart();
+        Chart *_chart = trade[chart.TfToIndex()].Chart();
         OHLC first_bar = _chart.LoadOHLC();
         summary_report.CalculateSummary();
         // @todo: Calculate average spread from stats[sid][AVG_SPREAD].
@@ -464,7 +464,7 @@ void OnDeinit(const int reason) {
             "%s-%.f%s-%s-%s-%dspread-(%d)-%s-report.txt",
             market.GetSymbol(), summary_report.GetInitDeposit(), account.GetCurrency(),
             DateTime::TimeToStr(first_bar.time, TIME_DATE), DateTime::TimeToStr(_chart.iTime(), TIME_DATE),
-            init_spread, GetNoOfStrategies(), Chart::TfToString(PERIOD_CURRENT));
+            init_spread, GetNoOfStrategies(), chart.TfToString());
             // ea_name, _Symbol, summary.init_deposit, account.AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE), Period());
             // ea_name, _Symbol, init_balance, account.AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES), Period());
         string data = summary_report.GetReport();
@@ -581,7 +581,7 @@ string InitInfo(bool startup = false, string sep = "\n") {
   output += "SYMBOL: " + ((SymbolInfo *)market).ToString() + sep;
   output += "MARKET: " + market.ToString() + sep;
   for (int tfi = 0; tfi < FINAL_ENUM_TIMEFRAMES_INDEX; tfi++) {
-    if (Object::IsDynamic(trade[tfi].Chart()) && trade[tfi].Chart().IsValidTf()) {
+    if (Object::IsValid(trade[tfi]) && trade[tfi].Chart().IsValidTf()) {
       output += StringFormat("CHART: %s%s", trade[tfi].Chart().ToString(), sep);
     }
     else {
@@ -4082,9 +4082,9 @@ uint GetMaxOrders(double volume_size) {
   uint _result = 0;
   uint _limit = account.GetLimitOrders();
   #ifdef __advanced__
-    _result = MaxOrders > 0 ? (MaxOrdersPerDay > 0 ? fmin(MaxOrders, GetMaxOrdersPerDay()) : MaxOrders) : trade[Chart::TfToIndex(PERIOD_CURRENT)].CalcMaxOrders(volume_size, ea_risk_ratio, max_orders, GetMaxOrdersPerDay());
+    _result = MaxOrders > 0 ? (MaxOrdersPerDay > 0 ? fmin(MaxOrders, GetMaxOrdersPerDay()) : MaxOrders) : trade[chart.TfToIndex()].CalcMaxOrders(volume_size, ea_risk_ratio, max_orders, GetMaxOrdersPerDay());
   #else
-    _result = MaxOrders > 0 ? MaxOrders : trade[Chart::TfToIndex(PERIOD_CURRENT)].CalcMaxOrders(volume_size, ea_risk_ratio, max_orders);
+    _result = MaxOrders > 0 ? MaxOrders : trade[chart.TfToIndex()].CalcMaxOrders(volume_size, ea_risk_ratio, max_orders);
   #endif
   return _limit > 0 ? fmin(_result, _limit) : _result;
 }
@@ -4111,12 +4111,12 @@ int GetNoOfStrategies() {
  * Calculate size of the lot based on the free margin and account leverage automatically.
  */
 double GetLotSizeAuto(uint _method = 0, bool smooth = true) {
-  double new_lot_size = trade[Chart::TfToIndex(PERIOD_CURRENT)].CalcLotSize(ea_risk_margin_per_order, ea_risk_ratio, _method);
+  double new_lot_size = trade[chart.TfToIndex()].CalcLotSize(ea_risk_margin_per_order, ea_risk_ratio, _method);
 
   // Lot size warm-up.
   static bool is_warm_up = InitNoOfDaysToWarmUp != 0;
   if (is_warm_up) {
-    OHLC first_bar = trade[Chart::TfToIndex(PERIOD_CURRENT)].Chart().LoadOHLC();
+    OHLC first_bar = trade[chart.TfToIndex()].Chart().LoadOHLC();
     long warmup_days = ((TimeCurrent() - first_bar.time) / 60 / 60 / 24);
     if (warmup_days < InitNoOfDaysToWarmUp) {
       /*
@@ -4372,7 +4372,7 @@ void StartNewDay(Trade *_trade) {
 
   // Calculate lot size if required.
   if (InitNoOfDaysToWarmUp != 0) {
-    OHLC first_bar = trade[Chart::TfToIndex(PERIOD_CURRENT)].Chart().LoadOHLC(0);
+    OHLC first_bar = trade[chart.TfToIndex()].Chart().LoadOHLC(0);
     long warmup_days = ((TimeCurrent() - first_bar.time) / 60 / 60 / 24);
     if (warmup_days <= InitNoOfDaysToWarmUp) {
       ea_lot_size = GetLotSize();
