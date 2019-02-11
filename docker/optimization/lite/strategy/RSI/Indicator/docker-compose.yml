@@ -3,10 +3,10 @@ services:
   RSI_Period_2018:
     command: run_backtest -v
     volumes:
-    - ../../../../../src:/opt/src
-#   - ../../../../../src/include/EA31337/lite:/opt/set:rw
-    - ../../../_rules:/opt/rules
-#   - ../../../../../../EA-Tester/scripts:/opt/scripts:rw
+    - ../../../../../../src:/opt/src
+    - ../../../../../../src/include/EA31337/lite:/opt/set:rw
+    - ../../../../_rules:/opt/rules
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts:rw
     - ./results:/opt/results:rw
     tty: true
 #   image: ea31337/ea-tester:dev
