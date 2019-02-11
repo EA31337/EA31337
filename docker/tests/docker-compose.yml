@@ -3,7 +3,7 @@ services:
   test_2018_01:
     command: run_backtest -v
     volumes:
-    - ../../../src:/opt/src
+    - ../../src:/opt/src
     tty: true
     image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
