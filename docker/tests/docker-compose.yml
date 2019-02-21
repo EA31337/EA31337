@@ -1,9 +1,16 @@
 version: '3'
 services:
+  compile_lite:
+    command: compile_ea EA31337 EA31337.log
+    volumes:
+    - ../../src:/opt/src
+    - ../../../EA-Tester/scripts:/opt/scripts
+    image: ea31337/ea-tester:dev
+    environment:
+      OPT_TRACE: $OPT_TRACE
   test_2018_01:
     command: run_backtest -v
     volumes:
     - ../../src:/opt/src
-    tty: true
     image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
