@@ -253,12 +253,14 @@ void OnTick() {
     }
   }
   if (_tick_procesed) {
+    if (PrintLogOnChart) {
+      DisplayInfoOnChart();
+    }
     if (!terminal.IsOptimization()) {
       terminal.Logger().Flush(false);
     }
   }
   UpdateTicks();
-  if (PrintLogOnChart && !terminal.IsOptimization()) DisplayInfoOnChart();
   #ifdef __profiler__ PROFILER_STOP #endif
 } // end: OnTick()
 
@@ -568,6 +570,7 @@ string InitInfo(bool startup = false, string sep = "\n") {
   string extra = "";
   #ifdef __expire__ CheckExpireDate(); extra += StringFormat(" [expires on %s]", TimeToStr(ea_expire_date, TIME_DATE)); #endif
   string output = StringFormat("%s v%s by %s (%s)%s%s", ea_name, ea_version, ea_author, ea_link, extra, sep);
+  output += "TERMINAL: " + terminal.ToString() + sep;
   output += "ACCOUNT: " + account.ToString() + sep;
   output += "SYMBOL: " + ((SymbolInfo *)market).ToString() + sep;
   output += "MARKET: " + market.ToString() + sep;
@@ -5916,10 +5919,16 @@ string GetMonthlyReport() {
  * Display info on chart.
  */
 string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
-  if (terminal.IsOptimization()) {
+  if (!terminal.IsRealtime() || !terminal.IsVisualMode()) {
     return NULL;
   }
+
+  datetime _lastupdate = 0;
   string output;
+  if (_lastupdate < TimeCurrent()) {
+    return NULL;
+  }
+
   // Prepare text for Stop Out.
   string stop_out_level = StringFormat("%d", account.AccountStopoutLevel());
   if (AccountStopoutMode() == 0) stop_out_level += "%"; else stop_out_level += account.AccountCurrency();
@@ -5986,6 +5995,7 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
     Comment(output);
     ChartRedraw(); // Redraws the current chart forcedly.
   }
+  _lastupdate = TimeCurrent();
   return output;
 }
 

@@ -25,13 +25,13 @@ env:
   - CMD="bash -n scripts/*.sh; shellcheck scripts/*.sh conf/*/*.sh"
   - |
     MODE="__lite__"
-    CMD="docker-compose -f docker/tests/docker-compose.yml up --exit-code-from test_2018_01"
+    CMD="docker-compose -f docker/tests/lite/docker-compose.yml up --exit-code-from test_2018_01"
   - |
     MODE="__advanced__"
-    CMD="docker-compose -f docker/tests/docker-compose.yml up --exit-code-from test_2018_01"
+    CMD="docker-compose -f docker/tests/lite/docker-compose.yml up --exit-code-from test_2018_01"
   - |
     MODE="__rider__"
-    CMD="docker-compose -f docker/tests/docker-compose.yml up --exit-code-from test_2018_01"
+    CMD="docker-compose -f docker/tests/lite/docker-compose.yml up --exit-code-from test_2018_01"
 matrix:
   fast_finish: true
 notifications:

@@ -1,0 +1,28 @@
+version: '3'
+services:
+  compile_lite:
+    command: compile_ea EA31337 EA31337.log
+    volumes:
+    - ../../../src:/opt/src
+    - ../../../../EA-Tester/scripts:/opt/scripts
+    image: ea31337/ea-tester:dev
+    environment:
+      OPT_TRACE: $OPT_TRACE
+  test_2018_01:
+    command: run_backtest -v
+    volumes:
+    - ../../../src:/opt/src
+    image: ea31337/ea-tester:EURUSD-2018-DS
+    env_file: .env
+    environment:
+      BT_DAYS: 10-12
+      BT_MONTHS: 1
+  test_2018_02:
+    command: run_backtest -v
+    volumes:
+    - ../../../src:/opt/src
+    image: ea31337/ea-tester:EURUSD-2018-DS
+    env_file: .env
+    environment:
+      BT_DAYS: 10-12
+      BT_MONTHS: 1
