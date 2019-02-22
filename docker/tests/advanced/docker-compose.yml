@@ -4,15 +4,16 @@ services:
     command: compile_ea EA31337 EA31337.log
     volumes:
     - ../../../src:/opt/src
-#   - ../../../../EA-Tester/scripts:/opt/scripts
+    - ../../../../EA-Tester/scripts:/opt/scripts
     image: ea31337/ea-tester:dev
     environment:
       OPT_TRACE: $OPT_TRACE
   test_2018_01:
     command: run_backtest -v
     volumes:
-    - ../../../src:/opt/src:rw
+    - ../../../src:/opt/src
     - ./_results:/opt/_results:rw
+    - ../../../../EA-Tester/scripts:/opt/scripts
     image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
     environment:
@@ -21,7 +22,7 @@ services:
   test_2018_02:
     command: run_backtest -v
     volumes:
-    - ../../../src:/opt/src:rw
+    - ../../../src:/opt/src
     - ./_results:/opt/_results:rw
     image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
@@ -31,7 +32,7 @@ services:
   test_2018_03:
     command: run_backtest -v
     volumes:
-    - ../../../src:/opt/src:rw
+    - ../../../src:/opt/src
     - ./_results:/opt/_results:rw
     image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
@@ -41,7 +42,7 @@ services:
   test_2018_04:
     command: run_backtest -v
     volumes:
-    - ../../../src:/opt/src:rw
+    - ../../../src:/opt/src
     - ./_results:/opt/_results:rw
     image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
@@ -51,7 +52,7 @@ services:
   test_2018_05:
     command: run_backtest -v
     volumes:
-    - ../../../src:/opt/src:rw
+    - ../../../src:/opt/src
     - ./_results:/opt/_results:rw
     image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
@@ -61,7 +62,7 @@ services:
   test_2018_06:
     command: run_backtest -v
     volumes:
-    - ../../../src:/opt/src:rw
+    - ../../../src:/opt/src
     - ./_results:/opt/_results:rw
     image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
@@ -71,7 +72,7 @@ services:
   test_2018_07:
     command: run_backtest -v
     volumes:
-    - ../../../src:/opt/src:rw
+    - ../../../src:/opt/src
     - ./_results:/opt/_results:rw
     image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
@@ -81,7 +82,7 @@ services:
   test_2018_08:
     command: run_backtest -v
     volumes:
-    - ../../../src:/opt/src:rw
+    - ../../../src:/opt/src
     - ./_results:/opt/_results:rw
     image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
@@ -91,7 +92,7 @@ services:
   test_2018_09:
     command: run_backtest -v
     volumes:
-    - ../../../src:/opt/src:rw
+    - ../../../src:/opt/src
     - ./_results:/opt/_results:rw
     image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
@@ -101,7 +102,7 @@ services:
   test_2018_10:
     command: run_backtest -v
     volumes:
-    - ../../../src:/opt/src:rw
+    - ../../../src:/opt/src
     - ./_results:/opt/_results:rw
     image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
@@ -111,7 +112,7 @@ services:
   test_2018_11:
     command: run_backtest -v
     volumes:
-    - ../../../src:/opt/src:rw
+    - ../../../src:/opt/src
     - ./_results:/opt/_results:rw
     image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
@@ -121,7 +122,7 @@ services:
   test_2018_12:
     command: run_backtest -v
     volumes:
-    - ../../../src:/opt/src:rw
+    - ../../../src:/opt/src
     - ./_results:/opt/_results:rw
     image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
