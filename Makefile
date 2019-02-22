@@ -3,7 +3,6 @@ SHELL:=/usr/bin/env bash
 .PHONY: all test compile-mql4 compile-mql5 requirements set-none \
 		clean clean-src clean-releases \
 		Backtest Lite-Backtest Advanced-Backtest Rider-Backtest \
-		Full Lite-Full Advanced-Full Rider-Full \
 		EA Lite Advanced Rider
 
 MQL=metaeditor.exe
@@ -30,11 +29,6 @@ Lite-Backtest:			$(OUT)/$(EA)-Lite-Backtest-%.ex4
 Advanced-Backtest:	$(OUT)/$(EA)-Advanced-Backtest-%.ex4
 Rider-Backtest:			$(OUT)/$(EA)-Rider-Backtest-%.ex4
 Backtest: 					Lite-Backtest Advanced-Backtest Rider-Backtest
-
-Lite-Full: 		  $(OUT)/$(EA)-Lite-Full-%.ex4
-Advanced-Full:  $(OUT)/$(EA)-Advanced-Full-%.ex4
-Rider-Full: 		$(OUT)/$(EA)-Rider-Full-%.ex4
-Full:						Lite-Full Advanced-Full Rider-Full
 
 compile-mql4: requirements $(MQL) clean-src $(OUT)/$(EA).ex4
 	@echo MQL4 compiled.
@@ -78,15 +72,6 @@ set-advanced-backtest: set-none
 set-rider-backtest: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__backtest__\|__rider__"
 
-set-lite-full: set-none
-	@$(MAKE) -f $(FILE) set-mode MODE="__release__"
-
-set-advanced-full: set-none
-	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__advanced__"
-
-set-rider-full: set-none
-	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__rider__"
-
 set-testing:
 	@$(MAKE) -f $(FILE) set-mode MODE="__testing__"
 
@@ -103,10 +88,7 @@ release: metaeditor.exe \
 		$(OUT)/$(EA)-Rider-%.ex4 \
 		$(OUT)/$(EA)-Lite-Backtest-%.ex4 \
 		$(OUT)/$(EA)-Advanced-Backtest-%.ex4 \
-		$(OUT)/$(EA)-Rider-Backtest-%.ex4 \
-		$(OUT)/$(EA)-Lite-Full-%.ex4 \
-		$(OUT)/$(EA)-Advanced-Full-%.ex4 \
-		$(OUT)/$(EA)-Rider-Full-%.ex4
+		$(OUT)/$(EA)-Rider-Backtest-%.ex4
 
 $(OUT)/$(EA)-Lite-Backtest-%.ex4: \
 		set-lite-backtest \
@@ -125,24 +107,6 @@ $(OUT)/$(EA)-Rider-Backtest-%.ex4: \
 		$(OUT)/$(EA).ex4 \
 		set-none
 	cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-Backtest-v$(VER).ex4"
-
-$(OUT)/$(EA)-Lite-Full-%.ex4: \
-		set-lite-full \
-		$(OUT)/$(EA).ex4 \
-		set-none
-	cp -v "$(EX4)" "$(OUT)/$(EA)-Lite-Full-v$(VER).ex4"
-
-$(OUT)/$(EA)-Advanced-Full-%.ex4: \
-		set-advanced-full \
-		$(OUT)/$(EA).ex4 \
-		set-none
-	cp -v "$(EX4)" "$(OUT)/$(EA)-Advanced-Full-v$(VER).ex4"
-
-$(OUT)/$(EA)-Rider-Full-%.ex4: \
-		set-rider-full \
-		$(OUT)/$(EA).ex4 \
-		set-none
-	cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-Full-v$(VER).ex4"
 
 $(OUT)/$(EA)-Lite-%.ex4: \
 		set-lite \
