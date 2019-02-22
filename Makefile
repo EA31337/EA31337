@@ -2,8 +2,9 @@ SHELL:=/usr/bin/env bash
 
 .PHONY: all test compile-mql4 compile-mql5 requirements set-none \
 		clean clean-src clean-releases \
-		Lite-Backtest Advanced-Backtest Rider-Backtest \
-		Lite Advanced Rider
+		Backtest Lite-Backtest Advanced-Backtest Rider-Backtest \
+		Full Lite-Full Advanced-Full Rider-Full \
+		EA Lite Advanced Rider
 
 MQL=metaeditor.exe
 SRC=$(wildcard src/*.mq4)
@@ -12,7 +13,7 @@ EX4=src/$(EA).ex4
 EX5=src/$(EA).ex5
 VER=$(shell grep 'define ea_version' src/include/EA31337/ea-properties.mqh | grep -o '[0-9].*[0-9]')
 FILE=$(lastword $(MAKEFILE_LIST)) # Determine this Makefile's path.
-OUT=releases
+OUT=.
 MKFILE=$(abspath $(lastword $(MAKEFILE_LIST)))
 CWD=$(notdir $(patsubst %/,%,$(dir $(MKFILE))))
 all: requirements $(MQL) compile-mql4
@@ -23,15 +24,17 @@ requirements:
 Lite: 		$(OUT)/$(EA)-Lite-%.ex4
 Advanced: $(OUT)/$(EA)-Advanced-%.ex4
 Rider: 		$(OUT)/$(EA)-Rider-%.ex4
+EA:				Lite Advanced Rider
 
 Lite-Backtest:			$(OUT)/$(EA)-Lite-Backtest-%.ex4
 Advanced-Backtest:	$(OUT)/$(EA)-Advanced-Backtest-%.ex4
 Rider-Backtest:			$(OUT)/$(EA)-Rider-Backtest-%.ex4
-Backtest: Lite-Backtest Advanced-Backtest Rider-Backtest
+Backtest: 					Lite-Backtest Advanced-Backtest Rider-Backtest
 
 Lite-Full: 		  $(OUT)/$(EA)-Lite-Full-%.ex4
 Advanced-Full:  $(OUT)/$(EA)-Advanced-Full-%.ex4
 Rider-Full: 		$(OUT)/$(EA)-Rider-Full-%.ex4
+Full:						Lite-Full Advanced-Full Rider-Full
 
 compile-mql4: requirements $(MQL) clean-src $(OUT)/$(EA).ex4
 	@echo MQL4 compiled.
@@ -43,7 +46,7 @@ test: requirements set-mode $(MQL)
 	wine metaeditor.exe /s /i:src /mql5 $(SRC)
 
 metaeditor.exe:
-	curl -LO https://github.com/EA31337/FX-MT-VM/releases/download/4.x/metaeditor.exe
+	curl -LO https://github.com/EA31337/MetaEditor/raw/master/metaeditor.exe
 
 # E.g.: make set-mode MODE="__advanced__"
 set-mode:
@@ -87,15 +90,11 @@ set-rider-full: set-none
 set-testing:
 	@$(MAKE) -f $(FILE) set-mode MODE="__testing__"
 
-clean-all: clean-src clean-releases
+clean-all: clean-src
 
 clean-src:
 	@echo Cleaning src...
 	find src/ '(' -name '*.ex4' -or -name '*.ex5' ')' -delete
-
-clean-releases: set-none
-	@echo Cleaning releases...
-	find "$(OUT)" '(' -name '*.ex4' -or -name '*.ex5' ')' -delete
 
 release: metaeditor.exe \
 		clean-all \
