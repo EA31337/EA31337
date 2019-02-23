@@ -1388,6 +1388,7 @@ extern string __Backtest_Parameters__ = "-- Testing & troubleshooting parameters
   extern bool ValidateSettings = 1; // Validate startup settings
 #endif
 extern bool RecordTicksToCSV = False; // Record ticks into CSV files
+#ifdef __profiler__ extern #endif uint ProfilingMinTime = 1; // Displays EA profiling times (0 - off)
 extern int SmartToggleComponent = 0; // Override: Toggle different components (0-43)
 extern int AccountConditionToDisable = 0; // Override: Disable specific n action
 extern bool DisableCloseConditions = FALSE; // Override: Disable all close conditions

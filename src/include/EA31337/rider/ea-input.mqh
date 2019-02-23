@@ -1380,6 +1380,7 @@ extern string SoundFileAtClose = "alert.wav"; // Sound: on order close
 extern string __Backtest_Parameters__ = "-- Backtest & troubleshooting parameters --"; // >>> BACKTESTING <<<
 extern bool ValidateSettings = TRUE; // Validate startup settings
 extern bool RecordTicksToCSV = False; // Record ticks into CSV files
+#ifdef __profiler__ extern #endif uint ProfilingMinTime = 1; // Displays EA profiling times (0 - off)
 // extern int DemoMarketStopLevel = 10; // Demo market stop level
 extern int SmartToggleComponent = 0; // Override: Toggle different components (0-43)
 extern int AccountConditionToDisable = 0; // Override: Disable specific n action
