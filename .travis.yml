@@ -28,6 +28,7 @@ before_script:
 - docker images
 script:
 - bash -n scripts/*.sh; shellcheck scripts/*.sh conf/*/*.sh
+- docker build --build-arg UID=$UID .
 - echo $CMD
 - eval $CMD
 after_script:
