@@ -55,13 +55,13 @@ metaeditor.exe:
 # E.g.: make set-mode MODE="__advanced__"
 set-mode:
 ifdef MODE
-	git checkout -- $(SRC)/include/EA31337/ea-mode.mqh
+	test -w .git && git checkout -- $(SRC)/include/EA31337/ea-mode.mqh || true
 	ex -s +"%s@^\zs.*\ze#define \($(MODE)\)@@g" -cwq $(SRC)/include/EA31337/ea-mode.mqh
 endif
 
 set-none:
 	@echo Reverting modes.
-	git checkout -- $(SRC)/include/EA31337/ea-mode.mqh
+	test -w .git && git checkout -- $(SRC)/include/EA31337/ea-mode.mqh || true
 	ex -s +":g@^#define@s@^@//" -cwq $(SRC)/include/EA31337/ea-mode.mqh
 
 set-lite: set-none

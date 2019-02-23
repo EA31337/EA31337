@@ -22,6 +22,7 @@ env:
   - DOCKER_RUN="docker run $DOCKER_ENV $DOCKER_VOL $DOCKER_REPO"
   - FAIL_CMD="$DOCKER_RUN \"ea_copy $EA_NAME; compile_ea $EA_NAME\""
   matrix:
+  - CMD="cd docker/tests; for mode in lite advanced rider; do cd \${mode}; for service in \${mode} \${mode}_backtest \${mode}_release; do docker-compose run compile_\${service} || exit 1; done; cd -; done"
   - CMD="cd docker/tests/lite; docker-compose run test_2018_01"
   - CMD="cd docker/tests/advanced; docker-compose run test_2018_01"
   - CMD="cd docker/tests/rider; docker-compose run test_2018_01"
@@ -39,7 +40,6 @@ before_script:
 - docker images
 script:
 - bash -n scripts/*.sh; shellcheck scripts/*.sh conf/*/*.sh
-- make release
 - echo $CMD
 - eval $CMD
 after_script:
