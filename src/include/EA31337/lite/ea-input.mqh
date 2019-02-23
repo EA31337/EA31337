@@ -4,7 +4,7 @@
 //|                                       https://github.com/EA31337 |
 //|                                                     ea-input.mqh |
 //+------------------------------------------------------------------+
-#property copyright "Copyright 2016, kenorb" // ©
+#property copyright "Copyright 2019, kenorb" // ©
 #property link      "https://github.com/EA31337"
 
 //+------------------------------------------------------------------+
@@ -23,7 +23,7 @@ extern uint   MaxOrdersPerType = 0; // Max orders per type (0 = auto)
 extern double LotSize = 0.00000000; // Lot size (0 = auto)
 extern bool   TradeMicroLots = 1; // Trade micro lots?
 ENUM_TIMEFRAMES TrendPeriod = PERIOD_H1; // Period for trend calculation
-int    TrendMethod = 192; // Main trend method (0-255)
+int           TrendMethod = 192; // Main trend method (0-255)
 extern int    MinVolumeToTrade = 2; // Min volume to trade
 extern int    MaxOrderPriceSlippage = 50; // Max price slippage (in pts)
 extern int    MaxTries = 5; // Max retries for opening orders
@@ -1153,7 +1153,7 @@ extern color ColorSell = 255; // Color: Sell
 extern bool SoundAlert = 0; // Enable sound alerts
 extern string SoundFileAtOpen = "alert.wav"; // Sound: on order open
 extern string SoundFileAtClose = "alert.wav"; // Sound: on order close
-// extern bool SendLogs = FALSE; // Send logs to remote host for diagnostic purposes
+// extern bool SendLogs = false; // Send logs to remote host for diagnostic purposes
 
 //+------------------------------------------------------------------+
 extern string __Backtest_Parameters__ = "-- Testing & troubleshooting parameters --"; // >>> TESTING <<<
@@ -1170,7 +1170,7 @@ extern bool DisableCloseConditions = 0; // Override: Disable all close condition
 
 //+------------------------------------------------------------------+
 extern string __EA_Constants__ = "-- Constants --"; // >>> CONSTANTS <<<
-extern int MagicNumber = 31337; // Starting EA magic number (+40)
+extern int MagicNumber = 31337; // Unique EA magic number (+40)
 
 //+------------------------------------------------------------------+
 extern string __Other_Parameters__ = "-- Other parameters --"; // >>> OTHER <<<
