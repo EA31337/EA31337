@@ -1,139 +1,159 @@
-version: '3'
+version: '3.4'
 services:
-
-  compile_rider:
-    command: make -C /opt/EA Rider
-    volumes:
-    - ../../..:/opt/EA:rw
-    image: ea31337/ea-tester:dev
-  compile_rider_backtest:
-    command: make -C /opt/EA Rider-Backtest
-    volumes:
-    - ../../..:/opt/EA:rw
-    image: ea31337/ea-tester:dev
-  compile_rider_release:
-    command: make -C /opt/EA Rider-Release
-    volumes:
-    - ../../..:/opt/EA:rw
-    image: ea31337/ea-tester:dev
-
   test_2018_01:
     command: run_backtest -v
+    image: ea31337:rider-eurusd-2018
+    build:
+      context: ../../..
+      target: ea31337-rider-eurusd-2018
     volumes:
     - ../../..:/opt/src
     - ./_results:/opt/_results:rw
-    image: ea31337/ea-tester:EURUSD-2018-DS
+#   - ../../../../EA-Tester/scripts:/opt/scripts
     env_file: .env
     environment:
       BT_MONTHS: 01
-      TEST_REPORT_NAME: EA31337_Lite_201801
+      TEST_REPORT_NAME: EA31337_Rider_201801
   test_2018_02:
     command: run_backtest -v
+    image: ea31337:rider-eurusd-2018
+    build:
+      context: ../../..
+      target: ea31337-rider-eurusd-2018
     volumes:
     - ../../..:/opt/src
     - ./_results:/opt/_results:rw
-    image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
     environment:
       BT_MONTHS: 02
-      TEST_REPORT_NAME: EA31337_Lite_201802
+      TEST_REPORT_NAME: EA31337_Rider_201802
   test_2018_03:
     command: run_backtest -v
+    image: ea31337:rider-eurusd-2018
+    build:
+      context: ../../..
+      target: ea31337-rider-eurusd-2018
     volumes:
     - ../../..:/opt/src
     - ./_results:/opt/_results:rw
-    image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
     environment:
       BT_MONTHS: 03
-      TEST_REPORT_NAME: EA31337_Lite_201803
+      TEST_REPORT_NAME: EA31337_Rider_201803
   test_2018_04:
     command: run_backtest -v
+    image: ea31337:rider-eurusd-2018
+    build:
+      context: ../../..
+      target: ea31337-rider-eurusd-2018
     volumes:
     - ../../..:/opt/src
     - ./_results:/opt/_results:rw
-    image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
     environment:
       BT_MONTHS: 04
-      TEST_REPORT_NAME: EA31337_Lite_201804
+      TEST_REPORT_NAME: EA31337_Rider_201804
   test_2018_05:
     command: run_backtest -v
+    image: ea31337:rider-eurusd-2018
+    build:
+      context: ../../..
+      target: ea31337-rider-eurusd-2018
     volumes:
     - ../../..:/opt/src
     - ./_results:/opt/_results:rw
-    image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
     environment:
       BT_MONTHS: 05
-      TEST_REPORT_NAME: EA31337_Lite_201805
+      TEST_REPORT_NAME: EA31337_Rider_201805
   test_2018_06:
     command: run_backtest -v
+    image: ea31337:rider-eurusd-2018
+    build:
+      context: ../../..
+      target: ea31337-rider-eurusd-2018
     volumes:
     - ../../..:/opt/src
     - ./_results:/opt/_results:rw
-    image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
     environment:
       BT_MONTHS: 06
-      TEST_REPORT_NAME: EA31337_Lite_201806
+      TEST_REPORT_NAME: EA31337_Rider_201806
   test_2018_07:
     command: run_backtest -v
+    image: ea31337:rider-eurusd-2018
+    build:
+      context: ../../..
+      target: ea31337-rider-eurusd-2018
     volumes:
     - ../../..:/opt/src
     - ./_results:/opt/_results:rw
-    image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
     environment:
       BT_MONTHS: 07
-      TEST_REPORT_NAME: EA31337_Lite_201807
+      TEST_REPORT_NAME: EA31337_Rider_201807
   test_2018_08:
     command: run_backtest -v
+    image: ea31337:rider-eurusd-2018
+    build:
+      context: ../../..
+      target: ea31337-rider-eurusd-2018
     volumes:
     - ../../..:/opt/src
     - ./_results:/opt/_results:rw
-    image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
     environment:
       BT_MONTHS: 08
-      TEST_REPORT_NAME: EA31337_Lite_201808
+      TEST_REPORT_NAME: EA31337_Rider_201808
   test_2018_09:
     command: run_backtest -v
+    image: ea31337:rider-eurusd-2018
+    build:
+      context: ../../..
+      target: ea31337-rider-eurusd-2018
     volumes:
     - ../../..:/opt/src
     - ./_results:/opt/_results:rw
-    image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
     environment:
       BT_MONTHS: 09
-      TEST_REPORT_NAME: EA31337_Lite_201809
+      TEST_REPORT_NAME: EA31337_Rider_201809
   test_2018_10:
     command: run_backtest -v
+    image: ea31337:rider-eurusd-2018
+    build:
+      context: ../../..
+      target: ea31337-rider-eurusd-2018
     volumes:
     - ../../..:/opt/src
     - ./_results:/opt/_results:rw
-    image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
     environment:
       BT_MONTHS: 10
-      TEST_REPORT_NAME: EA31337_Lite_201810
+      TEST_REPORT_NAME: EA31337_Rider_201810
   test_2018_11:
     command: run_backtest -v
+    image: ea31337:rider-eurusd-2018
+    build:
+      context: ../../..
+      target: ea31337-rider-eurusd-2018
     volumes:
     - ../../..:/opt/src
     - ./_results:/opt/_results:rw
-    image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
     environment:
       BT_MONTHS: 11
-      TEST_REPORT_NAME: EA31337_Lite_201811
+      TEST_REPORT_NAME: EA31337_Rider_201811
   test_2018_12:
     command: run_backtest -v
+    image: ea31337:rider-eurusd-2018
+    build:
+      context: ../../..
+      target: ea31337-rider-eurusd-2018
     volumes:
     - ../../..:/opt/src
     - ./_results:/opt/_results:rw
-    image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
     environment:
       BT_MONTHS: 12
-      TEST_REPORT_NAME: EA31337_Lite_201812
+      TEST_REPORT_NAME: EA31337_Rider_201812

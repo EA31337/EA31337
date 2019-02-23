@@ -9,20 +9,8 @@ addons:
     - shellcheck
 env:
   global:
-  - EA_NAME=EA31337
   - CWD=$TRAVIS_BUILD_DIR
-  - WINETRICKS_DOWNLOADER_RETRIES=20
-  - BOOT_CODE="${BOOT_CODE:-free -m}"
-  - FINAL_CODE="${FINAL_CODE:-find /opt -maxdepth 2 -ls}"
-  - DOCKER_IMAGE=ea-tester
-  - DOCKER_TAG=${DOCKER_TAG:-latest}
-  - DOCKER_REPO=ea31337/$DOCKER_IMAGE:$DOCKER_TAG
-  - DOCKER_ENV="-e BOOT_CODE=\"$BOOT_CODE\" -e FINAL_CODE=\"$FINAL_CODE\""
-  - DOCKER_VOL="-v $CWD/src:/opt/src:rw"
-  - DOCKER_RUN="docker run $DOCKER_ENV $DOCKER_VOL $DOCKER_REPO"
-  - FAIL_CMD="$DOCKER_RUN \"ea_copy $EA_NAME; compile_ea $EA_NAME\""
   matrix:
-  - CMD="cd docker/tests; for mode in lite advanced rider; do cd \${mode}; for service in \${mode} \${mode}_backtest \${mode}_release; do docker-compose run compile_\${service} || exit 1; done; cd -; done"
   - CMD="cd docker/tests/lite; docker-compose run test_2018_01"
   - CMD="cd docker/tests/advanced; docker-compose run test_2018_01"
   - CMD="cd docker/tests/rider; docker-compose run test_2018_01"
