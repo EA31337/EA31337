@@ -1274,7 +1274,10 @@ bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, int sid = EMPTY, double volume = EM
     last_msg = Msg::ShowText("Maximum open and pending orders has reached the limit set by the broker.", "Info", __FUNCTION__, __LINE__, VerboseInfo);
     result = false;
   } else if (total_orders >= max_orders) {
-    last_msg = Msg::ShowText("Maximum open and pending orders has reached the limit (MaxOrders).", "Info", __FUNCTION__, __LINE__, VerboseInfo);
+    last_msg = Msg::ShowText(
+      StringFormat("Maximum open and pending orders has reached the limit (MaxOrders) [%d>=%d].", total_orders, max_orders),
+      "Info", __FUNCTION__, __LINE__, VerboseInfo
+      );
     #ifdef __advanced__
     OrderQueueAdd(sid, cmd);
     #endif
