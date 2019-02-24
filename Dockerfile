@@ -29,6 +29,10 @@ RUN make Lite-Backtest
 FROM eurusd-2018 as ea31337-lite-eurusd-2018
 COPY --from=ea31337-lite --chown=ubuntu:root "/opt/EA" "/opt/EA"
 
+# Build Lite version with EURUSD 2017 data.
+FROM eurusd-2017 as ea31337-lite-eurusd-2017
+COPY --from=ea31337-lite --chown=ubuntu:root "/opt/EA" "/opt/EA"
+
 # Build Advanced version.
 FROM ea31337 as ea31337-advanced
 WORKDIR /opt/EA
@@ -40,6 +44,10 @@ RUN make Advanced-Backtest
 FROM eurusd-2018 as ea31337-advanced-eurusd-2018
 COPY --from=ea31337-advanced --chown=ubuntu:root "/opt/EA" "/opt/EA"
 
+# Build Advanced version with EURUSD 2017 data.
+FROM eurusd-2017 as ea31337-advanced-eurusd-2017
+COPY --from=ea31337-advanced --chown=ubuntu:root "/opt/EA" "/opt/EA"
+
 # Build Rider version.
 FROM ea31337 as ea31337-rider
 WORKDIR /opt/EA
@@ -49,4 +57,8 @@ RUN make Rider-Backtest
 
 # Build Rider version with EURUSD 2018 data.
 FROM eurusd-2018 as ea31337-rider-eurusd-2018
+COPY --from=ea31337-rider --chown=ubuntu:root "/opt/EA" "/opt/EA"
+
+# Build Rider version with EURUSD 2017 data.
+FROM eurusd-2017 as ea31337-rider-eurusd-2017
 COPY --from=ea31337-rider --chown=ubuntu:root "/opt/EA" "/opt/EA"
