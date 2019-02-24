@@ -4063,10 +4063,13 @@ void CheckStats(double value, int type, bool max = true) {
 
 /**
  * Get daily total available orders. It can dynamically change during the day.
+ *
+ * @return
+ *   Returns daily order limit when positive. When zero, it means unlimited.
  */
 #ifdef __advanced__
 uint GetMaxOrdersPerDay() {
-  if (MaxOrdersPerDay <= 0) return true;
+  if (MaxOrdersPerDay <= 0) return 0;
   int hours_left = (24 - hour_of_day);
   int curr_allowed_limit = (int) floor((MaxOrdersPerDay - daily_orders) / hours_left);
   // Message(StringFormat("Hours left: (%d - %d) / %d= %d", MaxOrdersPerDay, daily_orders, hours_left, curr_allowed_limit));
