@@ -1,10 +1,10 @@
 //+------------------------------------------------------------------+
 //|                 EA31337 - multi-strategy advanced trading robot. |
-//|                       Copyright 2016-2018, 31337 Investments Ltd |
+//|                       Copyright 2016-2019, 31337 Investments Ltd |
 //|                                       https://github.com/EA31337 |
 //|                                                     ea-input.mqh |
 //+------------------------------------------------------------------+
-#property copyright "Copyright 2018, kenorb" // ©
+#property copyright "Copyright 2019, kenorb" // ©
 #property link      "https://github.com/EA31337"
 
 //+------------------------------------------------------------------+
@@ -58,7 +58,7 @@ extern int RiskRatioDecreaseMethod = 0; // Risk ratio decrease method (0-255)
 extern int InitNoOfDaysToWarmUp = 21; // Initial warm-up period (in days)
 extern int CloseOrderAfterXHours = 24; // Close order after X hours (>0 - only profitable, <0 - all, 0 - off)
 
-extern bool ApplySpreadLimits = TRUE; // Apply strategy spread limits
+extern bool ApplySpreadLimits = true; // Apply strategy spread limits
 extern double MaxSpreadToTrade = 10.0; // Max spread to trade (in pips), 0 - disable limit
 
 //+------------------------------------------------------------------+
@@ -85,7 +85,7 @@ extern uint ConFactorOrdersLimit = 200; // No of orders to check on consequent w
 
 //+------------------------------------------------------------------+
 extern string __SmartQueue_Parameters__ = "-- Smart queue parameters --"; // >>> SMART QUEUE <<<
-extern bool SmartQueueActive = TRUE; // Activate QueueAI
+extern bool SmartQueueActive = true; // Activate QueueAI
 extern int SmartQueueMethod = 3; // QueueAI: Method for selecting the best order (0-15)
 extern int SmartQueueFilter = 27; // QueueAI: Method for filtering the orders (0-255)
 
@@ -1346,19 +1346,19 @@ int ManualGMToffset = 0; // Manual GMT Offset
 // How often trailing stop should be updated (in seconds). FIXME: Fix relative delay in backtesting.
 int TrailingStopDelay = 0; // Trail stop delay (in sec)
 int JobProcessDelay = 1; // Job process delay (in sec)
-bool DynamicSpreadConf = FALSE; // Dynamically calculate most optimal settings based on the current spread (MinPipChangeToTrade/MinPipGap).
+bool DynamicSpreadConf = false; // Dynamically calculate most optimal settings based on the current spread (MinPipChangeToTrade/MinPipGap).
 int SpreadRatio = 1.0;
 
 // Cache some calculated variables for better performance. FIXME: Needs some work.
 #ifdef __experimental__
-  extern bool Cache = FALSE; // Cache
+  extern bool Cache = false; // Cache
 #else
-  const bool Cache = FALSE; // Cache
+  const bool Cache = false; // Cache
 #endif
 
 //+------------------------------------------------------------------+
 extern string __Logging_Parameters__ = "-- Settings for logging & messages --"; // >>> LOGS & MESSAGES <<<
-extern bool WriteReport = 1; // Write file report on exit
+extern bool WriteReport = 1; // Write summary report on finish
 extern bool PrintLogOnChart = 1; // Display info on chart
 extern bool VerboseErrors = 1; // Display errors
 extern bool VerboseInfo = 1; // Display info messages
@@ -1378,7 +1378,7 @@ extern color ColorSell = 255; // Color: Sell
 extern bool SoundAlert = 0; // Enable sound alerts
 extern string SoundFileAtOpen = "alert.wav"; // Sound: on order open
 extern string SoundFileAtClose = "alert.wav"; // Sound: on order close
-// extern bool SendLogs = FALSE; // Send logs to remote host for diagnostic purposes
+// extern bool SendLogs = false; // Send logs to remote host for diagnostic purposes
 
 //+------------------------------------------------------------------+
 extern string __Backtest_Parameters__ = "-- Testing & troubleshooting parameters --"; // >>> TESTING <<<
@@ -1388,14 +1388,15 @@ extern string __Backtest_Parameters__ = "-- Testing & troubleshooting parameters
   extern bool ValidateSettings = 1; // Validate startup settings
 #endif
 extern bool RecordTicksToCSV = False; // Record ticks into CSV files
+#ifdef __profiler__ extern #endif uint ProfilingMinTime = 1; // Displays EA profiling times (0 - off)
 extern int SmartToggleComponent = 0; // Override: Toggle different components (0-43)
 extern int AccountConditionToDisable = 0; // Override: Disable specific n action
-extern bool DisableCloseConditions = FALSE; // Override: Disable all close conditions
+extern bool DisableCloseConditions = false; // Override: Disable all close conditions
 // extern int DemoMarketStopLevel = 10; // Demo market stop level
 
 //+------------------------------------------------------------------+
 extern string __EA_Constants__ = "-- Constants --"; // >>> CONSTANTS <<<
-extern int MagicNumber = 31337; // Starting EA magic number (+40)
+extern int MagicNumber = 31337; // Unique EA magic number (+40)
 
 //+------------------------------------------------------------------+
 extern string __Other_Parameters__ = "-- Other parameters --"; // >>> OTHER <<<

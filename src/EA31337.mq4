@@ -253,12 +253,14 @@ void OnTick() {
     }
   }
   if (_tick_procesed) {
+    if (PrintLogOnChart) {
+      DisplayInfoOnChart();
+    }
     if (!terminal.IsOptimization()) {
       terminal.Logger().Flush(false);
     }
   }
   UpdateTicks();
-  if (PrintLogOnChart && !terminal.IsOptimization()) DisplayInfoOnChart();
   #ifdef __profiler__ PROFILER_STOP #endif
 } // end: OnTick()
 
@@ -568,15 +570,16 @@ string InitInfo(bool startup = false, string sep = "\n") {
   string extra = "";
   #ifdef __expire__ CheckExpireDate(); extra += StringFormat(" [expires on %s]", TimeToStr(ea_expire_date, TIME_DATE)); #endif
   string output = StringFormat("%s v%s by %s (%s)%s%s", ea_name, ea_version, ea_author, ea_link, extra, sep);
+  output += "TERMINAL: " + terminal.ToString() + sep;
   output += "ACCOUNT: " + account.ToString() + sep;
   output += "SYMBOL: " + ((SymbolInfo *)market).ToString() + sep;
   output += "MARKET: " + market.ToString() + sep;
-  for (int tfi = 0; tfi < FINAL_ENUM_TIMEFRAMES_INDEX; tfi++) {
-    if (Object::IsValid(trade[tfi]) && trade[tfi].Chart().IsValidTf()) {
-      output += StringFormat("CHART: %s%s", trade[tfi].Chart().ToString(), sep);
+  for (ENUM_TIMEFRAMES_INDEX _tfi = 0; _tfi < FINAL_ENUM_TIMEFRAMES_INDEX; _tfi++) {
+    if (Object::IsValid(trade[_tfi]) && trade[_tfi].Chart().IsValidTf()) {
+      output += StringFormat("CHART: %s%s", trade[_tfi].Chart().ToString(), sep);
     }
     else {
-      output += StringFormat("CHART: %s not active.%s", Chart::IndexToString(tfi), sep);
+      output += StringFormat("CHART: %s not active.%s", Chart::IndexToString(_tfi), sep);
     }
   }
   /*
@@ -5027,7 +5030,6 @@ bool InitStrategies() {
  * Init classes.
  */
 bool InitClasses() {
-  Chart *_chart;
   #ifdef __profiler__ PROFILER_START #endif
 
   // Initialize main classes.
@@ -5035,23 +5037,15 @@ bool InitClasses() {
   logger = new Log(V_DEBUG);
   market = new Market(_Symbol, logger);
 
-  // Initialize trade classes per each available chart.
-  for (ENUM_TIMEFRAMES_INDEX tfi = 0; tfi < FINAL_ENUM_TIMEFRAMES_INDEX; tfi++) {
-    _chart = new Chart(tfi);
-    if (_chart.IsValidTf()) {
-      TradeParams trade_params;
-      trade_params.account = account;
-      trade_params.chart = _chart;
-      trade_params.logger = logger;
-      trade[tfi] = new Trade(trade_params);
-    }
-    else {
-      trade[tfi] = NULL;
-    }
-  }
+  // Initialize the current chart.
+  ENUM_TIMEFRAMES_INDEX _tfi = Chart::TfToIndex(PERIOD_CURRENT);
+  TradeParams trade_params;
+  trade_params.account = account;
+  trade_params.chart = new Chart(_tfi);
+  trade_params.logger = logger;
+  trade[_tfi] = new Trade(trade_params);
 
   // Verify that the current chart has been initialized correctly.
-  uint _tfi = Chart::TfToIndex(PERIOD_CURRENT);
   if (Object::IsDynamic(trade[_tfi]) && trade[_tfi].Chart().IsValidTf()) {
     // Assign to the current chart.
     chart = trade[_tfi].Chart();
@@ -5075,13 +5069,23 @@ bool InitClasses() {
  */
 bool InitStrategy(int key, string name, bool active, ENUM_INDICATOR_TYPE indicator, ENUM_TIMEFRAMES _tf, int signal_method = 0, double signal_level = 0.0, int open_cond1 = 0, int open_cond2 = 0, int close_cond = 0, double max_spread = 0.0) {
   if (active) {
-    uint _tfi = Chart::TfToIndex(_tf);
-    // Validate whether the timeframe is working.
-    if (!Object::IsDynamic(trade[_tfi]) || !trade[_tfi].Chart().IsValidTf(_tf)) {
-      Msg::ShowText(
-        StringFormat("Cannot initialize %s strategy, because its timeframe (%d) is not active!%s", name, _tf, ValidateSettings ? " Disabling..." : ""),
-        "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
-      active = false;
+    ENUM_TIMEFRAMES_INDEX _tfi = Chart::TfToIndex(_tf);
+    // Validate the timeframe.
+    if (!Object::IsValid(trade[_tfi]) || !trade[_tfi].Chart().IsValidTf(_tf)) {
+
+      // Initialize the Trade instance and its chart.
+      TradeParams trade_params;
+      trade_params.account = account;
+      trade_params.chart = new Chart(_tfi);
+      trade_params.logger = logger;
+      trade[_tfi] = new Trade(trade_params);
+
+      if (!Object::IsValid(trade[_tfi]) || !trade[_tfi].Chart().IsValidTf(_tf)) {
+        Msg::ShowText(
+          StringFormat("Cannot initialize %s strategy, because its timeframe (%d) is not active!%s", name, _tf, ValidateSettings ? " Disabling..." : ""),
+          "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
+        active = false;
+      }
     }
     // Validate whether indicator of the strategy is working.
     else if (!UpdateIndicator(trade[_tfi].Chart(), indicator)) {
@@ -5915,10 +5919,16 @@ string GetMonthlyReport() {
  * Display info on chart.
  */
 string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
-  if (terminal.IsOptimization()) {
+  if (!terminal.IsRealtime() || !terminal.IsVisualMode()) {
     return NULL;
   }
+
+  datetime _lastupdate = 0;
   string output;
+  if (_lastupdate < TimeCurrent()) {
+    return NULL;
+  }
+
   // Prepare text for Stop Out.
   string stop_out_level = StringFormat("%d", account.AccountStopoutLevel());
   if (AccountStopoutMode() == 0) stop_out_level += "%"; else stop_out_level += account.AccountCurrency();
@@ -5985,6 +5995,7 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
     Comment(output);
     ChartRedraw(); // Redraws the current chart forcedly.
   }
+  _lastupdate = TimeCurrent();
   return output;
 }
 

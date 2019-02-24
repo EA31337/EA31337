@@ -9,29 +9,11 @@ addons:
     - shellcheck
 env:
   global:
-  - EA_NAME=EA31337
   - CWD=$TRAVIS_BUILD_DIR
-  - WINETRICKS_DOWNLOADER_RETRIES=20
-  - BOOT_CODE="${BOOT_CODE:-free -m}"
-  - FINAL_CODE="${FINAL_CODE:-find /opt -maxdepth 2 -ls}"
-  - DOCKER_IMAGE=ea-tester
-  - DOCKER_TAG=${DOCKER_TAG:-latest}
-  - DOCKER_REPO=ea31337/$DOCKER_IMAGE:$DOCKER_TAG
-  - DOCKER_ENV="-e BOOT_CODE=\"$BOOT_CODE\" -e FINAL_CODE=\"$FINAL_CODE\""
-  - DOCKER_VOL="-v $CWD/src:/opt/src:rw"
-  - DOCKER_RUN="docker run $DOCKER_ENV $DOCKER_VOL $DOCKER_REPO"
-  - FAIL_CMD="$DOCKER_RUN \"ea_copy $EA_NAME; compile_ea $EA_NAME\""
   matrix:
-  - CMD="bash -n scripts/*.sh; shellcheck scripts/*.sh conf/*/*.sh"
-  - |
-    MODE="__lite__"
-    CMD="docker-compose -f docker/tests/docker-compose.yml up --exit-code-from test_2018_01"
-  - |
-    MODE="__advanced__"
-    CMD="docker-compose -f docker/tests/docker-compose.yml up --exit-code-from test_2018_01"
-  - |
-    MODE="__rider__"
-    CMD="docker-compose -f docker/tests/docker-compose.yml up --exit-code-from test_2018_01"
+  - CMD="cd docker/tests/lite; docker-compose build --build-arg UID=$UID test_2018_01; docker-compose run test_2018_01"
+  - CMD="cd docker/tests/advanced; docker-compose build --build-arg UID=$UID test_2018_01; docker-compose run test_2018_01"
+  - CMD="cd docker/tests/rider; docker-compose build --build-arg UID=$UID test_2018_01; docker-compose run test_2018_01"
 matrix:
   fast_finish: true
 notifications:
@@ -44,12 +26,12 @@ before_install:
 install:
 before_script:
 - docker images
-- test -n "$MODE" && ( echo "#define $MODE" | tee -a $CWD/src/include/EA31337/ea-mode.mqh ) || true
 script:
+- bash -n scripts/*.sh; shellcheck scripts/*.sh conf/*/*.sh
 - echo $CMD
 - eval $CMD
 after_script:
 - set +x
+- git diff
 after_success:
 after_failure:
-- test -n "$MODE" && eval $FAIL_CMD
