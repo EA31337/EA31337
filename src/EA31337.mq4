@@ -239,7 +239,7 @@ double zigzag[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
 void OnTick() {
   //#ifdef __trace__ PrintFormat("%s: Ask=%g/Bid=%g", __FUNCTION__, Ask, Bid); #endif
   if (!session_initiated) return;
-  #ifdef __profiler__ PROFILER_START #endif
+  //#ifdef __profiler__ PROFILER_START #endif
 
   MqlTick _tick = market.GetTick();
   bool _tick_procesed = false;
@@ -261,7 +261,7 @@ void OnTick() {
     }
   }
   UpdateTicks();
-  #ifdef __profiler__ PROFILER_STOP #endif
+  //#ifdef __profiler__ PROFILER_STOP #endif
 } // end: OnTick()
 
 /**
