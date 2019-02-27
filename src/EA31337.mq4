@@ -386,6 +386,7 @@ int OnInit() {
      session_initiated = true;
   }
 
+  #ifdef __profiler__ PROFILER_SET_MIN(10) #endif
   #ifdef __profiler__ PROFILER_START #endif
 
   session_initiated &= InitClasses();
@@ -415,7 +416,7 @@ int OnInit() {
   }
 
   ChartRedraw();
-  #ifdef __profiler__ PROFILER_STOP_MAX #endif
+  #ifdef __profiler__ PROFILER_STOP_PRINT #endif
   return (session_initiated ? INIT_SUCCEEDED : INIT_FAILED);
 } // end: OnInit()
 
@@ -433,10 +434,7 @@ void OnDeinit(const int reason) {
       // Show final account details.
       terminal.Logger().Info(GetSummaryText(), __FUNCTION_LINE__);
 
-      #ifdef __profiler__
-      PROFILER_SET_MIN(5)
-      PROFILER_PRINT
-      #endif
+      #ifdef __profiler__ PROFILER_PRINT #endif
 
       // Save ticks if recorded.
       if (RecordTicksToCSV) {
