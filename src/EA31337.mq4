@@ -434,9 +434,8 @@ void OnDeinit(const int reason) {
       terminal.Logger().Info(GetSummaryText(), __FUNCTION_LINE__);
 
       #ifdef __profiler__
-      if (ProfilingMinTime >= 1) {
-        PROFILER_PRINT(ProfilingMinTime);
-      }
+      PROFILER_SET_MIN(5)
+      PROFILER_PRINT
       #endif
 
       // Save ticks if recorded.

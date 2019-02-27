@@ -4,7 +4,7 @@ services:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
     build:
-      context: ../../..
+      context: ../../../..
       target: ea31337-lite-eurusd-2018
     volumes:
     - ../../../../src:/opt/src
@@ -16,7 +16,7 @@ services:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2017
     build:
-      context: ../../..
+      context: ../../../..
       target: ea31337-lite-eurusd-2017
     volumes:
     - ../../../../src:/opt/src
