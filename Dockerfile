@@ -18,6 +18,16 @@ RUN usermod -u $UID ubuntu
 USER ubuntu
 COPY --from=ea31337 --chown=ubuntu:root "/opt/EA" "/opt/EA"
 
+# EURUSD 2017
+FROM ea31337/ea-tester:EURUSD-2017-DS as eurusd-2017
+# Adjust the user's UID.
+ARG UID=1000
+USER root
+RUN usermod -u $UID ubuntu
+# Copy EA files.
+USER ubuntu
+COPY --from=ea31337 --chown=ubuntu:root "/opt/EA" "/opt/EA"
+
 # Build Lite version.
 FROM ea31337 as ea31337-lite
 WORKDIR /opt/EA
