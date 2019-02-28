@@ -5540,7 +5540,7 @@ double GetStrategyProfitFactor(int sid) {
  * Fetch strategy signal level based on the indicator and timeframe.
  */
 double GetStrategySignalLevel(int indicator, int timeframe = PERIOD_M30, double default_value = 0.0) {
-  int sid = GetStrategyViaIndicator(indicator, timeframe);
+  int sid = GetStrategyViaIndicator((ENUM_STRATEGY_TYPE) indicator, (ENUM_TIMEFRAMES) timeframe);
   // Message(StringFormat("%s(): indi = %d, timeframe = %d, sid = %d, signal_level = %f", __FUNCTION__, indicator, timeframe, sid, conf[sid][OPEN_LEVEL]));
   return sid >= 0 ? conf[sid][OPEN_LEVEL] : default_value;
 }
@@ -5549,7 +5549,7 @@ double GetStrategySignalLevel(int indicator, int timeframe = PERIOD_M30, double 
  * Fetch strategy signal level based on the indicator and timeframe.
  */
 int GetStrategySignalMethod(int indicator, int timeframe = PERIOD_M30, int default_value = 0) {
-  int sid = GetStrategyViaIndicator(indicator, timeframe);
+  int sid = GetStrategyViaIndicator((ENUM_STRATEGY_TYPE) indicator, (ENUM_TIMEFRAMES) timeframe);
   return sid >= 0 ? info[sid][OPEN_METHOD] : default_value;
 }
 
@@ -5570,14 +5570,14 @@ ENUM_TIMEFRAMES_INDEX GetStrategyTimeframeIndex(int sid, int default_value = PER
 /**
  * Get strategy id based on the indicator and tf.
  */
-int GetStrategyViaIndicator(int indicator, int tf) {
+int GetStrategyViaIndicator(ENUM_STRATEGY_TYPE indicator, int tf) {
   for (int sid = 0; sid < ArrayRange(info, 0); sid++) {
-    if (info[sid][INDICATOR] == indicator && info[sid][TIMEFRAME] == tf) {
+    if ((ENUM_STRATEGY_TYPE) info[sid][INDICATOR] == indicator && info[sid][TIMEFRAME] == tf) {
       return sid;
     }
   }
   Msg::ShowText(
-    StringFormat("Cannot find indicator %d for timeframe: %d", indicator, tf),
+    StringFormat("Cannot find indicator %d (%s) for timeframe: %d", (int) indicator, EnumToString(indicator), tf),
     "Error", __FUNCTION__, __LINE__, VerboseErrors);
   return EMPTY;
 }
