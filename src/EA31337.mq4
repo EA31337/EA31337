@@ -180,6 +180,14 @@ string last_cname;
 // Order queue.
 long order_queue[100][FINAL_ORDER_QUEUE_ENTRY];
 
+// For debugging purposes.
+string stacktrace = "";
+#define DEBUG_CHECKPOINT_RESET stacktrace = __FUNCTION__;
+#define DEBUG_CHECKPOINT_ADD  stacktrace += ">" + __FUNCTION__ + ":" + (string) __LINE__;
+#define DEBUG_CHECKPOINT_POP  stacktrace += "<";
+#define DEBUG_STACK_PRINT  Print(stacktrace);
+#define DEBUG_STACK_GET    stacktrace
+
 // Indicator variables.
 double iac[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
 double ad[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
@@ -644,6 +652,7 @@ string InitInfo(bool startup = false, string sep = "\n") {
  * Main function to trade.
  */
 bool EA_Trade(Trade *_trade) {
+  DEBUG_CHECKPOINT_RESET
   #ifdef __profiler__ PROFILER_START #endif
   bool order_placed = false;
   ENUM_ORDER_TYPE _cmd = EMPTY;
@@ -711,6 +720,7 @@ bool EA_Trade(Trade *_trade) {
  * Check if strategy is on trade conditionl.
  */
 bool TradeCondition(Trade *_trade, ENUM_STRATEGY_TYPE sid = 0, ENUM_ORDER_TYPE cmd = NULL) {
+  DEBUG_CHECKPOINT_ADD
   bool _result = false;
   #ifdef __profiler__ PROFILER_START #endif
   Chart *_chart = _trade.Chart();
@@ -749,6 +759,7 @@ bool TradeCondition(Trade *_trade, ENUM_STRATEGY_TYPE sid = 0, ENUM_ORDER_TYPE c
     case ZIGZAG1: case ZIGZAG5: case ZIGZAG15: case ZIGZAG30:                 _result = Trade_ZigZag(_chart, cmd); break;
   }
   #ifdef __profiler__ PROFILER_STOP #endif
+  DEBUG_CHECKPOINT_POP
   return _result;
 }
 
@@ -757,6 +768,7 @@ bool TradeCondition(Trade *_trade, ENUM_STRATEGY_TYPE sid = 0, ENUM_ORDER_TYPE c
  * Gukkuk im Versteck
  */
 bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
+  DEBUG_CHECKPOINT_ADD
   bool success = true;
   int i; string text = __FUNCTION__ + ": ";
   ENUM_TIMEFRAMES tf = _chart.GetTf();
@@ -1049,6 +1061,7 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
 
   //processed[type][index] = chart.GetBarTime(tf);
   #ifdef __profiler__ PROFILER_STOP #endif
+  DEBUG_CHECKPOINT_POP
   return (success);
 }
 
@@ -1068,6 +1081,7 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
  *     if true, re-try to open again after error/failure.
  */
 int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string order_comment = "", bool retry = true) {
+  DEBUG_CHECKPOINT_ADD
   bool result = false;
   int order_ticket;
   double trade_volume_max = market.GetVolumeMax();
@@ -1259,6 +1273,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
  * Check if we can open new order.
  */
 bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, int sid = EMPTY, double volume = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   bool result = true;
   string err;
   // if (VerboseTrace) Print(__FUNCTION__);
@@ -1333,7 +1348,7 @@ bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, int sid = EMPTY, double volume = EM
  *   If true, the profit factor is fine, otherwise return false.
  */
 bool CheckProfitFactorLimits(int sid = EMPTY) {
-  if (VerboseTrace) Print(__FUNCTION__);
+  DEBUG_CHECKPOINT_ADD
   if (sid == EMPTY) {
     // If sid is empty, unsuspend all strategies.
     ActionExecute(A_UNSUSPEND_STRATEGIES);
@@ -1377,6 +1392,7 @@ bool CheckProfitFactorLimits(int sid = EMPTY) {
  *   If true, the spread is fine, otherwise return false.
  */
 bool CheckSpreadLimit(int sid) {
+  DEBUG_CHECKPOINT_ADD
   double spread_limit = Misc::If(conf[sid][SPREAD_LIMIT] > 0, fmin(conf[sid][SPREAD_LIMIT], MaxSpreadToTrade), MaxSpreadToTrade);
   #ifdef __backtest__
   if (curr_spread > 10) { PrintFormat("%s: Error %d: %s", __FUNCTION__, __LINE__, "Backtesting over 10 pips not supported, sorry."); ExpertRemove(); }
@@ -1390,6 +1406,7 @@ bool CheckSpreadLimit(int sid) {
  * Close order.
  */
 bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = true) {
+  DEBUG_CHECKPOINT_ADD
   bool result = false;
   if (ticket_no == EMPTY) {
     ticket_no = OrderTicket();
@@ -1551,6 +1568,7 @@ bool UpdateStats() {
  *   signal_level (float) - signal level to use
  */
 bool Trade_AC(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false;
   uint period = _chart.TfToIndex();
@@ -1605,6 +1623,7 @@ bool Trade_AC(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, dou
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_AD(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_AD);
@@ -1659,6 +1678,7 @@ bool Trade_AD(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, dou
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_ADX(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_ADX);
@@ -1713,6 +1733,7 @@ bool Trade_ADX(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_Alligator(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   // [x][0] - The Blue line (Alligator's Jaw), [x][1] - The Red Line (Alligator's Teeth), [x][2] - The Green Line (Alligator's Lips)
   bool result = false; uint period = _chart.TfToIndex();
@@ -1791,6 +1812,7 @@ bool Trade_Alligator(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMP
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_ATR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_ATR);
@@ -1845,6 +1867,7 @@ bool Trade_ATR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_Awesome(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_AO);
@@ -1898,6 +1921,7 @@ bool Trade_Awesome(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_Bands(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_BANDS);
@@ -1959,6 +1983,7 @@ bool Trade_Bands(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_BPower(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_BEARS);
@@ -2003,6 +2028,7 @@ bool Trade_BPower(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY,
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_Breakage(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   // if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(BWMFI, tf, 0);
@@ -2046,6 +2072,7 @@ bool Trade_Breakage(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_BWMFI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_BWMFI);
@@ -2090,6 +2117,7 @@ bool Trade_BWMFI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_CCI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_CCI);
@@ -2138,6 +2166,7 @@ bool Trade_CCI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_DeMarker(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_DEMARKER);
@@ -2185,6 +2214,7 @@ bool Trade_DeMarker(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_Envelopes(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_ENVELOPES);
@@ -2238,6 +2268,7 @@ bool Trade_Envelopes(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMP
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_Force(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_FORCE);
@@ -2274,6 +2305,7 @@ bool Trade_Force(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_Fractals(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint index = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_FRACTALS);
@@ -2321,6 +2353,7 @@ bool Trade_Fractals(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_Gator(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_GATOR);
@@ -2357,6 +2390,7 @@ bool Trade_Gator(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_Ichimoku(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_ICHIMOKU);
@@ -2412,6 +2446,7 @@ bool Trade_Ichimoku(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_MA(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_MA);
@@ -2465,6 +2500,7 @@ bool Trade_MA(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, dou
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_MACD(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_MA);
@@ -2532,6 +2568,7 @@ bool Trade_MACD(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, d
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_MFI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_MFI);
@@ -2567,6 +2604,7 @@ bool Trade_MFI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_Momentum(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_MOMENTUM);
@@ -2593,6 +2631,7 @@ bool Trade_Momentum(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_OBV(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_OBV);
@@ -2619,6 +2658,7 @@ bool Trade_OBV(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_OSMA(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_OSMA);
@@ -2666,6 +2706,7 @@ bool Trade_OSMA(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, d
  *   signal_level - signal level to consider the signal
  */
 bool Trade_RSI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_RSI);
@@ -2727,6 +2768,7 @@ bool Trade_RSI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_RVI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_RVI);
@@ -2766,6 +2808,7 @@ bool Trade_RVI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_SAR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_SAR);
@@ -2826,6 +2869,7 @@ bool Trade_SAR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_StdDev(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_STDDEV);
@@ -2879,6 +2923,7 @@ bool Trade_StdDev(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY,
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_Stochastic(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_STOCHASTIC);
@@ -2948,6 +2993,7 @@ bool Trade_Stochastic(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EM
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_WPR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_WPR);
@@ -3006,6 +3052,7 @@ bool Trade_WPR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  *   signal_level (double) - signal level to consider the signal
  */
 bool Trade_ZigZag(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_ZIGZAG);
@@ -3051,6 +3098,7 @@ bool Trade_ZigZag(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY,
  *   default_value (bool) - default value to set, if false - return the opposite
  */
 bool CheckMarketCondition1(Chart *_chart, ENUM_ORDER_TYPE cmd, int condition = 0, bool default_value = true) {
+  DEBUG_CHECKPOINT_ADD
   bool result = true;
   if (condition == 0) {
     return result;
@@ -3083,6 +3131,7 @@ bool CheckMarketCondition1(Chart *_chart, ENUM_ORDER_TYPE cmd, int condition = 0
  *   default_value (bool) - default value to set, if false - return the opposite
  */
 bool CheckMarketEvent(Chart *_chart, ENUM_ORDER_TYPE cmd = EMPTY, int condition = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   bool result = false;
   uint period = _chart.TfToIndex();
   ENUM_TIMEFRAMES tf = _chart.GetTf();
@@ -3224,6 +3273,7 @@ bool CheckMarketEvent(Chart *_chart, ENUM_ORDER_TYPE cmd = EMPTY, int condition 
     default:
       result = false;
   }
+  DEBUG_CHECKPOINT_POP
   return result;
 }
 
@@ -3423,6 +3473,7 @@ bool UpdateTrailingStops(Trade *_trade) {
  *    Set to true if the calculation is for particular existing order, so additional local variables are available.
  */
 double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_DOUBLE mode = ORDER_SL, int order_type = 0, double previous = 0, bool existing = false) {
+  DEBUG_CHECKPOINT_ADD
   Chart *_chart = _trade.Chart();
   ENUM_TIMEFRAMES tf = _chart.GetTf();
   uint period = _chart.TfToIndex();
@@ -3687,6 +3738,7 @@ double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_
  * Get trailing method based on the strategy type.
  */
 int GetTrailingMethod(int order_type, ENUM_ORDER_PROPERTY_DOUBLE mode) {
+  DEBUG_CHECKPOINT_ADD
   int stop_method = DefaultTrailingStopMethod, profit_method = DefaultTrailingProfitMethod;
   switch (order_type) {
     case MA1:
@@ -4867,155 +4919,155 @@ bool InitStrategies() {
   ArrayInitialize(stats, 0); // Reset strategy statistics.
 
   // Initialize strategy array variables.
-  init &= !AC1_Active  || InitStrategy(AC1,  "AC M1",   AC1_Active,  INDI_AC, PERIOD_M1,  AC1_SignalMethod,  AC_SignalLevel, AC1_OpenCondition1,  AC1_OpenCondition2,  AC1_CloseCondition,  AC1_MaxSpread);
-  init &= !AC5_Active  || InitStrategy(AC5,  "AC M5",   AC5_Active,  INDI_AC, PERIOD_M5,  AC5_SignalMethod,  AC_SignalLevel, AC5_OpenCondition1,  AC5_OpenCondition2,  AC5_CloseCondition,  AC5_MaxSpread);
-  init &= !AC15_Active || InitStrategy(AC15, "AC M15", AC15_Active, INDI_AC, PERIOD_M15, AC15_SignalMethod, AC_SignalLevel, AC15_OpenCondition1, AC15_OpenCondition2, AC15_CloseCondition, AC15_MaxSpread);
-  init &= !AC30_Active || InitStrategy(AC30, "AC M30", AC30_Active, INDI_AC, PERIOD_M30, AC30_SignalMethod, AC_SignalLevel, AC30_OpenCondition1, AC30_OpenCondition2, AC30_CloseCondition, AC30_MaxSpread);
+  init &= !AC1_Active  | InitStrategy(AC1,  "AC M1",   AC1_Active,  INDI_AC, PERIOD_M1,  AC1_SignalMethod,  AC_SignalLevel, AC1_OpenCondition1,  AC1_OpenCondition2,  AC1_CloseCondition,  AC1_MaxSpread);
+  init &= !AC5_Active  | InitStrategy(AC5,  "AC M5",   AC5_Active,  INDI_AC, PERIOD_M5,  AC5_SignalMethod,  AC_SignalLevel, AC5_OpenCondition1,  AC5_OpenCondition2,  AC5_CloseCondition,  AC5_MaxSpread);
+  init &= !AC15_Active | InitStrategy(AC15, "AC M15", AC15_Active, INDI_AC, PERIOD_M15, AC15_SignalMethod, AC_SignalLevel, AC15_OpenCondition1, AC15_OpenCondition2, AC15_CloseCondition, AC15_MaxSpread);
+  init &= !AC30_Active | InitStrategy(AC30, "AC M30", AC30_Active, INDI_AC, PERIOD_M30, AC30_SignalMethod, AC_SignalLevel, AC30_OpenCondition1, AC30_OpenCondition2, AC30_CloseCondition, AC30_MaxSpread);
 
-  init &= !AD1_Active  || InitStrategy(AD1,  "AD M1",   AD1_Active,  INDI_AD, PERIOD_M1,  AD1_SignalMethod,  AD_SignalLevel, AD1_OpenCondition1,  AD1_OpenCondition2,  AD1_CloseCondition,  AD1_MaxSpread);
-  init &= !AD5_Active  || InitStrategy(AD5,  "AD M5",   AD5_Active,  INDI_AD, PERIOD_M5,  AD5_SignalMethod,  AD_SignalLevel, AD5_OpenCondition1,  AD5_OpenCondition2,  AD5_CloseCondition,  AD5_MaxSpread);
-  init &= !AD15_Active || InitStrategy(AD15, "AD M15", AD15_Active, INDI_AD, PERIOD_M15, AD15_SignalMethod, AD_SignalLevel, AD15_OpenCondition1, AD15_OpenCondition2, AD15_CloseCondition, AD15_MaxSpread);
-  init &= !AD30_Active || InitStrategy(AD30, "AD M30", AD30_Active, INDI_AD, PERIOD_M30, AD30_SignalMethod, AD_SignalLevel, AD30_OpenCondition1, AD30_OpenCondition2, AD30_CloseCondition, AD30_MaxSpread);
+  init &= !AD1_Active  | InitStrategy(AD1,  "AD M1",   AD1_Active,  INDI_AD, PERIOD_M1,  AD1_SignalMethod,  AD_SignalLevel, AD1_OpenCondition1,  AD1_OpenCondition2,  AD1_CloseCondition,  AD1_MaxSpread);
+  init &= !AD5_Active  | InitStrategy(AD5,  "AD M5",   AD5_Active,  INDI_AD, PERIOD_M5,  AD5_SignalMethod,  AD_SignalLevel, AD5_OpenCondition1,  AD5_OpenCondition2,  AD5_CloseCondition,  AD5_MaxSpread);
+  init &= !AD15_Active | InitStrategy(AD15, "AD M15", AD15_Active, INDI_AD, PERIOD_M15, AD15_SignalMethod, AD_SignalLevel, AD15_OpenCondition1, AD15_OpenCondition2, AD15_CloseCondition, AD15_MaxSpread);
+  init &= !AD30_Active | InitStrategy(AD30, "AD M30", AD30_Active, INDI_AD, PERIOD_M30, AD30_SignalMethod, AD_SignalLevel, AD30_OpenCondition1, AD30_OpenCondition2, AD30_CloseCondition, AD30_MaxSpread);
 
-  init &= !ADX1_Active  || InitStrategy(ADX1,  "ADX M1",   ADX1_Active,  INDI_ADX, PERIOD_M1,  ADX1_SignalMethod,  ADX_SignalLevel, ADX1_OpenCondition1,  ADX1_OpenCondition2,  ADX1_CloseCondition,  ADX1_MaxSpread);
-  init &= !ADX5_Active  || InitStrategy(ADX5,  "ADX M5",   ADX5_Active,  INDI_ADX, PERIOD_M5,  ADX5_SignalMethod,  ADX_SignalLevel, ADX5_OpenCondition1,  ADX5_OpenCondition2,  ADX5_CloseCondition,  ADX5_MaxSpread);
-  init &= !ADX15_Active || InitStrategy(ADX15, "ADX M15", ADX15_Active, INDI_ADX, PERIOD_M15, ADX15_SignalMethod, ADX_SignalLevel, ADX15_OpenCondition1, ADX15_OpenCondition2, ADX15_CloseCondition, ADX15_MaxSpread);
-  init &= !ADX30_Active || InitStrategy(ADX30, "ADX M30", ADX30_Active, INDI_ADX, PERIOD_M30, ADX30_SignalMethod, ADX_SignalLevel, ADX30_OpenCondition1, ADX30_OpenCondition2, ADX30_CloseCondition, ADX30_MaxSpread);
+  init &= !ADX1_Active  | InitStrategy(ADX1,  "ADX M1",   ADX1_Active,  INDI_ADX, PERIOD_M1,  ADX1_SignalMethod,  ADX_SignalLevel, ADX1_OpenCondition1,  ADX1_OpenCondition2,  ADX1_CloseCondition,  ADX1_MaxSpread);
+  init &= !ADX5_Active  | InitStrategy(ADX5,  "ADX M5",   ADX5_Active,  INDI_ADX, PERIOD_M5,  ADX5_SignalMethod,  ADX_SignalLevel, ADX5_OpenCondition1,  ADX5_OpenCondition2,  ADX5_CloseCondition,  ADX5_MaxSpread);
+  init &= !ADX15_Active | InitStrategy(ADX15, "ADX M15", ADX15_Active, INDI_ADX, PERIOD_M15, ADX15_SignalMethod, ADX_SignalLevel, ADX15_OpenCondition1, ADX15_OpenCondition2, ADX15_CloseCondition, ADX15_MaxSpread);
+  init &= !ADX30_Active | InitStrategy(ADX30, "ADX M30", ADX30_Active, INDI_ADX, PERIOD_M30, ADX30_SignalMethod, ADX_SignalLevel, ADX30_OpenCondition1, ADX30_OpenCondition2, ADX30_CloseCondition, ADX30_MaxSpread);
 
-  init &= !Alligator1_Active  || InitStrategy(ALLIGATOR1,  "Alligator M1",   Alligator1_Active,  INDI_ALLIGATOR, PERIOD_M1,  Alligator1_SignalMethod,  Alligator_SignalLevel, Alligator1_OpenCondition1,  Alligator1_OpenCondition2,  Alligator1_CloseCondition,  Alligator1_MaxSpread);
-  init &= !Alligator5_Active  || InitStrategy(ALLIGATOR5,  "Alligator M5",   Alligator5_Active,  INDI_ALLIGATOR, PERIOD_M5,  Alligator5_SignalMethod,  Alligator_SignalLevel, Alligator5_OpenCondition1,  Alligator5_OpenCondition2,  Alligator5_CloseCondition,  Alligator5_MaxSpread);
-  init &= !Alligator15_Active || InitStrategy(ALLIGATOR15, "Alligator M15", Alligator15_Active, INDI_ALLIGATOR, PERIOD_M15, Alligator15_SignalMethod, Alligator_SignalLevel, Alligator15_OpenCondition1, Alligator15_OpenCondition2, Alligator15_CloseCondition, Alligator15_MaxSpread);
-  init &= !Alligator30_Active || InitStrategy(ALLIGATOR30, "Alligator M30", Alligator30_Active, INDI_ALLIGATOR, PERIOD_M30, Alligator30_SignalMethod, Alligator_SignalLevel, Alligator30_OpenCondition1, Alligator30_OpenCondition2, Alligator30_CloseCondition, Alligator30_MaxSpread);
+  init &= !Alligator1_Active  | InitStrategy(ALLIGATOR1,  "Alligator M1",   Alligator1_Active,  INDI_ALLIGATOR, PERIOD_M1,  Alligator1_SignalMethod,  Alligator_SignalLevel, Alligator1_OpenCondition1,  Alligator1_OpenCondition2,  Alligator1_CloseCondition,  Alligator1_MaxSpread);
+  init &= !Alligator5_Active  | InitStrategy(ALLIGATOR5,  "Alligator M5",   Alligator5_Active,  INDI_ALLIGATOR, PERIOD_M5,  Alligator5_SignalMethod,  Alligator_SignalLevel, Alligator5_OpenCondition1,  Alligator5_OpenCondition2,  Alligator5_CloseCondition,  Alligator5_MaxSpread);
+  init &= !Alligator15_Active | InitStrategy(ALLIGATOR15, "Alligator M15", Alligator15_Active, INDI_ALLIGATOR, PERIOD_M15, Alligator15_SignalMethod, Alligator_SignalLevel, Alligator15_OpenCondition1, Alligator15_OpenCondition2, Alligator15_CloseCondition, Alligator15_MaxSpread);
+  init &= !Alligator30_Active | InitStrategy(ALLIGATOR30, "Alligator M30", Alligator30_Active, INDI_ALLIGATOR, PERIOD_M30, Alligator30_SignalMethod, Alligator_SignalLevel, Alligator30_OpenCondition1, Alligator30_OpenCondition2, Alligator30_CloseCondition, Alligator30_MaxSpread);
 
-  init &= !ATR1_Active  || InitStrategy(ATR1,  "ATR M1",   ATR1_Active,  INDI_ATR, PERIOD_M1,  ATR1_SignalMethod,  ATR_SignalLevel, ATR1_OpenCondition1,  ATR1_OpenCondition2,  ATR1_CloseCondition,  ATR1_MaxSpread);
-  init &= !ATR5_Active  || InitStrategy(ATR5,  "ATR M5",   ATR5_Active,  INDI_ATR, PERIOD_M5,  ATR5_SignalMethod,  ATR_SignalLevel, ATR5_OpenCondition1,  ATR5_OpenCondition2,  ATR5_CloseCondition,  ATR5_MaxSpread);
-  init &= !ATR15_Active || InitStrategy(ATR15, "ATR M15", ATR15_Active, INDI_ATR, PERIOD_M15, ATR15_SignalMethod, ATR_SignalLevel, ATR15_OpenCondition1, ATR15_OpenCondition2, ATR15_CloseCondition, ATR15_MaxSpread);
-  init &= !ATR30_Active || InitStrategy(ATR30, "ATR M30", ATR30_Active, INDI_ATR, PERIOD_M30, ATR30_SignalMethod, ATR_SignalLevel, ATR30_OpenCondition1, ATR30_OpenCondition2, ATR30_CloseCondition, ATR30_MaxSpread);
+  init &= !ATR1_Active  | InitStrategy(ATR1,  "ATR M1",   ATR1_Active,  INDI_ATR, PERIOD_M1,  ATR1_SignalMethod,  ATR_SignalLevel, ATR1_OpenCondition1,  ATR1_OpenCondition2,  ATR1_CloseCondition,  ATR1_MaxSpread);
+  init &= !ATR5_Active  | InitStrategy(ATR5,  "ATR M5",   ATR5_Active,  INDI_ATR, PERIOD_M5,  ATR5_SignalMethod,  ATR_SignalLevel, ATR5_OpenCondition1,  ATR5_OpenCondition2,  ATR5_CloseCondition,  ATR5_MaxSpread);
+  init &= !ATR15_Active | InitStrategy(ATR15, "ATR M15", ATR15_Active, INDI_ATR, PERIOD_M15, ATR15_SignalMethod, ATR_SignalLevel, ATR15_OpenCondition1, ATR15_OpenCondition2, ATR15_CloseCondition, ATR15_MaxSpread);
+  init &= !ATR30_Active | InitStrategy(ATR30, "ATR M30", ATR30_Active, INDI_ATR, PERIOD_M30, ATR30_SignalMethod, ATR_SignalLevel, ATR30_OpenCondition1, ATR30_OpenCondition2, ATR30_CloseCondition, ATR30_MaxSpread);
 
-  init &= !Awesome1_Active  || InitStrategy(AWESOME1,  "Awesome M1",   Awesome1_Active,  INDI_AO, PERIOD_M1,  Awesome1_SignalMethod,  Awesome_SignalLevel, Awesome1_OpenCondition1,  Awesome1_OpenCondition2,  Awesome1_CloseCondition,  Awesome1_MaxSpread);
-  init &= !Awesome5_Active  || InitStrategy(AWESOME5,  "Awesome M5",   Awesome5_Active,  INDI_AO, PERIOD_M5,  Awesome5_SignalMethod,  Awesome_SignalLevel, Awesome5_OpenCondition1,  Awesome5_OpenCondition2,  Awesome5_CloseCondition,  Awesome5_MaxSpread);
-  init &= !Awesome15_Active || InitStrategy(AWESOME15, "Awesome M15", Awesome15_Active, INDI_AO, PERIOD_M15, Awesome15_SignalMethod, Awesome_SignalLevel, Awesome15_OpenCondition1, Awesome15_OpenCondition2, Awesome15_CloseCondition, Awesome15_MaxSpread);
-  init &= !Awesome30_Active || InitStrategy(AWESOME30, "Awesome M30", Awesome30_Active, INDI_AO, PERIOD_M30, Awesome30_SignalMethod, Awesome_SignalLevel, Awesome30_OpenCondition1, Awesome30_OpenCondition2, Awesome30_CloseCondition, Awesome30_MaxSpread);
+  init &= !Awesome1_Active  | InitStrategy(AWESOME1,  "Awesome M1",   Awesome1_Active,  INDI_AO, PERIOD_M1,  Awesome1_SignalMethod,  Awesome_SignalLevel, Awesome1_OpenCondition1,  Awesome1_OpenCondition2,  Awesome1_CloseCondition,  Awesome1_MaxSpread);
+  init &= !Awesome5_Active  | InitStrategy(AWESOME5,  "Awesome M5",   Awesome5_Active,  INDI_AO, PERIOD_M5,  Awesome5_SignalMethod,  Awesome_SignalLevel, Awesome5_OpenCondition1,  Awesome5_OpenCondition2,  Awesome5_CloseCondition,  Awesome5_MaxSpread);
+  init &= !Awesome15_Active | InitStrategy(AWESOME15, "Awesome M15", Awesome15_Active, INDI_AO, PERIOD_M15, Awesome15_SignalMethod, Awesome_SignalLevel, Awesome15_OpenCondition1, Awesome15_OpenCondition2, Awesome15_CloseCondition, Awesome15_MaxSpread);
+  init &= !Awesome30_Active | InitStrategy(AWESOME30, "Awesome M30", Awesome30_Active, INDI_AO, PERIOD_M30, Awesome30_SignalMethod, Awesome_SignalLevel, Awesome30_OpenCondition1, Awesome30_OpenCondition2, Awesome30_CloseCondition, Awesome30_MaxSpread);
 
-  init &= !Bands1_Active  || InitStrategy(BANDS1,  "Bands M1",   Bands1_Active,  INDI_BANDS, PERIOD_M1,  Bands1_SignalMethod,  Bands_SignalLevel, Bands1_OpenCondition1,  Bands1_OpenCondition2,  Bands1_CloseCondition,  Bands1_MaxSpread);
-  init &= !Bands5_Active  || InitStrategy(BANDS5,  "Bands M5",   Bands5_Active,  INDI_BANDS, PERIOD_M5,  Bands5_SignalMethod,  Bands_SignalLevel, Bands5_OpenCondition1,  Bands5_OpenCondition2,  Bands5_CloseCondition,  Bands5_MaxSpread);
-  init &= !Bands15_Active || InitStrategy(BANDS15, "Bands M15", Bands15_Active, INDI_BANDS, PERIOD_M15, Bands15_SignalMethod, Bands_SignalLevel, Bands15_OpenCondition1, Bands15_OpenCondition2, Bands15_CloseCondition, Bands15_MaxSpread);
-  init &= !Bands30_Active || InitStrategy(BANDS30, "Bands M30", Bands30_Active, INDI_BANDS, PERIOD_M30, Bands30_SignalMethod, Bands_SignalLevel, Bands30_OpenCondition1, Bands30_OpenCondition2, Bands30_CloseCondition, Bands30_MaxSpread);
+  init &= !Bands1_Active  | InitStrategy(BANDS1,  "Bands M1",   Bands1_Active,  INDI_BANDS, PERIOD_M1,  Bands1_SignalMethod,  Bands_SignalLevel, Bands1_OpenCondition1,  Bands1_OpenCondition2,  Bands1_CloseCondition,  Bands1_MaxSpread);
+  init &= !Bands5_Active  | InitStrategy(BANDS5,  "Bands M5",   Bands5_Active,  INDI_BANDS, PERIOD_M5,  Bands5_SignalMethod,  Bands_SignalLevel, Bands5_OpenCondition1,  Bands5_OpenCondition2,  Bands5_CloseCondition,  Bands5_MaxSpread);
+  init &= !Bands15_Active | InitStrategy(BANDS15, "Bands M15", Bands15_Active, INDI_BANDS, PERIOD_M15, Bands15_SignalMethod, Bands_SignalLevel, Bands15_OpenCondition1, Bands15_OpenCondition2, Bands15_CloseCondition, Bands15_MaxSpread);
+  init &= !Bands30_Active | InitStrategy(BANDS30, "Bands M30", Bands30_Active, INDI_BANDS, PERIOD_M30, Bands30_SignalMethod, Bands_SignalLevel, Bands30_OpenCondition1, Bands30_OpenCondition2, Bands30_CloseCondition, Bands30_MaxSpread);
 
-  init &= !BPower1_Active  || InitStrategy(BPOWER1,  "BPower M1",   BPower1_Active,  INDI_BEARS, PERIOD_M1,  BPower1_SignalMethod,  BPower_SignalLevel, BPower1_OpenCondition1,  BPower1_OpenCondition2,  BPower1_CloseCondition,  BPower1_MaxSpread);
-  init &= !BPower5_Active  || InitStrategy(BPOWER5,  "BPower M5",   BPower5_Active,  INDI_BEARS, PERIOD_M5,  BPower5_SignalMethod,  BPower_SignalLevel, BPower5_OpenCondition1,  BPower5_OpenCondition2,  BPower5_CloseCondition,  BPower5_MaxSpread);
-  init &= !BPower15_Active || InitStrategy(BPOWER15, "BPower M15", BPower15_Active, INDI_BEARS, PERIOD_M15, BPower15_SignalMethod, BPower_SignalLevel, BPower15_OpenCondition1, BPower15_OpenCondition2, BPower15_CloseCondition, BPower15_MaxSpread);
-  init &= !BPower30_Active || InitStrategy(BPOWER30, "BPower M30", BPower30_Active, INDI_BEARS, PERIOD_M30, BPower30_SignalMethod, BPower_SignalLevel, BPower30_OpenCondition1, BPower30_OpenCondition2, BPower30_CloseCondition, BPower30_MaxSpread);
+  init &= !BPower1_Active  | InitStrategy(BPOWER1,  "BPower M1",   BPower1_Active,  INDI_BEARS, PERIOD_M1,  BPower1_SignalMethod,  BPower_SignalLevel, BPower1_OpenCondition1,  BPower1_OpenCondition2,  BPower1_CloseCondition,  BPower1_MaxSpread);
+  init &= !BPower5_Active  | InitStrategy(BPOWER5,  "BPower M5",   BPower5_Active,  INDI_BEARS, PERIOD_M5,  BPower5_SignalMethod,  BPower_SignalLevel, BPower5_OpenCondition1,  BPower5_OpenCondition2,  BPower5_CloseCondition,  BPower5_MaxSpread);
+  init &= !BPower15_Active | InitStrategy(BPOWER15, "BPower M15", BPower15_Active, INDI_BEARS, PERIOD_M15, BPower15_SignalMethod, BPower_SignalLevel, BPower15_OpenCondition1, BPower15_OpenCondition2, BPower15_CloseCondition, BPower15_MaxSpread);
+  init &= !BPower30_Active | InitStrategy(BPOWER30, "BPower M30", BPower30_Active, INDI_BEARS, PERIOD_M30, BPower30_SignalMethod, BPower_SignalLevel, BPower30_OpenCondition1, BPower30_OpenCondition2, BPower30_CloseCondition, BPower30_MaxSpread);
 
-  init &= !Breakage1_Active  || InitStrategy(BREAKAGE1,  "Breakage M1",   Breakage1_Active,  EMPTY, PERIOD_M1,  Breakage1_SignalMethod,  Breakage_SignalLevel, Breakage1_OpenCondition1,  Breakage1_OpenCondition2,  Breakage1_CloseCondition,  Breakage1_MaxSpread);
-  init &= !Breakage5_Active  || InitStrategy(BREAKAGE5,  "Breakage M5",   Breakage5_Active,  EMPTY, PERIOD_M5,  Breakage5_SignalMethod,  Breakage_SignalLevel, Breakage5_OpenCondition1,  Breakage5_OpenCondition2,  Breakage5_CloseCondition,  Breakage5_MaxSpread);
-  init &= !Breakage15_Active || InitStrategy(BREAKAGE15, "Breakage M15", Breakage15_Active, EMPTY, PERIOD_M15, Breakage15_SignalMethod, Breakage_SignalLevel, Breakage15_OpenCondition1, Breakage15_OpenCondition2, Breakage15_CloseCondition, Breakage15_MaxSpread);
-  init &= !Breakage30_Active || InitStrategy(BREAKAGE30, "Breakage M30", Breakage30_Active, EMPTY, PERIOD_M30, Breakage30_SignalMethod, Breakage_SignalLevel, Breakage30_OpenCondition1, Breakage30_OpenCondition2, Breakage30_CloseCondition, Breakage30_MaxSpread);
+  init &= !Breakage1_Active  | InitStrategy(BREAKAGE1,  "Breakage M1",   Breakage1_Active,  EMPTY, PERIOD_M1,  Breakage1_SignalMethod,  Breakage_SignalLevel, Breakage1_OpenCondition1,  Breakage1_OpenCondition2,  Breakage1_CloseCondition,  Breakage1_MaxSpread);
+  init &= !Breakage5_Active  | InitStrategy(BREAKAGE5,  "Breakage M5",   Breakage5_Active,  EMPTY, PERIOD_M5,  Breakage5_SignalMethod,  Breakage_SignalLevel, Breakage5_OpenCondition1,  Breakage5_OpenCondition2,  Breakage5_CloseCondition,  Breakage5_MaxSpread);
+  init &= !Breakage15_Active | InitStrategy(BREAKAGE15, "Breakage M15", Breakage15_Active, EMPTY, PERIOD_M15, Breakage15_SignalMethod, Breakage_SignalLevel, Breakage15_OpenCondition1, Breakage15_OpenCondition2, Breakage15_CloseCondition, Breakage15_MaxSpread);
+  init &= !Breakage30_Active | InitStrategy(BREAKAGE30, "Breakage M30", Breakage30_Active, EMPTY, PERIOD_M30, Breakage30_SignalMethod, Breakage_SignalLevel, Breakage30_OpenCondition1, Breakage30_OpenCondition2, Breakage30_CloseCondition, Breakage30_MaxSpread);
 
-  init &= !BWMFI1_Active  || InitStrategy(BWMFI1,  "BWMFI M1",   BWMFI1_Active,  EMPTY, PERIOD_M1,  BWMFI1_SignalMethod,  BWMFI_SignalLevel, BWMFI1_OpenCondition1,  BWMFI1_OpenCondition2,  BWMFI1_CloseCondition,  BWMFI1_MaxSpread);
-  init &= !BWMFI5_Active  || InitStrategy(BWMFI5,  "BWMFI M5",   BWMFI5_Active,  EMPTY, PERIOD_M5,  BWMFI5_SignalMethod,  BWMFI_SignalLevel, BWMFI5_OpenCondition1,  BWMFI5_OpenCondition2,  BWMFI5_CloseCondition,  BWMFI5_MaxSpread);
-  init &= !BWMFI15_Active || InitStrategy(BWMFI15, "BWMFI M15", BWMFI15_Active, EMPTY, PERIOD_M15, BWMFI15_SignalMethod, BWMFI_SignalLevel, BWMFI15_OpenCondition1, BWMFI15_OpenCondition2, BWMFI15_CloseCondition, BWMFI15_MaxSpread);
-  init &= !BWMFI30_Active || InitStrategy(BWMFI30, "BWMFI M30", BWMFI30_Active, EMPTY, PERIOD_M30, BWMFI30_SignalMethod, BWMFI_SignalLevel, BWMFI30_OpenCondition1, BWMFI30_OpenCondition2, BWMFI30_CloseCondition, BWMFI30_MaxSpread);
+  init &= !BWMFI1_Active  | InitStrategy(BWMFI1,  "BWMFI M1",   BWMFI1_Active,  EMPTY, PERIOD_M1,  BWMFI1_SignalMethod,  BWMFI_SignalLevel, BWMFI1_OpenCondition1,  BWMFI1_OpenCondition2,  BWMFI1_CloseCondition,  BWMFI1_MaxSpread);
+  init &= !BWMFI5_Active  | InitStrategy(BWMFI5,  "BWMFI M5",   BWMFI5_Active,  EMPTY, PERIOD_M5,  BWMFI5_SignalMethod,  BWMFI_SignalLevel, BWMFI5_OpenCondition1,  BWMFI5_OpenCondition2,  BWMFI5_CloseCondition,  BWMFI5_MaxSpread);
+  init &= !BWMFI15_Active | InitStrategy(BWMFI15, "BWMFI M15", BWMFI15_Active, EMPTY, PERIOD_M15, BWMFI15_SignalMethod, BWMFI_SignalLevel, BWMFI15_OpenCondition1, BWMFI15_OpenCondition2, BWMFI15_CloseCondition, BWMFI15_MaxSpread);
+  init &= !BWMFI30_Active | InitStrategy(BWMFI30, "BWMFI M30", BWMFI30_Active, EMPTY, PERIOD_M30, BWMFI30_SignalMethod, BWMFI_SignalLevel, BWMFI30_OpenCondition1, BWMFI30_OpenCondition2, BWMFI30_CloseCondition, BWMFI30_MaxSpread);
 
-  init &= !CCI1_Active  || InitStrategy(CCI1,  "CCI M1",   CCI1_Active,  INDI_CCI, PERIOD_M1,  CCI1_SignalMethod,  CCI_SignalLevel, CCI1_OpenCondition1,  CCI1_OpenCondition2,  CCI1_CloseCondition,  CCI1_MaxSpread);
-  init &= !CCI5_Active  || InitStrategy(CCI5,  "CCI M5",   CCI5_Active,  INDI_CCI, PERIOD_M5,  CCI5_SignalMethod,  CCI_SignalLevel, CCI5_OpenCondition1,  CCI5_OpenCondition2,  CCI5_CloseCondition,  CCI5_MaxSpread);
-  init &= !CCI15_Active || InitStrategy(CCI15, "CCI M15", CCI15_Active, INDI_CCI, PERIOD_M15, CCI15_SignalMethod, CCI_SignalLevel, CCI15_OpenCondition1, CCI15_OpenCondition2, CCI15_CloseCondition, CCI15_MaxSpread);
-  init &= !CCI30_Active || InitStrategy(CCI30, "CCI M30", CCI30_Active, INDI_CCI, PERIOD_M30, CCI30_SignalMethod, CCI_SignalLevel, CCI30_OpenCondition1, CCI30_OpenCondition2, CCI30_CloseCondition, CCI30_MaxSpread);
+  init &= !CCI1_Active  | InitStrategy(CCI1,  "CCI M1",   CCI1_Active,  INDI_CCI, PERIOD_M1,  CCI1_SignalMethod,  CCI_SignalLevel, CCI1_OpenCondition1,  CCI1_OpenCondition2,  CCI1_CloseCondition,  CCI1_MaxSpread);
+  init &= !CCI5_Active  | InitStrategy(CCI5,  "CCI M5",   CCI5_Active,  INDI_CCI, PERIOD_M5,  CCI5_SignalMethod,  CCI_SignalLevel, CCI5_OpenCondition1,  CCI5_OpenCondition2,  CCI5_CloseCondition,  CCI5_MaxSpread);
+  init &= !CCI15_Active | InitStrategy(CCI15, "CCI M15", CCI15_Active, INDI_CCI, PERIOD_M15, CCI15_SignalMethod, CCI_SignalLevel, CCI15_OpenCondition1, CCI15_OpenCondition2, CCI15_CloseCondition, CCI15_MaxSpread);
+  init &= !CCI30_Active | InitStrategy(CCI30, "CCI M30", CCI30_Active, INDI_CCI, PERIOD_M30, CCI30_SignalMethod, CCI_SignalLevel, CCI30_OpenCondition1, CCI30_OpenCondition2, CCI30_CloseCondition, CCI30_MaxSpread);
 
-  init &= !DeMarker1_Active  || InitStrategy(DEMARKER1,  "DeMarker M1",   DeMarker1_Active,  INDI_DEMARKER, PERIOD_M1,  DeMarker1_SignalMethod,  DeMarker_SignalLevel, DeMarker1_OpenCondition1,  DeMarker1_OpenCondition2,  DeMarker1_CloseCondition,  DeMarker1_MaxSpread);
-  init &= !DeMarker5_Active  || InitStrategy(DEMARKER5,  "DeMarker M5",   DeMarker5_Active,  INDI_DEMARKER, PERIOD_M5,  DeMarker5_SignalMethod,  DeMarker_SignalLevel, DeMarker5_OpenCondition1,  DeMarker5_OpenCondition2,  DeMarker5_CloseCondition,  DeMarker5_MaxSpread);
-  init &= !DeMarker15_Active || InitStrategy(DEMARKER15, "DeMarker M15", DeMarker15_Active, INDI_DEMARKER, PERIOD_M15, DeMarker15_SignalMethod, DeMarker_SignalLevel, DeMarker15_OpenCondition1, DeMarker15_OpenCondition2, DeMarker15_CloseCondition, DeMarker15_MaxSpread);
-  init &= !DeMarker30_Active || InitStrategy(DEMARKER30, "DeMarker M30", DeMarker30_Active, INDI_DEMARKER, PERIOD_M30, DeMarker30_SignalMethod, DeMarker_SignalLevel, DeMarker30_OpenCondition1, DeMarker30_OpenCondition2, DeMarker30_CloseCondition, DeMarker30_MaxSpread);
+  init &= !DeMarker1_Active  | InitStrategy(DEMARKER1,  "DeMarker M1",   DeMarker1_Active,  INDI_DEMARKER, PERIOD_M1,  DeMarker1_SignalMethod,  DeMarker_SignalLevel, DeMarker1_OpenCondition1,  DeMarker1_OpenCondition2,  DeMarker1_CloseCondition,  DeMarker1_MaxSpread);
+  init &= !DeMarker5_Active  | InitStrategy(DEMARKER5,  "DeMarker M5",   DeMarker5_Active,  INDI_DEMARKER, PERIOD_M5,  DeMarker5_SignalMethod,  DeMarker_SignalLevel, DeMarker5_OpenCondition1,  DeMarker5_OpenCondition2,  DeMarker5_CloseCondition,  DeMarker5_MaxSpread);
+  init &= !DeMarker15_Active | InitStrategy(DEMARKER15, "DeMarker M15", DeMarker15_Active, INDI_DEMARKER, PERIOD_M15, DeMarker15_SignalMethod, DeMarker_SignalLevel, DeMarker15_OpenCondition1, DeMarker15_OpenCondition2, DeMarker15_CloseCondition, DeMarker15_MaxSpread);
+  init &= !DeMarker30_Active | InitStrategy(DEMARKER30, "DeMarker M30", DeMarker30_Active, INDI_DEMARKER, PERIOD_M30, DeMarker30_SignalMethod, DeMarker_SignalLevel, DeMarker30_OpenCondition1, DeMarker30_OpenCondition2, DeMarker30_CloseCondition, DeMarker30_MaxSpread);
 
-  init &= !Envelopes1_Active  || InitStrategy(ENVELOPES1,  "Envelopes M1",   Envelopes1_Active,  INDI_ENVELOPES, PERIOD_M1,  Envelopes1_SignalMethod,  Envelopes_SignalLevel, Envelopes1_OpenCondition1,  Envelopes1_OpenCondition2,  Envelopes1_CloseCondition,  Envelopes1_MaxSpread);
-  init &= !Envelopes5_Active  || InitStrategy(ENVELOPES5,  "Envelopes M5",   Envelopes5_Active,  INDI_ENVELOPES, PERIOD_M5,  Envelopes5_SignalMethod,  Envelopes_SignalLevel, Envelopes5_OpenCondition1,  Envelopes5_OpenCondition2,  Envelopes5_CloseCondition,  Envelopes5_MaxSpread);
-  init &= !Envelopes15_Active || InitStrategy(ENVELOPES15, "Envelopes M15", Envelopes15_Active, INDI_ENVELOPES, PERIOD_M15, Envelopes15_SignalMethod, Envelopes_SignalLevel, Envelopes15_OpenCondition1, Envelopes15_OpenCondition2, Envelopes15_CloseCondition, Envelopes15_MaxSpread);
-  init &= !Envelopes30_Active || InitStrategy(ENVELOPES30, "Envelopes M30", Envelopes30_Active, INDI_ENVELOPES, PERIOD_M30, Envelopes30_SignalMethod, Envelopes_SignalLevel, Envelopes30_OpenCondition1, Envelopes30_OpenCondition2, Envelopes30_CloseCondition, Envelopes30_MaxSpread);
+  init &= !Envelopes1_Active  | InitStrategy(ENVELOPES1,  "Envelopes M1",   Envelopes1_Active,  INDI_ENVELOPES, PERIOD_M1,  Envelopes1_SignalMethod,  Envelopes_SignalLevel, Envelopes1_OpenCondition1,  Envelopes1_OpenCondition2,  Envelopes1_CloseCondition,  Envelopes1_MaxSpread);
+  init &= !Envelopes5_Active  | InitStrategy(ENVELOPES5,  "Envelopes M5",   Envelopes5_Active,  INDI_ENVELOPES, PERIOD_M5,  Envelopes5_SignalMethod,  Envelopes_SignalLevel, Envelopes5_OpenCondition1,  Envelopes5_OpenCondition2,  Envelopes5_CloseCondition,  Envelopes5_MaxSpread);
+  init &= !Envelopes15_Active | InitStrategy(ENVELOPES15, "Envelopes M15", Envelopes15_Active, INDI_ENVELOPES, PERIOD_M15, Envelopes15_SignalMethod, Envelopes_SignalLevel, Envelopes15_OpenCondition1, Envelopes15_OpenCondition2, Envelopes15_CloseCondition, Envelopes15_MaxSpread);
+  init &= !Envelopes30_Active | InitStrategy(ENVELOPES30, "Envelopes M30", Envelopes30_Active, INDI_ENVELOPES, PERIOD_M30, Envelopes30_SignalMethod, Envelopes_SignalLevel, Envelopes30_OpenCondition1, Envelopes30_OpenCondition2, Envelopes30_CloseCondition, Envelopes30_MaxSpread);
 
-  init &= !Force1_Active  || InitStrategy(FORCE1,  "Force M1",   Force1_Active,  INDI_FORCE, PERIOD_M1,  Force1_SignalMethod,  Force_SignalLevel, Force1_OpenCondition1,  Force1_OpenCondition2,  Force1_CloseCondition,  Force1_MaxSpread);
-  init &= !Force5_Active  || InitStrategy(FORCE5,  "Force M5",   Force5_Active,  INDI_FORCE, PERIOD_M5,  Force5_SignalMethod,  Force_SignalLevel, Force5_OpenCondition1,  Force5_OpenCondition2,  Force5_CloseCondition,  Force5_MaxSpread);
-  init &= !Force15_Active || InitStrategy(FORCE15, "Force M15", Force15_Active, INDI_FORCE, PERIOD_M15, Force15_SignalMethod, Force_SignalLevel, Force15_OpenCondition1, Force15_OpenCondition2, Force15_CloseCondition, Force15_MaxSpread);
-  init &= !Force30_Active || InitStrategy(FORCE30, "Force M30", Force30_Active, INDI_FORCE, PERIOD_M30, Force30_SignalMethod, Force_SignalLevel, Force30_OpenCondition1, Force30_OpenCondition2, Force30_CloseCondition, Force30_MaxSpread);
+  init &= !Force1_Active  | InitStrategy(FORCE1,  "Force M1",   Force1_Active,  INDI_FORCE, PERIOD_M1,  Force1_SignalMethod,  Force_SignalLevel, Force1_OpenCondition1,  Force1_OpenCondition2,  Force1_CloseCondition,  Force1_MaxSpread);
+  init &= !Force5_Active  | InitStrategy(FORCE5,  "Force M5",   Force5_Active,  INDI_FORCE, PERIOD_M5,  Force5_SignalMethod,  Force_SignalLevel, Force5_OpenCondition1,  Force5_OpenCondition2,  Force5_CloseCondition,  Force5_MaxSpread);
+  init &= !Force15_Active | InitStrategy(FORCE15, "Force M15", Force15_Active, INDI_FORCE, PERIOD_M15, Force15_SignalMethod, Force_SignalLevel, Force15_OpenCondition1, Force15_OpenCondition2, Force15_CloseCondition, Force15_MaxSpread);
+  init &= !Force30_Active | InitStrategy(FORCE30, "Force M30", Force30_Active, INDI_FORCE, PERIOD_M30, Force30_SignalMethod, Force_SignalLevel, Force30_OpenCondition1, Force30_OpenCondition2, Force30_CloseCondition, Force30_MaxSpread);
 
-  init &= !Fractals1_Active  || InitStrategy(FRACTALS1,  "Fractals M1",   Fractals1_Active,  INDI_FRACTALS, PERIOD_M1,  Fractals1_SignalMethod,  Fractals_SignalLevel, Fractals1_OpenCondition1,  Fractals1_OpenCondition2,  Fractals1_CloseCondition,  Fractals1_MaxSpread);
-  init &= !Fractals5_Active  || InitStrategy(FRACTALS5,  "Fractals M5",   Fractals5_Active,  INDI_FRACTALS, PERIOD_M5,  Fractals5_SignalMethod,  Fractals_SignalLevel, Fractals5_OpenCondition1,  Fractals5_OpenCondition2,  Fractals5_CloseCondition,  Fractals5_MaxSpread);
-  init &= !Fractals15_Active || InitStrategy(FRACTALS15, "Fractals M15", Fractals15_Active, INDI_FRACTALS, PERIOD_M15, Fractals15_SignalMethod, Fractals_SignalLevel, Fractals15_OpenCondition1, Fractals15_OpenCondition2, Fractals15_CloseCondition, Fractals15_MaxSpread);
-  init &= !Fractals30_Active || InitStrategy(FRACTALS30, "Fractals M30", Fractals30_Active, INDI_FRACTALS, PERIOD_M30, Fractals30_SignalMethod, Fractals_SignalLevel, Fractals30_OpenCondition1, Fractals30_OpenCondition2, Fractals30_CloseCondition, Fractals30_MaxSpread);
+  init &= !Fractals1_Active  | InitStrategy(FRACTALS1,  "Fractals M1",   Fractals1_Active,  INDI_FRACTALS, PERIOD_M1,  Fractals1_SignalMethod,  Fractals_SignalLevel, Fractals1_OpenCondition1,  Fractals1_OpenCondition2,  Fractals1_CloseCondition,  Fractals1_MaxSpread);
+  init &= !Fractals5_Active  | InitStrategy(FRACTALS5,  "Fractals M5",   Fractals5_Active,  INDI_FRACTALS, PERIOD_M5,  Fractals5_SignalMethod,  Fractals_SignalLevel, Fractals5_OpenCondition1,  Fractals5_OpenCondition2,  Fractals5_CloseCondition,  Fractals5_MaxSpread);
+  init &= !Fractals15_Active | InitStrategy(FRACTALS15, "Fractals M15", Fractals15_Active, INDI_FRACTALS, PERIOD_M15, Fractals15_SignalMethod, Fractals_SignalLevel, Fractals15_OpenCondition1, Fractals15_OpenCondition2, Fractals15_CloseCondition, Fractals15_MaxSpread);
+  init &= !Fractals30_Active | InitStrategy(FRACTALS30, "Fractals M30", Fractals30_Active, INDI_FRACTALS, PERIOD_M30, Fractals30_SignalMethod, Fractals_SignalLevel, Fractals30_OpenCondition1, Fractals30_OpenCondition2, Fractals30_CloseCondition, Fractals30_MaxSpread);
 
-  init &= !Gator1_Active  || InitStrategy(GATOR1,  "Gator M1",   Gator1_Active,  INDI_GATOR, PERIOD_M1,  Gator1_SignalMethod,  Gator_SignalLevel, Gator1_OpenCondition1,  Gator1_OpenCondition2,  Gator1_CloseCondition,  Gator1_MaxSpread);
-  init &= !Gator5_Active  || InitStrategy(GATOR5,  "Gator M5",   Gator5_Active,  INDI_GATOR, PERIOD_M5,  Gator5_SignalMethod,  Gator_SignalLevel, Gator5_OpenCondition1,  Gator5_OpenCondition2,  Gator5_CloseCondition,  Gator5_MaxSpread);
-  init &= !Gator15_Active || InitStrategy(GATOR15, "Gator M15", Gator15_Active, INDI_GATOR, PERIOD_M15, Gator15_SignalMethod, Gator_SignalLevel, Gator15_OpenCondition1, Gator15_OpenCondition2, Gator15_CloseCondition, Gator15_MaxSpread);
-  init &= !Gator30_Active || InitStrategy(GATOR30, "Gator M30", Gator30_Active, INDI_GATOR, PERIOD_M30, Gator30_SignalMethod, Gator_SignalLevel, Gator30_OpenCondition1, Gator30_OpenCondition2, Gator30_CloseCondition, Gator30_MaxSpread);
+  init &= !Gator1_Active  | InitStrategy(GATOR1,  "Gator M1",   Gator1_Active,  INDI_GATOR, PERIOD_M1,  Gator1_SignalMethod,  Gator_SignalLevel, Gator1_OpenCondition1,  Gator1_OpenCondition2,  Gator1_CloseCondition,  Gator1_MaxSpread);
+  init &= !Gator5_Active  | InitStrategy(GATOR5,  "Gator M5",   Gator5_Active,  INDI_GATOR, PERIOD_M5,  Gator5_SignalMethod,  Gator_SignalLevel, Gator5_OpenCondition1,  Gator5_OpenCondition2,  Gator5_CloseCondition,  Gator5_MaxSpread);
+  init &= !Gator15_Active | InitStrategy(GATOR15, "Gator M15", Gator15_Active, INDI_GATOR, PERIOD_M15, Gator15_SignalMethod, Gator_SignalLevel, Gator15_OpenCondition1, Gator15_OpenCondition2, Gator15_CloseCondition, Gator15_MaxSpread);
+  init &= !Gator30_Active | InitStrategy(GATOR30, "Gator M30", Gator30_Active, INDI_GATOR, PERIOD_M30, Gator30_SignalMethod, Gator_SignalLevel, Gator30_OpenCondition1, Gator30_OpenCondition2, Gator30_CloseCondition, Gator30_MaxSpread);
 
-  init &= !Ichimoku1_Active  || InitStrategy(ICHIMOKU1,  "Ichimoku M1",   Ichimoku1_Active,  INDI_ICHIMOKU, PERIOD_M1,  Ichimoku1_SignalMethod,  Ichimoku_SignalLevel, Ichimoku1_OpenCondition1,  Ichimoku1_OpenCondition2,  Ichimoku1_CloseCondition,  Ichimoku1_MaxSpread);
-  init &= !Ichimoku5_Active  || InitStrategy(ICHIMOKU5,  "Ichimoku M5",   Ichimoku5_Active,  INDI_ICHIMOKU, PERIOD_M5,  Ichimoku5_SignalMethod,  Ichimoku_SignalLevel, Ichimoku5_OpenCondition1,  Ichimoku5_OpenCondition2,  Ichimoku5_CloseCondition,  Ichimoku5_MaxSpread);
-  init &= !Ichimoku15_Active || InitStrategy(ICHIMOKU15, "Ichimoku M15", Ichimoku15_Active, INDI_ICHIMOKU, PERIOD_M15, Ichimoku15_SignalMethod, Ichimoku_SignalLevel, Ichimoku15_OpenCondition1, Ichimoku15_OpenCondition2, Ichimoku15_CloseCondition, Ichimoku15_MaxSpread);
-  init &= !Ichimoku30_Active || InitStrategy(ICHIMOKU30, "Ichimoku M30", Ichimoku30_Active, INDI_ICHIMOKU, PERIOD_M30, Ichimoku30_SignalMethod, Ichimoku_SignalLevel, Ichimoku30_OpenCondition1, Ichimoku30_OpenCondition2, Ichimoku30_CloseCondition, Ichimoku30_MaxSpread);
+  init &= !Ichimoku1_Active  | InitStrategy(ICHIMOKU1,  "Ichimoku M1",   Ichimoku1_Active,  INDI_ICHIMOKU, PERIOD_M1,  Ichimoku1_SignalMethod,  Ichimoku_SignalLevel, Ichimoku1_OpenCondition1,  Ichimoku1_OpenCondition2,  Ichimoku1_CloseCondition,  Ichimoku1_MaxSpread);
+  init &= !Ichimoku5_Active  | InitStrategy(ICHIMOKU5,  "Ichimoku M5",   Ichimoku5_Active,  INDI_ICHIMOKU, PERIOD_M5,  Ichimoku5_SignalMethod,  Ichimoku_SignalLevel, Ichimoku5_OpenCondition1,  Ichimoku5_OpenCondition2,  Ichimoku5_CloseCondition,  Ichimoku5_MaxSpread);
+  init &= !Ichimoku15_Active | InitStrategy(ICHIMOKU15, "Ichimoku M15", Ichimoku15_Active, INDI_ICHIMOKU, PERIOD_M15, Ichimoku15_SignalMethod, Ichimoku_SignalLevel, Ichimoku15_OpenCondition1, Ichimoku15_OpenCondition2, Ichimoku15_CloseCondition, Ichimoku15_MaxSpread);
+  init &= !Ichimoku30_Active | InitStrategy(ICHIMOKU30, "Ichimoku M30", Ichimoku30_Active, INDI_ICHIMOKU, PERIOD_M30, Ichimoku30_SignalMethod, Ichimoku_SignalLevel, Ichimoku30_OpenCondition1, Ichimoku30_OpenCondition2, Ichimoku30_CloseCondition, Ichimoku30_MaxSpread);
 
-  init &= !MA1_Active  || InitStrategy(MA1,  "MA M1",   MA1_Active,  INDI_MA, PERIOD_M1,  MA1_SignalMethod,  MA_SignalLevel,  MA1_OpenCondition1, MA1_OpenCondition2,  MA1_CloseCondition,  MA1_MaxSpread);
-  init &= !MA5_Active  || InitStrategy(MA5,  "MA M5",   MA5_Active,  INDI_MA, PERIOD_M5,  MA5_SignalMethod,  MA_SignalLevel,  MA5_OpenCondition1, MA5_OpenCondition2,  MA5_CloseCondition,  MA5_MaxSpread);
-  init &= !MA15_Active || InitStrategy(MA15, "MA M15", MA15_Active, INDI_MA, PERIOD_M15, MA15_SignalMethod, MA_SignalLevel, MA15_OpenCondition1, MA15_OpenCondition2, MA15_CloseCondition, MA15_MaxSpread);
-  init &= !MA30_Active || InitStrategy(MA30, "MA M30", MA30_Active, INDI_MA, PERIOD_M30, MA30_SignalMethod, MA_SignalLevel, MA30_OpenCondition1, MA30_OpenCondition2, MA30_CloseCondition, MA30_MaxSpread);
+  init &= !MA1_Active  | InitStrategy(MA1,  "MA M1",   MA1_Active,  INDI_MA, PERIOD_M1,  MA1_SignalMethod,  MA_SignalLevel,  MA1_OpenCondition1, MA1_OpenCondition2,  MA1_CloseCondition,  MA1_MaxSpread);
+  init &= !MA5_Active  | InitStrategy(MA5,  "MA M5",   MA5_Active,  INDI_MA, PERIOD_M5,  MA5_SignalMethod,  MA_SignalLevel,  MA5_OpenCondition1, MA5_OpenCondition2,  MA5_CloseCondition,  MA5_MaxSpread);
+  init &= !MA15_Active | InitStrategy(MA15, "MA M15", MA15_Active, INDI_MA, PERIOD_M15, MA15_SignalMethod, MA_SignalLevel, MA15_OpenCondition1, MA15_OpenCondition2, MA15_CloseCondition, MA15_MaxSpread);
+  init &= !MA30_Active | InitStrategy(MA30, "MA M30", MA30_Active, INDI_MA, PERIOD_M30, MA30_SignalMethod, MA_SignalLevel, MA30_OpenCondition1, MA30_OpenCondition2, MA30_CloseCondition, MA30_MaxSpread);
 
-  init &= !MACD1_Active  || InitStrategy(MACD1,  "MACD M1",   MACD1_Active,  INDI_MACD, PERIOD_M1,  MACD1_SignalMethod,  MACD_SignalLevel, MACD1_OpenCondition1,  MACD1_OpenCondition2,  MACD1_CloseCondition,  MACD1_MaxSpread);
-  init &= !MACD5_Active  || InitStrategy(MACD5,  "MACD M5",   MACD5_Active,  INDI_MACD, PERIOD_M5,  MACD5_SignalMethod,  MACD_SignalLevel, MACD5_OpenCondition1,  MACD5_OpenCondition2,  MACD5_CloseCondition,  MACD5_MaxSpread);
-  init &= !MACD15_Active || InitStrategy(MACD15, "MACD M15", MACD15_Active, INDI_MACD, PERIOD_M15, MACD15_SignalMethod, MACD_SignalLevel, MACD15_OpenCondition1, MACD15_OpenCondition2, MACD15_CloseCondition, MACD15_MaxSpread);
-  init &= !MACD30_Active || InitStrategy(MACD30, "MACD M30", MACD30_Active, INDI_MACD, PERIOD_M30, MACD30_SignalMethod, MACD_SignalLevel, MACD30_OpenCondition1, MACD30_OpenCondition2, MACD30_CloseCondition, MACD30_MaxSpread);
+  init &= !MACD1_Active  | InitStrategy(MACD1,  "MACD M1",   MACD1_Active,  INDI_MACD, PERIOD_M1,  MACD1_SignalMethod,  MACD_SignalLevel, MACD1_OpenCondition1,  MACD1_OpenCondition2,  MACD1_CloseCondition,  MACD1_MaxSpread);
+  init &= !MACD5_Active  | InitStrategy(MACD5,  "MACD M5",   MACD5_Active,  INDI_MACD, PERIOD_M5,  MACD5_SignalMethod,  MACD_SignalLevel, MACD5_OpenCondition1,  MACD5_OpenCondition2,  MACD5_CloseCondition,  MACD5_MaxSpread);
+  init &= !MACD15_Active | InitStrategy(MACD15, "MACD M15", MACD15_Active, INDI_MACD, PERIOD_M15, MACD15_SignalMethod, MACD_SignalLevel, MACD15_OpenCondition1, MACD15_OpenCondition2, MACD15_CloseCondition, MACD15_MaxSpread);
+  init &= !MACD30_Active | InitStrategy(MACD30, "MACD M30", MACD30_Active, INDI_MACD, PERIOD_M30, MACD30_SignalMethod, MACD_SignalLevel, MACD30_OpenCondition1, MACD30_OpenCondition2, MACD30_CloseCondition, MACD30_MaxSpread);
 
-  init &= !MFI1_Active  || InitStrategy(MFI1,  "MFI M1",   MFI1_Active,  INDI_MFI, PERIOD_M1,  MFI1_SignalMethod,  MFI_SignalLevel, MFI1_OpenCondition1,  MFI1_OpenCondition2,  MFI1_CloseCondition,  MFI1_MaxSpread);
-  init &= !MFI5_Active  || InitStrategy(MFI5,  "MFI M5",   MFI5_Active,  INDI_MFI, PERIOD_M5,  MFI5_SignalMethod,  MFI_SignalLevel, MFI5_OpenCondition1,  MFI5_OpenCondition2,  MFI5_CloseCondition,  MFI5_MaxSpread);
-  init &= !MFI15_Active || InitStrategy(MFI15, "MFI M15", MFI15_Active, INDI_MFI, PERIOD_M15, MFI15_SignalMethod, MFI_SignalLevel, MFI15_OpenCondition1, MFI15_OpenCondition2, MFI15_CloseCondition, MFI15_MaxSpread);
-  init &= !MFI30_Active || InitStrategy(MFI30, "MFI M30", MFI30_Active, INDI_MFI, PERIOD_M30, MFI30_SignalMethod, MFI_SignalLevel, MFI30_OpenCondition1, MFI30_OpenCondition2, MFI30_CloseCondition, MFI30_MaxSpread);
+  init &= !MFI1_Active  | InitStrategy(MFI1,  "MFI M1",   MFI1_Active,  INDI_MFI, PERIOD_M1,  MFI1_SignalMethod,  MFI_SignalLevel, MFI1_OpenCondition1,  MFI1_OpenCondition2,  MFI1_CloseCondition,  MFI1_MaxSpread);
+  init &= !MFI5_Active  | InitStrategy(MFI5,  "MFI M5",   MFI5_Active,  INDI_MFI, PERIOD_M5,  MFI5_SignalMethod,  MFI_SignalLevel, MFI5_OpenCondition1,  MFI5_OpenCondition2,  MFI5_CloseCondition,  MFI5_MaxSpread);
+  init &= !MFI15_Active | InitStrategy(MFI15, "MFI M15", MFI15_Active, INDI_MFI, PERIOD_M15, MFI15_SignalMethod, MFI_SignalLevel, MFI15_OpenCondition1, MFI15_OpenCondition2, MFI15_CloseCondition, MFI15_MaxSpread);
+  init &= !MFI30_Active | InitStrategy(MFI30, "MFI M30", MFI30_Active, INDI_MFI, PERIOD_M30, MFI30_SignalMethod, MFI_SignalLevel, MFI30_OpenCondition1, MFI30_OpenCondition2, MFI30_CloseCondition, MFI30_MaxSpread);
 
-  init &= !Momentum1_Active  || InitStrategy(MOM1,  "Momentum M1",   Momentum1_Active,  INDI_MOMENTUM, PERIOD_M1,  Momentum1_SignalMethod,  Momentum_SignalLevel, Momentum1_OpenCondition1,  Momentum1_OpenCondition2,  Momentum1_CloseCondition,  Momentum1_MaxSpread);
-  init &= !Momentum5_Active  || InitStrategy(MOM5,  "Momentum M5",   Momentum5_Active,  INDI_MOMENTUM, PERIOD_M5,  Momentum5_SignalMethod,  Momentum_SignalLevel, Momentum5_OpenCondition1,  Momentum5_OpenCondition2,  Momentum5_CloseCondition,  Momentum5_MaxSpread);
-  init &= !Momentum15_Active || InitStrategy(MOM15, "Momentum M15", Momentum15_Active, INDI_MOMENTUM, PERIOD_M15, Momentum15_SignalMethod, Momentum_SignalLevel, Momentum15_OpenCondition1, Momentum15_OpenCondition2, Momentum15_CloseCondition, Momentum15_MaxSpread);
-  init &= !Momentum30_Active || InitStrategy(MOM30, "Momentum M30", Momentum30_Active, INDI_MOMENTUM, PERIOD_M30, Momentum30_SignalMethod, Momentum_SignalLevel, Momentum30_OpenCondition1, Momentum30_OpenCondition2, Momentum30_CloseCondition, Momentum30_MaxSpread);
+  init &= !Momentum1_Active  | InitStrategy(MOM1,  "Momentum M1",   Momentum1_Active,  INDI_MOMENTUM, PERIOD_M1,  Momentum1_SignalMethod,  Momentum_SignalLevel, Momentum1_OpenCondition1,  Momentum1_OpenCondition2,  Momentum1_CloseCondition,  Momentum1_MaxSpread);
+  init &= !Momentum5_Active  | InitStrategy(MOM5,  "Momentum M5",   Momentum5_Active,  INDI_MOMENTUM, PERIOD_M5,  Momentum5_SignalMethod,  Momentum_SignalLevel, Momentum5_OpenCondition1,  Momentum5_OpenCondition2,  Momentum5_CloseCondition,  Momentum5_MaxSpread);
+  init &= !Momentum15_Active | InitStrategy(MOM15, "Momentum M15", Momentum15_Active, INDI_MOMENTUM, PERIOD_M15, Momentum15_SignalMethod, Momentum_SignalLevel, Momentum15_OpenCondition1, Momentum15_OpenCondition2, Momentum15_CloseCondition, Momentum15_MaxSpread);
+  init &= !Momentum30_Active | InitStrategy(MOM30, "Momentum M30", Momentum30_Active, INDI_MOMENTUM, PERIOD_M30, Momentum30_SignalMethod, Momentum_SignalLevel, Momentum30_OpenCondition1, Momentum30_OpenCondition2, Momentum30_CloseCondition, Momentum30_MaxSpread);
 
-  init &= !OBV1_Active  || InitStrategy(OBV1,  "OBV M1",   OBV1_Active,  INDI_OBV, PERIOD_M1,  OBV1_SignalMethod,  OBV_SignalLevel,  OBV1_OpenCondition1, OBV1_OpenCondition2,  OBV1_CloseCondition,  OBV1_MaxSpread);
-  init &= !OBV5_Active  || InitStrategy(OBV5,  "OBV M5",   OBV5_Active,  INDI_OBV, PERIOD_M5,  OBV5_SignalMethod,  OBV_SignalLevel,  OBV5_OpenCondition1, OBV5_OpenCondition2,  OBV5_CloseCondition,  OBV5_MaxSpread);
-  init &= !OBV15_Active || InitStrategy(OBV15, "OBV M15", OBV15_Active, INDI_OBV, PERIOD_M15, OBV15_SignalMethod, OBV_SignalLevel, OBV15_OpenCondition1, OBV15_OpenCondition2, OBV15_CloseCondition, OBV15_MaxSpread);
-  init &= !OBV30_Active || InitStrategy(OBV30, "OBV M30", OBV30_Active, INDI_OBV, PERIOD_M30, OBV30_SignalMethod, OBV_SignalLevel, OBV30_OpenCondition1, OBV30_OpenCondition2, OBV30_CloseCondition, OBV30_MaxSpread);
+  init &= !OBV1_Active  | InitStrategy(OBV1,  "OBV M1",   OBV1_Active,  INDI_OBV, PERIOD_M1,  OBV1_SignalMethod,  OBV_SignalLevel,  OBV1_OpenCondition1, OBV1_OpenCondition2,  OBV1_CloseCondition,  OBV1_MaxSpread);
+  init &= !OBV5_Active  | InitStrategy(OBV5,  "OBV M5",   OBV5_Active,  INDI_OBV, PERIOD_M5,  OBV5_SignalMethod,  OBV_SignalLevel,  OBV5_OpenCondition1, OBV5_OpenCondition2,  OBV5_CloseCondition,  OBV5_MaxSpread);
+  init &= !OBV15_Active | InitStrategy(OBV15, "OBV M15", OBV15_Active, INDI_OBV, PERIOD_M15, OBV15_SignalMethod, OBV_SignalLevel, OBV15_OpenCondition1, OBV15_OpenCondition2, OBV15_CloseCondition, OBV15_MaxSpread);
+  init &= !OBV30_Active | InitStrategy(OBV30, "OBV M30", OBV30_Active, INDI_OBV, PERIOD_M30, OBV30_SignalMethod, OBV_SignalLevel, OBV30_OpenCondition1, OBV30_OpenCondition2, OBV30_CloseCondition, OBV30_MaxSpread);
 
-  init &= !OSMA1_Active  || InitStrategy(OSMA1,  "OSMA M1",   OSMA1_Active,  INDI_OSMA, PERIOD_M1,  OSMA1_SignalMethod,  OSMA_SignalLevel, OSMA1_OpenCondition1,  OSMA1_OpenCondition2,  OSMA1_CloseCondition,  OSMA1_MaxSpread);
-  init &= !OSMA5_Active  || InitStrategy(OSMA5,  "OSMA M5",   OSMA5_Active,  INDI_OSMA, PERIOD_M5,  OSMA5_SignalMethod,  OSMA_SignalLevel, OSMA5_OpenCondition1,  OSMA5_OpenCondition2,  OSMA5_CloseCondition,  OSMA5_MaxSpread);
-  init &= !OSMA15_Active || InitStrategy(OSMA15, "OSMA M15", OSMA15_Active, INDI_OSMA, PERIOD_M15, OSMA15_SignalMethod, OSMA_SignalLevel, OSMA15_OpenCondition1, OSMA15_OpenCondition2, OSMA15_CloseCondition, OSMA15_MaxSpread);
-  init &= !OSMA30_Active || InitStrategy(OSMA30, "OSMA M30", OSMA30_Active, INDI_OSMA, PERIOD_M30, OSMA30_SignalMethod, OSMA_SignalLevel, OSMA30_OpenCondition1, OSMA30_OpenCondition2, OSMA30_CloseCondition, OSMA30_MaxSpread);
+  init &= !OSMA1_Active  | InitStrategy(OSMA1,  "OSMA M1",   OSMA1_Active,  INDI_OSMA, PERIOD_M1,  OSMA1_SignalMethod,  OSMA_SignalLevel, OSMA1_OpenCondition1,  OSMA1_OpenCondition2,  OSMA1_CloseCondition,  OSMA1_MaxSpread);
+  init &= !OSMA5_Active  | InitStrategy(OSMA5,  "OSMA M5",   OSMA5_Active,  INDI_OSMA, PERIOD_M5,  OSMA5_SignalMethod,  OSMA_SignalLevel, OSMA5_OpenCondition1,  OSMA5_OpenCondition2,  OSMA5_CloseCondition,  OSMA5_MaxSpread);
+  init &= !OSMA15_Active | InitStrategy(OSMA15, "OSMA M15", OSMA15_Active, INDI_OSMA, PERIOD_M15, OSMA15_SignalMethod, OSMA_SignalLevel, OSMA15_OpenCondition1, OSMA15_OpenCondition2, OSMA15_CloseCondition, OSMA15_MaxSpread);
+  init &= !OSMA30_Active | InitStrategy(OSMA30, "OSMA M30", OSMA30_Active, INDI_OSMA, PERIOD_M30, OSMA30_SignalMethod, OSMA_SignalLevel, OSMA30_OpenCondition1, OSMA30_OpenCondition2, OSMA30_CloseCondition, OSMA30_MaxSpread);
 
-  init &= !RSI1_Active  || InitStrategy(RSI1,  "RSI M1",   RSI1_Active,  INDI_RSI, PERIOD_M1,  RSI1_SignalMethod,  RSI_SignalLevel, RSI1_OpenCondition1,  RSI1_OpenCondition2,  RSI1_CloseCondition,  RSI1_MaxSpread);
-  init &= !RSI5_Active  || InitStrategy(RSI5,  "RSI M5",   RSI5_Active,  INDI_RSI, PERIOD_M5,  RSI5_SignalMethod,  RSI_SignalLevel, RSI5_OpenCondition1,  RSI5_OpenCondition2,  RSI5_CloseCondition,  RSI5_MaxSpread);
-  init &= !RSI15_Active || InitStrategy(RSI15, "RSI M15", RSI15_Active, INDI_RSI, PERIOD_M15, RSI15_SignalMethod, RSI_SignalLevel, RSI15_OpenCondition1, RSI15_OpenCondition2, RSI15_CloseCondition, RSI15_MaxSpread);
-  init &= !RSI30_Active || InitStrategy(RSI30, "RSI M30", RSI30_Active, INDI_RSI, PERIOD_M30, RSI30_SignalMethod, RSI_SignalLevel, RSI30_OpenCondition1, RSI30_OpenCondition2, RSI30_CloseCondition, RSI30_MaxSpread);
+  init &= !RSI1_Active  | InitStrategy(RSI1,  "RSI M1",   RSI1_Active,  INDI_RSI, PERIOD_M1,  RSI1_SignalMethod,  RSI_SignalLevel, RSI1_OpenCondition1,  RSI1_OpenCondition2,  RSI1_CloseCondition,  RSI1_MaxSpread);
+  init &= !RSI5_Active  | InitStrategy(RSI5,  "RSI M5",   RSI5_Active,  INDI_RSI, PERIOD_M5,  RSI5_SignalMethod,  RSI_SignalLevel, RSI5_OpenCondition1,  RSI5_OpenCondition2,  RSI5_CloseCondition,  RSI5_MaxSpread);
+  init &= !RSI15_Active | InitStrategy(RSI15, "RSI M15", RSI15_Active, INDI_RSI, PERIOD_M15, RSI15_SignalMethod, RSI_SignalLevel, RSI15_OpenCondition1, RSI15_OpenCondition2, RSI15_CloseCondition, RSI15_MaxSpread);
+  init &= !RSI30_Active | InitStrategy(RSI30, "RSI M30", RSI30_Active, INDI_RSI, PERIOD_M30, RSI30_SignalMethod, RSI_SignalLevel, RSI30_OpenCondition1, RSI30_OpenCondition2, RSI30_CloseCondition, RSI30_MaxSpread);
 
-  init &= !RVI1_Active ||  InitStrategy(RVI1,  "RVI M1",   RVI1_Active,  INDI_RVI, PERIOD_M1,  RVI1_SignalMethod,  RVI_SignalLevel, RVI1_OpenCondition1,  RVI1_OpenCondition2,  RVI1_CloseCondition,  RVI1_MaxSpread);
-  init &= !RVI5_Active ||  InitStrategy(RVI5,  "RVI M5",   RVI5_Active,  INDI_RVI, PERIOD_M5,  RVI5_SignalMethod,  RVI_SignalLevel, RVI5_OpenCondition1,  RVI5_OpenCondition2,  RVI5_CloseCondition,  RVI5_MaxSpread);
-  init &= !RVI15_Active || InitStrategy(RVI15, "RVI M15", RVI15_Active, INDI_RVI, PERIOD_M15, RVI15_SignalMethod, RVI_SignalLevel, RVI15_OpenCondition1, RVI15_OpenCondition2, RVI15_CloseCondition, RVI15_MaxSpread);
-  init &= !RVI30_Active || InitStrategy(RVI30, "RVI M30", RVI30_Active, INDI_RVI, PERIOD_M30, RVI30_SignalMethod, RVI_SignalLevel, RVI30_OpenCondition1, RVI30_OpenCondition2, RVI30_CloseCondition, RVI30_MaxSpread);
+  init &= !RVI1_Active  |  InitStrategy(RVI1,  "RVI M1",   RVI1_Active,  INDI_RVI, PERIOD_M1,  RVI1_SignalMethod,  RVI_SignalLevel, RVI1_OpenCondition1,  RVI1_OpenCondition2,  RVI1_CloseCondition,  RVI1_MaxSpread);
+  init &= !RVI5_Active  |  InitStrategy(RVI5,  "RVI M5",   RVI5_Active,  INDI_RVI, PERIOD_M5,  RVI5_SignalMethod,  RVI_SignalLevel, RVI5_OpenCondition1,  RVI5_OpenCondition2,  RVI5_CloseCondition,  RVI5_MaxSpread);
+  init &= !RVI15_Active | InitStrategy(RVI15, "RVI M15", RVI15_Active, INDI_RVI, PERIOD_M15, RVI15_SignalMethod, RVI_SignalLevel, RVI15_OpenCondition1, RVI15_OpenCondition2, RVI15_CloseCondition, RVI15_MaxSpread);
+  init &= !RVI30_Active | InitStrategy(RVI30, "RVI M30", RVI30_Active, INDI_RVI, PERIOD_M30, RVI30_SignalMethod, RVI_SignalLevel, RVI30_OpenCondition1, RVI30_OpenCondition2, RVI30_CloseCondition, RVI30_MaxSpread);
 
-  init &= !SAR1_Active  || InitStrategy(SAR1,  "SAR M1",   SAR1_Active,  INDI_SAR, PERIOD_M1,  SAR1_SignalMethod,  SAR_SignalLevel, SAR1_OpenCondition1,  SAR1_OpenCondition2,  SAR1_CloseCondition,  SAR1_MaxSpread);
-  init &= !SAR5_Active  || InitStrategy(SAR5,  "SAR M5",   SAR5_Active,  INDI_SAR, PERIOD_M5,  SAR5_SignalMethod,  SAR_SignalLevel, SAR5_OpenCondition1,  SAR5_OpenCondition2,  SAR5_CloseCondition,  SAR5_MaxSpread);
-  init &= !SAR15_Active || InitStrategy(SAR15, "SAR M15", SAR15_Active, INDI_SAR, PERIOD_M15, SAR15_SignalMethod, SAR_SignalLevel, SAR15_OpenCondition1, SAR15_OpenCondition2, SAR15_CloseCondition, SAR15_MaxSpread);
-  init &= !SAR30_Active || InitStrategy(SAR30, "SAR M30", SAR30_Active, INDI_SAR, PERIOD_M30, SAR30_SignalMethod, SAR_SignalLevel, SAR30_OpenCondition1, SAR30_OpenCondition2, SAR30_CloseCondition, SAR30_MaxSpread);
+  init &= !SAR1_Active  | InitStrategy(SAR1,  "SAR M1",   SAR1_Active,  INDI_SAR, PERIOD_M1,  SAR1_SignalMethod,  SAR_SignalLevel, SAR1_OpenCondition1,  SAR1_OpenCondition2,  SAR1_CloseCondition,  SAR1_MaxSpread);
+  init &= !SAR5_Active  | InitStrategy(SAR5,  "SAR M5",   SAR5_Active,  INDI_SAR, PERIOD_M5,  SAR5_SignalMethod,  SAR_SignalLevel, SAR5_OpenCondition1,  SAR5_OpenCondition2,  SAR5_CloseCondition,  SAR5_MaxSpread);
+  init &= !SAR15_Active | InitStrategy(SAR15, "SAR M15", SAR15_Active, INDI_SAR, PERIOD_M15, SAR15_SignalMethod, SAR_SignalLevel, SAR15_OpenCondition1, SAR15_OpenCondition2, SAR15_CloseCondition, SAR15_MaxSpread);
+  init &= !SAR30_Active | InitStrategy(SAR30, "SAR M30", SAR30_Active, INDI_SAR, PERIOD_M30, SAR30_SignalMethod, SAR_SignalLevel, SAR30_OpenCondition1, SAR30_OpenCondition2, SAR30_CloseCondition, SAR30_MaxSpread);
 
-  init &= !StdDev1_Active  || InitStrategy(STDDEV1,  "StdDev M1",   StdDev1_Active,  INDI_STDDEV, PERIOD_M1,  StdDev1_SignalMethod,  StdDev_SignalLevel,  StdDev1_OpenCondition1,  StdDev1_OpenCondition2,  StdDev1_CloseCondition,  StdDev1_MaxSpread);
-  init &= !StdDev5_Active  || InitStrategy(STDDEV5,  "StdDev M5",   StdDev5_Active,  INDI_STDDEV, PERIOD_M5,  StdDev5_SignalMethod,  StdDev_SignalLevel,  StdDev5_OpenCondition1,  StdDev5_OpenCondition2,  StdDev5_CloseCondition,  StdDev5_MaxSpread);
-  init &= !StdDev15_Active || InitStrategy(STDDEV15, "StdDev M15", StdDev15_Active, INDI_STDDEV, PERIOD_M15, StdDev15_SignalMethod, StdDev_SignalLevel, StdDev15_OpenCondition1, StdDev15_OpenCondition2, StdDev15_CloseCondition, StdDev15_MaxSpread);
-  init &= !StdDev30_Active || InitStrategy(STDDEV30, "StdDev M30", StdDev30_Active, INDI_STDDEV, PERIOD_M30, StdDev30_SignalMethod, StdDev_SignalLevel, StdDev30_OpenCondition1, StdDev30_OpenCondition2, StdDev30_CloseCondition, StdDev30_MaxSpread);
+  init &= !StdDev1_Active  | InitStrategy(STDDEV1,  "StdDev M1",   StdDev1_Active,  INDI_STDDEV, PERIOD_M1,  StdDev1_SignalMethod,  StdDev_SignalLevel,  StdDev1_OpenCondition1,  StdDev1_OpenCondition2,  StdDev1_CloseCondition,  StdDev1_MaxSpread);
+  init &= !StdDev5_Active  | InitStrategy(STDDEV5,  "StdDev M5",   StdDev5_Active,  INDI_STDDEV, PERIOD_M5,  StdDev5_SignalMethod,  StdDev_SignalLevel,  StdDev5_OpenCondition1,  StdDev5_OpenCondition2,  StdDev5_CloseCondition,  StdDev5_MaxSpread);
+  init &= !StdDev15_Active | InitStrategy(STDDEV15, "StdDev M15", StdDev15_Active, INDI_STDDEV, PERIOD_M15, StdDev15_SignalMethod, StdDev_SignalLevel, StdDev15_OpenCondition1, StdDev15_OpenCondition2, StdDev15_CloseCondition, StdDev15_MaxSpread);
+  init &= !StdDev30_Active | InitStrategy(STDDEV30, "StdDev M30", StdDev30_Active, INDI_STDDEV, PERIOD_M30, StdDev30_SignalMethod, StdDev_SignalLevel, StdDev30_OpenCondition1, StdDev30_OpenCondition2, StdDev30_CloseCondition, StdDev30_MaxSpread);
 
-  init &= !Stochastic1_Active  || InitStrategy(STOCHASTIC1,  "Stochastic M1",   Stochastic1_Active,  INDI_STOCHASTIC, PERIOD_M1,  Stochastic1_SignalMethod,  Stochastic_SignalLevel,  Stochastic1_OpenCondition1,  Stochastic1_OpenCondition2,  Stochastic1_CloseCondition,  Stochastic1_MaxSpread);
-  init &= !Stochastic5_Active  || InitStrategy(STOCHASTIC5,  "Stochastic M5",   Stochastic5_Active,  INDI_STOCHASTIC, PERIOD_M5,  Stochastic5_SignalMethod,  Stochastic_SignalLevel,  Stochastic5_OpenCondition1,  Stochastic5_OpenCondition2,  Stochastic5_CloseCondition,  Stochastic5_MaxSpread);
-  init &= !Stochastic15_Active || InitStrategy(STOCHASTIC15, "Stochastic M15", Stochastic15_Active, INDI_STOCHASTIC, PERIOD_M15, Stochastic15_SignalMethod, Stochastic_SignalLevel, Stochastic15_OpenCondition1, Stochastic15_OpenCondition2, Stochastic15_CloseCondition, Stochastic15_MaxSpread);
-  init &= !Stochastic30_Active || InitStrategy(STOCHASTIC30, "Stochastic M30", Stochastic30_Active, INDI_STOCHASTIC, PERIOD_M30, Stochastic30_SignalMethod, Stochastic_SignalLevel, Stochastic30_OpenCondition1, Stochastic30_OpenCondition2, Stochastic30_CloseCondition, Stochastic30_MaxSpread);
+  init &= !Stochastic1_Active  | InitStrategy(STOCHASTIC1,  "Stochastic M1",   Stochastic1_Active,  INDI_STOCHASTIC, PERIOD_M1,  Stochastic1_SignalMethod,  Stochastic_SignalLevel,  Stochastic1_OpenCondition1,  Stochastic1_OpenCondition2,  Stochastic1_CloseCondition,  Stochastic1_MaxSpread);
+  init &= !Stochastic5_Active  | InitStrategy(STOCHASTIC5,  "Stochastic M5",   Stochastic5_Active,  INDI_STOCHASTIC, PERIOD_M5,  Stochastic5_SignalMethod,  Stochastic_SignalLevel,  Stochastic5_OpenCondition1,  Stochastic5_OpenCondition2,  Stochastic5_CloseCondition,  Stochastic5_MaxSpread);
+  init &= !Stochastic15_Active | InitStrategy(STOCHASTIC15, "Stochastic M15", Stochastic15_Active, INDI_STOCHASTIC, PERIOD_M15, Stochastic15_SignalMethod, Stochastic_SignalLevel, Stochastic15_OpenCondition1, Stochastic15_OpenCondition2, Stochastic15_CloseCondition, Stochastic15_MaxSpread);
+  init &= !Stochastic30_Active | InitStrategy(STOCHASTIC30, "Stochastic M30", Stochastic30_Active, INDI_STOCHASTIC, PERIOD_M30, Stochastic30_SignalMethod, Stochastic_SignalLevel, Stochastic30_OpenCondition1, Stochastic30_OpenCondition2, Stochastic30_CloseCondition, Stochastic30_MaxSpread);
 
-  init &= !WPR1_Active  || InitStrategy(WPR1,  "WPR M1",   WPR1_Active,  INDI_WPR, PERIOD_M1,  WPR1_SignalMethod,  WPR_SignalLevel, WPR1_OpenCondition1,  WPR1_OpenCondition2,  WPR1_CloseCondition,  WPR1_MaxSpread);
-  init &= !WPR5_Active  || InitStrategy(WPR5,  "WPR M5",   WPR5_Active,  INDI_WPR, PERIOD_M5,  WPR5_SignalMethod,  WPR_SignalLevel, WPR5_OpenCondition1,  WPR5_OpenCondition2,  WPR5_CloseCondition,  WPR5_MaxSpread);
-  init &= !WPR15_Active || InitStrategy(WPR15, "WPR M15", WPR15_Active, INDI_WPR, PERIOD_M15, WPR15_SignalMethod, WPR_SignalLevel, WPR15_OpenCondition1, WPR15_OpenCondition2, WPR15_CloseCondition, WPR15_MaxSpread);
-  init &= !WPR30_Active || InitStrategy(WPR30, "WPR M30", WPR30_Active, INDI_WPR, PERIOD_M30, WPR30_SignalMethod, WPR_SignalLevel, WPR30_OpenCondition1, WPR30_OpenCondition2, WPR30_CloseCondition, WPR30_MaxSpread);
+  init &= !WPR1_Active  | InitStrategy(WPR1,  "WPR M1",   WPR1_Active,  INDI_WPR, PERIOD_M1,  WPR1_SignalMethod,  WPR_SignalLevel, WPR1_OpenCondition1,  WPR1_OpenCondition2,  WPR1_CloseCondition,  WPR1_MaxSpread);
+  init &= !WPR5_Active  | InitStrategy(WPR5,  "WPR M5",   WPR5_Active,  INDI_WPR, PERIOD_M5,  WPR5_SignalMethod,  WPR_SignalLevel, WPR5_OpenCondition1,  WPR5_OpenCondition2,  WPR5_CloseCondition,  WPR5_MaxSpread);
+  init &= !WPR15_Active | InitStrategy(WPR15, "WPR M15", WPR15_Active, INDI_WPR, PERIOD_M15, WPR15_SignalMethod, WPR_SignalLevel, WPR15_OpenCondition1, WPR15_OpenCondition2, WPR15_CloseCondition, WPR15_MaxSpread);
+  init &= !WPR30_Active | InitStrategy(WPR30, "WPR M30", WPR30_Active, INDI_WPR, PERIOD_M30, WPR30_SignalMethod, WPR_SignalLevel, WPR30_OpenCondition1, WPR30_OpenCondition2, WPR30_CloseCondition, WPR30_MaxSpread);
 
-  init &= !ZigZag1_Active  || InitStrategy(ZIGZAG1,  "ZigZag M1",   ZigZag1_Active,  INDI_ZIGZAG, PERIOD_M1,  ZigZag1_SignalMethod,  ZigZag_SignalLevel, ZigZag1_OpenCondition1,  ZigZag1_OpenCondition2,  ZigZag1_CloseCondition,  ZigZag1_MaxSpread);
-  init &= !ZigZag5_Active  || InitStrategy(ZIGZAG5,  "ZigZag M5",   ZigZag5_Active,  INDI_ZIGZAG, PERIOD_M5,  ZigZag5_SignalMethod,  ZigZag_SignalLevel, ZigZag5_OpenCondition1,  ZigZag5_OpenCondition2,  ZigZag5_CloseCondition,  ZigZag5_MaxSpread);
-  init &= !ZigZag15_Active || InitStrategy(ZIGZAG15, "ZigZag M15", ZigZag15_Active, INDI_ZIGZAG, PERIOD_M15, ZigZag15_SignalMethod, ZigZag_SignalLevel, ZigZag15_OpenCondition1, ZigZag15_OpenCondition2, ZigZag15_CloseCondition, ZigZag15_MaxSpread);
-  init &= !ZigZag30_Active || InitStrategy(ZIGZAG30, "ZigZag M30", ZigZag30_Active, INDI_ZIGZAG, PERIOD_M30, ZigZag30_SignalMethod, ZigZag_SignalLevel, ZigZag30_OpenCondition1, ZigZag30_OpenCondition2, ZigZag30_CloseCondition, ZigZag30_MaxSpread);
+  init &= !ZigZag1_Active  | InitStrategy(ZIGZAG1,  "ZigZag M1",   ZigZag1_Active,  INDI_ZIGZAG, PERIOD_M1,  ZigZag1_SignalMethod,  ZigZag_SignalLevel, ZigZag1_OpenCondition1,  ZigZag1_OpenCondition2,  ZigZag1_CloseCondition,  ZigZag1_MaxSpread);
+  init &= !ZigZag5_Active  | InitStrategy(ZIGZAG5,  "ZigZag M5",   ZigZag5_Active,  INDI_ZIGZAG, PERIOD_M5,  ZigZag5_SignalMethod,  ZigZag_SignalLevel, ZigZag5_OpenCondition1,  ZigZag5_OpenCondition2,  ZigZag5_CloseCondition,  ZigZag5_MaxSpread);
+  init &= !ZigZag15_Active | InitStrategy(ZIGZAG15, "ZigZag M15", ZigZag15_Active, INDI_ZIGZAG, PERIOD_M15, ZigZag15_SignalMethod, ZigZag_SignalLevel, ZigZag15_OpenCondition1, ZigZag15_OpenCondition2, ZigZag15_CloseCondition, ZigZag15_MaxSpread);
+  init &= !ZigZag30_Active | InitStrategy(ZIGZAG30, "ZigZag M30", ZigZag30_Active, INDI_ZIGZAG, PERIOD_M30, ZigZag30_SignalMethod, ZigZag_SignalLevel, ZigZag30_OpenCondition1, ZigZag30_OpenCondition2, ZigZag30_CloseCondition, ZigZag30_MaxSpread);
 
   if (!init && ValidateSettings) {
     Msg::ShowText(Chart::ListTimeframes(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
@@ -5119,6 +5171,7 @@ bool InitStrategy(int key, string name, bool active, ENUM_INDICATOR_TYPE indicat
  * Update global variables.
  */
 void UpdateVariables() {
+  DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   // static datetime last_bar_time
   time_current = TimeCurrent();
@@ -5539,17 +5592,21 @@ double GetStrategyProfitFactor(int sid) {
 /**
  * Fetch strategy signal level based on the indicator and timeframe.
  */
-double GetStrategySignalLevel(int indicator, int timeframe = PERIOD_M30, double default_value = 0.0) {
-  int sid = GetStrategyViaIndicator((ENUM_STRATEGY_TYPE) indicator, (ENUM_TIMEFRAMES) timeframe);
+double GetStrategySignalLevel(ENUM_INDICATOR_TYPE indicator, ENUM_TIMEFRAMES timeframe = PERIOD_M30, double default_value = 0.0) {
+  DEBUG_CHECKPOINT_ADD
+  int sid = GetStrategyViaIndicator(indicator, timeframe);
   // Message(StringFormat("%s(): indi = %d, timeframe = %d, sid = %d, signal_level = %f", __FUNCTION__, indicator, timeframe, sid, conf[sid][OPEN_LEVEL]));
+  DEBUG_CHECKPOINT_POP
   return sid >= 0 ? conf[sid][OPEN_LEVEL] : default_value;
 }
 
 /**
  * Fetch strategy signal level based on the indicator and timeframe.
  */
-int GetStrategySignalMethod(int indicator, int timeframe = PERIOD_M30, int default_value = 0) {
-  int sid = GetStrategyViaIndicator((ENUM_STRATEGY_TYPE) indicator, (ENUM_TIMEFRAMES) timeframe);
+int GetStrategySignalMethod(ENUM_INDICATOR_TYPE indicator, ENUM_TIMEFRAMES timeframe = PERIOD_M30, int default_value = 0) {
+  DEBUG_CHECKPOINT_ADD
+  int sid = GetStrategyViaIndicator(indicator, timeframe);
+  DEBUG_CHECKPOINT_POP
   return sid >= 0 ? info[sid][OPEN_METHOD] : default_value;
 }
 
@@ -5570,15 +5627,19 @@ ENUM_TIMEFRAMES_INDEX GetStrategyTimeframeIndex(int sid, int default_value = PER
 /**
  * Get strategy id based on the indicator and tf.
  */
-int GetStrategyViaIndicator(ENUM_STRATEGY_TYPE indicator, int tf) {
+int GetStrategyViaIndicator(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _tf) {
+  DEBUG_CHECKPOINT_ADD
   for (int sid = 0; sid < ArrayRange(info, 0); sid++) {
-    if ((ENUM_STRATEGY_TYPE) info[sid][INDICATOR] == indicator && info[sid][TIMEFRAME] == tf) {
+    if ((ENUM_INDICATOR_TYPE) info[sid][INDICATOR] == _indicator && (ENUM_TIMEFRAMES) info[sid][TIMEFRAME] == _tf) {
       return sid;
     }
   }
   Msg::ShowText(
-    StringFormat("Cannot find indicator %d (%s) for timeframe: %d", (int) indicator, EnumToString(indicator), tf),
-    "Error", __FUNCTION__, __LINE__, VerboseErrors);
+    StringFormat("Cannot find indicator %d (%s) for timeframe: %d", _indicator, EnumToString(_indicator), _tf),
+    "Error", __FUNCTION__, __LINE__, VerboseErrors | VerboseDebug
+    );
+  DEBUG_STACK_PRINT
+  DEBUG_CHECKPOINT_POP
   return EMPTY;
 }
 
@@ -6283,6 +6344,7 @@ int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = true) {
  * Note: Executing random actions can be potentially dangerous for the account if not used wisely.
  */
 bool ActionExecute(int aid, int id = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   bool result = false;
   int reason_id = (id != EMPTY ? acc_conditions[id][0] : EMPTY); // Account id condition.
   int mid = (id != EMPTY ? acc_conditions[id][1] : EMPTY); // Market id condition.
@@ -6481,6 +6543,7 @@ string MarketIdToText(int mid) {
  * @todo: Move to Array class.
  */
 bool TicketAdd(int ticket_no) {
+  DEBUG_CHECKPOINT_ADD
   int i, slot = EMPTY;
   int size = ArraySize(tickets);
   // Check if ticket is already in the list and at the same time find the empty slot.
@@ -6510,6 +6573,7 @@ bool TicketAdd(int ticket_no) {
  * Remove ticket from the list after it has been processed.
  */
 bool TicketRemove(int ticket_no) {
+  DEBUG_CHECKPOINT_ADD
   for (int i = 0; i < ArraySize(tickets); i++) {
     if (tickets[i] == ticket_no) {
       tickets[i] = 0; // Remove the ticket number from the array slot.
@@ -6547,6 +6611,7 @@ bool CheckHistory() {
  * Process AI queue of orders to see if we can open any trades.
  */
 bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   bool result = true;
   int queue_size = OrderQueueCount();
   long sorted_queue[][2];
@@ -6588,6 +6653,7 @@ bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
  * Check for the market condition to filter out the order queue.
  */
 bool OpenOrderCondition(ENUM_ORDER_TYPE cmd, int sid, datetime time, int method) {
+  DEBUG_CHECKPOINT_ADD
   bool result = true;
   ENUM_TIMEFRAMES tf = GetStrategyTimeframe(sid);
   uint tfi = Chart::TfToIndex(tf);
@@ -6617,6 +6683,7 @@ bool OpenOrderCondition(ENUM_ORDER_TYPE cmd, int sid, datetime time, int method)
  * Get key based on strategy id in order to prioritize the queue.
  */
 int GetOrderQueueKeyValue(int sid, int method, int qid) {
+  DEBUG_CHECKPOINT_ADD
   int key = 0;
   switch (method) {
     case  0: key = (int) order_queue[qid][Q_TIME]; break; // 7867 OK (10k, 0.02)
@@ -6647,6 +6714,7 @@ int GetOrderQueueKeyValue(int sid, int method, int qid) {
  * Get the next non-empty item from the queue.
  */
 int OrderQueueNext(int index = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
   if (index == EMPTY) index = 0;
   for (int qid = index; qid < ArrayRange(order_queue, 0); qid++)
     if (order_queue[qid][Q_SID] != EMPTY) { return qid; }
@@ -6657,6 +6725,7 @@ int OrderQueueNext(int index = EMPTY) {
  * Add new order to the queue.
  */
 bool OrderQueueAdd(int sid, ENUM_ORDER_TYPE cmd) {
+  DEBUG_CHECKPOINT_ADD
   bool result = false;
   int qid = EMPTY, size = ArrayRange(order_queue, 0);
   for (int i = 0; i < size; i++) {
@@ -6685,7 +6754,7 @@ bool OrderQueueAdd(int sid, ENUM_ORDER_TYPE cmd) {
  * Clear queue from the orders.
  */
 void OrderQueueClear() {
-  if (VerboseTrace) Print("Calling " + __FUNCTION__ + "().");
+  DEBUG_CHECKPOINT_ADD
   ArrayFill(order_queue, 0, ArraySize(order_queue), EMPTY);
 }
 
@@ -6693,6 +6762,7 @@ void OrderQueueClear() {
  * Check how many orders are in the queue.
  */
 int OrderQueueCount() {
+  DEBUG_CHECKPOINT_ADD
   int counter = 0;
   for (int i = 0; i < ArrayRange(order_queue, 0); i++)
     if (order_queue[i][Q_SID] != EMPTY) counter++;
