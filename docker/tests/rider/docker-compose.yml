@@ -14,6 +14,7 @@ services:
     environment:
       BT_MONTHS: 01
       TEST_REPORT_NAME: EA31337_Rider_201801
+#     SET_OPTS: VerboseDebug=0,VerboseTrace=0
   test_2018_02:
     command: run_backtest -v
     image: ea31337:rider-eurusd-2018
