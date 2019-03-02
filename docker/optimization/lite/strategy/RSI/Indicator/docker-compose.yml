@@ -1,17 +1,20 @@
-version: '3'
+version: '3.4'
 services:
   RSI_Period_2018:
     command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
     volumes:
     - ../../../../../../src:/opt/src
-    - ../../../../../../src/include/EA31337/lite:/opt/set:rw
     - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+#   - ../../../../../../src/include/EA31337/lite:/opt/set:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts:rw
-    - ./results:/opt/results:rw
-    tty: true
-#   image: ea31337/ea-tester:dev
-    image: ea31337/ea-tester:EURUSD-2018-DS
     env_file: .env
     environment:
       INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-All-RSI_Period.rules
-      SETFILE: /opt/results/EA31337.set
+      SETFILE: /opt/_results/EA31337-Lite_RSI_Period.set
+      TEST_REPORT_NAME: EA31337-Lite_RSI_Period
+      OPT_TRACE: 1
