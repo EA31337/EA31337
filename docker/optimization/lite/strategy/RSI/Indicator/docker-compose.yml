@@ -1,6 +1,6 @@
 version: '3.4'
 services:
-  RSI_Period_2018:
+  RSI_Period:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
     build:
@@ -17,7 +17,7 @@ services:
       INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-All-RSI_Period.rules
       SETFILE: /opt/_results/EA31337-Lite_RSI_Period.set
       TEST_REPORT_NAME: EA31337-Lite_RSI_Period
-  RSI_Applied_Price_2018:
+  RSI_Applied_Price:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
     build:
@@ -34,3 +34,20 @@ services:
       INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-All-RSI_Applied_Price.rule
       SETFILE: /opt/_results/EA31337-Lite_RSI_Applied_Price.set
       TEST_REPORT_NAME: EA31337-Lite_RSI_Applied_Price
+  RSI_Shift:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+#   - ../../../../../../src/include/EA31337/lite:/opt/set:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts:rw
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-All-RSI_Shift.rule
+      SETFILE: /opt/_results/EA31337-Lite_RSI_Shift.set
+      TEST_REPORT_NAME: EA31337-Lite_RSI_Shift

@@ -1,0 +1,24 @@
+# Base params.
+LotSize=0.01
+Boosting_Enabled=0
+Account_Conditions_Active=0
+CloseOrderAfterXHours=48
+ProfitFactorMinToTrade=0
+ProfitFactorMaxToTrade=0
+ValidateSettings=0
+PrintLogOnChart=0
+WriteReport=0
+RecordTicksToCSV=0
+VerboseInfo=0
+VerboseErrors=0
+# RSI params.
+RSI1_Active=1
+RSI5_Active=1
+RSI15_Active=1
+RSI30_Active=1
+# Optimization params.
+RSI_Shift=4
+RSI_Shift,F=0
+RSI_Shift,1=0
+RSI_Shift,2=0
+RSI_Shift,3=0
