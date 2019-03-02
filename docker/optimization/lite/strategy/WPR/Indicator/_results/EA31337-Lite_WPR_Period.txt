@@ -1,0 +1,23 @@
+
+
+
+                                                                 Optimization Report
+                                                                       EA31337
+                                                            Tripleafx-FX-Demo (Build 1010)
+
+                            Symbol          EURUSD (Euro vs US Dollar)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.01.30 23:30 (2018.01.01 - 2018.01.31)
+                            Model           Every tick (the most precise method based on all available least timeframes)
+                            Initial deposit 10000.00
+                            Spread          10
+                                                                 [Optimization Graph]
+             Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+                1 -32.93          230          0.85           -0.14     106.40       1.06  WPR_Period=5; MaxOrders=0; MaxOrdersPerType=0;
+                2 -32.93          230          0.85           -0.14     106.40       1.06  WPR_Period=6; MaxOrders=0; MaxOrdersPerType=0;
+                3 -32.93          230          0.85           -0.14     106.40       1.06  WPR_Period=7; MaxOrders=0; MaxOrdersPerType=0;
+                4 -32.93          230          0.85           -0.14     106.40       1.06  WPR_Period=8; MaxOrders=0; MaxOrdersPerType=0;
+                5 -32.93          230          0.85           -0.14     106.40       1.06  WPR_Period=9; MaxOrders=0; MaxOrdersPerType=0;
+                6 -32.93          230          0.85           -0.14     106.40       1.06 WPR_Period=10; MaxOrders=0; MaxOrdersPerType=0;
+                7 -32.93          230          0.85           -0.14     106.40       1.06 WPR_Period=11; MaxOrders=0; MaxOrdersPerType=0;
+                8 -32.93          230          0.85           -0.14     106.40       1.06 WPR_Period=12; MaxOrders=0; MaxOrdersPerType=0;
+                9 -32.93          230          0.85           -0.14     106.40       1.06 WPR_Period=13; MaxOrders=0; MaxOrdersPerType=0;

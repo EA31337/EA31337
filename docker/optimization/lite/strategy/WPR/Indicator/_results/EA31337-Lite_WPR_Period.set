@@ -1,0 +1,29 @@
+# Base params.
+LotSize=0.01
+Boosting_Enabled=0
+Account_Conditions_Active=0
+CloseOrderAfterXHours=48
+ProfitFactorMinToTrade=0
+ProfitFactorMaxToTrade=0
+ValidateSettings=0
+PrintLogOnChart=0
+WriteReport=0
+RecordTicksToCSV=0
+VerboseInfo=0
+VerboseErrors=0
+# WPR params.
+WPR1_Active=1
+WPR5_Active=1
+WPR15_Active=1
+WPR30_Active=1
+# Optimization params.
+WPR_Period=9
+WPR_Period,F=0
+WPR_Period,1=0
+WPR_Period,2=0
+WPR_Period,3=0
+WPR_Period_Ratio=1.00000000
+WPR_Period_Ratio,F=0
+WPR_Period_Ratio,1=1.00000000
+WPR_Period_Ratio,2=0.00000000
+WPR_Period_Ratio,3=0.00000000
