@@ -1,0 +1,74 @@
+version: '3.4'
+services:
+  RSI1_Active:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-RSI1_Active.rules
+      SETFILE: /opt/_results/EA31337-Lite_RSI1_Active.set
+      TEST_REPORT_NAME: EA31337-Lite_RSI1_Active
+      RUN_ON_SUCCESS: input_copy RSI1_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+  RSI5_Active:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-RSI5_Active.rules
+      SETFILE: /opt/_results/EA31337-Lite_RSI5_Active.set
+      TEST_REPORT_NAME: EA31337-Lite_RSI5_Active
+      RUN_ON_SUCCESS: input_copy RSI5_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+  RSI15_Active:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-RSI15_Active.rules
+      SETFILE: /opt/_results/EA31337-Lite_RSI15_Active.set
+      TEST_REPORT_NAME: EA31337-Lite_RSI15_Active
+      RUN_ON_SUCCESS: input_copy RSI15_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+  RSI30_Active:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-RSI30_Active.rules
+      SETFILE: /opt/_results/EA31337-Lite_RSI30_Active.set
+      TEST_REPORT_NAME: EA31337-Lite_RSI30_Active
+      RUN_ON_SUCCESS: input_copy RSI30_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
