@@ -6,11 +6,11 @@
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.01.30 23:30 (2018.01.01 - 2018.01.31)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.02.27 23:30 (2018.01.01 - 2018.02.28)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
              Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
                 1   0.00            0          0.00            0.00       0.00       0.00 RSI5_Active=0; MaxOrders=0; MaxOrdersPerType=0;
-                2 -19.56           14          0.18           -1.40      21.24       0.21 RSI5_Active=1; MaxOrders=0; MaxOrdersPerType=0;
+                2 -18.33           30          0.34           -0.61      23.47       0.23 RSI5_Active=1; MaxOrders=0; MaxOrdersPerType=0;

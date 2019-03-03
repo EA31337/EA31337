@@ -14,7 +14,7 @@ services:
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: .env
     environment:
-      INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-RSI1_Active.rules
+      INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-RSI1_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_RSI1_Active.set
       TEST_REPORT_NAME: EA31337-Lite_RSI1_Active
       RUN_ON_SUCCESS: input_copy RSI1_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
@@ -32,7 +32,7 @@ services:
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: .env
     environment:
-      INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-RSI5_Active.rules
+      INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-RSI5_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_RSI5_Active.set
       TEST_REPORT_NAME: EA31337-Lite_RSI5_Active
       RUN_ON_SUCCESS: input_copy RSI5_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
@@ -50,7 +50,7 @@ services:
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: .env
     environment:
-      INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-RSI15_Active.rules
+      INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-RSI15_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_RSI15_Active.set
       TEST_REPORT_NAME: EA31337-Lite_RSI15_Active
       RUN_ON_SUCCESS: input_copy RSI15_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
@@ -68,7 +68,7 @@ services:
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: .env
     environment:
-      INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-RSI30_Active.rules
+      INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-RSI30_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_RSI30_Active.set
       TEST_REPORT_NAME: EA31337-Lite_RSI30_Active
       RUN_ON_SUCCESS: input_copy RSI30_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh

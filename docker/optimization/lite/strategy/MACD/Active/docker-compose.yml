@@ -1,0 +1,74 @@
+version: '3.4'
+services:
+  MACD1_Active:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/MACD/Strategy-MACD-MACD1_Active.rule
+      SETFILE: /opt/_results/EA31337-Lite_MACD1_Active.set
+      TEST_REPORT_NAME: EA31337-Lite_MACD1_Active
+      RUN_ON_SUCCESS: input_copy MACD1_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+  MACD5_Active:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/MACD/Strategy-MACD-MACD5_Active.rule
+      SETFILE: /opt/_results/EA31337-Lite_MACD5_Active.set
+      TEST_REPORT_NAME: EA31337-Lite_MACD5_Active
+      RUN_ON_SUCCESS: input_copy MACD5_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+  MACD15_Active:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/MACD/Strategy-MACD-MACD15_Active.rule
+      SETFILE: /opt/_results/EA31337-Lite_MACD15_Active.set
+      TEST_REPORT_NAME: EA31337-Lite_MACD15_Active
+      RUN_ON_SUCCESS: input_copy MACD15_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+  MACD30_Active:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/MACD/Strategy-MACD-MACD30_Active.rule
+      SETFILE: /opt/_results/EA31337-Lite_MACD30_Active.set
+      TEST_REPORT_NAME: EA31337-Lite_MACD30_Active
+      RUN_ON_SUCCESS: input_copy MACD30_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
