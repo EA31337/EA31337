@@ -17,7 +17,7 @@ RSI5_Active=1
 RSI15_Active=1
 RSI30_Active=1
 # Optimization params.
-RSI_SignalLevel=15
+RSI_SignalLevel=17
 RSI_SignalLevel,F=0
 RSI_SignalLevel,1=0
 RSI_SignalLevel,2=0

@@ -10,13 +10,14 @@ services:
     - ../../../../../../src:/opt/src
     - ../../../../_rules:/opt/rules
     - ./_results:/opt/_results:rw
-#   - ../../../../../../src/include/EA31337/lite:/opt/set:rw
-#   - ../../../../../../../EA-Tester/scripts:/opt/scripts:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: .env
     environment:
-      INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-All-RSI_Period.rules
+      INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-All-RSI_Period.rule
       SETFILE: /opt/_results/EA31337-Lite_RSI_Period.set
       TEST_REPORT_NAME: EA31337-Lite_RSI_Period
+      RUN_ON_SUCCESS: input_copy RSI_Period "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
   RSI_Applied_Price:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -27,13 +28,14 @@ services:
     - ../../../../../../src:/opt/src
     - ../../../../_rules:/opt/rules
     - ./_results:/opt/_results:rw
-#   - ../../../../../../src/include/EA31337/lite:/opt/set:rw
-#   - ../../../../../../../EA-Tester/scripts:/opt/scripts:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: .env
     environment:
       INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-All-RSI_Applied_Price.rule
       SETFILE: /opt/_results/EA31337-Lite_RSI_Applied_Price.set
       TEST_REPORT_NAME: EA31337-Lite_RSI_Applied_Price
+      RUN_ON_SUCCESS: input_copy RSI_Applied_Price "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
   RSI_SignalLevel:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -44,13 +46,14 @@ services:
     - ../../../../../../src:/opt/src
     - ../../../../_rules:/opt/rules
     - ./_results:/opt/_results:rw
-#   - ../../../../../../src/include/EA31337/lite:/opt/set:rw
-#   - ../../../../../../../EA-Tester/scripts:/opt/scripts:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: .env
     environment:
       INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-All-RSI_SignalLevel.rule
       SETFILE: /opt/_results/EA31337-Lite_RSI_SignalLevel.set
       TEST_REPORT_NAME: EA31337-Lite_RSI_SignalLevel
+      RUN_ON_SUCCESS: input_copy RSI_SignalLevel "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
   RSI_Shift:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -61,10 +64,11 @@ services:
     - ../../../../../../src:/opt/src
     - ../../../../_rules:/opt/rules
     - ./_results:/opt/_results:rw
-#   - ../../../../../../src/include/EA31337/lite:/opt/set:rw
-#   - ../../../../../../../EA-Tester/scripts:/opt/scripts:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: .env
     environment:
       INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-All-RSI_Shift.rule
       SETFILE: /opt/_results/EA31337-Lite_RSI_Shift.set
       TEST_REPORT_NAME: EA31337-Lite_RSI_Shift
+      RUN_ON_SUCCESS: input_copy RSI_Shift "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
