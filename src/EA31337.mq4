@@ -136,7 +136,7 @@ bool session_active = false;
 
 // Time-based variables.
 // Bar time: initial, current and last one to check if bar has been changed since the last time.
-datetime curr_bar_time, last_bar_time = (int) EMPTY_VALUE;
+datetime curr_bar_time;
 datetime time_current = (int) EMPTY_VALUE;
 int hour_of_day, day_of_week, day_of_month, day_of_year, month, year;
 datetime last_order_time = 0, last_action_time = 0;
@@ -5173,7 +5173,6 @@ bool InitStrategy(int key, string name, bool active, ENUM_INDICATOR_TYPE indicat
 void UpdateVariables() {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
-  // static datetime last_bar_time
   time_current = TimeCurrent();
   //curr_bar_time = chart.GetBarTime(PERIOD_M1);
   last_close_profit = EMPTY;
@@ -5467,11 +5466,15 @@ bool MarketCondition(Chart *_chart, int condition = C_MARKET_NONE) {
   return false;
 }
 
-// Check our account if certain conditions are met.
+/**
+ * Check the account for configured conditions.
+ */
 void CheckAccConditions(Chart *_chart) {
-  // if (VerboseTrace) Print("Calling " + __FUNCTION__ + ".");
-  if (!Account_Conditions_Active) return;
-  if (trade[M1].Chart().GetBarTime() == last_action_time) return; // If action was already executed in the same bar, do not check again.
+  if (!Account_Conditions_Active || last_action_time + 60 < DateTime::TimeTradeServer()) {
+    // Do not execute action more often than a minute.
+    // @todo: Move 60 second rule into the external param.
+    return;
+  }
 
   #ifdef __profiler__ PROFILER_START #endif
 
@@ -6436,7 +6439,7 @@ bool ActionExecute(int aid, int id = EMPTY) {
         "Info", __FUNCTION__, __LINE__, VerboseInfo);
     Msg::ShowText(last_msg, "Debug", __FUNCTION__, __LINE__, VerboseDebug && aid != A_NONE);
     if (WriteReport && VerboseDebug) ReportAdd(GetLastMessage());
-    last_action_time = last_bar_time; // Set last execution bar time.
+    last_action_time = DateTime::TimeTradeServer(); // Set last execution bar time.
   } else {
     Msg::ShowText(
       StringFormat("Failed to execute action: %s (id: %d), condition: %s (id: %d).",
