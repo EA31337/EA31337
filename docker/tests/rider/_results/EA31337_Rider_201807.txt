@@ -52,16 +52,16 @@
   Bars in test                 1973 Ticks modelled                     8750894 Modelling quality                                              90.00%
   Mismatched charts errors        0
   Initial deposit          10000.00                                            Spread                                                             10
-  Total net profit           -66.02 Gross profit                         90.29 Gross loss                                                    -156.31
-  Profit factor                0.58 Expected payoff                      -0.50
-  Absolute drawdown           74.07 Maximal drawdown             87.25 (0.87%) Relative drawdown                                       0.87% (87.25)
-  Total trades                  131 Short positions (won %)        58 (34.48%) Long positions (won %)                                    73 (45.21%)
-                                    Profit trades (% of total)     53 (40.46%) Loss trades (% of total)                                  78 (59.54%)
-                            Largest profit trade                         18.78 loss trade                                                     -11.97
-                            Average profit trade                          1.70 loss trade                                                      -2.00
-                            Maximum consecutive wins (profit in       4 (1.50) consecutive losses (loss in money)                          6 (-4.08)
+  Total net profit           -10.37 Gross profit                         14.92 Gross loss                                                     -25.29
+  Profit factor                0.59 Expected payoff                      -0.29
+  Absolute drawdown           10.37 Maximal drawdown             12.85 (0.13%) Relative drawdown                                       0.13% (12.85)
+  Total trades                   36 Short positions (won %)        17 (41.18%) Long positions (won %)                                    19 (42.11%)
+                                    Profit trades (% of total)     15 (41.67%) Loss trades (% of total)                                  21 (58.33%)
+                            Largest profit trade                          2.89 loss trade                                                      -5.25
+                            Average profit trade                          0.99 loss trade                                                      -1.20
+                            Maximum consecutive wins (profit in       4 (2.54) consecutive losses (loss in money)                          4 (-4.27)
                                     money)
-                            Maximal consecutive profit (count of     18.78 (1) consecutive loss (count of losses)                         -21.60 (4)
+                            Maximal consecutive profit (count of      2.89 (1) consecutive loss (count of losses)                          -9.01 (3)
                                     wins)
                             Average consecutive wins                         2 consecutive losses                                                  2
                                                                        [Graph]

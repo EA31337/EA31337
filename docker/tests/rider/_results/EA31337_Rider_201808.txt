@@ -23,9 +23,9 @@
                                     BestDailyStrategyMultiplierFactor=1.2; BestWeeklyStrategyMultiplierFactor=1.5;
                                     BestMonthlyStrategyMultiplierFactor=1.5; WorseDailyStrategyMultiplierFactor=0.9;
                                     WorseWeeklyStrategyMultiplierFactor=0.8; WorseMonthlyStrategyMultiplierFactor=0.7; ConWinsIncreaseFactor=-1.2;
-                                    ConLossesIncreaseFactor=1.3; ConFactorOrdersLimit=200; __SmartQueue_Parameters__="-- Smart queue parameters --";
-                                    SmartQueueActive=true; SmartQueueMethod=3; SmartQueueFilter=27; __EA_Account_Conditions__="-- Account conditions
-                                    --"; Account_Conditions_Active=true; Account_Condition_MinProfitCloseOrder=20;
+                                    ConLossesIncreaseFactor=1.3; ConFactorOrdersLimit=200; __SmartQueue_Parameters__="-- Smart queue parameters --
+                                    "; SmartQueueActive=true; SmartQueueMethod=3; SmartQueueFilter=27; __EA_Account_Conditions__="-- Account
+                                    conditions --"; Account_Conditions_Active=true; Account_Condition_MinProfitCloseOrder=20;
                                     __EA_Account_Conditions_Params__="-- Account conditions parameters --"; MarketSuddenDropSize=10;
                                     MarketBigDropSize=50; MarketSpecificHour=0; CloseConditionOnlyProfitable=true; CloseConditionCustom1Method=0;
   Parameters                        CloseConditionCustom2Method=0; CloseConditionCustom3Method=0; CloseConditionCustom4Method=0;
@@ -49,19 +49,19 @@
                                     __DeMarker_Parameters__="-- Settings for the DeMarker indicator --"; DeMarker1_Active=false;
                                     DeMarker5_Active=false; DeMarker15_Active=false; DeMarker30_Active=false; DeMarker_Period=24;
                                     DeMarker_Period_Ratio=3; DeMarker_Shift=0; DeMarker_SignalLevel=0.2; DeMarker1_MaxSpread=6;
-  Bars in test                 2013 Ticks modelled                     8584690 Modelling quality                                              90.00%
+  Bars in test                 2013 Ticks modelled                    8584690 Modelling quality                                              90.00%
   Mismatched charts errors        0
-  Initial deposit          10000.00                                            Spread                                                             10
-  Total net profit           -10.65 Gross profit                          2.88 Gross loss                                                     -13.53
-  Profit factor                0.21 Expected payoff                      -0.38
-  Absolute drawdown           10.69 Maximal drawdown             10.69 (0.11%) Relative drawdown                                       0.11% (10.69)
-  Total trades                   28 Short positions (won %)         3 (33.33%) Long positions (won %)                                    25 (28.00%)
-                                    Profit trades (% of total)      8 (28.57%) Loss trades (% of total)                                  20 (71.43%)
-                            Largest profit trade                          1.70 loss trade                                                      -3.71
-                            Average profit trade                          0.36 loss trade                                                      -0.68
-                            Maximum consecutive wins (profit in       2 (1.78) consecutive losses (loss in money)                          8 (-5.69)
+  Initial deposit          10000.00                                           Spread                                                             10
+  Total net profit            -7.54 Gross profit                         1.82 Gross loss                                                      -9.36
+  Profit factor                0.19 Expected payoff                     -0.33
+  Absolute drawdown            7.70 Maximal drawdown             7.87 (0.08%) Relative drawdown                                        0.08% (7.87)
+  Total trades                   23 Short positions (won %)       1 (100.00%) Long positions (won %)                                    22 (18.18%)
+                                    Profit trades (% of total)     5 (21.74%) Loss trades (% of total)                                  18 (78.26%)
+                            Largest profit trade                         0.88 loss trade                                                      -1.29
+                            Average profit trade                         0.36 loss trade                                                      -0.52
+                            Maximum consecutive wins (profit in      2 (0.17) consecutive losses (loss in money)                          9 (-5.28)
                                     money)
-                            Maximal consecutive profit (count of      1.78 (2) consecutive loss (count of losses)                          -5.69 (8)
+                            Maximal consecutive profit (count of     0.88 (1) consecutive loss (count of losses)                          -5.28 (9)
                                     wins)
-                            Average consecutive wins                         1 consecutive losses                                                  3
+                            Average consecutive wins                        1 consecutive losses                                                  4
                                                                        [Graph]
