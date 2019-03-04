@@ -17,7 +17,7 @@ services:
       INCLUDE: /opt/rules/Strategies/WPR/Strategy-WPR-WPR1_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_WPR1_Active.set
       TEST_REPORT_NAME: EA31337-Lite_WPR1_Active
-      RUN_ON_SUCCESS: input_copy WPR1_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy WPR1_Active "$${SETFILE}" /opt/lite/ea-input.mqh
   WPR5_Active:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -35,7 +35,7 @@ services:
       INCLUDE: /opt/rules/Strategies/WPR/Strategy-WPR-WPR5_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_WPR5_Active.set
       TEST_REPORT_NAME: EA31337-Lite_WPR5_Active
-      RUN_ON_SUCCESS: input_copy WPR5_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy WPR5_Active "$${SETFILE}" /opt/lite/ea-input.mqh
   WPR15_Active:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -53,7 +53,7 @@ services:
       INCLUDE: /opt/rules/Strategies/WPR/Strategy-WPR-WPR15_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_WPR15_Active.set
       TEST_REPORT_NAME: EA31337-Lite_WPR15_Active
-      RUN_ON_SUCCESS: input_copy WPR15_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy WPR15_Active "$${SETFILE}" /opt/lite/ea-input.mqh
   WPR30_Active:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -71,4 +71,4 @@ services:
       INCLUDE: /opt/rules/Strategies/WPR/Strategy-WPR-WPR30_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_WPR30_Active.set
       TEST_REPORT_NAME: EA31337-Lite_WPR30_Active
-      RUN_ON_SUCCESS: input_copy WPR30_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy WPR30_Active "$${SETFILE}" /opt/lite/ea-input.mqh

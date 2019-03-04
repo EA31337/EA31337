@@ -17,7 +17,7 @@ services:
       INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-RSI1_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_RSI1_Active.set
       TEST_REPORT_NAME: EA31337-Lite_RSI1_Active
-      RUN_ON_SUCCESS: input_copy RSI1_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy RSI1_Active "$${SETFILE}" /opt/lite/ea-input.mqh
   RSI5_Active:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -35,7 +35,7 @@ services:
       INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-RSI5_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_RSI5_Active.set
       TEST_REPORT_NAME: EA31337-Lite_RSI5_Active
-      RUN_ON_SUCCESS: input_copy RSI5_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy RSI5_Active "$${SETFILE}" /opt/lite/ea-input.mqh
   RSI15_Active:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -53,7 +53,7 @@ services:
       INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-RSI15_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_RSI15_Active.set
       TEST_REPORT_NAME: EA31337-Lite_RSI15_Active
-      RUN_ON_SUCCESS: input_copy RSI15_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy RSI15_Active "$${SETFILE}" /opt/lite/ea-input.mqh
   RSI30_Active:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -71,4 +71,4 @@ services:
       INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-RSI30_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_RSI30_Active.set
       TEST_REPORT_NAME: EA31337-Lite_RSI30_Active
-      RUN_ON_SUCCESS: input_copy RSI30_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy RSI30_Active "$${SETFILE}" /opt/lite/ea-input.mqh

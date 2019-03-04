@@ -17,7 +17,7 @@ services:
       INCLUDE: /opt/rules/Strategies/SAR/Strategy-SAR-SAR1_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_SAR1_Active.set
       TEST_REPORT_NAME: EA31337-Lite_SAR1_Active
-      RUN_ON_SUCCESS: input_copy SAR1_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy SAR1_Active "$${SETFILE}" /opt/lite/ea-input.mqh
   SAR5_Active:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -35,7 +35,7 @@ services:
       INCLUDE: /opt/rules/Strategies/SAR/Strategy-SAR-SAR5_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_SAR5_Active.set
       TEST_REPORT_NAME: EA31337-Lite_SAR5_Active
-      RUN_ON_SUCCESS: input_copy SAR5_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy SAR5_Active "$${SETFILE}" /opt/lite/ea-input.mqh
   SAR15_Active:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -53,7 +53,7 @@ services:
       INCLUDE: /opt/rules/Strategies/SAR/Strategy-SAR-SAR15_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_SAR15_Active.set
       TEST_REPORT_NAME: EA31337-Lite_SAR15_Active
-      RUN_ON_SUCCESS: input_copy SAR15_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy SAR15_Active "$${SETFILE}" /opt/lite/ea-input.mqh
   SAR30_Active:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -71,4 +71,4 @@ services:
       INCLUDE: /opt/rules/Strategies/SAR/Strategy-SAR-SAR30_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_SAR30_Active.set
       TEST_REPORT_NAME: EA31337-Lite_SAR30_Active
-      RUN_ON_SUCCESS: input_copy SAR30_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy SAR30_Active "$${SETFILE}" /opt/lite/ea-input.mqh

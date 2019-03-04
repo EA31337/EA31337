@@ -17,7 +17,7 @@ services:
       INCLUDE: /opt/rules/Strategies/Fractals/Strategy-Fractals-Fractals1_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Fractals1_Active.set
       TEST_REPORT_NAME: EA31337-Lite_Fractals1_Active
-      RUN_ON_SUCCESS: input_copy Fractals1_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy Fractals1_Active "$${SETFILE}" /opt/lite/ea-input.mqh
   Fractals5_Active:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -35,7 +35,7 @@ services:
       INCLUDE: /opt/rules/Strategies/Fractals/Strategy-Fractals-Fractals5_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Fractals5_Active.set
       TEST_REPORT_NAME: EA31337-Lite_Fractals5_Active
-      RUN_ON_SUCCESS: input_copy Fractals5_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy Fractals5_Active "$${SETFILE}" /opt/lite/ea-input.mqh
   Fractals15_Active:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -53,7 +53,7 @@ services:
       INCLUDE: /opt/rules/Strategies/Fractals/Strategy-Fractals-Fractals15_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Fractals15_Active.set
       TEST_REPORT_NAME: EA31337-Lite_Fractals15_Active
-      RUN_ON_SUCCESS: input_copy Fractals15_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy Fractals15_Active "$${SETFILE}" /opt/lite/ea-input.mqh
   Fractals30_Active:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -71,4 +71,4 @@ services:
       INCLUDE: /opt/rules/Strategies/Fractals/Strategy-Fractals-Fractals30_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Fractals30_Active.set
       TEST_REPORT_NAME: EA31337-Lite_Fractals30_Active
-      RUN_ON_SUCCESS: input_copy Fractals30_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy Fractals30_Active "$${SETFILE}" /opt/lite/ea-input.mqh

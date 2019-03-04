@@ -17,7 +17,7 @@ services:
       INCLUDE: /opt/rules/Strategies/Alligator/Strategy-Alligator-Alligator1_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Alligator1_Active.set
       TEST_REPORT_NAME: EA31337-Lite_Alligator1_Active
-      RUN_ON_SUCCESS: input_copy Alligator1_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy Alligator1_Active "$${SETFILE}" /opt/lite/ea-input.mqh
   Alligator5_Active:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -35,7 +35,7 @@ services:
       INCLUDE: /opt/rules/Strategies/Alligator/Strategy-Alligator-Alligator5_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Alligator5_Active.set
       TEST_REPORT_NAME: EA31337-Lite_Alligator5_Active
-      RUN_ON_SUCCESS: input_copy Alligator5_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy Alligator5_Active "$${SETFILE}" /opt/lite/ea-input.mqh
   Alligator15_Active:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -53,7 +53,7 @@ services:
       INCLUDE: /opt/rules/Strategies/Alligator/Strategy-Alligator-Alligator15_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Alligator15_Active.set
       TEST_REPORT_NAME: EA31337-Lite_Alligator15_Active
-      RUN_ON_SUCCESS: input_copy Alligator15_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy Alligator15_Active "$${SETFILE}" /opt/lite/ea-input.mqh
   Alligator30_Active:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -71,4 +71,4 @@ services:
       INCLUDE: /opt/rules/Strategies/Alligator/Strategy-Alligator-Alligator30_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Alligator30_Active.set
       TEST_REPORT_NAME: EA31337-Lite_Alligator30_Active
-      RUN_ON_SUCCESS: input_copy Alligator30_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy Alligator30_Active "$${SETFILE}" /opt/lite/ea-input.mqh

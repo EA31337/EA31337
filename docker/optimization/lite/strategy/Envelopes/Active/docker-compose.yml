@@ -17,7 +17,7 @@ services:
       INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-Envelopes1_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Envelopes1_Active.set
       TEST_REPORT_NAME: EA31337-Lite_Envelopes1_Active
-      RUN_ON_SUCCESS: input_copy Envelopes1_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy Envelopes1_Active "$${SETFILE}" /opt/lite/ea-input.mqh
   Envelopes5_Active:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -35,7 +35,7 @@ services:
       INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-Envelopes5_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Envelopes5_Active.set
       TEST_REPORT_NAME: EA31337-Lite_Envelopes5_Active
-      RUN_ON_SUCCESS: input_copy Envelopes5_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy Envelopes5_Active "$${SETFILE}" /opt/lite/ea-input.mqh
   Envelopes15_Active:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -53,7 +53,7 @@ services:
       INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-Envelopes15_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Envelopes15_Active.set
       TEST_REPORT_NAME: EA31337-Lite_Envelopes15_Active
-      RUN_ON_SUCCESS: input_copy Envelopes15_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy Envelopes15_Active "$${SETFILE}" /opt/lite/ea-input.mqh
   Envelopes30_Active:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -71,4 +71,4 @@ services:
       INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-Envelopes30_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Envelopes30_Active.set
       TEST_REPORT_NAME: EA31337-Lite_Envelopes30_Active
-      RUN_ON_SUCCESS: input_copy Envelopes30_Active "$$(echo $$SETFILE)" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy Envelopes30_Active "$${SETFILE}" /opt/lite/ea-input.mqh
