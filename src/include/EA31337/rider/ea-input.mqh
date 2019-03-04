@@ -340,7 +340,7 @@ extern string __Alligator_Parameters__ = "-- Settings for the Alligator indicato
 extern bool Alligator1_Active = 0; // Enable for M1
 extern bool Alligator5_Active = 0; // Enable for M5
 extern bool Alligator15_Active = 0; // Enable for M15
-extern bool Alligator30_Active = 0; // Enable for M30
+extern bool Alligator30_Active = 1; // Enable for M30
 extern int Alligator_Period_Jaw = 11; // Jaw Period
 extern int Alligator_Period_Teeth = 4; // Teeth Period
 extern int Alligator_Period_Lips = 4; // Lips Period
@@ -452,10 +452,10 @@ double Awesome30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --"; // >>> BANDS <<<
-extern bool Bands1_Active = 0; // Enable for M1
-extern bool Bands5_Active = 0; // Enable for M5
-extern bool Bands15_Active = 0; // Enable for M15
-extern bool Bands30_Active = 0; // Enable for M30
+extern bool Bands1_Active = 1; // Enable for M1
+extern bool Bands5_Active = 1; // Enable for M5
+extern bool Bands15_Active = 1; // Enable for M15
+extern bool Bands30_Active = 1; // Enable for M30
 extern int Bands_Period = 20; // Period
 extern double Bands_Period_Ratio = 1.00000000; // Period ratio between timeframes (0.5-1.5)
 extern ENUM_APPLIED_PRICE Bands_Applied_Price = 2; // Applied Price
@@ -751,7 +751,7 @@ extern string __Fractals_Parameters__ = "-- Settings for the Fractals indicator 
 extern bool Fractals1_Active = 0; // Enable for M1
 extern bool Fractals5_Active = 0; // Enable for M5
 extern bool Fractals15_Active = 0; // Enable for M15
-extern bool Fractals30_Active = 0; // Enable for M30
+extern bool Fractals30_Active = 1; // Enable for M30
 ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = T_NONE; // Trail stop method
 ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = T_NONE; // Trail profit method
 /* @todo extern */ int Fractals_SignalLevel = 0; // Signal level
@@ -853,9 +853,9 @@ double Ichimoku30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __MA_Parameters__ = "-- Settings for the Moving Average indicator --"; // >>> MA <<<
-extern bool MA1_Active = 0; // Enable for M1
+extern bool MA1_Active = 1; // Enable for M1
 extern bool MA5_Active = 0; // Enable for M5
-extern bool MA15_Active = 0; // Enable for M15
+extern bool MA15_Active = 1; // Enable for M15
 extern bool MA30_Active = 0; // Enable for M30
 extern int MA_Period_Fast = 10; // Period Fast
 extern int MA_Period_Medium = 18; // Period Medium
