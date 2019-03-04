@@ -1,0 +1,74 @@
+version: '3.4'
+services:
+  Alligator_Periods:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/Alligator/Strategy-Alligator-All-Alligator_Periods.rule
+      SETFILE: /opt/_results/EA31337-Lite_Alligator_Periods.set
+      TEST_REPORT_NAME: EA31337-Lite_Alligator_Periods
+      RUN_ON_SUCCESS: for p in Jaw Teeth Lips; do input_copy "Alligator_Period_$${p}" "$$(echo $${SETFILE})" /opt/lite/ea-input.mqh; done
+  Alligator_Applied_Price:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/Alligator/Strategy-Alligator-All-Alligator_Applied_Price.rule
+      SETFILE: /opt/_results/EA31337-Lite_Alligator_Applied_Price.set
+      TEST_REPORT_NAME: EA31337-Lite_Alligator_Applied_Price
+      RUN_ON_SUCCESS: input_copy Alligator_Applied_Price "$${SETFILE}" /opt/lite/ea-input.mqh
+  Alligator_SignalLevel:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/Alligator/Strategy-Alligator-All-Alligator_SignalLevel.rule
+      SETFILE: /opt/_results/EA31337-Lite_Alligator_SignalLevel.set
+      TEST_REPORT_NAME: EA31337-Lite_Alligator_SignalLevel
+      RUN_ON_SUCCESS: input_copy Alligator_SignalLevel "$${SETFILE}" /opt/lite/ea-input.mqh
+  Alligator_Shift:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/Alligator/Strategy-Alligator-All-Alligator_Shift.rule
+      SETFILE: /opt/_results/EA31337-Lite_Alligator_Shift.set
+      TEST_REPORT_NAME: EA31337-Lite_Alligator_Shift
+      RUN_ON_SUCCESS: input_copy Alligator_Shift "$${$SETFILE}" /opt/lite/ea-input.mqh

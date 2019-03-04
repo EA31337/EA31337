@@ -2,7 +2,7 @@
 
 
                                                                  Optimization Report
-                                                                       EA31337
+                                                             EA31337-Lite-Backtest-v1.076
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
@@ -12,8 +12,8 @@
                             Spread          10
                                                                  [Optimization Graph]
              Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-                4  22.09          215          1.13            0.10      28.38       0.28  RSI_Period=8; MaxOrders=0; MaxOrdersPerType=0;
-                3  21.16          247          1.12            0.09      33.45       0.33  RSI_Period=6; MaxOrders=0; MaxOrdersPerType=0;
-                5  -0.16          189          1.00           -0.00      27.26       0.27 RSI_Period=10; MaxOrders=0; MaxOrdersPerType=0;
-                2  -5.24          278          0.97           -0.02      32.28       0.32  RSI_Period=4; MaxOrders=0; MaxOrdersPerType=0;
-                1 -64.43          341          0.73           -0.19      65.56       0.66  RSI_Period=2; MaxOrders=0; MaxOrdersPerType=0;
+                2  19.75          244          1.12            0.08      22.48       0.22  RSI_Period=6; MaxOrders=0; MaxOrdersPerType=0;
+                1  10.00          303          1.05            0.03      26.92       0.27  RSI_Period=4; MaxOrders=0; MaxOrdersPerType=0;
+                4   3.26          174          1.03            0.02      28.58       0.29 RSI_Period=10; MaxOrders=0; MaxOrdersPerType=0;
+                3   3.62          189          1.03            0.02      27.73       0.28  RSI_Period=8; MaxOrders=0; MaxOrdersPerType=0;
+                5   0.24          137          1.00            0.00      23.32       0.23 RSI_Period=12; MaxOrders=0; MaxOrdersPerType=0;

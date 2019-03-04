@@ -2,18 +2,18 @@
 
 
                                                                  Optimization Report
-                                                                       EA31337
+                                                             EA31337-Lite-Backtest-v1.076
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.01.30 23:30 (2018.01.01 - 2018.01.31)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.02.27 23:30 (2018.01.01 - 2018.02.28)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
              Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-                3 -29.35           35          0.58           -0.84      53.50       0.53 CCI_Period=10; MaxOrders=0; MaxOrdersPerType=0;
-                4 -33.90           29          0.47           -1.17      51.88       0.52 CCI_Period=12; MaxOrders=0; MaxOrdersPerType=0;
-                2 -33.63           41          0.54           -0.82      55.13       0.55  CCI_Period=8; MaxOrders=0; MaxOrdersPerType=0;
-                5 -35.39           29          0.46           -1.22      54.07       0.54 CCI_Period=14; MaxOrders=0; MaxOrdersPerType=0;
-                1 -37.18           45          0.48           -0.83      52.77       0.53  CCI_Period=6; MaxOrders=0; MaxOrdersPerType=0;
+                5  -4.60           49          0.96           -0.09      56.42       0.56 CCI_Period=18; MaxOrders=0; MaxOrdersPerType=0;
+                1  -5.08           49          0.95           -0.10      52.67       0.53 CCI_Period=10; MaxOrders=0; MaxOrdersPerType=0;
+                4 -12.62           47          0.88           -0.27      57.15       0.57 CCI_Period=16; MaxOrders=0; MaxOrdersPerType=0;
+                3 -13.60           48          0.87           -0.28      56.42       0.56 CCI_Period=14; MaxOrders=0; MaxOrdersPerType=0;
+                2 -14.85           49          0.86           -0.30      56.04       0.56 CCI_Period=12; MaxOrders=0; MaxOrdersPerType=0;
