@@ -1,0 +1,38 @@
+version: '3.4'
+services:
+  CCI_TrailingStopMethod:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/CCI/Strategy-CCI-All-CCI_TrailingStopMethod.rule
+      SETFILE: /opt/_results/EA31337-Lite_CCI_TrailingStopMethod.set
+      TEST_REPORT_NAME: EA31337-Lite_CCI_TrailingStopMethod
+      RUN_ON_SUCCESS: input_copy CCI_TrailingStopMethod "$${SETFILE}" /opt/lite/ea-input.mqh
+  CCI_TrailingProfitMethod:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/CCI/Strategy-CCI-All-CCI_TrailingProfitMethod.rule
+      SETFILE: /opt/_results/EA31337-Lite_CCI_TrailingProfitMethod.set
+      TEST_REPORT_NAME: EA31337-Lite_CCI_TrailingProfitMethod
+      RUN_ON_SUCCESS: input_copy CCI_TrailingProfitMethod "$${SETFILE}" /opt/lite/ea-input.mqh

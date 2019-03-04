@@ -1,0 +1,38 @@
+version: '3.4'
+services:
+  Bands_TrailingStopMethod:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/Bands/Strategy-Bands-All-Bands_TrailingStopMethod.rule
+      SETFILE: /opt/_results/EA31337-Lite_Bands_TrailingStopMethod.set
+      TEST_REPORT_NAME: EA31337-Lite_Bands_TrailingStopMethod
+      RUN_ON_SUCCESS: input_copy Bands_TrailingStopMethod "$${SETFILE}" /opt/lite/ea-input.mqh
+  Bands_TrailingProfitMethod:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/Bands/Strategy-Bands-All-Bands_TrailingProfitMethod.rule
+      SETFILE: /opt/_results/EA31337-Lite_Bands_TrailingProfitMethod.set
+      TEST_REPORT_NAME: EA31337-Lite_Bands_TrailingProfitMethod
+      RUN_ON_SUCCESS: input_copy Bands_TrailingProfitMethod "$${SETFILE}" /opt/lite/ea-input.mqh
