@@ -449,6 +449,7 @@ extern bool CCI5_Active = 0; // Enable for M5
 extern bool CCI15_Active = 0; // Enable for M15
 extern bool CCI30_Active = 0; // Enable for M30
 extern double CCI_Period_Ratio = 1; // Period ratio between timeframes (1.0 - default)
+extern int CCI_Shift = 0; // Shift (0 for default)
 extern ENUM_TRAIL_TYPE CCI_TrailingStopMethod = 4; // Trail stop method
 extern ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = 12; // Trail profit method
 extern int CCI_Period = 18; // Period
