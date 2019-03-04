@@ -1,0 +1,70 @@
+Currency pair symbol:                       EURUSD
+Initial deposit:                            10000.00 USD
+Total net profit:                           34.04 USD
+Gross profit:                               529.72 USD
+Gross loss:                                 495.68 USD
+Absolute drawdown:                          91.68 USD
+Maximal drawdown:                           149.2 USD (1.5%)
+Relative drawdown:                          (1.5%) 149.2 USD
+Profit factor:                              1.07
+Expected payoff:                            0.13
+Trades total                                257
+Short positions (won %):                    90 (31.1%)
+Long positions (won %):                     167 (12.6%)
+Profit trades (% of total):                 49 (19.1%)
+Loss trades (% of total):                   208 (80.9%)
+Largest profit trade:                       76.47
+Largest loss trade:                         -48.08
+Average profit trade:                       10.81
+Average loss trade:                         -2.38
+Average consecutive wins:                   1.00
+Average consecutive losses:                 6.00
+Maximum consecutive wins (profit in money): 4 (30.80)
+Maximum consecutive losses (loss in money): 48 (-32.97)
+Maximal consecutive profit (count of wins): 76.47 (1)
+Maximal consecutive loss (count of losses): 74.49 (3)
+Modelling quality:                          89.96%
+Strategy stats:
+Profit factor: 0.36, Total net profit: -7.81USD [+4.31/-12.12] (43.10pips), Total orders: 31 (Won: 3.2% [1] / Loss: 96.8% [30]) - Bands M30
+Profit factor: 0.23, Total net profit: -16.99USD [+4.96/-21.95] (49.60pips), Total orders: 15 (Won: 6.7% [1] / Loss: 93.3% [14]) - Fractals M30
+Profit factor: 1.00, Total net profit: -1.46USD [+0.00/-1.46] (0.00pips), Total orders: 2 (Won: 0.0% [0] / Loss: 100.0% [2]) - MA M15
+Profit factor: 0.02, Total net profit: -59.15USD [+1.28/-60.44] (1.60pips), Total orders: 11 (Won: 9.1% [1] / Loss: 90.9% [10]) - MA M30
+Profit factor: 0.49, Total net profit: -26.27USD [+25.38/-51.65] (253.81pips), Total orders: 106 (Won: 3.8% [4] / Loss: 96.2% [102]) - MACD M30
+Profit factor: 1.49, Total net profit: 162.67USD [+492.70/-330.03] (663.46pips), Total orders: 77 (Won: 51.9% [40] / Loss: 48.1% [37]) - RSI M1
+Profit factor: 0.22, Total net profit: -13.25USD [+3.79/-17.04] (37.90pips), Total orders: 15 (Won: 13.3% [2] / Loss: 86.7% [13]) - RSI M5
+Report log:
+2017.01.04 03:00:00: EA31337 Lite (Backtest) v1.076 by kenorb (https://github.com/EA31337)
+TERMINAL: Allow DLL: true; Allow Libraries: true; CPUs: 6; Community account: false; Community balance: 0.00; Community connection: false; Disk space: 425097; Enabled FTP: false; Enabled e-mail: false; Enabled notifications: false; IsOptimization: false; IsRealtime: false; IsTesting: true; IsVisual: false; MQ ID: false; Memory (free): 4095; Memory (physical): 30152; Memory (total): 4095; Memory (used): 0; Path (Common): C:\users\ubuntu\Application Data\MetaQuotes\Terminal\Common; Path (Data): C:\Program Files\MetaTrader 4; Path (Expert): C:\Program Files\MetaTrader 4\MQL4\Experts; Path (Terminal): C:\Program Files\MetaTrader 4; Program name: EA31337-Lite-Backtest-v1.076; Screen DPI: 96; Terminal build: 1010; Terminal code page: 0; Terminal company: MetaQuotes Software Corp.; Terminal connected: false; Terminal language: English; Terminal name: MetaTrader 4; Termnal max bars: 65000; Trade allowed: true; Trade context busy: false; Trade perm: true; Trade ping (last): 10000001
+ACCOUNT: Type: Off-line, Server/Company/Name: //, Currency: USD, Balance: 10000, Credit: 0, Equity: 10000, Orders limit: 999: Leverage: 1:100, StopOut Level: 0 (Mode: 0)
+SYMBOL: Symbol: EURUSD, Ask/Bid: 1.04065/1.04055, Price/Session Volume: 0/0, Point size: 1e-05, Pip size: 0.0001, Tick size: 1e-05 (1e-05 pts), Tick value: 1 (0/0), Digits: 5, Spread: 10 pts, Trade stops level: 8, Trade contract size: 100000, Min lot: 0.01, Max lot: 10000, Lot step: 0.01, Freeze level: 0, Margin init: 0
+MARKET: Pip digits: 4, Spread: 10 pts (1 pips; 0.0096%), Pts/pip: 10, Trade distance: 8 pts (0.0000 pips), Volume digits: 2, Margin required: 1040.6/lot, Delta: 100000
+CHART: OHLC (M1): 1.04055/1.04055/1.04055/1.04055
+CHART: M2 not active.
+CHART: M3 not active.
+CHART: M4 not active.
+CHART: OHLC (M5): 1.04055/1.04055/1.04055/1.04055
+CHART: M6 not active.
+CHART: M10 not active.
+CHART: M12 not active.
+CHART: OHLC (M15): 1.04055/1.04055/1.04055/1.04055
+CHART: M20 not active.
+CHART: OHLC (M30): 1.04055/1.04055/1.04055/1.04055
+CHART: H1 not active.
+CHART: H2 not active.
+CHART: H3 not active.
+CHART: H4 not active.
+CHART: H6 not active.
+CHART: H8 not active.
+CHART: H12 not active.
+CHART: D1 not active.
+CHART: W1 not active.
+CHART: MN1 not active.
+Swap specification for EURUSD: Mode: 0, Long/buy order value: 0.33, Short/sell order value: -1.04
+Calculated variables: Pip size: 0.0001, EA lot size: 0.01, Points per pip: 10, Pip digits: 4, Volume digits: 2, Spread in pips: 1.0 (10 pts), Stop Out Level: 0.7, Market gap: 8 pts (0 pips)
+EA params: Risk ratio: 1, Risk margin per order: 0.6%, Risk margin in total: 8%
+Strategies: Active strategies: 7 of 120, Max orders: 485 (per type: 138)
+Info (631): InitInfo: Modelling Quality: M1: 25.00%, M5: 87.83%, M15: 88.28%, M30: 87.77%, H1: 87.16%, H4: 80.71%, D1: 51.00%, W1: 25.00%, MN1: 25.00%;
+Timeframes: M1; M2; M3; M4; M5; M6; M10; M12; M15; M20; M30; H1; H2; H3; H4; H6; H8; H12; D1; W1; MN1; 
+Datetime: Hour of day: 3, Day of week: 3, Day of month: 4, Day of year: 4, Month: 1, Year: 2017
+Account Details: Time: 2017.01.04 03:00:00; Account Balance: $10000.00; Account Equity: $10000.00; Account Credit: $0.00; Used Margin: $0.00; Free Margin: $10000.00; No of Orders: 0 (BUY/SELL: 0/0); Risk Ratio: 1.0
+
