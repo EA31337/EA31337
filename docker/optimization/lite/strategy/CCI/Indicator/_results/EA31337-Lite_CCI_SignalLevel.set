@@ -57,8 +57,8 @@ WPR5_Active=0
 WPR15_Active=0
 WPR30_Active=0
 # Optimization params.
-WPR_SignalLevel=-5
-WPR_SignalLevel,F=0
-WPR_SignalLevel,1=0
-WPR_SignalLevel,2=0
-WPR_SignalLevel,3=0
+CCI_SignalLevel=102
+CCI_SignalLevel,F=0
+CCI_SignalLevel,1=0
+CCI_SignalLevel,2=0
+CCI_SignalLevel,3=0

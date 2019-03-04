@@ -6,18 +6,13 @@
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.01.30 23:30 (2018.01.01 - 2018.01.31)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.02.27 23:30 (2018.01.01 - 2018.02.28)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
              Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-                1 -45.07           20          0.33           -2.25      62.71       0.63  WPR_Period=5; MaxOrders=0; MaxOrdersPerType=0;
-                2 -45.07           20          0.33           -2.25      62.71       0.63  WPR_Period=6; MaxOrders=0; MaxOrdersPerType=0;
-                3 -45.07           20          0.33           -2.25      62.71       0.63  WPR_Period=7; MaxOrders=0; MaxOrdersPerType=0;
-                4 -45.07           20          0.33           -2.25      62.71       0.63  WPR_Period=8; MaxOrders=0; MaxOrdersPerType=0;
-                5 -45.07           20          0.33           -2.25      62.71       0.63  WPR_Period=9; MaxOrders=0; MaxOrdersPerType=0;
-                6 -45.07           20          0.33           -2.25      62.71       0.63 WPR_Period=10; MaxOrders=0; MaxOrdersPerType=0;
-                7 -45.07           20          0.33           -2.25      62.71       0.63 WPR_Period=11; MaxOrders=0; MaxOrdersPerType=0;
-                8 -45.07           20          0.33           -2.25      62.71       0.63 WPR_Period=12; MaxOrders=0; MaxOrdersPerType=0;
-                9 -45.07           20          0.33           -2.25      62.71       0.63 WPR_Period=13; MaxOrders=0; MaxOrdersPerType=0;
+                1 -50.82          308          0.81           -0.16      73.75       0.74 WPR_Period=2; MaxOrders=0; MaxOrdersPerType=0;
+                2 -50.82          308          0.81           -0.16      73.75       0.74 WPR_Period=4; MaxOrders=0; MaxOrdersPerType=0;
+                3 -50.82          308          0.81           -0.16      73.75       0.74 WPR_Period=6; MaxOrders=0; MaxOrdersPerType=0;
+                4 -50.82          308          0.81           -0.16      73.75       0.74 WPR_Period=8; MaxOrders=0; MaxOrdersPerType=0;

@@ -56,14 +56,11 @@ WPR1_Active=0
 WPR5_Active=0
 WPR15_Active=0
 WPR30_Active=0
+# Other strategy params.
+RSI_Period_Ratio=1.0
 # Optimization params.
 RSI_Period=6
 RSI_Period,F=0
 RSI_Period,1=0
 RSI_Period,2=0
 RSI_Period,3=0
-RSI_Period_Ratio=1.00000000
-RSI_Period_Ratio,F=0
-RSI_Period_Ratio,1=1.00000000
-RSI_Period_Ratio,2=0.00000000
-RSI_Period_Ratio,3=0.00000000

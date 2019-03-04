@@ -1,0 +1,35 @@
+
+
+
+                                                                 Optimization Report
+                                                             EA31337-Lite-Backtest-v1.076
+                                                            Tripleafx-FX-Demo (Build 1010)
+
+                            Symbol          EURUSD (Euro vs US Dollar)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.04.29 23:30 (2018.01.01 - 2018.04.30)
+                            Model           Every tick (the most precise method based on all available least timeframes)
+                            Initial deposit 10000.00
+                            Spread          10
+                                                                 [Optimization Graph]
+     Pass   Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+       10     0.05          461          1.00            0.00     164.92       1.64 Alligator_Period_Ratio=1.4; MaxOrders=0; MaxOrdersPerType=0;
+       11   -21.64          382          0.96           -0.06     133.35       1.32 Alligator_Period_Ratio=1.5; MaxOrders=0; MaxOrdersPerType=0;
+        9  -155.71          672          0.78           -0.23     312.83       3.12 Alligator_Period_Ratio=1.3; MaxOrders=0; MaxOrdersPerType=0;
+        6  -156.50          684          0.82           -0.23     334.98       3.31   Alligator_Period_Ratio=1; MaxOrders=0; MaxOrdersPerType=0;
+       18  -157.54         3057          0.70           -0.05     262.13       2.59 Alligator_Period_Ratio=2.2; MaxOrders=0; MaxOrdersPerType=0;
+        8  -157.34          793          0.79           -0.20     379.49       3.74 Alligator_Period_Ratio=1.2; MaxOrders=0; MaxOrdersPerType=0;
+       12  -195.42         1514          0.62           -0.13     278.59       2.77 Alligator_Period_Ratio=1.6; MaxOrders=0; MaxOrdersPerType=0;
+        2  -201.98         2358          0.75           -0.09     391.26       3.84 Alligator_Period_Ratio=0.6; MaxOrders=0; MaxOrdersPerType=0;
+        7  -206.16          777          0.75           -0.27     500.04       4.90 Alligator_Period_Ratio=1.1; MaxOrders=0; MaxOrdersPerType=0;
+       13  -255.39         3078          0.55           -0.08     302.93       3.02 Alligator_Period_Ratio=1.7; MaxOrders=0; MaxOrdersPerType=0;
+        5  -258.74          620          0.70           -0.42     417.10       4.15 Alligator_Period_Ratio=0.9; MaxOrders=0; MaxOrdersPerType=0;
+       17  -339.98         3746          0.42           -0.09     373.21       3.72 Alligator_Period_Ratio=2.1; MaxOrders=0; MaxOrdersPerType=0;
+       19  -357.23         3562          0.47           -0.10     427.18       4.24 Alligator_Period_Ratio=2.3; MaxOrders=0; MaxOrdersPerType=0;
+        1  -436.80         4822          0.64           -0.09     541.77       5.36 Alligator_Period_Ratio=0.5; MaxOrders=0; MaxOrdersPerType=0;
+       14  -450.51         3783          0.34           -0.12     493.69       4.92 Alligator_Period_Ratio=1.8; MaxOrders=0; MaxOrdersPerType=0;
+        3  -566.23         5296          0.57           -0.11     755.13       7.41 Alligator_Period_Ratio=0.7; MaxOrders=0; MaxOrdersPerType=0;
+       15  -603.56         6731          0.32           -0.09     639.73       6.39 Alligator_Period_Ratio=1.9; MaxOrders=0; MaxOrdersPerType=0;
+       16  -934.24         8738          0.20           -0.11     963.71       9.63   Alligator_Period_Ratio=2; MaxOrders=0; MaxOrdersPerType=0;
+       20 -1201.09        12107          0.23           -0.10    1247.84      12.42 Alligator_Period_Ratio=2.4; MaxOrders=0; MaxOrdersPerType=0;
+       21 -1903.91        19494          0.18           -0.10    1973.99      19.60 Alligator_Period_Ratio=2.5; MaxOrders=0; MaxOrdersPerType=0;
+        4 -3390.25        34800          0.14           -0.10    3411.19      34.04 Alligator_Period_Ratio=0.8; MaxOrders=0; MaxOrdersPerType=0;

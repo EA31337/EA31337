@@ -6,20 +6,20 @@
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.02.27 23:30 (2018.01.01 - 2018.02.28)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.04.29 23:30 (2018.01.01 - 2018.04.30)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
           Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-             1  26.44          261          1.15            0.10      19.86       0.20 RSI_SignalLevel=12; MaxOrders=0; MaxOrdersPerType=0;
-             3  14.78          238          1.09            0.06      26.95       0.27 RSI_SignalLevel=14; MaxOrders=0; MaxOrdersPerType=0;
-             2  12.17          247          1.07            0.05      24.22       0.24 RSI_SignalLevel=13; MaxOrders=0; MaxOrdersPerType=0;
-             8   7.79          179          1.06            0.04      26.84       0.27 RSI_SignalLevel=19; MaxOrders=0; MaxOrdersPerType=0;
-             9   7.85          167          1.07            0.05      24.48       0.24 RSI_SignalLevel=20; MaxOrders=0; MaxOrdersPerType=0;
-             5   6.22          199          1.04            0.03      25.37       0.25 RSI_SignalLevel=16; MaxOrders=0; MaxOrdersPerType=0;
-            10   5.86          156          1.05            0.04      20.47       0.20 RSI_SignalLevel=21; MaxOrders=0; MaxOrdersPerType=0;
-             7   4.16          189          1.03            0.02      29.37       0.29 RSI_SignalLevel=18; MaxOrders=0; MaxOrdersPerType=0;
-             6   3.62          189          1.03            0.02      27.73       0.28 RSI_SignalLevel=17; MaxOrders=0; MaxOrdersPerType=0;
-             4   2.28          215          1.01            0.01      30.50       0.30 RSI_SignalLevel=15; MaxOrders=0; MaxOrdersPerType=0;
-            11  -1.99          146          0.98           -0.01      25.19       0.25 RSI_SignalLevel=22; MaxOrders=0; MaxOrdersPerType=0;
+             6  -7.96          279          0.97           -0.03      54.57       0.54 RSI_SignalLevel=16; MaxOrders=0; MaxOrdersPerType=0;
+             7 -10.64          264          0.96           -0.04      50.14       0.50 RSI_SignalLevel=18; MaxOrders=0; MaxOrdersPerType=0;
+             4 -19.54          292          0.94           -0.07      64.10       0.64 RSI_SignalLevel=12; MaxOrders=0; MaxOrdersPerType=0;
+             5 -21.95          286          0.93           -0.08      66.38       0.66 RSI_SignalLevel=14; MaxOrders=0; MaxOrdersPerType=0;
+             2 -31.86          309          0.90           -0.10      68.73       0.69  RSI_SignalLevel=8; MaxOrders=0; MaxOrdersPerType=0;
+             3 -31.77          300          0.90           -0.11      68.83       0.69 RSI_SignalLevel=10; MaxOrders=0; MaxOrdersPerType=0;
+             9 -32.01          231          0.88           -0.14      51.74       0.52 RSI_SignalLevel=22; MaxOrders=0; MaxOrdersPerType=0;
+             8 -34.02          238          0.88           -0.14      55.35       0.55 RSI_SignalLevel=20; MaxOrders=0; MaxOrdersPerType=0;
+            10 -49.51          201          0.81           -0.25      77.34       0.77 RSI_SignalLevel=24; MaxOrders=0; MaxOrdersPerType=0;
+             1 -59.86          315          0.82           -0.19      76.31       0.76  RSI_SignalLevel=6; MaxOrders=0; MaxOrdersPerType=0;
+            11 -60.00          182          0.74           -0.33      69.59       0.70 RSI_SignalLevel=26; MaxOrders=0; MaxOrdersPerType=0;

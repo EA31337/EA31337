@@ -18,6 +18,24 @@ services:
       SETFILE: /opt/_results/EA31337-Lite_RSI_Period.set
       TEST_REPORT_NAME: EA31337-Lite_RSI_Period
       RUN_ON_SUCCESS: input_copy RSI_Period "$${SETFILE}" /opt/lite/ea-input.mqh
+  RSI_Period_Ratio:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-All-RSI_Period_Ratio.rule
+      SETFILE: /opt/_results/EA31337-Lite_RSI_Period_Ratio.set
+      TEST_REPORT_NAME: EA31337-Lite_RSI_Period_Ratio
+      RUN_ON_SUCCESS: input_copy RSI_Period_Ratio "$${SETFILE}" /opt/lite/ea-input.mqh
   RSI_Applied_Price:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018

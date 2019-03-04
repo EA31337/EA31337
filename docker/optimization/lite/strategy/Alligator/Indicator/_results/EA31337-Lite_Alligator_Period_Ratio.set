@@ -12,10 +12,10 @@ RecordTicksToCSV=0
 VerboseInfo=0
 VerboseErrors=0
 # Strategy params.
-Alligator1_Active=0
-Alligator5_Active=0
-Alligator15_Active=0
-Alligator30_Active=0
+Alligator1_Active=1
+Alligator5_Active=1
+Alligator15_Active=1
+Alligator30_Active=1
 Bands1_Active=0
 Bands5_Active=0
 Bands15_Active=0
@@ -56,9 +56,14 @@ WPR1_Active=0
 WPR5_Active=0
 WPR15_Active=0
 WPR30_Active=0
+# Other strategy params.
+Alligator1_SignalMethod=0
+Alligator5_SignalMethod=0
+Alligator15_SignalMethod=0
+Alligator30_SignalMethod=0
 # Optimization params.
-WPR_SignalLevel=-5
-WPR_SignalLevel,F=0
-WPR_SignalLevel,1=0
-WPR_SignalLevel,2=0
-WPR_SignalLevel,3=0
+Alligator_Period_Ratio=1.4
+Alligator_Period_Ratio,F=0
+Alligator_Period_Ratio,1=0
+Alligator_Period_Ratio,2=0
+Alligator_Period_Ratio,3=0
