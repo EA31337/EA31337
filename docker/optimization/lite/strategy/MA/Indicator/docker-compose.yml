@@ -1,0 +1,93 @@
+version: '3.4'
+services:
+  MA_Periods:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+    - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-All-MA_Periods.rule
+      SETFILE: /opt/_results/EA31337-Lite_MA_Periods.set
+      TEST_REPORT_NAME: EA31337-Lite_MA_Periods
+      RUN_ON_SUCCESS: for p in Fast Medium Slow; do input_copy "MA_Period_$${p}" "$${SETFILE}" /opt/lite/ea-input.mqh; done
+  MA_Period_Ratio:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+    - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-All-MA_Period_Ratio.rule
+      SETFILE: /opt/_results/EA31337-Lite_MA_Period_Ratio.set
+      TEST_REPORT_NAME: EA31337-Lite_MA_Period_Ratio
+      RUN_ON_SUCCESS: input_copy MA_Period_Ratio "$${SETFILE}" /opt/lite/ea-input.mqh
+  MA_Applied_Price:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+    - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-All-MA_Applied_Price.rule
+      SETFILE: /opt/_results/EA31337-Lite_MA_Applied_Price.set
+      TEST_REPORT_NAME: EA31337-Lite_MA_Applied_Price
+      RUN_ON_SUCCESS: input_copy MA_Applied_Price "$${SETFILE}" /opt/lite/ea-input.mqh
+  MA_SignalLevel:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+    - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-All-MA_SignalLevel.rule
+      SETFILE: /opt/_results/EA31337-Lite_MA_SignalLevel.set
+      TEST_REPORT_NAME: EA31337-Lite_MA_SignalLevel
+      RUN_ON_SUCCESS: input_copy MA_SignalLevel "$${SETFILE}" /opt/lite/ea-input.mqh
+  MA_Shift:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+    - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-All-MA_Shift.rule
+      SETFILE: /opt/_results/EA31337-Lite_MA_Shift.set
+      TEST_REPORT_NAME: EA31337-Lite_MA_Shift
+      RUN_ON_SUCCESS: input_copy MA_Shift "$${$SETFILE}" /opt/lite/ea-input.mqh
+      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=0.6

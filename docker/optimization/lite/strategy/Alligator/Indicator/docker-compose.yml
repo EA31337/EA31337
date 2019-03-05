@@ -17,7 +17,7 @@ services:
       INCLUDE: /opt/rules/Strategies/Alligator/Strategy-Alligator-All-Alligator_Periods.rule
       SETFILE: /opt/_results/EA31337-Lite_Alligator_Periods.set
       TEST_REPORT_NAME: EA31337-Lite_Alligator_Periods
-      RUN_ON_SUCCESS: for p in Jaw Teeth Lips; do input_copy "Alligator_Period_$${p}" "$$iSETFILE}" /opt/lite/ea-input.mqh; done
+      RUN_ON_SUCCESS: for p in Jaw Teeth Lips; do input_copy "Alligator_Period_$${p}" "$${SETFILE}" /opt/lite/ea-input.mqh; done
   Alligator_Period_Ratio:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -90,3 +90,4 @@ services:
       SETFILE: /opt/_results/EA31337-Lite_Alligator_Shift.set
       TEST_REPORT_NAME: EA31337-Lite_Alligator_Shift
       RUN_ON_SUCCESS: input_copy Alligator_Shift "$${$SETFILE}" /opt/lite/ea-input.mqh
+      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=0.6

@@ -12,14 +12,14 @@
                             Spread          10
                                                                  [Optimization Graph]
           Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-             1 -50.82          308          0.81           -0.16      73.75       0.74 WPR_SignalLevel=-5; MaxOrders=0; MaxOrdersPerType=0;
-             2 -50.82          308          0.81           -0.16      73.75       0.74 WPR_SignalLevel=-4; MaxOrders=0; MaxOrdersPerType=0;
-             3 -50.82          308          0.81           -0.16      73.75       0.74 WPR_SignalLevel=-3; MaxOrders=0; MaxOrdersPerType=0;
-             4 -50.82          308          0.81           -0.16      73.75       0.74 WPR_SignalLevel=-2; MaxOrders=0; MaxOrdersPerType=0;
-             5 -50.82          308          0.81           -0.16      73.75       0.74 WPR_SignalLevel=-1; MaxOrders=0; MaxOrdersPerType=0;
-             6 -50.82          308          0.81           -0.16      73.75       0.74  WPR_SignalLevel=0; MaxOrders=0; MaxOrdersPerType=0;
-             7 -50.82          308          0.81           -0.16      73.75       0.74  WPR_SignalLevel=1; MaxOrders=0; MaxOrdersPerType=0;
-             8 -50.82          308          0.81           -0.16      73.75       0.74  WPR_SignalLevel=2; MaxOrders=0; MaxOrdersPerType=0;
-             9 -50.82          308          0.81           -0.16      73.75       0.74  WPR_SignalLevel=3; MaxOrders=0; MaxOrdersPerType=0;
-            10 -50.82          308          0.81           -0.16      73.75       0.74  WPR_SignalLevel=4; MaxOrders=0; MaxOrdersPerType=0;
-            11 -50.82          308          0.81           -0.16      73.75       0.74  WPR_SignalLevel=5; MaxOrders=0; MaxOrdersPerType=0;
+             3   4.82          353          1.02            0.01      29.87       0.30 WPR_SignalLevel=-13; MaxOrders=0; MaxOrdersPerType=0;
+             8   2.98          359          1.01            0.01      29.60       0.30  WPR_SignalLevel=-8; MaxOrders=0; MaxOrdersPerType=0;
+             1   0.11          332          1.00            0.00      33.95       0.34 WPR_SignalLevel=-15; MaxOrders=0; MaxOrdersPerType=0;
+             9   0.99          350          1.00            0.00      29.60       0.30  WPR_SignalLevel=-7; MaxOrders=0; MaxOrdersPerType=0;
+             5  -1.12          359          1.00           -0.00      31.72       0.32 WPR_SignalLevel=-11; MaxOrders=0; MaxOrdersPerType=0;
+            10  -2.15          352          0.99           -0.01      31.19       0.31  WPR_SignalLevel=-6; MaxOrders=0; MaxOrdersPerType=0;
+             2  -3.98          331          0.98           -0.01      38.67       0.39 WPR_SignalLevel=-14; MaxOrders=0; MaxOrdersPerType=0;
+             7  -6.61          365          0.97           -0.02      29.60       0.30  WPR_SignalLevel=-9; MaxOrders=0; MaxOrdersPerType=0;
+             6  -8.60          362          0.96           -0.02      34.08       0.34 WPR_SignalLevel=-10; MaxOrders=0; MaxOrdersPerType=0;
+             4  -8.18          352          0.97           -0.02      33.54       0.33 WPR_SignalLevel=-12; MaxOrders=0; MaxOrdersPerType=0;
+            11 -12.26          368          0.95           -0.03      40.18       0.40  WPR_SignalLevel=-5; MaxOrders=0; MaxOrdersPerType=0;

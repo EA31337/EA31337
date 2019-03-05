@@ -1,0 +1,19 @@
+version: '3.4'
+services:
+  Fractals_Shift:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/Fractals/Strategy-Fractals-All-Fractals_Shift.rule
+      SETFILE: /opt/_results/EA31337-Lite_Fractals_Shift.set
+      TEST_REPORT_NAME: EA31337-Lite_Fractals_Shift
+      RUN_ON_SUCCESS: input_copy Fractals_Shift "$${SETFILE}" /opt/lite/ea-input.mqh

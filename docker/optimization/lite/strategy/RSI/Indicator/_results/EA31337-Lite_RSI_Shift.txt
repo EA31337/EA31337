@@ -12,12 +12,12 @@
                             Spread          10
                                                                  [Optimization Graph]
               Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-                 6  45.99          298          1.18            0.15      44.67       0.44 RSI_Shift=5; MaxOrders=0; MaxOrdersPerType=0;
-                 5  16.79          269          1.06            0.06      61.44       0.61 RSI_Shift=4; MaxOrders=0; MaxOrdersPerType=0;
-                 1  -7.96          279          0.97           -0.03      54.57       0.54 RSI_Shift=0; MaxOrders=0; MaxOrdersPerType=0;
-                 4 -17.15          295          0.94           -0.06      79.66       0.79 RSI_Shift=3; MaxOrders=0; MaxOrdersPerType=0;
-                 2 -20.23          273          0.93           -0.07      50.87       0.51 RSI_Shift=1; MaxOrders=0; MaxOrdersPerType=0;
-                 3 -26.79          286          0.91           -0.09      50.30       0.50 RSI_Shift=2; MaxOrders=0; MaxOrdersPerType=0;
-                 9 -31.89          317          0.89           -0.10      60.04       0.60 RSI_Shift=8; MaxOrders=0; MaxOrdersPerType=0;
-                 8 -35.54          313          0.87           -0.11      53.32       0.53 RSI_Shift=7; MaxOrders=0; MaxOrdersPerType=0;
-                 7 -45.81          283          0.84           -0.16      63.06       0.63 RSI_Shift=6; MaxOrders=0; MaxOrdersPerType=0;
+                 9  43.72          303          1.18            0.14      38.01       0.38 RSI_Shift=9; MaxOrders=0; MaxOrdersPerType=0;
+                 6   3.59          292          1.01            0.01      40.80       0.41 RSI_Shift=6; MaxOrders=0; MaxOrdersPerType=0;
+                 8   1.63          303          1.01            0.01      44.98       0.45 RSI_Shift=8; MaxOrders=0; MaxOrdersPerType=0;
+                 4   0.03          306          1.00            0.00      35.14       0.35 RSI_Shift=4; MaxOrders=0; MaxOrdersPerType=0;
+                 5  -4.98          301          0.98           -0.02      45.78       0.46 RSI_Shift=5; MaxOrders=0; MaxOrdersPerType=0;
+                 3 -17.94          312          0.94           -0.06      58.58       0.58 RSI_Shift=3; MaxOrders=0; MaxOrdersPerType=0;
+                 2 -24.76          277          0.92           -0.09      47.54       0.47 RSI_Shift=2; MaxOrders=0; MaxOrdersPerType=0;
+                 7 -41.06          320          0.87           -0.13      70.27       0.70 RSI_Shift=7; MaxOrders=0; MaxOrdersPerType=0;
+                 1 -50.26          288          0.84           -0.17      70.07       0.70 RSI_Shift=1; MaxOrders=0; MaxOrdersPerType=0;

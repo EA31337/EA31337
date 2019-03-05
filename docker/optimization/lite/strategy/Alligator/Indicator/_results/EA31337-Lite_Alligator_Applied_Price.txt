@@ -12,10 +12,10 @@
                             Spread          10
                                                                  [Optimization Graph]
        Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-          6  16.89           85          1.10            0.20      55.65       0.55 Alligator_Applied_Price=5; MaxOrders=0; MaxOrdersPerType=0;
-          1 -12.22           81          0.93           -0.15      60.92       0.61 Alligator_Applied_Price=0; MaxOrders=0; MaxOrdersPerType=0;
-          7 -12.22           85          0.94           -0.14      57.34       0.57 Alligator_Applied_Price=6; MaxOrders=0; MaxOrdersPerType=0;
-          3 -18.99           85          0.90           -0.22      60.41       0.60 Alligator_Applied_Price=2; MaxOrders=0; MaxOrdersPerType=0;
-          4 -21.03           83          0.89           -0.25      58.45       0.58 Alligator_Applied_Price=3; MaxOrders=0; MaxOrdersPerType=0;
-          5 -27.28           85          0.86           -0.32      64.28       0.64 Alligator_Applied_Price=4; MaxOrders=0; MaxOrdersPerType=0;
-          2 -69.76           82          0.66           -0.85     115.33       1.15 Alligator_Applied_Price=1; MaxOrders=0; MaxOrdersPerType=0;
+          6  31.96          187          1.16            0.17      36.90       0.37 Alligator_Applied_Price=5; MaxOrders=0; MaxOrdersPerType=0;
+          7  30.41          191          1.16            0.16      36.81       0.37 Alligator_Applied_Price=6; MaxOrders=0; MaxOrdersPerType=0;
+          3  17.51          209          1.08            0.08      31.20       0.31 Alligator_Applied_Price=2; MaxOrders=0; MaxOrdersPerType=0;
+          1  16.77          195          1.09            0.09      46.35       0.46 Alligator_Applied_Price=0; MaxOrders=0; MaxOrdersPerType=0;
+          5  14.09          199          1.07            0.07      39.91       0.40 Alligator_Applied_Price=4; MaxOrders=0; MaxOrdersPerType=0;
+          2  11.55          206          1.06            0.06      47.03       0.47 Alligator_Applied_Price=1; MaxOrders=0; MaxOrdersPerType=0;
+          4  -4.37          201          0.98           -0.02      40.11       0.40 Alligator_Applied_Price=3; MaxOrders=0; MaxOrdersPerType=0;
