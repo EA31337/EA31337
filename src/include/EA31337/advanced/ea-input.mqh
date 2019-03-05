@@ -754,6 +754,7 @@ extern bool Fractals1_Active = 0; // Enable for M1
 extern bool Fractals5_Active = 0; // Enable for M5
 extern bool Fractals15_Active = 0; // Enable for M15
 extern bool Fractals30_Active = 1; // Enable for M30
+extern int Fractals_Shift = 0; // Shift
 extern ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = 2; // Trail stop method
 extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = 24; // Trail profit method
 /* @todo extern */ int Fractals_SignalLevel = 0; // Signal level

@@ -912,8 +912,8 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
 #endif
     case INDI_FRACTALS: // Calculates the Fractals indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        fractals[index][i][LINE_LOWER] = iFractals(symbol, tf, LINE_LOWER, i);
-        fractals[index][i][LINE_UPPER] = iFractals(symbol, tf, LINE_UPPER, i);
+        fractals[index][i][LINE_LOWER] = iFractals(symbol, tf, LINE_LOWER, i + Fractals_Shift);
+        fractals[index][i][LINE_UPPER] = iFractals(symbol, tf, LINE_UPPER, i + Fractals_Shift);
       }
       if (VerboseDebug) PrintFormat("Fractals M%d: %s", tf, Array::ArrToString3D(fractals, ",", Digits));
       break;
