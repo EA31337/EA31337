@@ -7,8 +7,6 @@ services:
       context: ../../../../../..
       target: ea31337-lite-eurusd-2018
     volumes:
-    - ../../../../../../src:/opt/src
-    - ../../../../_rules:/opt/rules
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts:rw
@@ -25,8 +23,6 @@ services:
       context: ../../../../../..
       target: ea31337-lite-eurusd-2018
     volumes:
-    - ../../../../../../src:/opt/src
-    - ../../../../_rules:/opt/rules
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts:rw
@@ -43,8 +39,6 @@ services:
       context: ../../../../../..
       target: ea31337-lite-eurusd-2018
     volumes:
-    - ../../../../../../src:/opt/src
-    - ../../../../_rules:/opt/rules
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts:rw
@@ -61,8 +55,6 @@ services:
       context: ../../../../../..
       target: ea31337-lite-eurusd-2018
     volumes:
-    - ../../../../../../src:/opt/src
-    - ../../../../_rules:/opt/rules
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts:rw
@@ -79,8 +71,6 @@ services:
       context: ../../../../../..
       target: ea31337-lite-eurusd-2018
     volumes:
-    - ../../../../../../src:/opt/src
-    - ../../../../_rules:/opt/rules
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts:rw

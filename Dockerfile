@@ -7,6 +7,7 @@ RUN usermod -u $UID ubuntu
 # Copy EA files.
 USER ubuntu
 COPY --chown=ubuntu:root . /opt/EA
+COPY ./docker/optimization/_rules /opt/rules
 
 # EURUSD 2018
 FROM ea31337/ea-tester:EURUSD-2018-DS as eurusd-2018
@@ -17,6 +18,7 @@ RUN usermod -u $UID ubuntu
 # Copy EA files.
 USER ubuntu
 COPY --from=ea31337 --chown=ubuntu:root "/opt/EA" "/opt/EA"
+COPY ./docker/optimization/_rules /opt/rules
 
 # EURUSD 2017
 FROM ea31337/ea-tester:EURUSD-2017-DS as eurusd-2017
@@ -27,6 +29,7 @@ RUN usermod -u $UID ubuntu
 # Copy EA files.
 USER ubuntu
 COPY --from=ea31337 --chown=ubuntu:root "/opt/EA" "/opt/EA"
+COPY ./docker/optimization/_rules /opt/rules
 
 # Build Lite version.
 FROM ea31337 as ea31337-lite
