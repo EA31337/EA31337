@@ -59,7 +59,7 @@ WPR30_Active=0
 # Other strategy params.
 RSI_Period_Ratio=1.0
 # Optimization params.
-DeMarker_Period=25
+DeMarker_Period=17
 DeMarker_Period,F=0
 DeMarker_Period,1=0
 DeMarker_Period,2=0

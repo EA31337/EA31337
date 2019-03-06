@@ -1,0 +1,82 @@
+
+
+
+                                                                 Optimization Report
+                                                             EA31337-Lite-Backtest-v1.076
+                                                            Tripleafx-FX-Demo (Build 1010)
+
+                            Symbol          EURUSD (Euro vs US Dollar)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.02.27 23:30 (2018.01.01 - 2018.02.28)
+                            Model           Every tick (the most precise method based on all available least timeframes)
+                            Initial deposit 10000.00
+                            Spread          10
+                                                                 [Optimization Graph]
+      Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+        29 -190.40         2816          0.75           -0.07     209.24       2.09 Bands30_SignalMethod=-126; MaxOrders=0; MaxOrdersPerType=0;
+        23 -212.58         2748          0.70           -0.08     232.17       2.32  Bands30_SignalMethod=-71; MaxOrders=0; MaxOrdersPerType=0;
+         5 -215.01         2846          0.70           -0.08     230.95       2.31  Bands30_SignalMethod=-90; MaxOrders=0; MaxOrdersPerType=0;
+        14 -231.57         2779          0.67           -0.08     247.49       2.47  Bands30_SignalMethod=-75; MaxOrders=0; MaxOrdersPerType=0;
+        59 -237.03         2947          0.66           -0.08     252.95       2.53   Bands30_SignalMethod=24; MaxOrders=0; MaxOrdersPerType=0;
+        65 -238.16         2952          0.66           -0.08     254.53       2.55    Bands30_SignalMethod=8; MaxOrders=0; MaxOrdersPerType=0;
+        37 -238.73         2952          0.66           -0.08     254.65       2.55  Bands30_SignalMethod=-36; MaxOrders=0; MaxOrdersPerType=0;
+        44 -239.30         2794          0.67           -0.09     255.24       2.55 Bands30_SignalMethod=-123; MaxOrders=0; MaxOrdersPerType=0;
+        34 -244.99         2935          0.65           -0.08     260.91       2.61  Bands30_SignalMethod=-38; MaxOrders=0; MaxOrdersPerType=0;
+         6 -246.29         2941          0.65           -0.08     262.21       2.62   Bands30_SignalMethod=84; MaxOrders=0; MaxOrdersPerType=0;
+        17 -247.45         2903          0.66           -0.09     263.37       2.63   Bands30_SignalMethod=80; MaxOrders=0; MaxOrdersPerType=0;
+        60 -248.71         2885          0.65           -0.09     266.92       2.67    Bands30_SignalMethod=1; MaxOrders=0; MaxOrdersPerType=0;
+        28 -248.75         2938          0.65           -0.08     264.67       2.65   Bands30_SignalMethod=-4; MaxOrders=0; MaxOrdersPerType=0;
+        18 -248.67         2917          0.66           -0.09     264.59       2.65 Bands30_SignalMethod=-100; MaxOrders=0; MaxOrdersPerType=0;
+        57 -249.21         2929          0.65           -0.09     265.13       2.65   Bands30_SignalMethod=-2; MaxOrders=0; MaxOrdersPerType=0;
+        54 -249.61         2941          0.65           -0.08     265.53       2.66   Bands30_SignalMethod=-8; MaxOrders=0; MaxOrdersPerType=0;
+        50 -249.21         2929          0.65           -0.09     265.13       2.65  Bands30_SignalMethod=-22; MaxOrders=0; MaxOrdersPerType=0;
+        36 -250.13         2931          0.65           -0.09     266.05       2.66   Bands30_SignalMethod=94; MaxOrders=0; MaxOrdersPerType=0;
+        67 -251.27         2909          0.65           -0.09     267.19       2.67   Bands30_SignalMethod=33; MaxOrders=0; MaxOrdersPerType=0;
+        51 -251.63         2902          0.64           -0.09     269.84       2.70   Bands30_SignalMethod=17; MaxOrders=0; MaxOrdersPerType=0;
+        46 -251.14         2926          0.65           -0.09     267.76       2.68   Bands30_SignalMethod=18; MaxOrders=0; MaxOrdersPerType=0;
+         1 -251.71         2934          0.65           -0.09     268.67       2.69   Bands30_SignalMethod=34; MaxOrders=0; MaxOrdersPerType=0;
+        31 -252.83         2926          0.64           -0.09     269.41       2.69   Bands30_SignalMethod=38; MaxOrders=0; MaxOrdersPerType=0;
+        10 -252.83         2926          0.64           -0.09     269.41       2.69   Bands30_SignalMethod=52; MaxOrders=0; MaxOrdersPerType=0;
+        13 -253.94         2927          0.64           -0.09     269.86       2.70   Bands30_SignalMethod=60; MaxOrders=0; MaxOrdersPerType=0;
+        66 -254.19         2926          0.64           -0.09     270.11       2.70  Bands30_SignalMethod=-15; MaxOrders=0; MaxOrdersPerType=0;
+        64 -254.19         2926          0.64           -0.09     270.11       2.70  Bands30_SignalMethod=-63; MaxOrders=0; MaxOrdersPerType=0;
+        55 -254.19         2926          0.64           -0.09     270.11       2.70  Bands30_SignalMethod=121; MaxOrders=0; MaxOrdersPerType=0;
+        53 -254.19         2926          0.64           -0.09     270.11       2.70   Bands30_SignalMethod=63; MaxOrders=0; MaxOrdersPerType=0;
+        49 -254.19         2926          0.64           -0.09     270.11       2.70  Bands30_SignalMethod=-17; MaxOrders=0; MaxOrdersPerType=0;
+        48 -254.19         2926          0.64           -0.09     270.11       2.70  Bands30_SignalMethod=-51; MaxOrders=0; MaxOrdersPerType=0;
+        47 -254.19         2926          0.64           -0.09     270.11       2.70  Bands30_SignalMethod=-53; MaxOrders=0; MaxOrdersPerType=0;
+        45 -254.19         2926          0.64           -0.09     270.11       2.70   Bands30_SignalMethod=23; MaxOrders=0; MaxOrdersPerType=0;
+        43 -254.19         2926          0.64           -0.09     270.11       2.70  Bands30_SignalMethod=104; MaxOrders=0; MaxOrdersPerType=0;
+        42 -254.82         2888          0.65           -0.09     270.74       2.71 Bands30_SignalMethod=-102; MaxOrders=0; MaxOrdersPerType=0;
+        41 -254.19         2926          0.64           -0.09     270.11       2.70   Bands30_SignalMethod=-3; MaxOrders=0; MaxOrdersPerType=0;
+        39 -254.19         2926          0.64           -0.09     270.11       2.70   Bands30_SignalMethod=45; MaxOrders=0; MaxOrdersPerType=0;
+        35 -254.19         2926          0.64           -0.09     270.11       2.70   Bands30_SignalMethod=39; MaxOrders=0; MaxOrdersPerType=0;
+        33 -254.19         2926          0.64           -0.09     270.11       2.70   Bands30_SignalMethod=95; MaxOrders=0; MaxOrdersPerType=0;
+        32 -254.19         2926          0.64           -0.09     270.11       2.70  Bands30_SignalMethod=113; MaxOrders=0; MaxOrdersPerType=0;
+        30 -254.19         2926          0.64           -0.09     270.11       2.70    Bands30_SignalMethod=3; MaxOrders=0; MaxOrdersPerType=0;
+        27 -254.19         2926          0.64           -0.09     270.11       2.70  Bands30_SignalMethod=-45; MaxOrders=0; MaxOrdersPerType=0;
+        24 -254.19         2926          0.64           -0.09     270.11       2.70   Bands30_SignalMethod=46; MaxOrders=0; MaxOrdersPerType=0;
+        21 -254.19         2926          0.64           -0.09     270.11       2.70   Bands30_SignalMethod=75; MaxOrders=0; MaxOrdersPerType=0;
+        20 -254.19         2926          0.64           -0.09     270.11       2.70   Bands30_SignalMethod=29; MaxOrders=0; MaxOrdersPerType=0;
+        19 -254.19         2926          0.64           -0.09     270.11       2.70    Bands30_SignalMethod=7; MaxOrders=0; MaxOrdersPerType=0;
+        15 -254.19         2926          0.64           -0.09     270.11       2.70   Bands30_SignalMethod=62; MaxOrders=0; MaxOrdersPerType=0;
+        12 -254.96         2879          0.65           -0.09     270.88       2.71  Bands30_SignalMethod=-82; MaxOrders=0; MaxOrdersPerType=0;
+        11 -254.19         2926          0.64           -0.09     270.11       2.70  Bands30_SignalMethod=102; MaxOrders=0; MaxOrdersPerType=0;
+         9 -254.19         2926          0.64           -0.09     270.11       2.70   Bands30_SignalMethod=69; MaxOrders=0; MaxOrdersPerType=0;
+         8 -254.19         2926          0.64           -0.09     270.11       2.70  Bands30_SignalMethod=-23; MaxOrders=0; MaxOrdersPerType=0;
+         4 -254.19         2926          0.64           -0.09     270.11       2.70  Bands30_SignalMethod=-59; MaxOrders=0; MaxOrdersPerType=0;
+         3 -254.82         2888          0.65           -0.09     270.74       2.71  Bands30_SignalMethod=-98; MaxOrders=0; MaxOrdersPerType=0;
+         2 -254.19         2926          0.64           -0.09     270.11       2.70   Bands30_SignalMethod=97; MaxOrders=0; MaxOrdersPerType=0;
+        68 -257.75         2928          0.64           -0.09     273.67       2.74    Bands30_SignalMethod=9; MaxOrders=0; MaxOrdersPerType=0;
+        63 -264.62         2493          0.66           -0.11     280.16       2.80  Bands30_SignalMethod=-95; MaxOrders=0; MaxOrdersPerType=0;
+        58 -266.46         2494          0.66           -0.11     282.00       2.82 Bands30_SignalMethod=-127; MaxOrders=0; MaxOrdersPerType=0;
+        22 -267.49         2881          0.63           -0.09     283.41       2.83  Bands30_SignalMethod=-83; MaxOrders=0; MaxOrdersPerType=0;
+        25 -269.56         2979          0.63           -0.09     285.48       2.85  Bands30_SignalMethod=-60; MaxOrders=0; MaxOrdersPerType=0;
+        26 -275.48         2911          0.64           -0.09     294.57       2.95  Bands30_SignalMethod=-84; MaxOrders=0; MaxOrdersPerType=0;
+        16 -275.62         2958          0.62           -0.09     291.54       2.92  Bands30_SignalMethod=-14; MaxOrders=0; MaxOrdersPerType=0;
+        38 -276.04         2955          0.62           -0.09     291.96       2.92  Bands30_SignalMethod=-10; MaxOrders=0; MaxOrdersPerType=0;
+        62 -278.62         2984          0.62           -0.09     294.54       2.95  Bands30_SignalMethod=-16; MaxOrders=0; MaxOrdersPerType=0;
+         7 -278.62         2984          0.62           -0.09     294.54       2.95  Bands30_SignalMethod=-32; MaxOrders=0; MaxOrdersPerType=0;
+        61 -279.49         2867          0.64           -0.10     295.43       2.95 Bands30_SignalMethod=-124; MaxOrders=0; MaxOrdersPerType=0;
+        56 -281.91         2956          0.62           -0.10     297.83       2.98  Bands30_SignalMethod=-46; MaxOrders=0; MaxOrdersPerType=0;
+        40 -287.85         2848          0.63           -0.10     303.79       3.04  Bands30_SignalMethod=-92; MaxOrders=0; MaxOrdersPerType=0;
+        52 -327.12         2977          0.65           -0.11     343.67       3.44    Bands30_SignalMethod=0; MaxOrders=0; MaxOrdersPerType=0;

@@ -1,0 +1,19 @@
+# Base params.
+LotSize=0.01
+Boosting_Enabled=0
+Account_Conditions_Active=0
+CloseOrderAfterXHours=48
+ProfitFactorMinToTrade=0
+ProfitFactorMaxToTrade=0
+ValidateSettings=0
+PrintLogOnChart=0
+WriteReport=0
+RecordTicksToCSV=0
+VerboseInfo=0
+VerboseErrors=0
+# Optimization params.
+WorseMonthlyStrategyMultiplierFactor=0.1
+WorseMonthlyStrategyMultiplierFactor,F=0
+WorseMonthlyStrategyMultiplierFactor,1=0
+WorseMonthlyStrategyMultiplierFactor,2=0
+WorseMonthlyStrategyMultiplierFactor,3=0

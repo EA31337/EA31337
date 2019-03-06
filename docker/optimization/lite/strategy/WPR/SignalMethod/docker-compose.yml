@@ -1,0 +1,74 @@
+version: '3.4'
+services:
+  WPR1_SignalMethod:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/WPR/Strategy-WPR-WPR1_SignalMethod.rule
+      SETFILE: /opt/_results/EA31337-Lite_WPR1_SignalMethod.set
+      TEST_REPORT_NAME: EA31337-Lite_WPR1_SignalMethod
+      RUN_ON_SUCCESS: input_copy WPR1_SignalMethod "$${SETFILE}" /opt/lite/ea-input.mqh
+  WPR5_SignalMethod:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/WPR/Strategy-WPR-WPR5_SignalMethod.rule
+      SETFILE: /opt/_results/EA31337-Lite_WPR5_SignalMethod.set
+      TEST_REPORT_NAME: EA31337-Lite_WPR5_SignalMethod
+      RUN_ON_SUCCESS: input_copy WPR5_SignalMethod "$${SETFILE}" /opt/lite/ea-input.mqh
+  WPR15_SignalMethod:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/WPR/Strategy-WPR-WPR15_SignalMethod.rule
+      SETFILE: /opt/_results/EA31337-Lite_WPR15_SignalMethod.set
+      TEST_REPORT_NAME: EA31337-Lite_WPR15_SignalMethod
+      RUN_ON_SUCCESS: input_copy WPR15_SignalMethod "$${SETFILE}" /opt/lite/ea-input.mqh
+  WPR30_SignalMethod:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/WPR/Strategy-WPR-WPR30_SignalMethod.rule
+      SETFILE: /opt/_results/EA31337-Lite_WPR30_SignalMethod.set
+      TEST_REPORT_NAME: EA31337-Lite_WPR30_SignalMethod
+      RUN_ON_SUCCESS: input_copy WPR30_SignalMethod "$${SETFILE}" /opt/lite/ea-input.mqh

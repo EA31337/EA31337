@@ -1,0 +1,29 @@
+
+
+
+                                                                 Optimization Report
+                                                             EA31337-Lite-Backtest-v1.076
+                                                            Tripleafx-FX-Demo (Build 1010)
+
+                            Symbol          EURUSD (Euro vs US Dollar)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.01.30 23:30 (2018.01.01 - 2018.01.31)
+                            Model           Every tick (the most precise method based on all available least timeframes)
+                            Initial deposit 10000.00
+                            Spread          10
+                                                                 [Optimization Graph]
+              Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+                 1  28.17           52          1.48            0.54      35.38       0.35 MACD_Shift=3; MACD_Shift_Far=0; MaxOrders=0;
+                 6  28.17           52          1.48            0.54      35.38       0.35 MACD_Shift=3; MACD_Shift_Far=1; MaxOrders=0;
+                11  28.17           52          1.48            0.54      35.38       0.35 MACD_Shift=3; MACD_Shift_Far=2; MaxOrders=0;
+                 2  19.69           53          1.30            0.37      36.11       0.36 MACD_Shift=4; MACD_Shift_Far=0; MaxOrders=0;
+                 7  19.69           53          1.30            0.37      36.11       0.36 MACD_Shift=4; MACD_Shift_Far=1; MaxOrders=0;
+                12  19.69           53          1.30            0.37      36.11       0.36 MACD_Shift=4; MACD_Shift_Far=2; MaxOrders=0;
+                 5   7.55           69          1.11            0.11      32.01       0.32 MACD_Shift=7; MACD_Shift_Far=0; MaxOrders=0;
+                10   7.55           69          1.11            0.11      32.01       0.32 MACD_Shift=7; MACD_Shift_Far=1; MaxOrders=0;
+                15   7.55           69          1.11            0.11      32.01       0.32 MACD_Shift=7; MACD_Shift_Far=2; MaxOrders=0;
+                 4   6.36           58          1.10            0.11      27.82       0.28 MACD_Shift=6; MACD_Shift_Far=0; MaxOrders=0;
+                 9   6.36           58          1.10            0.11      27.82       0.28 MACD_Shift=6; MACD_Shift_Far=1; MaxOrders=0;
+                14   6.36           58          1.10            0.11      27.82       0.28 MACD_Shift=6; MACD_Shift_Far=2; MaxOrders=0;
+                 3 -17.32           53          0.77           -0.33      32.80       0.33 MACD_Shift=5; MACD_Shift_Far=0; MaxOrders=0;
+                 8 -17.32           53          0.77           -0.33      32.80       0.33 MACD_Shift=5; MACD_Shift_Far=1; MaxOrders=0;
+                13 -17.32           53          0.77           -0.33      32.80       0.33 MACD_Shift=5; MACD_Shift_Far=2; MaxOrders=0;

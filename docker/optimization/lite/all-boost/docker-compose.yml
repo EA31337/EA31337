@@ -1,0 +1,190 @@
+version: '3.4'
+services:
+  Boosting_Enabled:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../src:/opt/src
+    - ../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/All-Boosting/All-Boosting_Enabled.rules
+      SETFILE: /opt/_results/EA31337-Lite_Boosting_Enabled.set
+      TEST_REPORT_NAME: EA31337-Lite_Boosting_Enabled
+      RUN_ON_SUCCESS: input_copy Boosting_Enabled "$${SETFILE}" /opt/lite/ea-input.mqh
+# @fixme
+# BoostTrendFactor:
+#   command: run_backtest -v
+#   image: ea31337:lite-eurusd-2018
+#   build:
+#     context: ../../../..
+#     target: ea31337-lite-eurusd-2018
+#   volumes:
+#   - ../../../../src:/opt/src
+#   - ../../_rules:/opt/rules
+#   - ./_results:/opt/_results:rw
+#   - ../../../../src/include/EA31337/lite:/opt/lite:rw
+#   env_file: .env
+#   environment:
+#     INCLUDE: /opt/rules/All-Boosting/All-BoostTrendFactor.rules
+#     SETFILE: /opt/_results/EA31337-Lite_BoostTrendFactor.set
+#     TEST_REPORT_NAME: EA31337-Lite_BoostTrendFactor
+#     RUN_ON_SUCCESS: input_copy BoostTrendFactor "$${SETFILE}" /opt/lite/ea-input.mqh
+  ConWinsIncreaseFactor:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../src:/opt/src
+    - ../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/All-Boosting/All-ConWinsIncreaseFactor.rule
+      SETFILE: /opt/_results/EA31337-Lite_ConWinsIncreaseFactor.set
+      TEST_REPORT_NAME: EA31337-Lite_ConWinsIncreaseFactor
+      RUN_ON_SUCCESS: input_copy ConWinsIncreaseFactor "$${SETFILE}" /opt/lite/ea-input.mqh
+  ConLossesIncreaseFactor:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../src:/opt/src
+    - ../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/All-Boosting/All-ConLossesIncreaseFactor.rule
+      SETFILE: /opt/_results/EA31337-Lite_ConLossesIncreaseFactor.set
+      TEST_REPORT_NAME: EA31337-Lite_ConLossesIncreaseFactor
+      RUN_ON_SUCCESS: input_copy ConLossesIncreaseFactor "$${SETFILE}" /opt/lite/ea-input.mqh
+  ConFactorOrdersLimit:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../src:/opt/src
+    - ../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/All-Boosting/All-ConFactorOrdersLimit.rule
+      SETFILE: /opt/_results/EA31337-Lite_ConFactorOrdersLimit.set
+      TEST_REPORT_NAME: EA31337-Lite_ConFactorOrdersLimit
+      RUN_ON_SUCCESS: input_copy ConFactorOrdersLimit "$${SETFILE}" /opt/lite/ea-input.mqh
+  BestDailyStrategyMultiplierFactor:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../src:/opt/src
+    - ../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/All-Boosting/All-BestDailyStrategyMultiplierFactor.rule
+      SETFILE: /opt/_results/EA31337-Lite_BestDailyStrategyMultiplierFactor.set
+      TEST_REPORT_NAME: EA31337-Lite_BestDailyStrategyMultiplierFactor
+      RUN_ON_SUCCESS: input_copy BestDailyStrategyMultiplierFactor "$${SETFILE}" /opt/lite/ea-input.mqh
+  BestMonthlyStrategyMultiplierFactor:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../src:/opt/src
+    - ../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/All-Boosting/All-BestMonthlyStrategyMultiplierFactor.rule
+      SETFILE: /opt/_results/EA31337-Lite_BestMonthlyStrategyMultiplierFactor.set
+      TEST_REPORT_NAME: EA31337-Lite_BestMonthlyStrategyMultiplierFactor
+      RUN_ON_SUCCESS: input_copy BestMonthlyStrategyMultiplierFactor "$${SETFILE}" /opt/lite/ea-input.mqh
+  BestWeeklyStrategyMultiplierFactor:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../src:/opt/src
+    - ../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/All-Boosting/All-BestWeeklyStrategyMultiplierFactor.rule
+      SETFILE: /opt/_results/EA31337-Lite_BestWeeklyStrategyMultiplierFactor.set
+      TEST_REPORT_NAME: EA31337-Lite_BestWeeklyStrategyMultiplierFactor
+      RUN_ON_SUCCESS: input_copy BestWeeklyStrategyMultiplierFactor "$${SETFILE}" /opt/lite/ea-input.mqh
+  WorseDailyStrategyMultiplierFactor:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../src:/opt/src
+    - ../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/All-Boosting/All-WorseDailyStrategyMultiplierFactor.rule
+      SETFILE: /opt/_results/EA31337-Lite_WorseDailyStrategyMultiplierFactor.set
+      TEST_REPORT_NAME: EA31337-Lite_WorseDailyStrategyMultiplierFactor
+      RUN_ON_SUCCESS: input_copy WorseDailyStrategyMultiplierFactor "$${SETFILE}" /opt/lite/ea-input.mqh
+  WorseMonthlyStrategyMultiplierFactor:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../src:/opt/src
+    - ../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/All-Boosting/All-WorseMonthlyStrategyMultiplierFactor.rule
+      SETFILE: /opt/_results/EA31337-Lite_WorseMonthlyStrategyMultiplierFactor.set
+      TEST_REPORT_NAME: EA31337-Lite_WorseMonthlyStrategyMultiplierFactor
+      RUN_ON_SUCCESS: input_copy WorseMonthlyStrategyMultiplierFactor "$${SETFILE}" /opt/lite/ea-input.mqh
+  WorseWeeklyStrategyMultiplierFactor:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../src:/opt/src
+    - ../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/All-Boosting/All-WorseWeeklyStrategyMultiplierFactor.rule
+      SETFILE: /opt/_results/EA31337-Lite_WorseWeeklyStrategyMultiplierFactor.set
+      TEST_REPORT_NAME: EA31337-Lite_WorseWeeklyStrategyMultiplierFactor
+      RUN_ON_SUCCESS: input_copy WorseWeeklyStrategyMultiplierFactor "$${SETFILE}" /opt/lite/ea-input.mqh

@@ -1,0 +1,74 @@
+version: '3.4'
+services:
+  MA1_SignalMethod:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-MA1_SignalMethod.rule
+      SETFILE: /opt/_results/EA31337-Lite_MA1_SignalMethod.set
+      TEST_REPORT_NAME: EA31337-Lite_MA1_SignalMethod
+      RUN_ON_SUCCESS: input_copy MA1_SignalMethod "$${SETFILE}" /opt/lite/ea-input.mqh
+  MA5_SignalMethod:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-MA5_SignalMethod.rule
+      SETFILE: /opt/_results/EA31337-Lite_MA5_SignalMethod.set
+      TEST_REPORT_NAME: EA31337-Lite_MA5_SignalMethod
+      RUN_ON_SUCCESS: input_copy MA5_SignalMethod "$${SETFILE}" /opt/lite/ea-input.mqh
+  MA15_SignalMethod:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-MA15_SignalMethod.rule
+      SETFILE: /opt/_results/EA31337-Lite_MA15_SignalMethod.set
+      TEST_REPORT_NAME: EA31337-Lite_MA15_SignalMethod
+      RUN_ON_SUCCESS: input_copy MA15_SignalMethod "$${SETFILE}" /opt/lite/ea-input.mqh
+  MA30_SignalMethod:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../../src:/opt/src
+    - ../../../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-MA30_SignalMethod.rule
+      SETFILE: /opt/_results/EA31337-Lite_MA30_SignalMethod.set
+      TEST_REPORT_NAME: EA31337-Lite_MA30_SignalMethod
+      RUN_ON_SUCCESS: input_copy MA30_SignalMethod "$${SETFILE}" /opt/lite/ea-input.mqh

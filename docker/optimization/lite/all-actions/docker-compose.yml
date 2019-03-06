@@ -1,0 +1,104 @@
+version: '3.4'
+services:
+  Account_Conditions_Active:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../src:/opt/src
+    - ../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Actions/All-Account_Conditions_Active.rule
+      SETFILE: /opt/_results/EA31337-Lite_Account_Conditions_Active.set
+      TEST_REPORT_NAME: EA31337-Lite_Account_Conditions_Active
+      RUN_ON_SUCCESS: input_copy Account_Conditions_Active "$${SETFILE}" /opt/lite/ea-input.mqh
+  Action_On_Condition_1:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../src:/opt/src
+    - ../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Actions/All-Action_On_Condition_01.rule
+      SETFILE: /opt/_results/EA31337-Lite_Action_On_Condition_1.set
+      TEST_REPORT_NAME: EA31337-Lite_Action_On_Condition_1
+      RUN_ON_SUCCESS: input_copy Action_On_Condition_1 "$${SETFILE}" /opt/lite/ea-input.mqh
+  Action_On_Condition_2:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../src:/opt/src
+    - ../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Actions/All-Action_On_Condition_02.rule
+      SETFILE: /opt/_results/EA31337-Lite_Action_On_Condition_2.set
+      TEST_REPORT_NAME: EA31337-Lite_Action_On_Condition_2
+      RUN_ON_SUCCESS: input_copy Action_On_Condition_2 "$${SETFILE}" /opt/lite/ea-input.mqh
+  Action_On_Condition_3:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../src:/opt/src
+    - ../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Actions/All-Action_On_Condition_03.rule
+      SETFILE: /opt/_results/EA31337-Lite_Action_On_Condition_3.set
+      TEST_REPORT_NAME: EA31337-Lite_Action_On_Condition_3
+      RUN_ON_SUCCESS: input_copy Action_On_Condition_3 "$${SETFILE}" /opt/lite/ea-input.mqh
+  Action_On_Condition_4:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../src:/opt/src
+    - ../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Actions/All-Action_On_Condition_04.rule
+      SETFILE: /opt/_results/EA31337-Lite_Action_On_Condition_4.set
+      TEST_REPORT_NAME: EA31337-Lite_Action_On_Condition_4
+      RUN_ON_SUCCESS: input_copy Action_On_Condition_4 "$${SETFILE}" /opt/lite/ea-input.mqh
+  Action_On_Condition_5:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../src:/opt/src
+    - ../../_rules:/opt/rules
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: .env
+    environment:
+      INCLUDE: /opt/rules/Actions/All-Action_On_Condition_05.rule
+      SETFILE: /opt/_results/EA31337-Lite_Action_On_Condition_5.set
+      TEST_REPORT_NAME: EA31337-Lite_Action_On_Condition_5
+      RUN_ON_SUCCESS: input_copy Action_On_Condition_5 "$${SETFILE}" /opt/lite/ea-input.mqh

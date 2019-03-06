@@ -89,5 +89,5 @@ services:
       INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-All-MA_Shift.rule
       SETFILE: /opt/_results/EA31337-Lite_MA_Shift.set
       TEST_REPORT_NAME: EA31337-Lite_MA_Shift
-      RUN_ON_SUCCESS: input_copy MA_Shift "$${$SETFILE}" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: for p in Shift_Fast Shift_Medium Shift_Slow Shift Shift_Far; do input_copy "MA_$${p}" "$${SETFILE}" /opt/lite/ea-input.mqh; done
       EA_OPTS: maxdrawdown_enable=1,maxdrawdown=0.6
