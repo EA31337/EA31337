@@ -457,10 +457,10 @@ void OnDeinit(const int reason) {
         summary_report.CalculateSummary();
         // @todo: Calculate average spread from stats[sid][AVG_SPREAD].
         filename = StringFormat(
-            "%s-%.f%s-%s-%s-%dspread-(%d)-%s-report.txt",
+            "%s-%.f%s-%s-%s-%dspread-%s-report.txt",
             market.GetSymbol(), summary_report.GetInitDeposit(), account.GetCurrency(),
             DateTime::TimeToStr(first_bar.time, TIME_DATE), DateTime::TimeToStr(_chart.iTime(), TIME_DATE),
-            init_spread, GetNoOfStrategies(), chart.TfToString());
+            init_spread, chart.TfToString());
             // ea_name, _Symbol, summary.init_deposit, account.AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE), Period());
             // ea_name, _Symbol, init_balance, account.AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES), Period());
         string data = summary_report.GetReport();
