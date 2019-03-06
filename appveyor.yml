@@ -4,8 +4,9 @@ environment:
   - MODE: __lite__
   - MODE: __advanced__
   - MODE: __rider__
-# - MODE: __backtest__
-# - MODE: __profiler__
+  - MODE: __backtest__
+  - MODE: __optimize__
+  - MODE: __profiler__
   - MODE: __limited__
   - MODE: __release__
   - MODE: __debug__
