@@ -57,7 +57,7 @@ WPR5_Active=0
 WPR15_Active=0
 WPR30_Active=0
 # Optimization params.
-Bands_TrailingProfitMethod=-20
+Bands_TrailingProfitMethod=9
 Bands_TrailingProfitMethod,F=0
 Bands_TrailingProfitMethod,1=0
 Bands_TrailingProfitMethod,2=0

@@ -2,20 +2,22 @@
 
 
                                                                  Optimization Report
-                                                             EA31337-Lite-Backtest-v1.076
+                                                             EA31337-Lite-Optimize-v1.076
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.04.29 23:30 (2018.01.01 - 2018.04.30)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.02.27 23:30 (2018.01.01 - 2018.02.28)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
              Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-                1  25.02          312          1.09            0.08      36.34       0.36  RSI_Period=2; MaxOrders=0; MaxOrdersPerType=0;
-                2  16.78          305          1.06            0.06      49.95       0.50  RSI_Period=4; MaxOrders=0; MaxOrdersPerType=0;
-                3  -4.98          301          0.98           -0.02      45.78       0.46  RSI_Period=6; MaxOrders=0; MaxOrdersPerType=0;
-                4  -7.42          263          0.97           -0.03      35.78       0.36  RSI_Period=8; MaxOrders=0; MaxOrdersPerType=0;
-                7  -8.32          190          0.96           -0.04      34.28       0.34 RSI_Period=14; MaxOrders=0; MaxOrdersPerType=0;
-                5  -9.38          259          0.96           -0.04      38.24       0.38 RSI_Period=10; MaxOrders=0; MaxOrdersPerType=0;
-                6 -15.71          217          0.93           -0.07      40.86       0.41 RSI_Period=12; MaxOrders=0; MaxOrdersPerType=0;
+                9  -2.36            2          0.00           -1.18       2.36       0.02 RSI_Period=26; MaxOrders=0; MaxOrdersPerType=0;
+                8  -3.72            4          0.00           -0.93       3.72       0.04 RSI_Period=24; MaxOrders=0; MaxOrdersPerType=0;
+                6  -5.62           11          0.26           -0.51       6.38       0.06 RSI_Period=20; MaxOrders=0; MaxOrdersPerType=0;
+                7  -6.08            6          0.00           -1.01       6.08       0.06 RSI_Period=22; MaxOrders=0; MaxOrdersPerType=0;
+                4  -7.82           34          0.62           -0.23       9.51       0.10 RSI_Period=16; MaxOrders=0; MaxOrdersPerType=0;
+                5 -10.94           21          0.31           -0.52      11.70       0.12 RSI_Period=18; MaxOrders=0; MaxOrdersPerType=0;
+                3 -10.66           57          0.67           -0.19      10.85       0.11 RSI_Period=14; MaxOrders=0; MaxOrdersPerType=0;
+                2 -18.55           77          0.59           -0.24      19.17       0.19 RSI_Period=12; MaxOrders=0; MaxOrdersPerType=0;
+                1 -40.11          115          0.46           -0.35      40.72       0.41 RSI_Period=10; MaxOrders=0; MaxOrdersPerType=0;

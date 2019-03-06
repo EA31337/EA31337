@@ -41,7 +41,7 @@ extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = -27; // Default trail stop me
 extern int TrailingStop = 10; // Extra trailing stop (in pips)
 extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = -27; // Default trail profit method
 extern int TrailingProfit = 0; // Extra trailing profit (in pips)
-extern double TrailingStopAddPerMinute = 0.2; // Decrease trail stop per minute (pip/min)
+extern double TrailingStopAddPerMinute = 0.1; // Decrease trail stop per minute (pip/min)
 
 //+------------------------------------------------------------------+
 extern string __EA_Risk_Parameters__ = "-- Risk management parameters --"; // >>> RISK <<
@@ -55,13 +55,13 @@ extern int CloseOrderAfterXHours = 0; // Close order after X hours (>0 - only pr
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Parameters__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGIES <<<
-extern double ProfitFactorMinToTrade = 1.0; // Min. profit factor per strategy to trade
+extern double ProfitFactorMinToTrade = 0.9; // Min. profit factor per strategy to trade
 extern double ProfitFactorMaxToTrade = 0; // Max. profit factor per strategy to trade
 extern int InitNoOfOrdersToCalcPF = 10; // Initial number of orders to calculate profit factor
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameters (set 1.0 for default) --"; // >>> BOOSTING <<<
-extern bool Boosting_Enabled = 1; // Enable boosting
+extern bool Boosting_Enabled = 0; // Enable boosting
 extern double BoostTrendFactor = 0.5; // Boost by trend factor
 extern bool StrategyBoostByPF = 1.1; // Boost strategy by its profit factor
 extern bool StrategyHandicapByPF = true; // Handicap by its low profit factor
@@ -84,7 +84,7 @@ int SmartQueueFilter = 27; // QueueAI: Method for filtering the orders (0-255)
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions__ = "-- Account conditions --"; // >>> CONDITIONS & ACTIONS <<<
 // Note: It's not advice to use on accounts where multi bots are trading.
-extern bool Account_Conditions_Active = 1; // Enable account conditions
+extern bool Account_Conditions_Active = 0; // Enable account conditions
 // 6 - Equity 10% high
 extern ENUM_ACC_CONDITION Account_Condition_1 = 6; // 1. Account condition
 extern ENUM_MARKET_CONDITION Market_Condition_1 = 8; // 1. Market condition
@@ -684,11 +684,11 @@ extern int MA_Period_Fast = 10; // Period Fast
 extern int MA_Period_Medium = 12; // Period Medium
 extern int MA_Period_Slow = 8; // Period Slow
 extern double MA_Period_Ratio = 1.5; // Period ratio between timeframes (0.5-1.5)
-extern int MA_Shift = 2; // Shift
-extern int MA_Shift_Fast = 7; // Shift Fast (+1)
-extern int MA_Shift_Medium = 8; // Shift Medium (+1)
-extern int MA_Shift_Slow = 2; // Shift Slow (+1)
-extern int MA_Shift_Far = 1; // Shift Far (+2)
+extern int MA_Shift = 5; // Shift
+extern int MA_Shift_Fast = 9; // Shift Fast (+1)
+extern int MA_Shift_Medium = 10; // Shift Medium (+1)
+extern int MA_Shift_Slow = 5; // Shift Slow (+1)
+extern int MA_Shift_Far = 4; // Shift Far (+2)
 extern ENUM_MA_METHOD MA_Method = 1; // MA Method
 extern ENUM_APPLIED_PRICE MA_Applied_Price = 2; // Applied Price
 extern ENUM_TRAIL_TYPE MA_TrailingStopMethod = 27; // Trail stop method
@@ -888,17 +888,17 @@ double OSMA30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --"; // >>> RSI <<<
-extern bool RSI1_Active = 1; // Enable for M1
+extern bool RSI1_Active = 0; // Enable for M1
 extern bool RSI5_Active = 0; // Enable for M5
 extern bool RSI15_Active = 0; // Enable for M15
-extern bool RSI30_Active = 0; // Enable for M30
-extern int RSI_Period = 6; // Period
-extern double RSI_Period_Ratio = 0.5; // Period ratio between timeframes (0.5-1.5)
-extern ENUM_APPLIED_PRICE RSI_Applied_Price = 2; // Applied Price
-extern uint RSI_Shift = 10; // Shift
+extern bool RSI30_Active = 1; // Enable for M30
+extern int RSI_Period = 26; // Period
+extern double RSI_Period_Ratio = 1.0; // Period ratio between timeframes (0.5-1.5)
+extern ENUM_APPLIED_PRICE RSI_Applied_Price = 0; // Applied Price
+extern uint RSI_Shift = 2; // Shift
 extern ENUM_TRAIL_TYPE RSI_TrailingStopMethod = 1; // Trail stop method
 extern ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = 1; // Trail profit method
-extern int RSI_SignalLevel = 20; // Signal level (-49-49)
+extern int RSI_SignalLevel = 32; // Signal level (-49-49)
 extern int RSI1_SignalMethod = 3; // Signal method for M1 (-63-63)
 extern int RSI5_SignalMethod = 11; // Signal method for M5 (-63-63)
 extern int RSI15_SignalMethod = -24; // Signal method for M15 (-63-63)

@@ -7,7 +7,6 @@ services:
       context: ../../../..
       target: ea31337-lite-eurusd-2018
     volumes:
-    - ../../../../src:/opt/src
     - ../../_rules:/opt/rules
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
@@ -24,13 +23,12 @@ services:
       context: ../../../..
       target: ea31337-lite-eurusd-2018
     volumes:
-    - ../../../../src:/opt/src
     - ../../_rules:/opt/rules
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
     env_file: .env
     environment:
-      INCLUDE: /opt/rules/All-No_Boost/All-TrailingStopAddPerMinute.rules
+      INCLUDE: /opt/rules/All-No_Boost/All-TrailingStopAddPerMinute.rule
       SETFILE: /opt/_results/EA31337-Lite_TrailingStopAddPerMinute.set
       TEST_REPORT_NAME: EA31337-Lite_TrailingStopAddPerMinute
       RUN_ON_SUCCESS: input_copy TrailingStopAddPerMinute "$${SETFILE}" /opt/lite/ea-input.mqh
@@ -58,7 +56,6 @@ services:
       context: ../../../..
       target: ea31337-lite-eurusd-2018
     volumes:
-    - ../../../../src:/opt/src
     - ../../_rules:/opt/rules
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
@@ -75,7 +72,6 @@ services:
       context: ../../../..
       target: ea31337-lite-eurusd-2018
     volumes:
-    - ../../../../src:/opt/src
     - ../../_rules:/opt/rules
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
@@ -92,7 +88,6 @@ services:
       context: ../../../..
       target: ea31337-lite-eurusd-2018
     volumes:
-    - ../../../../src:/opt/src
     - ../../_rules:/opt/rules
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
@@ -109,7 +104,6 @@ services:
       context: ../../../..
       target: ea31337-lite-eurusd-2018
     volumes:
-    - ../../../../src:/opt/src
     - ../../_rules:/opt/rules
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
@@ -143,7 +137,6 @@ services:
       context: ../../../..
       target: ea31337-lite-eurusd-2018
     volumes:
-    - ../../../../src:/opt/src
     - ../../_rules:/opt/rules
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
@@ -170,20 +163,35 @@ services:
       SETFILE: /opt/_results/EA31337-Lite_DefaultTrailingStopMethod.set
       TEST_REPORT_NAME: EA31337-Lite_DefaultTrailingStopMethod
       RUN_ON_SUCCESS: input_copy DefaultTrailingStopMethod "$${SETFILE}" /opt/lite/ea-input.mqh
-  TrendMethod:
+  TrendPeriod:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
     build:
       context: ../../../..
       target: ea31337-lite-eurusd-2018
     volumes:
-    - ../../../../src:/opt/src
     - ../../_rules:/opt/rules
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
     env_file: .env
     environment:
-      INCLUDE: /opt/rules/All-No_Boost/All-TrendMethod.rule
-      SETFILE: /opt/_results/EA31337-Lite_TrendMethod.set
-      TEST_REPORT_NAME: EA31337-Lite_TrendMethod
-      RUN_ON_SUCCESS: input_copy TrendMethod "$${SETFILE}" /opt/lite/ea-input.mqh
+      INCLUDE: /opt/rules/All-No_Boost/All-TrendPeriod.rule
+      SETFILE: /opt/_results/EA31337-Lite_TrendPeriod.set
+      TEST_REPORT_NAME: EA31337-Lite_TrendPeriod
+      RUN_ON_SUCCESS: input_copy TrendPeriod "$${SETFILE}" /opt/lite/ea-input.mqh
+# TrendMethod:
+#   command: run_backtest -v
+#   image: ea31337:lite-eurusd-2018
+#   build:
+#     context: ../../../..
+#     target: ea31337-lite-eurusd-2018
+#   volumes:
+#   - ../../_rules:/opt/rules
+#   - ./_results:/opt/_results:rw
+#   - ../../../../src/include/EA31337/lite:/opt/lite:rw
+#   env_file: .env
+#   environment:
+#     INCLUDE: /opt/rules/All-No_Boost/All-TrendMethod.rule
+#     SETFILE: /opt/_results/EA31337-Lite_TrendMethod.set
+#     TEST_REPORT_NAME: EA31337-Lite_TrendMethod
+#     RUN_ON_SUCCESS: input_copy TrendMethod "$${SETFILE}" /opt/lite/ea-input.mqh

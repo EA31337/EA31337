@@ -12,7 +12,7 @@ RecordTicksToCSV=0
 VerboseInfo=0
 VerboseErrors=0
 # Optimization params.
-TrailingStopAddPerMinute=-0.4
+TrailingStopAddPerMinute=0.1
 TrailingStopAddPerMinute,F=0
 TrailingStopAddPerMinute,1=0
 TrailingStopAddPerMinute,2=0

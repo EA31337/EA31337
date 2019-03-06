@@ -57,6 +57,7 @@ WPR5_Active=0
 WPR15_Active=0
 WPR30_Active=0
 # Other strategy params.
+Alligator_Period_Ratio=1.0
 Alligator1_SignalMethod=0
 Alligator5_SignalMethod=0
 Alligator15_SignalMethod=0

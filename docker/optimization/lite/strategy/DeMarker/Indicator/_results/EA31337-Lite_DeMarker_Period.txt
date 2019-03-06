@@ -6,18 +6,18 @@
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.04.29 23:30 (2018.01.01 - 2018.04.30)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
           Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-             1 -236.36         3769          0.92           -0.06     348.75       3.46 DeMarker_Period=17; MaxOrders=0; MaxOrdersPerType=0;
-             9 -246.58         3769          0.92           -0.07     532.04       5.19 DeMarker_Period=33; MaxOrders=0; MaxOrdersPerType=0;
-             7 -250.94         3769          0.92           -0.07     477.91       4.69 DeMarker_Period=29; MaxOrders=0; MaxOrdersPerType=0;
-             3 -277.13         3769          0.91           -0.07     413.78       4.10 DeMarker_Period=21; MaxOrders=0; MaxOrdersPerType=0;
-             8 -287.13         3769          0.90           -0.08     506.90       4.98 DeMarker_Period=31; MaxOrders=0; MaxOrdersPerType=0;
-             4 -297.37         3769          0.90           -0.08     463.57       4.58 DeMarker_Period=23; MaxOrders=0; MaxOrdersPerType=0;
-             6 -325.80         3769          0.89           -0.09     505.70       4.98 DeMarker_Period=27; MaxOrders=0; MaxOrdersPerType=0;
-             2 -326.20         3769          0.89           -0.09     437.66       4.34 DeMarker_Period=19; MaxOrders=0; MaxOrdersPerType=0;
-             5 -333.25         3769          0.89           -0.09     503.92       4.97 DeMarker_Period=25; MaxOrders=0; MaxOrdersPerType=0;
+             1 -551.85         5833          0.88           -0.09     963.97       9.36  DeMarker_Period=9; MaxOrders=0; MaxOrdersPerType=0;
+             3 -555.08         5833          0.88           -0.10     975.34       9.45 DeMarker_Period=13; MaxOrders=0; MaxOrdersPerType=0;
+             4 -555.08         5833          0.88           -0.10     975.34       9.45 DeMarker_Period=15; MaxOrders=0; MaxOrdersPerType=0;
+             5 -555.08         5833          0.88           -0.10     975.34       9.45 DeMarker_Period=17; MaxOrders=0; MaxOrdersPerType=0;
+             6 -555.08         5833          0.88           -0.10     975.34       9.45 DeMarker_Period=19; MaxOrders=0; MaxOrdersPerType=0;
+             7 -555.08         5833          0.88           -0.10     975.34       9.45 DeMarker_Period=21; MaxOrders=0; MaxOrdersPerType=0;
+             8 -555.08         5833          0.88           -0.10     975.34       9.45 DeMarker_Period=23; MaxOrders=0; MaxOrdersPerType=0;
+             9 -555.08         5833          0.88           -0.10     975.34       9.45 DeMarker_Period=25; MaxOrders=0; MaxOrdersPerType=0;
+             2 -595.91         5833          0.88           -0.10     975.34       9.49 DeMarker_Period=11; MaxOrders=0; MaxOrdersPerType=0;

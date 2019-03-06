@@ -1,6 +1,6 @@
 # Base params.
 LotSize=0.01
-Boosting_Enabled=1
+Boosting_Enabled=0
 Account_Conditions_Active=0
 CloseOrderAfterXHours=48
 ProfitFactorMinToTrade=0
@@ -12,7 +12,7 @@ RecordTicksToCSV=0
 VerboseInfo=0
 VerboseErrors=0
 # Optimization params.
-Boosting_Enabled=1
+Boosting_Enabled=0
 Boosting_Enabled,F=0
 Boosting_Enabled,1=0
 Boosting_Enabled,2=0

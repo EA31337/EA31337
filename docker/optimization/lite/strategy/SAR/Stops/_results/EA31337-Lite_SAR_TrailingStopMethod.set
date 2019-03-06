@@ -57,7 +57,7 @@ WPR5_Active=0
 WPR15_Active=0
 WPR30_Active=0
 # Optimization params.
-SAR_TrailingStopMethod=26
+SAR_TrailingStopMethod=-27
 SAR_TrailingStopMethod,F=0
 SAR_TrailingStopMethod,1=0
 SAR_TrailingStopMethod,2=0

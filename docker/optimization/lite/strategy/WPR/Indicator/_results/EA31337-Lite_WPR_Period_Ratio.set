@@ -57,6 +57,7 @@ WPR5_Active=0
 WPR15_Active=0
 WPR30_Active=0
 # Other strategy params.
+WPR_Period_Ratio=1.0
 WPR1_SignalMethod=0
 WPR5_SignalMethod=0
 WPR15_SignalMethod=0

@@ -6,14 +6,14 @@
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.04.29 23:30 (2018.01.01 - 2018.04.30)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
       Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-         1 -153.08         3769          0.95           -0.04     506.25       4.91 DeMarker_SignalLevel=-0.5; MaxOrders=0; MaxOrdersPerType=0;
-         2 -154.62         3769          0.95           -0.04     506.25       4.91 DeMarker_SignalLevel=-0.4; MaxOrders=0; MaxOrdersPerType=0;
-         3 -333.25         3769          0.89           -0.09     503.92       4.97 DeMarker_SignalLevel=-0.3; MaxOrders=0; MaxOrdersPerType=0;
-         4 -439.52         3769          0.85           -0.12     524.80       5.22 DeMarker_SignalLevel=-0.2; MaxOrders=0; MaxOrdersPerType=0;
-         5 -521.87         3769          0.81           -0.14     575.33       5.74 DeMarker_SignalLevel=-0.1; MaxOrders=0; MaxOrdersPerType=0;
+         5 -490.68         5833          0.89           -0.08     721.88       7.17 DeMarker_SignalLevel=-0.3; MaxOrders=0; MaxOrdersPerType=0;
+         1 -555.08         5833          0.88           -0.10     975.34       9.45 DeMarker_SignalLevel=-0.7; MaxOrders=0; MaxOrdersPerType=0;
+         2 -555.08         5833          0.88           -0.10     975.34       9.45 DeMarker_SignalLevel=-0.6; MaxOrders=0; MaxOrdersPerType=0;
+         3 -555.08         5833          0.88           -0.10     975.34       9.45 DeMarker_SignalLevel=-0.5; MaxOrders=0; MaxOrdersPerType=0;
+         4 -640.89         5833          0.87           -0.11     969.02       9.46 DeMarker_SignalLevel=-0.4; MaxOrders=0; MaxOrdersPerType=0;

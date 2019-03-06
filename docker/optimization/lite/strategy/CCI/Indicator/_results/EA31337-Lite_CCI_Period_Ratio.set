@@ -57,6 +57,7 @@ WPR5_Active=0
 WPR15_Active=0
 WPR30_Active=0
 # Other strategy params
+CCI_Period_Ratio=1.0
 CCI1_SignalMethod=0
 CCI5_SignalMethod=0
 CCI15_SignalMethod=0

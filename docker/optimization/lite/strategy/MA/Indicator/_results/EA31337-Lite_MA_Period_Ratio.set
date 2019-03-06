@@ -56,13 +56,14 @@ WPR1_Active=0
 WPR5_Active=0
 WPR15_Active=0
 WPR30_Active=0
-# Other strategy params.
+# Other strategy params
+MA_Period_Ratio=1.0
 MA1_SignalMethod=0
 MA5_SignalMethod=0
 MA15_SignalMethod=0
 MA30_SignalMethod=0
 # Optimization params.
-MA_Period_Ratio=0.5
+MA_Period_Ratio=1.5
 MA_Period_Ratio,F=0
 MA_Period_Ratio,1=0
 MA_Period_Ratio,2=0
