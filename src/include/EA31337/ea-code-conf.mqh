@@ -17,6 +17,12 @@
   #define __nodebug__   // Disable debug messages by default.
 #endif
 
+#ifdef __optimize__
+  #undef __backtest__     // Disable backtesting mode.
+  #undef __debug__        // Disable debug messages.
+  #undef __trace__        // Disable trace messages.
+#endif
+
 #ifdef __backtest__
   #ifndef __input__
     #define __input__
@@ -48,6 +54,8 @@
     #define __input__
   #endif
   #undef __disabled__     // Enable all strategies by default.
+  #undef __backtest__     // Disable backtesting mode.
+  #undef __optimize__     // Disable optimization mode.
   #undef __noboost__      // Enable boosting by default.
   #undef __nospreads__    // Enable spread limitation by default.
   #undef __limited__      // Disable safe mode by default.

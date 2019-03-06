@@ -5,10 +5,12 @@ SHELL:=/usr/bin/env bash
 		set-lite set-advanced set-rider \
 		set-lite-release set-advanced-release set-rider-release \
 		set-lite-backtest set-advanced-backtest set-rider-backtest \
+		set-lite-optimize set-advanced-optimize set-rider-optimize \
 		clean clean-src clean-releases \
 		EA Lite Advanced Rider \
 		Release Lite-Release Advanced-Release Rider-Release \
 		Backtest Lite-Backtest Advanced-Backtest Rider-Backtest \
+		Optimize Lite-Optimize Advanced-Optimize Rider-Optimize \
 		All Lite-All Advanced-All Rider-All
 
 MQL=metaeditor.exe
@@ -39,9 +41,13 @@ Lite-Backtest:			$(OUT)/$(EA)-Lite-Backtest-%.ex4
 Advanced-Backtest:	$(OUT)/$(EA)-Advanced-Backtest-%.ex4
 Rider-Backtest:			$(OUT)/$(EA)-Rider-Backtest-%.ex4
 
-Lite-All:						Lite Lite-Release Lite-Backtest
-Advanced-All:				Advanced Advanced-Release Advanced-Backtest
-Rider-All:					Rider Rider-Release Rider-Backtest
+Lite-Optimize:			$(OUT)/$(EA)-Lite-Optimize-%.ex4
+Advanced-Optimize:	$(OUT)/$(EA)-Advanced-Optimize-%.ex4
+Rider-Optimize:			$(OUT)/$(EA)-Rider-Optimize-%.ex4
+
+Lite-All:						Lite Lite-Release Lite-Backtest Lite-Optimize
+Advanced-All:				Advanced Advanced-Release Advanced-Backtest Advanced-Optimize
+Rider-All:					Rider Rider-Release Rider-Backtest Rider-Optimize
 
 All:								requirements $(MQL) Lite-All Advanced-All Rider-All
 
@@ -56,13 +62,13 @@ metaeditor.exe:
 set-mode:
 ifdef MODE
 	test -w .git && git checkout -- $(SRC)/include/EA31337/ea-mode.mqh || true
-	ex -s +"%s@^\zs.*\ze#define \($(MODE)\)@@g" -cwq $(SRC)/include/EA31337/ea-mode.mqh
+	ex +"%s@^\zs.*\ze#define \($(MODE)\)@@g" -scwq! $(SRC)/include/EA31337/ea-mode.mqh
 endif
 
 set-none:
 	@echo Reverting modes.
 	test -w .git && git checkout -- $(SRC)/include/EA31337/ea-mode.mqh || true
-	ex -s +":g@^#define@s@^@//" -cwq $(SRC)/include/EA31337/ea-mode.mqh
+	ex +":g@^#define@s@^@//" -scwq! $(SRC)/include/EA31337/ea-mode.mqh
 
 set-lite: set-none
 	@$(MAKE) -f $(FILE)
@@ -91,6 +97,15 @@ set-advanced-backtest: set-none
 set-rider-backtest: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__backtest__\|__rider__"
 
+set-lite-optimize: set-none
+	@$(MAKE) -f $(FILE) set-mode MODE="__optimize__"
+
+set-advanced-optimize: set-none
+	@$(MAKE) -f $(FILE) set-mode MODE="__optimize__\|__advanced__"
+
+set-rider-optimize: set-none
+	@$(MAKE) -f $(FILE) set-mode MODE="__optimize__\|__rider__"
+
 set-testing:
 	@$(MAKE) -f $(FILE) set-mode MODE="__testing__"
 
@@ -117,6 +132,12 @@ Backtest: metaeditor.exe \
 		$(OUT)/$(EA)-Lite-Backtest-%.ex4 \
 		$(OUT)/$(EA)-Advanced-Backtest-%.ex4 \
 		$(OUT)/$(EA)-Rider-Backtest-%.ex4
+
+Optimize: metaeditor.exe \
+		clean-all \
+		$(OUT)/$(EA)-Lite-Optimize-%.ex4 \
+		$(OUT)/$(EA)-Advanced-Optimize-%.ex4 \
+		$(OUT)/$(EA)-Rider-Optimize-%.ex4
 
 compile-mql4: requirements $(MQL) metaeditor.exe $(SRC)/$(EA).mq4 $(SRC)/include/EA31337/ea-mode.mqh clean-src
 	file='$(MQL4)'; wine metaeditor.exe /log:CON /compile:"$${file//\//\\}" /inc:"$(SRC)" || true
@@ -179,6 +200,25 @@ $(OUT)/$(EA)-Rider-Backtest-%.ex4: \
 		compile-mql4 \
 		set-none
 		cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-Backtest-v$(VER).ex4"
+
+$(OUT)/$(EA)-Lite-Optimize-%.ex4: \
+		set-lite-optimize \
+		compile-mql4 \
+		set-none
+		cp -v "$(EX4)" "$(OUT)/$(EA)-Lite-Optimize-v$(VER).ex4"
+
+$(OUT)/$(EA)-Advanced-Optimize-%.ex4: \
+		set-advanced-optimize \
+		compile-mql4 \
+		set-none
+		cp -v "$(EX4)" "$(OUT)/$(EA)-Advanced-Optimize-v$(VER).ex4"
+
+$(OUT)/$(EA)-Rider-Optimize-%.ex4: \
+		set-rider-optimize \
+		compile-mql4 \
+		set-none
+		cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-Optimize-v$(VER).ex4"
+
 
 mt4-install:
 		install -v "$(EX4)" "$(shell find ~/.wine -name terminal.exe -execdir pwd ';' -quit)/MQL4/Experts"

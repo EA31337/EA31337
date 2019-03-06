@@ -13,6 +13,7 @@
 
 // Other modes.
 //#define __backtest__     // For backtest only.
+//#define __optimize__     // For optimization only.
 //#define __profiler__     // Activate profiler.
 //#define __expire__       // Activates expiration date.
 //#define __limited__      // Define safe options.

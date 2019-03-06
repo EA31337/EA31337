@@ -26,7 +26,6 @@ extern int    LotSizeIncreaseMethod = 202; // Lot size increase method (0-255)
 extern int    LotSizeDecreaseMethod = 167; // Lot size decrease method (0-255)
 extern bool   TradeMicroLots = 1; // Trade micro lots?
 ENUM_TIMEFRAMES TrendPeriod = PERIOD_H1; // Period for trend calculation
-int           TrendMethod = 192; // Main trend method (0-255)
 extern int    MinVolumeToTrade = 2; // Min volume to trade
 extern int    MaxOrderPriceSlippage = 50; // Max price slippage (in pts)
 extern int    MaxTries = 5; // Max retries for opening orders
@@ -1377,8 +1376,11 @@ extern bool SoundAlert = 0; // Enable sound alerts
 extern string SoundFileAtOpen = "alert.wav"; // Sound: on order open
 extern string SoundFileAtClose = "alert.wav"; // Sound: on order close
 // extern bool SendLogs = false; // Send logs to remote host for diagnostic purposes
-
 //+------------------------------------------------------------------+
+
+extern string __Optimization_Parameters__ = "-- Optimization parameters --"; // >>> TESTING <<<
+#ifdef __optimize__ extern #endif ENUM_TIMEFRAMES TrendPeriod = PERIOD_H1; // Period for trend calculation
+
 extern string __Backtest_Parameters__ = "-- Testing & troubleshooting parameters --"; // >>> TESTING <<<
 #ifndef __backtest__
   extern bool ValidateSettings = 0; // Validate startup settings
