@@ -25,7 +25,6 @@ extern double LotSize = 0.00000000; // Lot size (0 = auto)
 extern int    LotSizeIncreaseMethod = 202; // Lot size increase method (0-255)
 extern int    LotSizeDecreaseMethod = 167; // Lot size decrease method (0-255)
 extern bool   TradeMicroLots = 1; // Trade micro lots?
-ENUM_TIMEFRAMES TrendPeriod = PERIOD_H1; // Period for trend calculation
 extern int    MinVolumeToTrade = 2; // Min volume to trade
 extern int    MaxOrderPriceSlippage = 50; // Max price slippage (in pts)
 extern int    MaxTries = 5; // Max retries for opening orders
