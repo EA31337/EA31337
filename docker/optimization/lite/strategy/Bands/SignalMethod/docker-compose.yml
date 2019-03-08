@@ -10,7 +10,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/Bands/Strategy-Bands-Bands1_SignalMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_Bands1_SignalMethod.set
@@ -26,7 +26,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/Bands/Strategy-Bands-Bands5_SignalMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_Bands5_SignalMethod.set
@@ -42,7 +42,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/Bands/Strategy-Bands-Bands15_SignalMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_Bands15_SignalMethod.set
@@ -58,7 +58,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/Bands/Strategy-Bands-Bands30_SignalMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_Bands30_SignalMethod.set

@@ -9,9 +9,11 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: .env
+    - ../../../../../../src/include/EA31337/advanced:/opt/advanced:rw
+    - ../../../../../../src/include/EA31337/rider:/opt/rider:rw
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/Fractals/Strategy-Fractals-All-Fractals_Shift.rule
       SETFILE: /opt/_results/EA31337-Lite_Fractals_Shift.set
       TEST_REPORT_NAME: EA31337-Lite_Fractals_Shift
-      RUN_ON_SUCCESS: input_copy Fractals_Shift "$${SETFILE}" /opt/lite/ea-input.mqh
+      RUN_ON_SUCCESS: input_copy Fractals_Shift "$${SETFILE}" /opt/lite/ea-input.mqh /opt/advanced/ea-input.mqh /opt/rider/ea-input.mqh

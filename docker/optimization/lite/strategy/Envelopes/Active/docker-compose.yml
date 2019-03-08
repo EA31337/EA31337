@@ -10,7 +10,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-Envelopes1_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Envelopes1_Active.set
@@ -26,7 +26,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-Envelopes5_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Envelopes5_Active.set
@@ -42,7 +42,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-Envelopes15_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Envelopes15_Active.set
@@ -58,7 +58,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-Envelopes30_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Envelopes30_Active.set

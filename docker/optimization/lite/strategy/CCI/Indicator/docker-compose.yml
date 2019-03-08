@@ -10,7 +10,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts:rw
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/CCI/Strategy-CCI-All-CCI_Period.rule
       SETFILE: /opt/_results/EA31337-Lite_CCI_Period.set
@@ -26,7 +26,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts:rw
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/CCI/Strategy-CCI-All-CCI_Period_Ratio.rule
       SETFILE: /opt/_results/EA31337-Lite_CCI_Period_Ratio.set
@@ -42,7 +42,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts:rw
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/CCI/Strategy-CCI-All-CCI_Applied_Price.rule
       SETFILE: /opt/_results/EA31337-Lite_CCI_Applied_Price.set
@@ -58,7 +58,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts:rw
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/CCI/Strategy-CCI-All-CCI_SignalLevel.rule
       SETFILE: /opt/_results/EA31337-Lite_CCI_SignalLevel.set
@@ -74,7 +74,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts:rw
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/CCI/Strategy-CCI-All-CCI_Shift.rule
       SETFILE: /opt/_results/EA31337-Lite_CCI_Shift.set

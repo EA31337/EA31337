@@ -10,7 +10,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/WPR/Strategy-WPR-WPR1_SignalMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_WPR1_SignalMethod.set
@@ -26,7 +26,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/WPR/Strategy-WPR-WPR5_SignalMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_WPR5_SignalMethod.set
@@ -42,7 +42,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/WPR/Strategy-WPR-WPR15_SignalMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_WPR15_SignalMethod.set
@@ -58,7 +58,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/WPR/Strategy-WPR-WPR30_SignalMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_WPR30_SignalMethod.set

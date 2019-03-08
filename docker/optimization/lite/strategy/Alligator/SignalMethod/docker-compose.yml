@@ -10,7 +10,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/Alligator/Strategy-Alligator-Alligator1_SignalMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_Alligator1_SignalMethod.set
@@ -26,7 +26,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/Alligator/Strategy-Alligator-Alligator5_SignalMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_Alligator5_SignalMethod.set
@@ -42,7 +42,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/Alligator/Strategy-Alligator-Alligator15_SignalMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_Alligator15_SignalMethod.set
@@ -58,7 +58,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/Alligator/Strategy-Alligator-Alligator30_SignalMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_Alligator30_SignalMethod.set

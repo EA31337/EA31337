@@ -10,7 +10,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-All-Envelopes_TrailingStopMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_Envelopes_TrailingStopMethod.set
@@ -26,7 +26,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-All-Envelopes_TrailingProfitMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_Envelopes_TrailingProfitMethod.set

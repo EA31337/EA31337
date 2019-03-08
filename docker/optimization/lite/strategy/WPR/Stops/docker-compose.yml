@@ -10,7 +10,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/WPR/Strategy-WPR-All-WPR_TrailingStopMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_WPR_TrailingStopMethod.set
@@ -26,7 +26,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/WPR/Strategy-WPR-All-WPR_TrailingProfitMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_WPR_TrailingProfitMethod.set

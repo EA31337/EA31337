@@ -10,7 +10,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
     - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-All-MA_Periods.rule
       SETFILE: /opt/_results/EA31337-Lite_MA_Periods.set
@@ -26,7 +26,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
     - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-All-MA_Period_Ratio.rule
       SETFILE: /opt/_results/EA31337-Lite_MA_Period_Ratio.set
@@ -42,7 +42,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
     - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-All-MA_Applied_Price.rule
       SETFILE: /opt/_results/EA31337-Lite_MA_Applied_Price.set
@@ -58,7 +58,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
     - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-All-MA_SignalLevel.rule
       SETFILE: /opt/_results/EA31337-Lite_MA_SignalLevel.set
@@ -74,7 +74,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
     - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-All-MA_Shift.rule
       SETFILE: /opt/_results/EA31337-Lite_MA_Shift.set
@@ -91,7 +91,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
     - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-All-MA_Shift_Fast.rule
       SETFILE: /opt/_results/EA31337-Lite_MA_Shift_Fast.set
@@ -108,7 +108,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
     - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-All-MA_Shift_Medium.rule
       SETFILE: /opt/_results/EA31337-Lite_MA_Shift_Medium.set
@@ -125,7 +125,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
     - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: .env
+    env_file: ../../../.env
     environment:
       INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-All-MA_Shift_Slow.rule
       SETFILE: /opt/_results/EA31337-Lite_MA_Shift_Slow.set

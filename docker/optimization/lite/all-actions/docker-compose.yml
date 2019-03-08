@@ -9,7 +9,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: .env
+    env_file: ../.env
     environment:
       INCLUDE: /opt/rules/Actions/All-Account_Conditions_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Account_Conditions_Active.set
@@ -24,7 +24,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: .env
+    env_file: ../.env
     environment:
       INCLUDE: /opt/rules/Actions/All-Action_On_Condition_01.rule
       SETFILE: /opt/_results/EA31337-Lite_Action_On_Condition_1.set
@@ -39,7 +39,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: .env
+    env_file: ../.env
     environment:
       INCLUDE: /opt/rules/Actions/All-Action_On_Condition_02.rule
       SETFILE: /opt/_results/EA31337-Lite_Action_On_Condition_2.set
@@ -54,7 +54,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: .env
+    env_file: ../.env
     environment:
       INCLUDE: /opt/rules/Actions/All-Action_On_Condition_03.rule
       SETFILE: /opt/_results/EA31337-Lite_Action_On_Condition_3.set
@@ -69,7 +69,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: .env
+    env_file: ../.env
     environment:
       INCLUDE: /opt/rules/Actions/All-Action_On_Condition_04.rule
       SETFILE: /opt/_results/EA31337-Lite_Action_On_Condition_4.set
@@ -84,7 +84,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: .env
+    env_file: ../.env
     environment:
       INCLUDE: /opt/rules/Actions/All-Action_On_Condition_05.rule
       SETFILE: /opt/_results/EA31337-Lite_Action_On_Condition_5.set
