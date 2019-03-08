@@ -1,0 +1,82 @@
+version: '3.4'
+services:
+  RiskMarginPerOrder:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: ../EA-Tester-params.txt
+    environment:
+      BT_MONTHS: 1-2
+      INCLUDE: /opt/rules/All-Risk/All-RiskMarginPerOrder.rule
+      SETFILE: /opt/_results/EA31337-Lite_RiskMarginPerOrder.set
+      TEST_REPORT_NAME: EA31337-Lite_RiskMarginPerOrder
+      RUN_ON_SUCCESS: input_copy RiskMarginPerOrder "$${SETFILE}" /opt/lite/ea-input.mqh
+  RiskMarginTotal:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: ../EA-Tester-params.txt
+    environment:
+      BT_MONTHS: 1-2
+      INCLUDE: /opt/rules/All-Risk/All-RiskMarginTotal.rule
+      SETFILE: /opt/_results/EA31337-Lite_RiskMarginTotal.set
+      TEST_REPORT_NAME: EA31337-Lite_RiskMarginTotal
+      RUN_ON_SUCCESS: input_copy RiskMarginTotal "$${SETFILE}" /opt/lite/ea-input.mqh
+  RiskRatio:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: ../EA-Tester-params.txt
+    environment:
+      BT_MONTHS: 1-2
+      INCLUDE: /opt/rules/All-Risk/All-RiskRatio.rule
+      SETFILE: /opt/_results/EA31337-Lite_RiskRatio.set
+      TEST_REPORT_NAME: EA31337-Lite_RiskRatio
+      RUN_ON_SUCCESS: input_copy RiskRatio "$${SETFILE}" /opt/lite/ea-input.mqh
+  RiskRatioIncreaseMethod:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: ../EA-Tester-params.txt
+    environment:
+      BT_MONTHS: 1-2
+      INCLUDE: /opt/rules/All-Risk/All-RiskRatioIncreaseMethod.rule
+      SETFILE: /opt/_results/EA31337-Lite_RiskRatioIncreaseMethod.set
+      TEST_REPORT_NAME: EA31337-Lite_RiskRatioIncreaseMethod
+      RUN_ON_SUCCESS: input_copy RiskRatioIncreaseMethod "$${SETFILE}" /opt/lite/ea-input.mqh
+  RiskRatioDecreaseMethod:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: ../EA-Tester-params.txt
+    environment:
+      BT_MONTHS: 1-2
+      INCLUDE: /opt/rules/All-Risk/All-RiskRatioDecreaseMethod.rule
+      SETFILE: /opt/_results/EA31337-Lite_RiskRatioDecreaseMethod.set
+      TEST_REPORT_NAME: EA31337-Lite_RiskRatioDecreaseMethod
+      RUN_ON_SUCCESS: input_copy RiskRatioDecreaseMethod "$${SETFILE}" /opt/lite/ea-input.mqh

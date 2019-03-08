@@ -10,7 +10,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../.env
+    env_file: ../../../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/Strategies/SAR/Strategy-SAR-All-SAR_Step.rule
       SETFILE: /opt/_results/EA31337-Lite_SAR_Step.set
@@ -25,7 +25,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../../../.env
+    env_file: ../../../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/Strategies/SAR/Strategy-SAR-All-SAR_Step_Ratio.rule
       SETFILE: /opt/_results/EA31337-Lite_SAR_Step_Ratio.set
@@ -40,7 +40,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../../../.env
+    env_file: ../../../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/Strategies/SAR/Strategy-SAR-All-SAR_Maximum_Stop.rule
       SETFILE: /opt/_results/EA31337-Lite_SAR_Maximum_Stop.set
@@ -55,7 +55,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../../../.env
+    env_file: ../../../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/Strategies/SAR/Strategy-SAR-All-SAR_Shift.rule
       SETFILE: /opt/_results/EA31337-Lite_SAR_Shift.set

@@ -10,7 +10,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../.env
+    env_file: ../../../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/Strategies/Fractals/Strategy-Fractals-Fractals1_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Fractals1_Active.set
@@ -26,7 +26,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../.env
+    env_file: ../../../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/Strategies/Fractals/Strategy-Fractals-Fractals5_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Fractals5_Active.set
@@ -42,7 +42,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../.env
+    env_file: ../../../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/Strategies/Fractals/Strategy-Fractals-Fractals15_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Fractals15_Active.set
@@ -58,7 +58,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../.env
+    env_file: ../../../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/Strategies/Fractals/Strategy-Fractals-Fractals30_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Fractals30_Active.set

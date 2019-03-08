@@ -9,7 +9,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../.env
+    env_file: ../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/All-No_Boost/All-MinPipGap.rules
       SETFILE: /opt/_results/EA31337-Lite_MinPipGap.set
@@ -24,7 +24,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../.env
+    env_file: ../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/All-No_Boost/All-TrailingStopAddPerMinute.rule
       SETFILE: /opt/_results/EA31337-Lite_TrailingStopAddPerMinute.set
@@ -39,7 +39,7 @@ services:
 #   volumes:
 #   - ./_results:/opt/_results:rw
 #   - ../../../../src/include/EA31337/lite:/opt/lite:rw
-#   env_file: ../.env
+#   env_file: ../EA-Tester-params.txt
 #   environment:
 #     INCLUDE: /opt/rules/All-No_Boost/All-ProfitFactorMaxToTrade.rule
 #     SETFILE: /opt/_results/EA31337-Lite_ProfitFactorMaxToTrade.set
@@ -54,7 +54,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../.env
+    env_file: ../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/All-No_Boost/All-ProfitFactorMinToTrade.rule
       SETFILE: /opt/_results/EA31337-Lite_ProfitFactorMinToTrade.set
@@ -69,7 +69,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../.env
+    env_file: ../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/All-No_Boost/All-StopLossMax.rule
       SETFILE: /opt/_results/EA31337-Lite_StopLossMax.set
@@ -84,7 +84,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../.env
+    env_file: ../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/All-No_Boost/All-TakeProfitMax.rule
       SETFILE: /opt/_results/EA31337-Lite_TakeProfitMax.set
@@ -99,7 +99,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../.env
+    env_file: ../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/All-No_Boost/All-TrailingProfit.rules
       SETFILE: /opt/_results/EA31337-Lite_TrailingProfit.set
@@ -114,7 +114,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../.env
+    env_file: ../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/All-No_Boost/All-TrailingStop.rules
       SETFILE: /opt/_results/EA31337-Lite_TrailingStop.set
@@ -129,7 +129,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../.env
+    env_file: ../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/All-No_Boost/All-DefaultTrailingProfitMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_DefaultTrailingProfitMethod.set
@@ -144,7 +144,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../.env
+    env_file: ../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/All-No_Boost/All-DefaultTrailingStopMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_DefaultTrailingStopMethod.set
@@ -159,7 +159,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../.env
+    env_file: ../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/All-No_Boost/All-TrendPeriod.rule
       SETFILE: /opt/_results/EA31337-Lite_TrendPeriod.set
@@ -174,7 +174,7 @@ services:
 #   volumes:
 #   - ./_results:/opt/_results:rw
 #   - ../../../../src/include/EA31337/lite:/opt/lite:rw
-#   env_file: ../.env
+#   env_file: ../EA-Tester-params.txt
 #   environment:
 #     INCLUDE: /opt/rules/All-No_Boost/All-TrendMethod.rule
 #     SETFILE: /opt/_results/EA31337-Lite_TrendMethod.set

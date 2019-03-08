@@ -1,5 +1,20 @@
 version: '3.4'
 services:
+  LotSize:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: ../EA-Tester-params.txt
+    environment:
+      INCLUDE: /opt/rules/All/All-LotSize.rule
+      SETFILE: /opt/_results/EA31337-Lite_LotSize.set
+      TEST_REPORT_NAME: EA31337-Lite_LotSize
+      RUN_ON_SUCCESS: input_copy LotSize "$${SETFILE}" /opt/lite/ea-input.mqh
   CloseOrderAfterXHours:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -9,7 +24,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../.env
+    env_file: ../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/All/All-CloseOrderAfterXHours.rule
       SETFILE: /opt/_results/EA31337-Lite_CloseOrderAfterXHours.set
@@ -24,7 +39,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../.env
+    env_file: ../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/All/All-MaxOrdersPerType.rule
       SETFILE: /opt/_results/EA31337-Lite_MaxOrdersPerType.set
@@ -39,7 +54,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../.env
+    env_file: ../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/All/All-MaxOrders.rule
       SETFILE: /opt/_results/EA31337-Lite_MaxOrders.set
@@ -54,7 +69,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../.env
+    env_file: ../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/All/All-MinPipChangeToTrade.rule
       SETFILE: /opt/_results/EA31337-Lite_MinPipChangeToTrade.set

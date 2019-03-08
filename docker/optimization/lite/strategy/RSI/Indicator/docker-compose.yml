@@ -10,7 +10,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../.env
+    env_file: ../../../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-All-RSI_Period.rule
       SETFILE: /opt/_results/EA31337-Lite_RSI_Period.set
@@ -25,7 +25,7 @@ services:
 #   volumes:
 #   - ./_results:/opt/_results:rw
 #   - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-#   env_file: ../../../.env
+#   env_file: ../../../EA-Tester-params.txt
 #   environment:
 #     INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-All-RSI_Period_Ratio.rule
 #     SETFILE: /opt/_results/EA31337-Lite_RSI_Period_Ratio.set
@@ -41,7 +41,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../.env
+    env_file: ../../../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-All-RSI_Applied_Price.rule
       SETFILE: /opt/_results/EA31337-Lite_RSI_Applied_Price.set
@@ -57,7 +57,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../.env
+    env_file: ../../../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-All-RSI_SignalLevel.rule
       SETFILE: /opt/_results/EA31337-Lite_RSI_SignalLevel.set
@@ -73,7 +73,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../.env
+    env_file: ../../../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-All-RSI_Shift.rule
       SETFILE: /opt/_results/EA31337-Lite_RSI_Shift.set

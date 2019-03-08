@@ -9,7 +9,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../.env
+    env_file: ../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/All-SmartQueue/All-SmartQueueActive.rule
       SETFILE: /opt/_results/EA31337-Lite_SmartQueueActive.set
@@ -25,7 +25,7 @@ services:
 #   volumes:
 #   - ./_results:/opt/_results:rw
 #   - ../../../../src/include/EA31337/lite:/opt/lite:rw
-#   env_file: ../.env
+#   env_file: ../EA-Tester-params.txt
 #   environment:
 #     INCLUDE: /opt/rules/All-SmartQueue/All-SmartQueueMethod.rule
 #     SETFILE: /opt/_results/EA31337-Lite_SmartQueueMethod.set
@@ -40,7 +40,7 @@ services:
 #   volumes:
 #   - ./_results:/opt/_results:rw
 #   - ../../../../src/include/EA31337/lite:/opt/lite:rw
-#   env_file: ../.env
+#   env_file: ../EA-Tester-params.txt
 #   environment:
 #     INCLUDE: /opt/rules/All-SmartQueue/All-SmartQueueFilter.rule
 #     SETFILE: /opt/_results/EA31337-Lite_SmartQueueFilter.set

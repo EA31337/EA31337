@@ -10,7 +10,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../.env
+    env_file: ../../../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/Strategies/SAR/Strategy-SAR-SAR1_SignalMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_SAR1_SignalMethod.set
@@ -26,7 +26,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../.env
+    env_file: ../../../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/Strategies/SAR/Strategy-SAR-SAR5_SignalMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_SAR5_SignalMethod.set
@@ -42,7 +42,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../.env
+    env_file: ../../../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/Strategies/SAR/Strategy-SAR-SAR15_SignalMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_SAR15_SignalMethod.set
@@ -58,7 +58,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../.env
+    env_file: ../../../EA-Tester-params.txt
     environment:
       INCLUDE: /opt/rules/Strategies/SAR/Strategy-SAR-SAR30_SignalMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_SAR30_SignalMethod.set
