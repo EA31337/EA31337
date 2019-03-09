@@ -1,0 +1,79 @@
+version: '3.4'
+# Note: In case of timeout, run with: DOCKER_CLIENT_TIMEOUT=600 COMPOSE_HTTP_TIMEOUT=600
+services:
+# SAR
+  SAR_Backtest_2018:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../src:/opt/src
+    - ./_results:/opt/_results:rw
+    - ../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../EA-Tester-params.txt
+    environment:
+      BT_YEARS: 2018
+      SETFILE: /opt/_results/EA31337-Lite_SAR.set
+      TEST_REPORT_NAME: "EA31337-Lite_SAR[2018]"
+  SAR1_Backtest_2018:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../src:/opt/src
+    - ./_results:/opt/_results:rw
+    - ../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../EA-Tester-params.txt
+    environment:
+      BT_YEARS: 2018
+      SETFILE: /opt/_results/EA31337-Lite_SAR1.set
+      TEST_REPORT_NAME: "EA31337-Lite_SAR1[2018]"
+  SAR5_Backtest_2018:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../src:/opt/src
+    - ./_results:/opt/_results:rw
+    - ../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../EA-Tester-params.txt
+    environment:
+      BT_YEARS: 2018
+      SETFILE: /opt/_results/EA31337-Lite_SAR5.set
+      TEST_REPORT_NAME: "EA31337-Lite_SAR5[2018]"
+  SAR15_Backtest_2018:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../src:/opt/src
+    - ./_results:/opt/_results:rw
+    - ../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../EA-Tester-params.txt
+    environment:
+      BT_YEARS: 2018
+      SETFILE: /opt/_results/EA31337-Lite_SAR15.set
+      TEST_REPORT_NAME: 'EA31337-Lite_SAR15[2018]'
+  SAR30_Backtest_2018:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ../../../../../src:/opt/src
+    - ./_results:/opt/_results:rw
+    - ../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../EA-Tester-params.txt
+    environment:
+      BT_YEARS: 2018
+      SETFILE: /opt/_results/EA31337-Lite_SAR30.set
+      TEST_REPORT_NAME: "EA31337-Lite_SAR30[2018]"
