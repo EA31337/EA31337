@@ -2,18 +2,18 @@
 
 
                                                                  Optimization Report
-                                                             EA31337-Lite-Backtest-v1.076
+                                                             EA31337-Lite-Optimize-v1.076
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.01.30 23:30 (2018.01.01 - 2018.01.31)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
-           Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-              2  37.52           61          1.64            0.62      26.77       0.27 Fractals_Shift=1; MaxOrders=0; MaxOrdersPerType=0;
-              1  25.72           55          1.52            0.47      26.57       0.27 Fractals_Shift=0; MaxOrders=0; MaxOrdersPerType=0;
-              3  20.99           76          1.35            0.28      28.27       0.28 Fractals_Shift=2; MaxOrders=0; MaxOrdersPerType=0;
-              5 -31.51          116          0.63           -0.27      45.14       0.45 Fractals_Shift=4; MaxOrders=0; MaxOrdersPerType=0;
-              4 -43.76           86          0.46           -0.51      48.86       0.49 Fractals_Shift=3; MaxOrders=0; MaxOrdersPerType=0;
+           Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+              1  -40.70         1964          0.98           -0.02     280.79       2.79 Fractals_Shift=0; MaxOrders=0; MaxOrdersPerType=0;
+              2 -204.74         3320          0.93           -0.06     463.67       4.61 Fractals_Shift=1; MaxOrders=0; MaxOrdersPerType=0;
+              5 -261.21         4010          0.93           -0.07     538.93       5.38 Fractals_Shift=4; MaxOrders=0; MaxOrdersPerType=0;
+              3 -278.03         4275          0.93           -0.07     520.22       5.18 Fractals_Shift=2; MaxOrders=0; MaxOrdersPerType=0;
+              4 -432.10         4010          0.88           -0.11     634.23       6.33 Fractals_Shift=3; MaxOrders=0; MaxOrdersPerType=0;

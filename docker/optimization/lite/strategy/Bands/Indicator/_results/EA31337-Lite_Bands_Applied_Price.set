@@ -63,7 +63,7 @@ Bands5_SignalMethod=0
 Bands15_SignalMethod=0
 Bands30_SignalMethod=0
 # Optimization params.
-Bands_Applied_Price=6
+Bands_Applied_Price=3
 Bands_Applied_Price,F=0
 Bands_Applied_Price,1=0
 Bands_Applied_Price,2=0

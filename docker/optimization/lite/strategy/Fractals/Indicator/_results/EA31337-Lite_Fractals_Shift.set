@@ -63,7 +63,7 @@ Fractals5_SignalMethod=0
 Fractals15_SignalMethod=0
 Fractals30_SignalMethod=0
 # Optimization params.
-Fractals_Shift=1
+Fractals_Shift=0
 Fractals_Shift,F=0
 Fractals_Shift,1=0
 Fractals_Shift,2=0

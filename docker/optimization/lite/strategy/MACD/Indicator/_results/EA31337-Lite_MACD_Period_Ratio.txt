@@ -2,33 +2,13 @@
 
 
                                                                  Optimization Report
-                                                             EA31337-Lite-Backtest-v1.076
+                                                             EA31337-Lite-Optimize-v1.076
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.01.30 23:30 (2018.01.01 - 2018.01.31)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
-        Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-           2  128.47          183          1.64            0.70      75.64       0.74 MACD_Period_Ratio=0.6; MaxOrders=0; MaxOrdersPerType=0;
-           6   83.63          332          1.45            0.25      85.39       0.84   MACD_Period_Ratio=1; MaxOrders=0; MaxOrdersPerType=0;
-           1   78.87          677          1.33            0.12      87.84       0.87 MACD_Period_Ratio=0.5; MaxOrders=0; MaxOrdersPerType=0;
-          10   10.78          690          1.04            0.02     107.42       1.07 MACD_Period_Ratio=1.4; MaxOrders=0; MaxOrdersPerType=0;
-           3    7.04         1016          1.02            0.01      73.71       0.73 MACD_Period_Ratio=0.7; MaxOrders=0; MaxOrdersPerType=0;
-          11    2.12         1025          1.01            0.00     101.96       1.02 MACD_Period_Ratio=1.5; MaxOrders=0; MaxOrdersPerType=0;
-          20  -18.48         1241          0.94           -0.01     134.70       1.34 MACD_Period_Ratio=2.4; MaxOrders=0; MaxOrdersPerType=0;
-          16  -40.66          643          0.87           -0.06      91.09       0.91   MACD_Period_Ratio=2; MaxOrders=0; MaxOrdersPerType=0;
-          12  -41.20         1020          0.87           -0.04      93.07       0.93 MACD_Period_Ratio=1.6; MaxOrders=0; MaxOrdersPerType=0;
-           7  -45.97          494          0.82           -0.09     115.41       1.15 MACD_Period_Ratio=1.1; MaxOrders=0; MaxOrdersPerType=0;
-          17  -56.29          511          0.81           -0.11      86.12       0.86 MACD_Period_Ratio=2.1; MaxOrders=0; MaxOrdersPerType=0;
-          18  -71.20          899          0.78           -0.08      95.08       0.95 MACD_Period_Ratio=2.2; MaxOrders=0; MaxOrdersPerType=0;
-           9  -76.35          980          0.75           -0.08     174.00       1.74 MACD_Period_Ratio=1.3; MaxOrders=0; MaxOrdersPerType=0;
-           4  -88.93         1974          0.76           -0.05     170.20       1.70 MACD_Period_Ratio=0.8; MaxOrders=0; MaxOrdersPerType=0;
-           8  -91.51          672          0.71           -0.14     145.86       1.46 MACD_Period_Ratio=1.2; MaxOrders=0; MaxOrdersPerType=0;
-          19 -130.88         2570          0.71           -0.05     253.84       2.52 MACD_Period_Ratio=2.3; MaxOrders=0; MaxOrdersPerType=0;
-          15 -130.73         1741          0.69           -0.08     147.54       1.47 MACD_Period_Ratio=1.9; MaxOrders=0; MaxOrdersPerType=0;
-           5 -152.23          361          0.56           -0.42     226.72       2.26 MACD_Period_Ratio=0.9; MaxOrders=0; MaxOrdersPerType=0;
-          13 -169.33         1174          0.57           -0.14     188.68       1.89 MACD_Period_Ratio=1.7; MaxOrders=0; MaxOrdersPerType=0;
-          14 -436.78         3721          0.32           -0.12     442.58       4.42 MACD_Period_Ratio=1.8; MaxOrders=0; MaxOrdersPerType=0;
+                                     Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %

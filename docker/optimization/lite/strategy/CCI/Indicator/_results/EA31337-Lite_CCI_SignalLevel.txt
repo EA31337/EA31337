@@ -2,24 +2,24 @@
 
 
                                                                  Optimization Report
-                                                             EA31337-Lite-Backtest-v1.076
+                                                             EA31337-Lite-Optimize-v1.076
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.02.27 23:30 (2018.01.01 - 2018.02.28)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
-          Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-             6  -4.80           50          0.96           -0.10      57.46       0.57 CCI_SignalLevel=82; MaxOrders=0; MaxOrdersPerType=0;
-             7  -4.80           50          0.96           -0.10      57.46       0.57 CCI_SignalLevel=84; MaxOrders=0; MaxOrdersPerType=0;
-             8  -4.80           50          0.96           -0.10      57.46       0.57 CCI_SignalLevel=86; MaxOrders=0; MaxOrdersPerType=0;
-             9  -4.80           50          0.96           -0.10      57.46       0.57 CCI_SignalLevel=88; MaxOrders=0; MaxOrdersPerType=0;
-            10  -4.80           50          0.96           -0.10      57.46       0.57 CCI_SignalLevel=90; MaxOrders=0; MaxOrdersPerType=0;
-            11  -4.80           50          0.96           -0.10      57.46       0.57 CCI_SignalLevel=92; MaxOrders=0; MaxOrdersPerType=0;
-             1  -5.42           49          0.95           -0.11      56.71       0.57 CCI_SignalLevel=72; MaxOrders=0; MaxOrdersPerType=0;
-             2  -5.42           49          0.95           -0.11      56.71       0.57 CCI_SignalLevel=74; MaxOrders=0; MaxOrdersPerType=0;
-             5  -5.09           50          0.95           -0.10      57.46       0.57 CCI_SignalLevel=80; MaxOrders=0; MaxOrdersPerType=0;
-             3  -6.66           51          0.94           -0.13      57.95       0.58 CCI_SignalLevel=76; MaxOrders=0; MaxOrdersPerType=0;
-             4  -6.11           51          0.94           -0.12      57.46       0.57 CCI_SignalLevel=78; MaxOrders=0; MaxOrdersPerType=0;
+          Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+            11    8.58         1973          1.01            0.00     379.71       3.78 CCI_SignalLevel=92; MaxOrders=0; MaxOrdersPerType=0;
+            10  -13.17         2013          0.99           -0.01     389.18       3.88 CCI_SignalLevel=90; MaxOrders=0; MaxOrdersPerType=0;
+             9  -43.60         2055          0.97           -0.02     402.00       4.01 CCI_SignalLevel=88; MaxOrders=0; MaxOrdersPerType=0;
+             8  -44.90         2098          0.97           -0.02     412.23       4.11 CCI_SignalLevel=86; MaxOrders=0; MaxOrdersPerType=0;
+             7  -55.50         2150          0.97           -0.03     428.48       4.27 CCI_SignalLevel=84; MaxOrders=0; MaxOrdersPerType=0;
+             6  -67.31         2201          0.96           -0.03     435.82       4.34 CCI_SignalLevel=82; MaxOrders=0; MaxOrdersPerType=0;
+             5  -87.93         2247          0.95           -0.04     459.43       4.58 CCI_SignalLevel=80; MaxOrders=0; MaxOrdersPerType=0;
+             4  -91.09         2288          0.95           -0.04     471.15       4.69 CCI_SignalLevel=78; MaxOrders=0; MaxOrdersPerType=0;
+             3 -110.67         2332          0.94           -0.05     490.20       4.88 CCI_SignalLevel=76; MaxOrders=0; MaxOrdersPerType=0;
+             1 -121.79         2432          0.93           -0.05     510.60       5.08 CCI_SignalLevel=72; MaxOrders=0; MaxOrdersPerType=0;
+             2 -124.56         2384          0.93           -0.05     513.64       5.11 CCI_SignalLevel=74; MaxOrders=0; MaxOrdersPerType=0;

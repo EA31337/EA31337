@@ -63,7 +63,7 @@ Envelopes5_SignalMethod=0
 Envelopes15_SignalMethod=0
 Envelopes30_SignalMethod=0
 # Optimization params.
-Envelopes_MA_Method=2
+Envelopes_MA_Method=3
 Envelopes_MA_Method,F=0
 Envelopes_MA_Method,1=0
 Envelopes_MA_Method,2=0

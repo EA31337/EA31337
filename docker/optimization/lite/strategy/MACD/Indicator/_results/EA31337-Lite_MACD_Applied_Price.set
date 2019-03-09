@@ -63,7 +63,7 @@ MACD5_SignalMethod=0
 MACD15_SignalMethod=0
 MACD30_SignalMethod=0
 # Optimization params.
-MACD_Applied_Price=4
+MACD_Applied_Price=3
 MACD_Applied_Price,F=0
 MACD_Applied_Price,1=0
 MACD_Applied_Price,2=0

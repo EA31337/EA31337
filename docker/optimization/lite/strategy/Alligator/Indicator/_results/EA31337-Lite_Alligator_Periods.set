@@ -63,7 +63,7 @@ Alligator5_SignalMethod=0
 Alligator15_SignalMethod=0
 Alligator30_SignalMethod=0
 # Optimization params.
-Alligator_Period_Jaw=6
+Alligator_Period_Jaw=8
 Alligator_Period_Jaw,F=0
 Alligator_Period_Jaw,1=0
 Alligator_Period_Jaw,2=0
@@ -73,7 +73,7 @@ Alligator_Period_Teeth,F=0
 Alligator_Period_Teeth,1=0
 Alligator_Period_Teeth,2=0
 Alligator_Period_Teeth,3=0
-Alligator_Period_Lips=8
+Alligator_Period_Lips=6
 Alligator_Period_Lips,F=0
 Alligator_Period_Lips,1=0
 Alligator_Period_Lips,2=0

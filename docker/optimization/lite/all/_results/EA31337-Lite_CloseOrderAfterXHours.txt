@@ -2,19 +2,19 @@
 
 
                                                                  Optimization Report
-                                                             EA31337-Lite-Backtest-v1.076
+                                                             EA31337-Lite-Optimize-v1.076
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.01.30 23:30 (2018.01.01 - 2018.01.31)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
       Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-         1 5075.92         5298          2.08            0.96    4259.91      23.77   CloseOrderAfterXHours=0; MaxOrders=0; MaxOrdersPerType=0;
-         5 3354.43         6390          1.48            0.52    2755.23      18.91  CloseOrderAfterXHours=96; MaxOrders=0; MaxOrdersPerType=0;
-         4 2444.82         6384          1.37            0.38    3143.73      20.19  CloseOrderAfterXHours=72; MaxOrders=0; MaxOrdersPerType=0;
-         6 2377.11         6320          1.35            0.38    3275.43      21.19 CloseOrderAfterXHours=120; MaxOrders=0; MaxOrdersPerType=0;
-         3  998.88         6402          1.15            0.16    1684.91      14.61  CloseOrderAfterXHours=48; MaxOrders=0; MaxOrdersPerType=0;
-         2  610.72         6402          1.11            0.10    1339.22      11.60  CloseOrderAfterXHours=24; MaxOrders=0; MaxOrdersPerType=0;
+         6 -666.22         1222          0.61           -0.55    1152.68      11.01 CloseOrderAfterXHours=120; MaxOrders=0; MaxOrdersPerType=0;
+         3 -700.34          981          0.55           -0.71    1087.18      10.48  CloseOrderAfterXHours=48; MaxOrders=0; MaxOrdersPerType=0;
+         1 -703.67         1463          0.65           -0.48    1193.80      11.39   CloseOrderAfterXHours=0; MaxOrders=0; MaxOrdersPerType=0;
+         2 -710.47         1195          0.57           -0.59    1035.52      10.04  CloseOrderAfterXHours=24; MaxOrders=0; MaxOrdersPerType=0;
+         4 -742.53         1095          0.56           -0.68    1132.15      10.91  CloseOrderAfterXHours=72; MaxOrders=0; MaxOrdersPerType=0;
+         5 -758.57         1430          0.63           -0.53    1207.18      11.57  CloseOrderAfterXHours=96; MaxOrders=0; MaxOrdersPerType=0;

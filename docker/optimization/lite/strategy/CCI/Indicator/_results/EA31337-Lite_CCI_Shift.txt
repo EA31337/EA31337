@@ -2,18 +2,18 @@
 
 
                                                                  Optimization Report
-                                                             EA31337-Lite-Backtest-v1.076
+                                                             EA31337-Lite-Optimize-v1.076
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.02.27 23:30 (2018.01.01 - 2018.02.28)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
               Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-                 1  -4.80           50          0.96           -0.10      57.46       0.57 CCI_Shift=0; MaxOrders=0; MaxOrdersPerType=0;
-                 4 -10.51           44          0.90           -0.24      53.32       0.53 CCI_Shift=3; MaxOrders=0; MaxOrdersPerType=0;
-                 3 -27.99           46          0.72           -0.61      55.64       0.56 CCI_Shift=2; MaxOrders=0; MaxOrdersPerType=0;
-                 5 -27.94           50          0.73           -0.56      62.89       0.63 CCI_Shift=4; MaxOrders=0; MaxOrdersPerType=0;
-                 2 -38.24           48          0.66           -0.80      63.13       0.63 CCI_Shift=1; MaxOrders=0; MaxOrdersPerType=0;
+                 3  -6.61         1535          0.99           -0.00     325.49       3.25 CCI_Shift=2; MaxOrders=0; MaxOrdersPerType=0;
+                 5  -7.70         1535          0.99           -0.01     362.05       3.62 CCI_Shift=4; MaxOrders=0; MaxOrdersPerType=0;
+                 4  -9.92         1535          0.99           -0.01     328.01       3.27 CCI_Shift=3; MaxOrders=0; MaxOrdersPerType=0;
+                 2 -10.87         1536          0.99           -0.01     333.89       3.33 CCI_Shift=1; MaxOrders=0; MaxOrdersPerType=0;
+                 1 -67.31         2201          0.96           -0.03     435.82       4.34 CCI_Shift=0; MaxOrders=0; MaxOrdersPerType=0;

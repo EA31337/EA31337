@@ -2,33 +2,13 @@
 
 
                                                                  Optimization Report
-                                                             EA31337-Lite-Backtest-v1.076
+                                                             EA31337-Lite-Optimize-v1.076
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.02.27 23:30 (2018.01.01 - 2018.02.28)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
-         Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-           10 -346.17         5175          0.79           -0.07     354.55       3.55   WPR_Period_Ratio=1; MaxOrders=0; MaxOrdersPerType=0;
-            1 -401.48         3409          0.76           -0.12     448.08       4.48 WPR_Period_Ratio=0.1; MaxOrders=0; MaxOrdersPerType=0;
-            2 -401.48         3409          0.76           -0.12     448.08       4.48 WPR_Period_Ratio=0.2; MaxOrders=0; MaxOrdersPerType=0;
-            3 -401.48         3409          0.76           -0.12     448.08       4.48 WPR_Period_Ratio=0.3; MaxOrders=0; MaxOrdersPerType=0;
-            4 -401.48         3409          0.76           -0.12     448.08       4.48 WPR_Period_Ratio=0.4; MaxOrders=0; MaxOrdersPerType=0;
-            5 -401.48         3409          0.76           -0.12     448.08       4.48 WPR_Period_Ratio=0.5; MaxOrders=0; MaxOrdersPerType=0;
-            6 -401.48         3409          0.76           -0.12     448.08       4.48 WPR_Period_Ratio=0.6; MaxOrders=0; MaxOrdersPerType=0;
-            7 -401.48         3409          0.76           -0.12     448.08       4.48 WPR_Period_Ratio=0.7; MaxOrders=0; MaxOrdersPerType=0;
-            8 -401.48         3409          0.76           -0.12     448.08       4.48 WPR_Period_Ratio=0.8; MaxOrders=0; MaxOrdersPerType=0;
-            9 -401.48         3409          0.76           -0.12     448.08       4.48 WPR_Period_Ratio=0.9; MaxOrders=0; MaxOrdersPerType=0;
-           11 -420.92         5301          0.76           -0.08     423.22       4.23 WPR_Period_Ratio=1.1; MaxOrders=0; MaxOrdersPerType=0;
-           12 -432.19         5966          0.76           -0.07     437.99       4.38 WPR_Period_Ratio=1.2; MaxOrders=0; MaxOrdersPerType=0;
-           13 -565.61         7518          0.71           -0.08     573.29       5.73 WPR_Period_Ratio=1.3; MaxOrders=0; MaxOrdersPerType=0;
-           14 -572.23         7890          0.71           -0.07     573.02       5.73 WPR_Period_Ratio=1.4; MaxOrders=0; MaxOrdersPerType=0;
-           16 -580.79         7590          0.70           -0.08     580.85       5.81 WPR_Period_Ratio=1.6; MaxOrders=0; MaxOrdersPerType=0;
-           17 -591.15         7067          0.69           -0.08     591.44       5.91 WPR_Period_Ratio=1.7; MaxOrders=0; MaxOrdersPerType=0;
-           18 -619.60         7294          0.68           -0.08     619.66       6.20 WPR_Period_Ratio=1.8; MaxOrders=0; MaxOrdersPerType=0;
-           15 -671.65         8355          0.67           -0.08     683.15       6.83 WPR_Period_Ratio=1.5; MaxOrders=0; MaxOrdersPerType=0;
-           19 -711.97         8411          0.65           -0.08     712.03       7.12 WPR_Period_Ratio=1.9; MaxOrders=0; MaxOrdersPerType=0;
-           20 -831.14         9311          0.61           -0.09     831.20       8.31   WPR_Period_Ratio=2; MaxOrders=0; MaxOrdersPerType=0;
+                                     Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %

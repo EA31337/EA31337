@@ -63,7 +63,7 @@ DeMarker5_SignalMethod=0
 DeMarker15_SignalMethod=0
 DeMarker30_SignalMethod=0
 # Optimization params.
-DeMarker_Shift=0
+DeMarker_Shift=1
 DeMarker_Shift,F=0
 DeMarker_Shift,1=0
 DeMarker_Shift,2=0

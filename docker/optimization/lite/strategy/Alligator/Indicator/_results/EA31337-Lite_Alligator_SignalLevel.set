@@ -63,7 +63,7 @@ Alligator5_SignalMethod=0
 Alligator15_SignalMethod=0
 Alligator30_SignalMethod=0
 # Optimization params.
-Alligator_SignalLevel=0
+Alligator_SignalLevel=-0.2
 Alligator_SignalLevel,F=0
 Alligator_SignalLevel,1=0
 Alligator_SignalLevel,2=0

@@ -2,24 +2,24 @@
 
 
                                                                  Optimization Report
-                                                             EA31337-Lite-Backtest-v1.076
+                                                             EA31337-Lite-Optimize-v1.076
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.02.27 23:30 (2018.01.01 - 2018.02.28)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
-          Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-             3   4.82          353          1.02            0.01      29.87       0.30 WPR_SignalLevel=-13; MaxOrders=0; MaxOrdersPerType=0;
-             8   2.98          359          1.01            0.01      29.60       0.30  WPR_SignalLevel=-8; MaxOrders=0; MaxOrdersPerType=0;
-             1   0.11          332          1.00            0.00      33.95       0.34 WPR_SignalLevel=-15; MaxOrders=0; MaxOrdersPerType=0;
-             9   0.99          350          1.00            0.00      29.60       0.30  WPR_SignalLevel=-7; MaxOrders=0; MaxOrdersPerType=0;
-             5  -1.12          359          1.00           -0.00      31.72       0.32 WPR_SignalLevel=-11; MaxOrders=0; MaxOrdersPerType=0;
-            10  -2.15          352          0.99           -0.01      31.19       0.31  WPR_SignalLevel=-6; MaxOrders=0; MaxOrdersPerType=0;
-             2  -3.98          331          0.98           -0.01      38.67       0.39 WPR_SignalLevel=-14; MaxOrders=0; MaxOrdersPerType=0;
-             7  -6.61          365          0.97           -0.02      29.60       0.30  WPR_SignalLevel=-9; MaxOrders=0; MaxOrdersPerType=0;
-             6  -8.60          362          0.96           -0.02      34.08       0.34 WPR_SignalLevel=-10; MaxOrders=0; MaxOrdersPerType=0;
-             4  -8.18          352          0.97           -0.02      33.54       0.33 WPR_SignalLevel=-12; MaxOrders=0; MaxOrdersPerType=0;
-            11 -12.26          368          0.95           -0.03      40.18       0.40  WPR_SignalLevel=-5; MaxOrders=0; MaxOrdersPerType=0;
+         Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+            9  -60.17         5833          0.98           -0.01     519.73       5.15 WPR_SignalLevel=-10; MaxOrders=0; MaxOrdersPerType=0;
+            8  -68.32         5833          0.98           -0.01     523.37       5.19 WPR_SignalLevel=-11; MaxOrders=0; MaxOrdersPerType=0;
+           11  -71.41         5833          0.98           -0.01     562.73       5.58  WPR_SignalLevel=-8; MaxOrders=0; MaxOrdersPerType=0;
+           10 -149.29         5833          0.96           -0.03     565.58       5.61  WPR_SignalLevel=-9; MaxOrders=0; MaxOrdersPerType=0;
+            1 -155.38         5833          0.96           -0.03     497.07       4.95 WPR_SignalLevel=-18; MaxOrders=0; MaxOrdersPerType=0;
+            2 -192.10         5833          0.95           -0.03     520.44       5.18 WPR_SignalLevel=-17; MaxOrders=0; MaxOrdersPerType=0;
+            7 -194.27         5833          0.95           -0.03     574.10       5.70 WPR_SignalLevel=-12; MaxOrders=0; MaxOrdersPerType=0;
+            6 -196.66         5833          0.95           -0.03     559.29       5.56 WPR_SignalLevel=-13; MaxOrders=0; MaxOrdersPerType=0;
+            5 -204.92         5833          0.95           -0.04     535.27       5.32 WPR_SignalLevel=-14; MaxOrders=0; MaxOrdersPerType=0;
+            3 -212.10         5833          0.95           -0.04     531.06       5.29 WPR_SignalLevel=-16; MaxOrders=0; MaxOrdersPerType=0;
+            4 -234.76         5833          0.94           -0.04     564.11       5.61 WPR_SignalLevel=-15; MaxOrders=0; MaxOrdersPerType=0;

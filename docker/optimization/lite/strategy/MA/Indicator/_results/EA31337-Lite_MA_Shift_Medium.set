@@ -63,7 +63,7 @@ MA5_SignalMethod=0
 MA15_SignalMethod=0
 MA30_SignalMethod=0
 # Optimization params.
-MA_Shift_Medium=10
+MA_Shift_Medium=9
 MA_Shift_Medium,F=0
 MA_Shift_Medium,1=0
 MA_Shift_Medium,2=0

@@ -2,7 +2,7 @@
 
 
                                                                  Optimization Report
-                                                             EA31337-Lite-Backtest-v1.076
+                                                             EA31337-Lite-Optimize-v1.076
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
@@ -11,9 +11,9 @@
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
-         Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-            3  -90.98          895          0.85           -0.10     158.37       1.57 MA_SignalLevel=-0.2; MaxOrders=0; MaxOrdersPerType=0;
-            2  -94.91          904          0.84           -0.10     159.82       1.59 MA_SignalLevel=-0.3; MaxOrders=0; MaxOrdersPerType=0;
-            1  -97.23          910          0.84           -0.11     162.43       1.61 MA_SignalLevel=-0.4; MaxOrders=0; MaxOrdersPerType=0;
-            5  -99.05          877          0.83           -0.11     164.79       1.64    MA_SignalLevel=0; MaxOrders=0; MaxOrdersPerType=0;
-            4 -104.77          886          0.83           -0.12     167.31       1.66 MA_SignalLevel=-0.1; MaxOrders=0; MaxOrdersPerType=0;
+          Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+             1  98.36         1415          1.17            0.07      59.96       0.59 MA_SignalLevel=-0.4; MaxOrders=0; MaxOrdersPerType=0;
+             2  80.72         1345          1.14            0.06      66.40       0.66 MA_SignalLevel=-0.3; MaxOrders=0; MaxOrdersPerType=0;
+             3  71.51         1259          1.13            0.06      57.80       0.57 MA_SignalLevel=-0.2; MaxOrders=0; MaxOrdersPerType=0;
+             4  66.36         1180          1.13            0.06      50.11       0.50 MA_SignalLevel=-0.1; MaxOrders=0; MaxOrdersPerType=0;
+             5  60.23         1107          1.13            0.05      42.59       0.42    MA_SignalLevel=0; MaxOrders=0; MaxOrdersPerType=0;

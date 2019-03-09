@@ -63,7 +63,7 @@ SAR5_SignalMethod=0
 SAR15_SignalMethod=0
 SAR30_SignalMethod=0
 # Optimization params.
-SAR_Step_Ratio=0.5
+SAR_Step_Ratio=1.0
 SAR_Step_Ratio,F=0
 SAR_Step_Ratio,1=0
 SAR_Step_Ratio,2=0

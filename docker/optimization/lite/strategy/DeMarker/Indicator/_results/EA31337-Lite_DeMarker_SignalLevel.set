@@ -63,7 +63,7 @@ DeMarker5_SignalMethod=0
 DeMarker15_SignalMethod=0
 DeMarker30_SignalMethod=0
 # Optimization params.
-DeMarker_SignalLevel=-0.3
+DeMarker_SignalLevel=-0.5
 DeMarker_SignalLevel,F=0
 DeMarker_SignalLevel,1=0
 DeMarker_SignalLevel,2=0

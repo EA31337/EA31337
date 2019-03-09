@@ -63,7 +63,7 @@ RSI5_SignalMethod=0
 RSI15_SignalMethod=0
 RSI30_SignalMethod=0
 # Optimization params.
-RSI_Shift=2
+RSI_Shift=3
 RSI_Shift,F=0
 RSI_Shift,1=0
 RSI_Shift,2=0

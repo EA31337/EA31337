@@ -2,34 +2,13 @@
 
 
                                                                  Optimization Report
-                                                             EA31337-Lite-Backtest-v1.076
+                                                             EA31337-Lite-Optimize-v1.076
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.02.27 23:30 (2018.01.01 - 2018.02.28)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
-            Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-               3  -76.55         2053          0.88           -0.04     147.53       1.47  SAR_Step=0.2; MaxOrders=0; MaxOrdersPerType=0;
-              21 -124.75         2069          0.81           -0.06     218.64       2.17 SAR_Step=0.38; MaxOrders=0; MaxOrdersPerType=0;
-              20 -125.20         2069          0.81           -0.06     218.64       2.17 SAR_Step=0.37; MaxOrders=0; MaxOrdersPerType=0;
-              18 -135.00         2025          0.80           -0.07     218.64       2.17 SAR_Step=0.35; MaxOrders=0; MaxOrdersPerType=0;
-              19 -135.00         2025          0.80           -0.07     218.64       2.17 SAR_Step=0.36; MaxOrders=0; MaxOrdersPerType=0;
-              17 -148.32         2095          0.78           -0.07     231.96       2.30 SAR_Step=0.34; MaxOrders=0; MaxOrdersPerType=0;
-               8 -149.74         2032          0.77           -0.07     230.52       2.29 SAR_Step=0.25; MaxOrders=0; MaxOrdersPerType=0;
-               6 -153.56         1867          0.76           -0.08     235.32       2.34 SAR_Step=0.23; MaxOrders=0; MaxOrdersPerType=0;
-               7 -154.09         1865          0.76           -0.08     234.67       2.33 SAR_Step=0.24; MaxOrders=0; MaxOrdersPerType=0;
-               1 -169.35         2175          0.76           -0.08     235.34       2.34 SAR_Step=0.18; MaxOrders=0; MaxOrdersPerType=0;
-               5 -170.65         1935          0.75           -0.09     231.55       2.30 SAR_Step=0.22; MaxOrders=0; MaxOrdersPerType=0;
-               4 -176.11         1934          0.74           -0.09     242.38       2.41 SAR_Step=0.21; MaxOrders=0; MaxOrdersPerType=0;
-               2 -178.71         2155          0.74           -0.08     243.90       2.43 SAR_Step=0.19; MaxOrders=0; MaxOrdersPerType=0;
-               9 -183.42         2085          0.73           -0.09     245.89       2.45 SAR_Step=0.26; MaxOrders=0; MaxOrdersPerType=0;
-              14 -183.42         2043          0.73           -0.09     244.73       2.44 SAR_Step=0.31; MaxOrders=0; MaxOrdersPerType=0;
-              10 -183.18         2086          0.73           -0.09     245.65       2.44 SAR_Step=0.27; MaxOrders=0; MaxOrdersPerType=0;
-              12 -187.55         2053          0.72           -0.09     245.31       2.44 SAR_Step=0.29; MaxOrders=0; MaxOrdersPerType=0;
-              13 -187.47         2049          0.73           -0.09     245.23       2.44  SAR_Step=0.3; MaxOrders=0; MaxOrdersPerType=0;
-              11 -188.79         2057          0.72           -0.09     245.49       2.44 SAR_Step=0.28; MaxOrders=0; MaxOrdersPerType=0;
-              16 -190.48         2041          0.72           -0.09     245.49       2.44 SAR_Step=0.33; MaxOrders=0; MaxOrdersPerType=0;
-              15 -209.47         2052          0.70           -0.10     246.31       2.46 SAR_Step=0.32; MaxOrders=0; MaxOrdersPerType=0;
+                                     Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %

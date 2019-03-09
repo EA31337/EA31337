@@ -2,13 +2,29 @@
 
 
                                                                  Optimization Report
-                                                             EA31337-Lite-Backtest-v1.076
+                                                             EA31337-Lite-Optimize-v1.076
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.01.30 23:30 (2018.01.01 - 2018.01.31)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
-                                     Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+      Pass   Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+        11  1837.34        31846          1.17            0.06    2536.31      23.41 DeMarker_Period_Ratio=1.5; MaxOrders=0; MaxOrdersPerType=0;
+         1  1663.71        31794          1.15            0.05    2698.86      24.91 DeMarker_Period_Ratio=0.5; MaxOrders=0; MaxOrdersPerType=0;
+         3  1562.20        30964          1.12            0.05    2964.71      27.29 DeMarker_Period_Ratio=0.7; MaxOrders=0; MaxOrdersPerType=0;
+        10  1550.55        32005          1.14            0.05    2536.31      23.41 DeMarker_Period_Ratio=1.4; MaxOrders=0; MaxOrdersPerType=0;
+        12  1525.46        32008          1.14            0.05    2536.31      23.41 DeMarker_Period_Ratio=1.6; MaxOrders=0; MaxOrdersPerType=0;
+        13  1525.46        32008          1.14            0.05    2536.31      23.41 DeMarker_Period_Ratio=1.7; MaxOrders=0; MaxOrdersPerType=0;
+        14  1525.46        32008          1.14            0.05    2536.31      23.41 DeMarker_Period_Ratio=1.8; MaxOrders=0; MaxOrdersPerType=0;
+        15  1525.46        32008          1.14            0.05    2536.31      23.41 DeMarker_Period_Ratio=1.9; MaxOrders=0; MaxOrdersPerType=0;
+        16  1525.46        32008          1.14            0.05    2536.31      23.41   DeMarker_Period_Ratio=2; MaxOrders=0; MaxOrdersPerType=0;
+         9  1449.16        32029          1.13            0.05    2513.43      23.21 DeMarker_Period_Ratio=1.3; MaxOrders=0; MaxOrdersPerType=0;
+         2  1291.48        30968          1.10            0.04    3063.26      28.18 DeMarker_Period_Ratio=0.6; MaxOrders=0; MaxOrdersPerType=0;
+         8  1233.55        31990          1.11            0.04    2470.82      22.82 DeMarker_Period_Ratio=1.2; MaxOrders=0; MaxOrdersPerType=0;
+         7   588.12        31433          1.05            0.02    2822.04      26.13 DeMarker_Period_Ratio=1.1; MaxOrders=0; MaxOrdersPerType=0;
+         6   109.71        31563          1.01            0.00    2644.29      24.65   DeMarker_Period_Ratio=1; MaxOrders=0; MaxOrdersPerType=0;
+         4   -52.83        32002          1.00           -0.00    2635.43      24.57 DeMarker_Period_Ratio=0.8; MaxOrders=0; MaxOrdersPerType=0;
+         5 -1664.73        31698          0.89           -0.05    2092.18      20.29 DeMarker_Period_Ratio=0.9; MaxOrders=0; MaxOrdersPerType=0;

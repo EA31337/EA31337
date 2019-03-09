@@ -12,12 +12,12 @@
                             Spread          10
                                                                  [Optimization Graph]
              Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-                9  -2.36            2          0.00           -1.18       2.36       0.02 RSI_Period=26; MaxOrders=0; MaxOrdersPerType=0;
-                8  -3.72            4          0.00           -0.93       3.72       0.04 RSI_Period=24; MaxOrders=0; MaxOrdersPerType=0;
-                6  -5.62           11          0.26           -0.51       6.38       0.06 RSI_Period=20; MaxOrders=0; MaxOrdersPerType=0;
-                7  -6.08            6          0.00           -1.01       6.08       0.06 RSI_Period=22; MaxOrders=0; MaxOrdersPerType=0;
-                4  -7.82           34          0.62           -0.23       9.51       0.10 RSI_Period=16; MaxOrders=0; MaxOrdersPerType=0;
-                5 -10.94           21          0.31           -0.52      11.70       0.12 RSI_Period=18; MaxOrders=0; MaxOrdersPerType=0;
-                3 -10.66           57          0.67           -0.19      10.85       0.11 RSI_Period=14; MaxOrders=0; MaxOrdersPerType=0;
-                2 -18.55           77          0.59           -0.24      19.17       0.19 RSI_Period=12; MaxOrders=0; MaxOrdersPerType=0;
-                1 -40.11          115          0.46           -0.35      40.72       0.41 RSI_Period=10; MaxOrders=0; MaxOrdersPerType=0;
+                7   0.43           12          1.08            0.04       5.75       0.06 RSI_Period=24; MaxOrders=0; MaxOrdersPerType=0;
+                8   0.61            8          1.18            0.08       4.25       0.04 RSI_Period=26; MaxOrders=0; MaxOrdersPerType=0;
+                9   0.61            8          1.18            0.08       4.25       0.04 RSI_Period=28; MaxOrders=0; MaxOrdersPerType=0;
+                6  -3.07           23          0.74           -0.13       9.55       0.10 RSI_Period=22; MaxOrders=0; MaxOrdersPerType=0;
+                5  -6.59           32          0.64           -0.21      11.65       0.12 RSI_Period=20; MaxOrders=0; MaxOrdersPerType=0;
+                3  -8.00           66          0.79           -0.12      19.75       0.20 RSI_Period=16; MaxOrders=0; MaxOrdersPerType=0;
+                4 -10.40           50          0.64           -0.21      15.55       0.16 RSI_Period=18; MaxOrders=0; MaxOrdersPerType=0;
+                2 -14.75           84          0.70           -0.18      22.77       0.23 RSI_Period=14; MaxOrders=0; MaxOrdersPerType=0;
+                1 -26.00          113          0.62           -0.23      33.69       0.34 RSI_Period=12; MaxOrders=0; MaxOrdersPerType=0;
