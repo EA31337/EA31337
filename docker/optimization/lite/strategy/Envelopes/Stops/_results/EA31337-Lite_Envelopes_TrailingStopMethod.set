@@ -56,8 +56,14 @@ WPR1_Active=0
 WPR5_Active=0
 WPR15_Active=0
 WPR30_Active=0
+# Required strategy params
+Envelopes_Period_Ratio=1.0
+Envelopes1_SignalMethod=0
+Envelopes5_SignalMethod=0
+Envelopes15_SignalMethod=0
+Envelopes30_SignalMethod=0
 # Optimization params.
-Envelopes_TrailingStopMethod=25
+Envelopes_TrailingStopMethod=-3
 Envelopes_TrailingStopMethod,F=0
 Envelopes_TrailingStopMethod,1=0
 Envelopes_TrailingStopMethod,2=0

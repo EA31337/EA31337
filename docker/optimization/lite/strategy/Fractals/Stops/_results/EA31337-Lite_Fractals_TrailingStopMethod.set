@@ -56,8 +56,14 @@ WPR1_Active=0
 WPR5_Active=0
 WPR15_Active=0
 WPR30_Active=0
+# Required strategy params
+Fractals_Period_Ratio=1.0
+Fractals1_SignalMethod=0
+Fractals5_SignalMethod=0
+Fractals15_SignalMethod=0
+Fractals30_SignalMethod=0
 # Optimization params.
-Fractals_TrailingStopMethod=27
+Fractals_TrailingStopMethod=-26
 Fractals_TrailingStopMethod,F=0
 Fractals_TrailingStopMethod,1=0
 Fractals_TrailingStopMethod,2=0

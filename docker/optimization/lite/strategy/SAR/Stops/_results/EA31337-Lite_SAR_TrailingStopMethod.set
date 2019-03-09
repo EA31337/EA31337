@@ -56,8 +56,14 @@ WPR1_Active=0
 WPR5_Active=0
 WPR15_Active=0
 WPR30_Active=0
+# Required strategy params
+SAR_Period_Ratio=1.0
+SAR1_SignalMethod=0
+SAR5_SignalMethod=0
+SAR15_SignalMethod=0
+SAR30_SignalMethod=0
 # Optimization params.
-SAR_TrailingStopMethod=-27
+SAR_TrailingStopMethod=-8
 SAR_TrailingStopMethod,F=0
 SAR_TrailingStopMethod,1=0
 SAR_TrailingStopMethod,2=0
