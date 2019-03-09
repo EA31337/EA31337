@@ -2,17 +2,18 @@
 
 
                                                                  Optimization Report
-                                                             EA31337-Lite-Backtest-v1.076
+                                                             EA31337-Lite-Optimize-v1.076
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.01.30 23:30 (2018.01.01 - 2018.01.31)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.02.27 23:30 (2018.01.01 - 2018.02.28)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
             Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-               2  -7.41         1440          0.98           -0.01      51.17       0.51 TrailingStop=10; MaxOrders=0; MaxOrdersPerType=0;
-               4 -17.63         1455          0.96           -0.01      55.10       0.55 TrailingStop=30; MaxOrders=0; MaxOrdersPerType=0;
-               3 -19.17         1450          0.96           -0.01      53.96       0.54 TrailingStop=20; MaxOrders=0; MaxOrdersPerType=0;
-               1 -73.69         1566          0.85           -0.05      88.13       0.88  TrailingStop=0; MaxOrders=0; MaxOrdersPerType=0;
+               5 201.19        11516          1.02            0.02    2183.84      19.81 TrailingStop=50; MaxOrders=0; MaxOrdersPerType=0;
+               4 152.91        11564          1.01            0.01    2143.47      19.49 TrailingStop=40; MaxOrders=0; MaxOrdersPerType=0;
+               3 104.36        11623          1.01            0.01    2101.24      19.14 TrailingStop=30; MaxOrders=0; MaxOrdersPerType=0;
+               1  60.07        11724          1.01            0.01    1846.14      17.07 TrailingStop=10; MaxOrders=0; MaxOrdersPerType=0;
+               2  21.68        11666          1.00            0.00    1965.26      18.02 TrailingStop=20; MaxOrders=0; MaxOrdersPerType=0;

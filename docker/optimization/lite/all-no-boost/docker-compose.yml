@@ -180,3 +180,34 @@ services:
 #     SETFILE: /opt/_results/EA31337-Lite_TrendMethod.set
 #     TEST_REPORT_NAME: EA31337-Lite_TrendMethod
 #     RUN_ON_SUCCESS: input_copy TrendMethod "$${SETFILE}" /opt/lite/ea-input.mqh
+  TrailingStop:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: ../EA-Tester-params.txt
+    environment:
+      BT_MONTHS: 1-2
+      INCLUDE: /opt/rules/All-No_Boost/All-TrailingStop.rules
+      SETFILE: /opt/_results/EA31337-Lite_TrailingStop.set
+      TEST_REPORT_NAME: EA31337-Lite_TrailingStop
+      RUN_ON_SUCCESS: input_copy TrailingStop "$${SETFILE}" /opt/lite/ea-input.mqh
+  TrailingProfit:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: ../EA-Tester-params.txt
+    environment:
+      BT_MONTHS: 1-4
+      SETFILE: /opt/_results/EA31337-Lite_TrailingProfit.set
+      TEST_REPORT_NAME: EA31337-Lite_TrailingProfit
+      RUN_ON_SUCCESS: input_copy TrailingProfit "$${SETFILE}" /opt/lite/ea-input.mqh

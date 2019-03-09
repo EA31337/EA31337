@@ -2,7 +2,6 @@
 LotSize=0.01
 Boosting_Enabled=0
 Account_Conditions_Active=0
-CloseOrderAfterXHours=48
 ProfitFactorMinToTrade=0
 ProfitFactorMaxToTrade=0
 ValidateSettings=0
@@ -12,8 +11,8 @@ RecordTicksToCSV=0
 VerboseInfo=0
 VerboseErrors=0
 # Optimization params.
-TrailingStop=50
-TrailingStop,F=1
-TrailingStop,1=0
-TrailingStop,2=10
-TrailingStop,3=60
+TrendPeriod=0
+TrendPeriod,F=0
+TrendPeriod,1=0
+TrendPeriod,2=0
+TrendPeriod,3=0
