@@ -6277,9 +6277,10 @@ bool ActionCloseAllUnprofitableOrders(int reason_id = EMPTY){
  * Execute action to close all orders by specified type.
  */
 bool ActionCloseAllOrdersByType(ENUM_ORDER_TYPE cmd = EMPTY, int reason_id = EMPTY){
+  if (cmd == EMPTY) return (false);
+  #ifdef __profiler__ PROFILER_START #endif
   int selected_orders = 0;
   double ticket_profit = 0, total_profit = 0;
-  if (cmd == EMPTY) return (false);
   for (int order = 0; order < OrdersTotal(); order++) {
     if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
        if (OrderType() == cmd) {
@@ -6294,7 +6295,8 @@ bool ActionCloseAllOrdersByType(ENUM_ORDER_TYPE cmd = EMPTY, int reason_id = EMP
     Msg::ShowText(StringFormat("Queued %d orders to close with expected profit of %g pips.", selected_orders, total_profit)
     , "Info", __FUNCTION__, __LINE__, VerboseInfo);
   }
-  return (false);
+  #ifdef __profiler__ PROFILER_STOP #endif
+  return (true);
 }
 
 /**
@@ -6312,6 +6314,7 @@ bool ActionCloseAllOrdersByType(ENUM_ORDER_TYPE cmd = EMPTY, int reason_id = EMP
  *     therefore closing all make the things more predictable and to avoid any suprices.
  */
 int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = true) {
+  #ifdef __profiler__ PROFILER_START #endif
    int processed = 0;
    int total = OrdersTotal();
    double total_profit = 0;
@@ -6332,6 +6335,7 @@ int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = true) {
     Msg::ShowText(StringFormat("Queued %d orders out of %d for closure.", processed, total),
       "Info", __FUNCTION__, __LINE__, VerboseInfo);
    }
+  #ifdef __profiler__ PROFILER_STOP #endif
    return (processed > 0);
 }
 
@@ -6345,6 +6349,7 @@ int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = true) {
  */
 bool ActionExecute(int aid, int id = EMPTY) {
   DEBUG_CHECKPOINT_ADD
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = false;
   int reason_id = (id != EMPTY ? acc_conditions[id][0] : EMPTY); // Account id condition.
   int mid = (id != EMPTY ? acc_conditions[id][1] : EMPTY); // Market id condition.
@@ -6443,6 +6448,7 @@ bool ActionExecute(int aid, int id = EMPTY) {
         ActionIdToText(aid), aid, ReasonIdToText(reason_id), reason_id),
       "Warning", __FUNCTION__, __LINE__, VerboseErrors);
   }
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
