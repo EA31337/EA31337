@@ -2,7 +2,7 @@
 
 
                                                                  Optimization Report
-                                                             EA31337-Lite-Backtest-v1.076
+                                                             EA31337-Lite-Optimize-v1.076
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
@@ -12,57 +12,57 @@
                             Spread          10
                                                                  [Optimization Graph]
      Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-       39  -65.58         1357          0.92           -0.05     141.84       1.41  WPR_TrailingProfitMethod=20; MaxOrders=0; MaxOrdersPerType=0;
-       40  -69.61         1357          0.91           -0.05     143.08       1.42 WPR_TrailingProfitMethod=-20; MaxOrders=0; MaxOrdersPerType=0;
-       30  -72.14         1357          0.93           -0.05     215.49       2.14 WPR_TrailingProfitMethod=-15; MaxOrders=0; MaxOrdersPerType=0;
-       29  -75.26         1357          0.92           -0.06     216.34       2.15  WPR_TrailingProfitMethod=15; MaxOrders=0; MaxOrdersPerType=0;
-        8  -84.11         1357          0.90           -0.06     152.19       1.51  WPR_TrailingProfitMethod=-4; MaxOrders=0; MaxOrdersPerType=0;
-       44  -90.38         1357          0.91           -0.07     244.17       2.42 WPR_TrailingProfitMethod=-22; MaxOrders=0; MaxOrdersPerType=0;
-       32  -91.64         1357          0.91           -0.07     241.25       2.39 WPR_TrailingProfitMethod=-16; MaxOrders=0; MaxOrdersPerType=0;
-        7  -91.31         1357          0.89           -0.07     162.05       1.61   WPR_TrailingProfitMethod=4; MaxOrders=0; MaxOrdersPerType=0;
-       43  -92.53         1357          0.91           -0.07     243.44       2.41  WPR_TrailingProfitMethod=22; MaxOrders=0; MaxOrdersPerType=0;
-       31  -96.04         1357          0.90           -0.07     241.06       2.39  WPR_TrailingProfitMethod=16; MaxOrders=0; MaxOrdersPerType=0;
-       19 -101.55         1357          0.89           -0.07     211.30       2.10  WPR_TrailingProfitMethod=10; MaxOrders=0; MaxOrdersPerType=0;
-       20 -101.45         1357          0.89           -0.07     210.78       2.09 WPR_TrailingProfitMethod=-10; MaxOrders=0; MaxOrdersPerType=0;
-       37 -105.94         1357          0.86           -0.08     140.38       1.40  WPR_TrailingProfitMethod=19; MaxOrders=0; MaxOrdersPerType=0;
-        5 -107.22         1357          0.83           -0.08     147.87       1.47   WPR_TrailingProfitMethod=3; MaxOrders=0; MaxOrdersPerType=0;
-       27 -108.72         1357          0.88           -0.08     229.14       2.28  WPR_TrailingProfitMethod=14; MaxOrders=0; MaxOrdersPerType=0;
-        6 -108.55         1357          0.82           -0.08     149.20       1.49  WPR_TrailingProfitMethod=-3; MaxOrders=0; MaxOrdersPerType=0;
-       38 -108.42         1357          0.86           -0.08     139.05       1.39 WPR_TrailingProfitMethod=-19; MaxOrders=0; MaxOrdersPerType=0;
-        1 -109.16         1357          0.84           -0.08     155.03       1.54   WPR_TrailingProfitMethod=1; MaxOrders=0; MaxOrdersPerType=0;
-       28 -110.17         1357          0.88           -0.08     232.76       2.31 WPR_TrailingProfitMethod=-14; MaxOrders=0; MaxOrdersPerType=0;
-       26 -113.79         1357          0.90           -0.08     284.12       2.82 WPR_TrailingProfitMethod=-13; MaxOrders=0; MaxOrdersPerType=0;
-       25 -116.04         1357          0.90           -0.09     271.65       2.70  WPR_TrailingProfitMethod=13; MaxOrders=0; MaxOrdersPerType=0;
-        9 -121.06         1357          0.88           -0.09     200.99       2.00   WPR_TrailingProfitMethod=5; MaxOrders=0; MaxOrdersPerType=0;
-        2 -122.63         1357          0.83           -0.09     165.63       1.65  WPR_TrailingProfitMethod=-1; MaxOrders=0; MaxOrdersPerType=0;
-       10 -123.77         1357          0.88           -0.09     203.70       2.03  WPR_TrailingProfitMethod=-5; MaxOrders=0; MaxOrdersPerType=0;
-       34 -123.29         1357          0.89           -0.09     288.65       2.86 WPR_TrailingProfitMethod=-17; MaxOrders=0; MaxOrdersPerType=0;
-       22 -129.67         1357          0.87           -0.10     254.03       2.52 WPR_TrailingProfitMethod=-11; MaxOrders=0; MaxOrdersPerType=0;
-       33 -134.23         1357          0.88           -0.10     271.51       2.69  WPR_TrailingProfitMethod=17; MaxOrders=0; MaxOrdersPerType=0;
-       24 -135.21         1357          0.88           -0.10     279.51       2.77 WPR_TrailingProfitMethod=-12; MaxOrders=0; MaxOrdersPerType=0;
-       21 -135.18         1357          0.86           -0.10     255.61       2.54  WPR_TrailingProfitMethod=11; MaxOrders=0; MaxOrdersPerType=0;
-       23 -140.31         1357          0.87           -0.10     262.10       2.60  WPR_TrailingProfitMethod=12; MaxOrders=0; MaxOrdersPerType=0;
-        3 -145.56         1357          0.77           -0.11     215.13       2.14   WPR_TrailingProfitMethod=2; MaxOrders=0; MaxOrdersPerType=0;
-        4 -146.31         1357          0.77           -0.11     215.88       2.15  WPR_TrailingProfitMethod=-2; MaxOrders=0; MaxOrdersPerType=0;
-       36 -148.15         1357          0.87           -0.11     326.04       3.23 WPR_TrailingProfitMethod=-18; MaxOrders=0; MaxOrdersPerType=0;
-       48 -154.66         1357          0.86           -0.11     252.98       2.52 WPR_TrailingProfitMethod=-24; MaxOrders=0; MaxOrdersPerType=0;
-       45 -155.09         1357          0.84           -0.11     196.51       1.96  WPR_TrailingProfitMethod=23; MaxOrders=0; MaxOrdersPerType=0;
-       35 -164.58         1357          0.86           -0.12     323.33       3.21  WPR_TrailingProfitMethod=18; MaxOrders=0; MaxOrdersPerType=0;
-       47 -172.13         1357          0.84           -0.13     246.69       2.46  WPR_TrailingProfitMethod=24; MaxOrders=0; MaxOrdersPerType=0;
-       50 -177.64         1357          0.83           -0.13     284.12       2.82 WPR_TrailingProfitMethod=-25; MaxOrders=0; MaxOrdersPerType=0;
-       41 -180.90         1357          0.82           -0.13     250.20       2.49  WPR_TrailingProfitMethod=21; MaxOrders=0; MaxOrdersPerType=0;
-       49 -180.39         1357          0.83           -0.13     282.82       2.81  WPR_TrailingProfitMethod=25; MaxOrders=0; MaxOrdersPerType=0;
-       46 -198.94         1357          0.80           -0.15     243.09       2.43 WPR_TrailingProfitMethod=-23; MaxOrders=0; MaxOrdersPerType=0;
-       42 -205.40         1357          0.80           -0.15     287.86       2.86 WPR_TrailingProfitMethod=-21; MaxOrders=0; MaxOrdersPerType=0;
-       51 -218.74         1357          0.34           -0.16     219.93       2.20  WPR_TrailingProfitMethod=26; MaxOrders=0; MaxOrdersPerType=0;
-       52 -218.74         1357          0.34           -0.16     219.93       2.20 WPR_TrailingProfitMethod=-26; MaxOrders=0; MaxOrdersPerType=0;
-       18 -265.41         1357          0.83           -0.20     819.77       7.81  WPR_TrailingProfitMethod=-9; MaxOrders=0; MaxOrdersPerType=0;
-       17 -273.82         1357          0.82           -0.20     828.18       7.89   WPR_TrailingProfitMethod=9; MaxOrders=0; MaxOrdersPerType=0;
-       12 -395.86         1357          0.72           -0.29     654.23       6.41  WPR_TrailingProfitMethod=-6; MaxOrders=0; MaxOrdersPerType=0;
-       11 -395.52         1357          0.72           -0.29     653.89       6.40   WPR_TrailingProfitMethod=6; MaxOrders=0; MaxOrdersPerType=0;
-       54 -404.16         1357          0.66           -0.30     546.09       5.40 WPR_TrailingProfitMethod=-27; MaxOrders=0; MaxOrdersPerType=0;
-       53 -411.29         1357          0.65           -0.30     552.57       5.46  WPR_TrailingProfitMethod=27; MaxOrders=0; MaxOrdersPerType=0;
-       16 -496.23         1357          0.66           -0.37     669.75       6.62  WPR_TrailingProfitMethod=-8; MaxOrders=0; MaxOrdersPerType=0;
-       15 -511.29         1357          0.65           -0.38     682.11       6.74   WPR_TrailingProfitMethod=8; MaxOrders=0; MaxOrdersPerType=0;
-       14 -515.42         1357          0.67           -0.38     862.37       8.38  WPR_TrailingProfitMethod=-7; MaxOrders=0; MaxOrdersPerType=0;
-       13 -519.93         1357          0.67           -0.38     866.89       8.42   WPR_TrailingProfitMethod=7; MaxOrders=0; MaxOrdersPerType=0;
+       18  485.25         1109          1.43            0.44     276.91       2.77  WPR_TrailingProfitMethod=-9; MaxOrders=0; MaxOrdersPerType=0;
+       17  440.75         1109          1.39            0.40     276.12       2.76   WPR_TrailingProfitMethod=9; MaxOrders=0; MaxOrdersPerType=0;
+       54  413.23         1109          1.36            0.37     269.81       2.70 WPR_TrailingProfitMethod=-27; MaxOrders=0; MaxOrdersPerType=0;
+       12  398.45         1109          1.35            0.36     302.60       3.03  WPR_TrailingProfitMethod=-6; MaxOrders=0; MaxOrdersPerType=0;
+       36  395.72         1109          1.34            0.36     307.03       3.07 WPR_TrailingProfitMethod=-18; MaxOrders=0; MaxOrdersPerType=0;
+       53  387.65         1109          1.33            0.35     269.81       2.70  WPR_TrailingProfitMethod=27; MaxOrders=0; MaxOrdersPerType=0;
+       14  386.11         1109          1.34            0.35     308.96       3.09  WPR_TrailingProfitMethod=-7; MaxOrders=0; MaxOrdersPerType=0;
+       35  386.59         1109          1.34            0.35     307.63       3.08  WPR_TrailingProfitMethod=18; MaxOrders=0; MaxOrdersPerType=0;
+       13  384.00         1109          1.34            0.35     308.96       3.09   WPR_TrailingProfitMethod=7; MaxOrders=0; MaxOrdersPerType=0;
+       11  378.39         1109          1.33            0.34     302.60       3.03   WPR_TrailingProfitMethod=6; MaxOrders=0; MaxOrdersPerType=0;
+       26  376.34         1109          1.33            0.34     310.77       3.11 WPR_TrailingProfitMethod=-13; MaxOrders=0; MaxOrdersPerType=0;
+       23  371.24         1109          1.32            0.33     298.72       2.99  WPR_TrailingProfitMethod=12; MaxOrders=0; MaxOrdersPerType=0;
+       24  371.73         1109          1.32            0.34     303.04       3.03 WPR_TrailingProfitMethod=-12; MaxOrders=0; MaxOrdersPerType=0;
+       33  368.32         1109          1.32            0.33     298.21       2.98  WPR_TrailingProfitMethod=17; MaxOrders=0; MaxOrdersPerType=0;
+       34  367.76         1109          1.32            0.33     304.94       3.05 WPR_TrailingProfitMethod=-17; MaxOrders=0; MaxOrdersPerType=0;
+       25  367.96         1109          1.32            0.33     310.56       3.10  WPR_TrailingProfitMethod=13; MaxOrders=0; MaxOrdersPerType=0;
+       41  352.33         1109          1.31            0.32     301.50       3.01  WPR_TrailingProfitMethod=21; MaxOrders=0; MaxOrdersPerType=0;
+       42  352.85         1109          1.31            0.32     302.60       3.03 WPR_TrailingProfitMethod=-21; MaxOrders=0; MaxOrdersPerType=0;
+       47  326.74         1109          1.28            0.29     295.07       2.95  WPR_TrailingProfitMethod=24; MaxOrders=0; MaxOrdersPerType=0;
+       48  324.81         1109          1.28            0.29     295.55       2.95 WPR_TrailingProfitMethod=-24; MaxOrders=0; MaxOrdersPerType=0;
+        2  303.59         1109          1.27            0.27     242.58       2.43  WPR_TrailingProfitMethod=-1; MaxOrders=0; MaxOrdersPerType=0;
+        1  295.61         1109          1.26            0.27     249.93       2.50   WPR_TrailingProfitMethod=1; MaxOrders=0; MaxOrdersPerType=0;
+       45  284.45         1109          1.25            0.26     295.24       2.95  WPR_TrailingProfitMethod=23; MaxOrders=0; MaxOrdersPerType=0;
+       46  284.81         1109          1.25            0.26     293.55       2.93 WPR_TrailingProfitMethod=-23; MaxOrders=0; MaxOrdersPerType=0;
+       16  217.75         1109          1.19            0.20     303.65       3.04  WPR_TrailingProfitMethod=-8; MaxOrders=0; MaxOrdersPerType=0;
+       15  212.87         1109          1.18            0.19     306.13       3.06   WPR_TrailingProfitMethod=8; MaxOrders=0; MaxOrdersPerType=0;
+       49  208.65         1109          1.19            0.19     226.11       2.26  WPR_TrailingProfitMethod=25; MaxOrders=0; MaxOrdersPerType=0;
+       50  192.91         1109          1.18            0.17     170.36       1.70 WPR_TrailingProfitMethod=-25; MaxOrders=0; MaxOrdersPerType=0;
+       52  152.19         1109          1.15            0.14     186.34       1.86 WPR_TrailingProfitMethod=-26; MaxOrders=0; MaxOrdersPerType=0;
+       51  133.59         1109          1.13            0.12     265.58       2.66  WPR_TrailingProfitMethod=26; MaxOrders=0; MaxOrdersPerType=0;
+        7   71.95         1109          1.08            0.06     139.33       1.39   WPR_TrailingProfitMethod=4; MaxOrders=0; MaxOrdersPerType=0;
+        8   69.38         1109          1.08            0.06     137.33       1.37  WPR_TrailingProfitMethod=-4; MaxOrders=0; MaxOrdersPerType=0;
+        9   52.57         1109          1.05            0.05     224.31       2.24   WPR_TrailingProfitMethod=5; MaxOrders=0; MaxOrdersPerType=0;
+       22   44.36         1109          1.05            0.04     193.17       1.93 WPR_TrailingProfitMethod=-11; MaxOrders=0; MaxOrdersPerType=0;
+       20   39.47         1109          1.04            0.04     179.77       1.80 WPR_TrailingProfitMethod=-10; MaxOrders=0; MaxOrdersPerType=0;
+       10   32.67         1109          1.03            0.03     224.31       2.24  WPR_TrailingProfitMethod=-5; MaxOrders=0; MaxOrdersPerType=0;
+       39   18.81         1109          1.02            0.02     199.07       1.99  WPR_TrailingProfitMethod=20; MaxOrders=0; MaxOrdersPerType=0;
+       40   16.70         1109          1.02            0.02     181.17       1.81 WPR_TrailingProfitMethod=-20; MaxOrders=0; MaxOrdersPerType=0;
+       21   14.71         1109          1.02            0.01     209.42       2.09  WPR_TrailingProfitMethod=11; MaxOrders=0; MaxOrdersPerType=0;
+       30    7.69         1109          1.01            0.01     222.00       2.22 WPR_TrailingProfitMethod=-15; MaxOrders=0; MaxOrdersPerType=0;
+       19   -2.38         1109          1.00           -0.00     198.49       1.98  WPR_TrailingProfitMethod=10; MaxOrders=0; MaxOrdersPerType=0;
+        5   -8.60         1109          0.99           -0.01     132.88       1.33   WPR_TrailingProfitMethod=3; MaxOrders=0; MaxOrdersPerType=0;
+        6   -9.51         1109          0.98           -0.01     122.93       1.23  WPR_TrailingProfitMethod=-3; MaxOrders=0; MaxOrdersPerType=0;
+       32  -11.58         1109          0.99           -0.01     243.61       2.43 WPR_TrailingProfitMethod=-16; MaxOrders=0; MaxOrdersPerType=0;
+       29  -28.09         1109          0.97           -0.03     239.34       2.39  WPR_TrailingProfitMethod=15; MaxOrders=0; MaxOrdersPerType=0;
+       44  -37.88         1109          0.96           -0.03     292.69       2.92 WPR_TrailingProfitMethod=-22; MaxOrders=0; MaxOrdersPerType=0;
+        3  -40.51         1109          0.93           -0.04     129.95       1.30   WPR_TrailingProfitMethod=2; MaxOrders=0; MaxOrdersPerType=0;
+        4  -41.49         1109          0.92           -0.04     132.11       1.32  WPR_TrailingProfitMethod=-2; MaxOrders=0; MaxOrdersPerType=0;
+       31  -43.43         1109          0.95           -0.04     251.17       2.51  WPR_TrailingProfitMethod=16; MaxOrders=0; MaxOrdersPerType=0;
+       28  -49.97         1109          0.94           -0.05     220.47       2.20 WPR_TrailingProfitMethod=-14; MaxOrders=0; MaxOrdersPerType=0;
+       27  -49.30         1109          0.95           -0.04     223.21       2.23  WPR_TrailingProfitMethod=14; MaxOrders=0; MaxOrdersPerType=0;
+       43  -59.83         1109          0.94           -0.05     300.57       3.00  WPR_TrailingProfitMethod=22; MaxOrders=0; MaxOrdersPerType=0;
+       38  -70.74         1109          0.92           -0.06     184.33       1.84 WPR_TrailingProfitMethod=-19; MaxOrders=0; MaxOrdersPerType=0;
+       37 -104.46         1109          0.88           -0.09     224.80       2.25  WPR_TrailingProfitMethod=19; MaxOrders=0; MaxOrdersPerType=0;

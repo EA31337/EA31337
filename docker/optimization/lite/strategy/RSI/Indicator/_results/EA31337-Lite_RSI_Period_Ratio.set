@@ -56,7 +56,7 @@ WPR1_Active=0
 WPR5_Active=0
 WPR15_Active=0
 WPR30_Active=0
-# Other strategy params
+# Required strategy params
 RSI_Period_Ratio=1.0
 RSI1_SignalMethod=0
 RSI5_SignalMethod=0

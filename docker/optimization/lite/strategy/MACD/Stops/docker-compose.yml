@@ -12,6 +12,7 @@ services:
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../../../EA-Tester-params.txt
     environment:
+      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=8
       INCLUDE: /opt/rules/Strategies/MACD/Strategy-MACD-All-MACD_TrailingStopMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_MACD_TrailingStopMethod.set
       TEST_REPORT_NAME: EA31337-Lite_MACD_TrailingStopMethod
@@ -28,6 +29,7 @@ services:
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../../../EA-Tester-params.txt
     environment:
+      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=8
       INCLUDE: /opt/rules/Strategies/MACD/Strategy-MACD-All-MACD_TrailingProfitMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_MACD_TrailingProfitMethod.set
       TEST_REPORT_NAME: EA31337-Lite_MACD_TrailingProfitMethod

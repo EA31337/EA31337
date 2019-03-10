@@ -56,14 +56,14 @@ WPR1_Active=0
 WPR5_Active=0
 WPR15_Active=0
 WPR30_Active=0
-# Other strategy params
+# Required strategy params
 RSI_Period_Ratio=1.0
 RSI1_SignalMethod=0
 RSI5_SignalMethod=0
 RSI15_SignalMethod=0
 RSI30_SignalMethod=0
 # Optimization params.
-RSI_Applied_Price=1
+RSI_Applied_Price=3
 RSI_Applied_Price,F=0
 RSI_Applied_Price,1=0
 RSI_Applied_Price,2=0

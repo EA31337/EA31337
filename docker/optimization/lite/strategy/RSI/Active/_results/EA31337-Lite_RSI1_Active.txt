@@ -2,7 +2,7 @@
 
 
                                                                  Optimization Report
-                                                             EA31337-Lite-Backtest-v1.076
+                                                             EA31337-Lite-Optimize-v1.076
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
@@ -12,5 +12,5 @@
                             Spread          10
                                                                  [Optimization Graph]
              Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-                2  14.96           83          1.43            0.18      14.85       0.15 RSI1_Active=1; MaxOrders=0; MaxOrdersPerType=0;
+                2 765.14          781          1.68            0.98     277.41       2.52 RSI1_Active=1; MaxOrders=0; MaxOrdersPerType=0;
                 1   0.00            0          0.00            0.00       0.00       0.00 RSI1_Active=0; MaxOrders=0; MaxOrdersPerType=0;

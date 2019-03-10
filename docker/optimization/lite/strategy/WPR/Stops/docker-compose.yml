@@ -12,6 +12,7 @@ services:
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../../../EA-Tester-params.txt
     environment:
+      BT_MONTHS: 1-6
       INCLUDE: /opt/rules/Strategies/WPR/Strategy-WPR-All-WPR_TrailingStopMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_WPR_TrailingStopMethod.set
       TEST_REPORT_NAME: EA31337-Lite_WPR_TrailingStopMethod
@@ -25,9 +26,9 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../../../EA-Tester-params.txt
     environment:
+      BT_MONTHS: 1-6
       INCLUDE: /opt/rules/Strategies/WPR/Strategy-WPR-All-WPR_TrailingProfitMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_WPR_TrailingProfitMethod.set
       TEST_REPORT_NAME: EA31337-Lite_WPR_TrailingProfitMethod

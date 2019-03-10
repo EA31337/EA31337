@@ -6,14 +6,14 @@
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.02.27 23:30 (2018.01.01 - 2018.02.28)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
               Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-                 4  -4.70           33          0.75           -0.14       8.80       0.09 RSI_Shift=3; MaxOrders=0; MaxOrdersPerType=0;
-                 1  -6.59           32          0.64           -0.21      11.65       0.12 RSI_Shift=0; MaxOrders=0; MaxOrdersPerType=0;
-                 3  -6.24           33          0.67           -0.19      12.84       0.13 RSI_Shift=2; MaxOrders=0; MaxOrdersPerType=0;
-                 2  -7.77           33          0.60           -0.24      12.83       0.13 RSI_Shift=1; MaxOrders=0; MaxOrdersPerType=0;
-                 5 -17.19           33          0.34           -0.52      18.76       0.19 RSI_Shift=4; MaxOrders=0; MaxOrdersPerType=0;
+                 1  17.15          109          1.31            0.16      57.32       0.57 RSI_Shift=0; MaxOrders=0; MaxOrdersPerType=0;
+                 2 -42.67          124          0.47           -0.34      63.36       0.63 RSI_Shift=1; MaxOrders=0; MaxOrdersPerType=0;
+                 3 -50.08          124          0.41           -0.40      70.53       0.70 RSI_Shift=2; MaxOrders=0; MaxOrdersPerType=0;
+                 5 -70.93          124          0.28           -0.57      84.17       0.84 RSI_Shift=4; MaxOrders=0; MaxOrdersPerType=0;
+                 4 -75.73          124          0.27           -0.61      89.99       0.90 RSI_Shift=3; MaxOrders=0; MaxOrdersPerType=0;
