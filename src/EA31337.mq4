@@ -276,9 +276,6 @@ void OnTick() {
  * Process a new bar.
  */
 void ProcessBar(Trade *_trade) {
-  last_ask = market.GetLastAsk();
-  last_bid = market.GetLastBid();
-  //last_pip_change = market.GetLastPriceChangeInPips();
 
   // Parse a tick.
   /*
@@ -306,14 +303,19 @@ void ProcessBar(Trade *_trade) {
     PrintFormat("%s: Error: Chart object not valid!", __FUNCTION_LINE__);
   }
 
-  if (hour_of_day != DateTime::Hour()) StartNewHour(_trade);
-  UpdateVariables();
   if (TradeAllowed()) {
+    last_ask = market.GetLastAsk();
+    last_bid = market.GetLastBid();
+    last_pip_change = market.GetLastPriceChangeInPips();
+    if (hour_of_day != DateTime::Hour()) {
+      StartNewHour(_trade);
+    }
+    UpdateVariables();
     EA_Trade(_trade);
+    UpdateOrders(_trade);
+    UpdateStats();
   }
 
-  UpdateOrders(_trade);
-  UpdateStats();
 }
 
 /**
