@@ -9,7 +9,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
     environment:
       BT_MONTHS: 1-6
       EA_OPTS: maxdrawdown_enable=1,maxdrawdown=2
@@ -26,7 +26,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
     environment:
       BT_MONTHS: 1-6
       EA_OPTS: maxdrawdown_enable=1,maxdrawdown=2

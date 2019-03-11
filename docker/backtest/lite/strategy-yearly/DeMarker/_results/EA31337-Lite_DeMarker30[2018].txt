@@ -39,7 +39,7 @@
                                    CCI30_SignalMethod=-32; __DeMarker_Parameters__="-- Settings for the DeMarker indicator --";
                                    DeMarker1_Active=false; DeMarker5_Active=false; DeMarker15_Active=false; DeMarker30_Active=true;
                                    DeMarker_Period=8; DeMarker_Period_Ratio=1; DeMarker_Shift=1; DeMarker_SignalLevel=-0.5;
-                                   DeMarker1_SignalMethod=12; DeMarker5_SignalMethod=12; DeMarker15_SignalMethod=14; DeMarker30_SignalMethod=13;
+                                   DeMarker1_SignalMethod=12; DeMarker5_SignalMethod=3; DeMarker15_SignalMethod=-18; DeMarker30_SignalMethod=12;
                                    __Envelopes_Parameters__="-- Settings for the Envelopes indicator --"; Envelopes1_Active=false;
                                    Envelopes5_Active=false; Envelopes15_Active=false; Envelopes30_Active=false; Envelopes_MA_Period=22;
                                    Envelopes_MA_Period_Ratio=1; Envelopes_MA_Shift=0; Envelopes_Deviation=0.55; Envelopes_Deviation_Ratio=1;

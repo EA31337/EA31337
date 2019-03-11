@@ -9,7 +9,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
 #   - ../../../../EA-Tester/scripts:/opt/scripts
-    env_file: EA-Tester-params.txt
+    env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 01
       TEST_REPORT_NAME: EA31337_Rider_201801
@@ -22,7 +22,7 @@ services:
       target: ea31337-rider-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
-    env_file: EA-Tester-params.txt
+    env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 02
       TEST_REPORT_NAME: EA31337_Rider_201802
@@ -34,7 +34,7 @@ services:
       target: ea31337-rider-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
-    env_file: EA-Tester-params.txt
+    env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 03
       TEST_REPORT_NAME: EA31337_Rider_201803
@@ -46,7 +46,7 @@ services:
       target: ea31337-rider-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
-    env_file: EA-Tester-params.txt
+    env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 04
       TEST_REPORT_NAME: EA31337_Rider_201804
@@ -58,7 +58,7 @@ services:
       target: ea31337-rider-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
-    env_file: EA-Tester-params.txt
+    env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 05
       TEST_REPORT_NAME: EA31337_Rider_201805
@@ -70,7 +70,7 @@ services:
       target: ea31337-rider-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
-    env_file: EA-Tester-params.txt
+    env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 06
       TEST_REPORT_NAME: EA31337_Rider_201806
@@ -82,7 +82,7 @@ services:
       target: ea31337-rider-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
-    env_file: EA-Tester-params.txt
+    env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 07
       TEST_REPORT_NAME: EA31337_Rider_201807
@@ -94,7 +94,7 @@ services:
       target: ea31337-rider-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
-    env_file: EA-Tester-params.txt
+    env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 08
       TEST_REPORT_NAME: EA31337_Rider_201808
@@ -106,7 +106,7 @@ services:
       target: ea31337-rider-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
-    env_file: EA-Tester-params.txt
+    env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 09
       TEST_REPORT_NAME: EA31337_Rider_201809
@@ -118,7 +118,7 @@ services:
       target: ea31337-rider-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
-    env_file: EA-Tester-params.txt
+    env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 10
       TEST_REPORT_NAME: EA31337_Rider_201810
@@ -130,7 +130,7 @@ services:
       target: ea31337-rider-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
-    env_file: EA-Tester-params.txt
+    env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 11
       TEST_REPORT_NAME: EA31337_Rider_201811
@@ -142,7 +142,7 @@ services:
       target: ea31337-rider-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
-    env_file: EA-Tester-params.txt
+    env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 12
       TEST_REPORT_NAME: EA31337_Rider_201812

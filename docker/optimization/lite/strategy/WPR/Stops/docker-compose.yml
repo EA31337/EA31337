@@ -10,7 +10,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
     environment:
       BT_MONTHS: 1-6
       INCLUDE: /opt/rules/Strategies/WPR/Strategy-WPR-All-WPR_TrailingStopMethod.rule
@@ -26,7 +26,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
     environment:
       BT_MONTHS: 1-6
       INCLUDE: /opt/rules/Strategies/WPR/Strategy-WPR-All-WPR_TrailingProfitMethod.rule

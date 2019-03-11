@@ -39,7 +39,7 @@ Parameters                        Alligator_Shift_Jaw=5; Alligator_Shift_Teeth=4
                                   __DeMarker_Parameters__="-- Settings for the DeMarker indicator --"; DeMarker1_Active=false;
                                   DeMarker5_Active=false; DeMarker15_Active=false; DeMarker30_Active=false; DeMarker_Period=8;
                                   DeMarker_Period_Ratio=1; DeMarker_Shift=1; DeMarker_SignalLevel=-0.5; DeMarker1_SignalMethod=12;
-                                  DeMarker5_SignalMethod=12; DeMarker15_SignalMethod=14; DeMarker30_SignalMethod=13; __Envelopes_Parameters__="-
+                                  DeMarker5_SignalMethod=3; DeMarker15_SignalMethod=-18; DeMarker30_SignalMethod=12; __Envelopes_Parameters__="-
                                   - Settings for the Envelopes indicator --"; Envelopes1_Active=false; Envelopes5_Active=false;
                                   Envelopes15_Active=false; Envelopes30_Active=false; Envelopes_MA_Period=22; Envelopes_MA_Period_Ratio=1;
                                   Envelopes_MA_Shift=0; Envelopes_Deviation=0.55; Envelopes_Deviation_Ratio=1; Envelopes_Shift=0;
@@ -51,16 +51,16 @@ Parameters                        Alligator_Shift_Jaw=5; Alligator_Shift_Teeth=4
 Bars in test                11890 Ticks modelled                      108400237 Modelling quality                                              89.24%
 Mismatched charts errors        0
 Initial deposit          10000.00                                               Spread                                                             10
-Total net profit         -3597.50 Gross profit                          8471.43 Gross loss                                                  -12068.93
-Profit factor                0.70 Expected payoff                         -0.11
-Absolute drawdown         3598.16 Maximal drawdown             3625.57 (36.16%) Relative drawdown                                    36.16% (3625.57)
-Total trades                33458 Short positions (won %)        16071 (30.64%) Long positions (won %)                                 17387 (32.19%)
-                                  Profit trades (% of total)     10521 (31.45%) Loss trades (% of total)                               22937 (68.55%)
-                          Largest profit trade                            13.44 loss trade                                                      -4.00
-                          Average profit trade                             0.81 loss trade                                                      -0.53
-                          Maximum consecutive wins (profit in       73 (150.12) consecutive losses (loss in money)                        79 (-27.51)
+Total net profit         -2939.59 Gross profit                          8214.74 Gross loss                                                  -11154.34
+Profit factor                0.74 Expected payoff                         -0.10
+Absolute drawdown         2940.24 Maximal drawdown             2951.80 (29.48%) Relative drawdown                                    29.48% (2951.80)
+Total trades                30270 Short positions (won %)        14952 (30.88%) Long positions (won %)                                 15318 (32.54%)
+                                  Profit trades (% of total)      9602 (31.72%) Loss trades (% of total)                               20668 (68.28%)
+                          Largest profit trade                            12.33 loss trade                                                      -4.00
+                          Average profit trade                             0.86 loss trade                                                      -0.54
+                          Maximum consecutive wins (profit in       56 (244.54) consecutive losses (loss in money)                        47 (-33.99)
                                   money)
-                          Maximal consecutive profit (count of      271.19 (55) consecutive loss (count of losses)                        -69.15 (31)
+                          Maximal consecutive profit (count of      244.54 (56) consecutive loss (count of losses)                        -52.55 (34)
                                   wins)
-                          Average consecutive wins                            3 consecutive losses                                                  7
+                          Average consecutive wins                            3 consecutive losses                                                  6
                                                                        [Graph]

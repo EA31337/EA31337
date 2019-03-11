@@ -57,7 +57,7 @@ WPR5_Active=0
 WPR15_Active=0
 WPR30_Active=0
 # Optimization params.
-Bands30_SignalMethod=-126
+Bands30_SignalMethod=-90
 Bands30_SignalMethod,F=0
 Bands30_SignalMethod,1=0
 Bands30_SignalMethod,2=0

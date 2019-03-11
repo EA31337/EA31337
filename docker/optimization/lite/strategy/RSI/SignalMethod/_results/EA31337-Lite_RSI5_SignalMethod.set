@@ -57,7 +57,7 @@ WPR5_Active=0
 WPR15_Active=0
 WPR30_Active=0
 # Optimization params.
-RSI5_SignalMethod=11
+RSI5_SignalMethod=-63
 RSI5_SignalMethod,F=0
 RSI5_SignalMethod,1=0
 RSI5_SignalMethod,2=0

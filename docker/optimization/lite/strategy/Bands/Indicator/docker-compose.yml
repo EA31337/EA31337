@@ -10,7 +10,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/Bands/Strategy-Bands-All-Bands_Period.rule
       SETFILE: /opt/_results/EA31337-Lite_Bands_Period.set
@@ -26,7 +26,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/Bands/Strategy-Bands-All-Bands_Applied_Price.rule
       SETFILE: /opt/_results/EA31337-Lite_Bands_Applied_Price.set
@@ -42,7 +42,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/Bands/Strategy-Bands-All-Bands_Deviation.rule
       SETFILE: /opt/_results/EA31337-Lite_Bands_Deviation.set
@@ -58,7 +58,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/Bands/Strategy-Bands-All-Bands_Deviation_Ratio.rule
       SETFILE: /opt/_results/EA31337-Lite_Bands_Deviation_Ratio.set
@@ -74,7 +74,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/Bands/Strategy-Bands-All-Bands_SignalLevel.rule
       SETFILE: /opt/_results/EA31337-Lite_Bands_SignalLevel.set
@@ -90,7 +90,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/Bands/Strategy-Bands-All-Bands_Shift.rule
       SETFILE: /opt/_results/EA31337-Lite_Bands_Shift.set

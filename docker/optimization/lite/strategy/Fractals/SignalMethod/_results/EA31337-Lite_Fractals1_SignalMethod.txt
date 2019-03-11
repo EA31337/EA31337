@@ -2,20 +2,20 @@
 
 
                                                                  Optimization Report
-                                                             EA31337-Lite-Backtest-v1.076
+                                                             EA31337-Lite-Optimize-v1.076
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.02.27 23:30 (2018.01.01 - 2018.02.28)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
-      Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-         5 -159.05         2501          0.81           -0.06     172.83       1.73  Fractals1_SignalMethod=1; MaxOrders=0; MaxOrdersPerType=0;
-         2 -184.98         2441          0.78           -0.08     197.66       1.98 Fractals1_SignalMethod=-2; MaxOrders=0; MaxOrdersPerType=0;
-         6 -191.31         2705          0.78           -0.07     204.16       2.04  Fractals1_SignalMethod=2; MaxOrders=0; MaxOrdersPerType=0;
-         7 -205.19         2403          0.75           -0.09     212.59       2.13  Fractals1_SignalMethod=3; MaxOrders=0; MaxOrdersPerType=0;
-         4 -250.90         2232          0.70           -0.11     279.67       2.80  Fractals1_SignalMethod=0; MaxOrders=0; MaxOrdersPerType=0;
-         3 -261.05         2413          0.71           -0.11     265.41       2.65 Fractals1_SignalMethod=-1; MaxOrders=0; MaxOrdersPerType=0;
-         1 -287.73         2415          0.69           -0.12     292.33       2.92 Fractals1_SignalMethod=-3; MaxOrders=0; MaxOrdersPerType=0;
+      Pass   Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+         7  -190.48         1891          0.43           -0.10     192.29       1.92  Fractals1_SignalMethod=3; MaxOrders=0; MaxOrdersPerType=0;
+         5  -443.85         4872          0.44           -0.09     446.53       4.47  Fractals1_SignalMethod=1; MaxOrders=0; MaxOrdersPerType=0;
+         6  -575.38         5862          0.43           -0.10     577.14       5.77  Fractals1_SignalMethod=2; MaxOrders=0; MaxOrdersPerType=0;
+         3  -631.06         6572          0.43           -0.10     632.50       6.32 Fractals1_SignalMethod=-1; MaxOrders=0; MaxOrdersPerType=0;
+         1 -1547.79        17980          0.45           -0.09    1548.27      15.48 Fractals1_SignalMethod=-3; MaxOrders=0; MaxOrdersPerType=0;
+         2 -2088.44        21065          0.41           -0.10    2090.26      20.90 Fractals1_SignalMethod=-2; MaxOrders=0; MaxOrdersPerType=0;
+         4 -4913.08        55151          0.38           -0.09    4913.27      49.13  Fractals1_SignalMethod=0; MaxOrders=0; MaxOrdersPerType=0;

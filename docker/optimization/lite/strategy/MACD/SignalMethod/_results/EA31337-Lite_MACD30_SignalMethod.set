@@ -57,7 +57,7 @@ WPR5_Active=0
 WPR15_Active=0
 WPR30_Active=0
 # Optimization params.
-MACD30_SignalMethod=-20
+MACD30_SignalMethod=4
 MACD30_SignalMethod,F=0
 MACD30_SignalMethod,1=0
 MACD30_SignalMethod,2=0

@@ -63,7 +63,7 @@ MACD5_SignalMethod=0
 MACD15_SignalMethod=0
 MACD30_SignalMethod=0
 # Optimization params.
-MACD_TrailingProfitMethod=26
+MACD_TrailingProfitMethod=-19
 MACD_TrailingProfitMethod,F=0
 MACD_TrailingProfitMethod,1=0
 MACD_TrailingProfitMethod,2=0

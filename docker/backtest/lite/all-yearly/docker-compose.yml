@@ -9,7 +9,7 @@ services:
     volumes:
     - ../../../../src:/opt/src
     - ./_results:/opt/_results:rw
-    env_file: .env
+    env_file: EA-Tester.ini
     environment:
       BT_YEARS: 2018
       TEST_REPORT_NAME: EA31337-Lite_2018
@@ -22,7 +22,7 @@ services:
     volumes:
     - ../../../../src:/opt/src
     - ./_results:/opt/_results:rw
-    env_file: .env
+    env_file: EA-Tester.ini
     environment:
       BT_YEARS: 2017
       TEST_REPORT_NAME: EA31337-Lite_2017

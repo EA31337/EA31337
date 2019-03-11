@@ -9,7 +9,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/All-Boosting/All-Boosting_Enabled.rules
       SETFILE: /opt/_results/EA31337-Lite_Boosting_Enabled.set
@@ -25,7 +25,7 @@ services:
 #   volumes:
 #   - ./_results:/opt/_results:rw
 #   - ../../../../src/include/EA31337/lite:/opt/lite:rw
-#   env_file: ../EA-Tester-params.txt
+#   env_file: ../EA-Tester.ini
 #   environment:
 #     INCLUDE: /opt/rules/All-Boosting/All-BoostTrendFactor.rules
 #     SETFILE: /opt/_results/EA31337-Lite_BoostTrendFactor.set
@@ -40,7 +40,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/All-Boosting/All-ConWinsIncreaseFactor.rule
       SETFILE: /opt/_results/EA31337-Lite_ConWinsIncreaseFactor.set
@@ -55,7 +55,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/All-Boosting/All-ConLossesIncreaseFactor.rule
       SETFILE: /opt/_results/EA31337-Lite_ConLossesIncreaseFactor.set
@@ -70,7 +70,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/All-Boosting/All-ConFactorOrdersLimit.rule
       SETFILE: /opt/_results/EA31337-Lite_ConFactorOrdersLimit.set
@@ -85,7 +85,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/All-Boosting/All-BestDailyStrategyMultiplierFactor.rule
       SETFILE: /opt/_results/EA31337-Lite_BestDailyStrategyMultiplierFactor.set
@@ -100,7 +100,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/All-Boosting/All-BestMonthlyStrategyMultiplierFactor.rule
       SETFILE: /opt/_results/EA31337-Lite_BestMonthlyStrategyMultiplierFactor.set
@@ -115,7 +115,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/All-Boosting/All-BestWeeklyStrategyMultiplierFactor.rule
       SETFILE: /opt/_results/EA31337-Lite_BestWeeklyStrategyMultiplierFactor.set
@@ -130,7 +130,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/All-Boosting/All-WorseDailyStrategyMultiplierFactor.rule
       SETFILE: /opt/_results/EA31337-Lite_WorseDailyStrategyMultiplierFactor.set
@@ -145,7 +145,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/All-Boosting/All-WorseMonthlyStrategyMultiplierFactor.rule
       SETFILE: /opt/_results/EA31337-Lite_WorseMonthlyStrategyMultiplierFactor.set
@@ -160,7 +160,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/All-Boosting/All-WorseWeeklyStrategyMultiplierFactor.rule
       SETFILE: /opt/_results/EA31337-Lite_WorseWeeklyStrategyMultiplierFactor.set

@@ -32,14 +32,14 @@ Parameters                        Alligator_Shift_Jaw=5; Alligator_Shift_Teeth=4
                                   Alligator30_SignalMethod=19; __Bands_Parameters__="-- Settings for the Bollinger Bands indicator --";
                                   Bands1_Active=false; Bands5_Active=false; Bands15_Active=false; Bands30_Active=false; Bands_Period=26;
                                   Bands_Period_Ratio=1; Bands_Deviation=2.2; Bands_Deviation_Ratio=1; Bands_Shift=2; Bands_Shift_Far=2;
-                                  Bands1_SignalMethod=-96; Bands5_SignalMethod=-4; Bands15_SignalMethod=-111; Bands30_SignalMethod=-126;
+                                  Bands1_SignalMethod=-96; Bands5_SignalMethod=-4; Bands15_SignalMethod=-111; Bands30_SignalMethod=-90;
                                   __CCI_Parameters__="-- Settings for the Commodity Channel Index indicator --"; CCI1_Active=false;
                                   CCI5_Active=false; CCI15_Active=false; CCI30_Active=false; CCI_Period_Ratio=1; CCI_Shift=2; CCI_Period=30;
                                   CCI_SignalLevel=92; CCI1_SignalMethod=-63; CCI5_SignalMethod=-63; CCI15_SignalMethod=-63; CCI30_SignalMethod=-32;
                                   __DeMarker_Parameters__="-- Settings for the DeMarker indicator --"; DeMarker1_Active=false;
                                   DeMarker5_Active=false; DeMarker15_Active=false; DeMarker30_Active=false; DeMarker_Period=8;
                                   DeMarker_Period_Ratio=1; DeMarker_Shift=1; DeMarker_SignalLevel=-0.5; DeMarker1_SignalMethod=12;
-                                  DeMarker5_SignalMethod=12; DeMarker15_SignalMethod=14; DeMarker30_SignalMethod=13; __Envelopes_Parameters__="-
+                                  DeMarker5_SignalMethod=3; DeMarker15_SignalMethod=-18; DeMarker30_SignalMethod=12; __Envelopes_Parameters__="-
                                   - Settings for the Envelopes indicator --"; Envelopes1_Active=false; Envelopes5_Active=false;
                                   Envelopes15_Active=false; Envelopes30_Active=false; Envelopes_MA_Period=22; Envelopes_MA_Period_Ratio=1;
                                   Envelopes_MA_Shift=0; Envelopes_Deviation=0.55; Envelopes_Deviation_Ratio=1; Envelopes_Shift=0;
@@ -47,20 +47,20 @@ Parameters                        Alligator_Shift_Jaw=5; Alligator_Shift_Teeth=4
                                   Envelopes30_SignalMethod=-127; __Fractals_Parameters__="-- Settings for the Fractals indicator --";
                                   Fractals1_Active=false; Fractals5_Active=false; Fractals15_Active=false; Fractals30_Active=false; Fractals_Shift=0;
                                   Fractals1_SignalMethod=1; Fractals5_SignalMethod=-1; Fractals15_SignalMethod=1; Fractals30_SignalMethod=1;
-                                  MA_Period_Slow=6;
+                                  MA1_Active=false;
 Bars in test                11890 Ticks modelled                      108400237 Modelling quality                                              89.24%
 Mismatched charts errors        0
 Initial deposit          10000.00                                               Spread                                                             10
-Total net profit         -1171.32 Gross profit                          7720.17 Gross loss                                                   -8891.49
-Profit factor                0.87 Expected payoff                         -0.06
-Absolute drawdown         1173.10 Maximal drawdown             1428.08 (13.93%) Relative drawdown                                    13.93% (1428.08)
-Total trades                20417 Short positions (won %)         9578 (74.71%) Long positions (won %)                                  10839 (0.84%)
-                                  Profit trades (% of total)      7247 (35.49%) Loss trades (% of total)                               13170 (64.51%)
-                          Largest profit trade                            14.28 loss trade                                                      -4.07
-                          Average profit trade                             1.07 loss trade                                                      -0.68
-                          Maximum consecutive wins (profit in      136 (117.43) consecutive losses (loss in money)                      377 (-224.41)
+Total net profit          -804.75 Gross profit                         11000.16 Gross loss                                                  -11804.90
+Profit factor                0.93 Expected payoff                         -0.04
+Absolute drawdown          817.68 Maximal drawdown             1199.30 (11.55%) Relative drawdown                                    11.55% (1199.30)
+Total trades                20417 Short positions (won %)         9578 (76.76%) Long positions (won %)                                 10839 (46.25%)
+                                  Profit trades (% of total)     12365 (60.56%) Loss trades (% of total)                                8052 (39.44%)
+                          Largest profit trade                            14.81 loss trade                                                      -5.18
+                          Average profit trade                             0.89 loss trade                                                      -1.47
+                          Maximum consecutive wins (profit in      304 (325.79) consecutive losses (loss in money)                       53 (-182.69)
                                   money)
-                          Maximal consecutive profit (count of      207.82 (46) consecutive loss (count of losses)                       -297.28 (94)
+                          Maximal consecutive profit (count of     353.04 (281) consecutive loss (count of losses)                       -182.69 (53)
                                   wins)
-                          Average consecutive wins                           16 consecutive losses                                                 29
+                          Average consecutive wins                           10 consecutive losses                                                  6
                                                                        [Graph]

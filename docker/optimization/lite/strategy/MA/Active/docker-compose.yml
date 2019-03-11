@@ -1,6 +1,6 @@
 version: '3.4'
 services:
-  MA1_Active:
+  MA_Active:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
     build:
@@ -10,7 +10,22 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
+    environment:
+      SETFILE: /opt/_results/EA31337-Lite_MA_Active.set
+      TEST_REPORT_NAME: EA31337-Lite_MA_Active
+      SET_PARAMS: MA1_Active,MA5_Active,MA15_Active,MA30_Active
+      RUN_ON_SUCCESS: for tf in 1 5 15 30; do input_copy "MA$${tf}_Active" "$${SETFILE}" /opt/lite/ea-input.mqh; done
+  MA1_Active:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-MA1_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_MA1_Active.set
@@ -25,8 +40,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-MA5_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_MA5_Active.set
@@ -41,8 +55,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-MA15_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_MA15_Active.set
@@ -57,8 +70,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-MA30_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_MA30_Active.set

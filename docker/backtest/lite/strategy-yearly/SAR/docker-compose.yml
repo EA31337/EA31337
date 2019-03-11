@@ -12,7 +12,7 @@ services:
     - ../../../../../src:/opt/src
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_SAR.set
@@ -27,7 +27,7 @@ services:
     - ../../../../../src:/opt/src
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_SAR1.set
@@ -42,7 +42,7 @@ services:
     - ../../../../../src:/opt/src
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_SAR5.set
@@ -57,7 +57,7 @@ services:
     - ../../../../../src:/opt/src
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_SAR15.set
@@ -72,7 +72,7 @@ services:
     - ../../../../../src:/opt/src
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_SAR30.set

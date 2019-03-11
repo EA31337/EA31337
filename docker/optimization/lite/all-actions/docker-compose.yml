@@ -9,7 +9,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Actions/All-Account_Conditions_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Account_Conditions_Active.set
@@ -24,7 +24,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       BT_MONTHS: 1-2
       SETFILE: /opt/_results/EA31337-Lite_Action_On_Condition_1.set
@@ -39,7 +39,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       BT_MONTHS: 1-2
       SETFILE: /opt/_results/EA31337-Lite_Action_On_Condition_2.set
@@ -54,7 +54,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       BT_MONTHS: 1-2
       SETFILE: /opt/_results/EA31337-Lite_Action_On_Condition_3.set
@@ -69,7 +69,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       BT_MONTHS: 1-2
       INCLUDE: /opt/rules/Actions/All-Action_On_Condition_04.rule
@@ -85,7 +85,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       BT_MONTHS: 1-2
       SETFILE: /opt/_results/EA31337-Lite_Action_On_Condition_5.set

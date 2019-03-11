@@ -57,7 +57,7 @@ WPR5_Active=0
 WPR15_Active=0
 WPR30_Active=0
 # Optimization params.
-Envelopes1_SignalMethod=-104
+Envelopes1_SignalMethod=24
 Envelopes1_SignalMethod,F=0
 Envelopes1_SignalMethod,1=0
 Envelopes1_SignalMethod,2=0

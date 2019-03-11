@@ -8,16 +8,17 @@
   Symbol                            EURUSD (Euro vs US Dollar)
   Period                            30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
   Model                             Every tick (the most precise method based on all available least timeframes)
-                                    __EA_Parameters__="-- Input EA parameters for EA31337 Lite (Backtest) v1.076 --"; __Trade_Parameters__="-- Trade
-                                    parameters --"; MaxOrders=0; MaxOrdersPerType=0; LotSize=0.01; TradeMicroLots=true; MinVolumeToTrade=2;
-                                    MaxOrderPriceSlippage=50; MaxTries=5; MinPipChangeToTrade=0; MinPipGap=0; __EA_Order_Parameters__="-- Profit and
-                                    loss parameters --"; TakeProfitMax=0; StopLossMax=40; __EA_Trailing_Parameters__="-- Profit and loss trailing
-                                    parameters --"; TrailingStop=50; TrailingProfit=0; TrailingStopAddPerMinute=0.1; __EA_Risk_Parameters__="-- Risk
-                                    management parameters --"; RiskMarginPerOrder=1; RiskMarginTotal=10; RiskRatio=0; RiskRatioIncreaseMethod=0;
-                                    RiskRatioDecreaseMethod=0; InitNoOfDaysToWarmUp=21; CloseOrderAfterXHours=24; __Strategy_Parameters__="-- Per
-                                    strategy parameters (0 to disable) --"; ProfitFactorMinToTrade=0; ProfitFactorMaxToTrade=0;
-                                    InitNoOfOrdersToCalcPF=20; __Strategy_Boosting_Parameters__="-- Strategy boosting parameters (set 1.0 for
-                                    default) --"; Boosting_Enabled=false; BoostTrendFactor=1.1; StrategyBoostByPF=true; StrategyHandicapByPF=true;
+                                    __EA_Parameters__="-- Input EA parameters for EA31337 Lite (Backtest) v1.076 --"; __Trade_Parameters__="-
+                                    - Trade parameters --"; MaxOrders=0; MaxOrdersPerType=0; LotSize=0.01; TradeMicroLots=true; MinVolumeToTrade=2;
+                                    MaxOrderPriceSlippage=50; MaxTries=5; MinPipChangeToTrade=0; MinPipGap=0; __EA_Order_Parameters__="-- Profit
+                                    and loss parameters --"; TakeProfitMax=0; StopLossMax=40; __EA_Trailing_Parameters__="-- Profit and loss
+                                    trailing parameters --"; TrailingStop=50; TrailingProfit=0; TrailingStopAddPerMinute=0.1;
+                                    __EA_Risk_Parameters__="-- Risk management parameters --"; RiskMarginPerOrder=1; RiskMarginTotal=10;
+                                    RiskRatio=0; RiskRatioIncreaseMethod=0; RiskRatioDecreaseMethod=0; InitNoOfDaysToWarmUp=21;
+                                    CloseOrderAfterXHours=24; __Strategy_Parameters__="-- Per strategy parameters (0 to disable) --";
+                                    ProfitFactorMinToTrade=0; ProfitFactorMaxToTrade=0; InitNoOfOrdersToCalcPF=20;
+                                    __Strategy_Boosting_Parameters__="-- Strategy boosting parameters (set 1.0 for default) --";
+                                    Boosting_Enabled=false; BoostTrendFactor=1.1; StrategyBoostByPF=true; StrategyHandicapByPF=true;
                                     BestDailyStrategyMultiplierFactor=1.1; BestWeeklyStrategyMultiplierFactor=1.1;
                                     BestMonthlyStrategyMultiplierFactor=1.1; WorseDailyStrategyMultiplierFactor=0.9;
                                     WorseWeeklyStrategyMultiplierFactor=0.9; WorseMonthlyStrategyMultiplierFactor=0.8; ConWinsIncreaseFactor=1.1;
@@ -32,35 +33,35 @@
                                     Alligator15_SignalMethod=-15; Alligator30_SignalMethod=19; __Bands_Parameters__="-- Settings for the Bollinger
                                     Bands indicator --"; Bands1_Active=false; Bands5_Active=false; Bands15_Active=false; Bands30_Active=false;
                                     Bands_Period=26; Bands_Period_Ratio=1; Bands_Deviation=2.2; Bands_Deviation_Ratio=1; Bands_Shift=2;
-                                    Bands_Shift_Far=2; Bands1_SignalMethod=-96; Bands5_SignalMethod=-4; Bands15_SignalMethod=-111;
-                                    Bands30_SignalMethod=-126; __CCI_Parameters__="-- Settings for the Commodity Channel Index indicator --";
+                                    Bands_Shift_Far=2; Bands1_SignalMethod=-10; Bands5_SignalMethod=0; Bands15_SignalMethod=-90;
+                                    Bands30_SignalMethod=-90; __CCI_Parameters__="-- Settings for the Commodity Channel Index indicator --";
                                     CCI1_Active=false; CCI5_Active=false; CCI15_Active=false; CCI30_Active=false; CCI_Period_Ratio=1; CCI_Shift=2;
                                     CCI_Period=30; CCI_SignalLevel=92; CCI1_SignalMethod=-63; CCI5_SignalMethod=-63; CCI15_SignalMethod=-63;
                                     CCI30_SignalMethod=-32; __DeMarker_Parameters__="-- Settings for the DeMarker indicator --";
                                     DeMarker1_Active=false; DeMarker5_Active=false; DeMarker15_Active=false; DeMarker30_Active=false;
                                     DeMarker_Period=8; DeMarker_Period_Ratio=1; DeMarker_Shift=1; DeMarker_SignalLevel=-0.5;
-                                    DeMarker1_SignalMethod=12; DeMarker5_SignalMethod=12; DeMarker15_SignalMethod=14; DeMarker30_SignalMethod=13;
+                                    DeMarker1_SignalMethod=12; DeMarker5_SignalMethod=3; DeMarker15_SignalMethod=-18; DeMarker30_SignalMethod=12;
                                     __Envelopes_Parameters__="-- Settings for the Envelopes indicator --"; Envelopes1_Active=false;
                                     Envelopes5_Active=true; Envelopes15_Active=false; Envelopes30_Active=false; Envelopes_MA_Period=22;
                                     Envelopes_MA_Period_Ratio=1; Envelopes_MA_Shift=0; Envelopes_Deviation=0.55; Envelopes_Deviation_Ratio=1;
-                                    Envelopes_Shift=0; Envelopes1_SignalMethod=-104; Envelopes5_SignalMethod=-63; Envelopes15_SignalMethod=-127;
-                                    Envelopes30_SignalMethod=-127; __Fractals_Parameters__="-- Settings for the Fractals indicator --";
+                                    Envelopes_Shift=0; Envelopes1_SignalMethod=24; Envelopes5_SignalMethod=-68; Envelopes15_SignalMethod=49;
+                                    Envelopes30_SignalMethod=-19; __Fractals_Parameters__="-- Settings for the Fractals indicator --";
                                     Fractals1_Active=false; Fractals5_Active=false; Fractals15_Active=false; Fractals30_Active=false;
-                                    Fractals_Shift=0; Fractals1_SignalMethod=1; Fractals5_SignalMethod=-1; Fractals15_SignalMethod=1;
+                                    Fractals_Shift=0; Fractals1_SignalMethod=3; Fractals5_SignalMethod=3; Fractals15_SignalMethod=3;
                                     Fractals30_SignalMethod=1; MA1_Active=false;
-  Bars in test                11890 Ticks modelled                   108400237 Modelling quality                                              89.24%
+  Bars in test                11890 Ticks modelled                  108400237 Modelling quality                                              89.24%
   Mismatched charts errors        0
-  Initial deposit          10000.00                                            Spread                                                             10
-  Total net profit            -8.10 Gross profit                          1.32 Gross loss                                                      -9.42
-  Profit factor                0.14 Expected payoff                      -0.48
-  Absolute drawdown           10.35 Maximal drawdown             11.40 (0.11%) Relative drawdown                                       0.11% (11.40)
-  Total trades                   17 Short positions (won %)          0 (0.00%) Long positions (won %)                                    17 (17.65%)
-                                    Profit trades (% of total)      3 (17.65%) Loss trades (% of total)                                  14 (82.35%)
-                            Largest profit trade                          1.10 loss trade                                                      -3.05
-                            Average profit trade                          0.44 loss trade                                                      -0.67
-                            Maximum consecutive wins (profit in       2 (0.22) consecutive losses (loss in money)                         11 (-8.40)
+  Initial deposit          10000.00                                           Spread                                                             10
+  Total net profit             7.92 Gross profit                         7.92 Gross loss                                                      -0.00
+  Profit factor                     Expected payoff                      3.96
+  Absolute drawdown            0.59 Maximal drawdown             5.64 (0.06%) Relative drawdown                                        0.06% (5.64)
+  Total trades                    2 Short positions (won %)       2 (100.00%) Long positions (won %)                                      0 (0.00%)
+                                    Profit trades (% of total)    2 (100.00%) Loss trades (% of total)                                    0 (0.00%)
+                            Largest profit trade                         4.96 loss trade                                                      -0.00
+                            Average profit trade                         3.96 loss trade                                                      -0.00
+                            Maximum consecutive wins (profit in      2 (7.92) consecutive losses (loss in money)                          0 (-0.00)
                                     money)
-                            Maximal consecutive profit (count of      1.10 (1) consecutive loss (count of losses)                         -8.40 (11)
+                            Maximal consecutive profit (count of     7.92 (2) consecutive loss (count of losses)                          -0.00 (0)
                                     wins)
-                            Average consecutive wins                         2 consecutive losses                                                  7
+                            Average consecutive wins                        2 consecutive losses                                                  0
                                                                        [Graph]

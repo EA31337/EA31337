@@ -10,7 +10,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
     - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/MACD/Strategy-MACD-All-MACD_Periods.rule
       SETFILE: /opt/_results/EA31337-Lite_MACD_Periods.set
@@ -26,7 +26,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
     - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/MACD/Strategy-MACD-All-MACD_Period_Ratio.rule
       SETFILE: /opt/_results/EA31337-Lite_MACD_Period_Ratio.set
@@ -42,7 +42,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
     - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/MACD/Strategy-MACD-All-MACD_Applied_Price.rule
       SETFILE: /opt/_results/EA31337-Lite_MACD_Applied_Price.set
@@ -59,7 +59,7 @@ services:
 #   - ./_results:/opt/_results:rw
 #   - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-#   env_file: ../../../EA-Tester-params.txt
+#   env_file: ../../../EA-Tester.ini
 #   environment:
 #     INCLUDE: /opt/rules/Strategies/MACD/Strategy-MACD-All-MACD_SignalLevel.rule
 #     SETFILE: /opt/_results/EA31337-Lite_MACD_SignalLevel.set
@@ -75,7 +75,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
     - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/MACD/Strategy-MACD-All-MACD_Shift.rule
       SETFILE: /opt/_results/EA31337-Lite_MACD_Shift.set

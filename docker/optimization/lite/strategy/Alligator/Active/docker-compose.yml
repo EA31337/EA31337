@@ -1,5 +1,21 @@
 version: '3.4'
 services:
+  Alligator_Active:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+    - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../../../EA-Tester.ini
+    environment:
+      SETFILE: /opt/_results/EA31337-Lite_Alligator_Active.set
+      TEST_REPORT_NAME: EA31337-Lite_Alligator_Active
+      SET_PARAMS: Alligator1_Active,Alligator5_Active,Alligator15_Active,Alligator30_Active
+      RUN_ON_SUCCESS: for tf in 1 5 15 30; do input_copy "Alligator$${tf}_Active" "$${SETFILE}" /opt/lite/ea-input.mqh; done
   Alligator1_Active:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -9,8 +25,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/Alligator/Strategy-Alligator-Alligator1_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Alligator1_Active.set
@@ -25,8 +40,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/Alligator/Strategy-Alligator-Alligator5_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Alligator5_Active.set
@@ -41,8 +55,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/Alligator/Strategy-Alligator-Alligator15_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Alligator15_Active.set
@@ -57,8 +70,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/Alligator/Strategy-Alligator-Alligator30_Active.rule
       SETFILE: /opt/_results/EA31337-Lite_Alligator30_Active.set

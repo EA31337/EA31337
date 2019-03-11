@@ -9,7 +9,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       BT_MONTHS: 1-2
       INCLUDE: /opt/rules/All-Risk/All-RiskMarginPerOrder.rule
@@ -25,7 +25,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       BT_MONTHS: 1-2
       INCLUDE: /opt/rules/All-Risk/All-RiskMarginTotal.rule
@@ -41,7 +41,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       BT_MONTHS: 1-2
       INCLUDE: /opt/rules/All-Risk/All-RiskRatio.rule
@@ -58,7 +58,7 @@ services:
 #   volumes:
 #   - ./_results:/opt/_results:rw
 #   - ../../../../src/include/EA31337/lite:/opt/lite:rw
-#   env_file: ../EA-Tester-params.txt
+#   env_file: ../EA-Tester.ini
 #   environment:
 #     BT_MONTHS: 1-2
 #     SETFILE: /opt/_results/EA31337-Lite_RiskRatioIncreaseMethod.set
@@ -73,7 +73,7 @@ services:
 #   volumes:
 #   - ./_results:/opt/_results:rw
 #   - ../../../../src/include/EA31337/lite:/opt/lite:rw
-#   env_file: ../EA-Tester-params.txt
+#   env_file: ../EA-Tester.ini
 #   environment:
 #     BT_MONTHS: 1-2
 #     SETFILE: /opt/_results/EA31337-Lite_RiskRatioDecreaseMethod.set
@@ -88,7 +88,7 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
-    env_file: ../EA-Tester-params.txt
+    env_file: ../EA-Tester.ini
     environment:
       SETFILE: /opt/_results/EA31337-Lite_InitNoOfDaysToWarmUp.set
       TEST_REPORT_NAME: EA31337-Lite_InitNoOfDaysToWarmUp

@@ -63,7 +63,7 @@ MACD5_SignalMethod=0
 MACD15_SignalMethod=0
 MACD30_SignalMethod=0
 # Optimization params.
-MACD_TrailingStopMethod=27
+MACD_TrailingStopMethod=-1
 MACD_TrailingStopMethod,F=0
 MACD_TrailingStopMethod,1=0
 MACD_TrailingStopMethod,2=0

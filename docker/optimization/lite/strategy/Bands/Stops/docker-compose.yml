@@ -10,7 +10,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/Bands/Strategy-Bands-All-Bands_TrailingStopMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_Bands_TrailingStopMethod.set
@@ -26,7 +26,7 @@ services:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/Bands/Strategy-Bands-All-Bands_TrailingProfitMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_Bands_TrailingProfitMethod.set

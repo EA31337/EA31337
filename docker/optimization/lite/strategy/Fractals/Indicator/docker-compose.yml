@@ -11,7 +11,7 @@ services:
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
     - ../../../../../../src/include/EA31337/advanced:/opt/advanced:rw
     - ../../../../../../src/include/EA31337/rider:/opt/rider:rw
-    env_file: ../../../EA-Tester-params.txt
+    env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/Fractals/Strategy-Fractals-All-Fractals_Shift.rule
       SETFILE: /opt/_results/EA31337-Lite_Fractals_Shift.set
