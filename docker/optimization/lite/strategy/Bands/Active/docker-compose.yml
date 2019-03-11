@@ -12,6 +12,7 @@ services:
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../../../EA-Tester.ini
     environment:
+      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=60
       SETFILE: /opt/_results/EA31337-Lite_Bands_Active.set
       TEST_REPORT_NAME: EA31337-Lite_Bands_Active
       SET_PARAMS: Bands1_Active,Bands5_Active,Bands15_Active,Bands30_Active

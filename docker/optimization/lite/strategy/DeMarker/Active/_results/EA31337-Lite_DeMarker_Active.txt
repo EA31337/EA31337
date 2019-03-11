@@ -1,0 +1,26 @@
+
+
+
+                                                                 Optimization Report
+                                                             EA31337-Lite-Optimize-v1.076
+                                                            Tripleafx-FX-Demo (Build 1010)
+
+                            Symbol          EURUSD (Euro vs US Dollar)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
+                            Model           Every tick (the most precise method based on all available least timeframes)
+                            Initial deposit 10000.00
+                            Spread          10
+                                                                 [Optimization Graph]
+     Pass   Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+        7    23.54         1542          1.01            0.02     398.96       3.83 DeMarker1_Active=0; DeMarker5_Active=0; DeMarker15_Active=0;
+        1     0.00            0          0.00            0.00       0.00       0.00 DeMarker1_Active=0; DeMarker5_Active=0; DeMarker15_Active=0;
+        9  -370.18        37538          0.98           -0.01    2817.24      22.71 DeMarker1_Active=0; DeMarker5_Active=1; DeMarker15_Active=0;
+        3  -544.32        35996          0.97           -0.02    2676.96      22.13 DeMarker1_Active=0; DeMarker5_Active=1; DeMarker15_Active=0;
+        4  -692.20        12275          0.93           -0.06     851.53       8.43 DeMarker1_Active=0; DeMarker5_Active=0; DeMarker15_Active=1;
+       10  -766.09        13817          0.93           -0.06    1124.92      10.93 DeMarker1_Active=0; DeMarker5_Active=0; DeMarker15_Active=1;
+        6 -2757.25        48271          0.90           -0.06    3927.58      35.31 DeMarker1_Active=0; DeMarker5_Active=1; DeMarker15_Active=1;
+       12 -2874.85        49813          0.90           -0.06    4061.49      36.51 DeMarker1_Active=0; DeMarker5_Active=1; DeMarker15_Active=1;
+        8 -3123.59        48022          0.81           -0.07    3514.25      33.83 DeMarker1_Active=1; DeMarker5_Active=0; DeMarker15_Active=0;
+        2 -3258.98        46480          0.79           -0.07    3399.95      33.54 DeMarker1_Active=1; DeMarker5_Active=0; DeMarker15_Active=0;
+        5 -3659.84        58755          0.81           -0.06    3744.97      37.14 DeMarker1_Active=1; DeMarker5_Active=0; DeMarker15_Active=1;
+       11 -3867.75        60297          0.81           -0.06    3952.77      39.21 DeMarker1_Active=1; DeMarker5_Active=0; DeMarker15_Active=1;

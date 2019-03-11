@@ -32,7 +32,7 @@ Parameters                        Alligator_Shift_Jaw=5; Alligator_Shift_Teeth=4
                                   Alligator30_SignalMethod=19; __Bands_Parameters__="-- Settings for the Bollinger Bands indicator --";
                                   Bands1_Active=false; Bands5_Active=false; Bands15_Active=false; Bands30_Active=false; Bands_Period=26;
                                   Bands_Period_Ratio=1; Bands_Deviation=2.2; Bands_Deviation_Ratio=1; Bands_Shift=2; Bands_Shift_Far=2;
-                                  Bands1_SignalMethod=-96; Bands5_SignalMethod=-4; Bands15_SignalMethod=-111; Bands30_SignalMethod=-90;
+                                  Bands1_SignalMethod=-10; Bands5_SignalMethod=0; Bands15_SignalMethod=-90; Bands30_SignalMethod=-90;
                                   __CCI_Parameters__="-- Settings for the Commodity Channel Index indicator --"; CCI1_Active=false;
                                   CCI5_Active=false; CCI15_Active=false; CCI30_Active=false; CCI_Period_Ratio=1; CCI_Shift=2; CCI_Period=30;
                                   CCI_SignalLevel=92; CCI1_SignalMethod=-63; CCI5_SignalMethod=-63; CCI15_SignalMethod=-63; CCI30_SignalMethod=-32;
@@ -43,24 +43,24 @@ Parameters                        Alligator_Shift_Jaw=5; Alligator_Shift_Teeth=4
                                   - Settings for the Envelopes indicator --"; Envelopes1_Active=false; Envelopes5_Active=false;
                                   Envelopes15_Active=false; Envelopes30_Active=false; Envelopes_MA_Period=22; Envelopes_MA_Period_Ratio=1;
                                   Envelopes_MA_Shift=0; Envelopes_Deviation=0.55; Envelopes_Deviation_Ratio=1; Envelopes_Shift=0;
-                                  Envelopes1_SignalMethod=-104; Envelopes5_SignalMethod=-63; Envelopes15_SignalMethod=-127;
-                                  Envelopes30_SignalMethod=-127; __Fractals_Parameters__="-- Settings for the Fractals indicator --";
-                                  Fractals1_Active=false; Fractals5_Active=false; Fractals15_Active=false; Fractals30_Active=false; Fractals_Shift=0;
-                                  Fractals1_SignalMethod=1; Fractals5_SignalMethod=-1; Fractals15_SignalMethod=1; Fractals30_SignalMethod=1;
+                                  Envelopes1_SignalMethod=24; Envelopes5_SignalMethod=-68; Envelopes15_SignalMethod=49; Envelopes30_SignalMethod=-19;
+                                  __Fractals_Parameters__="-- Settings for the Fractals indicator --"; Fractals1_Active=false;
+                                  Fractals5_Active=false; Fractals15_Active=false; Fractals30_Active=false; Fractals_Shift=0;
+                                  Fractals1_SignalMethod=3; Fractals5_SignalMethod=3; Fractals15_SignalMethod=3; Fractals30_SignalMethod=1;
                                   MA1_Active=false;
 Bars in test                11890 Ticks modelled                      108400237 Modelling quality                                              89.24%
 Mismatched charts errors        0
 Initial deposit          10000.00                                               Spread                                                             10
-Total net profit         -6891.32 Gross profit                         63173.83 Gross loss                                                  -70065.15
+Total net profit         -4860.61 Gross profit                         45942.44 Gross loss                                                  -50803.05
 Profit factor                0.90 Expected payoff                         -0.05
-Absolute drawdown         7101.25 Maximal drawdown             8600.18 (74.79%) Relative drawdown                                    74.79% (8600.18)
-Total trades               140163 Short positions (won %)        72183 (82.60%) Long positions (won %)                                 67980 (79.84%)
-                                  Profit trades (% of total)    113898 (81.26%) Loss trades (% of total)                               26265 (18.74%)
-                          Largest profit trade                            19.28 loss trade                                                      -5.18
-                          Average profit trade                             0.55 loss trade                                                      -2.67
-                          Maximum consecutive wins (profit in       176 (28.03) consecutive losses (loss in money)                      166 (-665.89)
+Absolute drawdown         5045.88 Maximal drawdown             6533.44 (56.87%) Relative drawdown                                    56.87% (6533.44)
+Total trades                97000 Short positions (won %)        50353 (80.75%) Long positions (won %)                                 46647 (76.29%)
+                                  Profit trades (% of total)     76250 (78.61%) Loss trades (% of total)                               20750 (21.39%)
+                          Largest profit trade                            19.30 loss trade                                                      -5.17
+                          Average profit trade                             0.60 loss trade                                                      -2.45
+                          Maximum consecutive wins (profit in      128 (316.52) consecutive losses (loss in money)                      123 (-458.93)
                                   money)
-                          Maximal consecutive profit (count of      584.97 (44) consecutive loss (count of losses)                      -665.89 (166)
+                          Maximal consecutive profit (count of      505.37 (38) consecutive loss (count of losses)                      -458.93 (123)
                                   wins)
-                          Average consecutive wins                           18 consecutive losses                                                  4
+                          Average consecutive wins                           13 consecutive losses                                                  3
                                                                        [Graph]

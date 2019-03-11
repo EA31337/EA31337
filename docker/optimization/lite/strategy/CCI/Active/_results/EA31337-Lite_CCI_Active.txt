@@ -1,0 +1,30 @@
+
+
+
+                                                                 Optimization Report
+                                                             EA31337-Lite-Optimize-v1.076
+                                                            Tripleafx-FX-Demo (Build 1010)
+
+                            Symbol          EURUSD (Euro vs US Dollar)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
+                            Model           Every tick (the most precise method based on all available least timeframes)
+                            Initial deposit 10000.00
+                            Spread          10
+                                                                 [Optimization Graph]
+             Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+               16 1423.26        17027          1.11            0.08    1433.97      11.17 CCI1_Active=1; CCI5_Active=1; CCI15_Active=1;
+                8 1397.33        17014          1.11            0.08    1438.26      11.22 CCI1_Active=1; CCI5_Active=1; CCI15_Active=1;
+               12 1344.91        14667          1.12            0.09    1403.39      11.01 CCI1_Active=1; CCI5_Active=1; CCI15_Active=0;
+               14 1340.68        16099          1.11            0.08    1433.47      11.23 CCI1_Active=1; CCI5_Active=0; CCI15_Active=1;
+                4 1318.98        14654          1.12            0.09    1407.68      11.07 CCI1_Active=1; CCI5_Active=1; CCI15_Active=0;
+                6 1314.75        16086          1.11            0.08    1437.76      11.28 CCI1_Active=1; CCI5_Active=0; CCI15_Active=1;
+               10 1266.87        13739          1.12            0.09    1402.98      11.07 CCI1_Active=1; CCI5_Active=0; CCI15_Active=0;
+                2 1240.94        13726          1.12            0.09    1407.27      11.13 CCI1_Active=1; CCI5_Active=0; CCI15_Active=0;
+               15  227.45         3301          1.11            0.07     257.64       2.57 CCI1_Active=0; CCI5_Active=1; CCI15_Active=1;
+                7  198.22         3288          1.09            0.06     257.64       2.57 CCI1_Active=0; CCI5_Active=1; CCI15_Active=1;
+               13  156.99         2373          1.12            0.07     170.45       1.70 CCI1_Active=0; CCI5_Active=0; CCI15_Active=1;
+                5  125.50         2360          1.09            0.05     170.45       1.70 CCI1_Active=0; CCI5_Active=0; CCI15_Active=1;
+               11  109.34          941          1.13            0.12     100.71       1.00 CCI1_Active=0; CCI5_Active=1; CCI15_Active=0;
+                3   80.11          928          1.10            0.09     100.71       1.00 CCI1_Active=0; CCI5_Active=1; CCI15_Active=0;
+                9   31.40           13          0.00            2.42       4.31       0.04 CCI1_Active=0; CCI5_Active=0; CCI15_Active=0;
+                1    0.00            0          0.00            0.00       0.00       0.00 CCI1_Active=0; CCI5_Active=0; CCI15_Active=0;

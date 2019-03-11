@@ -53,9 +53,9 @@ SAR5_Active=0
 SAR15_Active=0
 SAR30_Active=0
 WPR1_Active=0
-WPR5_Active=0
-WPR15_Active=0
-WPR30_Active=0
+WPR5_Active=1
+WPR15_Active=1
+WPR30_Active=1
 # Optimization params.
 WPR1_Active,F=1
 WPR1_Active,1=0

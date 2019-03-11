@@ -337,7 +337,7 @@ double ADX30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 //+------------------------------------------------------------------+
 extern string __Alligator_Parameters__ = "-- Settings for the Alligator indicator --"; // >>> ALLIGATOR <<<
 extern bool Alligator1_Active = 0; // Enable for M1
-extern bool Alligator5_Active = 1; // Enable for M5
+extern bool Alligator5_Active = 0; // Enable for M5
 extern bool Alligator15_Active = 1; // Enable for M15
 extern bool Alligator30_Active = 1; // Enable for M30
 extern int Alligator_Period_Jaw = 8; // Jaw Period
@@ -354,10 +354,10 @@ extern int Alligator_Shift_Far = 10; // Shift Far
 extern ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = 14; // Trail stop method
 extern ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = 4; // Trail profit method
 extern double Alligator_SignalLevel = -0.2; // Signal level
-extern int Alligator1_SignalMethod = 17; // Signal method for M1 (-63-63)
-extern int Alligator5_SignalMethod = -8; // Signal method for M5 (-63-63)
-extern int Alligator15_SignalMethod = -15; // Signal method for M15 (-63-63)
-extern int Alligator30_SignalMethod = 19; // Signal method for M30 (-63-63)
+extern int Alligator1_SignalMethod = 0; // Signal method for M1 (-63-63)
+extern int Alligator5_SignalMethod = 0; // Signal method for M5 (-63-63)
+extern int Alligator15_SignalMethod = 0; // Signal method for M15 (-63-63)
+extern int Alligator30_SignalMethod = 0; // Signal method for M30 (-63-63)
 extern int Alligator1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 extern int Alligator1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
 extern ENUM_MARKET_EVENT Alligator1_CloseCondition = C_MA_BUY_SELL; // Close condition for M1
@@ -452,10 +452,10 @@ double Awesome30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --"; // >>> BANDS <<<
-extern bool Bands1_Active = 1; // Enable for M1
+extern bool Bands1_Active = 0; // Enable for M1
 extern bool Bands5_Active = 1; // Enable for M5
 extern bool Bands15_Active = 1; // Enable for M15
-extern bool Bands30_Active = 1; // Enable for M30
+extern bool Bands30_Active = 0; // Enable for M30
 extern int Bands_Period = 26; // Period
 extern double Bands_Period_Ratio = 1; // Period ratio between timeframes (0.5-1.5)
 extern ENUM_APPLIED_PRICE Bands_Applied_Price = 3; // Applied Price
@@ -594,8 +594,8 @@ double BWMFI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __CCI_Parameters__ = "-- Settings for the Commodity Channel Index indicator --"; // >>> CCI <<<
-extern bool CCI1_Active = 0; // Enable for M1
-extern bool CCI5_Active = 0; // Enable for M5
+extern bool CCI1_Active = 1; // Enable for M1
+extern bool CCI5_Active = 1; // Enable for M5
 extern bool CCI15_Active = 1; // Enable for M15
 extern bool CCI30_Active = 1; // Enable for M30
 extern double CCI_Period_Ratio = 1.0; // Period ratio between timeframes (1.0 - default)
@@ -633,8 +633,8 @@ double CCI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 //+------------------------------------------------------------------+
 extern string __DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --"; // >>> DEMARKER <<<
 extern bool DeMarker1_Active = 0; // Enable for M1
-extern bool DeMarker5_Active = 1; // Enable for M5
-extern bool DeMarker15_Active = 1; // Enable for M15
+extern bool DeMarker5_Active = 0; // Enable for M5
+extern bool DeMarker15_Active = 0; // Enable for M15
 extern bool DeMarker30_Active = 1; // Enable for M30
 extern int DeMarker_Period = 8; // Period
 extern double DeMarker_Period_Ratio = 1.0; // Period ratio between timeframes (0.5-1.5)
@@ -669,9 +669,9 @@ extern double DeMarker30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --"; // >>> ENVELOPES <<<
-extern bool Envelopes1_Active = 1; // Enable for M1
-extern bool Envelopes5_Active = 0; // Enable for M5
-extern bool Envelopes15_Active = 0; // Enable for M15
+extern bool Envelopes1_Active = 0; // Enable for M1
+extern bool Envelopes5_Active = 1; // Enable for M5
+extern bool Envelopes15_Active = 1; // Enable for M15
 extern bool Envelopes30_Active = 1; // Enable for M30
 extern int Envelopes_MA_Period = 22; // Period
 extern double Envelopes_MA_Period_Ratio = 1.0; // Period ratio between timeframes (0.5-1.5)
@@ -749,10 +749,10 @@ double Force30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __Fractals_Parameters__ = "-- Settings for the Fractals indicator --"; // >>> FRACTALS <<<
-extern bool Fractals1_Active = 1; // Enable for M1
-extern bool Fractals5_Active = 1; // Enable for M5
-extern bool Fractals15_Active = 1; // Enable for M15
-extern bool Fractals30_Active = 1; // Enable for M30
+extern bool Fractals1_Active = 0; // Enable for M1
+extern bool Fractals5_Active = 0; // Enable for M5
+extern bool Fractals15_Active = 0; // Enable for M15
+extern bool Fractals30_Active = 0; // Enable for M30
 extern int Fractals_Shift = 0; // Shift
 extern ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = -26; // Trail stop method
 extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = 25; // Trail profit method
@@ -856,8 +856,8 @@ double Ichimoku30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 //+------------------------------------------------------------------+
 extern string __MA_Parameters__ = "-- Settings for the Moving Average indicator --"; // >>> MA <<<
 extern bool MA1_Active = 0; // Enable for M1
-extern bool MA5_Active = 1; // Enable for M5
-extern bool MA15_Active = 1; // Enable for M15
+extern bool MA5_Active = 0; // Enable for M5
+extern bool MA15_Active = 0; // Enable for M15
 extern bool MA30_Active = 1; // Enable for M30
 extern int MA_Period_Fast = 10; // Period Fast
 extern int MA_Period_Medium = 14; // Period Medium
@@ -902,8 +902,8 @@ extern double MA30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 extern string __MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --"; // >>> MACD <<<
 extern bool MACD1_Active = 0; // Enable for M1
 extern bool MACD5_Active = 0; // Enable for M5
-extern bool MACD15_Active = 0; // Enable for M15
-extern bool MACD30_Active = 0; // Enable for M30
+extern bool MACD15_Active = 1; // Enable for M15
+extern bool MACD30_Active = 1; // Enable for M30
 extern int MACD_Period_Fast = 17; // Period Fast
 extern int MACD_Period_Slow = 31; // Period Slow
 extern int MACD_Period_Signal = 8; // Period for signal
@@ -1087,8 +1087,8 @@ double OSMA30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --"; // >>> RSI <<<
-extern bool RSI1_Active = 1; // Enable for M1
-extern bool RSI5_Active = 1; // Enable for M5
+extern bool RSI1_Active = 0; // Enable for M1
+extern bool RSI5_Active = 0; // Enable for M5
 extern bool RSI15_Active = 1; // Enable for M15
 extern bool RSI30_Active = 1; // Enable for M30
 extern int RSI_Period = 14; // Period
@@ -1163,9 +1163,9 @@ double RVI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __SAR_Parameters__ = "-- Settings for the Parabolic Stop and Reverse system indicator --"; // >>> SAR <<<
-extern bool SAR1_Active = 1; // Enable for M1
-extern bool SAR5_Active = 1; // Enable for M5
-extern bool SAR15_Active = 1; // Enable for M15
+extern bool SAR1_Active = 0; // Enable for M1
+extern bool SAR5_Active = 0; // Enable for M5
+extern bool SAR15_Active = 0; // Enable for M15
 extern bool SAR30_Active = 1; // Enable for M30
 extern double SAR_Step = 0.2; // Step
 extern double SAR_Step_Ratio = 1.0; // Step ratio between timeframes (0.5-1.5)
@@ -1269,7 +1269,7 @@ double Stochastic30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --"; // >>> WPR <<<
-extern bool WPR1_Active = 1; // Enable for M1
+extern bool WPR1_Active = 0; // Enable for M1
 extern bool WPR5_Active = 1; // Enable for M5
 extern bool WPR15_Active = 1; // Enable for M15
 extern bool WPR30_Active = 1; // Enable for M30
