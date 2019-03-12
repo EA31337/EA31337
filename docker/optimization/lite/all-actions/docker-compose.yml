@@ -1,0 +1,93 @@
+version: '3.4'
+services:
+  Account_Conditions_Active:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Actions/All-Account_Conditions_Active.rule
+      SETFILE: /opt/_results/EA31337-Lite_Account_Conditions_Active.set
+      TEST_REPORT_NAME: EA31337-Lite_Account_Conditions_Active
+      RUN_ON_SUCCESS: input_copy Account_Conditions_Active "$${SETFILE}" /opt/lite/ea-input.mqh
+  Action_On_Condition_1:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_MONTHS: 1-2
+      SETFILE: /opt/_results/EA31337-Lite_Action_On_Condition_1.set
+      TEST_REPORT_NAME: EA31337-Lite_Action_On_Condition_1
+      RUN_ON_SUCCESS: for p in Market_Condition_1 Action_On_Condition_1; do input_copy "$${p}" "$${SETFILE}" /opt/lite/ea-input.mqh; done
+  Action_On_Condition_2:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_MONTHS: 1-2
+      SETFILE: /opt/_results/EA31337-Lite_Action_On_Condition_2.set
+      TEST_REPORT_NAME: EA31337-Lite_Action_On_Condition_2
+      RUN_ON_SUCCESS: for p in Market_Condition_2 Action_On_Condition_2; do input_copy "$${p}" "$${SETFILE}" /opt/lite/ea-input.mqh; done
+  Action_On_Condition_3:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_MONTHS: 1-2
+      SETFILE: /opt/_results/EA31337-Lite_Action_On_Condition_3.set
+      TEST_REPORT_NAME: EA31337-Lite_Action_On_Condition_3
+      RUN_ON_SUCCESS: for p in Market_Condition_3 Action_On_Condition_3; do input_copy "$${p}" "$${SETFILE}" /opt/lite/ea-input.mqh; done
+  Action_On_Condition_4:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_MONTHS: 1-2
+      INCLUDE: /opt/rules/Actions/All-Action_On_Condition_04.rule
+      SETFILE: /opt/_results/EA31337-Lite_Action_On_Condition_4.set
+      TEST_REPORT_NAME: EA31337-Lite_Action_On_Condition_4
+      RUN_ON_SUCCESS: for p in Market_Condition_4 Action_On_Condition_4; do input_copy "$${p}" "$${SETFILE}" /opt/lite/ea-input.mqh; done
+  Action_On_Condition_5:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_MONTHS: 1-2
+      SETFILE: /opt/_results/EA31337-Lite_Action_On_Condition_5.set
+      TEST_REPORT_NAME: EA31337-Lite_Action_On_Condition_5
+      RUN_ON_SUCCESS: for p in Market_Condition_5 Action_On_Condition_5; do input_copy "$${p}" "$${SETFILE}" /opt/lite/ea-input.mqh; done

@@ -1,0 +1,36 @@
+version: '3.4'
+services:
+  SAR_TrailingStopMethod:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../../../EA-Tester.ini
+    environment:
+      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=2
+      INCLUDE: /opt/rules/Strategies/SAR/Strategy-SAR-All-SAR_TrailingStopMethod.rule
+      SETFILE: /opt/_results/EA31337-Lite_SAR_TrailingStopMethod.set
+      TEST_REPORT_NAME: EA31337-Lite_SAR_TrailingStopMethod
+      RUN_ON_SUCCESS: input_copy SAR_TrailingStopMethod "$${SETFILE}" /opt/lite/ea-input.mqh
+  SAR_TrailingProfitMethod:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../../../EA-Tester.ini
+    environment:
+      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=2
+      INCLUDE: /opt/rules/Strategies/SAR/Strategy-SAR-All-SAR_TrailingProfitMethod.rule
+      SETFILE: /opt/_results/EA31337-Lite_SAR_TrailingProfitMethod.set
+      TEST_REPORT_NAME: EA31337-Lite_SAR_TrailingProfitMethod
+      RUN_ON_SUCCESS: input_copy SAR_TrailingProfitMethod "$${SETFILE}" /opt/lite/ea-input.mqh

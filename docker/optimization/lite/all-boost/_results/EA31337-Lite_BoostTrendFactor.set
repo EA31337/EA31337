@@ -1,0 +1,16 @@
+# Base params.
+Boosting_Enabled=1
+Account_Conditions_Active=0
+ProfitFactorMaxToTrade=0
+ValidateSettings=0
+PrintLogOnChart=0
+WriteReport=0
+RecordTicksToCSV=0
+VerboseInfo=0
+VerboseErrors=0
+# Optimization params.
+BoostTrendFactor=1.0
+BoostTrendFactor,F=0
+BoostTrendFactor,1=0
+BoostTrendFactor,2=0
+BoostTrendFactor,3=0

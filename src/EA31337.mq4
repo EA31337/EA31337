@@ -276,9 +276,6 @@ void OnTick() {
  * Process a new bar.
  */
 void ProcessBar(Trade *_trade) {
-  last_ask = market.GetLastAsk();
-  last_bid = market.GetLastBid();
-  //last_pip_change = market.GetLastPriceChangeInPips();
 
   // Parse a tick.
   /*
@@ -306,14 +303,19 @@ void ProcessBar(Trade *_trade) {
     PrintFormat("%s: Error: Chart object not valid!", __FUNCTION_LINE__);
   }
 
-  if (hour_of_day != DateTime::Hour()) StartNewHour(_trade);
-  UpdateVariables();
   if (TradeAllowed()) {
+    last_ask = market.GetLastAsk();
+    last_bid = market.GetLastBid();
+    last_pip_change = market.GetLastPriceChangeInPips();
+    if (hour_of_day != DateTime::Hour()) {
+      StartNewHour(_trade);
+    }
+    UpdateVariables();
     EA_Trade(_trade);
+    UpdateOrders(_trade);
+    UpdateStats();
   }
 
-  UpdateOrders(_trade);
-  UpdateStats();
 }
 
 /**
@@ -457,10 +459,10 @@ void OnDeinit(const int reason) {
         summary_report.CalculateSummary();
         // @todo: Calculate average spread from stats[sid][AVG_SPREAD].
         filename = StringFormat(
-            "%s-%.f%s-%s-%s-%dspread-(%d)-%s-report.txt",
+            "%s-%.f%s-%s-%s-%dspread-%s-report.txt",
             market.GetSymbol(), summary_report.GetInitDeposit(), account.GetCurrency(),
             DateTime::TimeToStr(first_bar.time, TIME_DATE), DateTime::TimeToStr(_chart.iTime(), TIME_DATE),
-            init_spread, GetNoOfStrategies(), chart.TfToString());
+            init_spread, chart.TfToString());
             // ea_name, _Symbol, summary.init_deposit, account.AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE), Period());
             // ea_name, _Symbol, init_balance, account.AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES), Period());
         string data = summary_report.GetReport();
@@ -869,7 +871,7 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
     case INDI_CCI: // Calculates the Commodity Channel Index indicator.
       ratio = tf == 30 ? 1.0 : pow(CCI_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        cci[index][i] = iCCI(symbol, tf, (int) (CCI_Period * ratio), CCI_Applied_Price, i);
+        cci[index][i] = iCCI(symbol, tf, (int) (CCI_Period * ratio), CCI_Applied_Price, i + CCI_Shift);
       }
       success = (bool) cci[index][CURR];
       break;
@@ -912,8 +914,8 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
 #endif
     case INDI_FRACTALS: // Calculates the Fractals indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        fractals[index][i][LINE_LOWER] = iFractals(symbol, tf, LINE_LOWER, i);
-        fractals[index][i][LINE_UPPER] = iFractals(symbol, tf, LINE_UPPER, i);
+        fractals[index][i][LINE_LOWER] = iFractals(symbol, tf, LINE_LOWER, i + Fractals_Shift);
+        fractals[index][i][LINE_UPPER] = iFractals(symbol, tf, LINE_UPPER, i + Fractals_Shift);
       }
       if (VerboseDebug) PrintFormat("Fractals M%d: %s", tf, Array::ArrToString3D(fractals, ",", Digits));
       break;
@@ -960,7 +962,6 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       break;
     case INDI_MACD: // Calculates the Moving Averages Convergence/Divergence indicator.
       ratio = tf == 30 ? 1.0 : pow(MACD_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
-      //ratio = tf == 30 ? 1.0 : fmax(MACD_Period_Ratio, 0.1) / tf * 30;
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         shift = i + MACD_Shift + (i == FINAL_ENUM_INDICATOR_INDEX - 1 ? MACD_Shift_Far : 0);
         macd[index][i][MODE_MAIN]   = iMACD(symbol, tf, (int) (MACD_Period_Fast * ratio), (int) (MACD_Period_Slow * ratio), (int) (MACD_Period_Signal * ratio), MACD_Applied_Price, MODE_MAIN,   shift);
@@ -999,7 +1000,7 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
     case INDI_RSI: // Calculates the Relative Strength Index indicator.
       // int rsi_period = RSI_Period; // Not used at the moment.
       // sid = GetStrategyViaIndicator(RSI, tf); rsi_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
-      ratio = tf == 30 ? 1.0 : pow(RSI_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));      ratio = tf == 30 ? 1.0 : fmax(MACD_Period_Ratio, 0.1) / tf * 30;
+      ratio = tf == 30 ? 1.0 : pow(RSI_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         rsi[index][i] = iRSI(symbol, tf, (int) (RSI_Period * ratio), RSI_Applied_Price, i + RSI_Shift);
         if (rsi[index][i] > rsi_stats[index][LINE_UPPER]) rsi_stats[index][LINE_UPPER] = rsi[index][i]; // Calculate maximum value.
@@ -1021,7 +1022,6 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       break;
     case INDI_SAR: // Calculates the Parabolic Stop and Reverse system indicator.
       ratio = tf == 30 ? 1.0 : pow(SAR_Step_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex() + 1));
-      //ratio = tf == 30 ? 1.0 : fmax(MACD_Period_Ratio, 0.1) / tf * 30;
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         sar[index][i] = iSAR(symbol, tf, SAR_Step * ratio, SAR_Maximum_Stop, i + SAR_Shift);
       }
@@ -1047,7 +1047,6 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
     case INDI_WPR: // Calculates the  Larry Williams' Percent Range.
       // Update the Larry Williams' Percent Range indicator values.
       ratio = tf == 30 ? 1.0 : pow(WPR_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex() + 1));
-      //ratio = tf == 30 ? 1.0 : fmax(MACD_Period_Ratio, 0.1) / tf * 30;
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         wpr[index][i] = -iWPR(symbol, tf, (int) (WPR_Period * ratio), i + WPR_Shift);
       }
@@ -6280,9 +6279,10 @@ bool ActionCloseAllUnprofitableOrders(int reason_id = EMPTY){
  * Execute action to close all orders by specified type.
  */
 bool ActionCloseAllOrdersByType(ENUM_ORDER_TYPE cmd = EMPTY, int reason_id = EMPTY){
+  if (cmd == EMPTY) return (false);
+  #ifdef __profiler__ PROFILER_START #endif
   int selected_orders = 0;
   double ticket_profit = 0, total_profit = 0;
-  if (cmd == EMPTY) return (false);
   for (int order = 0; order < OrdersTotal(); order++) {
     if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
        if (OrderType() == cmd) {
@@ -6297,7 +6297,8 @@ bool ActionCloseAllOrdersByType(ENUM_ORDER_TYPE cmd = EMPTY, int reason_id = EMP
     Msg::ShowText(StringFormat("Queued %d orders to close with expected profit of %g pips.", selected_orders, total_profit)
     , "Info", __FUNCTION__, __LINE__, VerboseInfo);
   }
-  return (false);
+  #ifdef __profiler__ PROFILER_STOP #endif
+  return (true);
 }
 
 /**
@@ -6315,6 +6316,7 @@ bool ActionCloseAllOrdersByType(ENUM_ORDER_TYPE cmd = EMPTY, int reason_id = EMP
  *     therefore closing all make the things more predictable and to avoid any suprices.
  */
 int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = true) {
+  #ifdef __profiler__ PROFILER_START #endif
    int processed = 0;
    int total = OrdersTotal();
    double total_profit = 0;
@@ -6335,6 +6337,7 @@ int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = true) {
     Msg::ShowText(StringFormat("Queued %d orders out of %d for closure.", processed, total),
       "Info", __FUNCTION__, __LINE__, VerboseInfo);
    }
+  #ifdef __profiler__ PROFILER_STOP #endif
    return (processed > 0);
 }
 
@@ -6348,6 +6351,7 @@ int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = true) {
  */
 bool ActionExecute(int aid, int id = EMPTY) {
   DEBUG_CHECKPOINT_ADD
+  #ifdef __profiler__ PROFILER_START #endif
   bool result = false;
   int reason_id = (id != EMPTY ? acc_conditions[id][0] : EMPTY); // Account id condition.
   int mid = (id != EMPTY ? acc_conditions[id][1] : EMPTY); // Market id condition.
@@ -6446,6 +6450,7 @@ bool ActionExecute(int aid, int id = EMPTY) {
         ActionIdToText(aid), aid, ReasonIdToText(reason_id), reason_id),
       "Warning", __FUNCTION__, __LINE__, VerboseErrors);
   }
+  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 

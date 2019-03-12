@@ -1,0 +1,21 @@
+
+
+
+                                                                 Optimization Report
+                                                             EA31337-Lite-Optimize-v1.076
+                                                            Tripleafx-FX-Demo (Build 1010)
+
+                            Symbol          EURUSD (Euro vs US Dollar)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
+                            Model           Every tick (the most precise method based on all available least timeframes)
+                            Initial deposit 10000.00
+                            Spread          10
+                                                                 [Optimization Graph]
+      Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+         5    6.89          142          1.23            0.05      14.63       0.15  Fractals30_SignalMethod=1; MaxOrders=0; MaxOrdersPerType=0;
+         2    0.00            0          0.00            0.00       0.00       0.00 Fractals30_SignalMethod=-2; MaxOrders=0; MaxOrdersPerType=0;
+         3    0.00            0          0.00            0.00       0.00       0.00 Fractals30_SignalMethod=-1; MaxOrders=0; MaxOrdersPerType=0;
+         6    0.00            0          0.00            0.00       0.00       0.00  Fractals30_SignalMethod=2; MaxOrders=0; MaxOrdersPerType=0;
+         7    0.00            0          0.00            0.00       0.00       0.00  Fractals30_SignalMethod=3; MaxOrders=0; MaxOrdersPerType=0;
+         1  -65.39          605          0.50           -0.11      72.41       0.72 Fractals30_SignalMethod=-3; MaxOrders=0; MaxOrdersPerType=0;
+         4 -204.89         1964          0.54           -0.10     231.93       2.32  Fractals30_SignalMethod=0; MaxOrders=0; MaxOrdersPerType=0;

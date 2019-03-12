@@ -1,12 +1,17 @@
 # Introduction
 
-[![Join the chat at Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/EA31337/EA31337)
-
 Introducing EA31337, an advanced trading robot on the market written in MQL.
 
 It takes the currency trading on the next level by implementing the coordinated algorithm which prioritising and managing multi-timeframe strategies. With fully user customizable parameters, it makes real-time trading a hassle-free experience.
 
 Please follow [Wiki Home page](https://github.com/EA31337/EA31337/wiki) for the available documentation pages.
+
+## Build status
+
+| Type            | Status      |
+| --------------: |:-----------:|
+| Travis CI build | [![Build Status](https://api.travis-ci.org/EA31337/EA31337.svg?branch=master)](https://travis-ci.org/EA31337/EA31337) |
+| AppVeyor build  | [![Build status](https://ci.appveyor.com/api/projects/status/63qnd959vxl44102?svg=true)](https://ci.appveyor.com/project/kenorb/ea31337/branch/master) |
 
 ## About the project
 

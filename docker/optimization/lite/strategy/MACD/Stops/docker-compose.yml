@@ -1,0 +1,36 @@
+version: '3.4'
+services:
+  MACD_TrailingStopMethod:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../../../EA-Tester.ini
+    environment:
+      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=8
+      INCLUDE: /opt/rules/Strategies/MACD/Strategy-MACD-All-MACD_TrailingStopMethod.rule
+      SETFILE: /opt/_results/EA31337-Lite_MACD_TrailingStopMethod.set
+      TEST_REPORT_NAME: EA31337-Lite_MACD_TrailingStopMethod
+      RUN_ON_SUCCESS: input_copy MACD_TrailingStopMethod "$${SETFILE}" /opt/lite/ea-input.mqh
+  MACD_TrailingProfitMethod:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../../../EA-Tester.ini
+    environment:
+      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=8
+      INCLUDE: /opt/rules/Strategies/MACD/Strategy-MACD-All-MACD_TrailingProfitMethod.rule
+      SETFILE: /opt/_results/EA31337-Lite_MACD_TrailingProfitMethod.set
+      TEST_REPORT_NAME: EA31337-Lite_MACD_TrailingProfitMethod
+      RUN_ON_SUCCESS: input_copy MACD_TrailingProfitMethod "$${SETFILE}" /opt/lite/ea-input.mqh

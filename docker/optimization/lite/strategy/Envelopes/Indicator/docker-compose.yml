@@ -1,0 +1,178 @@
+version: '3.4'
+services:
+  Envelopes_MA_Period:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../../../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-All-Envelopes_MA_Period.rule
+      SETFILE: /opt/_results/EA31337-Lite_Envelopes_MA_Period.set
+      TEST_REPORT_NAME: EA31337-Lite_Envelopes_MA_Period
+      RUN_ON_SUCCESS: input_copy Envelopes_MA_Period "$${SETFILE}" /opt/lite/ea-input.mqh
+  Envelopes_MA_Period_Ratio:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../../../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-All-Envelopes_MA_Period_Ratio.rule
+      SETFILE: /opt/_results/EA31337-Lite_Envelopes_MA_Period_Ratio.set
+      TEST_REPORT_NAME: EA31337-Lite_Envelopes_MA_Period_Ratio
+      RUN_ON_SUCCESS: input_copy Envelopes_MA_Period_Ratio "$${SETFILE}" /opt/lite/ea-input.mqh
+  Envelopes_MA_Method:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../../../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-All-Envelopes_MA_Method.rule
+      SETFILE: /opt/_results/EA31337-Lite_Envelopes_MA_Method.set
+      TEST_REPORT_NAME: EA31337-Lite_Envelopes_MA_Method
+      RUN_ON_SUCCESS: input_copy Envelopes_MA_Method "$${SETFILE}" /opt/lite/ea-input.mqh
+  Envelopes_Shift:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../../../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-All-Envelopes_Shift.rule
+      SETFILE: /opt/_results/EA31337-Lite_Envelopes_Shift.set
+      TEST_REPORT_NAME: EA31337-Lite_Envelopes_Shift
+      RUN_ON_SUCCESS: input_copy Envelopes_Shift "$${SETFILE}" /opt/lite/ea-input.mqh
+  Envelopes_Applied_Price:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../../../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-All-Envelopes_Applied_Price.rule
+      SETFILE: /opt/_results/EA31337-Lite_Envelopes_Applied_Price.set
+      TEST_REPORT_NAME: EA31337-Lite_Envelopes_Applied_Price
+      RUN_ON_SUCCESS: input_copy Envelopes_Applied_Price "$${SETFILE}" /opt/lite/ea-input.mqh
+  Envelopes_Deviation:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../../../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-All-Envelopes_Deviation.rule
+      SETFILE: /opt/_results/EA31337-Lite_Envelopes_Deviation.set
+      TEST_REPORT_NAME: EA31337-Lite_Envelopes_Deviation
+      RUN_ON_SUCCESS: input_copy Envelopes_Deviation "$${SETFILE}" /opt/lite/ea-input.mqh
+  Envelopes_Deviation_Ratio:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../../../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-All-Envelopes_Deviation_Ratio.rule
+      SETFILE: /opt/_results/EA31337-Lite_Envelopes_Deviation_Ratio.set
+      TEST_REPORT_NAME: EA31337-Lite_Envelopes_Deviation_Ratio
+      RUN_ON_SUCCESS: input_copy Envelopes_Deviation_Ratio "$${SETFILE}" /opt/lite/ea-input.mqh
+# @todo
+#  Envelopes_SignalLevel:
+#    command: run_backtest -v
+#    image: ea31337:lite-eurusd-2018
+#    build:
+#      context: ../../../../../..
+#      target: ea31337-lite-eurusd-2018
+#    volumes:
+#    - ./_results:/opt/_results:rw
+#    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#    env_file: ../../../EA-Tester.ini
+#    environment:
+#      INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-All-Envelopes_SignalLevel.rule
+#      SETFILE: /opt/_results/EA31337-Lite_Envelopes_SignalLevel.set
+#      TEST_REPORT_NAME: EA31337-Lite_Envelopes_SignalLevel
+#      RUN_ON_SUCCESS: input_copy Envelopes_SignalLevel "$${SETFILE}" /opt/lite/ea-input.mqh
+  Envelopes_Shift:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../../../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-All-Envelopes_Shift.rule
+      SETFILE: /opt/_results/EA31337-Lite_Envelopes_Shift.set
+      TEST_REPORT_NAME: EA31337-Lite_Envelopes_Shift
+      RUN_ON_SUCCESS: for p in Shift MA_Shift; do input_copy "Envelopes_$${p}" "$${SETFILE}" /opt/lite/ea-input.mqh; done
+  Envelopes_Deviation:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../../../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-All-Envelopes_Deviation.rule
+      SETFILE: /opt/_results/EA31337-Lite_Envelopes_Deviation.set
+      TEST_REPORT_NAME: EA31337-Lite_Envelopes_Deviation
+      RUN_ON_SUCCESS: input_copy Envelopes_Deviation "$${SETFILE}" /opt/lite/ea-input.mqh
+  Envelopes_Deviation_Ratio:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../../../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-All-Envelopes_Deviation_Ratio.rule
+      SETFILE: /opt/_results/EA31337-Lite_Envelopes_Deviation_Ratio.set
+      TEST_REPORT_NAME: EA31337-Lite_Envelopes_Deviation_Ratio
+      RUN_ON_SUCCESS: input_copy Envelopes_Deviation_Ratio "$${SETFILE}" /opt/lite/ea-input.mqh

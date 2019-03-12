@@ -1,0 +1,30 @@
+
+
+
+                                                                 Optimization Report
+                                                             EA31337-Lite-Optimize-v1.076
+                                                            Tripleafx-FX-Demo (Build 1010)
+
+                            Symbol          EURUSD (Euro vs US Dollar)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
+                            Model           Every tick (the most precise method based on all available least timeframes)
+                            Initial deposit 10000.00
+                            Spread          10
+                                                                 [Optimization Graph]
+    Pass   Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+      13    97.16         3991          1.04            0.02     179.28       1.78 Alligator1_Active=0; Alligator5_Active=0; Alligator15_Active=1;
+       9    74.83         1527          1.07            0.05     101.12       1.00 Alligator1_Active=0; Alligator5_Active=0; Alligator15_Active=0;
+       5    53.89         2464          1.04            0.02     124.99       1.23 Alligator1_Active=0; Alligator5_Active=0; Alligator15_Active=1;
+       1     0.00            0          0.00            0.00       0.00       0.00 Alligator1_Active=0; Alligator5_Active=0; Alligator15_Active=0;
+       3  -485.74         4000          0.68           -0.12     506.64       5.06 Alligator1_Active=0; Alligator5_Active=1; Alligator15_Active=0;
+       7  -497.89         6464          0.80           -0.08     515.23       5.15 Alligator1_Active=0; Alligator5_Active=1; Alligator15_Active=1;
+      11  -582.23         5527          0.75           -0.11     622.96       6.21 Alligator1_Active=0; Alligator5_Active=1; Alligator15_Active=0;
+      15  -650.79         7991          0.81           -0.08     666.10       6.66 Alligator1_Active=0; Alligator5_Active=1; Alligator15_Active=1;
+       6 -1951.06        19473          0.63           -0.10    2405.27      23.03 Alligator1_Active=1; Alligator5_Active=0; Alligator15_Active=1;
+       2 -2050.76        17009          0.53           -0.12    2156.41      21.35 Alligator1_Active=1; Alligator5_Active=0; Alligator15_Active=0;
+      14 -2148.07        21000          0.64           -0.10    2630.70      25.10 Alligator1_Active=1; Alligator5_Active=0; Alligator15_Active=1;
+      10 -2182.64        18536          0.59           -0.12    2636.78      25.22 Alligator1_Active=1; Alligator5_Active=0; Alligator15_Active=0;
+       4 -2367.84        21009          0.56           -0.11    2499.00      24.68 Alligator1_Active=1; Alligator5_Active=1; Alligator15_Active=0;
+       8 -2614.34        23473          0.58           -0.11    2688.72      26.69 Alligator1_Active=1; Alligator5_Active=1; Alligator15_Active=1;
+      12 -2639.13        22536          0.58           -0.12    3056.64      29.34 Alligator1_Active=1; Alligator5_Active=1; Alligator15_Active=0;
+      16 -2856.62        25000          0.59           -0.11    2881.07      28.74 Alligator1_Active=1; Alligator5_Active=1; Alligator15_Active=1;

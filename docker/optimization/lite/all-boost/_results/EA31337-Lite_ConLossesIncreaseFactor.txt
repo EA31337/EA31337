@@ -1,0 +1,35 @@
+
+
+
+                                                                 Optimization Report
+                                                             EA31337-Lite-Backtest-v1.076
+                                                            Tripleafx-FX-Demo (Build 1010)
+
+                            Symbol          EURUSD (Euro vs US Dollar)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.01.30 23:30 (2018.01.01 - 2018.01.31)
+                            Model           Every tick (the most precise method based on all available least timeframes)
+                            Initial deposit 10000.00
+                            Spread          10
+                                                                 [Optimization Graph]
+     Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+       12 1616.77         6293          1.10            0.26    5463.96      38.04 ConLossesIncreaseFactor=1.4; MaxOrders=0; MaxOrdersPerType=0;
+       14 1535.62         6267          1.09            0.25    5985.66      39.98 ConLossesIncreaseFactor=1.6; MaxOrders=0; MaxOrdersPerType=0;
+       13 1347.37         6286          1.08            0.21    5778.59      40.05 ConLossesIncreaseFactor=1.5; MaxOrders=0; MaxOrdersPerType=0;
+       11 1332.56         6291          1.08            0.21    5500.14      38.49 ConLossesIncreaseFactor=1.3; MaxOrders=0; MaxOrdersPerType=0;
+        9 1276.54         6311          1.09            0.20    5293.17      37.18 ConLossesIncreaseFactor=1.1; MaxOrders=0; MaxOrdersPerType=0;
+       10 1245.83         6294          1.08            0.20    5518.44      38.57 ConLossesIncreaseFactor=1.2; MaxOrders=0; MaxOrdersPerType=0;
+       21 1233.10         6162          1.06            0.20    7114.43      45.41 ConLossesIncreaseFactor=2.3; MaxOrders=0; MaxOrdersPerType=0;
+        8 1227.11         6332          1.09            0.19    4474.78      32.56   ConLossesIncreaseFactor=1; MaxOrders=0; MaxOrdersPerType=0;
+       20 1148.19         6126          1.06            0.19    7174.32      48.29 ConLossesIncreaseFactor=2.2; MaxOrders=0; MaxOrdersPerType=0;
+        7  994.79         6317          1.08            0.16    4231.97      32.67 ConLossesIncreaseFactor=0.9; MaxOrders=0; MaxOrdersPerType=0;
+       17  989.42         6227          1.05            0.16    6438.06      43.48 ConLossesIncreaseFactor=1.9; MaxOrders=0; MaxOrdersPerType=0;
+        6  986.48         6317          1.08            0.16    4170.90      32.44 ConLossesIncreaseFactor=0.8; MaxOrders=0; MaxOrdersPerType=0;
+       16  844.17         6230          1.05            0.14    6371.03      42.93 ConLossesIncreaseFactor=1.8; MaxOrders=0; MaxOrdersPerType=0;
+       19  824.91         6143          1.04            0.13    7150.75      48.44 ConLossesIncreaseFactor=2.1; MaxOrders=0; MaxOrdersPerType=0;
+       15  656.20         6257          1.04            0.10    6428.86      42.81 ConLossesIncreaseFactor=1.7; MaxOrders=0; MaxOrdersPerType=0;
+       18  607.95         6203          1.03            0.10    6658.18      45.14   ConLossesIncreaseFactor=2; MaxOrders=0; MaxOrdersPerType=0;
+        4  583.05         6327          1.05            0.09    3983.65      31.92 ConLossesIncreaseFactor=0.6; MaxOrders=0; MaxOrdersPerType=0;
+        5  565.11         6324          1.05            0.09    4088.55      32.38 ConLossesIncreaseFactor=0.7; MaxOrders=0; MaxOrdersPerType=0;
+        3  457.30         6355          1.04            0.07    3489.82      28.02 ConLossesIncreaseFactor=0.5; MaxOrders=0; MaxOrdersPerType=0;
+        2   38.29         6360          1.00            0.01    3451.72      28.61 ConLossesIncreaseFactor=0.4; MaxOrders=0; MaxOrdersPerType=0;
+        1  -28.43         6356          1.00           -0.00    3520.47      29.39 ConLossesIncreaseFactor=0.3; MaxOrders=0; MaxOrdersPerType=0;

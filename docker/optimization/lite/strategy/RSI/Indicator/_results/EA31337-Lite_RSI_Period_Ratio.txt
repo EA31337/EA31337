@@ -1,0 +1,29 @@
+
+
+
+                                                                 Optimization Report
+                                                             EA31337-Lite-Backtest-v1.076
+                                                            Tripleafx-FX-Demo (Build 1010)
+
+                            Symbol          EURUSD (Euro vs US Dollar)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
+                            Model           Every tick (the most precise method based on all available least timeframes)
+                            Initial deposit 10000.00
+                            Spread          10
+                                                                 [Optimization Graph]
+        Pass   Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+           1  -470.33         4789          0.75           -0.10     499.18       4.99 RSI_Period_Ratio=0.5; MaxOrders=0; MaxOrdersPerType=0;
+           2  -471.22         4789          0.75           -0.10     499.18       4.99 RSI_Period_Ratio=0.6; MaxOrders=0; MaxOrdersPerType=0;
+           3  -471.22         4789          0.75           -0.10     499.18       4.99 RSI_Period_Ratio=0.7; MaxOrders=0; MaxOrdersPerType=0;
+           4  -471.22         4789          0.75           -0.10     499.18       4.99 RSI_Period_Ratio=0.8; MaxOrders=0; MaxOrdersPerType=0;
+           5  -471.22         4789          0.75           -0.10     499.18       4.99 RSI_Period_Ratio=0.9; MaxOrders=0; MaxOrdersPerType=0;
+          15  -861.17         8161          0.75           -0.11     865.50       8.65 RSI_Period_Ratio=2.3; MaxOrders=0; MaxOrdersPerType=0;
+          14  -883.40         8482          0.75           -0.10     888.50       8.88 RSI_Period_Ratio=2.2; MaxOrders=0; MaxOrdersPerType=0;
+          13  -888.64         8810          0.76           -0.10     893.74       8.93 RSI_Period_Ratio=2.1; MaxOrders=0; MaxOrdersPerType=0;
+          12  -933.18         9122          0.76           -0.10     939.44       9.39   RSI_Period_Ratio=2; MaxOrders=0; MaxOrdersPerType=0;
+          11 -1179.80         9862          0.73           -0.12    1186.78      11.86 RSI_Period_Ratio=1.9; MaxOrders=0; MaxOrdersPerType=0;
+          10 -1268.14        10509          0.73           -0.12    1277.94      12.77 RSI_Period_Ratio=1.8; MaxOrders=0; MaxOrdersPerType=0;
+           9 -1382.30        11950          0.74           -0.12    1469.09      14.66 RSI_Period_Ratio=1.7; MaxOrders=0; MaxOrdersPerType=0;
+           8 -2010.06        14291          0.70           -0.14    2106.50      21.04 RSI_Period_Ratio=1.6; MaxOrders=0; MaxOrdersPerType=0;
+           7 -3136.43        18448          0.67           -0.17    3414.21      34.11 RSI_Period_Ratio=1.5; MaxOrders=0; MaxOrdersPerType=0;
+           6 -4530.42        28680          0.72           -0.16    4917.83      48.99 RSI_Period_Ratio=1.4; MaxOrders=0; MaxOrdersPerType=0;

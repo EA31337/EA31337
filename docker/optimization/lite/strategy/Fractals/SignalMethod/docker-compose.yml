@@ -1,0 +1,66 @@
+version: '3.4'
+services:
+  Fractals1_SignalMethod:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../../../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Strategies/Fractals/Strategy-Fractals-Fractals1_SignalMethod.rule
+      SETFILE: /opt/_results/EA31337-Lite_Fractals1_SignalMethod.set
+      TEST_REPORT_NAME: EA31337-Lite_Fractals1_SignalMethod
+      RUN_ON_SUCCESS: input_copy Fractals1_SignalMethod "$${SETFILE}" /opt/lite/ea-input.mqh
+  Fractals5_SignalMethod:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../../../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Strategies/Fractals/Strategy-Fractals-Fractals5_SignalMethod.rule
+      SETFILE: /opt/_results/EA31337-Lite_Fractals5_SignalMethod.set
+      TEST_REPORT_NAME: EA31337-Lite_Fractals5_SignalMethod
+      RUN_ON_SUCCESS: input_copy Fractals5_SignalMethod "$${SETFILE}" /opt/lite/ea-input.mqh
+  Fractals15_SignalMethod:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../../../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Strategies/Fractals/Strategy-Fractals-Fractals15_SignalMethod.rule
+      SETFILE: /opt/_results/EA31337-Lite_Fractals15_SignalMethod.set
+      TEST_REPORT_NAME: EA31337-Lite_Fractals15_SignalMethod
+      RUN_ON_SUCCESS: input_copy Fractals15_SignalMethod "$${SETFILE}" /opt/lite/ea-input.mqh
+  Fractals30_SignalMethod:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../../../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Strategies/Fractals/Strategy-Fractals-Fractals30_SignalMethod.rule
+      SETFILE: /opt/_results/EA31337-Lite_Fractals30_SignalMethod.set
+      TEST_REPORT_NAME: EA31337-Lite_Fractals30_SignalMethod
+      RUN_ON_SUCCESS: input_copy Fractals30_SignalMethod "$${SETFILE}" /opt/lite/ea-input.mqh

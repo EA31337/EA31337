@@ -1,0 +1,23 @@
+
+
+
+                                                                 Optimization Report
+                                                             EA31337-Lite-Backtest-v1.076
+                                                            Tripleafx-FX-Demo (Build 1010)
+
+                            Symbol          EURUSD (Euro vs US Dollar)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.01.30 23:30 (2018.01.01 - 2018.01.31)
+                            Model           Every tick (the most precise method based on all available least timeframes)
+                            Initial deposit 10000.00
+                            Spread          10
+                                                                 [Optimization Graph]
+             Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+                1 998.88         6402          1.15            0.16    1684.91      14.61  MaxOrders=0; MaxOrdersPerType=0; LotSize=0.01;
+                8 132.02         2269          1.08            0.06     613.45       5.87 MaxOrders=35; MaxOrdersPerType=0; LotSize=0.01;
+                9 132.02         2269          1.08            0.06     613.45       5.87 MaxOrders=40; MaxOrdersPerType=0; LotSize=0.01;
+                7 101.71         1973          1.07            0.05     474.60       4.59 MaxOrders=30; MaxOrdersPerType=0; LotSize=0.01;
+                4  57.79         1317          1.07            0.04     309.81       3.03 MaxOrders=15; MaxOrdersPerType=0; LotSize=0.01;
+                3  43.23          830          1.08            0.05     139.93       1.38 MaxOrders=10; MaxOrdersPerType=0; LotSize=0.01;
+                5  36.66         1315          1.04            0.03     301.94       2.96 MaxOrders=20; MaxOrdersPerType=0; LotSize=0.01;
+                6  18.86         1688          1.02            0.01     430.49       4.18 MaxOrders=25; MaxOrdersPerType=0; LotSize=0.01;
+                2   6.61          705          1.02            0.01     146.21       1.45  MaxOrders=5; MaxOrdersPerType=0; LotSize=0.01;

@@ -1,0 +1,26 @@
+
+
+
+                                                                 Optimization Report
+                                                             EA31337-Lite-Optimize-v1.076
+                                                            Tripleafx-FX-Demo (Build 1010)
+
+                            Symbol          EURUSD (Euro vs US Dollar)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
+                            Model           Every tick (the most precise method based on all available least timeframes)
+                            Initial deposit 10000.00
+                            Spread          10
+                                                                 [Optimization Graph]
+     Pass   Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+        2 -2050.94        17009          0.53           -0.12    2156.59      21.35 Alligator1_SignalMethod=19; MaxOrders=0; MaxOrdersPerType=0;
+        5 -2050.94        17009          0.53           -0.12    2156.59      21.35 Alligator1_SignalMethod=23; MaxOrders=0; MaxOrdersPerType=0;
+        8 -2070.99        16862          0.52           -0.12    2178.75      21.56 Alligator1_SignalMethod=27; MaxOrders=0; MaxOrdersPerType=0;
+       12 -2070.99        16862          0.52           -0.12    2178.75      21.56 Alligator1_SignalMethod=31; MaxOrders=0; MaxOrdersPerType=0;
+       11 -2765.88        22861          0.53           -0.12    2888.83      28.54 Alligator1_SignalMethod=30; MaxOrders=0; MaxOrdersPerType=0;
+        7 -2771.42        22875          0.53           -0.12    2894.66      28.60 Alligator1_SignalMethod=26; MaxOrders=0; MaxOrdersPerType=0;
+        4 -3068.39        25418          0.54           -0.12    3179.77      31.45 Alligator1_SignalMethod=22; MaxOrders=0; MaxOrdersPerType=0;
+        1 -3100.61        25543          0.54           -0.12    3217.80      31.81 Alligator1_SignalMethod=18; MaxOrders=0; MaxOrdersPerType=0;
+       10 -3602.44        24425          0.46           -0.15    3668.88      36.46 Alligator1_SignalMethod=29; MaxOrders=0; MaxOrdersPerType=0;
+        3 -3689.17        25567          0.48           -0.14    3750.08      37.29 Alligator1_SignalMethod=21; MaxOrders=0; MaxOrdersPerType=0;
+        6 -3819.06        26907          0.51           -0.14    4615.36      42.77 Alligator1_SignalMethod=25; MaxOrders=0; MaxOrdersPerType=0;
+        9 -4719.42        31858          0.47           -0.15    4887.10      48.09 Alligator1_SignalMethod=28; MaxOrders=0; MaxOrdersPerType=0;

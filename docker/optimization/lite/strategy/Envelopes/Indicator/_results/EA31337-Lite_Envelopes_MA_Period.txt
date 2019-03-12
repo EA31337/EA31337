@@ -1,0 +1,23 @@
+
+
+
+                                                                 Optimization Report
+                                                             EA31337-Lite-Optimize-v1.076
+                                                            Tripleafx-FX-Demo (Build 1010)
+
+                            Symbol          EURUSD (Euro vs US Dollar)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
+                            Model           Every tick (the most precise method based on all available least timeframes)
+                            Initial deposit 10000.00
+                            Spread          10
+                                                                 [Optimization Graph]
+        Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+           1 -277.17          911          0.52           -0.30     290.56       2.90 Envelopes_MA_Period=22; MaxOrders=0; MaxOrdersPerType=0;
+           2 -288.96         1027          0.57           -0.28     312.79       3.13 Envelopes_MA_Period=24; MaxOrders=0; MaxOrdersPerType=0;
+           3 -343.87         1138          0.56           -0.30     359.88       3.60 Envelopes_MA_Period=26; MaxOrders=0; MaxOrdersPerType=0;
+           4 -359.97         1237          0.57           -0.29     387.67       3.87 Envelopes_MA_Period=28; MaxOrders=0; MaxOrdersPerType=0;
+           5 -387.48         1345          0.58           -0.29     418.15       4.18 Envelopes_MA_Period=30; MaxOrders=0; MaxOrdersPerType=0;
+           6 -435.76         1452          0.57           -0.30     466.92       4.67 Envelopes_MA_Period=32; MaxOrders=0; MaxOrdersPerType=0;
+           7 -495.60         1570          0.56           -0.32     528.03       5.28 Envelopes_MA_Period=34; MaxOrders=0; MaxOrdersPerType=0;
+           8 -532.77         1676          0.57           -0.32     562.85       5.63 Envelopes_MA_Period=36; MaxOrders=0; MaxOrdersPerType=0;
+           9 -570.14         1784          0.57           -0.32     602.46       6.02 Envelopes_MA_Period=38; MaxOrders=0; MaxOrdersPerType=0;

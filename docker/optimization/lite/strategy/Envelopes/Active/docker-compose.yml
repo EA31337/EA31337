@@ -1,0 +1,78 @@
+version: '3.4'
+services:
+  Envelopes_Active:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../../../EA-Tester.ini
+    environment:
+      SETFILE: /opt/_results/EA31337-Lite_Envelopes_Active.set
+      TEST_REPORT_NAME: EA31337-Lite_Envelopes_Active
+      SET_PARAMS: Envelopes1_Active,Envelopes5_Active,Envelopes15_Active,Envelopes30_Active
+      RUN_ON_SUCCESS: for tf in 1 5 15 30; do input_copy "Envelopes$${tf}_Active" "$${SETFILE}" /opt/lite/ea-input.mqh; done
+  Envelopes1_Active:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: ../../../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-Envelopes1_Active.rule
+      SETFILE: /opt/_results/EA31337-Lite_Envelopes1_Active.set
+      TEST_REPORT_NAME: EA31337-Lite_Envelopes1_Active
+      RUN_ON_SUCCESS: input_copy Envelopes1_Active "$${SETFILE}" /opt/lite/ea-input.mqh
+  Envelopes5_Active:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: ../../../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-Envelopes5_Active.rule
+      SETFILE: /opt/_results/EA31337-Lite_Envelopes5_Active.set
+      TEST_REPORT_NAME: EA31337-Lite_Envelopes5_Active
+      RUN_ON_SUCCESS: input_copy Envelopes5_Active "$${SETFILE}" /opt/lite/ea-input.mqh
+  Envelopes15_Active:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: ../../../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-Envelopes15_Active.rule
+      SETFILE: /opt/_results/EA31337-Lite_Envelopes15_Active.set
+      TEST_REPORT_NAME: EA31337-Lite_Envelopes15_Active
+      RUN_ON_SUCCESS: input_copy Envelopes15_Active "$${SETFILE}" /opt/lite/ea-input.mqh
+  Envelopes30_Active:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: ../../../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Strategies/Envelopes/Strategy-Envelopes-Envelopes30_Active.rule
+      SETFILE: /opt/_results/EA31337-Lite_Envelopes30_Active.set
+      TEST_REPORT_NAME: EA31337-Lite_Envelopes30_Active
+      RUN_ON_SUCCESS: input_copy Envelopes30_Active "$${SETFILE}" /opt/lite/ea-input.mqh

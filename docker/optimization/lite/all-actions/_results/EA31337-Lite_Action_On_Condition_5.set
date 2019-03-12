@@ -1,0 +1,25 @@
+# Base params.
+ValidateSettings=0
+PrintLogOnChart=0
+WriteReport=0
+RecordTicksToCSV=0
+VerboseInfo=0
+VerboseErrors=0
+# Required params.
+Account_Conditions_Active=1
+# Optimization params.
+Account_Condition_4=23
+Account_Condition_4,F=0
+Account_Condition_4,1=0
+Account_Condition_4,2=0
+Account_Condition_4,3=0
+Market_Condition_4=0
+Market_Condition_4,F=1
+Market_Condition_4,1=1
+Market_Condition_4,2=1
+Market_Condition_4,3=19
+Action_On_Condition_4=0
+Action_On_Condition_4,F=1
+Action_On_Condition_4,1=0
+Action_On_Condition_4,2=1
+Action_On_Condition_4,3=13

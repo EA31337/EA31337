@@ -1,0 +1,28 @@
+version: '3.4'
+services:
+  backtest_2018:
+    command: run_backtest -v
+    image: ea31337:advanced-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-advanced-eurusd-2018
+    volumes:
+    - ../../../../src:/opt/src
+    - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_YEARS: 2018
+      TEST_REPORT_NAME: EA31337-Advanced_2018
+  backtest_2017:
+    command: run_backtest -v
+    image: ea31337:advanced-eurusd-2017
+    build:
+      context: ../../../..
+      target: ea31337-advanced-eurusd-2017
+    volumes:
+    - ../../../../src:/opt/src
+    - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_YEARS: 2017
+      TEST_REPORT_NAME: EA31337-Advanced_2017

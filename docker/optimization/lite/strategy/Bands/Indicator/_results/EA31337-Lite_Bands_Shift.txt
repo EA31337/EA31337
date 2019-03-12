@@ -1,0 +1,23 @@
+
+
+
+                                                                 Optimization Report
+                                                             EA31337-Lite-Optimize-v1.076
+                                                            Tripleafx-FX-Demo (Build 1010)
+
+                            Symbol          EURUSD (Euro vs US Dollar)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
+                            Model           Every tick (the most precise method based on all available least timeframes)
+                            Initial deposit 10000.00
+                            Spread          10
+                                                                 [Optimization Graph]
+             Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+                6 784.35         3452          1.29            0.23     312.98       3.02 Bands_Shift=2; Bands_Shift_Far=2; MaxOrders=0;
+                9 729.42         3607          1.25            0.20     324.26       3.15 Bands_Shift=2; Bands_Shift_Far=3; MaxOrders=0;
+                3 715.31         3276          1.28            0.22     310.80       3.01 Bands_Shift=2; Bands_Shift_Far=1; MaxOrders=0;
+                8 631.53         3504          1.24            0.18     294.82       2.95 Bands_Shift=1; Bands_Shift_Far=3; MaxOrders=0;
+                7 630.75         3387          1.25            0.19     283.70       2.83 Bands_Shift=0; Bands_Shift_Far=3; MaxOrders=0;
+                5 596.92         3335          1.23            0.18     272.83       2.70 Bands_Shift=1; Bands_Shift_Far=2; MaxOrders=0;
+                1 556.94         3056          1.24            0.18     261.68       2.61 Bands_Shift=0; Bands_Shift_Far=1; MaxOrders=0;
+                2 502.27         3175          1.21            0.16     264.93       2.65 Bands_Shift=1; Bands_Shift_Far=1; MaxOrders=0;
+                4 493.11         3232          1.20            0.15     286.17       2.86 Bands_Shift=0; Bands_Shift_Far=2; MaxOrders=0;

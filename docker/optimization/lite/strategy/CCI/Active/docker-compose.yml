@@ -1,0 +1,78 @@
+version: '3.4'
+services:
+  CCI_Active:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../../../EA-Tester.ini
+    environment:
+      SETFILE: /opt/_results/EA31337-Lite_CCI_Active.set
+      TEST_REPORT_NAME: EA31337-Lite_CCI_Active
+      SET_PARAMS: CCI1_Active,CCI5_Active,CCI15_Active,CCI30_Active
+      RUN_ON_SUCCESS: for tf in 1 5 15 30; do input_copy "CCI$${tf}_Active" "$${SETFILE}" /opt/lite/ea-input.mqh; done
+  CCI1_Active:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: ../../../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Strategies/CCI/Strategy-CCI-CCI1_Active.rule
+      SETFILE: /opt/_results/EA31337-Lite_CCI1_Active.set
+      TEST_REPORT_NAME: EA31337-Lite_CCI1_Active
+      RUN_ON_SUCCESS: input_copy CCI1_Active "$${SETFILE}" /opt/lite/ea-input.mqh
+  CCI5_Active:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: ../../../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Strategies/CCI/Strategy-CCI-CCI5_Active.rule
+      SETFILE: /opt/_results/EA31337-Lite_CCI5_Active.set
+      TEST_REPORT_NAME: EA31337-Lite_CCI5_Active
+      RUN_ON_SUCCESS: input_copy CCI5_Active "$${SETFILE}" /opt/lite/ea-input.mqh
+  CCI15_Active:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: ../../../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Strategies/CCI/Strategy-CCI-CCI15_Active.rule
+      SETFILE: /opt/_results/EA31337-Lite_CCI15_Active.set
+      TEST_REPORT_NAME: EA31337-Lite_CCI15_Active
+      RUN_ON_SUCCESS: input_copy CCI15_Active "$${SETFILE}" /opt/lite/ea-input.mqh
+  CCI30_Active:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: ../../../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Strategies/CCI/Strategy-CCI-CCI30_Active.rule
+      SETFILE: /opt/_results/EA31337-Lite_CCI30_Active.set
+      TEST_REPORT_NAME: EA31337-Lite_CCI30_Active
+      RUN_ON_SUCCESS: input_copy CCI30_Active "$${SETFILE}" /opt/lite/ea-input.mqh

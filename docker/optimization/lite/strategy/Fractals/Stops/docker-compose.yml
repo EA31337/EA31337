@@ -1,0 +1,34 @@
+version: '3.4'
+services:
+  Fractals_TrailingStopMethod:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../../../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Strategies/Fractals/Strategy-Fractals-All-Fractals_TrailingStopMethod.rule
+      SETFILE: /opt/_results/EA31337-Lite_Fractals_TrailingStopMethod.set
+      TEST_REPORT_NAME: EA31337-Lite_Fractals_TrailingStopMethod
+      RUN_ON_SUCCESS: input_copy Fractals_TrailingStopMethod "$${SETFILE}" /opt/lite/ea-input.mqh
+  Fractals_TrailingProfitMethod:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   - ../../../../../../../EA-Tester/scripts:/opt/scripts
+    env_file: ../../../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/Strategies/Fractals/Strategy-Fractals-All-Fractals_TrailingProfitMethod.rule
+      SETFILE: /opt/_results/EA31337-Lite_Fractals_TrailingProfitMethod.set
+      TEST_REPORT_NAME: EA31337-Lite_Fractals_TrailingProfitMethod
+      RUN_ON_SUCCESS: input_copy Fractals_TrailingProfitMethod "$${SETFILE}" /opt/lite/ea-input.mqh

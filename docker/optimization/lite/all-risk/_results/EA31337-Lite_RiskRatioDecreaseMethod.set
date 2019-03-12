@@ -1,0 +1,15 @@
+# Base params.
+ValidateSettings=0
+PrintLogOnChart=0
+WriteReport=0
+RecordTicksToCSV=0
+VerboseInfo=0
+VerboseErrors=0
+# Overridden params.
+RiskRatio=1.0
+# Optimization params.
+RiskRatioDecreaseMethod=1
+RiskRatioDecreaseMethod,F=1
+RiskRatioDecreaseMethod,1=0
+RiskRatioDecreaseMethod,2=1
+RiskRatioDecreaseMethod,3=255

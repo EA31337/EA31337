@@ -1,0 +1,48 @@
+version: '3.4'
+services:
+  SmartQueueActive:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../src/include/EA31337/lite:/opt/lite:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      INCLUDE: /opt/rules/All-SmartQueue/All-SmartQueueActive.rule
+      SETFILE: /opt/_results/EA31337-Lite_SmartQueueActive.set
+      TEST_REPORT_NAME: EA31337-Lite_SmartQueueActive
+      RUN_ON_SUCCESS: input_copy SmartQueueActive "$${SETFILE}" /opt/lite/ea-input.mqh
+# @fixme
+# SmartQueueMethod:
+#   command: run_backtest -v
+#   image: ea31337:lite-eurusd-2018
+#   build:
+#     context: ../../../..
+#     target: ea31337-lite-eurusd-2018
+#   volumes:
+#   - ./_results:/opt/_results:rw
+#   - ../../../../src/include/EA31337/lite:/opt/lite:rw
+#   env_file: ../EA-Tester.ini
+#   environment:
+#     INCLUDE: /opt/rules/All-SmartQueue/All-SmartQueueMethod.rule
+#     SETFILE: /opt/_results/EA31337-Lite_SmartQueueMethod.set
+#     TEST_REPORT_NAME: EA31337-Lite_SmartQueueMethod
+#     RUN_ON_SUCCESS: input_copy SmartQueueMethod "$${SETFILE}" /opt/lite/ea-input.mqh
+# SmartQueueFilter:
+#   command: run_backtest -v
+#   image: ea31337:lite-eurusd-2018
+#   build:
+#     context: ../../../..
+#     target: ea31337-lite-eurusd-2018
+#   volumes:
+#   - ./_results:/opt/_results:rw
+#   - ../../../../src/include/EA31337/lite:/opt/lite:rw
+#   env_file: ../EA-Tester.ini
+#   environment:
+#     INCLUDE: /opt/rules/All-SmartQueue/All-SmartQueueFilter.rule
+#     SETFILE: /opt/_results/EA31337-Lite_SmartQueueFilter.set
+#     TEST_REPORT_NAME: EA31337-Lite_SmartQueueFilter
+#     RUN_ON_SUCCESS: input_copy SmartQueueFilter "$${SETFILE}" /opt/lite/ea-input.mqh

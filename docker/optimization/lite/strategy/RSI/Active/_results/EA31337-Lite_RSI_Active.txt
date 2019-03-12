@@ -1,0 +1,30 @@
+
+
+
+                                                                 Optimization Report
+                                                             EA31337-Lite-Optimize-v1.076
+                                                            Tripleafx-FX-Demo (Build 1010)
+
+                            Symbol          EURUSD (Euro vs US Dollar)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
+                            Model           Every tick (the most precise method based on all available least timeframes)
+                            Initial deposit 10000.00
+                            Spread          10
+                                                                 [Optimization Graph]
+             Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+               13  122.59         1131          1.22            0.11     126.47       1.25 RSI1_Active=0; RSI5_Active=0; RSI15_Active=1;
+                5   77.46          727          1.20            0.11      73.76       0.73 RSI1_Active=0; RSI5_Active=0; RSI15_Active=1;
+                9   32.36          404          1.12            0.08      71.05       0.71 RSI1_Active=0; RSI5_Active=0; RSI15_Active=0;
+                2    3.17          486          1.03            0.01      25.43       0.25 RSI1_Active=1; RSI5_Active=0; RSI15_Active=0;
+                1    0.00            0          0.00            0.00       0.00       0.00 RSI1_Active=0; RSI5_Active=0; RSI15_Active=0;
+                7    0.84         3523          1.00            0.00     183.12       1.83 RSI1_Active=0; RSI5_Active=1; RSI15_Active=1;
+               15   -1.09         3927          1.00           -0.00     206.90       2.06 RSI1_Active=0; RSI5_Active=1; RSI15_Active=1;
+               10  -12.91          890          0.93           -0.01      23.26       0.23 RSI1_Active=1; RSI5_Active=0; RSI15_Active=0;
+                6  -20.98         1213          0.91           -0.02      43.74       0.44 RSI1_Active=1; RSI5_Active=0; RSI15_Active=1;
+                3  -36.94         2796          0.97           -0.01     151.70       1.51 RSI1_Active=0; RSI5_Active=1; RSI15_Active=0;
+               11  -40.93         3200          0.97           -0.01     178.31       1.78 RSI1_Active=0; RSI5_Active=1; RSI15_Active=0;
+               14  -41.92         1617          0.87           -0.03      69.85       0.70 RSI1_Active=1; RSI5_Active=0; RSI15_Active=1;
+                4 -168.22         3282          0.75           -0.05     180.85       1.81 RSI1_Active=1; RSI5_Active=1; RSI15_Active=0;
+               12 -188.12         3686          0.75           -0.05     200.19       2.00 RSI1_Active=1; RSI5_Active=1; RSI15_Active=0;
+                8 -190.28         4009          0.77           -0.05     202.11       2.02 RSI1_Active=1; RSI5_Active=1; RSI15_Active=1;
+               16 -209.14         4413          0.77           -0.05     220.41       2.20 RSI1_Active=1; RSI5_Active=1; RSI15_Active=1;
