@@ -5985,7 +5985,7 @@ string GetMonthlyReport() {
  * Display info on chart.
  */
 string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
-  if (!terminal.IsRealtime() || !terminal.IsVisualMode()) {
+  if (!terminal.IsRealtime() && !terminal.IsVisualMode()) {
     return NULL;
   }
 
