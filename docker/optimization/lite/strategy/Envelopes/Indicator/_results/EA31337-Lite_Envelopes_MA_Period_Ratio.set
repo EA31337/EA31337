@@ -2,7 +2,7 @@
 LotSize=0.01
 Boosting_Enabled=0
 Account_Conditions_Active=0
-CloseOrderAfterXHours=48
+CloseOrderAfterXHours=24
 ProfitFactorMinToTrade=0
 ProfitFactorMaxToTrade=0
 ValidateSettings=0
