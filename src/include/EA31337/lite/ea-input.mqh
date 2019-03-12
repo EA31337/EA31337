@@ -314,9 +314,9 @@ double Awesome30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --"; // >>> BANDS <<<
-extern bool Bands1_Active = 0; // Enable for M1
+extern bool Bands1_Active = 1; // Enable for M1
 extern bool Bands5_Active = 1; // Enable for M5
-extern bool Bands15_Active = 1; // Enable for M15
+extern bool Bands15_Active = 0; // Enable for M15
 extern bool Bands30_Active = 0; // Enable for M30
 extern int Bands_Period = 26; // Period
 extern double Bands_Period_Ratio = 1; // Period ratio between timeframes (0.5-1.5)
