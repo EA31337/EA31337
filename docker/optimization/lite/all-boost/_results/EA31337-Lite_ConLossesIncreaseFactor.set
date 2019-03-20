@@ -9,7 +9,7 @@ RecordTicksToCSV=0
 VerboseInfo=0
 VerboseErrors=0
 # Optimization params.
-ConLossesIncreaseFactor=1
+ConLossesIncreaseFactor=0.7
 ConLossesIncreaseFactor,F=0
 ConLossesIncreaseFactor,1=0
 ConLossesIncreaseFactor,2=0

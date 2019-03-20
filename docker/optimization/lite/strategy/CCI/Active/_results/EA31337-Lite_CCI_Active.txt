@@ -12,19 +12,19 @@
                             Spread          10
                                                                  [Optimization Graph]
              Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-               16 1423.26        17027          1.11            0.08    1433.97      11.17 CCI1_Active=1; CCI5_Active=1; CCI15_Active=1;
-                8 1397.33        17014          1.11            0.08    1438.26      11.22 CCI1_Active=1; CCI5_Active=1; CCI15_Active=1;
-               12 1344.91        14667          1.12            0.09    1403.39      11.01 CCI1_Active=1; CCI5_Active=1; CCI15_Active=0;
-               14 1340.68        16099          1.11            0.08    1433.47      11.23 CCI1_Active=1; CCI5_Active=0; CCI15_Active=1;
-                4 1318.98        14654          1.12            0.09    1407.68      11.07 CCI1_Active=1; CCI5_Active=1; CCI15_Active=0;
-                6 1314.75        16086          1.11            0.08    1437.76      11.28 CCI1_Active=1; CCI5_Active=0; CCI15_Active=1;
-               10 1266.87        13739          1.12            0.09    1402.98      11.07 CCI1_Active=1; CCI5_Active=0; CCI15_Active=0;
-                2 1240.94        13726          1.12            0.09    1407.27      11.13 CCI1_Active=1; CCI5_Active=0; CCI15_Active=0;
-               15  227.45         3301          1.11            0.07     257.64       2.57 CCI1_Active=0; CCI5_Active=1; CCI15_Active=1;
-                7  198.22         3288          1.09            0.06     257.64       2.57 CCI1_Active=0; CCI5_Active=1; CCI15_Active=1;
-               13  156.99         2373          1.12            0.07     170.45       1.70 CCI1_Active=0; CCI5_Active=0; CCI15_Active=1;
-                5  125.50         2360          1.09            0.05     170.45       1.70 CCI1_Active=0; CCI5_Active=0; CCI15_Active=1;
-               11  109.34          941          1.13            0.12     100.71       1.00 CCI1_Active=0; CCI5_Active=1; CCI15_Active=0;
-                3   80.11          928          1.10            0.09     100.71       1.00 CCI1_Active=0; CCI5_Active=1; CCI15_Active=0;
-                9   31.40           13          0.00            2.42       4.31       0.04 CCI1_Active=0; CCI5_Active=0; CCI15_Active=0;
+               13  164.57         1538          1.15            0.11      81.32       0.81 CCI1_Active=0; CCI5_Active=0; CCI15_Active=1;
+                9   94.86          506          1.18            0.19      65.97       0.66 CCI1_Active=0; CCI5_Active=0; CCI15_Active=0;
+                5   61.65         1004          1.09            0.06      44.50       0.44 CCI1_Active=0; CCI5_Active=0; CCI15_Active=1;
+               11   15.93          826          1.04            0.02      42.10       0.42 CCI1_Active=0; CCI5_Active=1; CCI15_Active=0;
+                4    8.97           63          1.68            0.14       5.42       0.05 CCI1_Active=1; CCI5_Active=1; CCI15_Active=0;
+               15    6.01         2171          1.01            0.00      83.05       0.83 CCI1_Active=0; CCI5_Active=1; CCI15_Active=1;
+                3    5.92           58          1.27            0.10      11.02       0.11 CCI1_Active=0; CCI5_Active=1; CCI15_Active=0;
                 1    0.00            0          0.00            0.00       0.00       0.00 CCI1_Active=0; CCI5_Active=0; CCI15_Active=0;
+                2    0.00            0          0.00            0.00       0.00       0.00 CCI1_Active=1; CCI5_Active=0; CCI15_Active=0;
+                7   -3.73         1409          0.99           -0.00      48.36       0.48 CCI1_Active=0; CCI5_Active=1; CCI15_Active=1;
+               12  -54.14         1093          0.84           -0.05      67.81       0.68 CCI1_Active=1; CCI5_Active=1; CCI15_Active=0;
+               10  -63.86         1030          0.81           -0.06      78.11       0.78 CCI1_Active=1; CCI5_Active=0; CCI15_Active=0;
+                8 -111.99         2209          0.80           -0.05     123.64       1.24 CCI1_Active=1; CCI5_Active=1; CCI15_Active=1;
+                6 -121.31         2144          0.78           -0.06     133.85       1.34 CCI1_Active=1; CCI5_Active=0; CCI15_Active=1;
+               16 -175.47         3234          0.81           -0.05     202.14       2.02 CCI1_Active=1; CCI5_Active=1; CCI15_Active=1;
+               14 -184.79         3169          0.79           -0.06     212.35       2.12 CCI1_Active=1; CCI5_Active=0; CCI15_Active=1;

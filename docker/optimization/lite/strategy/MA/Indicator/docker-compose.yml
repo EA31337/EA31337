@@ -9,7 +9,6 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-    - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-All-MA_Periods.rule
@@ -25,7 +24,6 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-    - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-All-MA_Period_Ratio.rule
@@ -41,7 +39,6 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-    - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-All-MA_Applied_Price.rule
@@ -57,7 +54,6 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-    - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../../../EA-Tester.ini
     environment:
       INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-All-MA_SignalLevel.rule
@@ -73,14 +69,13 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-    - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../../../EA-Tester.ini
     environment:
+      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=10
       INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-All-MA_Shift.rule
       SETFILE: /opt/_results/EA31337-Lite_MA_Shift.set
       TEST_REPORT_NAME: EA31337-Lite_MA_Shift
       RUN_ON_SUCCESS: for p in Shift Shift_Far; do input_copy "MA_$${p}" "$${SETFILE}" /opt/lite/ea-input.mqh; done
-      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=0.8
   MA_Shift_Fast:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -90,14 +85,13 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-    - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../../../EA-Tester.ini
     environment:
+      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=10
       INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-All-MA_Shift_Fast.rule
       SETFILE: /opt/_results/EA31337-Lite_MA_Shift_Fast.set
       TEST_REPORT_NAME: EA31337-Lite_MA_Shift_Fast
       RUN_ON_SUCCESS: input_copy MA_Shift_Fast "$${SETFILE}" /opt/lite/ea-input.mqh
-      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=0.8
   MA_Shift_Medium:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -107,14 +101,13 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-    - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../../../EA-Tester.ini
     environment:
+      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=10
       INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-All-MA_Shift_Medium.rule
       SETFILE: /opt/_results/EA31337-Lite_MA_Shift_Medium.set
       TEST_REPORT_NAME: EA31337-Lite_MA_Shift_Medium
       RUN_ON_SUCCESS: input_copy MA_Shift_Medium "$${SETFILE}" /opt/lite/ea-input.mqh
-      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=0.8
   MA_Shift_Slow:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018
@@ -124,11 +117,10 @@ services:
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-    - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../../../EA-Tester.ini
     environment:
+      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=10
       INCLUDE: /opt/rules/Strategies/MA/Strategy-MA-All-MA_Shift_Slow.rule
       SETFILE: /opt/_results/EA31337-Lite_MA_Shift_Slow.set
       TEST_REPORT_NAME: EA31337-Lite_MA_Shift_Slow
       RUN_ON_SUCCESS: input_copy MA_Shift_Slow "$${SETFILE}" /opt/lite/ea-input.mqh
-      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=0.8

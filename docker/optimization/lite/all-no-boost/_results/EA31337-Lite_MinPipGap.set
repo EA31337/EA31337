@@ -12,7 +12,7 @@ RecordTicksToCSV=0
 VerboseInfo=0
 VerboseErrors=0
 # Optimization params.
-MinPipGap=0
+MinPipGap=10
 MinPipGap,F=0
 MinPipGap,1=0
 MinPipGap,2=0

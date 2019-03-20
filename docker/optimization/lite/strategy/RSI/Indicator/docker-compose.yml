@@ -12,6 +12,7 @@ services:
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../../../EA-Tester.ini
     environment:
+      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=5
       INCLUDE: /opt/rules/Strategies/RSI/Strategy-RSI-All-RSI_Period.rule
       SETFILE: /opt/_results/EA31337-Lite_RSI_Period.set
       TEST_REPORT_NAME: EA31337-Lite_RSI_Period

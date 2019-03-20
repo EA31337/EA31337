@@ -63,7 +63,7 @@ Alligator5_SignalMethod=0
 Alligator15_SignalMethod=0
 Alligator30_SignalMethod=0
 # Optimization params.
-Alligator_Applied_Price=2
+Alligator_Applied_Price=3
 Alligator_Applied_Price,F=0
 Alligator_Applied_Price,1=0
 Alligator_Applied_Price,2=0

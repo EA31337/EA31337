@@ -9,7 +9,7 @@ RecordTicksToCSV=0
 VerboseInfo=0
 VerboseErrors=0
 # Optimization params.
-BestMonthlyStrategyMultiplierFactor=1.0
+BestMonthlyStrategyMultiplierFactor=0.1
 BestMonthlyStrategyMultiplierFactor,F=0
 BestMonthlyStrategyMultiplierFactor,1=0
 BestMonthlyStrategyMultiplierFactor,2=0

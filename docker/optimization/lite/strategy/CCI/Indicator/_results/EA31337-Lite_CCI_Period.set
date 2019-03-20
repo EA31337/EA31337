@@ -64,7 +64,7 @@ CCI15_SignalMethod=0
 CCI30_SignalMethod=0
 CCI_Period_Ratio=1.0
 # Optimization params.
-CCI_Period=30
+CCI_Period=28
 CCI_Period,F=0
 CCI_Period,1=0
 CCI_Period,2=0

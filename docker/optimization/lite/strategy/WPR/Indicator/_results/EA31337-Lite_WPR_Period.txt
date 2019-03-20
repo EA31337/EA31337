@@ -12,12 +12,12 @@
                             Spread          10
                                                                  [Optimization Graph]
              Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-                1  28.84          543          1.07            0.05      71.24       0.71 WPR_Period=10; MaxOrders=0; MaxOrdersPerType=0;
-                6  24.43          520          1.05            0.05     126.25       1.26 WPR_Period=20; MaxOrders=0; MaxOrdersPerType=0;
-                2  19.79          536          1.05            0.04      78.73       0.79 WPR_Period=12; MaxOrders=0; MaxOrdersPerType=0;
-                4  17.35          531          1.04            0.03     113.26       1.13 WPR_Period=16; MaxOrders=0; MaxOrdersPerType=0;
-                7  17.59          516          1.04            0.03     127.58       1.28 WPR_Period=22; MaxOrders=0; MaxOrdersPerType=0;
-                5  10.34          521          1.02            0.02     117.83       1.18 WPR_Period=18; MaxOrders=0; MaxOrdersPerType=0;
-                8   8.58          516          1.02            0.02     145.81       1.46 WPR_Period=24; MaxOrders=0; MaxOrdersPerType=0;
-                3   3.47          535          1.01            0.01     108.56       1.09 WPR_Period=14; MaxOrders=0; MaxOrdersPerType=0;
-                9   0.28          503          1.00            0.00     159.33       1.59 WPR_Period=26; MaxOrders=0; MaxOrdersPerType=0;
+                3 614.04         1197          1.57            0.51     198.45       1.98  WPR_Period=6; MaxOrders=0; MaxOrdersPerType=0;
+                6 543.60         1095          1.56            0.50     259.11       2.59 WPR_Period=12; MaxOrders=0; MaxOrdersPerType=0;
+                5 524.59         1109          1.52            0.47     223.93       2.24 WPR_Period=10; MaxOrders=0; MaxOrdersPerType=0;
+                4 523.31         1134          1.50            0.46     224.86       2.25  WPR_Period=8; MaxOrders=0; MaxOrdersPerType=0;
+                9 468.81         1122          1.47            0.42     312.80       3.13 WPR_Period=18; MaxOrders=0; MaxOrdersPerType=0;
+                7 431.66         1117          1.42            0.39     275.72       2.76 WPR_Period=14; MaxOrders=0; MaxOrdersPerType=0;
+                8 430.49         1123          1.43            0.38     319.99       3.20 WPR_Period=16; MaxOrders=0; MaxOrdersPerType=0;
+                2 428.34         1227          1.37            0.35     198.43       1.98  WPR_Period=4; MaxOrders=0; MaxOrdersPerType=0;
+                1 356.13         1470          1.23            0.24     328.07       3.24  WPR_Period=2; MaxOrders=0; MaxOrdersPerType=0;

@@ -63,12 +63,12 @@ Bands5_SignalMethod=0
 Bands15_SignalMethod=0
 Bands30_SignalMethod=0
 # Optimization params.
-Bands_Shift=2
+Bands_Shift=3
 Bands_Shift,F=0
 Bands_Shift,1=0
 Bands_Shift,2=0
 Bands_Shift,3=0
-Bands_Shift_Far=2
+Bands_Shift_Far=1
 Bands_Shift_Far,F=0
 Bands_Shift_Far,1=0
 Bands_Shift_Far,2=0

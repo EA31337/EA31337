@@ -63,7 +63,7 @@ SAR5_SignalMethod=0
 SAR15_SignalMethod=0
 SAR30_SignalMethod=0
 # Optimization params.
-SAR_Maximum_Stop=0.3
+SAR_Maximum_Stop=0.4
 SAR_Maximum_Stop,F=0
 SAR_Maximum_Stop,1=0
 SAR_Maximum_Stop,2=0

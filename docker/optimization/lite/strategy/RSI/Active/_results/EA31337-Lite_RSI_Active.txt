@@ -11,20 +11,20 @@
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
-             Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-               13  122.59         1131          1.22            0.11     126.47       1.25 RSI1_Active=0; RSI5_Active=0; RSI15_Active=1;
-                5   77.46          727          1.20            0.11      73.76       0.73 RSI1_Active=0; RSI5_Active=0; RSI15_Active=1;
-                9   32.36          404          1.12            0.08      71.05       0.71 RSI1_Active=0; RSI5_Active=0; RSI15_Active=0;
-                2    3.17          486          1.03            0.01      25.43       0.25 RSI1_Active=1; RSI5_Active=0; RSI15_Active=0;
-                1    0.00            0          0.00            0.00       0.00       0.00 RSI1_Active=0; RSI5_Active=0; RSI15_Active=0;
-                7    0.84         3523          1.00            0.00     183.12       1.83 RSI1_Active=0; RSI5_Active=1; RSI15_Active=1;
-               15   -1.09         3927          1.00           -0.00     206.90       2.06 RSI1_Active=0; RSI5_Active=1; RSI15_Active=1;
-               10  -12.91          890          0.93           -0.01      23.26       0.23 RSI1_Active=1; RSI5_Active=0; RSI15_Active=0;
-                6  -20.98         1213          0.91           -0.02      43.74       0.44 RSI1_Active=1; RSI5_Active=0; RSI15_Active=1;
-                3  -36.94         2796          0.97           -0.01     151.70       1.51 RSI1_Active=0; RSI5_Active=1; RSI15_Active=0;
-               11  -40.93         3200          0.97           -0.01     178.31       1.78 RSI1_Active=0; RSI5_Active=1; RSI15_Active=0;
-               14  -41.92         1617          0.87           -0.03      69.85       0.70 RSI1_Active=1; RSI5_Active=0; RSI15_Active=1;
-                4 -168.22         3282          0.75           -0.05     180.85       1.81 RSI1_Active=1; RSI5_Active=1; RSI15_Active=0;
-               12 -188.12         3686          0.75           -0.05     200.19       2.00 RSI1_Active=1; RSI5_Active=1; RSI15_Active=0;
-                8 -190.28         4009          0.77           -0.05     202.11       2.02 RSI1_Active=1; RSI5_Active=1; RSI15_Active=1;
-               16 -209.14         4413          0.77           -0.05     220.41       2.20 RSI1_Active=1; RSI5_Active=1; RSI15_Active=1;
+              Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+                15  48.23          870          1.04            0.06     144.19       1.44 RSI1_Active=0; RSI5_Active=1; RSI15_Active=1;
+                13  48.74          395          1.09            0.12      96.87       0.97 RSI1_Active=0; RSI5_Active=0; RSI15_Active=1;
+                14  40.99         1599          1.02            0.03     203.65       2.03 RSI1_Active=1; RSI5_Active=0; RSI15_Active=1;
+                10  39.14         1402          1.02            0.03     165.31       1.65 RSI1_Active=1; RSI5_Active=0; RSI15_Active=0;
+                 9  39.42          190          1.18            0.21      54.65       0.55 RSI1_Active=0; RSI5_Active=0; RSI15_Active=0;
+                16  36.29         2076          1.01            0.02     261.06       2.60 RSI1_Active=1; RSI5_Active=1; RSI15_Active=1;
+                11  34.21          669          1.04            0.05     106.69       1.06 RSI1_Active=0; RSI5_Active=1; RSI15_Active=0;
+                12  33.41         1875          1.01            0.02     222.71       2.22 RSI1_Active=1; RSI5_Active=1; RSI15_Active=0;
+                 7  17.05          670          1.02            0.03     104.32       1.04 RSI1_Active=0; RSI5_Active=1; RSI15_Active=1;
+                 6  13.72         1391          1.01            0.01     154.19       1.53 RSI1_Active=1; RSI5_Active=0; RSI15_Active=1;
+                 2  11.98         1194          1.01            0.01     124.52       1.24 RSI1_Active=1; RSI5_Active=0; RSI15_Active=0;
+                 5   6.12          200          1.02            0.03      65.09       0.65 RSI1_Active=0; RSI5_Active=0; RSI15_Active=1;
+                 3   3.89          469          1.01            0.01      67.16       0.67 RSI1_Active=0; RSI5_Active=1; RSI15_Active=0;
+                 1   0.00            0          0.00            0.00       0.00       0.00 RSI1_Active=0; RSI5_Active=0; RSI15_Active=0;
+                 8  -2.46         1868          1.00           -0.00     218.73       2.17 RSI1_Active=1; RSI5_Active=1; RSI15_Active=1;
+                 4 -20.20         1667          0.99           -0.01     180.47       1.80 RSI1_Active=1; RSI5_Active=1; RSI15_Active=0;

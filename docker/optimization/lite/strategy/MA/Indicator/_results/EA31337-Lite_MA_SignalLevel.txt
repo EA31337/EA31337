@@ -6,14 +6,14 @@
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
-          Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-             1  98.36         1415          1.17            0.07      59.96       0.59 MA_SignalLevel=-0.4; MaxOrders=0; MaxOrdersPerType=0;
-             2  80.72         1345          1.14            0.06      66.40       0.66 MA_SignalLevel=-0.3; MaxOrders=0; MaxOrdersPerType=0;
-             3  71.51         1259          1.13            0.06      57.80       0.57 MA_SignalLevel=-0.2; MaxOrders=0; MaxOrdersPerType=0;
-             4  66.36         1180          1.13            0.06      50.11       0.50 MA_SignalLevel=-0.1; MaxOrders=0; MaxOrdersPerType=0;
-             5  60.23         1107          1.13            0.05      42.59       0.42    MA_SignalLevel=0; MaxOrders=0; MaxOrdersPerType=0;
+         Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+            1 1250.40         6536          1.16            0.19     467.88       4.14 MA_SignalLevel=-0.6; MaxOrders=0; MaxOrdersPerType=0;
+            2 1139.32         6283          1.15            0.18     453.57       4.05 MA_SignalLevel=-0.5; MaxOrders=0; MaxOrdersPerType=0;
+            3  970.47         6043          1.13            0.16     449.60       4.05 MA_SignalLevel=-0.4; MaxOrders=0; MaxOrdersPerType=0;
+            4  896.73         5791          1.13            0.15     443.74       4.02 MA_SignalLevel=-0.3; MaxOrders=0; MaxOrdersPerType=0;
+            5  878.98         5526          1.13            0.16     412.25       3.74 MA_SignalLevel=-0.2; MaxOrders=0; MaxOrdersPerType=0;

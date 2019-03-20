@@ -1,4 +1,6 @@
 # Base params.
+ProfitFactorMinToTrade=0
+ProfitFactorMaxToTrade=0
 ValidateSettings=0
 PrintLogOnChart=0
 WriteReport=0

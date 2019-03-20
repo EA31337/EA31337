@@ -11,20 +11,20 @@
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
-              Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-                15 919.71         2065          1.21            0.45     652.78       6.44 WPR1_Active=0; WPR5_Active=1; WPR15_Active=1;
-                16 915.29         3583          1.15            0.26     747.39       7.11 WPR1_Active=1; WPR5_Active=1; WPR15_Active=1;
-                14 749.72         3069          1.15            0.24     662.06       6.04 WPR1_Active=1; WPR5_Active=0; WPR15_Active=1;
-                13 737.45         1551          1.21            0.48     599.13       5.29 WPR1_Active=0; WPR5_Active=0; WPR15_Active=1;
-                11 728.82         1662          1.20            0.44     533.37       5.28 WPR1_Active=0; WPR5_Active=1; WPR15_Active=0;
-                12 726.28         3180          1.14            0.23     621.88       6.07 WPR1_Active=1; WPR5_Active=1; WPR15_Active=0;
-                10 588.38         2666          1.14            0.22     507.96       4.75 WPR1_Active=1; WPR5_Active=0; WPR15_Active=0;
-                 9 587.08         1148          1.22            0.51     429.77       3.92 WPR1_Active=0; WPR5_Active=0; WPR15_Active=0;
-                 8 437.26         2435          1.12            0.18     419.03       4.16 WPR1_Active=1; WPR5_Active=1; WPR15_Active=1;
-                 7 399.43          917          1.21            0.44     361.93       3.41 WPR1_Active=0; WPR5_Active=1; WPR15_Active=1;
-                 4 259.02         2032          1.09            0.13     290.74       2.90 WPR1_Active=1; WPR5_Active=1; WPR15_Active=0;
-                 5 249.27          403          1.30            0.62     135.72       1.31 WPR1_Active=0; WPR5_Active=0; WPR15_Active=1;
-                 3 190.30          514          1.18            0.37     236.56       2.28 WPR1_Active=0; WPR5_Active=1; WPR15_Active=0;
-                 6 185.22         1921          1.07            0.10     358.46       3.42 WPR1_Active=1; WPR5_Active=0; WPR15_Active=1;
-                 2  56.28         1518          1.03            0.04     200.62       1.96 WPR1_Active=1; WPR5_Active=0; WPR15_Active=0;
-                 1   0.00            0          0.00            0.00       0.00       0.00 WPR1_Active=0; WPR5_Active=0; WPR15_Active=0;
+             Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+                8  419.26         5000          1.06            0.08     456.90       4.52 WPR1_Active=1; WPR5_Active=1; WPR15_Active=1;
+               11  254.46         4427          1.06            0.06     267.77       2.67 WPR1_Active=0; WPR5_Active=1; WPR15_Active=0;
+                9  183.47         2734          1.10            0.07     147.89       1.43 WPR1_Active=0; WPR5_Active=0; WPR15_Active=0;
+               10  172.31         4145          1.05            0.04     336.98       3.24 WPR1_Active=1; WPR5_Active=0; WPR15_Active=0;
+               14   96.58         5369          1.02            0.02     431.52       4.29 WPR1_Active=1; WPR5_Active=0; WPR15_Active=1;
+                3   64.99         2777          1.03            0.02     249.81       2.44 WPR1_Active=0; WPR5_Active=1; WPR15_Active=0;
+                7   51.47         3683          1.01            0.01     385.41       3.82 WPR1_Active=0; WPR5_Active=1; WPR15_Active=1;
+               12    9.46         5575          1.00            0.00     525.79       5.24 WPR1_Active=1; WPR5_Active=1; WPR15_Active=0;
+                2    2.69         1650          1.00            0.00     247.85       2.44 WPR1_Active=1; WPR5_Active=0; WPR15_Active=0;
+                1    0.00            0          0.00            0.00       0.00       0.00 WPR1_Active=0; WPR5_Active=0; WPR15_Active=0;
+               15   -3.02         5292          1.00           -0.00     396.91       3.96 WPR1_Active=0; WPR5_Active=1; WPR15_Active=1;
+                6   -6.42         4264          1.00           -0.00     433.74       4.31 WPR1_Active=1; WPR5_Active=0; WPR15_Active=1;
+               16  -10.00         6645          1.00           -0.00     595.36       5.94 WPR1_Active=1; WPR5_Active=1; WPR15_Active=1;
+                5  -93.38         3230          0.96           -0.03     247.71       2.47 WPR1_Active=0; WPR5_Active=0; WPR15_Active=1;
+                4 -106.65         3899          0.97           -0.03     538.83       5.26 WPR1_Active=1; WPR5_Active=1; WPR15_Active=0;
+               13 -184.53         3985          0.96           -0.05     359.62       3.54 WPR1_Active=0; WPR5_Active=0; WPR15_Active=1;

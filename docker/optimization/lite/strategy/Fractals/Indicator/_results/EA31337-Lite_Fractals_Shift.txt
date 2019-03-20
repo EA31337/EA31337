@@ -6,14 +6,14 @@
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
            Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-              1  -40.70         1964          0.98           -0.02     280.79       2.79 Fractals_Shift=0; MaxOrders=0; MaxOrdersPerType=0;
-              2 -204.74         3320          0.93           -0.06     463.67       4.61 Fractals_Shift=1; MaxOrders=0; MaxOrdersPerType=0;
-              5 -261.21         4010          0.93           -0.07     538.93       5.38 Fractals_Shift=4; MaxOrders=0; MaxOrdersPerType=0;
-              3 -278.03         4275          0.93           -0.07     520.22       5.18 Fractals_Shift=2; MaxOrders=0; MaxOrdersPerType=0;
-              4 -432.10         4010          0.88           -0.11     634.23       6.33 Fractals_Shift=3; MaxOrders=0; MaxOrdersPerType=0;
+              1 -432.28         3952          0.49           -0.11     437.80       4.38 Fractals_Shift=0; MaxOrders=0; MaxOrdersPerType=0;
+              2 -629.42         6625          0.64           -0.10     664.04       6.63 Fractals_Shift=1; MaxOrders=0; MaxOrdersPerType=0;
+              4 -631.31         8024          0.72           -0.08     754.13       7.49 Fractals_Shift=3; MaxOrders=0; MaxOrdersPerType=0;
+              5 -663.25         8024          0.70           -0.08     749.83       7.47 Fractals_Shift=4; MaxOrders=0; MaxOrdersPerType=0;
+              3 -724.61         8573          0.71           -0.08     809.52       8.06 Fractals_Shift=2; MaxOrders=0; MaxOrdersPerType=0;

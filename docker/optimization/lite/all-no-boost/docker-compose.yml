@@ -161,9 +161,9 @@ services:
     - ../../../../src/include/EA31337/lite:/opt/lite:rw
     env_file: ../EA-Tester.ini
     environment:
-      INCLUDE: /opt/rules/All-No_Boost/All-TrendPeriod.rule
       SETFILE: /opt/_results/EA31337-Lite_TrendPeriod.set
       TEST_REPORT_NAME: EA31337-Lite_TrendPeriod
+      SET_PARAMS: TrendPeriod
       RUN_ON_SUCCESS: input_copy TrendPeriod "$${SETFILE}" /opt/lite/ea-input.mqh
 # TrendMethod:
 #   command: run_backtest -v

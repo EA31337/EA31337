@@ -6,36 +6,36 @@
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
        Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-          8   76.62         1199          1.15            0.06      58.29       0.58  MA_Period_Fast=10; MA_Period_Medium=14; MA_Period_Slow=6;
-         23   75.97         1267          1.14            0.06      60.78       0.60 MA_Period_Fast=10; MA_Period_Medium=12; MA_Period_Slow=10;
-         22   73.35         1255          1.14            0.06      58.93       0.58  MA_Period_Fast=8; MA_Period_Medium=12; MA_Period_Slow=10;
-         14   71.51         1259          1.13            0.06      57.80       0.57  MA_Period_Fast=10; MA_Period_Medium=12; MA_Period_Slow=8;
-          9   65.12         1200          1.13            0.05      55.09       0.55  MA_Period_Fast=12; MA_Period_Medium=14; MA_Period_Slow=6;
-         19   65.62         1357          1.11            0.05      60.85       0.61  MA_Period_Fast=8; MA_Period_Medium=10; MA_Period_Slow=10;
-         13   65.82         1243          1.13            0.05      56.93       0.57   MA_Period_Fast=8; MA_Period_Medium=12; MA_Period_Slow=8;
-         26   57.11         1122          1.12            0.05      60.71       0.60 MA_Period_Fast=10; MA_Period_Medium=14; MA_Period_Slow=10;
-         17   54.96         1143          1.11            0.05      61.70       0.61  MA_Period_Fast=10; MA_Period_Medium=14; MA_Period_Slow=8;
-         20   51.60         1383          1.09            0.04      84.25       0.84 MA_Period_Fast=10; MA_Period_Medium=10; MA_Period_Slow=10;
-          5   50.62         1296          1.09            0.04      58.83       0.58  MA_Period_Fast=10; MA_Period_Medium=12; MA_Period_Slow=6;
-          4   44.59         1277          1.08            0.03      57.98       0.58   MA_Period_Fast=8; MA_Period_Medium=12; MA_Period_Slow=6;
-          7   42.53         1174          1.08            0.04      65.12       0.65   MA_Period_Fast=8; MA_Period_Medium=14; MA_Period_Slow=6;
-         18   40.80         1144          1.08            0.04      62.33       0.62  MA_Period_Fast=12; MA_Period_Medium=14; MA_Period_Slow=8;
-         27   38.87         1123          1.08            0.03      61.16       0.61 MA_Period_Fast=12; MA_Period_Medium=14; MA_Period_Slow=10;
-          1   23.29         1359          1.04            0.02      64.84       0.65   MA_Period_Fast=8; MA_Period_Medium=10; MA_Period_Slow=6;
-         16   23.82         1121          1.05            0.02      69.50       0.69   MA_Period_Fast=8; MA_Period_Medium=14; MA_Period_Slow=8;
-         10   22.55         1332          1.04            0.02      66.52       0.66   MA_Period_Fast=8; MA_Period_Medium=10; MA_Period_Slow=8;
-         25   20.63         1102          1.04            0.02      68.51       0.68  MA_Period_Fast=8; MA_Period_Medium=14; MA_Period_Slow=10;
-          2   18.60         1417          1.03            0.01      93.14       0.93  MA_Period_Fast=10; MA_Period_Medium=10; MA_Period_Slow=6;
-         11   14.58         1383          1.02            0.01      91.02       0.91  MA_Period_Fast=10; MA_Period_Medium=10; MA_Period_Slow=8;
-         24    4.74         1304          1.01            0.00      82.53       0.82 MA_Period_Fast=12; MA_Period_Medium=12; MA_Period_Slow=10;
-         15   -6.51         1314          0.99           -0.00      81.70       0.81  MA_Period_Fast=12; MA_Period_Medium=12; MA_Period_Slow=8;
-          6  -13.23         1345          0.98           -0.01      76.51       0.76  MA_Period_Fast=12; MA_Period_Medium=12; MA_Period_Slow=6;
-         12 -218.42         2431          0.83           -0.09     277.19       2.76  MA_Period_Fast=12; MA_Period_Medium=10; MA_Period_Slow=8;
-         21 -223.50         2375          0.82           -0.09     273.53       2.73 MA_Period_Fast=12; MA_Period_Medium=10; MA_Period_Slow=10;
-          3 -232.06         2440          0.82           -0.10     282.62       2.82  MA_Period_Fast=12; MA_Period_Medium=10; MA_Period_Slow=6;
+          3 1560.05        10161          1.12            0.15     866.09       8.39 MA_Period_Fast=12; MA_Period_Medium=12; MA_Period_Slow=4;
+         12 1533.92        10322          1.11            0.15     907.93       8.80 MA_Period_Fast=12; MA_Period_Medium=12; MA_Period_Slow=6;
+         11 1333.53         8713          1.12            0.15     552.48       5.43 MA_Period_Fast=10; MA_Period_Medium=12; MA_Period_Slow=6;
+          2 1315.75         8742          1.12            0.15     536.59       5.26 MA_Period_Fast=10; MA_Period_Medium=12; MA_Period_Slow=4;
+          6 1305.40         8891          1.11            0.15     582.75       5.72 MA_Period_Fast=12; MA_Period_Medium=14; MA_Period_Slow=4;
+         21 1304.86        10370          1.09            0.13    1104.69      10.69 MA_Period_Fast=12; MA_Period_Medium=12; MA_Period_Slow=8;
+         15 1234.76         8831          1.11            0.14     597.93       5.86 MA_Period_Fast=12; MA_Period_Medium=14; MA_Period_Slow=6;
+         20 1173.98         8682          1.11            0.14     710.60       6.97 MA_Period_Fast=10; MA_Period_Medium=12; MA_Period_Slow=8;
+         19 1104.68         5974          1.16            0.18     437.31       3.87  MA_Period_Fast=8; MA_Period_Medium=12; MA_Period_Slow=8;
+         10 1034.16         6034          1.14            0.17     444.38       3.95  MA_Period_Fast=8; MA_Period_Medium=12; MA_Period_Slow=6;
+          1 1028.18         6170          1.14            0.17     442.60       3.96  MA_Period_Fast=8; MA_Period_Medium=12; MA_Period_Slow=4;
+         14  970.47         6043          1.13            0.16     449.60       4.05 MA_Period_Fast=10; MA_Period_Medium=14; MA_Period_Slow=6;
+          5  956.82         6199          1.13            0.15     457.26       4.11 MA_Period_Fast=10; MA_Period_Medium=14; MA_Period_Slow=4;
+         13  938.17         4674          1.18            0.20     375.81       3.39  MA_Period_Fast=8; MA_Period_Medium=14; MA_Period_Slow=6;
+          4  912.55         4866          1.16            0.19     378.93       3.41  MA_Period_Fast=8; MA_Period_Medium=14; MA_Period_Slow=4;
+         24  866.95         8787          1.08            0.10     754.43       7.40 MA_Period_Fast=12; MA_Period_Medium=14; MA_Period_Slow=8;
+          7  860.89         4133          1.18            0.21     294.69       2.68  MA_Period_Fast=8; MA_Period_Medium=16; MA_Period_Slow=4;
+         18  853.53         6073          1.11            0.14     432.14       4.05 MA_Period_Fast=12; MA_Period_Medium=16; MA_Period_Slow=6;
+         23  847.37         5956          1.12            0.14     454.41       4.13 MA_Period_Fast=10; MA_Period_Medium=14; MA_Period_Slow=8;
+         16  828.55         3946          1.19            0.21     277.63       2.54  MA_Period_Fast=8; MA_Period_Medium=16; MA_Period_Slow=6;
+         27  824.87         5975          1.11            0.14     404.09       3.98 MA_Period_Fast=12; MA_Period_Medium=16; MA_Period_Slow=8;
+          9  821.11         6201          1.11            0.13     440.42       4.03 MA_Period_Fast=12; MA_Period_Medium=16; MA_Period_Slow=4;
+         22  810.96         4569          1.15            0.18     387.15       3.52  MA_Period_Fast=8; MA_Period_Medium=14; MA_Period_Slow=8;
+         25  778.28         3823          1.18            0.20     261.71       2.43  MA_Period_Fast=8; MA_Period_Medium=16; MA_Period_Slow=8;
+          8  771.52         4844          1.13            0.16     408.64       3.72 MA_Period_Fast=10; MA_Period_Medium=16; MA_Period_Slow=4;
+         17  766.05         4675          1.14            0.16     390.68       3.57 MA_Period_Fast=10; MA_Period_Medium=16; MA_Period_Slow=6;
+         26  745.50         4558          1.14            0.16     348.81       3.20 MA_Period_Fast=10; MA_Period_Medium=16; MA_Period_Slow=8;

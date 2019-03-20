@@ -1,5 +1,5 @@
 # Base params.
-Boosting_Enabled=0
+Boosting_Enabled=1
 Account_Conditions_Active=0
 ProfitFactorMaxToTrade=0
 ValidateSettings=0
@@ -9,7 +9,7 @@ RecordTicksToCSV=0
 VerboseInfo=0
 VerboseErrors=0
 # Optimization params.
-WorseDailyStrategyMultiplierFactor=1.0
+WorseDailyStrategyMultiplierFactor=2
 WorseDailyStrategyMultiplierFactor,F=0
 WorseDailyStrategyMultiplierFactor,1=0
 WorseDailyStrategyMultiplierFactor,2=0

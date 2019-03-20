@@ -63,7 +63,7 @@ CCI5_SignalMethod=0
 CCI15_SignalMethod=0
 CCI30_SignalMethod=0
 # Optimization params.
-CCI_TrailingProfitMethod=-2
+CCI_TrailingProfitMethod=12
 CCI_TrailingProfitMethod,F=0
 CCI_TrailingProfitMethod,1=0
 CCI_TrailingProfitMethod,2=0

@@ -16,22 +16,22 @@ services:
       SETFILE: /opt/_results/EA31337-Lite_CCI_Period.set
       TEST_REPORT_NAME: EA31337-Lite_CCI_Period
       RUN_ON_SUCCESS: input_copy CCI_Period "$${SETFILE}" /opt/lite/ea-input.mqh
-  CCI_Period_Ratio:
-    command: run_backtest -v
-    image: ea31337:lite-eurusd-2018
-    build:
-      context: ../../../../../..
-      target: ea31337-lite-eurusd-2018
-    volumes:
-    - ./_results:/opt/_results:rw
-    - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
-#   - ../../../../../../../EA-Tester/scripts:/opt/scripts:rw
-    env_file: ../../../EA-Tester.ini
-    environment:
-      INCLUDE: /opt/rules/Strategies/CCI/Strategy-CCI-All-CCI_Period_Ratio.rule
-      SETFILE: /opt/_results/EA31337-Lite_CCI_Period_Ratio.set
-      TEST_REPORT_NAME: EA31337-Lite_CCI_Period_Ratio
-      RUN_ON_SUCCESS: input_copy CCI_Period_Ratio "$${SETFILE}" /opt/lite/ea-input.mqh
+# @todo
+# CCI_Period_Ratio:
+#   command: run_backtest -v
+#   image: ea31337:lite-eurusd-2018
+#   build:
+#     context: ../../../../../..
+#     target: ea31337-lite-eurusd-2018
+#   volumes:
+#   - ./_results:/opt/_results:rw
+#   - ../../../../../../src/include/EA31337/lite:/opt/lite:rw
+#   env_file: ../../../EA-Tester.ini
+#   environment:
+#     INCLUDE: /opt/rules/Strategies/CCI/Strategy-CCI-All-CCI_Period_Ratio.rule
+#     SETFILE: /opt/_results/EA31337-Lite_CCI_Period_Ratio.set
+#     TEST_REPORT_NAME: EA31337-Lite_CCI_Period_Ratio
+#     RUN_ON_SUCCESS: input_copy CCI_Period_Ratio "$${SETFILE}" /opt/lite/ea-input.mqh
   CCI_Applied_Price:
     command: run_backtest -v
     image: ea31337:lite-eurusd-2018

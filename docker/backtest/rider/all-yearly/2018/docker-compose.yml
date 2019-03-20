@@ -1,0 +1,41 @@
+version: '3.4'
+services:
+  backtest_2018_100k:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_YEARS: 2018
+      BT_DEPOSIT: 100000
+      TEST_REPORT_NAME: EA31337-Rider_2018_100k
+  backtest_2018_10k:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_YEARS: 2018
+      BT_DEPOSIT: 10000
+      TEST_REPORT_NAME: EA31337-Rider_2018_10k
+  backtest_2018_1k:
+    command: run_backtest -v
+    image: ea31337:lite-eurusd-2018
+    build:
+      context: ../../../../..
+      target: ea31337-lite-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_DEPOSIT: 1000
+      BT_YEARS: 2018
+      TEST_REPORT_NAME: EA31337-Rider_2018_1k

@@ -6,15 +6,15 @@
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
-       Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-          6  -84.11          289          0.50           -0.29     121.62       1.22 Envelopes_Deviation=0.55; MaxOrders=0; MaxOrdersPerType=0;
-          5 -121.24          431          0.52           -0.28     162.17       1.62  Envelopes_Deviation=0.5; MaxOrders=0; MaxOrdersPerType=0;
-          4 -219.38          657          0.47           -0.33     257.82       2.58 Envelopes_Deviation=0.45; MaxOrders=0; MaxOrdersPerType=0;
-          3 -301.97          980          0.55           -0.31     342.48       3.42  Envelopes_Deviation=0.4; MaxOrders=0; MaxOrdersPerType=0;
-          2 -387.48         1345          0.58           -0.29     418.15       4.18 Envelopes_Deviation=0.35; MaxOrders=0; MaxOrdersPerType=0;
-          1 -552.29         1826          0.58           -0.30     582.20       5.82  Envelopes_Deviation=0.3; MaxOrders=0; MaxOrdersPerType=0;
+       Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+          1  -2.71           93          0.95           -0.03      25.11       0.25  Envelopes_Deviation=0.5; MaxOrders=0; MaxOrdersPerType=0;
+          6  -2.67           13          0.62           -0.21       7.57       0.08 Envelopes_Deviation=0.75; MaxOrders=0; MaxOrdersPerType=0;
+          2  -9.28           52          0.73           -0.18      25.37       0.25 Envelopes_Deviation=0.55; MaxOrders=0; MaxOrdersPerType=0;
+          5 -11.83           18          0.24           -0.66      13.63       0.14  Envelopes_Deviation=0.7; MaxOrders=0; MaxOrdersPerType=0;
+          3 -16.17           34          0.39           -0.48      23.71       0.24  Envelopes_Deviation=0.6; MaxOrders=0; MaxOrdersPerType=0;
+          4 -16.06           24          0.24           -0.67      17.86       0.18 Envelopes_Deviation=0.65; MaxOrders=0; MaxOrdersPerType=0;

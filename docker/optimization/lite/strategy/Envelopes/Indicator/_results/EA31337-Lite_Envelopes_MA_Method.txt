@@ -6,13 +6,13 @@
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
-        Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-           4  -64.00          352          0.53           -0.18      79.66       0.80 Envelopes_MA_Method=3; MaxOrders=0; MaxOrdersPerType=0;
-           2  -93.03          500          0.58           -0.19     108.09       1.08 Envelopes_MA_Method=1; MaxOrders=0; MaxOrdersPerType=0;
-           1 -202.25          768          0.52           -0.26     226.06       2.26 Envelopes_MA_Method=0; MaxOrders=0; MaxOrdersPerType=0;
-           3 -387.48         1345          0.58           -0.29     418.15       4.18 Envelopes_MA_Method=2; MaxOrders=0; MaxOrdersPerType=0;
+         Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+            1   2.73          142          1.04            0.02      32.72       0.33 Envelopes_MA_Method=0; MaxOrders=0; MaxOrdersPerType=0;
+            2  -9.39           64          0.75           -0.15      26.00       0.26 Envelopes_MA_Method=1; MaxOrders=0; MaxOrdersPerType=0;
+            4  -9.28           52          0.73           -0.18      25.37       0.25 Envelopes_MA_Method=3; MaxOrders=0; MaxOrdersPerType=0;
+            3 -18.54          275          0.86           -0.07      43.73       0.44 Envelopes_MA_Method=2; MaxOrders=0; MaxOrdersPerType=0;

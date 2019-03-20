@@ -63,7 +63,7 @@ MA5_SignalMethod=0
 MA15_SignalMethod=0
 MA30_SignalMethod=0
 # Optimization params.
-MA_TrailingStopMethod=6
+MA_TrailingStopMethod=27
 MA_TrailingStopMethod,F=0
 MA_TrailingStopMethod,1=0
 MA_TrailingStopMethod,2=0

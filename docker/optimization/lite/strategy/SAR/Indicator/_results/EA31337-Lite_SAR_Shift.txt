@@ -6,14 +6,14 @@
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
              Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-                5  194.17         5833          1.04            0.03     391.90       3.70 SAR_Shift=4; MaxOrders=0; MaxOrdersPerType=0;
-                4    6.00         5833          1.00            0.00     405.33       3.97 SAR_Shift=3; MaxOrders=0; MaxOrdersPerType=0;
-                3  -32.61         5833          0.99           -0.01     474.53       4.55 SAR_Shift=2; MaxOrders=0; MaxOrdersPerType=0;
-                1  -95.07         5833          0.98           -0.02     475.80       4.61 SAR_Shift=0; MaxOrders=0; MaxOrdersPerType=0;
-                2 -139.50         5833          0.97           -0.02     416.09       4.05 SAR_Shift=1; MaxOrders=0; MaxOrdersPerType=0;
+                1 1385.85        11789          1.11            0.12     761.88       7.49 SAR_Shift=0; MaxOrders=0; MaxOrdersPerType=0;
+                5  575.62        11789          1.05            0.05     711.99       6.56 SAR_Shift=4; MaxOrders=0; MaxOrdersPerType=0;
+                2  512.09        11789          1.04            0.04     614.22       6.05 SAR_Shift=1; MaxOrders=0; MaxOrdersPerType=0;
+                3  316.70        11789          1.03            0.03     663.34       6.35 SAR_Shift=2; MaxOrders=0; MaxOrdersPerType=0;
+                4  307.65        11789          1.02            0.03     737.02       6.96 SAR_Shift=3; MaxOrders=0; MaxOrdersPerType=0;

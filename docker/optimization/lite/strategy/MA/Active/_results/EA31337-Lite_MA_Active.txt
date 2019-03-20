@@ -11,20 +11,20 @@
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
-              Pass   Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-                 9   705.97         6043          1.09            0.12     629.63       6.16 MA1_Active=0; MA5_Active=0; MA15_Active=0;
-                 7   351.76        14741          1.02            0.02     941.15       9.18 MA1_Active=0; MA5_Active=1; MA15_Active=1;
-                13   232.80        19497          1.01            0.01    1857.76      18.14 MA1_Active=0; MA5_Active=0; MA15_Active=1;
-                 5    97.95        13454          1.01            0.01    1040.52      10.04 MA1_Active=0; MA5_Active=0; MA15_Active=1;
-                 1     0.00            0          0.00            0.00       0.00       0.00 MA1_Active=0; MA5_Active=0; MA15_Active=0;
-                 2   -37.45          197          0.47           -0.19      37.55       0.38 MA1_Active=1; MA5_Active=0; MA15_Active=0;
-                 3   -49.30         1287          0.93           -0.04     262.38       2.58 MA1_Active=0; MA5_Active=1; MA15_Active=0;
-                10   -73.19         6240          0.99           -0.01     462.51       4.54 MA1_Active=1; MA5_Active=0; MA15_Active=0;
-                11   -98.54         7330          0.98           -0.01     548.67       5.32 MA1_Active=0; MA5_Active=1; MA15_Active=0;
-                 4  -129.48         1484          0.78           -0.09     294.90       2.90 MA1_Active=1; MA5_Active=1; MA15_Active=0;
-                12  -516.25         7527          0.90           -0.07     738.90       7.26 MA1_Active=1; MA5_Active=1; MA15_Active=0;
-                15  -702.19        20784          0.97           -0.03    1399.81      13.88 MA1_Active=0; MA5_Active=1; MA15_Active=1;
-                 6 -1321.03        13651          0.88           -0.10    1510.24      15.02 MA1_Active=1; MA5_Active=0; MA15_Active=1;
-                 8 -1476.30        14938          0.87           -0.10    1817.78      18.01 MA1_Active=1; MA5_Active=1; MA15_Active=1;
-                14 -2775.92        19694          0.84           -0.14    2900.80      29.01 MA1_Active=1; MA5_Active=0; MA15_Active=1;
-                16 -2828.69        20981          0.84           -0.13    2983.63      29.84 MA1_Active=1; MA5_Active=1; MA15_Active=1;
+               Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+                  2  291.03          142          2.35            2.05     136.68       1.34 MA1_Active=1; MA5_Active=0; MA15_Active=0;
+                  4  285.10          145          2.29            1.97     136.68       1.34 MA1_Active=1; MA5_Active=1; MA15_Active=0;
+                 10  173.44         3011          1.07            0.06     241.75       2.40 MA1_Active=1; MA5_Active=0; MA15_Active=0;
+                 12  160.01         3014          1.07            0.05     241.75       2.40 MA1_Active=1; MA5_Active=1; MA15_Active=0;
+                  6   72.59         4752          1.03            0.02     372.34       3.69 MA1_Active=1; MA5_Active=0; MA15_Active=1;
+                  8   66.70         4755          1.02            0.01     376.37       3.72 MA1_Active=1; MA5_Active=1; MA15_Active=1;
+                  1    0.00            0          0.00            0.00       0.00       0.00 MA1_Active=0; MA5_Active=0; MA15_Active=0;
+                  3   -5.93            3          0.01           -1.98      10.46       0.10 MA1_Active=0; MA5_Active=1; MA15_Active=0;
+                 14  -21.82         4830          1.00           -0.00     525.93       5.22 MA1_Active=1; MA5_Active=0; MA15_Active=1;
+                 16  -28.02         4833          0.99           -0.01     525.93       5.22 MA1_Active=1; MA5_Active=1; MA15_Active=1;
+                  9  -76.18         2699          0.97           -0.03     246.51       2.46 MA1_Active=0; MA5_Active=0; MA15_Active=0;
+                 11 -102.40         2830          0.95           -0.04     256.74       2.56 MA1_Active=0; MA5_Active=1; MA15_Active=0;
+                 13 -133.27         4604          0.97           -0.03     461.09       4.58 MA1_Active=0; MA5_Active=0; MA15_Active=1;
+                  5 -168.68         3223          0.94           -0.05     424.80       4.22 MA1_Active=0; MA5_Active=0; MA15_Active=1;
+                 15 -168.02         4668          0.97           -0.04     529.75       5.26 MA1_Active=0; MA5_Active=1; MA15_Active=1;
+                  7 -224.53         3805          0.92           -0.06     398.30       3.97 MA1_Active=0; MA5_Active=1; MA15_Active=1;

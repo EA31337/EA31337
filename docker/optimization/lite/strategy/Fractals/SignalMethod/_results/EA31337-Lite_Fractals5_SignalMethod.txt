@@ -6,16 +6,16 @@
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
       Pass   Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-         7   -31.73          323          0.53           -0.10      38.20       0.38  Fractals5_SignalMethod=3; MaxOrders=0; MaxOrdersPerType=0;
-         5   -71.46          918          0.62           -0.08      83.75       0.84  Fractals5_SignalMethod=1; MaxOrders=0; MaxOrdersPerType=0;
-         6  -101.93         1073          0.55           -0.09     112.40       1.12  Fractals5_SignalMethod=2; MaxOrders=0; MaxOrdersPerType=0;
-         3  -129.71         1286          0.47           -0.10     131.53       1.32 Fractals5_SignalMethod=-1; MaxOrders=0; MaxOrdersPerType=0;
-         1  -323.67         3656          0.51           -0.09     329.58       3.30 Fractals5_SignalMethod=-3; MaxOrders=0; MaxOrdersPerType=0;
-         2  -436.23         4200          0.45           -0.10     437.07       4.37 Fractals5_SignalMethod=-2; MaxOrders=0; MaxOrdersPerType=0;
-         4 -1127.34        11560          0.44           -0.10    1130.29      11.30  Fractals5_SignalMethod=0; MaxOrders=0; MaxOrdersPerType=0;
+         7   -58.52          633          0.64           -0.09      71.54       0.71  Fractals5_SignalMethod=3; MaxOrders=0; MaxOrdersPerType=0;
+         5   -78.04         1763          0.87           -0.04     113.96       1.14  Fractals5_SignalMethod=1; MaxOrders=0; MaxOrdersPerType=0;
+         6  -219.92         2068          0.59           -0.11     223.37       2.23  Fractals5_SignalMethod=2; MaxOrders=0; MaxOrdersPerType=0;
+         3  -269.42         2632          0.57           -0.10     286.99       2.87 Fractals5_SignalMethod=-1; MaxOrders=0; MaxOrdersPerType=0;
+         1  -690.15         7432          0.74           -0.09     701.14       7.01 Fractals5_SignalMethod=-3; MaxOrders=0; MaxOrdersPerType=0;
+         2  -892.16         8482          0.58           -0.11     901.53       9.01 Fractals5_SignalMethod=-2; MaxOrders=0; MaxOrdersPerType=0;
+         4 -2244.07        23501          0.72           -0.10    2283.45      22.81  Fractals5_SignalMethod=0; MaxOrders=0; MaxOrdersPerType=0;

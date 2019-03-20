@@ -12,9 +12,9 @@
                             Spread          10
                                                                  [Optimization Graph]
       Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-         6 -666.22         1222          0.61           -0.55    1152.68      11.01 CloseOrderAfterXHours=120; MaxOrders=0; MaxOrdersPerType=0;
-         3 -700.34          981          0.55           -0.71    1087.18      10.48  CloseOrderAfterXHours=48; MaxOrders=0; MaxOrdersPerType=0;
-         1 -703.67         1463          0.65           -0.48    1193.80      11.39   CloseOrderAfterXHours=0; MaxOrders=0; MaxOrdersPerType=0;
-         2 -710.47         1195          0.57           -0.59    1035.52      10.04  CloseOrderAfterXHours=24; MaxOrders=0; MaxOrdersPerType=0;
-         4 -742.53         1095          0.56           -0.68    1132.15      10.91  CloseOrderAfterXHours=72; MaxOrders=0; MaxOrdersPerType=0;
-         5 -758.57         1430          0.63           -0.53    1207.18      11.57  CloseOrderAfterXHours=96; MaxOrders=0; MaxOrdersPerType=0;
+         5 1051.40         2394          1.38            0.44     766.77       6.92  CloseOrderAfterXHours=96; MaxOrders=0; MaxOrdersPerType=0;
+         1  530.50         2085          1.21            0.25     961.45       9.17   CloseOrderAfterXHours=0; MaxOrders=0; MaxOrdersPerType=0;
+         2  393.79         1903          1.17            0.21     641.83       6.11  CloseOrderAfterXHours=24; MaxOrders=0; MaxOrdersPerType=0;
+         3 -360.63         1157          0.75           -0.31     701.82       6.80  CloseOrderAfterXHours=48; MaxOrders=0; MaxOrdersPerType=0;
+         6 -491.36         1725          0.77           -0.28     986.02       9.42 CloseOrderAfterXHours=120; MaxOrders=0; MaxOrdersPerType=0;
+         4 -582.64         2351          0.73           -0.25     756.36       7.45  CloseOrderAfterXHours=72; MaxOrders=0; MaxOrdersPerType=0;

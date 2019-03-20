@@ -57,7 +57,7 @@ WPR5_Active=0
 WPR15_Active=0
 WPR30_Active=0
 # Optimization params.
-SAR30_SignalMethod=-112
+SAR30_SignalMethod=-104
 SAR30_SignalMethod,F=0
 SAR30_SignalMethod,1=0
 SAR30_SignalMethod,2=0

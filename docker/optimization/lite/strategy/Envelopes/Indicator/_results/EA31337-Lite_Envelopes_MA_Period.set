@@ -63,7 +63,7 @@ Envelopes5_SignalMethod=0
 Envelopes15_SignalMethod=0
 Envelopes30_SignalMethod=0
 # Optimization params.
-Envelopes_MA_Period=22
+Envelopes_MA_Period=30
 Envelopes_MA_Period,F=0
 Envelopes_MA_Period,1=0
 Envelopes_MA_Period,2=0

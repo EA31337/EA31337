@@ -76,8 +76,8 @@ services:
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../../../EA-Tester.ini
     environment:
+      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=1
       INCLUDE: /opt/rules/Strategies/Alligator/Strategy-Alligator-All-Alligator_Shift.rule
       SETFILE: /opt/_results/EA31337-Lite_Alligator_Shift.set
       TEST_REPORT_NAME: EA31337-Lite_Alligator_Shift
       RUN_ON_SUCCESS: input_copy Alligator_Shift "$${$SETFILE}" /opt/lite/ea-input.mqh
-      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=0.6

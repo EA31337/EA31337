@@ -63,7 +63,7 @@ CCI5_SignalMethod=0
 CCI15_SignalMethod=0
 CCI30_SignalMethod=0
 # Optimization params.
-CCI_SignalLevel=92
+CCI_SignalLevel=98
 CCI_SignalLevel,F=0
 CCI_SignalLevel,1=0
 CCI_SignalLevel,2=0

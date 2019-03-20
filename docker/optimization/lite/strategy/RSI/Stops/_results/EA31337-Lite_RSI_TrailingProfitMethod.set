@@ -63,7 +63,7 @@ RSI5_SignalMethod=0
 RSI15_SignalMethod=0
 RSI30_SignalMethod=0
 # Optimization params.
-RSI_TrailingProfitMethod=8
+RSI_TrailingProfitMethod=4
 RSI_TrailingProfitMethod,F=0
 RSI_TrailingProfitMethod,1=0
 RSI_TrailingProfitMethod,2=0

@@ -63,7 +63,7 @@ RSI5_SignalMethod=0
 RSI15_SignalMethod=0
 RSI30_SignalMethod=0
 # Optimization params.
-RSI_Period=14
+RSI_Period=16
 RSI_Period,F=0
 RSI_Period,1=0
 RSI_Period,2=0

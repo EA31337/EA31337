@@ -6,18 +6,17 @@
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.01.30 23:30 (2018.01.01 - 2018.01.31)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
-          Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-             2  68.97          869          1.14            0.08      74.77       0.74  DeMarker_Period=8; MaxOrders=0; MaxOrdersPerType=0;
-             9  60.28          869          1.12            0.07     121.98       1.22 DeMarker_Period=22; MaxOrders=0; MaxOrdersPerType=0;
-             6  58.02          869          1.11            0.07     172.40       1.72 DeMarker_Period=16; MaxOrders=0; MaxOrdersPerType=0;
-             8  54.04          869          1.11            0.06     155.68       1.56 DeMarker_Period=20; MaxOrders=0; MaxOrdersPerType=0;
-             5  48.18          869          1.09            0.06     166.71       1.67 DeMarker_Period=14; MaxOrders=0; MaxOrdersPerType=0;
-             4  44.64          869          1.08            0.05     148.00       1.48 DeMarker_Period=12; MaxOrders=0; MaxOrdersPerType=0;
-             7  21.57          869          1.04            0.02     175.15       1.75 DeMarker_Period=18; MaxOrders=0; MaxOrdersPerType=0;
-             3  13.22          869          1.02            0.02     128.16       1.28 DeMarker_Period=10; MaxOrders=0; MaxOrdersPerType=0;
-             1 -69.40          869          0.87           -0.08     123.15       1.23  DeMarker_Period=6; MaxOrders=0; MaxOrdersPerType=0;
+         Pass   Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+            1  -795.92        11781          0.91           -0.07     946.14       9.42  DeMarker_Period=2; MaxOrders=0; MaxOrdersPerType=0;
+            7 -1032.17        11789          0.88           -0.09    1662.54      15.75 DeMarker_Period=14; MaxOrders=0; MaxOrdersPerType=0;
+            8 -1032.17        11789          0.88           -0.09    1662.54      15.75 DeMarker_Period=16; MaxOrders=0; MaxOrdersPerType=0;
+            2 -1089.20        11789          0.87           -0.09    1363.40      13.35  DeMarker_Period=4; MaxOrders=0; MaxOrdersPerType=0;
+            6 -1113.98        11789          0.87           -0.09    1662.85      15.86 DeMarker_Period=12; MaxOrders=0; MaxOrdersPerType=0;
+            5 -1141.31        11789          0.87           -0.10    1683.41      16.03 DeMarker_Period=10; MaxOrders=0; MaxOrdersPerType=0;
+            4 -1334.92        11789          0.85           -0.11    1892.16      17.98  DeMarker_Period=8; MaxOrders=0; MaxOrdersPerType=0;
+            3 -1578.96        11789          0.82           -0.13    1940.51      18.77  DeMarker_Period=6; MaxOrders=0; MaxOrdersPerType=0;

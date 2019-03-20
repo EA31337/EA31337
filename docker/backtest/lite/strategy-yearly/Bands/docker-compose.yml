@@ -9,7 +9,6 @@ services:
       context: ../../../../..
       target: ea31337-lite-eurusd-2018
     volumes:
-    - ../../../../../src:/opt/src
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini
@@ -24,7 +23,6 @@ services:
       context: ../../../../..
       target: ea31337-lite-eurusd-2018
     volumes:
-    - ../../../../../src:/opt/src
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini
@@ -39,7 +37,6 @@ services:
       context: ../../../../..
       target: ea31337-lite-eurusd-2018
     volumes:
-    - ../../../../../src:/opt/src
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini
@@ -54,7 +51,6 @@ services:
       context: ../../../../..
       target: ea31337-lite-eurusd-2018
     volumes:
-    - ../../../../../src:/opt/src
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini
@@ -69,7 +65,6 @@ services:
       context: ../../../../..
       target: ea31337-lite-eurusd-2018
     volumes:
-    - ../../../../../src:/opt/src
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini

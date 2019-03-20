@@ -63,7 +63,7 @@ Fractals5_SignalMethod=0
 Fractals15_SignalMethod=0
 Fractals30_SignalMethod=0
 # Optimization params.
-Fractals_TrailingProfitMethod=25
+Fractals_TrailingProfitMethod=-3
 Fractals_TrailingProfitMethod,F=0
 Fractals_TrailingProfitMethod,1=0
 Fractals_TrailingProfitMethod,2=0

@@ -63,7 +63,7 @@ Envelopes5_SignalMethod=0
 Envelopes15_SignalMethod=0
 Envelopes30_SignalMethod=0
 # Optimization params.
-Envelopes_Deviation_Ratio=1.3
+Envelopes_Deviation_Ratio=1.2
 Envelopes_Deviation_Ratio,F=0
 Envelopes_Deviation_Ratio,1=0
 Envelopes_Deviation_Ratio,2=0

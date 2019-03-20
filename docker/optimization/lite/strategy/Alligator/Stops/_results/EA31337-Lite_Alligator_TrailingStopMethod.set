@@ -63,7 +63,7 @@ Alligator5_SignalMethod=0
 Alligator15_SignalMethod=0
 Alligator30_SignalMethod=0
 # Optimization params.
-Alligator_TrailingStopMethod=14
+Alligator_TrailingStopMethod=-8
 Alligator_TrailingStopMethod,F=0
 Alligator_TrailingStopMethod,1=0
 Alligator_TrailingStopMethod,2=0

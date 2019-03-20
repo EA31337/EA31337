@@ -6,16 +6,16 @@
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
         Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-           4 1134.60         3362          1.39            0.34     372.99       3.69 Bands_Applied_Price=3; MaxOrders=0; MaxOrdersPerType=0;
-           2  818.16         3272          1.33            0.25     299.05       2.90 Bands_Applied_Price=1; MaxOrders=0; MaxOrdersPerType=0;
-           3  709.92         3353          1.28            0.21     297.42       2.74 Bands_Applied_Price=2; MaxOrders=0; MaxOrdersPerType=0;
-           1  610.00         3186          1.25            0.19     277.02       2.73 Bands_Applied_Price=0; MaxOrders=0; MaxOrdersPerType=0;
-           6  599.83         3373          1.23            0.18     270.49       2.70 Bands_Applied_Price=5; MaxOrders=0; MaxOrdersPerType=0;
-           7  596.92         3335          1.23            0.18     272.83       2.70 Bands_Applied_Price=6; MaxOrders=0; MaxOrdersPerType=0;
-           5  584.07         3374          1.23            0.17     283.88       2.84 Bands_Applied_Price=4; MaxOrders=0; MaxOrdersPerType=0;
+           4  -16.36         5540          1.00           -0.00     662.83       6.25 Bands_Applied_Price=3; MaxOrders=0; MaxOrdersPerType=0;
+           2  -47.81         5448          0.99           -0.01     699.62       6.79 Bands_Applied_Price=1; MaxOrders=0; MaxOrdersPerType=0;
+           6 -112.79         5525          0.98           -0.02     626.75       6.10 Bands_Applied_Price=5; MaxOrders=0; MaxOrdersPerType=0;
+           5 -138.37         5526          0.98           -0.03     663.97       6.45 Bands_Applied_Price=4; MaxOrders=0; MaxOrdersPerType=0;
+           7 -189.75         5486          0.97           -0.03     613.22       5.96 Bands_Applied_Price=6; MaxOrders=0; MaxOrdersPerType=0;
+           1 -275.31         5214          0.96           -0.05     635.45       6.19 Bands_Applied_Price=0; MaxOrders=0; MaxOrdersPerType=0;
+           3 -553.61         5498          0.93           -0.10    1364.22      13.36 Bands_Applied_Price=2; MaxOrders=0; MaxOrdersPerType=0;

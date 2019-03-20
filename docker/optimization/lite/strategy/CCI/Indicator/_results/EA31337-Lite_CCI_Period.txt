@@ -6,18 +6,18 @@
                                                             Tripleafx-FX-Demo (Build 1010)
 
                             Symbol          EURUSD (Euro vs US Dollar)
-                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.06.29 20:30 (2018.01.01 - 2018.06.30)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
                             Model           Every tick (the most precise method based on all available least timeframes)
                             Initial deposit 10000.00
                             Spread          10
                                                                  [Optimization Graph]
             Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
-               9  -21.87         2083          0.99           -0.01     435.48       4.34 CCI_Period=30; MaxOrders=0; MaxOrdersPerType=0;
-               7  -45.60         2129          0.97           -0.02     419.76       4.18 CCI_Period=26; MaxOrders=0; MaxOrdersPerType=0;
-               8  -51.59         2111          0.97           -0.02     424.58       4.23 CCI_Period=28; MaxOrders=0; MaxOrdersPerType=0;
-               5  -67.31         2201          0.96           -0.03     435.82       4.34 CCI_Period=22; MaxOrders=0; MaxOrdersPerType=0;
-               4  -84.71         2237          0.95           -0.04     450.76       4.49 CCI_Period=20; MaxOrders=0; MaxOrdersPerType=0;
-               6  -92.39         2162          0.95           -0.04     445.12       4.43 CCI_Period=24; MaxOrders=0; MaxOrdersPerType=0;
-               1  -92.10         2379          0.95           -0.04     509.22       5.08 CCI_Period=14; MaxOrders=0; MaxOrdersPerType=0;
-               3  -99.50         2276          0.94           -0.04     460.14       4.59 CCI_Period=18; MaxOrders=0; MaxOrdersPerType=0;
-               2 -109.94         2343          0.94           -0.05     512.50       5.11 CCI_Period=16; MaxOrders=0; MaxOrdersPerType=0;
+               4   -8.70         2640          0.99           -0.00     172.80       1.73 CCI_Period=28; MaxOrders=0; MaxOrdersPerType=0;
+               2  -11.51         2650          0.99           -0.00     178.55       1.79 CCI_Period=24; MaxOrders=0; MaxOrdersPerType=0;
+               5  -25.97         2643          0.98           -0.01     187.39       1.87 CCI_Period=30; MaxOrders=0; MaxOrdersPerType=0;
+               1  -27.20         2633          0.98           -0.01     165.39       1.65 CCI_Period=22; MaxOrders=0; MaxOrdersPerType=0;
+               3  -34.52         2635          0.98           -0.01     184.11       1.84 CCI_Period=26; MaxOrders=0; MaxOrdersPerType=0;
+               7  -51.25         2615          0.97           -0.02     223.79       2.24 CCI_Period=34; MaxOrders=0; MaxOrdersPerType=0;
+               8  -79.34         2594          0.95           -0.03     219.07       2.19 CCI_Period=36; MaxOrders=0; MaxOrdersPerType=0;
+               6  -87.13         2635          0.94           -0.03     208.85       2.09 CCI_Period=32; MaxOrders=0; MaxOrdersPerType=0;
+               9 -115.18         2585          0.92           -0.04     249.92       2.50 CCI_Period=38; MaxOrders=0; MaxOrdersPerType=0;

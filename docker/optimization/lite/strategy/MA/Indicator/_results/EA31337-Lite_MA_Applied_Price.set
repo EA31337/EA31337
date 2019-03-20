@@ -63,7 +63,7 @@ MA5_SignalMethod=0
 MA15_SignalMethod=0
 MA30_SignalMethod=0
 # Optimization params.
-MA_Applied_Price=2
+MA_Applied_Price=6
 MA_Applied_Price,F=0
 MA_Applied_Price,1=0
 MA_Applied_Price,2=0

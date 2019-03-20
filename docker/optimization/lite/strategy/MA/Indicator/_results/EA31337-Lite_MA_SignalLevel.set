@@ -63,7 +63,7 @@ MA5_SignalMethod=0
 MA15_SignalMethod=0
 MA30_SignalMethod=0
 # Optimization params.
-MA_SignalLevel=-0.4
+MA_SignalLevel=-0.6
 MA_SignalLevel,F=0
 MA_SignalLevel,1=0
 MA_SignalLevel,2=0

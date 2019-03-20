@@ -13,18 +13,18 @@
                                                                  [Optimization Graph]
       Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
          1    0.00            0          0.00            0.00       0.00       0.00 Fractals1_Active=0; Fractals5_Active=0; Fractals15_Active=0;
-         9   -9.38          272          0.86           -0.03      24.96       0.25 Fractals1_Active=0; Fractals5_Active=0; Fractals15_Active=0;
-         5  -10.92          209          0.71           -0.05      15.19       0.15 Fractals1_Active=0; Fractals5_Active=0; Fractals15_Active=1;
-        13  -41.39          481          0.61           -0.09      49.29       0.49 Fractals1_Active=0; Fractals5_Active=0; Fractals15_Active=1;
-         3  -65.42          656          0.50           -0.10      70.82       0.71 Fractals1_Active=0; Fractals5_Active=1; Fractals15_Active=0;
-         7  -82.68          865          0.50           -0.10      83.97       0.84 Fractals1_Active=0; Fractals5_Active=1; Fractals15_Active=1;
-        11  -84.88          928          0.53           -0.09      92.45       0.92 Fractals1_Active=0; Fractals5_Active=1; Fractals15_Active=0;
-        15 -102.95         1137          0.53           -0.09     108.12       1.08 Fractals1_Active=0; Fractals5_Active=1; Fractals15_Active=1;
-         2 -367.66         3590          0.42           -0.10     369.00       3.69 Fractals1_Active=1; Fractals5_Active=0; Fractals15_Active=0;
-        10 -390.54         3862          0.42           -0.10     391.26       3.91 Fractals1_Active=1; Fractals5_Active=0; Fractals15_Active=0;
-         6 -391.45         3799          0.41           -0.10     393.23       3.93 Fractals1_Active=1; Fractals5_Active=0; Fractals15_Active=1;
-        14 -414.65         4071          0.41           -0.10     415.89       4.16 Fractals1_Active=1; Fractals5_Active=0; Fractals15_Active=1;
-         4 -426.86         4246          0.40           -0.10     428.31       4.28 Fractals1_Active=1; Fractals5_Active=1; Fractals15_Active=0;
-        12 -448.86         4518          0.40           -0.10     449.90       4.50 Fractals1_Active=1; Fractals5_Active=1; Fractals15_Active=0;
-         8 -448.18         4455          0.40           -0.10     450.32       4.50 Fractals1_Active=1; Fractals5_Active=1; Fractals15_Active=1;
-        16 -470.34         4727          0.40           -0.10     472.01       4.72 Fractals1_Active=1; Fractals5_Active=1; Fractals15_Active=1;
+         9    0.00            0          0.00            0.00       0.00       0.00 Fractals1_Active=0; Fractals5_Active=0; Fractals15_Active=0;
+         5  -17.85          513          0.91           -0.03      49.58       0.49 Fractals1_Active=0; Fractals5_Active=0; Fractals15_Active=1;
+        13  -17.85          513          0.91           -0.03      49.58       0.49 Fractals1_Active=0; Fractals5_Active=0; Fractals15_Active=1;
+         3  -48.42          560          0.65           -0.09      61.26       0.61 Fractals1_Active=0; Fractals5_Active=1; Fractals15_Active=0;
+        11  -48.42          560          0.65           -0.09      61.26       0.61 Fractals1_Active=0; Fractals5_Active=1; Fractals15_Active=0;
+         7  -68.02         1088          0.79           -0.06     103.23       1.03 Fractals1_Active=0; Fractals5_Active=1; Fractals15_Active=1;
+        15  -68.02         1088          0.79           -0.06     103.23       1.03 Fractals1_Active=0; Fractals5_Active=1; Fractals15_Active=1;
+         2 -170.28         2015          0.63           -0.08     198.45       1.98 Fractals1_Active=1; Fractals5_Active=0; Fractals15_Active=0;
+        10 -170.28         2015          0.63           -0.08     198.45       1.98 Fractals1_Active=1; Fractals5_Active=0; Fractals15_Active=0;
+         4 -221.78         2619          0.63           -0.08     268.06       2.67 Fractals1_Active=1; Fractals5_Active=1; Fractals15_Active=0;
+        12 -221.78         2619          0.63           -0.08     268.06       2.67 Fractals1_Active=1; Fractals5_Active=1; Fractals15_Active=0;
+         6 -223.94         2581          0.65           -0.09     226.93       2.27 Fractals1_Active=1; Fractals5_Active=0; Fractals15_Active=1;
+        14 -223.94         2581          0.65           -0.09     226.93       2.27 Fractals1_Active=1; Fractals5_Active=0; Fractals15_Active=1;
+         8 -282.36         3174          0.63           -0.09     286.28       2.86 Fractals1_Active=1; Fractals5_Active=1; Fractals15_Active=1;
+        16 -282.36         3174          0.63           -0.09     286.28       2.86 Fractals1_Active=1; Fractals5_Active=1; Fractals15_Active=1;

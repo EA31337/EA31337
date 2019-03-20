@@ -63,12 +63,12 @@ Envelopes5_SignalMethod=0
 Envelopes15_SignalMethod=0
 Envelopes30_SignalMethod=0
 # Optimization params.
-Envelopes_MA_Shift=0
+Envelopes_MA_Shift=2
 Envelopes_MA_Shift,F=0
 Envelopes_MA_Shift,1=0
 Envelopes_MA_Shift,2=0
 Envelopes_MA_Shift,3=0
-Envelopes_Shift=0
+Envelopes_Shift=2
 Envelopes_Shift,F=0
 Envelopes_Shift,1=0
 Envelopes_Shift,2=0

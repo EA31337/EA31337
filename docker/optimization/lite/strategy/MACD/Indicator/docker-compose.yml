@@ -77,8 +77,8 @@ services:
     - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../../../EA-Tester.ini
     environment:
+      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=10
       INCLUDE: /opt/rules/Strategies/MACD/Strategy-MACD-All-MACD_Shift.rule
       SETFILE: /opt/_results/EA31337-Lite_MACD_Shift.set
       TEST_REPORT_NAME: EA31337-Lite_MACD_Shift
       RUN_ON_SUCCESS: for p in Shift Shift_Far; do input_copy "MACD_$${p}" "$${SETFILE}" /opt/lite/ea-input.mqh; done
-      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=0.6

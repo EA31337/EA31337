@@ -12,7 +12,7 @@ services:
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../../../EA-Tester.ini
     environment:
-      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=2
+      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=20
       INCLUDE: /opt/rules/Strategies/SAR/Strategy-SAR-All-SAR_TrailingStopMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_SAR_TrailingStopMethod.set
       TEST_REPORT_NAME: EA31337-Lite_SAR_TrailingStopMethod
@@ -29,7 +29,7 @@ services:
 #   - ../../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../../../EA-Tester.ini
     environment:
-      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=2
+      EA_OPTS: maxdrawdown_enable=1,maxdrawdown=20
       INCLUDE: /opt/rules/Strategies/SAR/Strategy-SAR-All-SAR_TrailingProfitMethod.rule
       SETFILE: /opt/_results/EA31337-Lite_SAR_TrailingProfitMethod.set
       TEST_REPORT_NAME: EA31337-Lite_SAR_TrailingProfitMethod
