@@ -61,7 +61,7 @@ WPR30_Active=0
 Bands1_SignalMethod=0
 Bands1_OpenCondition2=0
 # Optimization params.
-Bands1_OpenCondition1=1
+Bands1_OpenCondition1=971
 Bands1_OpenCondition1,F=1
 Bands1_OpenCondition1,1=1
 Bands1_OpenCondition1,2=97

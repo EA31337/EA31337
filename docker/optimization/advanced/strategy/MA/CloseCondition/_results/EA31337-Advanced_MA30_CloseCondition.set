@@ -2,14 +2,13 @@
 LotSize=0.01
 Boosting_Enabled=0
 Account_Conditions_Active=0
-CloseOrderAfterXHours=24
 MinPipGap=0
 ProfitFactorMinToTrade=0
 ProfitFactorMaxToTrade=0
 ValidateSettings=0
 PrintLogOnChart=0
 WriteReport=0
-RecordTicksToCSV=0
+VerboseDebug=0
 VerboseInfo=0
 VerboseErrors=0
 # Strategy params.
@@ -40,7 +39,7 @@ Fractals30_Active=0
 MA1_Active=0
 MA5_Active=0
 MA15_Active=0
-MA30_Active=0
+MA30_Active=1
 MACD1_Active=0
 MACD5_Active=0
 MACD15_Active=0
@@ -55,14 +54,14 @@ SAR15_Active=0
 SAR30_Active=0
 WPR1_Active=0
 WPR5_Active=0
-WPR15_Active=1
+WPR15_Active=0
 WPR30_Active=0
 # Required params.
-WPR15_SignalMethod=0
-WPR15_OpenCondition2=0
+MA30_SignalMethod=0
+CloseConditionOnlyProfitable=0
 # Optimization params.
-WPR15_OpenCondition1=292
-WPR15_OpenCondition1,F=1
-WPR15_OpenCondition1,1=1
-WPR15_OpenCondition1,2=97
-WPR15_OpenCondition1,3=1023
+MA30_CloseCondition=1
+MA30_CloseCondition,F=1
+MA30_CloseCondition,1=1
+MA30_CloseCondition,2=1
+MA30_CloseCondition,3=33

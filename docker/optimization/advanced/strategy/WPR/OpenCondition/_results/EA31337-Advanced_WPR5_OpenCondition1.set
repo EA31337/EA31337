@@ -61,7 +61,7 @@ WPR30_Active=0
 WPR5_SignalMethod=0
 WPR5_OpenCondition2=0
 # Optimization params.
-WPR5_OpenCondition1=1
+WPR5_OpenCondition1=292
 WPR5_OpenCondition1,F=1
 WPR5_OpenCondition1,1=1
 WPR5_OpenCondition1,2=97

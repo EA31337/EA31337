@@ -12,6 +12,7 @@ services:
     - ../../../../../../../EA-Tester/scripts:/opt/scripts:rw
     env_file: ../../../EA-Tester.ini
     environment:
+      BT_MONTHS: 1
       SETFILE: /opt/_results/EA31337-Advanced_Alligator1_CloseCondition.set
       TEST_REPORT_NAME: EA31337-Advanced_Alligator1_CloseCondition
       SET_PARAMS: Alligator1_CloseCondition
@@ -27,6 +28,7 @@ services:
     - ../../../../../../src/include/EA31337/advanced:/opt/advanced:rw
     env_file: ../../../EA-Tester.ini
     environment:
+      BT_MONTHS: 1
       SETFILE: /opt/_results/EA31337-Advanced_Alligator5_CloseCondition.set
       TEST_REPORT_NAME: EA31337-Advanced_Alligator5_CloseCondition
       SET_PARAMS: Alligator5_CloseCondition
@@ -42,6 +44,7 @@ services:
     - ../../../../../../src/include/EA31337/advanced:/opt/advanced:rw
     env_file: ../../../EA-Tester.ini
     environment:
+      BT_MONTHS: 1
       SETFILE: /opt/_results/EA31337-Advanced_Alligator15_CloseCondition.set
       TEST_REPORT_NAME: EA31337-Advanced_Alligator15_CloseCondition
       SET_PARAMS: Alligator15_CloseCondition
@@ -57,6 +60,7 @@ services:
     - ../../../../../../src/include/EA31337/advanced:/opt/advanced:rw
     env_file: ../../../EA-Tester.ini
     environment:
+      BT_MONTHS: 1
       SETFILE: /opt/_results/EA31337-Advanced_Alligator30_CloseCondition.set
       TEST_REPORT_NAME: EA31337-Advanced_Alligator30_CloseCondition
       SET_PARAMS: Alligator30_CloseCondition

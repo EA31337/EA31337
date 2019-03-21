@@ -1,6 +1,6 @@
 version: '3.4'
 services:
-  Bands1_CloseCondition:
+  Envelopes1_CloseCondition:
     command: run_backtest -v
     image: ea31337:advanced-eurusd-2018
     build:
@@ -12,12 +12,11 @@ services:
     - ../../../../../../../EA-Tester/scripts:/opt/scripts:rw
     env_file: ../../../EA-Tester.ini
     environment:
-      BT_MONTHS: 1-2
-      SETFILE: /opt/_results/EA31337-Advanced_Bands1_CloseCondition.set
-      TEST_REPORT_NAME: EA31337-Advanced_Bands1_CloseCondition
-      SET_PARAMS: Bands1_CloseCondition
-      RUN_ON_SUCCESS: input_copy Bands1_CloseCondition "$${SETFILE}" /opt/advanced/ea-input.mqh
-  Bands5_CloseCondition:
+      SETFILE: /opt/_results/EA31337-Advanced_Envelopes1_CloseCondition.set
+      TEST_REPORT_NAME: EA31337-Advanced_Envelopes1_CloseCondition
+      SET_PARAMS: Envelopes1_CloseCondition
+      RUN_ON_SUCCESS: input_copy Envelopes1_CloseCondition "$${SETFILE}" /opt/advanced/ea-input.mqh
+  Envelopes5_CloseCondition:
     command: run_backtest -v
     image: ea31337:advanced-eurusd-2018
     build:
@@ -28,12 +27,11 @@ services:
     - ../../../../../../src/include/EA31337/advanced:/opt/advanced:rw
     env_file: ../../../EA-Tester.ini
     environment:
-      BT_MONTHS: 1-2
-      SETFILE: /opt/_results/EA31337-Advanced_Bands5_CloseCondition.set
-      TEST_REPORT_NAME: EA31337-Advanced_Bands5_CloseCondition
-      SET_PARAMS: Bands5_CloseCondition
-      RUN_ON_SUCCESS: input_copy Bands5_CloseCondition "$${SETFILE}" /opt/advanced/ea-input.mqh
-  Bands15_CloseCondition:
+      SETFILE: /opt/_results/EA31337-Advanced_Envelopes5_CloseCondition.set
+      TEST_REPORT_NAME: EA31337-Advanced_Envelopes5_CloseCondition
+      SET_PARAMS: Envelopes5_CloseCondition
+      RUN_ON_SUCCESS: input_copy Envelopes5_CloseCondition "$${SETFILE}" /opt/advanced/ea-input.mqh
+  Envelopes15_CloseCondition:
     command: run_backtest -v
     image: ea31337:advanced-eurusd-2018
     build:
@@ -44,12 +42,11 @@ services:
     - ../../../../../../src/include/EA31337/advanced:/opt/advanced:rw
     env_file: ../../../EA-Tester.ini
     environment:
-      BT_MONTHS: 1-2
-      SETFILE: /opt/_results/EA31337-Advanced_Bands15_CloseCondition.set
-      TEST_REPORT_NAME: EA31337-Advanced_Bands15_CloseCondition
-      SET_PARAMS: Bands15_CloseCondition
-      RUN_ON_SUCCESS: input_copy Bands15_CloseCondition "$${SETFILE}" /opt/advanced/ea-input.mqh
-  Bands30_CloseCondition:
+      SETFILE: /opt/_results/EA31337-Advanced_Envelopes15_CloseCondition.set
+      TEST_REPORT_NAME: EA31337-Advanced_Envelopes15_CloseCondition
+      SET_PARAMS: Envelopes15_CloseCondition
+      RUN_ON_SUCCESS: input_copy Envelopes15_CloseCondition "$${SETFILE}" /opt/advanced/ea-input.mqh
+  Envelopes30_CloseCondition:
     command: run_backtest -v
     image: ea31337:advanced-eurusd-2018
     build:
@@ -60,8 +57,7 @@ services:
     - ../../../../../../src/include/EA31337/advanced:/opt/advanced:rw
     env_file: ../../../EA-Tester.ini
     environment:
-      BT_MONTHS: 1-2
-      SETFILE: /opt/_results/EA31337-Advanced_Bands30_CloseCondition.set
-      TEST_REPORT_NAME: EA31337-Advanced_Bands30_CloseCondition
-      SET_PARAMS: Bands30_CloseCondition
-      RUN_ON_SUCCESS: input_copy Bands30_CloseCondition "$${SETFILE}" /opt/advanced/ea-input.mqh
+      SETFILE: /opt/_results/EA31337-Advanced_Envelopes30_CloseCondition.set
+      TEST_REPORT_NAME: EA31337-Advanced_Envelopes30_CloseCondition
+      SET_PARAMS: Envelopes30_CloseCondition
+      RUN_ON_SUCCESS: input_copy Envelopes30_CloseCondition "$${SETFILE}" /opt/advanced/ea-input.mqh
