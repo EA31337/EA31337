@@ -1,0 +1,25 @@
+
+
+
+                                                                 Optimization Report
+                                                           EA31337-Advanced-Optimize-v1.076
+                                                            Tripleafx-FX-Demo (Build 1010)
+
+                            Symbol          EURUSD (Euro vs US Dollar)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
+                            Model           Every tick (the most precise method based on all available least timeframes)
+                            Initial deposit 10000.00
+                            Spread          10
+                                                                 [Optimization Graph]
+     Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+        5   7.70          248          1.07            0.03      32.97       0.33 Fractals30_OpenCondition2=389; MaxOrders=0; MaxOrdersPerType=0;
+        3   6.18          169          1.11            0.04      20.91       0.21 Fractals30_OpenCondition2=195; MaxOrders=0; MaxOrdersPerType=0;
+        9   4.18           77          1.14            0.05      13.08       0.13 Fractals30_OpenCondition2=777; MaxOrders=0; MaxOrdersPerType=0;
+       10   4.46           21          3.21            0.21       2.33       0.02 Fractals30_OpenCondition2=874; MaxOrders=0; MaxOrdersPerType=0;
+       11   0.00            0          0.00            0.00       0.00       0.00 Fractals30_OpenCondition2=971; MaxOrders=0; MaxOrdersPerType=0;
+        7  -2.17           63          0.93           -0.03      15.34       0.15 Fractals30_OpenCondition2=583; MaxOrders=0; MaxOrdersPerType=0;
+        8  -5.71           34          0.49           -0.17      10.51       0.11 Fractals30_OpenCondition2=680; MaxOrders=0; MaxOrdersPerType=0;
+        6 -22.33          240          0.74           -0.09      36.31       0.36 Fractals30_OpenCondition2=486; MaxOrders=0; MaxOrdersPerType=0;
+        2 -30.20          569          0.83           -0.05      56.37       0.56  Fractals30_OpenCondition2=98; MaxOrders=0; MaxOrdersPerType=0;
+        1 -54.95         1232          0.90           -0.04      76.19       0.76   Fractals30_OpenCondition2=1; MaxOrders=0; MaxOrdersPerType=0;
+        4 -62.29          670          0.76           -0.09      83.91       0.84 Fractals30_OpenCondition2=292; MaxOrders=0; MaxOrdersPerType=0;

@@ -1,0 +1,25 @@
+
+
+
+                                                                 Optimization Report
+                                                           EA31337-Advanced-Optimize-v1.076
+                                                            Tripleafx-FX-Demo (Build 1010)
+
+                            Symbol          EURUSD (Euro vs US Dollar)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
+                            Model           Every tick (the most precise method based on all available least timeframes)
+                            Initial deposit 10000.00
+                            Spread          10
+                                                                 [Optimization Graph]
+    Pass   Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+      10    23.72          246          1.38            0.10      28.82       0.29 DeMarker5_OpenCondition2=874; MaxOrders=0; MaxOrdersPerType=0;
+       8    17.30          547          1.12            0.03      43.16       0.43 DeMarker5_OpenCondition2=680; MaxOrders=0; MaxOrdersPerType=0;
+      11    -4.81           27          0.15           -0.18       8.53       0.09 DeMarker5_OpenCondition2=971; MaxOrders=0; MaxOrdersPerType=0;
+       9   -49.37         1034          0.85           -0.05      92.39       0.92 DeMarker5_OpenCondition2=777; MaxOrders=0; MaxOrdersPerType=0;
+       7  -169.43          931          0.53           -0.18     182.48       1.82 DeMarker5_OpenCondition2=583; MaxOrders=0; MaxOrdersPerType=0;
+       6  -192.93         4083          0.88           -0.05     539.05       5.22 DeMarker5_OpenCondition2=486; MaxOrders=0; MaxOrdersPerType=0;
+       5  -263.65         5325          0.90           -0.05     572.83       5.56 DeMarker5_OpenCondition2=389; MaxOrders=0; MaxOrdersPerType=0;
+       3  -283.10         3265          0.78           -0.09     371.64       3.70 DeMarker5_OpenCondition2=195; MaxOrders=0; MaxOrdersPerType=0;
+       4 -1162.75        15373          0.87           -0.08    2882.40      24.62 DeMarker5_OpenCondition2=292; MaxOrders=0; MaxOrdersPerType=0;
+       2 -1506.89         9475          0.66           -0.16    1779.40      17.49  DeMarker5_OpenCondition2=98; MaxOrders=0; MaxOrdersPerType=0;
+       1 -2825.05        22036          0.80           -0.13    3813.57      35.98   DeMarker5_OpenCondition2=1; MaxOrders=0; MaxOrdersPerType=0;

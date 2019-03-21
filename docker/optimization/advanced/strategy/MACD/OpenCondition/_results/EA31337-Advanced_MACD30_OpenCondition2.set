@@ -61,7 +61,7 @@ WPR30_Active=0
 MACD30_SignalMethod=0
 MACD30_OpenCondition1=0
 # Optimization params.
-MACD30_OpenCondition2=1
+MACD30_OpenCondition2=874
 MACD30_OpenCondition2,F=1
 MACD30_OpenCondition2,1=1
 MACD30_OpenCondition2,2=97

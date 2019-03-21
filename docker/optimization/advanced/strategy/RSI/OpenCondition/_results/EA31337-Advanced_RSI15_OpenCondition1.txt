@@ -1,0 +1,25 @@
+
+
+
+                                                                 Optimization Report
+                                                           EA31337-Advanced-Optimize-v1.076
+                                                            Tripleafx-FX-Demo (Build 1010)
+
+                            Symbol          EURUSD (Euro vs US Dollar)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
+                            Model           Every tick (the most precise method based on all available least timeframes)
+                            Initial deposit 10000.00
+                            Spread          10
+                                                                 [Optimization Graph]
+       Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+          4  49.61          574          1.09            0.09     108.54       1.08 RSI15_OpenCondition1=292; MaxOrders=0; MaxOrdersPerType=0;
+          2  17.40           41          1.72            0.42      15.40       0.15  RSI15_OpenCondition1=98; MaxOrders=0; MaxOrdersPerType=0;
+          6  15.82           40          1.66            0.40      15.40       0.15 RSI15_OpenCondition1=486; MaxOrders=0; MaxOrdersPerType=0;
+          7   4.58            6         13.72            0.76       1.74       0.02 RSI15_OpenCondition1=583; MaxOrders=0; MaxOrdersPerType=0;
+          3  -0.00           14          1.00           -0.00      10.04       0.10 RSI15_OpenCondition1=195; MaxOrders=0; MaxOrdersPerType=0;
+          8   0.00            0          0.00            0.00       0.00       0.00 RSI15_OpenCondition1=680; MaxOrders=0; MaxOrdersPerType=0;
+          9   0.00            0          0.00            0.00       0.00       0.00 RSI15_OpenCondition1=777; MaxOrders=0; MaxOrdersPerType=0;
+         10   0.00            0          0.00            0.00       0.00       0.00 RSI15_OpenCondition1=874; MaxOrders=0; MaxOrdersPerType=0;
+         11   0.00            0          0.00            0.00       0.00       0.00 RSI15_OpenCondition1=971; MaxOrders=0; MaxOrdersPerType=0;
+          5 -42.48          228          0.82           -0.19      90.29       0.90 RSI15_OpenCondition1=389; MaxOrders=0; MaxOrdersPerType=0;
+          1 -48.22          249          0.82           -0.19     101.32       1.01   RSI15_OpenCondition1=1; MaxOrders=0; MaxOrdersPerType=0;

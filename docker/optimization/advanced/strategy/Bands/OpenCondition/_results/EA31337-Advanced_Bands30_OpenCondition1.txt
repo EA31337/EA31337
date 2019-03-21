@@ -1,0 +1,25 @@
+
+
+
+                                                                 Optimization Report
+                                                           EA31337-Advanced-Optimize-v1.076
+                                                            Tripleafx-FX-Demo (Build 1010)
+
+                            Symbol          EURUSD (Euro vs US Dollar)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
+                            Model           Every tick (the most precise method based on all available least timeframes)
+                            Initial deposit 10000.00
+                            Spread          10
+                                                                 [Optimization Graph]
+      Pass Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+         4 181.70         2502          1.04            0.07     493.42       4.91 Bands30_OpenCondition1=292; MaxOrders=0; MaxOrdersPerType=0;
+         1 124.02         1934          1.05            0.06     218.72       2.15   Bands30_OpenCondition1=1; MaxOrders=0; MaxOrdersPerType=0;
+         7   6.91          135          1.04            0.05      44.97       0.45 Bands30_OpenCondition1=583; MaxOrders=0; MaxOrdersPerType=0;
+        11   0.00            0          0.00            0.00       0.00       0.00 Bands30_OpenCondition1=971; MaxOrders=0; MaxOrdersPerType=0;
+        10   0.07            1          0.00            0.07       0.41       0.00 Bands30_OpenCondition1=874; MaxOrders=0; MaxOrdersPerType=0;
+         8  -7.84            4          0.02           -1.96      10.69       0.11 Bands30_OpenCondition1=680; MaxOrders=0; MaxOrdersPerType=0;
+         9  -8.19            3          0.00           -2.73      11.04       0.11 Bands30_OpenCondition1=777; MaxOrders=0; MaxOrdersPerType=0;
+         2 -28.57         1095          0.99           -0.03     265.27       2.62  Bands30_OpenCondition1=98; MaxOrders=0; MaxOrdersPerType=0;
+         6 -34.28          686          0.97           -0.05     175.22       1.74 Bands30_OpenCondition1=486; MaxOrders=0; MaxOrdersPerType=0;
+         3 -73.14          394          0.87           -0.19     118.44       1.18 Bands30_OpenCondition1=195; MaxOrders=0; MaxOrdersPerType=0;
+         5 -89.90         1144          0.94           -0.08     186.30       1.86 Bands30_OpenCondition1=389; MaxOrders=0; MaxOrdersPerType=0;

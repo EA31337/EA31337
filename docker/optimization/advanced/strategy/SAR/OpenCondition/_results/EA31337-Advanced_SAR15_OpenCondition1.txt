@@ -1,0 +1,25 @@
+
+
+
+                                                                 Optimization Report
+                                                           EA31337-Advanced-Optimize-v1.076
+                                                            Tripleafx-FX-Demo (Build 1010)
+
+                            Symbol          EURUSD (Euro vs US Dollar)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
+                            Model           Every tick (the most precise method based on all available least timeframes)
+                            Initial deposit 10000.00
+                            Spread          10
+                                                                 [Optimization Graph]
+       Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+          2  459.58         3955          1.08            0.12     587.78       5.84  SAR15_OpenCondition1=98; MaxOrders=0; MaxOrdersPerType=0;
+          4  134.84         3248          1.03            0.04     500.66       4.99 SAR15_OpenCondition1=292; MaxOrders=0; MaxOrdersPerType=0;
+         10   81.99          231          1.25            0.35      73.62       0.72 SAR15_OpenCondition1=874; MaxOrders=0; MaxOrdersPerType=0;
+          7    1.40          535          1.00            0.00     101.59       1.02 SAR15_OpenCondition1=583; MaxOrders=0; MaxOrdersPerType=0;
+          6   -1.40         1938          1.00           -0.00     299.21       2.99 SAR15_OpenCondition1=486; MaxOrders=0; MaxOrdersPerType=0;
+         11  -14.56           61          0.74           -0.24      24.30       0.24 SAR15_OpenCondition1=971; MaxOrders=0; MaxOrdersPerType=0;
+          8  -19.58          167          0.90           -0.12      69.44       0.69 SAR15_OpenCondition1=680; MaxOrders=0; MaxOrdersPerType=0;
+          9  -49.47          220          0.76           -0.22      79.82       0.80 SAR15_OpenCondition1=777; MaxOrders=0; MaxOrdersPerType=0;
+          3 -107.00         1660          0.93           -0.06     301.72       3.02 SAR15_OpenCondition1=195; MaxOrders=0; MaxOrdersPerType=0;
+          5 -235.89         1411          0.83           -0.17     344.36       3.44 SAR15_OpenCondition1=389; MaxOrders=0; MaxOrdersPerType=0;
+          1 -552.75         7537          0.93           -0.07     929.84       9.24   SAR15_OpenCondition1=1; MaxOrders=0; MaxOrdersPerType=0;

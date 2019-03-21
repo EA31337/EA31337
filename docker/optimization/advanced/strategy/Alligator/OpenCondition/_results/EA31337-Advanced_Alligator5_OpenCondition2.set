@@ -61,7 +61,7 @@ WPR30_Active=0
 Alligator5_SignalMethod=0
 Alligator5_OpenCondition1=0
 # Optimization params.
-Alligator5_OpenCondition2=292
+Alligator5_OpenCondition2=874
 Alligator5_OpenCondition2,F=1
 Alligator5_OpenCondition2,1=1
 Alligator5_OpenCondition2,2=97

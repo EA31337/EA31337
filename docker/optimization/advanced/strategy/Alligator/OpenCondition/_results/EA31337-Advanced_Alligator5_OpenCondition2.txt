@@ -1,0 +1,25 @@
+
+
+
+                                                                 Optimization Report
+                                                           EA31337-Advanced-Optimize-v1.076
+                                                            Tripleafx-FX-Demo (Build 1010)
+
+                            Symbol          EURUSD (Euro vs US Dollar)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
+                            Model           Every tick (the most precise method based on all available least timeframes)
+                            Initial deposit 10000.00
+                            Spread          10
+                                                                 [Optimization Graph]
+    Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+      10   11.27           73          1.72            0.15      10.07       0.10 Alligator5_OpenCondition2=874; MaxOrders=0; MaxOrdersPerType=0;
+      11   -2.31            8          0.03           -0.29       2.82       0.03 Alligator5_OpenCondition2=971; MaxOrders=0; MaxOrdersPerType=0;
+       9  -98.10          487          0.73           -0.20     206.61       2.06 Alligator5_OpenCondition2=777; MaxOrders=0; MaxOrdersPerType=0;
+       8 -115.44          523          0.70           -0.22     174.65       1.75 Alligator5_OpenCondition2=680; MaxOrders=0; MaxOrdersPerType=0;
+       7 -124.20          387          0.50           -0.32     146.54       1.46 Alligator5_OpenCondition2=583; MaxOrders=0; MaxOrdersPerType=0;
+       5 -128.50         1114          0.84           -0.12     178.75       1.78 Alligator5_OpenCondition2=389; MaxOrders=0; MaxOrdersPerType=0;
+       3 -155.26          564          0.55           -0.28     169.63       1.70 Alligator5_OpenCondition2=195; MaxOrders=0; MaxOrdersPerType=0;
+       6 -198.41          871          0.61           -0.23     270.29       2.68 Alligator5_OpenCondition2=486; MaxOrders=0; MaxOrdersPerType=0;
+       2 -340.53         1770          0.62           -0.19     462.96       4.58  Alligator5_OpenCondition2=98; MaxOrders=0; MaxOrdersPerType=0;
+       4 -484.42         3331          0.78           -0.15     555.18       5.53 Alligator5_OpenCondition2=292; MaxOrders=0; MaxOrdersPerType=0;
+       1 -621.22         4506          0.80           -0.14     765.81       7.64   Alligator5_OpenCondition2=1; MaxOrders=0; MaxOrdersPerType=0;

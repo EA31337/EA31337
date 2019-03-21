@@ -1,0 +1,25 @@
+
+
+
+                                                                 Optimization Report
+                                                           EA31337-Advanced-Optimize-v1.076
+                                                            Tripleafx-FX-Demo (Build 1010)
+
+                            Symbol          EURUSD (Euro vs US Dollar)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
+                            Model           Every tick (the most precise method based on all available least timeframes)
+                            Initial deposit 10000.00
+                            Spread          10
+                                                                 [Optimization Graph]
+       Pass   Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+          2  3854.83        27787          1.09            0.14    3770.50      35.47  WPR1_OpenCondition1=98; MaxOrders=0; MaxOrdersPerType=0;
+         10  1875.25         8127          1.15            0.23    1850.29      13.93 WPR1_OpenCondition1=874; MaxOrders=0; MaxOrdersPerType=0;
+          9  1607.63        16411          1.07            0.10    3181.09      24.24 WPR1_OpenCondition1=777; MaxOrders=0; MaxOrdersPerType=0;
+          8  1587.78        28524          1.04            0.06    4143.42      26.58 WPR1_OpenCondition1=680; MaxOrders=0; MaxOrdersPerType=0;
+          7  1281.36         8531          1.10            0.15    1006.68       8.69 WPR1_OpenCondition1=583; MaxOrders=0; MaxOrdersPerType=0;
+          6   363.61         5974          1.05            0.06     440.46       4.40 WPR1_OpenCondition1=486; MaxOrders=0; MaxOrdersPerType=0;
+         11   141.67          852          1.15            0.17     225.35       2.23 WPR1_OpenCondition1=971; MaxOrders=0; MaxOrdersPerType=0;
+          5    10.18        12076          1.00            0.00    1838.49      16.88 WPR1_OpenCondition1=389; MaxOrders=0; MaxOrdersPerType=0;
+          3  -202.41         3897          0.96           -0.05     516.72       5.03 WPR1_OpenCondition1=195; MaxOrders=0; MaxOrdersPerType=0;
+          4 -2957.25         3446          0.58           -0.86    3012.51      30.08 WPR1_OpenCondition1=292; MaxOrders=0; MaxOrdersPerType=0;
+          1 -4212.58        33693          0.93           -0.13    5681.30      49.69   WPR1_OpenCondition1=1; MaxOrders=0; MaxOrdersPerType=0;

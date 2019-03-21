@@ -435,9 +435,9 @@ int OnInit() {
 //+------------------------------------------------------------------+
 void OnDeinit(const int reason) {
   time_current = TimeCurrent();
-  terminal.Logger().Debug(StringFormat("reason = %d", reason), __FUNCTION_LINE__);
+  if (VerboseDebug) terminal.Logger().Debug(StringFormat("reason = %d", reason), __FUNCTION_LINE__);
   // Also: _UninitReason.
-  terminal.Logger().Info(StringFormat("EA deinitializing, reason: %s (code: %s)", Terminal::GetUninitReasonText(reason), IntegerToString(reason)), __FUNCTION_LINE__);
+  if (VerboseInfo) terminal.Logger().Info(StringFormat("EA deinitializing, reason: %s (code: %s)", Terminal::GetUninitReasonText(reason), IntegerToString(reason)), __FUNCTION_LINE__);
 
   if (session_initiated) {
     if (!terminal.IsOptimization()) {

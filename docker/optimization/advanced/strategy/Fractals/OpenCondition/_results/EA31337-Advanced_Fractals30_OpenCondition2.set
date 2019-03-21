@@ -61,7 +61,7 @@ WPR30_Active=0
 Fractals30_SignalMethod=0
 Fractals30_OpenCondition1=0
 # Optimization params.
-Fractals30_OpenCondition2=486
+Fractals30_OpenCondition2=389
 Fractals30_OpenCondition2,F=1
 Fractals30_OpenCondition2,1=1
 Fractals30_OpenCondition2,2=97

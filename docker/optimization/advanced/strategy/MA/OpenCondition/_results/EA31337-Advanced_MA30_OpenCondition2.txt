@@ -1,0 +1,25 @@
+
+
+
+                                                                 Optimization Report
+                                                           EA31337-Advanced-Optimize-v1.076
+                                                            Tripleafx-FX-Demo (Build 1010)
+
+                            Symbol          EURUSD (Euro vs US Dollar)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
+                            Model           Every tick (the most precise method based on all available least timeframes)
+                            Initial deposit 10000.00
+                            Spread          10
+                                                                 [Optimization Graph]
+       Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+          1  525.50         3740          1.14            0.14     383.74       3.81   MA30_OpenCondition2=1; MaxOrders=0; MaxOrdersPerType=0;
+         10    9.40           30          2.61            0.31       7.04       0.07 MA30_OpenCondition2=874; MaxOrders=0; MaxOrdersPerType=0;
+          5    9.63          656          1.01            0.01     129.18       1.29 MA30_OpenCondition2=389; MaxOrders=0; MaxOrdersPerType=0;
+          8    0.00            0          0.00            0.00       0.00       0.00 MA30_OpenCondition2=680; MaxOrders=0; MaxOrdersPerType=0;
+         11    0.00            0          0.00            0.00       0.00       0.00 MA30_OpenCondition2=971; MaxOrders=0; MaxOrdersPerType=0;
+          7  -25.38          110          0.75           -0.23      63.66       0.64 MA30_OpenCondition2=583; MaxOrders=0; MaxOrdersPerType=0;
+          9  -29.21          219          0.88           -0.13      54.43       0.54 MA30_OpenCondition2=777; MaxOrders=0; MaxOrdersPerType=0;
+          6  -38.36          265          0.77           -0.14      69.95       0.70 MA30_OpenCondition2=486; MaxOrders=0; MaxOrdersPerType=0;
+          3  -89.72          263          0.72           -0.34      96.14       0.96 MA30_OpenCondition2=195; MaxOrders=0; MaxOrdersPerType=0;
+          2 -107.07         1039          0.83           -0.10     164.30       1.64  MA30_OpenCondition2=98; MaxOrders=0; MaxOrdersPerType=0;
+          4 -153.27         1622          0.87           -0.09     274.94       2.72 MA30_OpenCondition2=292; MaxOrders=0; MaxOrdersPerType=0;

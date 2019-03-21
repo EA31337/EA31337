@@ -61,7 +61,7 @@ WPR30_Active=0
 CCI1_SignalMethod=0
 CCI1_OpenCondition1=0
 # Optimization params.
-CCI1_OpenCondition2=680
+CCI1_OpenCondition2=98
 CCI1_OpenCondition2,F=1
 CCI1_OpenCondition2,1=1
 CCI1_OpenCondition2,2=97

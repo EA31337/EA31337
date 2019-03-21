@@ -61,7 +61,7 @@ WPR30_Active=0
 Envelopes30_SignalMethod=0
 Envelopes30_OpenCondition1=0
 # Optimization params.
-Envelopes30_OpenCondition2=1
+Envelopes30_OpenCondition2=98
 Envelopes30_OpenCondition2,F=1
 Envelopes30_OpenCondition2,1=1
 Envelopes30_OpenCondition2,2=97

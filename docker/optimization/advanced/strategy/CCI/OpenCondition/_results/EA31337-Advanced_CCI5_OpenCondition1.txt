@@ -1,0 +1,25 @@
+
+
+
+                                                                 Optimization Report
+                                                           EA31337-Advanced-Optimize-v1.076
+                                                            Tripleafx-FX-Demo (Build 1010)
+
+                            Symbol          EURUSD (Euro vs US Dollar)
+                            Period          30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
+                            Model           Every tick (the most precise method based on all available least timeframes)
+                            Initial deposit 10000.00
+                            Spread          10
+                                                                 [Optimization Graph]
+       Pass  Profit Total trades Profit factor Expected Payoff Drawdown $ Drawdown %
+         11  -25.13          124          0.43           -0.20      29.84       0.30 CCI5_OpenCondition1=971; MaxOrders=0; MaxOrdersPerType=0;
+          7  -31.71          700          0.86           -0.05      62.00       0.62 CCI5_OpenCondition1=583; MaxOrders=0; MaxOrdersPerType=0;
+          3  -31.30          477          0.81           -0.07      64.46       0.64 CCI5_OpenCondition1=195; MaxOrders=0; MaxOrdersPerType=0;
+          9  -35.19          653          0.85           -0.05     104.96       1.04 CCI5_OpenCondition1=777; MaxOrders=0; MaxOrdersPerType=0;
+          5  -37.69         1249          0.92           -0.03     125.42       1.24 CCI5_OpenCondition1=389; MaxOrders=0; MaxOrdersPerType=0;
+         10  -52.67          663          0.74           -0.08      54.94       0.55 CCI5_OpenCondition1=874; MaxOrders=0; MaxOrdersPerType=0;
+          1 -110.80         2245          0.86           -0.05     198.36       1.97   CCI5_OpenCondition1=1; MaxOrders=0; MaxOrdersPerType=0;
+          6 -110.70         1196          0.73           -0.09     118.00       1.18 CCI5_OpenCondition1=486; MaxOrders=0; MaxOrdersPerType=0;
+          2 -133.69         2455          0.83           -0.05     155.83       1.55  CCI5_OpenCondition1=98; MaxOrders=0; MaxOrdersPerType=0;
+          8 -155.56         2568          0.83           -0.06     176.13       1.76 CCI5_OpenCondition1=680; MaxOrders=0; MaxOrdersPerType=0;
+          4 -349.27         5114          0.81           -0.07     361.65       3.62 CCI5_OpenCondition1=292; MaxOrders=0; MaxOrdersPerType=0;
