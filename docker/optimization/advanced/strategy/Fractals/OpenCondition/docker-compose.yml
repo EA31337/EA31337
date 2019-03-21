@@ -1,0 +1,124 @@
+version: '3.4'
+services:
+  Fractals1_OpenCondition1:
+    command: run_backtest -v
+    image: ea31337:advanced-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-advanced-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/advanced:/opt/advanced:rw
+    - ../../../../../../../EA-Tester/scripts:/opt/scripts:rw
+    env_file: ../../../EA-Tester.ini
+    environment:
+      SETFILE: /opt/_results/EA31337-Advanced_Fractals1_OpenCondition1.set
+      TEST_REPORT_NAME: EA31337-Advanced_Fractals1_OpenCondition1
+      SET_PARAMS: Fractals1_OpenCondition1
+      RUN_ON_SUCCESS: input_copy Fractals1_OpenCondition1 "$${SETFILE}" /opt/advanced/ea-input.mqh
+  Fractals5_OpenCondition1:
+    command: run_backtest -v
+    image: ea31337:advanced-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-advanced-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/advanced:/opt/advanced:rw
+    env_file: ../../../EA-Tester.ini
+    environment:
+      SETFILE: /opt/_results/EA31337-Advanced_Fractals5_OpenCondition1.set
+      TEST_REPORT_NAME: EA31337-Advanced_Fractals5_OpenCondition1
+      SET_PARAMS: Fractals5_OpenCondition1
+      RUN_ON_SUCCESS: input_copy Fractals5_OpenCondition1 "$${SETFILE}" /opt/advanced/ea-input.mqh
+  Fractals15_OpenCondition1:
+    command: run_backtest -v
+    image: ea31337:advanced-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-advanced-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/advanced:/opt/advanced:rw
+    env_file: ../../../EA-Tester.ini
+    environment:
+      SETFILE: /opt/_results/EA31337-Advanced_Fractals15_OpenCondition1.set
+      TEST_REPORT_NAME: EA31337-Advanced_Fractals15_OpenCondition1
+      SET_PARAMS: Fractals15_OpenCondition1
+      RUN_ON_SUCCESS: input_copy Fractals15_OpenCondition1 "$${SETFILE}" /opt/advanced/ea-input.mqh
+  Fractals30_OpenCondition1:
+    command: run_backtest -v
+    image: ea31337:advanced-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-advanced-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/advanced:/opt/advanced:rw
+    env_file: ../../../EA-Tester.ini
+    environment:
+      SETFILE: /opt/_results/EA31337-Advanced_Fractals30_OpenCondition1.set
+      TEST_REPORT_NAME: EA31337-Advanced_Fractals30_OpenCondition1
+      SET_PARAMS: Fractals30_OpenCondition1
+      RUN_ON_SUCCESS: input_copy Fractals30_OpenCondition1 "$${SETFILE}" /opt/advanced/ea-input.mqh
+  Fractals1_OpenCondition2:
+    command: run_backtest -v
+    image: ea31337:advanced-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-advanced-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/advanced:/opt/advanced:rw
+    - ../../../../../../../EA-Tester/scripts:/opt/scripts:rw
+    env_file: ../../../EA-Tester.ini
+    environment:
+      SETFILE: /opt/_results/EA31337-Advanced_Fractals1_OpenCondition2.set
+      TEST_REPORT_NAME: EA31337-Advanced_Fractals1_OpenCondition2
+      SET_PARAMS: Fractals1_OpenCondition2
+      RUN_ON_SUCCESS: input_copy Fractals1_OpenCondition2 "$${SETFILE}" /opt/advanced/ea-input.mqh
+  Fractals5_OpenCondition2:
+    command: run_backtest -v
+    image: ea31337:advanced-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-advanced-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/advanced:/opt/advanced:rw
+    env_file: ../../../EA-Tester.ini
+    environment:
+      SETFILE: /opt/_results/EA31337-Advanced_Fractals5_OpenCondition2.set
+      TEST_REPORT_NAME: EA31337-Advanced_Fractals5_OpenCondition2
+      SET_PARAMS: Fractals5_OpenCondition2
+      RUN_ON_SUCCESS: input_copy Fractals5_OpenCondition2 "$${SETFILE}" /opt/advanced/ea-input.mqh
+  Fractals15_OpenCondition2:
+    command: run_backtest -v
+    image: ea31337:advanced-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-advanced-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/advanced:/opt/advanced:rw
+    env_file: ../../../EA-Tester.ini
+    environment:
+      SETFILE: /opt/_results/EA31337-Advanced_Fractals15_OpenCondition2.set
+      TEST_REPORT_NAME: EA31337-Advanced_Fractals15_OpenCondition2
+      SET_PARAMS: Fractals15_OpenCondition2
+      RUN_ON_SUCCESS: input_copy Fractals15_OpenCondition2 "$${SETFILE}" /opt/advanced/ea-input.mqh
+  Fractals30_OpenCondition2:
+    command: run_backtest -v
+    image: ea31337:advanced-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-advanced-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/advanced:/opt/advanced:rw
+    env_file: ../../../EA-Tester.ini
+    environment:
+      SETFILE: /opt/_results/EA31337-Advanced_Fractals30_OpenCondition2.set
+      TEST_REPORT_NAME: EA31337-Advanced_Fractals30_OpenCondition2
+      SET_PARAMS: Fractals30_OpenCondition2
+      RUN_ON_SUCCESS: input_copy Fractals30_OpenCondition2 "$${SETFILE}" /opt/advanced/ea-input.mqh

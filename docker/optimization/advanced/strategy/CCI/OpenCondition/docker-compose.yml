@@ -1,0 +1,124 @@
+version: '3.4'
+services:
+  CCI1_OpenCondition1:
+    command: run_backtest -v
+    image: ea31337:advanced-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-advanced-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/advanced:/opt/advanced:rw
+    - ../../../../../../../EA-Tester/scripts:/opt/scripts:rw
+    env_file: ../../../EA-Tester.ini
+    environment:
+      SETFILE: /opt/_results/EA31337-Advanced_CCI1_OpenCondition1.set
+      TEST_REPORT_NAME: EA31337-Advanced_CCI1_OpenCondition1
+      SET_PARAMS: CCI1_OpenCondition1
+      RUN_ON_SUCCESS: input_copy CCI1_OpenCondition1 "$${SETFILE}" /opt/advanced/ea-input.mqh
+  CCI5_OpenCondition1:
+    command: run_backtest -v
+    image: ea31337:advanced-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-advanced-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/advanced:/opt/advanced:rw
+    env_file: ../../../EA-Tester.ini
+    environment:
+      SETFILE: /opt/_results/EA31337-Advanced_CCI5_OpenCondition1.set
+      TEST_REPORT_NAME: EA31337-Advanced_CCI5_OpenCondition1
+      SET_PARAMS: CCI5_OpenCondition1
+      RUN_ON_SUCCESS: input_copy CCI5_OpenCondition1 "$${SETFILE}" /opt/advanced/ea-input.mqh
+  CCI15_OpenCondition1:
+    command: run_backtest -v
+    image: ea31337:advanced-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-advanced-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/advanced:/opt/advanced:rw
+    env_file: ../../../EA-Tester.ini
+    environment:
+      SETFILE: /opt/_results/EA31337-Advanced_CCI15_OpenCondition1.set
+      TEST_REPORT_NAME: EA31337-Advanced_CCI15_OpenCondition1
+      SET_PARAMS: CCI15_OpenCondition1
+      RUN_ON_SUCCESS: input_copy CCI15_OpenCondition1 "$${SETFILE}" /opt/advanced/ea-input.mqh
+  CCI30_OpenCondition1:
+    command: run_backtest -v
+    image: ea31337:advanced-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-advanced-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/advanced:/opt/advanced:rw
+    env_file: ../../../EA-Tester.ini
+    environment:
+      SETFILE: /opt/_results/EA31337-Advanced_CCI30_OpenCondition1.set
+      TEST_REPORT_NAME: EA31337-Advanced_CCI30_OpenCondition1
+      SET_PARAMS: CCI30_OpenCondition1
+      RUN_ON_SUCCESS: input_copy CCI30_OpenCondition1 "$${SETFILE}" /opt/advanced/ea-input.mqh
+  CCI1_OpenCondition2:
+    command: run_backtest -v
+    image: ea31337:advanced-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-advanced-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/advanced:/opt/advanced:rw
+    - ../../../../../../../EA-Tester/scripts:/opt/scripts:rw
+    env_file: ../../../EA-Tester.ini
+    environment:
+      SETFILE: /opt/_results/EA31337-Advanced_CCI1_OpenCondition2.set
+      TEST_REPORT_NAME: EA31337-Advanced_CCI1_OpenCondition2
+      SET_PARAMS: CCI1_OpenCondition2
+      RUN_ON_SUCCESS: input_copy CCI1_OpenCondition2 "$${SETFILE}" /opt/advanced/ea-input.mqh
+  CCI5_OpenCondition2:
+    command: run_backtest -v
+    image: ea31337:advanced-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-advanced-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/advanced:/opt/advanced:rw
+    env_file: ../../../EA-Tester.ini
+    environment:
+      SETFILE: /opt/_results/EA31337-Advanced_CCI5_OpenCondition2.set
+      TEST_REPORT_NAME: EA31337-Advanced_CCI5_OpenCondition2
+      SET_PARAMS: CCI5_OpenCondition2
+      RUN_ON_SUCCESS: input_copy CCI5_OpenCondition2 "$${SETFILE}" /opt/advanced/ea-input.mqh
+  CCI15_OpenCondition2:
+    command: run_backtest -v
+    image: ea31337:advanced-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-advanced-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/advanced:/opt/advanced:rw
+    env_file: ../../../EA-Tester.ini
+    environment:
+      SETFILE: /opt/_results/EA31337-Advanced_CCI15_OpenCondition2.set
+      TEST_REPORT_NAME: EA31337-Advanced_CCI15_OpenCondition2
+      SET_PARAMS: CCI15_OpenCondition2
+      RUN_ON_SUCCESS: input_copy CCI15_OpenCondition2 "$${SETFILE}" /opt/advanced/ea-input.mqh
+  CCI30_OpenCondition2:
+    command: run_backtest -v
+    image: ea31337:advanced-eurusd-2018
+    build:
+      context: ../../../../../..
+      target: ea31337-advanced-eurusd-2018
+    volumes:
+    - ./_results:/opt/_results:rw
+    - ../../../../../../src/include/EA31337/advanced:/opt/advanced:rw
+    env_file: ../../../EA-Tester.ini
+    environment:
+      SETFILE: /opt/_results/EA31337-Advanced_CCI30_OpenCondition2.set
+      TEST_REPORT_NAME: EA31337-Advanced_CCI30_OpenCondition2
+      SET_PARAMS: CCI30_OpenCondition2
+      RUN_ON_SUCCESS: input_copy CCI30_OpenCondition2 "$${SETFILE}" /opt/advanced/ea-input.mqh
