@@ -603,25 +603,25 @@ extern ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = 12; // Trail profit method
 extern int CCI_Period = 28; // Period
 extern ENUM_APPLIED_PRICE CCI_Applied_Price = 2; // Applied Price
 extern double CCI_SignalLevel = 98; // Signal level (100 by default)
-extern int CCI1_SignalMethod = 34; // Signal method for M1 (0-
-extern int CCI5_SignalMethod = 18; // Signal method for M5 (0-
-extern int CCI15_SignalMethod = 0; // Signal method for M15 (0-
-extern int CCI30_SignalMethod = -44; // Signal method for M30 (0-
-int CCI1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
-int CCI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-ENUM_MARKET_EVENT CCI1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
+extern int CCI1_SignalMethod = 34; // Signal method for M1 (0-63)
+extern int CCI5_SignalMethod = 18; // Signal method for M5 (0-63)
+extern int CCI15_SignalMethod = 0; // Signal method for M15 (0-63)
+extern int CCI30_SignalMethod = -44; // Signal method for M30 (0-63)
+extern int CCI1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
+extern int CCI1_OpenCondition2 = 1; // Open condition 2 for M1 (0-1023)
+extern ENUM_MARKET_EVENT CCI1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
 
-int CCI5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
-int CCI5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-ENUM_MARKET_EVENT CCI5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
+extern int CCI5_OpenCondition1 = 1; // Open condition 1 for M5 (0-1023)
+extern int CCI5_OpenCondition2 = 1; // Open condition 2 for M5 (0-1023)
+extern ENUM_MARKET_EVENT CCI5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
 
-int CCI15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
-int CCI15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-ENUM_MARKET_EVENT CCI15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
+extern int CCI15_OpenCondition1 = 1; // Open condition 1 for M15 (0-1023)
+extern int CCI15_OpenCondition2 = 1; // Open condition 2 for M15 (0-1023)
+extern ENUM_MARKET_EVENT CCI15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
 
-int CCI30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
-int CCI30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-ENUM_MARKET_EVENT CCI30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
+extern int CCI30_OpenCondition1 = 1; // Open condition 1 for M30 (0-1023)
+extern int CCI30_OpenCondition2 = 1; // Open condition 2 for M30 (0-1023)
+extern ENUM_MARKET_EVENT CCI30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
 
 double CCI1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 double CCI5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
@@ -1098,18 +1098,23 @@ extern int RSI1_SignalMethod = -63; // Signal method for M1 (-63-63)
 extern int RSI5_SignalMethod = -61; // Signal method for M5 (-63-63)
 extern int RSI15_SignalMethod = -63; // Signal method for M15 (-63-63)
 extern int RSI30_SignalMethod = 0; // Signal method for M30 (-63-63)
-extern int RSI1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
-extern int RSI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+
+extern int RSI1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
+extern int RSI1_OpenCondition2 = 1; // Open condition 2 for M1 (0-1023)
 extern ENUM_MARKET_EVENT RSI1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
-extern int RSI5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+
+extern int RSI5_OpenCondition1 = 1; // Open condition 1 for M5 (0-1023)
 extern int RSI5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
 extern ENUM_MARKET_EVENT RSI5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
-extern int RSI15_OpenCondition1 = 116; // Open condition 1 for M15 (0-1023)
+
+extern int RSI15_OpenCondition1 = 1; // Open condition 1 for M15 (0-1023)
 extern int RSI15_OpenCondition2 = 1; // Open condition 2 for M15 (0-1023)
 extern ENUM_MARKET_EVENT RSI15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
-extern int RSI30_OpenCondition1 = 0; // Open condition 1 for M30 (0-1023)
+
+extern int RSI30_OpenCondition1 = 1; // Open condition 1 for M30 (0-1023)
 extern int RSI30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
 extern ENUM_MARKET_EVENT RSI30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
+
 extern double RSI1_MaxSpread =   6.0; // Max spread to trade for M1 (pips)
 extern double RSI5_MaxSpread =   7.0; // Max spread to trade for M5 (pips)
 extern double RSI15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)

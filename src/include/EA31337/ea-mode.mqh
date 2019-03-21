@@ -8,7 +8,7 @@
 //+------------------------------------------------------------------+
 
 // Main modes (Lite, Advanced and Rider).
-//#define __advanced__  // Enable advanced configuration.
+#define __advanced__  // Enable advanced configuration.
 //#define __rider__     // Activate rider strategy.
 
 // Other modes.
