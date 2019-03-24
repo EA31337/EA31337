@@ -219,9 +219,5 @@ $(OUT)/$(EA)-Rider-Optimize-%.ex4: \
 		set-none
 		cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-Optimize-v$(VER).ex4"
 
-
 mt4-install:
 		install -v "$(EX4)" "$(shell find ~/.wine -name terminal.exe -execdir pwd ';' -quit)/MQL4/Experts"
-
-lite-license: compile-mql4 mt4-install
-	:

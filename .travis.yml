@@ -10,7 +10,12 @@ addons:
 env:
   global:
   - CWD=$TRAVIS_BUILD_DIR
+  - DOCKER_BUILDKIT=1
+  - DOCKER_REPO="ea31337/ea31337"
+  - DOCKER_LOGIN='[[ -n "$DOCKER_PASSWORD" ]] && docker login -u $DOCKER_USERNAME --password-stdin <<<$DOCKER_PASSWORD'
+  - DOCKER_PUSH='docker push $DOCKER_REPO'
   matrix:
+  - CMD="eval $DOCKER_LOGIN; docker build --target ea31337-lite -t ${DOCKER_REPO}:lite . && [[ '$TRAVIS_PULL_REQUEST' = 'false' ]] && ${DOCKER_PUSH}:lite"
   - CMD="cd docker/tests/lite; docker-compose build --build-arg UID=$UID test_2018_01; docker-compose run test_2018_01"
   - CMD="cd docker/tests/advanced; docker-compose build --build-arg UID=$UID test_2018_01; docker-compose run test_2018_01"
   - CMD="cd docker/tests/rider; docker-compose build --build-arg UID=$UID test_2018_01; docker-compose run test_2018_01"
