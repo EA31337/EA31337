@@ -1,5 +1,6 @@
-# Base.
+# Prepare source code.
 FROM ea31337/ea-tester:dev as ea31337-src
+MAINTAINER kenorb
 # Adjust the user's UID.
 ARG UID=1000
 USER root
@@ -34,10 +35,25 @@ RUN make Rider-Optimize
 
 # Build all versions.
 FROM ea31337-src as ea31337
+MAINTAINER kenorb
 WORKDIR /opt/EA
 COPY --from=ea31337-lite --chown=ubuntu:root "/opt/src/*.ex?" "/opt/EA/"
 COPY --from=ea31337-advanced --chown=ubuntu:root "/opt/src/*.ex?" "/opt/EA/"
 COPY --from=ea31337-rider --chown=ubuntu:root "/opt/src/*.ex?" "/opt/EA/"
+
+# Build-time metadata as defined at http://label-schema.org
+ARG BUILD_DATE
+ARG VCS_REF
+ARG VERSION
+LABEL org.label-schema.build-date=$BUILD_DATE \
+      org.label-schema.name="EA31337" \
+      org.label-schema.description="Multi-strategy advanced trading robot for Forex." \
+      org.label-schema.url="https://github.com/EA31337/EA31337" \
+      org.label-schema.vcs-ref=$VCS_REF \
+      org.label-schema.vcs-url="https://github.com/EA31337/EA31337" \
+      org.label-schema.vendor="FX31337" \
+      org.label-schema.version=$VERSION \
+      org.label-schema.schema-version="1.0"
 
 # EURUSD 2017
 FROM ea31337/ea-tester:EURUSD-2017-DS as ea31337-eurusd-2017
