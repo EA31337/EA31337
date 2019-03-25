@@ -78,3 +78,10 @@ COPY --from=ea31337-rider --chown=ubuntu:root "/opt/EA" "/opt/EA"
 # Build Rider version with EURUSD 2017 data.
 FROM eurusd-2017 as ea31337-rider-eurusd-2017
 COPY --from=ea31337-rider --chown=ubuntu:root "/opt/EA" "/opt/EA"
+
+# Build all versions.
+FROM ea31337 as ea31337-all
+WORKDIR /opt/EA
+COPY --from=ea31337-lite --chown=ubuntu:root "/opt/EA" "/opt/EA"
+COPY --from=ea31337-advanced --chown=ubuntu:root "/opt/EA" "/opt/EA"
+COPY --from=ea31337-rider --chown=ubuntu:root "/opt/EA" "/opt/EA"
