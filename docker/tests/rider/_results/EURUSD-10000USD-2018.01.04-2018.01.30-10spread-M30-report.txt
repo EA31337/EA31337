@@ -1,52 +1,49 @@
 Currency pair symbol:                       EURUSD
 Initial deposit:                            10000.00 USD
-Total net profit:                           -265.23 USD
-Gross profit:                               493.18 USD
-Gross loss:                                 758.42 USD
-Absolute drawdown:                          281.69 USD
-Maximal drawdown:                           398.2 USD (3.9%)
-Relative drawdown:                          (3.9%) 398.2 USD
-Profit factor:                              0.65
-Expected payoff:                            -0.54
-Trades total                                495
-Short positions (won %):                    258 (34.1%)
-Long positions (won %):                     237 (11.4%)
-Profit trades (% of total):                 115 (23.2%)
-Loss trades (% of total):                   380 (76.8%)
-Largest profit trade:                       21.69
-Largest loss trade:                         -16.00
-Average profit trade:                       4.29
+Total net profit:                           -249.45 USD
+Gross profit:                               292.69 USD
+Gross loss:                                 542.14 USD
+Absolute drawdown:                          256.64 USD
+Maximal drawdown:                           257.4 USD (2.6%)
+Relative drawdown:                          (2.6%) 257.4 USD
+Profit factor:                              0.54
+Expected payoff:                            -0.69
+Trades total                                364
+Short positions (won %):                    171 (39.2%)
+Long positions (won %):                     193 (13.5%)
+Profit trades (% of total):                 93 (25.5%)
+Loss trades (% of total):                   271 (74.5%)
+Largest profit trade:                       43.39
+Largest loss trade:                         -17.03
+Average profit trade:                       3.15
 Average loss trade:                         -2.00
 Average consecutive wins:                   2.00
-Average consecutive losses:                 6.00
-Maximum consecutive wins (profit in money): 12 (114.99)
-Maximum consecutive losses (loss in money): 42 (-77.36)
-Maximal consecutive profit (count of wins): 114.99 (12)
-Maximal consecutive loss (count of losses): 111.87 (27)
+Average consecutive losses:                 5.00
+Maximum consecutive wins (profit in money): 7 (41.14)
+Maximum consecutive losses (loss in money): 28 (-50.72)
+Maximal consecutive profit (count of wins): 43.79 (3)
+Maximal consecutive loss (count of losses): 82.90 (20)
 Modelling quality:                          89.96%
 Strategy stats:
-Profit factor: 0.66, Total net profit: -9.60USD [+18.70/-28.30] (186.97pips), Total orders: 23 (Won: 21.7% [5] / Loss: 78.3% [18]) - Alligator M15
-Profit factor: 0.50, Total net profit: -11.46USD [+11.29/-22.75] (112.87pips), Total orders: 22 (Won: 4.5% [1] / Loss: 95.5% [21]) - Alligator M30
-Profit factor: 1.53, Total net profit: 4.81USD [+13.88/-9.07] (138.81pips), Total orders: 22 (Won: 9.1% [2] / Loss: 90.9% [20]) - Bands M1
-Profit factor: 0.87, Total net profit: -5.94USD [+39.66/-45.61] (396.64pips), Total orders: 28 (Won: 17.9% [5] / Loss: 82.1% [23]) - Bands M5
-Profit factor: 0.23, Total net profit: -40.37USD [+12.02/-52.40] (119.48pips), Total orders: 23 (Won: 13.0% [3] / Loss: 87.0% [20]) - Bands M15
-Profit factor: 0.51, Total net profit: -27.57USD [+28.62/-56.18] (286.18pips), Total orders: 21 (Won: 19.0% [4] / Loss: 81.0% [17]) - Bands M30
-Profit factor: 0.33, Total net profit: -29.71USD [+14.87/-44.59] (148.72pips), Total orders: 22 (Won: 9.1% [2] / Loss: 90.9% [20]) - CCI M15
-Profit factor: 0.89, Total net profit: -4.95USD [+38.77/-43.73] (387.74pips), Total orders: 21 (Won: 23.8% [5] / Loss: 76.2% [16]) - CCI M30
-Profit factor: 0.63, Total net profit: -12.55USD [+21.70/-34.25] (199.01pips), Total orders: 23 (Won: 60.9% [14] / Loss: 39.1% [9]) - Envelopes M30
-Profit factor: 0.54, Total net profit: -13.65USD [+16.35/-29.99] (163.45pips), Total orders: 43 (Won: 11.6% [5] / Loss: 88.4% [38]) - MA M1
-Profit factor: 1.26, Total net profit: 14.78USD [+71.21/-56.43] (610.40pips), Total orders: 43 (Won: 34.9% [15] / Loss: 65.1% [28]) - MACD M1
-Profit factor: 1.00, Total net profit: 6.11USD [+8.69/-2.58] (86.87pips), Total orders: 14 (Won: 64.3% [9] / Loss: 35.7% [5]) - MACD M15
-Profit factor: 0.31, Total net profit: -34.79USD [+15.58/-50.37] (155.81pips), Total orders: 23 (Won: 30.4% [7] / Loss: 69.6% [16]) - RSI M5
-Profit factor: 1.00, Total net profit: -3.06USD [+28.86/-31.92] (250.81pips), Total orders: 17 (Won: 52.9% [9] / Loss: 47.1% [8]) - RSI M15
-Profit factor: 0.14, Total net profit: -54.99USD [+8.89/-63.88] (88.86pips), Total orders: 21 (Won: 33.3% [7] / Loss: 66.7% [14]) - RSI M30
-Profit factor: 0.39, Total net profit: -36.48USD [+22.93/-59.41] (157.38pips), Total orders: 21 (Won: 19.0% [4] / Loss: 81.0% [17]) - SAR M30
-Profit factor: 1.06, Total net profit: 2.83USD [+47.30/-44.48] (457.03pips), Total orders: 32 (Won: 21.9% [7] / Loss: 78.1% [25]) - WPR M1
-Profit factor: 0.88, Total net profit: -3.94USD [+29.84/-33.78] (298.40pips), Total orders: 31 (Won: 16.1% [5] / Loss: 83.9% [26]) - WPR M5
-Profit factor: 1.00, Total net profit: -0.13USD [+46.01/-46.14] (460.11pips), Total orders: 45 (Won: 15.6% [7] / Loss: 84.4% [38]) - WPR M15
+Profit factor: 1.21, Total net profit: 3.67USD [+21.03/-17.36] (205.30pips), Total orders: 27 (Won: 37.0% [10] / Loss: 63.0% [17]) - Alligator M15
+Profit factor: 0.13, Total net profit: -12.78USD [+1.89/-14.67] (18.90pips), Total orders: 22 (Won: 4.5% [1] / Loss: 95.5% [21]) - Alligator M30
+Profit factor: 0.06, Total net profit: -16.81USD [+1.04/-17.85] (10.37pips), Total orders: 21 (Won: 9.5% [2] / Loss: 90.5% [19]) - Bands M1
+Profit factor: 0.08, Total net profit: -23.03USD [+1.89/-24.92] (18.91pips), Total orders: 21 (Won: 19.0% [4] / Loss: 81.0% [17]) - Bands M5
+Profit factor: 0.83, Total net profit: -5.24USD [+25.40/-30.64] (173.31pips), Total orders: 21 (Won: 14.3% [3] / Loss: 85.7% [18]) - Bands M15
+Profit factor: 0.50, Total net profit: -34.07USD [+34.03/-68.10] (280.80pips), Total orders: 22 (Won: 22.7% [5] / Loss: 77.3% [17]) - Bands M30
+Profit factor: 1.00, Total net profit: -6.07USD [+6.97/-13.04] (69.71pips), Total orders: 12 (Won: 66.7% [8] / Loss: 33.3% [4]) - Envelopes M30
+Profit factor: 0.08, Total net profit: -29.07USD [+2.53/-31.60] (25.32pips), Total orders: 25 (Won: 16.0% [4] / Loss: 84.0% [21]) - MA M1
+Profit factor: 1.40, Total net profit: 28.12USD [+98.54/-70.42] (680.77pips), Total orders: 47 (Won: 34.0% [16] / Loss: 66.0% [31]) - MACD M1
+Profit factor: 1.00, Total net profit: 6.08USD [+9.56/-3.48] (86.87pips), Total orders: 14 (Won: 64.3% [9] / Loss: 35.7% [5]) - MACD M15
+Profit factor: 0.72, Total net profit: -12.25USD [+32.12/-44.37] (281.91pips), Total orders: 25 (Won: 52.0% [13] / Loss: 48.0% [12]) - RSI M5
+Profit factor: 1.00, Total net profit: -30.82USD [+12.98/-43.80] (129.82pips), Total orders: 16 (Won: 37.5% [6] / Loss: 62.5% [10]) - RSI M30
+Profit factor: 0.86, Total net profit: -2.72USD [+16.90/-19.62] (169.02pips), Total orders: 22 (Won: 18.2% [4] / Loss: 81.8% [18]) - SAR M30
+Profit factor: 0.13, Total net profit: -61.27USD [+8.76/-70.03] (72.57pips), Total orders: 21 (Won: 14.3% [3] / Loss: 85.7% [18]) - WPR M1
+Profit factor: 0.23, Total net profit: -26.11USD [+7.65/-33.76] (76.47pips), Total orders: 23 (Won: 13.0% [3] / Loss: 87.0% [20]) - WPR M5
+Profit factor: 0.35, Total net profit: -23.68USD [+12.52/-36.20] (125.22pips), Total orders: 25 (Won: 8.0% [2] / Loss: 92.0% [23]) - WPR M15
 Report log:
 2018.01.04 03:00:00: EA31337 Rider v1.076 by kenorb (https://github.com/EA31337)
-TERMINAL: Allow DLL: true; Allow Libraries: true; CPUs: 36; Community account: false; Community balance: 0.00; Community connection: false; Disk space: 6747461; Enabled FTP: false; Enabled e-mail: false; Enabled notifications: false; IsOptimization: false; IsRealtime: false; IsTesting: true; IsVisual: false; MQ ID: false; Memory (free): 4095; Memory (physical): 128606; Memory (total): 4095; Memory (used): 0; Path (Common): C:\users\ubuntu\Application Data\MetaQuotes\Terminal\Common; Path (Data): C:\Program Files\MetaTrader 4; Path (Expert): C:\Program Files\MetaTrader 4\MQL4\Experts; Path (Terminal): C:\Program Files\MetaTrader 4; Program name: EA31337-Rider-Release-v1.076; Screen DPI: 96; Terminal build: 1010; Terminal code page: 0; Terminal company: MetaQuotes Software Corp.; Terminal connected: false; Terminal language: English; Terminal name: MetaTrader 4; Termnal max bars: 65000; Trade allowed: true; Trade context busy: false; Trade perm: true; Trade ping (last): 10000001
+TERMINAL: Allow DLL: true; Allow Libraries: true; CPUs: 36; Community account: false; Community balance: 0.00; Community connection: false; Disk space: 8099084; Enabled FTP: false; Enabled e-mail: false; Enabled notifications: false; IsOptimization: false; IsRealtime: false; IsTesting: true; IsVisual: false; MQ ID: false; Memory (free): 4095; Memory (physical): 128606; Memory (total): 4095; Memory (used): 0; Path (Common): C:\users\ubuntu\Application Data\MetaQuotes\Terminal\Common; Path (Data): C:\Program Files\MetaTrader 4; Path (Expert): C:\Program Files\MetaTrader 4\MQL4\Experts; Path (Terminal): C:\Program Files\MetaTrader 4; Program name: EA31337-Rider-Release-v1.076; Screen DPI: 96; Terminal build: 1010; Terminal code page: 0; Terminal company: MetaQuotes Software Corp.; Terminal connected: false; Terminal language: English; Terminal name: MetaTrader 4; Termnal max bars: 65000; Trade allowed: true; Trade context busy: false; Trade perm: true; Trade ping (last): 10000001
 ACCOUNT: Type: Off-line, Server/Company/Name: //, Currency: USD, Balance: 10000, Credit: 0, Equity: 10000, Orders limit: 999: Leverage: 1:100, StopOut Level: 0 (Mode: 0)
 SYMBOL: Symbol: EURUSD, Ask/Bid: 1.20186/1.20176, Price/Session Volume: 0/0, Point size: 1e-05, Pip size: 0.0001, Tick size: 1e-05 (1e-05 pts), Tick value: 1 (0/0), Digits: 5, Spread: 10 pts, Trade stops level: 8, Trade contract size: 100000, Min lot: 0.01, Max lot: 10000, Lot step: 0.01, Freeze level: 0, Margin init: 0
 MARKET: Pip digits: 4, Spread: 10 pts (1 pips; 0.0083%), Pts/pip: 10, Trade distance: 8 pts (0.0000 pips), Volume digits: 2, Margin required: 1201.81/lot, Delta: 100000

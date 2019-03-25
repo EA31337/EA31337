@@ -48,20 +48,20 @@
                                    - Settings for the Commodity Channel Index indicator --"; CCI1_Active=false; CCI5_Active=false;
                                    CCI15_Active=true; CCI30_Active=true; CCI_Period_Ratio=1; CCI_Shift=0; CCI_Period=28; CCI_SignalLevel=98;
                                    CCI1_SignalMethod=34; CCI5_SignalMethod=18; CCI15_SignalMethod=0; CCI30_SignalMethod=-44;
-                                   __DeMarker_Parameters__="-- Settings for the DeMarker indicator --"; MA_Shift=8;
- Bars in test                 2013 Ticks modelled                      8584690 Modelling quality                                              90.00%
+                                   CCI1_OpenCondition1=971; CCI1_OpenCondition2=1; CCI5_OpenCondition1=1; MA_Shift=8;
+ Bars in test                 2013 Ticks modelled                       8584690 Modelling quality                                             90.00%
  Mismatched charts errors        0
- Initial deposit          10000.00                                             Spread                                                             10
- Total net profit            56.40 Gross profit                        1240.14 Gross loss                                                   -1183.74
- Profit factor                1.05 Expected payoff                        0.07
- Absolute drawdown           18.75 Maximal drawdown             734.80 (6.81%) Relative drawdown                                      6.81% (734.80)
- Total trades                  799 Short positions (won %)        340 (44.71%) Long positions (won %)                                    459 (9.80%)
-                                   Profit trades (% of total)     197 (24.66%) Loss trades (% of total)                                 602 (75.34%)
-                           Largest profit trade                          45.99 loss trade                                                     -44.46
-                           Average profit trade                           6.30 loss trade                                                      -1.97
-                           Maximum consecutive wins (profit in      10 (57.91) consecutive losses (loss in money)                       44 (-110.08)
+ Initial deposit          10000.00                                              Spread                                                            10
+ Total net profit           177.13 Gross profit                         1619.72 Gross loss                                                  -1442.60
+ Profit factor                1.12 Expected payoff                         0.26
+ Absolute drawdown           20.09 Maximal drawdown             1018.02 (9.10%) Relative drawdown                                    9.10% (1018.02)
+ Total trades                  682 Short positions (won %)         313 (45.37%) Long positions (won %)                                  369 (10.03%)
+                                   Profit trades (% of total)      179 (26.25%) Loss trades (% of total)                                503 (73.75%)
+                           Largest profit trade                           62.85 loss trade                                                    -40.42
+                           Average profit trade                            9.05 loss trade                                                     -2.87
+                           Maximum consecutive wins (profit in      13 (134.64) consecutive losses (loss in money)                      42 (-105.52)
                                    money)
-                           Maximal consecutive profit (count of     100.94 (3) consecutive loss (count of losses)                       -152.32 (28)
+                           Maximal consecutive profit (count of     264.71 (10) consecutive loss (count of losses)                      -209.52 (30)
                                    wins)
-                           Average consecutive wins                          2 consecutive losses                                                  7
+                           Average consecutive wins                           3 consecutive losses                                                 7
                                                                        [Graph]

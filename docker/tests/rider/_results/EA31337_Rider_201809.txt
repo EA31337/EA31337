@@ -48,20 +48,20 @@
                                    - Settings for the Commodity Channel Index indicator --"; CCI1_Active=false; CCI5_Active=false;
                                    CCI15_Active=true; CCI30_Active=true; CCI_Period_Ratio=1; CCI_Shift=0; CCI_Period=28; CCI_SignalLevel=98;
                                    CCI1_SignalMethod=34; CCI5_SignalMethod=18; CCI15_SignalMethod=0; CCI30_SignalMethod=-44;
-                                   __DeMarker_Parameters__="-- Settings for the DeMarker indicator --"; MA_Shift=8;
+                                   CCI1_OpenCondition1=971; CCI1_OpenCondition2=1; CCI5_OpenCondition1=1; MA_Shift=8;
  Bars in test                 1921 Ticks modelled                      7346617 Modelling quality                                              90.00%
  Mismatched charts errors        0
  Initial deposit          10000.00                                             Spread                                                             10
- Total net profit           -19.88 Gross profit                         989.55 Gross loss                                                   -1009.42
- Profit factor                0.98 Expected payoff                       -0.03
- Absolute drawdown          148.19 Maximal drawdown             355.93 (3.49%) Relative drawdown                                      3.49% (355.93)
- Total trades                  637 Short positions (won %)        309 (34.30%) Long positions (won %)                                   328 (15.24%)
-                                   Profit trades (% of total)     156 (24.49%) Loss trades (% of total)                                 481 (75.51%)
-                           Largest profit trade                          45.63 loss trade                                                     -17.55
-                           Average profit trade                           6.34 loss trade                                                      -2.10
-                           Maximum consecutive wins (profit in     14 (141.68) consecutive losses (loss in money)                       58 (-143.17)
+ Total net profit          -281.76 Gross profit                         291.04 Gross loss                                                    -572.80
+ Profit factor                0.51 Expected payoff                       -0.78
+ Absolute drawdown          295.86 Maximal drawdown             508.82 (4.98%) Relative drawdown                                      4.98% (508.82)
+ Total trades                  359 Short positions (won %)        185 (24.86%) Long positions (won %)                                    174 (9.77%)
+                                   Profit trades (% of total)      63 (17.55%) Loss trades (% of total)                                 296 (82.45%)
+                           Largest profit trade                          11.86 loss trade                                                     -16.00
+                           Average profit trade                           4.62 loss trade                                                      -1.94
+                           Maximum consecutive wins (profit in       5 (28.08) consecutive losses (loss in money)                       40 (-124.49)
                                    money)
-                           Maximal consecutive profit (count of    141.68 (14) consecutive loss (count of losses)                       -143.17 (58)
+                           Maximal consecutive profit (count of      38.32 (4) consecutive loss (count of losses)                       -124.49 (40)
                                    wins)
-                           Average consecutive wins                          2 consecutive losses                                                  7
+                           Average consecutive wins                          2 consecutive losses                                                  8
                                                                        [Graph]
