@@ -1,0 +1,8 @@
+# Ignore binaries.
+**/*.ex?
+**/*.exe
+# Ignore test results.
+**/*.htm
+**/*.json
+**/*.log
+**/*.txt
