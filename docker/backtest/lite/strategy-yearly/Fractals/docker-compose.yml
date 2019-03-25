@@ -4,10 +4,10 @@ services:
 # Fractals
   Fractals_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:lite-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../../../..
-      target: ea31337-lite-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts
@@ -18,10 +18,10 @@ services:
       TEST_REPORT_NAME: "EA31337-Lite_Fractals[2018]"
   Fractals1_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:lite-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../../../..
-      target: ea31337-lite-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts
@@ -32,10 +32,10 @@ services:
       TEST_REPORT_NAME: "EA31337-Lite_Fractals1[2018]"
   Fractals5_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:lite-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../../../..
-      target: ea31337-lite-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts
@@ -46,10 +46,10 @@ services:
       TEST_REPORT_NAME: "EA31337-Lite_Fractals5[2018]"
   Fractals15_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:lite-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../../../..
-      target: ea31337-lite-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts
@@ -60,10 +60,10 @@ services:
       TEST_REPORT_NAME: 'EA31337-Lite_Fractals15[2018]'
   Fractals30_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:lite-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../../../..
-      target: ea31337-lite-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts

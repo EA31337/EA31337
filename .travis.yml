@@ -20,7 +20,7 @@ env:
     DOCKER_TAG=$([[ "$TRAVIS_BRANCH" == "master" ]] && echo "latest" || echo ${TRAVIS_BRANCH////-})
     DOCKER_REPO="ea31337/ea31337:${DOCKER_TAG}"
     DOCKER_LOGIN="eval [[ -n $DOCKER_PASSWORD ]] && docker login -u $DOCKER_USERNAME --password-stdin <<<$DOCKER_PASSWORD || exit 0"
-    DOCKER_BUILD="docker build --target ea31337-all -t ${DOCKER_REPO} ."
+    DOCKER_BUILD="docker build --target ea31337 -t ${DOCKER_REPO} ."
     DOCKER_PUSH="docker push $DOCKER_REPO"
     CMD="${DOCKER_LOGIN} && ${DOCKER_BUILD} && [[ $TRAVIS_PULL_REQUEST = false ]] && ${DOCKER_PUSH}"
 matrix:

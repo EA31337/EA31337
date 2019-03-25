@@ -2,10 +2,10 @@ version: '3.4'
 services:
   test_2018_01:
     command: run_backtest -v
-    image: ea31337:rider-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../..
-      target: ea31337-rider-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
 #   - ../../../../EA-Tester/scripts:/opt/scripts
@@ -16,10 +16,10 @@ services:
 #     SET_OPTS: VerboseDebug=0,VerboseTrace=0
   test_2018_02:
     command: run_backtest -v
-    image: ea31337:rider-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../..
-      target: ea31337-rider-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
@@ -28,10 +28,10 @@ services:
       TEST_REPORT_NAME: EA31337_Rider_201802
   test_2018_03:
     command: run_backtest -v
-    image: ea31337:rider-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../..
-      target: ea31337-rider-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
@@ -40,10 +40,10 @@ services:
       TEST_REPORT_NAME: EA31337_Rider_201803
   test_2018_04:
     command: run_backtest -v
-    image: ea31337:rider-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../..
-      target: ea31337-rider-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
@@ -52,10 +52,10 @@ services:
       TEST_REPORT_NAME: EA31337_Rider_201804
   test_2018_05:
     command: run_backtest -v
-    image: ea31337:rider-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../..
-      target: ea31337-rider-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
@@ -64,10 +64,10 @@ services:
       TEST_REPORT_NAME: EA31337_Rider_201805
   test_2018_06:
     command: run_backtest -v
-    image: ea31337:rider-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../..
-      target: ea31337-rider-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
@@ -76,10 +76,10 @@ services:
       TEST_REPORT_NAME: EA31337_Rider_201806
   test_2018_07:
     command: run_backtest -v
-    image: ea31337:rider-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../..
-      target: ea31337-rider-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
@@ -88,10 +88,10 @@ services:
       TEST_REPORT_NAME: EA31337_Rider_201807
   test_2018_08:
     command: run_backtest -v
-    image: ea31337:rider-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../..
-      target: ea31337-rider-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
@@ -100,10 +100,10 @@ services:
       TEST_REPORT_NAME: EA31337_Rider_201808
   test_2018_09:
     command: run_backtest -v
-    image: ea31337:rider-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../..
-      target: ea31337-rider-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
@@ -112,10 +112,10 @@ services:
       TEST_REPORT_NAME: EA31337_Rider_201809
   test_2018_10:
     command: run_backtest -v
-    image: ea31337:rider-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../..
-      target: ea31337-rider-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
@@ -124,10 +124,10 @@ services:
       TEST_REPORT_NAME: EA31337_Rider_201810
   test_2018_11:
     command: run_backtest -v
-    image: ea31337:rider-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../..
-      target: ea31337-rider-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
@@ -136,10 +136,10 @@ services:
       TEST_REPORT_NAME: EA31337_Rider_201811
   test_2018_12:
     command: run_backtest -v
-    image: ea31337:rider-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../..
-      target: ea31337-rider-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini

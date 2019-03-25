@@ -4,10 +4,10 @@ services:
 # MACD
   MACD_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:lite-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../../../..
-      target: ea31337-lite-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts
@@ -18,10 +18,10 @@ services:
       TEST_REPORT_NAME: "EA31337-Lite_MACD[2018]"
   MACD1_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:lite-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../../../..
-      target: ea31337-lite-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts
@@ -32,10 +32,10 @@ services:
       TEST_REPORT_NAME: "EA31337-Lite_MACD1[2018]"
   MACD5_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:lite-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../../../..
-      target: ea31337-lite-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts
@@ -46,10 +46,10 @@ services:
       TEST_REPORT_NAME: "EA31337-Lite_MACD5[2018]"
   MACD15_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:lite-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../../../..
-      target: ea31337-lite-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts
@@ -60,10 +60,10 @@ services:
       TEST_REPORT_NAME: 'EA31337-Lite_MACD15[2018]'
   MACD30_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:lite-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../../../..
-      target: ea31337-lite-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts
