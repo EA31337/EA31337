@@ -27,7 +27,8 @@ run_test() {
 
   VM_NAME="$test_name" vagrant up --provider=aws --no-provision --destroy-on-error
 
-  # shellcheck disable=SC1117 # @fixme
+  # shellcheck disable=SC1117
+  # @fixme
   time \
   VM_NAME="$test_name" \
   RUN_TEST="-t -x -o -I TestModel=0 -E VerboseInfo=1,maxdrawdown_enable=0 -f */\"$SET_DIR\"/*.set -e EA31337-$VERSION -c $CURRENCY -p $SYMBOL -d $DEPOSIT -s $SPREAD -y $YEAR -M $MT4_VER -D $DIGITS -b $BT_SOURCE -i \"\$(find ~ -name .init.rules.inc)\" -i \"\$(find ~ -name \*${test_name}.rule\*)\" -r \"$rep_name\" -O */\"$OPT_DIR\" $args " \

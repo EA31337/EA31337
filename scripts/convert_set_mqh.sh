@@ -7,14 +7,17 @@ type ex > /dev/null
 SET=$1
 MQH=$2
 echo Converting...
-# shellcheck disable=SC1117 # @fixme
+# shellcheck disable=SC1117
+# @fixme
 grep "^[[:alnum:]][0-9A-Za-z_]\+=" "$SET" | while read -r opt; do
-  # shellcheck disable=SC2154 # @see: https://github.com/koalaman/shellcheck/issues/1419
+  # shellcheck disable=SC2154
+  # @see: https://github.com/koalaman/shellcheck/issues/1419
   name=${opt%=*}
   eval "$opt"
   value=${!name}
   ! [[ $value == ?(-)+([0-9.]) ]] && value="\"$value\""
-  # shellcheck disable=SC1117 # @fixme
+  # shellcheck disable=SC1117
+  # @fixme
   ex "+%s/ $name\s\+=.*;/ $name = $value;/" -scwq "$MQH"
 done
 echo "$0 done".
