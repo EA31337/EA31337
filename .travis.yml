@@ -13,14 +13,10 @@ env:
   - CMD="cd docker/tests/advanced; docker-compose build --build-arg UID=$UID test_2018_01; docker-compose run test_2018_01"
   - CMD="cd docker/tests/rider; docker-compose build --build-arg UID=$UID test_2018_01; docker-compose run test_2018_01"
   - |
-    DOCKER_BUILDKIT=1
-    DOCKER_TAG=$([[ "$TRAVIS_BRANCH" == "master" ]] && echo "latest" || echo ${TRAVIS_BRANCH////-})
-    DOCKER_TAG=$([[ "$TRAVIS_BRANCH" == "master" ]] && echo "latest" || echo ${TRAVIS_BRANCH////-})
-    DOCKER_REPO="ea31337/ea31337:${DOCKER_TAG}"
-    DOCKER_LOGIN="eval [[ -n $DOCKER_PASSWORD ]] && docker login -u $DOCKER_USERNAME --password-stdin <<<$DOCKER_PASSWORD || exit 0"
-    DOCKER_BUILD="docker build --target ea31337 -t ${DOCKER_REPO} ."
-    DOCKER_PUSH="docker push $DOCKER_REPO"
-    CMD="${DOCKER_LOGIN} && ${DOCKER_BUILD} && [[ $TRAVIS_PULL_REQUEST = false ]] && ${DOCKER_PUSH}"
+    DOCKER_LOGIN='eval [[ -n $DOCKER_PASSWORD ]] && docker login -u $DOCKER_USERNAME --password-stdin <<<$DOCKER_PASSWORD || exit 0'
+    DOCKER_REPO="ea31337/ea31337:${TRAVIS_BRANCH//master/latest}"
+    DOCKER_BUILD="DOCKER_BUILDKIT=1 docker build --target ea31337 -t ${DOCKER_REPO} ."
+    CMD="${DOCKER_LOGIN} && ${DOCKER_BUILD} && [[ $TRAVIS_PULL_REQUEST = false ]] && docker push $DOCKER_REPO"
 matrix:
   fast_finish: true
 notifications:
@@ -34,6 +30,7 @@ install:
 before_script:
 - docker --version
 - docker images
+- test -n "$OPT_TRACE" && set -x || true
 script:
 - bash -n scripts/*.sh; shellcheck scripts/*.sh conf/*/*.sh
 - echo $CMD
