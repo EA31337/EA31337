@@ -1,6 +1,4 @@
 language: generic
-sudo: required
-group: deprecated-2017Q4
 services:
   - docker
 addons:
