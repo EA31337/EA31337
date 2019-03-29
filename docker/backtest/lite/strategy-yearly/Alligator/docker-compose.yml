@@ -16,6 +16,9 @@ services:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_Alligator.set
       TEST_REPORT_NAME: "EA31337-Lite_Alligator[2018]"
+    deploy:
+      restart_policy:
+        condition: none
   Alligator1_Backtest_2018:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -30,6 +33,9 @@ services:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_Alligator1.set
       TEST_REPORT_NAME: "EA31337-Lite_Alligator1[2018]"
+    deploy:
+      restart_policy:
+        condition: none
   Alligator5_Backtest_2018:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -44,6 +50,9 @@ services:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_Alligator5.set
       TEST_REPORT_NAME: "EA31337-Lite_Alligator5[2018]"
+    deploy:
+      restart_policy:
+        condition: none
   Alligator15_Backtest_2018:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -58,6 +67,9 @@ services:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_Alligator15.set
       TEST_REPORT_NAME: "EA31337-Lite_Alligator15[2018]"
+    deploy:
+      restart_policy:
+        condition: none
   Alligator30_Backtest_2018:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -72,3 +84,6 @@ services:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_Alligator30.set
       TEST_REPORT_NAME: "EA31337-Lite_Alligator30[2018]"
+    deploy:
+      restart_policy:
+        condition: none

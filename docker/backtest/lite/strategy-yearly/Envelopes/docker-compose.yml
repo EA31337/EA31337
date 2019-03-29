@@ -16,6 +16,9 @@ services:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_Envelopes.set
       TEST_REPORT_NAME: "EA31337-Lite_Envelopes[2018]"
+    deploy:
+      restart_policy:
+        condition: none
   Envelopes1_Backtest_2018:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -30,6 +33,9 @@ services:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_Envelopes1.set
       TEST_REPORT_NAME: "EA31337-Lite_Envelopes1[2018]"
+    deploy:
+      restart_policy:
+        condition: none
   Envelopes5_Backtest_2018:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -44,6 +50,9 @@ services:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_Envelopes5.set
       TEST_REPORT_NAME: "EA31337-Lite_Envelopes5[2018]"
+    deploy:
+      restart_policy:
+        condition: none
   Envelopes15_Backtest_2018:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -58,6 +67,9 @@ services:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_Envelopes15.set
       TEST_REPORT_NAME: 'EA31337-Lite_Envelopes15[2018]'
+    deploy:
+      restart_policy:
+        condition: none
   Envelopes30_Backtest_2018:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -72,3 +84,6 @@ services:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_Envelopes30.set
       TEST_REPORT_NAME: "EA31337-Lite_Envelopes30[2018]"
+    deploy:
+      restart_policy:
+        condition: none

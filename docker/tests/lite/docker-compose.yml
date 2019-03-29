@@ -13,6 +13,9 @@ services:
     environment:
       BT_MONTHS: 01
       TEST_REPORT_NAME: EA31337_Lite_201801
+    deploy:
+      restart_policy:
+        condition: none
   test_2018_02:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -25,6 +28,9 @@ services:
     environment:
       BT_MONTHS: 02
       TEST_REPORT_NAME: EA31337_Lite_201802
+    deploy:
+      restart_policy:
+        condition: none
   test_2018_03:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -37,6 +43,9 @@ services:
     environment:
       BT_MONTHS: 03
       TEST_REPORT_NAME: EA31337_Lite_201803
+    deploy:
+      restart_policy:
+        condition: none
   test_2018_04:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -49,6 +58,9 @@ services:
     environment:
       BT_MONTHS: 04
       TEST_REPORT_NAME: EA31337_Lite_201804
+    deploy:
+      restart_policy:
+        condition: none
   test_2018_05:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -61,6 +73,9 @@ services:
     environment:
       BT_MONTHS: 05
       TEST_REPORT_NAME: EA31337_Lite_201805
+    deploy:
+      restart_policy:
+        condition: none
   test_2018_06:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -73,6 +88,9 @@ services:
     environment:
       BT_MONTHS: 06
       TEST_REPORT_NAME: EA31337_Lite_201806
+    deploy:
+      restart_policy:
+        condition: none
   test_2018_07:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -85,6 +103,9 @@ services:
     environment:
       BT_MONTHS: 07
       TEST_REPORT_NAME: EA31337_Lite_201807
+    deploy:
+      restart_policy:
+        condition: none
   test_2018_08:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -97,6 +118,9 @@ services:
     environment:
       BT_MONTHS: 08
       TEST_REPORT_NAME: EA31337_Lite_201808
+    deploy:
+      restart_policy:
+        condition: none
   test_2018_09:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -109,6 +133,9 @@ services:
     environment:
       BT_MONTHS: 09
       TEST_REPORT_NAME: EA31337_Lite_201809
+    deploy:
+      restart_policy:
+        condition: none
   test_2018_10:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -121,6 +148,9 @@ services:
     environment:
       BT_MONTHS: 10
       TEST_REPORT_NAME: EA31337_Lite_201810
+    deploy:
+      restart_policy:
+        condition: none
   test_2018_11:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -133,6 +163,9 @@ services:
     environment:
       BT_MONTHS: 11
       TEST_REPORT_NAME: EA31337_Lite_201811
+    deploy:
+      restart_policy:
+        condition: none
   test_2018_12:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -145,3 +178,6 @@ services:
     environment:
       BT_MONTHS: 12
       TEST_REPORT_NAME: EA31337_Lite_201812
+    deploy:
+      restart_policy:
+        condition: none
