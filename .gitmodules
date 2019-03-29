@@ -22,3 +22,6 @@
 [submodule "Advanced-optimization-tests"]
 	path = docker/optimization/advanced
 	url = https://github.com/EA31337/EA31337-Advanced-optimization-tests
+[submodule "Rider-optimization-tests"]
+	path = docker/optimization/rider
+	url = https://github.com/EA31337/EA31337-Rider-optimization-tests
