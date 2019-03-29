@@ -19,3 +19,6 @@
 [submodule "Lite-optimization-tests"]
 	path = docker/optimization/lite
 	url = https://github.com/EA31337/EA31337-Lite-optimization-tests
+[submodule "Advanced-optimization-tests"]
+	path = docker/optimization/advanced
+	url = https://github.com/EA31337/EA31337-Advanced-optimization-tests
