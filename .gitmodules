@@ -16,3 +16,6 @@
 [submodule "wiki"]
 	path = docs
 	url = https://github.com/EA31337/EA31337.wiki.git
+[submodule "Lite-optimization-tests"]
+	path = docker/optimization/lite
+	url = https://github.com/EA31337/EA31337-Lite-optimization-tests
