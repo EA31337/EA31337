@@ -4053,21 +4053,6 @@ int CheckSettings() {
       Msg::ShowText(StringFormat("This version will expire on %s!", TimeToStr(ea_expire_date, TIME_DATE)), "Warning", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, true);
     }
   #endif
-  #ifdef __release__
-  #ifdef __backtest__
-  if (Terminal::IsRealtime()) {
-    Msg::ShowText("This version is compiled for backtest mode only.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, true);
-    return -__LINE__;
-  }
-  #else
-  if (Terminal::IsRealtime()) {
-    if (AccountInfoDouble(ACCOUNT_BALANCE) > 100000) {
-      Msg::ShowText("This version doesn't support balance above 100k for a real account.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, true);
-      return -__LINE__;
-    }
-  }
-  #endif
-  #endif
   if (LotSize < 0.0) {
     Msg::ShowText("LotSize is less than 0.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, true);
     return -__LINE__;
