@@ -563,13 +563,6 @@ void OnTesterDeinit() {
 
 // @todo: OnTradeTransaction (https://www.mql5.com/en/docs/basis/function/events).
 
-// The Start event handler, which is automatically generated only for running scripts.
-// FIXME: Doesn't seems to be called, however MT4 doesn't want to execute EA without it.
-void start() {
-  if (VerboseTrace) Print("Calling " + __FUNCTION__ + ".");
-  if (VerboseInfo) Print(__FUNCTION__ + ": " + GetMarketTextDetails());
-}
-
 /**
  * Print init variables and constants.
  */
