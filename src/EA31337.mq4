@@ -1165,7 +1165,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
            NormalizeDouble(market.NormalizePrice(takeprofit), market.GetDigits()),
            order_comment,
            MagicNumber + sid, 0, Order::GetOrderColor(cmd)),
-           "Trace", __FUNCTION__, __LINE__, VerboseTrace);
+           "Debug", __FUNCTION__, __LINE__, VerboseDebug);
       result = true;
       // TicketAdd(order_ticket);
       last_order_time = TimeCurrent(); // Set last execution time.
