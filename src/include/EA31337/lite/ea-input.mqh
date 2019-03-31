@@ -79,31 +79,31 @@ extern uint ConFactorOrdersLimit = 200; // No of orders to check on consequent w
 //+------------------------------------------------------------------+
 extern string __SmartQueue_Parameters__ = "-- Smart queue parameters --"; // >>> SMART QUEUE <<<
 extern bool SmartQueueActive = true; // Activate QueueAI
-extern int SmartQueueMethod = 3; // QueueAI: Method for selecting the best order (0-15)
-extern int SmartQueueFilter = 27; // QueueAI: Method for filtering the orders (0-255)
+extern int SmartQueueMethod = 15; // QueueAI: Method for selecting the best order (0-15)
+extern int SmartQueueFilter = 0; // QueueAI: Method for filtering the orders (0-255)
 
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions__ = "-- Account conditions --"; // >>> CONDITIONS & ACTIONS <<<
 // Note: It's not advice to use on accounts where multi bots are trading.
 extern bool Account_Conditions_Active = 0; // Enable account conditions
-// 6 - Equity 10% high
-extern ENUM_ACC_CONDITION Account_Condition_1 = 6; // 1. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_1 = 0; // 1. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_1 = 0; // 1. Action to take
-// 8 - Equity 20% low
-extern ENUM_ACC_CONDITION Account_Condition_2 = 8; // 2. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_2 = 13; // 2. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_2 = 7; // 2. Action to take
-// 12 - 80% Margin Used
-extern ENUM_ACC_CONDITION Account_Condition_3 = 12; // 3. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_3 = 3; // 3. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_3 = 1; // 3. Action to take
-// 19 - Max. weekly balance < max. monthly
-extern ENUM_ACC_CONDITION Account_Condition_4 = 19; // 4. Account condition
+// 8 - Equity 1% high
+extern ENUM_ACC_CONDITION Account_Condition_1 = 8; // 1. Account condition
+extern ENUM_MARKET_CONDITION Market_Condition_1 = 1; // 1. Market condition
+extern ENUM_ACTION_TYPE Action_On_Condition_1 = 9; // 1. Action to take
+//
+extern ENUM_ACC_CONDITION Account_Condition_2 = 0; // 2. Account condition
+extern ENUM_MARKET_CONDITION Market_Condition_2 = 0; // 2. Market condition
+extern ENUM_ACTION_TYPE Action_On_Condition_2 = 0; // 2. Action to take
+//
+extern ENUM_ACC_CONDITION Account_Condition_3 = 0; // 3. Account condition
+extern ENUM_MARKET_CONDITION Market_Condition_3 = 0; // 3. Market condition
+extern ENUM_ACTION_TYPE Action_On_Condition_3 = 0; // 3. Action to take
+//
+extern ENUM_ACC_CONDITION Account_Condition_4 = 0; // 4. Account condition
 extern ENUM_MARKET_CONDITION Market_Condition_4 = 0; // 4. Market condition
 extern ENUM_ACTION_TYPE Action_On_Condition_4 = 0; // 4. Action to take
-// 18 - Max. daily balance > max. weekly
-extern ENUM_ACC_CONDITION Account_Condition_5 = 23; // 5. Account condition
+//
+extern ENUM_ACC_CONDITION Account_Condition_5 = 0; // 5. Account condition
 extern ENUM_MARKET_CONDITION Market_Condition_5 = 0; // 5. Market condition
 extern ENUM_ACTION_TYPE Action_On_Condition_5 = 0; // 5. Action to take
 
