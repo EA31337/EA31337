@@ -5464,7 +5464,7 @@ bool MarketCondition(Chart *_chart, int condition = C_MARKET_NONE) {
  * Check the account for configured conditions.
  */
 void CheckAccConditions(Chart *_chart) {
-  if (!Account_Conditions_Active || last_action_time + 60 < DateTime::TimeTradeServer()) {
+  if (!Account_Conditions_Active || DateTime::TimeTradeServer() - 60 < last_action_time) {
     // Do not execute action more often than a minute.
     // @todo: Move 60 second rule into the external param.
     return;
