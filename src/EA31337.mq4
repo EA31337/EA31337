@@ -1283,15 +1283,11 @@ bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, int sid = EMPTY, double volume = EM
       StringFormat("Maximum open and pending orders has reached the limit (MaxOrders) [%d>=%d].", total_orders, max_orders),
       "Info", __FUNCTION__, __LINE__, VerboseInfo
       );
-    #ifdef __advanced__
     OrderQueueAdd(sid, cmd);
-    #endif
     result = false;
   } else if (GetTotalOrdersByType(sid) >= GetMaxOrdersPerType()) {
     last_msg = Msg::ShowText(StringFormat("%s: Maximum open and pending orders per type has reached the limit (MaxOrdersPerType).", sname[sid]), "Info", __FUNCTION__, __LINE__, VerboseInfo);
-    #ifdef __advanced__
     OrderQueueAdd(sid, cmd);
-    #endif
     result = false;
   } else if (!account.CheckFreeMargin(cmd, volume)) {
     last_err = Msg::ShowText("No money to open more orders.", "Error", __FUNCTION__, __LINE__, VerboseInfo | VerboseErrors, PrintLogOnChart);
@@ -6665,7 +6661,7 @@ bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
       if (!OpenOrderCondition(cmd, sid, time, filter)) continue;
       if (OpenOrderIsAllowed(cmd, sid, volume)) {
         string comment = GetStrategyComment(sid) + " [AIQueued]";
-        result &= ExecuteOrder(cmd, sid, volume);
+        result &= ExecuteOrder(cmd, sid, volume, comment);
         break;
       }
     }
@@ -6699,7 +6695,6 @@ bool OpenOrderCondition(ENUM_ORDER_TYPE cmd, int sid, datetime time, int method)
     if (METHOD(method,6)) result &= UpdateIndicator(_chart, INDI_RSI) && Trade_RSI(_chart, cmd, 0, 0);
     if (METHOD(method,7)) result &= UpdateIndicator(_chart, INDI_MA) && Trade_MA(_chart, cmd, 0, 0);
   }
-  Object::Delete(_chart);
   return (result);
 }
 

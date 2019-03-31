@@ -77,10 +77,10 @@ extern double ConLossesIncreaseFactor = 0.7; // Increase lot factor on consequen
 extern uint ConFactorOrdersLimit = 200; // No of orders to check on consequent wins/loses
 
 //+------------------------------------------------------------------+
-string __SmartQueue_Parameters__ = "-- Smart queue parameters --"; // >>> SMART QUEUE <<<
-bool SmartQueueActive = true; // Activate QueueAI
-int SmartQueueMethod = 3; // QueueAI: Method for selecting the best order (0-15)
-int SmartQueueFilter = 27; // QueueAI: Method for filtering the orders (0-255)
+extern string __SmartQueue_Parameters__ = "-- Smart queue parameters --"; // >>> SMART QUEUE <<<
+extern bool SmartQueueActive = true; // Activate QueueAI
+extern int SmartQueueMethod = 3; // QueueAI: Method for selecting the best order (0-15)
+extern int SmartQueueFilter = 27; // QueueAI: Method for filtering the orders (0-255)
 
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions__ = "-- Account conditions --"; // >>> CONDITIONS & ACTIONS <<<
