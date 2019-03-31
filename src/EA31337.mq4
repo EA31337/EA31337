@@ -261,9 +261,6 @@ void OnTick() {
     }
   }
   if (_tick_procesed) {
-    if (PrintLogOnChart) {
-      DisplayInfoOnChart();
-    }
     if (!terminal.IsOptimization()) {
       terminal.Logger().Flush(false);
     }
@@ -316,6 +313,10 @@ void ProcessBar(Trade *_trade) {
     UpdateStats();
   }
 
+  if (PrintLogOnChart) {
+    // Update stats on chart.
+    DisplayInfoOnChart();
+  }
 }
 
 /**
@@ -631,7 +632,7 @@ string InitInfo(bool startup = false, string sep = "\n") {
   if (startup) {
     if (session_initiated && terminal.IsTradeAllowed()) {
       if (TradeAllowed()) {
-        output += sep + "Trading is allowed, waiting for ticks...";
+        output += sep + "Trading is allowed, waiting for new bars...";
       } else {
         output += sep + "Trading is allowed, but there is some issue...";
         output += sep + last_err;
@@ -5980,16 +5981,17 @@ string GetMonthlyReport() {
  * Display info on chart.
  */
 string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
-  if (!terminal.IsRealtime() && !terminal.IsVisualMode()) {
+  if (terminal.IsOptimization() || (terminal.IsTesting() && !terminal.IsVisualMode())) {
+    // Ignore chart updates when optimizing or testing in non-visual mode.
     return NULL;
   }
 
-  datetime _lastupdate = 0;
+  datetime _chart_lastupdate = 0;
+  if (TimeCurrent() - 2 < _chart_lastupdate) {
+    return NULL;
+  }
+
   string output;
-  if (_lastupdate < TimeCurrent()) {
-    return NULL;
-  }
-
   // Prepare text for Stop Out.
   string stop_out_level = StringFormat("%d", account.AccountStopoutLevel());
   if (AccountStopoutMode() == 0) stop_out_level += "%"; else stop_out_level += account.AccountCurrency();
@@ -6056,7 +6058,7 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
     Comment(output);
     ChartRedraw(); // Redraws the current chart forcedly.
   }
-  _lastupdate = TimeCurrent();
+  _chart_lastupdate = TimeCurrent();
   return output;
 }
 
