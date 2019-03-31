@@ -139,7 +139,7 @@ bool session_active = false;
 datetime curr_bar_time;
 datetime time_current = (int) EMPTY_VALUE;
 int hour_of_day, day_of_week, day_of_month, day_of_year, month, year;
-datetime last_order_time = 0, last_action_time = 0;
+datetime last_order_time = 0;
 int last_history_check = 0; // Last ticket position processed.
 datetime last_traded;
 
@@ -5465,14 +5465,17 @@ bool MarketCondition(Chart *_chart, int condition = C_MARKET_NONE) {
  * Check the account for configured conditions.
  */
 void CheckAccConditions(Chart *_chart) {
-  if (!Account_Conditions_Active || DateTime::TimeTradeServer() - 60 < last_action_time) {
-    // Do not execute action more often than a minute.
-    // @todo: Move 60 second rule into the external param.
+  datetime _last_check = 0;
+  if (!Account_Conditions_Active || _last_check > DateTime::TimeTradeServer() - 10) {
+    // Do not execute action more often than 10 seconds.
+    //Print("_last_check > Time - 10", _last_check, " ", DateTime::TimeTradeServer());
     return;
   }
+  _last_check = DateTime::TimeTradeServer();
 
   #ifdef __profiler__ PROFILER_START #endif
 
+  bool result = false;
   for (int i = 0; i < ArrayRange(acc_conditions, 0); i++) {
     if (AccCondition(acc_conditions[i][0]) && MarketCondition(_chart, acc_conditions[i][1]) && acc_conditions[i][2] != A_NONE) {
       ActionExecute(acc_conditions[i][2], i);
@@ -5986,10 +5989,12 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
     return NULL;
   }
 
-  datetime _chart_lastupdate = 0;
-  if (TimeCurrent() - 2 < _chart_lastupdate) {
+  datetime _last_check = 0;
+  if (_last_check > DateTime::TimeTradeServer() - 10) {
+    //Print("last_check < Time - 10", _last_check, " ", DateTime::TimeTradeServer());
     return NULL;
   }
+  _last_check = DateTime::TimeTradeServer();
 
   string output;
   // Prepare text for Stop Out.
@@ -6058,7 +6063,6 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
     Comment(output);
     ChartRedraw(); // Redraws the current chart forcedly.
   }
-  _chart_lastupdate = TimeCurrent();
   return output;
 }
 
@@ -6440,7 +6444,6 @@ bool ActionExecute(int aid, int id = EMPTY) {
         "Info", __FUNCTION__, __LINE__, VerboseInfo);
     Msg::ShowText(last_msg, "Debug", __FUNCTION__, __LINE__, VerboseDebug && aid != A_NONE);
     if (WriteReport && VerboseDebug) ReportAdd(GetLastMessage());
-    last_action_time = DateTime::TimeTradeServer(); // Set last execution bar time.
   } else {
     Msg::ShowText(
       StringFormat("Failed to execute action: %s (id: %d), condition: %s (id: %d).",
