@@ -9,16 +9,15 @@ env:
   global:
   - CWD=$TRAVIS_BUILD_DIR
   matrix:
-  - CMD="cd docker/tests/lite; docker-compose build --build-arg UID=$UID test_2018_01; docker-compose run test_2018_01"
-  - CMD="cd docker/tests/advanced; docker-compose build --build-arg UID=$UID test_2018_01; docker-compose run test_2018_01"
-  - CMD="cd docker/tests/rider; docker-compose build --build-arg UID=$UID test_2018_01; docker-compose run test_2018_01"
+  - CMD="cd docker/tests/lite; docker-compose build --build-arg UID=$UID test_2018_01; docker-compose run --rm test_2018_01"
+  - CMD="cd docker/tests/advanced; docker-compose build --build-arg UID=$UID test_2018_01; docker-compose run --rm test_2018_01"
+  - CMD="cd docker/tests/rider; docker-compose build --build-arg UID=$UID test_2018_01; docker-compose run --rm test_2018_01"
   - |
     DOCKER_LOGIN='eval [[ -n $DOCKER_PASSWORD ]] && docker login -u $DOCKER_USERNAME --password-stdin <<<$DOCKER_PASSWORD || exit 0'
     DOCKER_REPO="ea31337/ea31337:${TRAVIS_BRANCH//master/latest}"
-    DOCKER_BUILD="DOCKER_BUILDKIT=1 docker build --target ea31337 -t ${DOCKER_REPO} ."
-    CMD="${DOCKER_LOGIN} && ${DOCKER_BUILD} && [[ $TRAVIS_PULL_REQUEST = false ]] && docker push $DOCKER_REPO"
-  - |
-    CMD="docker run -v $CWD:/opt/EA:rw ea31337/ea-tester:dev 'for v in Lite-Backtest Advanced-Backtest Rider-Backtest Lite-Optimize Advanced-Optimize Rider-Optimize; do make -C /opt/EA \$v; done'"
+    DOCKER_BUILD="DOCKER_BUILDKIT=1 docker build --build-arg UID=$UID --target ea31337 -t ${DOCKER_REPO} ."
+    DOCKER_COPY="docker run -v $CWD:/opt/workspace:rw ${DOCKER_REPO} cp -frv /opt/EA/*.ex4 /opt/workspace"
+    CMD="${DOCKER_LOGIN} && ${DOCKER_BUILD} && [[ $TRAVIS_PULL_REQUEST = false ]] && $DOCKER_COPY && docker push $DOCKER_REPO"
     DEPLOY=1
 matrix:
   fast_finish: true
