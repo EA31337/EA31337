@@ -2,10 +2,10 @@ version: '3.4'
 services:
   test_2018_01:
     command: run_backtest -v
-    image: ea31337:rider-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../..
-      target: ea31337-rider-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
 #   - ../../../../EA-Tester/scripts:/opt/scripts
@@ -14,135 +14,171 @@ services:
       BT_MONTHS: 01
       TEST_REPORT_NAME: EA31337_Rider_201801
 #     SET_OPTS: VerboseDebug=0,VerboseTrace=0
+    deploy:
+      restart_policy:
+        condition: none
   test_2018_02:
     command: run_backtest -v
-    image: ea31337:rider-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../..
-      target: ea31337-rider-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 02
       TEST_REPORT_NAME: EA31337_Rider_201802
+    deploy:
+      restart_policy:
+        condition: none
   test_2018_03:
     command: run_backtest -v
-    image: ea31337:rider-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../..
-      target: ea31337-rider-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 03
       TEST_REPORT_NAME: EA31337_Rider_201803
+    deploy:
+      restart_policy:
+        condition: none
   test_2018_04:
     command: run_backtest -v
-    image: ea31337:rider-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../..
-      target: ea31337-rider-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 04
       TEST_REPORT_NAME: EA31337_Rider_201804
+    deploy:
+      restart_policy:
+        condition: none
   test_2018_05:
     command: run_backtest -v
-    image: ea31337:rider-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../..
-      target: ea31337-rider-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 05
       TEST_REPORT_NAME: EA31337_Rider_201805
+    deploy:
+      restart_policy:
+        condition: none
   test_2018_06:
     command: run_backtest -v
-    image: ea31337:rider-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../..
-      target: ea31337-rider-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 06
       TEST_REPORT_NAME: EA31337_Rider_201806
+    deploy:
+      restart_policy:
+        condition: none
   test_2018_07:
     command: run_backtest -v
-    image: ea31337:rider-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../..
-      target: ea31337-rider-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 07
       TEST_REPORT_NAME: EA31337_Rider_201807
+    deploy:
+      restart_policy:
+        condition: none
   test_2018_08:
     command: run_backtest -v
-    image: ea31337:rider-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../..
-      target: ea31337-rider-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 08
       TEST_REPORT_NAME: EA31337_Rider_201808
+    deploy:
+      restart_policy:
+        condition: none
   test_2018_09:
     command: run_backtest -v
-    image: ea31337:rider-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../..
-      target: ea31337-rider-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 09
       TEST_REPORT_NAME: EA31337_Rider_201809
+    deploy:
+      restart_policy:
+        condition: none
   test_2018_10:
     command: run_backtest -v
-    image: ea31337:rider-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../..
-      target: ea31337-rider-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 10
       TEST_REPORT_NAME: EA31337_Rider_201810
+    deploy:
+      restart_policy:
+        condition: none
   test_2018_11:
     command: run_backtest -v
-    image: ea31337:rider-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../..
-      target: ea31337-rider-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 11
       TEST_REPORT_NAME: EA31337_Rider_201811
+    deploy:
+      restart_policy:
+        condition: none
   test_2018_12:
     command: run_backtest -v
-    image: ea31337:rider-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../..
-      target: ea31337-rider-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 12
       TEST_REPORT_NAME: EA31337_Rider_201812
+    deploy:
+      restart_policy:
+        condition: none

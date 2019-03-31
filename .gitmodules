@@ -16,6 +16,12 @@
 [submodule "wiki"]
 	path = docs
 	url = https://github.com/EA31337/EA31337.wiki.git
-[submodule "rules"]
-	path = docker/optimization/_rules
-	url = https://github.com/EA31337/EA31337-optimization-rules.git
+[submodule "Lite-optimization-tests"]
+	path = docker/optimization/lite
+	url = https://github.com/EA31337/EA31337-Lite-optimization-tests
+[submodule "Advanced-optimization-tests"]
+	path = docker/optimization/advanced
+	url = https://github.com/EA31337/EA31337-Advanced-optimization-tests
+[submodule "Rider-optimization-tests"]
+	path = docker/optimization/rider
+	url = https://github.com/EA31337/EA31337-Rider-optimization-tests

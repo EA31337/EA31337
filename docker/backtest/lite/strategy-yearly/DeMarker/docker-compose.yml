@@ -4,12 +4,11 @@ services:
 # DeMarker
   DeMarker_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:lite-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../../../..
-      target: ea31337-lite-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
-    - ../../../../../src:/opt/src
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini
@@ -17,14 +16,16 @@ services:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_DeMarker.set
       TEST_REPORT_NAME: "EA31337-Lite_DeMarker[2018]"
+    deploy:
+      restart_policy:
+        condition: none
   DeMarker1_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:lite-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../../../..
-      target: ea31337-lite-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
-    - ../../../../../src:/opt/src
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini
@@ -32,14 +33,16 @@ services:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_DeMarker1.set
       TEST_REPORT_NAME: "EA31337-Lite_DeMarker1[2018]"
+    deploy:
+      restart_policy:
+        condition: none
   DeMarker5_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:lite-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../../../..
-      target: ea31337-lite-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
-    - ../../../../../src:/opt/src
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini
@@ -47,14 +50,16 @@ services:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_DeMarker5.set
       TEST_REPORT_NAME: "EA31337-Lite_DeMarker5[2018]"
+    deploy:
+      restart_policy:
+        condition: none
   DeMarker15_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:lite-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../../../..
-      target: ea31337-lite-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
-    - ../../../../../src:/opt/src
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini
@@ -62,14 +67,16 @@ services:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_DeMarker15.set
       TEST_REPORT_NAME: 'EA31337-Lite_DeMarker15[2018]'
+    deploy:
+      restart_policy:
+        condition: none
   DeMarker30_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:lite-eurusd-2018
+    image: ea31337:eurusd-2018
     build:
       context: ../../../../..
-      target: ea31337-lite-eurusd-2018
+      target: ea31337-eurusd-2018
     volumes:
-    - ../../../../../src:/opt/src
     - ./_results:/opt/_results:rw
     - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini
@@ -77,3 +84,6 @@ services:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_DeMarker30.set
       TEST_REPORT_NAME: "EA31337-Lite_DeMarker30[2018]"
+    deploy:
+      restart_policy:
+        condition: none

@@ -139,7 +139,7 @@ bool session_active = false;
 datetime curr_bar_time;
 datetime time_current = (int) EMPTY_VALUE;
 int hour_of_day, day_of_week, day_of_month, day_of_year, month, year;
-datetime last_order_time = 0, last_action_time = 0;
+datetime last_order_time = 0;
 int last_history_check = 0; // Last ticket position processed.
 datetime last_traded;
 
@@ -261,9 +261,6 @@ void OnTick() {
     }
   }
   if (_tick_procesed) {
-    if (PrintLogOnChart) {
-      DisplayInfoOnChart();
-    }
     if (!terminal.IsOptimization()) {
       terminal.Logger().Flush(false);
     }
@@ -316,6 +313,10 @@ void ProcessBar(Trade *_trade) {
     UpdateStats();
   }
 
+  if (PrintLogOnChart) {
+    // Update stats on chart.
+    DisplayInfoOnChart();
+  }
 }
 
 /**
@@ -435,9 +436,9 @@ int OnInit() {
 //+------------------------------------------------------------------+
 void OnDeinit(const int reason) {
   time_current = TimeCurrent();
-  terminal.Logger().Debug(StringFormat("reason = %d", reason), __FUNCTION_LINE__);
+  if (VerboseDebug) terminal.Logger().Debug(StringFormat("reason = %d", reason), __FUNCTION_LINE__);
   // Also: _UninitReason.
-  terminal.Logger().Info(StringFormat("EA deinitializing, reason: %s (code: %s)", Terminal::GetUninitReasonText(reason), IntegerToString(reason)), __FUNCTION_LINE__);
+  if (VerboseInfo) terminal.Logger().Info(StringFormat("EA deinitializing, reason: %s (code: %s)", Terminal::GetUninitReasonText(reason), IntegerToString(reason)), __FUNCTION_LINE__);
 
   if (session_initiated) {
     if (!terminal.IsOptimization()) {
@@ -563,13 +564,6 @@ void OnTesterDeinit() {
 
 // @todo: OnTradeTransaction (https://www.mql5.com/en/docs/basis/function/events).
 
-// The Start event handler, which is automatically generated only for running scripts.
-// FIXME: Doesn't seems to be called, however MT4 doesn't want to execute EA without it.
-void start() {
-  if (VerboseTrace) Print("Calling " + __FUNCTION__ + ".");
-  if (VerboseInfo) Print(__FUNCTION__ + ": " + GetMarketTextDetails());
-}
-
 /**
  * Print init variables and constants.
  */
@@ -638,7 +632,7 @@ string InitInfo(bool startup = false, string sep = "\n") {
   if (startup) {
     if (session_initiated && terminal.IsTradeAllowed()) {
       if (TradeAllowed()) {
-        output += sep + "Trading is allowed, waiting for ticks...";
+        output += sep + "Trading is allowed, waiting for new bars...";
       } else {
         output += sep + "Trading is allowed, but there is some issue...";
         output += sep + last_err;
@@ -684,9 +678,9 @@ bool EA_Trade(Trade *_trade) {
         if (_cmd == ORDER_TYPE_BUY  && !CheckMarketCondition1(_trade.Chart(), ORDER_TYPE_BUY,  info[id][OPEN_CONDITION1])) _cmd = EMPTY;
         if (_cmd == ORDER_TYPE_SELL && !CheckMarketCondition1(_trade.Chart(), ORDER_TYPE_SELL, info[id][OPEN_CONDITION1])) _cmd = EMPTY;
       }
-      if (Object::IsDynamic(trade[M30]) && info[id][OPEN_CONDITION2] != 0) {
-        if (_cmd == ORDER_TYPE_BUY  && CheckMarketCondition1(trade[M30].Chart(), ORDER_TYPE_SELL, info[id][OPEN_CONDITION2], false)) _cmd = EMPTY;
-        if (_cmd == ORDER_TYPE_SELL && CheckMarketCondition1(trade[M30].Chart(), ORDER_TYPE_BUY,  info[id][OPEN_CONDITION2], false)) _cmd = EMPTY;
+      if (Object::IsDynamic(trade[Chart::TfToIndex(TrendPeriod)]) && info[id][OPEN_CONDITION2] != 0) {
+        if (_cmd == ORDER_TYPE_BUY  && CheckMarketCondition1(trade[Chart::TfToIndex(TrendPeriod)].Chart(), ORDER_TYPE_SELL, info[id][OPEN_CONDITION2], false)) _cmd = EMPTY;
+        if (_cmd == ORDER_TYPE_SELL && CheckMarketCondition1(trade[Chart::TfToIndex(TrendPeriod)].Chart(), ORDER_TYPE_BUY,  info[id][OPEN_CONDITION2], false)) _cmd = EMPTY;
       }
 
       if (_cmd != EMPTY) {
@@ -1171,7 +1165,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
            NormalizeDouble(market.NormalizePrice(takeprofit), market.GetDigits()),
            order_comment,
            MagicNumber + sid, 0, Order::GetOrderColor(cmd)),
-           "Trace", __FUNCTION__, __LINE__, VerboseTrace);
+           "Debug", __FUNCTION__, __LINE__, VerboseDebug);
       result = true;
       // TicketAdd(order_ticket);
       last_order_time = TimeCurrent(); // Set last execution time.
@@ -1289,15 +1283,11 @@ bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, int sid = EMPTY, double volume = EM
       StringFormat("Maximum open and pending orders has reached the limit (MaxOrders) [%d>=%d].", total_orders, max_orders),
       "Info", __FUNCTION__, __LINE__, VerboseInfo
       );
-    #ifdef __advanced__
     OrderQueueAdd(sid, cmd);
-    #endif
     result = false;
   } else if (GetTotalOrdersByType(sid) >= GetMaxOrdersPerType()) {
     last_msg = Msg::ShowText(StringFormat("%s: Maximum open and pending orders per type has reached the limit (MaxOrdersPerType).", sname[sid]), "Info", __FUNCTION__, __LINE__, VerboseInfo);
-    #ifdef __advanced__
     OrderQueueAdd(sid, cmd);
-    #endif
     result = false;
   } else if (!account.CheckFreeMargin(cmd, volume)) {
     last_err = Msg::ShowText("No money to open more orders.", "Error", __FUNCTION__, __LINE__, VerboseInfo | VerboseErrors, PrintLogOnChart);
@@ -3105,17 +3095,17 @@ bool CheckMarketCondition1(Chart *_chart, ENUM_ORDER_TYPE cmd, int condition = 0
   uint period = _chart.TfToIndex();
   if (VerboseTrace) terminal.Logger().Trace(StringFormat("%s(%s, %d)", EnumToString(cmd), _chart.TfToString(), condition), __FUNCTION_LINE__);
   Market::RefreshRates(); // ?
-  if (condition ==  1) result &= ((cmd == ORDER_TYPE_BUY && Open[CURR] > Close[PREV]) || (cmd == ORDER_TYPE_SELL && Open[CURR] < Close[PREV]));
-  if (condition ==  2) result &= UpdateIndicator(_chart, INDI_SAR)       && ((cmd == ORDER_TYPE_BUY && sar[period][CURR] < Open[0]) || (cmd == ORDER_TYPE_SELL && sar[period][CURR] > Open[0]));
-  if (condition ==  3) result &= UpdateIndicator(_chart, INDI_RSI)       && ((cmd == ORDER_TYPE_BUY && rsi[period][CURR] < 50) || (cmd == ORDER_TYPE_SELL && rsi[period][CURR] > 50));
-  if (condition ==  4) result &= UpdateIndicator(_chart, INDI_MA)        && ((cmd == ORDER_TYPE_BUY && _chart.GetAsk() > ma_slow[period][CURR]) || (cmd == ORDER_TYPE_SELL && _chart.GetAsk() < ma_slow[period][CURR]));
-  if (condition ==  5) result &= UpdateIndicator(_chart, INDI_MA)        && ((cmd == ORDER_TYPE_BUY && ma_slow[period][CURR] > ma_slow[period][PREV]) || (cmd == ORDER_TYPE_SELL && ma_slow[period][CURR] < ma_slow[period][PREV]));
-  if (condition ==  6) result &= ((cmd == ORDER_TYPE_BUY && _chart.GetAsk() < Open[CURR]) || (cmd == ORDER_TYPE_SELL && _chart.GetAsk() > Open[CURR]));
-  if (condition ==  7) result &= UpdateIndicator(_chart, INDI_BANDS)     && ((cmd == ORDER_TYPE_BUY && Open[CURR] < bands[period][CURR][BAND_BASE]) || (cmd == ORDER_TYPE_SELL && Open[CURR] > bands[period][CURR][BAND_BASE]));
-  if (condition ==  8) result &= UpdateIndicator(_chart, INDI_ENVELOPES) && ((cmd == ORDER_TYPE_BUY && Open[CURR] < envelopes[period][CURR][MODE_MAIN]) || (cmd == ORDER_TYPE_SELL && Open[CURR] > envelopes[period][CURR][MODE_MAIN]));
-  if (condition ==  9) result &= UpdateIndicator(_chart, INDI_DEMARKER)  && ((cmd == ORDER_TYPE_BUY && demarker[period][CURR] < 0.5) || (cmd == ORDER_TYPE_SELL && demarker[period][CURR] > 0.5));
-  if (condition == 10) result &= UpdateIndicator(_chart, INDI_WPR)       && ((cmd == ORDER_TYPE_BUY && wpr[period][CURR] > 50) || (cmd == ORDER_TYPE_SELL && wpr[period][CURR] < 50));
-  if (condition == 11) result &= cmd == Convert::ValueToOp(curr_trend);
+  if (METHOD(condition,  0)) result &= ((cmd == ORDER_TYPE_BUY && Open[CURR] > Close[PREV]) || (cmd == ORDER_TYPE_SELL && Open[CURR] < Close[PREV]));
+  if (METHOD(condition,  1)) result &= UpdateIndicator(_chart, INDI_SAR)       && ((cmd == ORDER_TYPE_BUY && sar[period][CURR] < Open[0]) || (cmd == ORDER_TYPE_SELL && sar[period][CURR] > Open[0]));
+  if (METHOD(condition,  2)) result &= UpdateIndicator(_chart, INDI_RSI)       && ((cmd == ORDER_TYPE_BUY && rsi[period][CURR] < 50) || (cmd == ORDER_TYPE_SELL && rsi[period][CURR] > 50));
+  if (METHOD(condition,  3)) result &= UpdateIndicator(_chart, INDI_MA)        && ((cmd == ORDER_TYPE_BUY && _chart.GetAsk() > ma_slow[period][CURR]) || (cmd == ORDER_TYPE_SELL && _chart.GetAsk() < ma_slow[period][CURR]));
+  if (METHOD(condition,  4)) result &= UpdateIndicator(_chart, INDI_MA)        && ((cmd == ORDER_TYPE_BUY && ma_slow[period][CURR] > ma_slow[period][PREV]) || (cmd == ORDER_TYPE_SELL && ma_slow[period][CURR] < ma_slow[period][PREV]));
+  if (METHOD(condition,  5)) result &= ((cmd == ORDER_TYPE_BUY && _chart.GetAsk() < Open[CURR]) || (cmd == ORDER_TYPE_SELL && _chart.GetAsk() > Open[CURR]));
+  if (METHOD(condition,  6)) result &= UpdateIndicator(_chart, INDI_BANDS)     && ((cmd == ORDER_TYPE_BUY && Open[CURR] < bands[period][CURR][BAND_BASE]) || (cmd == ORDER_TYPE_SELL && Open[CURR] > bands[period][CURR][BAND_BASE]));
+  if (METHOD(condition,  7)) result &= UpdateIndicator(_chart, INDI_ENVELOPES) && ((cmd == ORDER_TYPE_BUY && Open[CURR] < envelopes[period][CURR][MODE_MAIN]) || (cmd == ORDER_TYPE_SELL && Open[CURR] > envelopes[period][CURR][MODE_MAIN]));
+  if (METHOD(condition,  8)) result &= UpdateIndicator(_chart, INDI_DEMARKER)  && ((cmd == ORDER_TYPE_BUY && demarker[period][CURR] < 0.5) || (cmd == ORDER_TYPE_SELL && demarker[period][CURR] > 0.5));
+  if (METHOD(condition,  9)) result &= UpdateIndicator(_chart, INDI_WPR)       && ((cmd == ORDER_TYPE_BUY && wpr[period][CURR] > 50) || (cmd == ORDER_TYPE_SELL && wpr[period][CURR] < 50));
+  if (METHOD(condition, 10)) result &= cmd == Convert::ValueToOp(curr_trend);
   if (!default_value) result = !result;
   return result;
 }
@@ -4060,21 +4050,6 @@ int CheckSettings() {
       Msg::ShowText(StringFormat("This version will expire on %s!", TimeToStr(ea_expire_date, TIME_DATE)), "Warning", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, true);
     }
   #endif
-  #ifdef __release__
-  #ifdef __backtest__
-  if (Terminal::IsRealtime()) {
-    Msg::ShowText("This version is compiled for backtest mode only.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, true);
-    return -__LINE__;
-  }
-  #else
-  if (Terminal::IsRealtime()) {
-    if (AccountInfoDouble(ACCOUNT_BALANCE) > 100000) {
-      Msg::ShowText("This version doesn't support balance above 100k for a real account.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, true);
-      return -__LINE__;
-    }
-  }
-  #endif
-  #endif
   if (LotSize < 0.0) {
     Msg::ShowText("LotSize is less than 0.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, true);
     return -__LINE__;
@@ -4188,24 +4163,24 @@ double GetLotSizeAuto(uint _method = 0, bool smooth = true) {
   if (Boosting_Enabled) {
     if (LotSizeIncreaseMethod != 0) {
       if (METHOD(LotSizeIncreaseMethod, 0)) if (AccCondition(C_ACC_IN_PROFIT))      new_lot_size *= 1.1;
-      if (METHOD(LotSizeIncreaseMethod, 1)) if (AccCondition(C_EQUITY_10PC_HIGH))   new_lot_size *= 1.1;
-      if (METHOD(LotSizeIncreaseMethod, 2)) if (AccCondition(C_EQUITY_20PC_HIGH))   new_lot_size *= 1.1;
+      if (METHOD(LotSizeIncreaseMethod, 1)) if (AccCondition(C_EQUITY_01PC_LOW))    new_lot_size *= 1.1;
+      if (METHOD(LotSizeIncreaseMethod, 2)) if (AccCondition(C_EQUITY_05PC_LOW))    new_lot_size *= 1.1;
       if (METHOD(LotSizeIncreaseMethod, 3)) if (AccCondition(C_DBAL_LT_WEEKLY))     new_lot_size *= 1.1;
-      if (METHOD(LotSizeIncreaseMethod, 4)) if (AccCondition(C_WBAL_GT_MONTHLY))    new_lot_size *= 1.1;
+      if (METHOD(LotSizeIncreaseMethod, 4)) if (AccCondition(C_WBAL_LT_MONTHLY))    new_lot_size *= 1.1;
       if (METHOD(LotSizeIncreaseMethod, 5)) if (AccCondition(C_ACC_IN_TREND))       new_lot_size *= 1.1;
-      if (METHOD(LotSizeIncreaseMethod, 6)) if (AccCondition(C_ACC_CDAY_IN_PROFIT)) new_lot_size *= 1.1;
-      if (METHOD(LotSizeIncreaseMethod, 7)) if (AccCondition(C_ACC_PDAY_IN_PROFIT)) new_lot_size *= 1.1;
+      if (METHOD(LotSizeIncreaseMethod, 6)) if (AccCondition(C_ACC_CDAY_IN_LOSS))   new_lot_size *= 1.1;
+      if (METHOD(LotSizeIncreaseMethod, 7)) if (AccCondition(C_ACC_PDAY_IN_LOSS))   new_lot_size *= 1.1;
     }
     // --
     if (LotSizeDecreaseMethod != 0) {
       if (METHOD(LotSizeDecreaseMethod, 0)) if (AccCondition(C_ACC_IN_LOSS))        new_lot_size *= 0.9;
-      if (METHOD(LotSizeDecreaseMethod, 1)) if (AccCondition(C_EQUITY_10PC_LOW))    new_lot_size *= 0.9;
-      if (METHOD(LotSizeDecreaseMethod, 2)) if (AccCondition(C_EQUITY_20PC_LOW))    new_lot_size *= 0.9;
+      if (METHOD(LotSizeDecreaseMethod, 1)) if (AccCondition(C_EQUITY_01PC_HIGH))   new_lot_size *= 0.9;
+      if (METHOD(LotSizeDecreaseMethod, 2)) if (AccCondition(C_EQUITY_05PC_HIGH))   new_lot_size *= 0.9;
       if (METHOD(LotSizeDecreaseMethod, 3)) if (AccCondition(C_DBAL_GT_WEEKLY))     new_lot_size *= 0.9;
-      if (METHOD(LotSizeDecreaseMethod, 4)) if (AccCondition(C_WBAL_LT_MONTHLY))    new_lot_size *= 0.9;
+      if (METHOD(LotSizeDecreaseMethod, 4)) if (AccCondition(C_WBAL_GT_MONTHLY))    new_lot_size *= 0.9;
       if (METHOD(LotSizeDecreaseMethod, 5)) if (AccCondition(C_ACC_IN_NON_TREND))   new_lot_size *= 0.9;
-      if (METHOD(LotSizeDecreaseMethod, 6)) if (AccCondition(C_ACC_CDAY_IN_LOSS))   new_lot_size *= 0.9;
-      if (METHOD(LotSizeDecreaseMethod, 7)) if (AccCondition(C_ACC_PDAY_IN_LOSS))   new_lot_size *= 0.9;
+      if (METHOD(LotSizeDecreaseMethod, 6)) if (AccCondition(C_ACC_CDAY_IN_PROFIT)) new_lot_size *= 0.9;
+      if (METHOD(LotSizeDecreaseMethod, 7)) if (AccCondition(C_ACC_PDAY_IN_PROFIT)) new_lot_size *= 0.9;
     }
   }
   #endif
@@ -5111,6 +5086,23 @@ bool InitClasses() {
     return false;
   }
 
+  // Initialize the trend's chart.
+  ENUM_TIMEFRAMES_INDEX _ttfi = Chart::TfToIndex(TrendPeriod);
+  if (!Object::IsDynamic(trade[_ttfi]) || !trade[_ttfi].Chart().IsValidTf()) {
+    TradeParams ttrade_params;
+    ttrade_params.account = account;
+    ttrade_params.chart = new Chart(_ttfi);
+    ttrade_params.logger = logger;
+    trade[_ttfi] = new Trade(ttrade_params);
+    // Verify the trend's chart.
+    if (!Object::IsDynamic(trade[_ttfi]) || !trade[_ttfi].Chart().IsValidTf()) {
+      Msg::ShowText(
+        StringFormat("Cannot initialize the trend's timeframe (%s)!", Chart::IndexToString(_ttfi)),
+        "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
+      return false;
+    }
+  }
+
   ticker = new Ticker(market);
   summary_report = new SummaryReport();
   terminal = market.TerminalHandler();
@@ -5322,6 +5314,18 @@ bool AccCondition(int condition = C_ACC_NONE) {
     case C_EQUITY_10PC_HIGH: // Equity 10% high
       last_cname = "Equ>10%";
       return account.AccountEquity() > (account.AccountBalance() + account.AccountCredit()) / 100 * 110;
+    case C_EQUITY_05PC_HIGH: // Equity 5% high
+      last_cname = "Equ>5%";
+      return account.AccountEquity() > (account.AccountBalance() + account.AccountCredit()) / 100 * 105;
+    case C_EQUITY_01PC_HIGH: // Equity 1% high
+      last_cname = "Equ>1%";
+      return account.AccountEquity() > (account.AccountBalance() + account.AccountCredit()) / 100 * 101;
+    case C_EQUITY_01PC_LOW:  // Equity 1% low
+      last_cname = "Equ<1%";
+      return account.AccountEquity() < (account.AccountBalance() + account.AccountCredit()) / 100 * 99;
+    case C_EQUITY_05PC_LOW:  // Equity 5% low
+      last_cname = "Equ<5%";
+      return account.AccountEquity() < (account.AccountBalance() + account.AccountCredit()) / 100 * 95;
     case C_EQUITY_10PC_LOW:  // Equity 10% low
       last_cname = "Equ<10%";
       return account.AccountEquity() < (account.AccountBalance() + account.AccountCredit()) / 100 * 90;
@@ -5333,17 +5337,17 @@ bool AccCondition(int condition = C_ACC_NONE) {
       return account.AccountEquity() <= (account.AccountBalance() + account.AccountCredit()) / 2;
     case C_MARGIN_USED_50PC: // 50% Margin Used
       last_cname = "Margin>50%";
-      return account.AccountMargin() >= account.AccountEquity() /100 * 50;
+      return account.AccountMargin() >= account.AccountEquity() / 100 * 50;
     case C_MARGIN_USED_70PC: // 70% Margin Used
       // Note that in some accounts, Stop Out will occur in your account when equity reaches 70% of your used margin resulting in immediate closing of all positions.
       last_cname = "Margin>70%";
-      return account.AccountMargin() >= account.AccountEquity() /100 * 70;
+      return account.AccountMargin() >= account.AccountEquity() / 100 * 70;
     case C_MARGIN_USED_80PC: // 80% Margin Used
       last_cname = "Margin>80%";
-      return account.AccountMargin() >= account.AccountEquity() /100 * 80;
+      return account.AccountMargin() >= account.AccountEquity() / 100 * 80;
     case C_MARGIN_USED_90PC: // 90% Margin Used
       last_cname = "Margin>90%";
-      return account.AccountMargin() >= account.AccountEquity() /100 * 90;
+      return account.AccountMargin() >= account.AccountEquity() / 100 * 90;
     case C_NO_FREE_MARGIN:
       last_cname = "NoMargin%";
       return account.AccountFreeMargin() <= 10;
@@ -5469,14 +5473,17 @@ bool MarketCondition(Chart *_chart, int condition = C_MARKET_NONE) {
  * Check the account for configured conditions.
  */
 void CheckAccConditions(Chart *_chart) {
-  if (!Account_Conditions_Active || last_action_time + 60 < DateTime::TimeTradeServer()) {
-    // Do not execute action more often than a minute.
-    // @todo: Move 60 second rule into the external param.
+  datetime _last_check = 0;
+  if (!Account_Conditions_Active || _last_check > DateTime::TimeTradeServer() - 10) {
+    // Do not execute action more often than 10 seconds.
+    //Print("_last_check > Time - 10", _last_check, " ", DateTime::TimeTradeServer());
     return;
   }
+  _last_check = DateTime::TimeTradeServer();
 
   #ifdef __profiler__ PROFILER_START #endif
 
+  bool result = false;
   for (int i = 0; i < ArrayRange(acc_conditions, 0); i++) {
     if (AccCondition(acc_conditions[i][0]) && MarketCondition(_chart, acc_conditions[i][1]) && acc_conditions[i][2] != A_NONE) {
       ActionExecute(acc_conditions[i][2], i);
@@ -5985,16 +5992,19 @@ string GetMonthlyReport() {
  * Display info on chart.
  */
 string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
-  if (!terminal.IsRealtime() || !terminal.IsVisualMode()) {
+  if (terminal.IsOptimization() || (terminal.IsTesting() && !terminal.IsVisualMode())) {
+    // Ignore chart updates when optimizing or testing in non-visual mode.
     return NULL;
   }
 
-  datetime _lastupdate = 0;
+  datetime _last_check = 0;
+  if (_last_check > DateTime::TimeTradeServer() - 10) {
+    //Print("last_check < Time - 10", _last_check, " ", DateTime::TimeTradeServer());
+    return NULL;
+  }
+  _last_check = DateTime::TimeTradeServer();
+
   string output;
-  if (_lastupdate < TimeCurrent()) {
-    return NULL;
-  }
-
   // Prepare text for Stop Out.
   string stop_out_level = StringFormat("%d", account.AccountStopoutLevel());
   if (AccountStopoutMode() == 0) stop_out_level += "%"; else stop_out_level += account.AccountCurrency();
@@ -6061,7 +6071,6 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
     Comment(output);
     ChartRedraw(); // Redraws the current chart forcedly.
   }
-  _lastupdate = TimeCurrent();
   return output;
 }
 
@@ -6443,7 +6452,6 @@ bool ActionExecute(int aid, int id = EMPTY) {
         "Info", __FUNCTION__, __LINE__, VerboseInfo);
     Msg::ShowText(last_msg, "Debug", __FUNCTION__, __LINE__, VerboseDebug && aid != A_NONE);
     if (WriteReport && VerboseDebug) ReportAdd(GetLastMessage());
-    last_action_time = DateTime::TimeTradeServer(); // Set last execution bar time.
   } else {
     Msg::ShowText(
       StringFormat("Failed to execute action: %s (id: %d), condition: %s (id: %d).",
@@ -6489,6 +6497,10 @@ string ReasonIdToText(int rid) {
     case R_EQUITY_50PC_HIGH: output = "Equity 50% high"; break;
     case R_EQUITY_20PC_HIGH: output = "Equity 20% high"; break;
     case R_EQUITY_10PC_HIGH: output = "Equity 10% high"; break;
+    case R_EQUITY_05PC_HIGH: output = "Equity 5% high"; break;
+    case R_EQUITY_01PC_HIGH: output = "Equity 1% high"; break;
+    case R_EQUITY_01PC_LOW: output = "Equity 1% low"; break;
+    case R_EQUITY_05PC_LOW: output = "Equity 5% low"; break;
     case R_EQUITY_10PC_LOW: output = "Equity 10% low"; break;
     case R_EQUITY_20PC_LOW: output = "Equity 20% low"; break;
     case R_EQUITY_50PC_LOW: output = "Equity 50% low"; break;
@@ -6649,7 +6661,7 @@ bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
       if (!OpenOrderCondition(cmd, sid, time, filter)) continue;
       if (OpenOrderIsAllowed(cmd, sid, volume)) {
         string comment = GetStrategyComment(sid) + " [AIQueued]";
-        result &= ExecuteOrder(cmd, sid, volume);
+        result &= ExecuteOrder(cmd, sid, volume, comment);
         break;
       }
     }
@@ -6683,7 +6695,6 @@ bool OpenOrderCondition(ENUM_ORDER_TYPE cmd, int sid, datetime time, int method)
     if (METHOD(method,6)) result &= UpdateIndicator(_chart, INDI_RSI) && Trade_RSI(_chart, cmd, 0, 0);
     if (METHOD(method,7)) result &= UpdateIndicator(_chart, INDI_MA) && Trade_MA(_chart, cmd, 0, 0);
   }
-  Object::Delete(_chart);
   return (result);
 }
 

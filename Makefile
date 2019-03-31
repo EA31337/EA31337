@@ -140,11 +140,11 @@ Optimize: metaeditor.exe \
 		$(OUT)/$(EA)-Rider-Optimize-%.ex4
 
 compile-mql4: requirements $(MQL) metaeditor.exe $(SRC)/$(EA).mq4 $(SRC)/include/EA31337/ea-mode.mqh clean-src
-	file='$(MQL4)'; wine metaeditor.exe /log:CON /compile:"$${file//\//\\}" /inc:"$(SRC)" || true
+	file='$(MQL4)'; wine metaeditor.exe /mql4 /log:CON /compile:"$${file//\//\\}" /inc:"$(SRC)" || true
 	test -s $(SRC)/$(EA).ex4 && echo $(MQL4) compiled.
 
 compile-mql5: requirements $(MQL) metaeditor.exe $(SRC)/$(EA).mq4 $(SRC)/include/EA31337/ea-mode.mqh clean-src
-	file='$(MQL5)'; wine metaeditor.exe /log:CON /compile:"$${file//\//\\}" /inc:"$(SRC)" || true
+	file='$(MQL5)'; wine metaeditor.exe /mql5 /log:CON /compile:"$${file//\//\\}" /inc:"$(SRC)" || true
 	test -s $(SRC)/$(EA).ex5 && @echo $(MQL5) compiled.
 
 $(OUT)/$(EA)-Lite-%.ex4: \
@@ -219,9 +219,5 @@ $(OUT)/$(EA)-Rider-Optimize-%.ex4: \
 		set-none
 		cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-Optimize-v$(VER).ex4"
 
-
 mt4-install:
 		install -v "$(EX4)" "$(shell find ~/.wine -name terminal.exe -execdir pwd ';' -quit)/MQL4/Experts"
-
-lite-license: compile-mql4 mt4-install
-	:

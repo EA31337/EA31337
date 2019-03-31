@@ -1,11 +1,13 @@
-# Ignore configuration files that may contain sensitive information.
+# Ignores configuration files that may contain sensitive information.
 build.properties
 logs/
 
-# Ignore compiled binary files.
-*.ex4
-*.ex5
+# Ignores test results in HTML format.
+*.htm
 
-# Ignore Finder metadata files on Mac
+# Ignores binary files.
+*.ex?
+
+# Ignores Finder metadata files on Mac
 .DS_Store
 
