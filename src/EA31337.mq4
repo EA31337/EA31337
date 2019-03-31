@@ -4167,8 +4167,8 @@ double GetLotSizeAuto(uint _method = 0, bool smooth = true) {
   if (Boosting_Enabled) {
     if (LotSizeIncreaseMethod != 0) {
       if (METHOD(LotSizeIncreaseMethod, 0)) if (AccCondition(C_ACC_IN_PROFIT))      new_lot_size *= 1.1;
-      if (METHOD(LotSizeIncreaseMethod, 1)) if (AccCondition(C_EQUITY_10PC_HIGH))   new_lot_size *= 1.1;
-      if (METHOD(LotSizeIncreaseMethod, 2)) if (AccCondition(C_EQUITY_20PC_HIGH))   new_lot_size *= 1.1;
+      if (METHOD(LotSizeIncreaseMethod, 1)) if (AccCondition(C_EQUITY_05PC_HIGH))   new_lot_size *= 1.1;
+      if (METHOD(LotSizeIncreaseMethod, 2)) if (AccCondition(C_EQUITY_10PC_HIGH))   new_lot_size *= 1.1;
       if (METHOD(LotSizeIncreaseMethod, 3)) if (AccCondition(C_DBAL_LT_WEEKLY))     new_lot_size *= 1.1;
       if (METHOD(LotSizeIncreaseMethod, 4)) if (AccCondition(C_WBAL_GT_MONTHLY))    new_lot_size *= 1.1;
       if (METHOD(LotSizeIncreaseMethod, 5)) if (AccCondition(C_ACC_IN_TREND))       new_lot_size *= 1.1;
@@ -4178,8 +4178,8 @@ double GetLotSizeAuto(uint _method = 0, bool smooth = true) {
     // --
     if (LotSizeDecreaseMethod != 0) {
       if (METHOD(LotSizeDecreaseMethod, 0)) if (AccCondition(C_ACC_IN_LOSS))        new_lot_size *= 0.9;
-      if (METHOD(LotSizeDecreaseMethod, 1)) if (AccCondition(C_EQUITY_10PC_LOW))    new_lot_size *= 0.9;
-      if (METHOD(LotSizeDecreaseMethod, 2)) if (AccCondition(C_EQUITY_20PC_LOW))    new_lot_size *= 0.9;
+      if (METHOD(LotSizeDecreaseMethod, 1)) if (AccCondition(C_EQUITY_05PC_LOW))    new_lot_size *= 0.9;
+      if (METHOD(LotSizeDecreaseMethod, 2)) if (AccCondition(C_EQUITY_10PC_LOW))    new_lot_size *= 0.9;
       if (METHOD(LotSizeDecreaseMethod, 3)) if (AccCondition(C_DBAL_GT_WEEKLY))     new_lot_size *= 0.9;
       if (METHOD(LotSizeDecreaseMethod, 4)) if (AccCondition(C_WBAL_LT_MONTHLY))    new_lot_size *= 0.9;
       if (METHOD(LotSizeDecreaseMethod, 5)) if (AccCondition(C_ACC_IN_NON_TREND))   new_lot_size *= 0.9;
@@ -5318,6 +5318,18 @@ bool AccCondition(int condition = C_ACC_NONE) {
     case C_EQUITY_10PC_HIGH: // Equity 10% high
       last_cname = "Equ>10%";
       return account.AccountEquity() > (account.AccountBalance() + account.AccountCredit()) / 100 * 110;
+    case C_EQUITY_05PC_HIGH: // Equity 5% high
+      last_cname = "Equ>5%";
+      return account.AccountEquity() > (account.AccountBalance() + account.AccountCredit()) / 100 * 105;
+    case C_EQUITY_01PC_HIGH: // Equity 1% high
+      last_cname = "Equ>1%";
+      return account.AccountEquity() > (account.AccountBalance() + account.AccountCredit()) / 100 * 101;
+    case C_EQUITY_01PC_LOW:  // Equity 1% low
+      last_cname = "Equ<1%";
+      return account.AccountEquity() < (account.AccountBalance() + account.AccountCredit()) / 100 * 99;
+    case C_EQUITY_05PC_LOW:  // Equity 5% low
+      last_cname = "Equ<5%";
+      return account.AccountEquity() < (account.AccountBalance() + account.AccountCredit()) / 100 * 95;
     case C_EQUITY_10PC_LOW:  // Equity 10% low
       last_cname = "Equ<10%";
       return account.AccountEquity() < (account.AccountBalance() + account.AccountCredit()) / 100 * 90;
@@ -5329,17 +5341,17 @@ bool AccCondition(int condition = C_ACC_NONE) {
       return account.AccountEquity() <= (account.AccountBalance() + account.AccountCredit()) / 2;
     case C_MARGIN_USED_50PC: // 50% Margin Used
       last_cname = "Margin>50%";
-      return account.AccountMargin() >= account.AccountEquity() /100 * 50;
+      return account.AccountMargin() >= account.AccountEquity() / 100 * 50;
     case C_MARGIN_USED_70PC: // 70% Margin Used
       // Note that in some accounts, Stop Out will occur in your account when equity reaches 70% of your used margin resulting in immediate closing of all positions.
       last_cname = "Margin>70%";
-      return account.AccountMargin() >= account.AccountEquity() /100 * 70;
+      return account.AccountMargin() >= account.AccountEquity() / 100 * 70;
     case C_MARGIN_USED_80PC: // 80% Margin Used
       last_cname = "Margin>80%";
-      return account.AccountMargin() >= account.AccountEquity() /100 * 80;
+      return account.AccountMargin() >= account.AccountEquity() / 100 * 80;
     case C_MARGIN_USED_90PC: // 90% Margin Used
       last_cname = "Margin>90%";
-      return account.AccountMargin() >= account.AccountEquity() /100 * 90;
+      return account.AccountMargin() >= account.AccountEquity() / 100 * 90;
     case C_NO_FREE_MARGIN:
       last_cname = "NoMargin%";
       return account.AccountFreeMargin() <= 10;
@@ -6489,6 +6501,10 @@ string ReasonIdToText(int rid) {
     case R_EQUITY_50PC_HIGH: output = "Equity 50% high"; break;
     case R_EQUITY_20PC_HIGH: output = "Equity 20% high"; break;
     case R_EQUITY_10PC_HIGH: output = "Equity 10% high"; break;
+    case R_EQUITY_05PC_HIGH: output = "Equity 5% high"; break;
+    case R_EQUITY_01PC_HIGH: output = "Equity 1% high"; break;
+    case R_EQUITY_01PC_LOW: output = "Equity 1% low"; break;
+    case R_EQUITY_05PC_LOW: output = "Equity 5% low"; break;
     case R_EQUITY_10PC_LOW: output = "Equity 10% low"; break;
     case R_EQUITY_20PC_LOW: output = "Equity 20% low"; break;
     case R_EQUITY_50PC_LOW: output = "Equity 50% low"; break;
