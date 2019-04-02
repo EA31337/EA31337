@@ -1,5 +1,9 @@
 # Introduction
 
+[![](https://img.shields.io/github/release/EA31337/EA31337.svg?logo=github)](https://github.com/EA31337/EA31337/releases)
+[![](https://img.shields.io/github/license/EA31337/EA31337.svg)](https://tldrlegal.com/license/gnu-general-public-license-v3-(gpl-3))
+[![](https://img.shields.io/badge/chat-Telegram-0088CC.svg?logo=telegram)](https://t.me/EA31337)
+
 Introducing EA31337, an advanced trading robot on the market written in MQL.
 
 It takes the currency trading on the next level by implementing the coordinated algorithm which prioritising and managing multi-timeframe strategies. With fully user customizable parameters, it makes real-time trading a hassle-free experience.
