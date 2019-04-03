@@ -16,9 +16,6 @@ services:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_CCI.set
       TEST_REPORT_NAME: "EA31337-Lite_CCI[2018]"
-    deploy:
-      restart_policy:
-        condition: none
   CCI1_Backtest_2018:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -33,9 +30,6 @@ services:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_CCI1.set
       TEST_REPORT_NAME: "EA31337-Lite_CCI1[2018]"
-    deploy:
-      restart_policy:
-        condition: none
   CCI5_Backtest_2018:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -50,9 +44,6 @@ services:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_CCI5.set
       TEST_REPORT_NAME: "EA31337-Lite_CCI5[2018]"
-    deploy:
-      restart_policy:
-        condition: none
   CCI15_Backtest_2018:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -67,9 +58,6 @@ services:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_CCI15.set
       TEST_REPORT_NAME: 'EA31337-Lite_CCI15[2018]'
-    deploy:
-      restart_policy:
-        condition: none
   CCI30_Backtest_2018:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -84,6 +72,3 @@ services:
       BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_CCI30.set
       TEST_REPORT_NAME: "EA31337-Lite_CCI30[2018]"
-    deploy:
-      restart_policy:
-        condition: none

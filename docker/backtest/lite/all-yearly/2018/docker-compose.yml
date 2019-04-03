@@ -13,9 +13,6 @@ services:
       BT_YEARS: 2018
       BT_DEPOSIT: 100000
       TEST_REPORT_NAME: EA31337-Lite_2018_100k
-    deploy:
-      restart_policy:
-        condition: none
   backtest_2018_10k:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -29,9 +26,6 @@ services:
       BT_YEARS: 2018
       BT_DEPOSIT: 10000
       TEST_REPORT_NAME: EA31337-Lite_2018_10k
-    deploy:
-      restart_policy:
-        condition: none
   backtest_2018_1k:
     command: run_backtest -v
     image: ea31337:eurusd-2018
@@ -45,6 +39,3 @@ services:
       BT_DEPOSIT: 1000
       BT_YEARS: 2018
       TEST_REPORT_NAME: EA31337-Lite_2018_1k
-    deploy:
-      restart_policy:
-        condition: none
