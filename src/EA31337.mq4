@@ -5305,9 +5305,6 @@ bool AccCondition(int condition = C_ACC_NONE) {
     case C_EQUITY_HIGHER:
       last_cname = "Equ>Bal";
       return account.AccountEquity() > account.AccountBalance() + account.AccountCredit();
-    case C_EQUITY_50PC_HIGH: // Equity 50% high
-      last_cname = "Equ>50%";
-      return account.AccountEquity() > (account.AccountBalance() + account.AccountCredit()) * 2;
     case C_EQUITY_20PC_HIGH: // Equity 20% high
       last_cname = "Equ>20%";
       return account.AccountEquity() > (account.AccountBalance() + account.AccountCredit()) / 100 * 120;
@@ -5332,9 +5329,6 @@ bool AccCondition(int condition = C_ACC_NONE) {
     case C_EQUITY_20PC_LOW:  // Equity 20% low
       last_cname = "Equ<20%";
       return account.AccountEquity() < (account.AccountBalance() + account.AccountCredit()) / 100 * 80;
-    case C_EQUITY_50PC_LOW:  // Equity 50% low
-      last_cname = "Equ<50%";
-      return account.AccountEquity() <= (account.AccountBalance() + account.AccountCredit()) / 2;
     case C_MARGIN_USED_50PC: // 50% Margin Used
       last_cname = "Margin>50%";
       return account.AccountMargin() >= account.AccountEquity() / 100 * 50;
@@ -6494,7 +6488,6 @@ string ReasonIdToText(int rid) {
     case R_TRUE: output = "Always true"; break;
     case R_EQUITY_LOWER: output = "Equity lower than balance"; break;
     case R_EQUITY_HIGHER: output = "Equity higher than balance"; break;
-    case R_EQUITY_50PC_HIGH: output = "Equity 50% high"; break;
     case R_EQUITY_20PC_HIGH: output = "Equity 20% high"; break;
     case R_EQUITY_10PC_HIGH: output = "Equity 10% high"; break;
     case R_EQUITY_05PC_HIGH: output = "Equity 5% high"; break;
@@ -6503,7 +6496,6 @@ string ReasonIdToText(int rid) {
     case R_EQUITY_05PC_LOW: output = "Equity 5% low"; break;
     case R_EQUITY_10PC_LOW: output = "Equity 10% low"; break;
     case R_EQUITY_20PC_LOW: output = "Equity 20% low"; break;
-    case R_EQUITY_50PC_LOW: output = "Equity 50% low"; break;
     case R_MARGIN_USED_50PC: output = "50% Margin Used"; break;
     case R_MARGIN_USED_70PC: output = "70% Margin Used"; break;
     case R_MARGIN_USED_80PC: output = "80% Margin Used"; break;

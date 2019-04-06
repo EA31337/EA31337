@@ -272,36 +272,34 @@ enum ENUM_TRAIL_TYPE { // Define type of trailing types.
 enum ENUM_ACC_CONDITION {
   C_ACC_NONE           =  0, // None (inactive)
   C_ACC_TRUE           =  1, // Always true
-  C_EQUITY_50PC_HIGH   =  2, // Equity 50% high
-  C_EQUITY_20PC_HIGH   =  3, // Equity 20% high
-  C_EQUITY_10PC_HIGH   =  4, // Equity 10% high
-  C_EQUITY_05PC_HIGH   =  5, // Equity 5% high
-  C_EQUITY_01PC_HIGH   =  6, // Equity 1% high
-  C_EQUITY_HIGHER      =  7, // Equity higher than balance
-  C_EQUITY_LOWER       =  8, // Equity lower than balance
-  C_EQUITY_01PC_LOW    =  9, // Equity 1% low
-  C_EQUITY_05PC_LOW    = 10, // Equity 5% low
-  C_EQUITY_10PC_LOW    = 11, // Equity 10% low
-  C_EQUITY_20PC_LOW    = 12, // Equity 20% low
-  C_EQUITY_50PC_LOW    = 13, // Equity 50% low
-  C_MARGIN_USED_50PC   = 14, // 50% Margin Used
-  C_MARGIN_USED_70PC   = 15, // 70% Margin Used
-  C_MARGIN_USED_80PC   = 16, // 80% Margin Used
-  C_MARGIN_USED_90PC   = 17, // 90% Margin Used
-  C_NO_FREE_MARGIN     = 18, // No free margin.
-  C_ACC_IN_LOSS        = 19, // Account in loss
-  C_ACC_IN_PROFIT      = 20, // Account in profit
-  C_DBAL_LT_WEEKLY     = 21, // Max. daily balance < max. weekly
-  C_DBAL_GT_WEEKLY     = 22, // Max. daily balance > max. weekly
-  C_WBAL_LT_MONTHLY    = 23, // Max. weekly balance < max. monthly
-  C_WBAL_GT_MONTHLY    = 24, // Max. weekly balance > max. monthly
-  C_ACC_IN_TREND       = 25, // Account in trend
-  C_ACC_IN_NON_TREND   = 26, // Account is against trend
-  C_ACC_CDAY_IN_PROFIT = 27, // Current day in profit
-  C_ACC_CDAY_IN_LOSS   = 28, // Current day in loss
-  C_ACC_PDAY_IN_PROFIT = 29, // Previous day in profit
-  C_ACC_PDAY_IN_LOSS   = 30, // Previous day in loss
-  C_ACC_MAX_ORDERS     = 31, // Max orders reached
+  C_EQUITY_20PC_HIGH   =  2, // Equity 20% high
+  C_EQUITY_10PC_HIGH   =  3, // Equity 10% high
+  C_EQUITY_05PC_HIGH   =  4, // Equity 5% high
+  C_EQUITY_01PC_HIGH   =  5, // Equity 1% high
+  C_EQUITY_HIGHER      =  6, // Equity higher than balance
+  C_EQUITY_LOWER       =  7, // Equity lower than balance
+  C_EQUITY_01PC_LOW    =  8, // Equity 1% low
+  C_EQUITY_05PC_LOW    =  9, // Equity 5% low
+  C_EQUITY_10PC_LOW    = 10, // Equity 10% low
+  C_EQUITY_20PC_LOW    = 11, // Equity 20% low
+  C_MARGIN_USED_50PC   = 12, // 50% Margin Used
+  C_MARGIN_USED_70PC   = 13, // 70% Margin Used
+  C_MARGIN_USED_80PC   = 14, // 80% Margin Used
+  C_MARGIN_USED_90PC   = 15, // 90% Margin Used
+  C_NO_FREE_MARGIN     = 16, // No free margin.
+  C_ACC_IN_LOSS        = 17, // Account in loss
+  C_ACC_IN_PROFIT      = 18, // Account in profit
+  C_DBAL_LT_WEEKLY     = 19, // Max. daily balance < max. weekly
+  C_DBAL_GT_WEEKLY     = 20, // Max. daily balance > max. weekly
+  C_WBAL_LT_MONTHLY    = 21, // Max. weekly balance < max. monthly
+  C_WBAL_GT_MONTHLY    = 22, // Max. weekly balance > max. monthly
+  C_ACC_IN_TREND       = 23, // Account in trend
+  C_ACC_IN_NON_TREND   = 24, // Account is against trend
+  C_ACC_CDAY_IN_PROFIT = 25, // Current day in profit
+  C_ACC_CDAY_IN_LOSS   = 26, // Current day in loss
+  C_ACC_PDAY_IN_PROFIT = 27, // Previous day in profit
+  C_ACC_PDAY_IN_LOSS   = 28, // Previous day in loss
+  C_ACC_MAX_ORDERS     = 29, // Max orders reached
 };
 
 // Define type of actions which can be executed.
@@ -375,7 +373,6 @@ enum ENUM_MARKET_EVENT {
 enum ENUM_REASON_TYPE {
   R_NONE                = C_ACC_NONE, // None
   R_TRUE                = C_ACC_TRUE, // True
-  R_EQUITY_50PC_HIGH    = C_EQUITY_50PC_HIGH, // Equity 50% high.
   R_EQUITY_20PC_HIGH    = C_EQUITY_20PC_HIGH, // Equity 20% high.
   R_EQUITY_10PC_HIGH    = C_EQUITY_10PC_HIGH, // Equity 10% high.
   R_EQUITY_05PC_HIGH    = C_EQUITY_05PC_HIGH, // Equity 5% high.
@@ -386,7 +383,6 @@ enum ENUM_REASON_TYPE {
   R_EQUITY_05PC_LOW     = C_EQUITY_05PC_LOW,  // Equity 5% low.
   R_EQUITY_10PC_LOW     = C_EQUITY_10PC_LOW,  // Equity 10% low.
   R_EQUITY_20PC_LOW     = C_EQUITY_20PC_LOW,  // Equity 20% low.
-  R_EQUITY_50PC_LOW     = C_EQUITY_50PC_LOW,  // Equity 50% low.
   R_MARGIN_USED_50PC    = C_MARGIN_USED_50PC, // 50% Margin Used.
   R_MARGIN_USED_70PC    = C_MARGIN_USED_70PC, // 70% Margin Used.
   R_MARGIN_USED_80PC    = C_MARGIN_USED_80PC, // 80% Margin Used.
