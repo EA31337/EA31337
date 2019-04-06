@@ -5323,6 +5323,9 @@ bool AccCondition(int condition = C_ACC_NONE) {
     case C_EQUITY_20PC_LOW:  // Equity 20% low
       last_cname = "Equ<20%";
       return account.AccountEquity() < (account.AccountBalance() + account.AccountCredit()) / 100 * 80;
+    case C_MARGIN_USED_20PC: // 20% Margin Used
+      last_cname = "Margin>20%";
+      return account.AccountMargin() >= account.AccountEquity() / 100 * 20;
     case C_MARGIN_USED_50PC: // 50% Margin Used
       last_cname = "Margin>50%";
       return account.AccountMargin() >= account.AccountEquity() / 100 * 50;
@@ -5330,9 +5333,6 @@ bool AccCondition(int condition = C_ACC_NONE) {
       // Note that in some accounts, Stop Out will occur in your account when equity reaches 70% of your used margin resulting in immediate closing of all positions.
       last_cname = "Margin>70%";
       return account.AccountMargin() >= account.AccountEquity() / 100 * 70;
-    case C_MARGIN_USED_80PC: // 80% Margin Used
-      last_cname = "Margin>80%";
-      return account.AccountMargin() >= account.AccountEquity() / 100 * 80;
     case C_MARGIN_USED_90PC: // 90% Margin Used
       last_cname = "Margin>90%";
       return account.AccountMargin() >= account.AccountEquity() / 100 * 90;
@@ -6488,9 +6488,9 @@ string ReasonIdToText(int rid) {
     case R_EQUITY_05PC_LOW: output = "Equity 5% low"; break;
     case R_EQUITY_10PC_LOW: output = "Equity 10% low"; break;
     case R_EQUITY_20PC_LOW: output = "Equity 20% low"; break;
+    case R_MARGIN_USED_20PC: output = "20% Margin Used"; break;
     case R_MARGIN_USED_50PC: output = "50% Margin Used"; break;
     case R_MARGIN_USED_70PC: output = "70% Margin Used"; break;
-    case R_MARGIN_USED_80PC: output = "80% Margin Used"; break;
     case R_MARGIN_USED_90PC: output = "90% Margin Used"; break;
     case R_NO_FREE_MARGIN: output = "No free margin"; break;
     case R_ACC_IN_LOSS: output = "Account in loss"; break;

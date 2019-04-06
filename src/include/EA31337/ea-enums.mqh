@@ -280,9 +280,9 @@ enum ENUM_ACC_CONDITION {
   C_EQUITY_05PC_LOW    =  7, // Equity 5% low
   C_EQUITY_10PC_LOW    =  8, // Equity 10% low
   C_EQUITY_20PC_LOW    =  9, // Equity 20% low
-  C_MARGIN_USED_50PC   = 10, // 50% Margin Used
-  C_MARGIN_USED_70PC   = 11, // 70% Margin Used
-  C_MARGIN_USED_80PC   = 12, // 80% Margin Used
+  C_MARGIN_USED_20PC   = 10, // 20% Margin Used
+  C_MARGIN_USED_50PC   = 11, // 50% Margin Used
+  C_MARGIN_USED_70PC   = 12, // 70% Margin Used
   C_MARGIN_USED_90PC   = 13, // 90% Margin Used
   C_NO_FREE_MARGIN     = 14, // No free margin.
   C_ACC_IN_LOSS        = 15, // Account in loss
@@ -379,9 +379,9 @@ enum ENUM_REASON_TYPE {
   R_EQUITY_05PC_LOW     = C_EQUITY_05PC_LOW,  // Equity 5% low.
   R_EQUITY_10PC_LOW     = C_EQUITY_10PC_LOW,  // Equity 10% low.
   R_EQUITY_20PC_LOW     = C_EQUITY_20PC_LOW,  // Equity 20% low.
+  R_MARGIN_USED_20PC    = C_MARGIN_USED_20PC, // 20% Margin Used.
   R_MARGIN_USED_50PC    = C_MARGIN_USED_50PC, // 50% Margin Used.
   R_MARGIN_USED_70PC    = C_MARGIN_USED_70PC, // 70% Margin Used.
-  R_MARGIN_USED_80PC    = C_MARGIN_USED_80PC, // 80% Margin Used.
   R_MARGIN_USED_90PC    = C_MARGIN_USED_90PC, // 90% Margin Used.
   R_NO_FREE_MARGIN      = C_NO_FREE_MARGIN, // No free margin.
   R_ACC_IN_LOSS         = C_ACC_IN_LOSS, // Account in loss.
