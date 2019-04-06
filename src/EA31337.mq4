@@ -5299,12 +5299,6 @@ bool AccCondition(int condition = C_ACC_NONE) {
     case C_ACC_TRUE:
       last_cname = "true";
       return true;
-    case C_EQUITY_LOWER:
-      last_cname = "Equ<Bal";
-      return account.AccountEquity() < account.AccountBalance() + account.AccountCredit();
-    case C_EQUITY_HIGHER:
-      last_cname = "Equ>Bal";
-      return account.AccountEquity() > account.AccountBalance() + account.AccountCredit();
     case C_EQUITY_20PC_HIGH: // Equity 20% high
       last_cname = "Equ>20%";
       return account.AccountEquity() > (account.AccountBalance() + account.AccountCredit()) / 100 * 120;
@@ -6486,8 +6480,6 @@ string ReasonIdToText(int rid) {
     case EMPTY: output = "Empty"; break;
     case R_NONE: output = "None (inactive)"; break;
     case R_TRUE: output = "Always true"; break;
-    case R_EQUITY_LOWER: output = "Equity lower than balance"; break;
-    case R_EQUITY_HIGHER: output = "Equity higher than balance"; break;
     case R_EQUITY_20PC_HIGH: output = "Equity 20% high"; break;
     case R_EQUITY_10PC_HIGH: output = "Equity 10% high"; break;
     case R_EQUITY_05PC_HIGH: output = "Equity 5% high"; break;
