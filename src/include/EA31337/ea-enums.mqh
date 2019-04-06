@@ -272,13 +272,13 @@ enum ENUM_TRAIL_TYPE { // Define type of trailing types.
 enum ENUM_ACC_CONDITION {
   C_ACC_NONE           =  0, // None (inactive)
   C_ACC_TRUE           =  1, // Always true
-  C_EQUITY_LOWER       =  2, // Equity lower than balance
-  C_EQUITY_HIGHER      =  3, // Equity higher than balance
-  C_EQUITY_50PC_HIGH   =  4, // Equity 50% high
-  C_EQUITY_20PC_HIGH   =  5, // Equity 20% high
-  C_EQUITY_10PC_HIGH   =  6, // Equity 10% high
-  C_EQUITY_05PC_HIGH   =  7, // Equity 5% high
-  C_EQUITY_01PC_HIGH   =  8, // Equity 1% high
+  C_EQUITY_50PC_HIGH   =  2, // Equity 50% high
+  C_EQUITY_20PC_HIGH   =  3, // Equity 20% high
+  C_EQUITY_10PC_HIGH   =  4, // Equity 10% high
+  C_EQUITY_05PC_HIGH   =  5, // Equity 5% high
+  C_EQUITY_01PC_HIGH   =  6, // Equity 1% high
+  C_EQUITY_HIGHER      =  7, // Equity higher than balance
+  C_EQUITY_LOWER       =  8, // Equity lower than balance
   C_EQUITY_01PC_LOW    =  9, // Equity 1% low
   C_EQUITY_05PC_LOW    = 10, // Equity 5% low
   C_EQUITY_10PC_LOW    = 11, // Equity 10% low
@@ -375,18 +375,18 @@ enum ENUM_MARKET_EVENT {
 enum ENUM_REASON_TYPE {
   R_NONE                = C_ACC_NONE, // None
   R_TRUE                = C_ACC_TRUE, // True
-  R_EQUITY_LOWER        = C_EQUITY_LOWER, // Equity lower than balance.
-  R_EQUITY_HIGHER       = C_EQUITY_HIGHER, // Equity higher than balance.
   R_EQUITY_50PC_HIGH    = C_EQUITY_50PC_HIGH, // Equity 50% high.
   R_EQUITY_20PC_HIGH    = C_EQUITY_20PC_HIGH, // Equity 20% high.
   R_EQUITY_10PC_HIGH    = C_EQUITY_10PC_HIGH, // Equity 10% high.
   R_EQUITY_05PC_HIGH    = C_EQUITY_05PC_HIGH, // Equity 5% high.
   R_EQUITY_01PC_HIGH    = C_EQUITY_01PC_HIGH, // Equity 1% high.
-  R_EQUITY_01PC_LOW     = C_EQUITY_01PC_LOW, // Equity 1% low.
-  R_EQUITY_05PC_LOW     = C_EQUITY_05PC_LOW, // Equity 5% low.
-  R_EQUITY_10PC_LOW     = C_EQUITY_10PC_LOW, // Equity 10% low.
-  R_EQUITY_20PC_LOW     = C_EQUITY_20PC_LOW, // Equity 20% low.
-  R_EQUITY_50PC_LOW     = C_EQUITY_50PC_LOW, // Equity 50% low.
+  R_EQUITY_HIGHER       = C_EQUITY_HIGHER,    // Equity higher than balance.
+  R_EQUITY_LOWER        = C_EQUITY_LOWER,     // Equity lower than balance.
+  R_EQUITY_01PC_LOW     = C_EQUITY_01PC_LOW,  // Equity 1% low.
+  R_EQUITY_05PC_LOW     = C_EQUITY_05PC_LOW,  // Equity 5% low.
+  R_EQUITY_10PC_LOW     = C_EQUITY_10PC_LOW,  // Equity 10% low.
+  R_EQUITY_20PC_LOW     = C_EQUITY_20PC_LOW,  // Equity 20% low.
+  R_EQUITY_50PC_LOW     = C_EQUITY_50PC_LOW,  // Equity 50% low.
   R_MARGIN_USED_50PC    = C_MARGIN_USED_50PC, // 50% Margin Used.
   R_MARGIN_USED_70PC    = C_MARGIN_USED_70PC, // 70% Margin Used.
   R_MARGIN_USED_80PC    = C_MARGIN_USED_80PC, // 80% Margin Used.
