@@ -1,74 +1,52 @@
 version: '3.4'
-# Note: In case of timeout, run with: DOCKER_CLIENT_TIMEOUT=600 COMPOSE_HTTP_TIMEOUT=600
 services:
-# Fractals
   Fractals_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
-    build:
-      context: ../../../../..
-      target: ea31337-eurusd-2018
+    image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
-    - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini
     environment:
-      BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_Fractals.set
       TEST_REPORT_NAME: "EA31337-Lite_Fractals[2018]"
   Fractals1_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
-    build:
-      context: ../../../../..
-      target: ea31337-eurusd-2018
+    image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
-    - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini
     environment:
-      BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_Fractals1.set
       TEST_REPORT_NAME: "EA31337-Lite_Fractals1[2018]"
   Fractals5_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
-    build:
-      context: ../../../../..
-      target: ea31337-eurusd-2018
+    image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
-    - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini
     environment:
-      BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_Fractals5.set
       TEST_REPORT_NAME: "EA31337-Lite_Fractals5[2018]"
   Fractals15_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
-    build:
-      context: ../../../../..
-      target: ea31337-eurusd-2018
+    image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
-    - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini
     environment:
-      BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_Fractals15.set
       TEST_REPORT_NAME: 'EA31337-Lite_Fractals15[2018]'
   Fractals30_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
-    build:
-      context: ../../../../..
-      target: ea31337-eurusd-2018
+    image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
-    - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini
     environment:
-      BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_Fractals30.set
       TEST_REPORT_NAME: "EA31337-Lite_Fractals30[2018]"

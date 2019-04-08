@@ -1,74 +1,52 @@
 version: '3.4'
-# Note: In case of timeout, run with: DOCKER_CLIENT_TIMEOUT=600 COMPOSE_HTTP_TIMEOUT=600
 services:
-# DeMarker
   DeMarker_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
-    build:
-      context: ../../../../..
-      target: ea31337-eurusd-2018
+    image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
-    - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini
     environment:
-      BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_DeMarker.set
       TEST_REPORT_NAME: "EA31337-Lite_DeMarker[2018]"
   DeMarker1_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
-    build:
-      context: ../../../../..
-      target: ea31337-eurusd-2018
+    image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
-    - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini
     environment:
-      BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_DeMarker1.set
       TEST_REPORT_NAME: "EA31337-Lite_DeMarker1[2018]"
   DeMarker5_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
-    build:
-      context: ../../../../..
-      target: ea31337-eurusd-2018
+    image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
-    - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini
     environment:
-      BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_DeMarker5.set
       TEST_REPORT_NAME: "EA31337-Lite_DeMarker5[2018]"
   DeMarker15_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
-    build:
-      context: ../../../../..
-      target: ea31337-eurusd-2018
+    image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
-    - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini
     environment:
-      BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_DeMarker15.set
       TEST_REPORT_NAME: 'EA31337-Lite_DeMarker15[2018]'
   DeMarker30_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
-    build:
-      context: ../../../../..
-      target: ea31337-eurusd-2018
+    image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
-    - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini
     environment:
-      BT_YEARS: 2018
       SETFILE: /opt/_results/EA31337-Lite_DeMarker30.set
       TEST_REPORT_NAME: "EA31337-Lite_DeMarker30[2018]"
