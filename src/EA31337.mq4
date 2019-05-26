@@ -436,14 +436,23 @@ int OnInit() {
 //+------------------------------------------------------------------+
 void OnDeinit(const int reason) {
   time_current = TimeCurrent();
-  if (VerboseDebug) terminal.Logger().Debug(StringFormat("reason = %d", reason), __FUNCTION_LINE__);
+
+  // Flush logs.
+  if (Object::IsDynamic(terminal) && Object::IsDynamic(terminal.Logger())) {
+    terminal.Logger().Flush(false);
+  }
+
+  Msg::ShowText(StringFormat("reason = %d", reason), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
+
   // Also: _UninitReason.
-  if (VerboseInfo) terminal.Logger().Info(StringFormat("EA deinitializing, reason: %s (code: %s)", Terminal::GetUninitReasonText(reason), IntegerToString(reason)), __FUNCTION_LINE__);
+  Msg::ShowText(
+      StringFormat("EA deinitializing, reason: %s (code: %s)", Terminal::GetUninitReasonText(reason), IntegerToString(reason)),
+      "Info", __FUNCTION__, __LINE__, VerboseInfo);
 
   if (session_initiated) {
     if (!terminal.IsOptimization()) {
       // Show final account details.
-      terminal.Logger().Info(GetSummaryText(), __FUNCTION_LINE__);
+      Msg::ShowText(GetSummaryText(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
 
       #ifdef __profiler__ PROFILER_PRINT #endif
 
@@ -471,13 +480,12 @@ void OnDeinit(const int reason) {
         data += GetStrategyReport();
         data += Array::ArrToString(log, "\n", "Report log:\n");
         Report::WriteReport(filename, data, VerboseInfo); // Todo: Add: Errors::GetUninitReasonText(reason)
-        terminal.Logger().Info("Saved report as: " + filename, __FUNCTION__);
+        Msg::ShowText(StringFormat("Saved report as: %s", filename), "Info", __FUNCTION__, __LINE__, VerboseInfo);
       }
 
     }
 
   }
-  terminal.Logger().Flush(false);
   DeinitVars();
   // #ifdef _DEBUG
   // DEBUG("n=" + n + " : " +  DoubleToStrMorePrecision(val,19) );
