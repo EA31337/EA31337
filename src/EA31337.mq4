@@ -1359,7 +1359,7 @@ bool CheckProfitFactorLimits(int sid = EMPTY) {
       "Warning", __FUNCTION__, __LINE__, VerboseErrors);
     return (true);
   }
-  if (ProfitFactorMinToTrade > 0 && conf[sid][PROFIT_FACTOR] < ProfitFactorMinToTrade) {
+  if (!info[sid][SUSPENDED] && ProfitFactorMinToTrade > 0 && conf[sid][PROFIT_FACTOR] < ProfitFactorMinToTrade) {
     last_err = Msg::ShowText(
       StringFormat("%s: Minimum profit factor has been reached, disabling strategy. (pf = %.1f)",
         sname[sid], conf[sid][PROFIT_FACTOR]),
@@ -1367,7 +1367,7 @@ bool CheckProfitFactorLimits(int sid = EMPTY) {
     info[sid][SUSPENDED] = true;
     return (false);
   }
-  if (ProfitFactorMaxToTrade > 0 && conf[sid][PROFIT_FACTOR] > ProfitFactorMaxToTrade) {
+  if (!info[sid][SUSPENDED] && ProfitFactorMaxToTrade > 0 && conf[sid][PROFIT_FACTOR] > ProfitFactorMaxToTrade) {
     last_err = Msg::ShowText(
       StringFormat("%s: Maximum profit factor has been reached, disabling strategy. (pf = %.1f)",
         sname[sid], conf[sid][PROFIT_FACTOR]),
