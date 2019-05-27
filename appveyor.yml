@@ -24,6 +24,7 @@ before_test:
 - ruby --version
 - echo ^#define %MODE% >> src/include/EA31337/ea-mode.mqh
 test_script:
+- ps: shellcheck scripts/*.sh
 - metaeditor /mql4 /s /compile:%EAFILE% /log:mql4.log || exit /b 0
 - metaeditor /mql5 /s /compile:%EAFILE% /log:mql5.log || exit /b 0
 - type mql4.log mql5.log

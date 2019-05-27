@@ -436,14 +436,23 @@ int OnInit() {
 //+------------------------------------------------------------------+
 void OnDeinit(const int reason) {
   time_current = TimeCurrent();
-  if (VerboseDebug) terminal.Logger().Debug(StringFormat("reason = %d", reason), __FUNCTION_LINE__);
+
+  // Flush logs.
+  if (Object::IsDynamic(terminal) && Object::IsDynamic(terminal.Logger())) {
+    terminal.Logger().Flush(false);
+  }
+
+  Msg::ShowText(StringFormat("reason = %d", reason), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
+
   // Also: _UninitReason.
-  if (VerboseInfo) terminal.Logger().Info(StringFormat("EA deinitializing, reason: %s (code: %s)", Terminal::GetUninitReasonText(reason), IntegerToString(reason)), __FUNCTION_LINE__);
+  Msg::ShowText(
+      StringFormat("EA deinitializing, reason: %s (code: %s)", Terminal::GetUninitReasonText(reason), IntegerToString(reason)),
+      "Info", __FUNCTION__, __LINE__, VerboseInfo);
 
   if (session_initiated) {
     if (!terminal.IsOptimization()) {
       // Show final account details.
-      terminal.Logger().Info(GetSummaryText(), __FUNCTION_LINE__);
+      Msg::ShowText(GetSummaryText(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
 
       #ifdef __profiler__ PROFILER_PRINT #endif
 
@@ -471,13 +480,12 @@ void OnDeinit(const int reason) {
         data += GetStrategyReport();
         data += Array::ArrToString(log, "\n", "Report log:\n");
         Report::WriteReport(filename, data, VerboseInfo); // Todo: Add: Errors::GetUninitReasonText(reason)
-        terminal.Logger().Info("Saved report as: " + filename, __FUNCTION__);
+        Msg::ShowText(StringFormat("Saved report as: %s", filename), "Info", __FUNCTION__, __LINE__, VerboseInfo);
       }
 
     }
 
   }
-  terminal.Logger().Flush(false);
   DeinitVars();
   // #ifdef _DEBUG
   // DEBUG("n=" + n + " : " +  DoubleToStrMorePrecision(val,19) );
@@ -1351,7 +1359,7 @@ bool CheckProfitFactorLimits(int sid = EMPTY) {
       "Warning", __FUNCTION__, __LINE__, VerboseErrors);
     return (true);
   }
-  if (ProfitFactorMinToTrade > 0 && conf[sid][PROFIT_FACTOR] < ProfitFactorMinToTrade) {
+  if (!info[sid][SUSPENDED] && ProfitFactorMinToTrade > 0 && conf[sid][PROFIT_FACTOR] < ProfitFactorMinToTrade) {
     last_err = Msg::ShowText(
       StringFormat("%s: Minimum profit factor has been reached, disabling strategy. (pf = %.1f)",
         sname[sid], conf[sid][PROFIT_FACTOR]),
@@ -1359,7 +1367,7 @@ bool CheckProfitFactorLimits(int sid = EMPTY) {
     info[sid][SUSPENDED] = true;
     return (false);
   }
-  if (ProfitFactorMaxToTrade > 0 && conf[sid][PROFIT_FACTOR] > ProfitFactorMaxToTrade) {
+  if (!info[sid][SUSPENDED] && ProfitFactorMaxToTrade > 0 && conf[sid][PROFIT_FACTOR] > ProfitFactorMaxToTrade) {
     last_err = Msg::ShowText(
       StringFormat("%s: Maximum profit factor has been reached, disabling strategy. (pf = %.1f)",
         sname[sid], conf[sid][PROFIT_FACTOR]),
@@ -5299,15 +5307,6 @@ bool AccCondition(int condition = C_ACC_NONE) {
     case C_ACC_TRUE:
       last_cname = "true";
       return true;
-    case C_EQUITY_LOWER:
-      last_cname = "Equ<Bal";
-      return account.AccountEquity() < account.AccountBalance() + account.AccountCredit();
-    case C_EQUITY_HIGHER:
-      last_cname = "Equ>Bal";
-      return account.AccountEquity() > account.AccountBalance() + account.AccountCredit();
-    case C_EQUITY_50PC_HIGH: // Equity 50% high
-      last_cname = "Equ>50%";
-      return account.AccountEquity() > (account.AccountBalance() + account.AccountCredit()) * 2;
     case C_EQUITY_20PC_HIGH: // Equity 20% high
       last_cname = "Equ>20%";
       return account.AccountEquity() > (account.AccountBalance() + account.AccountCredit()) / 100 * 120;
@@ -5332,9 +5331,9 @@ bool AccCondition(int condition = C_ACC_NONE) {
     case C_EQUITY_20PC_LOW:  // Equity 20% low
       last_cname = "Equ<20%";
       return account.AccountEquity() < (account.AccountBalance() + account.AccountCredit()) / 100 * 80;
-    case C_EQUITY_50PC_LOW:  // Equity 50% low
-      last_cname = "Equ<50%";
-      return account.AccountEquity() <= (account.AccountBalance() + account.AccountCredit()) / 2;
+    case C_MARGIN_USED_20PC: // 20% Margin Used
+      last_cname = "Margin>20%";
+      return account.AccountMargin() >= account.AccountEquity() / 100 * 20;
     case C_MARGIN_USED_50PC: // 50% Margin Used
       last_cname = "Margin>50%";
       return account.AccountMargin() >= account.AccountEquity() / 100 * 50;
@@ -5342,9 +5341,6 @@ bool AccCondition(int condition = C_ACC_NONE) {
       // Note that in some accounts, Stop Out will occur in your account when equity reaches 70% of your used margin resulting in immediate closing of all positions.
       last_cname = "Margin>70%";
       return account.AccountMargin() >= account.AccountEquity() / 100 * 70;
-    case C_MARGIN_USED_80PC: // 80% Margin Used
-      last_cname = "Margin>80%";
-      return account.AccountMargin() >= account.AccountEquity() / 100 * 80;
     case C_MARGIN_USED_90PC: // 90% Margin Used
       last_cname = "Margin>90%";
       return account.AccountMargin() >= account.AccountEquity() / 100 * 90;
@@ -6492,9 +6488,6 @@ string ReasonIdToText(int rid) {
     case EMPTY: output = "Empty"; break;
     case R_NONE: output = "None (inactive)"; break;
     case R_TRUE: output = "Always true"; break;
-    case R_EQUITY_LOWER: output = "Equity lower than balance"; break;
-    case R_EQUITY_HIGHER: output = "Equity higher than balance"; break;
-    case R_EQUITY_50PC_HIGH: output = "Equity 50% high"; break;
     case R_EQUITY_20PC_HIGH: output = "Equity 20% high"; break;
     case R_EQUITY_10PC_HIGH: output = "Equity 10% high"; break;
     case R_EQUITY_05PC_HIGH: output = "Equity 5% high"; break;
@@ -6503,10 +6496,9 @@ string ReasonIdToText(int rid) {
     case R_EQUITY_05PC_LOW: output = "Equity 5% low"; break;
     case R_EQUITY_10PC_LOW: output = "Equity 10% low"; break;
     case R_EQUITY_20PC_LOW: output = "Equity 20% low"; break;
-    case R_EQUITY_50PC_LOW: output = "Equity 50% low"; break;
+    case R_MARGIN_USED_20PC: output = "20% Margin Used"; break;
     case R_MARGIN_USED_50PC: output = "50% Margin Used"; break;
     case R_MARGIN_USED_70PC: output = "70% Margin Used"; break;
-    case R_MARGIN_USED_80PC: output = "80% Margin Used"; break;
     case R_MARGIN_USED_90PC: output = "90% Margin Used"; break;
     case R_NO_FREE_MARGIN: output = "No free margin"; break;
     case R_ACC_IN_LOSS: output = "Account in loss"; break;

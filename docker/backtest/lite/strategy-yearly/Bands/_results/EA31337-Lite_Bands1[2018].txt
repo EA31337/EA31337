@@ -2,15 +2,15 @@
 
 
                                                                 Strategy Tester Report
-                                                             EA31337-Lite-Backtest-v1.076
-                                                            Tripleafx-FX-Demo (Build 1010)
+                                                             EA31337-Lite-Backtest-v1.077
+                                                                     (Build 1010)
 
 Symbol                            EURUSD (Euro vs US Dollar)
 Period                            30 Minutes (M30) 2018.01.04 03:00 - 2018.12.30 23:30 (2018.01.01 - 2018.12.31)
 Model                             Every tick (the most precise method based on all available least timeframes)
-                                  __EA_Parameters__="-- Input EA parameters for EA31337 Lite (Backtest) v1.076 --"; __Trade_Parameters__="-- Trade
+                                  __EA_Parameters__="-- Input EA parameters for EA31337 Lite (Backtest) v1.077 --"; __Trade_Parameters__="-- Trade
                                   parameters --"; MaxOrders=0; MaxOrdersPerType=0; LotSize=0.01; TradeMicroLots=true; MinVolumeToTrade=2;
-                                  MaxOrderPriceSlippage=50; MaxTries=5; MinPipChangeToTrade=0; MinPipGap=0; __EA_Order_Parameters__="-- Profit and
+                                  MaxOrderPriceSlippage=50; MaxTries=5; MinPipChangeToTrade=0; MinPipGap=10; __EA_Order_Parameters__="-- Profit and
                                   loss parameters --"; TakeProfitMax=0; StopLossMax=40; __EA_Trailing_Parameters__="-- Profit and loss trailing
                                   parameters --"; TrailingStop=50; TrailingProfit=0; TrailingStopAddPerMinute=0.1; __EA_Risk_Parameters__="-- Risk
                                   management parameters --"; RiskMarginPerOrder=1; RiskMarginTotal=10; RiskRatio=0; RiskRatioIncreaseMethod=0;
@@ -18,16 +18,17 @@ Model                             Every tick (the most precise method based on a
                                   strategy parameters (0 to disable) --"; ProfitFactorMinToTrade=0; ProfitFactorMaxToTrade=0;
                                   InitNoOfOrdersToCalcPF=20; __Strategy_Boosting_Parameters__="-- Strategy boosting parameters (set 1.0 for default)
                                   --"; Boosting_Enabled=false; BoostTrendFactor=1.1; StrategyBoostByPF=true; StrategyHandicapByPF=true;
-                                  BestDailyStrategyMultiplierFactor=1.1; BestWeeklyStrategyMultiplierFactor=1.1;
-                                  BestMonthlyStrategyMultiplierFactor=1.1; WorseDailyStrategyMultiplierFactor=0.9;
-                                  WorseWeeklyStrategyMultiplierFactor=0.9; WorseMonthlyStrategyMultiplierFactor=0.8; ConWinsIncreaseFactor=1.1;
-                                  ConLossesIncreaseFactor=1.1; ConFactorOrdersLimit=300; __EA_Account_Conditions__="-- Account conditions --";
-                                  Account_Conditions_Active=false; Account_Condition_MinProfitCloseOrder=20; __EA_Account_Conditions_Params__="-
+                                  BestDailyStrategyMultiplierFactor=0.8; BestWeeklyStrategyMultiplierFactor=0.7;
+                                  BestMonthlyStrategyMultiplierFactor=0.6; WorseDailyStrategyMultiplierFactor=0.9;
+                                  WorseWeeklyStrategyMultiplierFactor=0.8; WorseMonthlyStrategyMultiplierFactor=0.7; ConWinsIncreaseFactor=0.4;
+                                  ConLossesIncreaseFactor=0.7; ConFactorOrdersLimit=600; __SmartQueue_Parameters__="-- Smart queue parameters --";
+                                  SmartQueueActive=true; SmartQueueMethod=14; SmartQueueFilter=112; __EA_Account_Conditions__="-- Account conditions
+                                  --"; Account_Conditions_Active=false; Account_Condition_MinProfitCloseOrder=20; __EA_Account_Conditions_Params__="-
                                   - Account conditions parameters --"; MarketSuddenDropSize=20; MarketBigDropSize=40; MarketSpecificHour=10;
                                   CloseConditionOnlyProfitable=true; __Alligator_Parameters__="-- Settings for the Alligator indicator --";
                                   Alligator1_Active=false; Alligator5_Active=false; Alligator15_Active=false; Alligator30_Active=false;
-                                  Alligator_Period_Jaw=6; Alligator_Period_Teeth=10; Alligator_Period_Lips=8; Alligator_Period_Ratio=1;
-Parameters                        Alligator_Shift_Jaw=5; Alligator_Shift_Teeth=4; Alligator_Shift_Lips=3; Alligator_Shift=-2; Alligator_Shift_Far=10;
+Parameters                        Alligator_Period_Jaw=6; Alligator_Period_Teeth=10; Alligator_Period_Lips=8; Alligator_Period_Ratio=1;
+                                  Alligator_Shift_Jaw=5; Alligator_Shift_Teeth=7; Alligator_Shift_Lips=5; Alligator_Shift=2; Alligator_Shift_Far=0;
                                   Alligator_SignalLevel=0; Alligator1_SignalMethod=19; Alligator5_SignalMethod=27; Alligator15_SignalMethod=20;
                                   Alligator30_SignalMethod=16; __Bands_Parameters__="-- Settings for the Bollinger Bands indicator --";
                                   Bands1_Active=true; Bands5_Active=false; Bands15_Active=false; Bands30_Active=false; Bands_Period=18;
@@ -46,21 +47,19 @@ Parameters                        Alligator_Shift_Jaw=5; Alligator_Shift_Teeth=4
                                   Envelopes1_SignalMethod=-88; Envelopes5_SignalMethod=-88; Envelopes15_SignalMethod=-12; Envelopes30_SignalMethod=-
                                   76; __Fractals_Parameters__="-- Settings for the Fractals indicator --"; Fractals1_Active=false;
                                   Fractals5_Active=false; Fractals15_Active=false; Fractals30_Active=false; Fractals_Shift=0;
-                                  Fractals1_SignalMethod=3; Fractals5_SignalMethod=3; Fractals15_SignalMethod=1; Fractals30_SignalMethod=-2;
-                                  MA1_Active=false;
 Bars in test                11890 Ticks modelled                      108400237 Modelling quality                                              89.24%
 Mismatched charts errors        0
 Initial deposit          10000.00                                               Spread                                                             10
-Total net profit           376.41 Gross profit                         11180.92 Gross loss                                                  -10804.51
-Profit factor                1.03 Expected payoff                          0.02
-Absolute drawdown          626.07 Maximal drawdown             1370.56 (12.76%) Relative drawdown                                    12.76% (1370.56)
-Total trades                16683 Short positions (won %)         4493 (36.66%) Long positions (won %)                                 12190 (42.88%)
-                                  Profit trades (% of total)      6874 (41.20%) Loss trades (% of total)                                9809 (58.80%)
-                          Largest profit trade                            14.34 loss trade                                                      -5.68
-                          Average profit trade                             1.63 loss trade                                                      -1.10
-                          Maximum consecutive wins (profit in       95 (355.22) consecutive losses (loss in money)                       63 (-154.95)
+Total net profit         -2166.78 Gross profit                         11931.55 Gross loss                                                  -14098.33
+Profit factor                0.85 Expected payoff                         -0.66
+Absolute drawdown         2507.34 Maximal drawdown             3246.83 (30.23%) Relative drawdown                                    30.23% (3246.83)
+Total trades                 3279 Short positions (won %)          845 (35.50%) Long positions (won %)                                  2434 (31.55%)
+                                  Profit trades (% of total)      1068 (32.57%) Loss trades (% of total)                                2211 (67.43%)
+                          Largest profit trade                           143.43 loss trade                                                     -57.30
+                          Average profit trade                            11.17 loss trade                                                      -6.38
+                          Maximum consecutive wins (profit in       10 (268.13) consecutive losses (loss in money)                        26 (-89.00)
                                   money)
-                          Maximal consecutive profit (count of      479.85 (60) consecutive loss (count of losses)                       -154.95 (63)
+                          Maximal consecutive profit (count of       589.56 (8) consecutive loss (count of losses)                       -162.91 (12)
                                   wins)
-                          Average consecutive wins                            7 consecutive losses                                                 10
+                          Average consecutive wins                            2 consecutive losses                                                  3
                                                                        [Graph]

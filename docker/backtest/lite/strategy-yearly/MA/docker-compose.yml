@@ -1,89 +1,57 @@
 version: '3.4'
-# Note: In case of timeout, run with: DOCKER_CLIENT_TIMEOUT=600 COMPOSE_HTTP_TIMEOUT=600
 services:
-# MA
   MA_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
-    build:
-      context: ../../../../..
-      target: ea31337-eurusd-2018
+    image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ./sets:/opt/sets:rw
+    - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
-    - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini
     environment:
-      BT_YEARS: 2018
-      SETFILE: /opt/_results/EA31337-Lite_MA.set
+      SETFILE: /opt/sets/EA31337-Lite_MA.set
       TEST_REPORT_NAME: "EA31337-Lite_MA[2018]"
-    deploy:
-      restart_policy:
-        condition: none
   MA1_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
-    build:
-      context: ../../../../..
-      target: ea31337-eurusd-2018
+    image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ./sets:/opt/sets:rw
+    - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
-    - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini
     environment:
-      BT_YEARS: 2018
-      SETFILE: /opt/_results/EA31337-Lite_MA1.set
+      SETFILE: /opt/sets/EA31337-Lite_MA1.set
       TEST_REPORT_NAME: "EA31337-Lite_MA1[2018]"
-    deploy:
-      restart_policy:
-        condition: none
   MA5_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
-    build:
-      context: ../../../../..
-      target: ea31337-eurusd-2018
+    image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ./sets:/opt/sets:rw
+    - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
-    - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini
     environment:
-      BT_YEARS: 2018
-      SETFILE: /opt/_results/EA31337-Lite_MA5.set
+      SETFILE: /opt/sets/EA31337-Lite_MA5.set
       TEST_REPORT_NAME: "EA31337-Lite_MA5[2018]"
-    deploy:
-      restart_policy:
-        condition: none
   MA15_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
-    build:
-      context: ../../../../..
-      target: ea31337-eurusd-2018
+    image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ./sets:/opt/sets:rw
+    - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
-    - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini
     environment:
-      BT_YEARS: 2018
-      SETFILE: /opt/_results/EA31337-Lite_MA15.set
+      SETFILE: /opt/sets/EA31337-Lite_MA15.set
       TEST_REPORT_NAME: 'EA31337-Lite_MA15[2018]'
-    deploy:
-      restart_policy:
-        condition: none
   MA30_Backtest_2018:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
-    build:
-      context: ../../../../..
-      target: ea31337-eurusd-2018
+    image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ./sets:/opt/sets:rw
+    - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
-    - ../../../../../../EA-Tester/scripts:/opt/scripts
     env_file: ../EA-Tester.ini
     environment:
-      BT_YEARS: 2018
-      SETFILE: /opt/_results/EA31337-Lite_MA30.set
+      SETFILE: /opt/sets/EA31337-Lite_MA30.set
       TEST_REPORT_NAME: "EA31337-Lite_MA30[2018]"
-    deploy:
-      restart_policy:
-        condition: none

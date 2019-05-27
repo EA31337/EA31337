@@ -1,50 +1,32 @@
 version: '3.4'
 services:
-  backtest_2017_100k:
+  lite_backtest_2017_100k:
     command: run_backtest -v
-    image: ea31337:eurusd-2017
-    build:
-      context: ../../../../..
-      target: ea31337-eurusd-2017
+    image: ea31337/ea-tester:EURUSD-2017-DS
     volumes:
+    - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
     env_file: ../EA-Tester.ini
     environment:
-      BT_YEARS: 2017
       BT_DEPOSIT: 100000
       TEST_REPORT_NAME: EA31337-Lite_2017_100k
-    deploy:
-      restart_policy:
-        condition: none
-  backtest_2017_10k:
+  lite_backtest_2017_10k:
     command: run_backtest -v
-    image: ea31337:eurusd-2017
-    build:
-      context: ../../../../..
-      target: ea31337-eurusd-2017
+    image: ea31337/ea-tester:EURUSD-2017-DS
     volumes:
+    - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
     env_file: ../EA-Tester.ini
     environment:
-      BT_YEARS: 2017
       BT_DEPOSIT: 10000
       TEST_REPORT_NAME: EA31337-Lite_2017_10k
-    deploy:
-      restart_policy:
-        condition: none
-  backtest_2017_1k:
+  lite_backtest_2017_1k:
     command: run_backtest -v
-    image: ea31337:eurusd-2017
-    build:
-      context: ../../../../..
-      target: ea31337-eurusd-2017
+    image: ea31337/ea-tester:EURUSD-2017-DS
     volumes:
+    - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
     env_file: ../EA-Tester.ini
     environment:
-      BT_YEARS: 2017
       BT_DEPOSIT: 1000
       TEST_REPORT_NAME: EA31337-Lite_2017_1k
-    deploy:
-      restart_policy:
-        condition: none
