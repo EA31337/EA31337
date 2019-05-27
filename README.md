@@ -1,47 +1,56 @@
-# Introduction
-
 [![](https://img.shields.io/github/release/EA31337/EA31337.svg?logo=github)](https://github.com/EA31337/EA31337/releases)
 [![](https://img.shields.io/badge/news-Telegram-0088CC.svg?logo=telegram)](https://t.me/EA31337_News)
 [![](https://img.shields.io/badge/chat-Telegram-0088CC.svg?logo=telegram)](https://t.me/EA31337)
 [![](https://img.shields.io/github/license/EA31337/EA31337.svg)](https://tldrlegal.com/license/gnu-general-public-license-v3-(gpl-3))
 
-Introducing EA31337, an advanced trading robot on the market written in MQL.
+# Introduction
 
-It takes the currency trading on the next level by implementing the coordinated algorithm which prioritising and managing multi-timeframe strategies. With fully user customizable parameters, it makes real-time trading a hassle-free experience.
+Introducing EA31337, an advanced trading robot for Forex markets written in MQL.
+
+The EA (_Expert Advisor_) implements the coordinated algorithm which prioritising and managing multi-timeframe strategies with fully user customizable parameters, which takes the currency trading on the next level. It makes real-time trading a hassle-free experience.
 
 Please follow [Wiki Home page](https://github.com/EA31337/EA31337/wiki) for the available documentation pages.
 
-## Build status
+# Build status
 
 | Type            | Status      |
 | --------------: |:-----------:|
 | Travis CI build | [![Build Status](https://api.travis-ci.org/EA31337/EA31337.svg?branch=master)](https://travis-ci.org/EA31337/EA31337) |
 | AppVeyor build  | [![Build status](https://ci.appveyor.com/api/projects/status/63qnd959vxl44102?svg=true)](https://ci.appveyor.com/project/kenorb/ea31337/branch/master) |
 
-## About the project
+# About the project
 
-The project aims to deliver fully working EA at the professional level to be compatible with both MQL4 and MQL5 at the same time.
+The project aims to deliver fully working EA at the professional level with code compability for MQL4 and MQL5 at the same time.
 
-Ideally, you should use this project for education or research purposes. However, if you're still planning to use it for trading, please take care, as neither it is the holy grail or making money machine. So if you're looking to double your investment in a short period with few clicks, this is not what you're looking for, and most likely you won't find it anywhere else. Therefore, to use this project most efficiently, you'll have to invest some time to understand how it works and how you can use it.
+## Disclamer
 
-The project has been published for free (see [License](#LICENSE)) after _MQL5 Ltd_ decided to remove this EA from their [marketplace](https://www.mql5.com/en/market) with all associated seller accounts for no apparent reason, a day after network of [scam brokers](https://money.stackexchange.com/q/91732/6888) has been reported at their _Service Desk_. These scam brokers still appearing on the MT4 app, so please be careful.
+The project has been published for free (see [License](#LICENSE)) after _MQL5 Ltd_ decided to remove this EA from their [marketplace](https://www.mql5.com/en/market) with all associated seller accounts for no apparent reason, a day after network of [scam brokers](https://money.stackexchange.com/q/91732/6888) has been reported at their _Service Desk_. These scam brokers still appearing on their live MT4 app, about which they really don't care much (as long as the scammers pay them for the licence), so please be careful. For that reason, I've stopped using MetaTrader platform for my daily trading, apart of the time when maintaining this project.
 
-# Features
+## Usage
+
+You can freely use this project for education or research purposes.
+
+However, if you're planning to use it for trading, please take care, as neither it is the holy grail or making money machine. So if you're looking to double your investment in a short period with few clicks, this is not what you're looking for, and most likely you won't find it anywhere else.
+
+To use this project most efficiently, you'll have to invest some time to understand how it works and how you can use it.
+
+To learn more about the usage, please check our [Wiki pages](https://github.com/EA31337/EA31337/wiki).
+
+## Features
 
 The EA provides the following out-of-box features:
 
 - Over 30 optimised strategies on four different timeframes analysing the market in real-time.
-- An exceptional number of customizable user parameters (over 300).
-- Task scheduler which queues and re-trades the rejected trades due to high volatility or broker requotes.
-- Trade tasker prioritises trading according to high demand or market limits.
-- Trade booster can increase lot ratio for successful strategies over current week or month.
-- Trade booster can also handicap or disable non-successful strategy for a temporary period.
-- Risk Ratio manages your risk automatically for the given equality/balance and the market conditions.
-- Lot balancer computes precisely how much to invest (contract size) given your equality/balance ratio.
-- Order balancer knows exactly how many trades to open given your balance, opened trades, Stop Out levels and market conditions (Risk Ratio).
-- Optional _TradeWithTrend_ parameter minimalizes the risk by trading with market trend only.
-- Profit/stop trailing system dynamically sets order limits based on the market conditions (learn more below).
-- The powerful OpenMethod system enhances technical indicators and trades only on prosperous market conditions (learn more below).
+- An exceptional number of user customizable parameters (over 300).
+- _Task scheduler_ which queues and re-trades the rejected trades due to high volatility or broker requotes.
+- _Trade booster_ can increase lot ratio for successful strategies over current day, week or month.
+- _Trade booster_ can also handicap or disable non-successful strategy for a temporary period.
+- _Risk Ratio_ feature manages your risk automatically for the given equality/balance and the market conditions.
+- _Lot balancer_ computes precisely how much to invest (contract size) given your equality/balance ratio.
+- _Order balancer_ computes how many trades can be opened given your balance, existing trades, _Stop Out_/_margin_ levels and market conditions (_Risk Ratio_).
+- Optional _TradeWithTrend_ parameter minimalizes the risk by not trading against the market trends.
+- _Profit/stop trailing system_ dynamically sets order limits based on the market conditions (learn more below).
+- The unique _OpenMethod system_ enhances technical indicators and trades only on prosperous market conditions (learn more below).
 - The powerful condition-action system gives you the full control what to do on specific market condition (learn more below).
 
 ## Strategies
@@ -116,36 +125,11 @@ If you decide to use this EA for the trading purposes, please use it responsivel
 * Be aware that potential profits can be matter of weeks, not days, so please be patient. The configuration could be right, but it's about finding a good opportunity.
 * Use major symbol pairs (such as EURUSD, GBPUSD, etc), the one which has been tested.
 
+For more important tips, refer to [Before you start](https://github.com/EA31337/EA31337/wiki/Before-you-start) wiki page.
+
 # Installation
 
-## MetaTrader 4 platform
-
-1. Download MetaTrader platform from your broker's site, alternatively from www.metaquotes.net.
-
-   a. Once on the site, click on MetaTrader 4, then on Trading Terminal.
-   a. At the bottom, click on Download MetaTrader 4 Terminal button.
-
-   Alternatively click this [direct link](https://download.mql5.com/cdn/web/metaquotes.software.corp/mt4/mt4setup.exe) to start download.
-
-1. Install platform by running its executable file and follow the steps of the installation wizzard.
-
-1. After completing installation, the Terminal window should be shown and you will be asked to create a demo account. So you may fill in the details and select the deposit amount of your account, otherwise please log-in to your existing account.
-
-## Installation of EA
-
-1. Run MetaTrader 4 Trading Terminal.
-1. Click *File, Open Data Folder* in a top menu bar.
-1. Copy provided *EX4* or *EX5* file into that opened folder (MQL4/Experts).
-<sup>Note: Check [_Releases_](https://github.com/EA31337/EA31337/releases) tab for compiled EX4 files.</sup>
-1. Click *Tools*, *Options*, and in *Expert Advisors* tab please enable *Allow automated trading* and *Allow DLL imports* to activate automated trading on your account, then click *OK*.
-1. Click *File, New Chart* and *EURUSD* (recommended). You may switch any timeframe (e.g. M1).
-1. Now in *Navigator* window attach *EA31337* to a chart either from contextual menu, or alternatively simply drag EA onto the chart (if you don't see EA yet, *Refresh* or restart your terminal).
-1. *Expert* pop-up should appear, so the following options are mandatory to set-up:
-
-    a. in *Common* tab: *Allow live trading* & *Allow DLL imports*
-    b. in *Inputs* tab, please enter your *E-Mail* and *License* by clicking on *Value* column and confirming by *Tab* or *Enter*
-1. Now you should have smiley face in the upper right hand corner of your chart which means your EA is up and running, otherwise if your EA is reporting invalid parameters, please repeat steps 5-6.
-1. You can enable or disable EA at any time by clicking AutoTrading button in upper bar.
+For installation steps, refer to [Installation](https://github.com/EA31337/EA31337/wiki/Installation) wiki page.
 
 ## Compilation
 
@@ -212,9 +196,9 @@ The project is released under [GNU GPLv3 licence](https://www.gnu.org/licenses/q
 
 You should have received a copy of the GNU General Public License along with this program (check the [LICENSE](https://github.com/EA31337/EA31337/blob/master/LICENSE) file).  If not, see <http://www.gnu.org/licenses/>.
 
-### Copyright information
+## Copyright information
 
-Copyright © 2016 – 31337 Investments Ltd. - All Rights Reserved
+Copyright © 2016-2019 – 31337 Investments Ltd. - All Rights Reserved
 
 Author & Publisher: kenorb at 31337 Investments Ltd.
 
