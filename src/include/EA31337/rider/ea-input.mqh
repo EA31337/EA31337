@@ -21,14 +21,14 @@ extern string __Trade_Parameters__ = "-- Trade parameters --"; // >>> TRADE <<<
 extern uint   MaxOrders = 0; // Max orders (0 = auto)
 extern uint   MaxOrdersPerType = 0; // Max orders per type (0 = auto)
 extern uint   MaxOrdersPerDay = 0; // Max orders per day (0 = unlimited)
-extern double LotSize = 0.01; // Lot size (0 = auto)
+extern double LotSize = 0; // Lot size (0 = auto)
 extern int    LotSizeIncreaseMethod = 202; // Lot size increase method (0-255)
 extern int    LotSizeDecreaseMethod = 167; // Lot size decrease method (0-255)
 extern bool   TradeMicroLots = 1; // Trade micro lots?
 extern int    MinVolumeToTrade = 2; // Min volume to trade
 extern int    MaxOrderPriceSlippage = 50; // Max price slippage (in pts)
 extern int    MaxTries = 5; // Max retries for opening orders
-extern double MinPipChangeToTrade = 0; // Min pip change to trade
+extern double MinPipChangeToTrade = 0.0; // Min pip change to trade
 extern int    MinPipGap = 10; // Min gap between trades per type (in pips)
 extern int    MinIntervalSec = 0; // Min interval between subsequent trade signals (in sec)
 //extern uint   TickProcessMethod = 0; // Tick process method (0-8, 0 - all)
@@ -40,9 +40,9 @@ extern uint     StopLossMax = 40; // Max Stop loss (in pips, 0 = auto)
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
-extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = -27; // Default trail stop method (0 = none)
+extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 0; // Default trail stop method (0 = none)
 extern int TrailingStop = 50; // Extra trailing stop (in pips)
-extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = -27; // Default trail profit method
+extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 0; // Default trail profit method
 extern int TrailingProfit = 0; // Extra trailing profit (in pips)
 extern double TrailingStopAddPerMinute = 0.1; // Decrease trail stop per minute (pip/min)
 
@@ -71,21 +71,21 @@ extern bool Boosting_Enabled = 1; // Enable boosting
 extern double BoostTrendFactor = 1.1; // Boost by trend factor
 extern bool StrategyBoostByPF = 1.1; // Boost strategy by its profit factor
 extern bool StrategyHandicapByPF = true; // Handicap by its low profit factor
-extern double BestDailyStrategyMultiplierFactor = 0.3; // Multiplier for the best daily strategy
-extern double BestWeeklyStrategyMultiplierFactor = 0.1; // Multiplier for the best weekly strategy
-extern double BestMonthlyStrategyMultiplierFactor = 0.1; // Multiplier for the best monthly strategy
-extern double WorseDailyStrategyMultiplierFactor = 2; // Multiplier for the worse daily strategy
-extern double WorseWeeklyStrategyMultiplierFactor = 1.1; // Multiplier for the worse weekly strategy
-extern double WorseMonthlyStrategyMultiplierFactor = 0.1; // Multiplier for the worse monthly strategy
+extern double BestDailyStrategyMultiplierFactor = 0.8; // Multiplier for the best daily strategy
+extern double BestWeeklyStrategyMultiplierFactor = 0.7; // Multiplier for the best weekly strategy
+extern double BestMonthlyStrategyMultiplierFactor = 0.6; // Multiplier for the best monthly strategy
+extern double WorseDailyStrategyMultiplierFactor = 0.9; // Multiplier for the worse daily strategy
+extern double WorseWeeklyStrategyMultiplierFactor = 0.8; // Multiplier for the worse weekly strategy
+extern double WorseMonthlyStrategyMultiplierFactor = 0.7; // Multiplier for the worse monthly strategy
 extern double ConWinsIncreaseFactor = 0.4; // Increase lot factor on consequent wins (in %, 0 - off)
 extern double ConLossesIncreaseFactor = 0.7; // Increase lot factor on consequent loses (in %, 0 - off)
-extern uint ConFactorOrdersLimit = 200; // No of orders to check on consequent wins/loses
+extern uint ConFactorOrdersLimit = 600; // No of orders to check on consequent wins/loses
 
 //+------------------------------------------------------------------+
 extern string __SmartQueue_Parameters__ = "-- Smart queue parameters --"; // >>> SMART QUEUE <<<
-extern bool SmartQueueActive = true; // Activate QueueAI
-extern int SmartQueueMethod = 3; // QueueAI: Method for selecting the best order (0-15)
-extern int SmartQueueFilter = 27; // QueueAI: Method for filtering the orders (0-255)
+extern bool SmartQueueActive = 1; // Activate QueueAI
+extern int SmartQueueMethod = 14; // QueueAI: Method for selecting the best order (0-15)
+extern int SmartQueueFilter = 112; // QueueAI: Method for filtering the orders (0-255)
 
 //+------------------------------------------------------------------+
 // extern string __Advanced_Parameters__ = "-- Advanced parameters --"; // >>> ADVANCED <<<
@@ -93,26 +93,27 @@ extern int SmartQueueFilter = 27; // QueueAI: Method for filtering the orders (0
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions__ = "-- Account conditions --"; // >>> CONDITIONS & ACTIONS <<<
 // Note: It's not advice to use on accounts where multi bots are trading.
-extern bool Account_Conditions_Active = 0; // Enable account conditions
-extern ENUM_ACC_CONDITION Account_Condition_1      = 1; // 1. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_1    = 0; // 1. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_1      = 0; // 1. Action to take
-
-extern ENUM_ACC_CONDITION Account_Condition_2      = 2; // 2. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_2    = 0; // 2. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_2      = 0; // 2. Action to take
-
-extern ENUM_ACC_CONDITION Account_Condition_3      = 3; // 3. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_3    = 0; // 3. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_3      = 0; // 3. Action to take
-
-extern ENUM_ACC_CONDITION Account_Condition_4      = 4; // 4. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_4    = 0; // 4. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_4      = 0; // 4. Action to take
-
-extern ENUM_ACC_CONDITION Account_Condition_5      = 5; // 5. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_5    = 0; // 5. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_5      = 0; // 5. Action to take
+extern bool Account_Conditions_Active = 1; // Enable account conditions
+// 5 - Equity 1% high
+extern ENUM_ACC_CONDITION Account_Condition_1 = 5; // 1. Account condition
+extern ENUM_MARKET_CONDITION Market_Condition_1 = 2; // 1. Market condition
+extern ENUM_ACTION_TYPE Action_On_Condition_1 = 1; // 1. Action to take
+// 6 - Equity 1%
+extern ENUM_ACC_CONDITION Account_Condition_2 = 6; // 2. Account condition
+extern ENUM_MARKET_CONDITION Market_Condition_2 = 1; // 2. Market condition
+extern ENUM_ACTION_TYPE Action_On_Condition_2 = 3; // 2. Action to take
+// 10 - 20% Margin Used
+extern ENUM_ACC_CONDITION Account_Condition_3 = 10; // 3. Account condition
+extern ENUM_MARKET_CONDITION Market_Condition_3 = 1; // 3. Market condition
+extern ENUM_ACTION_TYPE Action_On_Condition_3 = 0; // 3. Action to take
+// 17 - Max. daily balance < max. weekly
+extern ENUM_ACC_CONDITION Account_Condition_4 = 17; // 4. Account condition
+extern ENUM_MARKET_CONDITION Market_Condition_4 = 9; // 4. Market condition
+extern ENUM_ACTION_TYPE Action_On_Condition_4 = 8; // 4. Action to take
+//
+extern ENUM_ACC_CONDITION Account_Condition_5 = 0; // 5. Account condition
+extern ENUM_MARKET_CONDITION Market_Condition_5 = 0; // 5. Market condition
+extern ENUM_ACTION_TYPE Action_On_Condition_5 = 0; // 5. Action to take
 
 extern ENUM_ACC_CONDITION Account_Condition_6      = 6; // 6. Account condition
 extern ENUM_MARKET_CONDITION Market_Condition_6    = 0; // 6. Market condition
@@ -218,9 +219,9 @@ extern int Account_Condition_MinProfitCloseOrder = 20; // Min pip profit on acti
 
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions_Params__ = "-- Account conditions parameters --"; // >>> CONDITIONS & ACTIONS PARAMS <<<
-extern int MarketSuddenDropSize = 10; // Drop in pips to react
-extern int MarketBigDropSize = 50; // Big drop in pips to react
-extern int MarketSpecificHour = 0; // Specific hour used for conditions (0-23)
+extern int MarketSuddenDropSize = 20; // Drop in pips to react
+extern int MarketBigDropSize = 40; // Big drop in pips to react
+extern int MarketSpecificHour = 3; // Specific hour used for conditions (0-23)
 extern bool CloseConditionOnlyProfitable = true; // Apply close condition only for profitable orders
 extern int CloseConditionCustom1Method = 0; // Custom 1 indicator-based close condition (0-1023)
 extern int CloseConditionCustom2Method = 0; // Custom 2 indicator-based close condition (0-1023)
@@ -336,20 +337,20 @@ double ADX30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 //+------------------------------------------------------------------+
 extern string __Alligator_Parameters__ = "-- Settings for the Alligator indicator --"; // >>> ALLIGATOR <<<
 extern bool Alligator1_Active = 0; // Enable for M1
-extern bool Alligator5_Active = 0; // Enable for M5
-extern bool Alligator15_Active = 1; // Enable for M15
+extern bool Alligator5_Active = 1; // Enable for M5
+extern bool Alligator15_Active = 0; // Enable for M15
 extern bool Alligator30_Active = 1; // Enable for M30
 extern int Alligator_Period_Jaw = 6; // Jaw Period
 extern int Alligator_Period_Teeth = 10; // Teeth Period
 extern int Alligator_Period_Lips = 8; // Lips Period
 extern double Alligator_Period_Ratio = 1.0; // Period ratio between timeframes (0.5-1.5)
 extern int Alligator_Shift_Jaw = 5; // Jaw Shift
-extern int Alligator_Shift_Teeth = 4; // Teeth Shift
-extern int Alligator_Shift_Lips = 3; // Lips Shift
+extern int Alligator_Shift_Teeth = 7; // Teeth Shift
+extern int Alligator_Shift_Lips = 5; // Lips Shift
 extern ENUM_MA_METHOD Alligator_MA_Method = 2; // MA Method
 extern ENUM_APPLIED_PRICE Alligator_Applied_Price = 3; // Applied Price
-extern int Alligator_Shift = -2; // Shift
-extern int Alligator_Shift_Far = 10; // Shift Far
+extern int Alligator_Shift = 2; // Shift
+extern int Alligator_Shift_Far = 0; // Shift Far
 extern ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = -8; // Trail stop method
 extern ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = -24; // Trail profit method
 extern double Alligator_SignalLevel = 0; // Signal level
@@ -458,7 +459,7 @@ extern int Bands_Period = 18; // Period
 extern double Bands_Period_Ratio = 1; // Period ratio between timeframes (0.5-1.5)
 extern ENUM_APPLIED_PRICE Bands_Applied_Price = 3; // Applied Price
 extern double Bands_Deviation = 2.3; // Deviation
-extern double Bands_Deviation_Ratio = 1; // Deviation ratio between timeframes (0.5-1.5)
+extern double Bands_Deviation_Ratio = 1.0; // Deviation ratio between timeframes (0.5-1.5)
 extern int Bands_Shift = 3; // Shift
 extern int Bands_Shift_Far = 1; // Shift Far
 extern ENUM_TRAIL_TYPE Bands_TrailingStopMethod = 7; // Trail stop method
