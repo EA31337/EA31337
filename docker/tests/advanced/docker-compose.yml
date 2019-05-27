@@ -1,6 +1,6 @@
 version: '3.4'
 services:
-  test_2018_01:
+  advanced_test_2018_01:
     command: run_backtest -v
     image: ea31337:eurusd-2018
     build:
@@ -13,7 +13,7 @@ services:
     environment:
       BT_MONTHS: 01
       TEST_REPORT_NAME: EA31337_Advanced_201801
-  test_2018_02:
+  advanced_test_2018_02:
     command: run_backtest -v
     image: ea31337:eurusd-2018
     build:
@@ -25,7 +25,7 @@ services:
     environment:
       BT_MONTHS: 02
       TEST_REPORT_NAME: EA31337_Advanced_201802
-  test_2018_03:
+  advanced_test_2018_03:
     command: run_backtest -v
     image: ea31337:eurusd-2018
     build:
@@ -37,7 +37,7 @@ services:
     environment:
       BT_MONTHS: 03
       TEST_REPORT_NAME: EA31337_Advanced_201803
-  test_2018_04:
+  advanced_test_2018_04:
     command: run_backtest -v
     image: ea31337:eurusd-2018
     build:
@@ -49,7 +49,7 @@ services:
     environment:
       BT_MONTHS: 04
       TEST_REPORT_NAME: EA31337_Advanced_201804
-  test_2018_05:
+  advanced_test_2018_05:
     command: run_backtest -v
     image: ea31337:eurusd-2018
     build:
@@ -61,7 +61,7 @@ services:
     environment:
       BT_MONTHS: 05
       TEST_REPORT_NAME: EA31337_Advanced_201805
-  test_2018_06:
+  advanced_test_2018_06:
     command: run_backtest -v
     image: ea31337:eurusd-2018
     build:
@@ -73,7 +73,7 @@ services:
     environment:
       BT_MONTHS: 06
       TEST_REPORT_NAME: EA31337_Advanced_201806
-  test_2018_07:
+  advanced_test_2018_07:
     command: run_backtest -v
     image: ea31337:eurusd-2018
     build:
@@ -85,7 +85,7 @@ services:
     environment:
       BT_MONTHS: 07
       TEST_REPORT_NAME: EA31337_Advanced_201807
-  test_2018_08:
+  advanced_test_2018_08:
     command: run_backtest -v
     image: ea31337:eurusd-2018
     build:
@@ -97,7 +97,7 @@ services:
     environment:
       BT_MONTHS: 08
       TEST_REPORT_NAME: EA31337_Advanced_201808
-  test_2018_09:
+  advanced_test_2018_09:
     command: run_backtest -v
     image: ea31337:eurusd-2018
     build:
@@ -109,7 +109,7 @@ services:
     environment:
       BT_MONTHS: 09
       TEST_REPORT_NAME: EA31337_Advanced_201809
-  test_2018_10:
+  advanced_test_2018_10:
     command: run_backtest -v
     image: ea31337:eurusd-2018
     build:
@@ -121,7 +121,7 @@ services:
     environment:
       BT_MONTHS: 10
       TEST_REPORT_NAME: EA31337_Advanced_201810
-  test_2018_11:
+  advanced_test_2018_11:
     command: run_backtest -v
     image: ea31337:eurusd-2018
     build:
@@ -133,7 +133,7 @@ services:
     environment:
       BT_MONTHS: 11
       TEST_REPORT_NAME: EA31337_Advanced_201811
-  test_2018_12:
+  advanced_test_2018_12:
     command: run_backtest -v
     image: ea31337:eurusd-2018
     build:
