@@ -34,7 +34,7 @@ before_script:
 - docker images
 - test -n "$OPT_TRACE" && set -x || true
 script:
-- bash -n scripts/*.sh; shellcheck scripts/*.sh conf/*/*.sh
+- bash -n scripts/*.sh; shellcheck scripts/*.sh
 - echo $CMD
 - eval $CMD
 after_script:
