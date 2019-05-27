@@ -1,8 +1,10 @@
+# Base params.
+ValidateSettings=1
 # Strategy params.
-Alligator1_Active=1
-Alligator5_Active=1
+Alligator1_Active=0
+Alligator5_Active=0
 Alligator15_Active=1
-Alligator30_Active=1
+Alligator30_Active=0
 Bands1_Active=0
 Bands5_Active=0
 Bands15_Active=0

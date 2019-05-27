@@ -4,49 +4,54 @@ services:
     command: run_backtest -v
     image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ./sets:/opt/sets:rw
     - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
     env_file: ../EA-Tester.ini
     environment:
-      SETFILE: /opt/_results/EA31337-Lite_Fractals.set
+      SETFILE: /opt/sets/EA31337-Lite_Fractals.set
       TEST_REPORT_NAME: "EA31337-Lite_Fractals[2018]"
   Fractals1_Backtest_2018:
     command: run_backtest -v
     image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ./sets:/opt/sets:rw
     - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
     env_file: ../EA-Tester.ini
     environment:
-      SETFILE: /opt/_results/EA31337-Lite_Fractals1.set
+      SETFILE: /opt/sets/EA31337-Lite_Fractals1.set
       TEST_REPORT_NAME: "EA31337-Lite_Fractals1[2018]"
   Fractals5_Backtest_2018:
     command: run_backtest -v
     image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ./sets:/opt/sets:rw
     - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
     env_file: ../EA-Tester.ini
     environment:
-      SETFILE: /opt/_results/EA31337-Lite_Fractals5.set
+      SETFILE: /opt/sets/EA31337-Lite_Fractals5.set
       TEST_REPORT_NAME: "EA31337-Lite_Fractals5[2018]"
   Fractals15_Backtest_2018:
     command: run_backtest -v
     image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ./sets:/opt/sets:rw
     - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
     env_file: ../EA-Tester.ini
     environment:
-      SETFILE: /opt/_results/EA31337-Lite_Fractals15.set
+      SETFILE: /opt/sets/EA31337-Lite_Fractals15.set
       TEST_REPORT_NAME: 'EA31337-Lite_Fractals15[2018]'
   Fractals30_Backtest_2018:
     command: run_backtest -v
     image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ./sets:/opt/sets:rw
     - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
     env_file: ../EA-Tester.ini
     environment:
-      SETFILE: /opt/_results/EA31337-Lite_Fractals30.set
+      SETFILE: /opt/sets/EA31337-Lite_Fractals30.set
       TEST_REPORT_NAME: "EA31337-Lite_Fractals30[2018]"

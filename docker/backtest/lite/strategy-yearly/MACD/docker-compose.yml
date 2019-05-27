@@ -4,49 +4,54 @@ services:
     command: run_backtest -v
     image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ./sets:/opt/sets:rw
     - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
     env_file: ../EA-Tester.ini
     environment:
-      SETFILE: /opt/_results/EA31337-Lite_MACD.set
+      SETFILE: /opt/sets/EA31337-Lite_MACD.set
       TEST_REPORT_NAME: "EA31337-Lite_MACD[2018]"
   MACD1_Backtest_2018:
     command: run_backtest -v
     image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ./sets:/opt/sets:rw
     - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
     env_file: ../EA-Tester.ini
     environment:
-      SETFILE: /opt/_results/EA31337-Lite_MACD1.set
+      SETFILE: /opt/sets/EA31337-Lite_MACD1.set
       TEST_REPORT_NAME: "EA31337-Lite_MACD1[2018]"
   MACD5_Backtest_2018:
     command: run_backtest -v
     image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ./sets:/opt/sets:rw
     - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
     env_file: ../EA-Tester.ini
     environment:
-      SETFILE: /opt/_results/EA31337-Lite_MACD5.set
+      SETFILE: /opt/sets/EA31337-Lite_MACD5.set
       TEST_REPORT_NAME: "EA31337-Lite_MACD5[2018]"
   MACD15_Backtest_2018:
     command: run_backtest -v
     image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ./sets:/opt/sets:rw
     - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
     env_file: ../EA-Tester.ini
     environment:
-      SETFILE: /opt/_results/EA31337-Lite_MACD15.set
+      SETFILE: /opt/sets/EA31337-Lite_MACD15.set
       TEST_REPORT_NAME: 'EA31337-Lite_MACD15[2018]'
   MACD30_Backtest_2018:
     command: run_backtest -v
     image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ./sets:/opt/sets:rw
     - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
     env_file: ../EA-Tester.ini
     environment:
-      SETFILE: /opt/_results/EA31337-Lite_MACD30.set
+      SETFILE: /opt/sets/EA31337-Lite_MACD30.set
       TEST_REPORT_NAME: "EA31337-Lite_MACD30[2018]"

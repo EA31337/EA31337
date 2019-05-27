@@ -4,49 +4,54 @@ services:
     command: run_backtest -v
     image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ./sets:/opt/sets:rw
     - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
     env_file: ../EA-Tester.ini
     environment:
-      SETFILE: /opt/_results/EA31337-Lite_CCI.set
+      SETFILE: /opt/sets/EA31337-Lite_CCI.set
       TEST_REPORT_NAME: "EA31337-Lite_CCI[2018]"
   CCI1_Backtest_2018:
     command: run_backtest -v
     image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ./sets:/opt/sets:rw
     - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
     env_file: ../EA-Tester.ini
     environment:
-      SETFILE: /opt/_results/EA31337-Lite_CCI1.set
+      SETFILE: /opt/sets/EA31337-Lite_CCI1.set
       TEST_REPORT_NAME: "EA31337-Lite_CCI1[2018]"
   CCI5_Backtest_2018:
     command: run_backtest -v
     image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ./sets:/opt/sets:rw
     - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
     env_file: ../EA-Tester.ini
     environment:
-      SETFILE: /opt/_results/EA31337-Lite_CCI5.set
+      SETFILE: /opt/sets/EA31337-Lite_CCI5.set
       TEST_REPORT_NAME: "EA31337-Lite_CCI5[2018]"
   CCI15_Backtest_2018:
     command: run_backtest -v
     image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ./sets:/opt/sets:rw
     - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
     env_file: ../EA-Tester.ini
     environment:
-      SETFILE: /opt/_results/EA31337-Lite_CCI15.set
+      SETFILE: /opt/sets/EA31337-Lite_CCI15.set
       TEST_REPORT_NAME: 'EA31337-Lite_CCI15[2018]'
   CCI30_Backtest_2018:
     command: run_backtest -v
     image: ea31337/ea-tester:EURUSD-2018-DS
     volumes:
+    - ./sets:/opt/sets:rw
     - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
     env_file: ../EA-Tester.ini
     environment:
-      SETFILE: /opt/_results/EA31337-Lite_CCI30.set
+      SETFILE: /opt/sets/EA31337-Lite_CCI30.set
       TEST_REPORT_NAME: "EA31337-Lite_CCI30[2018]"
