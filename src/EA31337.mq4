@@ -52,6 +52,7 @@
 // #include "include\EA31337-classes\Draw.mqh"
 #include "include\EA31337-classes\File.mqh"
 #include "include\EA31337-classes\Indicator.mqh"
+#include "include\EA31337-classes\Indicators.mqh"
 #include "include\EA31337-classes\Order.mqh"
 #include "include\EA31337-classes\Orders.mqh"
 #include "include\EA31337-classes\Market.mqh"
@@ -795,7 +796,7 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       break;
     case INDI_ADX: // Calculates the Average Directional Movement Index indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        adx[index][i][MODE_MAIN]    = iADX(symbol, tf, ADX_Period, ADX_Applied_Price, MODE_MAIN, i);    // Base indicator line
+        adx[index][i][LINE_MAIN]    = iADX(symbol, tf, ADX_Period, ADX_Applied_Price, LINE_MAIN, i);    // Base indicator line
         adx[index][i][MODE_PLUSDI]  = iADX(symbol, tf, ADX_Period, ADX_Applied_Price, MODE_PLUSDI, i);  // +DI indicator line
         adx[index][i][MODE_MINUSDI] = iADX(symbol, tf, ADX_Period, ADX_Applied_Price, MODE_MINUSDI, i); // -DI indicator line
       }
@@ -806,9 +807,9 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       ratio = tf == 30 ? 1.0 : pow(Alligator_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         shift = i + Alligator_Shift + (i == FINAL_ENUM_INDICATOR_INDEX - 1 ? Alligator_Shift_Far : 0);
-        alligator[index][i][LINE_LIPS]  = iMA(symbol, tf, (int) (Alligator_Period_Lips * ratio),  Alligator_Shift_Lips,  Alligator_MA_Method, Alligator_Applied_Price, shift);
-        alligator[index][i][LINE_TEETH] = iMA(symbol, tf, (int) (Alligator_Period_Teeth * ratio), Alligator_Shift_Teeth, Alligator_MA_Method, Alligator_Applied_Price, shift);
-        alligator[index][i][LINE_JAW]   = iMA(symbol, tf, (int) (Alligator_Period_Jaw * ratio),   Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, shift);
+        alligator[index][i][LINE_LIPS]  = Indicators::iMA(symbol, tf, (int) (Alligator_Period_Lips * ratio),  Alligator_Shift_Lips,  Alligator_MA_Method, Alligator_Applied_Price, shift);
+        alligator[index][i][LINE_TEETH] = Indicators::iMA(symbol, tf, (int) (Alligator_Period_Teeth * ratio), Alligator_Shift_Teeth, Alligator_MA_Method, Alligator_Applied_Price, shift);
+        alligator[index][i][LINE_JAW]   = Indicators::iMA(symbol, tf, (int) (Alligator_Period_Jaw * ratio),   Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, shift);
         /**
         if (VerboseDebug) PrintFormat("%d: iMA(%s, %d, %d (%g), %d, %d, %d, %d) = %g",
           i, symbol, tf, (int) (Alligator_Period_Jaw * ratio), ratio, Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, shift, alligator[index][i][LINE_JAW]);
@@ -846,9 +847,9 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       //PrintFormat("tf: %s, ratio1/ratio2: %g/%g; %g/%g; fabs(%d - %d)", _chart.TfToString(), ratio, ratio2, Bands_Period * ratio, Bands_Deviation * ratio2, _chart.TfToIndex(PERIOD_M30), _chart.TfToIndex(tf));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         shift = i + Bands_Shift + (i == FINAL_ENUM_INDICATOR_INDEX - 1 ? Bands_Shift_Far : 0);
-        bands[index][i][BAND_BASE]  = iBands(symbol, tf, (int) (Bands_Period * ratio), Bands_Deviation * ratio2, 0, Bands_Applied_Price, BAND_BASE,  shift);
-        bands[index][i][BAND_UPPER] = iBands(symbol, tf, (int) (Bands_Period * ratio), Bands_Deviation * ratio2, 0, Bands_Applied_Price, BAND_UPPER, shift);
-        bands[index][i][BAND_LOWER] = iBands(symbol, tf, (int) (Bands_Period * ratio), Bands_Deviation * ratio2, 0, Bands_Applied_Price, BAND_LOWER, shift);
+        bands[index][i][BAND_BASE]  = Indicators::iBands(symbol, tf, (int) (Bands_Period * ratio), Bands_Deviation * ratio2, 0, Bands_Applied_Price, BAND_BASE,  shift);
+        bands[index][i][BAND_UPPER] = Indicators::iBands(symbol, tf, (int) (Bands_Period * ratio), Bands_Deviation * ratio2, 0, Bands_Applied_Price, BAND_UPPER, shift);
+        bands[index][i][BAND_LOWER] = Indicators::iBands(symbol, tf, (int) (Bands_Period * ratio), Bands_Deviation * ratio2, 0, Bands_Applied_Price, BAND_LOWER, shift);
       }
       success = (bool)bands[index][CURR][BAND_BASE];
       if (VerboseDebug) PrintFormat("Bands M%d: %s", tf, Array::ArrToString3D(bands, ",", Digits));
@@ -873,14 +874,14 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
     case INDI_CCI: // Calculates the Commodity Channel Index indicator.
       ratio = tf == 30 ? 1.0 : pow(CCI_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        cci[index][i] = iCCI(symbol, tf, (int) (CCI_Period * ratio), CCI_Applied_Price, i + CCI_Shift);
+        cci[index][i] = Indicators::iCCI(symbol, tf, (int) (CCI_Period * ratio), CCI_Applied_Price, i + CCI_Shift);
       }
       success = (bool) cci[index][CURR];
       break;
     case INDI_DEMARKER: // Calculates the DeMarker indicator.
       ratio = tf == 30 ? 1.0 : pow(DeMarker_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        demarker[index][i] = iDeMarker(symbol, tf, (int) (DeMarker_Period * ratio), i + DeMarker_Shift);
+        demarker[index][i] = Indicators::iDeMarker(symbol, tf, (int) (DeMarker_Period * ratio), i + DeMarker_Shift);
       }
       // success = (bool) demarker[index][CURR] + demarker[index][PREV] + demarker[index][FAR];
       // PrintFormat("Period: %d, DeMarker: %g", period, demarker[index][CURR]);
@@ -899,11 +900,11 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       ratio = tf == 30 ? 1.0 : pow(Envelopes_MA_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       ratio2 = tf == 30 ? 1.0 : pow(Envelopes_Deviation_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        envelopes[index][i][MODE_MAIN]  = iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, MODE_MAIN,  i + Envelopes_Shift);
-        envelopes[index][i][LINE_UPPER] = iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, LINE_UPPER, i + Envelopes_Shift);
-        envelopes[index][i][LINE_LOWER]  = iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, LINE_LOWER, i + Envelopes_Shift);
+        envelopes[index][i][LINE_MAIN]  = Indicators::iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, LINE_MAIN,  i + Envelopes_Shift);
+        envelopes[index][i][LINE_UPPER] = Indicators::iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, LINE_UPPER, i + Envelopes_Shift);
+        envelopes[index][i][LINE_LOWER] = Indicators::iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, LINE_LOWER, i + Envelopes_Shift);
       }
-      success = (bool) envelopes[index][CURR][MODE_MAIN];
+      success = (bool) envelopes[index][CURR][LINE_MAIN];
       if (VerboseDebug) PrintFormat("Envelopes M%d: %s", tf, Array::ArrToString3D(envelopes, ",", Digits));
       break;
 #ifdef __advanced__
@@ -916,38 +917,38 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
 #endif
     case INDI_FRACTALS: // Calculates the Fractals indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        fractals[index][i][LINE_LOWER] = iFractals(symbol, tf, LINE_LOWER, i + Fractals_Shift);
-        fractals[index][i][LINE_UPPER] = iFractals(symbol, tf, LINE_UPPER, i + Fractals_Shift);
+        fractals[index][i][LINE_LOWER] = Indicators::iFractals(symbol, tf, LINE_LOWER, i + Fractals_Shift);
+        fractals[index][i][LINE_UPPER] = Indicators::iFractals(symbol, tf, LINE_UPPER, i + Fractals_Shift);
       }
       if (VerboseDebug) PrintFormat("Fractals M%d: %s", tf, Array::ArrToString3D(fractals, ",", Digits));
       break;
     case INDI_GATOR: // Calculates the Gator oscillator.
       // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        gator[index][i][LINE_LIPS]  = iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
-        gator[index][i][LINE_TEETH] = iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
-        gator[index][i][LINE_JAW] = iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
+        gator[index][i][LINE_LIPS]  = Indicators::iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, LINE_LIPS,  Alligator_Shift);
+        gator[index][i][LINE_TEETH] = Indicators::iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, LINE_TEETH, Alligator_Shift);
+        gator[index][i][LINE_JAW]   = Indicators::iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, LINE_JAW,   Alligator_Shift);
       }
       success = (bool)gator[index][CURR][LINE_JAW];
       break;
     case INDI_ICHIMOKU: // Calculates the Ichimoku Kinko Hyo indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        ichimoku[index][i][MODE_TENKANSEN]   = iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_TENKANSEN, i);
-        ichimoku[index][i][MODE_KIJUNSEN]    = iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_KIJUNSEN, i);
-        ichimoku[index][i][MODE_SENKOUSPANA] = iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_SENKOUSPANA, i);
-        ichimoku[index][i][MODE_SENKOUSPANB] = iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_SENKOUSPANB, i);
-        ichimoku[index][i][MODE_CHIKOUSPAN]  = iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, MODE_CHIKOUSPAN, i);
+        ichimoku[index][i][LINE_TENKANSEN]   = Indicators::iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, LINE_TENKANSEN, i);
+        ichimoku[index][i][LINE_KIJUNSEN]    = Indicators::iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, LINE_KIJUNSEN, i);
+        ichimoku[index][i][LINE_SENKOUSPANA] = Indicators::iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, LINE_SENKOUSPANA, i);
+        ichimoku[index][i][LINE_SENKOUSPANB] = Indicators::iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, LINE_SENKOUSPANB, i);
+        ichimoku[index][i][LINE_CHIKOUSPAN]  = Indicators::iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, LINE_CHIKOUSPAN, i);
       }
-      success = (bool)ichimoku[index][CURR][MODE_TENKANSEN];
+      success = (bool)ichimoku[index][CURR][LINE_TENKANSEN];
       break;
     case INDI_MA: // Calculates the Moving Average indicator.
       // Calculate MA Fast.
       ratio = tf == 30 ? 1.0 : pow(MA_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         shift = i + MA_Shift + (i == FINAL_ENUM_INDICATOR_INDEX - 1 ? MA_Shift_Far : 0);
-        ma_fast[index][i]   = iMA(symbol, tf, (int) (MA_Period_Fast * ratio),   MA_Shift_Fast,   MA_Method, MA_Applied_Price, shift);
-        ma_medium[index][i] = iMA(symbol, tf, (int) (MA_Period_Medium * ratio), MA_Shift_Medium, MA_Method, MA_Applied_Price, shift);
-        ma_slow[index][i]   = iMA(symbol, tf, (int) (MA_Period_Slow * ratio),   MA_Shift_Slow,   MA_Method, MA_Applied_Price, shift);
+        ma_fast[index][i]   = Indicators::iMA(symbol, tf, (int) (MA_Period_Fast * ratio),   MA_Shift_Fast,   MA_Method, MA_Applied_Price, shift);
+        ma_medium[index][i] = Indicators::iMA(symbol, tf, (int) (MA_Period_Medium * ratio), MA_Shift_Medium, MA_Method, MA_Applied_Price, shift);
+        ma_slow[index][i]   = Indicators::iMA(symbol, tf, (int) (MA_Period_Slow * ratio),   MA_Shift_Slow,   MA_Method, MA_Applied_Price, shift);
         /*
         if (tf == Period() && i < FINAL_ENUM_INDICATOR_INDEX - 1) {
           Draw::TLine(StringFormat("%s%s%d", symbol, "MA Fast", i),   ma_fast[index][i],   ma_fast[index][i+1],    iTime(NULL, 0, shift), iTime(NULL, 0, shift+1), clrBlue);
@@ -966,11 +967,11 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       ratio = tf == 30 ? 1.0 : pow(MACD_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         shift = i + MACD_Shift + (i == FINAL_ENUM_INDICATOR_INDEX - 1 ? MACD_Shift_Far : 0);
-        macd[index][i][MODE_MAIN]   = iMACD(symbol, tf, (int) (MACD_Period_Fast * ratio), (int) (MACD_Period_Slow * ratio), (int) (MACD_Period_Signal * ratio), MACD_Applied_Price, MODE_MAIN,   shift);
-        macd[index][i][MODE_SIGNAL] = iMACD(symbol, tf, (int) (MACD_Period_Fast * ratio), (int) (MACD_Period_Slow * ratio), (int) (MACD_Period_Signal * ratio), MACD_Applied_Price, MODE_SIGNAL, shift);
+        macd[index][i][LINE_MAIN]   = Indicators::iMACD(symbol, tf, (int) (MACD_Period_Fast * ratio), (int) (MACD_Period_Slow * ratio), (int) (MACD_Period_Signal * ratio), MACD_Applied_Price, LINE_MAIN,   shift);
+        macd[index][i][LINE_SIGNAL] = Indicators::iMACD(symbol, tf, (int) (MACD_Period_Fast * ratio), (int) (MACD_Period_Slow * ratio), (int) (MACD_Period_Signal * ratio), MACD_Applied_Price, LINE_SIGNAL, shift);
       }
       if (VerboseDebug) PrintFormat("MACD M%d: %s", tf, Array::ArrToString3D(macd, ",", Digits));
-      success = (bool)macd[index][CURR][MODE_MAIN];
+      success = (bool)macd[index][CURR][LINE_MAIN];
       break;
     case INDI_MFI: // Calculates the Money Flow Index indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
@@ -989,13 +990,13 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
     */
     case INDI_OBV: // Calculates the On Balance Volume indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        obv[index][i] = iOBV(symbol, tf, OBV_Applied_Price, i);
+        obv[index][i] = Indicators::iOBV(symbol, tf, OBV_Applied_Price, i);
       }
       success = (bool) obv[index][CURR];
       break;
     case INDI_OSMA: // Calculates the Moving Average of Oscillator indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        osma[index][i] = iOsMA(symbol, tf, OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price, i);
+        osma[index][i] = Indicators::iOsMA(symbol, tf, OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price, i);
       }
       success = (bool) osma[index][CURR];
       break;
@@ -1004,7 +1005,7 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       // sid = GetStrategyViaIndicator(RSI, tf); rsi_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
       ratio = tf == 30 ? 1.0 : pow(RSI_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        rsi[index][i] = iRSI(symbol, tf, (int) (RSI_Period * ratio), RSI_Applied_Price, i + RSI_Shift);
+        rsi[index][i] = Indicators::iRSI(symbol, tf, (int) (RSI_Period * ratio), RSI_Applied_Price, i + RSI_Shift);
         if (rsi[index][i] > rsi_stats[index][LINE_UPPER]) rsi_stats[index][LINE_UPPER] = rsi[index][i]; // Calculate maximum value.
         if (rsi[index][i] < rsi_stats[index][LINE_LOWER] || rsi_stats[index][LINE_LOWER] == 0) rsi_stats[index][LINE_LOWER] = rsi[index][i]; // Calculate minimum value.
       }
@@ -1014,25 +1015,25 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       success = (bool) rsi[index][CURR] + rsi[index][PREV] + rsi[index][FAR];
       break;
     case INDI_RVI: // Calculates the Relative Strength Index indicator.
-      rvi[index][CURR][MODE_MAIN]   = iRVI(symbol, tf, 10, MODE_MAIN, CURR);
-      rvi[index][PREV][MODE_MAIN]   = iRVI(symbol, tf, 10, MODE_MAIN, PREV + RVI_Shift);
-      rvi[index][FAR][MODE_MAIN]    = iRVI(symbol, tf, 10, MODE_MAIN, FAR + RVI_Shift + RVI_Shift_Far);
-      rvi[index][CURR][MODE_SIGNAL] = iRVI(symbol, tf, 10, MODE_SIGNAL, CURR);
-      rvi[index][PREV][MODE_SIGNAL] = iRVI(symbol, tf, 10, MODE_SIGNAL, PREV + RVI_Shift);
-      rvi[index][FAR][MODE_SIGNAL]  = iRVI(symbol, tf, 10, MODE_SIGNAL, FAR + RVI_Shift + RVI_Shift_Far);
-      success = (bool) rvi[index][CURR][MODE_MAIN];
+      rvi[index][CURR][LINE_MAIN]   = Indicators::iRVI(symbol, tf, 10, LINE_MAIN, CURR);
+      rvi[index][PREV][LINE_MAIN]   = Indicators::iRVI(symbol, tf, 10, LINE_MAIN, PREV + RVI_Shift);
+      rvi[index][FAR][LINE_MAIN]    = Indicators::iRVI(symbol, tf, 10, LINE_MAIN, FAR + RVI_Shift + RVI_Shift_Far);
+      rvi[index][CURR][LINE_SIGNAL] = Indicators::iRVI(symbol, tf, 10, LINE_SIGNAL, CURR);
+      rvi[index][PREV][LINE_SIGNAL] = Indicators::iRVI(symbol, tf, 10, LINE_SIGNAL, PREV + RVI_Shift);
+      rvi[index][FAR][LINE_SIGNAL]  = Indicators::iRVI(symbol, tf, 10, LINE_SIGNAL, FAR + RVI_Shift + RVI_Shift_Far);
+      success = (bool) rvi[index][CURR][LINE_MAIN];
       break;
     case INDI_SAR: // Calculates the Parabolic Stop and Reverse system indicator.
       ratio = tf == 30 ? 1.0 : pow(SAR_Step_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex() + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        sar[index][i] = iSAR(symbol, tf, SAR_Step * ratio, SAR_Maximum_Stop, i + SAR_Shift);
+        sar[index][i] = Indicators::iSAR(symbol, tf, SAR_Step * ratio, SAR_Maximum_Stop, i + SAR_Shift);
       }
       if (VerboseDebug) PrintFormat("SAR M%d: %s", tf, Array::ArrToString2D(sar, ",", Digits));
       success = (bool) sar[index][CURR] + sar[index][PREV] + sar[index][FAR];
       break;
     case INDI_STDDEV: // Calculates the Standard Deviation indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        stddev[index][i] = iStdDev(symbol, tf, StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price, i);
+        stddev[index][i] = Indicators::iStdDev(symbol, tf, StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price, i);
       }
       if (VerboseDebug) PrintFormat("StdDev M%d: %s", tf, Array::ArrToString2D(stddev, ",", Digits));
       success = stddev[index][CURR];
@@ -1040,17 +1041,17 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
     case INDI_STOCHASTIC: // Calculates the Stochastic Oscillator.
       // TODO
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        stochastic[index][i][MODE_MAIN]   = iStochastic(symbol, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, MODE_MAIN, i);
-        stochastic[index][i][MODE_SIGNAL] = iStochastic(symbol, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, MODE_SIGNAL, i);
+        stochastic[index][i][LINE_MAIN]   = Indicators::iStochastic(symbol, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, LINE_MAIN, i);
+        stochastic[index][i][LINE_SIGNAL] = Indicators::iStochastic(symbol, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, LINE_SIGNAL, i);
       }
       if (VerboseDebug) PrintFormat("Stochastic M%d: %s", tf, Array::ArrToString3D(stochastic, ",", Digits));
-      success = stochastic[index][CURR][MODE_MAIN];
+      success = stochastic[index][CURR][LINE_MAIN];
       break;
     case INDI_WPR: // Calculates the  Larry Williams' Percent Range.
       // Update the Larry Williams' Percent Range indicator values.
       ratio = tf == 30 ? 1.0 : pow(WPR_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex() + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        wpr[index][i] = -iWPR(symbol, tf, (int) (WPR_Period * ratio), i + WPR_Shift);
+        wpr[index][i] = -Indicators::iWPR(symbol, tf, (int) (WPR_Period * ratio), i + WPR_Shift);
       }
       if (VerboseDebug) PrintFormat("%s: WPR M%d: %s", DateTime::TimeToStr(_chart.GetBarTime()), tf, Array::ArrToString2D(wpr, ",", Digits));
       success = (bool) wpr[index][CURR] + wpr[index][PREV] + wpr[index][FAR];
@@ -1682,14 +1683,14 @@ bool Trade_ADX(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ADX, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_ADX, _chart.GetTf(), 0.0);
   switch (cmd) {
-      //   if(iADX(NULL,0,14,PRICE_HIGH,MODE_MAIN,0)>iADX(NULL,0,14,PRICE_HIGH,MODE_PLUSDI,0)) return(0);
+      //   if(iADX(NULL,0,14,PRICE_HIGH,LINE_MAIN,0)>iADX(NULL,0,14,PRICE_HIGH,MODE_PLUSDI,0)) return(0);
     /*
       //5. Average Directional Movement Index - ADX
       //Buy: +DI line is above -DI line, ADX is more than a certain value and grows (i.e. trend strengthens)
       //Sell: -DI line is above +DI line, ADX is more than a certain value and grows (i.e. trend strengthens)
-      if (iADX(NULL,piadx,piadu,PRICE_CLOSE,MODE_MINUSDI,0)<iADX(NULL,piadx,piadu,PRICE_CLOSE,MODE_PLUSDI,0)&&iADX(NULL,piadx,piadu,PRICE_CLOSE,MODE_MAIN,0)>=minadx&&iADX(NULL,piadx,piadu,PRICE_CLOSE,MODE_MAIN,0)>iADX(NULL,piadx,piadu,PRICE_CLOSE,MODE_MAIN,1))
+      if (iADX(NULL,piadx,piadu,PRICE_CLOSE,MODE_MINUSDI,0)<iADX(NULL,piadx,piadu,PRICE_CLOSE,MODE_PLUSDI,0)&&iADX(NULL,piadx,piadu,PRICE_CLOSE,LINE_MAIN,0)>=minadx&&iADX(NULL,piadx,piadu,PRICE_CLOSE,LINE_MAIN,0)>iADX(NULL,piadx,piadu,PRICE_CLOSE,LINE_MAIN,1))
       {f5=1;}
-      if (iADX(NULL,piadx,piadu,PRICE_CLOSE,MODE_MINUSDI,0)>iADX(NULL,piadx,piadu,PRICE_CLOSE,MODE_PLUSDI,0)&&iADX(NULL,piadx,piadu,PRICE_CLOSE,MODE_MAIN,0)>=minadx&&iADX(NULL,piadx,piadu,PRICE_CLOSE,MODE_MAIN,0)>iADX(NULL,piadx,piadu,PRICE_CLOSE,MODE_MAIN,1))
+      if (iADX(NULL,piadx,piadu,PRICE_CLOSE,MODE_MINUSDI,0)>iADX(NULL,piadx,piadu,PRICE_CLOSE,MODE_PLUSDI,0)&&iADX(NULL,piadx,piadu,PRICE_CLOSE,LINE_MAIN,0)>=minadx&&iADX(NULL,piadx,piadu,PRICE_CLOSE,LINE_MAIN,0)>iADX(NULL,piadx,piadu,PRICE_CLOSE,LINE_MAIN,1))
       {f5=-1;}
     */
     case ORDER_TYPE_BUY:
@@ -2220,28 +2221,28 @@ bool Trade_Envelopes(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMP
   switch (cmd) {
     case ORDER_TYPE_BUY:
       result = Low[CURR] < envelopes[period][CURR][LINE_LOWER] || Low[PREV] < envelopes[period][CURR][LINE_LOWER]; // price low was below the lower band
-      // result = result || (envelopes[period][CURR][MODE_MAIN] > envelopes[period][FAR][MODE_MAIN] && Open[CURR] > envelopes[period][CURR][LINE_UPPER]);
+      // result = result || (envelopes[period][CURR][LINE_MAIN] > envelopes[period][FAR][LINE_MAIN] && Open[CURR] > envelopes[period][CURR][LINE_UPPER]);
       if (signal_method != 0) {
         if (METHOD(signal_method, 0)) result &= Open[CURR] > envelopes[period][CURR][LINE_LOWER]; // FIXME
-        if (METHOD(signal_method, 1)) result &= envelopes[period][CURR][MODE_MAIN] < envelopes[period][PREV][MODE_MAIN];
+        if (METHOD(signal_method, 1)) result &= envelopes[period][CURR][LINE_MAIN] < envelopes[period][PREV][LINE_MAIN];
         if (METHOD(signal_method, 2)) result &= envelopes[period][CURR][LINE_LOWER] < envelopes[period][PREV][LINE_LOWER];
         if (METHOD(signal_method, 3)) result &= envelopes[period][CURR][LINE_UPPER] < envelopes[period][PREV][LINE_UPPER];
         if (METHOD(signal_method, 4)) result &= envelopes[period][CURR][LINE_UPPER] - envelopes[period][CURR][LINE_LOWER] > envelopes[period][PREV][LINE_UPPER] - envelopes[period][PREV][LINE_LOWER];
-        if (METHOD(signal_method, 5)) result &= _chart.GetAsk() < envelopes[period][CURR][MODE_MAIN];
+        if (METHOD(signal_method, 5)) result &= _chart.GetAsk() < envelopes[period][CURR][LINE_MAIN];
         if (METHOD(signal_method, 6)) result &= Close[CURR] < envelopes[period][CURR][LINE_UPPER];
         //if (METHOD(signal_method, 7)) result &= _chart.GetAsk() > Close[PREV];
       }
       break;
     case ORDER_TYPE_SELL:
       result = High[CURR] > envelopes[period][CURR][LINE_UPPER] || High[PREV] > envelopes[period][CURR][LINE_UPPER]; // price high was above the upper band
-      // result = result || (envelopes[period][CURR][MODE_MAIN] < envelopes[period][FAR][MODE_MAIN] && Open[CURR] < envelopes[period][CURR][LINE_LOWER]);
+      // result = result || (envelopes[period][CURR][LINE_MAIN] < envelopes[period][FAR][LINE_MAIN] && Open[CURR] < envelopes[period][CURR][LINE_LOWER]);
       if (signal_method != 0) {
         if (METHOD(signal_method, 0)) result &= Open[CURR] < envelopes[period][CURR][LINE_UPPER]; // FIXME
-        if (METHOD(signal_method, 1)) result &= envelopes[period][CURR][MODE_MAIN] > envelopes[period][PREV][MODE_MAIN];
+        if (METHOD(signal_method, 1)) result &= envelopes[period][CURR][LINE_MAIN] > envelopes[period][PREV][LINE_MAIN];
         if (METHOD(signal_method, 2)) result &= envelopes[period][CURR][LINE_LOWER] > envelopes[period][PREV][LINE_LOWER];
         if (METHOD(signal_method, 3)) result &= envelopes[period][CURR][LINE_UPPER] > envelopes[period][PREV][LINE_UPPER];
         if (METHOD(signal_method, 4)) result &= envelopes[period][CURR][LINE_UPPER] - envelopes[period][CURR][LINE_LOWER] > envelopes[period][PREV][LINE_UPPER] - envelopes[period][PREV][LINE_LOWER];
-        if (METHOD(signal_method, 5)) result &= _chart.GetAsk() > envelopes[period][CURR][MODE_MAIN];
+        if (METHOD(signal_method, 5)) result &= _chart.GetAsk() > envelopes[period][CURR][LINE_MAIN];
         if (METHOD(signal_method, 6)) result &= Close[CURR] > envelopes[period][CURR][LINE_UPPER];
         //if (METHOD(signal_method, 7)) result &= _chart.GetAsk() < Close[PREV];
       }
@@ -2511,37 +2512,37 @@ bool Trade_MACD(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, d
           //VERSION EXISTS, THAT THE SIGNAL TO BUY IS TRUE ONLY IF MACD<0, SIGNAL TO SELL - IF MACD>0
           //Buy: MACD rises above the signal line
           //Sell: MACD falls below the signal line
-          if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_MAIN,1)<iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_SIGNAL,1)
-          && iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_MAIN,0)>=iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_SIGNAL,0))
+          if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,1)<iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_SIGNAL,1)
+          && iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,0)>=iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_SIGNAL,0))
           {f20=1;}
-          if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_MAIN,1)>iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_SIGNAL,1)
-          && iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_MAIN,0)<=iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_SIGNAL,0))
+          if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,1)>iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_SIGNAL,1)
+          && iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,0)<=iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_SIGNAL,0))
           {f20=-1;}
 
           //21. MACD (2)
           //Buy: crossing 0 upwards
           //Sell: crossing 0 downwards
-          if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_MAIN,1)<0&&iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_MAIN,0)>=0)
+          if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,1)<0&&iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,0)>=0)
           {f21=1;}
-          if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_MAIN,1)>0&&iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_MAIN,0)<=0)
+          if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,1)>0&&iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,0)<=0)
           {f21=-1;}
     */
     case ORDER_TYPE_BUY:
-      result = macd[period][CURR][MODE_MAIN] > macd[period][CURR][MODE_SIGNAL] + gap; // MACD rises above the signal line.
+      result = macd[period][CURR][LINE_MAIN] > macd[period][CURR][LINE_SIGNAL] + gap; // MACD rises above the signal line.
       if (signal_method != 0) {
-        if (METHOD(signal_method, 0)) result &= macd[period][FAR][MODE_MAIN] < macd[period][FAR][MODE_SIGNAL];
-        if (METHOD(signal_method, 1)) result &= macd[period][CURR][MODE_MAIN] >= 0;
-        if (METHOD(signal_method, 2)) result &= macd[period][PREV][MODE_MAIN] < 0;
+        if (METHOD(signal_method, 0)) result &= macd[period][FAR][LINE_MAIN] < macd[period][FAR][LINE_SIGNAL];
+        if (METHOD(signal_method, 1)) result &= macd[period][CURR][LINE_MAIN] >= 0;
+        if (METHOD(signal_method, 2)) result &= macd[period][PREV][LINE_MAIN] < 0;
         if (METHOD(signal_method, 3)) result &= ma_fast[period][CURR] > ma_fast[period][PREV];
         if (METHOD(signal_method, 4)) result &= ma_fast[period][CURR] > ma_medium[period][CURR];
       }
       break;
     case ORDER_TYPE_SELL:
-      result = macd[period][CURR][MODE_MAIN] < macd[period][CURR][MODE_SIGNAL] - gap; // MACD falls below the signal line.
+      result = macd[period][CURR][LINE_MAIN] < macd[period][CURR][LINE_SIGNAL] - gap; // MACD falls below the signal line.
       if (signal_method != 0) {
-        if (METHOD(signal_method, 0)) result &= macd[period][FAR][MODE_MAIN] > macd[period][FAR][MODE_SIGNAL];
-        if (METHOD(signal_method, 1)) result &= macd[period][CURR][MODE_MAIN] <= 0;
-        if (METHOD(signal_method, 2)) result &= macd[period][PREV][MODE_MAIN] > 0;
+        if (METHOD(signal_method, 0)) result &= macd[period][FAR][LINE_MAIN] > macd[period][FAR][LINE_SIGNAL];
+        if (METHOD(signal_method, 1)) result &= macd[period][CURR][LINE_MAIN] <= 0;
+        if (METHOD(signal_method, 2)) result &= macd[period][PREV][LINE_MAIN] > 0;
         if (METHOD(signal_method, 3)) result &= ma_fast[period][CURR] < ma_fast[period][PREV];
         if (METHOD(signal_method, 4)) result &= ma_fast[period][CURR] < ma_medium[period][CURR];
       }
@@ -2777,11 +2778,11 @@ bool Trade_RVI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
       //RECOMMENDED TO USE WITH A TREND INDICATOR
       //Buy: main line (green) crosses signal (red) upwards
       //Sell: main line (green) crosses signal (red) downwards
-      if(iRVI(NULL,pirvi,pirviu,MODE_MAIN,1)<iRVI(NULL,pirvi,pirviu,MODE_SIGNAL,1)
-      && iRVI(NULL,pirvi,pirviu,MODE_MAIN,0)>=iRVI(NULL,pirvi,pirviu,MODE_SIGNAL,0))
+      if(iRVI(NULL,pirvi,pirviu,LINE_MAIN,1)<iRVI(NULL,pirvi,pirviu,LINE_SIGNAL,1)
+      && iRVI(NULL,pirvi,pirviu,LINE_MAIN,0)>=iRVI(NULL,pirvi,pirviu,LINE_SIGNAL,0))
       {f26=1;}
-      if(iRVI(NULL,pirvi,pirviu,MODE_MAIN,1)>iRVI(NULL,pirvi,pirviu,MODE_SIGNAL,1)
-      && iRVI(NULL,pirvi,pirviu,MODE_MAIN,0)<=iRVI(NULL,pirvi,pirviu,MODE_SIGNAL,0))
+      if(iRVI(NULL,pirvi,pirviu,LINE_MAIN,1)>iRVI(NULL,pirvi,pirviu,LINE_SIGNAL,1)
+      && iRVI(NULL,pirvi,pirviu,LINE_MAIN,0)<=iRVI(NULL,pirvi,pirviu,LINE_SIGNAL,0))
       {f26=-1;}
     */
     case ORDER_TYPE_BUY:
@@ -2928,28 +2929,28 @@ bool Trade_Stochastic(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EM
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_STOCHASTIC, _chart.GetTf(), 0.0);
   switch (cmd) {
       /* TODO:
-            //   if(iStochastic(NULL,0,5,3,3,MODE_SMA,0,MODE_MAIN,0)>iStochastic(NULL,0,5,3,3,MODE_SMA,0,MODE_SIGNAL,0)) return(0);
+            //   if(iStochastic(NULL,0,5,3,3,MODE_SMA,0,LINE_MAIN,0)>iStochastic(NULL,0,5,3,3,MODE_SMA,0,LINE_SIGNAL,0)) return(0);
             // if(stoch4h<stoch4h2){ //Sell signal
             // if(stoch4h>stoch4h2){//Buy signal
 
             //28. Stochastic Oscillator (1)
             //Buy: main lline rises above 20 after it fell below this point
             //Sell: main line falls lower than 80 after it rose above this point
-            if(iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,MODE_MAIN,1)<20
-            &&iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,MODE_MAIN,0)>=20)
+            if(iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_MAIN,1)<20
+            &&iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_MAIN,0)>=20)
             {f28=1;}
-            if(iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,MODE_MAIN,1)>80
-            &&iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,MODE_MAIN,0)<=80)
+            if(iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_MAIN,1)>80
+            &&iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_MAIN,0)<=80)
             {f28=-1;}
 
             //29. Stochastic Oscillator (2)
             //Buy: main line goes above the signal line
             //Sell: signal line goes above the main line
-            if(iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,MODE_MAIN,1)<iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,MODE_SIGNAL,1)
-            && iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,MODE_MAIN,0)>=iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,MODE_SIGNAL,0))
+            if(iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_MAIN,1)<iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_SIGNAL,1)
+            && iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_MAIN,0)>=iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_SIGNAL,0))
             {f29=1;}
-            if(iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,MODE_MAIN,1)>iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,MODE_SIGNAL,1)
-            && iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,MODE_MAIN,0)<=iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,MODE_SIGNAL,0))
+            if(iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_MAIN,1)>iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_SIGNAL,1)
+            && iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_MAIN,0)<=iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_SIGNAL,0))
             {f29=-1;}
       */
     case ORDER_TYPE_BUY:
@@ -3110,7 +3111,7 @@ bool CheckMarketCondition1(Chart *_chart, ENUM_ORDER_TYPE cmd, int condition = 0
   if (METHOD(condition,  4)) result &= UpdateIndicator(_chart, INDI_MA)        && ((cmd == ORDER_TYPE_BUY && ma_slow[period][CURR] > ma_slow[period][PREV]) || (cmd == ORDER_TYPE_SELL && ma_slow[period][CURR] < ma_slow[period][PREV]));
   if (METHOD(condition,  5)) result &= ((cmd == ORDER_TYPE_BUY && _chart.GetAsk() < Open[CURR]) || (cmd == ORDER_TYPE_SELL && _chart.GetAsk() > Open[CURR]));
   if (METHOD(condition,  6)) result &= UpdateIndicator(_chart, INDI_BANDS)     && ((cmd == ORDER_TYPE_BUY && Open[CURR] < bands[period][CURR][BAND_BASE]) || (cmd == ORDER_TYPE_SELL && Open[CURR] > bands[period][CURR][BAND_BASE]));
-  if (METHOD(condition,  7)) result &= UpdateIndicator(_chart, INDI_ENVELOPES) && ((cmd == ORDER_TYPE_BUY && Open[CURR] < envelopes[period][CURR][MODE_MAIN]) || (cmd == ORDER_TYPE_SELL && Open[CURR] > envelopes[period][CURR][MODE_MAIN]));
+  if (METHOD(condition,  7)) result &= UpdateIndicator(_chart, INDI_ENVELOPES) && ((cmd == ORDER_TYPE_BUY && Open[CURR] < envelopes[period][CURR][LINE_MAIN]) || (cmd == ORDER_TYPE_SELL && Open[CURR] > envelopes[period][CURR][LINE_MAIN]));
   if (METHOD(condition,  8)) result &= UpdateIndicator(_chart, INDI_DEMARKER)  && ((cmd == ORDER_TYPE_BUY && demarker[period][CURR] < 0.5) || (cmd == ORDER_TYPE_SELL && demarker[period][CURR] > 0.5));
   if (METHOD(condition,  9)) result &= UpdateIndicator(_chart, INDI_WPR)       && ((cmd == ORDER_TYPE_BUY && wpr[period][CURR] > 50) || (cmd == ORDER_TYPE_SELL && wpr[period][CURR] < 50));
   if (METHOD(condition, 10)) result &= cmd == Convert::ValueToOp(curr_trend);
@@ -3372,11 +3373,11 @@ bool UpdateTrailingStops(Trade *_trade) {
         // if (MinimalizeLosses && Order::GetOrderProfit() > GetMinStopLevel()) {
           if ((OrderType() == ORDER_TYPE_BUY && OrderStopLoss() < market.GetBid()) ||
              (OrderType() == ORDER_TYPE_SELL && OrderStopLoss() > market.GetAsk())) {
-            result = OrderModify(OrderTicket(), OrderOpenPrice(), OrderOpenPrice() - OrderCommission() * Point, OrderTakeProfit(), 0, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell));
+            result = OrderModify(Order::OrderTicket(), Order::OrderOpenPrice(), Order::OrderOpenPrice() - Order::OrderCommission() * Point, Order::OrderTakeProfit(), 0, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell));
             if (!result && err_code > 1) {
              if (VerboseErrors) Print(__FUNCTION__, ": Error: OrderModify(): [MinimalizeLosses] ", Terminal::GetErrorText(err_code));
                if (VerboseDebug)
-                 Print(__FUNCTION__ + ": Error: OrderModify(", OrderTicket(), ", ", OrderOpenPrice(), ", ", OrderOpenPrice() - OrderCommission() * Point, ", ", OrderTakeProfit(), ", ", 0, ", ", Order::GetOrderColor(EMPTY, ColorBuy, ColorSell), "); ");
+                 Print(__FUNCTION__ + ": Error: OrderModify(", OrderTicket(), ", ", OrderOpenPrice(), ", ", OrderOpenPrice() - Order::OrderCommission() * Point, ", ", OrderTakeProfit(), ", ", 0, ", ", Order::GetOrderColor(EMPTY, ColorBuy, ColorSell), "); ");
             } else {
               if (VerboseTrace) Print(__FUNCTION__ + ": MinimalizeLosses: ", Order::OrderTypeToString((ENUM_ORDER_TYPE) OrderType()));
             }
@@ -3973,7 +3974,7 @@ bool TradeAllowed() {
   }
   #endif
   #ifdef __profiler__ PROFILER_START #endif
-  if (Bars < 100) {
+  if (chart.GetBars() < 100) {
     last_err = Msg::ShowText("Bars less than 100, not trading yet.", "Error", __FUNCTION__, __LINE__, VerboseErrors);
     if (PrintLogOnChart) DisplayInfoOnChart();
     _result = false;
@@ -3986,7 +3987,7 @@ bool TradeAllowed() {
   else if (!METHOD(16, ((int) ea_last_order[6] - (int) ea_last_order[2]))) {
     _result = false;
   }
-  else if (IsTradeContextBusy()) {
+  else if (terminal.IsTradeContextBusy()) {
     last_err = Msg::ShowText("Trade context is temporary busy.", "Error", __FUNCTION__, __LINE__, VerboseErrors);
     if (PrintLogOnChart) DisplayInfoOnChart();
     _result = false;
@@ -3995,11 +3996,11 @@ bool TradeAllowed() {
   // OrderSend(), OrderClose(), OrderCloseBy(), OrderModify(), OrderDelete() trading functions
   //   changing the state of a trading account can be called only if trading by Expert Advisors
   //   is allowed (the "Allow live trading" checkbox is enabled in the Expert Advisor or script properties).
-  else if (!IsTradeAllowed()) {
+  else if (!terminal.IsTradeAllowed()) {
     last_err = Msg::ShowText("Trade is not allowed at the moment, check the settings!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
     _result = false;
   }
-  else if (!IsConnected()) {
+  else if (!terminal.IsConnected()) {
     last_err = Msg::ShowText("Terminal is not connected!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
     if (PrintLogOnChart) DisplayInfoOnChart();
     _result = false;
@@ -4008,12 +4009,12 @@ bool TradeAllowed() {
     last_err = Msg::ShowText("Terminal is stopping!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
     _result = false;
   }
-  else if (Terminal::IsRealtime() && !MarketInfo(Symbol(), MODE_TRADEALLOWED)) {
+  else if (terminal.IsRealtime() && !terminal.IsTradeAllowed()) {
     last_err = Msg::ShowText("Trading is not allowed. Market may be closed or choose the right symbol. Otherwise contact your broker.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
     if (PrintLogOnChart) DisplayInfoOnChart();
     _result = false;
   }
-  else if (Terminal::IsRealtime() && !IsExpertEnabled()) {
+  else if (terminal.IsRealtime() && !terminal.IsExpertEnabled()) {
     last_err = Msg::ShowText("You need to enable: 'Enable Expert Advisor'/'AutoTrading'.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
     _result = false;
   }
@@ -4336,7 +4337,7 @@ void StartNewHour(Trade *_trade) {
 
   // Start the new hour.
   // Note: This needs to be after action processing.
-  hour_of_day = Hour();
+  hour_of_day = DateTime::Hour();
 
   // Update variables.
   ea_risk_ratio = GetRiskRatio();
@@ -4348,7 +4349,7 @@ void StartNewHour(Trade *_trade) {
   }
 
   // Check if new day has been started.
-  if (day_of_week != DayOfWeek()) {
+  if (day_of_week != DateTime::DayOfWeek()) {
     StartNewDay(_trade);
   }
 
@@ -4416,20 +4417,20 @@ void StartNewDay(Trade *_trade) {
   if (Boosting_Enabled) UpdateStrategyFactor(WEEKLY);
 
   // Check if day started another week.
-  if (DayOfWeek() < day_of_week) {
+  if (DateTime::DayOfWeek() < day_of_week) {
     StartNewWeek(_trade);
   }
-  if (Day() < day_of_month) {
+  if (DateTime::Day() < day_of_month) {
     StartNewMonth(_trade);
   }
-  if (DayOfYear() < day_of_year) {
+  if (DateTime::DayOfYear() < day_of_year) {
     StartNewYear(_trade);
   }
 
   // Store new data.
-  day_of_week = DayOfWeek(); // The zero-based day of week (0 means Sunday,1,2,3,4,5,6) of the specified date. At the testing, the last known server time is modelled.
-  day_of_month = Day(); // The day of month (1 - 31) of the specified date. At the testing, the last known server time is modelled.
-  day_of_year = DayOfYear(); // Day (1 means 1 January,..,365(6) does 31 December) of year. At the testing, the last known server time is modelled.
+  day_of_week = DateTime::DayOfWeek(); // The zero-based day of week (0 means Sunday,1,2,3,4,5,6) of the specified date. At the testing, the last known server time is modelled.
+  day_of_month = DateTime::Day(); // The day of month (1 - 31) of the specified date. At the testing, the last known server time is modelled.
+  day_of_year = DateTime::DayOfYear(); // Day (1 means 1 January,..,365(6) does 31 December) of year. At the testing, the last known server time is modelled.
   // Print and reset variables.
   daily_orders = 0;
   /*
@@ -5179,7 +5180,7 @@ void UpdateVariables() {
   curr_spread = market.GetSpreadInPips();
   // Calculate trend.
   // curr_trend = trade.GetTrend(fabs(TrendMethod), TrendMethod < 0 ? PERIOD_M1 : (ENUM_TIMEFRAMES) NULL);
-  double curr_rsi = iRSI(market.GetSymbol(), TrendPeriod, RSI_Period, RSI_Applied_Price, 0);
+  double curr_rsi = Indicators::iRSI(market.GetSymbol(), TrendPeriod, RSI_Period, RSI_Applied_Price, 0);
   curr_trend = fabs(curr_rsi - 50) > 10 ? (double) (1.0 / 50) * (curr_rsi - 50) : 0;
   // PrintFormat("Curr Trend: %g (%g: %g/%g), RSI: %g", curr_trend, (double) (1.0 / 50) * (curr_rsi - 50), 1 / 50, curr_rsi - 50, curr_rsi);
   #ifdef __profiler__ PROFILER_STOP #endif
@@ -5451,13 +5452,13 @@ bool MarketCondition(Chart *_chart, int condition = C_MARKET_NONE) {
         }
       }
     case C_NEW_HOUR:
-      return hour_of_day != Hour();
+      return hour_of_day != DateTime::Hour();
     case C_NEW_DAY:
-      return day_of_week != DayOfWeek();
+      return day_of_week != DateTime::DayOfWeek();
     case C_NEW_WEEK:
-      return DayOfWeek() < day_of_week;
+      return DateTime::DayOfWeek() < day_of_week;
     case C_NEW_MONTH:
-      return Day() < day_of_month;
+      return DateTime::Day() < day_of_month;
     case C_MARKET_NONE:
     default:
       return false;
@@ -6003,7 +6004,7 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
   string output;
   // Prepare text for Stop Out.
   string stop_out_level = StringFormat("%d", account.AccountStopoutLevel());
-  if (AccountStopoutMode() == 0) stop_out_level += "%"; else stop_out_level += account.AccountCurrency();
+  if (account.AccountStopoutMode() == 0) stop_out_level += "%"; else stop_out_level += account.AccountCurrency();
   stop_out_level += StringFormat(" (%.1f)", account.GetAccountStopoutLevel(VerboseErrors));
   // Prepare text to display max orders.
   string text_max_orders = StringFormat("Max orders: %d [Per type: %d]", max_orders, GetMaxOrdersPerType());
@@ -6027,9 +6028,9 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
   output = indent + "------------------------------------------------" + sep
                   + indent + StringFormat("| %s (Status: %s)%s", ea_text, (ea_active ? "ACTIVE" : "NOT ACTIVE"), sep)
                   + indent + StringFormat("| ACCOUNT INFORMATION:%s", sep)
-                  + indent + StringFormat("| Server Name: %s, Time: %s%s", AccountInfoString(ACCOUNT_SERVER), TimeToStr(time_current, TIME_DATE|TIME_MINUTES|TIME_SECONDS), sep)
-                  + indent + "| Acc Number: " + IntegerToString(account.AccountNumber()) + "; Acc Name: " + AccountName() + "; Broker: " + account.AccountCompany() + " (Type: " + account_type + ")" + sep
-                  + indent + StringFormat("| Stop Out Level: %s, Leverage: 1:%d %s", stop_out_level, AccountLeverage(), sep)
+                  + indent + StringFormat("| Server Name: %s, Time: %s%s", AccountInfoString(ACCOUNT_SERVER), DateTime::TimeToStr(time_current, TIME_DATE|TIME_MINUTES|TIME_SECONDS), sep)
+                  + indent + "| Acc Number: " + IntegerToString(account.AccountNumber()) + "; Acc Name: " + account.AccountName() + "; Broker: " + account.AccountCompany() + " (Type: " + account_type + ")" + sep
+                  + indent + StringFormat("| Stop Out Level: %s, Leverage: 1:%d %s", stop_out_level, account.AccountLeverage(), sep)
                   + indent + "| Used Margin: " + Convert::ValueWithCurrency(account.AccountMargin()) + "; Free: " + Convert::ValueWithCurrency(account.AccountFreeMargin()) + sep
                   + indent + "| Equity: " + Convert::ValueWithCurrency(account.AccountEquity())
                      + "; Balance: " + Convert::ValueWithCurrency(account.AccountBalance())
@@ -6082,7 +6083,7 @@ bool SendEmailExecuteOrder(string sep = "<br>\n") {
   string body = "Trade Information" + sep;
   body += sep + StringFormat("Event: %s", "Trade Opened");
   body += sep + StringFormat("Currency Pair: %s", _Symbol);
-  body += sep + StringFormat("Time: %s", TimeToStr(time_current, TIME_DATE|TIME_MINUTES|TIME_SECONDS));
+  body += sep + StringFormat("Time: %s", DateTime::TimeToStr(time_current, TIME_DATE|TIME_MINUTES|TIME_SECONDS));
   body += sep + StringFormat("Order Type: %s", Order::OrderTypeToString((ENUM_ORDER_TYPE) OrderType()));
   body += sep + StringFormat("Price: %s", DoubleToStr(OrderOpenPrice(), Digits));
   body += sep + StringFormat("Lot size: %g", Order::OrderLots());
@@ -6120,30 +6121,30 @@ string GetOrdersStats(string sep = "\n") {
 
 /**
  * Get information about account conditions in text format.
+ * @todo: Use Account instead.
+ * @todo: "No of Orders: ", total_orders, " (BUY/SELL: ", Orders::GetOrdersByType(ORDER_TYPE_BUY), "/", Orders::GetOrdersByType(ORDER_TYPE_SELL), ")", sep,
  */
 string GetAccountTextDetails(string sep = "; ") {
-   return StringConcatenate("Account Details: ",
-      "Time: ", TimeToStr(time_current, TIME_DATE|TIME_MINUTES|TIME_SECONDS), sep,
-      "Account Balance: ", Convert::ValueWithCurrency(account.AccountBalance()), sep,
-      "Account Equity: ", Convert::ValueWithCurrency(account.AccountEquity()), sep,
-      "Account Credit: ", Convert::ValueWithCurrency(account.AccountCredit()), sep,
-      "Used Margin: ", Convert::ValueWithCurrency(account.AccountMargin()), sep,
-      "Free Margin: ", Convert::ValueWithCurrency(account.AccountFreeMargin()), sep,
-      "No of Orders: ", total_orders, " (BUY/SELL: ", Orders::GetOrdersByType(ORDER_TYPE_BUY), "/", Orders::GetOrdersByType(ORDER_TYPE_SELL), ")", sep,
-      "Risk Ratio: ", DoubleToStr(ea_risk_ratio, 1)
-   );
+  return StringFormat("ACCOUNT: Time: %s; Balance: %s; Equity: %s; Credit: %s; Margin Used/Free: %s/%s; Risk: %s;",
+     DateTime::TimeToStr(time_current, TIME_DATE|TIME_MINUTES|TIME_SECONDS),
+     Convert::ValueWithCurrency(account.AccountBalance()),
+     Convert::ValueWithCurrency(account.AccountEquity()),
+     Convert::ValueWithCurrency(account.AccountCredit()),
+     Convert::ValueWithCurrency(account.AccountMargin()),
+     Convert::ValueWithCurrency(account.AccountFreeMargin()),
+     DoubleToStr(ea_risk_ratio, 1)
+  );
 }
 
 /**
  * Get information about market conditions in text format.
+ * @todo: Use Market instead.
  */
 string GetMarketTextDetails() {
-   return StringConcatenate("MarketInfo: ",
-     "Symbol: ", Symbol(), "; ",
-     "Ask: ", DoubleToStr(Ask, Digits), "; ",
-     "Bid: ", DoubleToStr(Bid, Digits), "; ",
-     StringFormat("Spread: %gpts (%.2f pips)", market.GetSpreadInPts(), market.GetSpreadInPips())
-   );
+  return StringFormat("MARKET: Symbol: %s; Ask: %s; Bid: %s; Spread: %gpts (%.2f pips);",
+    Symbol(), DoubleToStr(chart.GetAsk(), Digits), DoubleToStr(chart.Bid(), Digits),
+    market.GetSpreadInPts(), market.GetSpreadInPips()
+  );
 }
 
 /**
@@ -6444,7 +6445,7 @@ bool ActionExecute(int aid, int id = EMPTY) {
   if (result) {
     Msg::ShowText(
         StringFormat("Executed action: %s (id: %d), because of market condition: %s (id: %d) and account condition is: %s (id: %d) [E:%s/B:%s/C:%s/P:%sp].",
-          ActionIdToText(aid), aid, MarketIdToText(mid), mid, ReasonIdToText(reason_id), reason_id, Convert::ValueWithCurrency(account.AccountEquity()), Convert::ValueWithCurrency(AccountBalance()), Convert::ValueWithCurrency(AccountCredit()), DoubleToStr(last_close_profit, 1)),
+          ActionIdToText(aid), aid, MarketIdToText(mid), mid, ReasonIdToText(reason_id), reason_id, Convert::ValueWithCurrency(account.AccountEquity()), Convert::ValueWithCurrency(account.AccountBalance()), Convert::ValueWithCurrency(account.AccountCredit()), DoubleToStr(last_close_profit, 1)),
         "Info", __FUNCTION__, __LINE__, VerboseInfo);
     Msg::ShowText(last_msg, "Debug", __FUNCTION__, __LINE__, VerboseDebug && aid != A_NONE);
     if (WriteReport && VerboseDebug) ReportAdd(GetLastMessage());
@@ -6986,7 +6987,7 @@ bool TaskProcessList(bool with_force = false) {
 void ReportAdd(string msg) {
   int last = ArraySize(log);
   ArrayResize(log, last + 1);
-  log[last] = TimeToStr(time_current,TIME_DATE|TIME_SECONDS) + ": " + msg;
+  log[last] = DateTime::TimeToStr(time_current,TIME_DATE|TIME_SECONDS) + ": " + msg;
 }
 
 /**
