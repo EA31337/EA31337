@@ -4386,13 +4386,6 @@ string GetLastMessage() {
 }
 
 /**
- * Get last available error.
- */
-string GetLastErrMsg() {
-  return last_err;
-}
-
-/**
  * Executed for every new day.
  */
 void StartNewDay(Trade *_trade) {
