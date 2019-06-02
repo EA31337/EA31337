@@ -3373,7 +3373,7 @@ bool UpdateTrailingStops(Trade *_trade) {
         // if (MinimalizeLosses && Order::GetOrderProfit() > GetMinStopLevel()) {
           if ((OrderType() == ORDER_TYPE_BUY && OrderStopLoss() < market.GetBid()) ||
              (OrderType() == ORDER_TYPE_SELL && OrderStopLoss() > market.GetAsk())) {
-            result = OrderModify(Order::OrderTicket(), Order::OrderOpenPrice(), Order::OrderOpenPrice() - Order::OrderCommission() * Point, Order::OrderTakeProfit(), 0, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell));
+            result = Order::OrderModify(Order::OrderTicket(), Order::OrderOpenPrice(), Order::OrderOpenPrice() - Order::OrderCommission() * Point, Order::OrderTakeProfit(), 0, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell));
             if (!result && err_code > 1) {
              if (VerboseErrors) Print(__FUNCTION__, ": Error: OrderModify(): [MinimalizeLosses] ", Terminal::GetErrorText(err_code));
                if (VerboseDebug)
@@ -5705,105 +5705,6 @@ void ApplyStrategyMultiplierFactor(uint period = DAILY, int direction = 0, doubl
     }
   }
 }
-
-#ifdef __advanced__
-/**
- * Check if RSI period needs any change.
- *
- * FIXME: Doesn't improve much.
- */
-/*
-void RSI_CheckPeriod() {
-
-  uint period;
-  // 1 minute period.
-  period = M1;
-  if (rsi_stats[period][LINE_UPPER] - rsi_stats[period][LINE_LOWER] < RSI1_IncreasePeriod_MinDiff) {
-    info[RSI1][CUSTOM_PERIOD] = fmin(info[RSI1][CUSTOM_PERIOD] + 1, RSI_Period * 2);
-    if (VerboseDebug) PrintFormat("Increased " + sname[RSI1] + " period to %d", info[RSI1][CUSTOM_PERIOD]);
-    // Reset stats.
-    rsi_stats[period][LINE_UPPER] = 0;
-    rsi_stats[period][LINE_LOWER] = 0;
-  } else if (rsi_stats[period][LINE_UPPER] - rsi_stats[period][LINE_LOWER] > RSI1_DecreasePeriod_MaxDiff) {
-    info[RSI1][CUSTOM_PERIOD] = fmax(info[RSI1][CUSTOM_PERIOD] - 1, RSI_Period / 2);
-    if (VerboseDebug) PrintFormat("Decreased " + sname[RSI1] + " period to %d", info[RSI1][CUSTOM_PERIOD]);
-    // Reset stats.
-    rsi_stats[period][LINE_UPPER] = 0;
-    rsi_stats[period][LINE_LOWER] = 0;
-  }
-  // 5 minute period.
-  period = M5;
-  if (rsi_stats[period][LINE_UPPER] - rsi_stats[period][LINE_LOWER] < RSI5_IncreasePeriod_MinDiff) {
-    info[RSI5][CUSTOM_PERIOD] = fmin(info[RSI5][CUSTOM_PERIOD] + 1, RSI_Period * 2);
-    if (VerboseDebug) PrintFormat("Increased " + sname[RSI5] + " period to %d", info[RSI1][CUSTOM_PERIOD]);
-    // Reset stats.
-    rsi_stats[period][LINE_UPPER] = 0;
-    rsi_stats[period][LINE_LOWER] = 0;
-  } else if (rsi_stats[period][LINE_UPPER] - rsi_stats[period][LINE_LOWER] > RSI5_DecreasePeriod_MaxDiff) {
-    info[RSI5][CUSTOM_PERIOD] = fmax(info[RSI5][CUSTOM_PERIOD] - 1, RSI_Period / 2);
-    if (VerboseDebug) PrintFormat("Decreased " + sname[RSI5] + " period to %d", info[RSI1][CUSTOM_PERIOD]);
-    // Reset stats.
-    rsi_stats[period][LINE_UPPER] = 0;
-    rsi_stats[period][LINE_LOWER] = 0;
-  }
-  // 15 minute period.
-
-  period = M15;
-  if (rsi_stats[period][LINE_UPPER] - rsi_stats[period][LINE_LOWER] < RSI15_IncreasePeriod_MinDiff) {
-    info[RSI15][CUSTOM_PERIOD] = fmin(info[RSI15][CUSTOM_PERIOD] + 1, RSI_Period * 2);
-    if (VerboseDebug) PrintFormat("Increased " + sname[RSI15] + " period to %d", info[RSI15][CUSTOM_PERIOD]);
-    // Reset stats.
-    rsi_stats[period][LINE_UPPER] = 0;
-    rsi_stats[period][LINE_LOWER] = 0;
-  } else if (rsi_stats[period][LINE_UPPER] - rsi_stats[period][LINE_LOWER] > RSI15_DecreasePeriod_MaxDiff) {
-    info[RSI15][CUSTOM_PERIOD] = fmax(info[RSI15][CUSTOM_PERIOD] - 1, RSI_Period / 2);
-    if (VerboseDebug) PrintFormat("Decreased " + sname[RSI15] + " period to %d", info[RSI15][CUSTOM_PERIOD]);
-    // Reset stats.
-    rsi_stats[period][LINE_UPPER] = 0;
-    rsi_stats[period][LINE_LOWER] = 0;
-  }
-  /*
-  Print(__FUNCTION__ + ": M1: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][LINE_LOWER] + ", Max: " + rsi_stats[period][LINE_UPPER] + ", Diff: " + ( rsi_stats[period][LINE_UPPER] - rsi_stats[period][LINE_LOWER] ));
-  period = M5;
-  Print(__FUNCTION__ + ": M5: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][LINE_LOWER] + ", Max: " + rsi_stats[period][LINE_UPPER] + ", Diff: " + ( rsi_stats[period][LINE_UPPER] - rsi_stats[period][LINE_LOWER] ));
-  period = M15;
-  Print(__FUNCTION__ + ": M15: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][LINE_LOWER] + ", Max: " + rsi_stats[period][LINE_UPPER] + ", Diff: " + ( rsi_stats[period][LINE_UPPER] - rsi_stats[period][LINE_LOWER] ));
-  period = M30;
-  Print(__FUNCTION__ + ": M30: Avg: " + rsi_stats[period][0] + ", Min: " + rsi_stats[period][LINE_LOWER] + ", Max: " + rsi_stats[period][LINE_UPPER] + ", Diff: " + ( rsi_stats[period][LINE_UPPER] - rsi_stats[period][LINE_LOWER] ));
-  /
-}
-*/
-
-// FIXME: Doesn't improve anything.
-bool RSI_IncreasePeriod(Chart *_chart, int condition = 0) {
-  bool result = condition > 0;
-  UpdateIndicator(_chart, INDI_RSI);
-  uint period = _chart.TfToIndex();
-  if (METHOD(condition, 0)) result &= (rsi_stats[period][LINE_UPPER] > 50 + RSI_SignalLevel + RSI_SignalLevel / 2 && rsi_stats[period][LINE_LOWER] < 50 - RSI_SignalLevel - RSI_SignalLevel / 2);
-  if (METHOD(condition, 1)) result &= (rsi_stats[period][LINE_UPPER] > 50 + RSI_SignalLevel + RSI_SignalLevel / 2 || rsi_stats[period][LINE_LOWER] < 50 - RSI_SignalLevel - RSI_SignalLevel / 2);
-  if (METHOD(condition, 2)) result &= (rsi_stats[period][0] < 50 + RSI_SignalLevel + RSI_SignalLevel / 3 && rsi_stats[period][0] > 50 - RSI_SignalLevel - RSI_SignalLevel / 3);
-  // if (METHOD(condition, 0)) result = result || rsi_stats[period][0] < 50 + RSI_SignalLevel;
-  if (METHOD(condition, 3)) result &= rsi_stats[period][LINE_UPPER] - rsi_stats[period][LINE_LOWER] < 50;
-  // if (METHOD(condition, 0)) result &= rsi[period][CURR] - rsi[period][PREV] > rsi[period][PREV] - rsi[period][FAR];
-  // if (METHOD(condition, 0)) result &= Open[CURR] > Close[PREV];
-  return result;
-}
-
-// FIXME: Doesn't improve anything.
-bool RSI_DecreasePeriod(Chart *_chart, int condition = 0) {
-  bool result = condition > 0;
-  UpdateIndicator(_chart, INDI_RSI);
-  uint period = _chart.TfToIndex();
-  if (METHOD(condition, 0)) result &= (rsi_stats[period][LINE_UPPER] <= 50 + RSI_SignalLevel && rsi_stats[period][LINE_LOWER] >= 50 - RSI_SignalLevel);
-  if (METHOD(condition, 1)) result &= (rsi_stats[period][LINE_UPPER] <= 50 + RSI_SignalLevel || rsi_stats[period][LINE_LOWER] >= 50 - RSI_SignalLevel);
-  // if (METHOD(condition, 0)) result &= (rsi_stats[period][0] > 50 + RSI_SignalLevel / 3 || rsi_stats[period][0] < 50 - RSI_SignalLevel / 3);
-  // if (METHOD(condition, 0)) result &= rsi_stats[period][LINE_UPPER] > 50 + (RSI_SignalLevel / 3);
-  // if (METHOD(condition, 0)) result &= && rsi_stats[period][LINE_UPPER] < 50 - (RSI_SignalLevel / 3);
-  // if (METHOD(condition, 0)) result &= rsi[period][CURR] - rsi[period][PREV] > rsi[period][PREV] - rsi[period][FAR];
-  // if (METHOD(condition, 0)) result &= Open[CURR] > Close[PREV];
-  return result;
-}
-#endif
 
 /**
  * Return strategy id by order magic number.
