@@ -51,8 +51,6 @@
 #include "include\EA31337-classes\DateTime.mqh"
 // #include "include\EA31337-classes\Draw.mqh"
 #include "include\EA31337-classes\File.mqh"
-#include "include\EA31337-classes\Indicator.mqh"
-#include "include\EA31337-classes\Indicators.mqh"
 #include "include\EA31337-classes\Order.mqh"
 #include "include\EA31337-classes\Orders.mqh"
 #include "include\EA31337-classes\Market.mqh"
@@ -75,6 +73,41 @@
 #include "include\EA31337-classes\Profiler.mqh"
 #endif
 //#property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
+
+// Load technical indicator classes.
+
+// Includes.
+#include "include\EA31337-classes\Indicators\Indi_AC.mqh"
+#include "include\EA31337-classes\Indicators\Indi_AD.mqh"
+#include "include\EA31337-classes\Indicators\Indi_ADX.mqh"
+#include "include\EA31337-classes\Indicators\Indi_AO.mqh"
+#include "include\EA31337-classes\Indicators\Indi_ATR.mqh"
+#include "include\EA31337-classes\Indicators\Indi_Alligator.mqh"
+#include "include\EA31337-classes\Indicators\Indi_BWMFI.mqh"
+#include "include\EA31337-classes\Indicators\Indi_Bands.mqh"
+#include "include\EA31337-classes\Indicators\Indi_BearsPower.mqh"
+#include "include\EA31337-classes\Indicators\Indi_BullsPower.mqh"
+#include "include\EA31337-classes\Indicators\Indi_CCI.mqh"
+#include "include\EA31337-classes\Indicators\Indi_DeMarker.mqh"
+#include "include\EA31337-classes\Indicators\Indi_Envelopes.mqh"
+#include "include\EA31337-classes\Indicators\Indi_Force.mqh"
+#include "include\EA31337-classes\Indicators\Indi_Fractals.mqh"
+#include "include\EA31337-classes\Indicators\Indi_Gator.mqh"
+#include "include\EA31337-classes\Indicators\Indi_HeikenAshi.mqh"
+#include "include\EA31337-classes\Indicators\Indi_Ichimoku.mqh"
+#include "include\EA31337-classes\Indicators\Indi_MA.mqh"
+#include "include\EA31337-classes\Indicators\Indi_MACD.mqh"
+#include "include\EA31337-classes\Indicators\Indi_MFI.mqh"
+#include "include\EA31337-classes\Indicators\Indi_Momentum.mqh"
+#include "include\EA31337-classes\Indicators\Indi_OBV.mqh"
+#include "include\EA31337-classes\Indicators\Indi_OsMA.mqh"
+#include "include\EA31337-classes\Indicators\Indi_RSI.mqh"
+#include "include\EA31337-classes\Indicators\Indi_RVI.mqh"
+#include "include\EA31337-classes\Indicators\Indi_SAR.mqh"
+#include "include\EA31337-classes\Indicators\Indi_StdDev.mqh"
+#include "include\EA31337-classes\Indicators\Indi_Stochastic.mqh"
+#include "include\EA31337-classes\Indicators\Indi_WPR.mqh"
+#include "include\EA31337-classes\Indicators\Indi_ZigZag.mqh"
 
 //+------------------------------------------------------------------+
 //| User input variables.
@@ -193,7 +226,7 @@ string stacktrace = "";
 double iac[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
 double ad[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
 double adx[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_ADX_LINE_ENTRY];
-double alligator[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_ALLIGATOR_LINE_ENTRY];
+double alligator[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_GATOR_LINE_ENTRY];
 //double atr[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][MA_SLOW+1];
 double awesome[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
 double bands[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_BANDS_LINE_ENTRY];
@@ -204,7 +237,7 @@ double demarker[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
 double envelopes[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_LO_UP_LINE_ENTRY];
 double iforce[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
 double fractals[H4][FINAL_ENUM_INDICATOR_INDEX][FINAL_LO_UP_LINE_ENTRY];
-double gator[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_ALLIGATOR_LINE_ENTRY];
+double gator[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_GATOR_LINE_ENTRY];
 double ichimoku[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_ICHIMOKU_LINE_ENTRY];
 double ma_fast[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX], ma_medium[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX], ma_slow[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
 double macd[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_SIGNAL_LINE_ENTRY];
@@ -796,9 +829,9 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       break;
     case INDI_ADX: // Calculates the Average Directional Movement Index indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        adx[index][i][LINE_MAIN]    = iADX(symbol, tf, ADX_Period, ADX_Applied_Price, LINE_MAIN, i);    // Base indicator line
-        adx[index][i][MODE_PLUSDI]  = iADX(symbol, tf, ADX_Period, ADX_Applied_Price, MODE_PLUSDI, i);  // +DI indicator line
-        adx[index][i][MODE_MINUSDI] = iADX(symbol, tf, ADX_Period, ADX_Applied_Price, MODE_MINUSDI, i); // -DI indicator line
+        adx[index][i][LINE_MAIN]    = Indi_ADX::iADX(symbol, tf, ADX_Period, ADX_Applied_Price, LINE_MAIN_ADX, i);    // Base indicator line
+        adx[index][i][MODE_PLUSDI]  = Indi_ADX::iADX(symbol, tf, ADX_Period, ADX_Applied_Price, LINE_PLUSDI, i);  // +DI indicator line
+        adx[index][i][MODE_MINUSDI] = Indi_ADX::iADX(symbol, tf, ADX_Period, ADX_Applied_Price, LINE_MINUSDI, i); // -DI indicator line
       }
       break;
 #endif
@@ -807,9 +840,9 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       ratio = tf == 30 ? 1.0 : pow(Alligator_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         shift = i + Alligator_Shift + (i == FINAL_ENUM_INDICATOR_INDEX - 1 ? Alligator_Shift_Far : 0);
-        alligator[index][i][LINE_LIPS]  = Indicators::iMA(symbol, tf, (int) (Alligator_Period_Lips * ratio),  Alligator_Shift_Lips,  Alligator_MA_Method, Alligator_Applied_Price, shift);
-        alligator[index][i][LINE_TEETH] = Indicators::iMA(symbol, tf, (int) (Alligator_Period_Teeth * ratio), Alligator_Shift_Teeth, Alligator_MA_Method, Alligator_Applied_Price, shift);
-        alligator[index][i][LINE_JAW]   = Indicators::iMA(symbol, tf, (int) (Alligator_Period_Jaw * ratio),   Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, shift);
+        alligator[index][i][LINE_LIPS]  = Indi_MA::iMA(symbol, tf, (int) (Alligator_Period_Lips * ratio),  Alligator_Shift_Lips,  Alligator_MA_Method, Alligator_Applied_Price, shift);
+        alligator[index][i][LINE_TEETH] = Indi_MA::iMA(symbol, tf, (int) (Alligator_Period_Teeth * ratio), Alligator_Shift_Teeth, Alligator_MA_Method, Alligator_Applied_Price, shift);
+        alligator[index][i][LINE_JAW]   = Indi_MA::iMA(symbol, tf, (int) (Alligator_Period_Jaw * ratio),   Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, shift);
         /**
         if (VerboseDebug) PrintFormat("%d: iMA(%s, %d, %d (%g), %d, %d, %d, %d) = %g",
           i, symbol, tf, (int) (Alligator_Period_Jaw * ratio), ratio, Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, shift, alligator[index][i][LINE_JAW]);
@@ -847,9 +880,9 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       //PrintFormat("tf: %s, ratio1/ratio2: %g/%g; %g/%g; fabs(%d - %d)", _chart.TfToString(), ratio, ratio2, Bands_Period * ratio, Bands_Deviation * ratio2, _chart.TfToIndex(PERIOD_M30), _chart.TfToIndex(tf));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         shift = i + Bands_Shift + (i == FINAL_ENUM_INDICATOR_INDEX - 1 ? Bands_Shift_Far : 0);
-        bands[index][i][BAND_BASE]  = Indicators::iBands(symbol, tf, (int) (Bands_Period * ratio), Bands_Deviation * ratio2, 0, Bands_Applied_Price, BAND_BASE,  shift);
-        bands[index][i][BAND_UPPER] = Indicators::iBands(symbol, tf, (int) (Bands_Period * ratio), Bands_Deviation * ratio2, 0, Bands_Applied_Price, BAND_UPPER, shift);
-        bands[index][i][BAND_LOWER] = Indicators::iBands(symbol, tf, (int) (Bands_Period * ratio), Bands_Deviation * ratio2, 0, Bands_Applied_Price, BAND_LOWER, shift);
+        bands[index][i][BAND_BASE]  = Indi_Bands::iBands(symbol, tf, (int) (Bands_Period * ratio), Bands_Deviation * ratio2, 0, Bands_Applied_Price, BAND_BASE,  shift);
+        bands[index][i][BAND_UPPER] = Indi_Bands::iBands(symbol, tf, (int) (Bands_Period * ratio), Bands_Deviation * ratio2, 0, Bands_Applied_Price, BAND_UPPER, shift);
+        bands[index][i][BAND_LOWER] = Indi_Bands::iBands(symbol, tf, (int) (Bands_Period * ratio), Bands_Deviation * ratio2, 0, Bands_Applied_Price, BAND_LOWER, shift);
       }
       success = (bool)bands[index][CURR][BAND_BASE];
       if (VerboseDebug) PrintFormat("Bands M%d: %s", tf, Array::ArrToString3D(bands, ",", Digits));
@@ -858,15 +891,15 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
     case INDI_BEARS: // Calculates the Bears Power and Bulls Power indicators.
       ratio = tf == 30 ? 1.0 : pow(BPower_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        bpower[index][i][ORDER_TYPE_BUY]  = iBullsPower(symbol, tf, (int) (BPower_Period * ratio), BPower_Applied_Price, i);
-        bpower[index][i][ORDER_TYPE_SELL] = iBearsPower(symbol, tf, (int) (BPower_Period * ratio), BPower_Applied_Price, i);
+        bpower[index][i][ORDER_TYPE_BUY]  = Indi_BullsPower::iBullsPower(symbol, tf, (int) (BPower_Period * ratio), BPower_Applied_Price, i);
+        bpower[index][i][ORDER_TYPE_SELL] = Indi_BearsPower::iBearsPower(symbol, tf, (int) (BPower_Period * ratio), BPower_Applied_Price, i);
       }
       success = (bool)(bpower[index][CURR][ORDER_TYPE_BUY] || bpower[index][CURR][ORDER_TYPE_SELL]);
       // Message("Bulls: " + bpower[index][CURR][ORDER_TYPE_BUY] + ", Bears: " + bpower[index][CURR][ORDER_TYPE_SELL]);
       break;
     case INDI_BWMFI: // Calculates the Market Facilitation Index indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        bwmfi[index][i] = iBWMFI(symbol, tf, i);
+        bwmfi[index][i] = Indi_BWMFI::iBWMFI(symbol, tf, i);
       }
       success = (bool) bwmfi[index][CURR];
       break;
@@ -874,14 +907,14 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
     case INDI_CCI: // Calculates the Commodity Channel Index indicator.
       ratio = tf == 30 ? 1.0 : pow(CCI_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        cci[index][i] = Indicators::iCCI(symbol, tf, (int) (CCI_Period * ratio), CCI_Applied_Price, i + CCI_Shift);
+        cci[index][i] = Indi_CCI::iCCI(symbol, tf, (int) (CCI_Period * ratio), CCI_Applied_Price, i + CCI_Shift);
       }
       success = (bool) cci[index][CURR];
       break;
     case INDI_DEMARKER: // Calculates the DeMarker indicator.
       ratio = tf == 30 ? 1.0 : pow(DeMarker_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        demarker[index][i] = Indicators::iDeMarker(symbol, tf, (int) (DeMarker_Period * ratio), i + DeMarker_Shift);
+        demarker[index][i] = Indi_DeMarker::iDeMarker(symbol, tf, (int) (DeMarker_Period * ratio), i + DeMarker_Shift);
       }
       // success = (bool) demarker[index][CURR] + demarker[index][PREV] + demarker[index][FAR];
       // PrintFormat("Period: %d, DeMarker: %g", period, demarker[index][CURR]);
@@ -900,9 +933,9 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       ratio = tf == 30 ? 1.0 : pow(Envelopes_MA_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       ratio2 = tf == 30 ? 1.0 : pow(Envelopes_Deviation_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        envelopes[index][i][LINE_MAIN]  = Indicators::iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, LINE_MAIN,  i + Envelopes_Shift);
-        envelopes[index][i][LINE_UPPER] = Indicators::iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, LINE_UPPER, i + Envelopes_Shift);
-        envelopes[index][i][LINE_LOWER] = Indicators::iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, LINE_LOWER, i + Envelopes_Shift);
+        envelopes[index][i][LINE_MAIN]  = Indi_Envelopes::iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, LINE_MAIN,  i + Envelopes_Shift);
+        envelopes[index][i][LINE_UPPER] = Indi_Envelopes::iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, LINE_UPPER, i + Envelopes_Shift);
+        envelopes[index][i][LINE_LOWER] = Indi_Envelopes::iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, LINE_LOWER, i + Envelopes_Shift);
       }
       success = (bool) envelopes[index][CURR][LINE_MAIN];
       if (VerboseDebug) PrintFormat("Envelopes M%d: %s", tf, Array::ArrToString3D(envelopes, ",", Digits));
@@ -910,34 +943,34 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
 #ifdef __advanced__
     case INDI_FORCE: // Calculates the Force Index indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        iforce[index][i] = iForce(symbol, tf, Force_Period, Force_MA_Method, Force_Applied_price, i);
+        iforce[index][i] = Indi_Force::iForce(symbol, tf, Force_Period, Force_MA_Method, Force_Applied_price, i);
       }
       success = (bool) iforce[index][CURR];
       break;
 #endif
     case INDI_FRACTALS: // Calculates the Fractals indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        fractals[index][i][LINE_LOWER] = Indicators::iFractals(symbol, tf, LINE_LOWER, i + Fractals_Shift);
-        fractals[index][i][LINE_UPPER] = Indicators::iFractals(symbol, tf, LINE_UPPER, i + Fractals_Shift);
+        fractals[index][i][LINE_LOWER] = Indi_Fractals::iFractals(symbol, tf, LINE_LOWER, i + Fractals_Shift);
+        fractals[index][i][LINE_UPPER] = Indi_Fractals::iFractals(symbol, tf, LINE_UPPER, i + Fractals_Shift);
       }
       if (VerboseDebug) PrintFormat("Fractals M%d: %s", tf, Array::ArrToString3D(fractals, ",", Digits));
       break;
     case INDI_GATOR: // Calculates the Gator oscillator.
       // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        gator[index][i][LINE_LIPS]  = Indicators::iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, LINE_LIPS,  Alligator_Shift);
-        gator[index][i][LINE_TEETH] = Indicators::iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, LINE_TEETH, Alligator_Shift);
-        gator[index][i][LINE_JAW]   = Indicators::iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, LINE_JAW,   Alligator_Shift);
+        gator[index][i][LINE_LIPS]  = Indi_Gator::iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, LINE_LIPS,  Alligator_Shift);
+        gator[index][i][LINE_TEETH] = Indi_Gator::iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, LINE_TEETH, Alligator_Shift);
+        gator[index][i][LINE_JAW]   = Indi_Gator::iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, LINE_JAW,   Alligator_Shift);
       }
       success = (bool)gator[index][CURR][LINE_JAW];
       break;
     case INDI_ICHIMOKU: // Calculates the Ichimoku Kinko Hyo indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        ichimoku[index][i][LINE_TENKANSEN]   = Indicators::iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, LINE_TENKANSEN, i);
-        ichimoku[index][i][LINE_KIJUNSEN]    = Indicators::iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, LINE_KIJUNSEN, i);
-        ichimoku[index][i][LINE_SENKOUSPANA] = Indicators::iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, LINE_SENKOUSPANA, i);
-        ichimoku[index][i][LINE_SENKOUSPANB] = Indicators::iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, LINE_SENKOUSPANB, i);
-        ichimoku[index][i][LINE_CHIKOUSPAN]  = Indicators::iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, LINE_CHIKOUSPAN, i);
+        ichimoku[index][i][LINE_TENKANSEN]   = Indi_Ichimoku::iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, LINE_TENKANSEN, i);
+        ichimoku[index][i][LINE_KIJUNSEN]    = Indi_Ichimoku::iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, LINE_KIJUNSEN, i);
+        ichimoku[index][i][LINE_SENKOUSPANA] = Indi_Ichimoku::iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, LINE_SENKOUSPANA, i);
+        ichimoku[index][i][LINE_SENKOUSPANB] = Indi_Ichimoku::iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, LINE_SENKOUSPANB, i);
+        ichimoku[index][i][LINE_CHIKOUSPAN]  = Indi_Ichimoku::iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, LINE_CHIKOUSPAN, i);
       }
       success = (bool)ichimoku[index][CURR][LINE_TENKANSEN];
       break;
@@ -946,9 +979,9 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       ratio = tf == 30 ? 1.0 : pow(MA_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         shift = i + MA_Shift + (i == FINAL_ENUM_INDICATOR_INDEX - 1 ? MA_Shift_Far : 0);
-        ma_fast[index][i]   = Indicators::iMA(symbol, tf, (int) (MA_Period_Fast * ratio),   MA_Shift_Fast,   MA_Method, MA_Applied_Price, shift);
-        ma_medium[index][i] = Indicators::iMA(symbol, tf, (int) (MA_Period_Medium * ratio), MA_Shift_Medium, MA_Method, MA_Applied_Price, shift);
-        ma_slow[index][i]   = Indicators::iMA(symbol, tf, (int) (MA_Period_Slow * ratio),   MA_Shift_Slow,   MA_Method, MA_Applied_Price, shift);
+        ma_fast[index][i]   = Indi_MA::iMA(symbol, tf, (int) (MA_Period_Fast * ratio),   MA_Shift_Fast,   MA_Method, MA_Applied_Price, shift);
+        ma_medium[index][i] = Indi_MA::iMA(symbol, tf, (int) (MA_Period_Medium * ratio), MA_Shift_Medium, MA_Method, MA_Applied_Price, shift);
+        ma_slow[index][i]   = Indi_MA::iMA(symbol, tf, (int) (MA_Period_Slow * ratio),   MA_Shift_Slow,   MA_Method, MA_Applied_Price, shift);
         /*
         if (tf == Period() && i < FINAL_ENUM_INDICATOR_INDEX - 1) {
           Draw::TLine(StringFormat("%s%s%d", symbol, "MA Fast", i),   ma_fast[index][i],   ma_fast[index][i+1],    iTime(NULL, 0, shift), iTime(NULL, 0, shift+1), clrBlue);
@@ -967,15 +1000,15 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       ratio = tf == 30 ? 1.0 : pow(MACD_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         shift = i + MACD_Shift + (i == FINAL_ENUM_INDICATOR_INDEX - 1 ? MACD_Shift_Far : 0);
-        macd[index][i][LINE_MAIN]   = Indicators::iMACD(symbol, tf, (int) (MACD_Period_Fast * ratio), (int) (MACD_Period_Slow * ratio), (int) (MACD_Period_Signal * ratio), MACD_Applied_Price, LINE_MAIN,   shift);
-        macd[index][i][LINE_SIGNAL] = Indicators::iMACD(symbol, tf, (int) (MACD_Period_Fast * ratio), (int) (MACD_Period_Slow * ratio), (int) (MACD_Period_Signal * ratio), MACD_Applied_Price, LINE_SIGNAL, shift);
+        macd[index][i][LINE_MAIN]   = Indi_MACD::iMACD(symbol, tf, (int) (MACD_Period_Fast * ratio), (int) (MACD_Period_Slow * ratio), (int) (MACD_Period_Signal * ratio), MACD_Applied_Price, LINE_MAIN,   shift);
+        macd[index][i][LINE_SIGNAL] = Indi_MACD::iMACD(symbol, tf, (int) (MACD_Period_Fast * ratio), (int) (MACD_Period_Slow * ratio), (int) (MACD_Period_Signal * ratio), MACD_Applied_Price, LINE_SIGNAL, shift);
       }
       if (VerboseDebug) PrintFormat("MACD M%d: %s", tf, Array::ArrToString3D(macd, ",", Digits));
       success = (bool)macd[index][CURR][LINE_MAIN];
       break;
     case INDI_MFI: // Calculates the Money Flow Index indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        mfi[index][i] = iMFI(symbol, tf, MFI_Period, i);
+        mfi[index][i] = Indi_MFI::iMFI(symbol, tf, MFI_Period, i);
       }
       success = (bool)mfi[index][CURR];
       break;
@@ -990,13 +1023,13 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
     */
     case INDI_OBV: // Calculates the On Balance Volume indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        obv[index][i] = Indicators::iOBV(symbol, tf, OBV_Applied_Price, i);
+        obv[index][i] = Indi_OBV::iOBV(symbol, tf, OBV_Applied_Price, i);
       }
       success = (bool) obv[index][CURR];
       break;
     case INDI_OSMA: // Calculates the Moving Average of Oscillator indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        osma[index][i] = Indicators::iOsMA(symbol, tf, OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price, i);
+        osma[index][i] = Indi_OsMA::iOsMA(symbol, tf, OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price, i);
       }
       success = (bool) osma[index][CURR];
       break;
@@ -1005,7 +1038,7 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       // sid = GetStrategyViaIndicator(RSI, tf); rsi_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
       ratio = tf == 30 ? 1.0 : pow(RSI_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        rsi[index][i] = Indicators::iRSI(symbol, tf, (int) (RSI_Period * ratio), RSI_Applied_Price, i + RSI_Shift);
+        rsi[index][i] = Indi_RSI::iRSI(symbol, tf, (int) (RSI_Period * ratio), RSI_Applied_Price, i + RSI_Shift);
         if (rsi[index][i] > rsi_stats[index][LINE_UPPER]) rsi_stats[index][LINE_UPPER] = rsi[index][i]; // Calculate maximum value.
         if (rsi[index][i] < rsi_stats[index][LINE_LOWER] || rsi_stats[index][LINE_LOWER] == 0) rsi_stats[index][LINE_LOWER] = rsi[index][i]; // Calculate minimum value.
       }
@@ -1015,25 +1048,25 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       success = (bool) rsi[index][CURR] + rsi[index][PREV] + rsi[index][FAR];
       break;
     case INDI_RVI: // Calculates the Relative Strength Index indicator.
-      rvi[index][CURR][LINE_MAIN]   = Indicators::iRVI(symbol, tf, 10, LINE_MAIN, CURR);
-      rvi[index][PREV][LINE_MAIN]   = Indicators::iRVI(symbol, tf, 10, LINE_MAIN, PREV + RVI_Shift);
-      rvi[index][FAR][LINE_MAIN]    = Indicators::iRVI(symbol, tf, 10, LINE_MAIN, FAR + RVI_Shift + RVI_Shift_Far);
-      rvi[index][CURR][LINE_SIGNAL] = Indicators::iRVI(symbol, tf, 10, LINE_SIGNAL, CURR);
-      rvi[index][PREV][LINE_SIGNAL] = Indicators::iRVI(symbol, tf, 10, LINE_SIGNAL, PREV + RVI_Shift);
-      rvi[index][FAR][LINE_SIGNAL]  = Indicators::iRVI(symbol, tf, 10, LINE_SIGNAL, FAR + RVI_Shift + RVI_Shift_Far);
+      rvi[index][CURR][LINE_MAIN]   = Indi_RVI::iRVI(symbol, tf, 10, LINE_MAIN, CURR);
+      rvi[index][PREV][LINE_MAIN]   = Indi_RVI::iRVI(symbol, tf, 10, LINE_MAIN, PREV + RVI_Shift);
+      rvi[index][FAR][LINE_MAIN]    = Indi_RVI::iRVI(symbol, tf, 10, LINE_MAIN, FAR + RVI_Shift + RVI_Shift_Far);
+      rvi[index][CURR][LINE_SIGNAL] = Indi_RVI::iRVI(symbol, tf, 10, LINE_SIGNAL, CURR);
+      rvi[index][PREV][LINE_SIGNAL] = Indi_RVI::iRVI(symbol, tf, 10, LINE_SIGNAL, PREV + RVI_Shift);
+      rvi[index][FAR][LINE_SIGNAL]  = Indi_RVI::iRVI(symbol, tf, 10, LINE_SIGNAL, FAR + RVI_Shift + RVI_Shift_Far);
       success = (bool) rvi[index][CURR][LINE_MAIN];
       break;
     case INDI_SAR: // Calculates the Parabolic Stop and Reverse system indicator.
       ratio = tf == 30 ? 1.0 : pow(SAR_Step_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex() + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        sar[index][i] = Indicators::iSAR(symbol, tf, SAR_Step * ratio, SAR_Maximum_Stop, i + SAR_Shift);
+        sar[index][i] = Indi_SAR::iSAR(symbol, tf, SAR_Step * ratio, SAR_Maximum_Stop, i + SAR_Shift);
       }
       if (VerboseDebug) PrintFormat("SAR M%d: %s", tf, Array::ArrToString2D(sar, ",", Digits));
       success = (bool) sar[index][CURR] + sar[index][PREV] + sar[index][FAR];
       break;
     case INDI_STDDEV: // Calculates the Standard Deviation indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        stddev[index][i] = Indicators::iStdDev(symbol, tf, StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price, i);
+        stddev[index][i] = Indi_StdDev::iStdDev(symbol, tf, StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price, i);
       }
       if (VerboseDebug) PrintFormat("StdDev M%d: %s", tf, Array::ArrToString2D(stddev, ",", Digits));
       success = stddev[index][CURR];
@@ -1041,8 +1074,8 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
     case INDI_STOCHASTIC: // Calculates the Stochastic Oscillator.
       // TODO
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        stochastic[index][i][LINE_MAIN]   = Indicators::iStochastic(symbol, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, LINE_MAIN, i);
-        stochastic[index][i][LINE_SIGNAL] = Indicators::iStochastic(symbol, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, LINE_SIGNAL, i);
+        stochastic[index][i][LINE_MAIN]   = Indi_Stochastic::iStochastic(symbol, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, LINE_MAIN, i);
+        stochastic[index][i][LINE_SIGNAL] = Indi_Stochastic::iStochastic(symbol, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, LINE_SIGNAL, i);
       }
       if (VerboseDebug) PrintFormat("Stochastic M%d: %s", tf, Array::ArrToString3D(stochastic, ",", Digits));
       success = stochastic[index][CURR][LINE_MAIN];
@@ -1051,7 +1084,7 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       // Update the Larry Williams' Percent Range indicator values.
       ratio = tf == 30 ? 1.0 : pow(WPR_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex() + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        wpr[index][i] = -Indicators::iWPR(symbol, tf, (int) (WPR_Period * ratio), i + WPR_Shift);
+        wpr[index][i] = -Indi_WPR::iWPR(symbol, tf, (int) (WPR_Period * ratio), i + WPR_Shift);
       }
       if (VerboseDebug) PrintFormat("%s: WPR M%d: %s", DateTime::TimeToStr(_chart.GetBarTime()), tf, Array::ArrToString2D(wpr, ",", Digits));
       success = (bool) wpr[index][CURR] + wpr[index][PREV] + wpr[index][FAR];
@@ -5173,7 +5206,7 @@ void UpdateVariables() {
   curr_spread = market.GetSpreadInPips();
   // Calculate trend.
   // curr_trend = trade.GetTrend(fabs(TrendMethod), TrendMethod < 0 ? PERIOD_M1 : (ENUM_TIMEFRAMES) NULL);
-  double curr_rsi = Indicators::iRSI(market.GetSymbol(), TrendPeriod, RSI_Period, RSI_Applied_Price, 0);
+  double curr_rsi = Indi_RSI::iRSI(market.GetSymbol(), TrendPeriod, RSI_Period, RSI_Applied_Price, 0);
   curr_trend = fabs(curr_rsi - 50) > 10 ? (double) (1.0 / 50) * (curr_rsi - 50) : 0;
   // PrintFormat("Curr Trend: %g (%g: %g/%g), RSI: %g", curr_trend, (double) (1.0 / 50) * (curr_rsi - 50), 1 / 50, curr_rsi - 50, curr_rsi);
   #ifdef __profiler__ PROFILER_STOP #endif
