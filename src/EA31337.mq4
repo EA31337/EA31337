@@ -821,23 +821,21 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
 
   #ifdef __profiler__ PROFILER_START #endif
   switch (type) {
-#ifdef __advanced__
     case INDI_AC: // Calculates the Bill Williams' Accelerator/Decelerator oscillator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++)
-        iac[index][i] = iAC(symbol, tf, i);
+        iac[index][i] = Indi_AC::iAC(symbol, tf, i);
       break;
     case INDI_AD: // Calculates the Accumulation/Distribution indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++)
-        ad[index][i] = iAD(symbol, tf, i);
+        ad[index][i] = Indi_AD::iAD(symbol, tf, i);
       break;
     case INDI_ADX: // Calculates the Average Directional Movement Index indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        adx[index][i][LINE_MAIN]    = Indi_ADX::iADX(symbol, tf, ADX_Period, ADX_Applied_Price, LINE_MAIN_ADX, i);    // Base indicator line
-        adx[index][i][MODE_PLUSDI]  = Indi_ADX::iADX(symbol, tf, ADX_Period, ADX_Applied_Price, LINE_PLUSDI, i);  // +DI indicator line
-        adx[index][i][MODE_MINUSDI] = Indi_ADX::iADX(symbol, tf, ADX_Period, ADX_Applied_Price, LINE_MINUSDI, i); // -DI indicator line
+        adx[index][i][LINE_MAIN_ADX] = Indi_ADX::iADX(symbol, tf, ADX_Period, ADX_Applied_Price, LINE_MAIN_ADX, i); // Base indicator line
+        adx[index][i][LINE_PLUSDI]   = Indi_ADX::iADX(symbol, tf, ADX_Period, ADX_Applied_Price, LINE_PLUSDI, i);   // +DI indicator line
+        adx[index][i][LINE_MINUSDI]  = Indi_ADX::iADX(symbol, tf, ADX_Period, ADX_Applied_Price, LINE_MINUSDI, i);  // -DI indicator line
       }
       break;
-#endif
     case INDI_ALLIGATOR: // Calculates the Alligator indicator.
       // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
       ratio = tf == 30 ? 1.0 : pow(Alligator_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
@@ -1620,26 +1618,14 @@ bool Trade_AC(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, dou
       && iAC(NULL,piac,0)<iAC(NULL,piac,1)&&iAC(NULL,piac,1)<iAC(NULL,piac,2)&&iAC(NULL,piac,2)<iAC(NULL,piac,3)))
     */
     case ORDER_TYPE_BUY:
-      /*
-        bool result = iac[period][CURR][LINE_LOWER] != 0.0 || iac[period][PREV][LINE_LOWER] != 0.0 || iac[period][FAR][LINE_LOWER] != 0.0;
-        if (METHOD(signal_method, 0)) result &= Open[CURR] > Close[CURR];
-        if (METHOD(signal_method, 1)) result &= !AC_On_Sell(period);
-        if (METHOD(signal_method, 2)) result &= AC_On_Buy(fmin(period + 1, M30));
-        if (METHOD(signal_method, 3)) result &= AC_On_Buy(M30);
-        if (METHOD(signal_method, 4)) result &= iac[period][FAR][LINE_LOWER] != 0.0;
-        if (METHOD(signal_method, 5)) result &= !AC_On_Sell(M30);
-        */
+      result = iac[period][CURR] > 0 && iac[period][CURR] > iac[period][PREV];
+      if (METHOD(signal_method, 0)) result &= iac[period][PREV] > iac[period][FAR];
+      //if (METHOD(signal_method, 1)) result &= iac[period][PREV] > iac[period][FAR]; // @todo: one more bar.
     break;
     case ORDER_TYPE_SELL:
-      /*
-        bool result = iac[period][CURR][LINE_UPPER] != 0.0 || iac[period][PREV][LINE_UPPER] != 0.0 || iac[period][FAR][LINE_UPPER] != 0.0;
-        if (METHOD(signal_method, 0)) result &= Open[CURR] < Close[CURR];
-        if (METHOD(signal_method, 1)) result &= !AC_On_Buy(period);
-        if (METHOD(signal_method, 2)) result &= AC_On_Sell(fmin(period + 1, M30));
-        if (METHOD(signal_method, 3)) result &= AC_On_Sell(M30);
-        if (METHOD(signal_method, 4)) result &= iac[period][FAR][LINE_UPPER] != 0.0;
-        if (METHOD(signal_method, 5)) result &= !AC_On_Buy(M30);
-        */
+      result = iac[period][CURR] < 0 && iac[period][CURR] < iac[period][PREV];
+      if (METHOD(signal_method, 0)) result &= iac[period][PREV] < iac[period][FAR];
+      //if (METHOD(signal_method, 1)) result &= iac[period][PREV] < iac[period][FAR]; // @todo: one more bar.
     break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
@@ -1648,7 +1634,9 @@ bool Trade_AC(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, dou
 }
 
 /**
- * Check if AD indicator is on buy or sell.
+ * Check if A/D (Accumulation/Distribution) indicator is on buy or sell.
+ *
+ * Main principle - convergence/divergence.
  *
  * @param
  *   cmd (int) - type of trade order command
@@ -1664,37 +1652,15 @@ bool Trade_AD(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, dou
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_AD, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_AD, _chart.GetTf(), 0.0);
   switch (cmd) {
-    /*
-      //2. Accumulation/Distribution - A/D
-      //Main principle - convergence/divergence
-      //Buy: indicator growth at downtrend
-      //Sell: indicator fall at uptrend
-      if (iAD(NULL,piad,0)>=iAD(NULL,piad,1)&&iClose(NULL,piad2,0)<=iClose(NULL,piad2,1))
-      {f2=1;}
-      if (iAD(NULL,piad,0)<=iAD(NULL,piad,1)&&iClose(NULL,piad2,0)>=iClose(NULL,piad2,1))
-      {f2=-1;}
-    */
+    // Buy: indicator growth at downtrend.
     case ORDER_TYPE_BUY:
-      /*
-        bool result = AD[period][CURR][LINE_LOWER] != 0.0 || AD[period][PREV][LINE_LOWER] != 0.0 || AD[period][FAR][LINE_LOWER] != 0.0;
-        if (METHOD(signal_method, 0)) result &= Open[CURR] > Close[CURR];
-        if (METHOD(signal_method, 1)) result &= !AD_On_Sell(period);
-        if (METHOD(signal_method, 2)) result &= AD_On_Buy(fmin(period + 1, M30));
-        if (METHOD(signal_method, 3)) result &= AD_On_Buy(M30);
-        if (METHOD(signal_method, 4)) result &= AD[period][FAR][LINE_LOWER] != 0.0;
-        if (METHOD(signal_method, 5)) result &= !AD_On_Sell(M30);
-        */
+      result = ad[period][CURR] >= ad[period][PREV] && chart.GetClose(0) <= chart.GetClose(1);
+      if (METHOD(signal_method, 0)) result &= Open[CURR] > Close[CURR];
     break;
+    // Sell: indicator fall at uptrend.
     case ORDER_TYPE_SELL:
-      /*
-        bool result = AD[period][CURR][LINE_UPPER] != 0.0 || AD[period][PREV][LINE_UPPER] != 0.0 || AD[period][FAR][LINE_UPPER] != 0.0;
-        if (METHOD(signal_method, 0)) result &= Open[CURR] < Close[CURR];
-        if (METHOD(signal_method, 1)) result &= !AD_On_Buy(period);
-        if (METHOD(signal_method, 2)) result &= AD_On_Sell(fmin(period + 1, M30));
-        if (METHOD(signal_method, 3)) result &= AD_On_Sell(M30);
-        if (METHOD(signal_method, 4)) result &= AD[period][FAR][LINE_UPPER] != 0.0;
-        if (METHOD(signal_method, 5)) result &= !AD_On_Buy(M30);
-        */
+      result = ad[period][CURR] <= ad[period][PREV] && chart.GetClose(0) >= chart.GetClose(1);
+      if (METHOD(signal_method, 0)) result &= Open[CURR] < Close[CURR];
     break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
@@ -1719,37 +1685,17 @@ bool Trade_ADX(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ADX, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_ADX, _chart.GetTf(), 0.0);
   switch (cmd) {
-      //   if(iADX(NULL,0,14,PRICE_HIGH,LINE_MAIN,0)>iADX(NULL,0,14,PRICE_HIGH,MODE_PLUSDI,0)) return(0);
-    /*
-      //5. Average Directional Movement Index - ADX
-      //Buy: +DI line is above -DI line, ADX is more than a certain value and grows (i.e. trend strengthens)
-      //Sell: -DI line is above +DI line, ADX is more than a certain value and grows (i.e. trend strengthens)
-      if (iADX(NULL,piadx,piadu,PRICE_CLOSE,MODE_MINUSDI,0)<iADX(NULL,piadx,piadu,PRICE_CLOSE,MODE_PLUSDI,0)&&iADX(NULL,piadx,piadu,PRICE_CLOSE,LINE_MAIN,0)>=minadx&&iADX(NULL,piadx,piadu,PRICE_CLOSE,LINE_MAIN,0)>iADX(NULL,piadx,piadu,PRICE_CLOSE,LINE_MAIN,1))
-      {f5=1;}
-      if (iADX(NULL,piadx,piadu,PRICE_CLOSE,MODE_MINUSDI,0)>iADX(NULL,piadx,piadu,PRICE_CLOSE,MODE_PLUSDI,0)&&iADX(NULL,piadx,piadu,PRICE_CLOSE,LINE_MAIN,0)>=minadx&&iADX(NULL,piadx,piadu,PRICE_CLOSE,LINE_MAIN,0)>iADX(NULL,piadx,piadu,PRICE_CLOSE,LINE_MAIN,1))
-      {f5=-1;}
-    */
+    // Buy: +DI line is above -DI line, ADX is more than a certain value and grows (i.e. trend strengthens).
     case ORDER_TYPE_BUY:
-      /*
-        bool result = ADX[period][CURR][LINE_LOWER] != 0.0 || ADX[period][PREV][LINE_LOWER] != 0.0 || ADX[period][FAR][LINE_LOWER] != 0.0;
-        if (METHOD(signal_method, 0)) result &= Open[CURR] > Close[CURR];
-        if (METHOD(signal_method, 1)) result &= !ADX_On_Sell(period);
-        if (METHOD(signal_method, 2)) result &= ADX_On_Buy(fmin(period + 1, M30));
-        if (METHOD(signal_method, 3)) result &= ADX_On_Buy(M30);
-        if (METHOD(signal_method, 4)) result &= ADX[period][FAR][LINE_LOWER] != 0.0;
-        if (METHOD(signal_method, 5)) result &= !ADX_On_Sell(M30);
-        */
+      result = adx[period][CURR][LINE_MINUSDI] < adx[period][CURR][LINE_PLUSDI] && adx[period][CURR][LINE_MAIN_ADX] >= signal_level;
+      if (METHOD(signal_method, 0)) result &= adx[period][CURR][LINE_MAIN_ADX] > adx[period][PREV][LINE_MAIN_ADX];
+      if (METHOD(signal_method, 1)) result &= adx[period][PREV][LINE_MAIN_ADX] > adx[period][FAR][LINE_MAIN_ADX];
     break;
+    // Sell: -DI line is above +DI line, ADX is more than a certain value and grows (i.e. trend strengthens).
     case ORDER_TYPE_SELL:
-      /*
-        bool result = ADX[period][CURR][LINE_UPPER] != 0.0 || ADX[period][PREV][LINE_UPPER] != 0.0 || ADX[period][FAR][LINE_UPPER] != 0.0;
-        if (METHOD(signal_method, 0)) result &= Open[CURR] < Close[CURR];
-        if (METHOD(signal_method, 1)) result &= !ADX_On_Buy(period);
-        if (METHOD(signal_method, 2)) result &= ADX_On_Sell(fmin(period + 1, M30));
-        if (METHOD(signal_method, 3)) result &= ADX_On_Sell(M30);
-        if (METHOD(signal_method, 4)) result &= ADX[period][FAR][LINE_UPPER] != 0.0;
-        if (METHOD(signal_method, 5)) result &= !ADX_On_Buy(M30);
-        */
+      result = adx[period][CURR][LINE_MINUSDI] > adx[period][CURR][LINE_PLUSDI] && adx[period][CURR][LINE_MAIN_ADX] >= signal_level;
+      if (METHOD(signal_method, 0)) result &= adx[period][CURR][LINE_MAIN_ADX] > adx[period][PREV][LINE_MAIN_ADX];
+      if (METHOD(signal_method, 1)) result &= adx[period][PREV][LINE_MAIN_ADX] > adx[period][FAR][LINE_MAIN_ADX];
     break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
@@ -1864,8 +1810,8 @@ bool Trade_ATR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
       {f6=1;}
     */
     case ORDER_TYPE_BUY:
+      //bool result = atr[period][CURR];
       /*
-        bool result = ATR[period][CURR][LINE_LOWER] != 0.0 || ATR[period][PREV][LINE_LOWER] != 0.0 || ATR[period][FAR][LINE_LOWER] != 0.0;
         if (METHOD(signal_method, 0)) result &= Open[CURR] > Close[CURR];
         if (METHOD(signal_method, 1)) result &= !ATR_On_Sell(tf);
         if (METHOD(signal_method, 2)) result &= ATR_On_Buy(fmin(period + 1, M30));
@@ -1964,12 +1910,12 @@ bool Trade_Bands(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
   double lowest = fmin(Low[CURR], fmin(Low[PREV], Low[FAR]));
   double highest = fmax(High[CURR], fmax(High[PREV], High[FAR]));
   switch (cmd) {
+    // Buy: price crossed lower line upwards (returned to it from below).
     case ORDER_TYPE_BUY:
       // Price value was lower than the lower band.
       result = (
           lowest > 0 && lowest < fmax(fmax(bands[period][CURR][BAND_LOWER], bands[period][PREV][BAND_LOWER]), bands[period][FAR][BAND_LOWER])
           );
-      // Buy: price crossed lower line upwards (returned to it from below).
       if (signal_method != 0) {
         if (METHOD(signal_method, 0)) result &= fmin(Close[PREV], Close[FAR]) < bands[period][CURR][BAND_LOWER];
         if (METHOD(signal_method, 1)) result &= (bands[period][CURR][BAND_LOWER] > bands[period][FAR][BAND_LOWER]);
@@ -1981,12 +1927,12 @@ bool Trade_Bands(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
         // if (METHOD(signal_method, 7)) result &= !Trade_Bands(Convert::NegateOrderType(cmd), (ENUM_TIMEFRAMES) Convert::IndexToTf(fmin(period + 1, M30)));
       }
       break;
+    // Sell: price crossed upper line downwards (returned to it from above).
     case ORDER_TYPE_SELL:
       // Price value was higher than the upper band.
       result = (
           lowest > 0 && highest > fmin(fmin(bands[period][CURR][BAND_UPPER], bands[period][PREV][BAND_UPPER]), bands[period][FAR][BAND_UPPER])
           );
-      // Sell: price crossed upper line downwards (returned to it from above).
       if (signal_method != 0) {
         if (METHOD(signal_method, 0)) result &= fmin(Close[PREV], Close[FAR]) > bands[period][CURR][BAND_UPPER];
         if (METHOD(signal_method, 1)) result &= (bands[period][CURR][BAND_LOWER] < bands[period][FAR][BAND_LOWER]);
