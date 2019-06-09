@@ -227,7 +227,7 @@ double iac[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
 double ad[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
 double adx[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_ADX_LINE_ENTRY];
 double alligator[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_GATOR_LINE_ENTRY];
-//double atr[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][MA_SLOW+1];
+double atr[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
 double awesome[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
 double bands[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_BANDS_LINE_ENTRY];
 double bwmfi[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
@@ -235,14 +235,14 @@ double bpower[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][ORDER_TYP
 double cci[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
 double demarker[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
 double envelopes[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_LO_UP_LINE_ENTRY];
-double iforce[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
+double force[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
 double fractals[H4][FINAL_ENUM_INDICATOR_INDEX][FINAL_LO_UP_LINE_ENTRY];
 double gator[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_GATOR_LINE_ENTRY];
 double ichimoku[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_ICHIMOKU_LINE_ENTRY];
 double ma_fast[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX], ma_medium[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX], ma_slow[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
 double macd[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_SIGNAL_LINE_ENTRY];
 double mfi[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
-//double momentum[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][MA_SLOW+1];
+double momentum[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
 double obv[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
 double osma[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
 double rsi[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX], rsi_stats[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_LO_UP_LINE_ENTRY];
@@ -857,22 +857,16 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
        */
       if (VerboseDebug) PrintFormat("Alligator M%d: %s", tf, Array::ArrToString3D(alligator, ",", Digits));
       break;
-#ifdef __advanced__
-/*
     case INDI_ATR: // Calculates the Average True Range indicator.
-      ratio = tf == 30 ? 1.0 : pow(ATR_Period_Ratio, fabs(chart.TfToIndex(PERIOD_M30) - chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        atr[index][i][FAST] = iATR(symbol, tf, (int) (ATR_Period_Fast * ratio), i);
-        atr[index][i][SLOW] = iATR(symbol, tf, (int) (ATR_Period_Slow * ratio), i);
+        atr[index][i] = Indi_ATR::iATR(symbol, tf, ATR_Period, i);
       }
       break;
-    case AWESOME: // Calculates the Awesome oscillator.
+    case INDI_AO: // Calculates the Awesome oscillator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        awesome[index][i] = iAO(symbol, tf, i);
+        awesome[index][i] = Indi_AO::iAO(symbol, tf, i);
       }
       break;
-*/
-#endif // __advanced__
     case INDI_BANDS: // Calculates the Bollinger Bands indicator.
       // int sid, bands_period = Bands_Period; // Not used at the moment.
       // sid = GetStrategyViaIndicator(BANDS, tf); bands_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
@@ -941,14 +935,12 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       success = (bool) envelopes[index][CURR][LINE_MAIN];
       if (VerboseDebug) PrintFormat("Envelopes M%d: %s", tf, Array::ArrToString3D(envelopes, ",", Digits));
       break;
-#ifdef __advanced__
     case INDI_FORCE: // Calculates the Force Index indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        iforce[index][i] = Indi_Force::iForce(symbol, tf, Force_Period, Force_MA_Method, Force_Applied_price, i);
+        force[index][i] = Indi_Force::iForce(symbol, tf, Force_Period, Force_MA_Method, Force_Applied_price, i);
       }
-      success = (bool) iforce[index][CURR];
+      success = (bool) force[index][CURR];
       break;
-#endif
     case INDI_FRACTALS: // Calculates the Fractals indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         fractals[index][i][LINE_LOWER] = Indi_Fractals::iFractals(symbol, tf, LINE_LOWER, i + Fractals_Shift);
@@ -1013,15 +1005,12 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       }
       success = (bool)mfi[index][CURR];
       break;
-    /*
     case INDI_MOMENTUM: // Calculates the Momentum indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        momentum[index][i][FAST] = iMomentum(symbol, tf, Momentum_Period_Fast, Momentum_Applied_Price, i);
-        momentum[index][i][SLOW] = iMomentum(symbol, tf, Momentum_Period_Slow, Momentum_Applied_Price, i);
+        momentum[index][i] = Indi_Momentum::iMomentum(symbol, tf, Momentum_Period, Momentum_Applied_Price, i);
       }
-      success = (bool)momentum[index][CURR][SLOW];
+      success = (bool)momentum[index][CURR];
       break;
-    */
     case INDI_OBV: // Calculates the On Balance Volume indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         obv[index][i] = Indi_OBV::iOBV(symbol, tf, OBV_Applied_Price, i);
@@ -2239,7 +2228,9 @@ bool Trade_Envelopes(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMP
 }
 
 /**
- * Check if Force indicator is on buy or sell.
+ * Check if Force Index indicator is on buy or sell.
+ *
+ * Note: To use the indicator it should be correlated with another trend indicator.
  *
  * @param
  *   cmd (int) - type of trade order command
@@ -2255,19 +2246,13 @@ bool Trade_Force(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_FORCE, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_FORCE, _chart.GetTf(), 0.0);
   switch (cmd) {
-    /*
-      //14. Force Index
-      //To use the indicator it should be correlated with another trend indicator
-      //Flag 14 is 1, when FI recommends to buy (i.e. FI<0)
-      //Flag 14 is -1, when FI recommends to sell (i.e. FI>0)
-      if (iForce(NULL,piforce,piforceu,MODE_SMA,PRICE_CLOSE,0)<0)
-      {f14=1;}
-      if (iForce(NULL,piforce,piforceu,MODE_SMA,PRICE_CLOSE,0)>0)
-      {f14=-1;}
-    */
     case ORDER_TYPE_BUY:
+      // FI recommends to buy (i.e. FI<0).
+      result = force[period][CURR] < 0;
       break;
     case ORDER_TYPE_SELL:
+      // FI recommends to sell (i.e. FI>0).
+      result = force[period][CURR] > 0;
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
@@ -2324,7 +2309,10 @@ bool Trade_Fractals(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
 }
 
 /**
- * Check if Gator indicator is on buy or sell.
+ * Check if Gator Oscillator is on buy or sell.
+ *
+ * Note: It doesn't give independent signals. Is used for Alligator correction.
+ * Principle: trend must be strengthened. Together with this Gator Oscillator goes up.
  *
  * @param
  *   cmd (int) - type of trade order command
@@ -2342,12 +2330,12 @@ bool Trade_Gator(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
   switch (cmd) {
     /*
       //4. Gator Oscillator
-      //Doesn't give independent signals. Is used for Alligator correction.
-      //Principle: trend must be strengthened. Together with this Gator Oscillator goes up.
       //Lower part of diagram is taken for calculations. Growth is checked on 4 periods.
       //The flag is 1 of trend is strengthened, 0 - no strengthening, -1 - never.
       //Uses part of Alligator's variables
-      if (iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,3)>iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,2)&&iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,2)>iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,1)&&iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,1)>iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,0))
+      if (iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,3)>iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,2)
+      &&iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,2)>iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,1)
+      &&iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,1)>iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,0))
       {f4=1;}
     */
     case ORDER_TYPE_BUY:
@@ -2555,18 +2543,15 @@ bool Trade_MFI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MFI, _chart.GetTf(), 0);
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_MFI, _chart.GetTf(), 0.0);
   switch (cmd) {
-    /*
-      //18. Money Flow Index - MFI
-      //Buy: Crossing 20 upwards
-      //Sell: Crossing 20 downwards
-      if(iMFI(NULL,pimfi,barsimfi,1)<20&&iMFI(NULL,pimfi,barsimfi,0)>=20)
-      {f18=1;}
-      if(iMFI(NULL,pimfi,barsimfi,1)>80&&iMFI(NULL,pimfi,barsimfi,0)<=80)
-      {f18=-1;}]
-    */
+    // Buy: Crossing 20 upwards.
     case ORDER_TYPE_BUY:
+      result = mfi[period][PREV] > 0 && mfi[period][PREV] < (50 - signal_level);
+      if (METHOD(signal_method, 0)) result &= mfi[period][CURR] >= (50 - signal_level);
       break;
+    // Sell: Crossing 80 downwards.
     case ORDER_TYPE_SELL:
+      result = mfi[period][PREV] > 0 && mfi[period][PREV] > (50 + signal_level);
+      if (METHOD(signal_method, 0)) result &= mfi[period][CURR] <= (50 - signal_level);
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
