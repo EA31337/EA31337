@@ -3452,7 +3452,8 @@ bool UpdateTrailingStops(Trade *_trade) {
           }
           return (false);
         }
-        else if (new_sl == Order::OrderStopLoss() && new_tp == Order::OrderTakeProfit()) {
+        else if (fabs(new_sl - Order::OrderStopLoss()) <= pip_size && fabs(new_tp - Order::OrderTakeProfit()) <= pip_size) {
+          // Ignore change smaller than a pip.
           return (false);
         }
         // @todo
@@ -3736,7 +3737,7 @@ double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_
           method, new_value, previous, ask, bid, Convert::PointsToValue(market.GetTradeDistanceInPts()), market.GetTradeDistanceInPts(), Order::OrderTypeToString(Order::OrderType())),
         "Debug", __FUNCTION__, __LINE__, VerboseDebug);
     // If value is invalid, fallback to the previous one.
-    return previous;
+    return market.NormalizePrice(previous);
   }
 
   if (one_way) {
