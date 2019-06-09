@@ -679,8 +679,11 @@ string InitInfo(bool startup = false, string sep = "\n") {
         output += sep + "Trading is allowed, but there is some issue...";
         output += sep + last_err;
       }
-    } else {
+    } else if (terminal.IsRealtime()) {
       output += sep + StringFormat("Error %d: Trading is not allowed for this symbol, please enable automated trading or check the settings!", __LINE__);
+    }
+    else {
+      output += sep + "Waiting for new bars...";
     }
   }
   return output;
@@ -4029,11 +4032,11 @@ bool TradeAllowed() {
   // OrderSend(), OrderClose(), OrderCloseBy(), OrderModify(), OrderDelete() trading functions
   //   changing the state of a trading account can be called only if trading by Expert Advisors
   //   is allowed (the "Allow live trading" checkbox is enabled in the Expert Advisor or script properties).
-  else if (!terminal.IsTradeAllowed()) {
+  else if (terminal.IsRealtime() && !terminal.IsTradeAllowed()) {
     last_err = Msg::ShowText("Trade is not allowed at the moment, check the settings!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
     _result = false;
   }
-  else if (!terminal.IsConnected()) {
+  else if (terminal.IsRealtime() && !terminal.IsConnected()) {
     last_err = Msg::ShowText("Terminal is not connected!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart);
     if (PrintLogOnChart) DisplayInfoOnChart();
     _result = false;
