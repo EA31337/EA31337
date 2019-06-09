@@ -3410,7 +3410,7 @@ bool UpdateTrailingStops(Trade *_trade) {
           if ((OrderType() == ORDER_TYPE_BUY && OrderStopLoss() < market.GetBid()) ||
              (OrderType() == ORDER_TYPE_SELL && OrderStopLoss() > market.GetAsk())) {
             result = Order::OrderModify(Order::OrderTicket(), Order::OrderOpenPrice(), Order::OrderOpenPrice() - Order::OrderCommission() * Point, Order::OrderTakeProfit(), 0, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell));
-            if (!result && err_code > 1) {
+            if (!result && err_code > 0) {
              if (VerboseErrors) Print(__FUNCTION__, ": Error: OrderModify(): [MinimalizeLosses] ", Terminal::GetErrorText(err_code));
                if (VerboseDebug)
                  Print(__FUNCTION__ + ": Error: OrderModify(", OrderTicket(), ", ", OrderOpenPrice(), ", ", OrderOpenPrice() - Order::OrderCommission() * Point, ", ", OrderTakeProfit(), ", ", 0, ", ", Order::GetOrderColor(EMPTY, ColorBuy, ColorSell), "); ");
@@ -3465,7 +3465,7 @@ bool UpdateTrailingStops(Trade *_trade) {
           result = OrderModify(OrderTicket(), OrderOpenPrice(), new_sl, new_tp, 0, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell));
           if (!result) {
             err_code = GetLastError();
-            if (err_code > 1) {
+            if (err_code > 0) {
               Msg::ShowText(Terminal::GetErrorText(err_code), "Error", __FUNCTION__, __LINE__, VerboseErrors);
               Msg::ShowText(
                 StringFormat("OrderModify(%d, %g, %g, %g, %d, %d); Ask:%g/Bid:%g; Gap:%g pips",
@@ -3765,6 +3765,7 @@ double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_
   }
   // if (VerboseDebug && Terminal::IsVisualMode()) Draw::ShowLine("trail_stop_" + OrderTicket(), new_value, GetOrderColor(EMPTY, ColorBuy, ColorSell));
 
+  new_value = market.NormalizePrice(new_value);
   return market.NormalizeSLTP(new_value, cmd, mode);
 }
 
