@@ -11,7 +11,6 @@
 #include "include\EA31337\ea-mode.mqh"
 #include "include\EA31337\ea-code-conf.mqh"
 #include "include\EA31337\ea-defaults.mqh"
-#include "include\EA31337\ea-expire.mqh"
 #include "include\EA31337\ea-properties.mqh"
 #include "include\EA31337\ea-enums.mqh"
 
@@ -381,7 +380,6 @@ int OnInit() {
   string err;
   if (VerboseInfo) PrintFormat("%s v%s (%s) initializing...", ea_name, ea_version, ea_link);
   if (!session_initiated) {
-    #ifdef __expire__ CheckExpireDate(); #endif
     err_code = CheckSettings();
     if (err_code < 0) {
       // Incorrect set of input parameters occured.
@@ -584,7 +582,6 @@ void OnTesterDeinit() {
  */
 string InitInfo(bool startup = false, string sep = "\n") {
   string extra = "";
-  #ifdef __expire__ CheckExpireDate(); extra += StringFormat(" [expires on %s]", TimeToStr(ea_expire_date, TIME_DATE)); #endif
   string output = StringFormat("%s v%s by %s (%s)%s%s", ea_name, ea_version, ea_author, ea_link, extra, sep);
   output += "TERMINAL: " + terminal.ToString() + sep;
   output += "ACCOUNT: " + account.ToString() + sep;
@@ -1324,10 +1321,6 @@ bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, int sid = EMPTY, double volume = EM
     OrderQueueAdd(sid, cmd);
     result = false;
   }
-  #endif
-  #ifdef __expire__
-  CheckExpireDate();
-  if (ea_expired) result = false;
   #endif
   if (err != last_err) last_err = err;
   return (result);
@@ -3922,37 +3915,11 @@ bool CheckOurMagicNumber(int magic_number = NULL) {
   return (magic_number >= MagicNumber && magic_number < MagicNumber + FINAL_STRATEGY_TYPE_ENTRY);
 }
 
-#ifdef __expire__
-/**
- * Check for the expiration date.
- */
-void CheckExpireDate() {
-  if (TimeCurrent() > ea_expire_date + (PERIOD_W1 * 60)) {
-    Msg::ShowText("EA has expired!", "Error", __FUNCTION__, __LINE__, VerboseErrors | VerboseInfo, PrintLogOnChart, true);
-    ExpertRemove();
-  } else if (TimeCurrent() > ea_expire_date) {
-    ea_expired = true;
-  } else if (TimeCurrent() + (PERIOD_W1 * 60) > ea_expire_date) {
-    last_err = Msg::ShowText(StringFormat("This version will expire on %s!", TimeToStr(ea_expire_date, TIME_DATE)), "Warning", __FUNCTION__, __LINE__, VerboseErrors | VerboseInfo, PrintLogOnChart);
-  }
-}
-#endif
-
 /**
  * Check if it is possible to trade.
  */
 bool TradeAllowed() {
   bool _result = true;
-  #ifdef __expire__
-  if (TimeCurrent() > ea_expire_date) {
-    last_err = Msg::ShowText("New trades are not allowed, because EA has expired!", "Error", __FUNCTION__, __LINE__, VerboseInfo | VerboseErrors);
-    ea_active = false;
-    ea_expired = true;
-    if (PrintLogOnChart) DisplayInfoOnChart();
-    CheckExpireDate();
-    return (false);
-  }
-  #endif
   #ifdef __profiler__ PROFILER_START #endif
   if (chart.GetBars() < 100) {
     last_err = Msg::ShowText("Bars less than 100, not trading yet.", "Error", __FUNCTION__, __LINE__, VerboseErrors);
@@ -4030,15 +3997,6 @@ int CheckSettings() {
     return (false);
   }
   */
-  #ifdef __expire__
-    if (VerboseDebug) PrintFormat("Expire date: %s (%d)", TimeToStr(ea_expire_date, TIME_DATE), ea_expire_date);
-    if (TimeCurrent() > ea_expire_date) {
-      Msg::ShowText("This version has expired! Upgrade is required!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, true);
-      #ifndef __debug__ return -__LINE__; #endif
-    } else if (TimeCurrent() + (PERIOD_W1 * 60) >= ea_expire_date) {
-      Msg::ShowText(StringFormat("This version will expire on %s!", TimeToStr(ea_expire_date, TIME_DATE)), "Warning", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, true);
-    }
-  #endif
   if (LotSize < 0.0) {
     Msg::ShowText("LotSize is less than 0.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, true);
     return -__LINE__;
@@ -5942,7 +5900,6 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
   trend += StringFormat(" (%-.1f)", curr_trend);
   // EA text.
   string ea_text = StringFormat("%s v%s", ea_name, ea_version);
-  #ifdef __expire__ CheckExpireDate(); ea_text += StringFormat(" [expires on %s]", TimeToStr(ea_expire_date, TIME_DATE)); #endif
   // Print actual info.
   string indent = "";
   indent = "                      "; // if (total_orders > 5)?
@@ -6283,7 +6240,6 @@ bool ActionExecute(int aid, int id = EMPTY) {
   int reason_id = (id != EMPTY ? acc_conditions[id][0] : EMPTY); // Account id condition.
   int mid = (id != EMPTY ? acc_conditions[id][1] : EMPTY); // Market id condition.
   ENUM_ORDER_TYPE cmd;
-  #ifdef __expire__ CheckExpireDate(); #endif
   switch (aid) {
     case A_NONE: /* 0 */
       result = true;
@@ -6852,7 +6808,6 @@ bool TaskRun(int job_id) {
 
   switch (task_type) {
     case TASK_ORDER_OPEN:
-       #ifdef __expire__ CheckExpireDate(); if (ea_expired) return false; #endif
        cmd = todo_queue[job_id][3];
        // double volume = todo_queue[job_id][4]; // FIXME: Not used as we can't use double to integer array.
        sid = todo_queue[job_id][5];
