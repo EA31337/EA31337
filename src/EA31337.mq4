@@ -3597,7 +3597,12 @@ double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_
      case T1_MA_M_LOW: // 16: Lowest/highest value of MA Medium. Optimized (SL pf: 1.39 for MA).
      case T2_MA_M_LOW:
        UpdateIndicator(_chart, INDI_MA);
+       #ifdef __MQL4__
        diff = fmax(Array::HighestArrValue2(ma_medium, period) - Open[CURR], Open[CURR] - Array::LowestArrValue2(ma_medium, period));
+       #else
+       // @fixme
+       diff = fmax(fmax(ma_medium[period][CURR], ma_medium[period][PREV]) - Open[CURR], Open[CURR] - fmin(ma_medium[period][CURR], ma_medium[period][PREV]));
+       #endif
        new_value = Open[CURR] + diff * direction;
        break;
      case T1_MA_M_TRAIL: // 17: MA Small (Current) + trailing stop. Works fine (SL pf: 1.26 for MA).
@@ -3639,8 +3644,30 @@ double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_
      case T1_MA_FMS_PEAK: // 22: Lowest/highest value of all MAs. Works fine (SL pf: 1.39 for MA, PT pf: 1.23 for MA).
      case T2_MA_FMS_PEAK:
        UpdateIndicator(_chart, INDI_MA);
+       #ifdef __MQL4__
        highest_ma = fabs(fmax(fmax(Array::HighestArrValue2(ma_fast, period), Array::HighestArrValue2(ma_medium, period)), Array::HighestArrValue2(ma_slow, period)));
        lowest_ma = fabs(fmin(fmin(Array::LowestArrValue2(ma_fast, period), Array::LowestArrValue2(ma_medium, period)), Array::LowestArrValue2(ma_slow, period)));
+       #else
+       // @fixme
+       highest_ma = fabs(
+         fmax(
+           fmax(
+             fmax(ma_fast[period][CURR], ma_fast[period][PREV]),
+             fmax(ma_medium[period][CURR], ma_medium[period][PREV])
+             ),
+             fmax(ma_slow[period][CURR], ma_slow[period][PREV])
+           )
+         );
+       lowest_ma  = fabs(
+         fmin(
+           fmin(
+             fmin(ma_fast[period][CURR], ma_fast[period][PREV]),
+             fmin(ma_medium[period][CURR], ma_medium[period][PREV])
+             ),
+             fmin(ma_slow[period][CURR], ma_slow[period][PREV])
+           )
+         );
+       #endif
        diff = fmax(fabs(highest_ma - Open[CURR]), fabs(Open[CURR] - lowest_ma));
        new_value = Open[CURR] + diff * direction;
        break;
@@ -3654,7 +3681,14 @@ double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_
      case T1_SAR_PEAK: // 24: Lowest/highest SAR value.
      case T2_SAR_PEAK:
        UpdateIndicator(_chart, INDI_SAR);
+       #ifdef __MQL4__
        diff = fmax(fabs(Open[CURR] - Array::HighestArrValue2(sar, period)), fabs(Open[CURR] - Array::LowestArrValue2(sar, period)));
+       #else
+       diff = fmax(
+         fabs(Open[CURR] - fmax(sar[period][CURR], sar[period][PREV])),
+         fabs(Open[CURR] - fmin(sar[period][CURR], sar[period][PREV]))
+         );
+       #endif
        new_value = Open[CURR] + (diff + trail) * direction;
        break;
      case T1_BANDS: // 25: Current Bands value.
@@ -3711,6 +3745,7 @@ double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_
     }
   }
 
+  #ifdef __MQL4__
   if (VerboseDebug) {
     Msg::ShowText(
       StringFormat("Strategy: %s (%d), Method: %d, Tf: %d, Period: %d, Value: %g, Prev: %g, Direction: %d, Trail: %g (%g), LMA/HMA: %g/%g (%g/%g/%g|%g/%g/%g)",
@@ -3721,6 +3756,7 @@ double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_
         Array::HighestArrValue2(ma_fast, period), Array::HighestArrValue2(ma_medium, period), Array::HighestArrValue2(ma_slow, period))
       , "Trace", __FUNCTION__, __LINE__, VerboseTrace);
   }
+  #endif
   // if (VerboseDebug && Terminal::IsVisualMode()) Draw::ShowLine("trail_stop_" + OrderTicket(), new_value, GetOrderColor(EMPTY, ColorBuy, ColorSell));
 
   new_value = market.NormalizePrice(new_value);
@@ -5045,8 +5081,13 @@ bool InitStrategies() {
     Msg::ShowText("Initiation of strategies failed!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
   }
 
+  #ifdef __MQL4__
   Array::ArrSetValueD(conf, FACTOR, 1.0);
   Array::ArrSetValueD(conf, LOT_SIZE, ea_lot_size);
+  #else
+  // @fixme
+  PrintFormat("%s(): FIXME: ArrSetValueD();", __FUNCTION_LINE__);
+  #endif
 
   #ifdef __profiler__ PROFILER_STOP #endif
   return init || !ValidateSettings;
@@ -5362,22 +5403,48 @@ bool AccCondition(int condition = C_ACC_NONE) {
       last_cname = "InNonTrend";
       return !AccCondition(C_ACC_IN_TREND);
     case C_ACC_CDAY_IN_PROFIT: // Check if current day in profit.
+      #ifdef __MQL4__
       last_cname = "TodayInProfit";
       return Array::GetArrSumKey1(hourly_profit, day_of_year, 10) > 0;
+      #else
+      // @fixme
+      last_cname = "TodayInProfit(@FIXME)";
+      return False;
+      #endif
     case C_ACC_CDAY_IN_LOSS: // Check if current day in loss.
+      #ifdef __MQL4__
       last_cname = "TodayInLoss";
       return Array::GetArrSumKey1(hourly_profit, day_of_year, 10) < 0;
+      #else
+      // @fixme
+      last_cname = "TodayInLoss(@FIXME)";
+      return False;
+      #endif
     case C_ACC_PDAY_IN_PROFIT: // Check if previous day in profit.
       {
+        #ifdef __MQL4__
         last_cname = "YesterdayInProfit";
         int yesterday1 = DateTime::TimeDayOfYear(time_current - 24*60*60);
         return Array::GetArrSumKey1(hourly_profit, yesterday1) > 0;
+        #else
+        // @fixme
+        last_cname = "YesterdayInProfit(@FIXME)";
+        int yesterday1 = DateTime::TimeDayOfYear(time_current - 24*60*60);
+        return False;
+        #endif
       }
     case C_ACC_PDAY_IN_LOSS: // Check if previous day in loss.
       {
+        #ifdef __MQL4__
         last_cname = "YesterdayInLoss";
         int yesterday2 = DateTime::TimeDayOfYear(time_current - 24*60*60);
         return Array::GetArrSumKey1(hourly_profit, yesterday2) < 0;
+        #else
+        // @fixme
+        last_cname = "YesterdayInLoss(@FIXME)";
+        int yesterday2 = DateTime::TimeDayOfYear(time_current - 24*60*60);
+        return False;
+        #endif
       }
     case C_ACC_MAX_ORDERS:
       return total_orders >= max_orders;
@@ -5655,7 +5722,13 @@ void ApplyStrategyMultiplierFactor(uint period = DAILY, int direction = 0, doubl
   if (GetNoOfStrategies() <= 1 || factor == 1.0) return;
   int key = period == MONTHLY ? MONTHLY_PROFIT : (period == WEEKLY ? (int)WEEKLY_PROFIT : (int)DAILY_PROFIT);
   string period_name = period == MONTHLY ? "montly" : (period == WEEKLY ? "weekly" : "daily");
-  int new_strategy = direction > 0 ? Array::GetArrKey1ByHighestKey2ValueD(stats, key) : Array::GetArrKey1ByLowestKey2ValueD(stats, key);
+  int new_strategy;
+  #ifdef __MQL4__
+  new_strategy = direction > 0 ? Array::GetArrKey1ByHighestKey2ValueD(stats, key) : Array::GetArrKey1ByLowestKey2ValueD(stats, key);
+  #else
+  // @fixme
+  new_strategy = EMPTY;
+  #endif
   if (new_strategy == EMPTY) return;
   int previous = direction > 0 ? best_strategy[period] : worse_strategy[period];
   double new_factor = 1.0;
@@ -5776,7 +5849,12 @@ string GetStats(string sep = ", ") {
  * Get text output of hourly profit report.
  */
 string GetHourlyProfit(string sep = ", ") {
+  #ifdef __MQL4__
   string output = StringFormat("Hourly profit (total: %.1fp): ", Array::GetArrSumKey1(hourly_profit, day_of_year));
+  #else
+  // @fixme
+  string output = "Hourly profit (total: @fixme): ";
+  #endif
   for (int h = 0; h < hour_of_day; h++) {
     output += StringFormat("%d: %.1fp%s", h, hourly_profit[day_of_year][h], h < hour_of_day ? sep : "");
   }
@@ -5788,7 +5866,6 @@ string GetHourlyProfit(string sep = ", ") {
  */
 string GetDailyReport() {
   string output = "Daily max: ";
-  int key;
   // output += "Low: "     + daily[MAX_LOW] + "; ";
   // output += "High: "    + daily[MAX_HIGH] + "; ";
   // output += StringFormat("Tick: %g; ", daily[MAX_TICK]);
@@ -5802,6 +5879,8 @@ string GetDailyReport() {
 
   //output += GetAccountTextDetails() + "; " + GetOrdersStats();
 
+  #ifdef __MQL4__
+  int key;
   key = Array::GetArrKey1ByHighestKey2ValueD(stats, DAILY_PROFIT);
   if (key >= 0 && stats[key][DAILY_PROFIT] > 0) {
     output += StringFormat("Best: %s (%.2fp)", sname[key], stats[key][DAILY_PROFIT]);
@@ -5810,6 +5889,9 @@ string GetDailyReport() {
   if (key >= 0 && stats[key][DAILY_PROFIT] < 0) {
     output += StringFormat("Worse: %s (%.2fp)", sname[key], stats[key][DAILY_PROFIT]);
   }
+  #else
+  // @fixme
+  #endif
 
   return output;
 }
@@ -5819,7 +5901,6 @@ string GetDailyReport() {
  */
 string GetWeeklyReport() {
   string output = "Weekly max: ";
-  int key;
   // output =+ GetAccountTextDetails() + "; " + GetOrdersStats();
   // output += "Low: "     + weekly[MAX_LOW] + "; ";
   // output += "High: "    + weekly[MAX_HIGH] + "; ";
@@ -5832,6 +5913,8 @@ string GetWeeklyReport() {
   output += StringFormat("Equity: %.2f; ",     weekly[MAX_EQUITY]);
   output += StringFormat("Balance: %.2f; ",    weekly[MAX_BALANCE]);
 
+  #ifdef __MQL4__
+  int key;
   key = Array::GetArrKey1ByHighestKey2ValueD(stats, WEEKLY_PROFIT);
   if (key >= 0 && stats[key][WEEKLY_PROFIT] > 0) {
     output += StringFormat("Best: %s (%.2fp)", sname[key], stats[key][WEEKLY_PROFIT]);
@@ -5840,6 +5923,9 @@ string GetWeeklyReport() {
   if (key >= 0 && stats[key][WEEKLY_PROFIT] < 0) {
     output += StringFormat("Worse: %s (%.2fp)", sname[key], stats[key][WEEKLY_PROFIT]);
   }
+  #else
+  // @fixme
+  #endif
 
   return output;
 }
@@ -5849,7 +5935,6 @@ string GetWeeklyReport() {
  */
 string GetMonthlyReport() {
   string output = "Monthly max: ";
-  int key;
   // output =+ GetAccountTextDetails() + "; " + GetOrdersStats();
   // output += "Low: "     + monthly[MAX_LOW] + "; ";
   // output += "High: "    + monthly[MAX_HIGH] + "; ";
@@ -5862,6 +5947,8 @@ string GetMonthlyReport() {
   output += StringFormat("Equity: %.2f; ",     monthly[MAX_EQUITY]);
   output += StringFormat("Balance: %.2f; ",    monthly[MAX_BALANCE]);
 
+  #ifdef __MQL4__
+  int key;
   key = Array::GetArrKey1ByHighestKey2ValueD(stats, MONTHLY_PROFIT);
   if (key >= 0 && stats[key][MONTHLY_PROFIT] > 0) {
     output += StringFormat("Best: %s (%.2fp)", sname[key], stats[key][MONTHLY_PROFIT]);
@@ -5870,6 +5957,9 @@ string GetMonthlyReport() {
   if (key >= 0 && stats[key][MONTHLY_PROFIT] < 0) {
     output += StringFormat("Worse: %s (%.2fp)", sname[key], stats[key][MONTHLY_PROFIT]);
   }
+  #else
+  // @fixme
+  #endif
 
   return output;
 }
@@ -6294,17 +6384,32 @@ bool ActionExecute(int aid, int id = EMPTY) {
       result = ActionCloseAllOrders(reason_id);
       break;
     case A_SUSPEND_STRATEGIES: /* 11 */
+      #ifdef __MQL4__
       Array::ArrSetValueI(info, SUSPENDED, (int) true);
+      #else
+      // @fixme
+      if (VerboseDebug) PrintFormat("%s: FIXME: A_SUSPEND_STRATEGIES", __FUNCTION_LINE__);
+      #endif
       result = true;
       break;
     case A_UNSUSPEND_STRATEGIES: /* 12 */
+      #ifdef __MQL4__
       Array::ArrSetValueI(info, SUSPENDED, (int) false);
+      #else
+      // @fixme
+      if (VerboseDebug) PrintFormat("%s: FIXME: A_UNSUSPEND_STRATEGIES", __FUNCTION_LINE__);
+      #endif
       result = true;
       break;
     case A_RESET_STRATEGY_STATS: /* 13 */
+      #ifdef __MQL4__
       Array::ArrSetValueD(conf, PROFIT_FACTOR, GetDefaultProfitFactor());
       Array::ArrSetValueD(stats, TOTAL_GROSS_LOSS,   0.0);
       Array::ArrSetValueD(stats, TOTAL_GROSS_PROFIT, 0.0);
+      #else
+      // @fixme
+      if (VerboseDebug) PrintFormat("%s: FIXME: A_RESET_STRATEGY_STATS", __FUNCTION_LINE__);
+      #endif
       result = true;
       break;
       /*
@@ -6533,7 +6638,12 @@ bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
       sorted_queue[i][1] = curr_qid++;
     }
     // Sort array by first dimension (descending).
+    #ifdef __MQL4__
     ArraySort(sorted_queue, WHOLE_ARRAY, 0, MODE_DESCEND);
+    #else
+    if (VerboseDebug) PrintFormat("%s: FIXME: ArraySort();", __FUNCTION_LINE__);
+    // @fixme
+    #endif
     for (int i = 0; i < queue_size; i++) {
       selected_qid = (int) sorted_queue[i][1];
       cmd = (ENUM_ORDER_TYPE) order_queue[selected_qid][Q_CMD];
