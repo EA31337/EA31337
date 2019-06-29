@@ -35,10 +35,6 @@
 #property copyright   ea_copy
 #property icon        "resources\\favicon.ico"
 #property strict
-//#property stacksize
-//#property tester_file "trade_patterns.csv"    // File with the data to be read by an Expert Advisor.
-//#property tester_indicator "smoothed_ma.ex4"  // File with a custom indicator specified in iCustom() as a variable.
-//#property tester_library "MT4EA2DLL.dll" // Library file name from <terminal_data_folder>\MQL4\Libraries\ to be sent to a virtual server.
 
 //+------------------------------------------------------------------+
 //| Include public classes.
@@ -61,7 +57,6 @@
 #include "include\EA31337-classes\Report.mqh"
 #include "include\EA31337-classes\Stats.mqh"
 #include "include\EA31337-classes\Strategy.mqh"
-//#include "include\EA31337-classes\Strategies.mqh"
 #include "include\EA31337-classes\String.mqh"
 #include "include\EA31337-classes\SummaryReport.mqh"
 #include "include\EA31337-classes\Terminal.mqh"
@@ -72,7 +67,6 @@
 #ifdef __profiler__
 #include "include\EA31337-classes\Profiler.mqh"
 #endif
-//#property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 
 // Load technical indicator classes.
 
@@ -135,6 +129,7 @@ extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v"
  * Notes:
  *   - __MQL4__  macro is defined when compiling *.mq4 file, __MQL5__ macro is defined when compiling *.mq5 one.
  */
+
 //+------------------------------------------------------------------+
 
 // Class variables.
@@ -603,19 +598,7 @@ string InitInfo(bool startup = false, string sep = "\n") {
       output += StringFormat("CHART: %s not active.%s", Chart::IndexToString(_tfi), sep);
     }
   }
-  /*
-  output += StringFormat("Contract specification for %s: Profit mode: %d, Margin mode: %d, Spread: %d pts, Trade tick size: %f, Point value: %f, Digits: %d, Trade stops level: %dpts, Trade contract size: %g%s",
-      _Symbol,
-      MarketInfo(_Symbol, MODE_PROFITCALCMODE),
-      MarketInfo(_Symbol, MODE_MARGINCALCMODE),
-      (int)SymbolInfoInteger(_Symbol, SYMBOL_SPREAD),
-      SymbolInfoDouble(_Symbol, SYMBOL_TRADE_TICK_SIZE),
-      SymbolInfoDouble(_Symbol, SYMBOL_POINT),
-      (int)SymbolInfoInteger(_Symbol, SYMBOL_DIGITS),
-      market.GetTradeStopsLevel(),
-      SymbolInfoDouble(_Symbol, SYMBOL_TRADE_CONTRACT_SIZE),
-      sep);
-      */
+
   // @todo: Move to SymbolInfo.
   output += StringFormat("Swap specification for %s: Mode: %d, Long/buy order value: %g, Short/sell order value: %g%s",
       _Symbol,
@@ -822,10 +805,7 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
         alligator[index][i][LINE_LIPS]  = Indi_MA::iMA(symbol, tf, (int) (Alligator_Period_Lips * ratio),  Alligator_Shift_Lips,  Alligator_MA_Method, Alligator_Applied_Price, shift);
         alligator[index][i][LINE_TEETH] = Indi_MA::iMA(symbol, tf, (int) (Alligator_Period_Teeth * ratio), Alligator_Shift_Teeth, Alligator_MA_Method, Alligator_Applied_Price, shift);
         alligator[index][i][LINE_JAW]   = Indi_MA::iMA(symbol, tf, (int) (Alligator_Period_Jaw * ratio),   Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, shift);
-        /**
-        if (VerboseDebug) PrintFormat("%d: iMA(%s, %d, %d (%g), %d, %d, %d, %d) = %g",
-          i, symbol, tf, (int) (Alligator_Period_Jaw * ratio), ratio, Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, shift, alligator[index][i][LINE_JAW]);
-        */
+
       }
       success = (bool) alligator[index][CURR][LINE_JAW] + alligator[index][PREV][LINE_JAW] + alligator[index][FAR][LINE_JAW];
       /* Note: This is equivalent to:
@@ -900,15 +880,6 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       #endif
       break;
     case INDI_ENVELOPES: // Calculates the Envelopes indicator.
-      /*
-      envelopes_deviation = Envelopes30_Deviation;
-      switch (period) {
-        case M1: envelopes_deviation = Envelopes1_Deviation; break;
-        case M5: envelopes_deviation = Envelopes5_Deviation; break;
-        case M15: envelopes_deviation = Envelopes15_Deviation; break;
-        case M30: envelopes_deviation = Envelopes30_Deviation; break;
-      }
-      */
       ratio = tf == 30 ? 1.0 : pow(Envelopes_MA_Period_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       ratio2 = tf == 30 ? 1.0 : pow(Envelopes_Deviation_Ratio, fabs(_chart.TfToIndex(PERIOD_M30) - _chart.TfToIndex(tf) + 1));
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
@@ -4530,14 +4501,7 @@ void StartNewMonth(Trade *_trade) {
   string sar_stats = "Monthly SAR stats: ";
   for (int i = 0; i < FINAL_ENUM_TIMEFRAMES_INDEX; i++) {
     sar_stats += StringFormat("Period: %d, Buy/Sell: %d/%d; ", i, signals[MONTHLY][SAR1][i][ORDER_TYPE_BUY], signals[MONTHLY][SAR1][i][ORDER_TYPE_SELL]);
-    // sar_stats += "Buy M1: " + signals[MONTHLY][SAR1][i][ORDER_TYPE_BUY] + " / " + "Sell M1: " + signals[MONTHLY][SAR1][i][ORDER_TYPE_SELL] + "; ";
-    // sar_stats += "Buy M5: " + signals[MONTHLY][SAR5][i][ORDER_TYPE_BUY] + " / " + "Sell M5: " + signals[MONTHLY][SAR5][i][ORDER_TYPE_SELL] + "; ";
-    // sar_stats += "Buy M15: " + signals[MONTHLY][SAR15][i][ORDER_TYPE_BUY] + " / " + "Sell M15: " + signals[MONTHLY][SAR15][i][ORDER_TYPE_SELL] + "; ";
-    // sar_stats += "Buy M30: " + signals[MONTHLY][SAR30][i][ORDER_TYPE_BUY] + " / " + "Sell M30: " + signals[MONTHLY][SAR30][i][ORDER_TYPE_SELL] + "; ";
     signals[MONTHLY][SAR1][i][ORDER_TYPE_BUY]  = 0; signals[MONTHLY][SAR1][i][ORDER_TYPE_SELL]  = 0;
-    // signals[MONTHLY][SAR5][i][ORDER_TYPE_BUY]  = 0; signals[MONTHLY][SAR5][i][ORDER_TYPE_SELL]  = 0;
-    // signals[MONTHLY][SAR15][i][ORDER_TYPE_BUY] = 0; signals[MONTHLY][SAR15][i][ORDER_TYPE_SELL] = 0;
-    // signals[MONTHLY][SAR30][i][ORDER_TYPE_BUY] = 0; signals[MONTHLY][SAR30][i][ORDER_TYPE_SELL] = 0;
   }
   if (VerboseInfo) Print(sar_stats);
 
@@ -6984,5 +6948,3 @@ string GetStatReport(string sep = "\n") {
 
   return output;
 }
-
-//+------------------------------------------------------------------+
