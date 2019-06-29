@@ -253,28 +253,6 @@ double stochastic[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL
 double wpr[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
 double zigzag[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
 
-/*
- * TODO:
- *   - add trailing stops/profit for support/resistence,
- *   - daily higher highs and lower lows,
- *   - check risky dates and times,
- *   - check for risky patterns,
- *   - implement condition to close all strategy orders: when to trade, skip the day or week, etc.
- *   - implement SendFTP,
- *   - implement SendNotification,
- *   - send daily, weekly reports (SendMail),
- *   - check TesterStatistics(),
- *   - check ResourceCreate/ResourceSave to store dynamic parameters
- *   - consider to use Donchian Channel (ihighest/ilowest) for detecting s/r levels
- *   - convert `ma_fast`, `ma_medium`, `ma_slow` into one `ma` variable.
- *   - add RSI threshold param
- *   - trend calculated based on RSI
- *   - calculate support and resistance levels
- *   - calculate pivot levels
- *   - action to close the order after X hours when all orders of strategy are profitable
- *   - strategy flags: PP, S1-S3, R1-R3, trend
- */
-
 //+------------------------------------------------------------------+
 //| Expert tick function                                             |
 //+------------------------------------------------------------------+
