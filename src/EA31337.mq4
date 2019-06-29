@@ -182,7 +182,7 @@ int info[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_INFO_ENTRY];
 double conf[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_VALUE_ENTRY], stats[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_STAT_ENTRY];
 int open_orders[FINAL_STRATEGY_TYPE_ENTRY], closed_orders[FINAL_STRATEGY_TYPE_ENTRY];
 int signals[FINAL_STAT_PERIOD_TYPE_ENTRY][FINAL_STRATEGY_TYPE_ENTRY][FINAL_ENUM_TIMEFRAMES_INDEX][2]; // Count signals to buy and sell per period and strategy.
-int tickets[200]; // List of tickets to process.
+int tickets[]; // List of tickets to process.
 string sname[FINAL_STRATEGY_TYPE_ENTRY];
 int worse_strategy[FINAL_STAT_PERIOD_TYPE_ENTRY], best_strategy[FINAL_ENUM_TIMEFRAMES_INDEX];
 
@@ -198,7 +198,7 @@ string ea_last_order;
 double last_pip_change; // Last tick change in pips.
 double last_close_profit = EMPTY;
 // int last_trail_update = 0, last_indicators_update = 0, last_stats_update = 0;
-int todo_queue[100][8];
+int todo_queue[][8];
 datetime last_queue_process = 0;
 uint total_orders = 0; // Number of total orders currently open.
 double daily[FINAL_VALUE_TYPE_ENTRY], weekly[FINAL_VALUE_TYPE_ENTRY], monthly[FINAL_VALUE_TYPE_ENTRY];
@@ -212,7 +212,7 @@ int acc_conditions[30][3];
 string last_cname;
 
 // Order queue.
-long order_queue[100][FINAL_ORDER_QUEUE_ENTRY];
+long order_queue[][FINAL_ORDER_QUEUE_ENTRY];
 
 // For debugging purposes.
 string stacktrace = "";
