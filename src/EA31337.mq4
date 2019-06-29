@@ -855,7 +855,9 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
         alligator[index][i][LINE_TEETH] = iAlligator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
         alligator[index][i][LINE_LIPS]  = iAlligator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
        */
+      #ifdef __MQL4__
       if (VerboseDebug) PrintFormat("Alligator M%d: %s", tf, Array::ArrToString3D(alligator, ",", Digits));
+      #endif
       break;
     case INDI_ATR: // Calculates the Average True Range indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
@@ -880,7 +882,9 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
         bands[index][i][BAND_LOWER] = Indi_Bands::iBands(symbol, tf, (int) (Bands_Period * ratio), Bands_Deviation * ratio2, 0, Bands_Applied_Price, BAND_LOWER, shift);
       }
       success = (bool)bands[index][CURR][BAND_BASE];
+      #ifdef __MQL4__
       if (VerboseDebug) PrintFormat("Bands M%d: %s", tf, Array::ArrToString3D(bands, ",", Digits));
+      #endif
       break;
 #ifdef __advanced__
     case INDI_BEARS: // Calculates the Bears Power and Bulls Power indicators.
@@ -913,7 +917,9 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       }
       // success = (bool) demarker[index][CURR] + demarker[index][PREV] + demarker[index][FAR];
       // PrintFormat("Period: %d, DeMarker: %g", period, demarker[index][CURR]);
+      #ifdef __MQL4__
       if (VerboseDebug) PrintFormat("%s: DeMarker M%d: %s", DateTime::TimeToStr(_chart.GetBarTime(tf)), tf, Array::ArrToString2D(demarker, ",", Digits));
+      #endif
       break;
     case INDI_ENVELOPES: // Calculates the Envelopes indicator.
       /*
@@ -933,7 +939,9 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
         envelopes[index][i][LINE_LOWER] = Indi_Envelopes::iEnvelopes(symbol, tf, (int) (Envelopes_MA_Period * ratio), Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation * ratio2, LINE_LOWER, i + Envelopes_Shift);
       }
       success = (bool) envelopes[index][CURR][LINE_MAIN];
+      #ifdef __MQL4__
       if (VerboseDebug) PrintFormat("Envelopes M%d: %s", tf, Array::ArrToString3D(envelopes, ",", Digits));
+      #endif
       break;
     case INDI_FORCE: // Calculates the Force Index indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
@@ -946,7 +954,9 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
         fractals[index][i][LINE_LOWER] = Indi_Fractals::iFractals(symbol, tf, LINE_LOWER, i + Fractals_Shift);
         fractals[index][i][LINE_UPPER] = Indi_Fractals::iFractals(symbol, tf, LINE_UPPER, i + Fractals_Shift);
       }
+      #ifdef __MQL4__
       if (VerboseDebug) PrintFormat("Fractals M%d: %s", tf, Array::ArrToString3D(fractals, ",", Digits));
+      #endif
       break;
     case INDI_GATOR: // Calculates the Gator oscillator.
       // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
@@ -984,9 +994,11 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
         */
       }
       success = (bool) ma_fast[index][CURR] || ma_medium[index][CURR] || ma_slow[index][CURR];
+      #ifdef __MQL4__
       if (VerboseDebug) PrintFormat("MA Fast M%d: %s", tf, Array::ArrToString2D(ma_fast, ",", Digits));
       if (VerboseDebug) PrintFormat("MA Medium M%d: %s", tf, Array::ArrToString2D(ma_medium, ",", Digits));
       if (VerboseDebug) PrintFormat("MA Slow M%d: %s", tf, Array::ArrToString2D(ma_slow, ",", Digits));
+      #endif
       // if (VerboseDebug && Check::IsVisualMode()) Draw::DrawMA(tf);
       break;
     case INDI_MACD: // Calculates the Moving Averages Convergence/Divergence indicator.
@@ -996,7 +1008,9 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
         macd[index][i][LINE_MAIN]   = Indi_MACD::iMACD(symbol, tf, (int) (MACD_Period_Fast * ratio), (int) (MACD_Period_Slow * ratio), (int) (MACD_Period_Signal * ratio), MACD_Applied_Price, LINE_MAIN,   shift);
         macd[index][i][LINE_SIGNAL] = Indi_MACD::iMACD(symbol, tf, (int) (MACD_Period_Fast * ratio), (int) (MACD_Period_Slow * ratio), (int) (MACD_Period_Signal * ratio), MACD_Applied_Price, LINE_SIGNAL, shift);
       }
+      #ifdef __MQL4__
       if (VerboseDebug) PrintFormat("MACD M%d: %s", tf, Array::ArrToString3D(macd, ",", Digits));
+      #endif
       success = (bool)macd[index][CURR][LINE_MAIN];
       break;
     case INDI_MFI: // Calculates the Money Flow Index indicator.
@@ -1034,7 +1048,9 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       }
       // Calculate average value.
       rsi_stats[index][0] = (rsi_stats[index][0] > 0 ? (rsi_stats[index][0] + rsi[index][0] + rsi[index][1] + rsi[index][2]) / 4 : (rsi[index][0] + rsi[index][1] + rsi[index][2]) / 3);
+      #ifdef __MQL4__
       if (VerboseDebug) PrintFormat("%s: RSI %s: %s", DateTime::TimeToStr(_chart.GetBarTime()), _chart.TfToString(), Array::ArrToString2D(rsi, ",", Digits));
+      #endif
       success = (bool) rsi[index][CURR] + rsi[index][PREV] + rsi[index][FAR];
       break;
     case INDI_RVI: // Calculates the Relative Strength Index indicator.
@@ -1051,14 +1067,18 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         sar[index][i] = Indi_SAR::iSAR(symbol, tf, SAR_Step * ratio, SAR_Maximum_Stop, i + SAR_Shift);
       }
+      #ifdef __MQL4__
       if (VerboseDebug) PrintFormat("SAR M%d: %s", tf, Array::ArrToString2D(sar, ",", Digits));
+      #endif
       success = (bool) sar[index][CURR] + sar[index][PREV] + sar[index][FAR];
       break;
     case INDI_STDDEV: // Calculates the Standard Deviation indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         stddev[index][i] = Indi_StdDev::iStdDev(symbol, tf, StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price, i);
       }
+      #ifdef __MQL4__
       if (VerboseDebug) PrintFormat("StdDev M%d: %s", tf, Array::ArrToString2D(stddev, ",", Digits));
+      #endif
       success = stddev[index][CURR];
       break;
     case INDI_STOCHASTIC: // Calculates the Stochastic Oscillator.
@@ -1067,7 +1087,9 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
         stochastic[index][i][LINE_MAIN]   = Indi_Stochastic::iStochastic(symbol, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, LINE_MAIN, i);
         stochastic[index][i][LINE_SIGNAL] = Indi_Stochastic::iStochastic(symbol, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, LINE_SIGNAL, i);
       }
+      #ifdef __MQL4__
       if (VerboseDebug) PrintFormat("Stochastic M%d: %s", tf, Array::ArrToString3D(stochastic, ",", Digits));
+      #endif
       success = stochastic[index][CURR][LINE_MAIN];
       break;
     case INDI_WPR: // Calculates the  Larry Williams' Percent Range.
@@ -1076,7 +1098,9 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         wpr[index][i] = -Indi_WPR::iWPR(symbol, tf, (int) (WPR_Period * ratio), i + WPR_Shift);
       }
+      #ifdef __MQL4__
       if (VerboseDebug) PrintFormat("%s: WPR M%d: %s", DateTime::TimeToStr(_chart.GetBarTime()), tf, Array::ArrToString2D(wpr, ",", Digits));
+      #endif
       success = (bool) wpr[index][CURR] + wpr[index][PREV] + wpr[index][FAR];
       break;
     case INDI_ZIGZAG: // Calculates the custom ZigZag indicator.
@@ -2717,7 +2741,9 @@ bool Trade_RSI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
   if (VerboseTrace && result) {
     PrintFormat("%s: Signal: %s/%s/%d/%g", __FUNCTION_LINE__, EnumToString(cmd), _chart.TfToString(), signal_method, signal_level);
+    #ifdef __MQL4__
     PrintFormat("RSI %s: %s", _chart.TfToString(), Array::ArrToString2D(rsi, ",", Digits));
+    #endif
   }
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
