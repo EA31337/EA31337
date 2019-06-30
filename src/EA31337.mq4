@@ -1497,24 +1497,6 @@ bool UpdateStats() {
   CheckStats(account.AccountEquity(), MAX_EQUITY);
   CheckStats(total_orders, MAX_ORDERS);
   CheckStats(market.GetSpreadInPts(), MAX_SPREAD);
-  if (last_pip_change > MarketBigDropSize) {
-    Message(StringFormat("Market very big drop of %.1f pips detected!", last_pip_change));
-    Print(__FUNCTION__ + ": " + GetLastMessage());
-    if (WriteReport) ReportAdd(__FUNCTION__ + ": " + GetLastMessage());
-  }
-  else if (VerboseDebug && last_pip_change > MarketSuddenDropSize) {
-    Message(StringFormat("Market sudden drop of %.1f pips detected!", last_pip_change));
-    Print(__FUNCTION__ + ": " + GetLastMessage());
-    if (WriteReport) ReportAdd(__FUNCTION__ + ": " + GetLastMessage());
-  }
-  /*
-  PrintFormat("Orders: %d/%d (ORDER_TYPE_BUY:%d/ORDER_TYPE_SELL:%d), Balance: %g (Eq: %g), Total SL: %g (B:%g/S:%g), Total TP: %g (B:%g/S:%g), Calc Money: SL:%g/TP:%g",
-    GetTotalOrders(), OrdersTotal(), Orders::GetOrdersByType(ORDER_TYPE_BUY), Orders::GetOrdersByType(ORDER_TYPE_SELL),
-    AccountBalance(), AccountEquity(),
-    total_sl, Convert::ValueToMoney(Orders::TotalSL(ORDER_TYPE_BUY)), Convert::ValueToMoney(Orders::TotalSL(ORDER_TYPE_SELL)),
-    total_tp, Convert::ValueToMoney(Orders::TotalTP(ORDER_TYPE_BUY)), Convert::ValueToMoney(Orders::TotalTP(ORDER_TYPE_SELL)),
-    Convert::ValueToMoney(total_sl), Convert::ValueToMoney(total_tp));
-  */
   #ifdef __profiler__ PROFILER_STOP #endif
   return (true);
 }
@@ -5113,10 +5095,6 @@ bool MarketCondition(Chart *_chart, int condition = C_MARKET_NONE) {
       return hour_of_day >= HourAfterPeak && (market.GetLastAsk() >= _chart.iHigh(_Symbol, PERIOD_W1, CURR) || market.GetLastAsk() <= _chart.iLow(_Symbol, PERIOD_W1, CURR));
     case C_MONTHLY_PEAK:
       return hour_of_day >= HourAfterPeak && (market.GetLastAsk() >= _chart.iHigh(_Symbol, PERIOD_MN1, CURR) || market.GetLastAsk() <= _chart.iLow(_Symbol, PERIOD_MN1, CURR));
-    case C_MARKET_BIG_DROP:
-      return last_pip_change > MarketSuddenDropSize;
-    case C_MARKET_VBIG_DROP:
-      return last_pip_change > MarketBigDropSize;
     case C_MARKET_AT_HOUR:
       {
         static int hour_invoked = -1;
@@ -6092,8 +6070,6 @@ string MarketIdToText(int mid) {
     case C_DAILY_PEAK: output = "Daily peak price"; break;
     case C_WEEKLY_PEAK: output = "Weekly peak price"; break;
     case C_MONTHLY_PEAK: output = "Monthly peak price"; break;
-    case C_MARKET_BIG_DROP: output = "Market big drop"; break;
-    case C_MARKET_VBIG_DROP: output = "Market very big drop"; break;
     case C_MARKET_AT_HOUR: output = StringFormat("at specific %d hour", MarketSpecificHour); break;
   }
   return output;

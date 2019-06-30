@@ -220,8 +220,6 @@ extern int Account_Condition_MinProfitCloseOrder = 20; // Min pip profit on acti
 
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions_Params__ = "-- Account conditions parameters --"; // >>> CONDITIONS & ACTIONS PARAMS <<<
-extern int MarketSuddenDropSize = 20; // Drop in pips to react
-extern int MarketBigDropSize = 40; // Big drop in pips to react
 extern int MarketSpecificHour = 3; // Specific hour used for conditions (0-23)
 extern bool CloseConditionOnlyProfitable = true; // Apply close condition only for profitable orders
 extern int CloseConditionCustom1Method = 0; // Custom 1 indicator-based close condition (0-1023)
