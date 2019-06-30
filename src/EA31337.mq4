@@ -722,35 +722,35 @@ bool TradeCondition(Trade *_trade, ENUM_STRATEGY_TYPE sid = 0, ENUM_ORDER_TYPE c
   ENUM_TIMEFRAMES tf = (ENUM_TIMEFRAMES) info[sid][TIMEFRAME];
   if (VerboseTrace) PrintFormat("%s:%d: %s (%s), cmd=%d", __FUNCTION__, __LINE__, sname[sid], EnumToString(tf), Order::OrderTypeToString(cmd));
   switch (sid) {
-    case AC1: case AC5: case AC15: case AC30:                                 _result = Trade_AC(_chart, cmd); break;
-    case AD1: case AD5: case AD15: case AD30:                                 _result = Trade_AD(_chart, cmd); break;
-    case ADX1: case ADX5: case ADX15: case ADX30:                             _result = Trade_ADX(_chart, cmd); break;
-    case ALLIGATOR1: case ALLIGATOR5: case ALLIGATOR15: case ALLIGATOR30:     _result = Trade_Alligator(_chart, cmd); break;
-    case ATR1: case ATR5: case ATR15: case ATR30:                             _result = Trade_ATR(_chart, cmd); break;
-    case AWESOME1: case AWESOME5: case AWESOME15: case AWESOME30:             _result = Trade_Awesome(_chart, cmd); break;
-    case BANDS1: case BANDS5: case BANDS15: case BANDS30:                     _result = Trade_Bands(_chart, cmd); break;
-    case BPOWER1: case BPOWER5: case BPOWER15: case BPOWER30:                 _result = Trade_BPower(_chart, cmd); break;
-    case BWMFI1: case BWMFI5: case BWMFI15: case BWMFI30:                     _result = Trade_BWMFI(_chart, cmd); break;
-    case CCI1: case CCI5: case CCI15: case CCI30:                             _result = Trade_CCI(_chart, cmd); break;
-    case DEMARKER1: case DEMARKER5: case DEMARKER15: case DEMARKER30:         _result = Trade_DeMarker(_chart, cmd); break;
-    case ENVELOPES1: case ENVELOPES5: case ENVELOPES15: case ENVELOPES30:     _result = Trade_Envelopes(_chart, cmd); break;
-    case FORCE1: case FORCE5: case FORCE15: case FORCE30:                     _result = Trade_Force(_chart, cmd); break;
-    case FRACTALS1: case FRACTALS5: case FRACTALS15: case FRACTALS30:         _result = Trade_Fractals(_chart, cmd); break;
-    case GATOR1: case GATOR5: case GATOR15: case GATOR30:                     _result = Trade_Gator(_chart, cmd); break;
-    case ICHIMOKU1: case ICHIMOKU5: case ICHIMOKU15: case ICHIMOKU30:         _result = Trade_Ichimoku(_chart, cmd); break;
-    case MA1: case MA5: case MA15: case MA30:                                 _result = Trade_MA(_chart, cmd); break;
-    case MACD1: case MACD5: case MACD15: case MACD30:                         _result = Trade_MACD(_chart, cmd); break;
-    case MFI1: case MFI5: case MFI15: case MFI30:                             _result = Trade_MFI(_chart, cmd); break;
-    case MOM1: case MOM5: case MOM15: case MOM30:                             _result = Trade_Momentum(_chart, cmd); break;
-    case OBV1: case OBV5: case OBV15: case OBV30:                             _result = Trade_OBV(_chart, cmd); break;
-    case OSMA1: case OSMA5: case OSMA15: case OSMA30:                         _result = Trade_OSMA(_chart, cmd); break;
-    case RSI1: case RSI5: case RSI15: case RSI30:                             _result = Trade_RSI(_chart, cmd); break;
-    case RVI1: case RVI5: case RVI15: case RVI30:                             _result = Trade_RVI(_chart, cmd); break;
-    case SAR1: case SAR5: case SAR15: case SAR30:                             _result = Trade_SAR(_chart, cmd); break;
-    case STDDEV1: case STDDEV5: case STDDEV15: case STDDEV30:                 _result = Trade_StdDev(_chart, cmd); break;
-    case STOCHASTIC1: case STOCHASTIC5: case STOCHASTIC15: case STOCHASTIC30: _result = Trade_Stochastic(_chart, cmd); break;
-    case WPR1: case WPR5: case WPR15: case WPR30:                             _result = Trade_WPR(_chart, cmd); break;
-    case ZIGZAG1: case ZIGZAG5: case ZIGZAG15: case ZIGZAG30:                 _result = Trade_ZigZag(_chart, cmd); break;
+    case AC1: case AC5: case AC15: case AC30:                                 _result = Stg_AC::Trade_AC(_chart, cmd); break;
+    case AD1: case AD5: case AD15: case AD30:                                 _result = Stg_AD::Trade_AD(_chart, cmd); break;
+    case ADX1: case ADX5: case ADX15: case ADX30:                             _result = Stg_ADX::Trade_ADX(_chart, cmd); break;
+    case ALLIGATOR1: case ALLIGATOR5: case ALLIGATOR15: case ALLIGATOR30:     _result = Stg_Alligator::Trade_Alligator(_chart, cmd); break;
+    case ATR1: case ATR5: case ATR15: case ATR30:                             _result = Stg_ATR::Trade_ATR(_chart, cmd); break;
+    case AWESOME1: case AWESOME5: case AWESOME15: case AWESOME30:             _result = Stg_Awesome::Trade_Awesome(_chart, cmd); break;
+    case BANDS1: case BANDS5: case BANDS15: case BANDS30:                     _result = Stg_Bands::Trade_Bands(_chart, cmd); break;
+    case BPOWER1: case BPOWER5: case BPOWER15: case BPOWER30:                 _result = Stg_BPower::Trade_BPower(_chart, cmd); break;
+    case BWMFI1: case BWMFI5: case BWMFI15: case BWMFI30:                     _result = Stg_BWMFI::Trade_BWMFI(_chart, cmd); break;
+    case CCI1: case CCI5: case CCI15: case CCI30:                             _result = Stg_CCI::Trade_CCI(_chart, cmd); break;
+    case DEMARKER1: case DEMARKER5: case DEMARKER15: case DEMARKER30:         _result = Stg_DeMarker::Trade_DeMarker(_chart, cmd); break;
+    case ENVELOPES1: case ENVELOPES5: case ENVELOPES15: case ENVELOPES30:     _result = Stg_Envelopes::Trade_Envelopes(_chart, cmd); break;
+    case FORCE1: case FORCE5: case FORCE15: case FORCE30:                     _result = Stg_Force::Trade_Force(_chart, cmd); break;
+    case FRACTALS1: case FRACTALS5: case FRACTALS15: case FRACTALS30:         _result = Stg_Fractals::Trade_Fractals(_chart, cmd); break;
+    case GATOR1: case GATOR5: case GATOR15: case GATOR30:                     _result = Stg_Gator::Trade_Gator(_chart, cmd); break;
+    case ICHIMOKU1: case ICHIMOKU5: case ICHIMOKU15: case ICHIMOKU30:         _result = Stg_Ichimoku::Trade_Ichimoku(_chart, cmd); break;
+    case MA1: case MA5: case MA15: case MA30:                                 _result = Stg_MA::Trade_MA(_chart, cmd); break;
+    case MACD1: case MACD5: case MACD15: case MACD30:                         _result = Stg_MACD::Trade_MACD(_chart, cmd); break;
+    case MFI1: case MFI5: case MFI15: case MFI30:                             _result = Stg_MFI::Trade_MFI(_chart, cmd); break;
+    case MOM1: case MOM5: case MOM15: case MOM30:                             _result = Stg_Momentum::Trade_Momentum(_chart, cmd); break;
+    case OBV1: case OBV5: case OBV15: case OBV30:                             _result = Stg_OBV::Trade_OBV(_chart, cmd); break;
+    case OSMA1: case OSMA5: case OSMA15: case OSMA30:                         _result = Stg_OSMA::Trade_OSMA(_chart, cmd); break;
+    case RSI1: case RSI5: case RSI15: case RSI30:                             _result = Stg_RSI::Trade_RSI(_chart, cmd); break;
+    case RVI1: case RVI5: case RVI15: case RVI30:                             _result = Stg_RVI::Trade_RVI(_chart, cmd); break;
+    case SAR1: case SAR5: case SAR15: case SAR30:                             _result = Stg_SAR::Trade_SAR(_chart, cmd); break;
+    case STDDEV1: case STDDEV5: case STDDEV15: case STDDEV30:                 _result = Stg_StdDev::Trade_StdDev(_chart, cmd); break;
+    case STOCHASTIC1: case STOCHASTIC5: case STOCHASTIC15: case STOCHASTIC30: _result = Stg_Stoch::Trade_Stochastic(_chart, cmd); break;
+    case WPR1: case WPR5: case WPR15: case WPR30:                             _result = Stg_WPR::Trade_WPR(_chart, cmd); break;
+    case ZIGZAG1: case ZIGZAG5: case ZIGZAG15: case ZIGZAG30:                 _result = Stg_ZigZag::Trade_ZigZag(_chart, cmd); break;
   }
   #ifdef __profiler__ PROFILER_STOP #endif
   DEBUG_CHECKPOINT_POP
@@ -1501,7 +1501,13 @@ bool UpdateStats() {
   return (true);
 }
 
-/* INDICATOR FUNCTIONS */
+/* STRATEGY CLASSES */
+
+class Stg_AC : public Strategy {
+
+  public:
+
+    void Stg_AC(StgParams &_params) : Strategy(_params) {}
 
 /**
  * Check if AC indicator is on buy or sell.
@@ -1512,7 +1518,7 @@ bool UpdateStats() {
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (float) - signal level to use
  */
-bool Trade_AC(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_AC(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false;
@@ -1545,6 +1551,13 @@ bool Trade_AC(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, dou
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
+};
+
+class Stg_AD : public Strategy {
+
+  public:
+
+    void Stg_AD(StgParams &_params) : Strategy(_params) {}
 
 /**
  * Check if A/D (Accumulation/Distribution) indicator is on buy or sell.
@@ -1557,7 +1570,7 @@ bool Trade_AC(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, dou
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_AD(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_AD(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -1580,6 +1593,14 @@ bool Trade_AD(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, dou
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
+};
+
+class Stg_ADX : public Strategy {
+
+  public:
+
+    void Stg_ADX(StgParams &_params) : Strategy(_params) {}
+
 
 /**
  * Check if ADX indicator is on buy or sell.
@@ -1590,7 +1611,7 @@ bool Trade_AD(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, dou
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_ADX(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_ADX(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -1616,6 +1637,15 @@ bool Trade_ADX(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
   return result;
 }
 
+};
+
+
+class Stg_Alligator : public Strategy {
+
+  public:
+
+    void Stg_Alligator(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if Alligator indicator is on buy or sell.
  *
@@ -1625,7 +1655,7 @@ bool Trade_ADX(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Alligator(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_Alligator(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   // [x][0] - The Blue line (Alligator's Jaw), [x][1] - The Red Line (Alligator's Teeth), [x][2] - The Green Line (Alligator's Lips)
@@ -1695,6 +1725,14 @@ bool Trade_Alligator(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMP
   return result;
 }
 
+};
+
+class Stg_ATR : public Strategy {
+
+  public:
+
+    void Stg_ATR(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if ATR indicator is on buy or sell.
  *
@@ -1704,7 +1742,7 @@ bool Trade_Alligator(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMP
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_ATR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_ATR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -1750,6 +1788,15 @@ bool Trade_ATR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
   return result;
 }
 
+};
+
+
+class Stg_Awesome : public Strategy {
+
+  public:
+
+    void Stg_Awesome(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if Awesome indicator is on buy or sell.
  *
@@ -1759,7 +1806,7 @@ bool Trade_ATR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Awesome(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_Awesome(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -1804,6 +1851,14 @@ bool Trade_Awesome(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY
   return result;
 }
 
+};
+
+class Stg_Bands : public Strategy {
+
+  public:
+
+    void Stg_Bands(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if Bands indicator is on buy or sell.
  *
@@ -1813,7 +1868,7 @@ bool Trade_Awesome(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Bands(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_Bands(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -1867,6 +1922,15 @@ bool Trade_Bands(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
   return result;
 }
 
+};
+
+
+class Stg_BPower : public Strategy {
+
+  public:
+
+    void Stg_BPower(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if BPower indicator is on buy or sell.
  *
@@ -1876,7 +1940,7 @@ bool Trade_Bands(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_BPower(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_BPower(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -1912,6 +1976,15 @@ bool Trade_BPower(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY,
   return result;
 }
 
+};
+
+
+class Stg_BWMFI : public Strategy {
+
+  public:
+
+    void Stg_BWMFI(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if BWMFI indicator is on buy or sell.
  *
@@ -1921,7 +1994,7 @@ bool Trade_BPower(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY,
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_BWMFI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_BWMFI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -1957,6 +2030,14 @@ bool Trade_BWMFI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
   return result;
 }
 
+};
+
+class Stg_CCI : public Strategy {
+
+  public:
+
+    void Stg_CCI(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if CCI indicator is on buy or sell.
  *
@@ -1966,7 +2047,7 @@ bool Trade_BWMFI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_CCI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_CCI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -2005,6 +2086,14 @@ bool Trade_CCI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
   return result;
 }
 
+};
+
+class Stg_DeMarker : public Strategy {
+
+  public:
+
+    void Stg_DeMarker(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if DeMarker indicator is on buy or sell.
  * Demarker Technical Indicator is based on the comparison of the period maximum with the previous period maximum.
@@ -2015,7 +2104,7 @@ bool Trade_CCI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_DeMarker(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_DeMarker(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -2054,6 +2143,14 @@ bool Trade_DeMarker(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
   return result;
 }
 
+};
+
+class Stg_Envelopes : public Strategy {
+
+  public:
+
+    void Stg_Envelopes(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if Envelopes indicator is on sell.
  *
@@ -2063,7 +2160,7 @@ bool Trade_DeMarker(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Envelopes(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_Envelopes(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -2108,6 +2205,14 @@ bool Trade_Envelopes(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMP
   return result;
 }
 
+};
+
+class Stg_Force : public Strategy {
+
+  public:
+
+    void Stg_Force(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if Force Index indicator is on buy or sell.
  *
@@ -2119,7 +2224,7 @@ bool Trade_Envelopes(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMP
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Force(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_Force(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -2141,6 +2246,14 @@ bool Trade_Force(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
   return result;
 }
 
+};
+
+class Stg_Fractals : public Strategy {
+
+  public:
+
+    void Stg_Fractals(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if Fractals indicator is on buy or sell.
  *
@@ -2150,7 +2263,7 @@ bool Trade_Force(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Fractals(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_Fractals(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint index = _chart.TfToIndex();
@@ -2189,6 +2302,15 @@ bool Trade_Fractals(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
   return result;
 }
 
+};
+
+
+class Stg_Gator : public Strategy {
+
+  public:
+
+    void Stg_Gator(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if Gator Oscillator is on buy or sell.
  *
@@ -2201,7 +2323,7 @@ bool Trade_Fractals(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Gator(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_Gator(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -2229,6 +2351,14 @@ bool Trade_Gator(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
   return result;
 }
 
+};
+
+class Stg_Ichimoku : public Strategy {
+
+  public:
+
+    void Stg_Ichimoku(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if Ichimoku indicator is on buy or sell.
  *
@@ -2238,7 +2368,7 @@ bool Trade_Gator(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Ichimoku(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_Ichimoku(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -2285,6 +2415,14 @@ bool Trade_Ichimoku(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
   return result;
 }
 
+};
+
+class Stg_MA : public Strategy {
+
+  public:
+
+    void Stg_MA(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if MA indicator is on buy.
  *
@@ -2294,7 +2432,7 @@ bool Trade_Ichimoku(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_MA(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_MA(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -2339,6 +2477,15 @@ bool Trade_MA(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, dou
   return result;
 }
 
+};
+
+
+class Stg_MACD : public Strategy {
+
+  public:
+
+    void Stg_MACD(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if MACD indicator is on buy.
  *
@@ -2348,7 +2495,7 @@ bool Trade_MA(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, dou
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_MACD(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_MACD(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -2407,6 +2554,14 @@ bool Trade_MACD(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, d
   return result;
 }
 
+};
+
+class Stg_MFI : public Strategy {
+
+  public:
+
+    void Stg_MFI(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if MFI indicator is on buy or sell.
  *
@@ -2416,7 +2571,7 @@ bool Trade_MACD(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, d
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_MFI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_MFI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -2440,6 +2595,14 @@ bool Trade_MFI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
   return result;
 }
 
+};
+
+class Stg_Momentum : public Strategy {
+
+  public:
+
+    void Stg_Momentum(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if Momentum indicator is on buy or sell.
  *
@@ -2449,7 +2612,7 @@ bool Trade_MFI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Momentum(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_Momentum(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -2467,6 +2630,14 @@ bool Trade_Momentum(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
   return result;
 }
 
+};
+
+class Stg_OBV : public Strategy {
+
+  public:
+
+    void Stg_OBV(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if OBV indicator is on buy or sell.
  *
@@ -2476,7 +2647,7 @@ bool Trade_Momentum(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPT
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_OBV(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_OBV(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -2494,6 +2665,14 @@ bool Trade_OBV(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
   return result;
 }
 
+};
+
+class Stg_OSMA : public Strategy {
+
+  public:
+
+    void Stg_OSMA(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if OSMA indicator is on buy or sell.
  *
@@ -2503,7 +2682,7 @@ bool Trade_OBV(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_OSMA(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_OSMA(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -2542,6 +2721,15 @@ bool Trade_OSMA(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, d
   return result;
 }
 
+};
+
+
+class Stg_RSI : public Strategy {
+
+  public:
+
+    void Stg_RSI(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if RSI indicator is on buy.
  *
@@ -2551,7 +2739,7 @@ bool Trade_OSMA(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, d
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level - signal level to consider the signal
  */
-bool Trade_RSI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_RSI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -2606,6 +2794,14 @@ bool Trade_RSI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
   return result;
 }
 
+};
+
+class Stg_RVI : public Strategy {
+
+  public:
+
+    void Stg_RVI(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if RVI indicator is on buy or sell.
  *
@@ -2615,7 +2811,7 @@ bool Trade_RSI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_RVI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_RVI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -2645,6 +2841,14 @@ bool Trade_RVI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
   return result;
 }
 
+};
+
+class Stg_SAR : public Strategy {
+
+  public:
+
+    void Stg_SAR(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if SAR indicator is on buy or sell.
  *
@@ -2655,7 +2859,7 @@ bool Trade_RVI(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  *   signal_level (double) - signal level to consider the signal (in pips)
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_SAR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_SAR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -2707,6 +2911,14 @@ bool Trade_SAR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
   return result;
 }
 
+};
+
+class Stg_StdDev : public Strategy {
+
+  public:
+
+    void Stg_StdDev(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if StdDev indicator is on buy or sell.
  *
@@ -2716,7 +2928,7 @@ bool Trade_SAR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_StdDev(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_StdDev(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -2761,6 +2973,14 @@ bool Trade_StdDev(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY,
   return result;
 }
 
+};
+
+class Stg_Stoch : public Strategy {
+
+  public:
+
+    void Stg_Stoch(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if Stochastic indicator is on buy or sell.
  *
@@ -2770,7 +2990,7 @@ bool Trade_StdDev(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY,
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_Stochastic(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_Stochastic(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -2831,6 +3051,15 @@ bool Trade_Stochastic(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EM
   return result;
 }
 
+};
+
+
+class Stg_WPR : public Strategy {
+
+  public:
+
+    void Stg_WPR(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if WPR indicator is on buy or sell.
  *
@@ -2840,7 +3069,7 @@ bool Trade_Stochastic(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EM
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_WPR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_WPR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -2890,6 +3119,14 @@ bool Trade_WPR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
   return result;
 }
 
+};
+
+class Stg_ZigZag : public Strategy {
+
+  public:
+
+    void Stg_ZigZag(StgParams &_params) : Strategy(_params) {}
+
 /**
  * Check if ZigZag indicator is on buy or sell.
  *
@@ -2899,7 +3136,7 @@ bool Trade_WPR(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, do
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (double) - signal level to consider the signal
  */
-bool Trade_ZigZag(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Trade_ZigZag(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
@@ -2934,7 +3171,9 @@ bool Trade_ZigZag(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY,
   return result;
 }
 
-/* END: INDICATOR FUNCTIONS */
+};
+
+/* END: STRATEGY CLASSES */
 
 /**
  * Check for market condition.
@@ -2987,85 +3226,85 @@ bool CheckMarketEvent(Chart *_chart, ENUM_ORDER_TYPE cmd = EMPTY, int condition 
   if (VerboseTrace) terminal.Logger().Trace(StringFormat("%s(%s, %d)", EnumToString(cmd), _chart.TfToString(), condition), __FUNCTION_LINE__);
   switch (condition) {
     case C_AC_BUY_SELL:
-      result = Trade_AC(_chart, cmd);
+      result = Stg_AC::Trade_AC(_chart, cmd);
       break;
     case C_AD_BUY_SELL:
-      result = Trade_AD(_chart, cmd);
+      result = Stg_AD::Trade_AD(_chart, cmd);
       break;
     case C_ADX_BUY_SELL:
-      result = Trade_ADX(_chart, cmd);
+      result = Stg_ADX::Trade_ADX(_chart, cmd);
       break;
     case C_ALLIGATOR_BUY_SELL:
-      result = Trade_Alligator(_chart, cmd);
+      result = Stg_Alligator::Trade_Alligator(_chart, cmd);
       break;
     case C_ATR_BUY_SELL:
-      result = Trade_ATR(_chart, cmd);
+      result = Stg_ATR::Trade_ATR(_chart, cmd);
       break;
     case C_AWESOME_BUY_SELL:
-      result = Trade_Awesome(_chart, cmd);
+      result = Stg_Awesome::Trade_Awesome(_chart, cmd);
       break;
     case C_BANDS_BUY_SELL:
-      result = Trade_Bands(_chart, cmd);
+      result = Stg_Bands::Trade_Bands(_chart, cmd);
       break;
     case C_BPOWER_BUY_SELL:
-      result = Trade_BPower(_chart, cmd);
+      result = Stg_BPower::Trade_BPower(_chart, cmd);
       break;
     case C_CCI_BUY_SELL:
-      result = Trade_CCI(_chart, cmd);
+      result = Stg_CCI::Trade_CCI(_chart, cmd);
       break;
     case C_DEMARKER_BUY_SELL:
-      result = Trade_DeMarker(_chart, cmd);
+      result = Stg_DeMarker::Trade_DeMarker(_chart, cmd);
       break;
     case C_ENVELOPES_BUY_SELL:
-      result = Trade_Envelopes(_chart, cmd);
+      result = Stg_Envelopes::Trade_Envelopes(_chart, cmd);
       break;
     case C_FORCE_BUY_SELL:
-      result = Trade_Force(_chart, cmd);
+      result = Stg_Force::Trade_Force(_chart, cmd);
       break;
     case C_FRACTALS_BUY_SELL:
-      result = Trade_Fractals(_chart, cmd);
+      result = Stg_Fractals::Trade_Fractals(_chart, cmd);
       break;
     case C_GATOR_BUY_SELL:
-      result = Trade_Gator(_chart, cmd);
+      result = Stg_Gator::Trade_Gator(_chart, cmd);
       break;
     case C_ICHIMOKU_BUY_SELL:
-      result = Trade_Ichimoku(_chart, cmd);
+      result = Stg_Ichimoku::Trade_Ichimoku(_chart, cmd);
       break;
     case C_MA_BUY_SELL:
-      result = Trade_MA(_chart, cmd);
+      result = Stg_MA::Trade_MA(_chart, cmd);
       break;
     case C_MACD_BUY_SELL:
-      result = Trade_MACD(_chart, cmd);
+      result = Stg_MACD::Trade_MACD(_chart, cmd);
       break;
     case C_MFI_BUY_SELL:
-      result = Trade_MFI(_chart, cmd);
+      result = Stg_MFI::Trade_MFI(_chart, cmd);
       break;
     case C_OBV_BUY_SELL:
-      result = Trade_OBV(_chart, cmd);
+      result = Stg_OBV::Trade_OBV(_chart, cmd);
       break;
     case C_OSMA_BUY_SELL:
-      result = Trade_OSMA(_chart, cmd);
+      result = Stg_OSMA::Trade_OSMA(_chart, cmd);
       break;
     case C_RSI_BUY_SELL:
-      result = Trade_RSI(_chart, cmd);
+      result = Stg_RSI::Trade_RSI(_chart, cmd);
       break;
     case C_RVI_BUY_SELL:
-      result = Trade_RVI(_chart, cmd);
+      result = Stg_RVI::Trade_RVI(_chart, cmd);
       break;
     case C_SAR_BUY_SELL:
-      result = Trade_SAR(_chart, cmd);
+      result = Stg_SAR::Trade_SAR(_chart, cmd);
       break;
     case C_STDDEV_BUY_SELL:
-      result = Trade_StdDev(_chart, cmd);
+      result = Stg_StdDev::Trade_StdDev(_chart, cmd);
       break;
     case C_STOCHASTIC_BUY_SELL:
-      result = Trade_Stochastic(_chart, cmd);
+      result = Stg_Stoch::Trade_Stochastic(_chart, cmd);
       break;
     case C_WPR_BUY_SELL:
-      result = Trade_WPR(_chart, cmd);
+      result = Stg_WPR::Trade_WPR(_chart, cmd);
       break;
     case C_ZIGZAG_BUY_SELL:
-      result = Trade_ZigZag(_chart, cmd);
+      result = Stg_ZigZag::Trade_ZigZag(_chart, cmd);
       break;
     case C_MA_FAST_SLOW_OPP: // MA Fast&Slow are in opposite directions.
       UpdateIndicator(_chart, INDI_MA);
@@ -6216,10 +6455,10 @@ bool OpenOrderCondition(ENUM_ORDER_TYPE cmd, int sid, datetime time, int method)
     if (METHOD(method,1)) result &= (cmd == ORDER_TYPE_BUY && qclose < market.GetClose()) || (cmd == ORDER_TYPE_SELL && qclose > market.GetClose());
     if (METHOD(method,2)) result &= (cmd == ORDER_TYPE_BUY && qlowest < market.GetLow()) || (cmd == ORDER_TYPE_SELL && qlowest > market.GetLow());
     if (METHOD(method,3)) result &= (cmd == ORDER_TYPE_BUY && qhighest > market.GetHigh()) || (cmd == ORDER_TYPE_SELL && qhighest < market.GetHigh());
-    if (METHOD(method,4)) result &= UpdateIndicator(_chart, INDI_SAR) && Trade_SAR(_chart, cmd, 0, 0);
-    if (METHOD(method,5)) result &= UpdateIndicator(_chart, INDI_DEMARKER) && Trade_DeMarker(_chart, cmd, 0, 0);
-    if (METHOD(method,6)) result &= UpdateIndicator(_chart, INDI_RSI) && Trade_RSI(_chart, cmd, 0, 0);
-    if (METHOD(method,7)) result &= UpdateIndicator(_chart, INDI_MA) && Trade_MA(_chart, cmd, 0, 0);
+    if (METHOD(method,4)) result &= UpdateIndicator(_chart, INDI_SAR) && Stg_SAR::Trade_SAR(_chart, cmd, 0, 0);
+    if (METHOD(method,5)) result &= UpdateIndicator(_chart, INDI_DEMARKER) && Stg_DeMarker::Trade_DeMarker(_chart, cmd, 0, 0);
+    if (METHOD(method,6)) result &= UpdateIndicator(_chart, INDI_RSI) && Stg_RSI::Trade_RSI(_chart, cmd, 0, 0);
+    if (METHOD(method,7)) result &= UpdateIndicator(_chart, INDI_MA) && Stg_MA::Trade_MA(_chart, cmd, 0, 0);
   }
   return (result);
 }
