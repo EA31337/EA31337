@@ -1844,13 +1844,14 @@ bool Trade_Bands(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
   if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(INDI_BANDS, _chart.GetTf(), 0);
   double lowest = fmin(Low[CURR], fmin(Low[PREV], Low[FAR]));
   double highest = fmax(High[CURR], fmax(High[PREV], High[FAR]));
+  double level = signal_level * pip_size;
   switch (cmd) {
     // Buy: price crossed lower line upwards (returned to it from below).
     case ORDER_TYPE_BUY:
       // Price value was lower than the lower band.
       result = (
           lowest > 0 && lowest < fmax(fmax(bands[period][CURR][BAND_LOWER], bands[period][PREV][BAND_LOWER]), bands[period][FAR][BAND_LOWER])
-          );
+          ) - level;
       if (signal_method != 0) {
         if (METHOD(signal_method, 0)) result &= fmin(Close[PREV], Close[FAR]) < bands[period][CURR][BAND_LOWER];
         if (METHOD(signal_method, 1)) result &= (bands[period][CURR][BAND_LOWER] > bands[period][FAR][BAND_LOWER]);
@@ -1867,7 +1868,7 @@ bool Trade_Bands(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, 
       // Price value was higher than the upper band.
       result = (
           lowest > 0 && highest > fmin(fmin(bands[period][CURR][BAND_UPPER], bands[period][PREV][BAND_UPPER]), bands[period][FAR][BAND_UPPER])
-          );
+          ) + level;
       if (signal_method != 0) {
         if (METHOD(signal_method, 0)) result &= fmin(Close[PREV], Close[FAR]) > bands[period][CURR][BAND_UPPER];
         if (METHOD(signal_method, 1)) result &= (bands[period][CURR][BAND_LOWER] < bands[period][FAR][BAND_LOWER]);
