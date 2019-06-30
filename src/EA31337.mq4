@@ -38,9 +38,10 @@
 //+------------------------------------------------------------------+
 //| Include public classes.
 //+------------------------------------------------------------------+
-// #include "include\EA31337-classes\Account.mqh"
+#include "include\EA31337-classes\Account.mqh"
 #include "include\EA31337-classes\Array.mqh"
-// #include "include\EA31337-classes\Chart.mqh"
+#include "include\EA31337-classes\Chart.mqh"
+#include "include\EA31337-classes\Collection.mqh"
 #include "include\EA31337-classes\Condition.mqh"
 #include "include\EA31337-classes\Convert.mqh"
 #include "include\EA31337-classes\DateTime.mqh"
@@ -134,6 +135,7 @@ extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v"
 // Class variables.
 Account *account;
 Chart *chart;
+Collection *strats;
 Log *logger;
 Market *market;
 Stats *total_stats, *hourly_stats;
@@ -1507,7 +1509,8 @@ class Stg_AC : public Strategy {
 
   public:
 
-    void Stg_AC(StgParams &_params) : Strategy(_params) {}
+    void Stg_AC(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
 
 /**
  * Check if AC indicator is on buy or sell.
@@ -1518,7 +1521,7 @@ class Stg_AC : public Strategy {
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level (float) - signal level to use
  */
-static bool Signal(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
+static bool Signal(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = EMPTY, double signal_level = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false;
@@ -1551,13 +1554,18 @@ static bool Signal(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
+
+bool Signal(ENUM_ORDER_TYPE _cmd, long _signal_method, long _open_method, double _signal_level) {
+  return this.Signal(this.Chart(), _cmd, _signal_method, _signal_level);
+}
+
 };
 
 class Stg_AD : public Strategy {
 
   public:
 
-    void Stg_AD(StgParams &_params) : Strategy(_params) {}
+    void Stg_AD(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if A/D (Accumulation/Distribution) indicator is on buy or sell.
@@ -1599,8 +1607,7 @@ class Stg_ADX : public Strategy {
 
   public:
 
-    void Stg_ADX(StgParams &_params) : Strategy(_params) {}
-
+    void Stg_ADX(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if ADX indicator is on buy or sell.
@@ -1644,7 +1651,7 @@ class Stg_Alligator : public Strategy {
 
   public:
 
-    void Stg_Alligator(StgParams &_params) : Strategy(_params) {}
+    void Stg_Alligator(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if Alligator indicator is on buy or sell.
@@ -1731,7 +1738,7 @@ class Stg_ATR : public Strategy {
 
   public:
 
-    void Stg_ATR(StgParams &_params) : Strategy(_params) {}
+    void Stg_ATR(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if ATR indicator is on buy or sell.
@@ -1795,7 +1802,7 @@ class Stg_Awesome : public Strategy {
 
   public:
 
-    void Stg_Awesome(StgParams &_params) : Strategy(_params) {}
+    void Stg_Awesome(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if Awesome indicator is on buy or sell.
@@ -1857,7 +1864,7 @@ class Stg_Bands : public Strategy {
 
   public:
 
-    void Stg_Bands(StgParams &_params) : Strategy(_params) {}
+    void Stg_Bands(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if Bands indicator is on buy or sell.
@@ -1929,7 +1936,7 @@ class Stg_BPower : public Strategy {
 
   public:
 
-    void Stg_BPower(StgParams &_params) : Strategy(_params) {}
+    void Stg_BPower(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if BPower indicator is on buy or sell.
@@ -1983,7 +1990,7 @@ class Stg_BWMFI : public Strategy {
 
   public:
 
-    void Stg_BWMFI(StgParams &_params) : Strategy(_params) {}
+    void Stg_BWMFI(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if BWMFI indicator is on buy or sell.
@@ -2036,7 +2043,7 @@ class Stg_CCI : public Strategy {
 
   public:
 
-    void Stg_CCI(StgParams &_params) : Strategy(_params) {}
+    void Stg_CCI(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if CCI indicator is on buy or sell.
@@ -2092,7 +2099,7 @@ class Stg_DeMarker : public Strategy {
 
   public:
 
-    void Stg_DeMarker(StgParams &_params) : Strategy(_params) {}
+    void Stg_DeMarker(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if DeMarker indicator is on buy or sell.
@@ -2149,7 +2156,7 @@ class Stg_Envelopes : public Strategy {
 
   public:
 
-    void Stg_Envelopes(StgParams &_params) : Strategy(_params) {}
+    void Stg_Envelopes(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if Envelopes indicator is on sell.
@@ -2211,7 +2218,7 @@ class Stg_Force : public Strategy {
 
   public:
 
-    void Stg_Force(StgParams &_params) : Strategy(_params) {}
+    void Stg_Force(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if Force Index indicator is on buy or sell.
@@ -2252,7 +2259,7 @@ class Stg_Fractals : public Strategy {
 
   public:
 
-    void Stg_Fractals(StgParams &_params) : Strategy(_params) {}
+    void Stg_Fractals(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if Fractals indicator is on buy or sell.
@@ -2309,7 +2316,7 @@ class Stg_Gator : public Strategy {
 
   public:
 
-    void Stg_Gator(StgParams &_params) : Strategy(_params) {}
+    void Stg_Gator(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if Gator Oscillator is on buy or sell.
@@ -2357,7 +2364,7 @@ class Stg_Ichimoku : public Strategy {
 
   public:
 
-    void Stg_Ichimoku(StgParams &_params) : Strategy(_params) {}
+    void Stg_Ichimoku(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if Ichimoku indicator is on buy or sell.
@@ -2421,7 +2428,7 @@ class Stg_MA : public Strategy {
 
   public:
 
-    void Stg_MA(StgParams &_params) : Strategy(_params) {}
+    void Stg_MA(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if MA indicator is on buy.
@@ -2484,7 +2491,7 @@ class Stg_MACD : public Strategy {
 
   public:
 
-    void Stg_MACD(StgParams &_params) : Strategy(_params) {}
+    void Stg_MACD(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if MACD indicator is on buy.
@@ -2560,7 +2567,7 @@ class Stg_MFI : public Strategy {
 
   public:
 
-    void Stg_MFI(StgParams &_params) : Strategy(_params) {}
+    void Stg_MFI(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if MFI indicator is on buy or sell.
@@ -2601,7 +2608,7 @@ class Stg_Momentum : public Strategy {
 
   public:
 
-    void Stg_Momentum(StgParams &_params) : Strategy(_params) {}
+    void Stg_Momentum(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if Momentum indicator is on buy or sell.
@@ -2636,7 +2643,7 @@ class Stg_OBV : public Strategy {
 
   public:
 
-    void Stg_OBV(StgParams &_params) : Strategy(_params) {}
+    void Stg_OBV(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if OBV indicator is on buy or sell.
@@ -2671,7 +2678,7 @@ class Stg_OSMA : public Strategy {
 
   public:
 
-    void Stg_OSMA(StgParams &_params) : Strategy(_params) {}
+    void Stg_OSMA(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if OSMA indicator is on buy or sell.
@@ -2728,7 +2735,7 @@ class Stg_RSI : public Strategy {
 
   public:
 
-    void Stg_RSI(StgParams &_params) : Strategy(_params) {}
+    void Stg_RSI(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if RSI indicator is on buy.
@@ -2800,7 +2807,7 @@ class Stg_RVI : public Strategy {
 
   public:
 
-    void Stg_RVI(StgParams &_params) : Strategy(_params) {}
+    void Stg_RVI(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if RVI indicator is on buy or sell.
@@ -2847,7 +2854,7 @@ class Stg_SAR : public Strategy {
 
   public:
 
-    void Stg_SAR(StgParams &_params) : Strategy(_params) {}
+    void Stg_SAR(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if SAR indicator is on buy or sell.
@@ -2917,7 +2924,7 @@ class Stg_StdDev : public Strategy {
 
   public:
 
-    void Stg_StdDev(StgParams &_params) : Strategy(_params) {}
+    void Stg_StdDev(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if StdDev indicator is on buy or sell.
@@ -2979,7 +2986,7 @@ class Stg_Stoch : public Strategy {
 
   public:
 
-    void Stg_Stoch(StgParams &_params) : Strategy(_params) {}
+    void Stg_Stoch(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if Stochastic indicator is on buy or sell.
@@ -3058,7 +3065,7 @@ class Stg_WPR : public Strategy {
 
   public:
 
-    void Stg_WPR(StgParams &_params) : Strategy(_params) {}
+    void Stg_WPR(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if WPR indicator is on buy or sell.
@@ -3125,7 +3132,7 @@ class Stg_ZigZag : public Strategy {
 
   public:
 
-    void Stg_ZigZag(StgParams &_params) : Strategy(_params) {}
+    void Stg_ZigZag(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if ZigZag indicator is on buy or sell.
@@ -4783,6 +4790,43 @@ bool InitStrategies() {
   init &= !AC15_Active | InitStrategy(AC15, "AC M15", AC15_Active, INDI_AC, PERIOD_M15, AC15_SignalMethod, AC_SignalLevel, AC15_OpenCondition1, AC15_OpenCondition2, AC15_CloseCondition, AC15_MaxSpread);
   init &= !AC30_Active | InitStrategy(AC30, "AC M30", AC30_Active, INDI_AC, PERIOD_M30, AC30_SignalMethod, AC_SignalLevel, AC30_OpenCondition1, AC30_OpenCondition2, AC30_CloseCondition, AC30_MaxSpread);
 
+  if (AC1_Active) {
+    StgParams ac1_params;
+    ac1_params.trade = new Trade(PERIOD_M1);
+    ac1_params.signal_base_method = AC1_SignalMethod;
+    ac1_params.signal_open_method = AC1_OpenCondition1;
+    ac1_params.close_method = AC1_CloseCondition;
+    ac1_params.max_spread = AC1_MaxSpread;
+    strats.Add(new Stg_AC(ac1_params, "AC1"));
+  }
+  if (AC5_Active) {
+    StgParams ac5_params;
+    ac5_params.trade = new Trade(PERIOD_M5);
+    ac5_params.signal_base_method = AC5_SignalMethod;
+    ac5_params.signal_open_method = AC5_OpenCondition1;
+    ac5_params.close_method = AC5_CloseCondition;
+    ac5_params.max_spread = AC5_MaxSpread;
+    strats.Add(new Stg_AC(ac5_params, "AC5"));
+  }
+  if (AC15_Active) {
+    StgParams ac15_params;
+    ac15_params.trade = new Trade(PERIOD_M15);
+    ac15_params.signal_base_method = AC15_SignalMethod;
+    ac15_params.signal_open_method = AC15_OpenCondition1;
+    ac15_params.close_method = AC15_CloseCondition;
+    ac15_params.max_spread = AC15_MaxSpread;
+    strats.Add(new Stg_AC(ac15_params, "AC15"));
+  }
+  if (AC30_Active) {
+    StgParams ac30_params;
+    ac30_params.trade = new Trade(PERIOD_M30);
+    ac30_params.signal_base_method = AC30_SignalMethod;
+    ac30_params.signal_open_method = AC30_OpenCondition1;
+    ac30_params.close_method = AC30_CloseCondition;
+    ac30_params.max_spread = AC30_MaxSpread;
+    strats.Add(new Stg_AC(ac30_params, "AC30"));
+  }
+
   init &= !AD1_Active  | InitStrategy(AD1,  "AD M1",   AD1_Active,  INDI_AD, PERIOD_M1,  AD1_SignalMethod,  AD_SignalLevel, AD1_OpenCondition1,  AD1_OpenCondition2,  AD1_CloseCondition,  AD1_MaxSpread);
   init &= !AD5_Active  | InitStrategy(AD5,  "AD M5",   AD5_Active,  INDI_AD, PERIOD_M5,  AD5_SignalMethod,  AD_SignalLevel, AD5_OpenCondition1,  AD5_OpenCondition2,  AD5_CloseCondition,  AD5_MaxSpread);
   init &= !AD15_Active | InitStrategy(AD15, "AD M15", AD15_Active, INDI_AD, PERIOD_M15, AD15_SignalMethod, AD_SignalLevel, AD15_OpenCondition1, AD15_OpenCondition2, AD15_CloseCondition, AD15_MaxSpread);
@@ -4988,9 +5032,12 @@ bool InitClasses() {
     }
   }
 
-  ticker = new Ticker(market);
-  summary_report = new SummaryReport();
+  // Initialize other classes.
   terminal = market.TerminalHandler();
+  ticker = new Ticker(market);
+  strats = new Collection();
+  summary_report = new SummaryReport();
+
   #ifdef __profiler__ PROFILER_STOP #endif
   return market.GetSymbol() == _Symbol;
 }
