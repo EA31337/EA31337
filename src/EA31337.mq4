@@ -5404,72 +5404,7 @@ int GetIdByMagic(int magic = -1) {
 
 /* END: STRATEGY FUNCTIONS */
 
-/* BEGIN: SUPPORT/RESISTANCE CALCULATION */
-
-/**
-// See: http://forum.mql4.com/49780
-void CalculateSupRes() {
-   int commonPoint;
-   int minLevel, maxLevel;
-   double highest, lowest, stepIncrement, tolerance, high;
-   double storeLevel[];
-   ///ArrayResize(storeLevel, loopback);
-
-   minLevel = iLowest(Symbol(), Period(), MODE_LOW, loopback, 0);
-   maxLevel = iHighest(Symbol(), Period(), MODE_HIGH, loopback, 0);
-   highest = iHigh(Symbol(), Period(), maxLevel);
-   lowest = iLow(Symbol(), Period(), minLevel);
-
-   //Print("max: " + highest + " min: " + lowest);
-   stepIncrement = 0.0005;
-   tolerance = 0.0002;
-   static double tmp;
-   tmp = 0.0;
-
-
-   for (double actPrice = lowest; actPrice <= highest; actPrice += stepIncrement) {
-      for (int i = 1; i <= loopback; i++) {
-         //do some stuff here...
-         high = iHigh(Symbol(), Period(), i);
-         double topRange, bottomRange;
-         // if is the first value tmp stores the first high encountered until that moment
-         if (tmp == 0) {
-            tmp = high;
-         } else {
-            //define a buffer adding a subtracting from tmp to check if the new high is within that value
-            topRange = tmp + tolerance;
-            bottomRange = tmp - tolerance;
-
-            if (high <= topRange && high >= bottomRange) {
-               commonPoint++;
-            }
-         }
-         //if has been touched at least three times reset common point
-         //tmp goes to the new high value to keep looping
-         if (commonPoint == 3) {
-            commonPoint = 0;
-            tmp = high;
-            ///Print("valore tmp: " + tmp);
-            storeLevel[i] = tmp;
-         }
-      }
-   }
-}
-*/
-
-/* END: SUPPORT/RESISTANCE CALCULATION */
-
 /* BEGIN: DISPLAYING FUNCTIONS */
-
-/**
- * Get text output of hourly stats.
- */
-string GetStats(string sep = ", ") {
-  //string output = "Stats: ";
-  //output += Minute() > 0 ? StringFormat("%.1f ticks/min", hourly_stats.GetTotalTicks() / Minute()) + sep : "";
-  //return output;
-  return "";
-}
 
 /**
  * Get text output of hourly profit report.
@@ -5628,7 +5563,7 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
   string ea_text = StringFormat("%s v%s", ea_name, ea_version);
   // Print actual info.
   string indent = "";
-  indent = "                      "; // if (total_orders > 5)?
+  indent = "                      ";
   output = indent + "------------------------------------------------" + sep
                   + indent + StringFormat("| %s (Status: %s)%s", ea_text, (ea_active ? "ACTIVE" : "NOT ACTIVE"), sep)
                   + indent + StringFormat("| ACCOUNT INFORMATION:%s", sep)
@@ -5653,7 +5588,6 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
                   // + indent // + "Mini lot: " + MarketInfo(Symbol(), MODE_MINLOT) + "" + sep
                   + indent + "| ------------------------------------------------" + sep
                   + indent + "| STATISTICS:" + sep
-                  + indent + "| " + GetStats() + "" + sep
                   + indent + "| " + GetHourlyProfit() + "" + sep
                   + indent + "| " + GetDailyReport() + "" + sep
                   + indent + "| " + GetWeeklyReport() + "" + sep
