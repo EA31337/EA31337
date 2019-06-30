@@ -525,40 +525,6 @@ double BPower15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
 double BPower30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
-string __Breakage_Parameters__ = "-- Settings for the custom Breakage strategy --"; // >>> BREAKAGE <<<
-bool Breakage1_Active = 0; // Enable for M1
-bool Breakage5_Active = 0; // Enable for M5
-bool Breakage15_Active = 0; // Enable for M15
-bool Breakage30_Active = 0; // Enable for M30
-ENUM_TRAIL_TYPE Breakage_TrailingStopMethod = T1_MA_FMS_PEAK; // Trail stop method
-ENUM_TRAIL_TYPE Breakage_TrailingProfitMethod = T1_FIXED; // Trail profit method
-double Breakage_SignalLevel = 0.00000000; // Signal level
-int Breakage1_SignalMethod = 0; // Signal method for M1 (0-31)
-int Breakage5_SignalMethod = 0; // Signal method for M5 (0-31)
-int Breakage15_SignalMethod = 0; // Signal method for M15 (0-31)
-int Breakage30_SignalMethod = 0; // Signal method for M30 (0-31)
-int Breakage1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
-int Breakage1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-ENUM_MARKET_EVENT Breakage1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
-
-int Breakage5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
-int Breakage5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-ENUM_MARKET_EVENT Breakage5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
-
-int Breakage15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
-int Breakage15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-ENUM_MARKET_EVENT Breakage15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
-
-int Breakage30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
-int Breakage30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-ENUM_MARKET_EVENT Breakage30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
-
-double Breakage1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-double Breakage5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-double Breakage15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-double Breakage30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
-
-//+------------------------------------------------------------------+
 string __BWMFI_Parameters__ = "-- Settings for the Market Facilitation Index indicator --"; // >>> BWMFI <<<
 bool BWMFI1_Active = 0; // Enable for M1
 bool BWMFI5_Active = 0; // Enable for M5

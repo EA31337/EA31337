@@ -735,7 +735,6 @@ bool TradeCondition(Trade *_trade, ENUM_STRATEGY_TYPE sid = 0, ENUM_ORDER_TYPE c
     case BANDS1: case BANDS5: case BANDS15: case BANDS30:                     _result = Trade_Bands(_chart, cmd); break;
     case BPOWER1: case BPOWER5: case BPOWER15: case BPOWER30:                 _result = Trade_BPower(_chart, cmd); break;
     case BWMFI1: case BWMFI5: case BWMFI15: case BWMFI30:                     _result = Trade_BWMFI(_chart, cmd); break;
-    case BREAKAGE1: case BREAKAGE5: case BREAKAGE15: case BREAKAGE30:         _result = Trade_Breakage(_chart, cmd); break;
     case CCI1: case CCI5: case CCI15: case CCI30:                             _result = Trade_CCI(_chart, cmd); break;
     case DEMARKER1: case DEMARKER5: case DEMARKER15: case DEMARKER30:         _result = Trade_DeMarker(_chart, cmd); break;
     case ENVELOPES1: case ENVELOPES5: case ENVELOPES15: case ENVELOPES30:     _result = Trade_Envelopes(_chart, cmd); break;
@@ -1954,50 +1953,6 @@ bool Trade_BPower(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY,
 }
 
 /**
- * Check if Breakage indicator is on buy or sell.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level (double) - signal level to consider the signal
- */
-bool Trade_Breakage(Chart *_chart, ENUM_ORDER_TYPE cmd, int signal_method = EMPTY, double signal_level = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  // if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(BWMFI, tf, 0);
-  // if (signal_level  == EMPTY) signal_level  = GetStrategySignalLevel(BWMFI, tf, 0.0);
-  switch (cmd) {
-    case ORDER_TYPE_BUY:
-      /*
-        bool result = Breakage[period][CURR][LINE_LOWER] != 0.0 || Breakage[period][PREV][LINE_LOWER] != 0.0 || Breakage[period][FAR][LINE_LOWER] != 0.0;
-        if (METHOD(signal_method, 0)) result &= Open[CURR] > Close[CURR];
-        if (METHOD(signal_method, 1)) result &= !Breakage_On_Sell(tf);
-        if (METHOD(signal_method, 2)) result &= Breakage_On_Buy(fmin(period + 1, M30));
-        if (METHOD(signal_method, 3)) result &= Breakage_On_Buy(M30);
-        if (METHOD(signal_method, 4)) result &= Breakage[period][FAR][LINE_LOWER] != 0.0;
-        if (METHOD(signal_method, 5)) result &= !Breakage_On_Sell(M30);
-        */
-    break;
-    case ORDER_TYPE_SELL:
-      /*
-        bool result = Breakage[period][CURR][LINE_UPPER] != 0.0 || Breakage[period][PREV][LINE_UPPER] != 0.0 || Breakage[period][FAR][LINE_UPPER] != 0.0;
-        if (METHOD(signal_method, 0)) result &= Open[CURR] < Close[CURR];
-        if (METHOD(signal_method, 1)) result &= !Breakage_On_Buy(tf);
-        if (METHOD(signal_method, 2)) result &= Breakage_On_Sell(fmin(period + 1, M30));
-        if (METHOD(signal_method, 3)) result &= Breakage_On_Sell(M30);
-        if (METHOD(signal_method, 4)) result &= Breakage[period][FAR][LINE_UPPER] != 0.0;
-        if (METHOD(signal_method, 5)) result &= !Breakage_On_Buy(M30);
-        */
-    break;
-  }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-/**
  * Check if BWMFI indicator is on buy or sell.
  *
  * @param
@@ -3094,9 +3049,6 @@ bool CheckMarketEvent(Chart *_chart, ENUM_ORDER_TYPE cmd = EMPTY, int condition 
       break;
     case C_BPOWER_BUY_SELL:
       result = Trade_BPower(_chart, cmd);
-      break;
-    case C_BREAKAGE_BUY_SELL:
-      result = Trade_Breakage(_chart, cmd);
       break;
     case C_CCI_BUY_SELL:
       result = Trade_CCI(_chart, cmd);
@@ -4865,11 +4817,6 @@ bool InitStrategies() {
   init &= !BPower5_Active  | InitStrategy(BPOWER5,  "BPower M5",   BPower5_Active,  INDI_BEARS, PERIOD_M5,  BPower5_SignalMethod,  BPower_SignalLevel, BPower5_OpenCondition1,  BPower5_OpenCondition2,  BPower5_CloseCondition,  BPower5_MaxSpread);
   init &= !BPower15_Active | InitStrategy(BPOWER15, "BPower M15", BPower15_Active, INDI_BEARS, PERIOD_M15, BPower15_SignalMethod, BPower_SignalLevel, BPower15_OpenCondition1, BPower15_OpenCondition2, BPower15_CloseCondition, BPower15_MaxSpread);
   init &= !BPower30_Active | InitStrategy(BPOWER30, "BPower M30", BPower30_Active, INDI_BEARS, PERIOD_M30, BPower30_SignalMethod, BPower_SignalLevel, BPower30_OpenCondition1, BPower30_OpenCondition2, BPower30_CloseCondition, BPower30_MaxSpread);
-
-  init &= !Breakage1_Active  | InitStrategy(BREAKAGE1,  "Breakage M1",   Breakage1_Active,  EMPTY, PERIOD_M1,  Breakage1_SignalMethod,  Breakage_SignalLevel, Breakage1_OpenCondition1,  Breakage1_OpenCondition2,  Breakage1_CloseCondition,  Breakage1_MaxSpread);
-  init &= !Breakage5_Active  | InitStrategy(BREAKAGE5,  "Breakage M5",   Breakage5_Active,  EMPTY, PERIOD_M5,  Breakage5_SignalMethod,  Breakage_SignalLevel, Breakage5_OpenCondition1,  Breakage5_OpenCondition2,  Breakage5_CloseCondition,  Breakage5_MaxSpread);
-  init &= !Breakage15_Active | InitStrategy(BREAKAGE15, "Breakage M15", Breakage15_Active, EMPTY, PERIOD_M15, Breakage15_SignalMethod, Breakage_SignalLevel, Breakage15_OpenCondition1, Breakage15_OpenCondition2, Breakage15_CloseCondition, Breakage15_MaxSpread);
-  init &= !Breakage30_Active | InitStrategy(BREAKAGE30, "Breakage M30", Breakage30_Active, EMPTY, PERIOD_M30, Breakage30_SignalMethod, Breakage_SignalLevel, Breakage30_OpenCondition1, Breakage30_OpenCondition2, Breakage30_CloseCondition, Breakage30_MaxSpread);
 
   init &= !BWMFI1_Active  | InitStrategy(BWMFI1,  "BWMFI M1",   BWMFI1_Active,  EMPTY, PERIOD_M1,  BWMFI1_SignalMethod,  BWMFI_SignalLevel, BWMFI1_OpenCondition1,  BWMFI1_OpenCondition2,  BWMFI1_CloseCondition,  BWMFI1_MaxSpread);
   init &= !BWMFI5_Active  | InitStrategy(BWMFI5,  "BWMFI M5",   BWMFI5_Active,  EMPTY, PERIOD_M5,  BWMFI5_SignalMethod,  BWMFI_SignalLevel, BWMFI5_OpenCondition1,  BWMFI5_OpenCondition2,  BWMFI5_CloseCondition,  BWMFI5_MaxSpread);

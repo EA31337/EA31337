@@ -43,10 +43,6 @@ enum ENUM_STRATEGY_TYPE { // Define type of strategies.
   BPOWER5,
   BPOWER15,
   BPOWER30,
-  BREAKAGE1,
-  BREAKAGE5,
-  BREAKAGE15,
-  BREAKAGE30,
   BWMFI1,
   BWMFI5,
   BWMFI15,
@@ -332,7 +328,6 @@ enum ENUM_MARKET_EVENT {
   C_AWESOME_BUY_SELL    =  6, // Awesome on buy/sell
   C_BANDS_BUY_SELL      =  7, // Bands on buy/sell
   C_BPOWER_BUY_SELL     =  8, // BPower on buy/sell
-  C_BREAKAGE_BUY_SELL   =  9, // Breakage on buy/sell
   C_BWMFI_BUY_SELL      = 10, // BWMFI on buy/sell
   C_CCI_BUY_SELL        = 11, // CCI on buy/sell
   C_DEMARKER_BUY_SELL   = 12, // DeMarker on buy/sell
