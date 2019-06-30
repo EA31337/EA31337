@@ -1112,7 +1112,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
     }
 
   trade_volume = market.NormalizeLots(trade_volume);
-  order_ticket = OrderSend(
+  order_ticket = Order::OrderSend(
       market.GetSymbol(),
       cmd,
       trade_volume,
@@ -1125,9 +1125,9 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
    if (order_ticket >= 0) {
       total_orders++;
       daily_orders++;
-      if (!OrderSelect(order_ticket, SELECT_BY_TICKET) && VerboseErrors) {
+      if (!Order::OrderSelect(order_ticket, SELECT_BY_TICKET) && VerboseErrors) {
         Msg::ShowText(StringFormat("%s (err_code=%d, sid=%d)", terminal.GetLastErrorText(), err_code, sid), "Error", __FUNCTION__, __LINE__, VerboseErrors);
-        OrderPrint();
+        Order::OrderPrint();
         if (retry) TaskAddOrderOpen(cmd, trade_volume, sid); // Will re-try again.
         info[sid][TOTAL_ERRORS]++;
         return (false);
@@ -1149,7 +1149,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
       last_order_time = TimeCurrent(); // Set last execution time.
       // last_trail_update = 0; // Set to 0, so trailing stops can be updated faster.
       stats[sid][AVG_SPREAD] = (stats[sid][AVG_SPREAD] + curr_spread) / 2;
-      if (VerboseInfo) OrderPrint();
+      if (VerboseInfo) Order::OrderPrint();
       Msg::ShowText(StringFormat("%s: %s", Order::OrderTypeToString(Order::OrderType()), GetAccountTextDetails()), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
       if (SoundAlert && Terminal::IsRealtime()) PlaySound(SoundFileAtOpen);
       if (SendEmailEachOrder) SendEmailExecuteOrder();
@@ -1160,7 +1160,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
      int ticket = OrderSend(..., 0,0,...)
      if (ticket < 0)
        Alert("OrderSend failed: ", GetLastError());
-     else if (!OrderSelect(ticket, SELECT_BY_TICKET))
+     else if (!Order::OrderSelect(ticket, SELECT_BY_TICKET))
        Alert("OrderSelect failed: ", GetLastError());
      else if (!OrderModify(OrderTicket(), OrderOpenPrice(), SL, TP, 0))
        Alert("OrderModify failed: ", GetLastError());
@@ -1368,18 +1368,18 @@ bool CheckSpreadLimit(int sid) {
 /**
  * Close order.
  */
-bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = true) {
+bool CloseOrder(ulong ticket_no = EMPTY, int reason_id = EMPTY, bool retry = true) {
   DEBUG_CHECKPOINT_ADD
   bool result = false;
   if (ticket_no == EMPTY) {
-    ticket_no = OrderTicket();
+    ticket_no = Order::OrderTicket();
   }
   if (!Order::OrderSelect(ticket_no, SELECT_BY_TICKET, MODE_TRADES)) {
     return (false);
   }
   #ifdef __profiler__ PROFILER_START #endif
   double close_price = NormalizeDouble(market.GetCloseOffer(), market.GetDigits());
-  result = OrderClose(ticket_no, OrderLots(), close_price, max_order_slippage, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell)); // @fixme: warning 43: possible loss of data due to type conversion
+  result = Order::OrderClose(ticket_no, OrderLots(), close_price, max_order_slippage, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell)); // @fixme: warning 43: possible loss of data due to type conversion
   // if (VerboseTrace) Print(__FUNCTION__ + ": CloseOrder request. Reason: " + reason + "; Result=" + result + " @ " + TimeCurrent() + "(" + TimeToStr(TimeCurrent()) + "), ticket# " + ticket_no);
   if (result) {
     total_orders--;
@@ -1401,7 +1401,7 @@ bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = true)
     if (VerboseErrors) Print(__FUNCTION__, ": Error: Ticket: ", ticket_no, "; Error: ", terminal.GetErrorText(err_code)); // @fixme: CloseOrder: Error: Ticket: 10958; Error: Invalid ticket. OrderClose error 4108.
     if (VerboseDebug) PrintFormat("Error: OrderClose(%d, %f, %f, %f, %d);", ticket_no, OrderLots(), close_price, max_order_slippage, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell));
     if (VerboseDebug) Print(__FUNCTION__ + ": " + GetMarketTextDetails());
-    OrderPrint();
+    Order::OrderPrint();
     if (retry) TaskAddCloseOrder(ticket_no, reason_id); // Add task to re-try.
     int id = GetIdByMagic();
     if (id < 0) info[id][TOTAL_ERRORS]++;
@@ -1413,9 +1413,9 @@ bool CloseOrder(int ticket_no = EMPTY, int reason_id = EMPTY, bool retry = true)
 /**
  * Re-calculate statistics based on the order and return the profit value.
  */
-double OrderCalc(int ticket_no = 0) {
+double OrderCalc(ulong ticket_no = 0) {
   // OrderClosePrice(), OrderCloseTime(), OrderComment(), OrderCommission(), OrderExpiration(), OrderLots(), OrderOpenPrice(), OrderOpenTime(), OrderPrint(), OrderProfit(), OrderStopLoss(), OrderSwap(), OrderSymbol(), OrderTakeProfit(), OrderTicket(), OrderType()
-  if (ticket_no == 0) ticket_no = OrderTicket();
+  if (ticket_no == 0) ticket_no = Order::OrderTicket();
   int id = GetIdByMagic();
   if (id < 0) return false;
   datetime close_time = Order::OrderCloseTime();
@@ -1464,8 +1464,8 @@ int CloseOrdersByType(ENUM_ORDER_TYPE cmd, int strategy_id, int reason_id, bool 
    Market::RefreshRates();
    int order;
    for (order = 0; order < OrdersTotal(); order++) {
-      if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
-        if (strategy_id == GetIdByMagic() && OrderSymbol() == Symbol() && OrderType() == cmd) {
+      if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
+        if (strategy_id == GetIdByMagic() && Order::OrderSymbol() == Symbol() && OrderType() == cmd) {
           if (only_profitable && Order::GetOrderProfit() < 0) continue;
           if (CloseOrder(NULL, reason_id)) {
              orders_total++;
@@ -3209,8 +3209,8 @@ bool UpdateTrailingStops(Trade *_trade) {
 
    market.RefreshRates();
    for (int i = 0; i < OrdersTotal(); i++) {
-     if (!OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) { continue; }
-      if (OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
+     if (!Order::OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) { continue; }
+      if (Order::OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
         sid = OrderMagicNumber() - MagicNumber;
         // order_stop_loss = NormalizeDouble(Misc::If(Order::OrderDirection(OrderType()) > 0 || OrderStopLoss() != 0.0, OrderStopLoss(), 999999), pip_digits);
         // FIXME
@@ -3218,8 +3218,8 @@ bool UpdateTrailingStops(Trade *_trade) {
         // See: https://book.mql4.com/appendix/limits
         if (MinimalizeLosses) {
         // if (MinimalizeLosses && Order::GetOrderProfit() > GetMinStopLevel()) {
-          if ((OrderType() == ORDER_TYPE_BUY && OrderStopLoss() < market.GetBid()) ||
-             (OrderType() == ORDER_TYPE_SELL && OrderStopLoss() > market.GetAsk())) {
+          if ((Order::OrderType() == ORDER_TYPE_BUY && Order::OrderStopLoss() < market.GetBid()) ||
+             (Order::OrderType() == ORDER_TYPE_SELL && Order::OrderStopLoss() > market.GetAsk())) {
             result = Order::OrderModify(Order::OrderTicket(), Order::OrderOpenPrice(), Order::OrderOpenPrice() - Order::OrderCommission() * Point, Order::OrderTakeProfit(), 0, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell));
             if (!result && err_code > 0) {
              if (VerboseErrors) Print(__FUNCTION__, ": Error: OrderModify(): [MinimalizeLosses] ", Terminal::GetErrorText(err_code));
@@ -3274,21 +3274,21 @@ bool UpdateTrailingStops(Trade *_trade) {
         // datetime expiration=TimeTradeServer()+PeriodSeconds(PERIOD_D1);
 
         if (fabs(prev_sl - new_sl) > MinPipChangeToTrade * pip_size || fabs(prev_tp - new_tp) > MinPipChangeToTrade * pip_size) {
-          result = OrderModify(OrderTicket(), OrderOpenPrice(), new_sl, new_tp, 0, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell));
+          result = Order::OrderModify(Order::OrderTicket(), Order::OrderOpenPrice(), new_sl, new_tp, 0, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell));
           if (!result) {
             err_code = GetLastError();
             if (err_code > 0) {
               Msg::ShowText(Terminal::GetErrorText(err_code), "Error", __FUNCTION__, __LINE__, VerboseErrors);
               Msg::ShowText(
                 StringFormat("OrderModify(%d, %g, %g, %g, %d, %d); Ask:%g/Bid:%g; Gap:%g pips",
-                OrderTicket(), OrderOpenPrice(), new_sl, new_tp, 0, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell), market.GetAsk(), market.GetBid(), market.GetTradeDistanceInPips()),
+                Order::OrderTicket(), Order::OrderOpenPrice(), new_sl, new_tp, 0, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell), market.GetAsk(), market.GetBid(), market.GetTradeDistanceInPips()),
                 "Debug", __FUNCTION__, __LINE__, VerboseDebug
               );
               Msg::ShowText(
                 StringFormat("%s(): fabs(%g - %g) = %g > %g || fabs(%g - %g) = %g > %g",
                 __FUNCTION__,
-                OrderStopLoss(), new_sl, fabs(OrderStopLoss() - new_sl), MinPipChangeToTrade * pip_size,
-                OrderTakeProfit(), new_tp, fabs(OrderTakeProfit() - new_tp), MinPipChangeToTrade * pip_size),
+                Order::OrderStopLoss(), new_sl, fabs(Order::OrderStopLoss() - new_sl), MinPipChangeToTrade * pip_size,
+                Order::OrderTakeProfit(), new_tp, fabs(Order::OrderTakeProfit() - new_tp), MinPipChangeToTrade * pip_size),
                 "Debug", __FUNCTION__, __LINE__, VerboseDebug);
             }
           } else {
@@ -3723,10 +3723,10 @@ int CalculateCurrentOrders(string _symbol) {
    int buys=0, sells=0;
 
    for (int i = 0; i < OrdersTotal(); i++) {
-      if (OrderSelect(i, SELECT_BY_POS, MODE_TRADES) == false) break;
-      if (OrderSymbol() == _symbol && CheckOurMagicNumber()){
-         if (OrderType() == ORDER_TYPE_BUY)  buys++;
-         if (OrderType() == ORDER_TYPE_SELL) sells++;
+      if (Order::OrderSelect(i, SELECT_BY_POS, MODE_TRADES) == false) break;
+      if (Order::OrderSymbol() == _symbol && CheckOurMagicNumber()){
+         if (Order::OrderType() == ORDER_TYPE_BUY)  buys++;
+         if (Order::OrderType() == ORDER_TYPE_SELL) sells++;
         }
      }
    if (buys > 0) return(buys); else return(-sells); // Return orders volume
@@ -3739,7 +3739,7 @@ int CalculateCurrentOrders(string _symbol) {
 int GetTotalOrders(bool ours = true) {
   int total = 0;
   for (int order = 0; order < OrdersTotal(); order++) {
-    if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol()) {
+    if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol()) {
       if (CheckOurMagicNumber()) {
         if (ours) total++;
       } else {
@@ -3758,8 +3758,8 @@ int GetTotalOrdersByType(int order_type) {
   open_orders[order_type] = 0;
   // ArrayFill(open_orders[order_type], 0, ArraySize(open_orders), 0); // Reset open_orders array.
   for (int order = 0; order < OrdersTotal(); order++) {
-   if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
-     if (OrderSymbol() == Symbol() && OrderMagicNumber() == MagicNumber + order_type) {
+   if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
+     if (Order::OrderSymbol() == Symbol() && Order::OrderMagicNumber() == MagicNumber + order_type) {
        open_orders[order_type]++;
      }
    }
@@ -3774,10 +3774,10 @@ int GetTotalOrdersByType(int order_type) {
 double GetTotalProfitByType(ENUM_ORDER_TYPE cmd = NULL, int order_type = NULL) {
   double total = 0;
   for (int i = 0; i < OrdersTotal(); i++) {
-    if (OrderSelect(i, SELECT_BY_POS, MODE_TRADES) == false) break;
-    if (OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
-       if (OrderType() == cmd) total += Order::GetOrderProfit();
-       else if (OrderMagicNumber() == MagicNumber + order_type) total += Order::GetOrderProfit();
+    if (Order::OrderSelect(i, SELECT_BY_POS, MODE_TRADES) == false) break;
+    if (Order::OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
+       if (Order::OrderType() == cmd) total += Order::GetOrderProfit();
+       else if (Order::OrderMagicNumber() == MagicNumber + order_type) total += Order::GetOrderProfit();
      }
   }
   return total;
@@ -5702,8 +5702,8 @@ bool ActionCloseMostProfitableOrder(int reason_id = EMPTY, int min_profit = EMPT
   int selected_ticket = 0;
   double max_ticket_profit = 0, curr_ticket_profit = 0;
   for (int order = 0; order < OrdersTotal(); order++) {
-    if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES))
-     if (OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
+    if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES))
+     if (Order::OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
       curr_ticket_profit = Order::GetOrderProfit();
        if (curr_ticket_profit > max_ticket_profit) {
          selected_ticket = OrderTicket();
@@ -5729,8 +5729,8 @@ bool ActionCloseMostUnprofitableOrder(int reason_id = EMPTY){
   int selected_ticket = 0;
   double ticket_profit = 0;
   for (int order = 0; order < OrdersTotal(); order++) {
-    if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES))
-     if (OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
+    if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES))
+     if (Order::OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
        if (Order::GetOrderProfit() < ticket_profit) {
          selected_ticket = OrderTicket();
          ticket_profit = Order::GetOrderProfit();
@@ -5755,7 +5755,7 @@ bool ActionCloseAllProfitableOrders(int reason_id = EMPTY){
   int selected_orders = 0;
   double ticket_profit = 0, total_profit = 0;
   for (int order = 0; order < OrdersTotal(); order++) {
-    if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
+    if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
        ticket_profit = Order::GetOrderProfit();
        if (ticket_profit > 0) {
          result = TaskAddCloseOrder(OrderTicket(), reason_id);
@@ -5780,7 +5780,7 @@ bool ActionCloseAllUnprofitableOrders(int reason_id = EMPTY){
   int selected_orders = 0;
   double ticket_profit = 0, total_profit = 0;
   for (int order = 0; order < OrdersTotal(); order++) {
-    if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
+    if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
        ticket_profit = Order::GetOrderProfit();
        if (ticket_profit < 0) {
          result = TaskAddCloseOrder(OrderTicket(), reason_id);
@@ -5806,8 +5806,8 @@ bool ActionCloseAllOrdersByType(ENUM_ORDER_TYPE cmd = EMPTY, int reason_id = EMP
   int selected_orders = 0;
   double ticket_profit = 0, total_profit = 0;
   for (int order = 0; order < OrdersTotal(); order++) {
-    if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
-       if (OrderType() == cmd) {
+    if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
+       if (Order::OrderType() == cmd) {
          TaskAddCloseOrder(OrderTicket(), reason_id);
          selected_orders++;
          total_profit += ticket_profit;
@@ -5843,10 +5843,10 @@ int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = true) {
    int total = OrdersTotal();
    double total_profit = 0;
    for (int order = 0; order < total; order++) {
-      if (OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && OrderTicket() > 0) {
+      if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && Order::OrderTicket() > 0) {
          if (only_ours && !CheckOurMagicNumber()) continue;
          total_profit += Order::GetOrderProfit();
-         TaskAddCloseOrder(OrderTicket(), reason_id); // Add task to re-try.
+         TaskAddCloseOrder(Order::OrderTicket(), reason_id); // Add task to re-try.
          processed++;
       } else {
          Msg::ShowText(StringFormat("Error: Order Pos: %d; Message: %s", order, terminal.GetLastErrorText()),
@@ -6342,10 +6342,10 @@ bool TaskAddOrderOpen(ENUM_ORDER_TYPE cmd, double volume, int order_type) {
 /**
  * Add new close task by job id.
  */
-bool TaskAddCloseOrder(int ticket_no, int reason = EMPTY) {
+bool TaskAddCloseOrder(long ticket_no, int reason = EMPTY) {
   int job_id = TaskFindEmptySlot(ticket_no);
   if (job_id >= 0) {
-    todo_queue[job_id][0] = ticket_no;
+    todo_queue[job_id][0] = (int) ticket_no;
     todo_queue[job_id][1] = TASK_ORDER_CLOSE;
     todo_queue[job_id][2] = MaxTries; // Set number of retries.
     todo_queue[job_id][3] = reason;
@@ -6390,7 +6390,7 @@ bool TaskRemove(int job_id) {
  * Check if task for specific ticket already exists.
  * @todo: Move to Arrays.
  */
-bool TaskExistByKey(int key) {
+bool TaskExistByKey(long key) {
   for (int job_id = 0; job_id < ArrayRange(todo_queue, 0); job_id++) {
     if (todo_queue[job_id][0] == key) {
       // if (VerboseTrace) Print(__FUNCTION__ + ": Task already allocated for key: " + key);
@@ -6405,7 +6405,7 @@ bool TaskExistByKey(int key) {
  * Find available slot id.
  * @todo: Move to Arrays.
  */
-int TaskFindEmptySlot(int key) {
+int TaskFindEmptySlot(long key) {
   int taken = 0;
   if (!TaskExistByKey(key)) {
     for (int job_id = 0; job_id < ArrayRange(todo_queue, 0); job_id++) {
@@ -6436,7 +6436,7 @@ int TaskFindEmptySlot(int key) {
  */
 bool TaskRun(int job_id) {
   bool result = false;
-  int key = todo_queue[job_id][0];
+  long key = todo_queue[job_id][0];
   int task_type = todo_queue[job_id][1];
   int retries = todo_queue[job_id][2];
   int cmd, sid, reason_id;
@@ -6452,13 +6452,13 @@ bool TaskRun(int job_id) {
       break;
     case TASK_ORDER_CLOSE:
         reason_id = todo_queue[job_id][3];
-        if (OrderSelect(key, SELECT_BY_TICKET)) {
+        if (Order::OrderSelect(key, SELECT_BY_TICKET)) {
           if (CloseOrder(key, reason_id, false))
             result = TaskRemove(job_id);
         }
       break;
     case TASK_CALC_STATS:
-        if (OrderSelect(key, SELECT_BY_TICKET, MODE_HISTORY)) {
+        if (Order::OrderSelect(key, SELECT_BY_TICKET, MODE_HISTORY)) {
           OrderCalc(key);
         } else {
           Msg::ShowText(StringFormat("Access to history failed with error: (%d).", GetLastError()),
