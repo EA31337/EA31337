@@ -795,7 +795,7 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
     case INDI_ALLIGATOR: // Calculates the Alligator indicator.
       // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        shift = i + Alligator_Shift + (i == FINAL_ENUM_INDICATOR_INDEX - 1 ? Alligator_Shift_Far : 0);
+        shift = i + Alligator_Shift;
         alligator[index][i][LINE_LIPS]  = Indi_MA::iMA(symbol, tf, Alligator_Period_Lips,  Alligator_Shift_Lips,  Alligator_MA_Method, Alligator_Applied_Price, shift);
         alligator[index][i][LINE_TEETH] = Indi_MA::iMA(symbol, tf, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_MA_Method, Alligator_Applied_Price, shift);
         alligator[index][i][LINE_JAW]   = Indi_MA::iMA(symbol, tf, Alligator_Period_Jaw,   Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, shift);
@@ -823,7 +823,7 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       break;
     case INDI_BANDS: // Calculates the Bollinger Bands indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        shift = i + Bands_Shift + (i == FINAL_ENUM_INDICATOR_INDEX - 1 ? Bands_Shift_Far : 0);
+        shift = i + Bands_Shift;
         bands[index][i][BAND_BASE]  = Indi_Bands::iBands(symbol, tf, Bands_Period, Bands_Deviation, 0, Bands_Applied_Price, BAND_BASE,  shift);
         bands[index][i][BAND_UPPER] = Indi_Bands::iBands(symbol, tf, Bands_Period, Bands_Deviation, 0, Bands_Applied_Price, BAND_UPPER, shift);
         bands[index][i][BAND_LOWER] = Indi_Bands::iBands(symbol, tf, Bands_Period, Bands_Deviation, 0, Bands_Applied_Price, BAND_LOWER, shift);
@@ -911,7 +911,7 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
     case INDI_MA: // Calculates the Moving Average indicator.
       // Calculate MA Fast.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        shift = i + MA_Shift + (i == FINAL_ENUM_INDICATOR_INDEX - 1 ? MA_Shift_Far : 0);
+        shift = i + MA_Shift;
         ma_fast[index][i]   = Indi_MA::iMA(symbol, tf, MA_Period_Fast,   MA_Shift_Fast,   MA_Method, MA_Applied_Price, shift);
         ma_medium[index][i] = Indi_MA::iMA(symbol, tf, MA_Period_Medium, MA_Shift_Medium, MA_Method, MA_Applied_Price, shift);
         ma_slow[index][i]   = Indi_MA::iMA(symbol, tf, MA_Period_Slow,   MA_Shift_Slow,   MA_Method, MA_Applied_Price, shift);
@@ -933,7 +933,7 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       break;
     case INDI_MACD: // Calculates the Moving Averages Convergence/Divergence indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        shift = i + MACD_Shift + (i == FINAL_ENUM_INDICATOR_INDEX - 1 ? MACD_Shift_Far : 0);
+        shift = i + MACD_Shift;
         macd[index][i][LINE_MAIN]   = Indi_MACD::iMACD(symbol, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price, LINE_MAIN,   shift);
         macd[index][i][LINE_SIGNAL] = Indi_MACD::iMACD(symbol, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price, LINE_SIGNAL, shift);
       }
@@ -984,10 +984,10 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
     case INDI_RVI: // Calculates the Relative Strength Index indicator.
       rvi[index][CURR][LINE_MAIN]   = Indi_RVI::iRVI(symbol, tf, 10, LINE_MAIN, CURR);
       rvi[index][PREV][LINE_MAIN]   = Indi_RVI::iRVI(symbol, tf, 10, LINE_MAIN, PREV + RVI_Shift);
-      rvi[index][FAR][LINE_MAIN]    = Indi_RVI::iRVI(symbol, tf, 10, LINE_MAIN, FAR + RVI_Shift + RVI_Shift_Far);
+      rvi[index][FAR][LINE_MAIN]    = Indi_RVI::iRVI(symbol, tf, 10, LINE_MAIN, FAR + RVI_Shift);
       rvi[index][CURR][LINE_SIGNAL] = Indi_RVI::iRVI(symbol, tf, 10, LINE_SIGNAL, CURR);
       rvi[index][PREV][LINE_SIGNAL] = Indi_RVI::iRVI(symbol, tf, 10, LINE_SIGNAL, PREV + RVI_Shift);
-      rvi[index][FAR][LINE_SIGNAL]  = Indi_RVI::iRVI(symbol, tf, 10, LINE_SIGNAL, FAR + RVI_Shift + RVI_Shift_Far);
+      rvi[index][FAR][LINE_SIGNAL]  = Indi_RVI::iRVI(symbol, tf, 10, LINE_SIGNAL, FAR + RVI_Shift);
       success = (bool) rvi[index][CURR][LINE_MAIN];
       break;
     case INDI_SAR: // Calculates the Parabolic Stop and Reverse system indicator.
@@ -3440,23 +3440,11 @@ double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_
        diff = fabs(ask - ma_fast[period][PREV]);
        new_value = ask + diff * direction;
        break;
-     case T1_MA_F_FAR: // 11: MA Small (Far) + trailing stop. Optimize together with: MA_Shift_Far.
-     case T2_MA_F_FAR:
-       UpdateIndicator(_chart, INDI_MA);
-       diff = fabs(ask - ma_fast[period][FAR]);
-       new_value = ask + diff * direction;
-       break;
      case T1_MA_F_TRAIL: // 12: MA Fast (Current) + trailing stop. Works fine.
      case T2_MA_F_TRAIL:
        UpdateIndicator(_chart, INDI_MA);
        diff = fabs(ask - ma_fast[period][CURR]);
        new_value = ask + (diff + trail) * direction;
-       break;
-     case T1_MA_F_FAR_TRAIL: // 13: MA Fast (Far) + trailing stop. Works fine (SL pf: 1.26 for MA).
-     case T2_MA_F_FAR_TRAIL:
-       UpdateIndicator(_chart, INDI_MA);
-       diff = fabs(Open[CURR] - ma_fast[period][FAR]);
-       new_value = Open[CURR] + (diff + trail) * direction;
        break;
      case T1_MA_M: // 14: MA Medium (Current).
      case T2_MA_M:
