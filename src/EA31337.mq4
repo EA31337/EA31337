@@ -589,9 +589,6 @@ string InitInfo(bool startup = false, string sep = "\n") {
     if (Object::IsValid(trade[_tfi]) && trade[_tfi].Chart().IsValidTf()) {
       output += StringFormat("CHART: %s%s", trade[_tfi].Chart().ToString(), sep);
     }
-    else {
-      output += StringFormat("CHART: %s not active.%s", Chart::IndexToString(_tfi), sep);
-    }
   }
 
   // @todo: Move to SymbolInfo.
