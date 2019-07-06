@@ -39,10 +39,14 @@ enum ENUM_STRATEGY_TYPE { // Define type of strategies.
   BANDS5,
   BANDS15,
   BANDS30,
-  BPOWER1,
-  BPOWER5,
-  BPOWER15,
-  BPOWER30,
+  BEARSPOWER1,
+  BEARSPOWER5,
+  BEARSPOWER15,
+  BEARSPOWER30,
+  BULLSPOWER1,
+  BULLSPOWER5,
+  BULLSPOWER15,
+  BULLSPOWER30,
   BWMFI1,
   BWMFI5,
   BWMFI15,
@@ -321,7 +325,8 @@ enum ENUM_MARKET_EVENT {
   C_ATR_BUY_SELL        =  5, // ATR on buy/sell
   C_AWESOME_BUY_SELL    =  6, // Awesome on buy/sell
   C_BANDS_BUY_SELL      =  7, // Bands on buy/sell
-  C_BPOWER_BUY_SELL     =  8, // BPower on buy/sell
+  C_BEARSPOWER_BUY_SELL =  8, // BearsPower on buy/sell
+  C_BULLSPOWER_BUY_SELL = 40, // BullsPower on buy/sell
   C_BWMFI_BUY_SELL      = 10, // BWMFI on buy/sell
   C_CCI_BUY_SELL        = 11, // CCI on buy/sell
   C_DEMARKER_BUY_SELL   = 12, // DeMarker on buy/sell
