@@ -508,6 +508,7 @@ void DeinitVars() {
   Object::Delete(ticker);
   Object::Delete(terminal);
   Object::Delete(market);
+  Object::Delete(strats);
   for (int tfi = 0; tfi < FINAL_ENUM_TIMEFRAMES_INDEX; tfi++) {
     Object::Delete(trade[tfi]);
   }
@@ -4941,23 +4942,27 @@ bool InitStrategies() {
   init &= !AC30_Active | InitStrategy(AC30, "AC M30", AC30_Active, INDI_AC, PERIOD_M30, AC30_SignalMethod, AC_SignalLevel, AC30_OpenCondition1, AC30_OpenCondition2, AC30_CloseCondition, AC30_MaxSpread);
 
   IndicatorParams iparams(10);
+  ChartParams cparams1(PERIOD_M1);
+  ChartParams cparams5(PERIOD_M5);
+  ChartParams cparams15(PERIOD_M15);
+  ChartParams cparams30(PERIOD_M30);
   if (AC1_Active) {
-    StgParams ac1_params(new Trade(PERIOD_M1, _Symbol), new Indi_AC(iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams ac1_params(new Trade(PERIOD_M1, _Symbol), new Indi_AC(iparams, cparams1), NULL, NULL);
     ac1_params.SetSignals(AC1_SignalMethod, AC1_OpenCondition1, AC1_OpenCondition2, AC1_CloseCondition, NULL, AC_SignalLevel, NULL);
     strats.Add(new Stg_AC(ac1_params, "AC1"));
   }
   if (AC5_Active) {
-    StgParams ac5_params(new Trade(PERIOD_M5, _Symbol), new Indi_AC(iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams ac5_params(new Trade(PERIOD_M5, _Symbol), new Indi_AC(iparams, cparams5), NULL, NULL);
     ac5_params.SetSignals(AC5_SignalMethod, AC5_OpenCondition1, AC5_OpenCondition2, AC5_CloseCondition, NULL, AC_SignalLevel, NULL);
     strats.Add(new Stg_AC(ac5_params, "AC5"));
   }
   if (AC15_Active) {
-    StgParams ac15_params(new Trade(PERIOD_M15, _Symbol), new Indi_AC(iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams ac15_params(new Trade(PERIOD_M15, _Symbol), new Indi_AC(iparams, cparams15), NULL, NULL);
     ac15_params.SetSignals(AC15_SignalMethod, AC15_OpenCondition1, AC15_OpenCondition2, AC15_CloseCondition, NULL, AC_SignalLevel, NULL);
     strats.Add(new Stg_AC(ac15_params, "AC15"));
   }
   if (AC30_Active) {
-    StgParams ac30_params(new Trade(PERIOD_M30, _Symbol), new Indi_AC(iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams ac30_params(new Trade(PERIOD_M30, _Symbol), new Indi_AC(iparams, cparams30), NULL, NULL);
     ac30_params.SetSignals(AC30_SignalMethod, AC30_OpenCondition1, AC30_OpenCondition2, AC30_CloseCondition, NULL, AC_SignalLevel, NULL);
     strats.Add(new Stg_AC(ac30_params, "AC30"));
   }
@@ -4968,25 +4973,25 @@ bool InitStrategies() {
   init &= !AD30_Active | InitStrategy(AD30, "AD M30", AD30_Active, INDI_AD, PERIOD_M30, AD30_SignalMethod, AD_SignalLevel, AD30_OpenCondition1, AD30_OpenCondition2, AD30_CloseCondition, AD30_MaxSpread);
 
   if (AD1_Active) {
-    StgParams ad1_params(new Trade(PERIOD_M1, _Symbol), new Indi_AD(iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams ad1_params(new Trade(PERIOD_M1, _Symbol), new Indi_AD(iparams, cparams1), NULL, NULL);
     ad1_params.SetTf(PERIOD_M1);
     ad1_params.SetSignals(AD1_SignalMethod, AD1_OpenCondition1, AD1_OpenCondition2, AD1_CloseCondition, NULL, AD_SignalLevel, NULL);
     strats.Add(new Stg_AD(ad1_params, "AD1"));
   }
   if (AD5_Active) {
-    StgParams ad5_params(new Trade(PERIOD_M5, _Symbol), new Indi_AD(iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams ad5_params(new Trade(PERIOD_M5, _Symbol), new Indi_AD(iparams, cparams5), NULL, NULL);
     ad5_params.SetTf(PERIOD_M5);
     ad5_params.SetSignals(AD5_SignalMethod, AD5_OpenCondition1, AD5_OpenCondition2, AD5_CloseCondition, NULL, AD_SignalLevel, NULL);
     strats.Add(new Stg_AD(ad5_params, "AD5"));
   }
   if (AD15_Active) {
-    StgParams ad15_params(new Trade(PERIOD_M15, _Symbol), new Indi_AD(iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams ad15_params(new Trade(PERIOD_M15, _Symbol), new Indi_AD(iparams, cparams15), NULL, NULL);
     ad15_params.SetTf(PERIOD_M15);
     ad15_params.SetSignals(AD15_SignalMethod, AD15_OpenCondition1, AD15_OpenCondition2, AD15_CloseCondition, NULL, AD_SignalLevel, NULL);
     strats.Add(new Stg_AD(ad15_params, "AD15"));
   }
   if (AD30_Active) {
-    StgParams ad30_params(new Trade(PERIOD_M30, _Symbol), new Indi_AD(iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams ad30_params(new Trade(PERIOD_M30, _Symbol), new Indi_AD(iparams, cparams30), NULL, NULL);
     ad30_params.SetTf(PERIOD_M30);
     ad30_params.SetSignals(AD30_SignalMethod, AD30_OpenCondition1, AD30_OpenCondition2, AD30_CloseCondition, NULL, AD_SignalLevel, NULL);
     strats.Add(new Stg_AD(ad30_params, "AD30"));
@@ -4999,25 +5004,25 @@ bool InitStrategies() {
 
   if (ADX1_Active) {
     ADX_Params adx1_iparams(ADX_Period, ADX_Applied_Price);
-    StgParams adx1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_ADX(adx1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams adx1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_ADX(adx1_iparams, iparams, cparams1), NULL, NULL);
     adx1_sparams.SetSignals(ADX1_SignalMethod, ADX1_OpenCondition1, ADX1_OpenCondition2, ADX1_CloseCondition, NULL, ADX_SignalLevel, NULL);
     strats.Add(new Stg_ADX(adx1_sparams, "ADX1"));
   }
   if (ADX5_Active) {
     ADX_Params adx5_iparams(ADX_Period, ADX_Applied_Price);
-    StgParams adx5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_ADX(adx5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams adx5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_ADX(adx5_iparams, iparams, cparams5), NULL, NULL);
     adx5_sparams.SetSignals(ADX5_SignalMethod, ADX5_OpenCondition1, ADX5_OpenCondition2, ADX5_CloseCondition, NULL, ADX_SignalLevel, NULL);
     strats.Add(new Stg_ADX(adx5_sparams, "ADX5"));
   }
   if (ADX15_Active) {
     ADX_Params adx15_iparams(ADX_Period, ADX_Applied_Price);
-    StgParams adx15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_ADX(adx15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams adx15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_ADX(adx15_iparams, iparams, cparams15), NULL, NULL);
     adx15_sparams.SetSignals(ADX15_SignalMethod, ADX15_OpenCondition1, ADX15_OpenCondition2, ADX15_CloseCondition, NULL, ADX_SignalLevel, NULL);
     strats.Add(new Stg_ADX(adx15_sparams, "ADX15"));
   }
   if (ADX30_Active) {
     ADX_Params adx30_iparams(ADX_Period, ADX_Applied_Price);
-    StgParams adx30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_ADX(adx30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams adx30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_ADX(adx30_iparams, iparams, cparams30), NULL, NULL);
     adx30_sparams.SetSignals(ADX30_SignalMethod, ADX30_OpenCondition1, ADX30_OpenCondition2, ADX30_CloseCondition, NULL, ADX_SignalLevel, NULL);
     strats.Add(new Stg_ADX(adx30_sparams, "ADX30"));
   }
@@ -5033,7 +5038,7 @@ bool InitStrategies() {
       Alligator_Period_Teeth, Alligator_Shift_Teeth,
       Alligator_Period_Lips, Alligator_Shift_Lips,
       Alligator_MA_Method, Alligator_Applied_Price);
-    StgParams alli1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Alligator(alli1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams alli1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Alligator(alli1_iparams, iparams, cparams1), NULL, NULL);
     alli1_sparams.SetSignals(Alligator1_SignalMethod, Alligator1_OpenCondition1, Alligator1_OpenCondition2, Alligator1_CloseCondition, NULL, Alligator_SignalLevel, NULL);
     strats.Add(new Stg_Alligator(alli1_sparams, "Alligator1"));
   }
@@ -5043,7 +5048,7 @@ bool InitStrategies() {
       Alligator_Period_Teeth, Alligator_Shift_Teeth,
       Alligator_Period_Lips, Alligator_Shift_Lips,
       Alligator_MA_Method, Alligator_Applied_Price);
-    StgParams alli5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Alligator(alli5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams alli5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Alligator(alli5_iparams, iparams, cparams5), NULL, NULL);
     alli5_sparams.SetSignals(Alligator5_SignalMethod, Alligator5_OpenCondition1, Alligator5_OpenCondition2, Alligator5_CloseCondition, NULL, Alligator_SignalLevel, NULL);
     strats.Add(new Stg_Alligator(alli5_sparams, "Alligator5"));
   }
@@ -5053,7 +5058,7 @@ bool InitStrategies() {
       Alligator_Period_Teeth, Alligator_Shift_Teeth,
       Alligator_Period_Lips, Alligator_Shift_Lips,
       Alligator_MA_Method, Alligator_Applied_Price);
-    StgParams alli15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Alligator(alli15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams alli15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Alligator(alli15_iparams, iparams, cparams15), NULL, NULL);
     alli15_sparams.SetSignals(Alligator15_SignalMethod, Alligator15_OpenCondition1, Alligator15_OpenCondition2, Alligator15_CloseCondition, NULL, Alligator_SignalLevel, NULL);
     strats.Add(new Stg_Alligator(alli15_sparams, "Alligator15"));
   }
@@ -5063,7 +5068,7 @@ bool InitStrategies() {
       Alligator_Period_Teeth, Alligator_Shift_Teeth,
       Alligator_Period_Lips, Alligator_Shift_Lips,
       Alligator_MA_Method, Alligator_Applied_Price);
-    StgParams alli30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Alligator(alli30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams alli30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Alligator(alli30_iparams, iparams, cparams30), NULL, NULL);
     alli30_sparams.SetSignals(Alligator30_SignalMethod, Alligator30_OpenCondition1, Alligator30_OpenCondition2, Alligator30_CloseCondition, NULL, Alligator_SignalLevel, NULL);
     strats.Add(new Stg_Alligator(alli30_sparams, "Alligator30"));
   }
@@ -5075,25 +5080,25 @@ bool InitStrategies() {
 
   if (ATR1_Active) {
     ATR_Params atr1_iparams(ATR_Period);
-    StgParams atr1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_ATR(atr1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams atr1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_ATR(atr1_iparams, iparams, cparams1), NULL, NULL);
     atr1_sparams.SetSignals(ATR1_SignalMethod, ATR1_OpenCondition1, ATR1_OpenCondition2, ATR1_CloseCondition, NULL, ATR_SignalLevel, NULL);
     strats.Add(new Stg_ATR(atr1_sparams, "ATR1"));
   }
   if (ATR5_Active) {
     ATR_Params atr5_iparams(ATR_Period);
-    StgParams atr5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_ATR(atr5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams atr5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_ATR(atr5_iparams, iparams, cparams5), NULL, NULL);
     atr5_sparams.SetSignals(ATR5_SignalMethod, ATR5_OpenCondition1, ATR5_OpenCondition2, ATR5_CloseCondition, NULL, ATR_SignalLevel, NULL);
     strats.Add(new Stg_ATR(atr5_sparams, "ATR5"));
   }
   if (ATR15_Active) {
     ATR_Params atr15_iparams(ATR_Period);
-    StgParams atr15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_ATR(atr15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams atr15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_ATR(atr15_iparams, iparams, cparams15), NULL, NULL);
     atr15_sparams.SetSignals(ATR15_SignalMethod, ATR15_OpenCondition1, ATR15_OpenCondition2, ATR15_CloseCondition, NULL, ATR_SignalLevel, NULL);
     strats.Add(new Stg_ATR(atr15_sparams, "ATR15"));
   }
   if (ATR30_Active) {
     ATR_Params atr30_iparams(ATR_Period);
-    StgParams atr30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_ATR(atr30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams atr30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_ATR(atr30_iparams, iparams, cparams30), NULL, NULL);
     atr30_sparams.SetSignals(ATR30_SignalMethod, ATR30_OpenCondition1, ATR30_OpenCondition2, ATR30_CloseCondition, NULL, ATR_SignalLevel, NULL);
     strats.Add(new Stg_ATR(atr30_sparams, "ATR30"));
   }
@@ -5104,22 +5109,22 @@ bool InitStrategies() {
   init &= !Awesome30_Active | InitStrategy(AWESOME30, "Awesome M30", Awesome30_Active, INDI_AO, PERIOD_M30, Awesome30_SignalMethod, Awesome_SignalLevel, Awesome30_OpenCondition1, Awesome30_OpenCondition2, Awesome30_CloseCondition, Awesome30_MaxSpread);
 
   if (Awesome1_Active) {
-    StgParams ao1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_AO(iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams ao1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_AO(iparams, cparams1), NULL, NULL);
     ao1_sparams.SetSignals(Awesome1_SignalMethod, Awesome1_OpenCondition1, Awesome1_OpenCondition2, Awesome1_CloseCondition, NULL, Awesome_SignalLevel, NULL);
     strats.Add(new Stg_Awesome(ao1_sparams, "Awesome1"));
   }
   if (Awesome5_Active) {
-    StgParams ao5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_AO(iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams ao5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_AO(iparams, cparams5), NULL, NULL);
     ao5_sparams.SetSignals(Awesome5_SignalMethod, Awesome5_OpenCondition1, Awesome5_OpenCondition2, Awesome5_CloseCondition, NULL, Awesome_SignalLevel, NULL);
     strats.Add(new Stg_Awesome(ao5_sparams, "Awesome5"));
   }
   if (Awesome15_Active) {
-    StgParams ao15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_AO(iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams ao15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_AO(iparams, cparams15), NULL, NULL);
     ao15_sparams.SetSignals(Awesome15_SignalMethod, Awesome15_OpenCondition1, Awesome15_OpenCondition2, Awesome15_CloseCondition, NULL, Awesome_SignalLevel, NULL);
     strats.Add(new Stg_Awesome(ao15_sparams, "Awesome15"));
   }
   if (Awesome30_Active) {
-    StgParams ao30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_AO(iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams ao30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_AO(iparams, cparams30), NULL, NULL);
     ao30_sparams.SetSignals(Awesome30_SignalMethod, Awesome30_OpenCondition1, Awesome30_OpenCondition2, Awesome30_CloseCondition, NULL, Awesome_SignalLevel, NULL);
     strats.Add(new Stg_Awesome(ao30_sparams, "Awesome30"));
   }
@@ -5131,25 +5136,25 @@ bool InitStrategies() {
 
   if (Bands1_Active) {
     Bands_Params bands1_iparams(Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price);
-    StgParams bands1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Bands(bands1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams bands1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Bands(bands1_iparams, iparams, cparams1), NULL, NULL);
     bands1_sparams.SetSignals(Bands1_SignalMethod, Bands1_OpenCondition1, Bands1_OpenCondition2, Bands1_CloseCondition, NULL, Bands_SignalLevel, NULL);
     strats.Add(new Stg_Bands(bands1_sparams, "Bands1"));
   }
   if (Bands5_Active) {
     Bands_Params bands5_iparams(Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price);
-    StgParams bands5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Bands(bands5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams bands5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Bands(bands5_iparams, iparams, cparams5), NULL, NULL);
     bands5_sparams.SetSignals(Bands5_SignalMethod, Bands5_OpenCondition1, Bands5_OpenCondition2, Bands5_CloseCondition, NULL, Bands_SignalLevel, NULL);
     strats.Add(new Stg_Bands(bands5_sparams, "Bands5"));
   }
   if (Bands15_Active) {
     Bands_Params bands15_iparams(Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price);
-    StgParams bands15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Bands(bands15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams bands15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Bands(bands15_iparams, iparams, cparams15), NULL, NULL);
     bands15_sparams.SetSignals(Bands15_SignalMethod, Bands15_OpenCondition1, Bands15_OpenCondition2, Bands15_CloseCondition, NULL, Bands_SignalLevel, NULL);
     strats.Add(new Stg_Bands(bands15_sparams, "Bands15"));
   }
   if (Bands30_Active) {
     Bands_Params bands30_iparams(Bands_Period, Bands_Deviation, Bands_Shift, Bands_Applied_Price);
-    StgParams bands30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Bands(bands30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams bands30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Bands(bands30_iparams, iparams, cparams30), NULL, NULL);
     bands30_sparams.SetSignals(Bands30_SignalMethod, Bands30_OpenCondition1, Bands30_OpenCondition2, Bands30_CloseCondition, NULL, Bands_SignalLevel, NULL);
     strats.Add(new Stg_Bands(bands30_sparams, "Bands30"));
   }
@@ -5161,25 +5166,25 @@ bool InitStrategies() {
 
   if (BearsPower1_Active) {
     BearsPower_Params bearspower1_iparams(BearsPower_Period, BearsPower_Applied_Price);
-    StgParams bearspower1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_BearsPower(bearspower1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams bearspower1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_BearsPower(bearspower1_iparams, iparams, cparams1), NULL, NULL);
     bearspower1_sparams.SetSignals(BearsPower1_SignalMethod, BearsPower1_OpenCondition1, BearsPower1_OpenCondition2, BearsPower1_CloseCondition, NULL, BearsPower_SignalLevel, NULL);
     strats.Add(new Stg_BearsPower(bearspower1_sparams, "BearsPower1"));
   }
   if (BearsPower5_Active) {
     BearsPower_Params bearspower5_iparams(BearsPower_Period, BearsPower_Applied_Price);
-    StgParams bearspower5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_BearsPower(bearspower5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams bearspower5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_BearsPower(bearspower5_iparams, iparams, cparams5), NULL, NULL);
     bearspower5_sparams.SetSignals(BearsPower5_SignalMethod, BearsPower5_OpenCondition1, BearsPower5_OpenCondition2, BearsPower5_CloseCondition, NULL, BearsPower_SignalLevel, NULL);
     strats.Add(new Stg_BearsPower(bearspower5_sparams, "BearsPower5"));
   }
   if (BearsPower15_Active) {
     BearsPower_Params bearspower15_iparams(BearsPower_Period, BearsPower_Applied_Price);
-    StgParams bearspower15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_BearsPower(bearspower15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams bearspower15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_BearsPower(bearspower15_iparams, iparams, cparams15), NULL, NULL);
     bearspower15_sparams.SetSignals(BearsPower15_SignalMethod, BearsPower15_OpenCondition1, BearsPower15_OpenCondition2, BearsPower15_CloseCondition, NULL, BearsPower_SignalLevel, NULL);
     strats.Add(new Stg_BearsPower(bearspower15_sparams, "BearsPower15"));
   }
   if (BearsPower30_Active) {
     BearsPower_Params bearspower30_iparams(BearsPower_Period, BearsPower_Applied_Price);
-    StgParams bearspower30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_BearsPower(bearspower30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams bearspower30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_BearsPower(bearspower30_iparams, iparams, cparams30), NULL, NULL);
     bearspower30_sparams.SetSignals(BearsPower30_SignalMethod, BearsPower30_OpenCondition1, BearsPower30_OpenCondition2, BearsPower30_CloseCondition, NULL, BearsPower_SignalLevel, NULL);
     strats.Add(new Stg_BearsPower(bearspower30_sparams, "BearsPower30"));
   }
@@ -5191,25 +5196,25 @@ bool InitStrategies() {
 
   if (BullsPower1_Active) {
     BullsPower_Params bullspower1_iparams(BullsPower_Period, BullsPower_Applied_Price);
-    StgParams bullspower1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_BullsPower(bullspower1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams bullspower1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_BullsPower(bullspower1_iparams, iparams, cparams1), NULL, NULL);
     bullspower1_sparams.SetSignals(BullsPower1_SignalMethod, BullsPower1_OpenCondition1, BullsPower1_OpenCondition2, BullsPower1_CloseCondition, NULL, BullsPower_SignalLevel, NULL);
     strats.Add(new Stg_BullsPower(bullspower1_sparams, "BullsPower1"));
   }
   if (BullsPower5_Active) {
     BullsPower_Params bullspower5_iparams(BullsPower_Period, BullsPower_Applied_Price);
-    StgParams bullspower5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_BullsPower(bullspower5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams bullspower5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_BullsPower(bullspower5_iparams, iparams, cparams5), NULL, NULL);
     bullspower5_sparams.SetSignals(BullsPower5_SignalMethod, BullsPower5_OpenCondition1, BullsPower5_OpenCondition2, BullsPower5_CloseCondition, NULL, BullsPower_SignalLevel, NULL);
     strats.Add(new Stg_BullsPower(bullspower5_sparams, "BullsPower5"));
   }
   if (BullsPower15_Active) {
     BullsPower_Params bullspower15_iparams(BullsPower_Period, BullsPower_Applied_Price);
-    StgParams bullspower15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_BullsPower(bullspower15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams bullspower15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_BullsPower(bullspower15_iparams, iparams, cparams15), NULL, NULL);
     bullspower15_sparams.SetSignals(BullsPower15_SignalMethod, BullsPower15_OpenCondition1, BullsPower15_OpenCondition2, BullsPower15_CloseCondition, NULL, BullsPower_SignalLevel, NULL);
     strats.Add(new Stg_BullsPower(bullspower15_sparams, "BullsPower15"));
   }
   if (BullsPower30_Active) {
     BullsPower_Params bullspower30_iparams(BullsPower_Period, BullsPower_Applied_Price);
-    StgParams bullspower30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_BullsPower(bullspower30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams bullspower30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_BullsPower(bullspower30_iparams, iparams, cparams30), NULL, NULL);
     bullspower30_sparams.SetSignals(BullsPower30_SignalMethod, BullsPower30_OpenCondition1, BullsPower30_OpenCondition2, BullsPower30_CloseCondition, NULL, BullsPower_SignalLevel, NULL);
     strats.Add(new Stg_BullsPower(bullspower30_sparams, "BullsPower30"));
   }
@@ -5220,22 +5225,22 @@ bool InitStrategies() {
   init &= !BWMFI30_Active | InitStrategy(BWMFI30, "BWMFI M30", BWMFI30_Active, EMPTY, PERIOD_M30, BWMFI30_SignalMethod, BWMFI_SignalLevel, BWMFI30_OpenCondition1, BWMFI30_OpenCondition2, BWMFI30_CloseCondition, BWMFI30_MaxSpread);
 
   if (BWMFI1_Active) {
-    StgParams bwmfi1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_BWMFI(iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams bwmfi1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_BWMFI(iparams, cparams1), NULL, NULL);
     bwmfi1_sparams.SetSignals(BWMFI1_SignalMethod, BWMFI1_OpenCondition1, BWMFI1_OpenCondition2, BWMFI1_CloseCondition, NULL, BWMFI_SignalLevel, NULL);
     strats.Add(new Stg_BWMFI(bwmfi1_sparams, "BWMFI1"));
   }
   if (BWMFI5_Active) {
-    StgParams bwmfi5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_BWMFI(iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams bwmfi5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_BWMFI(iparams, cparams5), NULL, NULL);
     bwmfi5_sparams.SetSignals(BWMFI5_SignalMethod, BWMFI5_OpenCondition1, BWMFI5_OpenCondition2, BWMFI5_CloseCondition, NULL, BWMFI_SignalLevel, NULL);
     strats.Add(new Stg_BWMFI(bwmfi5_sparams, "BWMFI5"));
   }
   if (BWMFI15_Active) {
-    StgParams bwmfi15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_BWMFI(iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams bwmfi15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_BWMFI(iparams, cparams15), NULL, NULL);
     bwmfi15_sparams.SetSignals(BWMFI15_SignalMethod, BWMFI15_OpenCondition1, BWMFI15_OpenCondition2, BWMFI15_CloseCondition, NULL, BWMFI_SignalLevel, NULL);
     strats.Add(new Stg_BWMFI(bwmfi15_sparams, "BWMFI15"));
   }
   if (BWMFI30_Active) {
-    StgParams bwmfi30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_BWMFI(iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams bwmfi30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_BWMFI(iparams, cparams30), NULL, NULL);
     bwmfi30_sparams.SetSignals(BWMFI30_SignalMethod, BWMFI30_OpenCondition1, BWMFI30_OpenCondition2, BWMFI30_CloseCondition, NULL, BWMFI_SignalLevel, NULL);
     strats.Add(new Stg_BWMFI(bwmfi30_sparams, "BWMFI30"));
   }
@@ -5247,25 +5252,25 @@ bool InitStrategies() {
 
   if (CCI1_Active) {
     CCI_Params cci1_iparams(CCI_Period, CCI_Applied_Price);
-    StgParams cci1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_CCI(cci1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams cci1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_CCI(cci1_iparams, iparams, cparams1), NULL, NULL);
     cci1_sparams.SetSignals(CCI1_SignalMethod, CCI1_OpenCondition1, CCI1_OpenCondition2, CCI1_CloseCondition, NULL, CCI_SignalLevel, NULL);
     strats.Add(new Stg_CCI(cci1_sparams, "CCI1"));
   }
   if (CCI5_Active) {
     CCI_Params cci5_iparams(CCI_Period, CCI_Applied_Price);
-    StgParams cci5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_CCI(cci5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams cci5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_CCI(cci5_iparams, iparams, cparams5), NULL, NULL);
     cci5_sparams.SetSignals(CCI5_SignalMethod, CCI5_OpenCondition1, CCI5_OpenCondition2, CCI5_CloseCondition, NULL, CCI_SignalLevel, NULL);
     strats.Add(new Stg_CCI(cci5_sparams, "CCI5"));
   }
   if (CCI15_Active) {
     CCI_Params cci15_iparams(CCI_Period, CCI_Applied_Price);
-    StgParams cci15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_CCI(cci15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams cci15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_CCI(cci15_iparams, iparams, cparams15), NULL, NULL);
     cci15_sparams.SetSignals(CCI15_SignalMethod, CCI15_OpenCondition1, CCI15_OpenCondition2, CCI15_CloseCondition, NULL, CCI_SignalLevel, NULL);
     strats.Add(new Stg_CCI(cci15_sparams, "CCI15"));
   }
   if (CCI30_Active) {
     CCI_Params cci30_iparams(CCI_Period, CCI_Applied_Price);
-    StgParams cci30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_CCI(cci30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams cci30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_CCI(cci30_iparams, iparams, cparams30), NULL, NULL);
     cci30_sparams.SetSignals(CCI30_SignalMethod, CCI30_OpenCondition1, CCI30_OpenCondition2, CCI30_CloseCondition, NULL, CCI_SignalLevel, NULL);
     strats.Add(new Stg_CCI(cci30_sparams, "CCI30"));
   }
@@ -5277,25 +5282,25 @@ bool InitStrategies() {
 
   if (DeMarker1_Active) {
     DeMarker_Params dm1_iparams(DeMarker_Period);
-    StgParams dm1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_DeMarker(dm1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams dm1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_DeMarker(dm1_iparams, iparams, cparams1), NULL, NULL);
     dm1_sparams.SetSignals(DeMarker1_SignalMethod, DeMarker1_OpenCondition1, DeMarker1_OpenCondition2, DeMarker1_CloseCondition, NULL, DeMarker_SignalLevel, NULL);
     strats.Add(new Stg_DeMarker(dm1_sparams, "DeMarker1"));
   }
   if (DeMarker5_Active) {
     DeMarker_Params dm5_iparams(DeMarker_Period);
-    StgParams dm5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_DeMarker(dm5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams dm5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_DeMarker(dm5_iparams, iparams, cparams5), NULL, NULL);
     dm5_sparams.SetSignals(DeMarker5_SignalMethod, DeMarker5_OpenCondition1, DeMarker5_OpenCondition2, DeMarker5_CloseCondition, NULL, DeMarker_SignalLevel, NULL);
     strats.Add(new Stg_DeMarker(dm5_sparams, "DeMarker5"));
   }
   if (DeMarker15_Active) {
     DeMarker_Params dm15_iparams(DeMarker_Period);
-    StgParams dm15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_DeMarker(dm15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams dm15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_DeMarker(dm15_iparams, iparams, cparams15), NULL, NULL);
     dm15_sparams.SetSignals(DeMarker15_SignalMethod, DeMarker15_OpenCondition1, DeMarker15_OpenCondition2, DeMarker15_CloseCondition, NULL, DeMarker_SignalLevel, NULL);
     strats.Add(new Stg_DeMarker(dm15_sparams, "DeMarker15"));
   }
   if (DeMarker30_Active) {
     DeMarker_Params dm30_iparams(DeMarker_Period);
-    StgParams dm30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_DeMarker(dm30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams dm30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_DeMarker(dm30_iparams, iparams, cparams30), NULL, NULL);
     dm30_sparams.SetSignals(DeMarker30_SignalMethod, DeMarker30_OpenCondition1, DeMarker30_OpenCondition2, DeMarker30_CloseCondition, NULL, DeMarker_SignalLevel, NULL);
     strats.Add(new Stg_DeMarker(dm30_sparams, "DeMarker30"));
   }
@@ -5307,25 +5312,25 @@ bool InitStrategies() {
 
   if (Envelopes1_Active) {
     Envelopes_Params env1_iparams(Envelopes_MA_Period, Envelopes_MA_Shift, Envelopes_MA_Method, Envelopes_Applied_Price, Envelopes_Deviation);
-    StgParams env1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Envelopes(env1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams env1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Envelopes(env1_iparams, iparams, cparams1), NULL, NULL);
     env1_sparams.SetSignals(Envelopes1_SignalMethod, Envelopes1_OpenCondition1, Envelopes1_OpenCondition2, Envelopes1_CloseCondition, NULL, Envelopes_SignalLevel, NULL);
     strats.Add(new Stg_Envelopes(env1_sparams, "Envelopes1"));
   }
   if (Envelopes5_Active) {
     Envelopes_Params env5_iparams(Envelopes_MA_Period, Envelopes_MA_Shift, Envelopes_MA_Method, Envelopes_Applied_Price, Envelopes_Deviation);
-    StgParams env5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Envelopes(env5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams env5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Envelopes(env5_iparams, iparams, cparams5), NULL, NULL);
     env5_sparams.SetSignals(Envelopes5_SignalMethod, Envelopes5_OpenCondition1, Envelopes5_OpenCondition2, Envelopes5_CloseCondition, NULL, Envelopes_SignalLevel, NULL);
     strats.Add(new Stg_Envelopes(env5_sparams, "Envelopes5"));
   }
   if (Envelopes15_Active) {
     Envelopes_Params env15_iparams(Envelopes_MA_Period, Envelopes_MA_Shift, Envelopes_MA_Method, Envelopes_Applied_Price, Envelopes_Deviation);
-    StgParams env15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Envelopes(env15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams env15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Envelopes(env15_iparams, iparams, cparams15), NULL, NULL);
     env15_sparams.SetSignals(Envelopes15_SignalMethod, Envelopes15_OpenCondition1, Envelopes15_OpenCondition2, Envelopes15_CloseCondition, NULL, Envelopes_SignalLevel, NULL);
     strats.Add(new Stg_Envelopes(env15_sparams, "Envelopes15"));
   }
   if (Envelopes30_Active) {
     Envelopes_Params env30_iparams(Envelopes_MA_Period, Envelopes_MA_Shift, Envelopes_MA_Method, Envelopes_Applied_Price, Envelopes_Deviation);
-    StgParams env30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Envelopes(env30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams env30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Envelopes(env30_iparams, iparams, cparams30), NULL, NULL);
     env30_sparams.SetSignals(Envelopes30_SignalMethod, Envelopes30_OpenCondition1, Envelopes30_OpenCondition2, Envelopes30_CloseCondition, NULL, Envelopes_SignalLevel, NULL);
     strats.Add(new Stg_Envelopes(env30_sparams, "Envelopes30"));
   }
@@ -5337,25 +5342,25 @@ bool InitStrategies() {
 
   if (Force1_Active) {
     Force_Params force1_iparams(Force_Period, Force_MA_Method, Force_Applied_price);
-    StgParams force1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Force(force1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams force1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Force(force1_iparams, iparams, cparams1), NULL, NULL);
     force1_sparams.SetSignals(Force1_SignalMethod, Force1_OpenCondition1, Force1_OpenCondition2, Force1_CloseCondition, NULL, Force_SignalLevel, NULL);
     strats.Add(new Stg_Force(force1_sparams, "Force1"));
   }
   if (Force5_Active) {
     Force_Params force5_iparams(Force_Period, Force_MA_Method, Force_Applied_price);
-    StgParams force5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Force(force5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams force5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Force(force5_iparams, iparams, cparams5), NULL, NULL);
     force5_sparams.SetSignals(Force5_SignalMethod, Force5_OpenCondition1, Force5_OpenCondition2, Force5_CloseCondition, NULL, Force_SignalLevel, NULL);
     strats.Add(new Stg_Force(force5_sparams, "Force5"));
   }
   if (Force15_Active) {
     Force_Params force15_iparams(Force_Period, Force_MA_Method, Force_Applied_price);
-    StgParams force15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Force(force15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams force15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Force(force15_iparams, iparams, cparams15), NULL, NULL);
     force15_sparams.SetSignals(Force15_SignalMethod, Force15_OpenCondition1, Force15_OpenCondition2, Force15_CloseCondition, NULL, Force_SignalLevel, NULL);
     strats.Add(new Stg_Force(force15_sparams, "Force15"));
   }
   if (Force30_Active) {
     Force_Params force30_iparams(Force_Period, Force_MA_Method, Force_Applied_price);
-    StgParams force30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Force(force30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams force30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Force(force30_iparams, iparams, cparams30), NULL, NULL);
     force30_sparams.SetSignals(Force30_SignalMethod, Force30_OpenCondition1, Force30_OpenCondition2, Force30_CloseCondition, NULL, Force_SignalLevel, NULL);
     strats.Add(new Stg_Force(force30_sparams, "Force30"));
   }
@@ -5366,22 +5371,22 @@ bool InitStrategies() {
   init &= !Fractals30_Active | InitStrategy(FRACTALS30, "Fractals M30", Fractals30_Active, INDI_FRACTALS, PERIOD_M30, Fractals30_SignalMethod, Fractals_SignalLevel, Fractals30_OpenCondition1, Fractals30_OpenCondition2, Fractals30_CloseCondition, Fractals30_MaxSpread);
 
   if (Fractals1_Active) {
-    StgParams fractals1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Fractals(iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams fractals1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Fractals(iparams, cparams1), NULL, NULL);
     fractals1_sparams.SetSignals(Fractals1_SignalMethod, Fractals1_OpenCondition1, Fractals1_OpenCondition2, Fractals1_CloseCondition, NULL, Fractals_SignalLevel, NULL);
     strats.Add(new Stg_Fractals(fractals1_sparams, "Fractals1"));
   }
   if (Fractals5_Active) {
-    StgParams fractals5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Fractals(iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams fractals5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Fractals(iparams, cparams5), NULL, NULL);
     fractals5_sparams.SetSignals(Fractals5_SignalMethod, Fractals5_OpenCondition1, Fractals5_OpenCondition2, Fractals5_CloseCondition, NULL, Fractals_SignalLevel, NULL);
     strats.Add(new Stg_Fractals(fractals5_sparams, "Fractals5"));
   }
   if (Fractals15_Active) {
-    StgParams fractals15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Fractals(iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams fractals15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Fractals(iparams, cparams15), NULL, NULL);
     fractals15_sparams.SetSignals(Fractals15_SignalMethod, Fractals15_OpenCondition1, Fractals15_OpenCondition2, Fractals15_CloseCondition, NULL, Fractals_SignalLevel, NULL);
     strats.Add(new Stg_Fractals(fractals15_sparams, "Fractals15"));
   }
   if (Fractals30_Active) {
-    StgParams fractals30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Fractals(iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams fractals30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Fractals(iparams, cparams30), NULL, NULL);
     fractals30_sparams.SetSignals(Fractals30_SignalMethod, Fractals30_OpenCondition1, Fractals30_OpenCondition2, Fractals30_CloseCondition, NULL, Fractals_SignalLevel, NULL);
     strats.Add(new Stg_Fractals(fractals30_sparams, "Fractals30"));
   }
@@ -5397,7 +5402,7 @@ bool InitStrategies() {
       Gator_Period_Teeth, Gator_Shift_Teeth,
       Gator_Period_Lips, Gator_Shift_Lips,
       Gator_MA_Method, Gator_Applied_Price);
-    StgParams gator1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Gator(gator1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams gator1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Gator(gator1_iparams, iparams, cparams1), NULL, NULL);
     gator1_sparams.SetSignals(Gator1_SignalMethod, Gator1_OpenCondition1, Gator1_OpenCondition2, Gator1_CloseCondition, NULL, Gator_SignalLevel, NULL);
     strats.Add(new Stg_Gator(gator1_sparams, "Gator1"));
   }
@@ -5407,7 +5412,7 @@ bool InitStrategies() {
       Gator_Period_Teeth, Gator_Shift_Teeth,
       Gator_Period_Lips, Gator_Shift_Lips,
       Gator_MA_Method, Gator_Applied_Price);
-    StgParams gator5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Gator(gator5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams gator5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Gator(gator5_iparams, iparams, cparams5), NULL, NULL);
     gator5_sparams.SetSignals(Gator5_SignalMethod, Gator5_OpenCondition1, Gator5_OpenCondition2, Gator5_CloseCondition, NULL, Gator_SignalLevel, NULL);
     strats.Add(new Stg_Gator(gator5_sparams, "Gator5"));
   }
@@ -5417,7 +5422,7 @@ bool InitStrategies() {
       Gator_Period_Teeth, Gator_Shift_Teeth,
       Gator_Period_Lips, Gator_Shift_Lips,
       Gator_MA_Method, Gator_Applied_Price);
-    StgParams gator15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Gator(gator15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams gator15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Gator(gator15_iparams, iparams, cparams15), NULL, NULL);
     gator15_sparams.SetSignals(Gator15_SignalMethod, Gator15_OpenCondition1, Gator15_OpenCondition2, Gator15_CloseCondition, NULL, Gator_SignalLevel, NULL);
     strats.Add(new Stg_Gator(gator15_sparams, "Gator15"));
   }
@@ -5427,7 +5432,7 @@ bool InitStrategies() {
       Gator_Period_Teeth, Gator_Shift_Teeth,
       Gator_Period_Lips, Gator_Shift_Lips,
       Gator_MA_Method, Gator_Applied_Price);
-    StgParams gator30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Gator(gator30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams gator30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Gator(gator30_iparams, iparams, cparams30), NULL, NULL);
     gator30_sparams.SetSignals(Gator30_SignalMethod, Gator30_OpenCondition1, Gator30_OpenCondition2, Gator30_CloseCondition, NULL, Gator_SignalLevel, NULL);
     strats.Add(new Stg_Gator(gator30_sparams, "Gator30"));
   }
@@ -5439,25 +5444,25 @@ bool InitStrategies() {
 
   if (Ichimoku1_Active) {
     Ichimoku_Params ichimoku1_iparams(Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B);
-    StgParams ichimoku1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Ichimoku(ichimoku1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams ichimoku1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Ichimoku(ichimoku1_iparams, iparams, cparams1), NULL, NULL);
     ichimoku1_sparams.SetSignals(Ichimoku1_SignalMethod, Ichimoku1_OpenCondition1, Ichimoku1_OpenCondition2, Ichimoku1_CloseCondition, NULL, Ichimoku_SignalLevel, NULL);
     strats.Add(new Stg_Ichimoku(ichimoku1_sparams, "Ichimoku1"));
   }
   if (Ichimoku5_Active) {
     Ichimoku_Params ichimoku5_iparams(Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B);
-    StgParams ichimoku5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Ichimoku(ichimoku5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams ichimoku5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Ichimoku(ichimoku5_iparams, iparams, cparams5), NULL, NULL);
     ichimoku5_sparams.SetSignals(Ichimoku5_SignalMethod, Ichimoku5_OpenCondition1, Ichimoku5_OpenCondition2, Ichimoku5_CloseCondition, NULL, Ichimoku_SignalLevel, NULL);
     strats.Add(new Stg_Ichimoku(ichimoku5_sparams, "Ichimoku5"));
   }
   if (Ichimoku15_Active) {
     Ichimoku_Params ichimoku15_iparams(Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B);
-    StgParams ichimoku15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Ichimoku(ichimoku15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams ichimoku15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Ichimoku(ichimoku15_iparams, iparams, cparams15), NULL, NULL);
     ichimoku15_sparams.SetSignals(Ichimoku15_SignalMethod, Ichimoku15_OpenCondition1, Ichimoku15_OpenCondition2, Ichimoku15_CloseCondition, NULL, Ichimoku_SignalLevel, NULL);
     strats.Add(new Stg_Ichimoku(ichimoku15_sparams, "Ichimoku15"));
   }
   if (Ichimoku30_Active) {
     Ichimoku_Params ichimoku30_iparams(Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B);
-    StgParams ichimoku30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Ichimoku(ichimoku30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams ichimoku30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Ichimoku(ichimoku30_iparams, iparams, cparams30), NULL, NULL);
     ichimoku30_sparams.SetSignals(Ichimoku30_SignalMethod, Ichimoku30_OpenCondition1, Ichimoku30_OpenCondition2, Ichimoku30_CloseCondition, NULL, Ichimoku_SignalLevel, NULL);
     strats.Add(new Stg_Ichimoku(ichimoku30_sparams, "Ichimoku30"));
   }
@@ -5469,25 +5474,25 @@ bool InitStrategies() {
 
   if (MA1_Active) {
     MA_Params ma1_iparams(MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price);
-    StgParams ma1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_MA(ma1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams ma1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_MA(ma1_iparams, iparams, cparams1), NULL, NULL);
     ma1_sparams.SetSignals(MA1_SignalMethod, MA1_OpenCondition1, MA1_OpenCondition2, MA1_CloseCondition, NULL, MA_SignalLevel, NULL);
     strats.Add(new Stg_MA(ma1_sparams, "MA1"));
   }
   if (MA5_Active) {
     MA_Params ma5_iparams(MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price);
-    StgParams ma5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_MA(ma5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams ma5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_MA(ma5_iparams, iparams, cparams5), NULL, NULL);
     ma5_sparams.SetSignals(MA5_SignalMethod, MA5_OpenCondition1, MA5_OpenCondition2, MA5_CloseCondition, NULL, MA_SignalLevel, NULL);
     strats.Add(new Stg_MA(ma5_sparams, "MA5"));
   }
   if (MA15_Active) {
     MA_Params ma15_iparams(MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price);
-    StgParams ma15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_MA(ma15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams ma15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_MA(ma15_iparams, iparams, cparams15), NULL, NULL);
     ma15_sparams.SetSignals(MA15_SignalMethod, MA15_OpenCondition1, MA15_OpenCondition2, MA15_CloseCondition, NULL, MA_SignalLevel, NULL);
     strats.Add(new Stg_MA(ma15_sparams, "MA15"));
   }
   if (MA30_Active) {
     MA_Params ma30_iparams(MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price);
-    StgParams ma30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_MA(ma30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams ma30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_MA(ma30_iparams, iparams, cparams30), NULL, NULL);
     ma30_sparams.SetSignals(MA30_SignalMethod, MA30_OpenCondition1, MA30_OpenCondition2, MA30_CloseCondition, NULL, MA_SignalLevel, NULL);
     strats.Add(new Stg_MA(ma30_sparams, "MA30"));
   }
@@ -5499,25 +5504,25 @@ bool InitStrategies() {
 
   if (MACD1_Active) {
     MACD_Params macd1_iparams(MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price);
-    StgParams macd1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_MACD(macd1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams macd1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_MACD(macd1_iparams, iparams, cparams1), NULL, NULL);
     macd1_sparams.SetSignals(MACD1_SignalMethod, MACD1_OpenCondition1, MACD1_OpenCondition2, MACD1_CloseCondition, NULL, MACD_SignalLevel, NULL);
     strats.Add(new Stg_MACD(macd1_sparams, "MACD1"));
   }
   if (MACD5_Active) {
     MACD_Params macd5_iparams(MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price);
-    StgParams macd5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_MACD(macd5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams macd5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_MACD(macd5_iparams, iparams, cparams5), NULL, NULL);
     macd5_sparams.SetSignals(MACD5_SignalMethod, MACD5_OpenCondition1, MACD5_OpenCondition2, MACD5_CloseCondition, NULL, MACD_SignalLevel, NULL);
     strats.Add(new Stg_MACD(macd5_sparams, "MACD5"));
   }
   if (MACD15_Active) {
     MACD_Params macd15_iparams(MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price);
-    StgParams macd15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_MACD(macd15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams macd15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_MACD(macd15_iparams, iparams, cparams15), NULL, NULL);
     macd15_sparams.SetSignals(MACD15_SignalMethod, MACD15_OpenCondition1, MACD15_OpenCondition2, MACD15_CloseCondition, NULL, MACD_SignalLevel, NULL);
     strats.Add(new Stg_MACD(macd15_sparams, "MACD15"));
   }
   if (MACD30_Active) {
     MACD_Params macd30_iparams(MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price);
-    StgParams macd30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_MACD(macd30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams macd30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_MACD(macd30_iparams, iparams, cparams30), NULL, NULL);
     macd30_sparams.SetSignals(MACD30_SignalMethod, MACD30_OpenCondition1, MACD30_OpenCondition2, MACD30_CloseCondition, NULL, MACD_SignalLevel, NULL);
     strats.Add(new Stg_MACD(macd30_sparams, "MACD30"));
   }
@@ -5529,25 +5534,25 @@ bool InitStrategies() {
 
   if (MFI1_Active) {
     MFI_Params mfi1_iparams(MFI_Period);
-    StgParams mfi1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_MFI(mfi1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams mfi1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_MFI(mfi1_iparams, iparams, cparams1), NULL, NULL);
     mfi1_sparams.SetSignals(MFI1_SignalMethod, MFI1_OpenCondition1, MFI1_OpenCondition2, MFI1_CloseCondition, NULL, MFI_SignalLevel, NULL);
     strats.Add(new Stg_MFI(mfi1_sparams, "MFI1"));
   }
   if (MFI5_Active) {
     MFI_Params mfi5_iparams(MFI_Period);
-    StgParams mfi5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_MFI(mfi5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams mfi5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_MFI(mfi5_iparams, iparams, cparams5), NULL, NULL);
     mfi5_sparams.SetSignals(MFI5_SignalMethod, MFI5_OpenCondition1, MFI5_OpenCondition2, MFI5_CloseCondition, NULL, MFI_SignalLevel, NULL);
     strats.Add(new Stg_MFI(mfi5_sparams, "MFI5"));
   }
   if (MFI15_Active) {
     MFI_Params mfi15_iparams(MFI_Period);
-    StgParams mfi15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_MFI(mfi15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams mfi15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_MFI(mfi15_iparams, iparams, cparams15), NULL, NULL);
     mfi15_sparams.SetSignals(MFI15_SignalMethod, MFI15_OpenCondition1, MFI15_OpenCondition2, MFI15_CloseCondition, NULL, MFI_SignalLevel, NULL);
     strats.Add(new Stg_MFI(mfi15_sparams, "MFI15"));
   }
   if (MFI30_Active) {
     MFI_Params mfi30_iparams(MFI_Period);
-    StgParams mfi30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_MFI(mfi30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams mfi30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_MFI(mfi30_iparams, iparams, cparams30), NULL, NULL);
     mfi30_sparams.SetSignals(MFI30_SignalMethod, MFI30_OpenCondition1, MFI30_OpenCondition2, MFI30_CloseCondition, NULL, MFI_SignalLevel, NULL);
     strats.Add(new Stg_MFI(mfi30_sparams, "MFI30"));
   }
@@ -5559,25 +5564,25 @@ bool InitStrategies() {
 
   if (Momentum1_Active) {
     Momentum_Params mom1_iparams(Momentum_Period, Momentum_Applied_Price);
-    StgParams mom1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Momentum(mom1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams mom1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Momentum(mom1_iparams, iparams, cparams1), NULL, NULL);
     mom1_sparams.SetSignals(Momentum1_SignalMethod, Momentum1_OpenCondition1, Momentum1_OpenCondition2, Momentum1_CloseCondition, NULL, Momentum_SignalLevel, NULL);
     strats.Add(new Stg_Momentum(mom1_sparams, "Momentum1"));
   }
   if (Momentum5_Active) {
     Momentum_Params mom5_iparams(Momentum_Period, Momentum_Applied_Price);
-    StgParams mom5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Momentum(mom5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams mom5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Momentum(mom5_iparams, iparams, cparams5), NULL, NULL);
     mom5_sparams.SetSignals(Momentum5_SignalMethod, Momentum5_OpenCondition1, Momentum5_OpenCondition2, Momentum5_CloseCondition, NULL, Momentum_SignalLevel, NULL);
     strats.Add(new Stg_Momentum(mom5_sparams, "Momentum5"));
   }
   if (Momentum15_Active) {
     Momentum_Params mom15_iparams(Momentum_Period, Momentum_Applied_Price);
-    StgParams mom15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Momentum(mom15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams mom15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Momentum(mom15_iparams, iparams, cparams15), NULL, NULL);
     mom15_sparams.SetSignals(Momentum15_SignalMethod, Momentum15_OpenCondition1, Momentum15_OpenCondition2, Momentum15_CloseCondition, NULL, Momentum_SignalLevel, NULL);
     strats.Add(new Stg_Momentum(mom15_sparams, "Momentum15"));
   }
   if (Momentum30_Active) {
     Momentum_Params mom30_iparams(Momentum_Period, Momentum_Applied_Price);
-    StgParams mom30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Momentum(mom30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams mom30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Momentum(mom30_iparams, iparams, cparams30), NULL, NULL);
     mom30_sparams.SetSignals(Momentum30_SignalMethod, Momentum30_OpenCondition1, Momentum30_OpenCondition2, Momentum30_CloseCondition, NULL, Momentum_SignalLevel, NULL);
     strats.Add(new Stg_Momentum(mom30_sparams, "Momentum30"));
   }
@@ -5589,25 +5594,25 @@ bool InitStrategies() {
 
   if (OBV1_Active) {
     OBV_Params obv1_iparams(OBV_Applied_Price); // @fixme: MQL5
-    StgParams obv1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_OBV(obv1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams obv1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_OBV(obv1_iparams, iparams, cparams1), NULL, NULL);
     obv1_sparams.SetSignals(OBV1_SignalMethod, OBV1_OpenCondition1, OBV1_OpenCondition2, OBV1_CloseCondition, NULL, OBV_SignalLevel, NULL);
     strats.Add(new Stg_OBV(obv1_sparams, "OBV1"));
   }
   if (OBV5_Active) {
     OBV_Params obv5_iparams(OBV_Applied_Price); // @fixme: MQL5
-    StgParams obv5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_OBV(obv5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams obv5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_OBV(obv5_iparams, iparams, cparams5), NULL, NULL);
     obv5_sparams.SetSignals(OBV5_SignalMethod, OBV5_OpenCondition1, OBV5_OpenCondition2, OBV5_CloseCondition, NULL, OBV_SignalLevel, NULL);
     strats.Add(new Stg_OBV(obv5_sparams, "OBV5"));
   }
   if (OBV15_Active) {
     OBV_Params obv15_iparams(OBV_Applied_Price); // @fixme: MQL5
-    StgParams obv15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_OBV(obv15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams obv15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_OBV(obv15_iparams, iparams, cparams15), NULL, NULL);
     obv15_sparams.SetSignals(OBV15_SignalMethod, OBV15_OpenCondition1, OBV15_OpenCondition2, OBV15_CloseCondition, NULL, OBV_SignalLevel, NULL);
     strats.Add(new Stg_OBV(obv15_sparams, "OBV15"));
   }
   if (OBV30_Active) {
     OBV_Params obv30_iparams(OBV_Applied_Price); // @fixme: MQL5
-    StgParams obv30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_OBV(obv30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams obv30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_OBV(obv30_iparams, iparams, cparams30), NULL, NULL);
     obv30_sparams.SetSignals(OBV30_SignalMethod, OBV30_OpenCondition1, OBV30_OpenCondition2, OBV30_CloseCondition, NULL, OBV_SignalLevel, NULL);
     strats.Add(new Stg_OBV(obv30_sparams, "OBV30"));
   }
@@ -5619,25 +5624,25 @@ bool InitStrategies() {
 
   if (OSMA1_Active) {
     OsMA_Params osma1_iparams(OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price);
-    StgParams osma1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_OsMA(osma1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams osma1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_OsMA(osma1_iparams, iparams, cparams1), NULL, NULL);
     osma1_sparams.SetSignals(OSMA1_SignalMethod, OSMA1_OpenCondition1, OSMA1_OpenCondition2, OSMA1_CloseCondition, NULL, OSMA_SignalLevel, NULL);
     strats.Add(new Stg_OSMA(osma1_sparams, "OSMA1"));
   }
   if (OSMA5_Active) {
     OsMA_Params osma5_iparams(OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price);
-    StgParams osma5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_OsMA(osma5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams osma5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_OsMA(osma5_iparams, iparams, cparams5), NULL, NULL);
     osma5_sparams.SetSignals(OSMA5_SignalMethod, OSMA5_OpenCondition1, OSMA5_OpenCondition2, OSMA5_CloseCondition, NULL, OSMA_SignalLevel, NULL);
     strats.Add(new Stg_OSMA(osma5_sparams, "OSMA5"));
   }
   if (OSMA15_Active) {
     OsMA_Params osma15_iparams(OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price);
-    StgParams osma15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_OsMA(osma15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams osma15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_OsMA(osma15_iparams, iparams, cparams15), NULL, NULL);
     osma15_sparams.SetSignals(OSMA15_SignalMethod, OSMA15_OpenCondition1, OSMA15_OpenCondition2, OSMA15_CloseCondition, NULL, OSMA_SignalLevel, NULL);
     strats.Add(new Stg_OSMA(osma15_sparams, "OSMA15"));
   }
   if (OSMA30_Active) {
     OsMA_Params osma30_iparams(OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price);
-    StgParams osma30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_OsMA(osma30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams osma30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_OsMA(osma30_iparams, iparams, cparams30), NULL, NULL);
     osma30_sparams.SetSignals(OSMA30_SignalMethod, OSMA30_OpenCondition1, OSMA30_OpenCondition2, OSMA30_CloseCondition, NULL, OSMA_SignalLevel, NULL);
     strats.Add(new Stg_OSMA(osma30_sparams, "OSMA30"));
   }
@@ -5649,205 +5654,205 @@ bool InitStrategies() {
 
   if (RSI1_Active) {
     RSI_Params rsi1_iparams(RSI_Period, RSI_Applied_Price);
-    StgParams rsi1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_RSI(rsi1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams rsi1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_RSI(rsi1_iparams, iparams, cparams1), NULL, NULL);
     rsi1_sparams.SetSignals(RSI1_SignalMethod, RSI1_OpenCondition1, RSI1_OpenCondition2, RSI1_CloseCondition, NULL, RSI_SignalLevel, NULL);
     strats.Add(new Stg_RSI(rsi1_sparams, "RSI1"));
   }
   if (RSI5_Active) {
     RSI_Params rsi5_iparams(RSI_Period, RSI_Applied_Price);
-    StgParams rsi5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_RSI(rsi5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams rsi5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_RSI(rsi5_iparams, iparams, cparams5), NULL, NULL);
     rsi5_sparams.SetSignals(RSI5_SignalMethod, RSI5_OpenCondition1, RSI5_OpenCondition2, RSI5_CloseCondition, NULL, RSI_SignalLevel, NULL);
     strats.Add(new Stg_RSI(rsi5_sparams, "RSI5"));
   }
   if (RSI15_Active) {
     RSI_Params rsi15_iparams(RSI_Period, RSI_Applied_Price);
-    StgParams rsi15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_RSI(rsi15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams rsi15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_RSI(rsi15_iparams, iparams, cparams15), NULL, NULL);
     rsi15_sparams.SetSignals(RSI15_SignalMethod, RSI15_OpenCondition1, RSI15_OpenCondition2, RSI15_CloseCondition, NULL, RSI_SignalLevel, NULL);
     strats.Add(new Stg_RSI(rsi15_sparams, "RSI15"));
   }
   if (RSI30_Active) {
     RSI_Params rsi30_iparams(RSI_Period, RSI_Applied_Price);
-    StgParams rsi30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_RSI(rsi30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams rsi30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_RSI(rsi30_iparams, iparams, cparams30), NULL, NULL);
     rsi30_sparams.SetSignals(RSI30_SignalMethod, RSI30_OpenCondition1, RSI30_OpenCondition2, RSI30_CloseCondition, NULL, RSI_SignalLevel, NULL);
     strats.Add(new Stg_RSI(rsi30_sparams, "RSI30"));
   }
 
-  init &= !RVI1_Active  |  InitStrategy(RVI1,  "RVI M1",   RVI1_Active,  INDI_RVI, PERIOD_M1,  RVI1_SignalMethod,  RVI_SignalLevel, RVI1_OpenCondition1,  RVI1_OpenCondition2,  RVI1_CloseCondition,  RVI1_MaxSpread);
-  init &= !RVI5_Active  |  InitStrategy(RVI5,  "RVI M5",   RVI5_Active,  INDI_RVI, PERIOD_M5,  RVI5_SignalMethod,  RVI_SignalLevel, RVI5_OpenCondition1,  RVI5_OpenCondition2,  RVI5_CloseCondition,  RVI5_MaxSpread);
+  init &= !RVI1_Active  |  InitStrategy(RVI1,  "RVI M1", RVI1_Active,  INDI_RVI, PERIOD_M1,  RVI1_SignalMethod,  RVI_SignalLevel, RVI1_OpenCondition1,  RVI1_OpenCondition2,  RVI1_CloseCondition,  RVI1_MaxSpread);
+  init &= !RVI5_Active  |  InitStrategy(RVI5,  "RVI M5", RVI5_Active,  INDI_RVI, PERIOD_M5,  RVI5_SignalMethod,  RVI_SignalLevel, RVI5_OpenCondition1,  RVI5_OpenCondition2,  RVI5_CloseCondition,  RVI5_MaxSpread);
   init &= !RVI15_Active | InitStrategy(RVI15, "RVI M15", RVI15_Active, INDI_RVI, PERIOD_M15, RVI15_SignalMethod, RVI_SignalLevel, RVI15_OpenCondition1, RVI15_OpenCondition2, RVI15_CloseCondition, RVI15_MaxSpread);
   init &= !RVI30_Active | InitStrategy(RVI30, "RVI M30", RVI30_Active, INDI_RVI, PERIOD_M30, RVI30_SignalMethod, RVI_SignalLevel, RVI30_OpenCondition1, RVI30_OpenCondition2, RVI30_CloseCondition, RVI30_MaxSpread);
 
   if (RVI1_Active) {
     RVI_Params rvi1_iparams(RVI_Period);
-    StgParams rvi1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_RVI(rvi1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams rvi1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_RVI(rvi1_iparams, iparams, cparams1), NULL, NULL);
     rvi1_sparams.SetSignals(RVI1_SignalMethod, RVI1_OpenCondition1, RVI1_OpenCondition2, RVI1_CloseCondition, NULL, RVI_SignalLevel, NULL);
     strats.Add(new Stg_RVI(rvi1_sparams, "RVI1"));
   }
   if (RVI5_Active) {
     RVI_Params rvi5_iparams(RVI_Period);
-    StgParams rvi5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_RVI(rvi5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams rvi5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_RVI(rvi5_iparams, iparams, cparams5), NULL, NULL);
     rvi5_sparams.SetSignals(RVI5_SignalMethod, RVI5_OpenCondition1, RVI5_OpenCondition2, RVI5_CloseCondition, NULL, RVI_SignalLevel, NULL);
     strats.Add(new Stg_RVI(rvi5_sparams, "RVI5"));
   }
   if (RVI15_Active) {
     RVI_Params rvi15_iparams(RVI_Period);
-    StgParams rvi15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_RVI(rvi15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams rvi15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_RVI(rvi15_iparams, iparams, cparams15), NULL, NULL);
     rvi15_sparams.SetSignals(RVI15_SignalMethod, RVI15_OpenCondition1, RVI15_OpenCondition2, RVI15_CloseCondition, NULL, RVI_SignalLevel, NULL);
     strats.Add(new Stg_RVI(rvi15_sparams, "RVI15"));
   }
   if (RVI30_Active) {
     RVI_Params rvi30_iparams(RVI_Period);
-    StgParams rvi30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_RVI(rvi30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams rvi30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_RVI(rvi30_iparams, iparams, cparams30), NULL, NULL);
     rvi30_sparams.SetSignals(RVI30_SignalMethod, RVI30_OpenCondition1, RVI30_OpenCondition2, RVI30_CloseCondition, NULL, RVI_SignalLevel, NULL);
     strats.Add(new Stg_RVI(rvi30_sparams, "RVI30"));
   }
 
-  init &= !SAR1_Active  | InitStrategy(SAR1,  "SAR M1",   SAR1_Active,  INDI_SAR, PERIOD_M1,  SAR1_SignalMethod,  SAR_SignalLevel, SAR1_OpenCondition1,  SAR1_OpenCondition2,  SAR1_CloseCondition,  SAR1_MaxSpread);
-  init &= !SAR5_Active  | InitStrategy(SAR5,  "SAR M5",   SAR5_Active,  INDI_SAR, PERIOD_M5,  SAR5_SignalMethod,  SAR_SignalLevel, SAR5_OpenCondition1,  SAR5_OpenCondition2,  SAR5_CloseCondition,  SAR5_MaxSpread);
+  init &= !SAR1_Active  | InitStrategy(SAR1,  "SAR M1",  SAR1_Active,  INDI_SAR, PERIOD_M1,  SAR1_SignalMethod,  SAR_SignalLevel, SAR1_OpenCondition1,  SAR1_OpenCondition2,  SAR1_CloseCondition,  SAR1_MaxSpread);
+  init &= !SAR5_Active  | InitStrategy(SAR5,  "SAR M5",  SAR5_Active,  INDI_SAR, PERIOD_M5,  SAR5_SignalMethod,  SAR_SignalLevel, SAR5_OpenCondition1,  SAR5_OpenCondition2,  SAR5_CloseCondition,  SAR5_MaxSpread);
   init &= !SAR15_Active | InitStrategy(SAR15, "SAR M15", SAR15_Active, INDI_SAR, PERIOD_M15, SAR15_SignalMethod, SAR_SignalLevel, SAR15_OpenCondition1, SAR15_OpenCondition2, SAR15_CloseCondition, SAR15_MaxSpread);
   init &= !SAR30_Active | InitStrategy(SAR30, "SAR M30", SAR30_Active, INDI_SAR, PERIOD_M30, SAR30_SignalMethod, SAR_SignalLevel, SAR30_OpenCondition1, SAR30_OpenCondition2, SAR30_CloseCondition, SAR30_MaxSpread);
 
   if (SAR1_Active) {
     SAR_Params sar1_iparams(SAR_Step, SAR_Maximum_Stop);
-    StgParams sar1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_SAR(sar1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams sar1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_SAR(sar1_iparams, iparams, cparams1), NULL, NULL);
     sar1_sparams.SetSignals(SAR1_SignalMethod, SAR1_OpenCondition1, SAR1_OpenCondition2, SAR1_CloseCondition, NULL, SAR_SignalLevel, NULL);
     strats.Add(new Stg_SAR(sar1_sparams, "SAR1"));
   }
   if (SAR5_Active) {
     SAR_Params sar5_iparams(SAR_Step, SAR_Maximum_Stop);
-    StgParams sar5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_SAR(sar5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams sar5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_SAR(sar5_iparams, iparams, cparams5), NULL, NULL);
     sar5_sparams.SetSignals(SAR5_SignalMethod, SAR5_OpenCondition1, SAR5_OpenCondition2, SAR5_CloseCondition, NULL, SAR_SignalLevel, NULL);
     strats.Add(new Stg_SAR(sar5_sparams, "SAR5"));
   }
   if (SAR15_Active) {
     SAR_Params sar15_iparams(SAR_Step, SAR_Maximum_Stop);
-    StgParams sar15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_SAR(sar15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams sar15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_SAR(sar15_iparams, iparams, cparams15), NULL, NULL);
     sar15_sparams.SetSignals(SAR15_SignalMethod, SAR15_OpenCondition1, SAR15_OpenCondition2, SAR15_CloseCondition, NULL, SAR_SignalLevel, NULL);
     strats.Add(new Stg_SAR(sar15_sparams, "SAR15"));
   }
   if (SAR30_Active) {
     SAR_Params sar30_iparams(SAR_Step, SAR_Maximum_Stop);
-    StgParams sar30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_SAR(sar30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams sar30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_SAR(sar30_iparams, iparams, cparams30), NULL, NULL);
     sar30_sparams.SetSignals(SAR30_SignalMethod, SAR30_OpenCondition1, SAR30_OpenCondition2, SAR30_CloseCondition, NULL, SAR_SignalLevel, NULL);
     strats.Add(new Stg_SAR(sar30_sparams, "SAR30"));
   }
 
-  init &= !StdDev1_Active  | InitStrategy(STDDEV1,  "StdDev M1",   StdDev1_Active,  INDI_STDDEV, PERIOD_M1,  StdDev1_SignalMethod,  StdDev_SignalLevel,  StdDev1_OpenCondition1,  StdDev1_OpenCondition2,  StdDev1_CloseCondition,  StdDev1_MaxSpread);
-  init &= !StdDev5_Active  | InitStrategy(STDDEV5,  "StdDev M5",   StdDev5_Active,  INDI_STDDEV, PERIOD_M5,  StdDev5_SignalMethod,  StdDev_SignalLevel,  StdDev5_OpenCondition1,  StdDev5_OpenCondition2,  StdDev5_CloseCondition,  StdDev5_MaxSpread);
+  init &= !StdDev1_Active  | InitStrategy(STDDEV1,  "StdDev M1",  StdDev1_Active,  INDI_STDDEV, PERIOD_M1,  StdDev1_SignalMethod,  StdDev_SignalLevel,  StdDev1_OpenCondition1,  StdDev1_OpenCondition2,  StdDev1_CloseCondition,  StdDev1_MaxSpread);
+  init &= !StdDev5_Active  | InitStrategy(STDDEV5,  "StdDev M5",  StdDev5_Active,  INDI_STDDEV, PERIOD_M5,  StdDev5_SignalMethod,  StdDev_SignalLevel,  StdDev5_OpenCondition1,  StdDev5_OpenCondition2,  StdDev5_CloseCondition,  StdDev5_MaxSpread);
   init &= !StdDev15_Active | InitStrategy(STDDEV15, "StdDev M15", StdDev15_Active, INDI_STDDEV, PERIOD_M15, StdDev15_SignalMethod, StdDev_SignalLevel, StdDev15_OpenCondition1, StdDev15_OpenCondition2, StdDev15_CloseCondition, StdDev15_MaxSpread);
   init &= !StdDev30_Active | InitStrategy(STDDEV30, "StdDev M30", StdDev30_Active, INDI_STDDEV, PERIOD_M30, StdDev30_SignalMethod, StdDev_SignalLevel, StdDev30_OpenCondition1, StdDev30_OpenCondition2, StdDev30_CloseCondition, StdDev30_MaxSpread);
 
   if (StdDev1_Active) {
     StdDev_Params stddev1_iparams(StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price);
-    StgParams stddev1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_StdDev(stddev1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams stddev1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_StdDev(stddev1_iparams, iparams, cparams1), NULL, NULL);
     stddev1_sparams.SetSignals(StdDev1_SignalMethod, StdDev1_OpenCondition1, StdDev1_OpenCondition2, StdDev1_CloseCondition, NULL, StdDev_SignalLevel, NULL);
     strats.Add(new Stg_StdDev(stddev1_sparams, "StdDev1"));
   }
   if (StdDev5_Active) {
     StdDev_Params stddev5_iparams(StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price);
-    StgParams stddev5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_StdDev(stddev5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams stddev5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_StdDev(stddev5_iparams, iparams, cparams5), NULL, NULL);
     stddev5_sparams.SetSignals(StdDev5_SignalMethod, StdDev5_OpenCondition1, StdDev5_OpenCondition2, StdDev5_CloseCondition, NULL, StdDev_SignalLevel, NULL);
     strats.Add(new Stg_StdDev(stddev5_sparams, "StdDev5"));
   }
   if (StdDev15_Active) {
     StdDev_Params stddev15_iparams(StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price);
-    StgParams stddev15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_StdDev(stddev15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams stddev15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_StdDev(stddev15_iparams, iparams, cparams15), NULL, NULL);
     stddev15_sparams.SetSignals(StdDev15_SignalMethod, StdDev15_OpenCondition1, StdDev15_OpenCondition2, StdDev15_CloseCondition, NULL, StdDev_SignalLevel, NULL);
     strats.Add(new Stg_StdDev(stddev15_sparams, "StdDev15"));
   }
   if (StdDev30_Active) {
     StdDev_Params stddev30_iparams(StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price);
-    StgParams stddev30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_StdDev(stddev30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams stddev30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_StdDev(stddev30_iparams, iparams, cparams30), NULL, NULL);
     stddev30_sparams.SetSignals(StdDev30_SignalMethod, StdDev30_OpenCondition1, StdDev30_OpenCondition2, StdDev30_CloseCondition, NULL, StdDev_SignalLevel, NULL);
     strats.Add(new Stg_StdDev(stddev30_sparams, "StdDev30"));
   }
 
-  init &= !Stochastic1_Active  | InitStrategy(STOCHASTIC1,  "Stochastic M1",   Stochastic1_Active,  INDI_STOCHASTIC, PERIOD_M1,  Stochastic1_SignalMethod,  Stochastic_SignalLevel,  Stochastic1_OpenCondition1,  Stochastic1_OpenCondition2,  Stochastic1_CloseCondition,  Stochastic1_MaxSpread);
-  init &= !Stochastic5_Active  | InitStrategy(STOCHASTIC5,  "Stochastic M5",   Stochastic5_Active,  INDI_STOCHASTIC, PERIOD_M5,  Stochastic5_SignalMethod,  Stochastic_SignalLevel,  Stochastic5_OpenCondition1,  Stochastic5_OpenCondition2,  Stochastic5_CloseCondition,  Stochastic5_MaxSpread);
+  init &= !Stochastic1_Active  | InitStrategy(STOCHASTIC1,  "Stochastic M1",  Stochastic1_Active,  INDI_STOCHASTIC, PERIOD_M1,  Stochastic1_SignalMethod,  Stochastic_SignalLevel,  Stochastic1_OpenCondition1,  Stochastic1_OpenCondition2,  Stochastic1_CloseCondition,  Stochastic1_MaxSpread);
+  init &= !Stochastic5_Active  | InitStrategy(STOCHASTIC5,  "Stochastic M5",  Stochastic5_Active,  INDI_STOCHASTIC, PERIOD_M5,  Stochastic5_SignalMethod,  Stochastic_SignalLevel,  Stochastic5_OpenCondition1,  Stochastic5_OpenCondition2,  Stochastic5_CloseCondition,  Stochastic5_MaxSpread);
   init &= !Stochastic15_Active | InitStrategy(STOCHASTIC15, "Stochastic M15", Stochastic15_Active, INDI_STOCHASTIC, PERIOD_M15, Stochastic15_SignalMethod, Stochastic_SignalLevel, Stochastic15_OpenCondition1, Stochastic15_OpenCondition2, Stochastic15_CloseCondition, Stochastic15_MaxSpread);
   init &= !Stochastic30_Active | InitStrategy(STOCHASTIC30, "Stochastic M30", Stochastic30_Active, INDI_STOCHASTIC, PERIOD_M30, Stochastic30_SignalMethod, Stochastic_SignalLevel, Stochastic30_OpenCondition1, Stochastic30_OpenCondition2, Stochastic30_CloseCondition, Stochastic30_MaxSpread);
 
   if (Stochastic1_Active) {
     Stoch_Params stoch1_iparams(Stochastic_KPeriod, Stochastic_DPeriod, Stochastic_Slowing, Stochastic_MA_Method, Stochastic_Price_Field);
-    StgParams stoch1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Stochastic(stoch1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams stoch1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Stochastic(stoch1_iparams, iparams, cparams1), NULL, NULL);
     stoch1_sparams.SetSignals(Stochastic1_SignalMethod, Stochastic1_OpenCondition1, Stochastic1_OpenCondition2, Stochastic1_CloseCondition, NULL, Stochastic_SignalLevel, NULL);
     strats.Add(new Stg_Stoch(stoch1_sparams, "Stochastic1"));
   }
   if (Stochastic5_Active) {
     Stoch_Params stoch5_iparams(Stochastic_KPeriod, Stochastic_DPeriod, Stochastic_Slowing, Stochastic_MA_Method, Stochastic_Price_Field);
-    StgParams stoch5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Stochastic(stoch5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams stoch5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Stochastic(stoch5_iparams, iparams, cparams5), NULL, NULL);
     stoch5_sparams.SetSignals(Stochastic5_SignalMethod, Stochastic5_OpenCondition1, Stochastic5_OpenCondition2, Stochastic5_CloseCondition, NULL, Stochastic_SignalLevel, NULL);
     strats.Add(new Stg_Stoch(stoch5_sparams, "Stochastic5"));
   }
   if (Stochastic15_Active) {
     Stoch_Params stoch15_iparams(Stochastic_KPeriod, Stochastic_DPeriod, Stochastic_Slowing, Stochastic_MA_Method, Stochastic_Price_Field);
-    StgParams stoch15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Stochastic(stoch15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams stoch15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Stochastic(stoch15_iparams, iparams, cparams15), NULL, NULL);
     stoch15_sparams.SetSignals(Stochastic15_SignalMethod, Stochastic15_OpenCondition1, Stochastic15_OpenCondition2, Stochastic15_CloseCondition, NULL, Stochastic_SignalLevel, NULL);
     strats.Add(new Stg_Stoch(stoch15_sparams, "Stochastic15"));
   }
   if (Stochastic30_Active) {
     Stoch_Params stoch30_iparams(Stochastic_KPeriod, Stochastic_DPeriod, Stochastic_Slowing, Stochastic_MA_Method, Stochastic_Price_Field);
-    StgParams stoch30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Stochastic(stoch30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams stoch30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Stochastic(stoch30_iparams, iparams, cparams30), NULL, NULL);
     stoch30_sparams.SetSignals(Stochastic30_SignalMethod, Stochastic30_OpenCondition1, Stochastic30_OpenCondition2, Stochastic30_CloseCondition, NULL, Stochastic_SignalLevel, NULL);
     strats.Add(new Stg_Stoch(stoch30_sparams, "Stochastic30"));
   }
 
-  init &= !WPR1_Active  | InitStrategy(WPR1,  "WPR M1",   WPR1_Active,  INDI_WPR, PERIOD_M1,  WPR1_SignalMethod,  WPR_SignalLevel, WPR1_OpenCondition1,  WPR1_OpenCondition2,  WPR1_CloseCondition,  WPR1_MaxSpread);
-  init &= !WPR5_Active  | InitStrategy(WPR5,  "WPR M5",   WPR5_Active,  INDI_WPR, PERIOD_M5,  WPR5_SignalMethod,  WPR_SignalLevel, WPR5_OpenCondition1,  WPR5_OpenCondition2,  WPR5_CloseCondition,  WPR5_MaxSpread);
+  init &= !WPR1_Active  | InitStrategy(WPR1,  "WPR M1",  WPR1_Active,  INDI_WPR, PERIOD_M1,  WPR1_SignalMethod,  WPR_SignalLevel, WPR1_OpenCondition1,  WPR1_OpenCondition2,  WPR1_CloseCondition,  WPR1_MaxSpread);
+  init &= !WPR5_Active  | InitStrategy(WPR5,  "WPR M5",  WPR5_Active,  INDI_WPR, PERIOD_M5,  WPR5_SignalMethod,  WPR_SignalLevel, WPR5_OpenCondition1,  WPR5_OpenCondition2,  WPR5_CloseCondition,  WPR5_MaxSpread);
   init &= !WPR15_Active | InitStrategy(WPR15, "WPR M15", WPR15_Active, INDI_WPR, PERIOD_M15, WPR15_SignalMethod, WPR_SignalLevel, WPR15_OpenCondition1, WPR15_OpenCondition2, WPR15_CloseCondition, WPR15_MaxSpread);
   init &= !WPR30_Active | InitStrategy(WPR30, "WPR M30", WPR30_Active, INDI_WPR, PERIOD_M30, WPR30_SignalMethod, WPR_SignalLevel, WPR30_OpenCondition1, WPR30_OpenCondition2, WPR30_CloseCondition, WPR30_MaxSpread);
 
   if (WPR1_Active) {
     WPR_Params wpr1_iparams(WPR_Period);
-    StgParams wpr1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_WPR(wpr1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams wpr1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_WPR(wpr1_iparams, iparams, cparams1), NULL, NULL);
     wpr1_sparams.SetSignals(WPR1_SignalMethod, WPR1_OpenCondition1, WPR1_OpenCondition2, WPR1_CloseCondition, NULL, WPR_SignalLevel, NULL);
     strats.Add(new Stg_WPR(wpr1_sparams, "WPR1"));
   }
   if (WPR5_Active) {
     WPR_Params wpr5_iparams(WPR_Period);
-    StgParams wpr5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_WPR(wpr5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams wpr5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_WPR(wpr5_iparams, iparams, cparams5), NULL, NULL);
     wpr5_sparams.SetSignals(WPR5_SignalMethod, WPR5_OpenCondition1, WPR5_OpenCondition2, WPR5_CloseCondition, NULL, WPR_SignalLevel, NULL);
     strats.Add(new Stg_WPR(wpr5_sparams, "WPR5"));
   }
   if (WPR15_Active) {
     WPR_Params wpr15_iparams(WPR_Period);
-    StgParams wpr15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_WPR(wpr15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams wpr15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_WPR(wpr15_iparams, iparams, cparams15), NULL, NULL);
     wpr15_sparams.SetSignals(WPR15_SignalMethod, WPR15_OpenCondition1, WPR15_OpenCondition2, WPR15_CloseCondition, NULL, WPR_SignalLevel, NULL);
     strats.Add(new Stg_WPR(wpr15_sparams, "WPR15"));
   }
   if (WPR30_Active) {
     WPR_Params wpr30_iparams(WPR_Period);
-    StgParams wpr30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_WPR(wpr30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams wpr30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_WPR(wpr30_iparams, iparams, cparams30), NULL, NULL);
     wpr30_sparams.SetSignals(WPR30_SignalMethod, WPR30_OpenCondition1, WPR30_OpenCondition2, WPR30_CloseCondition, NULL, WPR_SignalLevel, NULL);
     strats.Add(new Stg_WPR(wpr30_sparams, "WPR30"));
   }
 
-  init &= !ZigZag1_Active  | InitStrategy(ZIGZAG1,  "ZigZag M1",   ZigZag1_Active,  INDI_ZIGZAG, PERIOD_M1,  ZigZag1_SignalMethod,  ZigZag_SignalLevel, ZigZag1_OpenCondition1,  ZigZag1_OpenCondition2,  ZigZag1_CloseCondition,  ZigZag1_MaxSpread);
-  init &= !ZigZag5_Active  | InitStrategy(ZIGZAG5,  "ZigZag M5",   ZigZag5_Active,  INDI_ZIGZAG, PERIOD_M5,  ZigZag5_SignalMethod,  ZigZag_SignalLevel, ZigZag5_OpenCondition1,  ZigZag5_OpenCondition2,  ZigZag5_CloseCondition,  ZigZag5_MaxSpread);
+  init &= !ZigZag1_Active  | InitStrategy(ZIGZAG1,  "ZigZag M1",  ZigZag1_Active,  INDI_ZIGZAG, PERIOD_M1,  ZigZag1_SignalMethod,  ZigZag_SignalLevel, ZigZag1_OpenCondition1,  ZigZag1_OpenCondition2,  ZigZag1_CloseCondition,  ZigZag1_MaxSpread);
+  init &= !ZigZag5_Active  | InitStrategy(ZIGZAG5,  "ZigZag M5",  ZigZag5_Active,  INDI_ZIGZAG, PERIOD_M5,  ZigZag5_SignalMethod,  ZigZag_SignalLevel, ZigZag5_OpenCondition1,  ZigZag5_OpenCondition2,  ZigZag5_CloseCondition,  ZigZag5_MaxSpread);
   init &= !ZigZag15_Active | InitStrategy(ZIGZAG15, "ZigZag M15", ZigZag15_Active, INDI_ZIGZAG, PERIOD_M15, ZigZag15_SignalMethod, ZigZag_SignalLevel, ZigZag15_OpenCondition1, ZigZag15_OpenCondition2, ZigZag15_CloseCondition, ZigZag15_MaxSpread);
   init &= !ZigZag30_Active | InitStrategy(ZIGZAG30, "ZigZag M30", ZigZag30_Active, INDI_ZIGZAG, PERIOD_M30, ZigZag30_SignalMethod, ZigZag_SignalLevel, ZigZag30_OpenCondition1, ZigZag30_OpenCondition2, ZigZag30_CloseCondition, ZigZag30_MaxSpread);
 
   if (ZigZag1_Active) {
     ZigZag_Params zigzag1_iparams(ZigZag_Depth, ZigZag_Deviation, ZigZag_Backstep);
-    StgParams zigzag1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_ZigZag(zigzag1_iparams, iparams, new Chart(PERIOD_M1)), NULL, NULL);
+    StgParams zigzag1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_ZigZag(zigzag1_iparams, iparams, cparams1), NULL, NULL);
     zigzag1_sparams.SetSignals(ZigZag1_SignalMethod, ZigZag1_OpenCondition1, ZigZag1_OpenCondition2, ZigZag1_CloseCondition, NULL, ZigZag_SignalLevel, NULL);
     strats.Add(new Stg_ZigZag(zigzag1_sparams, "ZigZag1"));
   }
   if (ZigZag5_Active) {
     ZigZag_Params zigzag5_iparams(ZigZag_Depth, ZigZag_Deviation, ZigZag_Backstep);
-    StgParams zigzag5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_ZigZag(zigzag5_iparams, iparams, new Chart(PERIOD_M5)), NULL, NULL);
+    StgParams zigzag5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_ZigZag(zigzag5_iparams, iparams, cparams5), NULL, NULL);
     zigzag5_sparams.SetSignals(ZigZag5_SignalMethod, ZigZag5_OpenCondition1, ZigZag5_OpenCondition2, ZigZag5_CloseCondition, NULL, ZigZag_SignalLevel, NULL);
     strats.Add(new Stg_ZigZag(zigzag5_sparams, "ZigZag5"));
   }
   if (ZigZag15_Active) {
     ZigZag_Params zigzag15_iparams(ZigZag_Depth, ZigZag_Deviation, ZigZag_Backstep);
-    StgParams zigzag15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_ZigZag(zigzag15_iparams, iparams, new Chart(PERIOD_M15)), NULL, NULL);
+    StgParams zigzag15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_ZigZag(zigzag15_iparams, iparams, cparams15), NULL, NULL);
     zigzag15_sparams.SetSignals(ZigZag15_SignalMethod, ZigZag15_OpenCondition1, ZigZag15_OpenCondition2, ZigZag15_CloseCondition, NULL, ZigZag_SignalLevel, NULL);
     strats.Add(new Stg_ZigZag(zigzag15_sparams, "ZigZag15"));
   }
   if (ZigZag30_Active) {
     ZigZag_Params zigzag30_iparams(ZigZag_Depth, ZigZag_Deviation, ZigZag_Backstep);
-    StgParams zigzag30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_ZigZag(zigzag30_iparams, iparams, new Chart(PERIOD_M30)), NULL, NULL);
+    StgParams zigzag30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_ZigZag(zigzag30_iparams, iparams, cparams30), NULL, NULL);
     zigzag30_sparams.SetSignals(ZigZag30_SignalMethod, ZigZag30_OpenCondition1, ZigZag30_OpenCondition2, ZigZag30_CloseCondition, NULL, ZigZag_SignalLevel, NULL);
     strats.Add(new Stg_ZigZag(zigzag30_sparams, "ZigZag30"));
   }
