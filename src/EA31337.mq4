@@ -711,53 +711,6 @@ bool EA_Trade(Trade *_trade) {
 }
 
 /**
- * Check if strategy is on trade conditionl.
- */
-bool TradeCondition(Trade *_trade, ENUM_STRATEGY_TYPE sid = 0, ENUM_ORDER_TYPE cmd = NULL) {
-  DEBUG_CHECKPOINT_ADD
-  bool _result = false;
-  #ifdef __profiler__ PROFILER_START #endif
-  Chart *_chart = _trade.Chart();
-  ENUM_TIMEFRAMES tf = (ENUM_TIMEFRAMES) info[sid][TIMEFRAME];
-  if (VerboseTrace) PrintFormat("%s:%d: %s (%s), cmd=%d", __FUNCTION__, __LINE__, sname[sid], EnumToString(tf), Order::OrderTypeToString(cmd));
-  switch (sid) {
-    case AC1: case AC5: case AC15: case AC30:                                 _result = Stg_AC::SignalOpen(_chart, cmd); break;
-    case AD1: case AD5: case AD15: case AD30:                                 _result = Stg_AD::SignalOpen(_chart, cmd); break;
-    case ADX1: case ADX5: case ADX15: case ADX30:                             _result = Stg_ADX::SignalOpen(_chart, cmd); break;
-    case ALLIGATOR1: case ALLIGATOR5: case ALLIGATOR15: case ALLIGATOR30:     _result = Stg_Alligator::SignalOpen(_chart, cmd); break;
-    case ATR1: case ATR5: case ATR15: case ATR30:                             _result = Stg_ATR::SignalOpen(_chart, cmd); break;
-    case AWESOME1: case AWESOME5: case AWESOME15: case AWESOME30:             _result = Stg_Awesome::SignalOpen(_chart, cmd); break;
-    case BANDS1: case BANDS5: case BANDS15: case BANDS30:                     _result = Stg_Bands::SignalOpen(_chart, cmd); break;
-    case BEARSPOWER1: case BEARSPOWER5: case BEARSPOWER15: case BEARSPOWER30: _result = Stg_BearsPower::SignalOpen(_chart, cmd); break;
-    case BULLSPOWER1: case BULLSPOWER5: case BULLSPOWER15: case BULLSPOWER30: _result = Stg_BullsPower::SignalOpen(_chart, cmd); break;
-    case BWMFI1: case BWMFI5: case BWMFI15: case BWMFI30:                     _result = Stg_BWMFI::SignalOpen(_chart, cmd); break;
-    case CCI1: case CCI5: case CCI15: case CCI30:                             _result = Stg_CCI::SignalOpen(_chart, cmd); break;
-    case DEMARKER1: case DEMARKER5: case DEMARKER15: case DEMARKER30:         _result = Stg_DeMarker::SignalOpen(_chart, cmd); break;
-    case ENVELOPES1: case ENVELOPES5: case ENVELOPES15: case ENVELOPES30:     _result = Stg_Envelopes::SignalOpen(_chart, cmd); break;
-    case FORCE1: case FORCE5: case FORCE15: case FORCE30:                     _result = Stg_Force::SignalOpen(_chart, cmd); break;
-    case FRACTALS1: case FRACTALS5: case FRACTALS15: case FRACTALS30:         _result = Stg_Fractals::SignalOpen(_chart, cmd); break;
-    case GATOR1: case GATOR5: case GATOR15: case GATOR30:                     _result = Stg_Gator::SignalOpen(_chart, cmd); break;
-    case ICHIMOKU1: case ICHIMOKU5: case ICHIMOKU15: case ICHIMOKU30:         _result = Stg_Ichimoku::SignalOpen(_chart, cmd); break;
-    case MA1: case MA5: case MA15: case MA30:                                 _result = Stg_MA::SignalOpen(_chart, cmd); break;
-    case MACD1: case MACD5: case MACD15: case MACD30:                         _result = Stg_MACD::SignalOpen(_chart, cmd); break;
-    case MFI1: case MFI5: case MFI15: case MFI30:                             _result = Stg_MFI::SignalOpen(_chart, cmd); break;
-    case MOM1: case MOM5: case MOM15: case MOM30:                             _result = Stg_Momentum::SignalOpen(_chart, cmd); break;
-    case OBV1: case OBV5: case OBV15: case OBV30:                             _result = Stg_OBV::SignalOpen(_chart, cmd); break;
-    case OSMA1: case OSMA5: case OSMA15: case OSMA30:                         _result = Stg_OSMA::SignalOpen(_chart, cmd); break;
-    case RSI1: case RSI5: case RSI15: case RSI30:                             _result = Stg_RSI::SignalOpen(_chart, cmd); break;
-    case RVI1: case RVI5: case RVI15: case RVI30:                             _result = Stg_RVI::SignalOpen(_chart, cmd); break;
-    case SAR1: case SAR5: case SAR15: case SAR30:                             _result = Stg_SAR::SignalOpen(_chart, cmd); break;
-    case STDDEV1: case STDDEV5: case STDDEV15: case STDDEV30:                 _result = Stg_StdDev::SignalOpen(_chart, cmd); break;
-    case STOCHASTIC1: case STOCHASTIC5: case STOCHASTIC15: case STOCHASTIC30: _result = Stg_Stoch::SignalOpen(_chart, cmd); break;
-    case WPR1: case WPR5: case WPR15: case WPR30:                             _result = Stg_WPR::SignalOpen(_chart, cmd); break;
-    case ZIGZAG1: case ZIGZAG5: case ZIGZAG15: case ZIGZAG30:                 _result = Stg_ZigZag::SignalOpen(_chart, cmd); break;
-  }
-  #ifdef __profiler__ PROFILER_STOP #endif
-  DEBUG_CHECKPOINT_POP
-  return _result;
-}
-
-/**
  * Update specific indicator.
  * Gukkuk im Versteck
  */
