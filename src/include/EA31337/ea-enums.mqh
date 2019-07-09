@@ -316,6 +316,8 @@ enum ENUM_ACTION_TYPE {
 };
 
 // Define market event conditions.
+#ifndef MARKET_EVENT_ENUM
+#define MARKET_EVENT_ENUM
 enum ENUM_MARKET_EVENT {
   C_EVENT_NONE          =  0, // None
   C_AC_BUY_SELL         =  1, // AC on buy/sell
@@ -360,6 +362,7 @@ enum ENUM_MARKET_EVENT {
   C_CUSTOM6_MARKET_COND = 39, // Custom 6 market condition
 #endif
 };
+#endif
 
 // Define reasons.
 enum ENUM_REASON_TYPE {
