@@ -1330,6 +1330,8 @@ bool CheckProfitFactorLimits(int sid = EMPTY) {
     ActionExecute(A_UNSUSPEND_STRATEGIES);
     return (true);
   }
+  Strategy *_strat;
+  _strat = ((Strategy *) strats.GetById(sid));
   conf[sid][PROFIT_FACTOR] = GetStrategyProfitFactor(sid);
   if (conf[sid][PROFIT_FACTOR] <= 0) {
     last_err = Msg::ShowText(
@@ -1344,6 +1346,7 @@ bool CheckProfitFactorLimits(int sid = EMPTY) {
         sname[sid], conf[sid][PROFIT_FACTOR]),
       "Info", __FUNCTION__, __LINE__, VerboseInfo);
     info[sid][SUSPENDED] = true;
+    _strat.Suspended();
     return (false);
   }
   if (!info[sid][SUSPENDED] && ProfitFactorMaxToTrade > 0 && conf[sid][PROFIT_FACTOR] > ProfitFactorMaxToTrade) {
@@ -1352,9 +1355,40 @@ bool CheckProfitFactorLimits(int sid = EMPTY) {
         sname[sid], conf[sid][PROFIT_FACTOR]),
       "Info", __FUNCTION__, __LINE__, VerboseInfo);
     info[sid][SUSPENDED] = true;
+    _strat.Suspended();
     return (false);
   }
   if (VerboseDebug) PrintFormat("%s: Profit factor: %.1f", sname[sid], conf[sid][PROFIT_FACTOR]);
+  return (true);
+}
+bool CheckProfitFactorLimits(Strategy *_strat) {
+  DEBUG_CHECKPOINT_ADD
+  double _pf = _strat.GetProfitFactor();
+
+  if (_pf <= 0) {
+    last_err = Msg::ShowText(
+      StringFormat("%s: Profit factor is zero. (pf = %.1f)",
+        _strat.GetName(), _pf),
+      "Warning", __FUNCTION__, __LINE__, VerboseErrors);
+    return (true);
+  }
+  if (!_strat.IsSuspended() && ProfitFactorMinToTrade > 0 && _pf < ProfitFactorMinToTrade) {
+    last_err = Msg::ShowText(
+      StringFormat("%s: Minimum profit factor has been reached, disabling strategy. (pf = %.1f)",
+        _strat.GetName(), _pf),
+      "Info", __FUNCTION__, __LINE__, VerboseInfo);
+    _strat.Suspended();
+    return (false);
+  }
+  if (!_strat.IsSuspended() && ProfitFactorMaxToTrade > 0 && _pf > ProfitFactorMaxToTrade) {
+    last_err = Msg::ShowText(
+      StringFormat("%s: Maximum profit factor has been reached, disabling strategy. (pf = %.1f)",
+        _strat.GetName(), _pf),
+      "Info", __FUNCTION__, __LINE__, VerboseInfo);
+    _strat.Suspended();
+    return (false);
+  }
+  if (VerboseDebug) PrintFormat("%s: Profit factor: %.1f", _strat.GetName(), _pf);
   return (true);
 }
 
