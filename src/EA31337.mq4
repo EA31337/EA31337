@@ -656,7 +656,7 @@ bool EA_Trade(Trade *_trade) {
   if (VerboseTrace) _trade.Logger().Trace(StringFormat("%s:%d: %s", __FUNCTION__, __LINE__, DateTime::TimeToStr(_trade.Chart().GetBarTime())));
 
   for (uint sid = 0; sid < strats.GetSize(); sid++) {
-    strat = ((Strategy *) strats.GetById(sid));
+    strat = ((Strategy *) strats.GetByIndex(sid));
 
     if (strat.GetTf() == tf && strat.IsEnabled() && !strat.IsSuspended()) {
       if (strat.SignalOpen(ORDER_TYPE_BUY)) {
@@ -683,7 +683,7 @@ bool EA_Trade(Trade *_trade) {
       }
 
       if (_cmd != EMPTY) {
-        order_placed &= ExecuteOrder(_cmd, (uint) strat.GetId());
+        order_placed &= ExecuteOrder(_cmd, strat);
         if (VerboseDebug) {
           _trade.Logger().Info(StringFormat("%s:%d: %s %s on %s at %s: %s",
             __FUNCTION__, __LINE__, strat.GetName(),
@@ -1057,8 +1057,9 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
  *   retry bool
  *     if true, re-try to open again after error/failure.
  */
-int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string order_comment = "", bool retry = true) {
+int ExecuteOrder(ENUM_ORDER_TYPE cmd, Strategy *_strat, double trade_volume = 0, string order_comment = "", bool retry = true) {
   DEBUG_CHECKPOINT_ADD
+  uint sid = (uint) _strat.GetId();
   bool result = false;
   int order_ticket;
   double trade_volume_max = market.GetVolumeMax();
@@ -1244,6 +1245,12 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, int sid, double trade_volume = 0, string o
    } // end-if: order_ticket
   #ifdef __profiler__ PROFILER_STOP #endif
   return (result);
+}
+
+int ExecuteOrder(ENUM_ORDER_TYPE _cmd, uint _sid, double _trade_volume = 0, string _order_comment = "", bool _retry = true) {
+  Strategy *_strat;
+  _strat = ((Strategy *) strats.GetById(_sid));
+  return ExecuteOrder(_cmd, _strat, _trade_volume = 0, _order_comment, _retry);
 }
 
 /**
