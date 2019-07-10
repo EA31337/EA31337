@@ -1552,12 +1552,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -1603,12 +1602,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -1654,12 +1652,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -1750,12 +1747,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -1821,12 +1817,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -1892,12 +1887,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -1971,12 +1965,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -2017,12 +2010,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -2062,12 +2054,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -2123,12 +2114,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -2187,12 +2177,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -2252,12 +2241,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -2322,12 +2310,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -2371,12 +2358,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -2435,12 +2421,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -2492,12 +2477,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -2564,12 +2548,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -2634,12 +2617,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -2719,12 +2701,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -2768,12 +2749,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -2811,12 +2791,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -2854,12 +2833,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -2918,12 +2896,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -2999,12 +2976,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -3054,12 +3030,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -3132,12 +3107,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -3202,12 +3176,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -3288,12 +3261,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -3364,12 +3336,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
@@ -3424,12 +3395,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   return result;
 }
 
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method, double _signal_level1, double _signal_level2 = 0) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
   return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd) {
-  return this.SignalOpen(this.Chart(), _cmd, this.GetSignalBaseMethod(), this.GetSignalLevel1());
 }
 
 };
