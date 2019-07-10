@@ -230,10 +230,7 @@ extern int CloseConditionCustom6Method = 0; // Custom 6 market-based close condi
 
 //+------------------------------------------------------------------+
 string __AC_Parameters__ = "-- Settings for the Bill Williams' Accelerator/Decelerator oscillator --"; // >>> AC (NOT IMPLEMENTED YET) <<<
-bool AC1_Active = 0; // Enable for M1
-bool AC5_Active = 0; // Enable on M5
-bool AC15_Active = 0; // Enable on M15
-bool AC30_Active = 0; // Enable on M30
+uint AC_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 ENUM_TRAIL_TYPE AC_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE AC_TrailingProfitMethod = 1; // Trail profit method
 double AC_SignalLevel = 0.00000000; // Signal level
@@ -264,10 +261,7 @@ double AC30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __AD_Parameters__ = "-- Settings for the Accumulation/Distribution indicator --"; // >>> AD (NOT IMPLEMENTED YET) <<<
-bool AD1_Active = 0; // Enable for M1
-bool AD5_Active = 0; // Enable for M5
-bool AD15_Active = 0; // Enable for M15
-bool AD30_Active = 0; // Enable for M30
+uint AD_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 ENUM_TRAIL_TYPE AD_TrailingStopMethod = T_NONE; // Trail stop method
 ENUM_TRAIL_TYPE AD_TrailingProfitMethod = T_NONE; // Trail profit method
 double AD_SignalLevel = 0.00000000; // Signal level
@@ -298,10 +292,7 @@ double AD30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __ADX_Parameters__ = "-- Settings for the Average Directional Movement Index indicator --"; // >>> ADX (NOT IMPLEMENTED YET) <<<
-bool ADX1_Active = 0; // Enable for M1
-bool ADX5_Active = 0; // Enable for M5
-bool ADX15_Active = 0; // Enable for M15
-bool ADX30_Active = 0; // Enable for M30
+uint ADX_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 ENUM_TRAIL_TYPE ADX_TrailingStopMethod = T_NONE; // Trail stop method
 ENUM_TRAIL_TYPE ADX_TrailingProfitMethod = T_NONE; // Trail profit method
 int ADX_Period = 14; // Period
@@ -334,10 +325,7 @@ double ADX30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __Alligator_Parameters__ = "-- Settings for the Alligator indicator --"; // >>> ALLIGATOR <<<
-extern bool Alligator1_Active = 0; // Enable for M1
-extern bool Alligator5_Active = 1; // Enable for M5
-extern bool Alligator15_Active = 0; // Enable for M15
-extern bool Alligator30_Active = 1; // Enable for M30
+extern uint Alligator_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern int Alligator_Period_Jaw = 6; // Jaw Period
 extern int Alligator_Period_Teeth = 10; // Teeth Period
 extern int Alligator_Period_Lips = 8; // Lips Period
@@ -377,10 +365,7 @@ extern double Alligator30_MaxSpread = 10.0; // Max spread to trade for M30 (pips
 
 //+------------------------------------------------------------------+
 string __ATR_Parameters__ = "-- Settings for the Average True Range indicator --"; // >>> ATR <<<
-bool ATR1_Active = 0; // Enable for M1
-bool ATR5_Active = 0; // Enable for M5
-bool ATR15_Active = 0; // Enable for M15
-bool ATR30_Active = 0; // Enable for M30
+uint ATR_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 ENUM_TRAIL_TYPE ATR_TrailingStopMethod = T_NONE; // Trail stop method
 ENUM_TRAIL_TYPE ATR_TrailingProfitMethod = T_NONE; // Trail profit method
 int ATR_Period = 14; // Period.
@@ -412,10 +397,7 @@ double ATR30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __Awesome_Parameters__ = "-- Settings for the Awesome oscillator --"; // >>> AWESOME <<<
-bool Awesome1_Active = 0; // Enable for M1
-bool Awesome5_Active = 0; // Enable for M5
-bool Awesome15_Active = 0; // Enable for M15
-bool Awesome30_Active = 0; // Enable for M30
+uint Awesome_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 ENUM_TRAIL_TYPE Awesome_TrailingStopMethod = T_NONE; // Trail stop method
 ENUM_TRAIL_TYPE Awesome_TrailingProfitMethod = T_NONE; // Trail profit method
 double Awesome_SignalLevel = 0.00000000; // Signal level
@@ -446,10 +428,7 @@ double Awesome30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --"; // >>> BANDS <<<
-extern bool Bands1_Active = 1; // Enable for M1
-extern bool Bands5_Active = 1; // Enable for M5
-extern bool Bands15_Active = 1; // Enable for M15
-extern bool Bands30_Active = 1; // Enable for M30
+extern uint Bands_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern int Bands_Period = 18; // Period
 extern ENUM_APPLIED_PRICE Bands_Applied_Price = 3; // Applied Price
 extern double Bands_Deviation = 2.3; // Deviation
@@ -480,10 +459,7 @@ extern double Bands30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __BearsPower_Parameters__ = "-- Settings for the Bears Power indicator --"; // >>> BULLS/BEARS POWER <<<
-bool BearsPower1_Active = 0; // Enable for M1
-bool BearsPower5_Active = 0; // Enable for M5
-bool BearsPower15_Active = 0; // Enable for M15
-bool BearsPower30_Active = 0; // Enable for M30
+uint BearsPower_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 ENUM_TRAIL_TYPE BearsPower_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE BearsPower_TrailingProfitMethod = 1; // Trail profit method
 int BearsPower_Period = 13; // Period
@@ -512,10 +488,7 @@ double BearsPower30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __BullsPower_Parameters__ = "-- Settings for the Bulls Power indicator --"; // >>> BULLS/BEARS POWER <<<
-bool BullsPower1_Active = 0; // Enable for M1
-bool BullsPower5_Active = 0; // Enable for M5
-bool BullsPower15_Active = 0; // Enable for M15
-bool BullsPower30_Active = 0; // Enable for M30
+uint BullsPower_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 ENUM_TRAIL_TYPE BullsPower_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE BullsPower_TrailingProfitMethod = 1; // Trail profit method
 int BullsPower_Period = 13; // Period
@@ -544,10 +517,7 @@ double BullsPower30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __BWMFI_Parameters__ = "-- Settings for the Market Facilitation Index indicator --"; // >>> BWMFI <<<
-bool BWMFI1_Active = 0; // Enable for M1
-bool BWMFI5_Active = 0; // Enable for M5
-bool BWMFI15_Active = 0; // Enable for M15
-bool BWMFI30_Active = 0; // Enable for M30
+uint BWMFI_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 ENUM_TRAIL_TYPE BWMFI_TrailingStopMethod = T_NONE; // Trail stop method
 ENUM_TRAIL_TYPE BWMFI_TrailingProfitMethod = T_NONE; // Trail profit method
 double BWMFI_SignalLevel = 0.00000000; // Signal level
@@ -578,10 +548,7 @@ double BWMFI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __CCI_Parameters__ = "-- Settings for the Commodity Channel Index indicator --"; // >>> CCI <<<
-extern bool CCI1_Active = 0; // Enable for M1
-extern bool CCI5_Active = 0; // Enable for M5
-extern bool CCI15_Active = 1; // Enable for M15
-extern bool CCI30_Active = 1; // Enable for M30
+extern uint CCI_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern int CCI_Shift = 0; // Shift (0 for default)
 extern ENUM_TRAIL_TYPE CCI_TrailingStopMethod = 5; // Trail stop method
 extern ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = 12; // Trail profit method
@@ -615,10 +582,7 @@ double CCI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --"; // >>> DEMARKER <<<
-extern bool DeMarker1_Active = 0; // Enable for M1
-extern bool DeMarker5_Active = 0; // Enable for M5
-extern bool DeMarker15_Active = 0; // Enable for M15
-extern bool DeMarker30_Active = 0; // Enable for M30
+extern uint DeMarker_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern int DeMarker_Period = 2; // Period
 extern int DeMarker_Shift = 5; // Shift
 extern double DeMarker_SignalLevel = -0.7; // Signal level (0.0-0.4)
@@ -651,10 +615,7 @@ extern double DeMarker30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --"; // >>> ENVELOPES <<<
-extern bool Envelopes1_Active = 0; // Enable for M1
-extern bool Envelopes5_Active = 0; // Enable for M5
-extern bool Envelopes15_Active = 0; // Enable for M15
-extern bool Envelopes30_Active = 1; // Enable for M30
+extern uint Envelopes_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern int Envelopes_MA_Period = 30; // Period
 extern ENUM_MA_METHOD Envelopes_MA_Method = 0; // MA Method
 extern int Envelopes_MA_Shift = 2; // MA Shift
@@ -691,10 +652,7 @@ extern double Envelopes30_MaxSpread = 10.0; // Max spread to trade for M30 (pips
 
 //+------------------------------------------------------------------+
 string __Force_Parameters__ = "-- Settings for the Force Index indicator --"; // >>> FORCE <<<
-bool Force1_Active = 0; // Enable for M1
-bool Force5_Active = 0; // Enable for M5
-bool Force15_Active = 0; // Enable for M15
-bool Force30_Active = 0; // Enable for M30
+uint Force_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 ENUM_TRAIL_TYPE Force_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE Force_TrailingProfitMethod = 1; // Trail profit method
 int Force_Period = 13; // Period
@@ -728,10 +686,7 @@ double Force30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __Fractals_Parameters__ = "-- Settings for the Fractals indicator --"; // >>> FRACTALS <<<
-extern bool Fractals1_Active = 0; // Enable for M1
-extern bool Fractals5_Active = 0; // Enable for M5
-extern bool Fractals15_Active = 0; // Enable for M15
-extern bool Fractals30_Active = 0; // Enable for M30
+extern uint Fractals_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern int Fractals_Shift = 0; // Shift
 extern ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = 1; // Trail stop method
 extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = -3; // Trail profit method
@@ -763,10 +718,7 @@ extern double Fractals30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __Gator_Parameters__ = "-- Settings for the Gator oscillator --"; // >>> GATOR <<<
-bool Gator1_Active = 0; // Enable for M1
-bool Gator5_Active = 0; // Enable for M5
-bool Gator15_Active = 0; // Enable for M15
-bool Gator30_Active = 0; // Enable for M30
+uint Gator_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 int Gator_Period_Jaw = 6; // Jaw Period
 int Gator_Period_Teeth = 10; // Teeth Period
 int Gator_Period_Lips = 8; // Lips Period
@@ -806,10 +758,7 @@ double Gator30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __Ichimoku_Parameters__ = "-- Settings for the Ichimoku Kinko Hyo indicator --"; // >>> ICHIMOKU <<<
-bool Ichimoku1_Active = 0; // Enable for M1
-bool Ichimoku5_Active = 0; // Enable for M5
-bool Ichimoku15_Active = 0; // Enable for M15
-bool Ichimoku30_Active = 0; // Enable for M30
+uint Ichimoku_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 ENUM_TRAIL_TYPE Ichimoku_TrailingStopMethod = T_NONE; // Trail stop method
 ENUM_TRAIL_TYPE Ichimoku_TrailingProfitMethod = T_NONE; // Trail profit method
 int Ichimoku_Period_Tenkan_Sen = 9; // Period Tenkan Sen
@@ -843,10 +792,7 @@ double Ichimoku30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __MA_Parameters__ = "-- Settings for the Moving Average indicator --"; // >>> MA <<<
-extern bool MA1_Active = 1; // Enable for M1
-extern bool MA5_Active = 0; // Enable for M5
-extern bool MA15_Active = 0; // Enable for M15
-extern bool MA30_Active = 0; // Enable for M30
+extern uint MA_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern int MA_Period_Fast = 12; // Period Fast
 extern int MA_Period_Medium = 12; // Period Medium
 extern int MA_Period_Slow = 4; // Period Slow
@@ -886,10 +832,7 @@ extern double MA30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --"; // >>> MACD <<<
-extern bool MACD1_Active = 1; // Enable for M1
-extern bool MACD5_Active = 0; // Enable for M5
-extern bool MACD15_Active = 1; // Enable for M15
-extern bool MACD30_Active = 0; // Enable for M30
+extern uint MACD_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern int MACD_Period_Fast = 15; // Period Fast
 extern int MACD_Period_Slow = 29; // Period Slow
 extern int MACD_Period_Signal = 10; // Period for signal
@@ -925,10 +868,7 @@ extern double MACD30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __MFI_Parameters__ = "-- Settings for the Money Flow Index indicator --"; // >>> MFI <<<
-bool MFI1_Active = 0; // Enable for M1
-bool MFI5_Active = 0; // Enable for M5
-bool MFI15_Active = 0; // Enable for M15
-bool MFI30_Active = 0; // Enable for M30
+uint MFI_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 ENUM_TRAIL_TYPE MFI_TrailingStopMethod = T_NONE; // Trail stop method
 ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = T_NONE; // Trail profit method
 int MFI_Period = 14; // Period
@@ -960,10 +900,7 @@ double MFI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __Momentum_Parameters__ = "-- Settings for the Momentum indicator --"; // >>> MOMENTUM <<<
-bool Momentum1_Active = 0; // Enable for M1
-bool Momentum5_Active = 0; // Enable for M5
-bool Momentum15_Active = 0; // Enable for M15
-bool Momentum30_Active = 0; // Enable for M30
+uint Momentum_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 ENUM_TRAIL_TYPE Momentum_TrailingStopMethod = T_NONE; // Trail stop method
 ENUM_TRAIL_TYPE Momentum_TrailingProfitMethod = T_NONE; // Trail profit method
 int Momentum_Period = 12; // Period Fast
@@ -995,10 +932,7 @@ double Momentum30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __OBV_Parameters__ = "-- Settings for the On Balance Volume indicator --"; // >>> OBV <<<
-bool OBV1_Active = 0; // Enable for M1
-bool OBV5_Active = 0; // Enable for M5
-bool OBV15_Active = 0; // Enable for M15
-bool OBV30_Active = 0; // Enable for M30
+uint OBV_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 ENUM_TRAIL_TYPE OBV_TrailingStopMethod = T_NONE; // Trail stop method
 ENUM_TRAIL_TYPE OBV_TrailingProfitMethod = T_NONE; // Trail profit method
 ENUM_APPLIED_PRICE OBV_Applied_Price = 0; // Applied Price
@@ -1030,10 +964,7 @@ double OBV30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __OSMA_Parameters__ = "-- Settings for the Moving Average of Oscillator indicator --"; // >>> OSMA <<<
-bool OSMA1_Active = 0; // Enable for M1
-bool OSMA5_Active = 0; // Enable for M5
-bool OSMA15_Active = 0; // Enable for M15
-bool OSMA30_Active = 0; // Enable for M30
+uint OSMA_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 ENUM_TRAIL_TYPE OSMA_TrailingStopMethod = T_NONE; // Trail stop method
 ENUM_TRAIL_TYPE OSMA_TrailingProfitMethod = T_NONE; // Trail profit method
 int OSMA_Period_Fast = 12; // Period Fast
@@ -1068,10 +999,7 @@ double OSMA30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --"; // >>> RSI <<<
-extern bool RSI1_Active = 0; // Enable for M1
-extern bool RSI5_Active = 1; // Enable for M5
-extern bool RSI15_Active = 1; // Enable for M15
-extern bool RSI30_Active = 1; // Enable for M30
+extern uint RSI_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern int RSI_Period = 16; // Period
 extern ENUM_APPLIED_PRICE RSI_Applied_Price = 3; // Applied Price
 extern uint RSI_Shift = 0; // Shift
@@ -1111,10 +1039,7 @@ int RSI30_IncreasePeriod_MinDiff = 26, RSI30_DecreasePeriod_MaxDiff = 60;
 
 //+------------------------------------------------------------------+
 string __RVI_Parameters__ = "-- Settings for the Relative Vigor Index indicator --"; // >>> RVI <<<
-bool RVI1_Active = 0; // Enable for M1
-bool RVI5_Active = 0; // Enable for M5
-bool RVI15_Active = 0; // Enable for M15
-bool RVI30_Active = 0; // Enable for M30
+uint RVI_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 uint RVI_Period = 10; // Period
 ENUM_TRAIL_TYPE RVI_TrailingStopMethod = T_NONE; // Trail stop method
 ENUM_TRAIL_TYPE RVI_TrailingProfitMethod = T_NONE; // Trail profit method
@@ -1147,10 +1072,7 @@ double RVI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __SAR_Parameters__ = "-- Settings for the Parabolic Stop and Reverse system indicator --"; // >>> SAR <<<
-extern bool SAR1_Active = 0; // Enable for M1
-extern bool SAR5_Active = 0; // Enable for M5
-extern bool SAR15_Active = 0; // Enable for M15
-extern bool SAR30_Active = 1; // Enable for M30
+extern uint SAR_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern double SAR_Step = 0.2; // Step
 extern double SAR_Maximum_Stop = 0.4; // Maximum stop
 extern int SAR_Shift = 0; // Shift
@@ -1180,10 +1102,7 @@ extern double SAR30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __StdDev_Parameters__ = "-- Settings for the Standard Deviation indicator --"; // >>> STDDEV <<<
-bool StdDev1_Active = 0; // Enable for M1
-bool StdDev5_Active = 0; // Enable for M5
-bool StdDev15_Active = 0; // Enable for M15
-bool StdDev30_Active = 0; // Enable for M30
+uint StdDev_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 int StdDev_MA_Period = 10; // Period
 int StdDev_MA_Shift = 0; // Shift
 ENUM_MA_METHOD StdDev_MA_Method = 1; // MA Method
@@ -1219,10 +1138,7 @@ double StdDev30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __Stochastic_Parameters__ = "-- Settings for the Stochastic Oscillator --"; // >>> STOCHASTIC <<<
-bool Stochastic1_Active = 0; // Enable for M1
-bool Stochastic5_Active = 0; // Enable for M5
-bool Stochastic15_Active = 0; // Enable for M15
-bool Stochastic30_Active = 0; // Enable for M30
+uint Stochastic_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 uint Stochastic_KPeriod = 5; // K line period
 uint Stochastic_DPeriod = 5; // D line period
 uint Stochastic_Slowing = 5; // Slowing
@@ -1259,10 +1175,7 @@ double Stochastic30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --"; // >>> WPR <<<
-extern bool WPR1_Active = 1; // Enable for M1
-extern bool WPR5_Active = 1; // Enable for M5
-extern bool WPR15_Active = 1; // Enable for M15
-extern bool WPR30_Active = 0; // Enable for M30
+extern uint WPR_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern int WPR_Period = 6; // Period
 extern int WPR_Shift = 0; // Shift
 extern int WPR_SignalLevel = 20; // Signal level
@@ -1295,10 +1208,7 @@ extern double WPR30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __ZigZag_Parameters__ = "-- Settings for the ZigZag indicator --"; // >>> ZIGZAG <<<
-bool ZigZag1_Active = 0; // Enable for M1
-bool ZigZag5_Active = 0; // Enable for M5
-bool ZigZag15_Active = 0; // Enable for M15
-bool ZigZag30_Active = 0; // Enable for M30
+uint ZigZag_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 uint ZigZag_Depth = 0; // Depth
 uint ZigZag_Deviation = 0; // Deviation
 uint ZigZag_Backstep = 0; // Deviation
