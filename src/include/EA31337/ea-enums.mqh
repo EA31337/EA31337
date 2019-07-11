@@ -208,6 +208,8 @@ enum ENUM_ORDER_QUEUE_ENTRY { // Define order queue.
   FINAL_ORDER_QUEUE_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };
 
+#ifndef TRAIL_TYPE_ENUM
+#define TRAIL_TYPE_ENUM
 enum ENUM_TRAIL_TYPE { // Define type of trailing types.
   T_NONE               =   0, // None (risky)
   T1_FIXED             =   1, // Fixed (locked)
@@ -261,6 +263,7 @@ enum ENUM_TRAIL_TYPE { // Define type of trailing types.
   T1_ENVELOPES         =  25, // Envelopes (locked)
   T2_ENVELOPES         = -25, // Envelopes (dynamic)
 };
+#endif
 
 // Define account conditions.
 enum ENUM_ACC_CONDITION {
