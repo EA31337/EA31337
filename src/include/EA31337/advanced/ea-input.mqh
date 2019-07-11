@@ -230,15 +230,15 @@ extern int CloseConditionCustom5Method = 0; // Custom 5 market-based close condi
 extern int CloseConditionCustom6Method = 0; // Custom 6 market-based close condition (0-1023)
 
 //+------------------------------------------------------------------+
-string __AC_Parameters__ = "-- Settings for the Bill Williams' Accelerator/Decelerator oscillator --"; // >>> AC (NOT IMPLEMENTED YET) <<<
-uint AC_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-ENUM_TRAIL_TYPE AC_TrailingStopMethod = 22; // Trail stop method
-ENUM_TRAIL_TYPE AC_TrailingProfitMethod = 1; // Trail profit method
-double AC_SignalLevel = 0.00000000; // Signal level
-int AC1_SignalMethod = 0; // Signal method for M1 (0-?)
-int AC5_SignalMethod = 0; // Signal method for M5 (0-?)
-int AC15_SignalMethod = 0; // Signal method for M15 (0-?)
-int AC30_SignalMethod = 0; // Signal method for M30 (0-?)
+extern string __AC_Parameters__ = "-- Settings for the Bill Williams' Accelerator/Decelerator oscillator --"; // >>> AC <<<
+extern uint AC_Active_Tf = 7; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern ENUM_TRAIL_TYPE AC_TrailingStopMethod = 13; // Trail stop method
+extern ENUM_TRAIL_TYPE AC_TrailingProfitMethod = 12; // Trail profit method
+extern double AC_SignalLevel = 0.0004; // Signal level (>0.0001)
+extern int AC1_SignalMethod = 1; // Signal method for M1 (0-1)
+extern int AC5_SignalMethod = 0; // Signal method for M5 (0-1)
+extern int AC15_SignalMethod = 0; // Signal method for M15 (0-1)
+extern int AC30_SignalMethod = 1; // Signal method for M30 (0-1)
 int AC1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int AC1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
 ENUM_MARKET_EVENT AC1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
@@ -261,15 +261,15 @@ double AC15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
 double AC30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
-string __AD_Parameters__ = "-- Settings for the Accumulation/Distribution indicator --"; // >>> AD (NOT IMPLEMENTED YET) <<<
-uint AD_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-ENUM_TRAIL_TYPE AD_TrailingStopMethod = T1_MA_FMS_PEAK; // Trail stop method
-ENUM_TRAIL_TYPE AD_TrailingProfitMethod = T1_FIXED; // Trail profit method
-double AD_SignalLevel = 0.00000000; // Signal level
-int AD1_SignalMethod = 0; // Signal method for M1 (0-?)
-int AD5_SignalMethod = 0; // Signal method for M5 (0-?)
-int AD15_SignalMethod = 0; // Signal method for M15 (0-?)
-int AD30_SignalMethod = 0; // Signal method for M30 (0-?)
+extern string __AD_Parameters__ = "-- Settings for the Accumulation/Distribution indicator --"; // >>> AD <<<
+extern uint AD_Active_Tf = 14; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern ENUM_TRAIL_TYPE AD_TrailingStopMethod = 9; // Trail stop method
+extern ENUM_TRAIL_TYPE AD_TrailingProfitMethod = 13; // Trail profit method
+extern double AD_SignalLevel = 0.00000000; // Signal level
+extern int AD1_SignalMethod = 0; // Signal method for M1 (0-?)
+extern int AD5_SignalMethod = 0; // Signal method for M5 (0-?)
+extern int AD15_SignalMethod = 0; // Signal method for M15 (0-?)
+extern int AD30_SignalMethod = 0; // Signal method for M30 (0-?)
 int AD1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int AD1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
 ENUM_MARKET_EVENT AD1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1

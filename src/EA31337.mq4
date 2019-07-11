@@ -1534,13 +1534,13 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
     */
     case ORDER_TYPE_BUY:
       result = iac[period][CURR] > signal_level1 && iac[period][CURR] > iac[period][PREV];
-      if (METHOD(signal_method, 0)) result &= iac[period][PREV] > iac[period][FAR];
-      //if (METHOD(signal_method, 1)) result &= iac[period][PREV] > iac[period][FAR]; // @todo: one more bar.
+      if (METHOD(signal_method, 0)) result &= iac[period][PREV] > iac[period][FAR]; // @todo: one more bar.
+      //if (METHOD(signal_method, 0)) result &= iac[period][PREV] > iac[period][FAR];
     break;
     case ORDER_TYPE_SELL:
       result = iac[period][CURR] < -signal_level1 && iac[period][CURR] < iac[period][PREV];
-      if (METHOD(signal_method, 0)) result &= iac[period][PREV] < iac[period][FAR];
-      //if (METHOD(signal_method, 1)) result &= iac[period][PREV] < iac[period][FAR]; // @todo: one more bar.
+      if (METHOD(signal_method, 0)) result &= iac[period][PREV] < iac[period][FAR]; // @todo: one more bar.
+      //if (METHOD(signal_method, 0)) result &= iac[period][PREV] < iac[period][FAR];
     break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
@@ -1584,12 +1584,12 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, long signal_method = 
   switch (cmd) {
     // Buy: indicator growth at downtrend.
     case ORDER_TYPE_BUY:
-      result = ad[period][CURR] >= ad[period][PREV] && chart.GetClose(0) <= chart.GetClose(1);
+      result = ad[period][CURR] >= ad[period][PREV] + signal_level1 && chart.GetClose(0) <= chart.GetClose(1);
       if (METHOD(signal_method, 0)) result &= Open[CURR] > Close[CURR];
     break;
     // Sell: indicator fall at uptrend.
     case ORDER_TYPE_SELL:
-      result = ad[period][CURR] <= ad[period][PREV] && chart.GetClose(0) >= chart.GetClose(1);
+      result = ad[period][CURR] <= ad[period][PREV] - signal_level1 && chart.GetClose(0) >= chart.GetClose(1);
       if (METHOD(signal_method, 0)) result &= Open[CURR] < Close[CURR];
     break;
   }
