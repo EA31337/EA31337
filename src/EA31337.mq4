@@ -4344,8 +4344,10 @@ int GetMaxOrdersPerType() {
  */
 int GetNoOfStrategies() {
   int result = 0;
-  for (int i = 0; i < FINAL_STRATEGY_TYPE_ENTRY; i++) {
-    result += info[i][ACTIVE];
+  Strategy *_strat;
+  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+    _strat = ((Strategy *) strats.GetByIndex(sid));
+    result += _strat.IsEnabled() && !_strat.IsSuspended() ? 1 : 0;
   }
   return result;
 }
