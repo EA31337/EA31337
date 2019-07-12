@@ -1028,7 +1028,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, Strategy *_strat, double trade_volume = 0,
   }
 
    // Check the limits.
-   if (!OpenOrderIsAllowed(cmd, sid, trade_volume)) {
+   if (!OpenOrderIsAllowed(cmd, _strat, trade_volume)) {
      return (false);
    }
 
@@ -1205,7 +1205,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE _cmd, uint _sid, double _trade_volume = 0, stri
 /**
  * Check if we can open new order.
  */
-bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, int sid = EMPTY, double volume = EMPTY) {
+bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, Strategy *_strat, double volume = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   bool result = true;
   string err;
@@ -1213,7 +1213,7 @@ bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, int sid = EMPTY, double volume = EM
   // total_sl = Orders::TotalSL(); // Convert::ValueToMoney(Orders::TotalSL(ORDER_TYPE_BUY)), Convert::ValueToMoney(Orders::TotalSL(ORDER_TYPE_SELL)
   // total_tp = Orders::TotalTP(); // Convert::ValueToMoney(Orders::TotalSL(ORDER_TYPE_BUY)), Convert::ValueToMoney(Orders::TotalSL(ORDER_TYPE_SELL)
   if (volume < market.GetVolumeMin()) {
-    last_trace = Msg::ShowText(StringFormat("%s: Lot size = %.2f", sname[sid], volume), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
+    last_trace = Msg::ShowText(StringFormat("%s: Lot size = %.2f", _strat.GetName(), volume), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
     result = false;
   } else if (!account.Trades().IsNewOrderAllowed()) {
     last_msg = Msg::ShowText("Maximum open and pending orders has reached the limit set by the broker.", "Info", __FUNCTION__, __LINE__, VerboseInfo);
@@ -1223,20 +1223,20 @@ bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, int sid = EMPTY, double volume = EM
       StringFormat("Maximum open and pending orders has reached the limit (MaxOrders) [%d>=%d].", total_orders, max_orders),
       "Info", __FUNCTION__, __LINE__, VerboseInfo
       );
-    OrderQueueAdd(sid, cmd);
+    OrderQueueAdd((uint) _strat.GetId(), cmd);
     result = false;
-  } else if (GetTotalOrdersByType(sid) >= GetMaxOrdersPerType()) {
-    last_msg = Msg::ShowText(StringFormat("%s: Maximum open and pending orders per type has reached the limit (MaxOrdersPerType).", sname[sid]), "Info", __FUNCTION__, __LINE__, VerboseInfo);
-    OrderQueueAdd(sid, cmd);
+  } else if (GetTotalOrdersByType((uint) _strat.GetId()) >= GetMaxOrdersPerType()) {
+    last_msg = Msg::ShowText(StringFormat("%s: Maximum open and pending orders per type has reached the limit (MaxOrdersPerType).", _strat.GetName()), "Info", __FUNCTION__, __LINE__, VerboseInfo);
+    OrderQueueAdd((uint) _strat.GetId(), cmd);
     result = false;
   } else if (!account.CheckFreeMargin(cmd, volume)) {
     last_err = Msg::ShowText("No money to open more orders.", "Error", __FUNCTION__, __LINE__, VerboseInfo | VerboseErrors, PrintLogOnChart);
-    if (VerboseDebug) PrintFormat("%s:%d: %s: Volume: %g", __FUNCTION__, __LINE__, sname[sid], volume);
+    if (VerboseDebug) PrintFormat("%s:%d: %s: Volume: %g", __FUNCTION__, __LINE__, _strat.GetName(), volume);
     result = false;
-  } else if (!CheckMinPipGap(sid)) {
-    last_trace = Msg::ShowText(StringFormat("%s: Ignoring the executing order, because the distance between orders is too close [MinPipGap].", sname[sid]), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
+  } else if (!CheckMinPipGap((uint) _strat.GetId())) {
+    last_trace = Msg::ShowText(StringFormat("%s: Ignoring the executing order, because the distance between orders is too close [MinPipGap].", _strat.GetName()), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
     result = false;
-  } else if (!CheckProfitFactorLimits(sid)) {
+  } else if (!CheckProfitFactorLimits(_strat)) {
     result = false;
   } else if (RiskMarginTotal >= 0 && ea_margin_risk_level[Convert::OrderTypeBuyOrSell(cmd)] > GetRiskMarginInTotal() / 100) {
     last_msg = Msg::ShowText(
@@ -1272,44 +1272,6 @@ bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, int sid = EMPTY, double volume = EM
  * @return
  *   If true, the profit factor is fine, otherwise return false.
  */
-bool CheckProfitFactorLimits(int sid = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  if (sid == EMPTY) {
-    // If sid is empty, unsuspend all strategies.
-    ActionExecute(A_UNSUSPEND_STRATEGIES);
-    return (true);
-  }
-  Strategy *_strat;
-  _strat = ((Strategy *) strats.GetById(sid));
-  conf[sid][PROFIT_FACTOR] = GetStrategyProfitFactor(sid);
-  if (conf[sid][PROFIT_FACTOR] <= 0) {
-    last_err = Msg::ShowText(
-      StringFormat("%s: Profit factor is zero. (pf = %.1f)",
-        sname[sid], conf[sid][PROFIT_FACTOR]),
-      "Warning", __FUNCTION__, __LINE__, VerboseErrors);
-    return (true);
-  }
-  if (!info[sid][SUSPENDED] && ProfitFactorMinToTrade > 0 && conf[sid][PROFIT_FACTOR] < ProfitFactorMinToTrade) {
-    last_err = Msg::ShowText(
-      StringFormat("%s: Minimum profit factor has been reached, disabling strategy. (pf = %.1f)",
-        sname[sid], conf[sid][PROFIT_FACTOR]),
-      "Info", __FUNCTION__, __LINE__, VerboseInfo);
-    info[sid][SUSPENDED] = true;
-    _strat.Suspended();
-    return (false);
-  }
-  if (!info[sid][SUSPENDED] && ProfitFactorMaxToTrade > 0 && conf[sid][PROFIT_FACTOR] > ProfitFactorMaxToTrade) {
-    last_err = Msg::ShowText(
-      StringFormat("%s: Maximum profit factor has been reached, disabling strategy. (pf = %.1f)",
-        sname[sid], conf[sid][PROFIT_FACTOR]),
-      "Info", __FUNCTION__, __LINE__, VerboseInfo);
-    info[sid][SUSPENDED] = true;
-    _strat.Suspended();
-    return (false);
-  }
-  if (VerboseDebug) PrintFormat("%s: Profit factor: %.1f", sname[sid], conf[sid][PROFIT_FACTOR]);
-  return (true);
-}
 bool CheckProfitFactorLimits(Strategy *_strat) {
   DEBUG_CHECKPOINT_ADD
   double _pf = _strat.GetProfitFactor();
@@ -1334,7 +1296,7 @@ bool CheckProfitFactorLimits(Strategy *_strat) {
       StringFormat("%s: Maximum profit factor has been reached, disabling strategy. (pf = %.1f)",
         _strat.GetName(), _pf),
       "Info", __FUNCTION__, __LINE__, VerboseInfo);
-    _strat.Suspended();
+    _strat.Suspended(true);
     return (false);
   }
   if (VerboseDebug) PrintFormat("%s: Profit factor: %.1f", _strat.GetName(), _pf);
@@ -4124,7 +4086,7 @@ int GetTotalOrders(bool ours = true) {
 }
 
 // Return total number of orders per strategy type. See: ENUM_STRATEGY_TYPE.
-int GetTotalOrdersByType(int order_type) {
+int GetTotalOrdersByType(uint order_type) {
   static datetime last_access = time_current;
   if (Cache && open_orders[order_type] > 0 && last_access == time_current) { return open_orders[order_type]; } else { last_access = time_current; }; // Return cached if available.
   open_orders[order_type] = 0;
@@ -6318,7 +6280,6 @@ bool InitStrategy(int key, string name, ENUM_INDICATOR_TYPE indicator, ENUM_TIME
     }
   sname[key]                 = name;
   info[key][ACTIVE]          = true;
-  info[key][SUSPENDED]       = false;
   info[key][TIMEFRAME]       = _tf;
   info[key][INDICATOR]       = indicator;
   conf[key][PROFIT_FACTOR]   = GetDefaultProfitFactor();
@@ -7437,21 +7398,15 @@ bool ActionExecute(int aid, int id = EMPTY) {
       result = ActionCloseAllOrders(reason_id);
       break;
     case A_SUSPEND_STRATEGIES: /* 11 */
-      #ifdef __MQL4__
-      Array::ArrSetValueI(info, SUSPENDED, (int) true);
-      #else
-      // @fixme
-      if (VerboseDebug) PrintFormat("%s: FIXME: A_SUSPEND_STRATEGIES", __FUNCTION_LINE__);
-      #endif
+      for (uint sid = 0; sid < strats.GetSize(); sid++) {
+        ((Strategy *) strats.GetByIndex(sid)).Suspended(true);
+      }
       result = true;
       break;
     case A_UNSUSPEND_STRATEGIES: /* 12 */
-      #ifdef __MQL4__
-      Array::ArrSetValueI(info, SUSPENDED, (int) false);
-      #else
-      // @fixme
-      if (VerboseDebug) PrintFormat("%s: FIXME: A_UNSUSPEND_STRATEGIES", __FUNCTION_LINE__);
-      #endif
+      for (uint sid = 0; sid < strats.GetSize(); sid++) {
+        ((Strategy *) strats.GetByIndex(sid)).Suspended(false);
+      }
       result = true;
       break;
     case A_RESET_STRATEGY_STATS: /* 13 */
@@ -7702,7 +7657,7 @@ bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
       time = (datetime) order_queue[selected_qid][Q_TIME];
       volume = GetStrategyLotSize(sid, cmd);
       if (!OpenOrderCondition(cmd, sid, time, filter)) continue;
-      if (OpenOrderIsAllowed(cmd, sid, volume)) {
+      if (OpenOrderIsAllowed(cmd, strats.GetById(sid), volume)) {
         string comment = GetStrategyComment(sid) + " [AIQueued]";
         result &= ExecuteOrder(cmd, sid, volume, comment);
         break;

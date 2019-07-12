@@ -143,7 +143,6 @@ enum ENUM_STRATEGY_TYPE { // Define type of strategies.
 
 enum ENUM_STRATEGY_INFO { // Define type of strategy information entry.
   ACTIVE,
-  SUSPENDED,
   TIMEFRAME,
   INDICATOR,
   CUSTOM_PERIOD,
