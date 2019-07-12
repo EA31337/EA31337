@@ -6322,11 +6322,6 @@ bool InitStrategy(int key, string name, ENUM_INDICATOR_TYPE indicator, ENUM_TIME
   info[key][TIMEFRAME]       = _tf;
   info[key][INDICATOR]       = indicator;
   conf[key][PROFIT_FACTOR]   = GetDefaultProfitFactor();
-  info[key][CLOSE_CONDITION] = close_cond;
-  // #ifdef __advanced__
-  info[key][OPEN_CONDITION1] = open_cond1;
-  info[key][OPEN_CONDITION2] = open_cond2;
-  // #endif
   return active || !ValidateSettings;
 }
 
