@@ -1016,7 +1016,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, Strategy *_strat, double trade_volume = 0,
   bool result = false;
   int order_ticket;
   double trade_volume_max = market.GetVolumeMax();
-  Trade *_trade = trade[GetStrategyTimeframeIndex(sid)];
+  Trade *_trade = _strat.Trade();
 
   #ifdef __profiler__ PROFILER_START #endif
 
@@ -6683,15 +6683,8 @@ ulong GetStrategySignalMethod(ENUM_INDICATOR_TYPE indicator, ENUM_TIMEFRAMES tim
 /**
  * Fetch strategy timeframe based on the strategy type.
  */
-ENUM_TIMEFRAMES GetStrategyTimeframe(int sid, int default_value = PERIOD_M1) {
-  return (ENUM_TIMEFRAMES) (sid >= 0 ? info[sid][TIMEFRAME] : default_value);
-}
-
-/**
- * Fetch strategy timeframe index based on the strategy type.
- */
-ENUM_TIMEFRAMES_INDEX GetStrategyTimeframeIndex(int sid, int default_value = PERIOD_M1) {
-  return (ENUM_TIMEFRAMES_INDEX) (sid >= 0 ? Chart::TfToIndex((ENUM_TIMEFRAMES) info[sid][TIMEFRAME]) : default_value);
+ENUM_TIMEFRAMES GetStrategyTimeframe(int sid) {
+  return ((Strategy *) strats.GetById(sid)).GetTf();
 }
 
 /**
