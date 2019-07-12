@@ -146,7 +146,6 @@ enum ENUM_STRATEGY_INFO { // Define type of strategy information entry.
   SUSPENDED,
   TIMEFRAME,
   INDICATOR,
-  OPEN_METHOD,
   STOP_METHOD,
   PROFIT_METHOD,
   CUSTOM_PERIOD,
@@ -165,7 +164,6 @@ enum ENUM_STRATEGY_VALUE { // Define strategy value entry.
   LOT_SIZE,      // Lot size to trade.
   FACTOR,        // Multiply lot factor.
   PROFIT_FACTOR, // Profit factor.
-  OPEN_LEVEL,    // Value to raise the signal.
   SPREAD_LIMIT,  // Spread limit.
   FINAL_STRATEGY_VALUE_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };
