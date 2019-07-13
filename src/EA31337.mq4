@@ -4893,12 +4893,6 @@ bool InitStrategies() {
   ArrayInitialize(conf, 0);  // Reset strategy configuration.
   ArrayInitialize(stats, 0); // Reset strategy statistics.
 
-  // Initialize strategy array variables.
-  init &= ((!AC_Active_Tf & M1B) == M1B)   | InitStrategy(AC1,  "AC M1",  INDI_AC, PERIOD_M1,  AC1_OpenCondition1,  AC1_OpenCondition2,  AC1_CloseCondition);
-  init &= ((!AC_Active_Tf & M5B) == M5B)   | InitStrategy(AC5,  "AC M5",  INDI_AC, PERIOD_M5,  AC5_OpenCondition1,  AC5_OpenCondition2,  AC5_CloseCondition);
-  init &= ((!AC_Active_Tf & M15B) == M15B) | InitStrategy(AC15, "AC M15", INDI_AC, PERIOD_M15, AC15_OpenCondition1, AC15_OpenCondition2, AC15_CloseCondition);
-  init &= ((!AC_Active_Tf & M30B) == M30B) | InitStrategy(AC30, "AC M30", INDI_AC, PERIOD_M30, AC30_OpenCondition1, AC30_OpenCondition2, AC30_CloseCondition);
-
   ChartParams cparams1(PERIOD_M1);
   ChartParams cparams5(PERIOD_M5);
   ChartParams cparams15(PERIOD_M15);
@@ -4938,11 +4932,6 @@ bool InitStrategies() {
     strats.Add(new Stg_AC(ac30_sparams, "AC30"));
   }
 
-  init &= ((!AD_Active_Tf & M1B) == M1B)   | InitStrategy(AD1,  "AD M1",  INDI_AD, PERIOD_M1,  AD1_OpenCondition1,  AD1_OpenCondition2,  AD1_CloseCondition);
-  init &= ((!AD_Active_Tf & M5B) == M5B)   | InitStrategy(AD5,  "AD M5",  INDI_AD, PERIOD_M5,  AD5_OpenCondition1,  AD5_OpenCondition2,  AD5_CloseCondition);
-  init &= ((!AD_Active_Tf & M15B) == M15B) | InitStrategy(AD15, "AD M15", INDI_AD, PERIOD_M15, AD15_OpenCondition1, AD15_OpenCondition2, AD15_CloseCondition);
-  init &= ((!AD_Active_Tf & M30B) == M30B) | InitStrategy(AD30, "AD M30", INDI_AD, PERIOD_M30, AD30_OpenCondition1, AD30_OpenCondition2, AD30_CloseCondition);
-
   IndicatorParams ad_iparams(10, INDI_AD);
   if ((AD_Active_Tf & M1B) == M1B) {
     StgParams ad1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_AD(ad_iparams, cparams1), NULL, NULL);
@@ -4976,11 +4965,6 @@ bool InitStrategies() {
     ad30_sparams.SetId(AD30);
     strats.Add(new Stg_AD(ad30_sparams, "AD30"));
   }
-
-  init &= ((!ADX_Active_Tf & M1B) == M1B)   | InitStrategy(ADX1,  "ADX M1",  INDI_ADX, PERIOD_M1,  ADX1_OpenCondition1,  ADX1_OpenCondition2,  ADX1_CloseCondition);
-  init &= ((!ADX_Active_Tf & M5B) == M5B)   | InitStrategy(ADX5,  "ADX M5",  INDI_ADX, PERIOD_M5,  ADX5_OpenCondition1,  ADX5_OpenCondition2,  ADX5_CloseCondition);
-  init &= ((!ADX_Active_Tf & M15B) == M15B) | InitStrategy(ADX15, "ADX M15", INDI_ADX, PERIOD_M15, ADX15_OpenCondition1, ADX15_OpenCondition2, ADX15_CloseCondition);
-  init &= ((!ADX_Active_Tf & M30B) == M30B) | InitStrategy(ADX30, "ADX M30", INDI_ADX, PERIOD_M30, ADX30_OpenCondition1, ADX30_OpenCondition2, ADX30_CloseCondition);
 
   IndicatorParams adx_iparams(10, INDI_ADX);
   if ((ADX_Active_Tf & M1B) == M1B) {
@@ -5019,11 +5003,6 @@ bool InitStrategies() {
     adx30_sparams.SetId(ADX30);
     strats.Add(new Stg_ADX(adx30_sparams, "ADX30"));
   }
-
-  init &= ((!Alligator_Active_Tf &  M1B) == M1B)  | InitStrategy(ALLIGATOR1,  "Alligator M1",  INDI_ALLIGATOR, PERIOD_M1,  Alligator1_OpenCondition1,  Alligator1_OpenCondition2,  Alligator1_CloseCondition);
-  init &= ((!Alligator_Active_Tf &  M5B) == M5B)  | InitStrategy(ALLIGATOR5,  "Alligator M5",  INDI_ALLIGATOR, PERIOD_M5,  Alligator5_OpenCondition1,  Alligator5_OpenCondition2,  Alligator5_CloseCondition);
-  init &= ((!Alligator_Active_Tf & M15B) == M15B) | InitStrategy(ALLIGATOR15, "Alligator M15", INDI_ALLIGATOR, PERIOD_M15, Alligator15_OpenCondition1, Alligator15_OpenCondition2, Alligator15_CloseCondition);
-  init &= ((!Alligator_Active_Tf & M30B) == M30B) | InitStrategy(ALLIGATOR30, "Alligator M30", INDI_ALLIGATOR, PERIOD_M30, Alligator30_OpenCondition1, Alligator30_OpenCondition2, Alligator30_CloseCondition);
 
   IndicatorParams alli_iparams(10, INDI_ALLIGATOR);
   if ((Alligator_Active_Tf & M1B) == M1B) {
@@ -5079,11 +5058,6 @@ bool InitStrategies() {
     strats.Add(new Stg_Alligator(alli30_sparams, "Alligator30"));
   }
 
-  init &= ((!ATR_Active_Tf & M1B) == M1B)   | InitStrategy(ATR1,  "ATR M1",  INDI_ATR, PERIOD_M1,  ATR1_OpenCondition1,  ATR1_OpenCondition2,  ATR1_CloseCondition);
-  init &= ((!ATR_Active_Tf & M5B) == M5B)   | InitStrategy(ATR5,  "ATR M5",  INDI_ATR, PERIOD_M5,  ATR5_OpenCondition1,  ATR5_OpenCondition2,  ATR5_CloseCondition);
-  init &= ((!ATR_Active_Tf & M15B) == M15B) | InitStrategy(ATR15, "ATR M15", INDI_ATR, PERIOD_M15, ATR15_OpenCondition1, ATR15_OpenCondition2, ATR15_CloseCondition);
-  init &= ((!ATR_Active_Tf & M30B) == M30B) | InitStrategy(ATR30, "ATR M30", INDI_ATR, PERIOD_M30, ATR30_OpenCondition1, ATR30_OpenCondition2, ATR30_CloseCondition);
-
   IndicatorParams atr_iparams(10, INDI_ATR);
   if ((ATR_Active_Tf & M1B) == M1B) {
     ATR_Params atr1_iparams(ATR_Period);
@@ -5122,11 +5096,6 @@ bool InitStrategies() {
     strats.Add(new Stg_ATR(atr30_sparams, "ATR30"));
   }
 
-  init &= ((!Awesome_Active_Tf & M1B) == M1B)   | InitStrategy(AWESOME1,  "Awesome M1",  INDI_AO, PERIOD_M1,  Awesome1_OpenCondition1,  Awesome1_OpenCondition2,  Awesome1_CloseCondition);
-  init &= ((!Awesome_Active_Tf & M5B) == M5B)   | InitStrategy(AWESOME5,  "Awesome M5",  INDI_AO, PERIOD_M5,  Awesome5_OpenCondition1,  Awesome5_OpenCondition2,  Awesome5_CloseCondition);
-  init &= ((!Awesome_Active_Tf & M15B) == M15B) | InitStrategy(AWESOME15, "Awesome M15", INDI_AO, PERIOD_M15, Awesome15_OpenCondition1, Awesome15_OpenCondition2, Awesome15_CloseCondition);
-  init &= ((!Awesome_Active_Tf & M30B) == M30B) | InitStrategy(AWESOME30, "Awesome M30", INDI_AO, PERIOD_M30, Awesome30_OpenCondition1, Awesome30_OpenCondition2, Awesome30_CloseCondition);
-
   IndicatorParams ao_iparams(10, INDI_AO);
   if ((Awesome_Active_Tf & M1B) == M1B) {
     StgParams ao1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_AO(ao_iparams, cparams1), NULL, NULL);
@@ -5160,11 +5129,6 @@ bool InitStrategies() {
     ao30_sparams.SetId(AWESOME30);
     strats.Add(new Stg_Awesome(ao30_sparams, "Awesome30"));
   }
-
-  init &= ((!Bands_Active_Tf & M1B) == M1B)   | InitStrategy(BANDS1,  "Bands M1",  INDI_BANDS, PERIOD_M1,  Bands1_OpenCondition1,  Bands1_OpenCondition2,  Bands1_CloseCondition);
-  init &= ((!Bands_Active_Tf & M5B) == M5B)   | InitStrategy(BANDS5,  "Bands M5",  INDI_BANDS, PERIOD_M5,  Bands5_OpenCondition1,  Bands5_OpenCondition2,  Bands5_CloseCondition);
-  init &= ((!Bands_Active_Tf & M15B) == M15B) | InitStrategy(BANDS15, "Bands M15", INDI_BANDS, PERIOD_M15, Bands15_OpenCondition1, Bands15_OpenCondition2, Bands15_CloseCondition);
-  init &= ((!Bands_Active_Tf & M30B) == M30B) | InitStrategy(BANDS30, "Bands M30", INDI_BANDS, PERIOD_M30, Bands30_OpenCondition1, Bands30_OpenCondition2, Bands30_CloseCondition);
 
   IndicatorParams bands_iparams(10, INDI_BANDS);
   if ((Bands_Active_Tf & M1B) == M1B) {
@@ -5204,11 +5168,6 @@ bool InitStrategies() {
     strats.Add(new Stg_Bands(bands30_sparams, "Bands30"));
   }
 
-  init &= ((!BearsPower_Active_Tf & M1B) == M1B)   | InitStrategy(BEARSPOWER1,  "BearsPower M1",  INDI_BEARS, PERIOD_M1,  BearsPower1_OpenCondition1,  BearsPower1_OpenCondition2,  BearsPower1_CloseCondition);
-  init &= ((!BearsPower_Active_Tf & M5B) == M5B)   | InitStrategy(BEARSPOWER5,  "BearsPower M5",  INDI_BEARS, PERIOD_M5,  BearsPower5_OpenCondition1,  BearsPower5_OpenCondition2,  BearsPower5_CloseCondition);
-  init &= ((!BearsPower_Active_Tf & M15B) == M15B) | InitStrategy(BEARSPOWER15, "BearsPower M15", INDI_BEARS, PERIOD_M15, BearsPower15_OpenCondition1, BearsPower15_OpenCondition2, BearsPower15_CloseCondition);
-  init &= ((!BearsPower_Active_Tf & M30B) == M30B) | InitStrategy(BEARSPOWER30, "BearsPower M30", INDI_BEARS, PERIOD_M30, BearsPower30_OpenCondition1, BearsPower30_OpenCondition2, BearsPower30_CloseCondition);
-
   IndicatorParams bearspower_iparams(10, INDI_BEARS);
   if ((BearsPower_Active_Tf & M1B) == M1B) {
     BearsPower_Params bearspower1_iparams(BearsPower_Period, BearsPower_Applied_Price);
@@ -5246,11 +5205,6 @@ bool InitStrategies() {
     bearspower30_sparams.SetId(BEARSPOWER30);
     strats.Add(new Stg_BearsPower(bearspower30_sparams, "BearsPower30"));
   }
-
-  init &= ((!BullsPower_Active_Tf & M1B) == M1B)   | InitStrategy(BULLSPOWER1,  "BullsPower M1",  INDI_BULLS, PERIOD_M1,  BullsPower1_OpenCondition1,  BullsPower1_OpenCondition2,  BullsPower1_CloseCondition);
-  init &= ((!BullsPower_Active_Tf & M5B) == M5B)   | InitStrategy(BULLSPOWER5,  "BullsPower M5",  INDI_BULLS, PERIOD_M5,  BullsPower5_OpenCondition1,  BullsPower5_OpenCondition2,  BullsPower5_CloseCondition);
-  init &= ((!BullsPower_Active_Tf & M15B) == M15B) | InitStrategy(BULLSPOWER15, "BullsPower M15", INDI_BULLS, PERIOD_M15, BullsPower15_OpenCondition1, BullsPower15_OpenCondition2, BullsPower15_CloseCondition);
-  init &= ((!BullsPower_Active_Tf & M30B) == M30B) | InitStrategy(BULLSPOWER30, "BullsPower M30", INDI_BULLS, PERIOD_M30, BullsPower30_OpenCondition1, BullsPower30_OpenCondition2, BullsPower30_CloseCondition);
 
   IndicatorParams bullspower_iparams(10, INDI_BULLS);
   if ((BullsPower_Active_Tf & M1B) == M1B) {
@@ -5290,11 +5244,6 @@ bool InitStrategies() {
     strats.Add(new Stg_BullsPower(bullspower30_sparams, "BullsPower30"));
   }
 
-  init &= ((!BWMFI_Active_Tf & M1B) == M1B)   | InitStrategy(BWMFI1,  "BWMFI M1",  INDI_BWMFI, PERIOD_M1,  BWMFI1_OpenCondition1,  BWMFI1_OpenCondition2,  BWMFI1_CloseCondition);
-  init &= ((!BWMFI_Active_Tf & M5B) == M5B)   | InitStrategy(BWMFI5,  "BWMFI M5",  INDI_BWMFI, PERIOD_M5,  BWMFI5_OpenCondition1,  BWMFI5_OpenCondition2,  BWMFI5_CloseCondition);
-  init &= ((!BWMFI_Active_Tf & M15B) == M15B) | InitStrategy(BWMFI15, "BWMFI M15", INDI_BWMFI, PERIOD_M15, BWMFI15_OpenCondition1, BWMFI15_OpenCondition2, BWMFI15_CloseCondition);
-  init &= ((!BWMFI_Active_Tf & M30B) == M30B) | InitStrategy(BWMFI30, "BWMFI M30", INDI_BWMFI, PERIOD_M30, BWMFI30_OpenCondition1, BWMFI30_OpenCondition2, BWMFI30_CloseCondition);
-
   IndicatorParams bwmfi_iparams(10, INDI_BWMFI);
   if ((BWMFI_Active_Tf & M1B) == M1B) {
     StgParams bwmfi1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_BWMFI(bwmfi_iparams, cparams1), NULL, NULL);
@@ -5328,11 +5277,6 @@ bool InitStrategies() {
     bwmfi30_sparams.SetId(BWMFI30);
     strats.Add(new Stg_BWMFI(bwmfi30_sparams, "BWMFI30"));
   }
-
-  init &= ((!CCI_Active_Tf & M1B) == M1B)   | InitStrategy(CCI1,  "CCI M1",  INDI_CCI, PERIOD_M1,  CCI1_OpenCondition1,  CCI1_OpenCondition2,  CCI1_CloseCondition);
-  init &= ((!CCI_Active_Tf & M5B) == M5B)   | InitStrategy(CCI5,  "CCI M5",  INDI_CCI, PERIOD_M5,  CCI5_OpenCondition1,  CCI5_OpenCondition2,  CCI5_CloseCondition);
-  init &= ((!CCI_Active_Tf & M15B) == M15B) | InitStrategy(CCI15, "CCI M15", INDI_CCI, PERIOD_M15, CCI15_OpenCondition1, CCI15_OpenCondition2, CCI15_CloseCondition);
-  init &= ((!CCI_Active_Tf & M30B) == M30B) | InitStrategy(CCI30, "CCI M30", INDI_CCI, PERIOD_M30, CCI30_OpenCondition1, CCI30_OpenCondition2, CCI30_CloseCondition);
 
   IndicatorParams cci_iparams(10, INDI_CCI);
   if ((CCI_Active_Tf & M1B) == M1B) {
@@ -5372,11 +5316,6 @@ bool InitStrategies() {
     strats.Add(new Stg_CCI(cci30_sparams, "CCI30"));
   }
 
-  init &= ((!DeMarker_Active_Tf & M1B) == M1B)   | InitStrategy(DEMARKER1,  "DeMarker M1",  INDI_DEMARKER, PERIOD_M1,  DeMarker1_OpenCondition1,  DeMarker1_OpenCondition2,  DeMarker1_CloseCondition);
-  init &= ((!DeMarker_Active_Tf & M5B) == M5B)   | InitStrategy(DEMARKER5,  "DeMarker M5",  INDI_DEMARKER, PERIOD_M5,  DeMarker5_OpenCondition1,  DeMarker5_OpenCondition2,  DeMarker5_CloseCondition);
-  init &= ((!DeMarker_Active_Tf & M15B) == M15B) | InitStrategy(DEMARKER15, "DeMarker M15", INDI_DEMARKER, PERIOD_M15, DeMarker15_OpenCondition1, DeMarker15_OpenCondition2, DeMarker15_CloseCondition);
-  init &= ((!DeMarker_Active_Tf & M30B) == M30B) | InitStrategy(DEMARKER30, "DeMarker M30", INDI_DEMARKER, PERIOD_M30, DeMarker30_OpenCondition1, DeMarker30_OpenCondition2, DeMarker30_CloseCondition);
-
   IndicatorParams dm_iparams(10, INDI_DEMARKER);
   if ((DeMarker_Active_Tf & M1B) == M1B) {
     DeMarker_Params dm1_iparams(DeMarker_Period);
@@ -5414,11 +5353,6 @@ bool InitStrategies() {
     dm30_sparams.SetId(DEMARKER30);
     strats.Add(new Stg_DeMarker(dm30_sparams, "DeMarker30"));
   }
-
-  init &= ((!Envelopes_Active_Tf & M1B) == M1B)   | InitStrategy(ENVELOPES1,  "Envelopes M1",  INDI_ENVELOPES, PERIOD_M1,  Envelopes1_OpenCondition1,  Envelopes1_OpenCondition2,  Envelopes1_CloseCondition);
-  init &= ((!Envelopes_Active_Tf & M5B) == M5B)   | InitStrategy(ENVELOPES5,  "Envelopes M5",  INDI_ENVELOPES, PERIOD_M5,  Envelopes5_OpenCondition1,  Envelopes5_OpenCondition2,  Envelopes5_CloseCondition);
-  init &= ((!Envelopes_Active_Tf & M15B) == M15B) | InitStrategy(ENVELOPES15, "Envelopes M15", INDI_ENVELOPES, PERIOD_M15, Envelopes15_OpenCondition1, Envelopes15_OpenCondition2, Envelopes15_CloseCondition);
-  init &= ((!Envelopes_Active_Tf & M30B) == M30B) | InitStrategy(ENVELOPES30, "Envelopes M30", INDI_ENVELOPES, PERIOD_M30, Envelopes30_OpenCondition1, Envelopes30_OpenCondition2, Envelopes30_CloseCondition);
 
   IndicatorParams env_iparams(10, INDI_ENVELOPES);
   if ((Envelopes_Active_Tf & M1B) == M1B) {
@@ -5458,11 +5392,6 @@ bool InitStrategies() {
     strats.Add(new Stg_Envelopes(env30_sparams, "Envelopes30"));
   }
 
-  init &= ((!Force_Active_Tf & M1B) == M1B)   | InitStrategy(FORCE1,  "Force M1",  INDI_FORCE, PERIOD_M1,  Force1_OpenCondition1,  Force1_OpenCondition2,  Force1_CloseCondition);
-  init &= ((!Force_Active_Tf & M5B) == M5B)   | InitStrategy(FORCE5,  "Force M5",  INDI_FORCE, PERIOD_M5,  Force5_OpenCondition1,  Force5_OpenCondition2,  Force5_CloseCondition);
-  init &= ((!Force_Active_Tf & M15B) == M15B) | InitStrategy(FORCE15, "Force M15", INDI_FORCE, PERIOD_M15, Force15_OpenCondition1, Force15_OpenCondition2, Force15_CloseCondition);
-  init &= ((!Force_Active_Tf & M30B) == M30B) | InitStrategy(FORCE30, "Force M30", INDI_FORCE, PERIOD_M30, Force30_OpenCondition1, Force30_OpenCondition2, Force30_CloseCondition);
-
   IndicatorParams force_iparams(10, INDI_FORCE);
   if ((Force_Active_Tf & M1B) == M1B) {
     Force_Params force1_iparams(Force_Period, Force_MA_Method, Force_Applied_price);
@@ -5501,11 +5430,6 @@ bool InitStrategies() {
     strats.Add(new Stg_Force(force30_sparams, "Force30"));
   }
 
-  init &= ((!Fractals_Active_Tf & M1B) == M1B)   | InitStrategy(FRACTALS1,  "Fractals M1",  INDI_FRACTALS, PERIOD_M1,  Fractals1_OpenCondition1,  Fractals1_OpenCondition2,  Fractals1_CloseCondition);
-  init &= ((!Fractals_Active_Tf & M5B) == M5B)   | InitStrategy(FRACTALS5,  "Fractals M5",  INDI_FRACTALS, PERIOD_M5,  Fractals5_OpenCondition1,  Fractals5_OpenCondition2,  Fractals5_CloseCondition);
-  init &= ((!Fractals_Active_Tf & M15B) == M15B) | InitStrategy(FRACTALS15, "Fractals M15", INDI_FRACTALS, PERIOD_M15, Fractals15_OpenCondition1, Fractals15_OpenCondition2, Fractals15_CloseCondition);
-  init &= ((!Fractals_Active_Tf & M30B) == M30B) | InitStrategy(FRACTALS30, "Fractals M30", INDI_FRACTALS, PERIOD_M30, Fractals30_OpenCondition1, Fractals30_OpenCondition2, Fractals30_CloseCondition);
-
   IndicatorParams fractals_iparams(10, INDI_FORCE);
   if ((Fractals_Active_Tf & M1B) == M1B) {
     StgParams fractals1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Fractals(fractals_iparams, cparams1), NULL, NULL);
@@ -5539,11 +5463,6 @@ bool InitStrategies() {
     fractals30_sparams.SetId(FRACTALS30);
     strats.Add(new Stg_Fractals(fractals30_sparams, "Fractals30"));
   }
-
-  init &= ((!Gator_Active_Tf & M1B) == M1B)   | InitStrategy(GATOR1,  "Gator M1",  INDI_GATOR, PERIOD_M1,  Gator1_OpenCondition1,  Gator1_OpenCondition2,  Gator1_CloseCondition);
-  init &= ((!Gator_Active_Tf & M5B) == M5B)   | InitStrategy(GATOR5,  "Gator M5",  INDI_GATOR, PERIOD_M5,  Gator5_OpenCondition1,  Gator5_OpenCondition2,  Gator5_CloseCondition);
-  init &= ((!Gator_Active_Tf & M15B) == M15B) | InitStrategy(GATOR15, "Gator M15", INDI_GATOR, PERIOD_M15, Gator15_OpenCondition1, Gator15_OpenCondition2, Gator15_CloseCondition);
-  init &= ((!Gator_Active_Tf & M30B) == M30B) | InitStrategy(GATOR30, "Gator M30", INDI_GATOR, PERIOD_M30, Gator30_OpenCondition1, Gator30_OpenCondition2, Gator30_CloseCondition);
 
   IndicatorParams gator_iparams(10, INDI_GATOR);
   if ((Gator_Active_Tf & M1B) == M1B) {
@@ -5599,11 +5518,6 @@ bool InitStrategies() {
     strats.Add(new Stg_Gator(gator30_sparams, "Gator30"));
   }
 
-  init &= ((!Ichimoku_Active_Tf & M1B) == M1B)   | InitStrategy(ICHIMOKU1,  "Ichimoku M1",  INDI_ICHIMOKU, PERIOD_M1,  Ichimoku1_OpenCondition1,  Ichimoku1_OpenCondition2,  Ichimoku1_CloseCondition);
-  init &= ((!Ichimoku_Active_Tf & M5B) == M5B)   | InitStrategy(ICHIMOKU5,  "Ichimoku M5",  INDI_ICHIMOKU, PERIOD_M5,  Ichimoku5_OpenCondition1,  Ichimoku5_OpenCondition2,  Ichimoku5_CloseCondition);
-  init &= ((!Ichimoku_Active_Tf & M15B) == M15B) | InitStrategy(ICHIMOKU15, "Ichimoku M15", INDI_ICHIMOKU, PERIOD_M15, Ichimoku15_OpenCondition1, Ichimoku15_OpenCondition2, Ichimoku15_CloseCondition);
-  init &= ((!Ichimoku_Active_Tf & M30B) == M30B) | InitStrategy(ICHIMOKU30, "Ichimoku M30", INDI_ICHIMOKU, PERIOD_M30, Ichimoku30_OpenCondition1, Ichimoku30_OpenCondition2, Ichimoku30_CloseCondition);
-
   IndicatorParams ichimoku_iparams(10, INDI_ICHIMOKU);
   if ((Ichimoku_Active_Tf & M1B) == M1B) {
     Ichimoku_Params ichimoku1_iparams(Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B);
@@ -5641,11 +5555,6 @@ bool InitStrategies() {
     ichimoku30_sparams.SetId(ICHIMOKU30);
     strats.Add(new Stg_Ichimoku(ichimoku30_sparams, "Ichimoku30"));
   }
-
-  init &= ((!MA_Active_Tf & M1B) == M1B)   | InitStrategy(MA1,  "MA M1",  INDI_MA, PERIOD_M1,  MA1_OpenCondition1, MA1_OpenCondition2,  MA1_CloseCondition);
-  init &= ((!MA_Active_Tf & M5B) == M5B)   | InitStrategy(MA5,  "MA M5",  INDI_MA, PERIOD_M5,  MA5_OpenCondition1, MA5_OpenCondition2,  MA5_CloseCondition);
-  init &= ((!MA_Active_Tf & M15B) == M15B) | InitStrategy(MA15, "MA M15", INDI_MA, PERIOD_M15, MA15_OpenCondition1, MA15_OpenCondition2, MA15_CloseCondition);
-  init &= ((!MA_Active_Tf & M30B) == M30B) | InitStrategy(MA30, "MA M30", INDI_MA, PERIOD_M30, MA30_OpenCondition1, MA30_OpenCondition2, MA30_CloseCondition);
 
   IndicatorParams ma_iparams(10, INDI_MA);
   if ((MA_Active_Tf & M1B) == M1B) {
@@ -5685,11 +5594,6 @@ bool InitStrategies() {
     strats.Add(new Stg_MA(ma30_sparams, "MA30"));
   }
 
-  init &= ((!MACD_Active_Tf & M1B) == M1B)   | InitStrategy(MACD1,  "MACD M1",  INDI_MACD, PERIOD_M1,  MACD1_OpenCondition1,  MACD1_OpenCondition2,  MACD1_CloseCondition);
-  init &= ((!MACD_Active_Tf & M5B) == M5B)   | InitStrategy(MACD5,  "MACD M5",  INDI_MACD, PERIOD_M5,  MACD5_OpenCondition1,  MACD5_OpenCondition2,  MACD5_CloseCondition);
-  init &= ((!MACD_Active_Tf & M15B) == M15B) | InitStrategy(MACD15, "MACD M15", INDI_MACD, PERIOD_M15, MACD15_OpenCondition1, MACD15_OpenCondition2, MACD15_CloseCondition);
-  init &= ((!MACD_Active_Tf & M30B) == M30B) | InitStrategy(MACD30, "MACD M30", INDI_MACD, PERIOD_M30, MACD30_OpenCondition1, MACD30_OpenCondition2, MACD30_CloseCondition);
-
   IndicatorParams macd_iparams(10, INDI_MACD);
   if ((MACD_Active_Tf & M1B) == M1B) {
     MACD_Params macd1_iparams(MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price);
@@ -5727,11 +5631,6 @@ bool InitStrategies() {
     macd30_sparams.SetId(MACD30);
     strats.Add(new Stg_MACD(macd30_sparams, "MACD30"));
   }
-
-  init &= ((!MFI_Active_Tf & M1B) == M1B)   | InitStrategy(MFI1,  "MFI M1",  INDI_MFI, PERIOD_M1,  MFI1_OpenCondition1,  MFI1_OpenCondition2,  MFI1_CloseCondition);
-  init &= ((!MFI_Active_Tf & M5B) == M5B)   | InitStrategy(MFI5,  "MFI M5",  INDI_MFI, PERIOD_M5,  MFI5_OpenCondition1,  MFI5_OpenCondition2,  MFI5_CloseCondition);
-  init &= ((!MFI_Active_Tf & M15B) == M15B) | InitStrategy(MFI15, "MFI M15", INDI_MFI, PERIOD_M15, MFI15_OpenCondition1, MFI15_OpenCondition2, MFI15_CloseCondition);
-  init &= ((!MFI_Active_Tf & M30B) == M30B) | InitStrategy(MFI30, "MFI M30", INDI_MFI, PERIOD_M30, MFI30_OpenCondition1, MFI30_OpenCondition2, MFI30_CloseCondition);
 
   IndicatorParams mfi_iparams(10, INDI_MFI);
   if ((MFI_Active_Tf & M1B) == M1B) {
@@ -5771,11 +5670,6 @@ bool InitStrategies() {
     strats.Add(new Stg_MFI(mfi30_sparams, "MFI30"));
   }
 
-  init &= ((!Momentum_Active_Tf & M1B) == M1B)   | InitStrategy(MOM1,  "Momentum M1",  INDI_MOMENTUM, PERIOD_M1,  Momentum1_OpenCondition1,  Momentum1_OpenCondition2,  Momentum1_CloseCondition);
-  init &= ((!Momentum_Active_Tf & M5B) == M5B)   | InitStrategy(MOM5,  "Momentum M5",  INDI_MOMENTUM, PERIOD_M5,  Momentum5_OpenCondition1,  Momentum5_OpenCondition2,  Momentum5_CloseCondition);
-  init &= ((!Momentum_Active_Tf & M15B) == M15B) | InitStrategy(MOM15, "Momentum M15", INDI_MOMENTUM, PERIOD_M15, Momentum15_OpenCondition1, Momentum15_OpenCondition2, Momentum15_CloseCondition);
-  init &= ((!Momentum_Active_Tf & M30B) == M30B) | InitStrategy(MOM30, "Momentum M30", INDI_MOMENTUM, PERIOD_M30, Momentum30_OpenCondition1, Momentum30_OpenCondition2, Momentum30_CloseCondition);
-
   IndicatorParams mom_iparams(10, INDI_MOMENTUM);
   if ((Momentum_Active_Tf & M1B) == M1B) {
     Momentum_Params mom1_iparams(Momentum_Period, Momentum_Applied_Price);
@@ -5813,11 +5707,6 @@ bool InitStrategies() {
     mom30_sparams.SetId(MOM30);
     strats.Add(new Stg_Momentum(mom30_sparams, "Momentum30"));
   }
-
-  init &= ((!OBV_Active_Tf & M1B) == M1B)   | InitStrategy(OBV1,  "OBV M1",  INDI_OBV, PERIOD_M1,  OBV1_OpenCondition1, OBV1_OpenCondition2,  OBV1_CloseCondition);
-  init &= ((!OBV_Active_Tf & M5B) == M5B)   | InitStrategy(OBV5,  "OBV M5",  INDI_OBV, PERIOD_M5,  OBV5_OpenCondition1, OBV5_OpenCondition2,  OBV5_CloseCondition);
-  init &= ((!OBV_Active_Tf & M15B) == M15B) | InitStrategy(OBV15, "OBV M15", INDI_OBV, PERIOD_M15, OBV15_OpenCondition1, OBV15_OpenCondition2, OBV15_CloseCondition);
-  init &= ((!OBV_Active_Tf & M30B) == M30B) | InitStrategy(OBV30, "OBV M30", INDI_OBV, PERIOD_M30, OBV30_OpenCondition1, OBV30_OpenCondition2, OBV30_CloseCondition);
 
   IndicatorParams obv_iparams(10, INDI_OBV);
   if ((OBV_Active_Tf & M1B) == M1B) {
@@ -5857,11 +5746,6 @@ bool InitStrategies() {
     strats.Add(new Stg_OBV(obv30_sparams, "OBV30"));
   }
 
-  init &= ((!OSMA_Active_Tf & M1B) == M1B)   | InitStrategy(OSMA1,  "OSMA M1",  INDI_OSMA, PERIOD_M1,  OSMA1_OpenCondition1,  OSMA1_OpenCondition2,  OSMA1_CloseCondition);
-  init &= ((!OSMA_Active_Tf & M5B) == M5B)   | InitStrategy(OSMA5,  "OSMA M5",  INDI_OSMA, PERIOD_M5,  OSMA5_OpenCondition1,  OSMA5_OpenCondition2,  OSMA5_CloseCondition);
-  init &= ((!OSMA_Active_Tf & M15B) == M15B) | InitStrategy(OSMA15, "OSMA M15", INDI_OSMA, PERIOD_M15, OSMA15_OpenCondition1, OSMA15_OpenCondition2, OSMA15_CloseCondition);
-  init &= ((!OSMA_Active_Tf & M30B) == M30B) | InitStrategy(OSMA30, "OSMA M30", INDI_OSMA, PERIOD_M30, OSMA30_OpenCondition1, OSMA30_OpenCondition2, OSMA30_CloseCondition);
-
   IndicatorParams osma_iparams(10, INDI_OSMA);
   if ((OSMA_Active_Tf & M1B) == M1B) {
     OsMA_Params osma1_iparams(OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price);
@@ -5899,11 +5783,6 @@ bool InitStrategies() {
     osma30_sparams.SetId(OSMA30);
     strats.Add(new Stg_OSMA(osma30_sparams, "OSMA30"));
   }
-
-  init &= ((!RSI_Active_Tf & M1B) == M1B)   | InitStrategy(RSI1,  "RSI M1",  INDI_RSI, PERIOD_M1,  RSI1_OpenCondition1,  RSI1_OpenCondition2,  RSI1_CloseCondition);
-  init &= ((!RSI_Active_Tf & M5B) == M5B)   | InitStrategy(RSI5,  "RSI M5",  INDI_RSI, PERIOD_M5,  RSI5_OpenCondition1,  RSI5_OpenCondition2,  RSI5_CloseCondition);
-  init &= ((!RSI_Active_Tf & M15B) == M15B) | InitStrategy(RSI15, "RSI M15", INDI_RSI, PERIOD_M15, RSI15_OpenCondition1, RSI15_OpenCondition2, RSI15_CloseCondition);
-  init &= ((!RSI_Active_Tf & M30B) == M30B) | InitStrategy(RSI30, "RSI M30", INDI_RSI, PERIOD_M30, RSI30_OpenCondition1, RSI30_OpenCondition2, RSI30_CloseCondition);
 
   IndicatorParams rsi_iparams(10, INDI_RSI);
   if ((RSI_Active_Tf & M1B) == M1B) {
@@ -5943,11 +5822,6 @@ bool InitStrategies() {
     strats.Add(new Stg_RSI(rsi30_sparams, "RSI30"));
   }
 
-  init &= ((!RVI_Active_Tf & M1B) == M1B)   |  InitStrategy(RVI1,  "RVI M1", INDI_RVI, PERIOD_M1,  RVI1_OpenCondition1,  RVI1_OpenCondition2,  RVI1_CloseCondition);
-  init &= ((!RVI_Active_Tf & M5B) == M5B)   |  InitStrategy(RVI5,  "RVI M5", INDI_RVI, PERIOD_M5,  RVI5_OpenCondition1,  RVI5_OpenCondition2,  RVI5_CloseCondition);
-  init &= ((!RVI_Active_Tf & M15B) == M15B) | InitStrategy(RVI15, "RVI M15", INDI_RVI, PERIOD_M15, RVI15_OpenCondition1, RVI15_OpenCondition2, RVI15_CloseCondition);
-  init &= ((!RVI_Active_Tf & M30B) == M30B) | InitStrategy(RVI30, "RVI M30", INDI_RVI, PERIOD_M30, RVI30_OpenCondition1, RVI30_OpenCondition2, RVI30_CloseCondition);
-
   IndicatorParams rvi_iparams(10, INDI_RVI);
   if ((RVI_Active_Tf & M1B) == M1B) {
     RVI_Params rvi1_iparams(RVI_Period);
@@ -5985,11 +5859,6 @@ bool InitStrategies() {
     rvi30_sparams.SetId(RVI30);
     strats.Add(new Stg_RVI(rvi30_sparams, "RVI30"));
   }
-
-  init &= ((!SAR_Active_Tf & M1B) == M1B)   | InitStrategy(SAR1,  "SAR M1",  INDI_SAR, PERIOD_M1,  SAR1_OpenCondition1,  SAR1_OpenCondition2,  SAR1_CloseCondition);
-  init &= ((!SAR_Active_Tf & M5B) == M5B)   | InitStrategy(SAR5,  "SAR M5",  INDI_SAR, PERIOD_M5,  SAR5_OpenCondition1,  SAR5_OpenCondition2,  SAR5_CloseCondition);
-  init &= ((!SAR_Active_Tf & M15B) == M15B) | InitStrategy(SAR15, "SAR M15", INDI_SAR, PERIOD_M15, SAR15_OpenCondition1, SAR15_OpenCondition2, SAR15_CloseCondition);
-  init &= ((!SAR_Active_Tf & M30B) == M30B) | InitStrategy(SAR30, "SAR M30", INDI_SAR, PERIOD_M30, SAR30_OpenCondition1, SAR30_OpenCondition2, SAR30_CloseCondition);
 
   IndicatorParams sar_iparams(10, INDI_SAR);
   if ((SAR_Active_Tf & M1B) == M1B) {
@@ -6029,11 +5898,6 @@ bool InitStrategies() {
     strats.Add(new Stg_SAR(sar30_sparams, "SAR30"));
   }
 
-  init &= ((!StdDev_Active_Tf & M1B) == M1B)   | InitStrategy(STDDEV1,  "StdDev M1",  INDI_STDDEV, PERIOD_M1,  StdDev1_OpenCondition1,  StdDev1_OpenCondition2,  StdDev1_CloseCondition);
-  init &= ((!StdDev_Active_Tf & M5B) == M5B)   | InitStrategy(STDDEV5,  "StdDev M5",  INDI_STDDEV, PERIOD_M5,  StdDev5_OpenCondition1,  StdDev5_OpenCondition2,  StdDev5_CloseCondition);
-  init &= ((!StdDev_Active_Tf & M15B) == M15B) | InitStrategy(STDDEV15, "StdDev M15", INDI_STDDEV, PERIOD_M15, StdDev15_OpenCondition1, StdDev15_OpenCondition2, StdDev15_CloseCondition);
-  init &= ((!StdDev_Active_Tf & M30B) == M30B) | InitStrategy(STDDEV30, "StdDev M30", INDI_STDDEV, PERIOD_M30, StdDev30_OpenCondition1, StdDev30_OpenCondition2, StdDev30_CloseCondition);
-
   IndicatorParams stddev_iparams(10, INDI_STDDEV);
   if ((StdDev_Active_Tf & M1B) == M1B) {
     StdDev_Params stddev1_iparams(StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price);
@@ -6071,11 +5935,6 @@ bool InitStrategies() {
     stddev30_sparams.SetId(STDDEV30);
     strats.Add(new Stg_StdDev(stddev30_sparams, "StdDev30"));
   }
-
-  init &= ((!Stochastic_Active_Tf & M1B) == M1B)   | InitStrategy(STOCHASTIC1,  "Stochastic M1",  INDI_STOCHASTIC, PERIOD_M1,  Stochastic1_OpenCondition1,  Stochastic1_OpenCondition2,  Stochastic1_CloseCondition);
-  init &= ((!Stochastic_Active_Tf & M5B) == M5B)   | InitStrategy(STOCHASTIC5,  "Stochastic M5",  INDI_STOCHASTIC, PERIOD_M5,  Stochastic5_OpenCondition1,  Stochastic5_OpenCondition2,  Stochastic5_CloseCondition);
-  init &= ((!Stochastic_Active_Tf & M15B) == M15B) | InitStrategy(STOCHASTIC15, "Stochastic M15", INDI_STOCHASTIC, PERIOD_M15, Stochastic15_OpenCondition1, Stochastic15_OpenCondition2, Stochastic15_CloseCondition);
-  init &= ((!Stochastic_Active_Tf & M30B) == M30B) | InitStrategy(STOCHASTIC30, "Stochastic M30", INDI_STOCHASTIC, PERIOD_M30, Stochastic30_OpenCondition1, Stochastic30_OpenCondition2, Stochastic30_CloseCondition);
 
   IndicatorParams stoch_iparams(10, INDI_STOCHASTIC);
   if ((Stochastic_Active_Tf & M1B) == M1B) {
@@ -6115,11 +5974,6 @@ bool InitStrategies() {
     strats.Add(new Stg_Stoch(stoch30_sparams, "Stochastic30"));
   }
 
-  init &= ((!WPR_Active_Tf & M1B) == M1B)   | InitStrategy(WPR1,  "WPR M1",  INDI_WPR, PERIOD_M1,  WPR1_OpenCondition1,  WPR1_OpenCondition2,  WPR1_CloseCondition);
-  init &= ((!WPR_Active_Tf & M5B) == M5B)   | InitStrategy(WPR5,  "WPR M5",  INDI_WPR, PERIOD_M5,  WPR5_OpenCondition1,  WPR5_OpenCondition2,  WPR5_CloseCondition);
-  init &= ((!WPR_Active_Tf & M15B) == M15B) | InitStrategy(WPR15, "WPR M15", INDI_WPR, PERIOD_M15, WPR15_OpenCondition1, WPR15_OpenCondition2, WPR15_CloseCondition);
-  init &= ((!WPR_Active_Tf & M30B) == M30B) | InitStrategy(WPR30, "WPR M30", INDI_WPR, PERIOD_M30, WPR30_OpenCondition1, WPR30_OpenCondition2, WPR30_CloseCondition);
-
   IndicatorParams wpr_iparams(10, INDI_WPR);
   if ((WPR_Active_Tf & M1B) == M1B) {
     WPR_Params wpr1_iparams(WPR_Period);
@@ -6157,11 +6011,6 @@ bool InitStrategies() {
     wpr30_sparams.SetId(WPR30);
     strats.Add(new Stg_WPR(wpr30_sparams, "WPR30"));
   }
-
-  init &= ((!ZigZag_Active_Tf & M1B) == M1B)   | InitStrategy(ZIGZAG1,  "ZigZag M1",  INDI_ZIGZAG, PERIOD_M1,  ZigZag1_OpenCondition1,  ZigZag1_OpenCondition2,  ZigZag1_CloseCondition);
-  init &= ((!ZigZag_Active_Tf & M5B) == M5B)   | InitStrategy(ZIGZAG5,  "ZigZag M5",  INDI_ZIGZAG, PERIOD_M5,  ZigZag5_OpenCondition1,  ZigZag5_OpenCondition2,  ZigZag5_CloseCondition);
-  init &= ((!ZigZag_Active_Tf & M15B) == M15B) | InitStrategy(ZIGZAG15, "ZigZag M15", INDI_ZIGZAG, PERIOD_M15, ZigZag15_OpenCondition1, ZigZag15_OpenCondition2, ZigZag15_CloseCondition);
-  init &= ((!ZigZag_Active_Tf & M30B) == M30B) | InitStrategy(ZIGZAG30, "ZigZag M30", INDI_ZIGZAG, PERIOD_M30, ZigZag30_OpenCondition1, ZigZag30_OpenCondition2, ZigZag30_CloseCondition);
 
   IndicatorParams zigzag_iparams(10, INDI_ZIGZAG);
   if ((ZigZag_Active_Tf & M1B) == M1B) {
@@ -6203,6 +6052,8 @@ bool InitStrategies() {
 
   Strategy *_strat;
   for (uint sid = 0; sid < strats.GetSize(); sid++) {
+
+    // Validate strategy.
     _strat = ((Strategy *) strats.GetByIndex(sid));
     if (!_strat.IsValid()) {
       Msg::ShowText(
@@ -6210,6 +6061,23 @@ bool InitStrategies() {
         "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
       init = false;
     }
+
+    // Validate the timeframe.
+    ENUM_TIMEFRAMES_INDEX _tfi = _strat.Chart().TfToIndex();
+    if (!Object::IsValid(trade[_tfi])) {
+
+      // Initialize the Trade instance and its chart.
+      TradeParams trade_params(account, new Chart(_tfi), logger, MaxOrderPriceSlippage);
+      trade[_tfi] = new Trade(trade_params);
+
+      if (!Object::IsValid(trade[_tfi]) || !trade[_tfi].Chart().IsValidTf()) {
+        Msg::ShowText(
+          StringFormat("Cannot initialize %s strategy, because its timeframe (%s) is not active!%s", _strat.GetName(), EnumToString(_strat.GetTf()), ValidateSettings ? " Disabling..." : ""),
+          "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
+        init = false;
+      }
+    }
+
   }
 
   if (!init && ValidateSettings) {
@@ -6220,6 +6088,7 @@ bool InitStrategies() {
   #ifdef __MQL4__
   Array::ArrSetValueD(conf, FACTOR, 1.0);
   Array::ArrSetValueD(conf, LOT_SIZE, ea_lot_size);
+  Array::ArrSetValueD(conf, PROFIT_FACTOR, GetDefaultProfitFactor());
   #else
   // @fixme
   PrintFormat("%s(): FIXME: ArrSetValueD();", __FUNCTION_LINE__);
@@ -6279,38 +6148,6 @@ bool InitClasses() {
 
   #ifdef __profiler__ PROFILER_STOP #endif
   return market.GetSymbol() == _Symbol;
-}
-
-/**
- * Initialize specific strategy.
- */
-bool InitStrategy(int key, string name, ENUM_INDICATOR_TYPE indicator, ENUM_TIMEFRAMES _tf, int open_cond1 = 0, int open_cond2 = 0, int close_cond = 0) {
-    bool active = true;
-    ENUM_TIMEFRAMES_INDEX _tfi = Chart::TfToIndex(_tf);
-    // Validate the timeframe.
-    if (!Object::IsValid(trade[_tfi]) || !trade[_tfi].Chart().IsValidTf(_tf)) {
-
-      // Initialize the Trade instance and its chart.
-      TradeParams trade_params(account, new Chart(_tfi), logger, MaxOrderPriceSlippage);
-      trade[_tfi] = new Trade(trade_params);
-
-      if (!Object::IsValid(trade[_tfi]) || !trade[_tfi].Chart().IsValidTf(_tf)) {
-        Msg::ShowText(
-          StringFormat("Cannot initialize %s strategy, because its timeframe (%d) is not active!%s", name, _tf, ValidateSettings ? " Disabling..." : ""),
-          "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
-        active = false;
-      }
-    }
-    // Validate whether indicator of the strategy is working.
-    else if (!UpdateIndicator(trade[_tfi].Chart(), indicator)) {
-      Msg::ShowText(
-        StringFormat("Cannot initialize indicator for the %s strategy!%s", name, ValidateSettings ? " Disabling..." : ""),
-        "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
-      active = false;
-    }
-  info[key][ACTIVE]          = true;
-  conf[key][PROFIT_FACTOR]   = GetDefaultProfitFactor();
-  return active || !ValidateSettings;
 }
 
 /**
