@@ -6201,6 +6201,17 @@ bool InitStrategies() {
     strats.Add(new Stg_ZigZag(zigzag30_sparams, "ZigZag30"));
   }
 
+  Strategy *_strat;
+  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+    _strat = ((Strategy *) strats.GetByIndex(sid));
+    if (!_strat.IsValid()) {
+      Msg::ShowText(
+        StringFormat("Cannot initialize %s strategy, because its timeframe (%s) is not active!%s", _strat.GetName(), EnumToString(_strat.GetTf()), ValidateSettings ? " Disabling..." : ""),
+        "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
+      init = false;
+    }
+  }
+
   if (!init && ValidateSettings) {
     Msg::ShowText(Chart::ListTimeframes(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
     Msg::ShowText("Initiation of strategies failed!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
