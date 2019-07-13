@@ -239,26 +239,26 @@ extern int AC1_SignalMethod = 1; // Signal method for M1 (0-1)
 extern int AC5_SignalMethod = 0; // Signal method for M5 (0-1)
 extern int AC15_SignalMethod = 0; // Signal method for M15 (0-1)
 extern int AC30_SignalMethod = 1; // Signal method for M30 (0-1)
-int AC1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
-int AC1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-ENUM_MARKET_EVENT AC1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
+extern int AC1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+extern int AC1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+extern ENUM_MARKET_EVENT AC1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
 
-int AC5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
-int AC5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-ENUM_MARKET_EVENT AC5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
+extern int AC5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+extern int AC5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+extern ENUM_MARKET_EVENT AC5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
 
-int AC15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
-int AC15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-ENUM_MARKET_EVENT AC15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
+extern int AC15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+extern int AC15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+extern ENUM_MARKET_EVENT AC15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
 
-int AC30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
-int AC30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-ENUM_MARKET_EVENT AC30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
+extern int AC30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+extern int AC30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+extern ENUM_MARKET_EVENT AC30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
 
-double AC1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-double AC5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-double AC15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-double AC30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+extern double AC1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+extern double AC5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+extern double AC15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+extern double AC30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __AD_Parameters__ = "-- Settings for the Accumulation/Distribution indicator --"; // >>> AD <<<
@@ -270,59 +270,62 @@ extern int AD1_SignalMethod = 0; // Signal method for M1 (0-?)
 extern int AD5_SignalMethod = 0; // Signal method for M5 (0-?)
 extern int AD15_SignalMethod = 0; // Signal method for M15 (0-?)
 extern int AD30_SignalMethod = 0; // Signal method for M30 (0-?)
-int AD1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
-int AD1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-ENUM_MARKET_EVENT AD1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
+extern int AD1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+extern int AD1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+extern ENUM_MARKET_EVENT AD1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
 
-int AD5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
-int AD5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-ENUM_MARKET_EVENT AD5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
+extern int AD5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+extern int AD5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+extern ENUM_MARKET_EVENT AD5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
 
-int AD15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
-int AD15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-ENUM_MARKET_EVENT AD15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
+extern int AD15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+extern int AD15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+extern ENUM_MARKET_EVENT AD15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
 
-int AD30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
-int AD30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-ENUM_MARKET_EVENT AD30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
+extern int AD30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+extern int AD30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+extern ENUM_MARKET_EVENT AD30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
 
-double AD1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-double AD5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-double AD15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-double AD30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+extern double AD1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+extern double AD5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+extern double AD15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+extern double AD30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
-string __ADX_Parameters__ = "-- Settings for the Average Directional Movement Index indicator --"; // >>> ADX (NOT IMPLEMENTED YET) <<<
-uint ADX_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-ENUM_TRAIL_TYPE ADX_TrailingStopMethod = T1_MA_FMS_PEAK; // Trail stop method
-ENUM_TRAIL_TYPE ADX_TrailingProfitMethod = T1_FIXED; // Trail profit method
-int ADX_Period = 14; // Period
-ENUM_APPLIED_PRICE ADX_Applied_Price = 2; // Applied Price
-double ADX_SignalLevel = 0.00000000; // Signal level
-int ADX1_SignalMethod = 0; // Signal method for M1 (0-?)
-int ADX5_SignalMethod = 0; // Signal method for M5 (0-?)
-int ADX15_SignalMethod = 0; // Signal method for M15 (0-?)
-int ADX30_SignalMethod = 0; // Signal method for M30 (0-?)
-int ADX1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
-int ADX1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-ENUM_MARKET_EVENT ADX1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
+extern string __ADX_Parameters__ = "-- Settings for the Average Directional Movement Index indicator --"; // >>> ADX <<<
+extern uint ADX_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern ENUM_TRAIL_TYPE ADX_TrailingStopMethod = 22; // Trail stop method
+extern ENUM_TRAIL_TYPE ADX_TrailingProfitMethod = 22; // Trail profit method
+extern uint ADX_Period_M1 = 14; // Period for M1
+extern uint ADX_Period_M5 = 14; // Period for M5
+extern uint ADX_Period_M15 = 14; // Period for M15
+extern uint ADX_Period_M30 = 14; // Period for M30
+extern ENUM_APPLIED_PRICE ADX_Applied_Price = PRICE_LOW; // Applied Price
+extern double ADX_SignalLevel = 0.00000000; // Signal level
+extern int ADX1_SignalMethod = 0; // Signal method for M1 (0-?)
+extern int ADX5_SignalMethod = 0; // Signal method for M5 (0-?)
+extern int ADX15_SignalMethod = 0; // Signal method for M15 (0-?)
+extern int ADX30_SignalMethod = 0; // Signal method for M30 (0-?)
+extern int ADX1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+extern int ADX1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+extern ENUM_MARKET_EVENT ADX1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
 
-int ADX5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
-int ADX5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-ENUM_MARKET_EVENT ADX5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
+extern int ADX5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+extern int ADX5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+extern ENUM_MARKET_EVENT ADX5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
 
-int ADX15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
-int ADX15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-ENUM_MARKET_EVENT ADX15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
+extern int ADX15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+extern int ADX15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+extern ENUM_MARKET_EVENT ADX15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
 
-int ADX30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
-int ADX30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-ENUM_MARKET_EVENT ADX30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
+extern int ADX30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+extern int ADX30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+extern ENUM_MARKET_EVENT ADX30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
 
-double ADX1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-double ADX5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-double ADX15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-double ADX30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+extern double ADX1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+extern double ADX5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+extern double ADX15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+extern double ADX30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __Alligator_Parameters__ = "-- Settings for the Alligator indicator --"; // >>> ALLIGATOR <<<

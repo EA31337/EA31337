@@ -722,6 +722,14 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
   string symbol = _chart.GetSymbol();
   int shift;
   // double envelopes_deviation;
+  uint adx_period;
+  switch (tf) {
+    case PERIOD_M1: adx_period = ADX_Period_M1; break;
+    case PERIOD_M5: adx_period = ADX_Period_M5; break;
+    case PERIOD_M15: adx_period = ADX_Period_M15; break;
+    default:
+    case PERIOD_M30: adx_period = ADX_Period_M30; break;
+  }
 
   #ifdef __profiler__ PROFILER_START #endif
   switch (type) {
@@ -735,9 +743,9 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       break;
     case INDI_ADX: // Calculates the Average Directional Movement Index indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        adx[index][i][LINE_MAIN_ADX] = Indi_ADX::iADX(symbol, tf, ADX_Period, ADX_Applied_Price, LINE_MAIN_ADX, i); // Base indicator line
-        adx[index][i][LINE_PLUSDI]   = Indi_ADX::iADX(symbol, tf, ADX_Period, ADX_Applied_Price, LINE_PLUSDI, i);   // +DI indicator line
-        adx[index][i][LINE_MINUSDI]  = Indi_ADX::iADX(symbol, tf, ADX_Period, ADX_Applied_Price, LINE_MINUSDI, i);  // -DI indicator line
+        adx[index][i][LINE_MAIN_ADX] = Indi_ADX::iADX(symbol, tf, adx_period, ADX_Applied_Price, LINE_MAIN_ADX, i); // Base indicator line
+        adx[index][i][LINE_PLUSDI]   = Indi_ADX::iADX(symbol, tf, adx_period, ADX_Applied_Price, LINE_PLUSDI, i);   // +DI indicator line
+        adx[index][i][LINE_MINUSDI]  = Indi_ADX::iADX(symbol, tf, adx_period, ADX_Applied_Price, LINE_MINUSDI, i);  // -DI indicator line
       }
       break;
     case INDI_ALLIGATOR: // Calculates the Alligator indicator.
@@ -1247,7 +1255,7 @@ bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, Strategy *_strat, double volume = E
   }
 
   #ifdef __advanced__
-  if (ApplySpreadLimits && !CheckSpreadLimit(sid)) {
+  if (ApplySpreadLimits && !CheckSpreadLimit(_strat)) {
     last_trace = Msg::ShowText(StringFormat("%s: Not executing order, because the spread is too high. (spread = %.1f pips).", _strat.GetName(), curr_spread), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
     result = false;
   } else if (MinIntervalSec > 0 && time_current - last_order_time < MinIntervalSec) {
@@ -1255,7 +1263,7 @@ bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, Strategy *_strat, double volume = E
     result = false;
   } else if (MaxOrdersPerDay > 0 && daily_orders >= GetMaxOrdersPerDay()) {
     last_err = Msg::ShowText("Maximum open and pending orders has reached the daily limit (MaxOrdersPerDay).", "Info", __FUNCTION__, __LINE__, VerboseInfo);
-    OrderQueueAdd(sid, cmd);
+    OrderQueueAdd((uint) _strat.GetId(), cmd);
     result = false;
   }
   #endif
@@ -1318,9 +1326,9 @@ bool CheckProfitFactorLimits(Strategy *_strat) {
  * @return
  *   If true, the spread is fine, otherwise return false.
  */
-bool CheckSpreadLimit(int sid) {
+bool CheckSpreadLimit(Strategy *_strat) {
   DEBUG_CHECKPOINT_ADD
-  double spread_limit = ((Strategy *) strats.GetById(sid)).GetMaxSpread();
+  double spread_limit = _strat.GetMaxSpread();
   spread_limit = spread_limit > 0 ? spread_limit : MaxSpreadToTrade;
   #ifdef __backtest__
   if (curr_spread > 10) { PrintFormat("%s: Error %d: %s", __FUNCTION__, __LINE__, "Backtesting over 10 pips not supported, sorry."); ExpertRemove(); }
@@ -4968,7 +4976,7 @@ bool InitStrategies() {
 
   IndicatorParams adx_iparams(10, INDI_ADX);
   if ((ADX_Active_Tf & M1B) == M1B) {
-    ADX_Params adx1_iparams(ADX_Period, ADX_Applied_Price);
+    ADX_Params adx1_iparams(ADX_Period_M1, ADX_Applied_Price);
     StgParams adx1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_ADX(adx1_iparams, adx_iparams, cparams1), NULL, NULL);
     adx1_sparams.SetSignals(ADX1_SignalMethod, ADX1_OpenCondition1, ADX1_OpenCondition2, ADX1_CloseCondition, NULL, ADX_SignalLevel, NULL);
     adx1_sparams.SetStops(ADX_TrailingProfitMethod, ADX_TrailingStopMethod);
@@ -4977,7 +4985,7 @@ bool InitStrategies() {
     strats.Add(new Stg_ADX(adx1_sparams, "ADX1"));
   }
   if ((ADX_Active_Tf & M5B) == M5B) {
-    ADX_Params adx5_iparams(ADX_Period, ADX_Applied_Price);
+    ADX_Params adx5_iparams(ADX_Period_M5, ADX_Applied_Price);
     StgParams adx5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_ADX(adx5_iparams, adx_iparams, cparams5), NULL, NULL);
     adx5_sparams.SetSignals(ADX5_SignalMethod, ADX5_OpenCondition1, ADX5_OpenCondition2, ADX5_CloseCondition, NULL, ADX_SignalLevel, NULL);
     adx5_sparams.SetStops(ADX_TrailingProfitMethod, ADX_TrailingStopMethod);
@@ -4986,7 +4994,7 @@ bool InitStrategies() {
     strats.Add(new Stg_ADX(adx5_sparams, "ADX5"));
   }
   if ((ADX_Active_Tf & M15B) == M15B) {
-    ADX_Params adx15_iparams(ADX_Period, ADX_Applied_Price);
+    ADX_Params adx15_iparams(ADX_Period_M15, ADX_Applied_Price);
     StgParams adx15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_ADX(adx15_iparams, adx_iparams, cparams15), NULL, NULL);
     adx15_sparams.SetSignals(ADX15_SignalMethod, ADX15_OpenCondition1, ADX15_OpenCondition2, ADX15_CloseCondition, NULL, ADX_SignalLevel, NULL);
     adx15_sparams.SetStops(ADX_TrailingProfitMethod, ADX_TrailingStopMethod);
@@ -4995,7 +5003,7 @@ bool InitStrategies() {
     strats.Add(new Stg_ADX(adx15_sparams, "ADX15"));
   }
   if ((ADX_Active_Tf & M30B) == M30B) {
-    ADX_Params adx30_iparams(ADX_Period, ADX_Applied_Price);
+    ADX_Params adx30_iparams(ADX_Period_M30, ADX_Applied_Price);
     StgParams adx30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_ADX(adx30_iparams, adx_iparams, cparams30), NULL, NULL);
     adx30_sparams.SetSignals(ADX30_SignalMethod, ADX30_OpenCondition1, ADX30_OpenCondition2, ADX30_CloseCondition, NULL, ADX_SignalLevel, NULL);
     adx30_sparams.SetStops(ADX_TrailingProfitMethod, ADX_TrailingStopMethod);
