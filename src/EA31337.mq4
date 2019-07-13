@@ -179,7 +179,6 @@ double conf[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_VALUE_ENTRY], stats[FINAL_
 int open_orders[FINAL_STRATEGY_TYPE_ENTRY], closed_orders[FINAL_STRATEGY_TYPE_ENTRY];
 int signals[FINAL_STAT_PERIOD_TYPE_ENTRY][FINAL_STRATEGY_TYPE_ENTRY][FINAL_ENUM_TIMEFRAMES_INDEX][2]; // Count signals to buy and sell per period and strategy.
 int tickets[]; // List of tickets to process.
-string sname[FINAL_STRATEGY_TYPE_ENTRY];
 int worse_strategy[FINAL_STAT_PERIOD_TYPE_ENTRY], best_strategy[FINAL_ENUM_TIMEFRAMES_INDEX];
 
 // EA variables.
@@ -1034,7 +1033,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, Strategy *_strat, double trade_volume = 0,
 
    // Check the order comment.
    if (order_comment == "") {
-     order_comment = GetStrategyComment(sid);
+     order_comment = GetStrategyComment(_strat);
    }
 
     // Print current market information before placing the order.
@@ -1249,10 +1248,10 @@ bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, Strategy *_strat, double volume = E
 
   #ifdef __advanced__
   if (ApplySpreadLimits && !CheckSpreadLimit(sid)) {
-    last_trace = Msg::ShowText(StringFormat("%s: Not executing order, because the spread is too high. (spread = %.1f pips).", sname[sid], curr_spread), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
+    last_trace = Msg::ShowText(StringFormat("%s: Not executing order, because the spread is too high. (spread = %.1f pips).", _strat.GetName(), curr_spread), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
     result = false;
   } else if (MinIntervalSec > 0 && time_current - last_order_time < MinIntervalSec) {
-    last_trace = Msg::ShowText(StringFormat("%s: There must be a %d sec minimum interval between subsequent trade signals.", sname[sid], MinIntervalSec), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
+    last_trace = Msg::ShowText(StringFormat("%s: There must be a %d sec minimum interval between subsequent trade signals.", _strat.GetName(), MinIntervalSec), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
     result = false;
   } else if (MaxOrdersPerDay > 0 && daily_orders >= GetMaxOrdersPerDay()) {
     last_err = Msg::ShowText("Maximum open and pending orders has reached the daily limit (MaxOrdersPerDay).", "Info", __FUNCTION__, __LINE__, VerboseInfo);
@@ -1274,7 +1273,14 @@ bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, Strategy *_strat, double volume = E
  */
 bool CheckProfitFactorLimits(Strategy *_strat) {
   DEBUG_CHECKPOINT_ADD
-  double _pf = _strat.GetProfitFactor();
+  //double _pf = _strat.GetProfitFactor(); // @fixme
+  uint sid = (uint) _strat.GetId();
+  double _pf = GetStrategyProfitFactor(sid);
+  conf[sid][PROFIT_FACTOR] = _pf;
+
+  if (!_strat.IsEnabled()) {
+    return (false);
+  }
 
   if (_pf <= 0) {
     last_err = Msg::ShowText(
@@ -1288,7 +1294,7 @@ bool CheckProfitFactorLimits(Strategy *_strat) {
       StringFormat("%s: Minimum profit factor has been reached, disabling strategy. (pf = %.1f)",
         _strat.GetName(), _pf),
       "Info", __FUNCTION__, __LINE__, VerboseInfo);
-    _strat.Suspended();
+    _strat.Suspended(true);
     return (false);
   }
   if (!_strat.IsSuspended() && ProfitFactorMaxToTrade > 0 && _pf > ProfitFactorMaxToTrade) {
@@ -3755,7 +3761,8 @@ bool UpdateTrailingStops(Trade *_trade) {
  */
 double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_DOUBLE mode = ORDER_SL, int order_type = 0, double previous = 0, bool existing = false) {
   DEBUG_CHECKPOINT_ADD
-  Chart *_chart = _trade.Chart();
+  Strategy *_strat = strats.GetById(order_type);
+  Chart *_chart = _strat.Chart();
   ENUM_TIMEFRAMES tf = _chart.GetTf();
   uint period = _chart.TfToIndex();
   string symbol = existing ? OrderSymbol() : _chart.GetSymbol();
@@ -4026,7 +4033,7 @@ double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_
   if (VerboseDebug) {
     Msg::ShowText(
       StringFormat("Strategy: %s (%d), Method: %d, Tf: %d, Period: %d, Value: %g, Prev: %g, Direction: %d, Trail: %g (%g), LMA/HMA: %g/%g (%g/%g/%g|%g/%g/%g)",
-        sname[order_type], order_type, method, tf, period, new_value, previous, direction, trail, default_trail,
+        _strat.GetName(), order_type, method, tf, period, new_value, previous, direction, trail, default_trail,
         fabs(fmin(fmin(Array::LowestArrValue2(ma_fast, period), Array::LowestArrValue2(ma_medium, period)), Array::LowestArrValue2(ma_slow, period))),
         fabs(fmax(fmax(Array::HighestArrValue2(ma_fast, period), Array::HighestArrValue2(ma_medium, period)), Array::HighestArrValue2(ma_slow, period))),
         Array::LowestArrValue2(ma_fast, period), Array::LowestArrValue2(ma_medium, period), Array::LowestArrValue2(ma_slow, period),
@@ -4619,8 +4626,12 @@ void StartNewDay(Trade *_trade) {
   ArrayFill(daily, 0, ArraySize(daily), 0);
   // Print and reset strategy stats.
   string strategy_stats = "Daily strategy stats: ";
-  for (int j = 0; j < FINAL_STRATEGY_TYPE_ENTRY; j++) {
-    if (stats[j][DAILY_PROFIT] != 0) strategy_stats += StringFormat("%s: %.1f pips; ", sname[j], stats[j][DAILY_PROFIT]);
+  Strategy *_strat;
+  uint j;
+  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+    _strat = ((Strategy *) strats.GetByIndex(sid));
+    j = (uint) _strat.GetId();
+    if (stats[j][DAILY_PROFIT] != 0) strategy_stats += StringFormat("%s: %.1f pips; ", _strat.GetName(), stats[j][DAILY_PROFIT]);
     stats[j][DAILY_PROFIT]  = 0;
   }
   if (VerboseInfo) Print(strategy_stats);
@@ -4671,9 +4682,13 @@ void StartNewWeek(Trade *_trade) {
   ArrayFill(weekly, 0, ArraySize(weekly), 0);
   // Reset strategy stats.
   string strategy_stats = "Weekly strategy stats: ";
-  for (int j = 0; j < FINAL_STRATEGY_TYPE_ENTRY; j++) {
-    if (stats[j][WEEKLY_PROFIT] != 0) strategy_stats += StringFormat("%s: %.1f pips; ", sname[j], stats[j][WEEKLY_PROFIT]);
-    stats[j][WEEKLY_PROFIT] = 0;
+  Strategy *_strat;
+  uint j;
+  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+    _strat = ((Strategy *) strats.GetByIndex(sid));
+    j = (uint) _strat.GetId();
+    if (stats[j][WEEKLY_PROFIT] != 0) strategy_stats += StringFormat("%s: %.1f pips; ", _strat.GetName(), stats[j][WEEKLY_PROFIT]);
+    stats[j][WEEKLY_PROFIT]  = 0;
   }
   if (VerboseInfo) Print(strategy_stats);
 }
@@ -4702,9 +4717,13 @@ void StartNewMonth(Trade *_trade) {
   ArrayFill(monthly, 0, ArraySize(monthly), 0);
   // Reset strategy stats.
   string strategy_stats = "Monthly strategy stats: ";
-  for (int j = 0; j < FINAL_STRATEGY_TYPE_ENTRY; j++) {
-    if (stats[j][MONTHLY_PROFIT] != 0) strategy_stats += StringFormat("%s: %.1f pips; ", sname[j], stats[j][MONTHLY_PROFIT]);
-    stats[j][MONTHLY_PROFIT] = fmin(0, stats[j][MONTHLY_PROFIT]);
+  Strategy *_strat;
+  uint j;
+  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+    _strat = ((Strategy *) strats.GetByIndex(sid));
+    j = (uint) _strat.GetId();
+    if (stats[j][MONTHLY_PROFIT] != 0) strategy_stats += StringFormat("%s: %.1f pips; ", _strat.GetName(), stats[j][MONTHLY_PROFIT]);
+    stats[j][MONTHLY_PROFIT]  = 0;
   }
   if (VerboseInfo) Print(strategy_stats);
 }
@@ -6278,10 +6297,7 @@ bool InitStrategy(int key, string name, ENUM_INDICATOR_TYPE indicator, ENUM_TIME
         "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
       active = false;
     }
-  sname[key]                 = name;
   info[key][ACTIVE]          = true;
-  info[key][TIMEFRAME]       = _tf;
-  info[key][INDICATOR]       = indicator;
   conf[key][PROFIT_FACTOR]   = GetDefaultProfitFactor();
   return active || !ValidateSettings;
 }
@@ -6652,7 +6668,7 @@ double GetStrategyLotSize(int sid, ENUM_ORDER_TYPE cmd) {
     }
     if (Convert::ValueToOp(curr_trend) == cmd && BoostTrendFactor != 1.0) {
       if (VerboseDebug) PrintFormat("%s:%d: %s: Factor: %g, Trade lot: %g, Final trade lot: %g",
-        __FUNCTION__, __LINE__, sname[sid], conf[sid][FACTOR], trade_lot, trade_lot * BoostTrendFactor);
+        __FUNCTION__, __LINE__, ((Strategy *) strats.GetById(sid)).GetName(), conf[sid][FACTOR], trade_lot, trade_lot * BoostTrendFactor);
       trade_lot *= BoostTrendFactor;
     }
   }
@@ -6662,8 +6678,8 @@ double GetStrategyLotSize(int sid, ENUM_ORDER_TYPE cmd) {
 /**
  * Get strategy comment for opened order.
  */
-string GetStrategyComment(int sid) {
-  return StringFormat("%s; %.1f pips spread; sid: %d", sname[sid], curr_spread, sid);
+string GetStrategyComment(Strategy *_strat) {
+  return StringFormat("%s; %.1f pips spread; sid: %d", _strat.GetName(), curr_spread, _strat.GetId());
 }
 
 /**
@@ -6671,7 +6687,11 @@ string GetStrategyComment(int sid) {
  */
 string GetStrategyReport(string sep = "\n") {
   string output = "Strategy stats:" + sep;
-  for (int id = 0; id < FINAL_STRATEGY_TYPE_ENTRY; id++) {
+  Strategy *_strat;
+  uint id;
+  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+    _strat = ((Strategy *) strats.GetByIndex(sid));
+    id = (uint) _strat.GetId();
     if (info[id][TOTAL_ORDERS] > 0) {
       output += StringFormat("Profit factor: %.2f, ",
                 GetStrategyProfitFactor(id));
@@ -6686,7 +6706,7 @@ string GetStrategyReport(string sep = "\n") {
                 (100 / NormalizeDouble(info[id][TOTAL_ORDERS], 2)) * info[id][TOTAL_ORDERS_LOSS],
                 info[id][TOTAL_ORDERS_LOSS]);
       output += info[id][TOTAL_ERRORS] > 0 ? StringFormat(", Errors: %d", info[id][TOTAL_ERRORS]) : "";
-      output += StringFormat(" - %s", sname[id]);
+      output += StringFormat(" - %s", _strat.GetName());
       output += sep;
     }
   }
@@ -6900,11 +6920,11 @@ string GetDailyReport() {
   int key;
   key = Array::GetArrKey1ByHighestKey2ValueD(stats, DAILY_PROFIT);
   if (key >= 0 && stats[key][DAILY_PROFIT] > 0) {
-    output += StringFormat("Best: %s (%.2fp)", sname[key], stats[key][DAILY_PROFIT]);
+    output += StringFormat("Best: %s (%.2fp)", ((Strategy *) strats.GetById(key)).GetName(), stats[key][DAILY_PROFIT]);
   }
   key = Array::GetArrKey1ByLowestKey2ValueD(stats, DAILY_PROFIT);
   if (key >= 0 && stats[key][DAILY_PROFIT] < 0) {
-    output += StringFormat("Worse: %s (%.2fp)", sname[key], stats[key][DAILY_PROFIT]);
+    output += StringFormat("Worse: %s (%.2fp)", ((Strategy *) strats.GetById(key)).GetName(), stats[key][DAILY_PROFIT]);
   }
   #else
   // @fixme
@@ -6934,11 +6954,11 @@ string GetWeeklyReport() {
   int key;
   key = Array::GetArrKey1ByHighestKey2ValueD(stats, WEEKLY_PROFIT);
   if (key >= 0 && stats[key][WEEKLY_PROFIT] > 0) {
-    output += StringFormat("Best: %s (%.2fp)", sname[key], stats[key][WEEKLY_PROFIT]);
+    output += StringFormat("Best: %s (%.2fp)", ((Strategy *) strats.GetById(key)).GetName(), stats[key][WEEKLY_PROFIT]);
   }
   key = Array::GetArrKey1ByLowestKey2ValueD(stats, WEEKLY_PROFIT);
   if (key >= 0 && stats[key][WEEKLY_PROFIT] < 0) {
-    output += StringFormat("Worse: %s (%.2fp)", sname[key], stats[key][WEEKLY_PROFIT]);
+    output += StringFormat("Worse: %s (%.2fp)", ((Strategy *) strats.GetById(key)).GetName(), stats[key][WEEKLY_PROFIT]);
   }
   #else
   // @fixme
@@ -6968,11 +6988,11 @@ string GetMonthlyReport() {
   int key;
   key = Array::GetArrKey1ByHighestKey2ValueD(stats, MONTHLY_PROFIT);
   if (key >= 0 && stats[key][MONTHLY_PROFIT] > 0) {
-    output += StringFormat("Best: %s (%.2fp)", sname[key], stats[key][MONTHLY_PROFIT]);
+    output += StringFormat("Best: %s (%.2fp)", ((Strategy *) strats.GetById(key)).GetName(), stats[key][MONTHLY_PROFIT]);
   }
   key = Array::GetArrKey1ByLowestKey2ValueD(stats, MONTHLY_PROFIT);
   if (key >= 0 && stats[key][MONTHLY_PROFIT] < 0) {
-    output += StringFormat("Worse: %s (%.2fp)", sname[key], stats[key][MONTHLY_PROFIT]);
+    output += StringFormat("Worse: %s (%.2fp)", ((Strategy *) strats.GetById(key)).GetName(), stats[key][MONTHLY_PROFIT]);
   }
   #else
   // @fixme
@@ -7102,9 +7122,13 @@ string GetOrdersStats(string sep = "\n") {
   // Prepare data about open orders per strategy type.
   string orders_per_type = "Stats: "; // Display open orders per type.
   if (total_orders > 0) {
-    for (int i = 0; i < FINAL_STRATEGY_TYPE_ENTRY; i++) {
-      if (open_orders[i] > 0) {
-        orders_per_type += StringFormat("%s: %.1f%% ", sname[i], MathFloor(100 / total_orders * open_orders[i]));
+    Strategy *_strat;
+    uint sid;
+    for (uint i = 0; i < strats.GetSize(); i++) {
+      _strat = ((Strategy *) strats.GetByIndex(i));
+      sid = (uint) _strat.GetId();
+      if (open_orders[sid] > 0) {
+        orders_per_type += StringFormat("%s: %.1f%% ", _strat.GetName(), MathFloor(100 / total_orders * open_orders[sid]));
       }
     }
   } else {
@@ -7658,7 +7682,7 @@ bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
       volume = GetStrategyLotSize(sid, cmd);
       if (!OpenOrderCondition(cmd, sid, time, filter)) continue;
       if (OpenOrderIsAllowed(cmd, strats.GetById(sid), volume)) {
-        string comment = GetStrategyComment(sid) + " [AIQueued]";
+        string comment = GetStrategyComment(strats.GetById(sid)) + " [AIQueued]";
         result &= ExecuteOrder(cmd, sid, volume, comment);
         break;
       }
