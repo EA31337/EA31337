@@ -5510,7 +5510,7 @@ bool InitStrategies() {
     strats.Add(new Stg_Force(force30_sparams, "Force30"));
   }
 
-  IndicatorParams fractals_iparams(10, INDI_FORCE);
+  IndicatorParams fractals_iparams(10, INDI_FRACTALS);
   if ((Fractals_Active_Tf & M1B) == M1B) {
     StgParams fractals1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Fractals(fractals_iparams, cparams1), NULL, NULL);
     fractals1_sparams.SetSignals(Fractals1_SignalMethod, Fractals1_OpenCondition1, Fractals1_OpenCondition2, Fractals1_CloseCondition, NULL, Fractals_SignalLevel, NULL);
