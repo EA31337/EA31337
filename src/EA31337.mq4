@@ -1569,8 +1569,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   bool result = false;
   uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_AC);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_AC, _chart.GetTf(), 0);
-  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_AC, _chart.GetTf(), 0.0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_AC, _chart.GetTf());
+  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_AC, _chart.GetTf());
   switch (cmd) {
     /*
       //1. Acceleration/Deceleration — AC
@@ -1628,8 +1628,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_AD);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_AD, _chart.GetTf(), 0);
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_AD, _chart.GetTf(), 0.0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_AD, _chart.GetTf());
+  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_AD, _chart.GetTf());
   switch (cmd) {
     // Buy: indicator growth at downtrend.
     case ORDER_TYPE_BUY:
@@ -1676,8 +1676,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_ADX);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ADX, _chart.GetTf(), 0);
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_ADX, _chart.GetTf(), 0.0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ADX, _chart.GetTf());
+  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_ADX, _chart.GetTf());
   switch (cmd) {
     // Buy: +DI line is above -DI line, ADX is more than a certain value and grows (i.e. trend strengthens).
     case ORDER_TYPE_BUY:
@@ -1728,8 +1728,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   // [x][0] - The Blue line (Alligator's Jaw), [x][1] - The Red Line (Alligator's Teeth), [x][2] - The Green Line (Alligator's Lips)
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_ALLIGATOR);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ALLIGATOR, _chart.GetTf(), 0);
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_ALLIGATOR, _chart.GetTf(), 0.0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ALLIGATOR, _chart.GetTf());
+  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_ALLIGATOR, _chart.GetTf());
   double gap = signal_level1 * pip_size;
 
   switch(cmd) {
@@ -1821,8 +1821,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_ATR);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ATR, _chart.GetTf(), 0);
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_ATR, _chart.GetTf(), 0.0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ATR, _chart.GetTf());
+  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_ATR, _chart.GetTf());
   switch (cmd) {
     //   if(iATR(NULL,0,12,0)>iATR(NULL,0,20,0)) return(0);
     /*
@@ -1892,8 +1892,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_AO);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_AO, _chart.GetTf(), 0);
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_AO, _chart.GetTf(), 0.0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_AO, _chart.GetTf());
+  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_AO, _chart.GetTf());
   switch (cmd) {
     /*
       //7. Awesome Oscillator
@@ -1961,8 +1961,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_BANDS);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_BANDS, _chart.GetTf(), 0);
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_BANDS, _chart.GetTf(), 0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_BANDS, _chart.GetTf());
+  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_BANDS, _chart.GetTf());
   double lowest = fmin(Low[CURR], fmin(Low[PREV], Low[FAR]));
   double highest = fmax(High[CURR], fmax(High[PREV], High[FAR]));
   double level = signal_level1 * pip_size;
@@ -2040,8 +2040,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_BEARS);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_BEARS, _chart.GetTf(), 0);
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_BEARS, _chart.GetTf(), 0.0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_BEARS, _chart.GetTf());
+  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_BEARS, _chart.GetTf());
   switch (cmd) {
     case ORDER_TYPE_BUY:
       // @todo
@@ -2084,8 +2084,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_BULLS);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_BULLS, _chart.GetTf(), 0);
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_BULLS, _chart.GetTf(), 0.0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_BULLS, _chart.GetTf());
+  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_BULLS, _chart.GetTf());
   switch (cmd) {
     case ORDER_TYPE_BUY:
       // @todo
@@ -2128,8 +2128,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_BWMFI);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_BWMFI, _chart.GetTf(), 0);
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_BWMFI, _chart.GetTf(), 0.0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_BWMFI, _chart.GetTf());
+  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_BWMFI, _chart.GetTf());
   switch (cmd) {
     case ORDER_TYPE_BUY:
       /*
@@ -2188,8 +2188,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_CCI);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_CCI, _chart.GetTf(), 0);
-  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_CCI, _chart.GetTf(), 100);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_CCI, _chart.GetTf());
+  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_CCI, _chart.GetTf());
   switch (cmd) {
     case ORDER_TYPE_BUY:
       result = cci[period][CURR] > 0 && cci[period][CURR] < -signal_level1;
@@ -2252,8 +2252,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_DEMARKER);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_DEMARKER, _chart.GetTf(), 0);
-  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_DEMARKER, _chart.GetTf(), 0.0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_DEMARKER, _chart.GetTf());
+  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_DEMARKER, _chart.GetTf());
   switch (cmd) {
     case ORDER_TYPE_BUY:
       result = demarker[period][CURR] < 0.5 - signal_level1;
@@ -2315,8 +2315,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_ENVELOPES);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ENVELOPES, _chart.GetTf(), 0);
-  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_ENVELOPES, _chart.GetTf(), 0.0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ENVELOPES, _chart.GetTf());
+  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_ENVELOPES, _chart.GetTf());
   switch (cmd) {
     case ORDER_TYPE_BUY:
       result = Low[CURR] < envelopes[period][CURR][LINE_LOWER] || Low[PREV] < envelopes[period][CURR][LINE_LOWER]; // price low was below the lower band
@@ -2386,8 +2386,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_FORCE);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_FORCE, _chart.GetTf(), 0);
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_FORCE, _chart.GetTf(), 0.0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_FORCE, _chart.GetTf());
+  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_FORCE, _chart.GetTf());
   switch (cmd) {
     case ORDER_TYPE_BUY:
       // FI recommends to buy (i.e. FI<0).
@@ -2432,8 +2432,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint index = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_FRACTALS);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_FRACTALS, _chart.GetTf(), 0);
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_FRACTALS, _chart.GetTf(), 0.0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_FRACTALS, _chart.GetTf());
+  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_FRACTALS, _chart.GetTf());
   bool lower = (fractals[index][CURR][LINE_LOWER] != 0.0 || fractals[index][PREV][LINE_LOWER] != 0.0 || fractals[index][FAR][LINE_LOWER] != 0.0);
   bool upper = (fractals[index][CURR][LINE_UPPER] != 0.0 || fractals[index][PREV][LINE_UPPER] != 0.0 || fractals[index][FAR][LINE_UPPER] != 0.0);
   switch (cmd) {
@@ -2499,8 +2499,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_GATOR);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_GATOR, _chart.GetTf(), 0);
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_GATOR, _chart.GetTf(), 0.0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_GATOR, _chart.GetTf());
+  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_GATOR, _chart.GetTf());
   switch (cmd) {
     /*
       //4. Gator Oscillator
@@ -2551,8 +2551,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_ICHIMOKU);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ICHIMOKU, _chart.GetTf(), 0);
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_ICHIMOKU, _chart.GetTf(), 0.0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ICHIMOKU, _chart.GetTf());
+  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_ICHIMOKU, _chart.GetTf());
   switch (cmd) {
     /*
       //15. Ichimoku Kinko Hyo (1)
@@ -2622,8 +2622,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_MA);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MA, _chart.GetTf(), 0);
-  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_MA, _chart.GetTf(), 0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MA, _chart.GetTf());
+  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_MA, _chart.GetTf());
   double gap = signal_level1 * pip_size;
 
   switch (cmd) {
@@ -2693,8 +2693,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_MA);
   UpdateIndicator(_chart, INDI_MACD);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MACD, _chart.GetTf(), 0);
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_MACD, _chart.GetTf(), 0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MACD, _chart.GetTf());
+  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_MACD, _chart.GetTf());
   double gap = signal_level1 * pip_size;
   switch (cmd) {
     /* TODO:
@@ -2775,8 +2775,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_MFI);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MFI, _chart.GetTf(), 0);
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_MFI, _chart.GetTf(), 0.0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MFI, _chart.GetTf());
+  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_MFI, _chart.GetTf());
   switch (cmd) {
     // Buy: Crossing 20 upwards.
     case ORDER_TYPE_BUY:
@@ -2823,8 +2823,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_MOMENTUM);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MOMENTUM, _chart.GetTf(), 0);
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_MOMENTUM, _chart.GetTf(), 0.0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MOMENTUM, _chart.GetTf());
+  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_MOMENTUM, _chart.GetTf());
   switch (cmd) {
     case ORDER_TYPE_BUY:
       break;
@@ -2865,8 +2865,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_OBV);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_OBV, _chart.GetTf(), 0);
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_OBV, _chart.GetTf(), 0.0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_OBV, _chart.GetTf());
+  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_OBV, _chart.GetTf());
   switch (cmd) {
     case ORDER_TYPE_BUY:
       break;
@@ -2907,8 +2907,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_OSMA);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_OSMA, _chart.GetTf(), 0);
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_OSMA, _chart.GetTf(), 0.0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_OSMA, _chart.GetTf());
+  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_OSMA, _chart.GetTf());
   switch (cmd) {
     /*
       //22. Moving Average of Oscillator (MACD histogram) (1)
@@ -2971,8 +2971,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_RSI);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_RSI, _chart.GetTf(), 0);
-  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_RSI, _chart.GetTf(), 20);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_RSI, _chart.GetTf());
+  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_RSI, _chart.GetTf());
   bool is_valid = fmin(fmin(rsi[period][CURR], rsi[period][PREV]), rsi[period][FAR]) > 0;
   switch (cmd) {
     case ORDER_TYPE_BUY:
@@ -3050,8 +3050,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_RVI);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_RVI, _chart.GetTf(), 0);
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_RVI, _chart.GetTf(), 20);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_RVI, _chart.GetTf());
+  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_RVI, _chart.GetTf());
   switch (cmd) {
     /*
       //26. RVI
@@ -3105,8 +3105,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_SAR);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_SAR, _chart.GetTf(), 0);
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_SAR, _chart.GetTf(), 0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_SAR, _chart.GetTf());
+  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_SAR, _chart.GetTf());
   double gap = signal_level1 * pip_size;
   switch (cmd) {
     case ORDER_TYPE_BUY:
@@ -3181,8 +3181,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_STDDEV);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_STDDEV, _chart.GetTf(), 0);
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_STDDEV, _chart.GetTf(), 0.0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_STDDEV, _chart.GetTf());
+  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_STDDEV, _chart.GetTf());
   switch (cmd) {
     /*
       //27. Standard Deviation
@@ -3250,8 +3250,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_STOCHASTIC);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_STOCHASTIC, _chart.GetTf(), 0);
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_STOCHASTIC, _chart.GetTf(), 0.0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_STOCHASTIC, _chart.GetTf());
+  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_STOCHASTIC, _chart.GetTf());
   switch (cmd) {
       /* TODO:
             //   if(iStochastic(NULL,0,5,3,3,MODE_SMA,0,LINE_MAIN,0)>iStochastic(NULL,0,5,3,3,MODE_SMA,0,LINE_SIGNAL,0)) return(0);
@@ -3336,8 +3336,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_WPR);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_WPR, _chart.GetTf(), 0);
-  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_WPR, _chart.GetTf(), 0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_WPR, _chart.GetTf());
+  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_WPR, _chart.GetTf());
 
   switch (cmd) {
     case ORDER_TYPE_BUY:
@@ -3410,8 +3410,8 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_ZIGZAG);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ZIGZAG, _chart.GetTf(), 0);
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_ZIGZAG, _chart.GetTf(), 0.0);
+  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ZIGZAG, _chart.GetTf());
+  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_ZIGZAG, _chart.GetTf());
   switch (cmd) {
     case ORDER_TYPE_BUY:
       /*
@@ -6695,28 +6695,67 @@ double GetStrategyProfitFactor(int sid) {
 /**
  * Fetch strategy signal level based on the indicator and timeframe.
  */
-double GetStrategySignalLevel(ENUM_INDICATOR_TYPE indicator, ENUM_TIMEFRAMES timeframe = PERIOD_M30, double default_value = 0.0) {
+double GetStrategySignalLevel(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _tf) {
   DEBUG_CHECKPOINT_ADD
-  uint sid = (uint) GetStrategyViaIndicator(indicator, timeframe);
+  double _result = 0.0;
+  bool _found = false;
+  Strategy *_strat;
+  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+    _strat = ((Strategy *) strats.GetByIndex(sid));
+    if (_strat.Data().GetIndicatorType() == _indicator && _strat.GetTf() == _tf) {
+      _result = _strat.GetSignalLevel1();
+      _found = true;
+      break;
+    }
+  }
+
+  if (!_found) {
+    Msg::ShowText(
+      StringFormat("Cannot find signal level via indicator %d (%s) for timeframe: %d", _indicator, EnumToString(_indicator), _tf),
+      "Error", __FUNCTION__, __LINE__, VerboseErrors | VerboseDebug
+      );
+    DEBUG_STACK_PRINT
+  }
+
   DEBUG_CHECKPOINT_POP
-  return sid >= 0 ? ((Strategy *) strats.GetById(sid)).GetSignalBaseMethod() : default_value;
+  return _result;
 }
 
 /**
  * Fetch strategy signal level based on the indicator and timeframe.
  */
-ulong GetStrategySignalMethod(ENUM_INDICATOR_TYPE indicator, ENUM_TIMEFRAMES timeframe = PERIOD_M30, ulong default_value = 0) {
+ulong GetStrategySignalMethod(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _tf) {
   DEBUG_CHECKPOINT_ADD
-  uint sid = (uint) GetStrategyViaIndicator(indicator, timeframe);
+  ulong _result = 0;
+  bool _found = false;
+  Strategy *_strat;
+  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+    _strat = ((Strategy *) strats.GetByIndex(sid));
+    if (_strat.Data().GetIndicatorType() == _indicator && _strat.GetTf() == _tf) {
+      _result = _strat.GetSignalOpenMethod1();
+      _found = true;
+      break;
+    }
+  }
+
+  if (!_found) {
+    Msg::ShowText(
+      StringFormat("Cannot find signal method via indicator %d (%s) for timeframe: %d", _indicator, EnumToString(_indicator), _tf),
+      "Error", __FUNCTION__, __LINE__, VerboseErrors | VerboseDebug
+      );
+    DEBUG_STACK_PRINT
+  }
+
   DEBUG_CHECKPOINT_POP
-  return sid >= 0 ? ((Strategy *) strats.GetById(sid)).GetSignalOpenMethod1() : default_value;
+  return _result;
 }
 
 /**
  * Fetch strategy timeframe based on the strategy type.
  */
 ENUM_TIMEFRAMES GetStrategyTimeframe(int sid) {
-  return ((Strategy *) strats.GetById(sid)).GetTf();
+  Strategy *_strat = strats.GetById(sid);
+  return _strat.GetTf();
 }
 
 /**
@@ -6724,22 +6763,28 @@ ENUM_TIMEFRAMES GetStrategyTimeframe(int sid) {
  */
 ulong GetStrategyViaIndicator(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _tf) {
   DEBUG_CHECKPOINT_ADD
-
+  ulong _result = EMPTY;
+  bool _found = false;
   Strategy *_strat;
   for (uint sid = 0; sid < strats.GetSize(); sid++) {
     _strat = ((Strategy *) strats.GetByIndex(sid));
     if (_strat.Data().GetIndicatorType() == _indicator && _strat.GetTf() == _tf) {
-      return _strat.GetId();
+      _result = _strat.GetId();
+      _found = true;
+      break;
     }
   }
 
-  Msg::ShowText(
-    StringFormat("Cannot find indicator %d (%s) for timeframe: %d", _indicator, EnumToString(_indicator), _tf),
-    "Error", __FUNCTION__, __LINE__, VerboseErrors | VerboseDebug
-    );
-  DEBUG_STACK_PRINT
+  if (!_found) {
+    Msg::ShowText(
+      StringFormat("Cannot find indicator %d (%s) for timeframe: %d", _indicator, EnumToString(_indicator), _tf),
+      "Error", __FUNCTION__, __LINE__, VerboseErrors | VerboseDebug
+      );
+    DEBUG_STACK_PRINT
+  }
+
   DEBUG_CHECKPOINT_POP
-  return EMPTY;
+  return _result;
 }
 
 /**
