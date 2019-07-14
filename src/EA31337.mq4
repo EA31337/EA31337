@@ -746,6 +746,14 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
     default:
     case PERIOD_M30: force_period = Force_Period_M30; break;
   }
+  uint mfi_period;
+  switch (tf) {
+    case PERIOD_M1: mfi_period = MFI_Period_M1; break;
+    case PERIOD_M5: mfi_period = MFI_Period_M5; break;
+    case PERIOD_M15: mfi_period = MFI_Period_M15; break;
+    default:
+    case PERIOD_M30: mfi_period = MFI_Period_M30; break;
+  }
 
   #ifdef __profiler__ PROFILER_START #endif
   switch (type) {
@@ -922,7 +930,7 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       break;
     case INDI_MFI: // Calculates the Money Flow Index indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        mfi[index][i] = Indi_MFI::iMFI(symbol, tf, MFI_Period, i);
+        mfi[index][i] = Indi_MFI::iMFI(symbol, tf, mfi_period, i);
       }
       success = (bool)mfi[index][CURR];
       break;
@@ -5658,7 +5666,7 @@ bool InitStrategies() {
 
   IndicatorParams mfi_iparams(10, INDI_MFI);
   if ((MFI_Active_Tf & M1B) == M1B) {
-    MFI_Params mfi1_iparams(MFI_Period);
+    MFI_Params mfi1_iparams(MFI_Period_M1);
     StgParams mfi1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_MFI(mfi1_iparams, mfi_iparams, cparams1), NULL, NULL);
     mfi1_sparams.SetSignals(MFI1_SignalMethod, MFI1_OpenCondition1, MFI1_OpenCondition2, MFI1_CloseCondition, NULL, MFI_SignalLevel, NULL);
     mfi1_sparams.SetStops(MFI_TrailingProfitMethod, MFI_TrailingStopMethod);
@@ -5667,7 +5675,7 @@ bool InitStrategies() {
     strats.Add(new Stg_MFI(mfi1_sparams, "MFI1"));
   }
   if ((MFI_Active_Tf & M5B) == M5B) {
-    MFI_Params mfi5_iparams(MFI_Period);
+    MFI_Params mfi5_iparams(MFI_Period_M5);
     StgParams mfi5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_MFI(mfi5_iparams, mfi_iparams, cparams5), NULL, NULL);
     mfi5_sparams.SetSignals(MFI5_SignalMethod, MFI5_OpenCondition1, MFI5_OpenCondition2, MFI5_CloseCondition, NULL, MFI_SignalLevel, NULL);
     mfi5_sparams.SetStops(MFI_TrailingProfitMethod, MFI_TrailingStopMethod);
@@ -5676,7 +5684,7 @@ bool InitStrategies() {
     strats.Add(new Stg_MFI(mfi5_sparams, "MFI5"));
   }
   if ((MFI_Active_Tf & M15B) == M15B) {
-    MFI_Params mfi15_iparams(MFI_Period);
+    MFI_Params mfi15_iparams(MFI_Period_M15);
     StgParams mfi15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_MFI(mfi15_iparams, mfi_iparams, cparams15), NULL, NULL);
     mfi15_sparams.SetSignals(MFI15_SignalMethod, MFI15_OpenCondition1, MFI15_OpenCondition2, MFI15_CloseCondition, NULL, MFI_SignalLevel, NULL);
     mfi15_sparams.SetStops(MFI_TrailingProfitMethod, MFI_TrailingStopMethod);
@@ -5685,7 +5693,7 @@ bool InitStrategies() {
     strats.Add(new Stg_MFI(mfi15_sparams, "MFI15"));
   }
   if ((MFI_Active_Tf & M30B) == M30B) {
-    MFI_Params mfi30_iparams(MFI_Period);
+    MFI_Params mfi30_iparams(MFI_Period_M30);
     StgParams mfi30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_MFI(mfi30_iparams, mfi_iparams, cparams30), NULL, NULL);
     mfi30_sparams.SetSignals(MFI30_SignalMethod, MFI30_OpenCondition1, MFI30_OpenCondition2, MFI30_CloseCondition, NULL, MFI_SignalLevel, NULL);
     mfi30_sparams.SetStops(MFI_TrailingProfitMethod, MFI_TrailingStopMethod);

@@ -701,16 +701,19 @@ double MACD15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
 double MACD30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
-string __MFI_Parameters__ = "-- Settings for the Money Flow Index indicator --"; // >>> MFI <<<
-uint MFI_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-ENUM_TRAIL_TYPE MFI_TrailingStopMethod = 22; // Trail stop method
-ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = 1; // Trail profit method
-int MFI_Period = 14; // Period
-double MFI_SignalLevel = 0.00000000; // Signal level
-int MFI1_SignalMethod = 0; // Signal method for M1 (0-
-int MFI5_SignalMethod = 0; // Signal method for M5 (0-
-int MFI15_SignalMethod = 0; // Signal method for M15 (0-
-int MFI30_SignalMethod = 0; // Signal method for M30 (0-
+extern string __MFI_Parameters__ = "-- Settings for the Money Flow Index indicator --"; // >>> MFI <<<
+extern uint MFI_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern ENUM_TRAIL_TYPE MFI_TrailingStopMethod = 22; // Trail stop method
+extern ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = 1; // Trail profit method
+extern int MFI_Period_M1 = 14; // Period for M1
+extern int MFI_Period_M5 = 14; // Period for M5
+extern int MFI_Period_M15 = 14; // Period for M15
+extern int MFI_Period_M30 = 14; // Period for M30
+extern double MFI_SignalLevel = 30; // Signal level
+int MFI1_SignalMethod = 0; // Signal method for M1 (0-1)
+int MFI5_SignalMethod = 0; // Signal method for M5 (0-1)
+int MFI15_SignalMethod = 0; // Signal method for M15 (0-1)
+int MFI30_SignalMethod = 0; // Signal method for M30 (0-1)
 int MFI1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int MFI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
 ENUM_MARKET_EVENT MFI1_CloseCondition = C_MFI_BUY_SELL; // Close condition for M1
