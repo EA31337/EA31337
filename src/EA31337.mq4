@@ -730,6 +730,22 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
     default:
     case PERIOD_M30: adx_period = ADX_Period_M30; break;
   }
+  uint atr_period;
+  switch (tf) {
+    case PERIOD_M1: atr_period = ATR_Period_M1; break;
+    case PERIOD_M5: atr_period = ATR_Period_M5; break;
+    case PERIOD_M15: atr_period = ATR_Period_M15; break;
+    default:
+    case PERIOD_M30: atr_period = ATR_Period_M30; break;
+  }
+  uint force_period;
+  switch (tf) {
+    case PERIOD_M1: force_period = Force_Period_M1; break;
+    case PERIOD_M5: force_period = Force_Period_M5; break;
+    case PERIOD_M15: force_period = Force_Period_M15; break;
+    default:
+    case PERIOD_M30: force_period = Force_Period_M30; break;
+  }
 
   #ifdef __profiler__ PROFILER_START #endif
   switch (type) {
@@ -769,7 +785,7 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       break;
     case INDI_ATR: // Calculates the Average True Range indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        atr[index][i] = Indi_ATR::iATR(symbol, tf, ATR_Period, i);
+        atr[index][i] = Indi_ATR::iATR(symbol, tf, atr_period, i);
       }
       break;
     case INDI_AO: // Calculates the Awesome oscillator.
@@ -838,7 +854,7 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       break;
     case INDI_FORCE: // Calculates the Force Index indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        force[index][i] = Indi_Force::iForce(symbol, tf, Force_Period, Force_MA_Method, Force_Applied_price, i);
+        force[index][i] = Indi_Force::iForce(symbol, tf, force_period, Force_MA_Method, Force_Applied_price, i);
       }
       success = (bool) force[index][CURR];
       break;
@@ -2319,11 +2335,11 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   switch (cmd) {
     case ORDER_TYPE_BUY:
       // FI recommends to buy (i.e. FI<0).
-      result = force[period][CURR] < 0;
+      result = force[period][CURR] < -signal_level1;
       break;
     case ORDER_TYPE_SELL:
       // FI recommends to sell (i.e. FI>0).
-      result = force[period][CURR] > 0;
+      result = force[period][CURR] > signal_level1;
       break;
   }
   result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
@@ -5068,7 +5084,7 @@ bool InitStrategies() {
 
   IndicatorParams atr_iparams(10, INDI_ATR);
   if ((ATR_Active_Tf & M1B) == M1B) {
-    ATR_Params atr1_iparams(ATR_Period);
+    ATR_Params atr1_iparams(ATR_Period_M1);
     StgParams atr1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_ATR(atr1_iparams, atr_iparams, cparams1), NULL, NULL);
     atr1_sparams.SetSignals(ATR1_SignalMethod, ATR1_OpenCondition1, ATR1_OpenCondition2, ATR1_CloseCondition, NULL, ATR_SignalLevel, NULL);
     atr1_sparams.SetStops(ATR_TrailingProfitMethod, ATR_TrailingStopMethod);
@@ -5077,7 +5093,7 @@ bool InitStrategies() {
     strats.Add(new Stg_ATR(atr1_sparams, "ATR1"));
   }
   if ((ATR_Active_Tf & M5B) == M5B) {
-    ATR_Params atr5_iparams(ATR_Period);
+    ATR_Params atr5_iparams(ATR_Period_M5);
     StgParams atr5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_ATR(atr5_iparams, atr_iparams, cparams5), NULL, NULL);
     atr5_sparams.SetSignals(ATR5_SignalMethod, ATR5_OpenCondition1, ATR5_OpenCondition2, ATR5_CloseCondition, NULL, ATR_SignalLevel, NULL);
     atr5_sparams.SetStops(ATR_TrailingProfitMethod, ATR_TrailingStopMethod);
@@ -5086,7 +5102,7 @@ bool InitStrategies() {
     strats.Add(new Stg_ATR(atr5_sparams, "ATR5"));
   }
   if ((ATR_Active_Tf & M15B) == M15B) {
-    ATR_Params atr15_iparams(ATR_Period);
+    ATR_Params atr15_iparams(ATR_Period_M15);
     StgParams atr15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_ATR(atr15_iparams, atr_iparams, cparams15), NULL, NULL);
     atr15_sparams.SetSignals(ATR15_SignalMethod, ATR15_OpenCondition1, ATR15_OpenCondition2, ATR15_CloseCondition, NULL, ATR_SignalLevel, NULL);
     atr15_sparams.SetStops(ATR_TrailingProfitMethod, ATR_TrailingStopMethod);
@@ -5095,7 +5111,7 @@ bool InitStrategies() {
     strats.Add(new Stg_ATR(atr15_sparams, "ATR15"));
   }
   if ((ATR_Active_Tf & M30B) == M30B) {
-    ATR_Params atr30_iparams(ATR_Period);
+    ATR_Params atr30_iparams(ATR_Period_M30);
     StgParams atr30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_ATR(atr30_iparams, atr_iparams, cparams30), NULL, NULL);
     atr30_sparams.SetSignals(ATR30_SignalMethod, ATR30_OpenCondition1, ATR30_OpenCondition2, ATR30_CloseCondition, NULL, ATR_SignalLevel, NULL);
     atr30_sparams.SetStops(ATR_TrailingProfitMethod, ATR_TrailingStopMethod);
@@ -5402,7 +5418,7 @@ bool InitStrategies() {
 
   IndicatorParams force_iparams(10, INDI_FORCE);
   if ((Force_Active_Tf & M1B) == M1B) {
-    Force_Params force1_iparams(Force_Period, Force_MA_Method, Force_Applied_price);
+    Force_Params force1_iparams(Force_Period_M1, Force_MA_Method, Force_Applied_price);
     StgParams force1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Force(force1_iparams, force_iparams, cparams1), NULL, NULL);
     force1_sparams.SetSignals(Force1_SignalMethod, Force1_OpenCondition1, Force1_OpenCondition2, Force1_CloseCondition, NULL, Force_SignalLevel, NULL);
     force1_sparams.SetStops(Force_TrailingProfitMethod, Force_TrailingStopMethod);
@@ -5411,7 +5427,7 @@ bool InitStrategies() {
     strats.Add(new Stg_Force(force1_sparams, "Force1"));
   }
   if ((Force_Active_Tf & M5B) == M5B) {
-    Force_Params force5_iparams(Force_Period, Force_MA_Method, Force_Applied_price);
+    Force_Params force5_iparams(Force_Period_M5, Force_MA_Method, Force_Applied_price);
     StgParams force5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Force(force5_iparams, force_iparams, cparams5), NULL, NULL);
     force5_sparams.SetSignals(Force5_SignalMethod, Force5_OpenCondition1, Force5_OpenCondition2, Force5_CloseCondition, NULL, Force_SignalLevel, NULL);
     force5_sparams.SetStops(Force_TrailingProfitMethod, Force_TrailingStopMethod);
@@ -5420,7 +5436,7 @@ bool InitStrategies() {
     strats.Add(new Stg_Force(force5_sparams, "Force5"));
   }
   if ((Force_Active_Tf & M15B) == M15B) {
-    Force_Params force15_iparams(Force_Period, Force_MA_Method, Force_Applied_price);
+    Force_Params force15_iparams(Force_Period_M15, Force_MA_Method, Force_Applied_price);
     StgParams force15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Force(force15_iparams, force_iparams, cparams15), NULL, NULL);
     force15_sparams.SetSignals(Force15_SignalMethod, Force15_OpenCondition1, Force15_OpenCondition2, Force15_CloseCondition, NULL, Force_SignalLevel, NULL);
     force15_sparams.SetStops(Force_TrailingProfitMethod, Force_TrailingStopMethod);
@@ -5429,7 +5445,7 @@ bool InitStrategies() {
     strats.Add(new Stg_Force(force15_sparams, "Force15"));
   }
   if ((Force_Active_Tf & M30B) == M30B) {
-    Force_Params force30_iparams(Force_Period, Force_MA_Method, Force_Applied_price);
+    Force_Params force30_iparams(Force_Period_M30, Force_MA_Method, Force_Applied_price);
     StgParams force30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Force(force30_iparams, force_iparams, cparams30), NULL, NULL);
     force30_sparams.SetSignals(Force30_SignalMethod, Force30_OpenCondition1, Force30_OpenCondition2, Force30_CloseCondition, NULL, Force_SignalLevel, NULL);
     force30_sparams.SetStops(Force_TrailingProfitMethod, Force_TrailingStopMethod);

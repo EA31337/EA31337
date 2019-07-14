@@ -371,7 +371,10 @@ string __ATR_Parameters__ = "-- Settings for the Average True Range indicator --
 uint ATR_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 ENUM_TRAIL_TYPE ATR_TrailingStopMethod = T_NONE; // Trail stop method
 ENUM_TRAIL_TYPE ATR_TrailingProfitMethod = T_NONE; // Trail profit method
-int ATR_Period = 14; // Period.
+int ATR_Period_M1 = 14; // Period for M1
+int ATR_Period_M5 = 14; // Period for M5
+int ATR_Period_M15 = 14; // Period for M15
+int ATR_Period_M30 = 14; // Period for M30
 double ATR_SignalLevel = 0.00000000; // Signal level
 int ATR1_SignalMethod = 0; // Signal method for M1 (0-31)
 int ATR5_SignalMethod = 0; // Signal method for M5 (0-31)
@@ -654,38 +657,41 @@ extern double Envelopes15_MaxSpread =  8.0; // Max spread to trade for M15 (pips
 extern double Envelopes30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
-string __Force_Parameters__ = "-- Settings for the Force Index indicator --"; // >>> FORCE <<<
-uint Force_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-ENUM_TRAIL_TYPE Force_TrailingStopMethod = 22; // Trail stop method
-ENUM_TRAIL_TYPE Force_TrailingProfitMethod = 1; // Trail profit method
-int Force_Period = 13; // Period
-ENUM_MA_METHOD Force_MA_Method = 0; // MA Method
-ENUM_APPLIED_PRICE Force_Applied_price = PRICE_CLOSE; // Applied Price
-double Force_SignalLevel = 0.00000000; // Signal level
-int Force1_SignalMethod = 0; // Signal method for M1 (0-
-int Force5_SignalMethod = 0; // Signal method for M5 (0-
-int Force15_SignalMethod = 0; // Signal method for M15 (0-
-int Force30_SignalMethod = 0; // Signal method for M30 (0-
-int Force1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
-int Force1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-ENUM_MARKET_EVENT Force1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
+extern string __Force_Parameters__ = "-- Settings for the Force Index indicator --"; // >>> FORCE <<<
+extern uint Force_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern ENUM_TRAIL_TYPE Force_TrailingStopMethod = 22; // Trail stop method
+extern ENUM_TRAIL_TYPE Force_TrailingProfitMethod = 22; // Trail profit method
+extern int Force_Period_M1 = 13; // Period for M1
+extern int Force_Period_M5 = 13; // Period for M5
+extern int Force_Period_M15 = 13; // Period for M15
+extern int Force_Period_M30 = 13; // Period for M30
+extern ENUM_MA_METHOD Force_MA_Method = 0; // MA Method
+extern ENUM_APPLIED_PRICE Force_Applied_price = PRICE_CLOSE; // Applied Price
+extern double Force_SignalLevel = 0.00000000; // Signal level
+extern int Force1_SignalMethod = 0; // Signal method for M1 (0-
+extern int Force5_SignalMethod = 0; // Signal method for M5 (0-
+extern int Force15_SignalMethod = 0; // Signal method for M15 (0-
+extern int Force30_SignalMethod = 0; // Signal method for M30 (0-
+extern int Force1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+extern int Force1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+extern ENUM_MARKET_EVENT Force1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
 
-int Force5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
-int Force5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-ENUM_MARKET_EVENT Force5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
+extern int Force5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+extern int Force5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+extern ENUM_MARKET_EVENT Force5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
 
-int Force15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
-int Force15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-ENUM_MARKET_EVENT Force15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
+extern int Force15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+extern int Force15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+extern ENUM_MARKET_EVENT Force15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
 
-int Force30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
-int Force30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-ENUM_MARKET_EVENT Force30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
+extern int Force30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+extern int Force30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+extern ENUM_MARKET_EVENT Force30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
 
-double Force1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-double Force5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-double Force15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-double Force30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+extern double Force1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+extern double Force5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+extern double Force15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+extern double Force30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __Fractals_Parameters__ = "-- Settings for the Fractals indicator --"; // >>> FRACTALS <<<
