@@ -3682,23 +3682,24 @@ bool CheckMinPipGap(int sid) {
  * Check orders for certain checks.
  */
 void CheckOrders() {
-  double elapsed_h;
+  double elapsed_mins;
   for (uint i = 0; i < Orders::OrdersTotal(); i++) {
     if (!Order::OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) { continue; }
-    if (CheckOurMagicNumber() && Order::OrderOpenTime() > 0) {
-      if (CloseOrderAfterXHours != 0) {
-        elapsed_h = ((double) (TimeCurrent() - Order::OrderOpenTime()) / 60 / 60);
-        if (elapsed_h > CloseOrderAfterXHours) {
-          if (Order::GetOrderProfit() > 0) {
-            TaskAddCloseOrder(OrderTicket(), R_ORDER_EXPIRED);
-          }
+    if (CheckOurMagicNumber() && Order::OrderOpenTime() > 0 && CloseOrderAfterXHours != 0) {
+      elapsed_mins = ((double) (TimeCurrent() - Order::OrderOpenTime()) / 60);
+      if (CloseOrderAfterXHours > 0) {
+        if (elapsed_mins / 60 > CloseOrderAfterXHours) {
+          TaskAddCloseOrder(OrderTicket(), R_ORDER_EXPIRED);
         }
-        else if (CloseOrderAfterXHours < 0 && elapsed_h > -CloseOrderAfterXHours) {
+      }
+      else if (CloseOrderAfterXHours < 0 && elapsed_mins / 60 > -CloseOrderAfterXHours) {
+        if (Order::GetOrderProfit() > 0) {
           TaskAddCloseOrder(OrderTicket(), R_ORDER_EXPIRED);
         }
       }
       /*
-      if (Order::OrderTakeProfit()) {
+      else if (elapsed_mins > CloseOrderAfterXHours * PeriodSeconds(CURRENT_PERIOD)) {
+        TaskAddCloseOrder(OrderTicket(), R_ORDER_EXPIRED);
       }
       */
     }

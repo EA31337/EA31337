@@ -55,7 +55,7 @@ extern double RiskRatio = 0; // Risk ratio (0 = auto, 1.0 = normal)
 extern int RiskRatioIncreaseMethod = 0; // Risk ratio increase method (0-255)
 extern int RiskRatioDecreaseMethod = 0; // Risk ratio decrease method (0-255)
 extern int InitNoOfDaysToWarmUp = 21; // Initial warm-up period (in days)
-extern int CloseOrderAfterXHours = 96; // Close order after X hours (>0 - only profitable, <0 - all, 0 - off)
+extern double CloseOrderAfterXHours = 96; // Close order after X hours (>0 - all, <0 - only profitable 0 - off)
 
 extern bool ApplySpreadLimits = true; // Apply strategy spread limits
 extern double MaxSpreadToTrade = 10.0; // Max spread to trade (in pips), 0 - disable limit
