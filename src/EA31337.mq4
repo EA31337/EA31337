@@ -807,17 +807,17 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
   switch (type) {
     case INDI_AC: // Calculates the Bill Williams' Accelerator/Decelerator oscillator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++)
-        iac[index][i] = Indi_AC::iAC(symbol, tf, i);
+        iac[index][i] = Indi_AC::iAC(symbol, tf, i + AC_Shift);
       break;
     case INDI_AD: // Calculates the Accumulation/Distribution indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++)
-        ad[index][i] = Indi_AD::iAD(symbol, tf, i);
+        ad[index][i] = Indi_AD::iAD(symbol, tf, i + AD_Shift);
       break;
     case INDI_ADX: // Calculates the Average Directional Movement Index indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        adx[index][i][LINE_MAIN_ADX] = Indi_ADX::iADX(symbol, tf, adx_period, ADX_Applied_Price, LINE_MAIN_ADX, i); // Base indicator line
-        adx[index][i][LINE_PLUSDI]   = Indi_ADX::iADX(symbol, tf, adx_period, ADX_Applied_Price, LINE_PLUSDI, i);   // +DI indicator line
-        adx[index][i][LINE_MINUSDI]  = Indi_ADX::iADX(symbol, tf, adx_period, ADX_Applied_Price, LINE_MINUSDI, i);  // -DI indicator line
+        adx[index][i][LINE_MAIN_ADX] = Indi_ADX::iADX(symbol, tf, adx_period, ADX_Applied_Price, LINE_MAIN_ADX, i + ADX_Shift); // Base indicator line
+        adx[index][i][LINE_PLUSDI]   = Indi_ADX::iADX(symbol, tf, adx_period, ADX_Applied_Price, LINE_PLUSDI, i + ADX_Shift);   // +DI indicator line
+        adx[index][i][LINE_MINUSDI]  = Indi_ADX::iADX(symbol, tf, adx_period, ADX_Applied_Price, LINE_MINUSDI, i + ADX_Shift);  // -DI indicator line
       }
       break;
     case INDI_ALLIGATOR: // Calculates the Alligator indicator.
@@ -841,12 +841,12 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       break;
     case INDI_ATR: // Calculates the Average True Range indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        atr[index][i] = Indi_ATR::iATR(symbol, tf, atr_period, i);
+        atr[index][i] = Indi_ATR::iATR(symbol, tf, atr_period, i + ATR_Shift);
       }
       break;
     case INDI_AO: // Calculates the Awesome oscillator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        awesome[index][i] = Indi_AO::iAO(symbol, tf, i);
+        awesome[index][i] = Indi_AO::iAO(symbol, tf, i + Awesome_Shift);
       }
       break;
     case INDI_BANDS: // Calculates the Bollinger Bands indicator.
@@ -863,21 +863,21 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       break;
     case INDI_BEARS: // Calculates the Bears Power and Bulls Power indicators.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        bpower[index][i][ORDER_TYPE_SELL] = Indi_BearsPower::iBearsPower(symbol, tf, BearsPower_Period, BearsPower_Applied_Price, i);
+        bpower[index][i][ORDER_TYPE_SELL] = Indi_BearsPower::iBearsPower(symbol, tf, BearsPower_Period, BearsPower_Applied_Price, i + BearsPower_Shift);
       }
       success = (bool)(bpower[index][CURR][ORDER_TYPE_BUY] || bpower[index][CURR][ORDER_TYPE_SELL]);
       // Message("Bulls: " + bpower[index][CURR][ORDER_TYPE_BUY] + ", Bears: " + bpower[index][CURR][ORDER_TYPE_SELL]);
       break;
     case INDI_BULLS: // Calculates the Bulls Power and Bulls Power indicators.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        bpower[index][i][ORDER_TYPE_BUY]  = Indi_BullsPower::iBullsPower(symbol, tf, BullsPower_Period, BullsPower_Applied_Price, i);
+        bpower[index][i][ORDER_TYPE_BUY]  = Indi_BullsPower::iBullsPower(symbol, tf, BullsPower_Period, BullsPower_Applied_Price, i + BullsPower_Shift);
       }
       success = (bool)(bpower[index][CURR][ORDER_TYPE_BUY] || bpower[index][CURR][ORDER_TYPE_SELL]);
       // Message("Bulls: " + bpower[index][CURR][ORDER_TYPE_BUY] + ", Bears: " + bpower[index][CURR][ORDER_TYPE_SELL]);
       break;
     case INDI_BWMFI: // Calculates the Market Facilitation Index indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        bwmfi[index][i] = Indi_BWMFI::iBWMFI(symbol, tf, i);
+        bwmfi[index][i] = Indi_BWMFI::iBWMFI(symbol, tf, i + BWMFI_Shift);
       }
       success = (bool) bwmfi[index][CURR];
       break;
@@ -910,7 +910,7 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       break;
     case INDI_FORCE: // Calculates the Force Index indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        force[index][i] = Indi_Force::iForce(symbol, tf, force_period, Force_MA_Method, Force_Applied_price, i);
+        force[index][i] = Indi_Force::iForce(symbol, tf, force_period, Force_MA_Method, Force_Applied_Price, i + Force_Shift);
       }
       success = (bool) force[index][CURR];
       break;
@@ -978,7 +978,7 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       break;
     case INDI_MFI: // Calculates the Money Flow Index indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        mfi[index][i] = Indi_MFI::iMFI(symbol, tf, mfi_period, i);
+        mfi[index][i] = Indi_MFI::iMFI(symbol, tf, mfi_period, i + MFI_Shift);
       }
       success = (bool)mfi[index][CURR];
       break;
@@ -5474,7 +5474,7 @@ bool InitStrategies() {
 
   IndicatorParams force_iparams(10, INDI_FORCE);
   if ((Force_Active_Tf & M1B) == M1B) {
-    Force_Params force1_iparams(Force_Period_M1, Force_MA_Method, Force_Applied_price);
+    Force_Params force1_iparams(Force_Period_M1, Force_MA_Method, Force_Applied_Price);
     StgParams force1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Force(force1_iparams, force_iparams, cparams1), NULL, NULL);
     force1_sparams.SetSignals(Force1_SignalMethod, Force1_OpenCondition1, Force1_OpenCondition2, Force1_CloseCondition, NULL, Force_SignalLevel, NULL);
     force1_sparams.SetStops(Force_TrailingProfitMethod, Force_TrailingStopMethod);
@@ -5483,7 +5483,7 @@ bool InitStrategies() {
     strats.Add(new Stg_Force(force1_sparams, "Force1"));
   }
   if ((Force_Active_Tf & M5B) == M5B) {
-    Force_Params force5_iparams(Force_Period_M5, Force_MA_Method, Force_Applied_price);
+    Force_Params force5_iparams(Force_Period_M5, Force_MA_Method, Force_Applied_Price);
     StgParams force5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Force(force5_iparams, force_iparams, cparams5), NULL, NULL);
     force5_sparams.SetSignals(Force5_SignalMethod, Force5_OpenCondition1, Force5_OpenCondition2, Force5_CloseCondition, NULL, Force_SignalLevel, NULL);
     force5_sparams.SetStops(Force_TrailingProfitMethod, Force_TrailingStopMethod);
@@ -5492,7 +5492,7 @@ bool InitStrategies() {
     strats.Add(new Stg_Force(force5_sparams, "Force5"));
   }
   if ((Force_Active_Tf & M15B) == M15B) {
-    Force_Params force15_iparams(Force_Period_M15, Force_MA_Method, Force_Applied_price);
+    Force_Params force15_iparams(Force_Period_M15, Force_MA_Method, Force_Applied_Price);
     StgParams force15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Force(force15_iparams, force_iparams, cparams15), NULL, NULL);
     force15_sparams.SetSignals(Force15_SignalMethod, Force15_OpenCondition1, Force15_OpenCondition2, Force15_CloseCondition, NULL, Force_SignalLevel, NULL);
     force15_sparams.SetStops(Force_TrailingProfitMethod, Force_TrailingStopMethod);
@@ -5501,7 +5501,7 @@ bool InitStrategies() {
     strats.Add(new Stg_Force(force15_sparams, "Force15"));
   }
   if ((Force_Active_Tf & M30B) == M30B) {
-    Force_Params force30_iparams(Force_Period_M30, Force_MA_Method, Force_Applied_price);
+    Force_Params force30_iparams(Force_Period_M30, Force_MA_Method, Force_Applied_Price);
     StgParams force30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Force(force30_iparams, force_iparams, cparams30), NULL, NULL);
     force30_sparams.SetSignals(Force30_SignalMethod, Force30_OpenCondition1, Force30_OpenCondition2, Force30_CloseCondition, NULL, Force_SignalLevel, NULL);
     force30_sparams.SetStops(Force_TrailingProfitMethod, Force_TrailingStopMethod);
