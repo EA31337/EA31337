@@ -738,6 +738,14 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
     default:
     case PERIOD_M30: atr_period = ATR_Period_M30; break;
   }
+  double bands_deviation;
+  switch (tf) {
+    case PERIOD_M1: bands_deviation = Bands_Deviation_M1; break;
+    case PERIOD_M5: bands_deviation = Bands_Deviation_M5; break;
+    case PERIOD_M15: bands_deviation = Bands_Deviation_M15; break;
+    default:
+    case PERIOD_M30: bands_deviation = Bands_Deviation_M30; break;
+  }
   uint bands_period;
   switch (tf) {
     case PERIOD_M1: bands_period = Bands_Period_M1; break;
@@ -761,6 +769,14 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
     case PERIOD_M15: dm_period = DeMarker_Period_M15; break;
     default:
     case PERIOD_M30: dm_period = DeMarker_Period_M30; break;
+  }
+  double env_deviation;
+  switch (tf) {
+    case PERIOD_M1: env_deviation = Envelopes_Deviation_M1; break;
+    case PERIOD_M5: env_deviation = Envelopes_Deviation_M5; break;
+    case PERIOD_M15: env_deviation = Envelopes_Deviation_M15; break;
+    default:
+    case PERIOD_M30: env_deviation = Envelopes_Deviation_M30; break;
   }
   uint env_period;
   switch (tf) {
@@ -851,10 +867,9 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       break;
     case INDI_BANDS: // Calculates the Bollinger Bands indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        shift = i + Bands_Shift;
-        bands[index][i][BAND_BASE]  = Indi_Bands::iBands(symbol, tf, bands_period, Bands_Deviation, Bands_HShift, Bands_Applied_Price, BAND_BASE,  shift);
-        bands[index][i][BAND_UPPER] = Indi_Bands::iBands(symbol, tf, bands_period, Bands_Deviation, Bands_HShift, Bands_Applied_Price, BAND_UPPER, shift);
-        bands[index][i][BAND_LOWER] = Indi_Bands::iBands(symbol, tf, bands_period, Bands_Deviation, Bands_HShift, Bands_Applied_Price, BAND_LOWER, shift);
+        bands[index][i][BAND_BASE]  = Indi_Bands::iBands(symbol, tf, bands_period, bands_deviation, Bands_HShift, Bands_Applied_Price, BAND_BASE,  i + Bands_Shift);
+        bands[index][i][BAND_UPPER] = Indi_Bands::iBands(symbol, tf, bands_period, bands_deviation, Bands_HShift, Bands_Applied_Price, BAND_UPPER, i + Bands_Shift);
+        bands[index][i][BAND_LOWER] = Indi_Bands::iBands(symbol, tf, bands_period, bands_deviation, Bands_HShift, Bands_Applied_Price, BAND_LOWER, i + Bands_Shift);
       }
       success = (bool)bands[index][CURR][BAND_BASE];
       #ifdef __MQL4__
@@ -899,9 +914,9 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       break;
     case INDI_ENVELOPES: // Calculates the Envelopes indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        envelopes[index][i][LINE_MAIN]  = Indi_Envelopes::iEnvelopes(symbol, tf, env_period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation, LINE_MAIN,  i + Envelopes_Shift);
-        envelopes[index][i][LINE_UPPER] = Indi_Envelopes::iEnvelopes(symbol, tf, env_period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation, LINE_UPPER, i + Envelopes_Shift);
-        envelopes[index][i][LINE_LOWER] = Indi_Envelopes::iEnvelopes(symbol, tf, env_period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation, LINE_LOWER, i + Envelopes_Shift);
+        envelopes[index][i][LINE_MAIN]  = Indi_Envelopes::iEnvelopes(symbol, tf, env_period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, env_deviation, LINE_MAIN,  i + Envelopes_Shift);
+        envelopes[index][i][LINE_UPPER] = Indi_Envelopes::iEnvelopes(symbol, tf, env_period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, env_deviation, LINE_UPPER, i + Envelopes_Shift);
+        envelopes[index][i][LINE_LOWER] = Indi_Envelopes::iEnvelopes(symbol, tf, env_period, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, env_deviation, LINE_LOWER, i + Envelopes_Shift);
       }
       success = (bool) envelopes[index][CURR][LINE_MAIN];
       #ifdef __MQL4__
@@ -5213,7 +5228,7 @@ bool InitStrategies() {
 
   IndicatorParams bands_iparams(10, INDI_BANDS);
   if ((Bands_Active_Tf & M1B) == M1B) {
-    Bands_Params bands1_iparams(Bands_Period_M1, Bands_Deviation, Bands_Shift, Bands_Applied_Price);
+    Bands_Params bands1_iparams(Bands_Period_M1, Bands_Deviation_M1, Bands_Shift, Bands_Applied_Price);
     StgParams bands1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Bands(bands1_iparams, bands_iparams, cparams1), NULL, NULL);
     bands1_sparams.SetSignals(Bands1_SignalMethod, Bands1_OpenCondition1, Bands1_OpenCondition2, Bands1_CloseCondition, NULL, Bands_SignalLevel, NULL);
     bands1_sparams.SetStops(Bands_TrailingProfitMethod, Bands_TrailingStopMethod);
@@ -5222,7 +5237,7 @@ bool InitStrategies() {
     strats.Add(new Stg_Bands(bands1_sparams, "Bands1"));
   }
   if ((Bands_Active_Tf & M5B) == M5B) {
-    Bands_Params bands5_iparams(Bands_Period_M5, Bands_Deviation, Bands_Shift, Bands_Applied_Price);
+    Bands_Params bands5_iparams(Bands_Period_M5, Bands_Deviation_M5, Bands_Shift, Bands_Applied_Price);
     StgParams bands5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Bands(bands5_iparams, bands_iparams, cparams5), NULL, NULL);
     bands5_sparams.SetSignals(Bands5_SignalMethod, Bands5_OpenCondition1, Bands5_OpenCondition2, Bands5_CloseCondition, NULL, Bands_SignalLevel, NULL);
     bands5_sparams.SetStops(Bands_TrailingProfitMethod, Bands_TrailingStopMethod);
@@ -5231,7 +5246,7 @@ bool InitStrategies() {
     strats.Add(new Stg_Bands(bands5_sparams, "Bands5"));
   }
   if ((Bands_Active_Tf & M15B) == M15B) {
-    Bands_Params bands15_iparams(Bands_Period_M15, Bands_Deviation, Bands_Shift, Bands_Applied_Price);
+    Bands_Params bands15_iparams(Bands_Period_M15, Bands_Deviation_M15, Bands_Shift, Bands_Applied_Price);
     StgParams bands15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Bands(bands15_iparams, bands_iparams, cparams15), NULL, NULL);
     bands15_sparams.SetSignals(Bands15_SignalMethod, Bands15_OpenCondition1, Bands15_OpenCondition2, Bands15_CloseCondition, NULL, Bands_SignalLevel, NULL);
     bands15_sparams.SetStops(Bands_TrailingProfitMethod, Bands_TrailingStopMethod);
@@ -5240,7 +5255,7 @@ bool InitStrategies() {
     strats.Add(new Stg_Bands(bands15_sparams, "Bands15"));
   }
   if ((Bands_Active_Tf & M30B) == M30B) {
-    Bands_Params bands30_iparams(Bands_Period_M30, Bands_Deviation, Bands_HShift, Bands_Applied_Price);
+    Bands_Params bands30_iparams(Bands_Period_M30, Bands_Deviation_M30, Bands_HShift, Bands_Applied_Price);
     StgParams bands30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Bands(bands30_iparams, bands_iparams, cparams30), NULL, NULL);
     bands30_sparams.SetSignals(Bands30_SignalMethod, Bands30_OpenCondition1, Bands30_OpenCondition2, Bands30_CloseCondition, NULL, Bands_SignalLevel, NULL);
     bands30_sparams.SetStops(Bands_TrailingProfitMethod, Bands_TrailingStopMethod);
@@ -5437,7 +5452,7 @@ bool InitStrategies() {
 
   IndicatorParams env_iparams(10, INDI_ENVELOPES);
   if ((Envelopes_Active_Tf & M1B) == M1B) {
-    Envelopes_Params env1_iparams(Envelopes_MA_Period_M1, Envelopes_MA_Shift, Envelopes_MA_Method, Envelopes_Applied_Price, Envelopes_Deviation);
+    Envelopes_Params env1_iparams(Envelopes_MA_Period_M1, Envelopes_MA_Shift, Envelopes_MA_Method, Envelopes_Applied_Price, Envelopes_Deviation_M1);
     StgParams env1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Envelopes(env1_iparams, env_iparams, cparams1), NULL, NULL);
     env1_sparams.SetSignals(Envelopes1_SignalMethod, Envelopes1_OpenCondition1, Envelopes1_OpenCondition2, Envelopes1_CloseCondition, NULL, Envelopes_SignalLevel, NULL);
     env1_sparams.SetStops(Envelopes_TrailingProfitMethod, Envelopes_TrailingStopMethod);
@@ -5446,7 +5461,7 @@ bool InitStrategies() {
     strats.Add(new Stg_Envelopes(env1_sparams, "Envelopes1"));
   }
   if ((Envelopes_Active_Tf & M5B) == M5B) {
-    Envelopes_Params env5_iparams(Envelopes_MA_Period_M5, Envelopes_MA_Shift, Envelopes_MA_Method, Envelopes_Applied_Price, Envelopes_Deviation);
+    Envelopes_Params env5_iparams(Envelopes_MA_Period_M5, Envelopes_MA_Shift, Envelopes_MA_Method, Envelopes_Applied_Price, Envelopes_Deviation_M5);
     StgParams env5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Envelopes(env5_iparams, env_iparams, cparams5), NULL, NULL);
     env5_sparams.SetSignals(Envelopes5_SignalMethod, Envelopes5_OpenCondition1, Envelopes5_OpenCondition2, Envelopes5_CloseCondition, NULL, Envelopes_SignalLevel, NULL);
     env5_sparams.SetStops(Envelopes_TrailingProfitMethod, Envelopes_TrailingStopMethod);
@@ -5455,7 +5470,7 @@ bool InitStrategies() {
     strats.Add(new Stg_Envelopes(env5_sparams, "Envelopes5"));
   }
   if ((Envelopes_Active_Tf & M15B) == M15B) {
-    Envelopes_Params env15_iparams(Envelopes_MA_Period_M15, Envelopes_MA_Shift, Envelopes_MA_Method, Envelopes_Applied_Price, Envelopes_Deviation);
+    Envelopes_Params env15_iparams(Envelopes_MA_Period_M15, Envelopes_MA_Shift, Envelopes_MA_Method, Envelopes_Applied_Price, Envelopes_Deviation_M15);
     StgParams env15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Envelopes(env15_iparams, env_iparams, cparams15), NULL, NULL);
     env15_sparams.SetSignals(Envelopes15_SignalMethod, Envelopes15_OpenCondition1, Envelopes15_OpenCondition2, Envelopes15_CloseCondition, NULL, Envelopes_SignalLevel, NULL);
     env15_sparams.SetStops(Envelopes_TrailingProfitMethod, Envelopes_TrailingStopMethod);
@@ -5464,7 +5479,7 @@ bool InitStrategies() {
     strats.Add(new Stg_Envelopes(env15_sparams, "Envelopes15"));
   }
   if ((Envelopes_Active_Tf & M30B) == M30B) {
-    Envelopes_Params env30_iparams(Envelopes_MA_Period_M30, Envelopes_MA_Shift, Envelopes_MA_Method, Envelopes_Applied_Price, Envelopes_Deviation);
+    Envelopes_Params env30_iparams(Envelopes_MA_Period_M30, Envelopes_MA_Shift, Envelopes_MA_Method, Envelopes_Applied_Price, Envelopes_Deviation_M30);
     StgParams env30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Envelopes(env30_iparams, env_iparams, cparams30), NULL, NULL);
     env30_sparams.SetSignals(Envelopes30_SignalMethod, Envelopes30_OpenCondition1, Envelopes30_OpenCondition2, Envelopes30_CloseCondition, NULL, Envelopes_SignalLevel, NULL);
     env30_sparams.SetStops(Envelopes_TrailingProfitMethod, Envelopes_TrailingStopMethod);
