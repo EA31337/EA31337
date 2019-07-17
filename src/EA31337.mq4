@@ -852,9 +852,9 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
     case INDI_BANDS: // Calculates the Bollinger Bands indicator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         shift = i + Bands_Shift;
-        bands[index][i][BAND_BASE]  = Indi_Bands::iBands(symbol, tf, bands_period, Bands_Deviation, 0, Bands_Applied_Price, BAND_BASE,  shift);
-        bands[index][i][BAND_UPPER] = Indi_Bands::iBands(symbol, tf, bands_period, Bands_Deviation, 0, Bands_Applied_Price, BAND_UPPER, shift);
-        bands[index][i][BAND_LOWER] = Indi_Bands::iBands(symbol, tf, bands_period, Bands_Deviation, 0, Bands_Applied_Price, BAND_LOWER, shift);
+        bands[index][i][BAND_BASE]  = Indi_Bands::iBands(symbol, tf, bands_period, Bands_Deviation, Bands_HShift, Bands_Applied_Price, BAND_BASE,  shift);
+        bands[index][i][BAND_UPPER] = Indi_Bands::iBands(symbol, tf, bands_period, Bands_Deviation, Bands_HShift, Bands_Applied_Price, BAND_UPPER, shift);
+        bands[index][i][BAND_LOWER] = Indi_Bands::iBands(symbol, tf, bands_period, Bands_Deviation, Bands_HShift, Bands_Applied_Price, BAND_LOWER, shift);
       }
       success = (bool)bands[index][CURR][BAND_BASE];
       #ifdef __MQL4__
@@ -5240,7 +5240,7 @@ bool InitStrategies() {
     strats.Add(new Stg_Bands(bands15_sparams, "Bands15"));
   }
   if ((Bands_Active_Tf & M30B) == M30B) {
-    Bands_Params bands30_iparams(Bands_Period_M30, Bands_Deviation, Bands_Shift, Bands_Applied_Price);
+    Bands_Params bands30_iparams(Bands_Period_M30, Bands_Deviation, Bands_HShift, Bands_Applied_Price);
     StgParams bands30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Bands(bands30_iparams, bands_iparams, cparams30), NULL, NULL);
     bands30_sparams.SetSignals(Bands30_SignalMethod, Bands30_OpenCondition1, Bands30_OpenCondition2, Bands30_CloseCondition, NULL, Bands_SignalLevel, NULL);
     bands30_sparams.SetStops(Bands_TrailingProfitMethod, Bands_TrailingStopMethod);
