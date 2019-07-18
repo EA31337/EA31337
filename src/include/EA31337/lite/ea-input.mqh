@@ -78,9 +78,9 @@ extern uint ConFactorOrdersLimit = 600; // No of orders to check on consequent w
 
 //+------------------------------------------------------------------+
 extern string __SmartQueue_Parameters__ = "-- Smart queue parameters --"; // >>> SMART QUEUE <<<
-extern bool SmartQueueActive = 1; // Activate QueueAI
-extern int SmartQueueMethod = 14; // QueueAI: Method for selecting the best order (0-15)
-extern int SmartQueueFilter = 112; // QueueAI: Method for filtering the orders (0-255)
+extern bool SmartQueueActive = 0; // Activate QueueAI
+extern int SmartQueueMethod = 11; // QueueAI: Method for selecting the best order (0-15)
+extern int SmartQueueFilter = 91; // QueueAI: Method for filtering the orders (0-255)
 
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions__ = "-- Account conditions --"; // >>> CONDITIONS & ACTIONS <<<
@@ -144,9 +144,9 @@ double AC30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __AD_Parameters__ = "-- Settings for the Accumulation/Distribution indicator --"; // >>> AD <<<
-extern uint AD_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern uint AD_Active_Tf = 12; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern ENUM_TRAIL_TYPE AD_TrailingStopMethod = 7; // Trail stop method
-extern ENUM_TRAIL_TYPE AD_TrailingProfitMethod = 22; // Trail profit method
+extern ENUM_TRAIL_TYPE AD_TrailingProfitMethod = 11; // Trail profit method
 extern double AD_SignalLevel = 0.00000000; // Signal level
 extern uint AD_Shift = 0; // Shift (relative to the current bar, 0 - default)
 extern int AD1_SignalMethod = 0; // Signal method for M1 (0-?)
@@ -205,7 +205,7 @@ double ADX30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __Alligator_Parameters__ = "-- Settings for the Alligator indicator --"; // >>> ALLIGATOR <<<
-extern uint Alligator_Active_Tf = 12; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern uint Alligator_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern int Alligator_Period_Jaw = 16; // Jaw Period
 extern int Alligator_Period_Teeth = 8; // Teeth Period
 extern int Alligator_Period_Lips = 6; // Lips Period
@@ -305,12 +305,12 @@ extern uint Bands_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M
 extern int Bands_Period_M1 = 2; // Period for M1
 extern int Bands_Period_M5 = 2; // Period for M5
 extern int Bands_Period_M15 = 2; // Period for M15
-extern int Bands_Period_M30 = 8; // Period for M30
-extern ENUM_APPLIED_PRICE Bands_Applied_Price = 3; // Applied Price
-extern double Bands_Deviation_M1 = 2.3; // Deviation for M1
-extern double Bands_Deviation_M5 = 2.3; // Deviation for M5
-extern double Bands_Deviation_M15 = 2.3; // Deviation for M15
-extern double Bands_Deviation_M30 = 2.3; // Deviation for M30
+extern int Bands_Period_M30 = 2; // Period for M30
+extern ENUM_APPLIED_PRICE Bands_Applied_Price = 0; // Applied Price
+extern double Bands_Deviation_M1 = 1.8; // Deviation for M1
+extern double Bands_Deviation_M5 = 1.8; // Deviation for M5
+extern double Bands_Deviation_M15 = 1.8; // Deviation for M15
+extern double Bands_Deviation_M30 = 1.8; // Deviation for M30
 extern int Bands_HShift = 0; // Horizontal shift
 extern int Bands_Shift = 0; // Shift (relative to the current bar, 0 - default)
 extern ENUM_TRAIL_TYPE Bands_TrailingStopMethod = 7; // Trail stop method
@@ -427,7 +427,7 @@ double BWMFI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __CCI_Parameters__ = "-- Settings for the Commodity Channel Index indicator --"; // >>> CCI <<<
-extern uint CCI_Active_Tf = 3; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern uint CCI_Active_Tf = 10; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern int CCI_Shift = 1; // Shift (0 for default)
 extern ENUM_TRAIL_TYPE CCI_TrailingStopMethod = 5; // Trail stop method
 extern ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = 12; // Trail profit method
@@ -463,11 +463,11 @@ double CCI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --"; // >>> DEMARKER <<<
-extern uint DeMarker_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern uint DeMarker_Active_Tf = 8; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern int DeMarker_Period_M1 = 36; // Period for M1
-extern int DeMarker_Period_M5 = 40; // Period for M5
+extern int DeMarker_Period_M5 = 54; // Period for M5
 extern int DeMarker_Period_M15 = 10; // Period for M15
-extern int DeMarker_Period_M30 = 14; // Period for M30
+extern int DeMarker_Period_M30 = 2; // Period for M30
 extern int DeMarker_Shift = 5; // Shift
 extern double DeMarker_SignalLevel = 0.2; // Signal level (0.0-0.4)
 extern ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = 22; // Trail stop method
@@ -495,15 +495,15 @@ double DeMarker30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --"; // >>> ENVELOPES <<<
-extern uint Envelopes_Active_Tf = 1; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-extern int Envelopes_MA_Period_M1 = 30; // Period for M1
-extern int Envelopes_MA_Period_M5 = 30; // Period for M5
-extern int Envelopes_MA_Period_M15 = 30; // Period for M15
-extern int Envelopes_MA_Period_M30 = 30; // Period for M30
-extern double Envelopes_Deviation_M1 = 0.4; // Deviation for M1
-extern double Envelopes_Deviation_M5 = 0.4; // Deviation for M5
-extern double Envelopes_Deviation_M15 = 0.4; // Deviation for M15
-extern double Envelopes_Deviation_M30 = 0.4; // Deviation for M30
+extern uint Envelopes_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern int Envelopes_MA_Period_M1 = 2; // Period for M1
+extern int Envelopes_MA_Period_M5 = 12; // Period for M5
+extern int Envelopes_MA_Period_M15 = 22; // Period for M15
+extern int Envelopes_MA_Period_M30 = 2; // Period for M30
+extern double Envelopes_Deviation_M1 = 0.9; // Deviation for M1
+extern double Envelopes_Deviation_M5 = 0.9; // Deviation for M5
+extern double Envelopes_Deviation_M15 = 0.9; // Deviation for M15
+extern double Envelopes_Deviation_M30 = 0.9; // Deviation for M30
 extern ENUM_MA_METHOD Envelopes_MA_Method = 2; // MA Method
 extern int Envelopes_MA_Shift = 0; // MA Shift
 extern ENUM_APPLIED_PRICE Envelopes_Applied_Price = 0; // Applied Price
@@ -511,10 +511,10 @@ extern int Envelopes_Shift = 0; // Shift
 extern ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = 3; // Trail stop method
 extern ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = -2; // Trail profit method
 /* @todo extern */ int Envelopes_SignalLevel = 0; // Signal level
-extern int Envelopes1_SignalMethod = -88; // Signal method for M1 (-127-127)
-extern int Envelopes5_SignalMethod = -88; // Signal method for M5 (-127-127)
-extern int Envelopes15_SignalMethod = -12; // Signal method for M15 (-127-127)
-extern int Envelopes30_SignalMethod = -76; // Signal method for M30 (-127-127)
+extern int Envelopes1_SignalMethod = 48; // Signal method for M1 (-127-127)
+extern int Envelopes5_SignalMethod = 97; // Signal method for M5 (-127-127)
+extern int Envelopes15_SignalMethod = 1; // Signal method for M15 (-127-127)
+extern int Envelopes30_SignalMethod = 127; // Signal method for M30 (-127-127)
 int Envelopes1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int Envelopes1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
 ENUM_MARKET_EVENT Envelopes1_CloseCondition = C_ENVELOPES_BUY_SELL; // Close condition for M1
@@ -538,11 +538,11 @@ extern uint Force_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M
 extern ENUM_TRAIL_TYPE Force_TrailingStopMethod = 7; // Trail stop method
 extern ENUM_TRAIL_TYPE Force_TrailingProfitMethod = 22; // Trail profit method
 extern int Force_Period_M1 = 22; // Period for M1
-extern int Force_Period_M5 = 30; // Period for M5
-extern int Force_Period_M15 = 22; // Period for M15
-extern int Force_Period_M30 = 22; // Period for M30
+extern int Force_Period_M5 = 22; // Period for M5
+extern int Force_Period_M15 = 18; // Period for M15
+extern int Force_Period_M30 = 26; // Period for M30
 extern ENUM_MA_METHOD Force_MA_Method = 1; // MA Method
-extern ENUM_APPLIED_PRICE Force_Applied_Price = 2; // Applied Price
+extern ENUM_APPLIED_PRICE Force_Applied_Price = 5; // Applied Price
 extern double Force_SignalLevel = 0; // Signal level
 extern uint Force_Shift = 2; // Shift (relative to the current bar, 0 - default)
 int Force1_SignalMethod = 0; // Signal method for M1 (0-
@@ -575,7 +575,7 @@ extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = -3; // Trail profit metho
 /* @todo extern */ int Fractals_SignalLevel = 0; // Signal level
 extern int Fractals1_SignalMethod = 3; // Signal method for M1 (-3-3)
 extern int Fractals5_SignalMethod = 3; // Signal method for M5 (-3-3)
-extern int Fractals15_SignalMethod = 1; // Signal method for M15 (-3-3)
+extern int Fractals15_SignalMethod = 3; // Signal method for M15 (-3-3)
 extern int Fractals30_SignalMethod = -2; // Signal method for M30 (-3-3)
 int Fractals1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int Fractals1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
@@ -662,7 +662,7 @@ double Ichimoku30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __MA_Parameters__ = "-- Settings for the Moving Average indicator --"; // >>> MA <<<
-extern uint MA_Active_Tf = 4; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern uint MA_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern int MA_Period_Fast = 12; // Period Fast
 extern int MA_Period_Medium = 12; // Period Medium
 extern int MA_Period_Slow = 4; // Period Slow
@@ -698,7 +698,7 @@ double MA30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --"; // >>> MACD <<<
-extern uint MACD_Active_Tf = 9; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern uint MACD_Active_Tf = 13; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern int MACD_Period_Fast = 15; // Period Fast
 extern int MACD_Period_Slow = 29; // Period Slow
 extern int MACD_Period_Signal = 10; // Period for signal
@@ -854,7 +854,7 @@ double OSMA30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --"; // >>> RSI <<<
-extern uint RSI_Active_Tf = 3; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern uint RSI_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern int RSI_Period_M1 = 32; // Period for M1
 extern int RSI_Period_M5 = 16; // Period for M5
 extern int RSI_Period_M15 = 8; // Period for M15
@@ -917,7 +917,7 @@ double RVI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __SAR_Parameters__ = "-- Settings for the Parabolic Stop and Reverse system indicator --"; // >>> SAR <<<
-extern uint SAR_Active_Tf = 15; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern uint SAR_Active_Tf = 1; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern double SAR_Step = 0.2; // Step
 extern double SAR_Maximum_Stop = 0.4; // Maximum stop
 extern int SAR_Shift = 0; // Shift
@@ -1012,7 +1012,7 @@ double Stochastic30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --"; // >>> WPR <<<
-extern uint WPR_Active_Tf = 12; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern uint WPR_Active_Tf = 9; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern int WPR_Period_M1 = 2; // Period for M1
 extern int WPR_Period_M5 = 2; // Period for M5
 extern int WPR_Period_M15 = 2; // Period for M15
