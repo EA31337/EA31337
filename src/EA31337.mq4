@@ -5228,7 +5228,7 @@ bool InitStrategies() {
 
   IndicatorParams bands_iparams(10, INDI_BANDS);
   if ((Bands_Active_Tf & M1B) == M1B) {
-    Bands_Params bands1_iparams(Bands_Period_M1, Bands_Deviation_M1, Bands_Shift, Bands_Applied_Price);
+    Bands_Params bands1_iparams(Bands_Period_M1, Bands_Deviation_M1, Bands_HShift, Bands_Applied_Price);
     StgParams bands1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Bands(bands1_iparams, bands_iparams, cparams1), NULL, NULL);
     bands1_sparams.SetSignals(Bands1_SignalMethod, Bands1_OpenCondition1, Bands1_OpenCondition2, Bands1_CloseCondition, NULL, Bands_SignalLevel, NULL);
     bands1_sparams.SetStops(Bands_TrailingProfitMethod, Bands_TrailingStopMethod);
@@ -5237,7 +5237,7 @@ bool InitStrategies() {
     strats.Add(new Stg_Bands(bands1_sparams, "Bands1"));
   }
   if ((Bands_Active_Tf & M5B) == M5B) {
-    Bands_Params bands5_iparams(Bands_Period_M5, Bands_Deviation_M5, Bands_Shift, Bands_Applied_Price);
+    Bands_Params bands5_iparams(Bands_Period_M5, Bands_Deviation_M5, Bands_HShift, Bands_Applied_Price);
     StgParams bands5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Bands(bands5_iparams, bands_iparams, cparams5), NULL, NULL);
     bands5_sparams.SetSignals(Bands5_SignalMethod, Bands5_OpenCondition1, Bands5_OpenCondition2, Bands5_CloseCondition, NULL, Bands_SignalLevel, NULL);
     bands5_sparams.SetStops(Bands_TrailingProfitMethod, Bands_TrailingStopMethod);
@@ -5246,7 +5246,7 @@ bool InitStrategies() {
     strats.Add(new Stg_Bands(bands5_sparams, "Bands5"));
   }
   if ((Bands_Active_Tf & M15B) == M15B) {
-    Bands_Params bands15_iparams(Bands_Period_M15, Bands_Deviation_M15, Bands_Shift, Bands_Applied_Price);
+    Bands_Params bands15_iparams(Bands_Period_M15, Bands_Deviation_M15, Bands_HShift, Bands_Applied_Price);
     StgParams bands15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Bands(bands15_iparams, bands_iparams, cparams15), NULL, NULL);
     bands15_sparams.SetSignals(Bands15_SignalMethod, Bands15_OpenCondition1, Bands15_OpenCondition2, Bands15_CloseCondition, NULL, Bands_SignalLevel, NULL);
     bands15_sparams.SetStops(Bands_TrailingProfitMethod, Bands_TrailingStopMethod);
