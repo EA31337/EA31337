@@ -88,19 +88,19 @@ extern bool Account_Conditions_Active = 0; // Enable account conditions (don't e
 // Condition 5 - Equity 20% high
 extern ENUM_ACC_CONDITION Account_Condition_1 = 5; // 1. Account condition
 extern ENUM_MARKET_CONDITION Market_Condition_1 = 5; // 1. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_1 = 1; // 1. Action to take
+extern ENUM_ACTION_TYPE Action_On_Condition_1 = 10; // 1. Action to take
 // Condition 6 - Equity 10% high
-extern ENUM_ACC_CONDITION Account_Condition_2 = 6; // 2. Account condition
+extern ENUM_ACC_CONDITION Account_Condition_2 = 0; // 2. Account condition
 extern ENUM_MARKET_CONDITION Market_Condition_2 = 8; // 2. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_2 = 3; // 2. Action to take
+extern ENUM_ACTION_TYPE Action_On_Condition_2 = 7; // 2. Action to take
 // Condition 10 - 50% Margin Used
-extern ENUM_ACC_CONDITION Account_Condition_3 = 10; // 3. Account condition
+extern ENUM_ACC_CONDITION Account_Condition_3 = 0; // 3. Account condition
 extern ENUM_MARKET_CONDITION Market_Condition_3 = 1; // 3. Market condition
 extern ENUM_ACTION_TYPE Action_On_Condition_3 = 0; // 3. Action to take
 // Condition 17 - Max. daily balance < max. weekly
 extern ENUM_ACC_CONDITION Account_Condition_4 = 17; // 4. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_4 = 9; // 4. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_4 = 8; // 4. Action to take
+extern ENUM_MARKET_CONDITION Market_Condition_4 = 16; // 4. Market condition
+extern ENUM_ACTION_TYPE Action_On_Condition_4 = 7; // 4. Action to take
 //
 extern ENUM_ACC_CONDITION Account_Condition_5 = 0; // 5. Account condition
 extern ENUM_MARKET_CONDITION Market_Condition_5 = 0; // 5. Market condition
