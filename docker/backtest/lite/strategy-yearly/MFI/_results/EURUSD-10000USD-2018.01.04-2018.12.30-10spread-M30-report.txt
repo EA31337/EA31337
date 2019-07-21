@@ -1,0 +1,50 @@
+Currency pair symbol:                       EURUSD
+Initial deposit:                            10000.00 USD
+Total net profit:                           -4792.97 USD
+Gross profit:                               101004.47 USD
+Gross loss:                                 105797.44 USD
+Absolute drawdown:                          7618.00 USD
+Maximal drawdown:                           7683.1 USD (76.3%)
+Relative drawdown:                          (76.3%) 7683.1 USD
+Profit factor:                              0.95
+Expected payoff:                            -0.29
+Trades total                                16312
+Short positions (won %):                    7537 (32.4%)
+Long positions (won %):                     8775 (15.1%)
+Profit trades (% of total):                 3761 (23.1%)
+Loss trades (% of total):                   12551 (76.9%)
+Largest profit trade:                       150.50
+Largest loss trade:                         -56.40
+Average profit trade:                       26.86
+Average loss trade:                         -8.43
+Average consecutive wins:                   3.00
+Average consecutive losses:                 10.00
+Maximum consecutive wins (profit in money): 20 (1168.20)
+Maximum consecutive losses (loss in money): 55 (-268.62)
+Maximal consecutive profit (count of wins): 1967.10 (18)
+Maximal consecutive loss (count of losses): 690.30 (23)
+Modelling quality:                          89.99%
+Strategy stats:
+Profit factor: 1.00, Total net profit: -7.68USD [+30764.13/-30771.81] (30764.13pips), Total orders: 4630 (Won: 24.8% [1146] / Loss: 75.2% [3484]) - MFI1
+Profit factor: 0.91, Total net profit: -2599.91USD [+27561.17/-30161.08] (27561.17pips), Total orders: 5748 (Won: 19.1% [1097] / Loss: 80.9% [4651]) - MFI5
+Profit factor: 0.95, Total net profit: -1160.52USD [+22689.98/-23850.50] (22689.98pips), Total orders: 3003 (Won: 27.3% [821] / Loss: 72.7% [2182]) - MFI15
+Profit factor: 0.97, Total net profit: -645.12USD [+20187.07/-20832.19] (20187.07pips), Total orders: 2927 (Won: 23.6% [692] / Loss: 76.4% [2235]) - MFI30
+Report log:
+2018.01.04 03:00:00: EA31337 Lite (Backtest) v1.078 by kenorb (https://github.com/EA31337)
+TERMINAL: Allow DLL: true; Allow Libraries: true; CPUs: 36; Community account: false; Community balance: 0.00; Community connection: false; Disk space: 7822800; Enabled FTP: false; Enabled e-mail: false; Enabled notifications: false; IsOptimization: false; IsRealtime: false; IsTesting: true; IsVisual: false; MQ ID: false; Memory (free): 4095; Memory (physical): 128603; Memory (total): 4095; Memory (used): 0; Path (Common): C:\users\ubuntu\Application Data\MetaQuotes\Terminal\Common; Path (Data): C:\Program Files\MetaTrader 4; Path (Expert): C:\Program Files\MetaTrader 4\MQL4\Experts; Path (Terminal): C:\Program Files\MetaTrader 4; Program name: EA31337-Lite-Backtest-v1.078; Screen DPI: 96; Terminal build: 1010; Terminal code page: 0; Terminal company: MetaQuotes Software Corp.; Terminal connected: false; Terminal language: English; Terminal name: MetaTrader 4; Termnal max bars: 65000; Trade allowed: true; Trade context busy: false; Trade perm: true; Trade ping (last): 119847
+ACCOUNT: Type: Off-line, Server/Company/Name: //, Currency: USD, Balance: 10000, Credit: 0, Equity: 10000, Orders limit: 999: Leverage: 1:100, StopOut Level: 0 (Mode: 0)
+SYMBOL: Symbol: EURUSD, Ask/Bid: 1.20186/1.20176, Price/Session Volume: 0/0, Point size: 1e-05, Pip size: 0.0001, Tick size: 1e-05 (1e-05 pts), Tick value: 1 (0/0), Digits: 5, Spread: 10 pts, Trade stops level: 8, Trade contract size: 100000, Min lot: 0.1, Max lot: 100, Lot step: 0.1, Freeze level: 0, Margin init: 0
+MARKET: Pip digits: 4, Spread: 10 pts (1 pips; 0.0083%), Pts/pip: 10, Trade distance: 8 pts (0.0000 pips), Volume digits: 1, Margin required: 1201.81/lot, Delta: 100000
+CHART: OHLC (M1): 1.20176/1.20176/1.20176/1.20176
+CHART: OHLC (M5): 1.20176/1.20176/1.20176/1.20176
+CHART: OHLC (M15): 1.20176/1.20176/1.20176/1.20176
+CHART: OHLC (M30): 1.20176/1.20176/1.20176/1.20176
+Swap specification for EURUSD: Mode: 0, Long/buy order value: 0.33, Short/sell order value: -1.04
+Calculated variables: Pip size: 0.0001, EA lot size: 0.1, Points per pip: 10, Pip digits: 4, Volume digits: 1, Spread in pips: 1.0 (10 pts), Stop Out Level: 0.3, Market gap: 8 pts (0 pips)
+EA params: Risk ratio: 1, Risk margin per order: 1%, Risk margin in total: 10%
+Strategies: Active strategies: 4 of 120, Max orders: 46 (per type: 22)
+
+Timeframes: M1; M2; M3; M4; M5; M6; M10; M12; M15; M20; M30; H1; H2; H3; H4; H6; H8; H12; D1; W1; MN1; 
+Datetime: Hour of day: 3, Day of week: 4, Day of month: 4, Day of year: 4, Month: 1, Year: 2018
+ACCOUNT: Time: 2018.01.04 03:00:00; Balance: $10000.00; Equity: $10000.00; Credit: $0.00; Margin Used/Free: $0.00/$10000.00; Risk: 1.0;
+
