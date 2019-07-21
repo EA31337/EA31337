@@ -1692,7 +1692,7 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_ADX);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ADX, _chart.GetTf());
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_ADX, _chart.GetTf());
+  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_ADX, _chart.GetTf(), 20);
   switch (cmd) {
     // Buy: +DI line is above -DI line, ADX is more than a certain value and grows (i.e. trend strengthens).
     case ORDER_TYPE_BUY:
@@ -2204,7 +2204,7 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_CCI);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_CCI, _chart.GetTf());
-  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_CCI, _chart.GetTf());
+  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_CCI, _chart.GetTf(), 100);
   switch (cmd) {
     case ORDER_TYPE_BUY:
       result = cci[period][CURR] > 0 && cci[period][CURR] < -signal_level1;
@@ -2268,7 +2268,7 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_DEMARKER);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_DEMARKER, _chart.GetTf());
-  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_DEMARKER, _chart.GetTf());
+  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_DEMARKER, _chart.GetTf(), 0.5);
   switch (cmd) {
     case ORDER_TYPE_BUY:
       result = demarker[period][CURR] < 0.5 - signal_level1;
@@ -2987,7 +2987,7 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_RSI);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_RSI, _chart.GetTf());
-  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_RSI, _chart.GetTf());
+  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_RSI, _chart.GetTf(), 30);
   bool is_valid = fmin(fmin(rsi[period][CURR], rsi[period][PREV]), rsi[period][FAR]) > 0;
   switch (cmd) {
     case ORDER_TYPE_BUY:
@@ -3352,7 +3352,7 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
   bool result = false; uint period = _chart.TfToIndex();
   UpdateIndicator(_chart, INDI_WPR);
   if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_WPR, _chart.GetTf());
-  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_WPR, _chart.GetTf());
+  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_WPR, _chart.GetTf(), 20);
 
   switch (cmd) {
     case ORDER_TYPE_BUY:
@@ -6711,9 +6711,9 @@ double GetStrategyProfitFactor(int sid) {
 /**
  * Fetch strategy signal level based on the indicator and timeframe.
  */
-double GetStrategySignalLevel(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _tf) {
+double GetStrategySignalLevel(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _tf, double _default = 0.0) {
   DEBUG_CHECKPOINT_ADD
-  double _result = 0.0;
+  double _result = _default;
   bool _found = false;
   Strategy *_strat;
   for (uint sid = 0; sid < strats.GetSize(); sid++) {
@@ -6725,7 +6725,7 @@ double GetStrategySignalLevel(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _t
     }
   }
 
-  if (!_found) {
+  if (VerboseDebug && !_found) {
     Msg::ShowText(
       StringFormat("Cannot find signal level via indicator %d (%s) for timeframe: %d", _indicator, EnumToString(_indicator), _tf),
       "Error", __FUNCTION__, __LINE__, VerboseErrors | VerboseDebug
@@ -6740,9 +6740,9 @@ double GetStrategySignalLevel(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _t
 /**
  * Fetch strategy signal level based on the indicator and timeframe.
  */
-ulong GetStrategySignalMethod(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _tf) {
+ulong GetStrategySignalMethod(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _tf, ulong _default = 0) {
   DEBUG_CHECKPOINT_ADD
-  ulong _result = 0;
+  ulong _result = _default;
   bool _found = false;
   Strategy *_strat;
   for (uint sid = 0; sid < strats.GetSize(); sid++) {
@@ -6754,7 +6754,7 @@ ulong GetStrategySignalMethod(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _t
     }
   }
 
-  if (!_found) {
+  if (VerboseDebug && !_found) {
     Msg::ShowText(
       StringFormat("Cannot find signal method via indicator %d (%s) for timeframe: %d", _indicator, EnumToString(_indicator), _tf),
       "Error", __FUNCTION__, __LINE__, VerboseErrors | VerboseDebug
