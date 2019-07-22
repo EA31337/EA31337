@@ -853,7 +853,7 @@ double OSMA30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --"; // >>> RSI <<<
-extern uint RSI_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern uint RSI_Active_Tf = 3; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern int RSI_Period_M1 = 38; // Period for M1
 extern int RSI_Period_M5 = 10; // Period for M5
 extern int RSI_Period_M15 = 4; // Period for M15
@@ -923,10 +923,10 @@ extern int SAR_Shift = 0; // Shift
 extern ENUM_TRAIL_TYPE SAR_TrailingStopMethod = 7; // Trail stop method
 extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = 11; // Trail profit method
 extern double SAR_SignalLevel = 0; // Signal level
-extern int SAR1_SignalMethod = 126; // Signal method for M1 (-127-127)
-extern int SAR5_SignalMethod = 17; // Signal method for M5 (-127-127)
-extern int SAR15_SignalMethod = -112; // Signal method for M15 (-127-127)
-extern int SAR30_SignalMethod = -104; // Signal method for M30 (-127-127)
+extern int SAR1_SignalMethod = 91; // Signal method for M1 (-127-127)
+extern int SAR5_SignalMethod = 25; // Signal method for M5 (-127-127)
+extern int SAR15_SignalMethod = 28; // Signal method for M15 (-127-127)
+extern int SAR30_SignalMethod = 2; // Signal method for M30 (-127-127)
 int SAR1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int SAR1_OpenCondition2 = 0;   // Open condition 2 for M1 (0-1023)
 ENUM_MARKET_EVENT SAR1_CloseCondition = C_SAR_BUY_SELL; // Close condition for M1
