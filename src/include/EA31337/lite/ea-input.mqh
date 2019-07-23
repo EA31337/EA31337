@@ -80,7 +80,7 @@ extern uint ConFactorOrdersLimit = 600; // No of orders to check on consequent w
 extern string __SmartQueue_Parameters__ = "-- Smart queue parameters --"; // >>> SMART QUEUE <<<
 extern bool SmartQueueActive = 1; // Activate QueueAI
 extern int SmartQueueMethod = 11; // QueueAI: Method for selecting the best order (0-15)
-extern int SmartQueueFilter = 91; // QueueAI: Method for filtering the orders (0-255)
+extern int SmartQueueFilter = 72; // QueueAI: Method for filtering the orders (0-255)
 
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions__ = "-- Account conditions --"; // >>> CONDITIONS & ACTIONS <<<
@@ -204,7 +204,7 @@ double ADX30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __Alligator_Parameters__ = "-- Settings for the Alligator indicator --"; // >>> ALLIGATOR <<<
-extern uint Alligator_Active_Tf = 13; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern uint Alligator_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern int Alligator_Period_Jaw = 16; // Jaw Period
 extern int Alligator_Period_Teeth = 8; // Teeth Period
 extern int Alligator_Period_Lips = 6; // Lips Period
@@ -494,7 +494,7 @@ double DeMarker30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --"; // >>> ENVELOPES <<<
-extern uint Envelopes_Active_Tf = 5; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern uint Envelopes_Active_Tf = 9; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern int Envelopes_MA_Period_M1 = 14; // Period for M1
 extern int Envelopes_MA_Period_M5 = 14; // Period for M5
 extern int Envelopes_MA_Period_M15 = 14; // Period for M15
@@ -697,7 +697,7 @@ double MA30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --"; // >>> MACD <<<
-extern uint MACD_Active_Tf = 13; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern uint MACD_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern int MACD_Period_Fast = 23; // Period Fast
 extern int MACD_Period_Slow = 21; // Period Slow
 extern int MACD_Period_Signal = 10; // Period for signal
@@ -1011,7 +1011,7 @@ double Stochastic30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --"; // >>> WPR <<<
-extern uint WPR_Active_Tf = 10; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern uint WPR_Active_Tf = 15; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern int WPR_Period_M1 = 3; // Period for M1
 extern int WPR_Period_M5 = 2; // Period for M5
 extern int WPR_Period_M15 = 2; // Period for M15

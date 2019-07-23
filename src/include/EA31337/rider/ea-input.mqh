@@ -86,7 +86,7 @@ extern uint ConFactorOrdersLimit = 600; // No of orders to check on consequent w
 extern string __SmartQueue_Parameters__ = "-- Smart queue parameters --"; // >>> SMART QUEUE <<<
 extern bool SmartQueueActive = 1; // Activate QueueAI
 extern int SmartQueueMethod = 11; // QueueAI: Method for selecting the best order (0-15)
-extern int SmartQueueFilter = 91; // QueueAI: Method for filtering the orders (0-255)
+extern int SmartQueueFilter = 72; // QueueAI: Method for filtering the orders (0-255)
 
 //+------------------------------------------------------------------+
 // extern string __Advanced_Parameters__ = "-- Advanced parameters --"; // >>> ADVANCED <<<
