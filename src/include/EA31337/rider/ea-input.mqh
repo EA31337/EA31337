@@ -41,8 +41,8 @@ extern uint     StopLossMax = 40; // Max Stop loss (in pips, 0 = auto)
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
-extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 0; // Default trail stop method (0 = none)
-extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 0; // Default trail profit method (0 = none)
+extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 3; // Default trail stop method (0 = none)
+extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 24; // Default trail profit method (0 = none)
 extern int TrailingStop = 50; // Extra trailing stop (in pips)
 extern int TrailingProfit = 0; // Extra trailing profit (in pips)
 extern double TrailingStopAddPerMinute = 0.3; // Decrease trail stop per minute (pip/min)
@@ -63,7 +63,7 @@ extern double MaxSpreadToTrade = 10.0; // Max spread to trade (in pips), 0 - dis
 //+------------------------------------------------------------------+
 extern string __Strategy_Parameters__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGIES <<<
 extern double ProfitFactorMinToTrade = 0.9; // Min. profit factor per strategy to trade
-extern double ProfitFactorMaxToTrade = 0; // Max. profit factor per strategy to trade
+extern double ProfitFactorMaxToTrade = 0.0; // Max. profit factor per strategy to trade
 extern int InitNoOfOrdersToCalcPF = 20; // Initial number of orders to calculate profit factor
 
 //+------------------------------------------------------------------+
@@ -93,7 +93,7 @@ extern string __EA_Account_Conditions__ = "-- Account conditions --"; // >>> CON
 extern bool Account_Conditions_Active = 0; // Enable account conditions (don't enable for multibot trading)
 // Condition 5 - Equity 20% high
 extern ENUM_ACC_CONDITION Account_Condition_1 = 5; // 1. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_1 = 5; // 1. Market condition
+extern ENUM_MARKET_CONDITION Market_Condition_1 = 1; // 1. Market condition
 extern ENUM_ACTION_TYPE Action_On_Condition_1 = 10; // 1. Action to take
 // Condition 6 - Equity 10% high
 extern ENUM_ACC_CONDITION Account_Condition_2 = 0; // 2. Account condition
