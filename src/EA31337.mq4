@@ -4158,9 +4158,14 @@ double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_
  */
 int GetTrailingMethod(int order_type, ENUM_ORDER_PROPERTY_DOUBLE mode) {
   DEBUG_CHECKPOINT_ADD
+  #ifdef __rider__
   int stop_method = DefaultTrailingStopMethod, profit_method = DefaultTrailingProfitMethod;
+  #else
   Strategy *_strat = strats.GetById(order_type);
-  return mode == ORDER_TP ? _strat.GetTpMethod() : _strat.GetSlMethod();
+  int stop_method = _strat.GetSlMethod(), profit_method = _strat.GetTpMethod();
+  #endif
+  DEBUG_CHECKPOINT_POP
+  return mode == ORDER_TP ? profit_method : stop_method;
 }
 
 /**
