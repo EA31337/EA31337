@@ -387,6 +387,7 @@ enum ENUM_REASON_TYPE {
   R_ACC_PDAY_IN_LOSS    = C_ACC_PDAY_IN_LOSS, // Previous day in loss.
   R_ACC_MAX_ORDERS      = C_ACC_MAX_ORDERS, // Maximum orders reached.
   R_OPPOSITE_SIGNAL, // Opposite signal.
+  R_CLOSE_SIGNAL,    // Close method signal.
   R_ORDER_EXPIRED,   // Order is expired.
 };
 

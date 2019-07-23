@@ -667,13 +667,17 @@ bool EA_Trade(Trade *_trade) {
       }
 
       if (!DisableCloseConditions) {
-        if (CheckMarketEvent(_trade.Chart(), ORDER_TYPE_BUY,  strat.GetSignalCloseMethod1())) CloseOrdersByType(ORDER_TYPE_SELL, strat.GetId(), R_OPPOSITE_SIGNAL, CloseConditionOnlyProfitable);
-        if (CheckMarketEvent(_trade.Chart(), ORDER_TYPE_SELL, strat.GetSignalCloseMethod1())) CloseOrdersByType(ORDER_TYPE_BUY,  strat.GetId(), R_OPPOSITE_SIGNAL, CloseConditionOnlyProfitable);
+        if (CheckMarketEvent(strat.Chart(), ORDER_TYPE_BUY,  strat.GetSignalCloseMethod1())) {
+          CloseOrdersByType(ORDER_TYPE_SELL, strat.GetId(), strat.GetSignalCloseMethod1(), CloseConditionOnlyProfitable);
+        }
+        if (CheckMarketEvent(strat.Chart(), ORDER_TYPE_SELL, strat.GetSignalCloseMethod1())) {
+          CloseOrdersByType(ORDER_TYPE_BUY,  strat.GetId(), strat.GetSignalCloseMethod1(), CloseConditionOnlyProfitable);
+        }
       }
 
       if (strat.GetSignalOpenMethod1() != 0) {
-        if (_cmd == ORDER_TYPE_BUY  && !CheckMarketCondition1(_trade.Chart(), ORDER_TYPE_BUY,  strat.GetSignalOpenMethod1())) _cmd = EMPTY;
-        if (_cmd == ORDER_TYPE_SELL && !CheckMarketCondition1(_trade.Chart(), ORDER_TYPE_SELL, strat.GetSignalOpenMethod1())) _cmd = EMPTY;
+        if (_cmd == ORDER_TYPE_BUY  && !CheckMarketCondition1(strat.Chart(), ORDER_TYPE_BUY,  strat.GetSignalOpenMethod1())) _cmd = EMPTY;
+        if (_cmd == ORDER_TYPE_SELL && !CheckMarketCondition1(strat.Chart(), ORDER_TYPE_SELL, strat.GetSignalOpenMethod1())) _cmd = EMPTY;
       }
 
       if (Object::IsDynamic(trade[Chart::TfToIndex(TrendPeriod)]) && strat.GetSignalOpenMethod2() != 0) {
@@ -684,7 +688,7 @@ bool EA_Trade(Trade *_trade) {
       if (_cmd != EMPTY) {
         order_placed &= ExecuteOrder(_cmd, strat);
         if (VerboseDebug) {
-          _trade.Logger().Info(StringFormat("%s:%d: %s %s on %s at %s: %s",
+          strat.Logger().Info(StringFormat("%s:%d: %s %s on %s at %s: %s",
             __FUNCTION__, __LINE__, strat.GetName(),
             Chart::TfToString((ENUM_TIMEFRAMES) strat.GetTf()),
             Order::OrderTypeToString(_cmd),
@@ -1428,30 +1432,33 @@ bool CheckSpreadLimit(Strategy *_strat) {
 /**
  * Close order.
  */
-bool CloseOrder(ulong ticket_no = EMPTY, int reason_id = EMPTY, bool retry = true) {
+bool CloseOrder(ulong ticket_no = NULL, int reason_id = EMPTY, ENUM_MARKET_EVENT _market_event = C_EVENT_NONE, bool retry = true) {
   DEBUG_CHECKPOINT_ADD
   bool result = false;
-  if (ticket_no == EMPTY) {
+  if (ticket_no == NULL) {
     ticket_no = Order::OrderTicket();
   }
   if (!Order::OrderSelect(ticket_no, SELECT_BY_TICKET, MODE_TRADES)) {
+    DEBUG_CHECKPOINT_POP
+    Msg::ShowText(StringFormat("Error: Ticket No: %d; Message: %s", ticket_no, terminal.GetLastErrorText()),
+        "Debug", __FUNCTION__, __LINE__, VerboseDebug);
     return (false);
   }
   #ifdef __profiler__ PROFILER_START #endif
   double close_price = NormalizeDouble(market.GetCloseOffer(), market.GetDigits());
-  result = Order::OrderClose(ticket_no, OrderLots(), close_price, max_order_slippage, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell)); // @fixme: warning 43: possible loss of data due to type conversion
+  result = Order::OrderClose(ticket_no, OrderLots(), close_price, max_order_slippage, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell));
   // if (VerboseTrace) Print(__FUNCTION__ + ": CloseOrder request. Reason: " + reason + "; Result=" + result + " @ " + TimeCurrent() + "(" + TimeToStr(TimeCurrent()) + "), ticket# " + ticket_no);
   if (result) {
     total_orders--;
     last_close_profit = Order::GetOrderProfit();
     if (SoundAlert) PlaySound(SoundFileAtClose);
     // TaskAddCalcStats(ticket_no); // Already done on CheckHistory().
-    last_msg = StringFormat("Closed order %d with profit %g pips (%s)", ticket_no, Order::GetOrderProfitInPips(), ReasonIdToText(reason_id));
+    last_msg = StringFormat("Closed order %d with profit %g pips (%s)", ticket_no, Order::GetOrderProfitInPips(), ReasonIdToText(reason_id, _market_event));
     Message(last_msg);
     Msg::ShowText(last_msg, "Info", __FUNCTION__, __LINE__, VerboseInfo);
     last_debug = Msg::ShowText(Order::OrderTypeToString((ENUM_ORDER_TYPE) Order::OrderType()), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
     #ifdef __advanced__
-      if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(Order::GetOrderProfitInPips(), 0) + " pips, reason: " + ReasonIdToText(reason_id) + "; " + Order::OrderTypeToString((ENUM_ORDER_TYPE) Order::OrderType()));
+      if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(Order::GetOrderProfitInPips(), 0) + " pips, reason: " + ReasonIdToText(reason_id, _market_event) + "; " + Order::OrderTypeToString((ENUM_ORDER_TYPE) Order::OrderType()));
     #else
       if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(Order::GetOrderProfitInPips(), 0) + " pips; " + Order::OrderTypeToString((ENUM_ORDER_TYPE) Order::OrderType()));
     #endif
@@ -1466,6 +1473,7 @@ bool CloseOrder(ulong ticket_no = EMPTY, int reason_id = EMPTY, bool retry = tru
     int id = GetIdByMagic();
     if (id < 0) info[id][TOTAL_ERRORS]++;
   } // end-if: !result
+  DEBUG_CHECKPOINT_POP
   #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
@@ -1517,7 +1525,7 @@ double OrderCalc(ulong ticket_no = 0) {
  *   cmd (int) - trade operation command to close (ORDER_TYPE_SELL/ORDER_TYPE_BUY)
  *   strategy_type (int) - strategy type, see ENUM_STRATEGY_TYPE
  */
-int CloseOrdersByType(ENUM_ORDER_TYPE cmd, long strategy_id, int reason_id, bool only_profitable = false) {
+int CloseOrdersByType(ENUM_ORDER_TYPE cmd, ulong strategy_id, ENUM_MARKET_EVENT _close_signal, bool only_profitable = false) {
    int orders_total = 0;
    int order_failed = 0;
    double profit_total = 0.0;
@@ -1525,19 +1533,21 @@ int CloseOrdersByType(ENUM_ORDER_TYPE cmd, long strategy_id, int reason_id, bool
    int order;
    for (order = 0; order < OrdersTotal(); order++) {
       if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
-        if (strategy_id == GetIdByMagic() && Order::OrderSymbol() == Symbol() && OrderType() == cmd) {
+        if ((int) strategy_id == GetIdByMagic() && Order::OrderSymbol() == Symbol() && (ENUM_ORDER_TYPE) OrderType() == cmd) {
           if (only_profitable && Order::GetOrderProfit() < 0) continue;
-          if (CloseOrder(NULL, reason_id)) {
+          if (CloseOrder(NULL, R_CLOSE_SIGNAL, _close_signal)) {
              orders_total++;
              profit_total += Order::GetOrderProfit();
           } else {
             order_failed++;
+            Msg::ShowText(StringFormat("Error: Order Pos: %d; Message: %s", order, terminal.GetLastErrorText()),
+                "Debug", __FUNCTION__, __LINE__, VerboseDebug);
           }
         }
       } else {
         if (VerboseDebug)
           Print(__FUNCTION__ + "(" + Order::OrderTypeToString(cmd) + ", " + IntegerToString(strategy_id) + "): Error: Order: " + IntegerToString(order) + "; Message: ", terminal.GetErrorText(err_code));
-        // TaskAddCloseOrder(OrderTicket(), reason_id); // Add task to re-try.
+        // TaskAddCloseOrder(OrderTicket(), R_CLOSE_SIGNAL, _close_signal); // Add task to re-try.
       }
    }
    if (orders_total > 0 && VerboseInfo) {
@@ -3514,7 +3524,7 @@ bool CheckMarketEvent(Chart *_chart, ENUM_ORDER_TYPE cmd = EMPTY, ENUM_MARKET_EV
 #ifdef __advanced__
   ulong condition2 = 0;
 #endif
-  uint period = _chart.TfToIndex();
+  uint tfi = _chart.TfToIndex();
   ENUM_TIMEFRAMES tf = _chart.GetTf();
   if (cmd == EMPTY || condition == C_EVENT_NONE) return (false);
   if (VerboseTrace) terminal.Logger().Trace(StringFormat("%s(%s, %d)", EnumToString(cmd), _chart.TfToString(), condition), __FUNCTION_LINE__);
@@ -3606,18 +3616,18 @@ bool CheckMarketEvent(Chart *_chart, ENUM_ORDER_TYPE cmd = EMPTY, ENUM_MARKET_EV
     case C_MA_FAST_SLOW_OPP: // MA Fast&Slow are in opposite directions.
       UpdateIndicator(_chart, INDI_MA);
       return
-        (cmd == ORDER_TYPE_BUY && ma_fast[period][CURR] < ma_fast[period][PREV] && ma_slow[period][CURR] > ma_slow[period][PREV]) ||
-        (cmd == ORDER_TYPE_SELL && ma_fast[period][CURR] > ma_fast[period][PREV] && ma_slow[period][CURR] < ma_slow[period][PREV]);
+        (cmd == ORDER_TYPE_BUY && ma_fast[tfi][CURR] < ma_fast[tfi][PREV] && ma_slow[tfi][CURR] > ma_slow[tfi][PREV]) ||
+        (cmd == ORDER_TYPE_SELL && ma_fast[tfi][CURR] > ma_fast[tfi][PREV] && ma_slow[tfi][CURR] < ma_slow[tfi][PREV]);
     case C_MA_FAST_MED_OPP: // MA Fast&Med are in opposite directions.
       UpdateIndicator(_chart, INDI_MA);
       return
-        (cmd == ORDER_TYPE_BUY && ma_fast[period][CURR] < ma_fast[period][PREV] && ma_medium[period][CURR] > ma_medium[period][PREV]) ||
-        (cmd == ORDER_TYPE_SELL && ma_fast[period][CURR] > ma_fast[period][PREV] && ma_medium[period][CURR] < ma_medium[period][PREV]);
+        (cmd == ORDER_TYPE_BUY && ma_fast[tfi][CURR] < ma_fast[tfi][PREV] && ma_medium[tfi][CURR] > ma_medium[tfi][PREV]) ||
+        (cmd == ORDER_TYPE_SELL && ma_fast[tfi][CURR] > ma_fast[tfi][PREV] && ma_medium[tfi][CURR] < ma_medium[tfi][PREV]);
     case C_MA_MED_SLOW_OPP: // MA Med&Slow are in opposite directions.
       UpdateIndicator(_chart, INDI_MA);
       return
-        (cmd == ORDER_TYPE_BUY && ma_medium[period][CURR] < ma_medium[period][PREV] && ma_slow[period][CURR] > ma_slow[period][PREV]) ||
-        (cmd == ORDER_TYPE_SELL && ma_medium[period][CURR] > ma_medium[period][PREV] && ma_slow[period][CURR] < ma_slow[period][PREV]);
+        (cmd == ORDER_TYPE_BUY && ma_medium[tfi][CURR] < ma_medium[tfi][PREV] && ma_slow[tfi][CURR] > ma_slow[tfi][PREV]) ||
+        (cmd == ORDER_TYPE_SELL && ma_medium[tfi][CURR] > ma_medium[tfi][PREV] && ma_slow[tfi][CURR] < ma_slow[tfi][PREV]);
 #ifdef __advanced__
     case C_CUSTOM1_BUY_SELL:
     case C_CUSTOM2_BUY_SELL:
@@ -3704,17 +3714,17 @@ void CheckOrders() {
       elapsed_mins = ((double) (TimeCurrent() - Order::OrderOpenTime()) / 60);
       if (CloseOrderAfterXHours > 0) {
         if (elapsed_mins / 60 > CloseOrderAfterXHours) {
-          TaskAddCloseOrder(OrderTicket(), R_ORDER_EXPIRED);
+          TaskAddCloseOrder(Order::OrderTicket(), R_ORDER_EXPIRED);
         }
       }
       else if (CloseOrderAfterXHours < 0 && elapsed_mins / 60 > -CloseOrderAfterXHours) {
         if (Order::GetOrderProfit() > 0) {
-          TaskAddCloseOrder(OrderTicket(), R_ORDER_EXPIRED);
+          TaskAddCloseOrder(Order::OrderTicket(), R_ORDER_EXPIRED);
         }
       }
       /*
       else if (elapsed_mins > CloseOrderAfterXHours * PeriodSeconds(CURRENT_PERIOD)) {
-        TaskAddCloseOrder(OrderTicket(), R_ORDER_EXPIRED);
+        TaskAddCloseOrder(Order::OrderTicket(), R_ORDER_EXPIRED);
       }
       */
     }
@@ -4104,7 +4114,7 @@ double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_
     #endif
     Msg::ShowText(
         StringFormat("#%d (%s;d:%d), method: %d, invalid value: %g, previous: %g, ask/bid/Gap: %f/%f/%f (%d pts); %s",
-          existing ? OrderTicket() : 0, EnumToString(mode), direction,
+          existing ? Order::OrderTicket() : 0, EnumToString(mode), direction,
           method, new_value, previous, ask, bid, Convert::PointsToValue(market.GetTradeDistanceInPts()), market.GetTradeDistanceInPts(), Order::OrderTypeToString(Order::OrderType())),
         "Debug", __FUNCTION__, __LINE__, VerboseDebug);
     // If value is invalid, fallback to the previous one.
@@ -7198,14 +7208,14 @@ string GetRiskRatioText() {
  */
 bool ActionCloseMostProfitableOrder(int reason_id = EMPTY, int min_profit = EMPTY){
   bool result = false;
-  int selected_ticket = 0;
+  ulong selected_ticket = 0;
   double max_ticket_profit = 0, curr_ticket_profit = 0;
   for (int order = 0; order < OrdersTotal(); order++) {
     if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES))
      if (Order::OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
       curr_ticket_profit = Order::GetOrderProfit();
        if (curr_ticket_profit > max_ticket_profit) {
-         selected_ticket = OrderTicket();
+         selected_ticket = Order::OrderTicket();
          max_ticket_profit = curr_ticket_profit;
        }
      }
@@ -7225,13 +7235,13 @@ bool ActionCloseMostProfitableOrder(int reason_id = EMPTY, int min_profit = EMPT
  * Execute action to close most unprofitable order.
  */
 bool ActionCloseMostUnprofitableOrder(int reason_id = EMPTY){
-  int selected_ticket = 0;
+  ulong selected_ticket = 0;
   double ticket_profit = 0;
   for (int order = 0; order < OrdersTotal(); order++) {
     if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES))
      if (Order::OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
        if (Order::GetOrderProfit() < ticket_profit) {
-         selected_ticket = OrderTicket();
+         selected_ticket = Order::OrderTicket();
          ticket_profit = Order::GetOrderProfit();
        }
      }
@@ -7257,7 +7267,7 @@ bool ActionCloseAllProfitableOrders(int reason_id = EMPTY){
     if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
        ticket_profit = Order::GetOrderProfit();
        if (ticket_profit > 0) {
-         result = TaskAddCloseOrder(OrderTicket(), reason_id);
+         result = TaskAddCloseOrder(Order::OrderTicket(), reason_id);
          selected_orders++;
          total_profit += ticket_profit;
      }
@@ -7282,7 +7292,7 @@ bool ActionCloseAllUnprofitableOrders(int reason_id = EMPTY){
     if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
        ticket_profit = Order::GetOrderProfit();
        if (ticket_profit < 0) {
-         result = TaskAddCloseOrder(OrderTicket(), reason_id);
+         result = TaskAddCloseOrder(Order::OrderTicket(), reason_id);
          selected_orders++;
          total_profit += ticket_profit;
      }
@@ -7307,7 +7317,7 @@ bool ActionCloseAllOrdersByType(ENUM_ORDER_TYPE cmd = EMPTY, int reason_id = EMP
   for (int order = 0; order < OrdersTotal(); order++) {
     if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
        if (Order::OrderType() == cmd) {
-         TaskAddCloseOrder(OrderTicket(), reason_id);
+         TaskAddCloseOrder(Order::OrderTicket(), reason_id);
          selected_orders++;
          total_profit += ticket_profit;
      }
@@ -7506,7 +7516,7 @@ string ActionIdToText(int aid) {
 /**
  * Convert reason id into text representation.
  */
-string ReasonIdToText(int rid) {
+string ReasonIdToText(int rid, ENUM_MARKET_EVENT _market_event = C_EVENT_NONE) {
   string output = "Unknown";
   switch (rid) {
     case EMPTY: output = "Empty"; break;
@@ -7540,6 +7550,7 @@ string ReasonIdToText(int rid) {
     case R_ACC_MAX_ORDERS: output = "Maximum orders opened"; break;
     case R_ORDER_EXPIRED: output = "Order expired (CloseOrderAfterXHours)"; break;
     case R_OPPOSITE_SIGNAL: output = "Opposite signal"; break;
+    case R_CLOSE_SIGNAL: output = StringFormat("Close method signal (%s)", EnumToString(_market_event)); break;
   }
   return output;
 }
