@@ -21,7 +21,7 @@ extern string __Trade_Parameters__ = "-- Trade parameters --"; // >>> TRADE <<<
 extern uint   MaxOrders = 0; // Max orders (0 = auto)
 extern uint   MaxOrdersPerType = 0; // Max orders per type (0 = auto)
 extern uint   MaxOrdersPerDay = 0; // Max orders per day (0 = unlimited)
-extern double LotSize = 0; // Lot size (0 = auto)
+extern double LotSize = 0.01; // Lot size (0 = auto)
 extern int    LotSizeIncreaseMethod = 202; // Lot size increase method (0-255)
 extern int    LotSizeDecreaseMethod = 167; // Lot size decrease method (0-255)
 extern bool   TradeMicroLots = 1; // Trade micro lots?
@@ -41,8 +41,8 @@ extern uint     StopLossMax = 40; // Max Stop loss (in pips, 0 = auto)
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
-extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 3; // Default trail stop method (0 = none)
-extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 24; // Default trail profit method (0 = none)
+extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 0; // Default trail stop method (0 = none)
+extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 0; // Default trail profit method (0 = none)
 extern int TrailingStop = 50; // Extra trailing stop (in pips)
 extern int TrailingProfit = 0; // Extra trailing profit (in pips)
 extern double TrailingStopAddPerMinute = 0.3; // Decrease trail stop per minute (pip/min)
@@ -55,14 +55,14 @@ extern double RiskRatio = 0; // Risk ratio (0 = auto, 1.0 = normal)
 extern int RiskRatioIncreaseMethod = 0; // Risk ratio increase method (0-255)
 extern int RiskRatioDecreaseMethod = 0; // Risk ratio decrease method (0-255)
 extern int InitNoOfDaysToWarmUp = 14; // Initial warm-up period (in days)
-extern double CloseOrderAfterXHours = 96; // Close order after X hours (>0 - all, <0 - only profitable 0 - off)
+extern double CloseOrderAfterXHours = 0; // Close order after X hours (>0 - all, <0 - only profitable 0 - off)
 
 extern bool ApplySpreadLimits = true; // Apply strategy spread limits
 extern double MaxSpreadToTrade = 10.0; // Max spread to trade (in pips), 0 - disable limit
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Parameters__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGIES <<<
-extern double ProfitFactorMinToTrade = 0.9; // Min. profit factor per strategy to trade
+extern double ProfitFactorMinToTrade = 0.0; // Min. profit factor per strategy to trade
 extern double ProfitFactorMaxToTrade = 0.0; // Max. profit factor per strategy to trade
 extern int InitNoOfOrdersToCalcPF = 20; // Initial number of orders to calculate profit factor
 
@@ -91,22 +91,22 @@ extern int SmartQueueFilter = 72; // QueueAI: Method for filtering the orders (0
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions__ = "-- Account conditions --"; // >>> CONDITIONS & ACTIONS <<<
 extern bool Account_Conditions_Active = 0; // Enable account conditions (don't enable for multibot trading)
-// Condition 5 - Equity 20% high
-extern ENUM_ACC_CONDITION Account_Condition_1 = 5; // 1. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_1 = 1; // 1. Market condition
+// Condition 5 - Equity 1% high
+extern ENUM_ACC_CONDITION Account_Condition_1 = 2; // 1. Account condition
+extern ENUM_MARKET_CONDITION Market_Condition_1 = 13; // 1. Market condition
 extern ENUM_ACTION_TYPE Action_On_Condition_1 = 10; // 1. Action to take
-// Condition 6 - Equity 10% high
+//
 extern ENUM_ACC_CONDITION Account_Condition_2 = 0; // 2. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_2 = 8; // 2. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_2 = 7; // 2. Action to take
-// Condition 10 - 50% Margin Used
+extern ENUM_MARKET_CONDITION Market_Condition_2 = 0; // 2. Market condition
+extern ENUM_ACTION_TYPE Action_On_Condition_2 = 0; // 2. Action to take
+//
 extern ENUM_ACC_CONDITION Account_Condition_3 = 0; // 3. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_3 = 1; // 3. Market condition
+extern ENUM_MARKET_CONDITION Market_Condition_3 = 0; // 3. Market condition
 extern ENUM_ACTION_TYPE Action_On_Condition_3 = 0; // 3. Action to take
-// Condition 17 - Max. daily balance < max. weekly
-extern ENUM_ACC_CONDITION Account_Condition_4 = 17; // 4. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_4 = 16; // 4. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_4 = 7; // 4. Action to take
+//
+extern ENUM_ACC_CONDITION Account_Condition_4 = 0; // 4. Account condition
+extern ENUM_MARKET_CONDITION Market_Condition_4 = 0; // 4. Market condition
+extern ENUM_ACTION_TYPE Action_On_Condition_4 = 0; // 4. Action to take
 //
 extern ENUM_ACC_CONDITION Account_Condition_5 = 0; // 5. Account condition
 extern ENUM_MARKET_CONDITION Market_Condition_5 = 0; // 5. Market condition
