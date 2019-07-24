@@ -45,7 +45,7 @@ extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 0; // Default trail stop meth
 extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 0; // Default trail profit method (0 = none)
 extern int TrailingStop = 50; // Extra trailing stop (in pips)
 extern int TrailingProfit = 0; // Extra trailing profit (in pips)
-extern double TrailingStopAddPerMinute = 0.3; // Decrease trail stop per minute (pip/min)
+extern double TrailingStopAddPerMinute = 0.1; // Decrease trail stop per minute (pip/min)
 
 //+------------------------------------------------------------------+
 extern string __EA_Risk_Parameters__ = "-- Risk management parameters --"; // >>> RISK <<
@@ -93,8 +93,8 @@ extern string __EA_Account_Conditions__ = "-- Account conditions --"; // >>> CON
 extern bool Account_Conditions_Active = 0; // Enable account conditions (don't enable for multibot trading)
 // Condition 5 - Equity 1% high
 extern ENUM_ACC_CONDITION Account_Condition_1 = 2; // 1. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_1 = 13; // 1. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_1 = 10; // 1. Action to take
+extern ENUM_MARKET_CONDITION Market_Condition_1 = 14; // 1. Market condition
+extern ENUM_ACTION_TYPE Action_On_Condition_1 = 1; // 1. Action to take
 //
 extern ENUM_ACC_CONDITION Account_Condition_2 = 0; // 2. Account condition
 extern ENUM_MARKET_CONDITION Market_Condition_2 = 0; // 2. Market condition
