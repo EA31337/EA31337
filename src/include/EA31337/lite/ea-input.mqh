@@ -85,7 +85,7 @@ extern int SmartQueueFilter = 72; // QueueAI: Method for filtering the orders (0
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions__ = "-- Account conditions --"; // >>> CONDITIONS & ACTIONS <<<
 extern bool Account_Conditions_Active = 0; // Enable account conditions (don't enable for multibot trading)
-// Condition 5 - Equity 20% high
+// Condition 5 - Equity 1% high
 extern ENUM_ACC_CONDITION Account_Condition_1 = 5; // 1. Account condition
 extern ENUM_MARKET_CONDITION Market_Condition_1 = 5; // 1. Market condition
 extern ENUM_ACTION_TYPE Action_On_Condition_1 = 10; // 1. Action to take

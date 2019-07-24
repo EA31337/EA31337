@@ -1,72 +1,58 @@
 Currency pair symbol:                       EURUSD
 Initial deposit:                            10000.00 USD
-Total net profit:                           96.90 USD
-Gross profit:                               269.12 USD
-Gross loss:                                 172.22 USD
-Absolute drawdown:                          32.28 USD
-Maximal drawdown:                           66.7 USD (0.7%)
-Relative drawdown:                          (0.7%) 66.7 USD
-Profit factor:                              1.56
-Expected payoff:                            0.64
-Trades total                                152
-Short positions (won %):                    131 (42.7%)
-Long positions (won %):                     21 (23.8%)
-Profit trades (% of total):                 61 (40.1%)
-Loss trades (% of total):                   91 (59.9%)
-Largest profit trade:                       17.28
-Largest loss trade:                         -8.02
-Average profit trade:                       4.41
-Average loss trade:                         -1.89
+Total net profit:                           -2649.46 USD
+Gross profit:                               2386.70 USD
+Gross loss:                                 5036.16 USD
+Absolute drawdown:                          2649.46 USD
+Maximal drawdown:                           2649.5 USD (26.5%)
+Relative drawdown:                          (26.5%) 2649.5 USD
+Profit factor:                              0.47
+Expected payoff:                            -9.85
+Trades total                                269
+Short positions (won %):                    83 (12.0%)
+Long positions (won %):                     186 (20.4%)
+Profit trades (% of total):                 48 (17.8%)
+Loss trades (% of total):                   221 (82.2%)
+Largest profit trade:                       97.69
+Largest loss trade:                         -63.90
+Average profit trade:                       49.72
+Average loss trade:                         -22.79
 Average consecutive wins:                   2.00
-Average consecutive losses:                 4.00
-Maximum consecutive wins (profit in money): 9 (60.79)
-Maximum consecutive losses (loss in money): 13 (-42.07)
-Maximal consecutive profit (count of wins): 60.79 (9)
-Maximal consecutive loss (count of losses): 42.07 (13)
+Average consecutive losses:                 10.00
+Maximum consecutive wins (profit in money): 8 (148.16)
+Maximum consecutive losses (loss in money): 48 (-856.72)
+Maximal consecutive profit (count of wins): 411.06 (5)
+Maximal consecutive loss (count of losses): 856.72 (48)
 Modelling quality:                          62.97%
 Strategy stats:
-Profit factor: 1.00, Total net profit: 20.49USD [+32.62/-12.13] (234.69pips), Total orders: 18 (Won: 50.0% [9] / Loss: 50.0% [9]) - Bands M15
-Profit factor: 1.00, Total net profit: 5.11USD [+31.60/-26.50] (270.73pips), Total orders: 20 (Won: 40.0% [8] / Loss: 60.0% [12]) - Bands M30
-Profit factor: 2.15, Total net profit: 28.45USD [+53.14/-24.69] (531.41pips), Total orders: 33 (Won: 36.4% [12] / Loss: 63.6% [21]) - CCI M15
-Profit factor: 1.00, Total net profit: 9.95USD [+25.86/-15.91] (187.10pips), Total orders: 20 (Won: 45.0% [9] / Loss: 55.0% [11]) - CCI M30
-Profit factor: 1.00, Total net profit: 17.61USD [+21.60/-3.99] (216.01pips), Total orders: 5 (Won: 80.0% [4] / Loss: 20.0% [1]) - RSI M15
-Profit factor: 1.00, Total net profit: 22.15USD [+30.13/-7.98] (301.31pips), Total orders: 7 (Won: 71.4% [5] / Loss: 28.6% [2]) - RSI M30
-Profit factor: 1.00, Total net profit: 11.50USD [+32.56/-21.06] (185.71pips), Total orders: 12 (Won: 33.3% [4] / Loss: 66.7% [8]) - SAR M30
-Profit factor: 1.00, Total net profit: -18.18USD [+0.08/-18.26] (0.80pips), Total orders: 11 (Won: 9.1% [1] / Loss: 90.9% [10]) - WPR M5
-Profit factor: 1.03, Total net profit: 1.33USD [+42.38/-41.05] (377.92pips), Total orders: 26 (Won: 34.6% [9] / Loss: 65.4% [17]) - WPR M15
+Profit factor: 0.43, Total net profit: -627.97USD [+469.37/-1097.34] (469.37pips), Total orders: 42 (Won: 21.4% [9] / Loss: 78.6% [33]) - AD15
+Profit factor: 0.61, Total net profit: -151.77USD [+236.24/-388.01] (236.24pips), Total orders: 24 (Won: 20.8% [5] / Loss: 79.2% [19]) - AD30
+Profit factor: 0.00, Total net profit: -319.65USD [+1.53/-321.19] (1.53pips), Total orders: 24 (Won: 8.3% [2] / Loss: 91.7% [22]) - Alligator1
+Profit factor: 0.29, Total net profit: -289.39USD [+117.37/-406.76] (117.37pips), Total orders: 24 (Won: 12.5% [3] / Loss: 87.5% [21]) - Alligator15
+Profit factor: 0.46, Total net profit: -297.74USD [+249.84/-547.58] (249.84pips), Total orders: 23 (Won: 17.4% [4] / Loss: 82.6% [19]) - Alligator30
+Profit factor: 1.00, Total net profit: -39.90USD [+0.00/-39.90] (0.00pips), Total orders: 1 (Won: 0.0% [0] / Loss: 100.0% [1]) - Envelopes1
+Profit factor: 1.00, Total net profit: -1.80USD [+0.00/-1.80] (0.00pips), Total orders: 1 (Won: 0.0% [0] / Loss: 100.0% [1]) - Envelopes15
+Profit factor: 1.13, Total net profit: 36.01USD [+312.01/-276.00] (312.01pips), Total orders: 35 (Won: 22.9% [8] / Loss: 77.1% [27]) - MACD1
+Profit factor: 0.67, Total net profit: -127.25USD [+260.27/-387.52] (260.27pips), Total orders: 24 (Won: 20.8% [5] / Loss: 79.2% [19]) - MACD15
+Profit factor: 0.69, Total net profit: -150.80USD [+329.29/-480.09] (329.29pips), Total orders: 23 (Won: 21.7% [5] / Loss: 78.3% [18]) - MACD30
+Profit factor: 0.10, Total net profit: -471.99USD [+50.48/-522.47] (50.48pips), Total orders: 24 (Won: 8.3% [2] / Loss: 91.7% [22]) - WPR5
+Profit factor: 0.66, Total net profit: -186.50USD [+361.90/-548.40] (361.90pips), Total orders: 24 (Won: 20.8% [5] / Loss: 79.2% [19]) - WPR30
 Report log:
-2018.12.02 22:00:00: EA31337 Advanced v1.077 by kenorb (https://github.com/EA31337)
-TERMINAL: Allow DLL: true; Allow Libraries: true; CPUs: 36; Community account: false; Community balance: 0.00; Community connection: false; Disk space: 8232249; Enabled FTP: false; Enabled e-mail: false; Enabled notifications: false; IsOptimization: false; IsRealtime: false; IsTesting: true; IsVisual: false; MQ ID: false; Memory (free): 4095; Memory (physical): 128603; Memory (total): 4095; Memory (used): 0; Path (Common): C:\users\ubuntu\Application Data\MetaQuotes\Terminal\Common; Path (Data): C:\Program Files\MetaTrader 4; Path (Expert): C:\Program Files\MetaTrader 4\MQL4\Experts; Path (Terminal): C:\Program Files\MetaTrader 4; Program name: EA31337-Advanced-Release-v1.077; Screen DPI: 96; Terminal build: 1010; Terminal code page: 0; Terminal company: MetaQuotes Software Corp.; Terminal connected: false; Terminal language: English; Terminal name: MetaTrader 4; Termnal max bars: 65000; Trade allowed: true; Trade context busy: false; Trade perm: true; Trade ping (last): 10000001
+2018.12.02 22:00:01: EA31337 Rider v1.078 by kenorb (https://github.com/EA31337)
+TERMINAL: Allow DLL: true; Allow Libraries: true; CPUs: 36; Community account: false; Community balance: 0.00; Community connection: false; Disk space: 8226146; Enabled FTP: false; Enabled e-mail: false; Enabled notifications: false; IsOptimization: false; IsRealtime: false; IsTesting: true; IsVisual: false; MQ ID: false; Memory (free): 4095; Memory (physical): 128603; Memory (total): 4095; Memory (used): 0; Path (Common): C:\users\ubuntu\Application Data\MetaQuotes\Terminal\Common; Path (Data): C:\Program Files\MetaTrader 4; Path (Expert): C:\Program Files\MetaTrader 4\MQL4\Experts; Path (Terminal): C:\Program Files\MetaTrader 4; Program name: EA31337-Advanced-Release-v1.078; Screen DPI: 96; Terminal build: 1010; Terminal code page: 0; Terminal company: MetaQuotes Software Corp.; Terminal connected: false; Terminal language: English; Terminal name: MetaTrader 4; Termnal max bars: 65000; Trade allowed: true; Trade context busy: false; Trade perm: true; Trade ping (last): 10000000
 ACCOUNT: Type: Off-line, Server/Company/Name: //, Currency: USD, Balance: 10000, Credit: 0, Equity: 10000, Orders limit: 999: Leverage: 1:100, StopOut Level: 0 (Mode: 0)
-SYMBOL: Symbol: EURUSD, Ask/Bid: 1.13509/1.13499, Price/Session Volume: 0/0, Point size: 1e-05, Pip size: 0.0001, Tick size: 1e-05 (1e-05 pts), Tick value: 1 (0/0), Digits: 5, Spread: 10 pts, Trade stops level: 8, Trade contract size: 100000, Min lot: 0.01, Max lot: 10000, Lot step: 0.01, Freeze level: 0, Margin init: 0
-MARKET: Pip digits: 4, Spread: 10 pts (1 pips; 0.0088%), Pts/pip: 10, Trade distance: 8 pts (0.0000 pips), Volume digits: 2, Margin required: 1135.04/lot, Delta: 100000
-CHART: OHLC (M1): 1.13189/1.13499/1.13189/1.13499
-CHART: M2 not active.
-CHART: M3 not active.
-CHART: M4 not active.
+SYMBOL: Symbol: EURUSD, Ask/Bid: 1.13509/1.13499, Price/Session Volume: 0/0, Point size: 1e-05, Pip size: 0.0001, Tick size: 1e-05 (1e-05 pts), Tick value: 1 (0/0), Digits: 5, Spread: 10 pts, Trade stops level: 8, Trade contract size: 100000, Min lot: 0.1, Max lot: 100, Lot step: 0.1, Freeze level: 0, Margin init: 0
+MARKET: Pip digits: 4, Spread: 10 pts (1 pips; 0.0088%), Pts/pip: 10, Trade distance: 8 pts (0.0000 pips), Volume digits: 1, Margin required: 1135.04/lot, Delta: 100000
+CHART: OHLC (M1): 1.13499/1.13499/1.13499/1.13499
 CHART: OHLC (M5): 1.13499/1.13499/1.13499/1.13499
-CHART: M6 not active.
-CHART: M10 not active.
-CHART: M12 not active.
 CHART: OHLC (M15): 1.13499/1.13499/1.13499/1.13499
-CHART: M20 not active.
 CHART: OHLC (M30): 1.13499/1.13499/1.13499/1.13499
-CHART: H1 not active.
-CHART: H2 not active.
-CHART: H3 not active.
-CHART: H4 not active.
-CHART: H6 not active.
-CHART: H8 not active.
-CHART: H12 not active.
-CHART: D1 not active.
-CHART: W1 not active.
-CHART: MN1 not active.
 Swap specification for EURUSD: Mode: 0, Long/buy order value: 0.33, Short/sell order value: -1.04
-Calculated variables: Pip size: 0.0001, EA lot size: 0.01, Points per pip: 10, Pip digits: 4, Volume digits: 2, Spread in pips: 1.0 (10 pts), Stop Out Level: 0.7, Market gap: 8 pts (0 pips)
+Calculated variables: Pip size: 0.0001, EA lot size: 0.1, Points per pip: 10, Pip digits: 4, Volume digits: 1, Spread in pips: 1.0 (10 pts), Stop Out Level: 0.3, Market gap: 8 pts (0 pips)
 EA params: Risk ratio: 1, Risk margin per order: 1%, Risk margin in total: 10%
-Strategies: Active strategies: 18 of 125, Max orders: 445 (per type: 48)
+Strategies: Active strategies: 15 of 125, Max orders: 49 (per type: 6)
 
 Timeframes: M1; M2; M3; M4; M5; M6; M10; M12; M15; M20; M30; H1; H2; H3; H4; H6; H8; H12; D1; W1; MN1; 
 Datetime: Hour of day: 22, Day of week: 0, Day of month: 2, Day of year: 336, Month: 12, Year: 2018
-Account Details: Time: 2018.12.02 22:00:00; Account Balance: $10000.00; Account Equity: $10000.00; Account Credit: $0.00; Used Margin: $0.00; Free Margin: $10000.00; No of Orders: 0 (BUY/SELL: 0/0); Risk Ratio: 1.0
+ACCOUNT: Time: 2018.12.02 22:00:01; Balance: $10000.00; Equity: $10000.00; Credit: $0.00; Margin Used/Free: $0.00/$10000.00; Risk: 1.0;
 
