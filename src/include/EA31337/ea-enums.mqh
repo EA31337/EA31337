@@ -39,14 +39,14 @@ enum ENUM_STRATEGY_TYPE { // Define type of strategies.
   BANDS5,
   BANDS15,
   BANDS30,
-  BPOWER1,
-  BPOWER5,
-  BPOWER15,
-  BPOWER30,
-  BREAKAGE1,
-  BREAKAGE5,
-  BREAKAGE15,
-  BREAKAGE30,
+  BEARSPOWER1,
+  BEARSPOWER5,
+  BEARSPOWER15,
+  BEARSPOWER30,
+  BULLSPOWER1,
+  BULLSPOWER5,
+  BULLSPOWER15,
+  BULLSPOWER30,
   BWMFI1,
   BWMFI5,
   BWMFI15,
@@ -143,16 +143,7 @@ enum ENUM_STRATEGY_TYPE { // Define type of strategies.
 
 enum ENUM_STRATEGY_INFO { // Define type of strategy information entry.
   ACTIVE,
-  SUSPENDED,
-  TIMEFRAME,
-  INDICATOR,
-  OPEN_METHOD,
-  STOP_METHOD,
-  PROFIT_METHOD,
   CUSTOM_PERIOD,
-  OPEN_CONDITION1,
-  OPEN_CONDITION2,
-  CLOSE_CONDITION,
   OPEN_ORDERS,
   TOTAL_ORDERS,
   TOTAL_ORDERS_LOSS,
@@ -165,8 +156,6 @@ enum ENUM_STRATEGY_VALUE { // Define strategy value entry.
   LOT_SIZE,      // Lot size to trade.
   FACTOR,        // Multiply lot factor.
   PROFIT_FACTOR, // Profit factor.
-  OPEN_LEVEL,    // Value to raise the signal.
-  SPREAD_LIMIT,  // Spread limit.
   FINAL_STRATEGY_VALUE_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };
 
@@ -192,8 +181,6 @@ enum ENUM_VALUE_TYPE { // Define type of values in order to store.
   MAX_LOW,
   MAX_HIGH,
   MAX_SPREAD,
-  MAX_DROP,
-  // MAX_TICK,
   MAX_LOSS,
   MAX_PROFIT,
   MAX_BALANCE,
@@ -210,6 +197,8 @@ enum ENUM_ORDER_QUEUE_ENTRY { // Define order queue.
   FINAL_ORDER_QUEUE_ENTRY // Should be the last one. Used to calculate the number of enum items.
 };
 
+#ifndef TRAIL_TYPE_ENUM
+#define TRAIL_TYPE_ENUM
 enum ENUM_TRAIL_TYPE { // Define type of trailing types.
   T_NONE               =   0, // None (risky)
   T1_FIXED             =   1, // Fixed (locked)
@@ -232,41 +221,38 @@ enum ENUM_TRAIL_TYPE { // Define type of trailing types.
   T2_HALF_PEAK_OPEN    =  -9, // Half price peak (dynamic)
   T1_MA_F_PREV         =  10, // MA Fast Prev (locked)
   T2_MA_F_PREV         = -10, // MA Fast Prev (dynamic)
-  T1_MA_F_FAR          =  11, // MA Fast Far (locked)
-  T2_MA_F_FAR          = -11, // MA Fast Far (dynamic)
-  T1_MA_F_TRAIL        =  12, // MA Fast+Trail (locked)
-  T2_MA_F_TRAIL        = -12, // MA Fast+Trail (dynamic)
-  T1_MA_F_FAR_TRAIL    =  13, // MA Fast Far+Trail (locked)
-  T2_MA_F_FAR_TRAIL    = -13, // MA Fast Far+Trail (dynamic)
-  T1_MA_M              =  14, // MA Med (locked)
-  T2_MA_M              = -14, // MA Med (dynamic)
-  T1_MA_M_FAR          =  15, // MA Med Far (locked)
-  T2_MA_M_FAR          = -15, // MA Med Far (dynamic)
-  T1_MA_M_LOW          =  16, // MA Med Low (locked)
-  T2_MA_M_LOW          = -16, // MA Med Low (dynamic)
-  T1_MA_M_TRAIL        =  17, // MA Med+Trail (locked)
-  T2_MA_M_TRAIL        = -17, // MA Med+Trail (dynamic)
-  T1_MA_M_FAR_TRAIL    =  18, // MA Med Far+Trail (locked)
-  T2_MA_M_FAR_TRAIL    = -18, // MA Med Far+Trail (dynamic)
-  T1_MA_S              =  19, // MA Slow (locked)
-  T2_MA_S              = -19, // MA Slow (dynamic)
-  T1_MA_S_FAR          =  20, // MA Slow Far (locked)
-  T2_MA_S_FAR          = -20, // MA Slow Far (dynamic)
-  T1_MA_S_TRAIL        =  21, // MA Slow+Trail (locked)
-  T2_MA_S_TRAIL        = -21, // MA Slow+Trail (dynamic)
-  T1_MA_FMS_PEAK       =  22, // MA F+M+S Peak (locked)
-  T2_MA_FMS_PEAK       = -22, // MA F+M+S Peak (dynamic)
-  T1_SAR               =  23, // SAR (locked)
-  T2_SAR               = -23, // SAR (dynamic)
-  T1_SAR_PEAK          =  24, // SAR Peak (locked)
-  T2_SAR_PEAK          = -24, // SAR Peak (dynamic)
-  T1_BANDS             =  25, // Bands (locked)
-  T2_BANDS             = -25, // Bands (dynamic)
-  T1_BANDS_PEAK        =  26, // Bands Peak (locked)
-  T2_BANDS_PEAK        = -26, // Bands Peak (dynamic)
-  T1_ENVELOPES         =  27, // Envelopes (locked)
-  T2_ENVELOPES         = -27, // Envelopes (dynamic)
+  T1_MA_F_TRAIL        =  11, // MA Fast+Trail (locked)
+  T2_MA_F_TRAIL        = -11, // MA Fast+Trail (dynamic)
+  T1_MA_M              =  12, // MA Med (locked)
+  T2_MA_M              = -12, // MA Med (dynamic)
+  T1_MA_M_FAR          =  13, // MA Med Far (locked)
+  T2_MA_M_FAR          = -13, // MA Med Far (dynamic)
+  T1_MA_M_LOW          =  14, // MA Med Low (locked)
+  T2_MA_M_LOW          = -14, // MA Med Low (dynamic)
+  T1_MA_M_TRAIL        =  15, // MA Med+Trail (locked)
+  T2_MA_M_TRAIL        = -15, // MA Med+Trail (dynamic)
+  T1_MA_M_FAR_TRAIL    =  16, // MA Med Far+Trail (locked)
+  T2_MA_M_FAR_TRAIL    = -16, // MA Med Far+Trail (dynamic)
+  T1_MA_S              =  17, // MA Slow (locked)
+  T2_MA_S              = -17, // MA Slow (dynamic)
+  T1_MA_S_FAR          =  18, // MA Slow Far (locked)
+  T2_MA_S_FAR          = -18, // MA Slow Far (dynamic)
+  T1_MA_S_TRAIL        =  19, // MA Slow+Trail (locked)
+  T2_MA_S_TRAIL        = -19, // MA Slow+Trail (dynamic)
+  T1_MA_FMS_PEAK       =  20, // MA F+M+S Peak (locked)
+  T2_MA_FMS_PEAK       = -20, // MA F+M+S Peak (dynamic)
+  T1_SAR               =  21, // SAR (locked)
+  T2_SAR               = -21, // SAR (dynamic)
+  T1_SAR_PEAK          =  22, // SAR Peak (locked)
+  T2_SAR_PEAK          = -22, // SAR Peak (dynamic)
+  T1_BANDS             =  23, // Bands (locked)
+  T2_BANDS             = -23, // Bands (dynamic)
+  T1_BANDS_PEAK        =  24, // Bands Peak (locked)
+  T2_BANDS_PEAK        = -24, // Bands Peak (dynamic)
+  T1_ENVELOPES         =  25, // Envelopes (locked)
+  T2_ENVELOPES         = -25, // Envelopes (dynamic)
 };
+#endif
 
 // Define account conditions.
 enum ENUM_ACC_CONDITION {
@@ -322,6 +308,8 @@ enum ENUM_ACTION_TYPE {
 };
 
 // Define market event conditions.
+#ifndef MARKET_EVENT_ENUM
+#define MARKET_EVENT_ENUM
 enum ENUM_MARKET_EVENT {
   C_EVENT_NONE          =  0, // None
   C_AC_BUY_SELL         =  1, // AC on buy/sell
@@ -331,8 +319,8 @@ enum ENUM_MARKET_EVENT {
   C_ATR_BUY_SELL        =  5, // ATR on buy/sell
   C_AWESOME_BUY_SELL    =  6, // Awesome on buy/sell
   C_BANDS_BUY_SELL      =  7, // Bands on buy/sell
-  C_BPOWER_BUY_SELL     =  8, // BPower on buy/sell
-  C_BREAKAGE_BUY_SELL   =  9, // Breakage on buy/sell
+  C_BEARSPOWER_BUY_SELL =  8, // BearsPower on buy/sell
+  C_BULLSPOWER_BUY_SELL = 40, // BullsPower on buy/sell
   C_BWMFI_BUY_SELL      = 10, // BWMFI on buy/sell
   C_CCI_BUY_SELL        = 11, // CCI on buy/sell
   C_DEMARKER_BUY_SELL   = 12, // DeMarker on buy/sell
@@ -366,6 +354,7 @@ enum ENUM_MARKET_EVENT {
   C_CUSTOM6_MARKET_COND = 39, // Custom 6 market condition
 #endif
 };
+#endif
 
 // Define reasons.
 enum ENUM_REASON_TYPE {
@@ -398,6 +387,7 @@ enum ENUM_REASON_TYPE {
   R_ACC_PDAY_IN_LOSS    = C_ACC_PDAY_IN_LOSS, // Previous day in loss.
   R_ACC_MAX_ORDERS      = C_ACC_MAX_ORDERS, // Maximum orders reached.
   R_OPPOSITE_SIGNAL, // Opposite signal.
+  R_CLOSE_SIGNAL,    // Close method signal.
   R_ORDER_EXPIRED,   // Order is expired.
 };
 

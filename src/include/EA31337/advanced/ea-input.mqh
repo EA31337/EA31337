@@ -41,11 +41,11 @@ extern uint     StopLossMax = 40; // Max Stop loss (in pips, 0 = auto)
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
-extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 0; // Default trail stop method (0 = none)
+ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 0; // Default trail stop method (0 = none)
+ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 0; // Default trail profit method
 extern int TrailingStop = 50; // Extra trailing stop (in pips)
-extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 0; // Default trail profit method
 extern int TrailingProfit = 0; // Extra trailing profit (in pips)
-extern double TrailingStopAddPerMinute = 0.1; // Decrease trail stop per minute (pip/min)
+extern double TrailingStopAddPerMinute = 0.3; // Decrease trail stop per minute (pip/min)
 
 //+------------------------------------------------------------------+
 extern string __EA_Risk_Parameters__ = "-- Risk management parameters --"; // >>> RISK <<
@@ -54,8 +54,8 @@ extern double RiskMarginTotal = 10; // Risk margin in total (in %, 0-100, 0 - au
 extern double RiskRatio = 0; // Risk ratio (0 = auto, 1.0 = normal)
 extern int RiskRatioIncreaseMethod = 0; // Risk ratio increase method (0-255)
 extern int RiskRatioDecreaseMethod = 0; // Risk ratio decrease method (0-255)
-extern int InitNoOfDaysToWarmUp = 21; // Initial warm-up period (in days)
-extern int CloseOrderAfterXHours = 96; // Close order after X hours (>0 - only profitable, <0 - all, 0 - off)
+extern int InitNoOfDaysToWarmUp = 14; // Initial warm-up period (in days)
+extern double CloseOrderAfterXHours = 0; // Close order after X hours (>0 - all, <0 - only profitable 0 - off)
 
 extern bool ApplySpreadLimits = true; // Apply strategy spread limits
 extern double MaxSpreadToTrade = 10.0; // Max spread to trade (in pips), 0 - disable limit
@@ -63,21 +63,21 @@ extern double MaxSpreadToTrade = 10.0; // Max spread to trade (in pips), 0 - dis
 //+------------------------------------------------------------------+
 extern string __Strategy_Parameters__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGIES <<<
 extern double ProfitFactorMinToTrade = 0.9; // Min. profit factor per strategy to trade
-extern double ProfitFactorMaxToTrade = 0; // Max. profit factor per strategy to trade
+extern double ProfitFactorMaxToTrade = 0.0; // Max. profit factor per strategy to trade
 extern int InitNoOfOrdersToCalcPF = 20; // Initial number of orders to calculate profit factor
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameters (set 1.0 for default) --"; // >>> BOOSTING <<<
-extern bool Boosting_Enabled = 1; // Enable boosting
-extern double BoostTrendFactor = 1.1; // Boost by trend factor
+extern bool Boosting_Enabled = 0; // Enable boosting
+extern double BoostTrendFactor = 0.9; // Boost by trend factor
 extern bool StrategyBoostByPF = 1.1; // Boost strategy by its profit factor
 extern bool StrategyHandicapByPF = true; // Handicap by its low profit factor
-extern double BestDailyStrategyMultiplierFactor = 0.8; // Multiplier for the best daily strategy
-extern double BestWeeklyStrategyMultiplierFactor = 0.7; // Multiplier for the best weekly strategy
-extern double BestMonthlyStrategyMultiplierFactor = 0.6; // Multiplier for the best monthly strategy
-extern double WorseDailyStrategyMultiplierFactor = 0.9; // Multiplier for the worse daily strategy
-extern double WorseWeeklyStrategyMultiplierFactor = 0.8; // Multiplier for the worse weekly strategy
-extern double WorseMonthlyStrategyMultiplierFactor = 0.7; // Multiplier for the worse monthly strategy
+extern double BestDailyStrategyMultiplierFactor = 1.0; // Multiplier for the best daily strategy
+extern double BestWeeklyStrategyMultiplierFactor = 1.0; // Multiplier for the best weekly strategy
+extern double BestMonthlyStrategyMultiplierFactor = 1.0; // Multiplier for the best monthly strategy
+extern double WorseDailyStrategyMultiplierFactor = 1.0; // Multiplier for the worse daily strategy
+extern double WorseWeeklyStrategyMultiplierFactor = 1.0; // Multiplier for the worse weekly strategy
+extern double WorseMonthlyStrategyMultiplierFactor = 1.0; // Multiplier for the worse monthly strategy
 extern double ConWinsIncreaseFactor = 0.4; // Increase lot factor on consequent wins (in %, 0 - off)
 extern double ConLossesIncreaseFactor = 0.7; // Increase lot factor on consequent loses (in %, 0 - off)
 extern uint ConFactorOrdersLimit = 600; // No of orders to check on consequent wins/loses
@@ -85,32 +85,28 @@ extern uint ConFactorOrdersLimit = 600; // No of orders to check on consequent w
 //+------------------------------------------------------------------+
 extern string __SmartQueue_Parameters__ = "-- Smart queue parameters --"; // >>> SMART QUEUE <<<
 extern bool SmartQueueActive = 1; // Activate QueueAI
-extern int SmartQueueMethod = 14; // QueueAI: Method for selecting the best order (0-15)
-extern int SmartQueueFilter = 112; // QueueAI: Method for filtering the orders (0-255)
-
-//+------------------------------------------------------------------+
-// extern string __Advanced_Parameters__ = "-- Advanced parameters --"; // >>> ADVANCED <<<
+extern int SmartQueueMethod = 11; // QueueAI: Method for selecting the best order (0-15)
+extern int SmartQueueFilter = 72; // QueueAI: Method for filtering the orders (0-255)
 
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions__ = "-- Account conditions --"; // >>> CONDITIONS & ACTIONS <<<
-// Note: It's not advice to use on accounts where multi bots are trading.
-extern bool Account_Conditions_Active = 1; // Enable account conditions
-// 5 - Equity 1% high
-extern ENUM_ACC_CONDITION Account_Condition_1 = 5; // 1. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_1 = 2; // 1. Market condition
+extern bool Account_Conditions_Active = 1; // Enable account conditions (don't enable for multibot trading)
+// Condition 5 - Equity 1% high
+extern ENUM_ACC_CONDITION Account_Condition_1 = 2; // 1. Account condition
+extern ENUM_MARKET_CONDITION Market_Condition_1 = 14; // 1. Market condition
 extern ENUM_ACTION_TYPE Action_On_Condition_1 = 1; // 1. Action to take
-// 6 - Equity 1%
-extern ENUM_ACC_CONDITION Account_Condition_2 = 6; // 2. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_2 = 1; // 2. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_2 = 3; // 2. Action to take
-// 10 - 20% Margin Used
-extern ENUM_ACC_CONDITION Account_Condition_3 = 10; // 3. Account condition
+// Condition 6 - Equity 10% high
+extern ENUM_ACC_CONDITION Account_Condition_2 = 0; // 2. Account condition
+extern ENUM_MARKET_CONDITION Market_Condition_2 = 8; // 2. Market condition
+extern ENUM_ACTION_TYPE Action_On_Condition_2 = 7; // 2. Action to take
+// Condition 10 - 50% Margin Used
+extern ENUM_ACC_CONDITION Account_Condition_3 = 0; // 3. Account condition
 extern ENUM_MARKET_CONDITION Market_Condition_3 = 1; // 3. Market condition
 extern ENUM_ACTION_TYPE Action_On_Condition_3 = 0; // 3. Action to take
-// 17 - Max. daily balance < max. weekly
+// Condition 17 - Max. daily balance < max. weekly
 extern ENUM_ACC_CONDITION Account_Condition_4 = 17; // 4. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_4 = 9; // 4. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_4 = 8; // 4. Action to take
+extern ENUM_MARKET_CONDITION Market_Condition_4 = 16; // 4. Market condition
+extern ENUM_ACTION_TYPE Action_On_Condition_4 = 7; // 4. Action to take
 //
 extern ENUM_ACC_CONDITION Account_Condition_5 = 0; // 5. Account condition
 extern ENUM_MARKET_CONDITION Market_Condition_5 = 0; // 5. Market condition
@@ -220,8 +216,6 @@ extern int Account_Condition_MinProfitCloseOrder = 20; // Min pip profit on acti
 
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions_Params__ = "-- Account conditions parameters --"; // >>> CONDITIONS & ACTIONS PARAMS <<<
-extern int MarketSuddenDropSize = 20; // Drop in pips to react
-extern int MarketBigDropSize = 40; // Big drop in pips to react
 extern int MarketSpecificHour = 3; // Specific hour used for conditions (0-23)
 extern bool CloseConditionOnlyProfitable = true; // Apply close condition only for profitable orders
 extern int CloseConditionCustom1Method = 0; // Custom 1 indicator-based close condition (0-1023)
@@ -232,148 +226,140 @@ extern int CloseConditionCustom5Method = 0; // Custom 5 market-based close condi
 extern int CloseConditionCustom6Method = 0; // Custom 6 market-based close condition (0-1023)
 
 //+------------------------------------------------------------------+
-string __AC_Parameters__ = "-- Settings for the Bill Williams' Accelerator/Decelerator oscillator --"; // >>> AC (NOT IMPLEMENTED YET) <<<
-bool AC1_Active = 0; // Enable for M1
-bool AC5_Active = 0; // Enable on M5
-bool AC15_Active = 0; // Enable on M15
-bool AC30_Active = 0; // Enable on M30
-ENUM_TRAIL_TYPE AC_TrailingStopMethod = 22; // Trail stop method
-ENUM_TRAIL_TYPE AC_TrailingProfitMethod = 1; // Trail profit method
-double AC_SignalLevel = 0.00000000; // Signal level
-int AC1_SignalMethod = 0; // Signal method for M1 (0-?)
-int AC5_SignalMethod = 0; // Signal method for M5 (0-?)
-int AC15_SignalMethod = 0; // Signal method for M15 (0-?)
-int AC30_SignalMethod = 0; // Signal method for M30 (0-?)
-int AC1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
-int AC1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-ENUM_MARKET_EVENT AC1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
+extern string __AC_Parameters__ = "-- Settings for the Bill Williams' Accelerator/Decelerator oscillator --"; // >>> AC <<<
+extern uint AC_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern ENUM_TRAIL_TYPE AC_TrailingStopMethod = 3; // Trail stop method
+extern ENUM_TRAIL_TYPE AC_TrailingProfitMethod = 22; // Trail profit method
+extern double AC_SignalLevel = 0.0004; // Signal level (>0.0001)
+extern uint AC_Shift = 0; // Shift (relative to the current bar, 0 - default)
+extern int AC1_SignalMethod = 0; // Signal method for M1 (0-1)
+extern int AC5_SignalMethod = 0; // Signal method for M5 (0-1)
+extern int AC15_SignalMethod = 0; // Signal method for M15 (0-1)
+extern int AC30_SignalMethod = 0; // Signal method for M30 (0-1)
+extern int AC1_OpenCondition1 = 777; // Open condition 1 for M1 (0-1023)
+extern int AC1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+extern ENUM_MARKET_EVENT AC1_CloseCondition = 26; // Close condition for M1
 
-int AC5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
-int AC5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-ENUM_MARKET_EVENT AC5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
+extern int AC5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
+extern int AC5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+extern ENUM_MARKET_EVENT AC5_CloseCondition = 24; // Close condition for M5
 
-int AC15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
-int AC15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-ENUM_MARKET_EVENT AC15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
+extern int AC15_OpenCondition1 = 1; // Open condition 1 for M15 (0-)
+extern int AC15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+extern ENUM_MARKET_EVENT AC15_CloseCondition = 1; // Close condition for M15
 
-int AC30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
-int AC30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-ENUM_MARKET_EVENT AC30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
+extern int AC30_OpenCondition1 = 389; // Open condition 1 for M30 (0-)
+extern int AC30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+extern ENUM_MARKET_EVENT AC30_CloseCondition = 29; // Close condition for M30
 
-double AC1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-double AC5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-double AC15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-double AC30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+extern double AC1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+extern double AC5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+extern double AC15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+extern double AC30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
-string __AD_Parameters__ = "-- Settings for the Accumulation/Distribution indicator --"; // >>> AD (NOT IMPLEMENTED YET) <<<
-bool AD1_Active = 0; // Enable for M1
-bool AD5_Active = 0; // Enable for M5
-bool AD15_Active = 0; // Enable for M15
-bool AD30_Active = 0; // Enable for M30
-ENUM_TRAIL_TYPE AD_TrailingStopMethod = T1_MA_FMS_PEAK; // Trail stop method
-ENUM_TRAIL_TYPE AD_TrailingProfitMethod = T1_FIXED; // Trail profit method
-double AD_SignalLevel = 0.00000000; // Signal level
-int AD1_SignalMethod = 0; // Signal method for M1 (0-?)
-int AD5_SignalMethod = 0; // Signal method for M5 (0-?)
-int AD15_SignalMethod = 0; // Signal method for M15 (0-?)
-int AD30_SignalMethod = 0; // Signal method for M30 (0-?)
-int AD1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
-int AD1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-ENUM_MARKET_EVENT AD1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
+extern string __AD_Parameters__ = "-- Settings for the Accumulation/Distribution indicator --"; // >>> AD <<<
+extern uint AD_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern ENUM_TRAIL_TYPE AD_TrailingStopMethod = 7; // Trail stop method
+extern ENUM_TRAIL_TYPE AD_TrailingProfitMethod = 11; // Trail profit method
+extern double AD_SignalLevel = 0.00000000; // Signal level
+extern uint AD_Shift = 0; // Shift (relative to the current bar, 0 - default)
+extern int AD1_SignalMethod = 0; // Signal method for M1 (0-?)
+extern int AD5_SignalMethod = 0; // Signal method for M5 (0-?)
+extern int AD15_SignalMethod = 0; // Signal method for M15 (0-?)
+extern int AD30_SignalMethod = 0; // Signal method for M30 (0-?)
+extern int AD1_OpenCondition1 = 583; // Open condition 1 for M1 (0-1023)
+extern int AD1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+extern ENUM_MARKET_EVENT AD1_CloseCondition = 2; // Close condition for M1
 
-int AD5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
-int AD5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-ENUM_MARKET_EVENT AD5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
+extern int AD5_OpenCondition1 = 486; // Open condition 1 for M5 (0-1023)
+extern int AD5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+extern ENUM_MARKET_EVENT AD5_CloseCondition = 3; // Close condition for M5
 
-int AD15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
-int AD15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-ENUM_MARKET_EVENT AD15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
+extern int AD15_OpenCondition1 = 292; // Open condition 1 for M15 (0-)
+extern int AD15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+extern ENUM_MARKET_EVENT AD15_CloseCondition = 1; // Close condition for M15
 
-int AD30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
-int AD30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-ENUM_MARKET_EVENT AD30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
+extern int AD30_OpenCondition1 = 292; // Open condition 1 for M30 (0-)
+extern int AD30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+extern ENUM_MARKET_EVENT AD30_CloseCondition = 24; // Close condition for M30
 
-double AD1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-double AD5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-double AD15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-double AD30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+extern double AD1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+extern double AD5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+extern double AD15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+extern double AD30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
-string __ADX_Parameters__ = "-- Settings for the Average Directional Movement Index indicator --"; // >>> ADX (NOT IMPLEMENTED YET) <<<
-bool ADX1_Active = 0; // Enable for M1
-bool ADX5_Active = 0; // Enable for M5
-bool ADX15_Active = 0; // Enable for M15
-bool ADX30_Active = 0; // Enable for M30
-ENUM_TRAIL_TYPE ADX_TrailingStopMethod = T1_MA_FMS_PEAK; // Trail stop method
-ENUM_TRAIL_TYPE ADX_TrailingProfitMethod = T1_FIXED; // Trail profit method
-int ADX_Period = 14; // Period
-ENUM_APPLIED_PRICE ADX_Applied_Price = 2; // Applied Price
-double ADX_SignalLevel = 0.00000000; // Signal level
-int ADX1_SignalMethod = 0; // Signal method for M1 (0-?)
-int ADX5_SignalMethod = 0; // Signal method for M5 (0-?)
-int ADX15_SignalMethod = 0; // Signal method for M15 (0-?)
-int ADX30_SignalMethod = 0; // Signal method for M30 (0-?)
-int ADX1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
-int ADX1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-ENUM_MARKET_EVENT ADX1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
+extern string __ADX_Parameters__ = "-- Settings for the Average Directional Movement Index indicator --"; // >>> ADX <<<
+extern uint ADX_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern ENUM_TRAIL_TYPE ADX_TrailingStopMethod = 11; // Trail stop method
+extern ENUM_TRAIL_TYPE ADX_TrailingProfitMethod = 25; // Trail profit method
+extern uint ADX_Period_M1 = 32; // Period for M1
+extern uint ADX_Period_M5 = 20; // Period for M5
+extern uint ADX_Period_M15 = 30; // Period for M15
+extern uint ADX_Period_M30 = 34; // Period for M30
+extern ENUM_APPLIED_PRICE ADX_Applied_Price = 3; // Applied Price
+extern double ADX_SignalLevel = 18.5; // Signal level
+extern uint ADX_Shift = 3; // Shift (relative to the current bar, 0 - default)
+extern int ADX1_SignalMethod = 0; // Signal method for M1 (0-?)
+extern int ADX5_SignalMethod = 0; // Signal method for M5 (0-?)
+extern int ADX15_SignalMethod = 0; // Signal method for M15 (0-?)
+extern int ADX30_SignalMethod = 0; // Signal method for M30 (0-?)
+extern int ADX1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
+extern int ADX1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+extern ENUM_MARKET_EVENT ADX1_CloseCondition = 13; // Close condition for M1
 
-int ADX5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
-int ADX5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-ENUM_MARKET_EVENT ADX5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
+extern int ADX5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
+extern int ADX5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+extern ENUM_MARKET_EVENT ADX5_CloseCondition = 11; // Close condition for M5
 
-int ADX15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
-int ADX15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-ENUM_MARKET_EVENT ADX15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
+extern int ADX15_OpenCondition1 = 1; // Open condition 1 for M15 (0-)
+extern int ADX15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+extern ENUM_MARKET_EVENT ADX15_CloseCondition = 1; // Close condition for M15
 
-int ADX30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
-int ADX30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-ENUM_MARKET_EVENT ADX30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
+extern int ADX30_OpenCondition1 = 292; // Open condition 1 for M30 (0-)
+extern int ADX30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+extern ENUM_MARKET_EVENT ADX30_CloseCondition = 24; // Close condition for M30
 
-double ADX1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-double ADX5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-double ADX15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-double ADX30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+extern double ADX1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+extern double ADX5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+extern double ADX15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+extern double ADX30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __Alligator_Parameters__ = "-- Settings for the Alligator indicator --"; // >>> ALLIGATOR <<<
-extern bool Alligator1_Active = 0; // Enable for M1
-extern bool Alligator5_Active = 1; // Enable for M5
-extern bool Alligator15_Active = 0; // Enable for M15
-extern bool Alligator30_Active = 1; // Enable for M30
-extern int Alligator_Period_Jaw = 6; // Jaw Period
-extern int Alligator_Period_Teeth = 10; // Teeth Period
-extern int Alligator_Period_Lips = 8; // Lips Period
-extern double Alligator_Period_Ratio = 1.0; // Period ratio between timeframes (0.5-1.5)
+extern uint Alligator_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern int Alligator_Period_Jaw = 16; // Jaw Period
+extern int Alligator_Period_Teeth = 8; // Teeth Period
+extern int Alligator_Period_Lips = 6; // Lips Period
 extern int Alligator_Shift_Jaw = 5; // Jaw Shift
 extern int Alligator_Shift_Teeth = 7; // Teeth Shift
 extern int Alligator_Shift_Lips = 5; // Lips Shift
 extern ENUM_MA_METHOD Alligator_MA_Method = 2; // MA Method
-extern ENUM_APPLIED_PRICE Alligator_Applied_Price = 3; // Applied Price
+extern ENUM_APPLIED_PRICE Alligator_Applied_Price = 4; // Applied Price
 extern int Alligator_Shift = 2; // Shift
-extern int Alligator_Shift_Far = 0; // Shift Far
-extern ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = -8; // Trail stop method
-extern ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = -24; // Trail profit method
-extern double Alligator_SignalLevel = 0; // Signal level
-extern int Alligator1_SignalMethod = 19; // Signal method for M1 (-63-63)
-extern int Alligator5_SignalMethod = 27; // Signal method for M5 (-63-63)
-extern int Alligator15_SignalMethod = 20; // Signal method for M15 (-63-63)
-extern int Alligator30_SignalMethod = 16; // Signal method for M30 (-63-63)
+extern ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = 7; // Trail stop method
+extern ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = 25; // Trail profit method
+extern double Alligator_SignalLevel = 0.1; // Signal level
+extern int Alligator1_SignalMethod = 0; // Signal method for M1 (-63-63)
+extern int Alligator5_SignalMethod = 0; // Signal method for M5 (-63-63)
+extern int Alligator15_SignalMethod = 0; // Signal method for M15 (-63-63)
+extern int Alligator30_SignalMethod = 0; // Signal method for M30 (-63-63)
 extern int Alligator1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
-extern int Alligator1_OpenCondition2 = 971; // Open condition 2 for M1 (0-1023)
-extern ENUM_MARKET_EVENT Alligator1_CloseCondition = 1; // Close condition for M1
+extern int Alligator1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+extern ENUM_MARKET_EVENT Alligator1_CloseCondition = 4; // Close condition for M1
 //
 extern int Alligator5_OpenCondition1 = 777; // Open condition 1 for M5 (0-1023)
-extern int Alligator5_OpenCondition2 = 874; // Open condition 2 for M5 (0-1023)
-extern ENUM_MARKET_EVENT Alligator5_CloseCondition = 1; // Close condition for M5
+extern int Alligator5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+extern ENUM_MARKET_EVENT Alligator5_CloseCondition = 4; // Close condition for M5
 //
 extern int Alligator15_OpenCondition1 = 98; // Open condition 1 for M15 (0-1023)
-extern int Alligator15_OpenCondition2 = 777; // Open condition 2 for M15 (0-1023)
-extern ENUM_MARKET_EVENT Alligator15_CloseCondition = 1; // Close condition for M15
+extern int Alligator15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+extern ENUM_MARKET_EVENT Alligator15_CloseCondition = 5; // Close condition for M15
 //
 extern int Alligator30_OpenCondition1 = 1; // Open condition 1 for M30 (0-1023)
-extern int Alligator30_OpenCondition2 = 1; // Open condition 2 for M30 (0-1023)
-extern ENUM_MARKET_EVENT Alligator30_CloseCondition = 1; // Close condition for M30
+extern int Alligator30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+extern ENUM_MARKET_EVENT Alligator30_CloseCondition = 11; // Close condition for M30
 //
 extern double Alligator1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 extern double Alligator5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
@@ -382,35 +368,34 @@ extern double Alligator30_MaxSpread = 10.0; // Max spread to trade for M30 (pips
 
 //+------------------------------------------------------------------+
 string __ATR_Parameters__ = "-- Settings for the Average True Range indicator --"; // >>> ATR <<<
-bool ATR1_Active = 0; // Enable for M1
-bool ATR5_Active = 0; // Enable for M5
-bool ATR15_Active = 0; // Enable for M15
-bool ATR30_Active = 0; // Enable for M30
-ENUM_TRAIL_TYPE ATR_TrailingStopMethod = T1_MA_FMS_PEAK; // Trail stop method
-ENUM_TRAIL_TYPE ATR_TrailingProfitMethod = T1_FIXED; // Trail profit method
-int ATR_Period_Fast = 14; // Period Fast
-int ATR_Period_Slow = 20; // Period Slow
-double ATR_Period_Ratio = 1.0; // Period ratio between timeframes (0.5-1.5)
+uint ATR_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+ENUM_TRAIL_TYPE ATR_TrailingStopMethod = 7; // Trail stop method
+ENUM_TRAIL_TYPE ATR_TrailingProfitMethod = 22; // Trail profit method
+int ATR_Period_M1 = 14; // Period for M1
+int ATR_Period_M5 = 14; // Period for M5
+int ATR_Period_M15 = 14; // Period for M15
+int ATR_Period_M30 = 14; // Period for M30
 double ATR_SignalLevel = 0.00000000; // Signal level
+uint ATR_Shift = 0; // Shift (relative to the current bar, 0 - default)
 int ATR1_SignalMethod = 0; // Signal method for M1 (0-31)
 int ATR5_SignalMethod = 0; // Signal method for M5 (0-31)
 int ATR15_SignalMethod = 0; // Signal method for M15 (0-31)
 int ATR30_SignalMethod = 0; // Signal method for M30 (0-31)
-int ATR1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int ATR1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
 int ATR1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-ENUM_MARKET_EVENT ATR1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
+ENUM_MARKET_EVENT ATR1_CloseCondition = 1; // Close condition for M1
 
-int ATR5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int ATR5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
 int ATR5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-ENUM_MARKET_EVENT ATR5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
+ENUM_MARKET_EVENT ATR5_CloseCondition = 1; // Close condition for M5
 
-int ATR15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int ATR15_OpenCondition1 = 292; // Open condition 1 for M15 (0-)
 int ATR15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-ENUM_MARKET_EVENT ATR15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
+ENUM_MARKET_EVENT ATR15_CloseCondition = 1; // Close condition for M15
 
-int ATR30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int ATR30_OpenCondition1 = 292; // Open condition 1 for M30 (0-)
 int ATR30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-ENUM_MARKET_EVENT ATR30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
+ENUM_MARKET_EVENT ATR30_CloseCondition = 1; // Close condition for M30
 
 double ATR1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 double ATR5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
@@ -419,13 +404,11 @@ double ATR30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __Awesome_Parameters__ = "-- Settings for the Awesome oscillator --"; // >>> AWESOME <<<
-bool Awesome1_Active = 0; // Enable for M1
-bool Awesome5_Active = 0; // Enable for M5
-bool Awesome15_Active = 0; // Enable for M15
-bool Awesome30_Active = 0; // Enable for M30
-ENUM_TRAIL_TYPE Awesome_TrailingStopMethod = T1_MA_FMS_PEAK; // Trail stop method
-ENUM_TRAIL_TYPE Awesome_TrailingProfitMethod = T1_FIXED; // Trail profit method
+uint Awesome_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+ENUM_TRAIL_TYPE Awesome_TrailingStopMethod = 22; // Trail stop method
+ENUM_TRAIL_TYPE Awesome_TrailingProfitMethod = 1; // Trail profit method
 double Awesome_SignalLevel = 0.00000000; // Signal level
+uint Awesome_Shift = 0; // Shift (relative to the current bar, 0 - default)
 int Awesome1_SignalMethod = 0; // Signal method for M1 (0-31)
 int Awesome5_SignalMethod = 0; // Signal method for M5 (0-31)
 int Awesome15_SignalMethod = 0; // Signal method for M15 (0-31)
@@ -453,35 +436,36 @@ double Awesome30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --"; // >>> BANDS <<<
-extern bool Bands1_Active = 1; // Enable for M1
-extern bool Bands5_Active = 1; // Enable for M5
-extern bool Bands15_Active = 1; // Enable for M15
-extern bool Bands30_Active = 1; // Enable for M30
-extern int Bands_Period = 18; // Period
-extern double Bands_Period_Ratio = 1; // Period ratio between timeframes (0.5-1.5)
-extern ENUM_APPLIED_PRICE Bands_Applied_Price = 3; // Applied Price
-extern double Bands_Deviation = 2.3; // Deviation
-extern double Bands_Deviation_Ratio = 1.0; // Deviation ratio between timeframes (0.5-1.5)
-extern int Bands_Shift = 3; // Shift
-extern int Bands_Shift_Far = 1; // Shift Far
+extern uint Bands_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern int Bands_Period_M1 = 2; // Period for M1
+extern int Bands_Period_M5 = 2; // Period for M5
+extern int Bands_Period_M15 = 2; // Period for M15
+extern int Bands_Period_M30 = 2; // Period for M30
+extern ENUM_APPLIED_PRICE Bands_Applied_Price = 0; // Applied Price
+extern double Bands_Deviation_M1 = 0.3; // Deviation for M1
+extern double Bands_Deviation_M5 = 0.3; // Deviation for M5
+extern double Bands_Deviation_M15 = 0.3; // Deviation for M15
+extern double Bands_Deviation_M30 = 0.3; // Deviation for M30
+extern int Bands_HShift = 0; // Horizontal shift
+extern int Bands_Shift = 0; // Shift (relative to the current bar, 0 - default)
 extern ENUM_TRAIL_TYPE Bands_TrailingStopMethod = 7; // Trail stop method
-extern ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = 27; // Trail profit method
-/* @todo extern */ int Bands_SignalLevel = 18; // Signal level
-extern int Bands1_SignalMethod = -85; // Signal method for M1 (-127-127)
-extern int Bands5_SignalMethod = -74; // Signal method for M5 (-127-127)
-extern int Bands15_SignalMethod = -127; // Signal method for M15 (-127-127)
-extern int Bands30_SignalMethod = -127; // Signal method for M30 (-127-127)
+extern ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = 22; // Trail profit method
+extern int Bands_SignalLevel = 18; // Signal level
+extern int Bands1_SignalMethod = 0; // Signal method for M1 (-127-127)
+extern int Bands5_SignalMethod = 0; // Signal method for M5 (-127-127)
+extern int Bands15_SignalMethod = 0; // Signal method for M15 (-127-127)
+extern int Bands30_SignalMethod = 0; // Signal method for M30 (-127-127)
 extern int Bands1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
-extern int Bands1_OpenCondition2 = 1; // Open condition 2 for M1 (0-1023)
-extern ENUM_MARKET_EVENT Bands1_CloseCondition = 1; // Close condition for M1
+extern int Bands1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+extern ENUM_MARKET_EVENT Bands1_CloseCondition = 24; // Close condition for M1
 extern int Bands5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
-extern int Bands5_OpenCondition2 = 680; // Open condition 2 for M5 (0-1023)
-extern ENUM_MARKET_EVENT Bands5_CloseCondition = 1; // Close condition for M5
+extern int Bands5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+extern ENUM_MARKET_EVENT Bands5_CloseCondition = 11; // Close condition for M5
 extern int Bands15_OpenCondition1 = 292; // Open condition 1 for M15 (0-1023)
-extern int Bands15_OpenCondition2 = 1; // Open condition 2 for M15 (0-1023)
-extern ENUM_MARKET_EVENT Bands15_CloseCondition = 1; // Close condition for M15
+extern int Bands15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+extern ENUM_MARKET_EVENT Bands15_CloseCondition = 2; // Close condition for M15
 extern int Bands30_OpenCondition1 = 292; // Open condition 1 for M30 (0-1023)
-extern int Bands30_OpenCondition2 = 1; // Open condition 2 for M30 (0-1023)
+extern int Bands30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
 extern ENUM_MARKET_EVENT Bands30_CloseCondition = 1; // Close condition for M30
 extern double Bands1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 extern double Bands5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
@@ -489,85 +473,72 @@ extern double Bands15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
 extern double Bands30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
-string __BPower_Parameters__ = "-- Settings for the Bulls/Bears Power indicator --"; // >>> BULLS/BEARS POWER <<<
-bool BPower1_Active = 0; // Enable for M1
-bool BPower5_Active = 0; // Enable for M5
-bool BPower15_Active = 0; // Enable for M15
-bool BPower30_Active = 0; // Enable for M30
-ENUM_TRAIL_TYPE BPower_TrailingStopMethod = T1_MA_FMS_PEAK; // Trail stop method
-ENUM_TRAIL_TYPE BPower_TrailingProfitMethod = T1_FIXED; // Trail profit method
-int BPower_Period = 13; // Period
-double BPower_Period_Ratio = 1.00000000; // Period ratio between timeframes (0.5-1.5)
-ENUM_APPLIED_PRICE BPower_Applied_Price = 0; // Applied Price
-double BPower_SignalLevel = 0.00000000; // Signal level
-int BPower1_SignalMethod = 0; // Signal method for M1 (0-
-int BPower5_SignalMethod = 0; // Signal method for M5 (0-
-int BPower15_SignalMethod = 0; // Signal method for M15 (0-
-int BPower30_SignalMethod = 0; // Signal method for M30 (0-
-int BPower1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
-int BPower1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-ENUM_MARKET_EVENT BPower1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
-
-int BPower5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
-int BPower5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-ENUM_MARKET_EVENT BPower5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
-
-int BPower15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
-int BPower15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-ENUM_MARKET_EVENT BPower15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
-
-int BPower30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
-int BPower30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-ENUM_MARKET_EVENT BPower30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
-
-double BPower1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-double BPower5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-double BPower15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-double BPower30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+string __BearsPower_Parameters__ = "-- Settings for the Bears Power indicator --"; // >>> BEARS POWER <<<
+uint BearsPower_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+ENUM_TRAIL_TYPE BearsPower_TrailingStopMethod = 22; // Trail stop method
+ENUM_TRAIL_TYPE BearsPower_TrailingProfitMethod = 1; // Trail profit method
+int BearsPower_Period = 13; // Period
+ENUM_APPLIED_PRICE BearsPower_Applied_Price = PRICE_CLOSE; // Applied Price
+double BearsPower_SignalLevel = 0.00000000; // Signal level
+uint BearsPower_Shift = 0; // Shift (relative to the current bar, 0 - default)
+int BearsPower1_SignalMethod = 0; // Signal method for M1 (0-
+int BearsPower5_SignalMethod = 0; // Signal method for M5 (0-
+int BearsPower15_SignalMethod = 0; // Signal method for M15 (0-
+int BearsPower30_SignalMethod = 0; // Signal method for M30 (0-
+int BearsPower1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int BearsPower1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+ENUM_MARKET_EVENT BearsPower1_CloseCondition = C_BEARSPOWER_BUY_SELL; // Close condition for M1
+int BearsPower5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int BearsPower5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+ENUM_MARKET_EVENT BearsPower5_CloseCondition = C_BEARSPOWER_BUY_SELL; // Close condition for M5
+int BearsPower15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int BearsPower15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+ENUM_MARKET_EVENT BearsPower15_CloseCondition = C_BEARSPOWER_BUY_SELL; // Close condition for M15
+int BearsPower30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int BearsPower30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+ENUM_MARKET_EVENT BearsPower30_CloseCondition = C_BEARSPOWER_BUY_SELL; // Close condition for M30
+double BearsPower1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+double BearsPower5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+double BearsPower15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+double BearsPower30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
-string __Breakage_Parameters__ = "-- Settings for the custom Breakage strategy --"; // >>> BREAKAGE <<<
-bool Breakage1_Active = 0; // Enable for M1
-bool Breakage5_Active = 0; // Enable for M5
-bool Breakage15_Active = 0; // Enable for M15
-bool Breakage30_Active = 0; // Enable for M30
-ENUM_TRAIL_TYPE Breakage_TrailingStopMethod = T1_MA_FMS_PEAK; // Trail stop method
-ENUM_TRAIL_TYPE Breakage_TrailingProfitMethod = T1_FIXED; // Trail profit method
-double Breakage_SignalLevel = 0.00000000; // Signal level
-int Breakage1_SignalMethod = 0; // Signal method for M1 (0-31)
-int Breakage5_SignalMethod = 0; // Signal method for M5 (0-31)
-int Breakage15_SignalMethod = 0; // Signal method for M15 (0-31)
-int Breakage30_SignalMethod = 0; // Signal method for M30 (0-31)
-int Breakage1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
-int Breakage1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-ENUM_MARKET_EVENT Breakage1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
-
-int Breakage5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
-int Breakage5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-ENUM_MARKET_EVENT Breakage5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
-
-int Breakage15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
-int Breakage15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-ENUM_MARKET_EVENT Breakage15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
-
-int Breakage30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
-int Breakage30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-ENUM_MARKET_EVENT Breakage30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
-
-double Breakage1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-double Breakage5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-double Breakage15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-double Breakage30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+string __BullsPower_Parameters__ = "-- Settings for the Bulls Power indicator --"; // >>> BULLS POWER <<<
+uint BullsPower_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+ENUM_TRAIL_TYPE BullsPower_TrailingStopMethod = 22; // Trail stop method
+ENUM_TRAIL_TYPE BullsPower_TrailingProfitMethod = 1; // Trail profit method
+int BullsPower_Period = 13; // Period
+ENUM_APPLIED_PRICE BullsPower_Applied_Price = PRICE_CLOSE; // Applied Price
+double BullsPower_SignalLevel = 0.00000000; // Signal level
+uint BullsPower_Shift = 0; // Shift (relative to the current bar, 0 - default)
+int BullsPower1_SignalMethod = 0; // Signal method for M1 (0-
+int BullsPower5_SignalMethod = 0; // Signal method for M5 (0-
+int BullsPower15_SignalMethod = 0; // Signal method for M15 (0-
+int BullsPower30_SignalMethod = 0; // Signal method for M30 (0-
+int BullsPower1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int BullsPower1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+ENUM_MARKET_EVENT BullsPower1_CloseCondition = C_BULLSPOWER_BUY_SELL; // Close condition for M1
+int BullsPower5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int BullsPower5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+ENUM_MARKET_EVENT BullsPower5_CloseCondition = C_BULLSPOWER_BUY_SELL; // Close condition for M5
+int BullsPower15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int BullsPower15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+ENUM_MARKET_EVENT BullsPower15_CloseCondition = C_BULLSPOWER_BUY_SELL; // Close condition for M15
+int BullsPower30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int BullsPower30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+ENUM_MARKET_EVENT BullsPower30_CloseCondition = C_BULLSPOWER_BUY_SELL; // Close condition for M30
+double BullsPower1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+double BullsPower5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+double BullsPower15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+double BullsPower30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __BWMFI_Parameters__ = "-- Settings for the Market Facilitation Index indicator --"; // >>> BWMFI <<<
-bool BWMFI1_Active = 0; // Enable for M1
-bool BWMFI5_Active = 0; // Enable for M5
-bool BWMFI15_Active = 0; // Enable for M15
-bool BWMFI30_Active = 0; // Enable for M30
+uint BWMFI_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 ENUM_TRAIL_TYPE BWMFI_TrailingStopMethod = T1_MA_FMS_PEAK; // Trail stop method
 ENUM_TRAIL_TYPE BWMFI_TrailingProfitMethod = T1_FIXED; // Trail profit method
 double BWMFI_SignalLevel = 0.00000000; // Signal level
+extern uint BWMFI_Shift = 0; // Shift (relative to the current bar, 0 - default)
 int BWMFI1_SignalMethod = 0; // Signal method for M1 (0-
 int BWMFI5_SignalMethod = 0; // Signal method for M5 (0-
 int BWMFI15_SignalMethod = 0; // Signal method for M15 (0-
@@ -595,36 +566,35 @@ double BWMFI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __CCI_Parameters__ = "-- Settings for the Commodity Channel Index indicator --"; // >>> CCI <<<
-extern bool CCI1_Active = 0; // Enable for M1
-extern bool CCI5_Active = 0; // Enable for M5
-extern bool CCI15_Active = 1; // Enable for M15
-extern bool CCI30_Active = 1; // Enable for M30
-extern double CCI_Period_Ratio = 1.0; // Period ratio between timeframes (1.0 - default)
-extern int CCI_Shift = 0; // Shift (0 for default)
-extern ENUM_TRAIL_TYPE CCI_TrailingStopMethod = 5; // Trail stop method
-extern ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = 12; // Trail profit method
-extern int CCI_Period = 28; // Period
+extern uint CCI_Active_Tf = 15; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern int CCI_Shift = 1; // Shift (0 for default)
+extern ENUM_TRAIL_TYPE CCI_TrailingStopMethod = 1; // Trail stop method
+extern ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = 1; // Trail profit method
+extern int CCI_Period_M1 = 58; // Period for M1
+extern int CCI_Period_M5 = 22; // Period for M5
+extern int CCI_Period_M15 = 18; // Period for M15
+extern int CCI_Period_M30 = 26; // Period for M30
 extern ENUM_APPLIED_PRICE CCI_Applied_Price = 2; // Applied Price
 extern double CCI_SignalLevel = 98; // Signal level (100 by default)
-extern int CCI1_SignalMethod = 34; // Signal method for M1 (0-63)
-extern int CCI5_SignalMethod = 18; // Signal method for M5 (0-63)
+extern int CCI1_SignalMethod = 0; // Signal method for M1 (0-63)
+extern int CCI5_SignalMethod = 0; // Signal method for M5 (0-63)
 extern int CCI15_SignalMethod = 0; // Signal method for M15 (0-63)
-extern int CCI30_SignalMethod = -44; // Signal method for M30 (0-63)
-extern int CCI1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
-extern int CCI1_OpenCondition2 = 98; // Open condition 2 for M1 (0-1023)
-extern ENUM_MARKET_EVENT CCI1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
+extern int CCI30_SignalMethod = 0; // Signal method for M30 (0-63)
+extern int CCI1_OpenCondition1 = 680; // Open condition 1 for M1 (0-1023)
+extern int CCI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+extern ENUM_MARKET_EVENT CCI1_CloseCondition = 31; // Close condition for M1
 
-extern int CCI5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
-extern int CCI5_OpenCondition2 = 583; // Open condition 2 for M5 (0-1023)
-extern ENUM_MARKET_EVENT CCI5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
+extern int CCI5_OpenCondition1 = 389; // Open condition 1 for M5 (0-1023)
+extern int CCI5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+extern ENUM_MARKET_EVENT CCI5_CloseCondition = 5; // Close condition for M5
 
 extern int CCI15_OpenCondition1 = 292; // Open condition 1 for M15 (0-1023)
-extern int CCI15_OpenCondition2 = 1; // Open condition 2 for M15 (0-1023)
-extern ENUM_MARKET_EVENT CCI15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
+extern int CCI15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+extern ENUM_MARKET_EVENT CCI15_CloseCondition = 5; // Close condition for M15
 
 extern int CCI30_OpenCondition1 = 292; // Open condition 1 for M30 (0-1023)
-extern int CCI30_OpenCondition2 = 1; // Open condition 2 for M30 (0-1023)
-extern ENUM_MARKET_EVENT CCI30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
+extern int CCI30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+extern ENUM_MARKET_EVENT CCI30_CloseCondition = 5; // Close condition for M30
 
 double CCI1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 double CCI5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
@@ -633,35 +603,34 @@ double CCI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --"; // >>> DEMARKER <<<
-extern bool DeMarker1_Active = 0; // Enable for M1
-extern bool DeMarker5_Active = 0; // Enable for M5
-extern bool DeMarker15_Active = 0; // Enable for M15
-extern bool DeMarker30_Active = 0; // Enable for M30
-extern int DeMarker_Period = 2; // Period
-extern double DeMarker_Period_Ratio = 1.5; // Period ratio between timeframes (0.5-1.5)
-extern int DeMarker_Shift = 5; // Shift
-extern double DeMarker_SignalLevel = -0.7; // Signal level (0.0-0.4)
-extern ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = 26; // Trail stop method
-extern ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = 20; // Trail profit method
-extern int DeMarker1_SignalMethod = 12; // Signal method for M1 (-31-31)
-extern int DeMarker5_SignalMethod = 12; // Signal method for M5 (-31-31)
-extern int DeMarker15_SignalMethod = 4; // Signal method for M15 (-31-31)
-extern int DeMarker30_SignalMethod = 12; // Signal method for M30 (-31-31)
-extern int DeMarker1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
-extern int DeMarker1_OpenCondition2 = 874; // Open condition 2 for M1 (0-1023)
-extern ENUM_MARKET_EVENT DeMarker1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
+extern uint DeMarker_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern int DeMarker_Period_M1 = 68; // Period for M1
+extern int DeMarker_Period_M5 = 76; // Period for M5
+extern int DeMarker_Period_M15 = 26; // Period for M15
+extern int DeMarker_Period_M30 = 14; // Period for M30
+extern int DeMarker_Shift = 1; // Shift
+extern double DeMarker_SignalLevel = 0.5; // Signal level (0.0-0.5)
+extern ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = 23; // Trail stop method
+extern ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = 22; // Trail profit method
+extern int DeMarker1_SignalMethod = 0; // Signal method for M1 (-31-31)
+extern int DeMarker5_SignalMethod = 0; // Signal method for M5 (-31-31)
+extern int DeMarker15_SignalMethod = 0; // Signal method for M15 (-31-31)
+extern int DeMarker30_SignalMethod = 0; // Signal method for M30 (-31-31)
+extern int DeMarker1_OpenCondition1 = 680; // Open condition 1 for M1 (0-1023)
+extern int DeMarker1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+extern ENUM_MARKET_EVENT DeMarker1_CloseCondition = 1; // Close condition for M1
 //
 extern int DeMarker5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
-extern int DeMarker5_OpenCondition2 = 874; // Open condition 2 for M5 (0-1023)
-extern ENUM_MARKET_EVENT DeMarker5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
+extern int DeMarker5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+extern ENUM_MARKET_EVENT DeMarker5_CloseCondition = 1; // Close condition for M5
 //
 extern int DeMarker15_OpenCondition1 = 874; // Open condition 1 for M15 (0-1023)
-extern int DeMarker15_OpenCondition2 = 680; // Open condition 2 for M15 (0-1023)
-extern ENUM_MARKET_EVENT DeMarker15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
+extern int DeMarker15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+extern ENUM_MARKET_EVENT DeMarker15_CloseCondition = 1; // Close condition for M15
 //
-extern int DeMarker30_OpenCondition1 = 98; // Open condition 1 for M30 (0-1023)
-extern int DeMarker30_OpenCondition2 = 680; // Open condition 2 for M30 (0-1023)
-extern ENUM_MARKET_EVENT DeMarker30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
+extern int DeMarker30_OpenCondition1 = 195; // Open condition 1 for M30 (0-1023)
+extern int DeMarker30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+extern ENUM_MARKET_EVENT DeMarker30_CloseCondition = 1; // Close condition for M30
 //
 extern double DeMarker1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 extern double DeMarker5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
@@ -670,41 +639,41 @@ extern double DeMarker30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --"; // >>> ENVELOPES <<<
-extern bool Envelopes1_Active = 0; // Enable for M1
-extern bool Envelopes5_Active = 0; // Enable for M5
-extern bool Envelopes15_Active = 0; // Enable for M15
-extern bool Envelopes30_Active = 1; // Enable for M30
-extern int Envelopes_MA_Period = 30; // Period
-extern double Envelopes_MA_Period_Ratio = 0.9; // Period ratio between timeframes (0.5-1.5)
-extern ENUM_MA_METHOD Envelopes_MA_Method = 0; // MA Method
-extern int Envelopes_MA_Shift = 2; // MA Shift
-extern ENUM_APPLIED_PRICE Envelopes_Applied_Price = 2; // Applied Price
-extern double Envelopes_Deviation = 0.5; // Deviation for M1
-extern double Envelopes_Deviation_Ratio = 1.2; // Deviation ratio between timeframes (0.5-1.5)
-extern int Envelopes_Shift = 2; // Shift
-int Envelopes_Shift_Far = 0; // Shift Far
-extern ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = 19; // Trail stop method
+extern uint Envelopes_Active_Tf = 4; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern int Envelopes_MA_Period_M1 = 6; // Period for M1
+extern int Envelopes_MA_Period_M5 = 6; // Period for M5
+extern int Envelopes_MA_Period_M15 = 22; // Period for M15
+extern int Envelopes_MA_Period_M30 = 6; // Period for M30
+extern double Envelopes_Deviation_M1 = 0.5; // Deviation for M1
+extern double Envelopes_Deviation_M5 = 0.6; // Deviation for M5
+extern double Envelopes_Deviation_M15 = 0.2; // Deviation for M15
+extern double Envelopes_Deviation_M30 = 0.3; // Deviation for M30
+extern ENUM_MA_METHOD Envelopes_MA_Method = 3; // MA Method
+extern int Envelopes_MA_Shift = 0; // MA Shift
+extern ENUM_APPLIED_PRICE Envelopes_Applied_Price = 3; // Applied Price
+extern int Envelopes_Shift = 0; // Shift
+extern ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = 23; // Trail stop method
 extern ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = -2; // Trail profit method
 /* @todo extern */ int Envelopes_SignalLevel = 0; // Signal level
-extern int Envelopes1_SignalMethod = -88; // Signal method for M1 (-127-127)
-extern int Envelopes5_SignalMethod = -88; // Signal method for M5 (-127-127)
-extern int Envelopes15_SignalMethod = -12; // Signal method for M15 (-127-127)
-extern int Envelopes30_SignalMethod = -76; // Signal method for M30 (-127-127)
+extern int Envelopes1_SignalMethod = 0; // Signal method for M1 (-127-127)
+extern int Envelopes5_SignalMethod = 0; // Signal method for M5 (-127-127)
+extern int Envelopes15_SignalMethod = 0; // Signal method for M15 (-127-127)
+extern int Envelopes30_SignalMethod = 0; // Signal method for M30 (-127-127)
 extern int Envelopes1_OpenCondition1 = 1; // Open condition 1 for M1 (0-1023)
-extern int Envelopes1_OpenCondition2 = 1; // Open condition 2 for M1 (0-1023)
-extern ENUM_MARKET_EVENT Envelopes1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
+extern int Envelopes1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+extern ENUM_MARKET_EVENT Envelopes1_CloseCondition = 13; // Close condition for M1
 //
 extern int Envelopes5_OpenCondition1 = 1; // Open condition 1 for M5 (0-1023)
-extern int Envelopes5_OpenCondition2 = 1; // Open condition 2 for M5 (0-1023)
-extern ENUM_MARKET_EVENT Envelopes5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
+extern int Envelopes5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+extern ENUM_MARKET_EVENT Envelopes5_CloseCondition = 7; // Close condition for M5
 //
-extern int Envelopes15_OpenCondition1 = 195; // Open condition 1 for M15 (0-1023)
-extern int Envelopes15_OpenCondition2 = 98; // Open condition 2 for M15 (0-1023)
-extern ENUM_MARKET_EVENT Envelopes15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
+extern int Envelopes15_OpenCondition1 = 292; // Open condition 1 for M15 (0-1023)
+extern int Envelopes15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+extern ENUM_MARKET_EVENT Envelopes15_CloseCondition = 29; // Close condition for M15
 //
 extern int Envelopes30_OpenCondition1 = 292; // Open condition 1 for M30 (0-1023)
-extern int Envelopes30_OpenCondition2 = 98; // Open condition 2 for M30 (0-1023)
-extern ENUM_MARKET_EVENT Envelopes30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
+extern int Envelopes30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+extern ENUM_MARKET_EVENT Envelopes30_CloseCondition = 29; // Close condition for M30
 //
 extern double Envelopes1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 extern double Envelopes5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
@@ -712,71 +681,69 @@ extern double Envelopes15_MaxSpread =  8.0; // Max spread to trade for M15 (pips
 extern double Envelopes30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
-string __Force_Parameters__ = "-- Settings for the Force Index indicator --"; // >>> FORCE <<<
-bool Force1_Active = 0; // Enable for M1
-bool Force5_Active = 0; // Enable for M5
-bool Force15_Active = 0; // Enable for M15
-bool Force30_Active = 0; // Enable for M30
-ENUM_TRAIL_TYPE Force_TrailingStopMethod = 22; // Trail stop method
-ENUM_TRAIL_TYPE Force_TrailingProfitMethod = 1; // Trail profit method
-int Force_Period = 13; // Period
-ENUM_MA_METHOD Force_MA_Method = 0; // MA Method
-ENUM_APPLIED_PRICE Force_Applied_price = PRICE_CLOSE; // Applied Price
-double Force_SignalLevel = 0.00000000; // Signal level
-int Force1_SignalMethod = 0; // Signal method for M1 (0-
-int Force5_SignalMethod = 0; // Signal method for M5 (0-
-int Force15_SignalMethod = 0; // Signal method for M15 (0-
-int Force30_SignalMethod = 0; // Signal method for M30 (0-
-int Force1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
-int Force1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-ENUM_MARKET_EVENT Force1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
+extern string __Force_Parameters__ = "-- Settings for the Force Index indicator --"; // >>> FORCE <<<
+extern uint Force_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern ENUM_TRAIL_TYPE Force_TrailingStopMethod = 7; // Trail stop method
+extern ENUM_TRAIL_TYPE Force_TrailingProfitMethod = 22; // Trail profit method
+extern int Force_Period_M1 = 38; // Period for M1
+extern int Force_Period_M5 = 38; // Period for M5
+extern int Force_Period_M15 = 12; // Period for M15
+extern int Force_Period_M30 = 38; // Period for M30
+extern ENUM_MA_METHOD Force_MA_Method = 0; // MA Method
+extern ENUM_APPLIED_PRICE Force_Applied_Price = 2; // Applied Price
+extern double Force_SignalLevel = 0; // Signal level
+extern uint Force_Shift = 1; // Shift (relative to the current bar, 0 - default)
+extern int Force1_SignalMethod = 0; // Signal method for M1 (0-
+extern int Force5_SignalMethod = 0; // Signal method for M5 (0-
+extern int Force15_SignalMethod = 0; // Signal method for M15 (0-
+extern int Force30_SignalMethod = 0; // Signal method for M30 (0-
+extern int Force1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
+extern int Force1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+extern ENUM_MARKET_EVENT Force1_CloseCondition = 1; // Close condition for M1
 
-int Force5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
-int Force5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-ENUM_MARKET_EVENT Force5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
+extern int Force5_OpenCondition1 = 680; // Open condition 1 for M5 (0-1023)
+extern int Force5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+extern ENUM_MARKET_EVENT Force5_CloseCondition = 1; // Close condition for M5
 
-int Force15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
-int Force15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-ENUM_MARKET_EVENT Force15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
+extern int Force15_OpenCondition1 = 292; // Open condition 1 for M15 (0-)
+extern int Force15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+extern ENUM_MARKET_EVENT Force15_CloseCondition = 1; // Close condition for M15
 
-int Force30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
-int Force30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-ENUM_MARKET_EVENT Force30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
+extern int Force30_OpenCondition1 = 777; // Open condition 1 for M30 (0-)
+extern int Force30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+extern ENUM_MARKET_EVENT Force30_CloseCondition = 1; // Close condition for M30
 
-double Force1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-double Force5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-double Force15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-double Force30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+extern double Force1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+extern double Force5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+extern double Force15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+extern double Force30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __Fractals_Parameters__ = "-- Settings for the Fractals indicator --"; // >>> FRACTALS <<<
-extern bool Fractals1_Active = 0; // Enable for M1
-extern bool Fractals5_Active = 0; // Enable for M5
-extern bool Fractals15_Active = 0; // Enable for M15
-extern bool Fractals30_Active = 0; // Enable for M30
+extern uint Fractals_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern int Fractals_Shift = 0; // Shift
 extern ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = 1; // Trail stop method
-extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = -3; // Trail profit method
+extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = 21; // Trail profit method
 /* @todo extern */ int Fractals_SignalLevel = 0; // Signal level
-extern int Fractals1_SignalMethod = 3; // Signal method for M1 (-3-3)
-extern int Fractals5_SignalMethod = 3; // Signal method for M5 (-3-3)
-extern int Fractals15_SignalMethod = 1; // Signal method for M15 (-3-3)
-extern int Fractals30_SignalMethod = -2; // Signal method for M30 (-3-3)
+extern int Fractals1_SignalMethod = 0; // Signal method for M1 (-3-3)
+extern int Fractals5_SignalMethod = 0; // Signal method for M5 (-3-3)
+extern int Fractals15_SignalMethod = 0; // Signal method for M15 (-3-3)
+extern int Fractals30_SignalMethod = 0; // Signal method for M30 (-3-3)
 extern int Fractals1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
-extern int Fractals1_OpenCondition2 = 874; // Open condition 2 for M1 (0-)
-extern ENUM_MARKET_EVENT Fractals1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
+extern int Fractals1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+extern ENUM_MARKET_EVENT Fractals1_CloseCondition = 11; // Close condition for M1
 //
 extern int Fractals5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
-extern int Fractals5_OpenCondition2 = 971; // Open condition 2 for M5 (0-)
-extern ENUM_MARKET_EVENT Fractals5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
+extern int Fractals5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+extern ENUM_MARKET_EVENT Fractals5_CloseCondition = 1; // Close condition for M5
 //
-extern int Fractals15_OpenCondition1 = 777; // Open condition 1 for M15 (0-)
-extern int Fractals15_OpenCondition2 = 971; // Open condition 2 for M15 (0-)
-extern ENUM_MARKET_EVENT Fractals15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
+extern int Fractals15_OpenCondition1 = 486; // Open condition 1 for M15 (0-)
+extern int Fractals15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+extern ENUM_MARKET_EVENT Fractals15_CloseCondition = 15; // Close condition for M15
 //
-extern int Fractals30_OpenCondition1 = 874; // Open condition 1 for M30 (0-)
-extern int Fractals30_OpenCondition2 = 389; // Open condition 2 for M30 (0-)
-extern ENUM_MARKET_EVENT Fractals30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
+extern int Fractals30_OpenCondition1 = 195; // Open condition 1 for M30 (0-)
+extern int Fractals30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+extern ENUM_MARKET_EVENT Fractals30_CloseCondition = 1; // Close condition for M30
 //
 extern double Fractals1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 extern double Fractals5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
@@ -785,12 +752,18 @@ extern double Fractals30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __Gator_Parameters__ = "-- Settings for the Gator oscillator --"; // >>> GATOR <<<
-bool Gator1_Active = 0; // Enable for M1
-bool Gator5_Active = 0; // Enable for M5
-bool Gator15_Active = 0; // Enable for M15
-bool Gator30_Active = 0; // Enable for M30
-ENUM_TRAIL_TYPE Gator_TrailingStopMethod = T1_MA_FMS_PEAK; // Trail stop method
-ENUM_TRAIL_TYPE Gator_TrailingProfitMethod = T1_FIXED; // Trail profit method
+uint Gator_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+int Gator_Period_Jaw = 6; // Jaw Period
+int Gator_Period_Teeth = 10; // Teeth Period
+int Gator_Period_Lips = 8; // Lips Period
+int Gator_Shift_Jaw = 5; // Jaw Shift
+int Gator_Shift_Teeth = 7; // Teeth Shift
+int Gator_Shift_Lips = 5; // Lips Shift
+ENUM_MA_METHOD Gator_MA_Method = 2; // MA Method
+ENUM_APPLIED_PRICE Gator_Applied_Price = 3; // Applied Price
+int Gator_Shift = 2; // Shift
+ENUM_TRAIL_TYPE Gator_TrailingStopMethod = 22; // Trail stop method
+ENUM_TRAIL_TYPE Gator_TrailingProfitMethod = 1; // Trail profit method
 double Gator_SignalLevel = 0.00000000; // Signal level
 int Gator1_SignalMethod = 0; // Signal method for M1 (0-
 int Gator5_SignalMethod = 0; // Signal method for M5 (0-
@@ -819,10 +792,7 @@ double Gator30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __Ichimoku_Parameters__ = "-- Settings for the Ichimoku Kinko Hyo indicator --"; // >>> ICHIMOKU <<<
-bool Ichimoku1_Active = 0; // Enable for M1
-bool Ichimoku5_Active = 0; // Enable for M5
-bool Ichimoku15_Active = 0; // Enable for M15
-bool Ichimoku30_Active = 0; // Enable for M30
+uint Ichimoku_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 ENUM_TRAIL_TYPE Ichimoku_TrailingStopMethod = T1_MA_FMS_PEAK; // Trail stop method
 ENUM_TRAIL_TYPE Ichimoku_TrailingProfitMethod = T1_FIXED; // Trail profit method
 int Ichimoku_Period_Tenkan_Sen = 9; // Period Tenkan Sen
@@ -856,43 +826,38 @@ double Ichimoku30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __MA_Parameters__ = "-- Settings for the Moving Average indicator --"; // >>> MA <<<
-extern bool MA1_Active = 1; // Enable for M1
-extern bool MA5_Active = 0; // Enable for M5
-extern bool MA15_Active = 0; // Enable for M15
-extern bool MA30_Active = 0; // Enable for M30
+extern uint MA_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 extern int MA_Period_Fast = 12; // Period Fast
 extern int MA_Period_Medium = 12; // Period Medium
 extern int MA_Period_Slow = 4; // Period Slow
-extern double MA_Period_Ratio = 2.5; // Period ratio between timeframes (0.5-1.5)
 extern int MA_Shift = 8; // Shift
 extern int MA_Shift_Fast = 10; // Shift Fast (+1)
 extern int MA_Shift_Medium = 10; // Shift Medium (+1)
 extern int MA_Shift_Slow = 5; // Shift Slow (+1)
-extern int MA_Shift_Far = 0; // Shift Far (+2)
 extern ENUM_MA_METHOD MA_Method = 1; // MA Method
 extern ENUM_APPLIED_PRICE MA_Applied_Price = 6; // Applied Price
-extern ENUM_TRAIL_TYPE MA_TrailingStopMethod = 27; // Trail stop method
-extern ENUM_TRAIL_TYPE MA_TrailingProfitMethod = 13; // Trail profit method
+extern ENUM_TRAIL_TYPE MA_TrailingStopMethod = 23; // Trail stop method
+extern ENUM_TRAIL_TYPE MA_TrailingProfitMethod = 16; // Trail profit method
 extern double MA_SignalLevel = -0.6; // Signal level
-extern int MA1_SignalMethod = -118; // Signal method for M1 (-127-127)
-extern int MA5_SignalMethod = 32; // Signal method for M5 (-127-127)
-extern int MA15_SignalMethod = -127; // Signal method for M15 (-127-127)
-extern int MA30_SignalMethod = -127; // Signal method for M30 (-127-127)
-extern int MA1_OpenCondition1 = 680; // Open condition 1 for M1 (0-1023)
-extern int MA1_OpenCondition2 = 292; // Open condition 2 for M1 (0-1023)
-extern ENUM_MARKET_EVENT MA1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
+extern int MA1_SignalMethod = 0; // Signal method for M1 (-127-127)
+extern int MA5_SignalMethod = 0; // Signal method for M5 (-127-127)
+extern int MA15_SignalMethod = 0; // Signal method for M15 (-127-127)
+extern int MA30_SignalMethod = 0; // Signal method for M30 (-127-127)
+extern int MA1_OpenCondition1 = 874; // Open condition 1 for M1 (0-1023)
+extern int MA1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+extern ENUM_MARKET_EVENT MA1_CloseCondition = 24; // Close condition for M1
 //
-extern int MA5_OpenCondition1 = 292; // Open condition 1 for M5 (0-1023)
-extern int MA5_OpenCondition2 = 1; // Open condition 2 for M5 (0-1023)
-extern ENUM_MARKET_EVENT MA5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
+extern int MA5_OpenCondition1 = 680; // Open condition 1 for M5 (0-1023)
+extern int MA5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+extern ENUM_MARKET_EVENT MA5_CloseCondition = 11; // Close condition for M5
 //
-extern int MA15_OpenCondition1 = 98; // Open condition 1 for M15 (0-1023)
-extern int MA15_OpenCondition2 = 1; // Open condition 2 for M15 (0-1023)
-extern ENUM_MARKET_EVENT MA15_CloseCondition = C_MA_BUY_SELL; // Close condition for M15
+extern int MA15_OpenCondition1 = 583; // Open condition 1 for M15 (0-1023)
+extern int MA15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+extern ENUM_MARKET_EVENT MA15_CloseCondition = 24; // Close condition for M15
 //
-extern int MA30_OpenCondition1 = 292; // Open condition 1 for M30 (0-1023)
-extern int MA30_OpenCondition2 = 1; // Open condition 2 for M30 (0-1023)
-extern ENUM_MARKET_EVENT MA30_CloseCondition = C_MA_BUY_SELL; // Close condition for M30
+extern int MA30_OpenCondition1 = 195; // Open condition 1 for M30 (0-1023)
+extern int MA30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+extern ENUM_MARKET_EVENT MA30_CloseCondition = 1; // Close condition for M30
 //
 extern double MA1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 extern double MA5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
@@ -901,39 +866,34 @@ extern double MA30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --"; // >>> MACD <<<
-extern bool MACD1_Active = 1; // Enable for M1
-extern bool MACD5_Active = 0; // Enable for M5
-extern bool MACD15_Active = 1; // Enable for M15
-extern bool MACD30_Active = 0; // Enable for M30
-extern int MACD_Period_Fast = 15; // Period Fast
-extern int MACD_Period_Slow = 29; // Period Slow
+extern uint MACD_Active_Tf = 13; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern int MACD_Period_Fast = 23; // Period Fast
+extern int MACD_Period_Slow = 21; // Period Slow
 extern int MACD_Period_Signal = 10; // Period for signal
-extern double MACD_Period_Ratio = 1.0; // Period ratio between timeframes (0.5-1.5)
-extern ENUM_APPLIED_PRICE MACD_Applied_Price = 2; // Applied Price
+extern ENUM_APPLIED_PRICE MACD_Applied_Price = 0; // Applied Price
 extern int MACD_Shift = 3; // Shift
-extern int MACD_Shift_Far = 0; // Shift Far
 extern ENUM_TRAIL_TYPE MACD_TrailingStopMethod = -1; // Trail stop method
 extern ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = -19; // Trail profit method
-extern double MACD_SignalLevel = -0.3; // Signal level
-extern int MACD1_SignalMethod = -26; // Signal method for M1 (-31-31)
-extern int MACD5_SignalMethod = -31; // Signal method for M5 (-31-31)
-extern int MACD15_SignalMethod = -25; // Signal method for M15 (-31-31)
-extern int MACD30_SignalMethod = 4; // Signal method for M30 (-31-31)
+extern double MACD_SignalLevel = 0.1; // Signal level
+extern int MACD1_SignalMethod = 0; // Signal method for M1 (-31-31)
+extern int MACD5_SignalMethod = 0; // Signal method for M5 (-31-31)
+extern int MACD15_SignalMethod = 0; // Signal method for M15 (-31-31)
+extern int MACD30_SignalMethod = 0; // Signal method for M30 (-31-31)
 extern int MACD1_OpenCondition1 = 874; // Open condition 1 for M1 (0-1023)
-extern int MACD1_OpenCondition2 = 292; // Open condition 2 for M1 (0-1023)
-extern ENUM_MARKET_EVENT MACD1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
+extern int MACD1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+extern ENUM_MARKET_EVENT MACD1_CloseCondition = 1; // Close condition for M1
 //
-extern int MACD5_OpenCondition1 = 583; // Open condition 1 for M5 (0-1023)
-extern int MACD5_OpenCondition2 = 971; // Open condition 2 for M5 (0-1023)
-extern ENUM_MARKET_EVENT MACD5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
+extern int MACD5_OpenCondition1 = 680; // Open condition 1 for M5 (0-1023)
+extern int MACD5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+extern ENUM_MARKET_EVENT MACD5_CloseCondition = 1; // Close condition for M5
 //
-extern int MACD15_OpenCondition1 = 583; // Open condition 1 for M15 (0-1023)
-extern int MACD15_OpenCondition2 = 680; // Open condition 2 for M15 (0-1023)
-extern ENUM_MARKET_EVENT MACD15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
+extern int MACD15_OpenCondition1 = 486; // Open condition 1 for M15 (0-1023)
+extern int MACD15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+extern ENUM_MARKET_EVENT MACD15_CloseCondition = 1; // Close condition for M15
 //
-extern int MACD30_OpenCondition1 = 874; // Open condition 1 for M30 (0-1023)
-extern int MACD30_OpenCondition2 = 874; // Open condition 2 for M30 (0-1023)
-extern ENUM_MARKET_EVENT MACD30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
+extern int MACD30_OpenCondition1 = 777; // Open condition 1 for M30 (0-1023)
+extern int MACD30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+extern ENUM_MARKET_EVENT MACD30_CloseCondition = 1; // Close condition for M30
 //
 extern double MACD1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 extern double MACD5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
@@ -941,50 +901,47 @@ extern double MACD15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
 extern double MACD30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
-string __MFI_Parameters__ = "-- Settings for the Money Flow Index indicator --"; // >>> MFI <<<
-bool MFI1_Active = 0; // Enable for M1
-bool MFI5_Active = 0; // Enable for M5
-bool MFI15_Active = 0; // Enable for M15
-bool MFI30_Active = 0; // Enable for M30
-ENUM_TRAIL_TYPE MFI_TrailingStopMethod = 22; // Trail stop method
-ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = 1; // Trail profit method
-int MFI_Period = 14; // Period
-double MFI_SignalLevel = 0.00000000; // Signal level
-int MFI1_SignalMethod = 0; // Signal method for M1 (0-
-int MFI5_SignalMethod = 0; // Signal method for M5 (0-
-int MFI15_SignalMethod = 0; // Signal method for M15 (0-
-int MFI30_SignalMethod = 0; // Signal method for M30 (0-
-int MFI1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
-int MFI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-ENUM_MARKET_EVENT MFI1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
+extern string __MFI_Parameters__ = "-- Settings for the Money Flow Index indicator --"; // >>> MFI <<<
+extern uint MFI_Active_Tf = 4; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern ENUM_TRAIL_TYPE MFI_TrailingStopMethod = 7; // Trail stop method
+extern ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = 22; // Trail profit method
+extern int MFI_Period_M1 = 2; // Period for M1
+extern int MFI_Period_M5 = 22; // Period for M5
+extern int MFI_Period_M15 = 8; // Period for M15
+extern int MFI_Period_M30 = 12; // Period for M30
+extern double MFI_SignalLevel = 0.9; // Signal level
+extern uint MFI_Shift = 0; // Shift (relative to the current bar, 0 - default)
+extern int MFI1_SignalMethod = 0; // Signal method for M1 (0-1)
+extern int MFI5_SignalMethod = 0; // Signal method for M5 (0-1)
+extern int MFI15_SignalMethod = 0; // Signal method for M15 (0-1)
+extern int MFI30_SignalMethod = 0; // Signal method for M30 (0-1)
+extern int MFI1_OpenCondition1 = 874; // Open condition 1 for M1 (0-1023)
+extern int MFI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+extern ENUM_MARKET_EVENT MFI1_CloseCondition = 14; // Close condition for M1
 
-int MFI5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
-int MFI5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-ENUM_MARKET_EVENT MFI5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
+extern int MFI5_OpenCondition1 = 1; // Open condition 1 for M5 (0-1023)
+extern int MFI5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+extern ENUM_MARKET_EVENT MFI5_CloseCondition = 2; // Close condition for M5
 
-int MFI15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
-int MFI15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-ENUM_MARKET_EVENT MFI15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
+extern int MFI15_OpenCondition1 = 292; // Open condition 1 for M15 (0-)
+extern int MFI15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+extern ENUM_MARKET_EVENT MFI15_CloseCondition = 1; // Close condition for M15
 
-int MFI30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
-int MFI30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-ENUM_MARKET_EVENT MFI30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
+extern int MFI30_OpenCondition1 = 777; // Open condition 1 for M30 (0-)
+extern int MFI30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+extern ENUM_MARKET_EVENT MFI30_CloseCondition = 3; // Close condition for M30
 
-double MFI1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-double MFI5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-double MFI15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-double MFI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+extern double MFI1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+extern double MFI5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+extern double MFI15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+extern double MFI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __Momentum_Parameters__ = "-- Settings for the Momentum indicator --"; // >>> MOMENTUM <<<
-bool Momentum1_Active = 0; // Enable for M1
-bool Momentum5_Active = 0; // Enable for M5
-bool Momentum15_Active = 0; // Enable for M15
-bool Momentum30_Active = 0; // Enable for M30
-ENUM_TRAIL_TYPE Momentum_TrailingStopMethod = T1_MA_FMS_PEAK; // Trail stop method
-ENUM_TRAIL_TYPE Momentum_TrailingProfitMethod = T1_FIXED; // Trail profit method
-int Momentum_Period_Fast = 12; // Period Fast
-int Momentum_Period_Slow = 20; // Period Slow
+uint Momentum_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+ENUM_TRAIL_TYPE Momentum_TrailingStopMethod = 22; // Trail stop method
+ENUM_TRAIL_TYPE Momentum_TrailingProfitMethod = 1; // Trail profit method
+int Momentum_Period = 12; // Period Fast
 ENUM_APPLIED_PRICE Momentum_Applied_Price = 0; // Applied Price
 double Momentum_SignalLevel = 0.00000000; // Signal level
 int Momentum1_SignalMethod = 0; // Signal method for M1 (0-
@@ -1013,10 +970,7 @@ double Momentum30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __OBV_Parameters__ = "-- Settings for the On Balance Volume indicator --"; // >>> OBV <<<
-bool OBV1_Active = 0; // Enable for M1
-bool OBV5_Active = 0; // Enable for M5
-bool OBV15_Active = 0; // Enable for M15
-bool OBV30_Active = 0; // Enable for M30
+uint OBV_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 ENUM_TRAIL_TYPE OBV_TrailingStopMethod = T1_MA_FMS_PEAK; // Trail stop method
 ENUM_TRAIL_TYPE OBV_TrailingProfitMethod = T1_FIXED; // Trail profit method
 ENUM_APPLIED_PRICE OBV_Applied_Price = 0; // Applied Price
@@ -1048,16 +1002,12 @@ double OBV30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __OSMA_Parameters__ = "-- Settings for the Moving Average of Oscillator indicator --"; // >>> OSMA <<<
-bool OSMA1_Active = 0; // Enable for M1
-bool OSMA5_Active = 0; // Enable for M5
-bool OSMA15_Active = 0; // Enable for M15
-bool OSMA30_Active = 0; // Enable for M30
+uint OSMA_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 ENUM_TRAIL_TYPE OSMA_TrailingStopMethod = T1_MA_FMS_PEAK; // Trail stop method
 ENUM_TRAIL_TYPE OSMA_TrailingProfitMethod = T1_FIXED; // Trail profit method
 int OSMA_Period_Fast = 12; // Period Fast
 int OSMA_Period_Slow = 26; // Period Slow
 int OSMA_Period_Signal = 9; // Period for signal
-double OSMA_Period_Ratio = 1.0; // Period ratio between timeframes (0.5-1.5)
 ENUM_APPLIED_PRICE OSMA_Applied_Price = 0; // Applied Price
 double OSMA_SignalLevel = 1.20000000; // Signal level
 int OSMA1_SignalMethod = 0; // Signal method for M1 (0-
@@ -1088,38 +1038,36 @@ double OSMA30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --"; // >>> RSI <<<
-extern bool RSI1_Active = 0; // Enable for M1
-extern bool RSI5_Active = 1; // Enable for M5
-extern bool RSI15_Active = 1; // Enable for M15
-extern bool RSI30_Active = 1; // Enable for M30
-extern int RSI_Period = 16; // Period
-extern double RSI_Period_Ratio = 1.0; // Period ratio between timeframes (0.5-1.5)
+extern uint RSI_Active_Tf = 14; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern int RSI_Period_M1 = 32; // Period for M1
+extern int RSI_Period_M5 = 2; // Period for M5
+extern int RSI_Period_M15 = 2; // Period for M15
+extern int RSI_Period_M30 = 2; // Period for M30
 extern ENUM_APPLIED_PRICE RSI_Applied_Price = 3; // Applied Price
 extern uint RSI_Shift = 0; // Shift
-extern ENUM_TRAIL_TYPE RSI_TrailingStopMethod = 24; // Trail stop method
-extern ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = 4; // Trail profit method
-extern int RSI_SignalLevel = 26; // Signal level (-49-49)
-extern int RSI1_SignalMethod = -63; // Signal method for M1 (-63-63)
-extern int RSI5_SignalMethod = -61; // Signal method for M5 (-63-63)
-extern int RSI15_SignalMethod = -63; // Signal method for M15 (-63-63)
+extern ENUM_TRAIL_TYPE RSI_TrailingStopMethod = 6; // Trail stop method
+extern ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = 11; // Trail profit method
+extern int RSI_SignalLevel = 36; // Signal level (-49-49)
+extern int RSI1_SignalMethod = 0; // Signal method for M1 (-63-63)
+extern int RSI5_SignalMethod = 0; // Signal method for M5 (-63-63)
+extern int RSI15_SignalMethod = 0; // Signal method for M15 (-63-63)
 extern int RSI30_SignalMethod = 0; // Signal method for M30 (-63-63)
-// bool RSI_DynamicPeriod = False;
 
-extern int RSI1_OpenCondition1 = 292; // Open condition 1 for M1 (0-1023)
-extern int RSI1_OpenCondition2 = 1; // Open condition 2 for M1 (0-1023)
-extern ENUM_MARKET_EVENT RSI1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
+extern int RSI1_OpenCondition1 = 1; // Open condition 1 for M1 (0-1023)
+extern int RSI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+extern ENUM_MARKET_EVENT RSI1_CloseCondition = 1; // Close condition for M1
 
 extern int RSI5_OpenCondition1 = 1; // Open condition 1 for M5 (0-1023)
-extern int RSI5_OpenCondition2 = 1; // Open condition 2 for M5 (0-1023)
-extern ENUM_MARKET_EVENT RSI5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
+extern int RSI5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+extern ENUM_MARKET_EVENT RSI5_CloseCondition = 31; // Close condition for M5
 
-extern int RSI15_OpenCondition1 = 292; // Open condition 1 for M15 (0-1023)
-extern int RSI15_OpenCondition2 = 1; // Open condition 2 for M15 (0-1023)
-extern ENUM_MARKET_EVENT RSI15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
+extern int RSI15_OpenCondition1 = 389; // Open condition 1 for M15 (0-1023)
+extern int RSI15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+extern ENUM_MARKET_EVENT RSI15_CloseCondition = 1; // Close condition for M15
 
-extern int RSI30_OpenCondition1 = 292; // Open condition 1 for M30 (0-1023)
-extern int RSI30_OpenCondition2 = 1; // Open condition 2 for M30 (0-1023)
-extern ENUM_MARKET_EVENT RSI30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
+extern int RSI30_OpenCondition1 = 195; // Open condition 1 for M30 (0-1023)
+extern int RSI30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+extern ENUM_MARKET_EVENT RSI30_CloseCondition = 1; // Close condition for M30
 
 double RSI1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 double RSI5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
@@ -1128,14 +1076,11 @@ double RSI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __RVI_Parameters__ = "-- Settings for the Relative Vigor Index indicator --"; // >>> RVI <<<
-bool RVI1_Active = 0; // Enable for M1
-bool RVI5_Active = 0; // Enable for M5
-bool RVI15_Active = 0; // Enable for M15
-bool RVI30_Active = 0; // Enable for M30
+uint RVI_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+uint RVI_Period = 10; // Period
 ENUM_TRAIL_TYPE RVI_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE RVI_TrailingProfitMethod = 1; // Trail profit method
 int RVI_Shift = 2; // Shift
-int RVI_Shift_Far = 0; // Shift Far
 double RVI_SignalLevel = 0.00000000; // Signal level
 int RVI1_SignalMethod = 0; // Signal method for M1 (0-
 int RVI5_SignalMethod = 0; // Signal method for M5 (0-
@@ -1164,33 +1109,29 @@ double RVI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __SAR_Parameters__ = "-- Settings for the Parabolic Stop and Reverse system indicator --"; // >>> SAR <<<
-extern bool SAR1_Active = 0; // Enable for M1
-extern bool SAR5_Active = 0; // Enable for M5
-extern bool SAR15_Active = 0; // Enable for M15
-extern bool SAR30_Active = 1; // Enable for M30
-extern double SAR_Step = 0.2; // Step
-extern double SAR_Step_Ratio = 1.0; // Step ratio between timeframes (0.5-1.5)
+extern uint SAR_Active_Tf = 10; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern double SAR_Step = 0.05; // Step
 extern double SAR_Maximum_Stop = 0.4; // Maximum stop
 extern int SAR_Shift = 0; // Shift
-extern ENUM_TRAIL_TYPE SAR_TrailingStopMethod = 8; // Trail stop method
-extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = 27; // Trail profit method
-extern double SAR_SignalLevel = 0.00000000; // Signal level
-extern int SAR1_SignalMethod = 127; // Signal method for M1 (-127-127)
-extern int SAR5_SignalMethod = -101; // Signal method for M5 (-127-127)
-extern int SAR15_SignalMethod = -112; // Signal method for M15 (-127-127)
-extern int SAR30_SignalMethod = -104; // Signal method for M30 (-127-127)
-extern int SAR1_OpenCondition1 = 971;
-extern int SAR1_OpenCondition2 = 874;
-extern ENUM_MARKET_EVENT SAR1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
-extern int SAR5_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
-extern int SAR5_OpenCondition2 = 874; // Open condition 2 for M5 (0-1023)
-extern ENUM_MARKET_EVENT SAR5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
-extern int SAR15_OpenCondition1 = 98; // Open condition 1 for M15 (0-1023)
-extern int SAR15_OpenCondition2 = 680; // Open condition 2 for M15 (0-1023)
-extern ENUM_MARKET_EVENT SAR15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
-extern int SAR30_OpenCondition1 = 98; // Open condition 1 for M30 (0-1023)
-extern int SAR30_OpenCondition2 = 1; // Open condition 2 for M30 (0-1023)
-extern ENUM_MARKET_EVENT SAR30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
+extern ENUM_TRAIL_TYPE SAR_TrailingStopMethod = 7; // Trail stop method
+extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = 11; // Trail profit method
+extern double SAR_SignalLevel = 0; // Signal level
+extern int SAR1_SignalMethod = 0; // Signal method for M1 (-127-127)
+extern int SAR5_SignalMethod = 0; // Signal method for M5 (-127-127)
+extern int SAR15_SignalMethod = 0; // Signal method for M15 (-127-127)
+extern int SAR30_SignalMethod = 0; // Signal method for M30 (-127-127)
+extern int SAR1_OpenCondition1 = 680;
+extern int SAR1_OpenCondition2 = 0;
+extern ENUM_MARKET_EVENT SAR1_CloseCondition = 1; // Close condition for M1
+extern int SAR5_OpenCondition1 = 680; // Open condition 1 for M1 (0-1023)
+extern int SAR5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+extern ENUM_MARKET_EVENT SAR5_CloseCondition = 1; // Close condition for M5
+extern int SAR15_OpenCondition1 = 389; // Open condition 1 for M15 (0-1023)
+extern int SAR15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+extern ENUM_MARKET_EVENT SAR15_CloseCondition = 1; // Close condition for M15
+extern int SAR30_OpenCondition1 = 389; // Open condition 1 for M30 (0-1023)
+extern int SAR30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+extern ENUM_MARKET_EVENT SAR30_CloseCondition = 1; // Close condition for M30
 extern double SAR1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 extern double SAR5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 extern double SAR15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
@@ -1198,16 +1139,14 @@ extern double SAR30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __StdDev_Parameters__ = "-- Settings for the Standard Deviation indicator --"; // >>> STDDEV <<<
-bool StdDev1_Active = 0; // Enable for M1
-bool StdDev5_Active = 0; // Enable for M5
-bool StdDev15_Active = 0; // Enable for M15
-bool StdDev30_Active = 0; // Enable for M30
+uint StdDev_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+int StdDev_MA_Period = 10; // Period
+int StdDev_MA_Shift = 0; // Shift
+ENUM_MA_METHOD StdDev_MA_Method = 1; // MA Method
+ENUM_APPLIED_PRICE StdDev_Applied_Price = PRICE_CLOSE; // Applied Price
+int StdDev_Shift = 0; // Shift
 ENUM_TRAIL_TYPE StdDev_TrailingStopMethod = T1_MA_FMS_PEAK; // Trail stop method
 ENUM_TRAIL_TYPE StdDev_TrailingProfitMethod = T1_FIXED; // Trail profit method
-ENUM_APPLIED_PRICE StdDev_Applied_Price = 0; // Applied Price
-int StdDev_MA_Period = 10; // Period
-ENUM_MA_METHOD StdDev_MA_Method = 1; // MA Method
-int StdDev_MA_Shift = 0; // Shift
 double StdDev_SignalLevel = 0.00000000; // Signal level
 int StdDev1_SignalMethod = 0; // Signal method for M1 (0-
 int StdDev5_SignalMethod = 0; // Signal method for M5 (0-
@@ -1236,10 +1175,13 @@ double StdDev30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __Stochastic_Parameters__ = "-- Settings for the Stochastic Oscillator --"; // >>> STOCHASTIC <<<
-bool Stochastic1_Active = 0; // Enable for M1
-bool Stochastic5_Active = 0; // Enable for M5
-bool Stochastic15_Active = 0; // Enable for M15
-bool Stochastic30_Active = 0; // Enable for M30
+uint Stochastic_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+uint Stochastic_KPeriod = 5; // K line period
+uint Stochastic_DPeriod = 5; // D line period
+uint Stochastic_Slowing = 5; // Slowing
+ENUM_MA_METHOD Stochastic_MA_Method = MODE_SMA; // Moving Average method
+ENUM_STO_PRICE Stochastic_Price_Field = 0; // Price (0 - Low/High or 1 - Close/Close)
+uint Stochastic_Shift = 0; // Shift (relative to the current bar)
 ENUM_TRAIL_TYPE Stochastic_TrailingStopMethod = T1_MA_FMS_PEAK; // Trail stop method
 ENUM_TRAIL_TYPE Stochastic_TrailingProfitMethod = T1_FIXED; // Trail profit method
 double Stochastic_SignalLevel = 0.00000000; // Signal level
@@ -1270,35 +1212,34 @@ double Stochastic30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 extern string __WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --"; // >>> WPR <<<
-extern bool WPR1_Active = 1; // Enable for M1
-extern bool WPR5_Active = 1; // Enable for M5
-extern bool WPR15_Active = 1; // Enable for M15
-extern bool WPR30_Active = 0; // Enable for M30
-extern int WPR_Period = 6; // Period
-extern double WPR_Period_Ratio = 1.0; // Period ratio between timeframes (0.5-1.5)
+extern uint WPR_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern int WPR_Period_M1 = 11; // Period for M1
+extern int WPR_Period_M5 = 5; // Period for M5
+extern int WPR_Period_M15 = 5; // Period for M15
+extern int WPR_Period_M30 = 8; // Period for M30
 extern int WPR_Shift = 0; // Shift
 extern int WPR_SignalLevel = 20; // Signal level
-extern ENUM_TRAIL_TYPE WPR_TrailingStopMethod = 27; // Trail stop method
-extern ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = 27; // Trail profit method
-extern int WPR1_SignalMethod = -46; // Signal method for M1 (-63-63)
-extern int WPR5_SignalMethod = -40; // Signal method for M5 (-63-63)
-extern int WPR15_SignalMethod = -60; // Signal method for M15 (-63-63)
+extern ENUM_TRAIL_TYPE WPR_TrailingStopMethod = 22; // Trail stop method
+extern ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = 11; // Trail profit method
+extern int WPR1_SignalMethod = 0; // Signal method for M1 (-63-63)
+extern int WPR5_SignalMethod = 0; // Signal method for M5 (-63-63)
+extern int WPR15_SignalMethod = 0; // Signal method for M15 (-63-63)
 extern int WPR30_SignalMethod = 0; // Signal method for M30 (-63-63)
-extern int WPR1_OpenCondition1 = 98; // Open condition 1 for M1 (0-1023)
-extern int WPR1_OpenCondition2 = 680; // Open condition 2 for M1 (0-1023)
-extern ENUM_MARKET_EVENT WPR1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
+extern int WPR1_OpenCondition1 = 874; // Open condition 1 for M1 (0-1023)
+extern int WPR1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+extern ENUM_MARKET_EVENT WPR1_CloseCondition = 1; // Close condition for M1
 //
-extern int WPR5_OpenCondition1 = 292; // Open condition 1 for M5 (0-1023)
-extern int WPR5_OpenCondition2 = 389; // Open condition 2 for M5 (0-1023)
-extern ENUM_MARKET_EVENT WPR5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
+extern int WPR5_OpenCondition1 = 680; // Open condition 1 for M5 (0-1023)
+extern int WPR5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+extern ENUM_MARKET_EVENT WPR5_CloseCondition = 1; // Close condition for M5
 //
-extern int WPR15_OpenCondition1 = 292; // Open condition 1 for M15 (0-1023)
-extern int WPR15_OpenCondition2 = 1; // Open condition 2 for M15 (0-1023)
-extern ENUM_MARKET_EVENT WPR15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
+extern int WPR15_OpenCondition1 = 98; // Open condition 1 for M15 (0-1023)
+extern int WPR15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+extern ENUM_MARKET_EVENT WPR15_CloseCondition = 1; // Close condition for M15
 //
 extern int WPR30_OpenCondition1 = 292; // Open condition 1 for M30 (0-1023)
-extern int WPR30_OpenCondition2 = 1; // Open condition 2 for M30 (0-1023)
-extern ENUM_MARKET_EVENT WPR30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
+extern int WPR30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+extern ENUM_MARKET_EVENT WPR30_CloseCondition = 1; // Close condition for M30
 //
 extern double WPR1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 extern double WPR5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
@@ -1307,10 +1248,11 @@ extern double WPR30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 //+------------------------------------------------------------------+
 string __ZigZag_Parameters__ = "-- Settings for the ZigZag indicator --"; // >>> ZIGZAG <<<
-bool ZigZag1_Active = 0; // Enable for M1
-bool ZigZag5_Active = 0; // Enable for M5
-bool ZigZag15_Active = 0; // Enable for M15
-bool ZigZag30_Active = 0; // Enable for M30
+uint ZigZag_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+uint ZigZag_Depth = 0; // Depth
+uint ZigZag_Deviation = 0; // Deviation
+uint ZigZag_Backstep = 0; // Deviation
+uint ZigZag_Shift = 0; // Shift (relative to the current bar)
 ENUM_TRAIL_TYPE ZigZag_TrailingStopMethod = T1_MA_FMS_PEAK; // Trail stop method
 ENUM_TRAIL_TYPE ZigZag_TrailingProfitMethod = T1_FIXED; // Trail profit method
 double ZigZag_SignalLevel = 0.00000000; // Signal level
@@ -1394,7 +1336,6 @@ extern string __Backtest_Parameters__ = "-- Testing & troubleshooting parameters
   extern bool ValidateSettings = 1; // Validate startup settings
 #endif
 extern bool RecordTicksToCSV = 0; // Record ticks into CSV files
-extern int SmartToggleComponent = 0; // Override: Toggle different components (0-43)
 extern int AccountConditionToDisable = 0; // Override: Disable specific n action
 extern bool DisableCloseConditions = 0; // Override: Disable all close conditions
 // extern int DemoMarketStopLevel = 10; // Demo market stop level

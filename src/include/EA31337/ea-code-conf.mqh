@@ -45,10 +45,6 @@
   //#define __noactions__ // Disable actions for limited mode.
 #endif
 
-#ifdef __expire__
-  #define __release__     // Enable release if expiration is enabled.
-#endif
-
 #ifdef __release__
   #ifndef __input__
     #define __input__
