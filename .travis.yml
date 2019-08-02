@@ -8,10 +8,11 @@ addons:
 env:
   global:
   - CWD=$TRAVIS_BUILD_DIR
+  - BUILD_EURUSD_2018="DOCKER_BUILDKIT=1 docker build --build-arg UID=$UID --target ea31337-eurusd-2018 ."
   matrix:
-  - CMD="cd docker/tests/lite; docker-compose build --build-arg UID=$UID lite_test_2018_01; docker-compose run --rm lite_test_2018_01"
-  - CMD="cd docker/tests/advanced; docker-compose build --build-arg UID=$UID advanced_test_2018_01; docker-compose run --rm advanced_test_2018_01"
-  - CMD="cd docker/tests/rider; docker-compose build --build-arg UID=$UID rider_test_2018_01; docker-compose run --rm rider_test_2018_01"
+  - CMD="$BUILD_EURUSD_2018; docker images; cd docker/tests/lite; docker-compose up"
+  - CMD="$BUILD_EURUSD_2018; docker images; cd docker/tests/advanced; docker-compose up"
+  - CMD="$BUILD_EURUSD_2018; docker images; cd docker/tests/rider; docker-compose up"
   - |
     DOCKER_LOGIN='eval [[ -n $DOCKER_PASSWORD ]] && docker login -u $DOCKER_USERNAME --password-stdin <<<$DOCKER_PASSWORD || exit 0'
     DOCKER_REPO="ea31337/ea31337:${TRAVIS_BRANCH//master/latest}"
@@ -30,7 +31,7 @@ before_install:
 - ulimit -a && free -m
 install:
 before_script:
-- docker --version
+- docker --version && docker info
 - docker images
 - test -n "$OPT_TRACE" && set -x || true
 script:
