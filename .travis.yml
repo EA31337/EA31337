@@ -10,9 +10,9 @@ env:
   - CWD=$TRAVIS_BUILD_DIR
   - BUILD_EURUSD_2018="DOCKER_BUILDKIT=1 docker build --build-arg UID=$UID --target ea31337-eurusd-2018 ."
   matrix:
-  - CMD="$BUILD_EURUSD_2018; docker images; cd docker/tests/lite; docker-compose up"
-  - CMD="$BUILD_EURUSD_2018; docker images; cd docker/tests/advanced; docker-compose up"
-  - CMD="$BUILD_EURUSD_2018; docker images; cd docker/tests/rider; docker-compose up"
+  - CMD="$BUILD_EURUSD_2018; docker images; cd docker/tests/lite; docker-compose up --exit-code-from lite_test_2018_01"
+  - CMD="$BUILD_EURUSD_2018; docker images; cd docker/tests/advanced; docker-compose up --exit-code-from advanced_test_2018_01"
+  - CMD="$BUILD_EURUSD_2018; docker images; cd docker/tests/rider; docker-compose up --exit-code-from rider_test_2018_01"
   - |
     DOCKER_LOGIN='eval [[ -n $DOCKER_PASSWORD ]] && docker login -u $DOCKER_USERNAME --password-stdin <<<$DOCKER_PASSWORD || exit 0'
     DOCKER_REPO="ea31337/ea31337:${TRAVIS_BRANCH//master/latest}"
@@ -27,9 +27,13 @@ notifications:
     on_success: change
     on_failure: always
     on_start: never
+cache:
+  directories:
+  - /var/lib/docker
 before_install:
 - ulimit -a && free -m
 install:
+- curl -fsSL https://get.docker.com | sudo bash
 before_script:
 - docker --version && docker info
 - docker images
