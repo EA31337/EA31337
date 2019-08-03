@@ -8,14 +8,14 @@
 Symbol                            EURUSD (Euro vs US Dollar)
 Period                            30 Minutes (M30) 2018.09.02 21:00 - 2018.09.28 20:30 (2018.09.01 - 2018.09.30)
 Model                             Control points (a very crude method, the results must not be considered)
-                                  __EA_Parameters__="-- Input EA parameters for EA31337 Rider v1.078 --"; __Trade_Parameters__="-- Trade parameters -
-                                  -"; MaxOrders=0; MaxOrdersPerType=0; MaxOrdersPerDay=0; LotSize=0; LotSizeIncreaseMethod=202;
+                                  __EA_Parameters__="-- Input EA parameters for EA31337 Advanced v1.078 --"; __Trade_Parameters__="-- Trade
+                                  parameters --"; MaxOrders=0; MaxOrdersPerType=0; MaxOrdersPerDay=0; LotSize=0; LotSizeIncreaseMethod=202;
                                   LotSizeDecreaseMethod=167; TradeMicroLots=true; MinVolumeToTrade=2; MaxOrderPriceSlippage=50; MaxTries=5;
                                   MinPipChangeToTrade=0; MinPipGap=10; MinIntervalSec=0; __EA_Order_Parameters__="-- Profit and loss parameters --";
                                   TakeProfitMax=0; StopLossMax=40; __EA_Trailing_Parameters__="-- Profit and loss trailing parameters --";
                                   TrailingStop=50; TrailingProfit=0; TrailingStopAddPerMinute=0.3; __EA_Risk_Parameters__="-- Risk management
                                   parameters --"; RiskMarginPerOrder=1; RiskMarginTotal=10; RiskRatio=0; RiskRatioIncreaseMethod=0;
-                                  RiskRatioDecreaseMethod=0; InitNoOfDaysToWarmUp=14; CloseOrderAfterXHours=96; ApplySpreadLimits=true;
+                                  RiskRatioDecreaseMethod=0; InitNoOfDaysToWarmUp=14; CloseOrderAfterXHours=0; ApplySpreadLimits=true;
                                   MaxSpreadToTrade=10; __Strategy_Parameters__="-- Per strategy parameters (0 to disable) --";
                                   ProfitFactorMinToTrade=0.9; ProfitFactorMaxToTrade=0; InitNoOfOrdersToCalcPF=20;
                                   __Strategy_Boosting_Parameters__="-- Strategy boosting parameters (set 1.0 for default) --";
@@ -24,42 +24,43 @@ Model                             Control points (a very crude method, the resul
                                   WorseDailyStrategyMultiplierFactor=1; WorseWeeklyStrategyMultiplierFactor=1;
                                   WorseMonthlyStrategyMultiplierFactor=1; ConWinsIncreaseFactor=0.4; ConLossesIncreaseFactor=0.7;
                                   ConFactorOrdersLimit=600; __SmartQueue_Parameters__="-- Smart queue parameters --"; SmartQueueActive=true;
-                                  SmartQueueMethod=11; SmartQueueFilter=91; __EA_Account_Conditions__="-- Account conditions --";
-                                  Account_Conditions_Active=false; Account_Condition_MinProfitCloseOrder=20; __EA_Account_Conditions_Params__="-
+                                  SmartQueueMethod=11; SmartQueueFilter=72; __EA_Account_Conditions__="-- Account conditions --";
+                                  Account_Conditions_Active=true; Account_Condition_MinProfitCloseOrder=20; __EA_Account_Conditions_Params__="-
                                   - Account conditions parameters --"; MarketSpecificHour=3; CloseConditionOnlyProfitable=true;
 Parameters                        CloseConditionCustom1Method=0; CloseConditionCustom2Method=0; CloseConditionCustom3Method=0;
                                   CloseConditionCustom4Method=0; CloseConditionCustom5Method=0; CloseConditionCustom6Method=0; __AC_Parameters__="-
                                   - Settings for the Bill Williams' Accelerator/Decelerator oscillator --"; AC_Active_Tf=0; AC_SignalLevel=0.0004;
-                                  AC_Shift=0; AC1_SignalMethod=0; AC5_SignalMethod=0; AC15_SignalMethod=0; AC30_SignalMethod=0; AC1_OpenCondition1=0;
-                                  AC1_OpenCondition2=0; AC5_OpenCondition1=0; AC5_OpenCondition2=0; AC15_OpenCondition1=0; AC15_OpenCondition2=0;
-                                  AC30_OpenCondition1=0; AC30_OpenCondition2=0; AC1_MaxSpread=6; AC5_MaxSpread=7; AC15_MaxSpread=8;
-                                  AC30_MaxSpread=10; __AD_Parameters__="-- Settings for the Accumulation/Distribution indicator --"; AD_Active_Tf=12;
-                                  AD_SignalLevel=0; AD_Shift=0; AD1_SignalMethod=0; AD5_SignalMethod=0; AD15_SignalMethod=0; AD30_SignalMethod=0;
-                                  AD1_OpenCondition1=0; AD1_OpenCondition2=0; AD5_OpenCondition1=0; AD5_OpenCondition2=0; AD15_OpenCondition1=0;
-                                  AD15_OpenCondition2=0; AD30_OpenCondition1=0; AD30_OpenCondition2=0; AD1_MaxSpread=6; AD5_MaxSpread=7;
-                                  AD15_MaxSpread=8; AD30_MaxSpread=10; __ADX_Parameters__="-- Settings for the Average Directional Movement Index
-                                  indicator --"; ADX_Active_Tf=0; ADX_Period_M1=24; ADX_Period_M5=14; ADX_Period_M15=30; ADX_Period_M30=26;
-                                  ADX_SignalLevel=18.4; ADX_Shift=3; ADX1_SignalMethod=0; ADX5_SignalMethod=0; ADX15_SignalMethod=0;
-                                  ADX30_SignalMethod=0; ADX1_OpenCondition1=0; ADX1_OpenCondition2=0; ADX5_OpenCondition1=0; ADX5_OpenCondition2=0;
-                                  ADX15_OpenCondition1=0; ADX15_OpenCondition2=0; ADX30_OpenCondition1=0; ADX30_OpenCondition2=0; ADX1_MaxSpread=6;
-                                  ADX5_MaxSpread=7; ADX15_MaxSpread=8; ADX30_MaxSpread=10; __Alligator_Parameters__="-- Settings for the Alligator
-                                  indicator --"; Alligator_Active_Tf=13; Alligator_Period_Jaw=16; Alligator_Period_Teeth=8; Alligator_Period_Lips=6;
-                                  Alligator_Shift_Jaw=5; Alligator_Shift_Teeth=7; Alligator_Shift_Lips=5; Alligator_Shift=2;
-                                  Alligator_SignalLevel=0.1; Alligator1_SignalMethod=0; Alligator5_SignalMethod=0; Alligator15_SignalMethod=0;
-                                  Alligator30_SignalMethod=0; Alligator1_OpenCondition1=0; Alligator1_OpenCondition2=0; Alligator5_OpenCondition1=0;
+                                  AC_Shift=0; AC1_SignalMethod=0; AC5_SignalMethod=0; AC15_SignalMethod=0; AC30_SignalMethod=0;
+                                  AC1_OpenCondition1=777; AC1_OpenCondition2=0; AC5_OpenCondition1=971; AC5_OpenCondition2=0; AC15_OpenCondition1=1;
+                                  AC15_OpenCondition2=0; AC30_OpenCondition1=389; AC30_OpenCondition2=0; AC1_MaxSpread=6; AC5_MaxSpread=7;
+                                  AC15_MaxSpread=8; AC30_MaxSpread=10; __AD_Parameters__="-- Settings for the Accumulation/Distribution indicator --
+                                  "; AD_Active_Tf=0; AD_SignalLevel=0; AD_Shift=0; AD1_SignalMethod=0; AD5_SignalMethod=0; AD15_SignalMethod=0;
+                                  AD30_SignalMethod=0; AD1_OpenCondition1=583; AD1_OpenCondition2=0; AD5_OpenCondition1=486; AD5_OpenCondition2=0;
+                                  AD15_OpenCondition1=292; AD15_OpenCondition2=0; AD30_OpenCondition1=292; AD30_OpenCondition2=0; AD1_MaxSpread=6;
+                                  AD5_MaxSpread=7; AD15_MaxSpread=8; AD30_MaxSpread=10; __ADX_Parameters__="-- Settings for the Average Directional
+                                  Movement Index indicator --"; ADX_Active_Tf=0; ADX_Period_M1=32; ADX_Period_M5=20; ADX_Period_M15=30;
+                                  ADX_Period_M30=34; ADX_SignalLevel=18.5; ADX_Shift=3; ADX1_SignalMethod=0; ADX5_SignalMethod=0;
+                                  ADX15_SignalMethod=0; ADX30_SignalMethod=0; ADX1_OpenCondition1=971; ADX1_OpenCondition2=0;
+                                  ADX5_OpenCondition1=971; ADX5_OpenCondition2=0; ADX15_OpenCondition1=1; ADX15_OpenCondition2=0;
+                                  ADX30_OpenCondition1=292; ADX30_OpenCondition2=0; ADX1_MaxSpread=6; ADX5_MaxSpread=7; ADX15_MaxSpread=8;
+                                  ADX30_MaxSpread=10; __Alligator_Parameters__="-- Settings for the Alligator indicator --"; Alligator_Active_Tf=0;
+                                  Alligator_Period_Jaw=16; Alligator_Period_Teeth=8; Alligator_Period_Lips=6; Alligator_Shift_Jaw=5;
+                                  Alligator_Shift_Teeth=7; Alligator_Shift_Lips=5; Alligator_Shift=2; Alligator_SignalLevel=0.1;
+                                  Alligator1_SignalMethod=0; Alligator5_SignalMethod=0; Alligator15_SignalMethod=0; Alligator30_SignalMethod=0;
+                                  Alligator1_OpenCondition1=971; Alligator1_OpenCondition2=0; Bands_HShift=0;
 Bars in test                 1921 Ticks modelled                          23495 Modelling quality                                                 n/a
 Mismatched charts errors        0
 Initial deposit          10000.00                                               Spread                                                             10
-Total net profit         -1749.37 Gross profit                          4030.09 Gross loss                                                   -5779.46
-Profit factor                0.70 Expected payoff                         -5.37
-Absolute drawdown         1749.37 Maximal drawdown             2481.02 (23.12%) Relative drawdown                                    23.12% (2481.02)
-Total trades                  326 Short positions (won %)          112 (23.21%) Long positions (won %)                                   214 (17.29%)
-                                  Profit trades (% of total)        63 (19.33%) Loss trades (% of total)                                 263 (80.67%)
-                          Largest profit trade                           102.53 loss trade                                                     -55.47
-                          Average profit trade                            63.97 loss trade                                                     -21.98
-                          Maximum consecutive wins (profit in        8 (531.27) consecutive losses (loss in money)                       32 (-643.27)
+Total net profit            75.23 Gross profit                          4456.93 Gross loss                                                   -4381.70
+Profit factor                1.02 Expected payoff                          0.18
+Absolute drawdown          494.72 Maximal drawdown             1848.51 (16.28%) Relative drawdown                                    16.28% (1848.51)
+Total trades                  424 Short positions (won %)          351 (69.52%) Long positions (won %)                                    73 (21.92%)
+                                  Profit trades (% of total)       260 (61.32%) Loss trades (% of total)                                 164 (38.68%)
+                          Largest profit trade                            49.80 loss trade                                                     -40.52
+                          Average profit trade                            17.14 loss trade                                                     -26.72
+                          Maximum consecutive wins (profit in       14 (363.88) consecutive losses (loss in money)                       21 (-842.60)
                                   money)
-                          Maximal consecutive profit (count of       531.33 (7) consecutive loss (count of losses)                       -816.80 (31)
+                          Maximal consecutive profit (count of      381.07 (12) consecutive loss (count of losses)                       -842.60 (21)
                                   wins)
-                          Average consecutive wins                            3 consecutive losses                                                 10
+                          Average consecutive wins                            5 consecutive losses                                                  3
                                                                        [Graph]
