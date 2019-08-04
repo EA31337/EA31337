@@ -692,7 +692,7 @@ bool EA_Trade(Trade *_trade) {
       if (_cmd != EMPTY) {
         order_placed &= ExecuteOrder(_cmd, strat);
         if (VerboseDebug) {
-          strat.Logger().Info(StringFormat("%s:%d: %s %s on %s at %s: %s",
+          strat.Logger().Debug(StringFormat("%s:%d: %s %s on %s at %s: %s",
             __FUNCTION__, __LINE__, strat.GetName(),
             Chart::TfToString((ENUM_TIMEFRAMES) strat.GetTf()),
             Order::OrderTypeToString(_cmd),
@@ -2985,119 +2985,66 @@ class Stg_RSI : public Strategy {
 
   public:
 
-    void Stg_RSI(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_RSI(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
-/**
- * Check if RSI indicator is on buy.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_RSI);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_RSI, _chart.GetTf());
-  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_RSI, _chart.GetTf(), 30);
-  bool is_valid = fmin(fmin(rsi[period][CURR], rsi[period][PREV]), rsi[period][FAR]) > 0;
-  switch (cmd) {
-    case ORDER_TYPE_BUY:
-      result = rsi[period][CURR] > 0 && rsi[period][CURR] < (50 - signal_level1);
-      if (result && VerboseTrace) {
-        PrintFormat("RSI %s: %g vs %g", _chart.TfToString(), rsi[period][CURR], 50 - signal_level1);
-      }
-      if (signal_method != 0) {
-        result &= is_valid;
-        if (METHOD(signal_method, 0)) result &= rsi[period][CURR] < rsi[period][PREV];
-        if (METHOD(signal_method, 1)) result &= rsi[period][PREV] < rsi[period][FAR];
-        if (METHOD(signal_method, 2)) result &= rsi[period][PREV] < (50 - signal_level1);
-        if (METHOD(signal_method, 3)) result &= rsi[period][FAR]  < (50 - signal_level1);
-        if (METHOD(signal_method, 4)) result &= rsi[period][CURR] - rsi[period][PREV] > rsi[period][PREV] - rsi[period][FAR];
-        if (METHOD(signal_method, 5)) result &= rsi[period][FAR] > 50;
-        //if (METHOD(signal_method, 5)) result &= Open[CURR] > Close[PREV];
-        //if (METHOD(signal_method, 7)) result &= !RSI_On_Sell(M30);
-      }
-      break;
-    case ORDER_TYPE_SELL:
-      result = rsi[period][CURR] > 0 && rsi[period][CURR] > (50 + signal_level1);
-      if (result && VerboseTrace) {
-        PrintFormat("RSI %s: %g vs %g", _chart.TfToString(), rsi[period][CURR], 50 - signal_level1);
-      }
-      if (signal_method != 0) {
-        result &= is_valid;
-        if (METHOD(signal_method, 0)) result &= rsi[period][CURR] > rsi[period][PREV];
-        if (METHOD(signal_method, 1)) result &= rsi[period][PREV] > rsi[period][FAR];
-        if (METHOD(signal_method, 2)) result &= rsi[period][PREV] > (50 + signal_level1);
-        if (METHOD(signal_method, 3)) result &= rsi[period][FAR]  > (50 + signal_level1);
-        if (METHOD(signal_method, 4)) result &= rsi[period][PREV] - rsi[period][CURR] > rsi[period][FAR] - rsi[period][PREV];
-        if (METHOD(signal_method, 5)) result &= rsi[period][FAR] < 50;
-        //if (METHOD(signal_method, 5)) result &= Open[CURR] < Close[PREV];
-        //if (METHOD(signal_method, 7)) result &= !RSI_On_Buy(M30);
-      }
-      break;
+  /**
+   * Check if RSI indicator is on buy.
+   *
+   * @param
+   *   _cmd (int) - type of trade order command
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 - 1st signal level to consider the signal
+   *   _signal_level2 - 2nd signal level to consider the signal
+   * @result bool
+   * Returns true on signal for the given _cmd, otherwise false.
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double _rsi_0 = ((Indi_RSI *) this.Data()).GetValue(0);
+    double _rsi_1 = ((Indi_RSI *) this.Data()).GetValue(1);
+    double _rsi_2 = ((Indi_RSI *) this.Data()).GetValue(2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    bool is_valid = fmin(fmin(_rsi_0, _rsi_1), _rsi_2) > 0;
+    switch (_cmd) {
+      case ORDER_TYPE_BUY:
+        _result = _rsi_0 > 0 && _rsi_0 < (50 - _signal_level1);
+        if (_result && VerboseDebug) {
+          PrintFormat("RSI %s on buy: %g < %g", this.Chart().TfToString(), _rsi_0, 50 - _signal_level1);
+        }
+        if (_signal_method != 0) {
+          _result &= is_valid;
+          if (METHOD(_signal_method, 0)) _result &= _rsi_0 < _rsi_1;
+          if (METHOD(_signal_method, 1)) _result &= _rsi_1 < _rsi_2;
+          if (METHOD(_signal_method, 2)) _result &= _rsi_1 < (50 - _signal_level1);
+          if (METHOD(_signal_method, 3)) _result &= _rsi_2  < (50 - _signal_level1);
+          if (METHOD(_signal_method, 4)) _result &= _rsi_0 - _rsi_1 > _rsi_1 - _rsi_2;
+          if (METHOD(_signal_method, 5)) _result &= _rsi_2 > 50;
+        }
+        break;
+      case ORDER_TYPE_SELL:
+        _result = _rsi_0 > 0 && _rsi_0 > (50 + _signal_level1);
+        if (_result && VerboseDebug) {
+          PrintFormat("RSI %s on sell: %g > %g", this.Chart().TfToString(), _rsi_0, 50 + _signal_level1);
+        }
+        if (_signal_method != 0) {
+          _result &= is_valid;
+          if (METHOD(_signal_method, 0)) _result &= _rsi_0 > _rsi_1;
+          if (METHOD(_signal_method, 1)) _result &= _rsi_1 > _rsi_2;
+          if (METHOD(_signal_method, 2)) _result &= _rsi_1 > (50 + _signal_level1);
+          if (METHOD(_signal_method, 3)) _result &= _rsi_2  > (50 + _signal_level1);
+          if (METHOD(_signal_method, 4)) _result &= _rsi_1 - _rsi_0 > _rsi_2 - _rsi_1;
+          if (METHOD(_signal_method, 5)) _result &= _rsi_2 < 50;
+        }
+        break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == _cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  if (VerboseTrace && result) {
-    PrintFormat("%s: Signal: %s/%s/%d/%g", __FUNCTION_LINE__, EnumToString(cmd), _chart.TfToString(), signal_method, signal_level1);
-    #ifdef __MQL4__
-    PrintFormat("RSI %s: %s", _chart.TfToString(), Array::ArrToString2D(rsi, ",", Digits));
-    #endif
-  }
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool _result = false;
-  double _rsi_0 = ((Indi_RSI *) this.Data()).GetValue(0);
-  double _rsi_1 = ((Indi_RSI *) this.Data()).GetValue(1);
-  double _rsi_2 = ((Indi_RSI *) this.Data()).GetValue(2);
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  bool is_valid = fmin(fmin(_rsi_0, _rsi_1), _rsi_2) > 0;
-  switch (_cmd) {
-    case ORDER_TYPE_BUY:
-      _result = _rsi_0 > 0 && _rsi_0 < (50 - _signal_level1);
-      if (_result && VerboseDebug) {
-        PrintFormat("RSI %s: %g vs %g", this.Chart().TfToString(), _rsi_0, 50 - _signal_level1);
-      }
-      if (_signal_method != 0) {
-        _result &= is_valid;
-        if (METHOD(_signal_method, 0)) _result &= _rsi_0 < _rsi_1;
-        if (METHOD(_signal_method, 1)) _result &= _rsi_1 < _rsi_2;
-        if (METHOD(_signal_method, 2)) _result &= _rsi_1 < (50 - _signal_level1);
-        if (METHOD(_signal_method, 3)) _result &= _rsi_2  < (50 - _signal_level1);
-        if (METHOD(_signal_method, 4)) _result &= _rsi_0 - _rsi_1 > _rsi_1 - _rsi_2;
-        if (METHOD(_signal_method, 5)) _result &= _rsi_2 > 50;
-      }
-      break;
-    case ORDER_TYPE_SELL:
-      _result = _rsi_0 > 0 && _rsi_0 > (50 + _signal_level1);
-      if (_result && VerboseDebug) {
-        PrintFormat("RSI %s: %g vs %g", this.Chart().TfToString(), _rsi_0, 50 - _signal_level1);
-      }
-      if (_signal_method != 0) {
-        _result &= is_valid;
-        if (METHOD(_signal_method, 0)) _result &= _rsi_0 > _rsi_1;
-        if (METHOD(_signal_method, 1)) _result &= _rsi_1 > _rsi_2;
-        if (METHOD(_signal_method, 2)) _result &= _rsi_1 > (50 + _signal_level1);
-        if (METHOD(_signal_method, 3)) _result &= _rsi_2  > (50 + _signal_level1);
-        if (METHOD(_signal_method, 4)) _result &= _rsi_1 - _rsi_0 > _rsi_2 - _rsi_1;
-        if (METHOD(_signal_method, 5)) _result &= _rsi_2 < 50;
-      }
-      break;
-  }
-  _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == _cmd;
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return _result;
-}
 
 };
 
@@ -3564,9 +3511,12 @@ bool CheckMarketCondition1(Chart *_chart, ENUM_ORDER_TYPE cmd, long condition = 
  *   condition (int) - condition to check by using bitwise AND operation
  *   default_value (bool) - default value to set, if false - return the opposite
  */
-bool CheckMarketEvent(Chart *_chart, ENUM_ORDER_TYPE cmd = EMPTY, ENUM_MARKET_EVENT condition = C_EVENT_NONE) {
+bool CheckMarketEvent(Chart *_chart, ENUM_ORDER_TYPE cmd = EMPTY, ENUM_MARKET_EVENT condition = C_EVENT_NONE,
+       long _bm = EMPTY, double _sl1 = EMPTY, double _sl2 = EMPTY
+  ) {
   DEBUG_CHECKPOINT_ADD
   bool result = false;
+  Strategy *strat;
 #ifdef __advanced__
   ulong condition2 = 0;
 #endif
@@ -3639,7 +3589,14 @@ bool CheckMarketEvent(Chart *_chart, ENUM_ORDER_TYPE cmd = EMPTY, ENUM_MARKET_EV
       result = Stg_OSMA::SignalOpen(_chart, cmd);
       break;
     case C_RSI_BUY_SELL:
-      result = Stg_RSI::SignalOpen(_chart, cmd);
+      for (uint sid = 0; sid < strats.GetSize(); sid++) {
+        strat = ((Strategy *) strats.GetByIndex(sid));
+        if (strat.Data().GetIndicatorType() == INDI_RSI && strat.GetTf() == _chart.GetTf()) {
+          result = strat.SignalOpen(cmd, _bm, _sl1, _sl2);
+          break;
+        }
+      }
+      if (result && VerboseDebug) PrintFormat("%s(): %s on %s", __FUNCTION_LINE__, EnumToString(condition), EnumToString(cmd));
       break;
     case C_RVI_BUY_SELL:
       result = Stg_RVI::SignalOpen(_chart, cmd);
@@ -7771,10 +7728,10 @@ bool OpenOrderCondition(ENUM_ORDER_TYPE cmd, int sid, datetime time, int method)
     if (METHOD(method,1)) result &= (cmd == ORDER_TYPE_BUY && qclose < market.GetClose()) || (cmd == ORDER_TYPE_SELL && qclose > market.GetClose());
     if (METHOD(method,2)) result &= (cmd == ORDER_TYPE_BUY && qlowest < market.GetLow()) || (cmd == ORDER_TYPE_SELL && qlowest > market.GetLow());
     if (METHOD(method,3)) result &= (cmd == ORDER_TYPE_BUY && qhighest > market.GetHigh()) || (cmd == ORDER_TYPE_SELL && qhighest < market.GetHigh());
-    if (METHOD(method,4)) result &= UpdateIndicator(_chart, INDI_SAR) && Stg_SAR::SignalOpen(_chart, cmd, 0, 0);
-    if (METHOD(method,5)) result &= UpdateIndicator(_chart, INDI_DEMARKER) && Stg_DeMarker::SignalOpen(_chart, cmd, 0, 0);
-    if (METHOD(method,6)) result &= UpdateIndicator(_chart, INDI_RSI) && Stg_RSI::SignalOpen(_chart, cmd, 0, 0);
-    if (METHOD(method,7)) result &= UpdateIndicator(_chart, INDI_MA) && Stg_MA::SignalOpen(_chart, cmd, 0, 0);
+    if (METHOD(method,4)) result &= UpdateIndicator(_chart, INDI_SAR) && CheckMarketEvent(_chart, cmd, C_SAR_BUY_SELL, 0, 0, 0);
+    if (METHOD(method,5)) result &= UpdateIndicator(_chart, INDI_DEMARKER) && CheckMarketEvent(_chart, cmd, C_DEMARKER_BUY_SELL, 0, 0.5, 0);
+    if (METHOD(method,6)) result &= UpdateIndicator(_chart, INDI_RSI) && CheckMarketEvent(_chart, cmd, C_RSI_BUY_SELL, 0, 30, 0);
+    if (METHOD(method,7)) result &= UpdateIndicator(_chart, INDI_MA) && CheckMarketEvent(_chart, cmd, C_MA_BUY_SELL, 0, 0, 0);
   }
   return (result);
 }
