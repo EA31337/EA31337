@@ -3052,10 +3052,51 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
 }
 
 bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  DEBUG_CHECKPOINT_ADD
+  #ifdef __profiler__ PROFILER_START #endif
+  bool _result = false;
+  double _rsi_0 = ((Indi_RSI *) this.Data()).GetValue(0);
+  double _rsi_1 = ((Indi_RSI *) this.Data()).GetValue(1);
+  double _rsi_2 = ((Indi_RSI *) this.Data()).GetValue(2);
   if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
   if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
   if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
+  bool is_valid = fmin(fmin(_rsi_0, _rsi_1), _rsi_2) > 0;
+  switch (_cmd) {
+    case ORDER_TYPE_BUY:
+      _result = _rsi_0 > 0 && _rsi_0 < (50 - _signal_level1);
+      if (_result && VerboseDebug) {
+        PrintFormat("RSI %s: %g vs %g", this.Chart().TfToString(), _rsi_0, 50 - _signal_level1);
+      }
+      if (_signal_method != 0) {
+        _result &= is_valid;
+        if (METHOD(_signal_method, 0)) _result &= _rsi_0 < _rsi_1;
+        if (METHOD(_signal_method, 1)) _result &= _rsi_1 < _rsi_2;
+        if (METHOD(_signal_method, 2)) _result &= _rsi_1 < (50 - _signal_level1);
+        if (METHOD(_signal_method, 3)) _result &= _rsi_2  < (50 - _signal_level1);
+        if (METHOD(_signal_method, 4)) _result &= _rsi_0 - _rsi_1 > _rsi_1 - _rsi_2;
+        if (METHOD(_signal_method, 5)) _result &= _rsi_2 > 50;
+      }
+      break;
+    case ORDER_TYPE_SELL:
+      _result = _rsi_0 > 0 && _rsi_0 > (50 + _signal_level1);
+      if (_result && VerboseDebug) {
+        PrintFormat("RSI %s: %g vs %g", this.Chart().TfToString(), _rsi_0, 50 - _signal_level1);
+      }
+      if (_signal_method != 0) {
+        _result &= is_valid;
+        if (METHOD(_signal_method, 0)) _result &= _rsi_0 > _rsi_1;
+        if (METHOD(_signal_method, 1)) _result &= _rsi_1 > _rsi_2;
+        if (METHOD(_signal_method, 2)) _result &= _rsi_1 > (50 + _signal_level1);
+        if (METHOD(_signal_method, 3)) _result &= _rsi_2  > (50 + _signal_level1);
+        if (METHOD(_signal_method, 4)) _result &= _rsi_1 - _rsi_0 > _rsi_2 - _rsi_1;
+        if (METHOD(_signal_method, 5)) _result &= _rsi_2 < 50;
+      }
+      break;
+  }
+  _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == _cmd;
+  #ifdef __profiler__ PROFILER_STOP #endif
+  return _result;
 }
 
 };
