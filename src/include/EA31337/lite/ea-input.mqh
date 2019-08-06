@@ -305,7 +305,7 @@ extern int Bands_Period_M1 = 2; // Period for M1
 extern int Bands_Period_M5 = 2; // Period for M5
 extern int Bands_Period_M15 = 2; // Period for M15
 extern int Bands_Period_M30 = 2; // Period for M30
-extern ENUM_APPLIED_PRICE Bands_Applied_Price = 0; // Applied Price
+extern ENUM_APPLIED_PRICE Bands_Applied_Price = PRICE_CLOSE; // Applied Price
 extern double Bands_Deviation_M1 = 0.3; // Deviation for M1
 extern double Bands_Deviation_M5 = 0.3; // Deviation for M5
 extern double Bands_Deviation_M15 = 0.3; // Deviation for M15
@@ -701,7 +701,7 @@ extern uint MACD_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M1
 extern int MACD_Period_Fast = 23; // Period Fast
 extern int MACD_Period_Slow = 21; // Period Slow
 extern int MACD_Period_Signal = 10; // Period for signal
-extern ENUM_APPLIED_PRICE MACD_Applied_Price = 0; // Applied Price
+extern ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_CLOSE; // Applied Price
 extern int MACD_Shift = 3; // Shift
 extern ENUM_TRAIL_TYPE MACD_TrailingStopMethod = -1; // Trail stop method
 extern ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = -19; // Trail profit method
