@@ -1578,11 +1578,14 @@ bool UpdateStats() {
 
 /* STRATEGY CLASSES */
 
+/**
+ * Implements AC strategy.
+ */
 class Stg_AC : public Strategy {
 
   public:
 
-    void Stg_AC(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_AC(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
 /**
  * Check if AC indicator is on buy or sell.
@@ -1593,15 +1596,18 @@ class Stg_AC : public Strategy {
  *   signal_method (int) - signal method to use by using bitwise AND operation
  *   signal_level1 (float) - signal level to use
  */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
+bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
-  bool result = false;
-  uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_AC);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_AC, _chart.GetTf());
-  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_AC, _chart.GetTf());
-  switch (cmd) {
+  bool _result = false;
+  double _ac_0 = ((Indi_AC *) this.Data()).GetValue(0);
+  double _ac_1 = ((Indi_AC *) this.Data()).GetValue(1);
+  double _ac_2 = ((Indi_AC *) this.Data()).GetValue(2);
+  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+  bool is_valid = fmin(fmin(_ac_0, _ac_1), _ac_2) != 0;
+  switch (_cmd) {
     /*
       //1. Acceleration/Deceleration — AC
       //Buy: if the indicator is above zero and 2 consecutive columns are green or if the indicator is below zero and 3 consecutive columns are green
@@ -1612,26 +1618,25 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
       && iAC(NULL,piac,0)<iAC(NULL,piac,1)&&iAC(NULL,piac,1)<iAC(NULL,piac,2)&&iAC(NULL,piac,2)<iAC(NULL,piac,3)))
     */
     case ORDER_TYPE_BUY:
-      result = iac[period][CURR] > signal_level1 && iac[period][CURR] > iac[period][PREV];
-      if (METHOD(signal_method, 0)) result &= iac[period][PREV] > iac[period][FAR]; // @todo: one more bar.
-      //if (METHOD(signal_method, 0)) result &= iac[period][PREV] > iac[period][FAR];
+      _result = _ac_0 > _signal_level1 && _ac_0 > _ac_1;
+      if (_signal_method != 0) {
+        _result &= is_valid;
+        if (METHOD(_signal_method, 0)) _result &= _ac_1 > _ac_2; // @todo: one more bar.
+        //if (METHOD(_signal_method, 0)) _result &= _ac_1 > _ac_2;
+      }
     break;
     case ORDER_TYPE_SELL:
-      result = iac[period][CURR] < -signal_level1 && iac[period][CURR] < iac[period][PREV];
-      if (METHOD(signal_method, 0)) result &= iac[period][PREV] < iac[period][FAR]; // @todo: one more bar.
-      //if (METHOD(signal_method, 0)) result &= iac[period][PREV] < iac[period][FAR];
+      _result = _ac_0 < -_signal_level1 && _ac_0 < _ac_1;
+      if (_signal_method != 0) {
+        _result &= is_valid;
+        if (METHOD(_signal_method, 0)) _result &= _ac_1 < _ac_2; // @todo: one more bar.
+        //if (METHOD(_signal_method, 0)) _result &= _ac_1 < _ac_2;
+      }
     break;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+  _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == _cmd;
   #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
+  return _result;
 }
 
 };
@@ -2981,6 +2986,9 @@ bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signa
 };
 
 
+/**
+ * Implements RSI strategy.
+ */
 class Stg_RSI : public Strategy {
 
   public:
@@ -3503,6 +3511,20 @@ bool CheckMarketCondition1(Chart *_chart, ENUM_ORDER_TYPE cmd, long condition = 
 }
 
 /**
+ * Get strategy instance via indicator type.
+ */
+Strategy *GetStratByIndiType(ENUM_INDICATOR_TYPE _indi, Chart *_chart) {
+  Strategy *_strat;
+  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+    _strat = ((Strategy *) strats.GetByIndex(sid));
+    if (_strat.Data().GetIndicatorType() == _indi && _strat.GetTf() == _chart.GetTf()) {
+      return _strat;
+    }
+  }
+  return NULL;
+}
+
+/**
  * Check for market event.
  *
  * @param
@@ -3516,7 +3538,6 @@ bool CheckMarketEvent(Chart *_chart, ENUM_ORDER_TYPE cmd = EMPTY, ENUM_MARKET_EV
   ) {
   DEBUG_CHECKPOINT_ADD
   bool result = false;
-  Strategy *strat;
 #ifdef __advanced__
   ulong condition2 = 0;
 #endif
@@ -3526,7 +3547,7 @@ bool CheckMarketEvent(Chart *_chart, ENUM_ORDER_TYPE cmd = EMPTY, ENUM_MARKET_EV
   if (VerboseTrace) terminal.Logger().Trace(StringFormat("%s(%s, %d)", EnumToString(cmd), _chart.TfToString(), condition), __FUNCTION_LINE__);
   switch (condition) {
     case C_AC_BUY_SELL:
-      result = Stg_AC::SignalOpen(_chart, cmd);
+      GetStratByIndiType(INDI_AC, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_AD_BUY_SELL:
       result = Stg_AD::SignalOpen(_chart, cmd);
@@ -3589,13 +3610,7 @@ bool CheckMarketEvent(Chart *_chart, ENUM_ORDER_TYPE cmd = EMPTY, ENUM_MARKET_EV
       result = Stg_OSMA::SignalOpen(_chart, cmd);
       break;
     case C_RSI_BUY_SELL:
-      for (uint sid = 0; sid < strats.GetSize(); sid++) {
-        strat = ((Strategy *) strats.GetByIndex(sid));
-        if (strat.Data().GetIndicatorType() == INDI_RSI && strat.GetTf() == _chart.GetTf()) {
-          result = strat.SignalOpen(cmd, _bm, _sl1, _sl2);
-          break;
-        }
-      }
+      GetStratByIndiType(INDI_RSI, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       if (result && VerboseDebug) PrintFormat("%s(): %s on %s", __FUNCTION_LINE__, EnumToString(condition), EnumToString(cmd));
       break;
     case C_RVI_BUY_SELL:
