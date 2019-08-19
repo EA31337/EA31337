@@ -4917,9 +4917,9 @@ bool InitVariables() {
     Msg::ShowText(StringFormat("Step lot is higher than min lot (%g > %g)", market.GetVolumeStep(), market.GetVolumeMin()), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
   }
 
-  if (market.GetMarginRequired() == 0) {
+  if (Trade::GetMarginRequired(_Symbol) == 0) {
     init &= !ValidateSettings;
-    Msg::ShowText(StringFormat("Invalid MODE_MARGINREQUIRED: %g", market.GetMarginRequired()), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
+    Msg::ShowText(StringFormat("Invalid MODE_MARGINREQUIRED: %g", Trade::GetMarginRequired(_Symbol)), "Error", __FUNCTION__, __LINE__, VerboseErrors & ValidateSettings, PrintLogOnChart, ValidateSettings);
     // market.GetMarginRequired() = 10; // Fix for 'zero divide' bug when MODE_MARGINREQUIRED is zero.
   }
 
