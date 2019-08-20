@@ -1112,7 +1112,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, Strategy *_strat, double trade_volume = 0,
   DEBUG_CHECKPOINT_ADD
   uint sid = (uint) _strat.GetId();
   bool result = false;
-  int order_ticket;
+  long order_ticket;
   double trade_volume_max = market.GetVolumeMax();
   Trade *_trade = _strat.Trade();
 
@@ -1170,7 +1170,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, Strategy *_strat, double trade_volume = 0,
     }
 
   trade_volume = market.NormalizeLots(trade_volume);
-  order_ticket = Order::OrderSend(
+  order_ticket = (new Order).OrderSend(
       market.GetSymbol(),
       cmd,
       trade_volume,
