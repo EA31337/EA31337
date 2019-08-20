@@ -585,6 +585,7 @@ string InitInfo(bool startup = false, string sep = "\n") {
   output += "ACCOUNT: " + account.ToString() + sep;
   output += "SYMBOL: " + ((SymbolInfo *)market).ToString() + sep;
   output += "MARKET: " + market.ToString() + sep;
+  output += "TRADE: " + trade[Chart::TfToIndex(PERIOD_CURRENT)].ToString() + sep;
   for (ENUM_TIMEFRAMES_INDEX _tfi = 0; _tfi < FINAL_ENUM_TIMEFRAMES_INDEX; _tfi++) {
     if (Object::IsValid(trade[_tfi]) && trade[_tfi].Chart().IsValidTf()) {
       output += StringFormat("CHART: %s%s", trade[_tfi].Chart().ToString(), sep);
@@ -700,9 +701,13 @@ bool EA_Trade(Trade *_trade) {
     } // end: if
   } // end: for
 
+  #ifdef __MQL4__
   if (SmartQueueActive && !order_placed && total_orders <= max_orders) {
     order_placed &= OrderQueueProcess();
   }
+  #else // _MQL5__
+  // @fixme
+  #endif
 
   if (order_placed) {
     ProcessOrders();
@@ -1184,6 +1189,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, Strategy *_strat, double trade_volume = 0,
       total_orders++;
       daily_orders++;
       if (!Order::OrderSelect(order_ticket, SELECT_BY_TICKET) && VerboseErrors) {
+        err_code = GetLastError();
         Msg::ShowText(StringFormat("%s (err_code=%d, sid=%d)", terminal.GetLastErrorText(), err_code, sid), "Error", __FUNCTION__, __LINE__, VerboseErrors);
         Order::OrderPrint();
         if (retry) TaskAddOrderOpen(cmd, trade_volume, sid); // Will re-try again.

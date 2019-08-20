@@ -190,11 +190,11 @@ enum ENUM_VALUE_TYPE { // Define type of values in order to store.
 };
 
 enum ENUM_ORDER_QUEUE_ENTRY { // Define order queue.
-  Q_SID,        // Strategy id.
-  Q_CMD,        // Type of trade order.
-  Q_TIME,       // Time requested to open.
-  Q_TOTAL,      // Total number of orders queued.
-  FINAL_ORDER_QUEUE_ENTRY // Should be the last one. Used to calculate the number of enum items.
+  Q_SID   = 0, // Strategy id.
+  Q_CMD   = 1, // Type of trade order.
+  Q_TIME  = 2, // Time requested to open.
+  Q_TOTAL = 3, // Total number of orders queued.
+  FINAL_ORDER_QUEUE_ENTRY = 4 // Should be the last one. Used to calculate the number of enum items.
 };
 
 #ifndef TRAIL_TYPE_ENUM
