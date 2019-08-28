@@ -13,10 +13,6 @@
 #include "include\EA31337\ea-defaults.mqh"
 #include "include\EA31337\ea-properties.mqh"
 #include "include\EA31337\ea-enums.mqh"
-#include "include\EA31337-classes\Indicators\Indi_ADX.mqh"
-#include "include\EA31337-classes\Indicators\Indi_Alligator.mqh"
-#include "include\EA31337-classes\Indicators\Indi_Bands.mqh"
-#include "include\EA31337-classes\Indicators\Indi_Ichimoku.mqh"
 
 #ifdef __advanced__
   #ifdef __rider__
