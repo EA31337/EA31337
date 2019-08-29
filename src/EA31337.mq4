@@ -701,13 +701,9 @@ bool EA_Trade(Trade *_trade) {
     } // end: if
   } // end: for
 
-  #ifdef __MQL4__
   if (SmartQueueActive && !order_placed && total_orders <= max_orders) {
     order_placed &= OrderQueueProcess();
   }
-  #else // _MQL5__
-  // @fixme
-  #endif
 
   if (order_placed) {
     ProcessOrders();
@@ -7679,7 +7675,7 @@ bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
   if (filter == EMPTY) filter = SmartQueueFilter;
   if (queue_size > 1) {
     int selected_qid = EMPTY, curr_qid = EMPTY;
-    ArrayResize(sorted_queue, queue_size, 100);
+    ArrayResizeFill(sorted_queue, queue_size, 100, EMPTY);
     for (int i = 0; i < queue_size; i++) {
       curr_qid = OrderQueueNext(curr_qid);
       if (curr_qid == EMPTY) break;
@@ -8054,4 +8050,12 @@ string GetStatReport(string sep = "\n") {
   //output += StringFormat("Ticks per min (avg):                        %d", total_stats.GetTicksPerMin()) + sep; / @todo
 
   return output;
+}
+
+/**
+ * ArrayResizeFill specialization for OrderQueueProcess function.
+ */
+template <typename X, typename Y>
+int ArrayResizeFill(X &array[][2], int new_size, int reserve_size = 0, Y fill_value = EMPTY) {
+   return ArrayResizeFill(array, new_size, reserve_size, fill_value);
 }
