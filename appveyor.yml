@@ -24,7 +24,7 @@ before_test:
 - ruby --version
 - echo ^#define %MODE% >> src/include/EA31337/ea-mode.mqh
 test_script:
-- ps: shellcheck scripts/*.sh
+- ps: Get-ChildItem -File scripts | Foreach {shellcheck $_.fullname}
 - metaeditor64 /mql4 /s /compile:.. /inc:.. /log:mql4.log || exit /b 0
 - metaeditor64 /mql5 /s /compile:.. /inc:.. /log:mql5.log || exit /b 0
 - type mql4.log mql5.log
