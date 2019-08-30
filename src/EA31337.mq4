@@ -144,6 +144,9 @@ Ticker *ticker; // For parsing ticks.
 Terminal *terminal;
 Trade *trade[FINAL_ENUM_TIMEFRAMES_INDEX];
 
+// Auxiliary objects.
+Order empty_order;
+
 // Market/session variables.
 double pip_size, ea_lot_size;
 double last_ask, last_bid;
@@ -1171,7 +1174,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, Strategy *_strat, double trade_volume = 0,
     }
 
   trade_volume = market.NormalizeLots(trade_volume);
-  order_ticket = (new Order).OrderSend(
+  order_ticket = empty_order.OrderSend(
       market.GetSymbol(),
       cmd,
       trade_volume,
