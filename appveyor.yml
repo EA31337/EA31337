@@ -15,7 +15,7 @@ environment:
 init:
 - ps: iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
 install:
-- appveyor DownloadFile https://github.com/EA31337/MetaEditor/raw/master/metaeditor.exe
+- appveyor DownloadFile https://github.com/EA31337/MetaEditor/raw/master/metaeditor64.exe
 - scoop install ruby python
 - ps: scoop install shellcheck
 before_test:
@@ -25,8 +25,8 @@ before_test:
 - echo ^#define %MODE% >> src/include/EA31337/ea-mode.mqh
 test_script:
 - ps: shellcheck scripts/*.sh
-- metaeditor /mql4 /s /compile:%EAFILE% /log:mql4.log || exit /b 0
-- metaeditor /mql5 /s /compile:%EAFILE% /log:mql5.log || exit /b 0
+- metaeditor64 /mql4 /s /compile:.. /inc:.. /log:mql4.log || exit /b 0
+- metaeditor64 /mql5 /s /compile:.. /inc:.. /log:mql5.log || exit /b 0
 - type mql4.log mql5.log
 - ruby -e "if File.open('mql4.log', mode:'rb:BOM|UTF-16LE').readlines.grep(Regexp.new '[1-9] error'.encode(Encoding::UTF_16LE)) {exit 1}; end"
 - ruby -e "if File.open('mql4.log', mode:'rb:BOM|UTF-16LE').readlines.grep(Regexp.new '[1-9] warning'.encode(Encoding::UTF_16LE)) {exit 1}; end"
