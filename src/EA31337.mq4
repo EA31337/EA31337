@@ -7675,7 +7675,7 @@ bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
   if (filter == EMPTY) filter = SmartQueueFilter;
   if (queue_size > 1) {
     int selected_qid = EMPTY, curr_qid = EMPTY;
-    ArrayResizeFill(sorted_queue, queue_size, 100, EMPTY);
+    ArrayResize(sorted_queue, queue_size, 100);
     for (int i = 0; i < queue_size; i++) {
       curr_qid = OrderQueueNext(curr_qid);
       if (curr_qid == EMPTY) break;
@@ -7793,7 +7793,7 @@ bool OrderQueueAdd(int sid, ENUM_ORDER_TYPE cmd) {
     }
     if (order_queue[i][Q_SID] == EMPTY) { qid = i; break; } // Find the empty qid.
   }
-  if (qid == EMPTY && size < 1000) { ArrayResize(order_queue, size + FINAL_ORDER_QUEUE_ENTRY); qid = size; }
+  if (qid == EMPTY && size < 1000) { OrderQueueResize(order_queue, size + FINAL_ORDER_QUEUE_ENTRY, 0, EMPTY); qid = size; }
   if (qid == EMPTY) {
     return (false);
   } else {
@@ -8056,6 +8056,17 @@ string GetStatReport(string sep = "\n") {
  * ArrayResizeFill specialization for OrderQueueProcess function.
  */
 template <typename X, typename Y>
-int ArrayResizeFill(X &array[][2], int new_size, int reserve_size = 0, Y fill_value = EMPTY) {
-   return ArrayResizeFill(array, new_size, reserve_size, fill_value);
+int OrderQueueResize(X& array[][FINAL_ORDER_QUEUE_ENTRY], int new_size, int reserve_size = 0, Y fill_value = EMPTY) {
+  const int old_size = ArrayRange(array, 0);
+
+  if (new_size <= old_size)
+    return old_size;
+
+  int result = ArrayResize(array, new_size, reserve_size);
+
+  for (int i = old_size; i < new_size; ++i)
+   for (int k = 0; k < FINAL_ORDER_QUEUE_ENTRY; ++k)
+      array[i][k] = fill_value;
+
+  return result;
 }
