@@ -144,6 +144,9 @@ Ticker *ticker; // For parsing ticks.
 Terminal *terminal;
 Trade *trade[FINAL_ENUM_TIMEFRAMES_INDEX];
 
+// Auxiliary objects.
+Order empty_order;
+
 // Market/session variables.
 double pip_size, ea_lot_size;
 double last_ask, last_bid;
@@ -701,13 +704,9 @@ bool EA_Trade(Trade *_trade) {
     } // end: if
   } // end: for
 
-  #ifdef __MQL4__
   if (SmartQueueActive && !order_placed && total_orders <= max_orders) {
     order_placed &= OrderQueueProcess();
   }
-  #else // _MQL5__
-  // @fixme
-  #endif
 
   if (order_placed) {
     ProcessOrders();
@@ -1175,7 +1174,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, Strategy *_strat, double trade_volume = 0,
     }
 
   trade_volume = market.NormalizeLots(trade_volume);
-  order_ticket = (new Order).OrderSend(
+  order_ticket = empty_order.OrderSend(
       market.GetSymbol(),
       cmd,
       trade_volume,
@@ -7797,7 +7796,7 @@ bool OrderQueueAdd(int sid, ENUM_ORDER_TYPE cmd) {
     }
     if (order_queue[i][Q_SID] == EMPTY) { qid = i; break; } // Find the empty qid.
   }
-  if (qid == EMPTY && size < 1000) { ArrayResize(order_queue, size + FINAL_ORDER_QUEUE_ENTRY); qid = size; }
+  if (qid == EMPTY && size < 1000) { OrderQueueResize(order_queue, size + FINAL_ORDER_QUEUE_ENTRY, 0, EMPTY); qid = size; }
   if (qid == EMPTY) {
     return (false);
   } else {
@@ -8054,4 +8053,23 @@ string GetStatReport(string sep = "\n") {
   //output += StringFormat("Ticks per min (avg):                        %d", total_stats.GetTicksPerMin()) + sep; / @todo
 
   return output;
+}
+
+/**
+ * ArrayResizeFill specialization for OrderQueueProcess function.
+ */
+template <typename X, typename Y>
+int OrderQueueResize(X& array[][FINAL_ORDER_QUEUE_ENTRY], int new_size, int reserve_size = 0, Y fill_value = EMPTY) {
+  const int old_size = ArrayRange(array, 0);
+
+  if (new_size <= old_size)
+    return old_size;
+
+  int result = ArrayResize(array, new_size, reserve_size);
+
+  for (int i = old_size; i < new_size; ++i)
+   for (int k = 0; k < FINAL_ORDER_QUEUE_ENTRY; ++k)
+      array[i][k] = fill_value;
+
+  return result;
 }
