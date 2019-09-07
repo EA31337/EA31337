@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                 EA31337 - multi-strategy advanced trading robot. |
-//|                       Copyright 2016-2018, 31337 Investments Ltd |
+//|                       Copyright 2016-2019, 31337 Investments Ltd |
 //|                                       https://github.com/EA31337 |
 //+------------------------------------------------------------------+
 
@@ -11,8 +11,8 @@
 #include "include\EA31337\ea-mode.mqh"
 #include "include\EA31337\ea-code-conf.mqh"
 #include "include\EA31337\ea-defaults.mqh"
-#include "include\EA31337\ea-properties.mqh"
 #include "include\EA31337\ea-enums.mqh"
+#include "include\EA31337\ea-properties.mqh"
 
 #ifdef __advanced__
   #ifdef __rider__
@@ -24,12 +24,12 @@
   #include "include\EA31337\lite\ea-conf.mqh"
 #endif
 
-//+------------------------------------------------------------------+
-//| EA properties.
-//+------------------------------------------------------------------+
-#property version     ea_version
+// EA properties.
+#ifdef __MQL4__
 #property description ea_name
 #property description ea_desc
+#endif
+#property version     ea_version
 #property link        ea_link
 #property copyright   ea_copy
 #property icon        "resources\\favicon.ico"
