@@ -1489,6 +1489,56 @@ class Stg_AC : public Strategy {
 
   void Stg_AC(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
+  static Stg_AC *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams ac_iparams(10, INDI_AC);
+    StgParams ac1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_AC(ac_iparams, cparams1), NULL, NULL);
+    ac1_sparams.SetSignals(AC1_SignalMethod, AC1_OpenCondition1, AC1_OpenCondition2, AC1_CloseCondition, NULL, AC_SignalLevel, NULL);
+    ac1_sparams.SetStops(AC_TrailingProfitMethod, AC_TrailingStopMethod);
+    ac1_sparams.SetMaxSpread(AC1_MaxSpread);
+    ac1_sparams.SetId(AC1);
+    return (new Stg_AC(ac1_sparams, "AC1"));
+  }
+  static Stg_AC *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams ac_iparams(10, INDI_AC);
+    StgParams ac5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_AC(ac_iparams, cparams5), NULL, NULL);
+    ac5_sparams.SetSignals(AC5_SignalMethod, AC5_OpenCondition1, AC5_OpenCondition2, AC5_CloseCondition, NULL, AC_SignalLevel, NULL);
+    ac5_sparams.SetStops(AC_TrailingProfitMethod, AC_TrailingStopMethod);
+    ac5_sparams.SetMaxSpread(AC5_MaxSpread);
+    ac5_sparams.SetId(AC5);
+    return (new Stg_AC(ac5_sparams, "AC5"));
+  }
+  static Stg_AC *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams ac_iparams(10, INDI_AC);
+    StgParams ac15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_AC(ac_iparams, cparams15), NULL, NULL);
+    ac15_sparams.SetSignals(AC15_SignalMethod, AC15_OpenCondition1, AC15_OpenCondition2, AC15_CloseCondition, NULL, AC_SignalLevel, NULL);
+    ac15_sparams.SetStops(AC_TrailingProfitMethod, AC_TrailingStopMethod);
+    ac15_sparams.SetMaxSpread(AC15_MaxSpread);
+    ac15_sparams.SetId(AC15);
+    return (new Stg_AC(ac15_sparams, "AC15"));
+  }
+  static Stg_AC *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams ac_iparams(10, INDI_AC);
+    StgParams ac30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_AC(ac_iparams, cparams30), NULL, NULL);
+    ac30_sparams.SetSignals(AC30_SignalMethod, AC30_OpenCondition1, AC30_OpenCondition2, AC30_CloseCondition, NULL, AC_SignalLevel, NULL);
+    ac30_sparams.SetStops(AC_TrailingProfitMethod, AC_TrailingStopMethod);
+    ac30_sparams.SetMaxSpread(AC30_MaxSpread);
+    ac30_sparams.SetId(AC30);
+    return (new Stg_AC(ac30_sparams, "AC30"));
+  }
+  static Stg_AC *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
+
 /**
  * Check if AC indicator is on buy or sell.
  *
@@ -2897,6 +2947,60 @@ class Stg_RSI : public Strategy {
 
   void Stg_RSI(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
+  static Stg_RSI *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams rsi_iparams(10, INDI_RSI);
+    RSI_Params rsi1_iparams(RSI_Period_M1, RSI_Applied_Price);
+    StgParams rsi1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_RSI(rsi1_iparams, rsi_iparams, cparams1), NULL, NULL);
+    rsi1_sparams.SetSignals(RSI1_SignalMethod, RSI1_OpenCondition1, RSI1_OpenCondition2, RSI1_CloseCondition, NULL, RSI_SignalLevel, NULL);
+    rsi1_sparams.SetStops(RSI_TrailingProfitMethod, RSI_TrailingStopMethod);
+    rsi1_sparams.SetMaxSpread(RSI1_MaxSpread);
+    rsi1_sparams.SetId(RSI1);
+    return (new Stg_RSI(rsi1_sparams, "RSI1"));
+  }
+  static Stg_RSI *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams rsi_iparams(10, INDI_RSI);
+    RSI_Params rsi5_iparams(RSI_Period_M5, RSI_Applied_Price);
+    StgParams rsi5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_RSI(rsi5_iparams, rsi_iparams, cparams5), NULL, NULL);
+    rsi5_sparams.SetSignals(RSI5_SignalMethod, RSI5_OpenCondition1, RSI5_OpenCondition2, RSI5_CloseCondition, NULL, RSI_SignalLevel, NULL);
+    rsi5_sparams.SetStops(RSI_TrailingProfitMethod, RSI_TrailingStopMethod);
+    rsi5_sparams.SetMaxSpread(RSI5_MaxSpread);
+    rsi5_sparams.SetId(RSI5);
+    return (new Stg_RSI(rsi5_sparams, "RSI5"));
+  }
+  static Stg_RSI *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams rsi_iparams(10, INDI_RSI);
+    RSI_Params rsi15_iparams(RSI_Period_M15, RSI_Applied_Price);
+    StgParams rsi15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_RSI(rsi15_iparams, rsi_iparams, cparams15), NULL, NULL);
+    rsi15_sparams.SetSignals(RSI15_SignalMethod, RSI15_OpenCondition1, RSI15_OpenCondition2, RSI15_CloseCondition, NULL, RSI_SignalLevel, NULL);
+    rsi15_sparams.SetStops(RSI_TrailingProfitMethod, RSI_TrailingStopMethod);
+    rsi15_sparams.SetMaxSpread(RSI15_MaxSpread);
+    rsi15_sparams.SetId(RSI15);
+    return (new Stg_RSI(rsi15_sparams, "RSI15"));
+  }
+  static Stg_RSI *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams rsi_iparams(10, INDI_RSI);
+    RSI_Params rsi30_iparams(RSI_Period_M30, RSI_Applied_Price);
+    StgParams rsi30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_RSI(rsi30_iparams, rsi_iparams, cparams30), NULL, NULL);
+    rsi30_sparams.SetSignals(RSI30_SignalMethod, RSI30_OpenCondition1, RSI30_OpenCondition2, RSI30_CloseCondition, NULL, RSI_SignalLevel, NULL);
+    rsi30_sparams.SetStops(RSI_TrailingProfitMethod, RSI_TrailingStopMethod);
+    rsi30_sparams.SetMaxSpread(RSI30_MaxSpread);
+    rsi30_sparams.SetId(RSI30);
+    return (new Stg_RSI(rsi30_sparams, "RSI30"));
+  }
+  static Stg_RSI *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
+
   /**
    * Check if RSI indicator is on buy.
    *
@@ -3422,6 +3526,10 @@ Strategy *GetStratByIndiType(ENUM_INDICATOR_TYPE _indi, Chart *_chart) {
     if (_strat.Data().GetIndicatorType() == _indi && _strat.GetTf() == _chart.GetTf()) {
       return _strat;
     }
+  }
+  switch (_indi) {
+    case INDI_AC:  return Stg_AC::Init(_chart.GetTf());
+    case INDI_RSI: return Stg_RSI::Init(_chart.GetTf());
   }
   return NULL;
 }
@@ -4929,39 +5037,10 @@ bool InitStrategies() {
   ChartParams cparams15(PERIOD_M15);
   ChartParams cparams30(PERIOD_M30);
 
-  IndicatorParams ac_iparams(10, INDI_AC);
-  if ((AC_Active_Tf & M1B) == M1B) {
-    StgParams ac1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_AC(ac_iparams, cparams1), NULL, NULL);
-    ac1_sparams.SetSignals(AC1_SignalMethod, AC1_OpenCondition1, AC1_OpenCondition2, AC1_CloseCondition, NULL, AC_SignalLevel, NULL);
-    ac1_sparams.SetStops(AC_TrailingProfitMethod, AC_TrailingStopMethod);
-    ac1_sparams.SetMaxSpread(AC1_MaxSpread);
-    ac1_sparams.SetId(AC1);
-    strats.Add(new Stg_AC(ac1_sparams, "AC1"));
-  }
-  if ((AC_Active_Tf & M5B) == M5B) {
-    StgParams ac5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_AC(ac_iparams, cparams5), NULL, NULL);
-    ac5_sparams.SetSignals(AC5_SignalMethod, AC5_OpenCondition1, AC5_OpenCondition2, AC5_CloseCondition, NULL, AC_SignalLevel, NULL);
-    ac5_sparams.SetStops(AC_TrailingProfitMethod, AC_TrailingStopMethod);
-    ac5_sparams.SetMaxSpread(AC5_MaxSpread);
-    ac5_sparams.SetId(AC5);
-    strats.Add(new Stg_AC(ac5_sparams, "AC5"));
-  }
-  if ((AC_Active_Tf & M15B) == M15B) {
-    StgParams ac15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_AC(ac_iparams, cparams15), NULL, NULL);
-    ac15_sparams.SetSignals(AC15_SignalMethod, AC15_OpenCondition1, AC15_OpenCondition2, AC15_CloseCondition, NULL, AC_SignalLevel, NULL);
-    ac15_sparams.SetStops(AC_TrailingProfitMethod, AC_TrailingStopMethod);
-    ac15_sparams.SetMaxSpread(AC15_MaxSpread);
-    ac15_sparams.SetId(AC15);
-    strats.Add(new Stg_AC(ac15_sparams, "AC15"));
-  }
-  if ((AC_Active_Tf & M30B) == M30B) {
-    StgParams ac30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_AC(ac_iparams, cparams30), NULL, NULL);
-    ac30_sparams.SetSignals(AC30_SignalMethod, AC30_OpenCondition1, AC30_OpenCondition2, AC30_CloseCondition, NULL, AC_SignalLevel, NULL);
-    ac30_sparams.SetStops(AC_TrailingProfitMethod, AC_TrailingStopMethod);
-    ac30_sparams.SetMaxSpread(AC30_MaxSpread);
-    ac30_sparams.SetId(AC30);
-    strats.Add(new Stg_AC(ac30_sparams, "AC30"));
-  }
+  if ((AC_Active_Tf & M1B) == M1B)   { strats.Add(Stg_AC::Init_M1()); }
+  if ((AC_Active_Tf & M5B) == M5B)   { strats.Add(Stg_AC::Init_M5()); }
+  if ((AC_Active_Tf & M15B) == M15B) { strats.Add(Stg_AC::Init_M15()); }
+  if ((AC_Active_Tf & M30B) == M30B) { strats.Add(Stg_AC::Init_M30()); }
 
   IndicatorParams ad_iparams(10, INDI_AD);
   if ((AD_Active_Tf & M1B) == M1B) {
@@ -5815,43 +5894,10 @@ bool InitStrategies() {
     strats.Add(new Stg_OSMA(osma30_sparams, "OSMA30"));
   }
 
-  IndicatorParams rsi_iparams(10, INDI_RSI);
-  if ((RSI_Active_Tf & M1B) == M1B) {
-    RSI_Params rsi1_iparams(RSI_Period_M1, RSI_Applied_Price);
-    StgParams rsi1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_RSI(rsi1_iparams, rsi_iparams, cparams1), NULL, NULL);
-    rsi1_sparams.SetSignals(RSI1_SignalMethod, RSI1_OpenCondition1, RSI1_OpenCondition2, RSI1_CloseCondition, NULL, RSI_SignalLevel, NULL);
-    rsi1_sparams.SetStops(RSI_TrailingProfitMethod, RSI_TrailingStopMethod);
-    rsi1_sparams.SetMaxSpread(RSI1_MaxSpread);
-    rsi1_sparams.SetId(RSI1);
-    strats.Add(new Stg_RSI(rsi1_sparams, "RSI1"));
-  }
-  if ((RSI_Active_Tf & M5B) == M5B) {
-    RSI_Params rsi5_iparams(RSI_Period_M5, RSI_Applied_Price);
-    StgParams rsi5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_RSI(rsi5_iparams, rsi_iparams, cparams5), NULL, NULL);
-    rsi5_sparams.SetSignals(RSI5_SignalMethod, RSI5_OpenCondition1, RSI5_OpenCondition2, RSI5_CloseCondition, NULL, RSI_SignalLevel, NULL);
-    rsi5_sparams.SetStops(RSI_TrailingProfitMethod, RSI_TrailingStopMethod);
-    rsi5_sparams.SetMaxSpread(RSI5_MaxSpread);
-    rsi5_sparams.SetId(RSI5);
-    strats.Add(new Stg_RSI(rsi5_sparams, "RSI5"));
-  }
-  if ((RSI_Active_Tf & M15B) == M15B) {
-    RSI_Params rsi15_iparams(RSI_Period_M15, RSI_Applied_Price);
-    StgParams rsi15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_RSI(rsi15_iparams, rsi_iparams, cparams15), NULL, NULL);
-    rsi15_sparams.SetSignals(RSI15_SignalMethod, RSI15_OpenCondition1, RSI15_OpenCondition2, RSI15_CloseCondition, NULL, RSI_SignalLevel, NULL);
-    rsi15_sparams.SetStops(RSI_TrailingProfitMethod, RSI_TrailingStopMethod);
-    rsi15_sparams.SetMaxSpread(RSI15_MaxSpread);
-    rsi15_sparams.SetId(RSI15);
-    strats.Add(new Stg_RSI(rsi15_sparams, "RSI15"));
-  }
-  if ((RSI_Active_Tf & M30B) == M30B) {
-    RSI_Params rsi30_iparams(RSI_Period_M30, RSI_Applied_Price);
-    StgParams rsi30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_RSI(rsi30_iparams, rsi_iparams, cparams30), NULL, NULL);
-    rsi30_sparams.SetSignals(RSI30_SignalMethod, RSI30_OpenCondition1, RSI30_OpenCondition2, RSI30_CloseCondition, NULL, RSI_SignalLevel, NULL);
-    rsi30_sparams.SetStops(RSI_TrailingProfitMethod, RSI_TrailingStopMethod);
-    rsi30_sparams.SetMaxSpread(RSI30_MaxSpread);
-    rsi30_sparams.SetId(RSI30);
-    strats.Add(new Stg_RSI(rsi30_sparams, "RSI30"));
-  }
+  if ((RSI_Active_Tf & M1B) == M1B)   { strats.Add(Stg_RSI::Init_M1()); };
+  if ((RSI_Active_Tf & M5B) == M5B)   { strats.Add(Stg_RSI::Init_M5()); };
+  if ((RSI_Active_Tf & M15B) == M15B) { strats.Add(Stg_RSI::Init_M15()); };
+  if ((RSI_Active_Tf & M30B) == M30B) { strats.Add(Stg_RSI::Init_M30()); };
 
   IndicatorParams rvi_iparams(10, INDI_RVI);
   if ((RVI_Active_Tf & M1B) == M1B) {
