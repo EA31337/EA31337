@@ -5923,22 +5923,6 @@ bool TradeAllowed() {
  */
 int CheckSettings() {
   string err;
-   // TODO: IsDllsAllowed(), IsLibrariesAllowed()
-  /* @todo
-  if (File::FileIsExist(Terminal::GetExpertPath() + "\\" + ea_file)) {
-    Msg::ShowText("Meow!", "Error", __FUNCTION__, __LINE__, true, true, true);
-    return (false);
-  }
-  #ifdef __release__
-  #endif
-  */
-  /* // @todo
-  if (ValidateSettings && !ValidateSettings()) {
-    last_err = Msg::ShowText("Market values are invalid!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
-    ea_active = false;
-    return (false);
-  }
-  */
   if (LotSize < 0.0) {
     Msg::ShowText("LotSize is less than 0.", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, true);
     return -__LINE__;
@@ -6035,14 +6019,6 @@ double GetLotSizeAuto(uint _method = 0, bool smooth = true) {
     OHLC first_bar = trade[chart.TfToIndex()].Chart().LoadOHLC();
     long warmup_days = ((TimeCurrent() - first_bar.time) / 60 / 60 / 24);
     if (warmup_days < InitNoOfDaysToWarmUp) {
-      /*
-      PrintFormat("%s: %d of %d, lot: %g of %g",
-        __FUNCTION__,
-        warmup_days, InitNoOfDaysToWarmUp,
-        market.NormalizeLots(new_lot_size * 1 / (double) InitNoOfDaysToWarmUp * warmup_days),
-        new_lot_size
-        );
-      */
       new_lot_size *= market.NormalizeLots(new_lot_size * 1 / (double) InitNoOfDaysToWarmUp * warmup_days);
     }
     else {
