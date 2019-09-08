@@ -81,7 +81,6 @@ datetime last_traded;
 int info[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_INFO_ENTRY];
 double conf[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_VALUE_ENTRY], stats[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_STAT_ENTRY];
 int open_orders[FINAL_STRATEGY_TYPE_ENTRY], closed_orders[FINAL_STRATEGY_TYPE_ENTRY];
-int signals[FINAL_STAT_PERIOD_TYPE_ENTRY][FINAL_STRATEGY_TYPE_ENTRY][FINAL_ENUM_TIMEFRAMES_INDEX][2]; // Count signals to buy and sell per period and strategy.
 int tickets[]; // List of tickets to process.
 int worse_strategy[FINAL_STAT_PERIOD_TYPE_ENTRY], best_strategy[FINAL_ENUM_TIMEFRAMES_INDEX];
 
@@ -4464,11 +4463,6 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
         if (METHOD(signal_method, 5)) result &= sar[period][PREV] > Close[PREV];
         if (METHOD(signal_method, 6)) result &= sar[period][PREV] > Open[PREV];
       }
-      if (result) {
-        // FIXME: Convert into more flexible way.
-        signals[DAILY][SAR1][period][ORDER_TYPE_BUY]++; signals[WEEKLY][SAR1][period][ORDER_TYPE_BUY]++;
-        signals[MONTHLY][SAR1][period][ORDER_TYPE_BUY]++; signals[YEARLY][SAR1][period][ORDER_TYPE_BUY]++;
-      }
       break;
     case ORDER_TYPE_SELL:
       result = sar[period][CURR] - gap > Open[CURR] || sar[period][PREV] - gap > Open[PREV];
@@ -4480,11 +4474,6 @@ static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method =
         if (METHOD(signal_method, 4)) result &= sar[period][CURR] >= Close[CURR];
         if (METHOD(signal_method, 5)) result &= sar[period][PREV] < Close[PREV];
         if (METHOD(signal_method, 6)) result &= sar[period][PREV] < Open[PREV];
-      }
-      if (result) {
-        // FIXME: Convert into more flexible way.
-        signals[DAILY][SAR1][period][ORDER_TYPE_SELL]++; signals[WEEKLY][SAR1][period][ORDER_TYPE_SELL]++;
-        signals[MONTHLY][SAR1][period][ORDER_TYPE_SELL]++; signals[YEARLY][SAR1][period][ORDER_TYPE_SELL]++;
       }
       break;
   }
@@ -6284,20 +6273,6 @@ void StartNewDay(Trade *_trade) {
   day_of_year = DateTime::DayOfYear(); // Day (1 means 1 January,..,365(6) does 31 December) of year. At the testing, the last known server time is modelled.
   // Print and reset variables.
   daily_orders = 0;
-  /*
-  string sar_stats = "Daily SAR stats: ";
-  for (int i = 0; i < FINAL_PERIOD_TYPE_ENTRY; i++) {
-    sar_stats += StringFormat("Period: %d, Buy/Sell: %d/%d; ", i, signals[DAILY][SAR1][i][ORDER_TYPE_BUY], signals[DAILY][SAR1][i][ORDER_TYPE_SELL]);
-    // sar_stats += "Buy M5: " + signals[DAILY][SAR5][i][ORDER_TYPE_BUY] + " / " + "Sell M5: " + signals[DAILY][SAR5][i][ORDER_TYPE_SELL] + "; ";
-    // sar_stats += "Buy M15: " + signals[DAILY][SAR15][i][ORDER_TYPE_BUY] + " / " + "Sell M15: " + signals[DAILY][SAR15][i][ORDER_TYPE_SELL] + "; ";
-    // sar_stats += "Buy M30: " + signals[DAILY][SAR30][i][ORDER_TYPE_BUY] + " / " + "Sell M30: " + signals[DAILY][SAR30][i][ORDER_TYPE_SELL] + "; ";
-    signals[DAILY][SAR1][i][ORDER_TYPE_BUY] = 0;  signals[DAILY][SAR1][i][ORDER_TYPE_SELL]  = 0;
-    // signals[DAILY][SAR5][i][ORDER_TYPE_BUY] = 0;  signals[DAILY][SAR5][i][ORDER_TYPE_SELL]  = 0;
-    // signals[DAILY][SAR15][i][ORDER_TYPE_BUY] = 0; signals[DAILY][SAR15][i][ORDER_TYPE_SELL] = 0;
-    // signals[DAILY][SAR30][i][ORDER_TYPE_BUY] = 0; signals[DAILY][SAR30][i][ORDER_TYPE_SELL] = 0;
-  }
-  if (VerboseInfo) Print(sar_stats);
-  */
 
   // Reset previous data.
   ArrayFill(daily, 0, ArraySize(daily), 0);
@@ -6341,21 +6316,6 @@ void StartNewWeek(Trade *_trade) {
   // Update boosting values.
   if (Boosting_Enabled) UpdateStrategyFactor(MONTHLY);
 
-  // Reset variables.
-  string sar_stats = "Weekly SAR stats: ";
-  for (int i = 0; i < FINAL_ENUM_TIMEFRAMES_INDEX; i++) {
-    sar_stats += StringFormat("Period: %d, Buy/Sell: %d/%d; ", i, signals[WEEKLY][SAR1][i][ORDER_TYPE_BUY], signals[WEEKLY][SAR1][i][ORDER_TYPE_SELL]);
-    //sar_stats += "Buy M1: " + signals[WEEKLY][SAR1][i][ORDER_TYPE_BUY] + " / " + "Sell M1: " + signals[WEEKLY][SAR1][i][ORDER_TYPE_SELL] + "; ";
-    //sar_stats += "Buy M5: " + signals[WEEKLY][SAR5][i][ORDER_TYPE_BUY] + " / " + "Sell M5: " + signals[WEEKLY][SAR5][i][ORDER_TYPE_SELL] + "; ";
-    //sar_stats += "Buy M15: " + signals[WEEKLY][SAR15][i][ORDER_TYPE_BUY] + " / " + "Sell M15: " + signals[WEEKLY][SAR15][i][ORDER_TYPE_SELL] + "; ";
-    //sar_stats += "Buy M30: " + signals[WEEKLY][SAR30][i][ORDER_TYPE_BUY] + " / " + "Sell M30: " + signals[WEEKLY][SAR30][i][ORDER_TYPE_SELL] + "; ";
-    signals[WEEKLY][SAR1][i][ORDER_TYPE_BUY]  = 0; signals[WEEKLY][SAR1][i][ORDER_TYPE_SELL]  = 0;
-    // signals[WEEKLY][SAR5][i][ORDER_TYPE_BUY]  = 0; signals[WEEKLY][SAR5][i][ORDER_TYPE_SELL]  = 0;
-    // signals[WEEKLY][SAR15][i][ORDER_TYPE_BUY] = 0; signals[WEEKLY][SAR15][i][ORDER_TYPE_SELL] = 0;
-    // signals[WEEKLY][SAR30][i][ORDER_TYPE_BUY] = 0; signals[WEEKLY][SAR30][i][ORDER_TYPE_SELL] = 0;
-  }
-  if (VerboseInfo) Print(sar_stats);
-
   ArrayFill(weekly, 0, ArraySize(weekly), 0);
   // Reset strategy stats.
   string strategy_stats = "Weekly strategy stats: ";
@@ -6383,14 +6343,6 @@ void StartNewMonth(Trade *_trade) {
   // Store new data.
   month = DateTime::Month(); // Returns the current month as number (1-January,2,3,4,5,6,7,8,9,10,11,12), i.e., the number of month of the last known server time.
 
-  // Reset variables.
-  string sar_stats = "Monthly SAR stats: ";
-  for (int i = 0; i < FINAL_ENUM_TIMEFRAMES_INDEX; i++) {
-    sar_stats += StringFormat("Period: %d, Buy/Sell: %d/%d; ", i, signals[MONTHLY][SAR1][i][ORDER_TYPE_BUY], signals[MONTHLY][SAR1][i][ORDER_TYPE_SELL]);
-    signals[MONTHLY][SAR1][i][ORDER_TYPE_BUY]  = 0; signals[MONTHLY][SAR1][i][ORDER_TYPE_SELL]  = 0;
-  }
-  if (VerboseInfo) Print(sar_stats);
-
   ArrayFill(monthly, 0, ArraySize(monthly), 0);
   // Reset strategy stats.
   string strategy_stats = "Monthly strategy stats: ";
@@ -6414,12 +6366,6 @@ void StartNewYear(Trade *_trade) {
 
   // Store new data.
   year = DateTime::Year(); // Returns the current year, i.e., the year of the last known server time.
-
-  // Reset variables.
-  for (int i = 0; i < FINAL_ENUM_TIMEFRAMES_INDEX; i++) {
-    signals[YEARLY][SAR1][i][ORDER_TYPE_BUY] = 0;
-    signals[YEARLY][SAR1][i][ORDER_TYPE_SELL] = 0;
-  }
 }
 
 /* END: PERIODIC FUNCTIONS */
