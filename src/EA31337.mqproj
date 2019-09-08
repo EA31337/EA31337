@@ -362,6 +362,26 @@
       "path":".\\include\\includes.mqh",
       "compile":"false",
       "relative_to_project":"true"
+    },
+    {
+      "path":".\\include\\EA31337\\advanced\\ea-conf.mqh",
+      "compile":"false",
+      "relative_to_project":"true"
+    },
+    {
+      "path":".\\include\\EA31337\\advanced\\ea-input.mqh",
+      "compile":"false",
+      "relative_to_project":"true"
+    },
+    {
+      "path":".\\include\\EA31337\\rider\\ea-conf.mqh",
+      "compile":"false",
+      "relative_to_project":"true"
+    },
+    {
+      "path":".\\include\\EA31337\\rider\\ea-input.mqh",
+      "compile":"false",
+      "relative_to_project":"true"
     }
   ]
 }
