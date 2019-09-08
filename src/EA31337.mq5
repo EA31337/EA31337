@@ -1597,7 +1597,57 @@ class Stg_AD : public Strategy {
 
   public:
 
-    void Stg_AD(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_AD(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_AD *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams ad_iparams(10, INDI_AD);
+    StgParams ad1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_AD(ad_iparams, cparams1), NULL, NULL);
+    ad1_sparams.SetSignals(AD1_SignalMethod, AD1_OpenCondition1, AD1_OpenCondition2, AD1_CloseCondition, NULL, AD_SignalLevel, NULL);
+    ad1_sparams.SetStops(AD_TrailingProfitMethod, AD_TrailingStopMethod);
+    ad1_sparams.SetMaxSpread(AD1_MaxSpread);
+    ad1_sparams.SetId(AD1);
+    return (new Stg_AD(ad1_sparams, "AD1"));
+  }
+  static Stg_AD *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams ad_iparams(10, INDI_AD);
+    StgParams ad5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_AD(ad_iparams, cparams5), NULL, NULL);
+    ad5_sparams.SetSignals(AD5_SignalMethod, AD5_OpenCondition1, AD5_OpenCondition2, AD5_CloseCondition, NULL, AD_SignalLevel, NULL);
+    ad5_sparams.SetStops(AD_TrailingProfitMethod, AD_TrailingStopMethod);
+    ad5_sparams.SetMaxSpread(AD5_MaxSpread);
+    ad5_sparams.SetId(AD5);
+    return (new Stg_AD(ad5_sparams, "AD5"));
+  }
+  static Stg_AD *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams ad_iparams(10, INDI_AD);
+    StgParams ad15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_AD(ad_iparams, cparams15), NULL, NULL);
+    ad15_sparams.SetSignals(AD15_SignalMethod, AD15_OpenCondition1, AD15_OpenCondition2, AD15_CloseCondition, NULL, AD_SignalLevel, NULL);
+    ad15_sparams.SetStops(AD_TrailingProfitMethod, AD_TrailingStopMethod);
+    ad15_sparams.SetMaxSpread(AD15_MaxSpread);
+    ad15_sparams.SetId(AD15);
+    return (new Stg_AD(ad15_sparams, "AD15"));
+  }
+  static Stg_AD *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams ad_iparams(10, INDI_AD);
+    StgParams ad30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_AD(ad_iparams, cparams30), NULL, NULL);
+    ad30_sparams.SetSignals(AD30_SignalMethod, AD30_OpenCondition1, AD30_OpenCondition2, AD30_CloseCondition, NULL, AD_SignalLevel, NULL);
+    ad30_sparams.SetStops(AD_TrailingProfitMethod, AD_TrailingStopMethod);
+    ad30_sparams.SetMaxSpread(AD30_MaxSpread);
+    ad30_sparams.SetId(AD30);
+    return (new Stg_AD(ad30_sparams, "AD30"));
+  }
+  static Stg_AD *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if A/D (Accumulation/Distribution) indicator is on buy or sell.
@@ -1647,7 +1697,61 @@ class Stg_ADX : public Strategy {
 
   public:
 
-    void Stg_ADX(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_ADX(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_ADX *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams adx_iparams(10, INDI_ADX);
+    ADX_Params adx1_iparams(ADX_Period_M1, ADX_Applied_Price);
+    StgParams adx1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_ADX(adx1_iparams, adx_iparams, cparams1), NULL, NULL);
+    adx1_sparams.SetSignals(ADX1_SignalMethod, ADX1_OpenCondition1, ADX1_OpenCondition2, ADX1_CloseCondition, NULL, ADX_SignalLevel, NULL);
+    adx1_sparams.SetStops(ADX_TrailingProfitMethod, ADX_TrailingStopMethod);
+    adx1_sparams.SetMaxSpread(ADX1_MaxSpread);
+    adx1_sparams.SetId(ADX1);
+    return (new Stg_ADX(adx1_sparams, "ADX1"));
+  }
+  static Stg_ADX *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams adx_iparams(10, INDI_ADX);
+    ADX_Params adx5_iparams(ADX_Period_M5, ADX_Applied_Price);
+    StgParams adx5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_ADX(adx5_iparams, adx_iparams, cparams5), NULL, NULL);
+    adx5_sparams.SetSignals(ADX5_SignalMethod, ADX5_OpenCondition1, ADX5_OpenCondition2, ADX5_CloseCondition, NULL, ADX_SignalLevel, NULL);
+    adx5_sparams.SetStops(ADX_TrailingProfitMethod, ADX_TrailingStopMethod);
+    adx5_sparams.SetMaxSpread(ADX5_MaxSpread);
+    adx5_sparams.SetId(ADX5);
+    return (new Stg_ADX(adx5_sparams, "ADX5"));
+  }
+  static Stg_ADX *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams adx_iparams(10, INDI_ADX);
+    ADX_Params adx15_iparams(ADX_Period_M15, ADX_Applied_Price);
+    StgParams adx15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_ADX(adx15_iparams, adx_iparams, cparams15), NULL, NULL);
+    adx15_sparams.SetSignals(ADX15_SignalMethod, ADX15_OpenCondition1, ADX15_OpenCondition2, ADX15_CloseCondition, NULL, ADX_SignalLevel, NULL);
+    adx15_sparams.SetStops(ADX_TrailingProfitMethod, ADX_TrailingStopMethod);
+    adx15_sparams.SetMaxSpread(ADX15_MaxSpread);
+    adx15_sparams.SetId(ADX15);
+    return (new Stg_ADX(adx15_sparams, "ADX15"));
+  }
+  static Stg_ADX *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams adx_iparams(10, INDI_ADX);
+    ADX_Params adx30_iparams(ADX_Period_M30, ADX_Applied_Price);
+    StgParams adx30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_ADX(adx30_iparams, adx_iparams, cparams30), NULL, NULL);
+    adx30_sparams.SetSignals(ADX30_SignalMethod, ADX30_OpenCondition1, ADX30_OpenCondition2, ADX30_CloseCondition, NULL, ADX_SignalLevel, NULL);
+    adx30_sparams.SetStops(ADX_TrailingProfitMethod, ADX_TrailingStopMethod);
+    adx30_sparams.SetMaxSpread(ADX30_MaxSpread);
+    adx30_sparams.SetId(ADX30);
+    return (new Stg_ADX(adx30_sparams, "ADX30"));
+  }
+  static Stg_ADX *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if ADX indicator is on buy or sell.
@@ -1698,7 +1802,77 @@ class Stg_Alligator : public Strategy {
 
   public:
 
-    void Stg_Alligator(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_Alligator(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_Alligator *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams alli_iparams(10, INDI_ALLIGATOR);
+    Alligator_Params alli1_iparams(
+      Alligator_Period_Jaw, Alligator_Shift_Jaw,
+      Alligator_Period_Teeth, Alligator_Shift_Teeth,
+      Alligator_Period_Lips, Alligator_Shift_Lips,
+      Alligator_MA_Method, Alligator_Applied_Price);
+    StgParams alli1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Alligator(alli1_iparams, alli_iparams, cparams1), NULL, NULL);
+    alli1_sparams.SetSignals(Alligator1_SignalMethod, Alligator1_OpenCondition1, Alligator1_OpenCondition2, Alligator1_CloseCondition, NULL, Alligator_SignalLevel, NULL);
+    alli1_sparams.SetStops(Alligator_TrailingProfitMethod, Alligator_TrailingStopMethod);
+    alli1_sparams.SetMaxSpread(Alligator1_MaxSpread);
+    alli1_sparams.SetId(ALLIGATOR1);
+    return (new Stg_Alligator(alli1_sparams, "Alligator1"));
+  }
+  static Stg_Alligator *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams alli_iparams(10, INDI_ALLIGATOR);
+    Alligator_Params alli5_iparams(
+      Alligator_Period_Jaw, Alligator_Shift_Jaw,
+      Alligator_Period_Teeth, Alligator_Shift_Teeth,
+      Alligator_Period_Lips, Alligator_Shift_Lips,
+      Alligator_MA_Method, Alligator_Applied_Price);
+    StgParams alli5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Alligator(alli5_iparams, alli_iparams, cparams5), NULL, NULL);
+    alli5_sparams.SetSignals(Alligator5_SignalMethod, Alligator5_OpenCondition1, Alligator5_OpenCondition2, Alligator5_CloseCondition, NULL, Alligator_SignalLevel, NULL);
+    alli5_sparams.SetStops(Alligator_TrailingProfitMethod, Alligator_TrailingStopMethod);
+    alli5_sparams.SetMaxSpread(Alligator5_MaxSpread);
+    alli5_sparams.SetId(ALLIGATOR5);
+    return (new Stg_Alligator(alli5_sparams, "Alligator5"));
+  }
+  static Stg_Alligator *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams alli_iparams(10, INDI_ALLIGATOR);
+    Alligator_Params alli15_iparams(
+      Alligator_Period_Jaw, Alligator_Shift_Jaw,
+      Alligator_Period_Teeth, Alligator_Shift_Teeth,
+      Alligator_Period_Lips, Alligator_Shift_Lips,
+      Alligator_MA_Method, Alligator_Applied_Price);
+    StgParams alli15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Alligator(alli15_iparams, alli_iparams, cparams15), NULL, NULL);
+    alli15_sparams.SetSignals(Alligator15_SignalMethod, Alligator15_OpenCondition1, Alligator15_OpenCondition2, Alligator15_CloseCondition, NULL, Alligator_SignalLevel, NULL);
+    alli15_sparams.SetStops(Alligator_TrailingProfitMethod, Alligator_TrailingStopMethod);
+    alli15_sparams.SetMaxSpread(Alligator15_MaxSpread);
+    alli15_sparams.SetId(ALLIGATOR15);
+    return (new Stg_Alligator(alli15_sparams, "Alligator15"));
+  }
+  static Stg_Alligator *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams alli_iparams(10, INDI_ALLIGATOR);
+    Alligator_Params alli30_iparams(
+      Alligator_Period_Jaw, Alligator_Shift_Jaw,
+      Alligator_Period_Teeth, Alligator_Shift_Teeth,
+      Alligator_Period_Lips, Alligator_Shift_Lips,
+      Alligator_MA_Method, Alligator_Applied_Price);
+    StgParams alli30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Alligator(alli30_iparams, alli_iparams, cparams30), NULL, NULL);
+    alli30_sparams.SetSignals(Alligator30_SignalMethod, Alligator30_OpenCondition1, Alligator30_OpenCondition2, Alligator30_CloseCondition, NULL, Alligator_SignalLevel, NULL);
+    alli30_sparams.SetStops(Alligator_TrailingProfitMethod, Alligator_TrailingStopMethod);
+    alli30_sparams.SetMaxSpread(Alligator30_MaxSpread);
+    alli30_sparams.SetId(ALLIGATOR30);
+    return (new Stg_Alligator(alli30_sparams, "Alligator30"));
+  }
+  static Stg_Alligator *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if Alligator indicator is on buy or sell.
@@ -1792,7 +1966,61 @@ class Stg_ATR : public Strategy {
 
   public:
 
-    void Stg_ATR(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_ATR(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_ATR *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams atr_iparams(10, INDI_ATR);
+    ATR_Params atr1_iparams(ATR_Period_M1);
+    StgParams atr1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_ATR(atr1_iparams, atr_iparams, cparams1), NULL, NULL);
+    atr1_sparams.SetSignals(ATR1_SignalMethod, ATR1_OpenCondition1, ATR1_OpenCondition2, ATR1_CloseCondition, NULL, ATR_SignalLevel, NULL);
+    atr1_sparams.SetStops(ATR_TrailingProfitMethod, ATR_TrailingStopMethod);
+    atr1_sparams.SetMaxSpread(ATR1_MaxSpread);
+    atr1_sparams.SetId(ATR1);
+    return (new Stg_ATR(atr1_sparams, "ATR1"));
+  }
+  static Stg_ATR *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams atr_iparams(10, INDI_ATR);
+    ATR_Params atr5_iparams(ATR_Period_M5);
+    StgParams atr5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_ATR(atr5_iparams, atr_iparams, cparams5), NULL, NULL);
+    atr5_sparams.SetSignals(ATR5_SignalMethod, ATR5_OpenCondition1, ATR5_OpenCondition2, ATR5_CloseCondition, NULL, ATR_SignalLevel, NULL);
+    atr5_sparams.SetStops(ATR_TrailingProfitMethod, ATR_TrailingStopMethod);
+    atr5_sparams.SetMaxSpread(ATR5_MaxSpread);
+    atr5_sparams.SetId(ATR5);
+    return (new Stg_ATR(atr5_sparams, "ATR5"));
+  }
+  static Stg_ATR *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams atr_iparams(10, INDI_ATR);
+    ATR_Params atr15_iparams(ATR_Period_M15);
+    StgParams atr15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_ATR(atr15_iparams, atr_iparams, cparams15), NULL, NULL);
+    atr15_sparams.SetSignals(ATR15_SignalMethod, ATR15_OpenCondition1, ATR15_OpenCondition2, ATR15_CloseCondition, NULL, ATR_SignalLevel, NULL);
+    atr15_sparams.SetStops(ATR_TrailingProfitMethod, ATR_TrailingStopMethod);
+    atr15_sparams.SetMaxSpread(ATR15_MaxSpread);
+    atr15_sparams.SetId(ATR15);
+    return (new Stg_ATR(atr15_sparams, "ATR15"));
+  }
+  static Stg_ATR *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams atr_iparams(10, INDI_ATR);
+    ATR_Params atr30_iparams(ATR_Period_M30);
+    StgParams atr30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_ATR(atr30_iparams, atr_iparams, cparams30), NULL, NULL);
+    atr30_sparams.SetSignals(ATR30_SignalMethod, ATR30_OpenCondition1, ATR30_OpenCondition2, ATR30_CloseCondition, NULL, ATR_SignalLevel, NULL);
+    atr30_sparams.SetStops(ATR_TrailingProfitMethod, ATR_TrailingStopMethod);
+    atr30_sparams.SetMaxSpread(ATR30_MaxSpread);
+    atr30_sparams.SetId(ATR30);
+    return (new Stg_ATR(atr30_sparams, "ATR30"));
+  }
+  static Stg_ATR *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if ATR indicator is on buy or sell.
@@ -1863,7 +2091,57 @@ class Stg_Awesome : public Strategy {
 
   public:
 
-    void Stg_Awesome(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_Awesome(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_Awesome *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams ao_iparams(10, INDI_AO);
+    StgParams ao1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_AO(ao_iparams, cparams1), NULL, NULL);
+    ao1_sparams.SetSignals(Awesome1_SignalMethod, Awesome1_OpenCondition1, Awesome1_OpenCondition2, Awesome1_CloseCondition, NULL, Awesome_SignalLevel, NULL);
+    ao1_sparams.SetStops(Awesome_TrailingProfitMethod, Awesome_TrailingStopMethod);
+    ao1_sparams.SetMaxSpread(Awesome1_MaxSpread);
+    ao1_sparams.SetId(AWESOME1);
+    return (new Stg_Awesome(ao1_sparams, "Awesome1"));
+  }
+  static Stg_Awesome *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams ao_iparams(10, INDI_AO);
+    StgParams ao5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_AO(ao_iparams, cparams5), NULL, NULL);
+    ao5_sparams.SetSignals(Awesome5_SignalMethod, Awesome5_OpenCondition1, Awesome5_OpenCondition2, Awesome5_CloseCondition, NULL, Awesome_SignalLevel, NULL);
+    ao5_sparams.SetStops(Awesome_TrailingProfitMethod, Awesome_TrailingStopMethod);
+    ao5_sparams.SetMaxSpread(Awesome5_MaxSpread);
+    ao5_sparams.SetId(AWESOME5);
+    return (new Stg_Awesome(ao5_sparams, "Awesome5"));
+  }
+  static Stg_Awesome *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams ao_iparams(10, INDI_AO);
+    StgParams ao15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_AO(ao_iparams, cparams15), NULL, NULL);
+    ao15_sparams.SetSignals(Awesome15_SignalMethod, Awesome15_OpenCondition1, Awesome15_OpenCondition2, Awesome15_CloseCondition, NULL, Awesome_SignalLevel, NULL);
+    ao15_sparams.SetStops(Awesome_TrailingProfitMethod, Awesome_TrailingStopMethod);
+    ao15_sparams.SetMaxSpread(Awesome15_MaxSpread);
+    ao15_sparams.SetId(AWESOME15);
+    return (new Stg_Awesome(ao15_sparams, "Awesome15"));
+  }
+  static Stg_Awesome *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams ao_iparams(10, INDI_AO);
+    StgParams ao30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_AO(ao_iparams, cparams30), NULL, NULL);
+    ao30_sparams.SetSignals(Awesome30_SignalMethod, Awesome30_OpenCondition1, Awesome30_OpenCondition2, Awesome30_CloseCondition, NULL, Awesome_SignalLevel, NULL);
+    ao30_sparams.SetStops(Awesome_TrailingProfitMethod, Awesome_TrailingStopMethod);
+    ao30_sparams.SetMaxSpread(Awesome30_MaxSpread);
+    ao30_sparams.SetId(AWESOME30);
+    return (new Stg_Awesome(ao30_sparams, "Awesome30"));
+  }
+  static Stg_Awesome *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if Awesome indicator is on buy or sell.
@@ -1932,7 +2210,61 @@ class Stg_Bands : public Strategy {
 
   public:
 
-    void Stg_Bands(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_Bands(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_Bands *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams bands_iparams(10, INDI_BANDS);
+    Bands_Params bands1_iparams(Bands_Period_M1, Bands_Deviation_M1, Bands_HShift, Bands_Applied_Price);
+    StgParams bands1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Bands(bands1_iparams, bands_iparams, cparams1), NULL, NULL);
+    bands1_sparams.SetSignals(Bands1_SignalMethod, Bands1_OpenCondition1, Bands1_OpenCondition2, Bands1_CloseCondition, NULL, Bands_SignalLevel, NULL);
+    bands1_sparams.SetStops(Bands_TrailingProfitMethod, Bands_TrailingStopMethod);
+    bands1_sparams.SetMaxSpread(Bands1_MaxSpread);
+    bands1_sparams.SetId(BANDS1);
+    return (new Stg_Bands(bands1_sparams, "Bands1"));
+  }
+  static Stg_Bands *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams bands_iparams(10, INDI_BANDS);
+    Bands_Params bands5_iparams(Bands_Period_M5, Bands_Deviation_M5, Bands_HShift, Bands_Applied_Price);
+    StgParams bands5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Bands(bands5_iparams, bands_iparams, cparams5), NULL, NULL);
+    bands5_sparams.SetSignals(Bands5_SignalMethod, Bands5_OpenCondition1, Bands5_OpenCondition2, Bands5_CloseCondition, NULL, Bands_SignalLevel, NULL);
+    bands5_sparams.SetStops(Bands_TrailingProfitMethod, Bands_TrailingStopMethod);
+    bands5_sparams.SetMaxSpread(Bands5_MaxSpread);
+    bands5_sparams.SetId(BANDS5);
+    return (new Stg_Bands(bands5_sparams, "Bands5"));
+  }
+  static Stg_Bands *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams bands_iparams(10, INDI_BANDS);
+    Bands_Params bands15_iparams(Bands_Period_M15, Bands_Deviation_M15, Bands_HShift, Bands_Applied_Price);
+    StgParams bands15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Bands(bands15_iparams, bands_iparams, cparams15), NULL, NULL);
+    bands15_sparams.SetSignals(Bands15_SignalMethod, Bands15_OpenCondition1, Bands15_OpenCondition2, Bands15_CloseCondition, NULL, Bands_SignalLevel, NULL);
+    bands15_sparams.SetStops(Bands_TrailingProfitMethod, Bands_TrailingStopMethod);
+    bands15_sparams.SetMaxSpread(Bands15_MaxSpread);
+    bands15_sparams.SetId(BANDS15);
+    return (new Stg_Bands(bands15_sparams, "Bands15"));
+  }
+  static Stg_Bands *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams bands_iparams(10, INDI_BANDS);
+    Bands_Params bands30_iparams(Bands_Period_M30, Bands_Deviation_M30, Bands_HShift, Bands_Applied_Price);
+    StgParams bands30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Bands(bands30_iparams, bands_iparams, cparams30), NULL, NULL);
+    bands30_sparams.SetSignals(Bands30_SignalMethod, Bands30_OpenCondition1, Bands30_OpenCondition2, Bands30_CloseCondition, NULL, Bands_SignalLevel, NULL);
+    bands30_sparams.SetStops(Bands_TrailingProfitMethod, Bands_TrailingStopMethod);
+    bands30_sparams.SetMaxSpread(Bands30_MaxSpread);
+    bands30_sparams.SetId(BANDS30);
+    return (new Stg_Bands(bands30_sparams, "Bands30"));
+  }
+  static Stg_Bands *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if Bands indicator is on buy or sell.
@@ -2011,7 +2343,61 @@ class Stg_BearsPower : public Strategy {
 
   public:
 
-    void Stg_BearsPower(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_BearsPower(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_BearsPower *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams bearspower_iparams(10, INDI_BEARS);
+    BearsPower_Params bearspower1_iparams(BearsPower_Period, BearsPower_Applied_Price);
+    StgParams bearspower1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_BearsPower(bearspower1_iparams, bearspower_iparams, cparams1), NULL, NULL);
+    bearspower1_sparams.SetSignals(BearsPower1_SignalMethod, BearsPower1_OpenCondition1, BearsPower1_OpenCondition2, BearsPower1_CloseCondition, NULL, BearsPower_SignalLevel, NULL);
+    bearspower1_sparams.SetStops(BearsPower_TrailingProfitMethod, BearsPower_TrailingStopMethod);
+    bearspower1_sparams.SetMaxSpread(BearsPower1_MaxSpread);
+    bearspower1_sparams.SetId(BEARSPOWER1);
+    return (new Stg_BearsPower(bearspower1_sparams, "BearsPower1"));
+  }
+  static Stg_BearsPower *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams bearspower_iparams(10, INDI_BEARS);
+    BearsPower_Params bearspower5_iparams(BearsPower_Period, BearsPower_Applied_Price);
+    StgParams bearspower5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_BearsPower(bearspower5_iparams, bearspower_iparams, cparams5), NULL, NULL);
+    bearspower5_sparams.SetSignals(BearsPower5_SignalMethod, BearsPower5_OpenCondition1, BearsPower5_OpenCondition2, BearsPower5_CloseCondition, NULL, BearsPower_SignalLevel, NULL);
+    bearspower5_sparams.SetStops(BearsPower_TrailingProfitMethod, BearsPower_TrailingStopMethod);
+    bearspower5_sparams.SetMaxSpread(BearsPower5_MaxSpread);
+    bearspower5_sparams.SetId(BEARSPOWER5);
+    return (new Stg_BearsPower(bearspower5_sparams, "BearsPower5"));
+  }
+  static Stg_BearsPower *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams bearspower_iparams(10, INDI_BEARS);
+    BearsPower_Params bearspower15_iparams(BearsPower_Period, BearsPower_Applied_Price);
+    StgParams bearspower15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_BearsPower(bearspower15_iparams, bearspower_iparams, cparams15), NULL, NULL);
+    bearspower15_sparams.SetSignals(BearsPower15_SignalMethod, BearsPower15_OpenCondition1, BearsPower15_OpenCondition2, BearsPower15_CloseCondition, NULL, BearsPower_SignalLevel, NULL);
+    bearspower15_sparams.SetStops(BearsPower_TrailingProfitMethod, BearsPower_TrailingStopMethod);
+    bearspower15_sparams.SetMaxSpread(BearsPower15_MaxSpread);
+    bearspower15_sparams.SetId(BEARSPOWER15);
+    return (new Stg_BearsPower(bearspower15_sparams, "BearsPower15"));
+  }
+  static Stg_BearsPower *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams bearspower_iparams(10, INDI_BEARS);
+    BearsPower_Params bearspower30_iparams(BearsPower_Period, BearsPower_Applied_Price);
+    StgParams bearspower30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_BearsPower(bearspower30_iparams, bearspower_iparams, cparams30), NULL, NULL);
+    bearspower30_sparams.SetSignals(BearsPower30_SignalMethod, BearsPower30_OpenCondition1, BearsPower30_OpenCondition2, BearsPower30_CloseCondition, NULL, BearsPower_SignalLevel, NULL);
+    bearspower30_sparams.SetStops(BearsPower_TrailingProfitMethod, BearsPower_TrailingStopMethod);
+    bearspower30_sparams.SetMaxSpread(BearsPower30_MaxSpread);
+    bearspower30_sparams.SetId(BEARSPOWER30);
+    return (new Stg_BearsPower(bearspower30_sparams, "BearsPower30"));
+  }
+  static Stg_BearsPower *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if BearsPower indicator is on buy or sell.
@@ -2055,7 +2441,61 @@ class Stg_BullsPower : public Strategy {
 
   public:
 
-    void Stg_BullsPower(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_BullsPower(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_BullsPower *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams bullspower_iparams(10, INDI_BULLS);
+    BullsPower_Params bullspower1_iparams(BullsPower_Period, BullsPower_Applied_Price);
+    StgParams bullspower1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_BullsPower(bullspower1_iparams, bullspower_iparams, cparams1), NULL, NULL);
+    bullspower1_sparams.SetSignals(BullsPower1_SignalMethod, BullsPower1_OpenCondition1, BullsPower1_OpenCondition2, BullsPower1_CloseCondition, NULL, BullsPower_SignalLevel, NULL);
+    bullspower1_sparams.SetStops(BullsPower_TrailingProfitMethod, BullsPower_TrailingStopMethod);
+    bullspower1_sparams.SetMaxSpread(BullsPower1_MaxSpread);
+    bullspower1_sparams.SetId(BULLSPOWER1);
+    return (new Stg_BullsPower(bullspower1_sparams, "BullsPower1"));
+  }
+  static Stg_BullsPower *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams bullspower_iparams(10, INDI_BULLS);
+    BullsPower_Params bullspower5_iparams(BullsPower_Period, BullsPower_Applied_Price);
+    StgParams bullspower5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_BullsPower(bullspower5_iparams, bullspower_iparams, cparams5), NULL, NULL);
+    bullspower5_sparams.SetSignals(BullsPower5_SignalMethod, BullsPower5_OpenCondition1, BullsPower5_OpenCondition2, BullsPower5_CloseCondition, NULL, BullsPower_SignalLevel, NULL);
+    bullspower5_sparams.SetStops(BullsPower_TrailingProfitMethod, BullsPower_TrailingStopMethod);
+    bullspower5_sparams.SetMaxSpread(BullsPower5_MaxSpread);
+    bullspower5_sparams.SetId(BULLSPOWER5);
+    return (new Stg_BullsPower(bullspower5_sparams, "BullsPower5"));
+  }
+  static Stg_BullsPower *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams bullspower_iparams(10, INDI_BULLS);
+    BullsPower_Params bullspower15_iparams(BullsPower_Period, BullsPower_Applied_Price);
+    StgParams bullspower15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_BullsPower(bullspower15_iparams, bullspower_iparams, cparams15), NULL, NULL);
+    bullspower15_sparams.SetSignals(BullsPower15_SignalMethod, BullsPower15_OpenCondition1, BullsPower15_OpenCondition2, BullsPower15_CloseCondition, NULL, BullsPower_SignalLevel, NULL);
+    bullspower15_sparams.SetStops(BullsPower_TrailingProfitMethod, BullsPower_TrailingStopMethod);
+    bullspower15_sparams.SetMaxSpread(BullsPower15_MaxSpread);
+    bullspower15_sparams.SetId(BULLSPOWER15);
+    return (new Stg_BullsPower(bullspower15_sparams, "BullsPower15"));
+  }
+  static Stg_BullsPower *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams bullspower_iparams(10, INDI_BULLS);
+    BullsPower_Params bullspower30_iparams(BullsPower_Period, BullsPower_Applied_Price);
+    StgParams bullspower30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_BullsPower(bullspower30_iparams, bullspower_iparams, cparams30), NULL, NULL);
+    bullspower30_sparams.SetSignals(BullsPower30_SignalMethod, BullsPower30_OpenCondition1, BullsPower30_OpenCondition2, BullsPower30_CloseCondition, NULL, BullsPower_SignalLevel, NULL);
+    bullspower30_sparams.SetStops(BullsPower_TrailingProfitMethod, BullsPower_TrailingStopMethod);
+    bullspower30_sparams.SetMaxSpread(BullsPower30_MaxSpread);
+    bullspower30_sparams.SetId(BULLSPOWER30);
+    return (new Stg_BullsPower(bullspower30_sparams, "BullsPower30"));
+  }
+  static Stg_BullsPower *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if BullsPower indicator is on buy or sell.
@@ -2099,7 +2539,57 @@ class Stg_BWMFI : public Strategy {
 
   public:
 
-    void Stg_BWMFI(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_BWMFI(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_BWMFI *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams bwmfi_iparams(10, INDI_BWMFI);
+    StgParams bwmfi1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_BWMFI(bwmfi_iparams, cparams1), NULL, NULL);
+    bwmfi1_sparams.SetSignals(BWMFI1_SignalMethod, BWMFI1_OpenCondition1, BWMFI1_OpenCondition2, BWMFI1_CloseCondition, NULL, BWMFI_SignalLevel, NULL);
+    bwmfi1_sparams.SetStops(BWMFI_TrailingProfitMethod, BWMFI_TrailingStopMethod);
+    bwmfi1_sparams.SetMaxSpread(BWMFI1_MaxSpread);
+    bwmfi1_sparams.SetId(BWMFI1);
+    return (new Stg_BWMFI(bwmfi1_sparams, "BWMFI1"));
+  }
+  static Stg_BWMFI *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams bwmfi_iparams(10, INDI_BWMFI);
+    StgParams bwmfi5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_BWMFI(bwmfi_iparams, cparams5), NULL, NULL);
+    bwmfi5_sparams.SetSignals(BWMFI5_SignalMethod, BWMFI5_OpenCondition1, BWMFI5_OpenCondition2, BWMFI5_CloseCondition, NULL, BWMFI_SignalLevel, NULL);
+    bwmfi5_sparams.SetStops(BWMFI_TrailingProfitMethod, BWMFI_TrailingStopMethod);
+    bwmfi5_sparams.SetMaxSpread(BWMFI5_MaxSpread);
+    bwmfi5_sparams.SetId(BWMFI5);
+    return (new Stg_BWMFI(bwmfi5_sparams, "BWMFI5"));
+  }
+  static Stg_BWMFI *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams bwmfi_iparams(10, INDI_BWMFI);
+    StgParams bwmfi15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_BWMFI(bwmfi_iparams, cparams15), NULL, NULL);
+    bwmfi15_sparams.SetSignals(BWMFI15_SignalMethod, BWMFI15_OpenCondition1, BWMFI15_OpenCondition2, BWMFI15_CloseCondition, NULL, BWMFI_SignalLevel, NULL);
+    bwmfi15_sparams.SetStops(BWMFI_TrailingProfitMethod, BWMFI_TrailingStopMethod);
+    bwmfi15_sparams.SetMaxSpread(BWMFI15_MaxSpread);
+    bwmfi15_sparams.SetId(BWMFI15);
+    return (new Stg_BWMFI(bwmfi15_sparams, "BWMFI15"));
+  }
+  static Stg_BWMFI *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams bwmfi_iparams(10, INDI_BWMFI);
+    StgParams bwmfi30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_BWMFI(bwmfi_iparams, cparams30), NULL, NULL);
+    bwmfi30_sparams.SetSignals(BWMFI30_SignalMethod, BWMFI30_OpenCondition1, BWMFI30_OpenCondition2, BWMFI30_CloseCondition, NULL, BWMFI_SignalLevel, NULL);
+    bwmfi30_sparams.SetStops(BWMFI_TrailingProfitMethod, BWMFI_TrailingStopMethod);
+    bwmfi30_sparams.SetMaxSpread(BWMFI30_MaxSpread);
+    bwmfi30_sparams.SetId(BWMFI30);
+    return (new Stg_BWMFI(bwmfi30_sparams, "BWMFI30"));
+  }
+  static Stg_BWMFI *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if BWMFI indicator is on buy or sell.
@@ -2159,7 +2649,61 @@ class Stg_CCI : public Strategy {
 
   public:
 
-    void Stg_CCI(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_CCI(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_CCI *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams cci_iparams(10, INDI_CCI);
+    CCI_Params cci1_iparams(CCI_Period_M1, CCI_Applied_Price);
+    StgParams cci1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_CCI(cci1_iparams, cci_iparams, cparams1), NULL, NULL);
+    cci1_sparams.SetSignals(CCI1_SignalMethod, CCI1_OpenCondition1, CCI1_OpenCondition2, CCI1_CloseCondition, NULL, CCI_SignalLevel, NULL);
+    cci1_sparams.SetStops(CCI_TrailingProfitMethod, CCI_TrailingStopMethod);
+    cci1_sparams.SetMaxSpread(CCI1_MaxSpread);
+    cci1_sparams.SetId(CCI1);
+    return (new Stg_CCI(cci1_sparams, "CCI1"));
+  }
+  static Stg_CCI *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams cci_iparams(10, INDI_CCI);
+    CCI_Params cci5_iparams(CCI_Period_M5, CCI_Applied_Price);
+    StgParams cci5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_CCI(cci5_iparams, cci_iparams, cparams5), NULL, NULL);
+    cci5_sparams.SetSignals(CCI5_SignalMethod, CCI5_OpenCondition1, CCI5_OpenCondition2, CCI5_CloseCondition, NULL, CCI_SignalLevel, NULL);
+    cci5_sparams.SetStops(CCI_TrailingProfitMethod, CCI_TrailingStopMethod);
+    cci5_sparams.SetMaxSpread(CCI5_MaxSpread);
+    cci5_sparams.SetId(CCI5);
+    return (new Stg_CCI(cci5_sparams, "CCI5"));
+  }
+  static Stg_CCI *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams cci_iparams(10, INDI_CCI);
+    CCI_Params cci15_iparams(CCI_Period_M15, CCI_Applied_Price);
+    StgParams cci15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_CCI(cci15_iparams, cci_iparams, cparams15), NULL, NULL);
+    cci15_sparams.SetSignals(CCI15_SignalMethod, CCI15_OpenCondition1, CCI15_OpenCondition2, CCI15_CloseCondition, NULL, CCI_SignalLevel, NULL);
+    cci15_sparams.SetStops(CCI_TrailingProfitMethod, CCI_TrailingStopMethod);
+    cci15_sparams.SetMaxSpread(CCI15_MaxSpread);
+    cci15_sparams.SetId(CCI15);
+    return (new Stg_CCI(cci15_sparams, "CCI15"));
+  }
+  static Stg_CCI *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams cci_iparams(10, INDI_CCI);
+    CCI_Params cci30_iparams(CCI_Period_M30, CCI_Applied_Price);
+    StgParams cci30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_CCI(cci30_iparams, cci_iparams, cparams30), NULL, NULL);
+    cci30_sparams.SetSignals(CCI30_SignalMethod, CCI30_OpenCondition1, CCI30_OpenCondition2, CCI30_CloseCondition, NULL, CCI_SignalLevel, NULL);
+    cci30_sparams.SetStops(CCI_TrailingProfitMethod, CCI_TrailingStopMethod);
+    cci30_sparams.SetMaxSpread(CCI30_MaxSpread);
+    cci30_sparams.SetId(CCI30);
+    return (new Stg_CCI(cci30_sparams, "CCI30"));
+  }
+  static Stg_CCI *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if CCI indicator is on buy or sell.
@@ -2222,7 +2766,61 @@ class Stg_DeMarker : public Strategy {
 
   public:
 
-    void Stg_DeMarker(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_DeMarker(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_DeMarker *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams dm_iparams(10, INDI_DEMARKER);
+    DeMarker_Params dm1_iparams(DeMarker_Period_M1);
+    StgParams dm1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_DeMarker(dm1_iparams, dm_iparams, cparams1), NULL, NULL);
+    dm1_sparams.SetSignals(DeMarker1_SignalMethod, DeMarker1_OpenCondition1, DeMarker1_OpenCondition2, DeMarker1_CloseCondition, NULL, DeMarker_SignalLevel, NULL);
+    dm1_sparams.SetStops(DeMarker_TrailingProfitMethod, DeMarker_TrailingStopMethod);
+    dm1_sparams.SetMaxSpread(DeMarker1_MaxSpread);
+    dm1_sparams.SetId(DEMARKER1);
+    return (new Stg_DeMarker(dm1_sparams, "DeMarker1"));
+  }
+  static Stg_DeMarker *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams dm_iparams(10, INDI_DEMARKER);
+    DeMarker_Params dm5_iparams(DeMarker_Period_M5);
+    StgParams dm5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_DeMarker(dm5_iparams, dm_iparams, cparams5), NULL, NULL);
+    dm5_sparams.SetSignals(DeMarker5_SignalMethod, DeMarker5_OpenCondition1, DeMarker5_OpenCondition2, DeMarker5_CloseCondition, NULL, DeMarker_SignalLevel, NULL);
+    dm5_sparams.SetStops(DeMarker_TrailingProfitMethod, DeMarker_TrailingStopMethod);
+    dm5_sparams.SetMaxSpread(DeMarker5_MaxSpread);
+    dm5_sparams.SetId(DEMARKER5);
+    return (new Stg_DeMarker(dm5_sparams, "DeMarker5"));
+  }
+  static Stg_DeMarker *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams dm_iparams(10, INDI_DEMARKER);
+    DeMarker_Params dm15_iparams(DeMarker_Period_M15);
+    StgParams dm15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_DeMarker(dm15_iparams, dm_iparams, cparams15), NULL, NULL);
+    dm15_sparams.SetSignals(DeMarker15_SignalMethod, DeMarker15_OpenCondition1, DeMarker15_OpenCondition2, DeMarker15_CloseCondition, NULL, DeMarker_SignalLevel, NULL);
+    dm15_sparams.SetStops(DeMarker_TrailingProfitMethod, DeMarker_TrailingStopMethod);
+    dm15_sparams.SetMaxSpread(DeMarker15_MaxSpread);
+    dm15_sparams.SetId(DEMARKER15);
+    return (new Stg_DeMarker(dm15_sparams, "DeMarker15"));
+  }
+  static Stg_DeMarker *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams dm_iparams(10, INDI_DEMARKER);
+    DeMarker_Params dm30_iparams(DeMarker_Period_M30);
+    StgParams dm30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_DeMarker(dm30_iparams, dm_iparams, cparams30), NULL, NULL);
+    dm30_sparams.SetSignals(DeMarker30_SignalMethod, DeMarker30_OpenCondition1, DeMarker30_OpenCondition2, DeMarker30_CloseCondition, NULL, DeMarker_SignalLevel, NULL);
+    dm30_sparams.SetStops(DeMarker_TrailingProfitMethod, DeMarker_TrailingStopMethod);
+    dm30_sparams.SetMaxSpread(DeMarker30_MaxSpread);
+    dm30_sparams.SetId(DEMARKER30);
+    return (new Stg_DeMarker(dm30_sparams, "DeMarker30"));
+  }
+  static Stg_DeMarker *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if DeMarker indicator is on buy or sell.
@@ -2286,7 +2884,61 @@ class Stg_Envelopes : public Strategy {
 
   public:
 
-    void Stg_Envelopes(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_Envelopes(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_Envelopes *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams env_iparams(10, INDI_ENVELOPES);
+    Envelopes_Params env1_iparams(Envelopes_MA_Period_M1, Envelopes_MA_Shift, Envelopes_MA_Method, Envelopes_Applied_Price, Envelopes_Deviation_M1);
+    StgParams env1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Envelopes(env1_iparams, env_iparams, cparams1), NULL, NULL);
+    env1_sparams.SetSignals(Envelopes1_SignalMethod, Envelopes1_OpenCondition1, Envelopes1_OpenCondition2, Envelopes1_CloseCondition, NULL, Envelopes_SignalLevel, NULL);
+    env1_sparams.SetStops(Envelopes_TrailingProfitMethod, Envelopes_TrailingStopMethod);
+    env1_sparams.SetMaxSpread(Envelopes1_MaxSpread);
+    env1_sparams.SetId(ENVELOPES1);
+    return (new Stg_Envelopes(env1_sparams, "Envelopes1"));
+  }
+  static Stg_Envelopes *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams env_iparams(10, INDI_ENVELOPES);
+    Envelopes_Params env5_iparams(Envelopes_MA_Period_M5, Envelopes_MA_Shift, Envelopes_MA_Method, Envelopes_Applied_Price, Envelopes_Deviation_M5);
+    StgParams env5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Envelopes(env5_iparams, env_iparams, cparams5), NULL, NULL);
+    env5_sparams.SetSignals(Envelopes5_SignalMethod, Envelopes5_OpenCondition1, Envelopes5_OpenCondition2, Envelopes5_CloseCondition, NULL, Envelopes_SignalLevel, NULL);
+    env5_sparams.SetStops(Envelopes_TrailingProfitMethod, Envelopes_TrailingStopMethod);
+    env5_sparams.SetMaxSpread(Envelopes5_MaxSpread);
+    env5_sparams.SetId(ENVELOPES5);
+    return (new Stg_Envelopes(env5_sparams, "Envelopes5"));
+  }
+  static Stg_Envelopes *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams env_iparams(10, INDI_ENVELOPES);
+    Envelopes_Params env15_iparams(Envelopes_MA_Period_M15, Envelopes_MA_Shift, Envelopes_MA_Method, Envelopes_Applied_Price, Envelopes_Deviation_M15);
+    StgParams env15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Envelopes(env15_iparams, env_iparams, cparams15), NULL, NULL);
+    env15_sparams.SetSignals(Envelopes15_SignalMethod, Envelopes15_OpenCondition1, Envelopes15_OpenCondition2, Envelopes15_CloseCondition, NULL, Envelopes_SignalLevel, NULL);
+    env15_sparams.SetStops(Envelopes_TrailingProfitMethod, Envelopes_TrailingStopMethod);
+    env15_sparams.SetMaxSpread(Envelopes15_MaxSpread);
+    env15_sparams.SetId(ENVELOPES15);
+    return (new Stg_Envelopes(env15_sparams, "Envelopes15"));
+  }
+  static Stg_Envelopes *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams env_iparams(10, INDI_ENVELOPES);
+    Envelopes_Params env30_iparams(Envelopes_MA_Period_M30, Envelopes_MA_Shift, Envelopes_MA_Method, Envelopes_Applied_Price, Envelopes_Deviation_M30);
+    StgParams env30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Envelopes(env30_iparams, env_iparams, cparams30), NULL, NULL);
+    env30_sparams.SetSignals(Envelopes30_SignalMethod, Envelopes30_OpenCondition1, Envelopes30_OpenCondition2, Envelopes30_CloseCondition, NULL, Envelopes_SignalLevel, NULL);
+    env30_sparams.SetStops(Envelopes_TrailingProfitMethod, Envelopes_TrailingStopMethod);
+    env30_sparams.SetMaxSpread(Envelopes30_MaxSpread);
+    env30_sparams.SetId(ENVELOPES30);
+    return (new Stg_Envelopes(env30_sparams, "Envelopes30"));
+  }
+  static Stg_Envelopes *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if Envelopes indicator is on sell.
@@ -2355,7 +3007,61 @@ class Stg_Force : public Strategy {
 
   public:
 
-    void Stg_Force(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_Force(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_Force *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams force_iparams(10, INDI_FORCE);
+    Force_Params force1_iparams(Force_Period_M1, Force_MA_Method, Force_Applied_Price);
+    StgParams force1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Force(force1_iparams, force_iparams, cparams1), NULL, NULL);
+    force1_sparams.SetSignals(Force1_SignalMethod, Force1_OpenCondition1, Force1_OpenCondition2, Force1_CloseCondition, NULL, Force_SignalLevel, NULL);
+    force1_sparams.SetStops(Force_TrailingProfitMethod, Force_TrailingStopMethod);
+    force1_sparams.SetMaxSpread(Force1_MaxSpread);
+    force1_sparams.SetId(FORCE1);
+    return (new Stg_Force(force1_sparams, "Force1"));
+  }
+  static Stg_Force *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams force_iparams(10, INDI_FORCE);
+    Force_Params force5_iparams(Force_Period_M5, Force_MA_Method, Force_Applied_Price);
+    StgParams force5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Force(force5_iparams, force_iparams, cparams5), NULL, NULL);
+    force5_sparams.SetSignals(Force5_SignalMethod, Force5_OpenCondition1, Force5_OpenCondition2, Force5_CloseCondition, NULL, Force_SignalLevel, NULL);
+    force5_sparams.SetStops(Force_TrailingProfitMethod, Force_TrailingStopMethod);
+    force5_sparams.SetMaxSpread(Force5_MaxSpread);
+    force5_sparams.SetId(FORCE5);
+    return (new Stg_Force(force5_sparams, "Force5"));
+  }
+  static Stg_Force *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams force_iparams(10, INDI_FORCE);
+    Force_Params force15_iparams(Force_Period_M15, Force_MA_Method, Force_Applied_Price);
+    StgParams force15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Force(force15_iparams, force_iparams, cparams15), NULL, NULL);
+    force15_sparams.SetSignals(Force15_SignalMethod, Force15_OpenCondition1, Force15_OpenCondition2, Force15_CloseCondition, NULL, Force_SignalLevel, NULL);
+    force15_sparams.SetStops(Force_TrailingProfitMethod, Force_TrailingStopMethod);
+    force15_sparams.SetMaxSpread(Force15_MaxSpread);
+    force15_sparams.SetId(FORCE15);
+    return (new Stg_Force(force15_sparams, "Force15"));
+  }
+  static Stg_Force *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams force_iparams(10, INDI_FORCE);
+    Force_Params force30_iparams(Force_Period_M30, Force_MA_Method, Force_Applied_Price);
+    StgParams force30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Force(force30_iparams, force_iparams, cparams30), NULL, NULL);
+    force30_sparams.SetSignals(Force30_SignalMethod, Force30_OpenCondition1, Force30_OpenCondition2, Force30_CloseCondition, NULL, Force_SignalLevel, NULL);
+    force30_sparams.SetStops(Force_TrailingProfitMethod, Force_TrailingStopMethod);
+    force30_sparams.SetMaxSpread(Force30_MaxSpread);
+    force30_sparams.SetId(FORCE30);
+    return (new Stg_Force(force30_sparams, "Force30"));
+  }
+  static Stg_Force *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if Force Index indicator is on buy or sell.
@@ -2403,7 +3109,57 @@ class Stg_Fractals : public Strategy {
 
   public:
 
-    void Stg_Fractals(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_Fractals(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_Fractals *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams fractals_iparams(10, INDI_FRACTALS);
+    StgParams fractals1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Fractals(fractals_iparams, cparams1), NULL, NULL);
+    fractals1_sparams.SetSignals(Fractals1_SignalMethod, Fractals1_OpenCondition1, Fractals1_OpenCondition2, Fractals1_CloseCondition, NULL, Fractals_SignalLevel, NULL);
+    fractals1_sparams.SetStops(Fractals_TrailingProfitMethod, Fractals_TrailingStopMethod);
+    fractals1_sparams.SetMaxSpread(Fractals1_MaxSpread);
+    fractals1_sparams.SetId(FRACTALS1);
+    return (new Stg_Fractals(fractals1_sparams, "Fractals1"));
+  }
+  static Stg_Fractals *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams fractals_iparams(10, INDI_FRACTALS);
+    StgParams fractals5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Fractals(fractals_iparams, cparams5), NULL, NULL);
+    fractals5_sparams.SetSignals(Fractals5_SignalMethod, Fractals5_OpenCondition1, Fractals5_OpenCondition2, Fractals5_CloseCondition, NULL, Fractals_SignalLevel, NULL);
+    fractals5_sparams.SetStops(Fractals_TrailingProfitMethod, Fractals_TrailingStopMethod);
+    fractals5_sparams.SetMaxSpread(Fractals5_MaxSpread);
+    fractals5_sparams.SetId(FRACTALS5);
+    return (new Stg_Fractals(fractals5_sparams, "Fractals5"));
+  }
+  static Stg_Fractals *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams fractals_iparams(10, INDI_FRACTALS);
+    StgParams fractals15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Fractals(fractals_iparams, cparams15), NULL, NULL);
+    fractals15_sparams.SetSignals(Fractals15_SignalMethod, Fractals15_OpenCondition1, Fractals15_OpenCondition2, Fractals15_CloseCondition, NULL, Fractals_SignalLevel, NULL);
+    fractals15_sparams.SetStops(Fractals_TrailingProfitMethod, Fractals_TrailingStopMethod);
+    fractals15_sparams.SetMaxSpread(Fractals15_MaxSpread);
+    fractals15_sparams.SetId(FRACTALS15);
+    return (new Stg_Fractals(fractals15_sparams, "Fractals15"));
+  }
+  static Stg_Fractals *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams fractals_iparams(10, INDI_FRACTALS);
+    StgParams fractals30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Fractals(fractals_iparams, cparams30), NULL, NULL);
+    fractals30_sparams.SetSignals(Fractals30_SignalMethod, Fractals30_OpenCondition1, Fractals30_OpenCondition2, Fractals30_CloseCondition, NULL, Fractals_SignalLevel, NULL);
+    fractals30_sparams.SetStops(Fractals_TrailingProfitMethod, Fractals_TrailingStopMethod);
+    fractals30_sparams.SetMaxSpread(Fractals30_MaxSpread);
+    fractals30_sparams.SetId(FRACTALS30);
+    return (new Stg_Fractals(fractals30_sparams, "Fractals30"));
+  }
+  static Stg_Fractals *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if Fractals indicator is on buy or sell.
@@ -2467,7 +3223,77 @@ class Stg_Gator : public Strategy {
 
   public:
 
-    void Stg_Gator(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_Gator(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_Gator *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams gator_iparams(10, INDI_GATOR);
+    Gator_Params gator1_iparams(
+      Gator_Period_Jaw, Gator_Shift_Jaw,
+      Gator_Period_Teeth, Gator_Shift_Teeth,
+      Gator_Period_Lips, Gator_Shift_Lips,
+      Gator_MA_Method, Gator_Applied_Price);
+    StgParams gator1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Gator(gator1_iparams, gator_iparams, cparams1), NULL, NULL);
+    gator1_sparams.SetSignals(Gator1_SignalMethod, Gator1_OpenCondition1, Gator1_OpenCondition2, Gator1_CloseCondition, NULL, Gator_SignalLevel, NULL);
+    gator1_sparams.SetStops(Gator_TrailingProfitMethod, Gator_TrailingStopMethod);
+    gator1_sparams.SetMaxSpread(Gator1_MaxSpread);
+    gator1_sparams.SetId(GATOR1);
+    return (new Stg_Gator(gator1_sparams, "Gator1"));
+  }
+  static Stg_Gator *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams gator_iparams(10, INDI_GATOR);
+    Gator_Params gator5_iparams(
+      Gator_Period_Jaw, Gator_Shift_Jaw,
+      Gator_Period_Teeth, Gator_Shift_Teeth,
+      Gator_Period_Lips, Gator_Shift_Lips,
+      Gator_MA_Method, Gator_Applied_Price);
+    StgParams gator5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Gator(gator5_iparams, gator_iparams, cparams5), NULL, NULL);
+    gator5_sparams.SetSignals(Gator5_SignalMethod, Gator5_OpenCondition1, Gator5_OpenCondition2, Gator5_CloseCondition, NULL, Gator_SignalLevel, NULL);
+    gator5_sparams.SetStops(Gator_TrailingProfitMethod, Gator_TrailingStopMethod);
+    gator5_sparams.SetMaxSpread(Gator5_MaxSpread);
+    gator5_sparams.SetId(GATOR5);
+    return (new Stg_Gator(gator5_sparams, "Gator5"));
+  }
+  static Stg_Gator *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams gator_iparams(10, INDI_GATOR);
+    Gator_Params gator15_iparams(
+      Gator_Period_Jaw, Gator_Shift_Jaw,
+      Gator_Period_Teeth, Gator_Shift_Teeth,
+      Gator_Period_Lips, Gator_Shift_Lips,
+      Gator_MA_Method, Gator_Applied_Price);
+    StgParams gator15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Gator(gator15_iparams, gator_iparams, cparams15), NULL, NULL);
+    gator15_sparams.SetSignals(Gator15_SignalMethod, Gator15_OpenCondition1, Gator15_OpenCondition2, Gator15_CloseCondition, NULL, Gator_SignalLevel, NULL);
+    gator15_sparams.SetStops(Gator_TrailingProfitMethod, Gator_TrailingStopMethod);
+    gator15_sparams.SetMaxSpread(Gator15_MaxSpread);
+    gator15_sparams.SetId(GATOR15);
+    return (new Stg_Gator(gator15_sparams, "Gator15"));
+  }
+  static Stg_Gator *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams gator_iparams(10, INDI_GATOR);
+    Gator_Params gator30_iparams(
+      Gator_Period_Jaw, Gator_Shift_Jaw,
+      Gator_Period_Teeth, Gator_Shift_Teeth,
+      Gator_Period_Lips, Gator_Shift_Lips,
+      Gator_MA_Method, Gator_Applied_Price);
+    StgParams gator30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Gator(gator30_iparams, gator_iparams, cparams30), NULL, NULL);
+    gator30_sparams.SetSignals(Gator30_SignalMethod, Gator30_OpenCondition1, Gator30_OpenCondition2, Gator30_CloseCondition, NULL, Gator_SignalLevel, NULL);
+    gator30_sparams.SetStops(Gator_TrailingProfitMethod, Gator_TrailingStopMethod);
+    gator30_sparams.SetMaxSpread(Gator30_MaxSpread);
+    gator30_sparams.SetId(GATOR30);
+    return (new Stg_Gator(gator30_sparams, "Gator30"));
+  }
+  static Stg_Gator *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if Gator Oscillator is on buy or sell.
@@ -2522,7 +3348,61 @@ class Stg_Ichimoku : public Strategy {
 
   public:
 
-    void Stg_Ichimoku(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_Ichimoku(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_Ichimoku *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams ichimoku_iparams(10, INDI_ICHIMOKU);
+    Ichimoku_Params ichimoku1_iparams(Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B);
+    StgParams ichimoku1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Ichimoku(ichimoku1_iparams, ichimoku_iparams, cparams1), NULL, NULL);
+    ichimoku1_sparams.SetSignals(Ichimoku1_SignalMethod, Ichimoku1_OpenCondition1, Ichimoku1_OpenCondition2, Ichimoku1_CloseCondition, NULL, Ichimoku_SignalLevel, NULL);
+    ichimoku1_sparams.SetStops(Ichimoku_TrailingProfitMethod, Ichimoku_TrailingStopMethod);
+    ichimoku1_sparams.SetMaxSpread(Ichimoku1_MaxSpread);
+    ichimoku1_sparams.SetId(ICHIMOKU1);
+    return (new Stg_Ichimoku(ichimoku1_sparams, "Ichimoku1"));
+  }
+  static Stg_Ichimoku *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams ichimoku_iparams(10, INDI_ICHIMOKU);
+    Ichimoku_Params ichimoku5_iparams(Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B);
+    StgParams ichimoku5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Ichimoku(ichimoku5_iparams, ichimoku_iparams, cparams5), NULL, NULL);
+    ichimoku5_sparams.SetSignals(Ichimoku5_SignalMethod, Ichimoku5_OpenCondition1, Ichimoku5_OpenCondition2, Ichimoku5_CloseCondition, NULL, Ichimoku_SignalLevel, NULL);
+    ichimoku5_sparams.SetStops(Ichimoku_TrailingProfitMethod, Ichimoku_TrailingStopMethod);
+    ichimoku5_sparams.SetMaxSpread(Ichimoku5_MaxSpread);
+    ichimoku5_sparams.SetId(ICHIMOKU5);
+    return (new Stg_Ichimoku(ichimoku5_sparams, "Ichimoku5"));
+  }
+  static Stg_Ichimoku *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams ichimoku_iparams(10, INDI_ICHIMOKU);
+    Ichimoku_Params ichimoku15_iparams(Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B);
+    StgParams ichimoku15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Ichimoku(ichimoku15_iparams, ichimoku_iparams, cparams15), NULL, NULL);
+    ichimoku15_sparams.SetSignals(Ichimoku15_SignalMethod, Ichimoku15_OpenCondition1, Ichimoku15_OpenCondition2, Ichimoku15_CloseCondition, NULL, Ichimoku_SignalLevel, NULL);
+    ichimoku15_sparams.SetStops(Ichimoku_TrailingProfitMethod, Ichimoku_TrailingStopMethod);
+    ichimoku15_sparams.SetMaxSpread(Ichimoku15_MaxSpread);
+    ichimoku15_sparams.SetId(ICHIMOKU15);
+    return (new Stg_Ichimoku(ichimoku15_sparams, "Ichimoku15"));
+  }
+  static Stg_Ichimoku *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams ichimoku_iparams(10, INDI_ICHIMOKU);
+    Ichimoku_Params ichimoku30_iparams(Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B);
+    StgParams ichimoku30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Ichimoku(ichimoku30_iparams, ichimoku_iparams, cparams30), NULL, NULL);
+    ichimoku30_sparams.SetSignals(Ichimoku30_SignalMethod, Ichimoku30_OpenCondition1, Ichimoku30_OpenCondition2, Ichimoku30_CloseCondition, NULL, Ichimoku_SignalLevel, NULL);
+    ichimoku30_sparams.SetStops(Ichimoku_TrailingProfitMethod, Ichimoku_TrailingStopMethod);
+    ichimoku30_sparams.SetMaxSpread(Ichimoku30_MaxSpread);
+    ichimoku30_sparams.SetId(ICHIMOKU30);
+    return (new Stg_Ichimoku(ichimoku30_sparams, "Ichimoku30"));
+  }
+  static Stg_Ichimoku *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if Ichimoku indicator is on buy or sell.
@@ -2593,7 +3473,61 @@ class Stg_MA : public Strategy {
 
   public:
 
-    void Stg_MA(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_MA(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_MA *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams ma_iparams(10, INDI_MA);
+    MA_Params ma1_iparams(MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price);
+    StgParams ma1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_MA(ma1_iparams, ma_iparams, cparams1), NULL, NULL);
+    ma1_sparams.SetSignals(MA1_SignalMethod, MA1_OpenCondition1, MA1_OpenCondition2, MA1_CloseCondition, NULL, MA_SignalLevel, NULL);
+    ma1_sparams.SetStops(MA_TrailingProfitMethod, MA_TrailingStopMethod);
+    ma1_sparams.SetMaxSpread(MA1_MaxSpread);
+    ma1_sparams.SetId(MA1);
+    return (new Stg_MA(ma1_sparams, "MA1"));
+  }
+  static Stg_MA *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams ma_iparams(10, INDI_MA);
+    MA_Params ma5_iparams(MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price);
+    StgParams ma5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_MA(ma5_iparams, ma_iparams, cparams5), NULL, NULL);
+    ma5_sparams.SetSignals(MA5_SignalMethod, MA5_OpenCondition1, MA5_OpenCondition2, MA5_CloseCondition, NULL, MA_SignalLevel, NULL);
+    ma5_sparams.SetStops(MA_TrailingProfitMethod, MA_TrailingStopMethod);
+    ma5_sparams.SetMaxSpread(MA5_MaxSpread);
+    ma5_sparams.SetId(MA5);
+    return (new Stg_MA(ma5_sparams, "MA5"));
+  }
+  static Stg_MA *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams ma_iparams(10, INDI_MA);
+    MA_Params ma15_iparams(MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price);
+    StgParams ma15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_MA(ma15_iparams, ma_iparams, cparams15), NULL, NULL);
+    ma15_sparams.SetSignals(MA15_SignalMethod, MA15_OpenCondition1, MA15_OpenCondition2, MA15_CloseCondition, NULL, MA_SignalLevel, NULL);
+    ma15_sparams.SetStops(MA_TrailingProfitMethod, MA_TrailingStopMethod);
+    ma15_sparams.SetMaxSpread(MA15_MaxSpread);
+    ma15_sparams.SetId(MA15);
+    return (new Stg_MA(ma15_sparams, "MA15"));
+  }
+  static Stg_MA *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams ma_iparams(10, INDI_MA);
+    MA_Params ma30_iparams(MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price);
+    StgParams ma30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_MA(ma30_iparams, ma_iparams, cparams30), NULL, NULL);
+    ma30_sparams.SetSignals(MA30_SignalMethod, MA30_OpenCondition1, MA30_OpenCondition2, MA30_CloseCondition, NULL, MA_SignalLevel, NULL);
+    ma30_sparams.SetStops(MA_TrailingProfitMethod, MA_TrailingStopMethod);
+    ma30_sparams.SetMaxSpread(MA30_MaxSpread);
+    ma30_sparams.SetId(MA30);
+    return (new Stg_MA(ma30_sparams, "MA30"));
+  }
+  static Stg_MA *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if MA indicator is on buy.
@@ -2663,7 +3597,61 @@ class Stg_MACD : public Strategy {
 
   public:
 
-    void Stg_MACD(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_MACD(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_MACD *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams macd_iparams(10, INDI_MACD);
+    MACD_Params macd1_iparams(MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price);
+    StgParams macd1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_MACD(macd1_iparams, macd_iparams, cparams1), NULL, NULL);
+    macd1_sparams.SetSignals(MACD1_SignalMethod, MACD1_OpenCondition1, MACD1_OpenCondition2, MACD1_CloseCondition, NULL, MACD_SignalLevel, NULL);
+    macd1_sparams.SetStops(MACD_TrailingProfitMethod, MACD_TrailingStopMethod);
+    macd1_sparams.SetMaxSpread(MACD1_MaxSpread);
+    macd1_sparams.SetId(MACD1);
+    return (new Stg_MACD(macd1_sparams, "MACD1"));
+  }
+  static Stg_MACD *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams macd_iparams(10, INDI_MACD);
+    MACD_Params macd5_iparams(MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price);
+    StgParams macd5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_MACD(macd5_iparams, macd_iparams, cparams5), NULL, NULL);
+    macd5_sparams.SetSignals(MACD5_SignalMethod, MACD5_OpenCondition1, MACD5_OpenCondition2, MACD5_CloseCondition, NULL, MACD_SignalLevel, NULL);
+    macd5_sparams.SetStops(MACD_TrailingProfitMethod, MACD_TrailingStopMethod);
+    macd5_sparams.SetMaxSpread(MACD5_MaxSpread);
+    macd5_sparams.SetId(MACD5);
+    return (new Stg_MACD(macd5_sparams, "MACD5"));
+  }
+  static Stg_MACD *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams macd_iparams(10, INDI_MACD);
+    MACD_Params macd15_iparams(MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price);
+    StgParams macd15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_MACD(macd15_iparams, macd_iparams, cparams15), NULL, NULL);
+    macd15_sparams.SetSignals(MACD15_SignalMethod, MACD15_OpenCondition1, MACD15_OpenCondition2, MACD15_CloseCondition, NULL, MACD_SignalLevel, NULL);
+    macd15_sparams.SetStops(MACD_TrailingProfitMethod, MACD_TrailingStopMethod);
+    macd15_sparams.SetMaxSpread(MACD15_MaxSpread);
+    macd15_sparams.SetId(MACD15);
+    return (new Stg_MACD(macd15_sparams, "MACD15"));
+  }
+  static Stg_MACD *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams macd_iparams(10, INDI_MACD);
+    MACD_Params macd30_iparams(MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price);
+    StgParams macd30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_MACD(macd30_iparams, macd_iparams, cparams30), NULL, NULL);
+    macd30_sparams.SetSignals(MACD30_SignalMethod, MACD30_OpenCondition1, MACD30_OpenCondition2, MACD30_CloseCondition, NULL, MACD_SignalLevel, NULL);
+    macd30_sparams.SetStops(MACD_TrailingProfitMethod, MACD_TrailingStopMethod);
+    macd30_sparams.SetMaxSpread(MACD30_MaxSpread);
+    macd30_sparams.SetId(MACD30);
+    return (new Stg_MACD(macd30_sparams, "MACD30"));
+  }
+  static Stg_MACD *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if MACD indicator is on buy.
@@ -2746,7 +3734,61 @@ class Stg_MFI : public Strategy {
 
   public:
 
-    void Stg_MFI(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_MFI(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_MFI *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams mfi_iparams(10, INDI_MFI);
+    MFI_Params mfi1_iparams(MFI_Period_M1);
+    StgParams mfi1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_MFI(mfi1_iparams, mfi_iparams, cparams1), NULL, NULL);
+    mfi1_sparams.SetSignals(MFI1_SignalMethod, MFI1_OpenCondition1, MFI1_OpenCondition2, MFI1_CloseCondition, NULL, MFI_SignalLevel, NULL);
+    mfi1_sparams.SetStops(MFI_TrailingProfitMethod, MFI_TrailingStopMethod);
+    mfi1_sparams.SetMaxSpread(MFI1_MaxSpread);
+    mfi1_sparams.SetId(MFI1);
+    return (new Stg_MFI(mfi1_sparams, "MFI1"));
+  }
+  static Stg_MFI *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams mfi_iparams(10, INDI_MFI);
+    MFI_Params mfi5_iparams(MFI_Period_M5);
+    StgParams mfi5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_MFI(mfi5_iparams, mfi_iparams, cparams5), NULL, NULL);
+    mfi5_sparams.SetSignals(MFI5_SignalMethod, MFI5_OpenCondition1, MFI5_OpenCondition2, MFI5_CloseCondition, NULL, MFI_SignalLevel, NULL);
+    mfi5_sparams.SetStops(MFI_TrailingProfitMethod, MFI_TrailingStopMethod);
+    mfi5_sparams.SetMaxSpread(MFI5_MaxSpread);
+    mfi5_sparams.SetId(MFI5);
+    return (new Stg_MFI(mfi5_sparams, "MFI5"));
+  }
+  static Stg_MFI *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams mfi_iparams(10, INDI_MFI);
+    MFI_Params mfi15_iparams(MFI_Period_M15);
+    StgParams mfi15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_MFI(mfi15_iparams, mfi_iparams, cparams15), NULL, NULL);
+    mfi15_sparams.SetSignals(MFI15_SignalMethod, MFI15_OpenCondition1, MFI15_OpenCondition2, MFI15_CloseCondition, NULL, MFI_SignalLevel, NULL);
+    mfi15_sparams.SetStops(MFI_TrailingProfitMethod, MFI_TrailingStopMethod);
+    mfi15_sparams.SetMaxSpread(MFI15_MaxSpread);
+    mfi15_sparams.SetId(MFI15);
+    return (new Stg_MFI(mfi15_sparams, "MFI15"));
+  }
+  static Stg_MFI *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams mfi_iparams(10, INDI_MFI);
+    MFI_Params mfi30_iparams(MFI_Period_M30);
+    StgParams mfi30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_MFI(mfi30_iparams, mfi_iparams, cparams30), NULL, NULL);
+    mfi30_sparams.SetSignals(MFI30_SignalMethod, MFI30_OpenCondition1, MFI30_OpenCondition2, MFI30_CloseCondition, NULL, MFI_SignalLevel, NULL);
+    mfi30_sparams.SetStops(MFI_TrailingProfitMethod, MFI_TrailingStopMethod);
+    mfi30_sparams.SetMaxSpread(MFI30_MaxSpread);
+    mfi30_sparams.SetId(MFI30);
+    return (new Stg_MFI(mfi30_sparams, "MFI30"));
+  }
+  static Stg_MFI *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if MFI indicator is on buy or sell.
@@ -2794,7 +3836,61 @@ class Stg_Momentum : public Strategy {
 
   public:
 
-    void Stg_Momentum(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_Momentum(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_Momentum *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams mom_iparams(10, INDI_MOMENTUM);
+    Momentum_Params mom1_iparams(Momentum_Period, Momentum_Applied_Price);
+    StgParams mom1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Momentum(mom1_iparams, mom_iparams, cparams1), NULL, NULL);
+    mom1_sparams.SetSignals(Momentum1_SignalMethod, Momentum1_OpenCondition1, Momentum1_OpenCondition2, Momentum1_CloseCondition, NULL, Momentum_SignalLevel, NULL);
+    mom1_sparams.SetStops(Momentum_TrailingProfitMethod, Momentum_TrailingStopMethod);
+    mom1_sparams.SetMaxSpread(Momentum1_MaxSpread);
+    mom1_sparams.SetId(MOM1);
+    return (new Stg_Momentum(mom1_sparams, "Momentum1"));
+  }
+  static Stg_Momentum *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams mom_iparams(10, INDI_MOMENTUM);
+    Momentum_Params mom5_iparams(Momentum_Period, Momentum_Applied_Price);
+    StgParams mom5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Momentum(mom5_iparams, mom_iparams, cparams5), NULL, NULL);
+    mom5_sparams.SetSignals(Momentum5_SignalMethod, Momentum5_OpenCondition1, Momentum5_OpenCondition2, Momentum5_CloseCondition, NULL, Momentum_SignalLevel, NULL);
+    mom5_sparams.SetStops(Momentum_TrailingProfitMethod, Momentum_TrailingStopMethod);
+    mom5_sparams.SetMaxSpread(Momentum5_MaxSpread);
+    mom5_sparams.SetId(MOM5);
+    return (new Stg_Momentum(mom5_sparams, "Momentum5"));
+  }
+  static Stg_Momentum *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams mom_iparams(10, INDI_MOMENTUM);
+    Momentum_Params mom15_iparams(Momentum_Period, Momentum_Applied_Price);
+    StgParams mom15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Momentum(mom15_iparams, mom_iparams, cparams15), NULL, NULL);
+    mom15_sparams.SetSignals(Momentum15_SignalMethod, Momentum15_OpenCondition1, Momentum15_OpenCondition2, Momentum15_CloseCondition, NULL, Momentum_SignalLevel, NULL);
+    mom15_sparams.SetStops(Momentum_TrailingProfitMethod, Momentum_TrailingStopMethod);
+    mom15_sparams.SetMaxSpread(Momentum15_MaxSpread);
+    mom15_sparams.SetId(MOM15);
+    return (new Stg_Momentum(mom15_sparams, "Momentum15"));
+  }
+  static Stg_Momentum *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams mom_iparams(10, INDI_MOMENTUM);
+    Momentum_Params mom30_iparams(Momentum_Period, Momentum_Applied_Price);
+    StgParams mom30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Momentum(mom30_iparams, mom_iparams, cparams30), NULL, NULL);
+    mom30_sparams.SetSignals(Momentum30_SignalMethod, Momentum30_OpenCondition1, Momentum30_OpenCondition2, Momentum30_CloseCondition, NULL, Momentum_SignalLevel, NULL);
+    mom30_sparams.SetStops(Momentum_TrailingProfitMethod, Momentum_TrailingStopMethod);
+    mom30_sparams.SetMaxSpread(Momentum30_MaxSpread);
+    mom30_sparams.SetId(MOM30);
+    return (new Stg_Momentum(mom30_sparams, "Momentum30"));
+  }
+  static Stg_Momentum *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if Momentum indicator is on buy or sell.
@@ -2836,7 +3932,61 @@ class Stg_OBV : public Strategy {
 
   public:
 
-    void Stg_OBV(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_OBV(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_OBV *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams obv_iparams(10, INDI_OBV);
+    OBV_Params obv1_iparams(OBV_Applied_Price); // @fixme: MQL5
+    StgParams obv1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_OBV(obv1_iparams, obv_iparams, cparams1), NULL, NULL);
+    obv1_sparams.SetSignals(OBV1_SignalMethod, OBV1_OpenCondition1, OBV1_OpenCondition2, OBV1_CloseCondition, NULL, OBV_SignalLevel, NULL);
+    obv1_sparams.SetStops(OBV_TrailingProfitMethod, OBV_TrailingStopMethod);
+    obv1_sparams.SetMaxSpread(OBV1_MaxSpread);
+    obv1_sparams.SetId(OBV1);
+    return (new Stg_OBV(obv1_sparams, "OBV1"));
+  }
+  static Stg_OBV *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams obv_iparams(10, INDI_OBV);
+    OBV_Params obv5_iparams(OBV_Applied_Price); // @fixme: MQL5
+    StgParams obv5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_OBV(obv5_iparams, obv_iparams, cparams5), NULL, NULL);
+    obv5_sparams.SetSignals(OBV5_SignalMethod, OBV5_OpenCondition1, OBV5_OpenCondition2, OBV5_CloseCondition, NULL, OBV_SignalLevel, NULL);
+    obv5_sparams.SetStops(OBV_TrailingProfitMethod, OBV_TrailingStopMethod);
+    obv5_sparams.SetMaxSpread(OBV5_MaxSpread);
+    obv5_sparams.SetId(OBV5);
+    return (new Stg_OBV(obv5_sparams, "OBV5"));
+  }
+  static Stg_OBV *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams obv_iparams(10, INDI_OBV);
+    OBV_Params obv15_iparams(OBV_Applied_Price); // @fixme: MQL5
+    StgParams obv15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_OBV(obv15_iparams, obv_iparams, cparams15), NULL, NULL);
+    obv15_sparams.SetSignals(OBV15_SignalMethod, OBV15_OpenCondition1, OBV15_OpenCondition2, OBV15_CloseCondition, NULL, OBV_SignalLevel, NULL);
+    obv15_sparams.SetStops(OBV_TrailingProfitMethod, OBV_TrailingStopMethod);
+    obv15_sparams.SetMaxSpread(OBV15_MaxSpread);
+    obv15_sparams.SetId(OBV15);
+    return (new Stg_OBV(obv15_sparams, "OBV15"));
+  }
+  static Stg_OBV *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams obv_iparams(10, INDI_OBV);
+    OBV_Params obv30_iparams(OBV_Applied_Price); // @fixme: MQL5
+    StgParams obv30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_OBV(obv30_iparams, obv_iparams, cparams30), NULL, NULL);
+    obv30_sparams.SetSignals(OBV30_SignalMethod, OBV30_OpenCondition1, OBV30_OpenCondition2, OBV30_CloseCondition, NULL, OBV_SignalLevel, NULL);
+    obv30_sparams.SetStops(OBV_TrailingProfitMethod, OBV_TrailingStopMethod);
+    obv30_sparams.SetMaxSpread(OBV30_MaxSpread);
+    obv30_sparams.SetId(OBV30);
+    return (new Stg_OBV(obv30_sparams, "OBV30"));
+  }
+  static Stg_OBV *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if OBV indicator is on buy or sell.
@@ -2878,7 +4028,61 @@ class Stg_OSMA : public Strategy {
 
   public:
 
-    void Stg_OSMA(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_OSMA(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_OSMA *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams osma_iparams(10, INDI_OSMA);
+    OsMA_Params osma1_iparams(OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price);
+    StgParams osma1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_OsMA(osma1_iparams, osma_iparams, cparams1), NULL, NULL);
+    osma1_sparams.SetSignals(OSMA1_SignalMethod, OSMA1_OpenCondition1, OSMA1_OpenCondition2, OSMA1_CloseCondition, NULL, OSMA_SignalLevel, NULL);
+    osma1_sparams.SetStops(OSMA_TrailingProfitMethod, OSMA_TrailingStopMethod);
+    osma1_sparams.SetMaxSpread(OSMA1_MaxSpread);
+    osma1_sparams.SetId(OSMA1);
+    return (new Stg_OSMA(osma1_sparams, "OSMA1"));
+  }
+  static Stg_OSMA *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams osma_iparams(10, INDI_OSMA);
+    OsMA_Params osma5_iparams(OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price);
+    StgParams osma5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_OsMA(osma5_iparams, osma_iparams, cparams5), NULL, NULL);
+    osma5_sparams.SetSignals(OSMA5_SignalMethod, OSMA5_OpenCondition1, OSMA5_OpenCondition2, OSMA5_CloseCondition, NULL, OSMA_SignalLevel, NULL);
+    osma5_sparams.SetStops(OSMA_TrailingProfitMethod, OSMA_TrailingStopMethod);
+    osma5_sparams.SetMaxSpread(OSMA5_MaxSpread);
+    osma5_sparams.SetId(OSMA5);
+    return (new Stg_OSMA(osma5_sparams, "OSMA5"));
+  }
+  static Stg_OSMA *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams osma_iparams(10, INDI_OSMA);
+    OsMA_Params osma15_iparams(OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price);
+    StgParams osma15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_OsMA(osma15_iparams, osma_iparams, cparams15), NULL, NULL);
+    osma15_sparams.SetSignals(OSMA15_SignalMethod, OSMA15_OpenCondition1, OSMA15_OpenCondition2, OSMA15_CloseCondition, NULL, OSMA_SignalLevel, NULL);
+    osma15_sparams.SetStops(OSMA_TrailingProfitMethod, OSMA_TrailingStopMethod);
+    osma15_sparams.SetMaxSpread(OSMA15_MaxSpread);
+    osma15_sparams.SetId(OSMA15);
+    return (new Stg_OSMA(osma15_sparams, "OSMA15"));
+  }
+  static Stg_OSMA *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams osma_iparams(10, INDI_OSMA);
+    OsMA_Params osma30_iparams(OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price);
+    StgParams osma30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_OsMA(osma30_iparams, osma_iparams, cparams30), NULL, NULL);
+    osma30_sparams.SetSignals(OSMA30_SignalMethod, OSMA30_OpenCondition1, OSMA30_OpenCondition2, OSMA30_CloseCondition, NULL, OSMA_SignalLevel, NULL);
+    osma30_sparams.SetStops(OSMA_TrailingProfitMethod, OSMA_TrailingStopMethod);
+    osma30_sparams.SetMaxSpread(OSMA30_MaxSpread);
+    osma30_sparams.SetId(OSMA30);
+    return (new Stg_OSMA(osma30_sparams, "OSMA30"));
+  }
+  static Stg_OSMA *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if OSMA indicator is on buy or sell.
@@ -3066,7 +4270,61 @@ class Stg_RVI : public Strategy {
 
   public:
 
-    void Stg_RVI(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_RVI(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_RVI *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams rvi_iparams(10, INDI_RVI);
+    RVI_Params rvi1_iparams(RVI_Period);
+    StgParams rvi1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_RVI(rvi1_iparams, rvi_iparams, cparams1), NULL, NULL);
+    rvi1_sparams.SetSignals(RVI1_SignalMethod, RVI1_OpenCondition1, RVI1_OpenCondition2, RVI1_CloseCondition, NULL, RVI_SignalLevel, NULL);
+    rvi1_sparams.SetStops(RVI_TrailingProfitMethod, RVI_TrailingStopMethod);
+    rvi1_sparams.SetMaxSpread(RVI1_MaxSpread);
+    rvi1_sparams.SetId(RVI1);
+    return (new Stg_RVI(rvi1_sparams, "RVI1"));
+  }
+  static Stg_RVI *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams rvi_iparams(10, INDI_RVI);
+    RVI_Params rvi5_iparams(RVI_Period);
+    StgParams rvi5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_RVI(rvi5_iparams, rvi_iparams, cparams5), NULL, NULL);
+    rvi5_sparams.SetSignals(RVI5_SignalMethod, RVI5_OpenCondition1, RVI5_OpenCondition2, RVI5_CloseCondition, NULL, RVI_SignalLevel, NULL);
+    rvi5_sparams.SetStops(RVI_TrailingProfitMethod, RVI_TrailingStopMethod);
+    rvi5_sparams.SetMaxSpread(RVI5_MaxSpread);
+    rvi5_sparams.SetId(RVI5);
+    return (new Stg_RVI(rvi5_sparams, "RVI5"));
+  }
+  static Stg_RVI *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams rvi_iparams(10, INDI_RVI);
+    RVI_Params rvi15_iparams(RVI_Period);
+    StgParams rvi15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_RVI(rvi15_iparams, rvi_iparams, cparams15), NULL, NULL);
+    rvi15_sparams.SetSignals(RVI15_SignalMethod, RVI15_OpenCondition1, RVI15_OpenCondition2, RVI15_CloseCondition, NULL, RVI_SignalLevel, NULL);
+    rvi15_sparams.SetStops(RVI_TrailingProfitMethod, RVI_TrailingStopMethod);
+    rvi15_sparams.SetMaxSpread(RVI15_MaxSpread);
+    rvi15_sparams.SetId(RVI15);
+    return (new Stg_RVI(rvi15_sparams, "RVI15"));
+  }
+  static Stg_RVI *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams rvi_iparams(10, INDI_RVI);
+    RVI_Params rvi30_iparams(RVI_Period);
+    StgParams rvi30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_RVI(rvi30_iparams, rvi_iparams, cparams30), NULL, NULL);
+    rvi30_sparams.SetSignals(RVI30_SignalMethod, RVI30_OpenCondition1, RVI30_OpenCondition2, RVI30_CloseCondition, NULL, RVI_SignalLevel, NULL);
+    rvi30_sparams.SetStops(RVI_TrailingProfitMethod, RVI_TrailingStopMethod);
+    rvi30_sparams.SetMaxSpread(RVI30_MaxSpread);
+    rvi30_sparams.SetId(RVI30);
+    return (new Stg_RVI(rvi30_sparams, "RVI30"));
+  }
+  static Stg_RVI *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if RVI indicator is on buy or sell.
@@ -3120,7 +4378,61 @@ class Stg_SAR : public Strategy {
 
   public:
 
-    void Stg_SAR(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_SAR(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_SAR *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams sar_iparams(10, INDI_SAR);
+    SAR_Params sar1_iparams(SAR_Step, SAR_Maximum_Stop);
+    StgParams sar1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_SAR(sar1_iparams, sar_iparams, cparams1), NULL, NULL);
+    sar1_sparams.SetSignals(SAR1_SignalMethod, SAR1_OpenCondition1, SAR1_OpenCondition2, SAR1_CloseCondition, NULL, SAR_SignalLevel, NULL);
+    sar1_sparams.SetStops(SAR_TrailingProfitMethod, SAR_TrailingStopMethod);
+    sar1_sparams.SetMaxSpread(SAR1_MaxSpread);
+    sar1_sparams.SetId(SAR1);
+    return (new Stg_SAR(sar1_sparams, "SAR1"));
+  }
+  static Stg_SAR *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams sar_iparams(10, INDI_SAR);
+    SAR_Params sar5_iparams(SAR_Step, SAR_Maximum_Stop);
+    StgParams sar5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_SAR(sar5_iparams, sar_iparams, cparams5), NULL, NULL);
+    sar5_sparams.SetSignals(SAR5_SignalMethod, SAR5_OpenCondition1, SAR5_OpenCondition2, SAR5_CloseCondition, NULL, SAR_SignalLevel, NULL);
+    sar5_sparams.SetStops(SAR_TrailingProfitMethod, SAR_TrailingStopMethod);
+    sar5_sparams.SetMaxSpread(SAR5_MaxSpread);
+    sar5_sparams.SetId(SAR5);
+    return (new Stg_SAR(sar5_sparams, "SAR5"));
+  }
+  static Stg_SAR *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams sar_iparams(10, INDI_SAR);
+    SAR_Params sar15_iparams(SAR_Step, SAR_Maximum_Stop);
+    StgParams sar15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_SAR(sar15_iparams, sar_iparams, cparams15), NULL, NULL);
+    sar15_sparams.SetSignals(SAR15_SignalMethod, SAR15_OpenCondition1, SAR15_OpenCondition2, SAR15_CloseCondition, NULL, SAR_SignalLevel, NULL);
+    sar15_sparams.SetStops(SAR_TrailingProfitMethod, SAR_TrailingStopMethod);
+    sar15_sparams.SetMaxSpread(SAR15_MaxSpread);
+    sar15_sparams.SetId(SAR15);
+    return (new Stg_SAR(sar15_sparams, "SAR15"));
+  }
+  static Stg_SAR *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams sar_iparams(10, INDI_SAR);
+    SAR_Params sar30_iparams(SAR_Step, SAR_Maximum_Stop);
+    StgParams sar30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_SAR(sar30_iparams, sar_iparams, cparams30), NULL, NULL);
+    sar30_sparams.SetSignals(SAR30_SignalMethod, SAR30_OpenCondition1, SAR30_OpenCondition2, SAR30_CloseCondition, NULL, SAR_SignalLevel, NULL);
+    sar30_sparams.SetStops(SAR_TrailingProfitMethod, SAR_TrailingStopMethod);
+    sar30_sparams.SetMaxSpread(SAR30_MaxSpread);
+    sar30_sparams.SetId(SAR30);
+    return (new Stg_SAR(sar30_sparams, "SAR30"));
+  }
+  static Stg_SAR *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if SAR indicator is on buy or sell.
@@ -3197,7 +4509,61 @@ class Stg_StdDev : public Strategy {
 
   public:
 
-    void Stg_StdDev(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_StdDev(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_StdDev *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams stddev_iparams(10, INDI_STDDEV);
+    StdDev_Params stddev1_iparams(StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price);
+    StgParams stddev1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_StdDev(stddev1_iparams, stddev_iparams, cparams1), NULL, NULL);
+    stddev1_sparams.SetSignals(StdDev1_SignalMethod, StdDev1_OpenCondition1, StdDev1_OpenCondition2, StdDev1_CloseCondition, NULL, StdDev_SignalLevel, NULL);
+    stddev1_sparams.SetStops(StdDev_TrailingProfitMethod, StdDev_TrailingStopMethod);
+    stddev1_sparams.SetMaxSpread(StdDev1_MaxSpread);
+    stddev1_sparams.SetId(STDDEV1);
+    return (new Stg_StdDev(stddev1_sparams, "StdDev1"));
+  }
+  static Stg_StdDev *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams stddev_iparams(10, INDI_STDDEV);
+    StdDev_Params stddev5_iparams(StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price);
+    StgParams stddev5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_StdDev(stddev5_iparams, stddev_iparams, cparams5), NULL, NULL);
+    stddev5_sparams.SetSignals(StdDev5_SignalMethod, StdDev5_OpenCondition1, StdDev5_OpenCondition2, StdDev5_CloseCondition, NULL, StdDev_SignalLevel, NULL);
+    stddev5_sparams.SetStops(StdDev_TrailingProfitMethod, StdDev_TrailingStopMethod);
+    stddev5_sparams.SetMaxSpread(StdDev5_MaxSpread);
+    stddev5_sparams.SetId(STDDEV5);
+    return (new Stg_StdDev(stddev5_sparams, "StdDev5"));
+  }
+  static Stg_StdDev *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams stddev_iparams(10, INDI_STDDEV);
+    StdDev_Params stddev15_iparams(StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price);
+    StgParams stddev15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_StdDev(stddev15_iparams, stddev_iparams, cparams15), NULL, NULL);
+    stddev15_sparams.SetSignals(StdDev15_SignalMethod, StdDev15_OpenCondition1, StdDev15_OpenCondition2, StdDev15_CloseCondition, NULL, StdDev_SignalLevel, NULL);
+    stddev15_sparams.SetStops(StdDev_TrailingProfitMethod, StdDev_TrailingStopMethod);
+    stddev15_sparams.SetMaxSpread(StdDev15_MaxSpread);
+    stddev15_sparams.SetId(STDDEV15);
+    return (new Stg_StdDev(stddev15_sparams, "StdDev15"));
+  }
+  static Stg_StdDev *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams stddev_iparams(10, INDI_STDDEV);
+    StdDev_Params stddev30_iparams(StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price);
+    StgParams stddev30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_StdDev(stddev30_iparams, stddev_iparams, cparams30), NULL, NULL);
+    stddev30_sparams.SetSignals(StdDev30_SignalMethod, StdDev30_OpenCondition1, StdDev30_OpenCondition2, StdDev30_CloseCondition, NULL, StdDev_SignalLevel, NULL);
+    stddev30_sparams.SetStops(StdDev_TrailingProfitMethod, StdDev_TrailingStopMethod);
+    stddev30_sparams.SetMaxSpread(StdDev30_MaxSpread);
+    stddev30_sparams.SetId(STDDEV30);
+    return (new Stg_StdDev(stddev30_sparams, "StdDev30"));
+  }
+  static Stg_StdDev *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if StdDev indicator is on buy or sell.
@@ -3266,7 +4632,61 @@ class Stg_Stoch : public Strategy {
 
   public:
 
-    void Stg_Stoch(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_Stoch(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_Stoch *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams stoch_iparams(10, INDI_STOCHASTIC);
+    Stoch_Params stoch1_iparams(Stochastic_KPeriod, Stochastic_DPeriod, Stochastic_Slowing, Stochastic_MA_Method, Stochastic_Price_Field);
+    StgParams stoch1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Stochastic(stoch1_iparams, stoch_iparams, cparams1), NULL, NULL);
+    stoch1_sparams.SetSignals(Stochastic1_SignalMethod, Stochastic1_OpenCondition1, Stochastic1_OpenCondition2, Stochastic1_CloseCondition, NULL, Stochastic_SignalLevel, NULL);
+    stoch1_sparams.SetStops(Stochastic_TrailingProfitMethod, Stochastic_TrailingStopMethod);
+    stoch1_sparams.SetMaxSpread(Stochastic1_MaxSpread);
+    stoch1_sparams.SetId(STOCHASTIC1);
+    return (new Stg_Stoch(stoch1_sparams, "Stochastic1"));
+  }
+  static Stg_Stoch *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams stoch_iparams(10, INDI_STOCHASTIC);
+    Stoch_Params stoch5_iparams(Stochastic_KPeriod, Stochastic_DPeriod, Stochastic_Slowing, Stochastic_MA_Method, Stochastic_Price_Field);
+    StgParams stoch5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Stochastic(stoch5_iparams, stoch_iparams, cparams5), NULL, NULL);
+    stoch5_sparams.SetSignals(Stochastic5_SignalMethod, Stochastic5_OpenCondition1, Stochastic5_OpenCondition2, Stochastic5_CloseCondition, NULL, Stochastic_SignalLevel, NULL);
+    stoch5_sparams.SetStops(Stochastic_TrailingProfitMethod, Stochastic_TrailingStopMethod);
+    stoch5_sparams.SetMaxSpread(Stochastic5_MaxSpread);
+    stoch5_sparams.SetId(STOCHASTIC5);
+    return (new Stg_Stoch(stoch5_sparams, "Stochastic5"));
+  }
+  static Stg_Stoch *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams stoch_iparams(10, INDI_STOCHASTIC);
+    Stoch_Params stoch15_iparams(Stochastic_KPeriod, Stochastic_DPeriod, Stochastic_Slowing, Stochastic_MA_Method, Stochastic_Price_Field);
+    StgParams stoch15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Stochastic(stoch15_iparams, stoch_iparams, cparams15), NULL, NULL);
+    stoch15_sparams.SetSignals(Stochastic15_SignalMethod, Stochastic15_OpenCondition1, Stochastic15_OpenCondition2, Stochastic15_CloseCondition, NULL, Stochastic_SignalLevel, NULL);
+    stoch15_sparams.SetStops(Stochastic_TrailingProfitMethod, Stochastic_TrailingStopMethod);
+    stoch15_sparams.SetMaxSpread(Stochastic15_MaxSpread);
+    stoch15_sparams.SetId(STOCHASTIC15);
+    return (new Stg_Stoch(stoch15_sparams, "Stochastic15"));
+  }
+  static Stg_Stoch *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams stoch_iparams(10, INDI_STOCHASTIC);
+    Stoch_Params stoch30_iparams(Stochastic_KPeriod, Stochastic_DPeriod, Stochastic_Slowing, Stochastic_MA_Method, Stochastic_Price_Field);
+    StgParams stoch30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Stochastic(stoch30_iparams, stoch_iparams, cparams30), NULL, NULL);
+    stoch30_sparams.SetSignals(Stochastic30_SignalMethod, Stochastic30_OpenCondition1, Stochastic30_OpenCondition2, Stochastic30_CloseCondition, NULL, Stochastic_SignalLevel, NULL);
+    stoch30_sparams.SetStops(Stochastic_TrailingProfitMethod, Stochastic_TrailingStopMethod);
+    stoch30_sparams.SetMaxSpread(Stochastic30_MaxSpread);
+    stoch30_sparams.SetId(STOCHASTIC30);
+    return (new Stg_Stoch(stoch30_sparams, "Stochastic30"));
+  }
+  static Stg_Stoch *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if Stochastic indicator is on buy or sell.
@@ -3352,7 +4772,61 @@ class Stg_WPR : public Strategy {
 
   public:
 
-    void Stg_WPR(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_WPR(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_WPR *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams wpr_iparams(10, INDI_WPR);
+    WPR_Params wpr1_iparams(WPR_Period_M1);
+    StgParams wpr1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_WPR(wpr1_iparams, wpr_iparams, cparams1), NULL, NULL);
+    wpr1_sparams.SetSignals(WPR1_SignalMethod, WPR1_OpenCondition1, WPR1_OpenCondition2, WPR1_CloseCondition, NULL, WPR_SignalLevel, NULL);
+    wpr1_sparams.SetStops(WPR_TrailingProfitMethod, WPR_TrailingStopMethod);
+    wpr1_sparams.SetMaxSpread(WPR1_MaxSpread);
+    wpr1_sparams.SetId(WPR1);
+    return (new Stg_WPR(wpr1_sparams, "WPR1"));
+  }
+  static Stg_WPR *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams wpr_iparams(10, INDI_WPR);
+    WPR_Params wpr5_iparams(WPR_Period_M5);
+    StgParams wpr5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_WPR(wpr5_iparams, wpr_iparams, cparams5), NULL, NULL);
+    wpr5_sparams.SetSignals(WPR5_SignalMethod, WPR5_OpenCondition1, WPR5_OpenCondition2, WPR5_CloseCondition, NULL, WPR_SignalLevel, NULL);
+    wpr5_sparams.SetStops(WPR_TrailingProfitMethod, WPR_TrailingStopMethod);
+    wpr5_sparams.SetMaxSpread(WPR5_MaxSpread);
+    wpr5_sparams.SetId(WPR5);
+    return (new Stg_WPR(wpr5_sparams, "WPR5"));
+  }
+  static Stg_WPR *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams wpr_iparams(10, INDI_WPR);
+    WPR_Params wpr15_iparams(WPR_Period_M15);
+    StgParams wpr15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_WPR(wpr15_iparams, wpr_iparams, cparams15), NULL, NULL);
+    wpr15_sparams.SetSignals(WPR15_SignalMethod, WPR15_OpenCondition1, WPR15_OpenCondition2, WPR15_CloseCondition, NULL, WPR_SignalLevel, NULL);
+    wpr15_sparams.SetStops(WPR_TrailingProfitMethod, WPR_TrailingStopMethod);
+    wpr15_sparams.SetMaxSpread(WPR15_MaxSpread);
+    wpr15_sparams.SetId(WPR15);
+    return (new Stg_WPR(wpr15_sparams, "WPR15"));
+  }
+  static Stg_WPR *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams wpr_iparams(10, INDI_WPR);
+    WPR_Params wpr30_iparams(WPR_Period_M30);
+    StgParams wpr30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_WPR(wpr30_iparams, wpr_iparams, cparams30), NULL, NULL);
+    wpr30_sparams.SetSignals(WPR30_SignalMethod, WPR30_OpenCondition1, WPR30_OpenCondition2, WPR30_CloseCondition, NULL, WPR_SignalLevel, NULL);
+    wpr30_sparams.SetStops(WPR_TrailingProfitMethod, WPR_TrailingStopMethod);
+    wpr30_sparams.SetMaxSpread(WPR30_MaxSpread);
+    wpr30_sparams.SetId(WPR30);
+    return (new Stg_WPR(wpr30_sparams, "WPR30"));
+  }
+  static Stg_WPR *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if WPR indicator is on buy or sell.
@@ -3426,7 +4900,61 @@ class Stg_ZigZag : public Strategy {
 
   public:
 
-    void Stg_ZigZag(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  void Stg_ZigZag(StgParams &_params, string _name) : Strategy(_params, _name) {}
+
+  static Stg_ZigZag *Init_M1() {
+    ChartParams cparams1(PERIOD_M1);
+    IndicatorParams zigzag_iparams(10, INDI_ZIGZAG);
+    ZigZag_Params zigzag1_iparams(ZigZag_Depth, ZigZag_Deviation, ZigZag_Backstep);
+    StgParams zigzag1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_ZigZag(zigzag1_iparams, zigzag_iparams, cparams1), NULL, NULL);
+    zigzag1_sparams.SetSignals(ZigZag1_SignalMethod, ZigZag1_OpenCondition1, ZigZag1_OpenCondition2, ZigZag1_CloseCondition, NULL, ZigZag_SignalLevel, NULL);
+    zigzag1_sparams.SetStops(ZigZag_TrailingProfitMethod, ZigZag_TrailingStopMethod);
+    zigzag1_sparams.SetMaxSpread(ZigZag1_MaxSpread);
+    zigzag1_sparams.SetId(ZIGZAG1);
+    return (new Stg_ZigZag(zigzag1_sparams, "ZigZag1"));
+  }
+  static Stg_ZigZag *Init_M5() {
+    ChartParams cparams5(PERIOD_M5);
+    IndicatorParams zigzag_iparams(10, INDI_ZIGZAG);
+    ZigZag_Params zigzag5_iparams(ZigZag_Depth, ZigZag_Deviation, ZigZag_Backstep);
+    StgParams zigzag5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_ZigZag(zigzag5_iparams, zigzag_iparams, cparams5), NULL, NULL);
+    zigzag5_sparams.SetSignals(ZigZag5_SignalMethod, ZigZag5_OpenCondition1, ZigZag5_OpenCondition2, ZigZag5_CloseCondition, NULL, ZigZag_SignalLevel, NULL);
+    zigzag5_sparams.SetStops(ZigZag_TrailingProfitMethod, ZigZag_TrailingStopMethod);
+    zigzag5_sparams.SetMaxSpread(ZigZag5_MaxSpread);
+    zigzag5_sparams.SetId(ZIGZAG5);
+    return (new Stg_ZigZag(zigzag5_sparams, "ZigZag5"));
+  }
+  static Stg_ZigZag *Init_M15() {
+    ChartParams cparams15(PERIOD_M15);
+    IndicatorParams zigzag_iparams(10, INDI_ZIGZAG);
+    ZigZag_Params zigzag15_iparams(ZigZag_Depth, ZigZag_Deviation, ZigZag_Backstep);
+    StgParams zigzag15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_ZigZag(zigzag15_iparams, zigzag_iparams, cparams15), NULL, NULL);
+    zigzag15_sparams.SetSignals(ZigZag15_SignalMethod, ZigZag15_OpenCondition1, ZigZag15_OpenCondition2, ZigZag15_CloseCondition, NULL, ZigZag_SignalLevel, NULL);
+    zigzag15_sparams.SetStops(ZigZag_TrailingProfitMethod, ZigZag_TrailingStopMethod);
+    zigzag15_sparams.SetMaxSpread(ZigZag15_MaxSpread);
+    zigzag15_sparams.SetId(ZIGZAG15);
+    return (new Stg_ZigZag(zigzag15_sparams, "ZigZag15"));
+  }
+  static Stg_ZigZag *Init_M30() {
+    ChartParams cparams30(PERIOD_M30);
+    IndicatorParams zigzag_iparams(10, INDI_ZIGZAG);
+    ZigZag_Params zigzag30_iparams(ZigZag_Depth, ZigZag_Deviation, ZigZag_Backstep);
+    StgParams zigzag30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_ZigZag(zigzag30_iparams, zigzag_iparams, cparams30), NULL, NULL);
+    zigzag30_sparams.SetSignals(ZigZag30_SignalMethod, ZigZag30_OpenCondition1, ZigZag30_OpenCondition2, ZigZag30_CloseCondition, NULL, ZigZag_SignalLevel, NULL);
+    zigzag30_sparams.SetStops(ZigZag_TrailingProfitMethod, ZigZag_TrailingStopMethod);
+    zigzag30_sparams.SetMaxSpread(ZigZag30_MaxSpread);
+    zigzag30_sparams.SetId(ZIGZAG30);
+    return (new Stg_ZigZag(zigzag30_sparams, "ZigZag30"));
+  }
+  static Stg_ZigZag *Init(ENUM_TIMEFRAMES _tf) {
+    switch (_tf) {
+      case PERIOD_M1:  return Init_M1();
+      case PERIOD_M5:  return Init_M5();
+      case PERIOD_M15: return Init_M15();
+      case PERIOD_M30: return Init_M30();
+      default: return NULL;
+    }
+  }
 
 /**
  * Check if ZigZag indicator is on buy or sell.
@@ -3517,6 +5045,44 @@ bool CheckMarketCondition1(Chart *_chart, ENUM_ORDER_TYPE cmd, long condition = 
 }
 
 /**
+ * Initialize strategy via indicator.
+ */
+Strategy *InitStratByIndiType(ENUM_INDICATOR_TYPE _indi, ENUM_TIMEFRAMES _tf) {
+  switch (_indi) {
+    case INDI_AC:         return Stg_AC::Init(_tf);
+    case INDI_AD:         return Stg_AD::Init(_tf);
+    case INDI_ADX:        return Stg_ADX::Init(_tf);
+    case INDI_ALLIGATOR:  return Stg_Alligator::Init(_tf);
+    case INDI_ATR:        return Stg_ATR::Init(_tf);
+    case INDI_AO:         return Stg_Awesome::Init(_tf);
+    case INDI_BANDS:      return Stg_Bands::Init(_tf);
+    case INDI_BEARS:      return Stg_BearsPower::Init(_tf);
+    case INDI_BULLS:      return Stg_BullsPower::Init(_tf);
+    case INDI_BWMFI:      return Stg_BWMFI::Init(_tf);
+    case INDI_CCI:        return Stg_CCI::Init(_tf);
+    case INDI_DEMARKER:   return Stg_DeMarker::Init(_tf);
+    case INDI_ENVELOPES:  return Stg_Envelopes::Init(_tf);
+    case INDI_FORCE:      return Stg_Force::Init(_tf);
+    case INDI_FRACTALS:   return Stg_Fractals::Init(_tf);
+    case INDI_GATOR:      return Stg_Gator::Init(_tf);
+    case INDI_ICHIMOKU:   return Stg_Ichimoku::Init(_tf);
+    case INDI_MA:         return Stg_MA::Init(_tf);
+    case INDI_MACD:       return Stg_MACD::Init(_tf);
+    case INDI_MFI:        return Stg_MFI::Init(_tf);
+    case INDI_MOMENTUM:   return Stg_Momentum::Init(_tf);
+    case INDI_OBV:        return Stg_OBV::Init(_tf);
+    case INDI_OSMA:       return Stg_OSMA::Init(_tf);
+    case INDI_RSI:        return Stg_RSI::Init(_tf);
+    case INDI_RVI:        return Stg_RVI::Init(_tf);
+    case INDI_SAR:        return Stg_SAR::Init(_tf);
+    case INDI_STDDEV:     return Stg_StdDev::Init(_tf);
+    case INDI_STOCHASTIC: return Stg_Stoch::Init(_tf);
+    case INDI_WPR:        return Stg_WPR::Init(_tf);
+    default:              return NULL;
+  }
+}
+
+/**
  * Get strategy instance via indicator type.
  */
 Strategy *GetStratByIndiType(ENUM_INDICATOR_TYPE _indi, Chart *_chart) {
@@ -3527,11 +5093,7 @@ Strategy *GetStratByIndiType(ENUM_INDICATOR_TYPE _indi, Chart *_chart) {
       return _strat;
     }
   }
-  switch (_indi) {
-    case INDI_AC:  return Stg_AC::Init(_chart.GetTf());
-    case INDI_RSI: return Stg_RSI::Init(_chart.GetTf());
-  }
-  return NULL;
+  return InitStratByIndiType(_indi, _chart.GetTf());
 }
 
 /**
@@ -5032,1100 +6594,155 @@ bool InitStrategies() {
   ArrayInitialize(conf, 0);  // Reset strategy configuration.
   ArrayInitialize(stats, 0); // Reset strategy statistics.
 
-  ChartParams cparams1(PERIOD_M1);
-  ChartParams cparams5(PERIOD_M5);
-  ChartParams cparams15(PERIOD_M15);
-  ChartParams cparams30(PERIOD_M30);
-
   if ((AC_Active_Tf & M1B) == M1B)   { strats.Add(Stg_AC::Init_M1()); }
   if ((AC_Active_Tf & M5B) == M5B)   { strats.Add(Stg_AC::Init_M5()); }
   if ((AC_Active_Tf & M15B) == M15B) { strats.Add(Stg_AC::Init_M15()); }
   if ((AC_Active_Tf & M30B) == M30B) { strats.Add(Stg_AC::Init_M30()); }
 
-  IndicatorParams ad_iparams(10, INDI_AD);
-  if ((AD_Active_Tf & M1B) == M1B) {
-    StgParams ad1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_AD(ad_iparams, cparams1), NULL, NULL);
-    ad1_sparams.SetSignals(AD1_SignalMethod, AD1_OpenCondition1, AD1_OpenCondition2, AD1_CloseCondition, NULL, AD_SignalLevel, NULL);
-    ad1_sparams.SetStops(AD_TrailingProfitMethod, AD_TrailingStopMethod);
-    ad1_sparams.SetMaxSpread(AD1_MaxSpread);
-    ad1_sparams.SetId(AD1);
-    strats.Add(new Stg_AD(ad1_sparams, "AD1"));
-  }
-  if ((AD_Active_Tf & M5B) == M5B) {
-    StgParams ad5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_AD(ad_iparams, cparams5), NULL, NULL);
-    ad5_sparams.SetSignals(AD5_SignalMethod, AD5_OpenCondition1, AD5_OpenCondition2, AD5_CloseCondition, NULL, AD_SignalLevel, NULL);
-    ad5_sparams.SetStops(AD_TrailingProfitMethod, AD_TrailingStopMethod);
-    ad5_sparams.SetMaxSpread(AD5_MaxSpread);
-    ad5_sparams.SetId(AD5);
-    strats.Add(new Stg_AD(ad5_sparams, "AD5"));
-  }
-  if ((AD_Active_Tf & M15B) == M15B) {
-    StgParams ad15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_AD(ad_iparams, cparams15), NULL, NULL);
-    ad15_sparams.SetSignals(AD15_SignalMethod, AD15_OpenCondition1, AD15_OpenCondition2, AD15_CloseCondition, NULL, AD_SignalLevel, NULL);
-    ad15_sparams.SetStops(AD_TrailingProfitMethod, AD_TrailingStopMethod);
-    ad15_sparams.SetMaxSpread(AD15_MaxSpread);
-    ad15_sparams.SetId(AD15);
-    strats.Add(new Stg_AD(ad15_sparams, "AD15"));
-  }
-  if ((AD_Active_Tf & M30B) == M30B) {
-    StgParams ad30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_AD(ad_iparams, cparams30), NULL, NULL);
-    ad30_sparams.SetSignals(AD30_SignalMethod, AD30_OpenCondition1, AD30_OpenCondition2, AD30_CloseCondition, NULL, AD_SignalLevel, NULL);
-    ad30_sparams.SetStops(AD_TrailingProfitMethod, AD_TrailingStopMethod);
-    ad30_sparams.SetMaxSpread(AD30_MaxSpread);
-    ad30_sparams.SetId(AD30);
-    strats.Add(new Stg_AD(ad30_sparams, "AD30"));
-  }
+  if ((AD_Active_Tf & M1B) == M1B) { strats.Add(Stg_AD::Init_M1()); };
+  if ((AD_Active_Tf & M5B) == M5B) { strats.Add(Stg_AD::Init_M5()); };
+  if ((AD_Active_Tf & M15B) == M15B) { strats.Add(Stg_AD::Init_M15()); };
+  if ((AD_Active_Tf & M30B) == M30B) { strats.Add(Stg_AD::Init_M30()); };
 
-  IndicatorParams adx_iparams(10, INDI_ADX);
-  if ((ADX_Active_Tf & M1B) == M1B) {
-    ADX_Params adx1_iparams(ADX_Period_M1, ADX_Applied_Price);
-    StgParams adx1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_ADX(adx1_iparams, adx_iparams, cparams1), NULL, NULL);
-    adx1_sparams.SetSignals(ADX1_SignalMethod, ADX1_OpenCondition1, ADX1_OpenCondition2, ADX1_CloseCondition, NULL, ADX_SignalLevel, NULL);
-    adx1_sparams.SetStops(ADX_TrailingProfitMethod, ADX_TrailingStopMethod);
-    adx1_sparams.SetMaxSpread(ADX1_MaxSpread);
-    adx1_sparams.SetId(ADX1);
-    strats.Add(new Stg_ADX(adx1_sparams, "ADX1"));
-  }
-  if ((ADX_Active_Tf & M5B) == M5B) {
-    ADX_Params adx5_iparams(ADX_Period_M5, ADX_Applied_Price);
-    StgParams adx5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_ADX(adx5_iparams, adx_iparams, cparams5), NULL, NULL);
-    adx5_sparams.SetSignals(ADX5_SignalMethod, ADX5_OpenCondition1, ADX5_OpenCondition2, ADX5_CloseCondition, NULL, ADX_SignalLevel, NULL);
-    adx5_sparams.SetStops(ADX_TrailingProfitMethod, ADX_TrailingStopMethod);
-    adx5_sparams.SetMaxSpread(ADX5_MaxSpread);
-    adx5_sparams.SetId(ADX5);
-    strats.Add(new Stg_ADX(adx5_sparams, "ADX5"));
-  }
-  if ((ADX_Active_Tf & M15B) == M15B) {
-    ADX_Params adx15_iparams(ADX_Period_M15, ADX_Applied_Price);
-    StgParams adx15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_ADX(adx15_iparams, adx_iparams, cparams15), NULL, NULL);
-    adx15_sparams.SetSignals(ADX15_SignalMethod, ADX15_OpenCondition1, ADX15_OpenCondition2, ADX15_CloseCondition, NULL, ADX_SignalLevel, NULL);
-    adx15_sparams.SetStops(ADX_TrailingProfitMethod, ADX_TrailingStopMethod);
-    adx15_sparams.SetMaxSpread(ADX15_MaxSpread);
-    adx15_sparams.SetId(ADX15);
-    strats.Add(new Stg_ADX(adx15_sparams, "ADX15"));
-  }
-  if ((ADX_Active_Tf & M30B) == M30B) {
-    ADX_Params adx30_iparams(ADX_Period_M30, ADX_Applied_Price);
-    StgParams adx30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_ADX(adx30_iparams, adx_iparams, cparams30), NULL, NULL);
-    adx30_sparams.SetSignals(ADX30_SignalMethod, ADX30_OpenCondition1, ADX30_OpenCondition2, ADX30_CloseCondition, NULL, ADX_SignalLevel, NULL);
-    adx30_sparams.SetStops(ADX_TrailingProfitMethod, ADX_TrailingStopMethod);
-    adx30_sparams.SetMaxSpread(ADX30_MaxSpread);
-    adx30_sparams.SetId(ADX30);
-    strats.Add(new Stg_ADX(adx30_sparams, "ADX30"));
-  }
+  if ((ADX_Active_Tf & M1B) == M1B) { strats.Add(Stg_ADX::Init_M1()); }
+  if ((ADX_Active_Tf & M5B) == M5B) { strats.Add(Stg_ADX::Init_M5()); }
+  if ((ADX_Active_Tf & M15B) == M15B) { strats.Add(Stg_ADX::Init_M15()); }
+  if ((ADX_Active_Tf & M30B) == M30B) { strats.Add(Stg_ADX::Init_M30()); }
 
-  IndicatorParams alli_iparams(10, INDI_ALLIGATOR);
-  if ((Alligator_Active_Tf & M1B) == M1B) {
-    Alligator_Params alli1_iparams(
-      Alligator_Period_Jaw, Alligator_Shift_Jaw,
-      Alligator_Period_Teeth, Alligator_Shift_Teeth,
-      Alligator_Period_Lips, Alligator_Shift_Lips,
-      Alligator_MA_Method, Alligator_Applied_Price);
-    StgParams alli1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Alligator(alli1_iparams, alli_iparams, cparams1), NULL, NULL);
-    alli1_sparams.SetSignals(Alligator1_SignalMethod, Alligator1_OpenCondition1, Alligator1_OpenCondition2, Alligator1_CloseCondition, NULL, Alligator_SignalLevel, NULL);
-    alli1_sparams.SetStops(Alligator_TrailingProfitMethod, Alligator_TrailingStopMethod);
-    alli1_sparams.SetMaxSpread(Alligator1_MaxSpread);
-    alli1_sparams.SetId(ALLIGATOR1);
-    strats.Add(new Stg_Alligator(alli1_sparams, "Alligator1"));
-  }
-  if ((Alligator_Active_Tf & M5B) == M5B) {
-    Alligator_Params alli5_iparams(
-      Alligator_Period_Jaw, Alligator_Shift_Jaw,
-      Alligator_Period_Teeth, Alligator_Shift_Teeth,
-      Alligator_Period_Lips, Alligator_Shift_Lips,
-      Alligator_MA_Method, Alligator_Applied_Price);
-    StgParams alli5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Alligator(alli5_iparams, alli_iparams, cparams5), NULL, NULL);
-    alli5_sparams.SetSignals(Alligator5_SignalMethod, Alligator5_OpenCondition1, Alligator5_OpenCondition2, Alligator5_CloseCondition, NULL, Alligator_SignalLevel, NULL);
-    alli5_sparams.SetStops(Alligator_TrailingProfitMethod, Alligator_TrailingStopMethod);
-    alli5_sparams.SetMaxSpread(Alligator5_MaxSpread);
-    alli5_sparams.SetId(ALLIGATOR5);
-    strats.Add(new Stg_Alligator(alli5_sparams, "Alligator5"));
-  }
-  if ((Alligator_Active_Tf & M15B) == M15B) {
-    Alligator_Params alli15_iparams(
-      Alligator_Period_Jaw, Alligator_Shift_Jaw,
-      Alligator_Period_Teeth, Alligator_Shift_Teeth,
-      Alligator_Period_Lips, Alligator_Shift_Lips,
-      Alligator_MA_Method, Alligator_Applied_Price);
-    StgParams alli15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Alligator(alli15_iparams, alli_iparams, cparams15), NULL, NULL);
-    alli15_sparams.SetSignals(Alligator15_SignalMethod, Alligator15_OpenCondition1, Alligator15_OpenCondition2, Alligator15_CloseCondition, NULL, Alligator_SignalLevel, NULL);
-    alli15_sparams.SetStops(Alligator_TrailingProfitMethod, Alligator_TrailingStopMethod);
-    alli15_sparams.SetMaxSpread(Alligator15_MaxSpread);
-    alli15_sparams.SetId(ALLIGATOR15);
-    strats.Add(new Stg_Alligator(alli15_sparams, "Alligator15"));
-  }
-  if ((Alligator_Active_Tf & M30B) == M30B) {
-    Alligator_Params alli30_iparams(
-      Alligator_Period_Jaw, Alligator_Shift_Jaw,
-      Alligator_Period_Teeth, Alligator_Shift_Teeth,
-      Alligator_Period_Lips, Alligator_Shift_Lips,
-      Alligator_MA_Method, Alligator_Applied_Price);
-    StgParams alli30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Alligator(alli30_iparams, alli_iparams, cparams30), NULL, NULL);
-    alli30_sparams.SetSignals(Alligator30_SignalMethod, Alligator30_OpenCondition1, Alligator30_OpenCondition2, Alligator30_CloseCondition, NULL, Alligator_SignalLevel, NULL);
-    alli30_sparams.SetStops(Alligator_TrailingProfitMethod, Alligator_TrailingStopMethod);
-    alli30_sparams.SetMaxSpread(Alligator30_MaxSpread);
-    alli30_sparams.SetId(ALLIGATOR30);
-    strats.Add(new Stg_Alligator(alli30_sparams, "Alligator30"));
-  }
+  if ((Alligator_Active_Tf & M1B) == M1B) { strats.Add(Stg_Alligator::Init_M1()); }
+  if ((Alligator_Active_Tf & M5B) == M5B) { strats.Add(Stg_Alligator::Init_M5()); }
+  if ((Alligator_Active_Tf & M15B) == M15B) { strats.Add(Stg_Alligator::Init_M15()); }
+  if ((Alligator_Active_Tf & M30B) == M30B) { strats.Add(Stg_Alligator::Init_M30()); }
 
-  IndicatorParams atr_iparams(10, INDI_ATR);
-  if ((ATR_Active_Tf & M1B) == M1B) {
-    ATR_Params atr1_iparams(ATR_Period_M1);
-    StgParams atr1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_ATR(atr1_iparams, atr_iparams, cparams1), NULL, NULL);
-    atr1_sparams.SetSignals(ATR1_SignalMethod, ATR1_OpenCondition1, ATR1_OpenCondition2, ATR1_CloseCondition, NULL, ATR_SignalLevel, NULL);
-    atr1_sparams.SetStops(ATR_TrailingProfitMethod, ATR_TrailingStopMethod);
-    atr1_sparams.SetMaxSpread(ATR1_MaxSpread);
-    atr1_sparams.SetId(ATR1);
-    strats.Add(new Stg_ATR(atr1_sparams, "ATR1"));
-  }
-  if ((ATR_Active_Tf & M5B) == M5B) {
-    ATR_Params atr5_iparams(ATR_Period_M5);
-    StgParams atr5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_ATR(atr5_iparams, atr_iparams, cparams5), NULL, NULL);
-    atr5_sparams.SetSignals(ATR5_SignalMethod, ATR5_OpenCondition1, ATR5_OpenCondition2, ATR5_CloseCondition, NULL, ATR_SignalLevel, NULL);
-    atr5_sparams.SetStops(ATR_TrailingProfitMethod, ATR_TrailingStopMethod);
-    atr5_sparams.SetMaxSpread(ATR5_MaxSpread);
-    atr5_sparams.SetId(ATR5);
-    strats.Add(new Stg_ATR(atr5_sparams, "ATR5"));
-  }
-  if ((ATR_Active_Tf & M15B) == M15B) {
-    ATR_Params atr15_iparams(ATR_Period_M15);
-    StgParams atr15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_ATR(atr15_iparams, atr_iparams, cparams15), NULL, NULL);
-    atr15_sparams.SetSignals(ATR15_SignalMethod, ATR15_OpenCondition1, ATR15_OpenCondition2, ATR15_CloseCondition, NULL, ATR_SignalLevel, NULL);
-    atr15_sparams.SetStops(ATR_TrailingProfitMethod, ATR_TrailingStopMethod);
-    atr15_sparams.SetMaxSpread(ATR15_MaxSpread);
-    atr15_sparams.SetId(ATR15);
-    strats.Add(new Stg_ATR(atr15_sparams, "ATR15"));
-  }
-  if ((ATR_Active_Tf & M30B) == M30B) {
-    ATR_Params atr30_iparams(ATR_Period_M30);
-    StgParams atr30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_ATR(atr30_iparams, atr_iparams, cparams30), NULL, NULL);
-    atr30_sparams.SetSignals(ATR30_SignalMethod, ATR30_OpenCondition1, ATR30_OpenCondition2, ATR30_CloseCondition, NULL, ATR_SignalLevel, NULL);
-    atr30_sparams.SetStops(ATR_TrailingProfitMethod, ATR_TrailingStopMethod);
-    atr30_sparams.SetMaxSpread(ATR30_MaxSpread);
-    atr30_sparams.SetId(ATR30);
-    strats.Add(new Stg_ATR(atr30_sparams, "ATR30"));
-  }
+  if ((ATR_Active_Tf & M1B) == M1B) { strats.Add(Stg_ATR::Init_M1()); }
+  if ((ATR_Active_Tf & M5B) == M5B) { strats.Add(Stg_ATR::Init_M5()); }
+  if ((ATR_Active_Tf & M15B) == M15B) { strats.Add(Stg_ATR::Init_M15()); }
+  if ((ATR_Active_Tf & M30B) == M30B) { strats.Add(Stg_ATR::Init_M30()); }
 
-  IndicatorParams ao_iparams(10, INDI_AO);
-  if ((Awesome_Active_Tf & M1B) == M1B) {
-    StgParams ao1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_AO(ao_iparams, cparams1), NULL, NULL);
-    ao1_sparams.SetSignals(Awesome1_SignalMethod, Awesome1_OpenCondition1, Awesome1_OpenCondition2, Awesome1_CloseCondition, NULL, Awesome_SignalLevel, NULL);
-    ao1_sparams.SetStops(Awesome_TrailingProfitMethod, Awesome_TrailingStopMethod);
-    ao1_sparams.SetMaxSpread(Awesome1_MaxSpread);
-    ao1_sparams.SetId(AWESOME1);
-    strats.Add(new Stg_Awesome(ao1_sparams, "Awesome1"));
-  }
-  if ((Awesome_Active_Tf & M5B) == M5B) {
-    StgParams ao5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_AO(ao_iparams, cparams5), NULL, NULL);
-    ao5_sparams.SetSignals(Awesome5_SignalMethod, Awesome5_OpenCondition1, Awesome5_OpenCondition2, Awesome5_CloseCondition, NULL, Awesome_SignalLevel, NULL);
-    ao5_sparams.SetStops(Awesome_TrailingProfitMethod, Awesome_TrailingStopMethod);
-    ao5_sparams.SetMaxSpread(Awesome5_MaxSpread);
-    ao5_sparams.SetId(AWESOME5);
-    strats.Add(new Stg_Awesome(ao5_sparams, "Awesome5"));
-  }
-  if ((Awesome_Active_Tf & M15B) == M15B) {
-    StgParams ao15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_AO(ao_iparams, cparams15), NULL, NULL);
-    ao15_sparams.SetSignals(Awesome15_SignalMethod, Awesome15_OpenCondition1, Awesome15_OpenCondition2, Awesome15_CloseCondition, NULL, Awesome_SignalLevel, NULL);
-    ao15_sparams.SetStops(Awesome_TrailingProfitMethod, Awesome_TrailingStopMethod);
-    ao15_sparams.SetMaxSpread(Awesome15_MaxSpread);
-    ao15_sparams.SetId(AWESOME15);
-    strats.Add(new Stg_Awesome(ao15_sparams, "Awesome15"));
-  }
-  if ((Awesome_Active_Tf & M30B) == M30B) {
-    StgParams ao30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_AO(ao_iparams, cparams30), NULL, NULL);
-    ao30_sparams.SetSignals(Awesome30_SignalMethod, Awesome30_OpenCondition1, Awesome30_OpenCondition2, Awesome30_CloseCondition, NULL, Awesome_SignalLevel, NULL);
-    ao30_sparams.SetStops(Awesome_TrailingProfitMethod, Awesome_TrailingStopMethod);
-    ao30_sparams.SetMaxSpread(Awesome30_MaxSpread);
-    ao30_sparams.SetId(AWESOME30);
-    strats.Add(new Stg_Awesome(ao30_sparams, "Awesome30"));
-  }
+  if ((Awesome_Active_Tf & M1B) == M1B) { strats.Add(Stg_Awesome::Init_M1()); }
+  if ((Awesome_Active_Tf & M5B) == M5B) { strats.Add(Stg_Awesome::Init_M5()); }
+  if ((Awesome_Active_Tf & M15B) == M15B) { strats.Add(Stg_Awesome::Init_M15()); }
+  if ((Awesome_Active_Tf & M30B) == M30B) { strats.Add(Stg_Awesome::Init_M30()); }
 
-  IndicatorParams bands_iparams(10, INDI_BANDS);
-  if ((Bands_Active_Tf & M1B) == M1B) {
-    Bands_Params bands1_iparams(Bands_Period_M1, Bands_Deviation_M1, Bands_HShift, Bands_Applied_Price);
-    StgParams bands1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Bands(bands1_iparams, bands_iparams, cparams1), NULL, NULL);
-    bands1_sparams.SetSignals(Bands1_SignalMethod, Bands1_OpenCondition1, Bands1_OpenCondition2, Bands1_CloseCondition, NULL, Bands_SignalLevel, NULL);
-    bands1_sparams.SetStops(Bands_TrailingProfitMethod, Bands_TrailingStopMethod);
-    bands1_sparams.SetMaxSpread(Bands1_MaxSpread);
-    bands1_sparams.SetId(BANDS1);
-    strats.Add(new Stg_Bands(bands1_sparams, "Bands1"));
-  }
-  if ((Bands_Active_Tf & M5B) == M5B) {
-    Bands_Params bands5_iparams(Bands_Period_M5, Bands_Deviation_M5, Bands_HShift, Bands_Applied_Price);
-    StgParams bands5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Bands(bands5_iparams, bands_iparams, cparams5), NULL, NULL);
-    bands5_sparams.SetSignals(Bands5_SignalMethod, Bands5_OpenCondition1, Bands5_OpenCondition2, Bands5_CloseCondition, NULL, Bands_SignalLevel, NULL);
-    bands5_sparams.SetStops(Bands_TrailingProfitMethod, Bands_TrailingStopMethod);
-    bands5_sparams.SetMaxSpread(Bands5_MaxSpread);
-    bands5_sparams.SetId(BANDS5);
-    strats.Add(new Stg_Bands(bands5_sparams, "Bands5"));
-  }
-  if ((Bands_Active_Tf & M15B) == M15B) {
-    Bands_Params bands15_iparams(Bands_Period_M15, Bands_Deviation_M15, Bands_HShift, Bands_Applied_Price);
-    StgParams bands15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Bands(bands15_iparams, bands_iparams, cparams15), NULL, NULL);
-    bands15_sparams.SetSignals(Bands15_SignalMethod, Bands15_OpenCondition1, Bands15_OpenCondition2, Bands15_CloseCondition, NULL, Bands_SignalLevel, NULL);
-    bands15_sparams.SetStops(Bands_TrailingProfitMethod, Bands_TrailingStopMethod);
-    bands15_sparams.SetMaxSpread(Bands15_MaxSpread);
-    bands15_sparams.SetId(BANDS15);
-    strats.Add(new Stg_Bands(bands15_sparams, "Bands15"));
-  }
-  if ((Bands_Active_Tf & M30B) == M30B) {
-    Bands_Params bands30_iparams(Bands_Period_M30, Bands_Deviation_M30, Bands_HShift, Bands_Applied_Price);
-    StgParams bands30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Bands(bands30_iparams, bands_iparams, cparams30), NULL, NULL);
-    bands30_sparams.SetSignals(Bands30_SignalMethod, Bands30_OpenCondition1, Bands30_OpenCondition2, Bands30_CloseCondition, NULL, Bands_SignalLevel, NULL);
-    bands30_sparams.SetStops(Bands_TrailingProfitMethod, Bands_TrailingStopMethod);
-    bands30_sparams.SetMaxSpread(Bands30_MaxSpread);
-    bands30_sparams.SetId(BANDS30);
-    strats.Add(new Stg_Bands(bands30_sparams, "Bands30"));
-  }
+  if ((Bands_Active_Tf & M1B) == M1B) { strats.Add(Stg_Bands::Init_M1()); }
+  if ((Bands_Active_Tf & M5B) == M5B) { strats.Add(Stg_Bands::Init_M5()); }
+  if ((Bands_Active_Tf & M15B) == M15B) { strats.Add(Stg_Bands::Init_M15()); }
+  if ((Bands_Active_Tf & M30B) == M30B) { strats.Add(Stg_Bands::Init_M30()); }
 
-  IndicatorParams bearspower_iparams(10, INDI_BEARS);
-  if ((BearsPower_Active_Tf & M1B) == M1B) {
-    BearsPower_Params bearspower1_iparams(BearsPower_Period, BearsPower_Applied_Price);
-    StgParams bearspower1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_BearsPower(bearspower1_iparams, bearspower_iparams, cparams1), NULL, NULL);
-    bearspower1_sparams.SetSignals(BearsPower1_SignalMethod, BearsPower1_OpenCondition1, BearsPower1_OpenCondition2, BearsPower1_CloseCondition, NULL, BearsPower_SignalLevel, NULL);
-    bearspower1_sparams.SetStops(BearsPower_TrailingProfitMethod, BearsPower_TrailingStopMethod);
-    bearspower1_sparams.SetMaxSpread(BearsPower1_MaxSpread);
-    bearspower1_sparams.SetId(BEARSPOWER1);
-    strats.Add(new Stg_BearsPower(bearspower1_sparams, "BearsPower1"));
-  }
-  if ((BearsPower_Active_Tf & M5B) == M5B) {
-    BearsPower_Params bearspower5_iparams(BearsPower_Period, BearsPower_Applied_Price);
-    StgParams bearspower5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_BearsPower(bearspower5_iparams, bearspower_iparams, cparams5), NULL, NULL);
-    bearspower5_sparams.SetSignals(BearsPower5_SignalMethod, BearsPower5_OpenCondition1, BearsPower5_OpenCondition2, BearsPower5_CloseCondition, NULL, BearsPower_SignalLevel, NULL);
-    bearspower5_sparams.SetStops(BearsPower_TrailingProfitMethod, BearsPower_TrailingStopMethod);
-    bearspower5_sparams.SetMaxSpread(BearsPower5_MaxSpread);
-    bearspower5_sparams.SetId(BEARSPOWER5);
-    strats.Add(new Stg_BearsPower(bearspower5_sparams, "BearsPower5"));
-  }
-  if ((BearsPower_Active_Tf & M15B) == M15B) {
-    BearsPower_Params bearspower15_iparams(BearsPower_Period, BearsPower_Applied_Price);
-    StgParams bearspower15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_BearsPower(bearspower15_iparams, bearspower_iparams, cparams15), NULL, NULL);
-    bearspower15_sparams.SetSignals(BearsPower15_SignalMethod, BearsPower15_OpenCondition1, BearsPower15_OpenCondition2, BearsPower15_CloseCondition, NULL, BearsPower_SignalLevel, NULL);
-    bearspower15_sparams.SetStops(BearsPower_TrailingProfitMethod, BearsPower_TrailingStopMethod);
-    bearspower15_sparams.SetMaxSpread(BearsPower15_MaxSpread);
-    bearspower15_sparams.SetId(BEARSPOWER15);
-    strats.Add(new Stg_BearsPower(bearspower15_sparams, "BearsPower15"));
-  }
-  if ((BearsPower_Active_Tf & M30B) == M30B) {
-    BearsPower_Params bearspower30_iparams(BearsPower_Period, BearsPower_Applied_Price);
-    StgParams bearspower30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_BearsPower(bearspower30_iparams, bearspower_iparams, cparams30), NULL, NULL);
-    bearspower30_sparams.SetSignals(BearsPower30_SignalMethod, BearsPower30_OpenCondition1, BearsPower30_OpenCondition2, BearsPower30_CloseCondition, NULL, BearsPower_SignalLevel, NULL);
-    bearspower30_sparams.SetStops(BearsPower_TrailingProfitMethod, BearsPower_TrailingStopMethod);
-    bearspower30_sparams.SetMaxSpread(BearsPower30_MaxSpread);
-    bearspower30_sparams.SetId(BEARSPOWER30);
-    strats.Add(new Stg_BearsPower(bearspower30_sparams, "BearsPower30"));
-  }
+  if ((BearsPower_Active_Tf & M1B) == M1B) { strats.Add(Stg_BearsPower::Init_M1()); }
+  if ((BearsPower_Active_Tf & M5B) == M5B) { strats.Add(Stg_BearsPower::Init_M5()); }
+  if ((BearsPower_Active_Tf & M15B) == M15B) { strats.Add(Stg_BearsPower::Init_M15()); }
+  if ((BearsPower_Active_Tf & M30B) == M30B) { strats.Add(Stg_BearsPower::Init_M30()); }
 
-  IndicatorParams bullspower_iparams(10, INDI_BULLS);
-  if ((BullsPower_Active_Tf & M1B) == M1B) {
-    BullsPower_Params bullspower1_iparams(BullsPower_Period, BullsPower_Applied_Price);
-    StgParams bullspower1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_BullsPower(bullspower1_iparams, bullspower_iparams, cparams1), NULL, NULL);
-    bullspower1_sparams.SetSignals(BullsPower1_SignalMethod, BullsPower1_OpenCondition1, BullsPower1_OpenCondition2, BullsPower1_CloseCondition, NULL, BullsPower_SignalLevel, NULL);
-    bullspower1_sparams.SetStops(BullsPower_TrailingProfitMethod, BullsPower_TrailingStopMethod);
-    bullspower1_sparams.SetMaxSpread(BullsPower1_MaxSpread);
-    bullspower1_sparams.SetId(BULLSPOWER1);
-    strats.Add(new Stg_BullsPower(bullspower1_sparams, "BullsPower1"));
-  }
-  if ((BullsPower_Active_Tf & M5B) == M5B) {
-    BullsPower_Params bullspower5_iparams(BullsPower_Period, BullsPower_Applied_Price);
-    StgParams bullspower5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_BullsPower(bullspower5_iparams, bullspower_iparams, cparams5), NULL, NULL);
-    bullspower5_sparams.SetSignals(BullsPower5_SignalMethod, BullsPower5_OpenCondition1, BullsPower5_OpenCondition2, BullsPower5_CloseCondition, NULL, BullsPower_SignalLevel, NULL);
-    bullspower5_sparams.SetStops(BullsPower_TrailingProfitMethod, BullsPower_TrailingStopMethod);
-    bullspower5_sparams.SetMaxSpread(BullsPower5_MaxSpread);
-    bullspower5_sparams.SetId(BULLSPOWER5);
-    strats.Add(new Stg_BullsPower(bullspower5_sparams, "BullsPower5"));
-  }
-  if ((BullsPower_Active_Tf & M15B) == M15B) {
-    BullsPower_Params bullspower15_iparams(BullsPower_Period, BullsPower_Applied_Price);
-    StgParams bullspower15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_BullsPower(bullspower15_iparams, bullspower_iparams, cparams15), NULL, NULL);
-    bullspower15_sparams.SetSignals(BullsPower15_SignalMethod, BullsPower15_OpenCondition1, BullsPower15_OpenCondition2, BullsPower15_CloseCondition, NULL, BullsPower_SignalLevel, NULL);
-    bullspower15_sparams.SetStops(BullsPower_TrailingProfitMethod, BullsPower_TrailingStopMethod);
-    bullspower15_sparams.SetMaxSpread(BullsPower15_MaxSpread);
-    bullspower15_sparams.SetId(BULLSPOWER15);
-    strats.Add(new Stg_BullsPower(bullspower15_sparams, "BullsPower15"));
-  }
-  if ((BullsPower_Active_Tf & M30B) == M30B) {
-    BullsPower_Params bullspower30_iparams(BullsPower_Period, BullsPower_Applied_Price);
-    StgParams bullspower30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_BullsPower(bullspower30_iparams, bullspower_iparams, cparams30), NULL, NULL);
-    bullspower30_sparams.SetSignals(BullsPower30_SignalMethod, BullsPower30_OpenCondition1, BullsPower30_OpenCondition2, BullsPower30_CloseCondition, NULL, BullsPower_SignalLevel, NULL);
-    bullspower30_sparams.SetStops(BullsPower_TrailingProfitMethod, BullsPower_TrailingStopMethod);
-    bullspower30_sparams.SetMaxSpread(BullsPower30_MaxSpread);
-    bullspower30_sparams.SetId(BULLSPOWER30);
-    strats.Add(new Stg_BullsPower(bullspower30_sparams, "BullsPower30"));
-  }
+  if ((BullsPower_Active_Tf & M1B) == M1B) { strats.Add(Stg_BullsPower::Init_M1()); }
+  if ((BullsPower_Active_Tf & M5B) == M5B) { strats.Add(Stg_BullsPower::Init_M5()); }
+  if ((BullsPower_Active_Tf & M15B) == M15B) { strats.Add(Stg_BullsPower::Init_M15()); }
+  if ((BullsPower_Active_Tf & M30B) == M30B) { strats.Add(Stg_BullsPower::Init_M30()); }
 
-  IndicatorParams bwmfi_iparams(10, INDI_BWMFI);
-  if ((BWMFI_Active_Tf & M1B) == M1B) {
-    StgParams bwmfi1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_BWMFI(bwmfi_iparams, cparams1), NULL, NULL);
-    bwmfi1_sparams.SetSignals(BWMFI1_SignalMethod, BWMFI1_OpenCondition1, BWMFI1_OpenCondition2, BWMFI1_CloseCondition, NULL, BWMFI_SignalLevel, NULL);
-    bwmfi1_sparams.SetStops(BWMFI_TrailingProfitMethod, BWMFI_TrailingStopMethod);
-    bwmfi1_sparams.SetMaxSpread(BWMFI1_MaxSpread);
-    bwmfi1_sparams.SetId(BWMFI1);
-    strats.Add(new Stg_BWMFI(bwmfi1_sparams, "BWMFI1"));
-  }
-  if ((BWMFI_Active_Tf & M5B) == M5B) {
-    StgParams bwmfi5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_BWMFI(bwmfi_iparams, cparams5), NULL, NULL);
-    bwmfi5_sparams.SetSignals(BWMFI5_SignalMethod, BWMFI5_OpenCondition1, BWMFI5_OpenCondition2, BWMFI5_CloseCondition, NULL, BWMFI_SignalLevel, NULL);
-    bwmfi5_sparams.SetStops(BWMFI_TrailingProfitMethod, BWMFI_TrailingStopMethod);
-    bwmfi5_sparams.SetMaxSpread(BWMFI5_MaxSpread);
-    bwmfi5_sparams.SetId(BWMFI5);
-    strats.Add(new Stg_BWMFI(bwmfi5_sparams, "BWMFI5"));
-  }
-  if ((BWMFI_Active_Tf & M15B) == M15B) {
-    StgParams bwmfi15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_BWMFI(bwmfi_iparams, cparams15), NULL, NULL);
-    bwmfi15_sparams.SetSignals(BWMFI15_SignalMethod, BWMFI15_OpenCondition1, BWMFI15_OpenCondition2, BWMFI15_CloseCondition, NULL, BWMFI_SignalLevel, NULL);
-    bwmfi15_sparams.SetStops(BWMFI_TrailingProfitMethod, BWMFI_TrailingStopMethod);
-    bwmfi15_sparams.SetMaxSpread(BWMFI15_MaxSpread);
-    bwmfi15_sparams.SetId(BWMFI15);
-    strats.Add(new Stg_BWMFI(bwmfi15_sparams, "BWMFI15"));
-  }
-  if ((BWMFI_Active_Tf & M30B) == M30B) {
-    StgParams bwmfi30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_BWMFI(bwmfi_iparams, cparams30), NULL, NULL);
-    bwmfi30_sparams.SetSignals(BWMFI30_SignalMethod, BWMFI30_OpenCondition1, BWMFI30_OpenCondition2, BWMFI30_CloseCondition, NULL, BWMFI_SignalLevel, NULL);
-    bwmfi30_sparams.SetStops(BWMFI_TrailingProfitMethod, BWMFI_TrailingStopMethod);
-    bwmfi30_sparams.SetMaxSpread(BWMFI30_MaxSpread);
-    bwmfi30_sparams.SetId(BWMFI30);
-    strats.Add(new Stg_BWMFI(bwmfi30_sparams, "BWMFI30"));
-  }
+  if ((BWMFI_Active_Tf & M1B) == M1B) { strats.Add(Stg_BWMFI::Init_M1()); }
+  if ((BWMFI_Active_Tf & M5B) == M5B) { strats.Add(Stg_BWMFI::Init_M5()); }
+  if ((BWMFI_Active_Tf & M15B) == M15B) { strats.Add(Stg_BWMFI::Init_M15()); }
+  if ((BWMFI_Active_Tf & M30B) == M30B) { strats.Add(Stg_BWMFI::Init_M30()); }
 
-  IndicatorParams cci_iparams(10, INDI_CCI);
-  if ((CCI_Active_Tf & M1B) == M1B) {
-    CCI_Params cci1_iparams(CCI_Period_M1, CCI_Applied_Price);
-    StgParams cci1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_CCI(cci1_iparams, cci_iparams, cparams1), NULL, NULL);
-    cci1_sparams.SetSignals(CCI1_SignalMethod, CCI1_OpenCondition1, CCI1_OpenCondition2, CCI1_CloseCondition, NULL, CCI_SignalLevel, NULL);
-    cci1_sparams.SetStops(CCI_TrailingProfitMethod, CCI_TrailingStopMethod);
-    cci1_sparams.SetMaxSpread(CCI1_MaxSpread);
-    cci1_sparams.SetId(CCI1);
-    strats.Add(new Stg_CCI(cci1_sparams, "CCI1"));
-  }
-  if ((CCI_Active_Tf & M5B) == M5B) {
-    CCI_Params cci5_iparams(CCI_Period_M5, CCI_Applied_Price);
-    StgParams cci5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_CCI(cci5_iparams, cci_iparams, cparams5), NULL, NULL);
-    cci5_sparams.SetSignals(CCI5_SignalMethod, CCI5_OpenCondition1, CCI5_OpenCondition2, CCI5_CloseCondition, NULL, CCI_SignalLevel, NULL);
-    cci5_sparams.SetStops(CCI_TrailingProfitMethod, CCI_TrailingStopMethod);
-    cci5_sparams.SetMaxSpread(CCI5_MaxSpread);
-    cci5_sparams.SetId(CCI5);
-    strats.Add(new Stg_CCI(cci5_sparams, "CCI5"));
-  }
-  if ((CCI_Active_Tf & M15B) == M15B) {
-    CCI_Params cci15_iparams(CCI_Period_M15, CCI_Applied_Price);
-    StgParams cci15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_CCI(cci15_iparams, cci_iparams, cparams15), NULL, NULL);
-    cci15_sparams.SetSignals(CCI15_SignalMethod, CCI15_OpenCondition1, CCI15_OpenCondition2, CCI15_CloseCondition, NULL, CCI_SignalLevel, NULL);
-    cci15_sparams.SetStops(CCI_TrailingProfitMethod, CCI_TrailingStopMethod);
-    cci15_sparams.SetMaxSpread(CCI15_MaxSpread);
-    cci15_sparams.SetId(CCI15);
-    strats.Add(new Stg_CCI(cci15_sparams, "CCI15"));
-  }
-  if ((CCI_Active_Tf & M30B) == M30B) {
-    CCI_Params cci30_iparams(CCI_Period_M30, CCI_Applied_Price);
-    StgParams cci30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_CCI(cci30_iparams, cci_iparams, cparams30), NULL, NULL);
-    cci30_sparams.SetSignals(CCI30_SignalMethod, CCI30_OpenCondition1, CCI30_OpenCondition2, CCI30_CloseCondition, NULL, CCI_SignalLevel, NULL);
-    cci30_sparams.SetStops(CCI_TrailingProfitMethod, CCI_TrailingStopMethod);
-    cci30_sparams.SetMaxSpread(CCI30_MaxSpread);
-    cci30_sparams.SetId(CCI30);
-    strats.Add(new Stg_CCI(cci30_sparams, "CCI30"));
-  }
+  if ((CCI_Active_Tf & M1B) == M1B) { strats.Add(Stg_CCI::Init_M1()); }
+  if ((CCI_Active_Tf & M5B) == M5B) { strats.Add(Stg_CCI::Init_M5()); }
+  if ((CCI_Active_Tf & M15B) == M15B) { strats.Add(Stg_CCI::Init_M15()); }
+  if ((CCI_Active_Tf & M30B) == M30B) { strats.Add(Stg_CCI::Init_M30()); }
 
-  IndicatorParams dm_iparams(10, INDI_DEMARKER);
-  if ((DeMarker_Active_Tf & M1B) == M1B) {
-    DeMarker_Params dm1_iparams(DeMarker_Period_M1);
-    StgParams dm1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_DeMarker(dm1_iparams, dm_iparams, cparams1), NULL, NULL);
-    dm1_sparams.SetSignals(DeMarker1_SignalMethod, DeMarker1_OpenCondition1, DeMarker1_OpenCondition2, DeMarker1_CloseCondition, NULL, DeMarker_SignalLevel, NULL);
-    dm1_sparams.SetStops(DeMarker_TrailingProfitMethod, DeMarker_TrailingStopMethod);
-    dm1_sparams.SetMaxSpread(DeMarker1_MaxSpread);
-    dm1_sparams.SetId(DEMARKER1);
-    strats.Add(new Stg_DeMarker(dm1_sparams, "DeMarker1"));
-  }
-  if ((DeMarker_Active_Tf & M5B) == M5B) {
-    DeMarker_Params dm5_iparams(DeMarker_Period_M5);
-    StgParams dm5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_DeMarker(dm5_iparams, dm_iparams, cparams5), NULL, NULL);
-    dm5_sparams.SetSignals(DeMarker5_SignalMethod, DeMarker5_OpenCondition1, DeMarker5_OpenCondition2, DeMarker5_CloseCondition, NULL, DeMarker_SignalLevel, NULL);
-    dm5_sparams.SetStops(DeMarker_TrailingProfitMethod, DeMarker_TrailingStopMethod);
-    dm5_sparams.SetMaxSpread(DeMarker5_MaxSpread);
-    dm5_sparams.SetId(DEMARKER5);
-    strats.Add(new Stg_DeMarker(dm5_sparams, "DeMarker5"));
-  }
-  if ((DeMarker_Active_Tf & M15B) == M15B) {
-    DeMarker_Params dm15_iparams(DeMarker_Period_M15);
-    StgParams dm15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_DeMarker(dm15_iparams, dm_iparams, cparams15), NULL, NULL);
-    dm15_sparams.SetSignals(DeMarker15_SignalMethod, DeMarker15_OpenCondition1, DeMarker15_OpenCondition2, DeMarker15_CloseCondition, NULL, DeMarker_SignalLevel, NULL);
-    dm15_sparams.SetStops(DeMarker_TrailingProfitMethod, DeMarker_TrailingStopMethod);
-    dm15_sparams.SetMaxSpread(DeMarker15_MaxSpread);
-    dm15_sparams.SetId(DEMARKER15);
-    strats.Add(new Stg_DeMarker(dm15_sparams, "DeMarker15"));
-  }
-  if ((DeMarker_Active_Tf & M30B) == M30B) {
-    DeMarker_Params dm30_iparams(DeMarker_Period_M30);
-    StgParams dm30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_DeMarker(dm30_iparams, dm_iparams, cparams30), NULL, NULL);
-    dm30_sparams.SetSignals(DeMarker30_SignalMethod, DeMarker30_OpenCondition1, DeMarker30_OpenCondition2, DeMarker30_CloseCondition, NULL, DeMarker_SignalLevel, NULL);
-    dm30_sparams.SetStops(DeMarker_TrailingProfitMethod, DeMarker_TrailingStopMethod);
-    dm30_sparams.SetMaxSpread(DeMarker30_MaxSpread);
-    dm30_sparams.SetId(DEMARKER30);
-    strats.Add(new Stg_DeMarker(dm30_sparams, "DeMarker30"));
-  }
+  if ((DeMarker_Active_Tf & M1B) == M1B) { strats.Add(Stg_DeMarker::Init_M1()); }
+  if ((DeMarker_Active_Tf & M5B) == M5B) { strats.Add(Stg_DeMarker::Init_M5()); }
+  if ((DeMarker_Active_Tf & M15B) == M15B) { strats.Add(Stg_DeMarker::Init_M15()); }
+  if ((DeMarker_Active_Tf & M30B) == M30B) { strats.Add(Stg_DeMarker::Init_M30()); }
 
-  IndicatorParams env_iparams(10, INDI_ENVELOPES);
-  if ((Envelopes_Active_Tf & M1B) == M1B) {
-    Envelopes_Params env1_iparams(Envelopes_MA_Period_M1, Envelopes_MA_Shift, Envelopes_MA_Method, Envelopes_Applied_Price, Envelopes_Deviation_M1);
-    StgParams env1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Envelopes(env1_iparams, env_iparams, cparams1), NULL, NULL);
-    env1_sparams.SetSignals(Envelopes1_SignalMethod, Envelopes1_OpenCondition1, Envelopes1_OpenCondition2, Envelopes1_CloseCondition, NULL, Envelopes_SignalLevel, NULL);
-    env1_sparams.SetStops(Envelopes_TrailingProfitMethod, Envelopes_TrailingStopMethod);
-    env1_sparams.SetMaxSpread(Envelopes1_MaxSpread);
-    env1_sparams.SetId(ENVELOPES1);
-    strats.Add(new Stg_Envelopes(env1_sparams, "Envelopes1"));
-  }
-  if ((Envelopes_Active_Tf & M5B) == M5B) {
-    Envelopes_Params env5_iparams(Envelopes_MA_Period_M5, Envelopes_MA_Shift, Envelopes_MA_Method, Envelopes_Applied_Price, Envelopes_Deviation_M5);
-    StgParams env5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Envelopes(env5_iparams, env_iparams, cparams5), NULL, NULL);
-    env5_sparams.SetSignals(Envelopes5_SignalMethod, Envelopes5_OpenCondition1, Envelopes5_OpenCondition2, Envelopes5_CloseCondition, NULL, Envelopes_SignalLevel, NULL);
-    env5_sparams.SetStops(Envelopes_TrailingProfitMethod, Envelopes_TrailingStopMethod);
-    env5_sparams.SetMaxSpread(Envelopes5_MaxSpread);
-    env5_sparams.SetId(ENVELOPES5);
-    strats.Add(new Stg_Envelopes(env5_sparams, "Envelopes5"));
-  }
-  if ((Envelopes_Active_Tf & M15B) == M15B) {
-    Envelopes_Params env15_iparams(Envelopes_MA_Period_M15, Envelopes_MA_Shift, Envelopes_MA_Method, Envelopes_Applied_Price, Envelopes_Deviation_M15);
-    StgParams env15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Envelopes(env15_iparams, env_iparams, cparams15), NULL, NULL);
-    env15_sparams.SetSignals(Envelopes15_SignalMethod, Envelopes15_OpenCondition1, Envelopes15_OpenCondition2, Envelopes15_CloseCondition, NULL, Envelopes_SignalLevel, NULL);
-    env15_sparams.SetStops(Envelopes_TrailingProfitMethod, Envelopes_TrailingStopMethod);
-    env15_sparams.SetMaxSpread(Envelopes15_MaxSpread);
-    env15_sparams.SetId(ENVELOPES15);
-    strats.Add(new Stg_Envelopes(env15_sparams, "Envelopes15"));
-  }
-  if ((Envelopes_Active_Tf & M30B) == M30B) {
-    Envelopes_Params env30_iparams(Envelopes_MA_Period_M30, Envelopes_MA_Shift, Envelopes_MA_Method, Envelopes_Applied_Price, Envelopes_Deviation_M30);
-    StgParams env30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Envelopes(env30_iparams, env_iparams, cparams30), NULL, NULL);
-    env30_sparams.SetSignals(Envelopes30_SignalMethod, Envelopes30_OpenCondition1, Envelopes30_OpenCondition2, Envelopes30_CloseCondition, NULL, Envelopes_SignalLevel, NULL);
-    env30_sparams.SetStops(Envelopes_TrailingProfitMethod, Envelopes_TrailingStopMethod);
-    env30_sparams.SetMaxSpread(Envelopes30_MaxSpread);
-    env30_sparams.SetId(ENVELOPES30);
-    strats.Add(new Stg_Envelopes(env30_sparams, "Envelopes30"));
-  }
+  if ((Envelopes_Active_Tf & M1B) == M1B) { strats.Add(Stg_Envelopes::Init_M1()); }
+  if ((Envelopes_Active_Tf & M5B) == M5B) { strats.Add(Stg_Envelopes::Init_M5()); }
+  if ((Envelopes_Active_Tf & M15B) == M15B) { strats.Add(Stg_Envelopes::Init_M15()); }
+  if ((Envelopes_Active_Tf & M30B) == M30B) { strats.Add(Stg_Envelopes::Init_M30()); }
 
-  IndicatorParams force_iparams(10, INDI_FORCE);
-  if ((Force_Active_Tf & M1B) == M1B) {
-    Force_Params force1_iparams(Force_Period_M1, Force_MA_Method, Force_Applied_Price);
-    StgParams force1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Force(force1_iparams, force_iparams, cparams1), NULL, NULL);
-    force1_sparams.SetSignals(Force1_SignalMethod, Force1_OpenCondition1, Force1_OpenCondition2, Force1_CloseCondition, NULL, Force_SignalLevel, NULL);
-    force1_sparams.SetStops(Force_TrailingProfitMethod, Force_TrailingStopMethod);
-    force1_sparams.SetMaxSpread(Force1_MaxSpread);
-    force1_sparams.SetId(FORCE1);
-    strats.Add(new Stg_Force(force1_sparams, "Force1"));
-  }
-  if ((Force_Active_Tf & M5B) == M5B) {
-    Force_Params force5_iparams(Force_Period_M5, Force_MA_Method, Force_Applied_Price);
-    StgParams force5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Force(force5_iparams, force_iparams, cparams5), NULL, NULL);
-    force5_sparams.SetSignals(Force5_SignalMethod, Force5_OpenCondition1, Force5_OpenCondition2, Force5_CloseCondition, NULL, Force_SignalLevel, NULL);
-    force5_sparams.SetStops(Force_TrailingProfitMethod, Force_TrailingStopMethod);
-    force5_sparams.SetMaxSpread(Force5_MaxSpread);
-    force5_sparams.SetId(FORCE5);
-    strats.Add(new Stg_Force(force5_sparams, "Force5"));
-  }
-  if ((Force_Active_Tf & M15B) == M15B) {
-    Force_Params force15_iparams(Force_Period_M15, Force_MA_Method, Force_Applied_Price);
-    StgParams force15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Force(force15_iparams, force_iparams, cparams15), NULL, NULL);
-    force15_sparams.SetSignals(Force15_SignalMethod, Force15_OpenCondition1, Force15_OpenCondition2, Force15_CloseCondition, NULL, Force_SignalLevel, NULL);
-    force15_sparams.SetStops(Force_TrailingProfitMethod, Force_TrailingStopMethod);
-    force15_sparams.SetMaxSpread(Force15_MaxSpread);
-    force15_sparams.SetId(FORCE15);
-    strats.Add(new Stg_Force(force15_sparams, "Force15"));
-  }
-  if ((Force_Active_Tf & M30B) == M30B) {
-    Force_Params force30_iparams(Force_Period_M30, Force_MA_Method, Force_Applied_Price);
-    StgParams force30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Force(force30_iparams, force_iparams, cparams30), NULL, NULL);
-    force30_sparams.SetSignals(Force30_SignalMethod, Force30_OpenCondition1, Force30_OpenCondition2, Force30_CloseCondition, NULL, Force_SignalLevel, NULL);
-    force30_sparams.SetStops(Force_TrailingProfitMethod, Force_TrailingStopMethod);
-    force30_sparams.SetMaxSpread(Force30_MaxSpread);
-    force30_sparams.SetId(FORCE30);
-    strats.Add(new Stg_Force(force30_sparams, "Force30"));
-  }
+  if ((Force_Active_Tf & M1B) == M1B) { strats.Add(Stg_Force::Init_M1()); }
+  if ((Force_Active_Tf & M5B) == M5B) { strats.Add(Stg_Force::Init_M5()); }
+  if ((Force_Active_Tf & M15B) == M15B) { strats.Add(Stg_Force::Init_M15()); }
+  if ((Force_Active_Tf & M30B) == M30B) { strats.Add(Stg_Force::Init_M30()); }
 
-  IndicatorParams fractals_iparams(10, INDI_FRACTALS);
-  if ((Fractals_Active_Tf & M1B) == M1B) {
-    StgParams fractals1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Fractals(fractals_iparams, cparams1), NULL, NULL);
-    fractals1_sparams.SetSignals(Fractals1_SignalMethod, Fractals1_OpenCondition1, Fractals1_OpenCondition2, Fractals1_CloseCondition, NULL, Fractals_SignalLevel, NULL);
-    fractals1_sparams.SetStops(Fractals_TrailingProfitMethod, Fractals_TrailingStopMethod);
-    fractals1_sparams.SetMaxSpread(Fractals1_MaxSpread);
-    fractals1_sparams.SetId(FRACTALS1);
-    strats.Add(new Stg_Fractals(fractals1_sparams, "Fractals1"));
-  }
-  if ((Fractals_Active_Tf & M5B) == M5B) {
-    StgParams fractals5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Fractals(fractals_iparams, cparams5), NULL, NULL);
-    fractals5_sparams.SetSignals(Fractals5_SignalMethod, Fractals5_OpenCondition1, Fractals5_OpenCondition2, Fractals5_CloseCondition, NULL, Fractals_SignalLevel, NULL);
-    fractals5_sparams.SetStops(Fractals_TrailingProfitMethod, Fractals_TrailingStopMethod);
-    fractals5_sparams.SetMaxSpread(Fractals5_MaxSpread);
-    fractals5_sparams.SetId(FRACTALS5);
-    strats.Add(new Stg_Fractals(fractals5_sparams, "Fractals5"));
-  }
-  if ((Fractals_Active_Tf & M15B) == M15B) {
-    StgParams fractals15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Fractals(fractals_iparams, cparams15), NULL, NULL);
-    fractals15_sparams.SetSignals(Fractals15_SignalMethod, Fractals15_OpenCondition1, Fractals15_OpenCondition2, Fractals15_CloseCondition, NULL, Fractals_SignalLevel, NULL);
-    fractals15_sparams.SetStops(Fractals_TrailingProfitMethod, Fractals_TrailingStopMethod);
-    fractals15_sparams.SetMaxSpread(Fractals15_MaxSpread);
-    fractals15_sparams.SetId(FRACTALS15);
-    strats.Add(new Stg_Fractals(fractals15_sparams, "Fractals15"));
-  }
-  if ((Fractals_Active_Tf & M30B) == M30B) {
-    StgParams fractals30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Fractals(fractals_iparams, cparams30), NULL, NULL);
-    fractals30_sparams.SetSignals(Fractals30_SignalMethod, Fractals30_OpenCondition1, Fractals30_OpenCondition2, Fractals30_CloseCondition, NULL, Fractals_SignalLevel, NULL);
-    fractals30_sparams.SetStops(Fractals_TrailingProfitMethod, Fractals_TrailingStopMethod);
-    fractals30_sparams.SetMaxSpread(Fractals30_MaxSpread);
-    fractals30_sparams.SetId(FRACTALS30);
-    strats.Add(new Stg_Fractals(fractals30_sparams, "Fractals30"));
-  }
+  if ((Fractals_Active_Tf & M1B) == M1B) { strats.Add(Stg_Fractals::Init_M1()); }
+  if ((Fractals_Active_Tf & M5B) == M5B) { strats.Add(Stg_Fractals::Init_M5()); }
+  if ((Fractals_Active_Tf & M15B) == M15B) { strats.Add(Stg_Fractals::Init_M15()); }
+  if ((Fractals_Active_Tf & M30B) == M30B) { strats.Add(Stg_Fractals::Init_M30()); }
 
-  IndicatorParams gator_iparams(10, INDI_GATOR);
-  if ((Gator_Active_Tf & M1B) == M1B) {
-    Gator_Params gator1_iparams(
-      Gator_Period_Jaw, Gator_Shift_Jaw,
-      Gator_Period_Teeth, Gator_Shift_Teeth,
-      Gator_Period_Lips, Gator_Shift_Lips,
-      Gator_MA_Method, Gator_Applied_Price);
-    StgParams gator1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Gator(gator1_iparams, gator_iparams, cparams1), NULL, NULL);
-    gator1_sparams.SetSignals(Gator1_SignalMethod, Gator1_OpenCondition1, Gator1_OpenCondition2, Gator1_CloseCondition, NULL, Gator_SignalLevel, NULL);
-    gator1_sparams.SetStops(Gator_TrailingProfitMethod, Gator_TrailingStopMethod);
-    gator1_sparams.SetMaxSpread(Gator1_MaxSpread);
-    gator1_sparams.SetId(GATOR1);
-    strats.Add(new Stg_Gator(gator1_sparams, "Gator1"));
-  }
-  if ((Gator_Active_Tf & M5B) == M5B) {
-    Gator_Params gator5_iparams(
-      Gator_Period_Jaw, Gator_Shift_Jaw,
-      Gator_Period_Teeth, Gator_Shift_Teeth,
-      Gator_Period_Lips, Gator_Shift_Lips,
-      Gator_MA_Method, Gator_Applied_Price);
-    StgParams gator5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Gator(gator5_iparams, gator_iparams, cparams5), NULL, NULL);
-    gator5_sparams.SetSignals(Gator5_SignalMethod, Gator5_OpenCondition1, Gator5_OpenCondition2, Gator5_CloseCondition, NULL, Gator_SignalLevel, NULL);
-    gator5_sparams.SetStops(Gator_TrailingProfitMethod, Gator_TrailingStopMethod);
-    gator5_sparams.SetMaxSpread(Gator5_MaxSpread);
-    gator5_sparams.SetId(GATOR5);
-    strats.Add(new Stg_Gator(gator5_sparams, "Gator5"));
-  }
-  if ((Gator_Active_Tf & M15B) == M15B) {
-    Gator_Params gator15_iparams(
-      Gator_Period_Jaw, Gator_Shift_Jaw,
-      Gator_Period_Teeth, Gator_Shift_Teeth,
-      Gator_Period_Lips, Gator_Shift_Lips,
-      Gator_MA_Method, Gator_Applied_Price);
-    StgParams gator15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Gator(gator15_iparams, gator_iparams, cparams15), NULL, NULL);
-    gator15_sparams.SetSignals(Gator15_SignalMethod, Gator15_OpenCondition1, Gator15_OpenCondition2, Gator15_CloseCondition, NULL, Gator_SignalLevel, NULL);
-    gator15_sparams.SetStops(Gator_TrailingProfitMethod, Gator_TrailingStopMethod);
-    gator15_sparams.SetMaxSpread(Gator15_MaxSpread);
-    gator15_sparams.SetId(GATOR15);
-    strats.Add(new Stg_Gator(gator15_sparams, "Gator15"));
-  }
-  if ((Gator_Active_Tf & M30B) == M30B) {
-    Gator_Params gator30_iparams(
-      Gator_Period_Jaw, Gator_Shift_Jaw,
-      Gator_Period_Teeth, Gator_Shift_Teeth,
-      Gator_Period_Lips, Gator_Shift_Lips,
-      Gator_MA_Method, Gator_Applied_Price);
-    StgParams gator30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Gator(gator30_iparams, gator_iparams, cparams30), NULL, NULL);
-    gator30_sparams.SetSignals(Gator30_SignalMethod, Gator30_OpenCondition1, Gator30_OpenCondition2, Gator30_CloseCondition, NULL, Gator_SignalLevel, NULL);
-    gator30_sparams.SetStops(Gator_TrailingProfitMethod, Gator_TrailingStopMethod);
-    gator30_sparams.SetMaxSpread(Gator30_MaxSpread);
-    gator30_sparams.SetId(GATOR30);
-    strats.Add(new Stg_Gator(gator30_sparams, "Gator30"));
-  }
+  if ((Gator_Active_Tf & M1B) == M1B) { strats.Add(Stg_Gator::Init_M1()); }
+  if ((Gator_Active_Tf & M5B) == M5B) { strats.Add(Stg_Gator::Init_M5()); }
+  if ((Gator_Active_Tf & M15B) == M15B) { strats.Add(Stg_Gator::Init_M15()); }
+  if ((Gator_Active_Tf & M30B) == M30B) { strats.Add(Stg_Gator::Init_M30()); }
 
-  IndicatorParams ichimoku_iparams(10, INDI_ICHIMOKU);
-  if ((Ichimoku_Active_Tf & M1B) == M1B) {
-    Ichimoku_Params ichimoku1_iparams(Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B);
-    StgParams ichimoku1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Ichimoku(ichimoku1_iparams, ichimoku_iparams, cparams1), NULL, NULL);
-    ichimoku1_sparams.SetSignals(Ichimoku1_SignalMethod, Ichimoku1_OpenCondition1, Ichimoku1_OpenCondition2, Ichimoku1_CloseCondition, NULL, Ichimoku_SignalLevel, NULL);
-    ichimoku1_sparams.SetStops(Ichimoku_TrailingProfitMethod, Ichimoku_TrailingStopMethod);
-    ichimoku1_sparams.SetMaxSpread(Ichimoku1_MaxSpread);
-    ichimoku1_sparams.SetId(ICHIMOKU1);
-    strats.Add(new Stg_Ichimoku(ichimoku1_sparams, "Ichimoku1"));
-  }
-  if ((Ichimoku_Active_Tf & M5B) == M5B) {
-    Ichimoku_Params ichimoku5_iparams(Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B);
-    StgParams ichimoku5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Ichimoku(ichimoku5_iparams, ichimoku_iparams, cparams5), NULL, NULL);
-    ichimoku5_sparams.SetSignals(Ichimoku5_SignalMethod, Ichimoku5_OpenCondition1, Ichimoku5_OpenCondition2, Ichimoku5_CloseCondition, NULL, Ichimoku_SignalLevel, NULL);
-    ichimoku5_sparams.SetStops(Ichimoku_TrailingProfitMethod, Ichimoku_TrailingStopMethod);
-    ichimoku5_sparams.SetMaxSpread(Ichimoku5_MaxSpread);
-    ichimoku5_sparams.SetId(ICHIMOKU5);
-    strats.Add(new Stg_Ichimoku(ichimoku5_sparams, "Ichimoku5"));
-  }
-  if ((Ichimoku_Active_Tf & M15B) == M15B) {
-    Ichimoku_Params ichimoku15_iparams(Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B);
-    StgParams ichimoku15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Ichimoku(ichimoku15_iparams, ichimoku_iparams, cparams15), NULL, NULL);
-    ichimoku15_sparams.SetSignals(Ichimoku15_SignalMethod, Ichimoku15_OpenCondition1, Ichimoku15_OpenCondition2, Ichimoku15_CloseCondition, NULL, Ichimoku_SignalLevel, NULL);
-    ichimoku15_sparams.SetStops(Ichimoku_TrailingProfitMethod, Ichimoku_TrailingStopMethod);
-    ichimoku15_sparams.SetMaxSpread(Ichimoku15_MaxSpread);
-    ichimoku15_sparams.SetId(ICHIMOKU15);
-    strats.Add(new Stg_Ichimoku(ichimoku15_sparams, "Ichimoku15"));
-  }
-  if ((Ichimoku_Active_Tf & M30B) == M30B) {
-    Ichimoku_Params ichimoku30_iparams(Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B);
-    StgParams ichimoku30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Ichimoku(ichimoku30_iparams, ichimoku_iparams, cparams30), NULL, NULL);
-    ichimoku30_sparams.SetSignals(Ichimoku30_SignalMethod, Ichimoku30_OpenCondition1, Ichimoku30_OpenCondition2, Ichimoku30_CloseCondition, NULL, Ichimoku_SignalLevel, NULL);
-    ichimoku30_sparams.SetStops(Ichimoku_TrailingProfitMethod, Ichimoku_TrailingStopMethod);
-    ichimoku30_sparams.SetMaxSpread(Ichimoku30_MaxSpread);
-    ichimoku30_sparams.SetId(ICHIMOKU30);
-    strats.Add(new Stg_Ichimoku(ichimoku30_sparams, "Ichimoku30"));
-  }
+  if ((Ichimoku_Active_Tf & M1B) == M1B) { strats.Add(Stg_Ichimoku::Init_M1()); }
+  if ((Ichimoku_Active_Tf & M5B) == M5B) { strats.Add(Stg_Ichimoku::Init_M5()); }
+  if ((Ichimoku_Active_Tf & M15B) == M15B) { strats.Add(Stg_Ichimoku::Init_M15()); }
+  if ((Ichimoku_Active_Tf & M30B) == M30B) { strats.Add(Stg_Ichimoku::Init_M30()); }
 
-  IndicatorParams ma_iparams(10, INDI_MA);
-  if ((MA_Active_Tf & M1B) == M1B) {
-    MA_Params ma1_iparams(MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price);
-    StgParams ma1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_MA(ma1_iparams, ma_iparams, cparams1), NULL, NULL);
-    ma1_sparams.SetSignals(MA1_SignalMethod, MA1_OpenCondition1, MA1_OpenCondition2, MA1_CloseCondition, NULL, MA_SignalLevel, NULL);
-    ma1_sparams.SetStops(MA_TrailingProfitMethod, MA_TrailingStopMethod);
-    ma1_sparams.SetMaxSpread(MA1_MaxSpread);
-    ma1_sparams.SetId(MA1);
-    strats.Add(new Stg_MA(ma1_sparams, "MA1"));
-  }
-  if ((MA_Active_Tf & M5B) == M5B) {
-    MA_Params ma5_iparams(MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price);
-    StgParams ma5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_MA(ma5_iparams, ma_iparams, cparams5), NULL, NULL);
-    ma5_sparams.SetSignals(MA5_SignalMethod, MA5_OpenCondition1, MA5_OpenCondition2, MA5_CloseCondition, NULL, MA_SignalLevel, NULL);
-    ma5_sparams.SetStops(MA_TrailingProfitMethod, MA_TrailingStopMethod);
-    ma5_sparams.SetMaxSpread(MA5_MaxSpread);
-    ma5_sparams.SetId(MA5);
-    strats.Add(new Stg_MA(ma5_sparams, "MA5"));
-  }
-  if ((MA_Active_Tf & M15B) == M15B) {
-    MA_Params ma15_iparams(MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price);
-    StgParams ma15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_MA(ma15_iparams, ma_iparams, cparams15), NULL, NULL);
-    ma15_sparams.SetSignals(MA15_SignalMethod, MA15_OpenCondition1, MA15_OpenCondition2, MA15_CloseCondition, NULL, MA_SignalLevel, NULL);
-    ma15_sparams.SetStops(MA_TrailingProfitMethod, MA_TrailingStopMethod);
-    ma15_sparams.SetMaxSpread(MA15_MaxSpread);
-    ma15_sparams.SetId(MA15);
-    strats.Add(new Stg_MA(ma15_sparams, "MA15"));
-  }
-  if ((MA_Active_Tf & M30B) == M30B) {
-    MA_Params ma30_iparams(MA_Period_Fast, MA_Shift, MA_Method, MA_Applied_Price);
-    StgParams ma30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_MA(ma30_iparams, ma_iparams, cparams30), NULL, NULL);
-    ma30_sparams.SetSignals(MA30_SignalMethod, MA30_OpenCondition1, MA30_OpenCondition2, MA30_CloseCondition, NULL, MA_SignalLevel, NULL);
-    ma30_sparams.SetStops(MA_TrailingProfitMethod, MA_TrailingStopMethod);
-    ma30_sparams.SetMaxSpread(MA30_MaxSpread);
-    ma30_sparams.SetId(MA30);
-    strats.Add(new Stg_MA(ma30_sparams, "MA30"));
-  }
+  if ((MA_Active_Tf & M1B) == M1B) { strats.Add(Stg_MA::Init_M1()); }
+  if ((MA_Active_Tf & M5B) == M5B) { strats.Add(Stg_MA::Init_M5()); }
+  if ((MA_Active_Tf & M15B) == M15B) { strats.Add(Stg_MA::Init_M15()); }
+  if ((MA_Active_Tf & M30B) == M30B) { strats.Add(Stg_MA::Init_M30()); }
 
-  IndicatorParams macd_iparams(10, INDI_MACD);
-  if ((MACD_Active_Tf & M1B) == M1B) {
-    MACD_Params macd1_iparams(MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price);
-    StgParams macd1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_MACD(macd1_iparams, macd_iparams, cparams1), NULL, NULL);
-    macd1_sparams.SetSignals(MACD1_SignalMethod, MACD1_OpenCondition1, MACD1_OpenCondition2, MACD1_CloseCondition, NULL, MACD_SignalLevel, NULL);
-    macd1_sparams.SetStops(MACD_TrailingProfitMethod, MACD_TrailingStopMethod);
-    macd1_sparams.SetMaxSpread(MACD1_MaxSpread);
-    macd1_sparams.SetId(MACD1);
-    strats.Add(new Stg_MACD(macd1_sparams, "MACD1"));
-  }
-  if ((MACD_Active_Tf & M5B) == M5B) {
-    MACD_Params macd5_iparams(MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price);
-    StgParams macd5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_MACD(macd5_iparams, macd_iparams, cparams5), NULL, NULL);
-    macd5_sparams.SetSignals(MACD5_SignalMethod, MACD5_OpenCondition1, MACD5_OpenCondition2, MACD5_CloseCondition, NULL, MACD_SignalLevel, NULL);
-    macd5_sparams.SetStops(MACD_TrailingProfitMethod, MACD_TrailingStopMethod);
-    macd5_sparams.SetMaxSpread(MACD5_MaxSpread);
-    macd5_sparams.SetId(MACD5);
-    strats.Add(new Stg_MACD(macd5_sparams, "MACD5"));
-  }
-  if ((MACD_Active_Tf & M15B) == M15B) {
-    MACD_Params macd15_iparams(MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price);
-    StgParams macd15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_MACD(macd15_iparams, macd_iparams, cparams15), NULL, NULL);
-    macd15_sparams.SetSignals(MACD15_SignalMethod, MACD15_OpenCondition1, MACD15_OpenCondition2, MACD15_CloseCondition, NULL, MACD_SignalLevel, NULL);
-    macd15_sparams.SetStops(MACD_TrailingProfitMethod, MACD_TrailingStopMethod);
-    macd15_sparams.SetMaxSpread(MACD15_MaxSpread);
-    macd15_sparams.SetId(MACD15);
-    strats.Add(new Stg_MACD(macd15_sparams, "MACD15"));
-  }
-  if ((MACD_Active_Tf & M30B) == M30B) {
-    MACD_Params macd30_iparams(MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price);
-    StgParams macd30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_MACD(macd30_iparams, macd_iparams, cparams30), NULL, NULL);
-    macd30_sparams.SetSignals(MACD30_SignalMethod, MACD30_OpenCondition1, MACD30_OpenCondition2, MACD30_CloseCondition, NULL, MACD_SignalLevel, NULL);
-    macd30_sparams.SetStops(MACD_TrailingProfitMethod, MACD_TrailingStopMethod);
-    macd30_sparams.SetMaxSpread(MACD30_MaxSpread);
-    macd30_sparams.SetId(MACD30);
-    strats.Add(new Stg_MACD(macd30_sparams, "MACD30"));
-  }
+  if ((MACD_Active_Tf & M1B) == M1B) { strats.Add(Stg_MACD::Init_M1()); }
+  if ((MACD_Active_Tf & M5B) == M5B) { strats.Add(Stg_MACD::Init_M5()); }
+  if ((MACD_Active_Tf & M15B) == M15B) { strats.Add(Stg_MACD::Init_M15()); }
+  if ((MACD_Active_Tf & M30B) == M30B) { strats.Add(Stg_MACD::Init_M30()); }
 
-  IndicatorParams mfi_iparams(10, INDI_MFI);
-  if ((MFI_Active_Tf & M1B) == M1B) {
-    MFI_Params mfi1_iparams(MFI_Period_M1);
-    StgParams mfi1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_MFI(mfi1_iparams, mfi_iparams, cparams1), NULL, NULL);
-    mfi1_sparams.SetSignals(MFI1_SignalMethod, MFI1_OpenCondition1, MFI1_OpenCondition2, MFI1_CloseCondition, NULL, MFI_SignalLevel, NULL);
-    mfi1_sparams.SetStops(MFI_TrailingProfitMethod, MFI_TrailingStopMethod);
-    mfi1_sparams.SetMaxSpread(MFI1_MaxSpread);
-    mfi1_sparams.SetId(MFI1);
-    strats.Add(new Stg_MFI(mfi1_sparams, "MFI1"));
-  }
-  if ((MFI_Active_Tf & M5B) == M5B) {
-    MFI_Params mfi5_iparams(MFI_Period_M5);
-    StgParams mfi5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_MFI(mfi5_iparams, mfi_iparams, cparams5), NULL, NULL);
-    mfi5_sparams.SetSignals(MFI5_SignalMethod, MFI5_OpenCondition1, MFI5_OpenCondition2, MFI5_CloseCondition, NULL, MFI_SignalLevel, NULL);
-    mfi5_sparams.SetStops(MFI_TrailingProfitMethod, MFI_TrailingStopMethod);
-    mfi5_sparams.SetMaxSpread(MFI5_MaxSpread);
-    mfi5_sparams.SetId(MFI5);
-    strats.Add(new Stg_MFI(mfi5_sparams, "MFI5"));
-  }
-  if ((MFI_Active_Tf & M15B) == M15B) {
-    MFI_Params mfi15_iparams(MFI_Period_M15);
-    StgParams mfi15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_MFI(mfi15_iparams, mfi_iparams, cparams15), NULL, NULL);
-    mfi15_sparams.SetSignals(MFI15_SignalMethod, MFI15_OpenCondition1, MFI15_OpenCondition2, MFI15_CloseCondition, NULL, MFI_SignalLevel, NULL);
-    mfi15_sparams.SetStops(MFI_TrailingProfitMethod, MFI_TrailingStopMethod);
-    mfi15_sparams.SetMaxSpread(MFI15_MaxSpread);
-    mfi15_sparams.SetId(MFI15);
-    strats.Add(new Stg_MFI(mfi15_sparams, "MFI15"));
-  }
-  if ((MFI_Active_Tf & M30B) == M30B) {
-    MFI_Params mfi30_iparams(MFI_Period_M30);
-    StgParams mfi30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_MFI(mfi30_iparams, mfi_iparams, cparams30), NULL, NULL);
-    mfi30_sparams.SetSignals(MFI30_SignalMethod, MFI30_OpenCondition1, MFI30_OpenCondition2, MFI30_CloseCondition, NULL, MFI_SignalLevel, NULL);
-    mfi30_sparams.SetStops(MFI_TrailingProfitMethod, MFI_TrailingStopMethod);
-    mfi30_sparams.SetMaxSpread(MFI30_MaxSpread);
-    mfi30_sparams.SetId(MFI30);
-    strats.Add(new Stg_MFI(mfi30_sparams, "MFI30"));
-  }
+  if ((MFI_Active_Tf & M1B) == M1B) { strats.Add(Stg_MFI::Init_M1()); }
+  if ((MFI_Active_Tf & M5B) == M5B) { strats.Add(Stg_MFI::Init_M5()); }
+  if ((MFI_Active_Tf & M15B) == M15B) { strats.Add(Stg_MFI::Init_M15()); }
+  if ((MFI_Active_Tf & M30B) == M30B) { strats.Add(Stg_MFI::Init_M30()); }
 
-  IndicatorParams mom_iparams(10, INDI_MOMENTUM);
-  if ((Momentum_Active_Tf & M1B) == M1B) {
-    Momentum_Params mom1_iparams(Momentum_Period, Momentum_Applied_Price);
-    StgParams mom1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Momentum(mom1_iparams, mom_iparams, cparams1), NULL, NULL);
-    mom1_sparams.SetSignals(Momentum1_SignalMethod, Momentum1_OpenCondition1, Momentum1_OpenCondition2, Momentum1_CloseCondition, NULL, Momentum_SignalLevel, NULL);
-    mom1_sparams.SetStops(Momentum_TrailingProfitMethod, Momentum_TrailingStopMethod);
-    mom1_sparams.SetMaxSpread(Momentum1_MaxSpread);
-    mom1_sparams.SetId(MOM1);
-    strats.Add(new Stg_Momentum(mom1_sparams, "Momentum1"));
-  }
-  if ((Momentum_Active_Tf & M5B) == M5B) {
-    Momentum_Params mom5_iparams(Momentum_Period, Momentum_Applied_Price);
-    StgParams mom5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Momentum(mom5_iparams, mom_iparams, cparams5), NULL, NULL);
-    mom5_sparams.SetSignals(Momentum5_SignalMethod, Momentum5_OpenCondition1, Momentum5_OpenCondition2, Momentum5_CloseCondition, NULL, Momentum_SignalLevel, NULL);
-    mom5_sparams.SetStops(Momentum_TrailingProfitMethod, Momentum_TrailingStopMethod);
-    mom5_sparams.SetMaxSpread(Momentum5_MaxSpread);
-    mom5_sparams.SetId(MOM5);
-    strats.Add(new Stg_Momentum(mom5_sparams, "Momentum5"));
-  }
-  if ((Momentum_Active_Tf & M15B) == M15B) {
-    Momentum_Params mom15_iparams(Momentum_Period, Momentum_Applied_Price);
-    StgParams mom15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Momentum(mom15_iparams, mom_iparams, cparams15), NULL, NULL);
-    mom15_sparams.SetSignals(Momentum15_SignalMethod, Momentum15_OpenCondition1, Momentum15_OpenCondition2, Momentum15_CloseCondition, NULL, Momentum_SignalLevel, NULL);
-    mom15_sparams.SetStops(Momentum_TrailingProfitMethod, Momentum_TrailingStopMethod);
-    mom15_sparams.SetMaxSpread(Momentum15_MaxSpread);
-    mom15_sparams.SetId(MOM15);
-    strats.Add(new Stg_Momentum(mom15_sparams, "Momentum15"));
-  }
-  if ((Momentum_Active_Tf & M30B) == M30B) {
-    Momentum_Params mom30_iparams(Momentum_Period, Momentum_Applied_Price);
-    StgParams mom30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Momentum(mom30_iparams, mom_iparams, cparams30), NULL, NULL);
-    mom30_sparams.SetSignals(Momentum30_SignalMethod, Momentum30_OpenCondition1, Momentum30_OpenCondition2, Momentum30_CloseCondition, NULL, Momentum_SignalLevel, NULL);
-    mom30_sparams.SetStops(Momentum_TrailingProfitMethod, Momentum_TrailingStopMethod);
-    mom30_sparams.SetMaxSpread(Momentum30_MaxSpread);
-    mom30_sparams.SetId(MOM30);
-    strats.Add(new Stg_Momentum(mom30_sparams, "Momentum30"));
-  }
+  if ((Momentum_Active_Tf & M1B) == M1B) { strats.Add(Stg_Momentum::Init_M1()); }
+  if ((Momentum_Active_Tf & M5B) == M5B) { strats.Add(Stg_Momentum::Init_M5()); }
+  if ((Momentum_Active_Tf & M15B) == M15B) { strats.Add(Stg_Momentum::Init_M15()); }
+  if ((Momentum_Active_Tf & M30B) == M30B) { strats.Add(Stg_Momentum::Init_M30()); }
 
-  IndicatorParams obv_iparams(10, INDI_OBV);
-  if ((OBV_Active_Tf & M1B) == M1B) {
-    OBV_Params obv1_iparams(OBV_Applied_Price); // @fixme: MQL5
-    StgParams obv1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_OBV(obv1_iparams, obv_iparams, cparams1), NULL, NULL);
-    obv1_sparams.SetSignals(OBV1_SignalMethod, OBV1_OpenCondition1, OBV1_OpenCondition2, OBV1_CloseCondition, NULL, OBV_SignalLevel, NULL);
-    obv1_sparams.SetStops(OBV_TrailingProfitMethod, OBV_TrailingStopMethod);
-    obv1_sparams.SetMaxSpread(OBV1_MaxSpread);
-    obv1_sparams.SetId(OBV1);
-    strats.Add(new Stg_OBV(obv1_sparams, "OBV1"));
-  }
-  if ((OBV_Active_Tf & M5B) == M5B) {
-    OBV_Params obv5_iparams(OBV_Applied_Price); // @fixme: MQL5
-    StgParams obv5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_OBV(obv5_iparams, obv_iparams, cparams5), NULL, NULL);
-    obv5_sparams.SetSignals(OBV5_SignalMethod, OBV5_OpenCondition1, OBV5_OpenCondition2, OBV5_CloseCondition, NULL, OBV_SignalLevel, NULL);
-    obv5_sparams.SetStops(OBV_TrailingProfitMethod, OBV_TrailingStopMethod);
-    obv5_sparams.SetMaxSpread(OBV5_MaxSpread);
-    obv5_sparams.SetId(OBV5);
-    strats.Add(new Stg_OBV(obv5_sparams, "OBV5"));
-  }
-  if ((OBV_Active_Tf & M15B) == M15B) {
-    OBV_Params obv15_iparams(OBV_Applied_Price); // @fixme: MQL5
-    StgParams obv15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_OBV(obv15_iparams, obv_iparams, cparams15), NULL, NULL);
-    obv15_sparams.SetSignals(OBV15_SignalMethod, OBV15_OpenCondition1, OBV15_OpenCondition2, OBV15_CloseCondition, NULL, OBV_SignalLevel, NULL);
-    obv15_sparams.SetStops(OBV_TrailingProfitMethod, OBV_TrailingStopMethod);
-    obv15_sparams.SetMaxSpread(OBV15_MaxSpread);
-    obv15_sparams.SetId(OBV15);
-    strats.Add(new Stg_OBV(obv15_sparams, "OBV15"));
-  }
-  if ((OBV_Active_Tf & M30B) == M30B) {
-    OBV_Params obv30_iparams(OBV_Applied_Price); // @fixme: MQL5
-    StgParams obv30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_OBV(obv30_iparams, obv_iparams, cparams30), NULL, NULL);
-    obv30_sparams.SetSignals(OBV30_SignalMethod, OBV30_OpenCondition1, OBV30_OpenCondition2, OBV30_CloseCondition, NULL, OBV_SignalLevel, NULL);
-    obv30_sparams.SetStops(OBV_TrailingProfitMethod, OBV_TrailingStopMethod);
-    obv30_sparams.SetMaxSpread(OBV30_MaxSpread);
-    obv30_sparams.SetId(OBV30);
-    strats.Add(new Stg_OBV(obv30_sparams, "OBV30"));
-  }
+  if ((OBV_Active_Tf & M1B) == M1B) { strats.Add(Stg_OBV::Init_M1()); }
+  if ((OBV_Active_Tf & M5B) == M5B) { strats.Add(Stg_OBV::Init_M5()); }
+  if ((OBV_Active_Tf & M15B) == M15B) { strats.Add(Stg_OBV::Init_M15()); }
+  if ((OBV_Active_Tf & M30B) == M30B) { strats.Add(Stg_OBV::Init_M30()); }
 
-  IndicatorParams osma_iparams(10, INDI_OSMA);
-  if ((OSMA_Active_Tf & M1B) == M1B) {
-    OsMA_Params osma1_iparams(OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price);
-    StgParams osma1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_OsMA(osma1_iparams, osma_iparams, cparams1), NULL, NULL);
-    osma1_sparams.SetSignals(OSMA1_SignalMethod, OSMA1_OpenCondition1, OSMA1_OpenCondition2, OSMA1_CloseCondition, NULL, OSMA_SignalLevel, NULL);
-    osma1_sparams.SetStops(OSMA_TrailingProfitMethod, OSMA_TrailingStopMethod);
-    osma1_sparams.SetMaxSpread(OSMA1_MaxSpread);
-    osma1_sparams.SetId(OSMA1);
-    strats.Add(new Stg_OSMA(osma1_sparams, "OSMA1"));
-  }
-  if ((OSMA_Active_Tf & M5B) == M5B) {
-    OsMA_Params osma5_iparams(OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price);
-    StgParams osma5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_OsMA(osma5_iparams, osma_iparams, cparams5), NULL, NULL);
-    osma5_sparams.SetSignals(OSMA5_SignalMethod, OSMA5_OpenCondition1, OSMA5_OpenCondition2, OSMA5_CloseCondition, NULL, OSMA_SignalLevel, NULL);
-    osma5_sparams.SetStops(OSMA_TrailingProfitMethod, OSMA_TrailingStopMethod);
-    osma5_sparams.SetMaxSpread(OSMA5_MaxSpread);
-    osma5_sparams.SetId(OSMA5);
-    strats.Add(new Stg_OSMA(osma5_sparams, "OSMA5"));
-  }
-  if ((OSMA_Active_Tf & M15B) == M15B) {
-    OsMA_Params osma15_iparams(OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price);
-    StgParams osma15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_OsMA(osma15_iparams, osma_iparams, cparams15), NULL, NULL);
-    osma15_sparams.SetSignals(OSMA15_SignalMethod, OSMA15_OpenCondition1, OSMA15_OpenCondition2, OSMA15_CloseCondition, NULL, OSMA_SignalLevel, NULL);
-    osma15_sparams.SetStops(OSMA_TrailingProfitMethod, OSMA_TrailingStopMethod);
-    osma15_sparams.SetMaxSpread(OSMA15_MaxSpread);
-    osma15_sparams.SetId(OSMA15);
-    strats.Add(new Stg_OSMA(osma15_sparams, "OSMA15"));
-  }
-  if ((OSMA_Active_Tf & M30B) == M30B) {
-    OsMA_Params osma30_iparams(OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price);
-    StgParams osma30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_OsMA(osma30_iparams, osma_iparams, cparams30), NULL, NULL);
-    osma30_sparams.SetSignals(OSMA30_SignalMethod, OSMA30_OpenCondition1, OSMA30_OpenCondition2, OSMA30_CloseCondition, NULL, OSMA_SignalLevel, NULL);
-    osma30_sparams.SetStops(OSMA_TrailingProfitMethod, OSMA_TrailingStopMethod);
-    osma30_sparams.SetMaxSpread(OSMA30_MaxSpread);
-    osma30_sparams.SetId(OSMA30);
-    strats.Add(new Stg_OSMA(osma30_sparams, "OSMA30"));
-  }
+  if ((OSMA_Active_Tf & M1B) == M1B) { strats.Add(Stg_OSMA::Init_M1()); }
+  if ((OSMA_Active_Tf & M5B) == M5B) { strats.Add(Stg_OSMA::Init_M5()); }
+  if ((OSMA_Active_Tf & M15B) == M15B) { strats.Add(Stg_OSMA::Init_M15()); }
+  if ((OSMA_Active_Tf & M30B) == M30B) { strats.Add(Stg_OSMA::Init_M30()); }
 
   if ((RSI_Active_Tf & M1B) == M1B)   { strats.Add(Stg_RSI::Init_M1()); };
   if ((RSI_Active_Tf & M5B) == M5B)   { strats.Add(Stg_RSI::Init_M5()); };
   if ((RSI_Active_Tf & M15B) == M15B) { strats.Add(Stg_RSI::Init_M15()); };
   if ((RSI_Active_Tf & M30B) == M30B) { strats.Add(Stg_RSI::Init_M30()); };
 
-  IndicatorParams rvi_iparams(10, INDI_RVI);
-  if ((RVI_Active_Tf & M1B) == M1B) {
-    RVI_Params rvi1_iparams(RVI_Period);
-    StgParams rvi1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_RVI(rvi1_iparams, rvi_iparams, cparams1), NULL, NULL);
-    rvi1_sparams.SetSignals(RVI1_SignalMethod, RVI1_OpenCondition1, RVI1_OpenCondition2, RVI1_CloseCondition, NULL, RVI_SignalLevel, NULL);
-    rvi1_sparams.SetStops(RVI_TrailingProfitMethod, RVI_TrailingStopMethod);
-    rvi1_sparams.SetMaxSpread(RVI1_MaxSpread);
-    rvi1_sparams.SetId(RVI1);
-    strats.Add(new Stg_RVI(rvi1_sparams, "RVI1"));
-  }
-  if ((RVI_Active_Tf & M5B) == M5B) {
-    RVI_Params rvi5_iparams(RVI_Period);
-    StgParams rvi5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_RVI(rvi5_iparams, rvi_iparams, cparams5), NULL, NULL);
-    rvi5_sparams.SetSignals(RVI5_SignalMethod, RVI5_OpenCondition1, RVI5_OpenCondition2, RVI5_CloseCondition, NULL, RVI_SignalLevel, NULL);
-    rvi5_sparams.SetStops(RVI_TrailingProfitMethod, RVI_TrailingStopMethod);
-    rvi5_sparams.SetMaxSpread(RVI5_MaxSpread);
-    rvi5_sparams.SetId(RVI5);
-    strats.Add(new Stg_RVI(rvi5_sparams, "RVI5"));
-  }
-  if ((RVI_Active_Tf & M15B) == M15B) {
-    RVI_Params rvi15_iparams(RVI_Period);
-    StgParams rvi15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_RVI(rvi15_iparams, rvi_iparams, cparams15), NULL, NULL);
-    rvi15_sparams.SetSignals(RVI15_SignalMethod, RVI15_OpenCondition1, RVI15_OpenCondition2, RVI15_CloseCondition, NULL, RVI_SignalLevel, NULL);
-    rvi15_sparams.SetStops(RVI_TrailingProfitMethod, RVI_TrailingStopMethod);
-    rvi15_sparams.SetMaxSpread(RVI15_MaxSpread);
-    rvi15_sparams.SetId(RVI15);
-    strats.Add(new Stg_RVI(rvi15_sparams, "RVI15"));
-  }
-  if ((RVI_Active_Tf & M30B) == M30B) {
-    RVI_Params rvi30_iparams(RVI_Period);
-    StgParams rvi30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_RVI(rvi30_iparams, rvi_iparams, cparams30), NULL, NULL);
-    rvi30_sparams.SetSignals(RVI30_SignalMethod, RVI30_OpenCondition1, RVI30_OpenCondition2, RVI30_CloseCondition, NULL, RVI_SignalLevel, NULL);
-    rvi30_sparams.SetStops(RVI_TrailingProfitMethod, RVI_TrailingStopMethod);
-    rvi30_sparams.SetMaxSpread(RVI30_MaxSpread);
-    rvi30_sparams.SetId(RVI30);
-    strats.Add(new Stg_RVI(rvi30_sparams, "RVI30"));
-  }
+  if ((RVI_Active_Tf & M1B) == M1B) { strats.Add(Stg_RVI::Init_M1()); }
+  if ((RVI_Active_Tf & M5B) == M5B) { strats.Add(Stg_RVI::Init_M5()); }
+  if ((RVI_Active_Tf & M15B) == M15B) { strats.Add(Stg_RVI::Init_M15()); }
+  if ((RVI_Active_Tf & M30B) == M30B) { strats.Add(Stg_RVI::Init_M30()); }
 
-  IndicatorParams sar_iparams(10, INDI_SAR);
-  if ((SAR_Active_Tf & M1B) == M1B) {
-    SAR_Params sar1_iparams(SAR_Step, SAR_Maximum_Stop);
-    StgParams sar1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_SAR(sar1_iparams, sar_iparams, cparams1), NULL, NULL);
-    sar1_sparams.SetSignals(SAR1_SignalMethod, SAR1_OpenCondition1, SAR1_OpenCondition2, SAR1_CloseCondition, NULL, SAR_SignalLevel, NULL);
-    sar1_sparams.SetStops(SAR_TrailingProfitMethod, SAR_TrailingStopMethod);
-    sar1_sparams.SetMaxSpread(SAR1_MaxSpread);
-    sar1_sparams.SetId(SAR1);
-    strats.Add(new Stg_SAR(sar1_sparams, "SAR1"));
-  }
-  if ((SAR_Active_Tf & M5B) == M5B) {
-    SAR_Params sar5_iparams(SAR_Step, SAR_Maximum_Stop);
-    StgParams sar5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_SAR(sar5_iparams, sar_iparams, cparams5), NULL, NULL);
-    sar5_sparams.SetSignals(SAR5_SignalMethod, SAR5_OpenCondition1, SAR5_OpenCondition2, SAR5_CloseCondition, NULL, SAR_SignalLevel, NULL);
-    sar5_sparams.SetStops(SAR_TrailingProfitMethod, SAR_TrailingStopMethod);
-    sar5_sparams.SetMaxSpread(SAR5_MaxSpread);
-    sar5_sparams.SetId(SAR5);
-    strats.Add(new Stg_SAR(sar5_sparams, "SAR5"));
-  }
-  if ((SAR_Active_Tf & M15B) == M15B) {
-    SAR_Params sar15_iparams(SAR_Step, SAR_Maximum_Stop);
-    StgParams sar15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_SAR(sar15_iparams, sar_iparams, cparams15), NULL, NULL);
-    sar15_sparams.SetSignals(SAR15_SignalMethod, SAR15_OpenCondition1, SAR15_OpenCondition2, SAR15_CloseCondition, NULL, SAR_SignalLevel, NULL);
-    sar15_sparams.SetStops(SAR_TrailingProfitMethod, SAR_TrailingStopMethod);
-    sar15_sparams.SetMaxSpread(SAR15_MaxSpread);
-    sar15_sparams.SetId(SAR15);
-    strats.Add(new Stg_SAR(sar15_sparams, "SAR15"));
-  }
-  if ((SAR_Active_Tf & M30B) == M30B) {
-    SAR_Params sar30_iparams(SAR_Step, SAR_Maximum_Stop);
-    StgParams sar30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_SAR(sar30_iparams, sar_iparams, cparams30), NULL, NULL);
-    sar30_sparams.SetSignals(SAR30_SignalMethod, SAR30_OpenCondition1, SAR30_OpenCondition2, SAR30_CloseCondition, NULL, SAR_SignalLevel, NULL);
-    sar30_sparams.SetStops(SAR_TrailingProfitMethod, SAR_TrailingStopMethod);
-    sar30_sparams.SetMaxSpread(SAR30_MaxSpread);
-    sar30_sparams.SetId(SAR30);
-    strats.Add(new Stg_SAR(sar30_sparams, "SAR30"));
-  }
+  if ((SAR_Active_Tf & M1B) == M1B) { strats.Add(Stg_SAR::Init_M1()); }
+  if ((SAR_Active_Tf & M5B) == M5B) { strats.Add(Stg_SAR::Init_M5()); }
+  if ((SAR_Active_Tf & M15B) == M15B) { strats.Add(Stg_SAR::Init_M15()); }
+  if ((SAR_Active_Tf & M30B) == M30B) { strats.Add(Stg_SAR::Init_M30()); }
 
-  IndicatorParams stddev_iparams(10, INDI_STDDEV);
-  if ((StdDev_Active_Tf & M1B) == M1B) {
-    StdDev_Params stddev1_iparams(StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price);
-    StgParams stddev1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_StdDev(stddev1_iparams, stddev_iparams, cparams1), NULL, NULL);
-    stddev1_sparams.SetSignals(StdDev1_SignalMethod, StdDev1_OpenCondition1, StdDev1_OpenCondition2, StdDev1_CloseCondition, NULL, StdDev_SignalLevel, NULL);
-    stddev1_sparams.SetStops(StdDev_TrailingProfitMethod, StdDev_TrailingStopMethod);
-    stddev1_sparams.SetMaxSpread(StdDev1_MaxSpread);
-    stddev1_sparams.SetId(STDDEV1);
-    strats.Add(new Stg_StdDev(stddev1_sparams, "StdDev1"));
-  }
-  if ((StdDev_Active_Tf & M5B) == M5B) {
-    StdDev_Params stddev5_iparams(StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price);
-    StgParams stddev5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_StdDev(stddev5_iparams, stddev_iparams, cparams5), NULL, NULL);
-    stddev5_sparams.SetSignals(StdDev5_SignalMethod, StdDev5_OpenCondition1, StdDev5_OpenCondition2, StdDev5_CloseCondition, NULL, StdDev_SignalLevel, NULL);
-    stddev5_sparams.SetStops(StdDev_TrailingProfitMethod, StdDev_TrailingStopMethod);
-    stddev5_sparams.SetMaxSpread(StdDev5_MaxSpread);
-    stddev5_sparams.SetId(STDDEV5);
-    strats.Add(new Stg_StdDev(stddev5_sparams, "StdDev5"));
-  }
-  if ((StdDev_Active_Tf & M15B) == M15B) {
-    StdDev_Params stddev15_iparams(StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price);
-    StgParams stddev15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_StdDev(stddev15_iparams, stddev_iparams, cparams15), NULL, NULL);
-    stddev15_sparams.SetSignals(StdDev15_SignalMethod, StdDev15_OpenCondition1, StdDev15_OpenCondition2, StdDev15_CloseCondition, NULL, StdDev_SignalLevel, NULL);
-    stddev15_sparams.SetStops(StdDev_TrailingProfitMethod, StdDev_TrailingStopMethod);
-    stddev15_sparams.SetMaxSpread(StdDev15_MaxSpread);
-    stddev15_sparams.SetId(STDDEV15);
-    strats.Add(new Stg_StdDev(stddev15_sparams, "StdDev15"));
-  }
-  if ((StdDev_Active_Tf & M30B) == M30B) {
-    StdDev_Params stddev30_iparams(StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price);
-    StgParams stddev30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_StdDev(stddev30_iparams, stddev_iparams, cparams30), NULL, NULL);
-    stddev30_sparams.SetSignals(StdDev30_SignalMethod, StdDev30_OpenCondition1, StdDev30_OpenCondition2, StdDev30_CloseCondition, NULL, StdDev_SignalLevel, NULL);
-    stddev30_sparams.SetStops(StdDev_TrailingProfitMethod, StdDev_TrailingStopMethod);
-    stddev30_sparams.SetMaxSpread(StdDev30_MaxSpread);
-    stddev30_sparams.SetId(STDDEV30);
-    strats.Add(new Stg_StdDev(stddev30_sparams, "StdDev30"));
-  }
+  if ((StdDev_Active_Tf & M1B) == M1B) { strats.Add(Stg_StdDev::Init_M1()); }
+  if ((StdDev_Active_Tf & M5B) == M5B) { strats.Add(Stg_StdDev::Init_M5()); }
+  if ((StdDev_Active_Tf & M15B) == M15B) { strats.Add(Stg_StdDev::Init_M15()); }
+  if ((StdDev_Active_Tf & M30B) == M30B) { strats.Add(Stg_StdDev::Init_M30()); }
 
-  IndicatorParams stoch_iparams(10, INDI_STOCHASTIC);
-  if ((Stochastic_Active_Tf & M1B) == M1B) {
-    Stoch_Params stoch1_iparams(Stochastic_KPeriod, Stochastic_DPeriod, Stochastic_Slowing, Stochastic_MA_Method, Stochastic_Price_Field);
-    StgParams stoch1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Stochastic(stoch1_iparams, stoch_iparams, cparams1), NULL, NULL);
-    stoch1_sparams.SetSignals(Stochastic1_SignalMethod, Stochastic1_OpenCondition1, Stochastic1_OpenCondition2, Stochastic1_CloseCondition, NULL, Stochastic_SignalLevel, NULL);
-    stoch1_sparams.SetStops(Stochastic_TrailingProfitMethod, Stochastic_TrailingStopMethod);
-    stoch1_sparams.SetMaxSpread(Stochastic1_MaxSpread);
-    stoch1_sparams.SetId(STOCHASTIC1);
-    strats.Add(new Stg_Stoch(stoch1_sparams, "Stochastic1"));
-  }
-  if ((Stochastic_Active_Tf & M5B) == M5B) {
-    Stoch_Params stoch5_iparams(Stochastic_KPeriod, Stochastic_DPeriod, Stochastic_Slowing, Stochastic_MA_Method, Stochastic_Price_Field);
-    StgParams stoch5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Stochastic(stoch5_iparams, stoch_iparams, cparams5), NULL, NULL);
-    stoch5_sparams.SetSignals(Stochastic5_SignalMethod, Stochastic5_OpenCondition1, Stochastic5_OpenCondition2, Stochastic5_CloseCondition, NULL, Stochastic_SignalLevel, NULL);
-    stoch5_sparams.SetStops(Stochastic_TrailingProfitMethod, Stochastic_TrailingStopMethod);
-    stoch5_sparams.SetMaxSpread(Stochastic5_MaxSpread);
-    stoch5_sparams.SetId(STOCHASTIC5);
-    strats.Add(new Stg_Stoch(stoch5_sparams, "Stochastic5"));
-  }
-  if ((Stochastic_Active_Tf & M15B) == M15B) {
-    Stoch_Params stoch15_iparams(Stochastic_KPeriod, Stochastic_DPeriod, Stochastic_Slowing, Stochastic_MA_Method, Stochastic_Price_Field);
-    StgParams stoch15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Stochastic(stoch15_iparams, stoch_iparams, cparams15), NULL, NULL);
-    stoch15_sparams.SetSignals(Stochastic15_SignalMethod, Stochastic15_OpenCondition1, Stochastic15_OpenCondition2, Stochastic15_CloseCondition, NULL, Stochastic_SignalLevel, NULL);
-    stoch15_sparams.SetStops(Stochastic_TrailingProfitMethod, Stochastic_TrailingStopMethod);
-    stoch15_sparams.SetMaxSpread(Stochastic15_MaxSpread);
-    stoch15_sparams.SetId(STOCHASTIC15);
-    strats.Add(new Stg_Stoch(stoch15_sparams, "Stochastic15"));
-  }
-  if ((Stochastic_Active_Tf & M30B) == M30B) {
-    Stoch_Params stoch30_iparams(Stochastic_KPeriod, Stochastic_DPeriod, Stochastic_Slowing, Stochastic_MA_Method, Stochastic_Price_Field);
-    StgParams stoch30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Stochastic(stoch30_iparams, stoch_iparams, cparams30), NULL, NULL);
-    stoch30_sparams.SetSignals(Stochastic30_SignalMethod, Stochastic30_OpenCondition1, Stochastic30_OpenCondition2, Stochastic30_CloseCondition, NULL, Stochastic_SignalLevel, NULL);
-    stoch30_sparams.SetStops(Stochastic_TrailingProfitMethod, Stochastic_TrailingStopMethod);
-    stoch30_sparams.SetMaxSpread(Stochastic30_MaxSpread);
-    stoch30_sparams.SetId(STOCHASTIC30);
-    strats.Add(new Stg_Stoch(stoch30_sparams, "Stochastic30"));
-  }
+  if ((Stochastic_Active_Tf & M1B) == M1B) { strats.Add(Stg_Stoch::Init_M1()); }
+  if ((Stochastic_Active_Tf & M5B) == M5B) { strats.Add(Stg_Stoch::Init_M5()); }
+  if ((Stochastic_Active_Tf & M15B) == M15B) { strats.Add(Stg_Stoch::Init_M15()); }
+  if ((Stochastic_Active_Tf & M30B) == M30B) { strats.Add(Stg_Stoch::Init_M30()); }
 
-  IndicatorParams wpr_iparams(10, INDI_WPR);
-  if ((WPR_Active_Tf & M1B) == M1B) {
-    WPR_Params wpr1_iparams(WPR_Period_M1);
-    StgParams wpr1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_WPR(wpr1_iparams, wpr_iparams, cparams1), NULL, NULL);
-    wpr1_sparams.SetSignals(WPR1_SignalMethod, WPR1_OpenCondition1, WPR1_OpenCondition2, WPR1_CloseCondition, NULL, WPR_SignalLevel, NULL);
-    wpr1_sparams.SetStops(WPR_TrailingProfitMethod, WPR_TrailingStopMethod);
-    wpr1_sparams.SetMaxSpread(WPR1_MaxSpread);
-    wpr1_sparams.SetId(WPR1);
-    strats.Add(new Stg_WPR(wpr1_sparams, "WPR1"));
-  }
-  if ((WPR_Active_Tf & M5B) == M5B) {
-    WPR_Params wpr5_iparams(WPR_Period_M5);
-    StgParams wpr5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_WPR(wpr5_iparams, wpr_iparams, cparams5), NULL, NULL);
-    wpr5_sparams.SetSignals(WPR5_SignalMethod, WPR5_OpenCondition1, WPR5_OpenCondition2, WPR5_CloseCondition, NULL, WPR_SignalLevel, NULL);
-    wpr5_sparams.SetStops(WPR_TrailingProfitMethod, WPR_TrailingStopMethod);
-    wpr5_sparams.SetMaxSpread(WPR5_MaxSpread);
-    wpr5_sparams.SetId(WPR5);
-    strats.Add(new Stg_WPR(wpr5_sparams, "WPR5"));
-  }
-  if ((WPR_Active_Tf & M15B) == M15B) {
-    WPR_Params wpr15_iparams(WPR_Period_M15);
-    StgParams wpr15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_WPR(wpr15_iparams, wpr_iparams, cparams15), NULL, NULL);
-    wpr15_sparams.SetSignals(WPR15_SignalMethod, WPR15_OpenCondition1, WPR15_OpenCondition2, WPR15_CloseCondition, NULL, WPR_SignalLevel, NULL);
-    wpr15_sparams.SetStops(WPR_TrailingProfitMethod, WPR_TrailingStopMethod);
-    wpr15_sparams.SetMaxSpread(WPR15_MaxSpread);
-    wpr15_sparams.SetId(WPR15);
-    strats.Add(new Stg_WPR(wpr15_sparams, "WPR15"));
-  }
-  if ((WPR_Active_Tf & M30B) == M30B) {
-    WPR_Params wpr30_iparams(WPR_Period_M30);
-    StgParams wpr30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_WPR(wpr30_iparams, wpr_iparams, cparams30), NULL, NULL);
-    wpr30_sparams.SetSignals(WPR30_SignalMethod, WPR30_OpenCondition1, WPR30_OpenCondition2, WPR30_CloseCondition, NULL, WPR_SignalLevel, NULL);
-    wpr30_sparams.SetStops(WPR_TrailingProfitMethod, WPR_TrailingStopMethod);
-    wpr30_sparams.SetMaxSpread(WPR30_MaxSpread);
-    wpr30_sparams.SetId(WPR30);
-    strats.Add(new Stg_WPR(wpr30_sparams, "WPR30"));
-  }
+  if ((WPR_Active_Tf & M1B) == M1B) { strats.Add(Stg_WPR::Init_M1()); }
+  if ((WPR_Active_Tf & M5B) == M5B) { strats.Add(Stg_WPR::Init_M5()); }
+  if ((WPR_Active_Tf & M15B) == M15B) { strats.Add(Stg_WPR::Init_M15()); }
+  if ((WPR_Active_Tf & M30B) == M30B) { strats.Add(Stg_WPR::Init_M30()); }
 
-  IndicatorParams zigzag_iparams(10, INDI_ZIGZAG);
-  if ((ZigZag_Active_Tf & M1B) == M1B) {
-    ZigZag_Params zigzag1_iparams(ZigZag_Depth, ZigZag_Deviation, ZigZag_Backstep);
-    StgParams zigzag1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_ZigZag(zigzag1_iparams, zigzag_iparams, cparams1), NULL, NULL);
-    zigzag1_sparams.SetSignals(ZigZag1_SignalMethod, ZigZag1_OpenCondition1, ZigZag1_OpenCondition2, ZigZag1_CloseCondition, NULL, ZigZag_SignalLevel, NULL);
-    zigzag1_sparams.SetStops(ZigZag_TrailingProfitMethod, ZigZag_TrailingStopMethod);
-    zigzag1_sparams.SetMaxSpread(ZigZag1_MaxSpread);
-    zigzag1_sparams.SetId(ZIGZAG1);
-    strats.Add(new Stg_ZigZag(zigzag1_sparams, "ZigZag1"));
-  }
-  if ((ZigZag_Active_Tf & M5B) == M5B) {
-    ZigZag_Params zigzag5_iparams(ZigZag_Depth, ZigZag_Deviation, ZigZag_Backstep);
-    StgParams zigzag5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_ZigZag(zigzag5_iparams, zigzag_iparams, cparams5), NULL, NULL);
-    zigzag5_sparams.SetSignals(ZigZag5_SignalMethod, ZigZag5_OpenCondition1, ZigZag5_OpenCondition2, ZigZag5_CloseCondition, NULL, ZigZag_SignalLevel, NULL);
-    zigzag5_sparams.SetStops(ZigZag_TrailingProfitMethod, ZigZag_TrailingStopMethod);
-    zigzag5_sparams.SetMaxSpread(ZigZag5_MaxSpread);
-    zigzag5_sparams.SetId(ZIGZAG5);
-    strats.Add(new Stg_ZigZag(zigzag5_sparams, "ZigZag5"));
-  }
-  if ((ZigZag_Active_Tf & M15B) == M15B) {
-    ZigZag_Params zigzag15_iparams(ZigZag_Depth, ZigZag_Deviation, ZigZag_Backstep);
-    StgParams zigzag15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_ZigZag(zigzag15_iparams, zigzag_iparams, cparams15), NULL, NULL);
-    zigzag15_sparams.SetSignals(ZigZag15_SignalMethod, ZigZag15_OpenCondition1, ZigZag15_OpenCondition2, ZigZag15_CloseCondition, NULL, ZigZag_SignalLevel, NULL);
-    zigzag15_sparams.SetStops(ZigZag_TrailingProfitMethod, ZigZag_TrailingStopMethod);
-    zigzag15_sparams.SetMaxSpread(ZigZag15_MaxSpread);
-    zigzag15_sparams.SetId(ZIGZAG15);
-    strats.Add(new Stg_ZigZag(zigzag15_sparams, "ZigZag15"));
-  }
-  if ((ZigZag_Active_Tf & M30B) == M30B) {
-    ZigZag_Params zigzag30_iparams(ZigZag_Depth, ZigZag_Deviation, ZigZag_Backstep);
-    StgParams zigzag30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_ZigZag(zigzag30_iparams, zigzag_iparams, cparams30), NULL, NULL);
-    zigzag30_sparams.SetSignals(ZigZag30_SignalMethod, ZigZag30_OpenCondition1, ZigZag30_OpenCondition2, ZigZag30_CloseCondition, NULL, ZigZag_SignalLevel, NULL);
-    zigzag30_sparams.SetStops(ZigZag_TrailingProfitMethod, ZigZag_TrailingStopMethod);
-    zigzag30_sparams.SetMaxSpread(ZigZag30_MaxSpread);
-    zigzag30_sparams.SetId(ZIGZAG30);
-    strats.Add(new Stg_ZigZag(zigzag30_sparams, "ZigZag30"));
-  }
+  if ((ZigZag_Active_Tf & M1B) == M1B) { strats.Add(Stg_ZigZag::Init_M1()); }
+  if ((ZigZag_Active_Tf & M5B) == M5B) { strats.Add(Stg_ZigZag::Init_M5()); }
+  if ((ZigZag_Active_Tf & M15B) == M15B) { strats.Add(Stg_ZigZag::Init_M15()); }
+  if ((ZigZag_Active_Tf & M30B) == M30B) { strats.Add(Stg_ZigZag::Init_M30()); }
 
   Strategy *_strat;
   for (uint sid = 0; sid < strats.GetSize(); sid++) {
