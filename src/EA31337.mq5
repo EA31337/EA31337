@@ -1227,6 +1227,7 @@ bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, Strategy *_strat, double volume = E
       StringFormat("Maximum open and pending orders has reached the limit (MaxOrders) [%d>=%d].", total_orders, max_orders),
       "Info", __FUNCTION__, __LINE__, VerboseInfo
       );
+    //PrintFormat("DEBUG: %s (%d vs %d)", _strat.GetName(), _strat.GetId(), (uint) _strat.GetId());
     OrderQueueAdd((uint) _strat.GetId(), cmd);
     result = false;
   } else if (GetTotalOrdersByType((uint) _strat.GetId()) >= GetMaxOrdersPerType()) {
@@ -3416,8 +3417,8 @@ bool CheckMarketCondition1(Chart *_chart, ENUM_ORDER_TYPE cmd, long condition = 
  */
 Strategy *GetStratByIndiType(ENUM_INDICATOR_TYPE _indi, Chart *_chart) {
   Strategy *_strat;
-  for (uint sid = 0; sid < strats.GetSize(); sid++) {
-    _strat = ((Strategy *) strats.GetByIndex(sid));
+  for (uint _sid = 0; _sid < strats.GetSize(); _sid++) {
+    _strat = ((Strategy *) strats.GetByIndex(_sid));
     if (_strat.Data().GetIndicatorType() == _indi && _strat.GetTf() == _chart.GetTf()) {
       return _strat;
     }
@@ -6703,8 +6704,8 @@ ulong GetStrategySignalMethod(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _t
 /**
  * Fetch strategy timeframe based on the strategy type.
  */
-ENUM_TIMEFRAMES GetStrategyTimeframe(int sid) {
-  Strategy *_strat = strats.GetById(sid);
+ENUM_TIMEFRAMES GetStrategyTimeframe(uint _sid) {
+  Strategy *_strat = strats.GetById(_sid);
   return _strat.GetTf();
 }
 
@@ -6716,8 +6717,8 @@ ulong GetStrategyViaIndicator(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _t
   ulong _result = EMPTY;
   bool _found = false;
   Strategy *_strat;
-  for (uint sid = 0; sid < strats.GetSize(); sid++) {
-    _strat = ((Strategy *) strats.GetByIndex(sid));
+  for (uint _id = 0; _id < strats.GetSize(); _id++) {
+    _strat = ((Strategy *) strats.GetByIndex(_id));
     if (_strat.Data().GetIndicatorType() == _indicator && _strat.GetTf() == _tf) {
       _result = _strat.GetId();
       _found = true;
@@ -7698,14 +7699,14 @@ int OrderQueueNext(int index = EMPTY) {
 /**
  * Add new order to the queue.
  */
-bool OrderQueueAdd(int sid, ENUM_ORDER_TYPE cmd) {
+bool OrderQueueAdd(uint _sid, ENUM_ORDER_TYPE cmd) {
   DEBUG_CHECKPOINT_ADD
   bool result = false;
   int qid = EMPTY, size = ArrayRange(order_queue, 0);
   for (int i = 0; i < size; i++) {
-    if (order_queue[i][Q_SID] == sid && order_queue[i][Q_CMD] == cmd) {
+    if (order_queue[i][Q_SID] == _sid && order_queue[i][Q_CMD] == cmd) {
       order_queue[i][Q_TOTAL]++;
-      if (VerboseTrace) PrintFormat("%s(): Added qid %d with sid: %d, cmd: %d, time: %d, total: %d", __FUNCTION__, i, sid, cmd, time_current, order_queue[i][Q_TOTAL]);
+      if (VerboseTrace) PrintFormat("%s(): Added qid %d with sid: %d, cmd: %d, time: %d, total: %d", __FUNCTION__, i, _sid, cmd, time_current, order_queue[i][Q_TOTAL]);
       return (true); // Increase the existing if it's there.
     }
     if (order_queue[i][Q_SID] == EMPTY) { qid = i; break; } // Find the empty qid.
@@ -7714,12 +7715,12 @@ bool OrderQueueAdd(int sid, ENUM_ORDER_TYPE cmd) {
   if (qid == EMPTY) {
     return (false);
   } else {
-    order_queue[qid][Q_SID] = sid;
+    order_queue[qid][Q_SID] = _sid;
     order_queue[qid][Q_CMD] = cmd;
     order_queue[qid][Q_TIME] = time_current;
     order_queue[qid][Q_TOTAL] = 1;
     result = true;
-    if (VerboseTrace) PrintFormat("%s(): Added qid: %d with sid: %d, cmd: %d, time: %d, total: %d", __FUNCTION__, qid, sid, cmd, time_current, 1);
+    if (VerboseTrace) PrintFormat("%s(): Added qid: %d with sid: %d, cmd: %d, time: %d, total: %d", __FUNCTION__, qid, _sid, cmd, time_current, 1);
   }
   return result;
 }
