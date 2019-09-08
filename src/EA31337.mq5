@@ -1538,57 +1538,57 @@ class Stg_AC : public Strategy {
     }
   }
 
-/**
- * Check if AC indicator is on buy or sell.
- *
- * @param
- *   _chart (Chart) - given chart to check
- *   cmd (int) - type of trade order command
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (float) - signal level to use
- */
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool _result = false;
-  double _ac_0 = ((Indi_AC *) this.Data()).GetValue(0);
-  double _ac_1 = ((Indi_AC *) this.Data()).GetValue(1);
-  double _ac_2 = ((Indi_AC *) this.Data()).GetValue(2);
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  bool is_valid = fmin(fmin(_ac_0, _ac_1), _ac_2) != 0;
-  switch (_cmd) {
-    /*
-      //1. Acceleration/Deceleration — AC
-      //Buy: if the indicator is above zero and 2 consecutive columns are green or if the indicator is below zero and 3 consecutive columns are green
-      //Sell: if the indicator is below zero and 2 consecutive columns are red or if the indicator is above zero and 3 consecutive columns are red
-      if ((iAC(NULL,piac,0)>=0&&iAC(NULL,piac,0)>iAC(NULL,piac,1)&&iAC(NULL,piac,1)>iAC(NULL,piac,2))||(iAC(NULL,piac,0)<=0
-      && iAC(NULL,piac,0)>iAC(NULL,piac,1)&&iAC(NULL,piac,1)>iAC(NULL,piac,2)&&iAC(NULL,piac,2)>iAC(NULL,piac,3)))
-      if ((iAC(NULL,piac,0)<=0&&iAC(NULL,piac,0)<iAC(NULL,piac,1)&&iAC(NULL,piac,1)<iAC(NULL,piac,2))||(iAC(NULL,piac,0)>=0
-      && iAC(NULL,piac,0)<iAC(NULL,piac,1)&&iAC(NULL,piac,1)<iAC(NULL,piac,2)&&iAC(NULL,piac,2)<iAC(NULL,piac,3)))
-    */
-    case ORDER_TYPE_BUY:
-      _result = _ac_0 > _signal_level1 && _ac_0 > _ac_1;
-      if (_signal_method != 0) {
-        _result &= is_valid;
-        if (METHOD(_signal_method, 0)) _result &= _ac_1 > _ac_2; // @todo: one more bar.
-        //if (METHOD(_signal_method, 0)) _result &= _ac_1 > _ac_2;
-      }
-    break;
-    case ORDER_TYPE_SELL:
-      _result = _ac_0 < -_signal_level1 && _ac_0 < _ac_1;
-      if (_signal_method != 0) {
-        _result &= is_valid;
-        if (METHOD(_signal_method, 0)) _result &= _ac_1 < _ac_2; // @todo: one more bar.
-        //if (METHOD(_signal_method, 0)) _result &= _ac_1 < _ac_2;
-      }
-    break;
+  /**
+   * Check if AC indicator is on buy or sell.
+   *
+   * @param
+   *   _chart (Chart) - given chart to check
+   *   cmd (int) - type of trade order command
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (float) - signal level to use
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double ac_0 = ((Indi_AC *) this.Data()).GetValue(0);
+    double ac_1 = ((Indi_AC *) this.Data()).GetValue(1);
+    double ac_2 = ((Indi_AC *) this.Data()).GetValue(2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    bool is_valid = fmin(fmin(ac_0, ac_1), ac_2) != 0;
+    switch (_cmd) {
+      /*
+        //1. Acceleration/Deceleration — AC
+        //Buy: if the indicator is above zero and 2 consecutive columns are green or if the indicator is below zero and 3 consecutive columns are green
+        //Sell: if the indicator is below zero and 2 consecutive columns are red or if the indicator is above zero and 3 consecutive columns are red
+        if ((iAC(NULL,piac,0)>=0&&iAC(NULL,piac,0)>iAC(NULL,piac,1)&&iAC(NULL,piac,1)>iAC(NULL,piac,2))||(iAC(NULL,piac,0)<=0
+        && iAC(NULL,piac,0)>iAC(NULL,piac,1)&&iAC(NULL,piac,1)>iAC(NULL,piac,2)&&iAC(NULL,piac,2)>iAC(NULL,piac,3)))
+        if ((iAC(NULL,piac,0)<=0&&iAC(NULL,piac,0)<iAC(NULL,piac,1)&&iAC(NULL,piac,1)<iAC(NULL,piac,2))||(iAC(NULL,piac,0)>=0
+        && iAC(NULL,piac,0)<iAC(NULL,piac,1)&&iAC(NULL,piac,1)<iAC(NULL,piac,2)&&iAC(NULL,piac,2)<iAC(NULL,piac,3)))
+      */
+      case ORDER_TYPE_BUY:
+        _result = ac_0 > _signal_level1 && ac_0 > ac_1;
+        if (_signal_method != 0) {
+          _result &= is_valid;
+          if (METHOD(_signal_method, 0)) _result &= ac_1 > ac_2; // @todo: one more bar.
+          //if (METHOD(_signal_method, 0)) _result &= ac_1 > ac_2;
+        }
+      break;
+      case ORDER_TYPE_SELL:
+        _result = ac_0 < -_signal_level1 && ac_0 < ac_1;
+        if (_signal_method != 0) {
+          _result &= is_valid;
+          if (METHOD(_signal_method, 0)) _result &= ac_1 < ac_2; // @todo: one more bar.
+          //if (METHOD(_signal_method, 0)) _result &= ac_1 < ac_2;
+        }
+      break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == _cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == _cmd;
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return _result;
-}
 
 };
 
@@ -1648,47 +1648,43 @@ class Stg_AD : public Strategy {
     }
   }
 
-/**
- * Check if A/D (Accumulation/Distribution) indicator is on buy or sell.
- *
- * Main principle - convergence/divergence.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_AD);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_AD, _chart.GetTf());
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_AD, _chart.GetTf());
-  switch (cmd) {
-    // Buy: indicator growth at downtrend.
-    case ORDER_TYPE_BUY:
-      result = ad[period][CURR] >= ad[period][PREV] + signal_level1 && chart.GetClose(0) <= chart.GetClose(1);
-      if (METHOD(signal_method, 0)) result &= Open[CURR] > Close[CURR];
-    break;
-    // Sell: indicator fall at uptrend.
-    case ORDER_TYPE_SELL:
-      result = ad[period][CURR] <= ad[period][PREV] - signal_level1 && chart.GetClose(0) >= chart.GetClose(1);
-      if (METHOD(signal_method, 0)) result &= Open[CURR] < Close[CURR];
-    break;
+  /**
+   * Check if A/D (Accumulation/Distribution) indicator is on buy or sell.
+   *
+   * Main principle - convergence/divergence.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double ad_0 = ((Indi_AD *) this.Data()).GetValue(0);
+    double ad_1 = ((Indi_AD *) this.Data()).GetValue(1);
+    double ad_2 = ((Indi_AD *) this.Data()).GetValue(2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    switch (cmd) {
+      // Buy: indicator growth at downtrend.
+      case ORDER_TYPE_BUY:
+        _result = ad_0 >= ad_1 + _signal_level1 && chart.GetClose(0) <= chart.GetClose(1);
+        if (METHOD(_signal_method, 0)) _result &= Open[CURR] > Close[CURR];
+      break;
+      // Sell: indicator fall at uptrend.
+      case ORDER_TYPE_SELL:
+        _result = ad_0 <= ad_1 - _signal_level1 && chart.GetClose(0) >= chart.GetClose(1);
+        if (METHOD(_signal_method, 0)) _result &= Open[CURR] < Close[CURR];
+      break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -1752,50 +1748,51 @@ class Stg_ADX : public Strategy {
     }
   }
 
-/**
- * Check if ADX indicator is on buy or sell.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_ADX);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ADX, _chart.GetTf());
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_ADX, _chart.GetTf(), 20);
-  switch (cmd) {
-    // Buy: +DI line is above -DI line, ADX is more than a certain value and grows (i.e. trend strengthens).
-    case ORDER_TYPE_BUY:
-      result = adx[period][CURR][LINE_MINUSDI] < adx[period][CURR][LINE_PLUSDI] && adx[period][CURR][LINE_MAIN_ADX] >= signal_level1;
-      if (METHOD(signal_method, 0)) result &= adx[period][CURR][LINE_MAIN_ADX] > adx[period][PREV][LINE_MAIN_ADX];
-      if (METHOD(signal_method, 1)) result &= adx[period][PREV][LINE_MAIN_ADX] > adx[period][FAR][LINE_MAIN_ADX];
-    break;
-    // Sell: -DI line is above +DI line, ADX is more than a certain value and grows (i.e. trend strengthens).
-    case ORDER_TYPE_SELL:
-      result = adx[period][CURR][LINE_MINUSDI] > adx[period][CURR][LINE_PLUSDI] && adx[period][CURR][LINE_MAIN_ADX] >= signal_level1;
-      if (METHOD(signal_method, 0)) result &= adx[period][CURR][LINE_MAIN_ADX] > adx[period][PREV][LINE_MAIN_ADX];
-      if (METHOD(signal_method, 1)) result &= adx[period][PREV][LINE_MAIN_ADX] > adx[period][FAR][LINE_MAIN_ADX];
-    break;
+  /**
+   * Check if ADX indicator is on buy or sell.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double adx_0_main    = ((Indi_ADX *) this.Data()).GetValue(LINE_MAIN_ADX, 0);
+    double adx_0_plusdi  = ((Indi_ADX *) this.Data()).GetValue(LINE_PLUSDI, 0);
+    double adx_0_minusdi = ((Indi_ADX *) this.Data()).GetValue(LINE_MINUSDI, 0);
+    double adx_1_main    = ((Indi_ADX *) this.Data()).GetValue(LINE_MAIN_ADX, 1);
+    double adx_1_plusdi  = ((Indi_ADX *) this.Data()).GetValue(LINE_PLUSDI, 1);
+    double adx_1_minusdi = ((Indi_ADX *) this.Data()).GetValue(LINE_MINUSDI, 1);
+    double adx_2_main    = ((Indi_ADX *) this.Data()).GetValue(LINE_MAIN_ADX, 2);
+    double adx_2_plusdi  = ((Indi_ADX *) this.Data()).GetValue(LINE_PLUSDI, 2);
+    double adx_2_minusdi = ((Indi_ADX *) this.Data()).GetValue(LINE_MINUSDI, 2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    switch (cmd) {
+      // Buy: +DI line is above -DI line, ADX is more than a certain value and grows (i.e. trend strengthens).
+      case ORDER_TYPE_BUY:
+        _result = adx_0_minusdi < adx_0_plusdi && adx_0_main >= _signal_level1;
+        if (METHOD(_signal_method, 0)) _result &= adx_0_main > adx_1_main;
+        if (METHOD(_signal_method, 1)) _result &= adx_1_main > adx_2_main;
+      break;
+      // Sell: -DI line is above +DI line, ADX is more than a certain value and grows (i.e. trend strengthens).
+      case ORDER_TYPE_SELL:
+        _result = adx_0_minusdi > adx_0_plusdi && adx_0_main >= _signal_level1;
+        if (METHOD(_signal_method, 0)) _result &= adx_0_main > adx_1_main;
+        if (METHOD(_signal_method, 1)) _result &= adx_1_main > adx_2_main;
+      break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
-
 
 class Stg_Alligator : public Strategy {
 
@@ -1873,91 +1870,89 @@ class Stg_Alligator : public Strategy {
     }
   }
 
-/**
- * Check if Alligator indicator is on buy or sell.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  // [x][0] - The Blue line (Alligator's Jaw), [x][1] - The Red Line (Alligator's Teeth), [x][2] - The Green Line (Alligator's Lips)
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_ALLIGATOR);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ALLIGATOR, _chart.GetTf());
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_ALLIGATOR, _chart.GetTf());
-  double gap = signal_level1 * pip_size;
-
-  switch(cmd) {
-    case ORDER_TYPE_BUY:
-      result = (
-        alligator[period][CURR][LINE_LIPS] > alligator[period][CURR][LINE_TEETH] + gap && // Check if Lips are above Teeth ...
-        alligator[period][CURR][LINE_TEETH] > alligator[period][CURR][LINE_JAW] + gap // ... Teeth are above Jaw ...
-        );
-      if (signal_method != 0) {
-        if (METHOD(signal_method, 0)) result &= (
-          alligator[period][CURR][LINE_LIPS] > alligator[period][PREV][LINE_LIPS] && // Check if Lips increased.
-          alligator[period][CURR][LINE_TEETH] > alligator[period][PREV][LINE_TEETH] && // Check if Teeth increased.
-          alligator[period][CURR][LINE_JAW] > alligator[period][PREV][LINE_JAW] // // Check if Jaw increased.
+  /**
+   * Check if Alligator indicator is on buy or sell.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    // [x][0] - The Blue line (Alligator's Jaw), [x][1] - The Red Line (Alligator's Teeth), [x][2] - The Green Line (Alligator's Lips)
+    bool _result = false;
+    double alligator_0_jaw   = ((Indi_Alligator *) this.Data()).GetValue(LINE_JAW, 0);
+    double alligator_0_teeth = ((Indi_Alligator *) this.Data()).GetValue(LINE_TEETH, 0);
+    double alligator_0_lips  = ((Indi_Alligator *) this.Data()).GetValue(LINE_LIPS, 0);
+    double alligator_1_jaw   = ((Indi_Alligator *) this.Data()).GetValue(LINE_JAW, 1);
+    double alligator_1_teeth = ((Indi_Alligator *) this.Data()).GetValue(LINE_TEETH, 1);
+    double alligator_1_lips  = ((Indi_Alligator *) this.Data()).GetValue(LINE_LIPS, 1);
+    double alligator_2_jaw   = ((Indi_Alligator *) this.Data()).GetValue(LINE_JAW, 2);
+    double alligator_2_teeth = ((Indi_Alligator *) this.Data()).GetValue(LINE_TEETH, 2);
+    double alligator_2_lips  = ((Indi_Alligator *) this.Data()).GetValue(LINE_LIPS, 2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    double gap = _signal_level1 * pip_size;
+    switch(cmd) {
+      case ORDER_TYPE_BUY:
+        _result = (
+          alligator_0_lips > alligator_0_teeth + gap && // Check if Lips are above Teeth ...
+          alligator_0_teeth > alligator_0_jaw + gap // ... Teeth are above Jaw ...
           );
-        if (METHOD(signal_method, 1)) result &= (
-          alligator[period][PREV][LINE_LIPS] > alligator[period][FAR][LINE_LIPS] && // Check if Lips increased.
-          alligator[period][PREV][LINE_TEETH] > alligator[period][FAR][LINE_TEETH] && // Check if Teeth increased.
-          alligator[period][PREV][LINE_JAW] > alligator[period][FAR][LINE_JAW] // // Check if Jaw increased.
+        if (_signal_method != 0) {
+          if (METHOD(_signal_method, 0)) _result &= (
+            alligator_0_lips > alligator_1_lips && // Check if Lips increased.
+            alligator_0_teeth > alligator_1_teeth && // Check if Teeth increased.
+            alligator_0_jaw > alligator_1_jaw // // Check if Jaw increased.
+            );
+          if (METHOD(_signal_method, 1)) _result &= (
+            alligator_1_lips > alligator_2_lips && // Check if Lips increased.
+            alligator_1_teeth > alligator_2_teeth && // Check if Teeth increased.
+            alligator_1_jaw > alligator_2_jaw // // Check if Jaw increased.
+            );
+          if (METHOD(_signal_method, 2)) _result &= alligator_0_lips > alligator_2_lips; // Check if Lips increased.
+          if (METHOD(_signal_method, 3)) _result &= alligator_0_lips - alligator_0_teeth > alligator_0_teeth - alligator_0_jaw;
+          if (METHOD(_signal_method, 4)) _result &= (
+            alligator_2_lips <= alligator_2_teeth || // Check if Lips are below Teeth and ...
+            alligator_2_lips <= alligator_2_jaw || // ... Lips are below Jaw and ...
+            alligator_2_teeth <= alligator_2_jaw // ... Teeth are below Jaw ...
+            );
+        }
+        break;
+      case ORDER_TYPE_SELL:
+        _result = (
+          alligator_0_lips + gap < alligator_0_teeth && // Check if Lips are below Teeth and ...
+          alligator_0_teeth + gap < alligator_0_jaw // ... Teeth are below Jaw ...
           );
-        if (METHOD(signal_method, 2)) result &= alligator[period][CURR][LINE_LIPS] > alligator[period][FAR][LINE_LIPS]; // Check if Lips increased.
-        if (METHOD(signal_method, 3)) result &= alligator[period][CURR][LINE_LIPS] - alligator[period][CURR][LINE_TEETH] > alligator[period][CURR][LINE_TEETH] - alligator[period][CURR][LINE_JAW];
-        if (METHOD(signal_method, 4)) result &= (
-          alligator[period][FAR][LINE_LIPS] <= alligator[period][FAR][LINE_TEETH] || // Check if Lips are below Teeth and ...
-          alligator[period][FAR][LINE_LIPS] <= alligator[period][FAR][LINE_JAW] || // ... Lips are below Jaw and ...
-          alligator[period][FAR][LINE_TEETH] <= alligator[period][FAR][LINE_JAW] // ... Teeth are below Jaw ...
-          );
-      }
-      break;
-    case ORDER_TYPE_SELL:
-      result = (
-        alligator[period][CURR][LINE_LIPS] + gap < alligator[period][CURR][LINE_TEETH] && // Check if Lips are below Teeth and ...
-        alligator[period][CURR][LINE_TEETH] + gap < alligator[period][CURR][LINE_JAW] // ... Teeth are below Jaw ...
-        );
-      if (signal_method != 0) {
-        if (METHOD(signal_method, 0)) result &= (
-          alligator[period][CURR][LINE_LIPS] < alligator[period][PREV][LINE_LIPS] && // Check if Lips decreased.
-          alligator[period][CURR][LINE_TEETH] < alligator[period][PREV][LINE_TEETH] && // Check if Teeth decreased.
-          alligator[period][CURR][LINE_JAW] < alligator[period][PREV][LINE_JAW] // // Check if Jaw decreased.
-          );
-        if (METHOD(signal_method, 1)) result &= (
-          alligator[period][PREV][LINE_LIPS] < alligator[period][FAR][LINE_LIPS] && // Check if Lips decreased.
-          alligator[period][PREV][LINE_TEETH] < alligator[period][FAR][LINE_TEETH] && // Check if Teeth decreased.
-          alligator[period][PREV][LINE_JAW] < alligator[period][FAR][LINE_JAW] // // Check if Jaw decreased.
-          );
-        if (METHOD(signal_method, 2)) result &= alligator[period][CURR][LINE_LIPS] < alligator[period][FAR][LINE_LIPS]; // Check if Lips decreased.
-        if (METHOD(signal_method, 3)) result &= alligator[period][CURR][LINE_TEETH] - alligator[period][CURR][LINE_LIPS] > alligator[period][CURR][LINE_JAW] - alligator[period][CURR][LINE_TEETH];
-        if (METHOD(signal_method, 4)) result &= (
-          alligator[period][FAR][LINE_LIPS] >= alligator[period][FAR][LINE_TEETH] || // Check if Lips are above Teeth ...
-          alligator[period][FAR][LINE_LIPS] >= alligator[period][FAR][LINE_JAW] || // ... Lips are above Jaw ...
-          alligator[period][FAR][LINE_TEETH] >= alligator[period][FAR][LINE_JAW] // ... Teeth are above Jaw ...
-          );
-      }
-      break;
+        if (_signal_method != 0) {
+          if (METHOD(_signal_method, 0)) _result &= (
+            alligator_0_lips < alligator_1_lips && // Check if Lips decreased.
+            alligator_0_teeth < alligator_1_teeth && // Check if Teeth decreased.
+            alligator_0_jaw < alligator_1_jaw // // Check if Jaw decreased.
+            );
+          if (METHOD(_signal_method, 1)) _result &= (
+            alligator_1_lips < alligator_2_lips && // Check if Lips decreased.
+            alligator_1_teeth < alligator_2_teeth && // Check if Teeth decreased.
+            alligator_1_jaw < alligator_2_jaw // // Check if Jaw decreased.
+            );
+          if (METHOD(_signal_method, 2)) _result &= alligator_0_lips < alligator_2_lips; // Check if Lips decreased.
+          if (METHOD(_signal_method, 3)) _result &= alligator_0_teeth - alligator_0_lips > alligator_0_jaw - alligator_0_teeth;
+          if (METHOD(_signal_method, 4)) _result &= (
+            alligator_2_lips >= alligator_2_teeth || // Check if Lips are above Teeth ...
+            alligator_2_lips >= alligator_2_jaw || // ... Lips are above Jaw ...
+            alligator_2_teeth >= alligator_2_jaw // ... Teeth are above Jaw ...
+            );
+        }
+        break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  if (VerboseTrace && result) {
-    PrintFormat("%s:%d: Signal: %d/%d/%d/%g; Trend: %g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level1, curr_trend);
-  }
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -2021,67 +2016,53 @@ class Stg_ATR : public Strategy {
     }
   }
 
-/**
- * Check if ATR indicator is on buy or sell.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_ATR);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ATR, _chart.GetTf());
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_ATR, _chart.GetTf());
-  switch (cmd) {
-    //   if(iATR(NULL,0,12,0)>iATR(NULL,0,20,0)) return(0);
-    /*
-      //6. Average True Range - ATR
-      //Doesn't give independent signals. Is used to define volatility (trend strength).
-      //principle: trend must be strengthened. Together with that ATR grows.
-      //Because of the chart form it is inconvenient to analyze rise/fall. Only exceeding of threshold value is checked.
-      //Flag is 1 when ATR is above threshold value (i.e. there is a trend), 0 - when ATR is below threshold value, -1 - never.
-      if (iATR(NULL,piatr,piatru,0)>=minatr)
-      {f6=1;}
-    */
-    case ORDER_TYPE_BUY:
-      //bool result = atr[period][CURR];
+  /**
+   * Check if ATR indicator is on buy or sell.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double atr_0 = ((Indi_ATR *) this.Data()).GetValue(0);
+    double atr_1 = ((Indi_ATR *) this.Data()).GetValue(1);
+    double atr_2 = ((Indi_ATR *) this.Data()).GetValue(2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    switch (cmd) {
+      //   if(iATR(NULL,0,12,0)>iATR(NULL,0,20,0)) return(0);
       /*
-        if (METHOD(signal_method, 0)) result &= Open[CURR] > Close[CURR];
-        if (METHOD(signal_method, 1)) result &= !ATR_On_Sell(tf);
-        if (METHOD(signal_method, 2)) result &= ATR_On_Buy(fmin(period + 1, M30));
-        if (METHOD(signal_method, 3)) result &= ATR_On_Buy(M30);
-        if (METHOD(signal_method, 4)) result &= ATR[period][FAR][LINE_LOWER] != 0.0;
-        if (METHOD(signal_method, 5)) result &= !ATR_On_Sell(M30);
+        //6. Average True Range - ATR
+        //Doesn't give independent signals. Is used to define volatility (trend strength).
+        //principle: trend must be strengthened. Together with that ATR grows.
+        //Because of the chart form it is inconvenient to analyze rise/fall. Only exceeding of threshold value is checked.
+        //Flag is 1 when ATR is above threshold value (i.e. there is a trend), 0 - when ATR is below threshold value, -1 - never.
+        if (iATR(NULL,piatr,piatru,0)>=minatr)
+        {f6=1;}
+      */
+      case ORDER_TYPE_BUY:
+        //bool _result = atr_0;
+        /*
+          if (METHOD(_signal_method, 0)) _result &= Open[CURR] > Close[CURR];
+          */
+      break;
+      case ORDER_TYPE_SELL:
+        /*
+          bool _result = ATR_0[LINE_UPPER] != 0.0 || ATR_1[LINE_UPPER] != 0.0 || ATR_2[LINE_UPPER] != 0.0;
+          if (METHOD(_signal_method, 0)) _result &= Open[CURR] < Close[CURR];
         */
-    break;
-    case ORDER_TYPE_SELL:
-      /*
-        bool result = ATR[period][CURR][LINE_UPPER] != 0.0 || ATR[period][PREV][LINE_UPPER] != 0.0 || ATR[period][FAR][LINE_UPPER] != 0.0;
-        if (METHOD(signal_method, 0)) result &= Open[CURR] < Close[CURR];
-        if (METHOD(signal_method, 1)) result &= !ATR_On_Buy(tf);
-        if (METHOD(signal_method, 2)) result &= ATR_On_Sell(fmin(period + 1, M30));
-        if (METHOD(signal_method, 3)) result &= ATR_On_Sell(M30);
-        if (METHOD(signal_method, 4)) result &= ATR[period][FAR][LINE_UPPER] != 0.0;
-        if (METHOD(signal_method, 5)) result &= !ATR_On_Buy(M30);
-        */
-    break;
+      break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -2142,66 +2123,62 @@ class Stg_Awesome : public Strategy {
     }
   }
 
-/**
- * Check if Awesome indicator is on buy or sell.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_AO);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_AO, _chart.GetTf());
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_AO, _chart.GetTf());
-  switch (cmd) {
-    /*
-      //7. Awesome Oscillator
-      //Buy: 1. Signal "saucer" (3 positive columns, medium column is smaller than 2 others); 2. Changing from negative values to positive.
-      //Sell: 1. Signal "saucer" (3 negative columns, medium column is larger than 2 others); 2. Changing from positive values to negative.
-      if ((iAO(NULL,piao,2)>0&&iAO(NULL,piao,1)>0&&iAO(NULL,piao,0)>0&&iAO(NULL,piao,1)<iAO(NULL,piao,2)&&iAO(NULL,piao,1)<iAO(NULL,piao,0))||(iAO(NULL,piao,1)<0&&iAO(NULL,piao,0)>0))
-      {f7=1;}
-      if ((iAO(NULL,piao,2)<0&&iAO(NULL,piao,1)<0&&iAO(NULL,piao,0)<0&&iAO(NULL,piao,1)>iAO(NULL,piao,2)&&iAO(NULL,piao,1)>iAO(NULL,piao,0))||(iAO(NULL,piao,1)>0&&iAO(NULL,piao,0)<0))
-      {f7=-1;}
-    */
-    case ORDER_TYPE_BUY:
+  /**
+   * Check if Awesome indicator is on buy or sell.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double ao_0 = ((Indi_AO *) this.Data()).GetValue(0);
+    double ao_1 = ((Indi_AO *) this.Data()).GetValue(1);
+    double ao_2 = ((Indi_AO *) this.Data()).GetValue(2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    switch (cmd) {
       /*
-        bool result = Awesome[period][CURR][LINE_LOWER] != 0.0 || Awesome[period][PREV][LINE_LOWER] != 0.0 || Awesome[period][FAR][LINE_LOWER] != 0.0;
-        if (METHOD(signal_method, 0)) result &= Open[CURR] > Close[CURR];
-        if (METHOD(signal_method, 1)) result &= !Awesome_On_Sell(tf);
-        if (METHOD(signal_method, 2)) result &= Awesome_On_Buy(fmin(period + 1, M30));
-        if (METHOD(signal_method, 3)) result &= Awesome_On_Buy(M30);
-        if (METHOD(signal_method, 4)) result &= Awesome[period][FAR][LINE_LOWER] != 0.0;
-        if (METHOD(signal_method, 5)) result &= !Awesome_On_Sell(M30);
-        */
-    break;
-    case ORDER_TYPE_SELL:
-      /*
-        bool result = Awesome[period][CURR][LINE_UPPER] != 0.0 || Awesome[period][PREV][LINE_UPPER] != 0.0 || Awesome[period][FAR][LINE_UPPER] != 0.0;
-        if (METHOD(signal_method, 0)) result &= Open[CURR] < Close[CURR];
-        if (METHOD(signal_method, 1)) result &= !Awesome_On_Buy(tf);
-        if (METHOD(signal_method, 2)) result &= Awesome_On_Sell(fmin(period + 1, M30));
-        if (METHOD(signal_method, 3)) result &= Awesome_On_Sell(M30);
-        if (METHOD(signal_method, 4)) result &= Awesome[period][FAR][LINE_UPPER] != 0.0;
-        if (METHOD(signal_method, 5)) result &= !Awesome_On_Buy(M30);
-        */
-    break;
+        //7. Awesome Oscillator
+        //Buy: 1. Signal "saucer" (3 positive columns, medium column is smaller than 2 others); 2. Changing from negative values to positive.
+        //Sell: 1. Signal "saucer" (3 negative columns, medium column is larger than 2 others); 2. Changing from positive values to negative.
+        if ((iAO(NULL,piao,2)>0&&iAO(NULL,piao,1)>0&&iAO(NULL,piao,0)>0&&iAO(NULL,piao,1)<iAO(NULL,piao,2)&&iAO(NULL,piao,1)<iAO(NULL,piao,0))||(iAO(NULL,piao,1)<0&&iAO(NULL,piao,0)>0))
+        {f7=1;}
+        if ((iAO(NULL,piao,2)<0&&iAO(NULL,piao,1)<0&&iAO(NULL,piao,0)<0&&iAO(NULL,piao,1)>iAO(NULL,piao,2)&&iAO(NULL,piao,1)>iAO(NULL,piao,0))||(iAO(NULL,piao,1)>0&&iAO(NULL,piao,0)<0))
+        {f7=-1;}
+      */
+      case ORDER_TYPE_BUY:
+        /*
+          bool _result = Awesome_0[LINE_LOWER] != 0.0 || Awesome_1[LINE_LOWER] != 0.0 || Awesome_2[LINE_LOWER] != 0.0;
+          if (METHOD(_signal_method, 0)) _result &= Open[CURR] > Close[CURR];
+          if (METHOD(_signal_method, 1)) _result &= !Awesome_On_Sell(tf);
+          if (METHOD(_signal_method, 2)) _result &= Awesome_On_Buy(fmin(period + 1, M30));
+          if (METHOD(_signal_method, 3)) _result &= Awesome_On_Buy(M30);
+          if (METHOD(_signal_method, 4)) _result &= Awesome_2[LINE_LOWER] != 0.0;
+          if (METHOD(_signal_method, 5)) _result &= !Awesome_On_Sell(M30);
+          */
+      break;
+      case ORDER_TYPE_SELL:
+        /*
+          bool _result = Awesome_0[LINE_UPPER] != 0.0 || Awesome_1[LINE_UPPER] != 0.0 || Awesome_2[LINE_UPPER] != 0.0;
+          if (METHOD(_signal_method, 0)) _result &= Open[CURR] < Close[CURR];
+          if (METHOD(_signal_method, 1)) _result &= !Awesome_On_Buy(tf);
+          if (METHOD(_signal_method, 2)) _result &= Awesome_On_Sell(fmin(period + 1, M30));
+          if (METHOD(_signal_method, 3)) _result &= Awesome_On_Sell(M30);
+          if (METHOD(_signal_method, 4)) _result &= Awesome_2[LINE_UPPER] != 0.0;
+          if (METHOD(_signal_method, 5)) _result &= !Awesome_On_Buy(M30);
+          */
+      break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -2265,78 +2242,76 @@ class Stg_Bands : public Strategy {
     }
   }
 
-/**
- * Check if Bands indicator is on buy or sell.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_BANDS);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_BANDS, _chart.GetTf());
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_BANDS, _chart.GetTf());
-  double lowest = fmin(Low[CURR], fmin(Low[PREV], Low[FAR]));
-  double highest = fmax(High[CURR], fmax(High[PREV], High[FAR]));
-  double level = signal_level1 * pip_size;
-  switch (cmd) {
-    // Buy: price crossed lower line upwards (returned to it from below).
-    case ORDER_TYPE_BUY:
-      // Price value was lower than the lower band.
-      result = (
-          lowest > 0 && lowest < fmax(fmax(bands[period][CURR][BAND_LOWER], bands[period][PREV][BAND_LOWER]), bands[period][FAR][BAND_LOWER])
-          ) - level;
-      if (signal_method != 0) {
-        if (METHOD(signal_method, 0)) result &= fmin(Close[PREV], Close[FAR]) < bands[period][CURR][BAND_LOWER];
-        if (METHOD(signal_method, 1)) result &= (bands[period][CURR][BAND_LOWER] > bands[period][FAR][BAND_LOWER]);
-        if (METHOD(signal_method, 2)) result &= (bands[period][CURR][BAND_BASE] > bands[period][FAR][BAND_BASE]);
-        if (METHOD(signal_method, 3)) result &= (bands[period][CURR][BAND_UPPER] > bands[period][FAR][BAND_UPPER]);
-        if (METHOD(signal_method, 4)) result &= highest > bands[period][CURR][BAND_BASE];
-        if (METHOD(signal_method, 5)) result &= Open[CURR] < bands[period][CURR][BAND_BASE];
-        if (METHOD(signal_method, 6)) result &= fmin(Close[PREV], Close[FAR]) > bands[period][CURR][BAND_BASE];
-        // if (METHOD(signal_method, 7)) result &= !Trade_Bands(Convert::NegateOrderType(cmd), (ENUM_TIMEFRAMES) Convert::IndexToTf(fmin(period + 1, M30)));
-      }
-      break;
-    // Sell: price crossed upper line downwards (returned to it from above).
-    case ORDER_TYPE_SELL:
-      // Price value was higher than the upper band.
-      result = (
-          lowest > 0 && highest > fmin(fmin(bands[period][CURR][BAND_UPPER], bands[period][PREV][BAND_UPPER]), bands[period][FAR][BAND_UPPER])
-          ) + level;
-      if (signal_method != 0) {
-        if (METHOD(signal_method, 0)) result &= fmin(Close[PREV], Close[FAR]) > bands[period][CURR][BAND_UPPER];
-        if (METHOD(signal_method, 1)) result &= (bands[period][CURR][BAND_LOWER] < bands[period][FAR][BAND_LOWER]);
-        if (METHOD(signal_method, 2)) result &= (bands[period][CURR][BAND_BASE] < bands[period][FAR][BAND_BASE]);
-        if (METHOD(signal_method, 3)) result &= (bands[period][CURR][BAND_UPPER] < bands[period][FAR][BAND_UPPER]);
-        if (METHOD(signal_method, 4)) result &= lowest < bands[period][CURR][BAND_BASE];
-        if (METHOD(signal_method, 5)) result &= Open[CURR] > bands[period][CURR][BAND_BASE];
-        if (METHOD(signal_method, 6)) result &= fmin(Close[PREV], Close[FAR]) < bands[period][CURR][BAND_BASE];
-        // if (METHOD(signal_method, 7)) result &= !Trade_Bands(Convert::NegateOrderType(cmd), (ENUM_TIMEFRAMES) Convert::IndexToTf(fmin(period + 1, M30)));
-      }
-      break;
+  /**
+   * Check if Bands indicator is on buy or sell.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double bands_0_base  = ((Indi_Bands *) this.Data()).GetValue(BAND_BASE, 0);
+    double bands_0_lower = ((Indi_Bands *) this.Data()).GetValue(BAND_LOWER, 0);
+    double bands_0_upper = ((Indi_Bands *) this.Data()).GetValue(BAND_UPPER, 0);
+    double bands_1_base  = ((Indi_Bands *) this.Data()).GetValue(BAND_BASE, 1);
+    double bands_1_lower = ((Indi_Bands *) this.Data()).GetValue(BAND_LOWER, 1);
+    double bands_1_upper = ((Indi_Bands *) this.Data()).GetValue(BAND_UPPER, 1);
+    double bands_2_base  = ((Indi_Bands *) this.Data()).GetValue(BAND_BASE, 2);
+    double bands_2_lower = ((Indi_Bands *) this.Data()).GetValue(BAND_LOWER, 2);
+    double bands_2_upper = ((Indi_Bands *) this.Data()).GetValue(BAND_UPPER, 2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    double lowest = fmin(Low[CURR], fmin(Low[PREV], Low[FAR]));
+    double highest = fmax(High[CURR], fmax(High[PREV], High[FAR]));
+    double level = _signal_level1 * pip_size;
+    switch (cmd) {
+      // Buy: price crossed lower line upwards (returned to it from below).
+      case ORDER_TYPE_BUY:
+        // Price value was lower than the lower band.
+        _result = (
+            lowest > 0 && lowest < fmax(fmax(bands_0_lower, bands_1_lower), bands_2_lower)
+            ) - level;
+        if (_signal_method != 0) {
+          if (METHOD(_signal_method, 0)) _result &= fmin(Close[PREV], Close[FAR]) < bands_0_lower;
+          if (METHOD(_signal_method, 1)) _result &= (bands_0_lower > bands_2_lower);
+          if (METHOD(_signal_method, 2)) _result &= (bands_0_base > bands_2_base);
+          if (METHOD(_signal_method, 3)) _result &= (bands_0_upper > bands_2_upper);
+          if (METHOD(_signal_method, 4)) _result &= highest > bands_0_base;
+          if (METHOD(_signal_method, 5)) _result &= Open[CURR] < bands_0_base;
+          if (METHOD(_signal_method, 6)) _result &= fmin(Close[PREV], Close[FAR]) > bands_0_base;
+          // if (METHOD(_signal_method, 7)) _result &= !Trade_Bands(Convert::NegateOrderType(cmd), (ENUM_TIMEFRAMES) Convert::IndexToTf(fmin(period + 1, M30)));
+        }
+        break;
+      // Sell: price crossed upper line downwards (returned to it from above).
+      case ORDER_TYPE_SELL:
+        // Price value was higher than the upper band.
+        _result = (
+            lowest > 0 && highest > fmin(fmin(bands_0_upper, bands_1_upper), bands_2_upper)
+            ) + level;
+        if (_signal_method != 0) {
+          if (METHOD(_signal_method, 0)) _result &= fmin(Close[PREV], Close[FAR]) > bands_0_upper;
+          if (METHOD(_signal_method, 1)) _result &= (bands_0_lower < bands_2_lower);
+          if (METHOD(_signal_method, 2)) _result &= (bands_0_base < bands_2_base);
+          if (METHOD(_signal_method, 3)) _result &= (bands_0_upper < bands_2_upper);
+          if (METHOD(_signal_method, 4)) _result &= lowest < bands_0_base;
+          if (METHOD(_signal_method, 5)) _result &= Open[CURR] > bands_0_base;
+          if (METHOD(_signal_method, 6)) _result &= fmin(Close[PREV], Close[FAR]) < bands_0_base;
+          // if (METHOD(_signal_method, 7)) _result &= !Trade_Bands(Convert::NegateOrderType(cmd), (ENUM_TIMEFRAMES) Convert::IndexToTf(fmin(period + 1, M30)));
+        }
+        break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  if (VerboseTrace && result) {
-    terminal.Logger().Trace(StringFormat("Signal: %s/%s/%d/%g", EnumToString(cmd), _chart.TfToString(), signal_method, signal_level1), __FUNCTION_LINE__);
-  }
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
-
 
 class Stg_BearsPower : public Strategy {
 
@@ -2398,41 +2373,37 @@ class Stg_BearsPower : public Strategy {
     }
   }
 
-/**
- * Check if BearsPower indicator is on buy or sell.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_BEARS);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_BEARS, _chart.GetTf());
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_BEARS, _chart.GetTf());
-  switch (cmd) {
-    case ORDER_TYPE_BUY:
-      // @todo
-    break;
-    case ORDER_TYPE_SELL:
-      // @todo
-    break;
+  /**
+   * Check if BearsPower indicator is on buy or sell.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double bears_0 = ((Indi_BearsPower *) this.Data()).GetValue(0);
+    double bears_1 = ((Indi_BearsPower *) this.Data()).GetValue(1);
+    double bears_2 = ((Indi_BearsPower *) this.Data()).GetValue(2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    switch (cmd) {
+      case ORDER_TYPE_BUY:
+        // @todo
+      break;
+      case ORDER_TYPE_SELL:
+        // @todo
+      break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -2496,41 +2467,37 @@ class Stg_BullsPower : public Strategy {
     }
   }
 
-/**
- * Check if BullsPower indicator is on buy or sell.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_BULLS);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_BULLS, _chart.GetTf());
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_BULLS, _chart.GetTf());
-  switch (cmd) {
-    case ORDER_TYPE_BUY:
-      // @todo
-    break;
-    case ORDER_TYPE_SELL:
-      // @todo
-    break;
+  /**
+   * Check if BullsPower indicator is on buy or sell.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double bulls_0 = ((Indi_BullsPower *) this.Data()).GetValue(0);
+    double bulls_1 = ((Indi_BullsPower *) this.Data()).GetValue(1);
+    double bulls_2 = ((Indi_BullsPower *) this.Data()).GetValue(2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    switch (cmd) {
+      case ORDER_TYPE_BUY:
+        // @todo
+      break;
+      case ORDER_TYPE_SELL:
+        // @todo
+      break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -2590,57 +2557,43 @@ class Stg_BWMFI : public Strategy {
     }
   }
 
-/**
- * Check if BWMFI indicator is on buy or sell.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_BWMFI);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_BWMFI, _chart.GetTf());
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_BWMFI, _chart.GetTf());
-  switch (cmd) {
-    case ORDER_TYPE_BUY:
-      /*
-        bool result = BWMFI[period][CURR][LINE_LOWER] != 0.0 || BWMFI[period][PREV][LINE_LOWER] != 0.0 || BWMFI[period][FAR][LINE_LOWER] != 0.0;
-        if (METHOD(signal_method, 0)) result &= Open[CURR] > Close[CURR];
-        if (METHOD(signal_method, 1)) result &= !BWMFI_On_Sell(tf);
-        if (METHOD(signal_method, 2)) result &= BWMFI_On_Buy(fmin(period + 1, M30));
-        if (METHOD(signal_method, 3)) result &= BWMFI_On_Buy(M30);
-        if (METHOD(signal_method, 4)) result &= BWMFI[period][FAR][LINE_LOWER] != 0.0;
-        if (METHOD(signal_method, 5)) result &= !BWMFI_On_Sell(M30);
+  /**
+   * Check if BWMFI indicator is on buy or sell.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double bwmfi_0 = ((Indi_BWMFI *) this.Data()).GetValue(0);
+    double bwmfi_1 = ((Indi_BWMFI *) this.Data()).GetValue(1);
+    double bwmfi_2 = ((Indi_BWMFI *) this.Data()).GetValue(2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    switch (cmd) {
+      case ORDER_TYPE_BUY:
+        /*
+          bool _result = BWMFI_0[LINE_LOWER] != 0.0 || BWMFI_1[LINE_LOWER] != 0.0 || BWMFI_2[LINE_LOWER] != 0.0;
+          if (METHOD(_signal_method, 0)) _result &= Open[CURR] > Close[CURR];
         */
-    break;
-    case ORDER_TYPE_SELL:
-      /*
-        bool result = BWMFI[period][CURR][LINE_UPPER] != 0.0 || BWMFI[period][PREV][LINE_UPPER] != 0.0 || BWMFI[period][FAR][LINE_UPPER] != 0.0;
-        if (METHOD(signal_method, 0)) result &= Open[CURR] < Close[CURR];
-        if (METHOD(signal_method, 1)) result &= !BWMFI_On_Buy(tf);
-        if (METHOD(signal_method, 2)) result &= BWMFI_On_Sell(fmin(period + 1, M30));
-        if (METHOD(signal_method, 3)) result &= BWMFI_On_Sell(M30);
-        if (METHOD(signal_method, 4)) result &= BWMFI[period][FAR][LINE_UPPER] != 0.0;
-        if (METHOD(signal_method, 5)) result &= !BWMFI_On_Buy(M30);
+      break;
+      case ORDER_TYPE_SELL:
+        /*
+          bool _result = BWMFI_0[LINE_UPPER] != 0.0 || BWMFI_1[LINE_UPPER] != 0.0 || BWMFI_2[LINE_UPPER] != 0.0;
+          if (METHOD(_signal_method, 0)) _result &= Open[CURR] < Close[CURR];
         */
-    break;
+      break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -2704,60 +2657,53 @@ class Stg_CCI : public Strategy {
     }
   }
 
-/**
- * Check if CCI indicator is on buy or sell.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_CCI);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_CCI, _chart.GetTf());
-  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_CCI, _chart.GetTf(), 100);
-  switch (cmd) {
-    case ORDER_TYPE_BUY:
-      result = cci[period][CURR] > 0 && cci[period][CURR] < -signal_level1;
-      if (signal_method != 0) {
-        if (METHOD(signal_method, 0)) result &= cci[period][CURR] > cci[period][PREV];
-        if (METHOD(signal_method, 1)) result &= cci[period][PREV] > cci[period][FAR];
-        if (METHOD(signal_method, 2)) result &= cci[period][PREV] < -signal_level1;
-        if (METHOD(signal_method, 3)) result &= cci[period][FAR]  < -signal_level1;
-        if (METHOD(signal_method, 4)) result &= cci[period][CURR] - cci[period][PREV] > cci[period][PREV] - cci[period][FAR];
-        if (METHOD(signal_method, 5)) result &= cci[period][FAR] > 0;
-      }
-      break;
-    case ORDER_TYPE_SELL:
-      result = cci[period][CURR] > 0 && cci[period][CURR] > signal_level1;
-      if (signal_method != 0) {
-        if (METHOD(signal_method, 0)) result &= cci[period][CURR] < cci[period][PREV];
-        if (METHOD(signal_method, 1)) result &= cci[period][PREV] < cci[period][FAR];
-        if (METHOD(signal_method, 2)) result &= cci[period][PREV] > signal_level1;
-        if (METHOD(signal_method, 3)) result &= cci[period][FAR]  > signal_level1;
-        if (METHOD(signal_method, 4)) result &= cci[period][PREV] - cci[period][CURR] > cci[period][FAR] - cci[period][PREV];
-        if (METHOD(signal_method, 5)) result &= cci[period][FAR] < 0;
-      }
-      break;
+  /**
+   * Check if CCI indicator is on buy or sell.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double cci_0 = ((Indi_CCI *) this.Data()).GetValue(0);
+    double cci_1 = ((Indi_CCI *) this.Data()).GetValue(1);
+    double cci_2 = ((Indi_CCI *) this.Data()).GetValue(2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    switch (cmd) {
+      case ORDER_TYPE_BUY:
+        _result = cci_0 > 0 && cci_0 < -_signal_level1;
+        if (_signal_method != 0) {
+          if (METHOD(_signal_method, 0)) _result &= cci_0 > cci_1;
+          if (METHOD(_signal_method, 1)) _result &= cci_1 > cci_2;
+          if (METHOD(_signal_method, 2)) _result &= cci_1 < -_signal_level1;
+          if (METHOD(_signal_method, 3)) _result &= cci_2  < -_signal_level1;
+          if (METHOD(_signal_method, 4)) _result &= cci_0 - cci_1 > cci_1 - cci_2;
+          if (METHOD(_signal_method, 5)) _result &= cci_2 > 0;
+        }
+        break;
+      case ORDER_TYPE_SELL:
+        _result = cci_0 > 0 && cci_0 > _signal_level1;
+        if (_signal_method != 0) {
+          if (METHOD(_signal_method, 0)) _result &= cci_0 < cci_1;
+          if (METHOD(_signal_method, 1)) _result &= cci_1 < cci_2;
+          if (METHOD(_signal_method, 2)) _result &= cci_1 > _signal_level1;
+          if (METHOD(_signal_method, 3)) _result &= cci_2  > _signal_level1;
+          if (METHOD(_signal_method, 4)) _result &= cci_1 - cci_0 > cci_2 - cci_1;
+          if (METHOD(_signal_method, 5)) _result &= cci_2 < 0;
+        }
+        break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  if (VerboseTrace && result) {
-    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level1);
-  }
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -2821,61 +2767,54 @@ class Stg_DeMarker : public Strategy {
     }
   }
 
-/**
- * Check if DeMarker indicator is on buy or sell.
- * Demarker Technical Indicator is based on the comparison of the period maximum with the previous period maximum.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_DEMARKER);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_DEMARKER, _chart.GetTf());
-  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_DEMARKER, _chart.GetTf(), 0.5);
-  switch (cmd) {
-    case ORDER_TYPE_BUY:
-      result = demarker[period][CURR] < 0.5 - signal_level1;
-      if (signal_method != 0) {
-        if (METHOD(signal_method, 0)) result &= demarker[period][PREV] < 0.5 - signal_level1;
-        if (METHOD(signal_method, 1)) result &= demarker[period][FAR] < 0.5 - signal_level1; // @to-remove?
-        if (METHOD(signal_method, 2)) result &= demarker[period][CURR] < demarker[period][PREV]; // @to-remove?
-        if (METHOD(signal_method, 3)) result &= demarker[period][PREV] < demarker[period][FAR]; // @to-remove?
-        if (METHOD(signal_method, 4)) result &= demarker[period][PREV] < 0.5 - signal_level1 - signal_level1/2;
-      }
-      // PrintFormat("DeMarker buy: %g <= %g", demarker[period][CURR], 0.5 - signal_level1);
-      break;
-    case ORDER_TYPE_SELL:
-      result = demarker[period][CURR] > 0.5 + signal_level1;
-      if (signal_method != 0) {
-        if (METHOD(signal_method, 0)) result &= demarker[period][PREV] > 0.5 + signal_level1;
-        if (METHOD(signal_method, 1)) result &= demarker[period][FAR] > 0.5 + signal_level1;
-        if (METHOD(signal_method, 2)) result &= demarker[period][CURR] > demarker[period][PREV];
-        if (METHOD(signal_method, 3)) result &= demarker[period][PREV] > demarker[period][FAR];
-        if (METHOD(signal_method, 4)) result &= demarker[period][PREV] > 0.5 + signal_level1 + signal_level1/2;
-      }
-      // PrintFormat("DeMarker sell: %g >= %g", demarker[period][CURR], 0.5 + signal_level1);
-      break;
+  /**
+   * Check if DeMarker indicator is on buy or sell.
+   * Demarker Technical Indicator is based on the comparison of the period maximum with the previous period maximum.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double demarker_0 = ((Indi_DeMarker *) this.Data()).GetValue(0);
+    double demarker_1 = ((Indi_DeMarker *) this.Data()).GetValue(1);
+    double demarker_2 = ((Indi_DeMarker *) this.Data()).GetValue(2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    switch (cmd) {
+      case ORDER_TYPE_BUY:
+        _result = demarker_0 < 0.5 - _signal_level1;
+        if (_signal_method != 0) {
+          if (METHOD(_signal_method, 0)) _result &= demarker_1 < 0.5 - _signal_level1;
+          if (METHOD(_signal_method, 1)) _result &= demarker_2 < 0.5 - _signal_level1; // @to-remove?
+          if (METHOD(_signal_method, 2)) _result &= demarker_0 < demarker_1; // @to-remove?
+          if (METHOD(_signal_method, 3)) _result &= demarker_1 < demarker_2; // @to-remove?
+          if (METHOD(_signal_method, 4)) _result &= demarker_1 < 0.5 - _signal_level1 - _signal_level1/2;
+        }
+        // PrintFormat("DeMarker buy: %g <= %g", demarker_0, 0.5 - _signal_level1);
+        break;
+      case ORDER_TYPE_SELL:
+        _result = demarker_0 > 0.5 + _signal_level1;
+        if (_signal_method != 0) {
+          if (METHOD(_signal_method, 0)) _result &= demarker_1 > 0.5 + _signal_level1;
+          if (METHOD(_signal_method, 1)) _result &= demarker_2 > 0.5 + _signal_level1;
+          if (METHOD(_signal_method, 2)) _result &= demarker_0 > demarker_1;
+          if (METHOD(_signal_method, 3)) _result &= demarker_1 > demarker_2;
+          if (METHOD(_signal_method, 4)) _result &= demarker_1 > 0.5 + _signal_level1 + _signal_level1/2;
+        }
+        // PrintFormat("DeMarker sell: %g >= %g", demarker_0, 0.5 + _signal_level1);
+        break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  if (VerboseTrace && result) {
-    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level1);
-  }
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -2939,66 +2878,65 @@ class Stg_Envelopes : public Strategy {
     }
   }
 
-/**
- * Check if Envelopes indicator is on sell.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_ENVELOPES);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ENVELOPES, _chart.GetTf());
-  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_ENVELOPES, _chart.GetTf());
-  switch (cmd) {
-    case ORDER_TYPE_BUY:
-      result = Low[CURR] < envelopes[period][CURR][LINE_LOWER] || Low[PREV] < envelopes[period][CURR][LINE_LOWER]; // price low was below the lower band
-      // result = result || (envelopes[period][CURR][LINE_MAIN] > envelopes[period][FAR][LINE_MAIN] && Open[CURR] > envelopes[period][CURR][LINE_UPPER]);
-      if (signal_method != 0) {
-        if (METHOD(signal_method, 0)) result &= Open[CURR] > envelopes[period][CURR][LINE_LOWER]; // FIXME
-        if (METHOD(signal_method, 1)) result &= envelopes[period][CURR][LINE_MAIN] < envelopes[period][PREV][LINE_MAIN];
-        if (METHOD(signal_method, 2)) result &= envelopes[period][CURR][LINE_LOWER] < envelopes[period][PREV][LINE_LOWER];
-        if (METHOD(signal_method, 3)) result &= envelopes[period][CURR][LINE_UPPER] < envelopes[period][PREV][LINE_UPPER];
-        if (METHOD(signal_method, 4)) result &= envelopes[period][CURR][LINE_UPPER] - envelopes[period][CURR][LINE_LOWER] > envelopes[period][PREV][LINE_UPPER] - envelopes[period][PREV][LINE_LOWER];
-        if (METHOD(signal_method, 5)) result &= _chart.GetAsk() < envelopes[period][CURR][LINE_MAIN];
-        if (METHOD(signal_method, 6)) result &= Close[CURR] < envelopes[period][CURR][LINE_UPPER];
-        //if (METHOD(signal_method, 7)) result &= _chart.GetAsk() > Close[PREV];
-      }
-      break;
-    case ORDER_TYPE_SELL:
-      result = High[CURR] > envelopes[period][CURR][LINE_UPPER] || High[PREV] > envelopes[period][CURR][LINE_UPPER]; // price high was above the upper band
-      // result = result || (envelopes[period][CURR][LINE_MAIN] < envelopes[period][FAR][LINE_MAIN] && Open[CURR] < envelopes[period][CURR][LINE_LOWER]);
-      if (signal_method != 0) {
-        if (METHOD(signal_method, 0)) result &= Open[CURR] < envelopes[period][CURR][LINE_UPPER]; // FIXME
-        if (METHOD(signal_method, 1)) result &= envelopes[period][CURR][LINE_MAIN] > envelopes[period][PREV][LINE_MAIN];
-        if (METHOD(signal_method, 2)) result &= envelopes[period][CURR][LINE_LOWER] > envelopes[period][PREV][LINE_LOWER];
-        if (METHOD(signal_method, 3)) result &= envelopes[period][CURR][LINE_UPPER] > envelopes[period][PREV][LINE_UPPER];
-        if (METHOD(signal_method, 4)) result &= envelopes[period][CURR][LINE_UPPER] - envelopes[period][CURR][LINE_LOWER] > envelopes[period][PREV][LINE_UPPER] - envelopes[period][PREV][LINE_LOWER];
-        if (METHOD(signal_method, 5)) result &= _chart.GetAsk() > envelopes[period][CURR][LINE_MAIN];
-        if (METHOD(signal_method, 6)) result &= Close[CURR] > envelopes[period][CURR][LINE_UPPER];
-        //if (METHOD(signal_method, 7)) result &= _chart.GetAsk() < Close[PREV];
-      }
-      break;
+  /**
+   * Check if Envelopes indicator is on sell.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double envelopes_0_main  = ((Indi_Envelopes *) this.Data()).GetValue(LINE_MAIN, 0);
+    double envelopes_0_lower = ((Indi_Envelopes *) this.Data()).GetValue(LINE_LOWER, 0);
+    double envelopes_0_upper = ((Indi_Envelopes *) this.Data()).GetValue(LINE_UPPER, 0);
+    double envelopes_1_main  = ((Indi_Envelopes *) this.Data()).GetValue(LINE_MAIN, 1);
+    double envelopes_1_lower = ((Indi_Envelopes *) this.Data()).GetValue(LINE_LOWER, 1);
+    double envelopes_1_upper = ((Indi_Envelopes *) this.Data()).GetValue(LINE_UPPER, 1);
+    double envelopes_2_main  = ((Indi_Envelopes *) this.Data()).GetValue(LINE_MAIN, 2);
+    double envelopes_2_lower = ((Indi_Envelopes *) this.Data()).GetValue(LINE_LOWER, 2);
+    double envelopes_2_upper = ((Indi_Envelopes *) this.Data()).GetValue(LINE_UPPER, 2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    switch (cmd) {
+      case ORDER_TYPE_BUY:
+        _result = Low[CURR] < envelopes_0_lower || Low[PREV] < envelopes_0_lower; // price low was below the lower band
+        // _result = _result || (envelopes_0_main > envelopes_2_main && Open[CURR] > envelopes_0_upper);
+        if (_signal_method != 0) {
+          if (METHOD(_signal_method, 0)) _result &= Open[CURR] > envelopes_0_lower; // FIXME
+          if (METHOD(_signal_method, 1)) _result &= envelopes_0_main < envelopes_1_main;
+          if (METHOD(_signal_method, 2)) _result &= envelopes_0_lower < envelopes_1_lower;
+          if (METHOD(_signal_method, 3)) _result &= envelopes_0_upper < envelopes_1_upper;
+          if (METHOD(_signal_method, 4)) _result &= envelopes_0_upper - envelopes_0_lower > envelopes_1_upper - envelopes_1_lower;
+          if (METHOD(_signal_method, 5)) _result &= this.Chart().GetAsk() < envelopes_0_main;
+          if (METHOD(_signal_method, 6)) _result &= Close[CURR] < envelopes_0_upper;
+          //if (METHOD(_signal_method, 7)) _result &= _chart.GetAsk() > Close[PREV];
+        }
+        break;
+      case ORDER_TYPE_SELL:
+        _result = High[CURR] > envelopes_0_upper || High[PREV] > envelopes_0_upper; // price high was above the upper band
+        // _result = _result || (envelopes_0_main < envelopes_2_main && Open[CURR] < envelopes_0_lower);
+        if (_signal_method != 0) {
+          if (METHOD(_signal_method, 0)) _result &= Open[CURR] < envelopes_0_upper; // FIXME
+          if (METHOD(_signal_method, 1)) _result &= envelopes_0_main > envelopes_1_main;
+          if (METHOD(_signal_method, 2)) _result &= envelopes_0_lower > envelopes_1_lower;
+          if (METHOD(_signal_method, 3)) _result &= envelopes_0_upper > envelopes_1_upper;
+          if (METHOD(_signal_method, 4)) _result &= envelopes_0_upper - envelopes_0_lower > envelopes_1_upper - envelopes_1_lower;
+          if (METHOD(_signal_method, 5)) _result &= this.Chart().GetAsk() > envelopes_0_main;
+          if (METHOD(_signal_method, 6)) _result &= Close[CURR] > envelopes_0_upper;
+          //if (METHOD(_signal_method, 7)) _result &= _chart.GetAsk() < Close[PREV];
+        }
+        break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  if (VerboseTrace && result) {
-    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level1);
-  }
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -3062,45 +3000,41 @@ class Stg_Force : public Strategy {
     }
   }
 
-/**
- * Check if Force Index indicator is on buy or sell.
- *
- * Note: To use the indicator it should be correlated with another trend indicator.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_FORCE);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_FORCE, _chart.GetTf());
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_FORCE, _chart.GetTf());
-  switch (cmd) {
-    case ORDER_TYPE_BUY:
-      // FI recommends to buy (i.e. FI<0).
-      result = force[period][CURR] < -signal_level1;
-      break;
-    case ORDER_TYPE_SELL:
-      // FI recommends to sell (i.e. FI>0).
-      result = force[period][CURR] > signal_level1;
-      break;
+  /**
+   * Check if Force Index indicator is on buy or sell.
+   *
+   * Note: To use the indicator it should be correlated with another trend indicator.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double force_0 = ((Indi_Force *) this.Data()).GetValue(0);
+    double force_1 = ((Indi_Force *) this.Data()).GetValue(1);
+    double force_2 = ((Indi_Force *) this.Data()).GetValue(2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    switch (cmd) {
+      case ORDER_TYPE_BUY:
+        // FI recommends to buy (i.e. FI<0).
+        _result = force_0 < -_signal_level1;
+        break;
+      case ORDER_TYPE_SELL:
+        // FI recommends to sell (i.e. FI>0).
+        _result = force_0 > _signal_level1;
+        break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -3160,63 +3094,58 @@ class Stg_Fractals : public Strategy {
     }
   }
 
-/**
- * Check if Fractals indicator is on buy or sell.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint index = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_FRACTALS);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_FRACTALS, _chart.GetTf());
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_FRACTALS, _chart.GetTf());
-  bool lower = (fractals[index][CURR][LINE_LOWER] != 0.0 || fractals[index][PREV][LINE_LOWER] != 0.0 || fractals[index][FAR][LINE_LOWER] != 0.0);
-  bool upper = (fractals[index][CURR][LINE_UPPER] != 0.0 || fractals[index][PREV][LINE_UPPER] != 0.0 || fractals[index][FAR][LINE_UPPER] != 0.0);
-  switch (cmd) {
-    case ORDER_TYPE_BUY:
-      result = lower;
-      if (METHOD(signal_method, 0)) result &= Open[CURR] > Close[PREV];
-      if (METHOD(signal_method, 1)) result &= _chart.GetBid() > Open[CURR];
-      // if (METHOD(signal_method, 0)) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), PERIOD_M30);
-      // if (METHOD(signal_method, 1)) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), Convert::IndexToTf(fmax(index + 1, M30)));
-      // if (METHOD(signal_method, 2)) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), Convert::IndexToTf(fmax(index + 2, M30)));
-      // if (METHOD(signal_method, 1)) result &= !Fractals_On_Sell(tf);
-      // if (METHOD(signal_method, 3)) result &= Fractals_On_Buy(M30);
-      break;
-    case ORDER_TYPE_SELL:
-      result = upper;
-      if (METHOD(signal_method, 0)) result &= Open[CURR] < Close[PREV];
-      if (METHOD(signal_method, 1)) result &= _chart.GetAsk() < Open[CURR];
-      // if (METHOD(signal_method, 0)) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), PERIOD_M30);
-      // if (METHOD(signal_method, 1)) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), Convert::IndexToTf(fmax(index + 1, M30)));
-      // if (METHOD(signal_method, 2)) result &= !Trade_Fractals(Convert::NegateOrderType(cmd), Convert::IndexToTf(fmax(index + 2, M30)));
-      // if (METHOD(signal_method, 1)) result &= !Fractals_On_Buy(tf);
-      // if (METHOD(signal_method, 3)) result &= Fractals_On_Sell(M30);
-      break;
+  /**
+   * Check if Fractals indicator is on buy or sell.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double fractals_0_lower = ((Indi_Fractals *) this.Data()).GetValue(LINE_LOWER, 0);
+    double fractals_0_upper = ((Indi_Fractals *) this.Data()).GetValue(LINE_UPPER, 0);
+    double fractals_1_lower = ((Indi_Fractals *) this.Data()).GetValue(LINE_LOWER, 1);
+    double fractals_1_upper = ((Indi_Fractals *) this.Data()).GetValue(LINE_UPPER, 1);
+    double fractals_2_lower = ((Indi_Fractals *) this.Data()).GetValue(LINE_LOWER, 2);
+    double fractals_2_upper = ((Indi_Fractals *) this.Data()).GetValue(LINE_UPPER, 2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    bool lower = (fractals_0_lower != 0.0 || fractals_1_lower != 0.0 || fractals_2_lower != 0.0);
+    bool upper = (fractals_0_upper != 0.0 || fractals_1_upper != 0.0 || fractals_2_upper != 0.0);
+    switch (cmd) {
+      case ORDER_TYPE_BUY:
+        _result = lower;
+        if (METHOD(_signal_method, 0)) _result &= Open[CURR] > Close[PREV];
+        if (METHOD(_signal_method, 1)) _result &= this.Chart().GetBid() > Open[CURR];
+        // if (METHOD(_signal_method, 0)) _result &= !Trade_Fractals(Convert::NegateOrderType(cmd), PERIOD_M30);
+        // if (METHOD(_signal_method, 1)) _result &= !Trade_Fractals(Convert::NegateOrderType(cmd), Convert::IndexToTf(fmax(index + 1, M30)));
+        // if (METHOD(_signal_method, 2)) _result &= !Trade_Fractals(Convert::NegateOrderType(cmd), Convert::IndexToTf(fmax(index + 2, M30)));
+        // if (METHOD(_signal_method, 1)) _result &= !Fractals_On_Sell(tf);
+        // if (METHOD(_signal_method, 3)) _result &= Fractals_On_Buy(M30);
+        break;
+      case ORDER_TYPE_SELL:
+        _result = upper;
+        if (METHOD(_signal_method, 0)) _result &= Open[CURR] < Close[PREV];
+        if (METHOD(_signal_method, 1)) _result &= this.Chart().GetAsk() < Open[CURR];
+        // if (METHOD(_signal_method, 0)) _result &= !Trade_Fractals(Convert::NegateOrderType(cmd), PERIOD_M30);
+        // if (METHOD(_signal_method, 1)) _result &= !Trade_Fractals(Convert::NegateOrderType(cmd), Convert::IndexToTf(fmax(index + 1, M30)));
+        // if (METHOD(_signal_method, 2)) _result &= !Trade_Fractals(Convert::NegateOrderType(cmd), Convert::IndexToTf(fmax(index + 2, M30)));
+        // if (METHOD(_signal_method, 1)) _result &= !Fractals_On_Buy(tf);
+        // if (METHOD(_signal_method, 3)) _result &= Fractals_On_Sell(M30);
+        break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  if (VerboseTrace && result) {
-    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level1);
-  }
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
-
 
 class Stg_Gator : public Strategy {
 
@@ -3294,52 +3223,55 @@ class Stg_Gator : public Strategy {
     }
   }
 
-/**
- * Check if Gator Oscillator is on buy or sell.
- *
- * Note: It doesn't give independent signals. Is used for Alligator correction.
- * Principle: trend must be strengthened. Together with this Gator Oscillator goes up.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_GATOR);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_GATOR, _chart.GetTf());
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_GATOR, _chart.GetTf());
-  switch (cmd) {
-    /*
-      //4. Gator Oscillator
-      //Lower part of diagram is taken for calculations. Growth is checked on 4 periods.
-      //The flag is 1 of trend is strengthened, 0 - no strengthening, -1 - never.
-      //Uses part of Alligator's variables
-      if (iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,3)>iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,2)
-      &&iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,2)>iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,1)
-      &&iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,1)>iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,0))
-      {f4=1;}
-    */
-    case ORDER_TYPE_BUY:
-      break;
-    case ORDER_TYPE_SELL:
-      break;
+  /**
+   * Check if Gator Oscillator is on buy or sell.
+   *
+   * Note: It doesn't give independent signals. Is used for Alligator correction.
+   * Principle: trend must be strengthened. Together with this Gator Oscillator goes up.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double gator_0_jaw   = ((Indi_Gator *) this.Data()).GetValue(LINE_JAW, 0);
+    double gator_0_teeth = ((Indi_Gator *) this.Data()).GetValue(LINE_TEETH, 0);
+    double gator_0_lips  = ((Indi_Gator *) this.Data()).GetValue(LINE_LIPS, 0);
+    double gator_1_jaw   = ((Indi_Gator *) this.Data()).GetValue(LINE_JAW, 1);
+    double gator_1_teeth = ((Indi_Gator *) this.Data()).GetValue(LINE_TEETH, 1);
+    double gator_1_lips  = ((Indi_Gator *) this.Data()).GetValue(LINE_LIPS, 1);
+    double gator_2_jaw   = ((Indi_Gator *) this.Data()).GetValue(LINE_JAW, 2);
+    double gator_2_teeth = ((Indi_Gator *) this.Data()).GetValue(LINE_TEETH, 2);
+    double gator_2_lips  = ((Indi_Gator *) this.Data()).GetValue(LINE_LIPS, 2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    double gap = _signal_level1 * pip_size;
+    switch (cmd) {
+      /*
+        //4. Gator Oscillator
+        //Lower part of diagram is taken for calculations. Growth is checked on 4 periods.
+        //The flag is 1 of trend is strengthened, 0 - no strengthening, -1 - never.
+        //Uses part of Alligator's variables
+        if (iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,3)>iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,2)
+        &&iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,2)>iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,1)
+        &&iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,1)>iGator(NULL,piga,jaw_tf,jaw_shift,teeth_tf,teeth_shift,lips_tf,lips_shift,MODE_SMMA,PRICE_MEDIAN,LOWER,0))
+        {f4=1;}
+      */
+      case ORDER_TYPE_BUY:
+        break;
+      case ORDER_TYPE_SELL:
+        break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -3403,68 +3335,76 @@ class Stg_Ichimoku : public Strategy {
     }
   }
 
-/**
- * Check if Ichimoku indicator is on buy or sell.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_ICHIMOKU);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ICHIMOKU, _chart.GetTf());
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_ICHIMOKU, _chart.GetTf());
-  switch (cmd) {
-    /*
-      //15. Ichimoku Kinko Hyo (1)
-      //Buy: Price crosses Senkou Span-B upwards; price is outside Senkou Span cloud
-      //Sell: Price crosses Senkou Span-B downwards; price is outside Senkou Span cloud
-      if (iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANB,1)>iClose(NULL,pich2,1)&&iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANB,0)<=iClose(NULL,pich2,0)&&iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANA,0)<iClose(NULL,pich2,0))
-      {f15=1;}
-      if (iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANB,1)<iClose(NULL,pich2,1)&&iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANB,0)>=iClose(NULL,pich2,0)&&iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANA,0)>iClose(NULL,pich2,0))
-      {f15=-1;}
-    */
-    /*
-      //16. Ichimoku Kinko Hyo (2)
-      //Buy: Tenkan-sen crosses Kijun-sen upwards
-      //Sell: Tenkan-sen crosses Kijun-sen downwards
-      //VERSION EXISTS, IN THIS CASE PRICE MUSTN'T BE IN THE CLOUD!
-      if (iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_TENKANSEN,1)<iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_KIJUNSEN,1)&&iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_TENKANSEN,0)>=iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_KIJUNSEN,0))
-      {f16=1;}
-      if (iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_TENKANSEN,1)>iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_KIJUNSEN,1)&&iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_TENKANSEN,0)<=iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_KIJUNSEN,0))
-      {f16=-1;}
-    */
+  /**
+   * Check if Ichimoku indicator is on buy or sell.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double ichimoku_0_tenkan_sen    = ((Indi_Ichimoku *) this.Data()).GetValue(LINE_TENKANSEN, 0);
+    double ichimoku_0_kijun_sen     = ((Indi_Ichimoku *) this.Data()).GetValue(LINE_KIJUNSEN, 0);
+    double ichimoku_0_senkou_span_a = ((Indi_Ichimoku *) this.Data()).GetValue(LINE_SENKOUSPANA, 0);
+    double ichimoku_0_senkou_span_b = ((Indi_Ichimoku *) this.Data()).GetValue(LINE_SENKOUSPANB, 0);
+    double ichimoku_0_chikou_span   = ((Indi_Ichimoku *) this.Data()).GetValue(LINE_CHIKOUSPAN, 0);
+    double ichimoku_1_tenkan_sen    = ((Indi_Ichimoku *) this.Data()).GetValue(LINE_TENKANSEN, 1);
+    double ichimoku_1_kijun_sen     = ((Indi_Ichimoku *) this.Data()).GetValue(LINE_KIJUNSEN, 1);
+    double ichimoku_1_senkou_span_a = ((Indi_Ichimoku *) this.Data()).GetValue(LINE_SENKOUSPANA, 1);
+    double ichimoku_1_senkou_span_b = ((Indi_Ichimoku *) this.Data()).GetValue(LINE_SENKOUSPANB, 1);
+    double ichimoku_1_chikou_span   = ((Indi_Ichimoku *) this.Data()).GetValue(LINE_CHIKOUSPAN, 1);
+    double ichimoku_2_tenkan_sen    = ((Indi_Ichimoku *) this.Data()).GetValue(LINE_TENKANSEN, 2);
+    double ichimoku_2_kijun_sen     = ((Indi_Ichimoku *) this.Data()).GetValue(LINE_KIJUNSEN, 2);
+    double ichimoku_2_senkou_span_a = ((Indi_Ichimoku *) this.Data()).GetValue(LINE_SENKOUSPANA, 2);
+    double ichimoku_2_senkou_span_b = ((Indi_Ichimoku *) this.Data()).GetValue(LINE_SENKOUSPANB, 2);
+    double ichimoku_2_chikou_span   = ((Indi_Ichimoku *) this.Data()).GetValue(LINE_CHIKOUSPAN, 2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    switch (cmd) {
+      /*
+        //15. Ichimoku Kinko Hyo (1)
+        //Buy: Price crosses Senkou Span-B upwards; price is outside Senkou Span cloud
+        //Sell: Price crosses Senkou Span-B downwards; price is outside Senkou Span cloud
+        if (iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANB,1)>iClose(NULL,pich2,1)&&iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANB,0)<=iClose(NULL,pich2,0)&&iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANA,0)<iClose(NULL,pich2,0))
+        {f15=1;}
+        if (iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANB,1)<iClose(NULL,pich2,1)&&iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANB,0)>=iClose(NULL,pich2,0)&&iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANA,0)>iClose(NULL,pich2,0))
+        {f15=-1;}
+      */
+      /*
+        //16. Ichimoku Kinko Hyo (2)
+        //Buy: Tenkan-sen crosses Kijun-sen upwards
+        //Sell: Tenkan-sen crosses Kijun-sen downwards
+        //VERSION EXISTS, IN THIS CASE PRICE MUSTN'T BE IN THE CLOUD!
+        if (iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_TENKANSEN,1)<iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_KIJUNSEN,1)&&iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_TENKANSEN,0)>=iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_KIJUNSEN,0))
+        {f16=1;}
+        if (iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_TENKANSEN,1)>iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_KIJUNSEN,1)&&iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_TENKANSEN,0)<=iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_KIJUNSEN,0))
+        {f16=-1;}
+      */
 
-    /*
-      //17. Ichimoku Kinko Hyo (3)
-      //Buy: Chinkou Span crosses chart upwards; price is ib the cloud
-      //Sell: Chinkou Span crosses chart downwards; price is ib the cloud
-      if ((iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_CHINKOUSPAN,pkijun+1)<iClose(NULL,pich2,pkijun+1)&&iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_CHINKOUSPAN,pkijun+0)>=iClose(NULL,pich2,pkijun+0))&&((iClose(NULL,pich2,0)>iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANA,0)&&iClose(NULL,pich2,0)<iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANB,0))||(iClose(NULL,pich2,0)<iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANA,0)&&iClose(NULL,pich2,0)>iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANB,0))))
-      {f17=1;}
-      if ((iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_CHINKOUSPAN,pkijun+1)>iClose(NULL,pich2,pkijun+1)&&iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_CHINKOUSPAN,pkijun+0)<=iClose(NULL,pich2,pkijun+0))&&((iClose(NULL,pich2,0)>iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANA,0)&&iClose(NULL,pich2,0)<iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANB,0))||(iClose(NULL,pich2,0)<iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANA,0)&&iClose(NULL,pich2,0)>iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANB,0))))
-      {f17=-1;}
-    */
-    case ORDER_TYPE_BUY:
-      break;
-    case ORDER_TYPE_SELL:
-      break;
+      /*
+        //17. Ichimoku Kinko Hyo (3)
+        //Buy: Chinkou Span crosses chart upwards; price is ib the cloud
+        //Sell: Chinkou Span crosses chart downwards; price is ib the cloud
+        if ((iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_CHINKOUSPAN,pkijun+1)<iClose(NULL,pich2,pkijun+1)&&iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_CHINKOUSPAN,pkijun+0)>=iClose(NULL,pich2,pkijun+0))&&((iClose(NULL,pich2,0)>iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANA,0)&&iClose(NULL,pich2,0)<iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANB,0))||(iClose(NULL,pich2,0)<iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANA,0)&&iClose(NULL,pich2,0)>iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANB,0))))
+        {f17=1;}
+        if ((iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_CHINKOUSPAN,pkijun+1)>iClose(NULL,pich2,pkijun+1)&&iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_CHINKOUSPAN,pkijun+0)<=iClose(NULL,pich2,pkijun+0))&&((iClose(NULL,pich2,0)>iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANA,0)&&iClose(NULL,pich2,0)<iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANB,0))||(iClose(NULL,pich2,0)<iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANA,0)&&iClose(NULL,pich2,0)>iIchimoku(NULL,pich,ptenkan,pkijun,psenkou,MODE_SENKOUSPANB,0))))
+        {f17=-1;}
+      */
+      case ORDER_TYPE_BUY:
+        break;
+      case ORDER_TYPE_SELL:
+        break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -3528,66 +3468,71 @@ class Stg_MA : public Strategy {
     }
   }
 
-/**
- * Check if MA indicator is on buy.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_MA);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MA, _chart.GetTf());
-  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_MA, _chart.GetTf());
-  double gap = signal_level1 * pip_size;
+  /**
+   * Check if MA indicator is on buy.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double ma_0_fast = ma_fast[this.Chart().TfToIndex()][CURR];
+    double ma_0_medium = ma_medium[this.Chart().TfToIndex()][CURR];
+    double ma_0_slow = ma_slow[this.Chart().TfToIndex()][CURR];
+    double ma_1_fast = ma_fast[this.Chart().TfToIndex()][PREV];
+    double ma_1_medium = ma_medium[this.Chart().TfToIndex()][PREV];
+    double ma_1_slow = ma_slow[this.Chart().TfToIndex()][PREV];
+    double ma_2_fast = ma_fast[this.Chart().TfToIndex()][FAR];
+    double ma_2_medium = ma_medium[this.Chart().TfToIndex()][FAR];
+    double ma_2_slow = ma_slow[this.Chart().TfToIndex()][FAR];
+    /*
+    @todo:
+    double ma_0 = ((Indi_MA *) this.Data()).GetValue(0);
+    double ma_1 = ((Indi_MA *) this.Data()).GetValue(1);
+    double ma_2 = ((Indi_MA *) this.Data()).GetValue(2);
+    */
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    double gap = _signal_level1 * pip_size;
 
-  switch (cmd) {
-    case ORDER_TYPE_BUY:
-      result  = ma_fast[period][CURR]   > ma_medium[period][CURR] + gap;
-      result &= ma_medium[period][CURR] > ma_slow[period][CURR];
-      if (signal_method != 0) {
-        if (METHOD(signal_method, 0)) result &= ma_fast[period][CURR] > ma_slow[period][CURR] + gap;
-        if (METHOD(signal_method, 1)) result &= ma_medium[period][CURR] > ma_slow[period][CURR];
-        if (METHOD(signal_method, 2)) result &= ma_slow[period][CURR] > ma_slow[period][PREV];
-        if (METHOD(signal_method, 3)) result &= ma_fast[period][CURR] > ma_fast[period][PREV];
-        if (METHOD(signal_method, 4)) result &= ma_fast[period][CURR] - ma_medium[period][CURR] > ma_medium[period][CURR] - ma_slow[period][CURR];
-        if (METHOD(signal_method, 5)) result &= (ma_medium[period][PREV] < ma_slow[period][PREV] || ma_medium[period][FAR] < ma_slow[period][FAR]);
-        if (METHOD(signal_method, 6)) result &= (ma_fast[period][PREV] < ma_medium[period][PREV] || ma_fast[period][FAR] < ma_medium[period][FAR]);
-      }
-      break;
-    case ORDER_TYPE_SELL:
-      result  = ma_fast[period][CURR]   < ma_medium[period][CURR] - gap;
-      result &= ma_medium[period][CURR] < ma_slow[period][CURR];
-      if (signal_method != 0) {
-        if (METHOD(signal_method, 0)) result &= ma_fast[period][CURR] < ma_slow[period][CURR] - gap;
-        if (METHOD(signal_method, 1)) result &= ma_medium[period][CURR] < ma_slow[period][CURR];
-        if (METHOD(signal_method, 2)) result &= ma_slow[period][CURR] < ma_slow[period][PREV];
-        if (METHOD(signal_method, 3)) result &= ma_fast[period][CURR] < ma_fast[period][PREV];
-        if (METHOD(signal_method, 4)) result &= ma_medium[period][CURR] - ma_fast[period][CURR] > ma_slow[period][CURR] - ma_medium[period][CURR];
-        if (METHOD(signal_method, 5)) result &= (ma_medium[period][PREV] > ma_slow[period][PREV] || ma_medium[period][FAR] > ma_slow[period][FAR]);
-        if (METHOD(signal_method, 6)) result &= (ma_fast[period][PREV] > ma_medium[period][PREV] || ma_fast[period][FAR] > ma_medium[period][FAR]);
-      }
-      break;
+    switch (cmd) {
+      case ORDER_TYPE_BUY:
+        _result  = ma_0_fast   > ma_0_medium + gap;
+        _result &= ma_0_medium > ma_0_slow;
+        if (_signal_method != 0) {
+          if (METHOD(_signal_method, 0)) _result &= ma_0_fast > ma_0_slow + gap;
+          if (METHOD(_signal_method, 1)) _result &= ma_0_medium > ma_0_slow;
+          if (METHOD(_signal_method, 2)) _result &= ma_0_slow > ma_1_slow;
+          if (METHOD(_signal_method, 3)) _result &= ma_0_fast > ma_1_fast;
+          if (METHOD(_signal_method, 4)) _result &= ma_0_fast - ma_0_medium > ma_0_medium - ma_0_slow;
+          if (METHOD(_signal_method, 5)) _result &= (ma_1_medium < ma_1_slow || ma_2_medium < ma_2_slow);
+          if (METHOD(_signal_method, 6)) _result &= (ma_1_fast < ma_1_medium || ma_2_fast < ma_2_medium);
+        }
+        break;
+      case ORDER_TYPE_SELL:
+        _result  = ma_0_fast   < ma_0_medium - gap;
+        _result &= ma_0_medium < ma_0_slow;
+        if (_signal_method != 0) {
+          if (METHOD(_signal_method, 0)) _result &= ma_0_fast < ma_0_slow - gap;
+          if (METHOD(_signal_method, 1)) _result &= ma_0_medium < ma_0_slow;
+          if (METHOD(_signal_method, 2)) _result &= ma_0_slow < ma_1_slow;
+          if (METHOD(_signal_method, 3)) _result &= ma_0_fast < ma_1_fast;
+          if (METHOD(_signal_method, 4)) _result &= ma_0_medium - ma_0_fast > ma_0_slow - ma_0_medium;
+          if (METHOD(_signal_method, 5)) _result &= (ma_1_medium > ma_1_slow || ma_2_medium > ma_2_slow);
+          if (METHOD(_signal_method, 6)) _result &= (ma_1_fast > ma_1_medium || ma_2_fast > ma_2_medium);
+        }
+        break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  if (VerboseTrace && result) {
-    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level1);
-  }
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -3652,80 +3597,75 @@ class Stg_MACD : public Strategy {
     }
   }
 
-/**
- * Check if MACD indicator is on buy.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_MA);
-  UpdateIndicator(_chart, INDI_MACD);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MACD, _chart.GetTf());
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_MACD, _chart.GetTf());
-  double gap = signal_level1 * pip_size;
-  switch (cmd) {
-    /* TODO:
-          //20. MACD (1)
-          //VERSION EXISTS, THAT THE SIGNAL TO BUY IS TRUE ONLY IF MACD<0, SIGNAL TO SELL - IF MACD>0
-          //Buy: MACD rises above the signal line
-          //Sell: MACD falls below the signal line
-          if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,1)<iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_SIGNAL,1)
-          && iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,0)>=iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_SIGNAL,0))
-          {f20=1;}
-          if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,1)>iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_SIGNAL,1)
-          && iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,0)<=iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_SIGNAL,0))
-          {f20=-1;}
+  /**
+   * Check if MACD indicator is on buy.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double macd_0_main   = ((Indi_MACD *) this.Data()).GetValue(LINE_MAIN, 0);
+    double macd_0_signal = ((Indi_MACD *) this.Data()).GetValue(LINE_SIGNAL, 0);
+    double macd_1_main   = ((Indi_MACD *) this.Data()).GetValue(LINE_MAIN, 1);
+    double macd_1_signal = ((Indi_MACD *) this.Data()).GetValue(LINE_SIGNAL, 1);
+    double macd_2_main   = ((Indi_MACD *) this.Data()).GetValue(LINE_MAIN, 2);
+    double macd_2_signal = ((Indi_MACD *) this.Data()).GetValue(LINE_SIGNAL, 2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    double gap = _signal_level1 * pip_size;
+    switch (cmd) {
+      /* TODO:
+            //20. MACD (1)
+            //VERSION EXISTS, THAT THE SIGNAL TO BUY IS TRUE ONLY IF MACD<0, SIGNAL TO SELL - IF MACD>0
+            //Buy: MACD rises above the signal line
+            //Sell: MACD falls below the signal line
+            if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,1)<iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_SIGNAL,1)
+            && iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,0)>=iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_SIGNAL,0))
+            {f20=1;}
+            if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,1)>iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_SIGNAL,1)
+            && iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,0)<=iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_SIGNAL,0))
+            {f20=-1;}
 
-          //21. MACD (2)
-          //Buy: crossing 0 upwards
-          //Sell: crossing 0 downwards
-          if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,1)<0&&iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,0)>=0)
-          {f21=1;}
-          if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,1)>0&&iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,0)<=0)
-          {f21=-1;}
-    */
-    case ORDER_TYPE_BUY:
-      result = macd[period][CURR][LINE_MAIN] > macd[period][CURR][LINE_SIGNAL] + gap; // MACD rises above the signal line.
-      if (signal_method != 0) {
-        if (METHOD(signal_method, 0)) result &= macd[period][FAR][LINE_MAIN] < macd[period][FAR][LINE_SIGNAL];
-        if (METHOD(signal_method, 1)) result &= macd[period][CURR][LINE_MAIN] >= 0;
-        if (METHOD(signal_method, 2)) result &= macd[period][PREV][LINE_MAIN] < 0;
-        if (METHOD(signal_method, 3)) result &= ma_fast[period][CURR] > ma_fast[period][PREV];
-        if (METHOD(signal_method, 4)) result &= ma_fast[period][CURR] > ma_medium[period][CURR];
-      }
-      break;
-    case ORDER_TYPE_SELL:
-      result = macd[period][CURR][LINE_MAIN] < macd[period][CURR][LINE_SIGNAL] - gap; // MACD falls below the signal line.
-      if (signal_method != 0) {
-        if (METHOD(signal_method, 0)) result &= macd[period][FAR][LINE_MAIN] > macd[period][FAR][LINE_SIGNAL];
-        if (METHOD(signal_method, 1)) result &= macd[period][CURR][LINE_MAIN] <= 0;
-        if (METHOD(signal_method, 2)) result &= macd[period][PREV][LINE_MAIN] > 0;
-        if (METHOD(signal_method, 3)) result &= ma_fast[period][CURR] < ma_fast[period][PREV];
-        if (METHOD(signal_method, 4)) result &= ma_fast[period][CURR] < ma_medium[period][CURR];
-      }
-      break;
+            //21. MACD (2)
+            //Buy: crossing 0 upwards
+            //Sell: crossing 0 downwards
+            if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,1)<0&&iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,0)>=0)
+            {f21=1;}
+            if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,1)>0&&iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,0)<=0)
+            {f21=-1;}
+      */
+      case ORDER_TYPE_BUY:
+        _result = macd_0_main > macd_0_signal + gap; // MACD rises above the signal line.
+        if (_signal_method != 0) {
+          if (METHOD(_signal_method, 0)) _result &= macd_2_main < macd_2_signal;
+          if (METHOD(_signal_method, 1)) _result &= macd_0_main >= 0;
+          if (METHOD(_signal_method, 2)) _result &= macd_1_main < 0;
+          if (METHOD(_signal_method, 3)) _result &= ma_fast[this.Chart().TfToIndex()][CURR] > ma_fast[this.Chart().TfToIndex()][PREV];
+          if (METHOD(_signal_method, 4)) _result &= ma_fast[this.Chart().TfToIndex()][CURR] > ma_medium[this.Chart().TfToIndex()][CURR];
+        }
+        break;
+      case ORDER_TYPE_SELL:
+        _result = macd_0_main < macd_0_signal - gap; // MACD falls below the signal line.
+        if (_signal_method != 0) {
+          if (METHOD(_signal_method, 0)) _result &= macd_2_main > macd_2_signal;
+          if (METHOD(_signal_method, 1)) _result &= macd_0_main <= 0;
+          if (METHOD(_signal_method, 2)) _result &= macd_1_main > 0;
+          if (METHOD(_signal_method, 3)) _result &= ma_fast[this.Chart().TfToIndex()][CURR] < ma_fast[this.Chart().TfToIndex()][PREV];
+          if (METHOD(_signal_method, 4)) _result &= ma_fast[this.Chart().TfToIndex()][CURR] < ma_medium[this.Chart().TfToIndex()][CURR];
+        }
+        break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  if (VerboseTrace && result) {
-    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level1);
-  }
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -3789,45 +3729,41 @@ class Stg_MFI : public Strategy {
     }
   }
 
-/**
- * Check if MFI indicator is on buy or sell.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_MFI);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MFI, _chart.GetTf());
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_MFI, _chart.GetTf());
-  switch (cmd) {
-    // Buy: Crossing 20 upwards.
-    case ORDER_TYPE_BUY:
-      result = mfi[period][PREV] > 0 && mfi[period][PREV] < (50 - signal_level1);
-      if (METHOD(signal_method, 0)) result &= mfi[period][CURR] >= (50 - signal_level1);
-      break;
-    // Sell: Crossing 80 downwards.
-    case ORDER_TYPE_SELL:
-      result = mfi[period][PREV] > 0 && mfi[period][PREV] > (50 + signal_level1);
-      if (METHOD(signal_method, 0)) result &= mfi[period][CURR] <= (50 - signal_level1);
-      break;
+  /**
+   * Check if MFI indicator is on buy or sell.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double mfi_0 = ((Indi_MFI *) this.Data()).GetValue(0);
+    double mfi_1 = ((Indi_MFI *) this.Data()).GetValue(1);
+    double mfi_2 = ((Indi_MFI *) this.Data()).GetValue(2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    switch (cmd) {
+      // Buy: Crossing 20 upwards.
+      case ORDER_TYPE_BUY:
+        _result = mfi_1 > 0 && mfi_1 < (50 - _signal_level1);
+        if (METHOD(_signal_method, 0)) _result &= mfi_0 >= (50 - _signal_level1);
+        break;
+      // Sell: Crossing 80 downwards.
+      case ORDER_TYPE_SELL:
+        _result = mfi_1 > 0 && mfi_1 > (50 + _signal_level1);
+        if (METHOD(_signal_method, 0)) _result &= mfi_0 <= (50 - _signal_level1);
+        break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -3891,39 +3827,35 @@ class Stg_Momentum : public Strategy {
     }
   }
 
-/**
- * Check if Momentum indicator is on buy or sell.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_MOMENTUM);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_MOMENTUM, _chart.GetTf());
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_MOMENTUM, _chart.GetTf());
-  switch (cmd) {
-    case ORDER_TYPE_BUY:
-      break;
-    case ORDER_TYPE_SELL:
-      break;
+  /**
+   * Check if Momentum indicator is on buy or sell.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double momentum_0 = ((Indi_Momentum *) this.Data()).GetValue(0);
+    double momentum_1 = ((Indi_Momentum *) this.Data()).GetValue(1);
+    double momentum_2 = ((Indi_Momentum *) this.Data()).GetValue(2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    switch (cmd) {
+      case ORDER_TYPE_BUY:
+        break;
+      case ORDER_TYPE_SELL:
+        break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -3987,39 +3919,35 @@ class Stg_OBV : public Strategy {
     }
   }
 
-/**
- * Check if OBV indicator is on buy or sell.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_OBV);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_OBV, _chart.GetTf());
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_OBV, _chart.GetTf());
-  switch (cmd) {
-    case ORDER_TYPE_BUY:
-      break;
-    case ORDER_TYPE_SELL:
-      break;
+  /**
+   * Check if OBV indicator is on buy or sell.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double obv_0 = ((Indi_OBV *) this.Data()).GetValue(0);
+    double obv_1 = ((Indi_OBV *) this.Data()).GetValue(1);
+    double obv_2 = ((Indi_OBV *) this.Data()).GetValue(2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    switch (cmd) {
+      case ORDER_TYPE_BUY:
+        break;
+      case ORDER_TYPE_SELL:
+        break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -4083,60 +4011,56 @@ class Stg_OSMA : public Strategy {
     }
   }
 
-/**
- * Check if OSMA indicator is on buy or sell.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_OSMA);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_OSMA, _chart.GetTf());
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_OSMA, _chart.GetTf());
-  switch (cmd) {
-    /*
-      //22. Moving Average of Oscillator (MACD histogram) (1)
-      //Buy: histogram is below zero and changes falling direction into rising (5 columns are taken)
-      //Sell: histogram is above zero and changes its rising direction into falling (5 columns are taken)
-      if(iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,4)<0&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,3)<0&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,2)<0&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,1)<0&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,0)<0&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,4)>=iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,3)&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,3)>=iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,2)&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,2)<=iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,1)&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,1)<=iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,0))
-      {f22=1;}
-      if(iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,4)>0&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,3)>0&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,2)>0&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,1)>0&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,0)>0&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,4)<=iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,3)&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,3)<=iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,2)&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,2)>=iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,1)&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,1)>=iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,0))
-      {f22=-1;}
-    */
+  /**
+   * Check if OSMA indicator is on buy or sell.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double osma_0 = ((Indi_OsMA *) this.Data()).GetValue(0);
+    double osma_1 = ((Indi_OsMA *) this.Data()).GetValue(1);
+    double osma_2 = ((Indi_OsMA *) this.Data()).GetValue(2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    switch (cmd) {
+      /*
+        //22. Moving Average of Oscillator (MACD histogram) (1)
+        //Buy: histogram is below zero and changes falling direction into rising (5 columns are taken)
+        //Sell: histogram is above zero and changes its rising direction into falling (5 columns are taken)
+        if(iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,4)<0&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,3)<0&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,2)<0&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,1)<0&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,0)<0&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,4)>=iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,3)&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,3)>=iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,2)&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,2)<=iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,1)&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,1)<=iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,0))
+        {f22=1;}
+        if(iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,4)>0&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,3)>0&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,2)>0&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,1)>0&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,0)>0&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,4)<=iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,3)&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,3)<=iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,2)&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,2)>=iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,1)&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,1)>=iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,0))
+        {f22=-1;}
+      */
 
-    /*
-      //23. Moving Average of Oscillator (MACD histogram) (2)
-      //To use the indicator it should be correlated with another trend indicator
-      //Flag 23 is 1, when MACD histogram recommends to buy (i.e. histogram is sloping upwards)
-      //Flag 23 is -1, when MACD histogram recommends to sell (i.e. histogram is sloping downwards)
-      //3 columns are taken for calculation
-      if(iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,2)<=iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,1)&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,1)<=iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,0))
-      {f23=1;}
-      if(iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,2)>=iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,1)&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,1)>=iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,0))
-      {f23=-1;}
-    */
-    case ORDER_TYPE_BUY:
-      break;
-    case ORDER_TYPE_SELL:
-      break;
+      /*
+        //23. Moving Average of Oscillator (MACD histogram) (2)
+        //To use the indicator it should be correlated with another trend indicator
+        //Flag 23 is 1, when MACD histogram recommends to buy (i.e. histogram is sloping upwards)
+        //Flag 23 is -1, when MACD histogram recommends to sell (i.e. histogram is sloping downwards)
+        //3 columns are taken for calculation
+        if(iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,2)<=iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,1)&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,1)<=iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,0))
+        {f23=1;}
+        if(iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,2)>=iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,1)&&iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,1)>=iOsMA(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,0))
+        {f23=-1;}
+      */
+      case ORDER_TYPE_BUY:
+        break;
+      case ORDER_TYPE_SELL:
+        break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -4219,42 +4143,42 @@ class Stg_RSI : public Strategy {
     DEBUG_CHECKPOINT_ADD
     #ifdef __profiler__ PROFILER_START #endif
     bool _result = false;
-    double _rsi_0 = ((Indi_RSI *) this.Data()).GetValue(0);
-    double _rsi_1 = ((Indi_RSI *) this.Data()).GetValue(1);
-    double _rsi_2 = ((Indi_RSI *) this.Data()).GetValue(2);
+    double rsi_0 = ((Indi_RSI *) this.Data()).GetValue(0);
+    double rsi_1 = ((Indi_RSI *) this.Data()).GetValue(1);
+    double rsi_2 = ((Indi_RSI *) this.Data()).GetValue(2);
     if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
     if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
     if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-    bool is_valid = fmin(fmin(_rsi_0, _rsi_1), _rsi_2) > 0;
+    bool is_valid = fmin(fmin(rsi_0, rsi_1), rsi_2) > 0;
     switch (_cmd) {
       case ORDER_TYPE_BUY:
-        _result = _rsi_0 > 0 && _rsi_0 < (50 - _signal_level1);
+        _result = rsi_0 > 0 && rsi_0 < (50 - _signal_level1);
         if (_result && VerboseDebug) {
-          PrintFormat("RSI %s on buy: %g < %g", this.Chart().TfToString(), _rsi_0, 50 - _signal_level1);
+          PrintFormat("RSI %s on buy: %g < %g", this.Chart().TfToString(), rsi_0, 50 - _signal_level1);
         }
         if (_signal_method != 0) {
           _result &= is_valid;
-          if (METHOD(_signal_method, 0)) _result &= _rsi_0 < _rsi_1;
-          if (METHOD(_signal_method, 1)) _result &= _rsi_1 < _rsi_2;
-          if (METHOD(_signal_method, 2)) _result &= _rsi_1 < (50 - _signal_level1);
-          if (METHOD(_signal_method, 3)) _result &= _rsi_2  < (50 - _signal_level1);
-          if (METHOD(_signal_method, 4)) _result &= _rsi_0 - _rsi_1 > _rsi_1 - _rsi_2;
-          if (METHOD(_signal_method, 5)) _result &= _rsi_2 > 50;
+          if (METHOD(_signal_method, 0)) _result &= rsi_0 < rsi_1;
+          if (METHOD(_signal_method, 1)) _result &= rsi_1 < rsi_2;
+          if (METHOD(_signal_method, 2)) _result &= rsi_1 < (50 - _signal_level1);
+          if (METHOD(_signal_method, 3)) _result &= rsi_2  < (50 - _signal_level1);
+          if (METHOD(_signal_method, 4)) _result &= rsi_0 - rsi_1 > rsi_1 - rsi_2;
+          if (METHOD(_signal_method, 5)) _result &= rsi_2 > 50;
         }
         break;
       case ORDER_TYPE_SELL:
-        _result = _rsi_0 > 0 && _rsi_0 > (50 + _signal_level1);
+        _result = rsi_0 > 0 && rsi_0 > (50 + _signal_level1);
         if (_result && VerboseDebug) {
-          PrintFormat("RSI %s on sell: %g > %g", this.Chart().TfToString(), _rsi_0, 50 + _signal_level1);
+          PrintFormat("RSI %s on sell: %g > %g", this.Chart().TfToString(), rsi_0, 50 + _signal_level1);
         }
         if (_signal_method != 0) {
           _result &= is_valid;
-          if (METHOD(_signal_method, 0)) _result &= _rsi_0 > _rsi_1;
-          if (METHOD(_signal_method, 1)) _result &= _rsi_1 > _rsi_2;
-          if (METHOD(_signal_method, 2)) _result &= _rsi_1 > (50 + _signal_level1);
-          if (METHOD(_signal_method, 3)) _result &= _rsi_2  > (50 + _signal_level1);
-          if (METHOD(_signal_method, 4)) _result &= _rsi_1 - _rsi_0 > _rsi_2 - _rsi_1;
-          if (METHOD(_signal_method, 5)) _result &= _rsi_2 < 50;
+          if (METHOD(_signal_method, 0)) _result &= rsi_0 > rsi_1;
+          if (METHOD(_signal_method, 1)) _result &= rsi_1 > rsi_2;
+          if (METHOD(_signal_method, 2)) _result &= rsi_1 > (50 + _signal_level1);
+          if (METHOD(_signal_method, 3)) _result &= rsi_2  > (50 + _signal_level1);
+          if (METHOD(_signal_method, 4)) _result &= rsi_1 - rsi_0 > rsi_2 - rsi_1;
+          if (METHOD(_signal_method, 5)) _result &= rsi_2 < 50;
         }
         break;
     }
@@ -4325,51 +4249,49 @@ class Stg_RVI : public Strategy {
     }
   }
 
-/**
- * Check if RVI indicator is on buy or sell.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_RVI);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_RVI, _chart.GetTf());
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_RVI, _chart.GetTf());
-  switch (cmd) {
+  /**
+   * Check if RVI indicator is on buy or sell.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
     /*
-      //26. RVI
-      //RECOMMENDED TO USE WITH A TREND INDICATOR
-      //Buy: main line (green) crosses signal (red) upwards
-      //Sell: main line (green) crosses signal (red) downwards
-      if(iRVI(NULL,pirvi,pirviu,LINE_MAIN,1)<iRVI(NULL,pirvi,pirviu,LINE_SIGNAL,1)
-      && iRVI(NULL,pirvi,pirviu,LINE_MAIN,0)>=iRVI(NULL,pirvi,pirviu,LINE_SIGNAL,0))
-      {f26=1;}
-      if(iRVI(NULL,pirvi,pirviu,LINE_MAIN,1)>iRVI(NULL,pirvi,pirviu,LINE_SIGNAL,1)
-      && iRVI(NULL,pirvi,pirviu,LINE_MAIN,0)<=iRVI(NULL,pirvi,pirviu,LINE_SIGNAL,0))
-      {f26=-1;}
+    double rvi_0 = ((Indi_RVI *) this.Data()).GetValue(0);
+    double rvi_1 = ((Indi_RVI *) this.Data()).GetValue(1);
+    double rvi_2 = ((Indi_RVI *) this.Data()).GetValue(2);
     */
-    case ORDER_TYPE_BUY:
-      break;
-    case ORDER_TYPE_SELL:
-      break;
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    switch (cmd) {
+      /*
+        //26. RVI
+        //RECOMMENDED TO USE WITH A TREND INDICATOR
+        //Buy: main line (green) crosses signal (red) upwards
+        //Sell: main line (green) crosses signal (red) downwards
+        if(iRVI(NULL,pirvi,pirviu,LINE_MAIN,1)<iRVI(NULL,pirvi,pirviu,LINE_SIGNAL,1)
+        && iRVI(NULL,pirvi,pirviu,LINE_MAIN,0)>=iRVI(NULL,pirvi,pirviu,LINE_SIGNAL,0))
+        {f26=1;}
+        if(iRVI(NULL,pirvi,pirviu,LINE_MAIN,1)>iRVI(NULL,pirvi,pirviu,LINE_SIGNAL,1)
+        && iRVI(NULL,pirvi,pirviu,LINE_MAIN,0)<=iRVI(NULL,pirvi,pirviu,LINE_SIGNAL,0))
+        {f26=-1;}
+      */
+      case ORDER_TYPE_BUY:
+        break;
+      case ORDER_TYPE_SELL:
+        break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -4433,64 +4355,57 @@ class Stg_SAR : public Strategy {
     }
   }
 
-/**
- * Check if SAR indicator is on buy or sell.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal (in pips)
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_SAR);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_SAR, _chart.GetTf());
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_SAR, _chart.GetTf());
-  double gap = signal_level1 * pip_size;
-  switch (cmd) {
-    case ORDER_TYPE_BUY:
-      result = sar[period][CURR] + gap < Open[CURR] || sar[period][PREV] + gap < Open[PREV];
-      if (signal_method != 0) {
-        if (METHOD(signal_method, 0)) result &= sar[period][PREV] - gap > _chart.GetAsk();
-        if (METHOD(signal_method, 1)) result &= sar[period][CURR] < sar[period][PREV];
-        if (METHOD(signal_method, 2)) result &= sar[period][CURR] - sar[period][PREV] <= sar[period][PREV] - sar[period][FAR];
-        if (METHOD(signal_method, 3)) result &= sar[period][FAR] > _chart.GetAsk();
-        if (METHOD(signal_method, 4)) result &= sar[period][CURR] <= Close[CURR];
-        if (METHOD(signal_method, 5)) result &= sar[period][PREV] > Close[PREV];
-        if (METHOD(signal_method, 6)) result &= sar[period][PREV] > Open[PREV];
-      }
-      break;
-    case ORDER_TYPE_SELL:
-      result = sar[period][CURR] - gap > Open[CURR] || sar[period][PREV] - gap > Open[PREV];
-      if (signal_method != 0) {
-        if (METHOD(signal_method, 0)) result &= sar[period][PREV] + gap < _chart.GetAsk();
-        if (METHOD(signal_method, 1)) result &= sar[period][CURR] > sar[period][PREV];
-        if (METHOD(signal_method, 2)) result &= sar[period][PREV] - sar[period][CURR] <= sar[period][FAR] - sar[period][PREV];
-        if (METHOD(signal_method, 3)) result &= sar[period][FAR] < _chart.GetAsk();
-        if (METHOD(signal_method, 4)) result &= sar[period][CURR] >= Close[CURR];
-        if (METHOD(signal_method, 5)) result &= sar[period][PREV] < Close[PREV];
-        if (METHOD(signal_method, 6)) result &= sar[period][PREV] < Open[PREV];
-      }
-      break;
+  /**
+   * Check if SAR indicator is on buy or sell.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal (in pips)
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double sar_0 = ((Indi_SAR *) this.Data()).GetValue(0);
+    double sar_1 = ((Indi_SAR *) this.Data()).GetValue(1);
+    double sar_2 = ((Indi_SAR *) this.Data()).GetValue(2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    double gap = _signal_level1 * pip_size;
+    switch (cmd) {
+      case ORDER_TYPE_BUY:
+        _result = sar_0 + gap < Open[CURR] || sar_1 + gap < Open[PREV];
+        if (_signal_method != 0) {
+          if (METHOD(_signal_method, 0)) _result &= sar_1 - gap > this.Chart().GetAsk();
+          if (METHOD(_signal_method, 1)) _result &= sar_0 < sar_1;
+          if (METHOD(_signal_method, 2)) _result &= sar_0 - sar_1 <= sar_1 - sar_2;
+          if (METHOD(_signal_method, 3)) _result &= sar_2 > this.Chart().GetAsk();
+          if (METHOD(_signal_method, 4)) _result &= sar_0 <= Close[CURR];
+          if (METHOD(_signal_method, 5)) _result &= sar_1 > Close[PREV];
+          if (METHOD(_signal_method, 6)) _result &= sar_1 > Open[PREV];
+        }
+        break;
+      case ORDER_TYPE_SELL:
+        _result = sar_0 - gap > Open[CURR] || sar_1 - gap > Open[PREV];
+        if (_signal_method != 0) {
+          if (METHOD(_signal_method, 0)) _result &= sar_1 + gap < this.Chart().GetAsk();
+          if (METHOD(_signal_method, 1)) _result &= sar_0 > sar_1;
+          if (METHOD(_signal_method, 2)) _result &= sar_1 - sar_0 <= sar_2 - sar_1;
+          if (METHOD(_signal_method, 3)) _result &= sar_2 < this.Chart().GetAsk();
+          if (METHOD(_signal_method, 4)) _result &= sar_0 >= Close[CURR];
+          if (METHOD(_signal_method, 5)) _result &= sar_1 < Close[PREV];
+          if (METHOD(_signal_method, 6)) _result &= sar_1 < Open[PREV];
+        }
+        break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  if (VerboseTrace && result) {
-    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level1);
-  }
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -4554,66 +4469,52 @@ class Stg_StdDev : public Strategy {
     }
   }
 
-/**
- * Check if StdDev indicator is on buy or sell.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_STDDEV);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_STDDEV, _chart.GetTf());
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_STDDEV, _chart.GetTf());
-  switch (cmd) {
-    /*
-      //27. Standard Deviation
-      //Doesn't give independent signals. Is used to define volatility (trend strength).
-      //Principle: the trend must be strengthened. Together with this Standard Deviation goes up.
-      //Growth on 3 consecutive bars is analyzed
-      //Flag is 1 when Standard Deviation rises, 0 - when no growth, -1 - never.
-      if (iStdDev(NULL,pistd,pistdu,0,MODE_SMA,PRICE_CLOSE,2)<=iStdDev(NULL,pistd,pistdu,0,MODE_SMA,PRICE_CLOSE,1)&&iStdDev(NULL,pistd,pistdu,0,MODE_SMA,PRICE_CLOSE,1)<=iStdDev(NULL,pistd,pistdu,0,MODE_SMA,PRICE_CLOSE,0))
-      {f27=1;}
-    */
-    case ORDER_TYPE_BUY:
+  /**
+   * Check if StdDev indicator is on buy or sell.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double stddev_0 = ((Indi_StdDev *) this.Data()).GetValue(0);
+    double stddev_1 = ((Indi_StdDev *) this.Data()).GetValue(1);
+    double stddev_2 = ((Indi_StdDev *) this.Data()).GetValue(2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    switch (cmd) {
       /*
-        bool result = StdDev[period][CURR][LINE_LOWER] != 0.0 || StdDev[period][PREV][LINE_LOWER] != 0.0 || StdDev[period][FAR][LINE_LOWER] != 0.0;
-        if (METHOD(signal_method, 0)) result &= Open[CURR] > Close[CURR];
-        if (METHOD(signal_method, 1)) result &= !StdDev_On_Sell(tf);
-        if (METHOD(signal_method, 2)) result &= StdDev_On_Buy(fmin(period + 1, M30));
-        if (METHOD(signal_method, 3)) result &= StdDev_On_Buy(M30);
-        if (METHOD(signal_method, 4)) result &= StdDev[period][FAR][LINE_LOWER] != 0.0;
-        if (METHOD(signal_method, 5)) result &= !StdDev_On_Sell(M30);
-        */
-    break;
-    case ORDER_TYPE_SELL:
-      /*
-        bool result = StdDev[period][CURR][LINE_UPPER] != 0.0 || StdDev[period][PREV][LINE_UPPER] != 0.0 || StdDev[period][FAR][LINE_UPPER] != 0.0;
-        if (METHOD(signal_method, 0)) result &= Open[CURR] < Close[CURR];
-        if (METHOD(signal_method, 1)) result &= !StdDev_On_Buy(tf);
-        if (METHOD(signal_method, 2)) result &= StdDev_On_Sell(fmin(period + 1, M30));
-        if (METHOD(signal_method, 3)) result &= StdDev_On_Sell(M30);
-        if (METHOD(signal_method, 4)) result &= StdDev[period][FAR][LINE_UPPER] != 0.0;
-        if (METHOD(signal_method, 5)) result &= !StdDev_On_Buy(M30);
-        */
-    break;
+        //27. Standard Deviation
+        //Doesn't give independent signals. Is used to define volatility (trend strength).
+        //Principle: the trend must be strengthened. Together with this Standard Deviation goes up.
+        //Growth on 3 consecutive bars is analyzed
+        //Flag is 1 when Standard Deviation rises, 0 - when no growth, -1 - never.
+        if (iStdDev(NULL,pistd,pistdu,0,MODE_SMA,PRICE_CLOSE,2)<=iStdDev(NULL,pistd,pistdu,0,MODE_SMA,PRICE_CLOSE,1)&&iStdDev(NULL,pistd,pistdu,0,MODE_SMA,PRICE_CLOSE,1)<=iStdDev(NULL,pistd,pistdu,0,MODE_SMA,PRICE_CLOSE,0))
+        {f27=1;}
+      */
+      case ORDER_TYPE_BUY:
+        /*
+          bool _result = StdDev_0[LINE_LOWER] != 0.0 || StdDev_1[LINE_LOWER] != 0.0 || StdDev_2[LINE_LOWER] != 0.0;
+          if (METHOD(_signal_method, 0)) _result &= Open[CURR] > Close[CURR];
+          */
+      break;
+      case ORDER_TYPE_SELL:
+        /*
+          bool _result = StdDev_0[LINE_UPPER] != 0.0 || StdDev_1[LINE_UPPER] != 0.0 || StdDev_2[LINE_UPPER] != 0.0;
+          if (METHOD(_signal_method, 0)) _result &= Open[CURR] < Close[CURR];
+          */
+      break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -4677,82 +4578,78 @@ class Stg_Stoch : public Strategy {
     }
   }
 
-/**
- * Check if Stochastic indicator is on buy or sell.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_STOCHASTIC);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_STOCHASTIC, _chart.GetTf());
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_STOCHASTIC, _chart.GetTf());
-  switch (cmd) {
-      /* TODO:
-            //   if(iStochastic(NULL,0,5,3,3,MODE_SMA,0,LINE_MAIN,0)>iStochastic(NULL,0,5,3,3,MODE_SMA,0,LINE_SIGNAL,0)) return(0);
-            // if(stoch4h<stoch4h2){ //Sell signal
-            // if(stoch4h>stoch4h2){//Buy signal
+  /**
+   * Check if Stochastic indicator is on buy or sell.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double stoch_0 = ((Indi_Stochastic *) this.Data()).GetValue(0);
+    double stoch_1 = ((Indi_Stochastic *) this.Data()).GetValue(1);
+    double stoch_2 = ((Indi_Stochastic *) this.Data()).GetValue(2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    switch (cmd) {
+        /* TODO:
+              //   if(iStochastic(NULL,0,5,3,3,MODE_SMA,0,LINE_MAIN,0)>iStochastic(NULL,0,5,3,3,MODE_SMA,0,LINE_SIGNAL,0)) return(0);
+              // if(stoch4h<stoch4h2){ //Sell signal
+              // if(stoch4h>stoch4h2){//Buy signal
 
-            //28. Stochastic Oscillator (1)
-            //Buy: main lline rises above 20 after it fell below this point
-            //Sell: main line falls lower than 80 after it rose above this point
-            if(iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_MAIN,1)<20
-            &&iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_MAIN,0)>=20)
-            {f28=1;}
-            if(iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_MAIN,1)>80
-            &&iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_MAIN,0)<=80)
-            {f28=-1;}
+              //28. Stochastic Oscillator (1)
+              //Buy: main lline rises above 20 after it fell below this point
+              //Sell: main line falls lower than 80 after it rose above this point
+              if(iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_MAIN,1)<20
+              &&iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_MAIN,0)>=20)
+              {f28=1;}
+              if(iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_MAIN,1)>80
+              &&iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_MAIN,0)<=80)
+              {f28=-1;}
 
-            //29. Stochastic Oscillator (2)
-            //Buy: main line goes above the signal line
-            //Sell: signal line goes above the main line
-            if(iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_MAIN,1)<iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_SIGNAL,1)
-            && iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_MAIN,0)>=iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_SIGNAL,0))
-            {f29=1;}
-            if(iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_MAIN,1)>iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_SIGNAL,1)
-            && iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_MAIN,0)<=iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_SIGNAL,0))
-            {f29=-1;}
-      */
-    case ORDER_TYPE_BUY:
-      /*
-        bool result = Stochastic[period][CURR][LINE_LOWER] != 0.0 || Stochastic[period][PREV][LINE_LOWER] != 0.0 || Stochastic[period][FAR][LINE_LOWER] != 0.0;
-        if (METHOD(signal_method, 0)) result &= Open[CURR] > Close[CURR];
-        if (METHOD(signal_method, 1)) result &= !Stochastic_On_Sell(tf);
-        if (METHOD(signal_method, 2)) result &= Stochastic_On_Buy(fmin(period + 1, M30));
-        if (METHOD(signal_method, 3)) result &= Stochastic_On_Buy(M30);
-        if (METHOD(signal_method, 4)) result &= Stochastic[period][FAR][LINE_LOWER] != 0.0;
-        if (METHOD(signal_method, 5)) result &= !Stochastic_On_Sell(M30);
+              //29. Stochastic Oscillator (2)
+              //Buy: main line goes above the signal line
+              //Sell: signal line goes above the main line
+              if(iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_MAIN,1)<iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_SIGNAL,1)
+              && iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_MAIN,0)>=iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_SIGNAL,0))
+              {f29=1;}
+              if(iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_MAIN,1)>iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_SIGNAL,1)
+              && iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_MAIN,0)<=iStochastic(NULL,pisto,pistok,pistod,istslow,MODE_EMA,0,LINE_SIGNAL,0))
+              {f29=-1;}
         */
-    break;
-    case ORDER_TYPE_SELL:
-      /*
-        bool result = Stochastic[period][CURR][LINE_UPPER] != 0.0 || Stochastic[period][PREV][LINE_UPPER] != 0.0 || Stochastic[period][FAR][LINE_UPPER] != 0.0;
-        if (METHOD(signal_method, 0)) result &= Open[CURR] < Close[CURR];
-        if (METHOD(signal_method, 1)) result &= !Stochastic_On_Buy(tf);
-        if (METHOD(signal_method, 2)) result &= Stochastic_On_Sell(fmin(period + 1, M30));
-        if (METHOD(signal_method, 3)) result &= Stochastic_On_Sell(M30);
-        if (METHOD(signal_method, 4)) result &= Stochastic[period][FAR][LINE_UPPER] != 0.0;
-        if (METHOD(signal_method, 5)) result &= !Stochastic_On_Buy(M30);
-        */
-    break;
+      case ORDER_TYPE_BUY:
+        /*
+          bool _result = Stochastic_0[LINE_LOWER] != 0.0 || Stochastic_1[LINE_LOWER] != 0.0 || Stochastic_2[LINE_LOWER] != 0.0;
+          if (METHOD(_signal_method, 0)) _result &= Open[CURR] > Close[CURR];
+          if (METHOD(_signal_method, 1)) _result &= !Stochastic_On_Sell(tf);
+          if (METHOD(_signal_method, 2)) _result &= Stochastic_On_Buy(fmin(period + 1, M30));
+          if (METHOD(_signal_method, 3)) _result &= Stochastic_On_Buy(M30);
+          if (METHOD(_signal_method, 4)) _result &= Stochastic_2[LINE_LOWER] != 0.0;
+          if (METHOD(_signal_method, 5)) _result &= !Stochastic_On_Sell(M30);
+          */
+      break;
+      case ORDER_TYPE_SELL:
+        /*
+          bool _result = Stochastic_0[LINE_UPPER] != 0.0 || Stochastic_1[LINE_UPPER] != 0.0 || Stochastic_2[LINE_UPPER] != 0.0;
+          if (METHOD(_signal_method, 0)) _result &= Open[CURR] < Close[CURR];
+          if (METHOD(_signal_method, 1)) _result &= !Stochastic_On_Buy(tf);
+          if (METHOD(_signal_method, 2)) _result &= Stochastic_On_Sell(fmin(period + 1, M30));
+          if (METHOD(_signal_method, 3)) _result &= Stochastic_On_Sell(M30);
+          if (METHOD(_signal_method, 4)) _result &= Stochastic_2[LINE_UPPER] != 0.0;
+          if (METHOD(_signal_method, 5)) _result &= !Stochastic_On_Buy(M30);
+          */
+      break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -4817,71 +4714,63 @@ class Stg_WPR : public Strategy {
     }
   }
 
-/**
- * Check if WPR indicator is on buy or sell.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_WPR);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_WPR, _chart.GetTf());
-  if (signal_level1 == EMPTY)  signal_level1  = GetStrategySignalLevel(INDI_WPR, _chart.GetTf(), 20);
+  /**
+   * Check if WPR indicator is on buy or sell.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double wpr_0 = ((Indi_WPR *) this.Data()).GetValue(0);
+    double wpr_1 = ((Indi_WPR *) this.Data()).GetValue(1);
+    double wpr_2 = ((Indi_WPR *) this.Data()).GetValue(2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
 
-  switch (cmd) {
-    case ORDER_TYPE_BUY:
-      result = wpr[period][CURR] > 50 + signal_level1;
-      if (signal_method != 0) {
-        if (METHOD(signal_method, 0)) result &= wpr[period][CURR] < wpr[period][PREV];
-        if (METHOD(signal_method, 1)) result &= wpr[period][PREV] < wpr[period][FAR];
-        if (METHOD(signal_method, 2)) result &= wpr[period][PREV] > 50 + signal_level1;
-        if (METHOD(signal_method, 3)) result &= wpr[period][FAR]  > 50 + signal_level1;
-        if (METHOD(signal_method, 4)) result &= wpr[period][PREV] - wpr[period][CURR] > wpr[period][FAR] - wpr[period][PREV];
-        if (METHOD(signal_method, 5)) result &= wpr[period][PREV] > 50 + signal_level1 + signal_level1 / 2;
-      }
-      /* TODO:
-
-            //30. Williams Percent Range
-            //Buy: crossing -80 upwards
-            //Sell: crossing -20 downwards
-            if (iWPR(NULL,piwpr,piwprbar,1)<-80&&iWPR(NULL,piwpr,piwprbar,0)>=-80)
-            {f30=1;}
-            if (iWPR(NULL,piwpr,piwprbar,1)>-20&&iWPR(NULL,piwpr,piwprbar,0)<=-20)
-            {f30=-1;}
-      */
-      break;
-    case ORDER_TYPE_SELL:
-      result = wpr[period][CURR] < 50 - signal_level1;
-      if (signal_method != 0) {
-        if (METHOD(signal_method, 0)) result &= wpr[period][CURR] > wpr[period][PREV];
-        if (METHOD(signal_method, 1)) result &= wpr[period][PREV] > wpr[period][FAR];
-        if (METHOD(signal_method, 2)) result &= wpr[period][PREV] < 50 - signal_level1;
-        if (METHOD(signal_method, 3)) result &= wpr[period][FAR]  < 50 - signal_level1;
-        if (METHOD(signal_method, 4)) result &= wpr[period][CURR] - wpr[period][PREV] > wpr[period][PREV] - wpr[period][FAR];
-        if (METHOD(signal_method, 5)) result &= wpr[period][PREV] > 50 - signal_level1 - signal_level1 / 2;
-      }
-      break;
+    switch (cmd) {
+      case ORDER_TYPE_BUY:
+        _result = wpr_0 > 50 + _signal_level1;
+        if (_signal_method != 0) {
+          if (METHOD(_signal_method, 0)) _result &= wpr_0 < wpr_1;
+          if (METHOD(_signal_method, 1)) _result &= wpr_1 < wpr_2;
+          if (METHOD(_signal_method, 2)) _result &= wpr_1 > 50 + _signal_level1;
+          if (METHOD(_signal_method, 3)) _result &= wpr_2  > 50 + _signal_level1;
+          if (METHOD(_signal_method, 4)) _result &= wpr_1 - wpr_0 > wpr_2 - wpr_1;
+          if (METHOD(_signal_method, 5)) _result &= wpr_1 > 50 + _signal_level1 + _signal_level1 / 2;
+        }
+        /* @todo
+           //30. Williams Percent Range
+           //Buy: crossing -80 upwards
+           //Sell: crossing -20 downwards
+           if (iWPR(NULL,piwpr,piwprbar,1)<-80&&iWPR(NULL,piwpr,piwprbar,0)>=-80)
+           {f30=1;}
+           if (iWPR(NULL,piwpr,piwprbar,1)>-20&&iWPR(NULL,piwpr,piwprbar,0)<=-20)
+           {f30=-1;}
+        */
+        break;
+      case ORDER_TYPE_SELL:
+        _result = wpr_0 < 50 - _signal_level1;
+        if (_signal_method != 0) {
+          if (METHOD(_signal_method, 0)) _result &= wpr_0 > wpr_1;
+          if (METHOD(_signal_method, 1)) _result &= wpr_1 > wpr_2;
+          if (METHOD(_signal_method, 2)) _result &= wpr_1 < 50 - _signal_level1;
+          if (METHOD(_signal_method, 3)) _result &= wpr_2  < 50 - _signal_level1;
+          if (METHOD(_signal_method, 4)) _result &= wpr_0 - wpr_1 > wpr_1 - wpr_2;
+          if (METHOD(_signal_method, 5)) _result &= wpr_1 > 50 - _signal_level1 - _signal_level1 / 2;
+        }
+        break;
+    }
+    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  result &= signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
-  if (VerboseTrace && result) {
-    PrintFormat("%s:%d: Signal: %d/%d/%d/%g", __FUNCTION__, __LINE__, cmd, _chart.GetTf(), signal_method, signal_level1);
-  }
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -4945,56 +4834,52 @@ class Stg_ZigZag : public Strategy {
     }
   }
 
-/**
- * Check if ZigZag indicator is on buy or sell.
- *
- * @param
- *   cmd (int) - type of trade order command
- *   period (int) - period to check for
- *   signal_method (int) - signal method to use by using bitwise AND operation
- *   signal_level1 (double) - signal level to consider the signal
- */
-static bool SignalOpen(Chart *_chart, ENUM_ORDER_TYPE cmd, ulong signal_method = EMPTY, double signal_level1 = EMPTY, double signal_level12 = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
-  bool result = false; uint period = _chart.TfToIndex();
-  UpdateIndicator(_chart, INDI_ZIGZAG);
-  if (signal_method == EMPTY) signal_method = GetStrategySignalMethod(INDI_ZIGZAG, _chart.GetTf());
-  if (signal_level1  == EMPTY) signal_level1  = GetStrategySignalLevel(INDI_ZIGZAG, _chart.GetTf());
-  switch (cmd) {
-    case ORDER_TYPE_BUY:
-      /*
-        bool result = ZigZag[period][CURR][LINE_LOWER] != 0.0 || ZigZag[period][PREV][LINE_LOWER] != 0.0 || ZigZag[period][FAR][LINE_LOWER] != 0.0;
-        if (METHOD(signal_method, 0)) result &= Open[CURR] > Close[CURR];
-        if (METHOD(signal_method, 1)) result &= !ZigZag_On_Sell(tf);
-        if (METHOD(signal_method, 2)) result &= ZigZag_On_Buy(fmin(period + 1, M30));
-        if (METHOD(signal_method, 3)) result &= ZigZag_On_Buy(M30);
-        if (METHOD(signal_method, 4)) result &= ZigZag[period][FAR][LINE_LOWER] != 0.0;
-        if (METHOD(signal_method, 5)) result &= !ZigZag_On_Sell(M30);
-        */
-    break;
-    case ORDER_TYPE_SELL:
-      /*
-        bool result = ZigZag[period][CURR][LINE_UPPER] != 0.0 || ZigZag[period][PREV][LINE_UPPER] != 0.0 || ZigZag[period][FAR][LINE_UPPER] != 0.0;
-        if (METHOD(signal_method, 0)) result &= Open[CURR] < Close[CURR];
-        if (METHOD(signal_method, 1)) result &= !ZigZag_On_Buy(tf);
-        if (METHOD(signal_method, 2)) result &= ZigZag_On_Sell(fmin(period + 1, M30));
-        if (METHOD(signal_method, 3)) result &= ZigZag_On_Sell(M30);
-        if (METHOD(signal_method, 4)) result &= ZigZag[period][FAR][LINE_UPPER] != 0.0;
-        if (METHOD(signal_method, 5)) result &= !ZigZag_On_Buy(M30);
-        */
-    break;
+  /**
+   * Check if ZigZag indicator is on buy or sell.
+   *
+   * @param
+   *   cmd (int) - type of trade order command
+   *   period (int) - period to check for
+   *   _signal_method (int) - signal method to use by using bitwise AND operation
+   *   _signal_level1 (double) - signal level to consider the signal
+   */
+  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+    DEBUG_CHECKPOINT_ADD
+    #ifdef __profiler__ PROFILER_START #endif
+    bool _result = false;
+    double zigzag_0 = ((Indi_ZigZag *) this.Data()).GetValue(0);
+    double zigzag_1 = ((Indi_ZigZag *) this.Data()).GetValue(1);
+    double zigzag_2 = ((Indi_ZigZag *) this.Data()).GetValue(2);
+    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
+    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
+    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    switch (cmd) {
+      case ORDER_TYPE_BUY:
+        /*
+          bool _result = ZigZag_0[LINE_LOWER] != 0.0 || ZigZag_1[LINE_LOWER] != 0.0 || ZigZag_2[LINE_LOWER] != 0.0;
+          if (METHOD(_signal_method, 0)) _result &= Open[CURR] > Close[CURR];
+          if (METHOD(_signal_method, 1)) _result &= !ZigZag_On_Sell(tf);
+          if (METHOD(_signal_method, 2)) _result &= ZigZag_On_Buy(fmin(period + 1, M30));
+          if (METHOD(_signal_method, 3)) _result &= ZigZag_On_Buy(M30);
+          if (METHOD(_signal_method, 4)) _result &= ZigZag_2[LINE_LOWER] != 0.0;
+          if (METHOD(_signal_method, 5)) _result &= !ZigZag_On_Sell(M30);
+          */
+      break;
+      case ORDER_TYPE_SELL:
+        /*
+          bool _result = ZigZag_0[LINE_UPPER] != 0.0 || ZigZag_1[LINE_UPPER] != 0.0 || ZigZag_2[LINE_UPPER] != 0.0;
+          if (METHOD(_signal_method, 0)) _result &= Open[CURR] < Close[CURR];
+          if (METHOD(_signal_method, 1)) _result &= !ZigZag_On_Buy(tf);
+          if (METHOD(_signal_method, 2)) _result &= ZigZag_On_Sell(fmin(period + 1, M30));
+          if (METHOD(_signal_method, 3)) _result &= ZigZag_On_Sell(M30);
+          if (METHOD(_signal_method, 4)) _result &= ZigZag_2[LINE_UPPER] != 0.0;
+          if (METHOD(_signal_method, 5)) _result &= !ZigZag_On_Buy(M30);
+          */
+      break;
+    }
+    #ifdef __profiler__ PROFILER_STOP #endif
+    return _result;
   }
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return result;
-}
-
-bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-  if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-  if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-  if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-  return this.SignalOpen(this.Chart(), _cmd, _signal_method, _signal_level1);
-}
 
 };
 
@@ -5108,89 +4993,88 @@ bool CheckMarketEvent(Chart *_chart, ENUM_ORDER_TYPE cmd = EMPTY, ENUM_MARKET_EV
   if (VerboseTrace) terminal.Logger().Trace(StringFormat("%s(%s, %d)", EnumToString(cmd), _chart.TfToString(), condition), __FUNCTION_LINE__);
   switch (condition) {
     case C_AC_BUY_SELL:
-      GetStratByIndiType(INDI_AC, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
+      result = GetStratByIndiType(INDI_AC, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_AD_BUY_SELL:
-      result = Stg_AD::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_AD, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_ADX_BUY_SELL:
-      result = Stg_ADX::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_ADX, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_ALLIGATOR_BUY_SELL:
-      result = Stg_Alligator::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_ALLIGATOR, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_ATR_BUY_SELL:
-      result = Stg_ATR::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_ATR, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_AWESOME_BUY_SELL:
-      result = Stg_Awesome::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_AO, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_BANDS_BUY_SELL:
-      result = Stg_Bands::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_BANDS, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_BEARSPOWER_BUY_SELL:
-      result = Stg_BearsPower::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_BEARS, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_BULLSPOWER_BUY_SELL:
-      result = Stg_BullsPower::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_BULLS, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_CCI_BUY_SELL:
-      result = Stg_CCI::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_CCI, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_DEMARKER_BUY_SELL:
-      result = Stg_DeMarker::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_DEMARKER, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_ENVELOPES_BUY_SELL:
-      result = Stg_Envelopes::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_ENVELOPES, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_FORCE_BUY_SELL:
-      result = Stg_Force::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_FORCE, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_FRACTALS_BUY_SELL:
-      result = Stg_Fractals::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_FRACTALS, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_GATOR_BUY_SELL:
-      result = Stg_Gator::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_GATOR, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_ICHIMOKU_BUY_SELL:
-      result = Stg_Ichimoku::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_ICHIMOKU, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_MA_BUY_SELL:
-      result = Stg_MA::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_MA, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_MACD_BUY_SELL:
-      result = Stg_MACD::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_MACD, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_MFI_BUY_SELL:
-      result = Stg_MFI::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_MFI, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_OBV_BUY_SELL:
-      result = Stg_OBV::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_OBV, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_OSMA_BUY_SELL:
-      result = Stg_OSMA::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_OSMA, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_RSI_BUY_SELL:
-      GetStratByIndiType(INDI_RSI, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
-      if (result && VerboseDebug) PrintFormat("%s(): %s on %s", __FUNCTION_LINE__, EnumToString(condition), EnumToString(cmd));
+      result = GetStratByIndiType(INDI_RSI, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_RVI_BUY_SELL:
-      result = Stg_RVI::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_RVI, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_SAR_BUY_SELL:
-      result = Stg_SAR::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_SAR, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_STDDEV_BUY_SELL:
-      result = Stg_StdDev::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_STDDEV, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_STOCHASTIC_BUY_SELL:
-      result = Stg_Stoch::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_STOCHASTIC, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_WPR_BUY_SELL:
-      result = Stg_WPR::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_WPR, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_ZIGZAG_BUY_SELL:
-      result = Stg_ZigZag::SignalOpen(_chart, cmd);
+      result = GetStratByIndiType(INDI_ZIGZAG, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_MA_FAST_SLOW_OPP: // MA Fast&Slow are in opposite directions.
       UpdateIndicator(_chart, INDI_MA);
