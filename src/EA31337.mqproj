@@ -532,6 +532,11 @@
       "path":".\\include\\EA31337-strategies\\ZigZag\\Stg_ZigZag.mqh",
       "compile":"false",
       "relative_to_project":"true"
+    },
+    {
+      "path":".\\include\\EA31337-strategies\\strategies.mqh",
+      "compile":"false",
+      "relative_to_project":"true"
     }
   ]
 }
