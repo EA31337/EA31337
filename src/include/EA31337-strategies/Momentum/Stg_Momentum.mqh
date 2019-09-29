@@ -13,6 +13,37 @@
 #include "../../EA31337-classes/Indicators/Indi_Momentum.mqh"
 #include "../../EA31337-classes/Strategy.mqh"
 
+// User input params.
+#ifndef __noparams__
+string __Momentum_Parameters__ = "-- Settings for the Momentum indicator --"; // >>> MOMENTUM <<<
+uint Momentum_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+ENUM_TRAIL_TYPE Momentum_TrailingStopMethod = 22; // Trail stop method
+ENUM_TRAIL_TYPE Momentum_TrailingProfitMethod = 1; // Trail profit method
+int Momentum_Period = 12; // Period Fast
+ENUM_APPLIED_PRICE Momentum_Applied_Price = PRICE_CLOSE; // Applied Price
+double Momentum_SignalLevel = 0.00000000; // Signal level
+int Momentum1_SignalMethod = 0; // Signal method for M1 (0-
+int Momentum5_SignalMethod = 0; // Signal method for M5 (0-
+int Momentum15_SignalMethod = 0; // Signal method for M15 (0-
+int Momentum30_SignalMethod = 0; // Signal method for M30 (0-
+int Momentum1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int Momentum1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+ENUM_MARKET_EVENT Momentum1_CloseCondition = C_MOMENTUM_BUY_SELL; // Close condition for M1
+int Momentum5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int Momentum5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+ENUM_MARKET_EVENT Momentum5_CloseCondition = C_MOMENTUM_BUY_SELL; // Close condition for M5
+int Momentum15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int Momentum15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+ENUM_MARKET_EVENT Momentum15_CloseCondition = C_MOMENTUM_BUY_SELL; // Close condition for M15
+int Momentum30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int Momentum30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+ENUM_MARKET_EVENT Momentum30_CloseCondition = C_MOMENTUM_BUY_SELL; // Close condition for M30
+double Momentum1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+double Momentum5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+double Momentum15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+double Momentum30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+#endif
+
 class Stg_Momentum : public Strategy {
 
   public:

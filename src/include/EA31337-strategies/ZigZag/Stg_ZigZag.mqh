@@ -13,6 +13,39 @@
 #include "../../EA31337-classes/Indicators/Indi_ZigZag.mqh"
 #include "../../EA31337-classes/Strategy.mqh"
 
+// User input params.
+#ifndef __noparams__
+string __ZigZag_Parameters__ = "-- Settings for the ZigZag indicator --"; // >>> ZIGZAG <<<
+uint ZigZag_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+uint ZigZag_Depth = 0; // Depth
+uint ZigZag_Deviation = 0; // Deviation
+uint ZigZag_Backstep = 0; // Deviation
+uint ZigZag_Shift = 0; // Shift (relative to the current bar)
+ENUM_TRAIL_TYPE ZigZag_TrailingStopMethod = 22; // Trail stop method
+ENUM_TRAIL_TYPE ZigZag_TrailingProfitMethod = 1; // Trail profit method
+double ZigZag_SignalLevel = 0.00000000; // Signal level
+int ZigZag1_SignalMethod = 0; // Signal method for M1 (0-31)
+int ZigZag5_SignalMethod = 0; // Signal method for M5 (0-31)
+int ZigZag15_SignalMethod = 0; // Signal method for M15 (0-31)
+int ZigZag30_SignalMethod = 0; // Signal method for M30 (0-31)
+int ZigZag1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int ZigZag1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+ENUM_MARKET_EVENT ZigZag1_CloseCondition = C_ZIGZAG_BUY_SELL; // Close condition for M1
+int ZigZag5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int ZigZag5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+ENUM_MARKET_EVENT ZigZag5_CloseCondition = C_ZIGZAG_BUY_SELL; // Close condition for M5
+int ZigZag15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int ZigZag15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+ENUM_MARKET_EVENT ZigZag15_CloseCondition = C_ZIGZAG_BUY_SELL; // Close condition for M15
+int ZigZag30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int ZigZag30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+ENUM_MARKET_EVENT ZigZag30_CloseCondition = C_ZIGZAG_BUY_SELL; // Close condition for M30
+double ZigZag1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+double ZigZag5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+double ZigZag15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+double ZigZag30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+#endif
+
 class Stg_ZigZag : public Strategy {
 
   public:

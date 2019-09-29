@@ -13,6 +13,40 @@
 #include "../../EA31337-classes/Indicators/Indi_DeMarker.mqh"
 #include "../../EA31337-classes/Strategy.mqh"
 
+// User input params.
+#ifndef __noparams__
+extern string __DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --"; // >>> DEMARKER <<<
+extern uint DeMarker_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern int DeMarker_Period_M1 = 68; // Period for M1
+extern int DeMarker_Period_M5 = 76; // Period for M5
+extern int DeMarker_Period_M15 = 26; // Period for M15
+extern int DeMarker_Period_M30 = 14; // Period for M30
+extern int DeMarker_Shift = 1; // Shift
+extern double DeMarker_SignalLevel = 0.5; // Signal level (0.0-0.5)
+extern ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = 23; // Trail stop method
+extern ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = 22; // Trail profit method
+extern int DeMarker1_SignalMethod = 12; // Signal method for M1 (-31-31)
+extern int DeMarker5_SignalMethod = 12; // Signal method for M5 (-31-31)
+extern int DeMarker15_SignalMethod = 4; // Signal method for M15 (-31-31)
+extern int DeMarker30_SignalMethod = 12; // Signal method for M30 (-31-31)
+extern int DeMarker1_OpenCondition1 = 680; // Open condition 1 for M1 (0-1023)
+extern int DeMarker1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+extern ENUM_MARKET_EVENT DeMarker1_CloseCondition = 1; // Close condition for M1
+extern int DeMarker5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
+extern int DeMarker5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+extern ENUM_MARKET_EVENT DeMarker5_CloseCondition = 1; // Close condition for M5
+extern int DeMarker15_OpenCondition1 = 874; // Open condition 1 for M15 (0-1023)
+extern int DeMarker15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+extern ENUM_MARKET_EVENT DeMarker15_CloseCondition = 1; // Close condition for M15
+extern int DeMarker30_OpenCondition1 = 195; // Open condition 1 for M30 (0-1023)
+extern int DeMarker30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+extern ENUM_MARKET_EVENT DeMarker30_CloseCondition = 1; // Close condition for M30
+extern double DeMarker1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+extern double DeMarker5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+extern double DeMarker15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+extern double DeMarker30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+#endif
+
 class Stg_DeMarker : public Strategy {
 
   public:

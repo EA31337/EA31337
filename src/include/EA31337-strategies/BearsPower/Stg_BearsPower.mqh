@@ -13,6 +13,38 @@
 #include "../../EA31337-classes/Indicators/Indi_BearsPower.mqh"
 #include "../../EA31337-classes/Strategy.mqh"
 
+// User input params.
+#ifndef __noparams__
+string __BearsPower_Parameters__ = "-- Settings for the Bears Power indicator --"; // >>> BEARS POWER <<<
+uint BearsPower_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+ENUM_TRAIL_TYPE BearsPower_TrailingStopMethod = 22; // Trail stop method
+ENUM_TRAIL_TYPE BearsPower_TrailingProfitMethod = 1; // Trail profit method
+int BearsPower_Period = 13; // Period
+ENUM_APPLIED_PRICE BearsPower_Applied_Price = PRICE_CLOSE; // Applied Price
+double BearsPower_SignalLevel = 0.00000000; // Signal level
+uint BearsPower_Shift = 0; // Shift (relative to the current bar, 0 - default)
+int BearsPower1_SignalMethod = 0; // Signal method for M1 (0-
+int BearsPower5_SignalMethod = 0; // Signal method for M5 (0-
+int BearsPower15_SignalMethod = 0; // Signal method for M15 (0-
+int BearsPower30_SignalMethod = 0; // Signal method for M30 (0-
+int BearsPower1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int BearsPower1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+ENUM_MARKET_EVENT BearsPower1_CloseCondition = C_BEARSPOWER_BUY_SELL; // Close condition for M1
+int BearsPower5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int BearsPower5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+ENUM_MARKET_EVENT BearsPower5_CloseCondition = C_BEARSPOWER_BUY_SELL; // Close condition for M5
+int BearsPower15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int BearsPower15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+ENUM_MARKET_EVENT BearsPower15_CloseCondition = C_BEARSPOWER_BUY_SELL; // Close condition for M15
+int BearsPower30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int BearsPower30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+ENUM_MARKET_EVENT BearsPower30_CloseCondition = C_BEARSPOWER_BUY_SELL; // Close condition for M30
+double BearsPower1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+double BearsPower5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+double BearsPower15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+double BearsPower30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+#endif
+
 class Stg_BearsPower : public Strategy {
 
   public:

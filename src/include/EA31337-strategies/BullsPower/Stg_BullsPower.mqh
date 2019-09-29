@@ -13,6 +13,38 @@
 #include "../../EA31337-classes/Indicators/Indi_BullsPower.mqh"
 #include "../../EA31337-classes/Strategy.mqh"
 
+// User input params.
+#ifndef __noparams__
+string __BullsPower_Parameters__ = "-- Settings for the Bulls Power indicator --"; // >>> BULLS POWER <<<
+uint BullsPower_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+ENUM_TRAIL_TYPE BullsPower_TrailingStopMethod = 22; // Trail stop method
+ENUM_TRAIL_TYPE BullsPower_TrailingProfitMethod = 1; // Trail profit method
+int BullsPower_Period = 13; // Period
+ENUM_APPLIED_PRICE BullsPower_Applied_Price = PRICE_CLOSE; // Applied Price
+double BullsPower_SignalLevel = 0.00000000; // Signal level
+uint BullsPower_Shift = 0; // Shift (relative to the current bar, 0 - default)
+int BullsPower1_SignalMethod = 0; // Signal method for M1 (0-
+int BullsPower5_SignalMethod = 0; // Signal method for M5 (0-
+int BullsPower15_SignalMethod = 0; // Signal method for M15 (0-
+int BullsPower30_SignalMethod = 0; // Signal method for M30 (0-
+int BullsPower1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int BullsPower1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+ENUM_MARKET_EVENT BullsPower1_CloseCondition = C_BULLSPOWER_BUY_SELL; // Close condition for M1
+int BullsPower5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int BullsPower5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+ENUM_MARKET_EVENT BullsPower5_CloseCondition = C_BULLSPOWER_BUY_SELL; // Close condition for M5
+int BullsPower15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int BullsPower15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+ENUM_MARKET_EVENT BullsPower15_CloseCondition = C_BULLSPOWER_BUY_SELL; // Close condition for M15
+int BullsPower30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int BullsPower30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+ENUM_MARKET_EVENT BullsPower30_CloseCondition = C_BULLSPOWER_BUY_SELL; // Close condition for M30
+double BullsPower1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+double BullsPower5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+double BullsPower15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+double BullsPower30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+#endif
+
 class Stg_BullsPower : public Strategy {
 
   public:
