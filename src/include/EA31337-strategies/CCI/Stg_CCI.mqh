@@ -13,6 +13,41 @@
 #include "../../EA31337-classes/Indicators/Indi_CCI.mqh"
 #include "../../EA31337-classes/Strategy.mqh"
 
+// User input params.
+#ifndef __noparams__
+extern string __CCI_Parameters__ = "-- Settings for the Commodity Channel Index indicator --"; // >>> CCI <<<
+extern uint CCI_Active_Tf = 15; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern int CCI_Shift = 1; // Shift (0 for default)
+extern ENUM_TRAIL_TYPE CCI_TrailingStopMethod = 1; // Trail stop method
+extern ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = 1; // Trail profit method
+extern int CCI_Period_M1 = 58; // Period for M1
+extern int CCI_Period_M5 = 22; // Period for M5
+extern int CCI_Period_M15 = 18; // Period for M15
+extern int CCI_Period_M30 = 26; // Period for M30
+extern ENUM_APPLIED_PRICE CCI_Applied_Price = 2; // Applied Price
+extern double CCI_SignalLevel = 98; // Signal level (100 by default)
+extern int CCI1_SignalMethod = 34; // Signal method for M1 (0-63)
+extern int CCI5_SignalMethod = 18; // Signal method for M5 (0-63)
+extern int CCI15_SignalMethod = 0; // Signal method for M15 (0-63)
+extern int CCI30_SignalMethod = -44; // Signal method for M30 (0-63)
+extern int CCI1_OpenCondition1 = 680; // Open condition 1 for M1 (0-1023)
+extern int CCI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+extern ENUM_MARKET_EVENT CCI1_CloseCondition = 31; // Close condition for M1
+extern int CCI5_OpenCondition1 = 389; // Open condition 1 for M5 (0-1023)
+extern int CCI5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+extern ENUM_MARKET_EVENT CCI5_CloseCondition = 5; // Close condition for M5
+extern int CCI15_OpenCondition1 = 292; // Open condition 1 for M15 (0-1023)
+extern int CCI15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+extern ENUM_MARKET_EVENT CCI15_CloseCondition = 5; // Close condition for M15
+extern int CCI30_OpenCondition1 = 292; // Open condition 1 for M30 (0-1023)
+extern int CCI30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+extern ENUM_MARKET_EVENT CCI30_CloseCondition = 5; // Close condition for M30
+double CCI1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+double CCI5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+double CCI15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+double CCI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+#endif
+
 class Stg_CCI : public Strategy {
 
   public:

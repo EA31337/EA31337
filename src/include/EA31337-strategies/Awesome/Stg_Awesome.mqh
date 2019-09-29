@@ -13,6 +13,36 @@
 #include "../../EA31337-classes/Indicators/Indi_AO.mqh"
 #include "../../EA31337-classes/Strategy.mqh"
 
+// User input params.
+#ifndef __noparams__
+string __Awesome_Parameters__ = "-- Settings for the Awesome oscillator --"; // >>> AWESOME <<<
+uint Awesome_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+ENUM_TRAIL_TYPE Awesome_TrailingStopMethod = 22; // Trail stop method
+ENUM_TRAIL_TYPE Awesome_TrailingProfitMethod = 1; // Trail profit method
+double Awesome_SignalLevel = 0.00000000; // Signal level
+uint Awesome_Shift = 0; // Shift (relative to the current bar, 0 - default)
+int Awesome1_SignalMethod = 0; // Signal method for M1 (0-31)
+int Awesome5_SignalMethod = 0; // Signal method for M5 (0-31)
+int Awesome15_SignalMethod = 0; // Signal method for M15 (0-31)
+int Awesome30_SignalMethod = 0; // Signal method for M30 (0-31)
+int Awesome1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int Awesome1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+ENUM_MARKET_EVENT Awesome1_CloseCondition = C_AWESOME_BUY_SELL; // Close condition for M1
+int Awesome5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int Awesome5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+ENUM_MARKET_EVENT Awesome5_CloseCondition = C_AWESOME_BUY_SELL; // Close condition for M5
+int Awesome15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int Awesome15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+ENUM_MARKET_EVENT Awesome15_CloseCondition = C_AWESOME_BUY_SELL; // Close condition for M15
+int Awesome30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int Awesome30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+ENUM_MARKET_EVENT Awesome30_CloseCondition = C_AWESOME_BUY_SELL; // Close condition for M30
+double Awesome1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+double Awesome5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+double Awesome15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+double Awesome30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+#endif
+
 class Stg_Awesome : public Strategy {
 
   public:

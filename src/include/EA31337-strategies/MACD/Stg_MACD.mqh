@@ -13,6 +13,40 @@
 #include "../../EA31337-classes/Indicators/Indi_MACD.mqh"
 #include "../../EA31337-classes/Strategy.mqh"
 
+// User input params.
+#ifndef __noparams__
+extern string __MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --"; // >>> MACD <<<
+extern uint MACD_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern int MACD_Period_Fast = 23; // Period Fast
+extern int MACD_Period_Slow = 21; // Period Slow
+extern int MACD_Period_Signal = 10; // Period for signal
+extern ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_CLOSE; // Applied Price
+extern int MACD_Shift = 3; // Shift
+extern ENUM_TRAIL_TYPE MACD_TrailingStopMethod = -1; // Trail stop method
+extern ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = -19; // Trail profit method
+extern double MACD_SignalLevel = 0.1; // Signal level
+extern int MACD1_SignalMethod = -26; // Signal method for M1 (-31-31)
+extern int MACD5_SignalMethod = -31; // Signal method for M5 (-31-31)
+extern int MACD15_SignalMethod = -25; // Signal method for M15 (-31-31)
+extern int MACD30_SignalMethod = 4; // Signal method for M30 (-31-31)
+extern int MACD1_OpenCondition1 = 874; // Open condition 1 for M1 (0-1023)
+extern int MACD1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+extern ENUM_MARKET_EVENT MACD1_CloseCondition = 1; // Close condition for M1
+extern int MACD5_OpenCondition1 = 680; // Open condition 1 for M5 (0-1023)
+extern int MACD5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+extern ENUM_MARKET_EVENT MACD5_CloseCondition = 1; // Close condition for M5
+extern int MACD15_OpenCondition1 = 486; // Open condition 1 for M15 (0-1023)
+extern int MACD15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+extern ENUM_MARKET_EVENT MACD15_CloseCondition = 1; // Close condition for M15
+extern int MACD30_OpenCondition1 = 777; // Open condition 1 for M30 (0-1023)
+extern int MACD30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+extern ENUM_MARKET_EVENT MACD30_CloseCondition = 1; // Close condition for M30
+extern double MACD1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+extern double MACD5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+extern double MACD15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+extern double MACD30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+#endif
+
 class Stg_MACD : public Strategy {
 
   public:

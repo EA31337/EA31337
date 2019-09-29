@@ -13,6 +13,38 @@
 #include "../../EA31337-classes/Indicators/Indi_SAR.mqh"
 #include "../../EA31337-classes/Strategy.mqh"
 
+// User input params.
+#ifndef __noparams__
+extern string __SAR_Parameters__ = "-- Settings for the Parabolic Stop and Reverse system indicator --"; // >>> SAR <<<
+extern uint SAR_Active_Tf = 8; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern double SAR_Step = 0.05; // Step
+extern double SAR_Maximum_Stop = 0.4; // Maximum stop
+extern int SAR_Shift = 0; // Shift
+extern ENUM_TRAIL_TYPE SAR_TrailingStopMethod = 7; // Trail stop method
+extern ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = 11; // Trail profit method
+extern double SAR_SignalLevel = 0; // Signal level
+extern int SAR1_SignalMethod = 91; // Signal method for M1 (-127-127)
+extern int SAR5_SignalMethod = 25; // Signal method for M5 (-127-127)
+extern int SAR15_SignalMethod = 28; // Signal method for M15 (-127-127)
+extern int SAR30_SignalMethod = 2; // Signal method for M30 (-127-127)
+extern int SAR1_OpenCondition1 = 680;
+extern int SAR1_OpenCondition2 = 0;
+extern ENUM_MARKET_EVENT SAR1_CloseCondition = 1; // Close condition for M1
+extern int SAR5_OpenCondition1 = 680; // Open condition 1 for M1 (0-1023)
+extern int SAR5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+extern ENUM_MARKET_EVENT SAR5_CloseCondition = 1; // Close condition for M5
+extern int SAR15_OpenCondition1 = 389; // Open condition 1 for M15 (0-1023)
+extern int SAR15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+extern ENUM_MARKET_EVENT SAR15_CloseCondition = 1; // Close condition for M15
+extern int SAR30_OpenCondition1 = 389; // Open condition 1 for M30 (0-1023)
+extern int SAR30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+extern ENUM_MARKET_EVENT SAR30_CloseCondition = 1; // Close condition for M30
+extern double SAR1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+extern double SAR5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+extern double SAR15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+extern double SAR30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+#endif
+
 class Stg_SAR : public Strategy {
 
   public:

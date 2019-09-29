@@ -13,6 +13,39 @@
 #include "../../EA31337-classes/Indicators/Indi_OSMA.mqh"
 #include "../../EA31337-classes/Strategy.mqh"
 
+// User input params.
+#ifndef __noparams__
+string __OSMA_Parameters__ = "-- Settings for the Moving Average of Oscillator indicator --"; // >>> OSMA <<<
+uint OSMA_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+ENUM_TRAIL_TYPE OSMA_TrailingStopMethod = 25; // Trail stop method
+ENUM_TRAIL_TYPE OSMA_TrailingProfitMethod = 1; // Trail profit method
+int OSMA_Period_Fast = 8; // Period Fast
+int OSMA_Period_Slow = 6; // Period Slow
+int OSMA_Period_Signal = 9; // Period for signal
+ENUM_APPLIED_PRICE OSMA_Applied_Price = 4; // Applied Price
+double OSMA_SignalLevel = -0.2; // Signal level
+int OSMA1_SignalMethod = 120; // Signal method for M1 (0-
+int OSMA5_SignalMethod = 49; // Signal method for M5 (0-
+int OSMA15_SignalMethod = -71; // Signal method for M15 (0-
+int OSMA30_SignalMethod = -95; // Signal method for M30 (0-
+int OSMA1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int OSMA1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+ENUM_MARKET_EVENT OSMA1_CloseCondition = C_OSMA_BUY_SELL; // Close condition for M1
+int OSMA5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int OSMA5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+ENUM_MARKET_EVENT OSMA5_CloseCondition = C_OSMA_BUY_SELL; // Close condition for M5
+int OSMA15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int OSMA15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+ENUM_MARKET_EVENT OSMA15_CloseCondition = C_OSMA_BUY_SELL; // Close condition for M15
+int OSMA30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int OSMA30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+ENUM_MARKET_EVENT OSMA30_CloseCondition = C_OSMA_BUY_SELL; // Close condition for M30
+double OSMA1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+double OSMA5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+double OSMA15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+double OSMA30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+#endif
+
 class Stg_OSMA : public Strategy {
 
   public:

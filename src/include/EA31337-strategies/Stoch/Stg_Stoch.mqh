@@ -13,6 +13,41 @@
 #include "../../EA31337-classes/Indicators/Indi_Stochastic.mqh"
 #include "../../EA31337-classes/Strategy.mqh"
 
+// User input params.
+#ifndef __noparams__
+string __Stochastic_Parameters__ = "-- Settings for the Stochastic Oscillator --"; // >>> STOCHASTIC <<<
+uint Stochastic_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+uint Stochastic_KPeriod = 5; // K line period
+uint Stochastic_DPeriod = 5; // D line period
+uint Stochastic_Slowing = 5; // Slowing
+ENUM_MA_METHOD Stochastic_MA_Method = MODE_SMA; // Moving Average method
+ENUM_STO_PRICE Stochastic_Price_Field = 0; // Price (0 - Low/High or 1 - Close/Close)
+uint Stochastic_Shift = 0; // Shift (relative to the current bar)
+ENUM_TRAIL_TYPE Stochastic_TrailingStopMethod = 22; // Trail stop method
+ENUM_TRAIL_TYPE Stochastic_TrailingProfitMethod = 1; // Trail profit method
+double Stochastic_SignalLevel = 0.00000000; // Signal level
+int Stochastic1_SignalMethod = 0; // Signal method for M1 (0-
+int Stochastic5_SignalMethod = 0; // Signal method for M5 (0-
+int Stochastic15_SignalMethod = 0; // Signal method for M15 (0-
+int Stochastic30_SignalMethod = 0; // Signal method for M30 (0-
+int Stochastic1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int Stochastic1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+ENUM_MARKET_EVENT Stochastic1_CloseCondition = C_STOCHASTIC_BUY_SELL; // Close condition for M1
+int Stochastic5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int Stochastic5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+ENUM_MARKET_EVENT Stochastic5_CloseCondition = C_STOCHASTIC_BUY_SELL; // Close condition for M5
+int Stochastic15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int Stochastic15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+ENUM_MARKET_EVENT Stochastic15_CloseCondition = C_STOCHASTIC_BUY_SELL; // Close condition for M15
+int Stochastic30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int Stochastic30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+ENUM_MARKET_EVENT Stochastic30_CloseCondition = C_STOCHASTIC_BUY_SELL; // Close condition for M30
+double Stochastic1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+double Stochastic5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+double Stochastic15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+double Stochastic30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+#endif
+
 class Stg_Stoch : public Strategy {
 
   public:

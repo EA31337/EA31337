@@ -13,6 +13,38 @@
 #include "../../EA31337-classes/Indicators/Indi_Ichimoku.mqh"
 #include "../../EA31337-classes/Strategy.mqh"
 
+// User input params.
+#ifndef __noparams__
+string __Ichimoku_Parameters__ = "-- Settings for the Ichimoku Kinko Hyo indicator --"; // >>> ICHIMOKU <<<
+uint Ichimoku_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+ENUM_TRAIL_TYPE Ichimoku_TrailingStopMethod = 22; // Trail stop method
+ENUM_TRAIL_TYPE Ichimoku_TrailingProfitMethod = 1; // Trail profit method
+int Ichimoku_Period_Tenkan_Sen = 9; // Period Tenkan Sen
+int Ichimoku_Period_Kijun_Sen = 26; // Period Kijun Sen
+int Ichimoku_Period_Senkou_Span_B = 52; // Period Senkou Span B
+double Ichimoku_SignalLevel = 0.00000000; // Signal level
+int Ichimoku1_SignalMethod = 0; // Signal method for M1 (0-
+int Ichimoku5_SignalMethod = 0; // Signal method for M5 (0-
+int Ichimoku15_SignalMethod = 0; // Signal method for M15 (0-
+int Ichimoku30_SignalMethod = 0; // Signal method for M30 (0-
+int Ichimoku1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int Ichimoku1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+ENUM_MARKET_EVENT Ichimoku1_CloseCondition = C_ICHIMOKU_BUY_SELL; // Close condition for M1
+int Ichimoku5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int Ichimoku5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+ENUM_MARKET_EVENT Ichimoku5_CloseCondition = C_ICHIMOKU_BUY_SELL; // Close condition for M5
+int Ichimoku15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int Ichimoku15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+ENUM_MARKET_EVENT Ichimoku15_CloseCondition = C_ICHIMOKU_BUY_SELL; // Close condition for M15
+int Ichimoku30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int Ichimoku30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+ENUM_MARKET_EVENT Ichimoku30_CloseCondition = C_ICHIMOKU_BUY_SELL; // Close condition for M30
+double Ichimoku1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+double Ichimoku5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+double Ichimoku15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+double Ichimoku30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+#endif
+
 class Stg_Ichimoku : public Strategy {
 
   public:

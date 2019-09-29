@@ -13,6 +13,40 @@
 #include "../../EA31337-classes/Indicators/Indi_WPR.mqh"
 #include "../../EA31337-classes/Strategy.mqh"
 
+// User input params.
+#ifndef __noparams__
+extern string __WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --"; // >>> WPR <<<
+extern uint WPR_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern int WPR_Period_M1 = 11; // Period for M1
+extern int WPR_Period_M5 = 5; // Period for M5
+extern int WPR_Period_M15 = 5; // Period for M15
+extern int WPR_Period_M30 = 8; // Period for M30
+extern int WPR_Shift = 0; // Shift
+extern int WPR_SignalLevel = 20; // Signal level
+extern ENUM_TRAIL_TYPE WPR_TrailingStopMethod = 22; // Trail stop method
+extern ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = 11; // Trail profit method
+extern int WPR1_SignalMethod = -46; // Signal method for M1 (-63-63)
+extern int WPR5_SignalMethod = -40; // Signal method for M5 (-63-63)
+extern int WPR15_SignalMethod = -60; // Signal method for M15 (-63-63)
+extern int WPR30_SignalMethod = 0; // Signal method for M30 (-63-63)
+extern int WPR1_OpenCondition1 = 874; // Open condition 1 for M1 (0-1023)
+extern int WPR1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+extern ENUM_MARKET_EVENT WPR1_CloseCondition = 1; // Close condition for M1
+extern int WPR5_OpenCondition1 = 680; // Open condition 1 for M5 (0-1023)
+extern int WPR5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+extern ENUM_MARKET_EVENT WPR5_CloseCondition = 1; // Close condition for M5
+extern int WPR15_OpenCondition1 = 98; // Open condition 1 for M15 (0-1023)
+extern int WPR15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+extern ENUM_MARKET_EVENT WPR15_CloseCondition = 1; // Close condition for M15
+extern int WPR30_OpenCondition1 = 292; // Open condition 1 for M30 (0-1023)
+extern int WPR30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+extern ENUM_MARKET_EVENT WPR30_CloseCondition = 1; // Close condition for M30
+extern double WPR1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+extern double WPR5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+extern double WPR15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+extern double WPR30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+#endif
+
 class Stg_WPR : public Strategy {
 
   public:

@@ -13,6 +13,37 @@
 #include "../../EA31337-classes/Indicators/Indi_RVI.mqh"
 #include "../../EA31337-classes/Strategy.mqh"
 
+// User input params.
+#ifndef __noparams__
+string __RVI_Parameters__ = "-- Settings for the Relative Vigor Index indicator --"; // >>> RVI <<<
+uint RVI_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+uint RVI_Period = 10; // Period
+ENUM_TRAIL_TYPE RVI_TrailingStopMethod = 22; // Trail stop method
+ENUM_TRAIL_TYPE RVI_TrailingProfitMethod = 1; // Trail profit method
+int RVI_Shift = 2; // Shift
+double RVI_SignalLevel = 0.00000000; // Signal level
+int RVI1_SignalMethod = 0; // Signal method for M1 (0-
+int RVI5_SignalMethod = 0; // Signal method for M5 (0-
+int RVI15_SignalMethod = 0; // Signal method for M15 (0-
+int RVI30_SignalMethod = 0; // Signal method for M30 (0-
+int RVI1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int RVI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+ENUM_MARKET_EVENT RVI1_CloseCondition = C_RVI_BUY_SELL; // Close condition for M1
+int RVI5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int RVI5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+ENUM_MARKET_EVENT RVI5_CloseCondition = C_RVI_BUY_SELL; // Close condition for M5
+int RVI15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int RVI15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+ENUM_MARKET_EVENT RVI15_CloseCondition = C_RVI_BUY_SELL; // Close condition for M15
+int RVI30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int RVI30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+ENUM_MARKET_EVENT RVI30_CloseCondition = C_RVI_BUY_SELL; // Close condition for M30
+double RVI1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+double RVI5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+double RVI15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+double RVI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+#endif
+
 class Stg_RVI : public Strategy {
 
   public:

@@ -13,6 +13,36 @@
 #include "../../EA31337-classes/Indicators/Indi_AD.mqh"
 #include "../../EA31337-classes/Strategy.mqh"
 
+// User input params.
+#ifndef __noparams__
+extern string __AD_Parameters__ = "-- Settings for the Accumulation/Distribution indicator --"; // >>> AD <<<
+extern uint AD_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+extern ENUM_TRAIL_TYPE AD_TrailingStopMethod = 7; // Trail stop method
+extern ENUM_TRAIL_TYPE AD_TrailingProfitMethod = 11; // Trail profit method
+extern double AD_SignalLevel = 0.00000000; // Signal level
+extern uint AD_Shift = 0; // Shift (relative to the current bar, 0 - default)
+extern int AD1_SignalMethod = 0; // Signal method for M1 (0-?)
+extern int AD5_SignalMethod = 0; // Signal method for M5 (0-?)
+extern int AD15_SignalMethod = 0; // Signal method for M15 (0-?)
+extern int AD30_SignalMethod = 0; // Signal method for M30 (0-?)
+extern int AD1_OpenCondition1 = 583; // Open condition 1 for M1 (0-1023)
+extern int AD1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+extern ENUM_MARKET_EVENT AD1_CloseCondition = 2; // Close condition for M1
+extern int AD5_OpenCondition1 = 486; // Open condition 1 for M5 (0-1023)
+extern int AD5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+extern ENUM_MARKET_EVENT AD5_CloseCondition = 3; // Close condition for M5
+extern int AD15_OpenCondition1 = 292; // Open condition 1 for M15 (0-)
+extern int AD15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+extern ENUM_MARKET_EVENT AD15_CloseCondition = 1; // Close condition for M15
+extern int AD30_OpenCondition1 = 292; // Open condition 1 for M30 (0-)
+extern int AD30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+extern ENUM_MARKET_EVENT AD30_CloseCondition = 24; // Close condition for M30
+extern double AD1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+extern double AD5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+extern double AD15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+extern double AD30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+#endif
+
 class Stg_AD : public Strategy {
 
   public:
