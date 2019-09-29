@@ -14,39 +14,37 @@
 #include "../../EA31337-classes/Strategy.mqh"
 
 // User input params.
-#ifndef __noparams__
-extern string __RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --"; // >>> RSI <<<
-extern uint RSI_Active_Tf = 12; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-extern int RSI_Period_M1 = 32; // Period for M1
-extern int RSI_Period_M5 = 2; // Period for M5
-extern int RSI_Period_M15 = 2; // Period for M15
-extern int RSI_Period_M30 = 2; // Period for M30
-extern ENUM_APPLIED_PRICE RSI_Applied_Price = 3; // Applied Price
-extern uint RSI_Shift = 0; // Shift
-extern ENUM_TRAIL_TYPE RSI_TrailingStopMethod = 6; // Trail stop method
-extern ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = 11; // Trail profit method
-extern int RSI_SignalLevel = 36; // Signal level (-49-49)
-extern int RSI1_SignalMethod = -63; // Signal method for M1 (-63-63)
-extern int RSI5_SignalMethod = -61; // Signal method for M5 (-63-63)
-extern int RSI15_SignalMethod = -63; // Signal method for M15 (-63-63)
-extern int RSI30_SignalMethod = 0; // Signal method for M30 (-63-63)
-extern int RSI1_OpenCondition1 = 1; // Open condition 1 for M1 (0-1023)
-extern int RSI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
-extern ENUM_MARKET_EVENT RSI1_CloseCondition = 1; // Close condition for M1
-extern int RSI5_OpenCondition1 = 1; // Open condition 1 for M5 (0-1023)
-extern int RSI5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
-extern ENUM_MARKET_EVENT RSI5_CloseCondition = 31; // Close condition for M5
-extern int RSI15_OpenCondition1 = 389; // Open condition 1 for M15 (0-1023)
-extern int RSI15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
-extern ENUM_MARKET_EVENT RSI15_CloseCondition = 1; // Close condition for M15
-extern int RSI30_OpenCondition1 = 195; // Open condition 1 for M30 (0-1023)
-extern int RSI30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
-extern ENUM_MARKET_EVENT RSI30_CloseCondition = 1; // Close condition for M30
+INPUT string __RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --"; // >>> RSI <<<
+INPUT uint RSI_Active_Tf = 12; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+INPUT int RSI_Period_M1 = 32; // Period for M1
+INPUT int RSI_Period_M5 = 2; // Period for M5
+INPUT int RSI_Period_M15 = 2; // Period for M15
+INPUT int RSI_Period_M30 = 2; // Period for M30
+INPUT ENUM_APPLIED_PRICE RSI_Applied_Price = 3; // Applied Price
+INPUT uint RSI_Shift = 0; // Shift
+INPUT ENUM_TRAIL_TYPE RSI_TrailingStopMethod = 6; // Trail stop method
+INPUT ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = 11; // Trail profit method
+INPUT int RSI_SignalLevel = 36; // Signal level (-49-49)
+INPUT int RSI1_SignalMethod = -63; // Signal method for M1 (-63-63)
+INPUT int RSI5_SignalMethod = -61; // Signal method for M5 (-63-63)
+INPUT int RSI15_SignalMethod = -63; // Signal method for M15 (-63-63)
+INPUT int RSI30_SignalMethod = 0; // Signal method for M30 (-63-63)
+INPUT int RSI1_OpenCondition1 = 1; // Open condition 1 for M1 (0-1023)
+INPUT int RSI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+INPUT ENUM_MARKET_EVENT RSI1_CloseCondition = 1; // Close condition for M1
+INPUT int RSI5_OpenCondition1 = 1; // Open condition 1 for M5 (0-1023)
+INPUT int RSI5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+INPUT ENUM_MARKET_EVENT RSI5_CloseCondition = 31; // Close condition for M5
+INPUT int RSI15_OpenCondition1 = 389; // Open condition 1 for M15 (0-1023)
+INPUT int RSI15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+INPUT ENUM_MARKET_EVENT RSI15_CloseCondition = 1; // Close condition for M15
+INPUT int RSI30_OpenCondition1 = 195; // Open condition 1 for M30 (0-1023)
+INPUT int RSI30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+INPUT ENUM_MARKET_EVENT RSI30_CloseCondition = 1; // Close condition for M30
 double RSI1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 double RSI5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 double RSI15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
 double RSI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
-#endif
 
 class Stg_RSI : public Strategy {
 

@@ -14,7 +14,6 @@
 #include "../../EA31337-classes/Strategy.mqh"
 
 // User input params.
-#ifndef __noparams__
 string __ZigZag_Parameters__ = "-- Settings for the ZigZag indicator --"; // >>> ZIGZAG <<<
 uint ZigZag_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 uint ZigZag_Depth = 0; // Depth
@@ -44,7 +43,6 @@ double ZigZag1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 double ZigZag5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 double ZigZag15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
 double ZigZag30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
-#endif
 
 class Stg_ZigZag : public Strategy {
 

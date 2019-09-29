@@ -14,44 +14,42 @@
 #include "../../EA31337-classes/Strategy.mqh"
 
 // User input params.
-#ifndef __noparams__
-extern string __Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --"; // >>> BANDS <<<
-extern uint Bands_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-extern int Bands_Period_M1 = 2; // Period for M1
-extern int Bands_Period_M5 = 2; // Period for M5
-extern int Bands_Period_M15 = 2; // Period for M15
-extern int Bands_Period_M30 = 2; // Period for M30
-extern ENUM_APPLIED_PRICE Bands_Applied_Price = PRICE_CLOSE; // Applied Price
-extern double Bands_Deviation_M1 = 0.3; // Deviation for M1
-extern double Bands_Deviation_M5 = 0.3; // Deviation for M5
-extern double Bands_Deviation_M15 = 0.3; // Deviation for M15
-extern double Bands_Deviation_M30 = 0.3; // Deviation for M30
-extern int Bands_HShift = 0; // Horizontal shift
-extern int Bands_Shift = 0; // Shift (relative to the current bar, 0 - default)
-extern ENUM_TRAIL_TYPE Bands_TrailingStopMethod = 7; // Trail stop method
-extern ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = 22; // Trail profit method
-extern int Bands_SignalLevel = 18; // Signal level
-extern int Bands1_SignalMethod = -85; // Signal method for M1 (-127-127)
-extern int Bands5_SignalMethod = -74; // Signal method for M5 (-127-127)
-extern int Bands15_SignalMethod = -127; // Signal method for M15 (-127-127)
-extern int Bands30_SignalMethod = -127; // Signal method for M30 (-127-127)
-extern int Bands1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
-extern int Bands1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
-extern ENUM_MARKET_EVENT Bands1_CloseCondition = 24; // Close condition for M1
-extern int Bands5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
-extern int Bands5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
-extern ENUM_MARKET_EVENT Bands5_CloseCondition = 11; // Close condition for M5
-extern int Bands15_OpenCondition1 = 292; // Open condition 1 for M15 (0-1023)
-extern int Bands15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
-extern ENUM_MARKET_EVENT Bands15_CloseCondition = 2; // Close condition for M15
-extern int Bands30_OpenCondition1 = 292; // Open condition 1 for M30 (0-1023)
-extern int Bands30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
-extern ENUM_MARKET_EVENT Bands30_CloseCondition = 1; // Close condition for M30
-extern double Bands1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-extern double Bands5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-extern double Bands15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-extern double Bands30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
-#endif
+INPUT string __Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --"; // >>> BANDS <<<
+INPUT uint Bands_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+INPUT int Bands_Period_M1 = 2; // Period for M1
+INPUT int Bands_Period_M5 = 2; // Period for M5
+INPUT int Bands_Period_M15 = 2; // Period for M15
+INPUT int Bands_Period_M30 = 2; // Period for M30
+INPUT ENUM_APPLIED_PRICE Bands_Applied_Price = PRICE_CLOSE; // Applied Price
+INPUT double Bands_Deviation_M1 = 0.3; // Deviation for M1
+INPUT double Bands_Deviation_M5 = 0.3; // Deviation for M5
+INPUT double Bands_Deviation_M15 = 0.3; // Deviation for M15
+INPUT double Bands_Deviation_M30 = 0.3; // Deviation for M30
+INPUT int Bands_HShift = 0; // Horizontal shift
+INPUT int Bands_Shift = 0; // Shift (relative to the current bar, 0 - default)
+INPUT ENUM_TRAIL_TYPE Bands_TrailingStopMethod = 7; // Trail stop method
+INPUT ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = 22; // Trail profit method
+INPUT int Bands_SignalLevel = 18; // Signal level
+INPUT int Bands1_SignalMethod = -85; // Signal method for M1 (-127-127)
+INPUT int Bands5_SignalMethod = -74; // Signal method for M5 (-127-127)
+INPUT int Bands15_SignalMethod = -127; // Signal method for M15 (-127-127)
+INPUT int Bands30_SignalMethod = -127; // Signal method for M30 (-127-127)
+INPUT int Bands1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
+INPUT int Bands1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+INPUT ENUM_MARKET_EVENT Bands1_CloseCondition = 24; // Close condition for M1
+INPUT int Bands5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
+INPUT int Bands5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+INPUT ENUM_MARKET_EVENT Bands5_CloseCondition = 11; // Close condition for M5
+INPUT int Bands15_OpenCondition1 = 292; // Open condition 1 for M15 (0-1023)
+INPUT int Bands15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+INPUT ENUM_MARKET_EVENT Bands15_CloseCondition = 2; // Close condition for M15
+INPUT int Bands30_OpenCondition1 = 292; // Open condition 1 for M30 (0-1023)
+INPUT int Bands30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+INPUT ENUM_MARKET_EVENT Bands30_CloseCondition = 1; // Close condition for M30
+INPUT double Bands1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+INPUT double Bands5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+INPUT double Bands15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+INPUT double Bands30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 class Stg_Bands : public Strategy {
 

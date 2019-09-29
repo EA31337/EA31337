@@ -14,13 +14,12 @@
 #include "../../EA31337-classes/Strategy.mqh"
 
 // User input params.
-#ifndef __noparams__
 string __BWMFI_Parameters__ = "-- Settings for the Market Facilitation Index indicator --"; // >>> BWMFI <<<
 uint BWMFI_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 ENUM_TRAIL_TYPE BWMFI_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE BWMFI_TrailingProfitMethod = 1; // Trail profit method
 double BWMFI_SignalLevel = 0.00000000; // Signal level
-extern uint BWMFI_Shift = 0; // Shift (relative to the current bar, 0 - default)
+INPUT uint BWMFI_Shift = 0; // Shift (relative to the current bar, 0 - default)
 int BWMFI1_SignalMethod = 0; // Signal method for M1 (0-
 int BWMFI5_SignalMethod = 0; // Signal method for M5 (0-
 int BWMFI15_SignalMethod = 0; // Signal method for M15 (0-
@@ -41,7 +40,6 @@ double BWMFI1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 double BWMFI5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 double BWMFI15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
 double BWMFI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
-#endif
 
 class Stg_BWMFI : public Strategy {
 

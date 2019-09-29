@@ -14,39 +14,37 @@
 #include "../../EA31337-classes/Strategy.mqh"
 
 // User input params.
-#ifndef __noparams__
-extern string __ADX_Parameters__ = "-- Settings for the Average Directional Movement Index indicator --"; // >>> ADX <<<
-extern uint ADX_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-extern ENUM_TRAIL_TYPE ADX_TrailingStopMethod = 11; // Trail stop method
-extern ENUM_TRAIL_TYPE ADX_TrailingProfitMethod = 25; // Trail profit method
-extern uint ADX_Period_M1 = 32; // Period for M1
-extern uint ADX_Period_M5 = 20; // Period for M5
-extern uint ADX_Period_M15 = 30; // Period for M15
-extern uint ADX_Period_M30 = 34; // Period for M30
-extern ENUM_APPLIED_PRICE ADX_Applied_Price = 3; // Applied Price
-extern double ADX_SignalLevel = 18.5; // Signal level
-extern uint ADX_Shift = 3; // Shift (relative to the current bar, 0 - default)
-extern int ADX1_SignalMethod = 0; // Signal method for M1 (0-?)
-extern int ADX5_SignalMethod = 0; // Signal method for M5 (0-?)
-extern int ADX15_SignalMethod = 0; // Signal method for M15 (0-?)
-extern int ADX30_SignalMethod = 0; // Signal method for M30 (0-?)
-extern int ADX1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
-extern int ADX1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-extern ENUM_MARKET_EVENT ADX1_CloseCondition = 13; // Close condition for M1
-extern int ADX5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
-extern int ADX5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-extern ENUM_MARKET_EVENT ADX5_CloseCondition = 11; // Close condition for M5
-extern int ADX15_OpenCondition1 = 1; // Open condition 1 for M15 (0-)
-extern int ADX15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-extern ENUM_MARKET_EVENT ADX15_CloseCondition = 1; // Close condition for M15
-extern int ADX30_OpenCondition1 = 292; // Open condition 1 for M30 (0-)
-extern int ADX30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-extern ENUM_MARKET_EVENT ADX30_CloseCondition = 24; // Close condition for M30
-extern double ADX1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-extern double ADX5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-extern double ADX15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-extern double ADX30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
-#endif
+INPUT string __ADX_Parameters__ = "-- Settings for the Average Directional Movement Index indicator --"; // >>> ADX <<<
+INPUT uint ADX_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+INPUT ENUM_TRAIL_TYPE ADX_TrailingStopMethod = 11; // Trail stop method
+INPUT ENUM_TRAIL_TYPE ADX_TrailingProfitMethod = 25; // Trail profit method
+INPUT uint ADX_Period_M1 = 32; // Period for M1
+INPUT uint ADX_Period_M5 = 20; // Period for M5
+INPUT uint ADX_Period_M15 = 30; // Period for M15
+INPUT uint ADX_Period_M30 = 34; // Period for M30
+INPUT ENUM_APPLIED_PRICE ADX_Applied_Price = 3; // Applied Price
+INPUT double ADX_SignalLevel = 18.5; // Signal level
+INPUT uint ADX_Shift = 3; // Shift (relative to the current bar, 0 - default)
+INPUT int ADX1_SignalMethod = 0; // Signal method for M1 (0-?)
+INPUT int ADX5_SignalMethod = 0; // Signal method for M5 (0-?)
+INPUT int ADX15_SignalMethod = 0; // Signal method for M15 (0-?)
+INPUT int ADX30_SignalMethod = 0; // Signal method for M30 (0-?)
+INPUT int ADX1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
+INPUT int ADX1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+INPUT ENUM_MARKET_EVENT ADX1_CloseCondition = 13; // Close condition for M1
+INPUT int ADX5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
+INPUT int ADX5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+INPUT ENUM_MARKET_EVENT ADX5_CloseCondition = 11; // Close condition for M5
+INPUT int ADX15_OpenCondition1 = 1; // Open condition 1 for M15 (0-)
+INPUT int ADX15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+INPUT ENUM_MARKET_EVENT ADX15_CloseCondition = 1; // Close condition for M15
+INPUT int ADX30_OpenCondition1 = 292; // Open condition 1 for M30 (0-)
+INPUT int ADX30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+INPUT ENUM_MARKET_EVENT ADX30_CloseCondition = 24; // Close condition for M30
+INPUT double ADX1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+INPUT double ADX5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+INPUT double ADX15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+INPUT double ADX30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 class Stg_ADX : public Strategy {
 

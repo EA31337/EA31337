@@ -14,42 +14,40 @@
 #include "..\..\EA31337-classes\Strategy.mqh"
 
 // User input params.
-#ifndef __noparams__
-extern string __Alligator_Parameters__ = "-- Settings for the Alligator indicator --"; // >>> ALLIGATOR <<<
-extern uint Alligator_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-extern int Alligator_Period_Jaw = 16; // Jaw Period
-extern int Alligator_Period_Teeth = 8; // Teeth Period
-extern int Alligator_Period_Lips = 6; // Lips Period
-extern int Alligator_Shift_Jaw = 5; // Jaw Shift
-extern int Alligator_Shift_Teeth = 7; // Teeth Shift
-extern int Alligator_Shift_Lips = 5; // Lips Shift
-extern ENUM_MA_METHOD Alligator_MA_Method = 2; // MA Method
-extern ENUM_APPLIED_PRICE Alligator_Applied_Price = 4; // Applied Price
-extern int Alligator_Shift = 2; // Shift
-extern ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = 7; // Trail stop method
-extern ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = 25; // Trail profit method
-extern double Alligator_SignalLevel = 0.1; // Signal level
-extern int Alligator1_SignalMethod = 19; // Signal method for M1 (-63-63)
-extern int Alligator5_SignalMethod = 27; // Signal method for M5 (-63-63)
-extern int Alligator15_SignalMethod = 20; // Signal method for M15 (-63-63)
-extern int Alligator30_SignalMethod = 16; // Signal method for M30 (-63-63)
-extern int Alligator1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
-extern int Alligator1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
-extern ENUM_MARKET_EVENT Alligator1_CloseCondition = 4; // Close condition for M1
-extern int Alligator5_OpenCondition1 = 777; // Open condition 1 for M5 (0-1023)
-extern int Alligator5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
-extern ENUM_MARKET_EVENT Alligator5_CloseCondition = 4; // Close condition for M5
-extern int Alligator15_OpenCondition1 = 98; // Open condition 1 for M15 (0-1023)
-extern int Alligator15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
-extern ENUM_MARKET_EVENT Alligator15_CloseCondition = 5; // Close condition for M15
-extern int Alligator30_OpenCondition1 = 1; // Open condition 1 for M30 (0-1023)
-extern int Alligator30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
-extern ENUM_MARKET_EVENT Alligator30_CloseCondition = 11; // Close condition for M30
-extern double Alligator1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-extern double Alligator5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-extern double Alligator15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-extern double Alligator30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
-#endif
+INPUT string __Alligator_Parameters__ = "-- Settings for the Alligator indicator --"; // >>> ALLIGATOR <<<
+INPUT uint Alligator_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+INPUT int Alligator_Period_Jaw = 16; // Jaw Period
+INPUT int Alligator_Period_Teeth = 8; // Teeth Period
+INPUT int Alligator_Period_Lips = 6; // Lips Period
+INPUT int Alligator_Shift_Jaw = 5; // Jaw Shift
+INPUT int Alligator_Shift_Teeth = 7; // Teeth Shift
+INPUT int Alligator_Shift_Lips = 5; // Lips Shift
+INPUT ENUM_MA_METHOD Alligator_MA_Method = 2; // MA Method
+INPUT ENUM_APPLIED_PRICE Alligator_Applied_Price = 4; // Applied Price
+INPUT int Alligator_Shift = 2; // Shift
+INPUT ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = 7; // Trail stop method
+INPUT ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = 25; // Trail profit method
+INPUT double Alligator_SignalLevel = 0.1; // Signal level
+INPUT int Alligator1_SignalMethod = 19; // Signal method for M1 (-63-63)
+INPUT int Alligator5_SignalMethod = 27; // Signal method for M5 (-63-63)
+INPUT int Alligator15_SignalMethod = 20; // Signal method for M15 (-63-63)
+INPUT int Alligator30_SignalMethod = 16; // Signal method for M30 (-63-63)
+INPUT int Alligator1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
+INPUT int Alligator1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+INPUT ENUM_MARKET_EVENT Alligator1_CloseCondition = 4; // Close condition for M1
+INPUT int Alligator5_OpenCondition1 = 777; // Open condition 1 for M5 (0-1023)
+INPUT int Alligator5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+INPUT ENUM_MARKET_EVENT Alligator5_CloseCondition = 4; // Close condition for M5
+INPUT int Alligator15_OpenCondition1 = 98; // Open condition 1 for M15 (0-1023)
+INPUT int Alligator15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+INPUT ENUM_MARKET_EVENT Alligator15_CloseCondition = 5; // Close condition for M15
+INPUT int Alligator30_OpenCondition1 = 1; // Open condition 1 for M30 (0-1023)
+INPUT int Alligator30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+INPUT ENUM_MARKET_EVENT Alligator30_CloseCondition = 11; // Close condition for M30
+INPUT double Alligator1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+INPUT double Alligator5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+INPUT double Alligator15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+INPUT double Alligator30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 class Stg_Alligator : public Strategy {
 
