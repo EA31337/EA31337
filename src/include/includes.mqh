@@ -66,5 +66,5 @@ extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v"
 #endif
 
 // Includes strategies.
-extern string __Strategy_Parameters__ = "-- Strategy parameters --"; // >>> STRATEGIES <<<
+INPUT string __Strategy_Parameters__ = "-- Strategy parameters --"; // >>> STRATEGIES <<<
 #include "EA31337-strategies/strategies.mqh"

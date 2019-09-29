@@ -14,7 +14,6 @@
 #include "../../EA31337-classes/Strategy.mqh"
 
 // User input params.
-#ifndef __noparams__
 string __Gator_Parameters__ = "-- Settings for the Gator oscillator --"; // >>> GATOR <<<
 uint Gator_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 int Gator_Period_Jaw = 6; // Jaw Period
@@ -49,7 +48,6 @@ double Gator1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 double Gator5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 double Gator15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
 double Gator30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
-#endif
 
 class Stg_Gator : public Strategy {
 

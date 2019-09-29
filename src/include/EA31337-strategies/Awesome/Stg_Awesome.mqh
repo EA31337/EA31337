@@ -14,7 +14,6 @@
 #include "../../EA31337-classes/Strategy.mqh"
 
 // User input params.
-#ifndef __noparams__
 string __Awesome_Parameters__ = "-- Settings for the Awesome oscillator --"; // >>> AWESOME <<<
 uint Awesome_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 ENUM_TRAIL_TYPE Awesome_TrailingStopMethod = 22; // Trail stop method
@@ -41,7 +40,6 @@ double Awesome1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 double Awesome5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 double Awesome15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
 double Awesome30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
-#endif
 
 class Stg_Awesome : public Strategy {
 

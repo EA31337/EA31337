@@ -7,6 +7,7 @@ environment:
   - MODE: __backtest__
   - MODE: __optimize__
   - MODE: __profiler__
+  - MODE: __noinput__
   - MODE: __limited__
   - MODE: __release__
   - MODE: __debug__

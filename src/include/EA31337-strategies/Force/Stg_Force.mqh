@@ -14,40 +14,38 @@
 #include "../../EA31337-classes/Strategy.mqh"
 
 // User input params.
-#ifndef __noparams__
-extern string __Force_Parameters__ = "-- Settings for the Force Index indicator --"; // >>> FORCE <<<
-extern uint Force_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-extern ENUM_TRAIL_TYPE Force_TrailingStopMethod = 7; // Trail stop method
-extern ENUM_TRAIL_TYPE Force_TrailingProfitMethod = 22; // Trail profit method
-extern int Force_Period_M1 = 38; // Period for M1
-extern int Force_Period_M5 = 38; // Period for M5
-extern int Force_Period_M15 = 12; // Period for M15
-extern int Force_Period_M30 = 38; // Period for M30
-extern ENUM_MA_METHOD Force_MA_Method = 0; // MA Method
-extern ENUM_APPLIED_PRICE Force_Applied_Price = 2; // Applied Price
-extern double Force_SignalLevel = 0; // Signal level
-extern uint Force_Shift = 1; // Shift (relative to the current bar, 0 - default)
-extern int Force1_SignalMethod = 0; // Signal method for M1 (0-
-extern int Force5_SignalMethod = 0; // Signal method for M5 (0-
-extern int Force15_SignalMethod = 0; // Signal method for M15 (0-
-extern int Force30_SignalMethod = 0; // Signal method for M30 (0-
-extern int Force1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
-extern int Force1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-extern ENUM_MARKET_EVENT Force1_CloseCondition = 1; // Close condition for M1
-extern int Force5_OpenCondition1 = 680; // Open condition 1 for M5 (0-1023)
-extern int Force5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-extern ENUM_MARKET_EVENT Force5_CloseCondition = 1; // Close condition for M5
-extern int Force15_OpenCondition1 = 292; // Open condition 1 for M15 (0-)
-extern int Force15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-extern ENUM_MARKET_EVENT Force15_CloseCondition = 1; // Close condition for M15
-extern int Force30_OpenCondition1 = 777; // Open condition 1 for M30 (0-)
-extern int Force30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-extern ENUM_MARKET_EVENT Force30_CloseCondition = 1; // Close condition for M30
-extern double Force1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-extern double Force5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-extern double Force15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-extern double Force30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
-#endif
+INPUT string __Force_Parameters__ = "-- Settings for the Force Index indicator --"; // >>> FORCE <<<
+INPUT uint Force_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+INPUT ENUM_TRAIL_TYPE Force_TrailingStopMethod = 7; // Trail stop method
+INPUT ENUM_TRAIL_TYPE Force_TrailingProfitMethod = 22; // Trail profit method
+INPUT int Force_Period_M1 = 38; // Period for M1
+INPUT int Force_Period_M5 = 38; // Period for M5
+INPUT int Force_Period_M15 = 12; // Period for M15
+INPUT int Force_Period_M30 = 38; // Period for M30
+INPUT ENUM_MA_METHOD Force_MA_Method = 0; // MA Method
+INPUT ENUM_APPLIED_PRICE Force_Applied_Price = 2; // Applied Price
+INPUT double Force_SignalLevel = 0; // Signal level
+INPUT uint Force_Shift = 1; // Shift (relative to the current bar, 0 - default)
+INPUT int Force1_SignalMethod = 0; // Signal method for M1 (0-
+INPUT int Force5_SignalMethod = 0; // Signal method for M5 (0-
+INPUT int Force15_SignalMethod = 0; // Signal method for M15 (0-
+INPUT int Force30_SignalMethod = 0; // Signal method for M30 (0-
+INPUT int Force1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
+INPUT int Force1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+INPUT ENUM_MARKET_EVENT Force1_CloseCondition = 1; // Close condition for M1
+INPUT int Force5_OpenCondition1 = 680; // Open condition 1 for M5 (0-1023)
+INPUT int Force5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+INPUT ENUM_MARKET_EVENT Force5_CloseCondition = 1; // Close condition for M5
+INPUT int Force15_OpenCondition1 = 292; // Open condition 1 for M15 (0-)
+INPUT int Force15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+INPUT ENUM_MARKET_EVENT Force15_CloseCondition = 1; // Close condition for M15
+INPUT int Force30_OpenCondition1 = 777; // Open condition 1 for M30 (0-)
+INPUT int Force30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+INPUT ENUM_MARKET_EVENT Force30_CloseCondition = 1; // Close condition for M30
+INPUT double Force1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+INPUT double Force5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+INPUT double Force15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+INPUT double Force30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 class Stg_Force : public Strategy {
 

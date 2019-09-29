@@ -14,34 +14,32 @@
 #include "../../EA31337-classes/Strategy.mqh"
 
 // User input params.
-#ifndef __noparams__
-extern string __Fractals_Parameters__ = "-- Settings for the Fractals indicator --"; // >>> FRACTALS <<<
-extern uint Fractals_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-extern int Fractals_Shift = 0; // Shift
-extern ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = 1; // Trail stop method
-extern ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = 21; // Trail profit method
-/* @todo extern */ int Fractals_SignalLevel = 0; // Signal level
-extern int Fractals1_SignalMethod = 3; // Signal method for M1 (-3-3)
-extern int Fractals5_SignalMethod = 3; // Signal method for M5 (-3-3)
-extern int Fractals15_SignalMethod = 3; // Signal method for M15 (-3-3)
-extern int Fractals30_SignalMethod = -2; // Signal method for M30 (-3-3)
-extern int Fractals1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
-extern int Fractals1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-extern ENUM_MARKET_EVENT Fractals1_CloseCondition = 11; // Close condition for M1
-extern int Fractals5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
-extern int Fractals5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-extern ENUM_MARKET_EVENT Fractals5_CloseCondition = 1; // Close condition for M5
-extern int Fractals15_OpenCondition1 = 486; // Open condition 1 for M15 (0-)
-extern int Fractals15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-extern ENUM_MARKET_EVENT Fractals15_CloseCondition = 15; // Close condition for M15
-extern int Fractals30_OpenCondition1 = 195; // Open condition 1 for M30 (0-)
-extern int Fractals30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-extern ENUM_MARKET_EVENT Fractals30_CloseCondition = 1; // Close condition for M30
-extern double Fractals1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-extern double Fractals5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-extern double Fractals15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-extern double Fractals30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
-#endif
+INPUT string __Fractals_Parameters__ = "-- Settings for the Fractals indicator --"; // >>> FRACTALS <<<
+INPUT uint Fractals_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+INPUT int Fractals_Shift = 0; // Shift
+INPUT ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = 1; // Trail stop method
+INPUT ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = 21; // Trail profit method
+/* @todo INPUT */ int Fractals_SignalLevel = 0; // Signal level
+INPUT int Fractals1_SignalMethod = 3; // Signal method for M1 (-3-3)
+INPUT int Fractals5_SignalMethod = 3; // Signal method for M5 (-3-3)
+INPUT int Fractals15_SignalMethod = 3; // Signal method for M15 (-3-3)
+INPUT int Fractals30_SignalMethod = -2; // Signal method for M30 (-3-3)
+INPUT int Fractals1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
+INPUT int Fractals1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+INPUT ENUM_MARKET_EVENT Fractals1_CloseCondition = 11; // Close condition for M1
+INPUT int Fractals5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
+INPUT int Fractals5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+INPUT ENUM_MARKET_EVENT Fractals5_CloseCondition = 1; // Close condition for M5
+INPUT int Fractals15_OpenCondition1 = 486; // Open condition 1 for M15 (0-)
+INPUT int Fractals15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+INPUT ENUM_MARKET_EVENT Fractals15_CloseCondition = 15; // Close condition for M15
+INPUT int Fractals30_OpenCondition1 = 195; // Open condition 1 for M30 (0-)
+INPUT int Fractals30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+INPUT ENUM_MARKET_EVENT Fractals30_CloseCondition = 1; // Close condition for M30
+INPUT double Fractals1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
+INPUT double Fractals5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
+INPUT double Fractals15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
+INPUT double Fractals30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
 
 class Stg_Fractals : public Strategy {
 
