@@ -22,6 +22,18 @@
   #include "EA31337\lite\ea-conf.mqh"
 #endif
 
+// Includes version specific user input params.
+extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v" + ea_version + " --"; // >>> EA31337 <<<
+#ifdef __advanced__ // Include default input settings based on the mode.
+  #ifdef __rider__
+    #include "EA31337\rider\ea-input.mqh"
+  #else
+    #include "EA31337\advanced\ea-input.mqh"
+  #endif
+#else
+  #include "EA31337\lite\ea-input.mqh"
+#endif
+
 // Includes class files.
 #include "EA31337-classes\Account.mqh"
 #include "EA31337-classes\Array.mqh"

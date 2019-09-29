@@ -7,32 +7,6 @@
 // Includes.
 #include "include/includes.mqh"
 
-// EA properties.
-#ifdef __MQL4__
-#property description ea_name
-#property description ea_desc
-#endif
-#property version     ea_version
-#property link        ea_link
-#property copyright   ea_copy
-#property icon        "resources\\favicon.ico"
-#property strict
-
-//+------------------------------------------------------------------+
-//| User input variables.
-//+------------------------------------------------------------------+
-extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v" + ea_version + " --"; // >>> EA31337 <<<
-
-#ifdef __advanced__ // Include default input settings based on the mode.
-  #ifdef __rider__
-    #include "include\EA31337\rider\ea-input.mqh"
-  #else
-    #include "include\EA31337\advanced\ea-input.mqh"
-  #endif
-#else
-  #include "include\EA31337\lite\ea-input.mqh"
-#endif
-
 // Class variables.
 Account *account;
 Chart *chart;
