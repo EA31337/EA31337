@@ -1,6 +1,10 @@
-# Ignores configuration files that may contain sensitive information.
-build.properties
-logs/
+# Ignores compiled binary files.
+*.ex4
+*.ex5
+
+# Ignores temporary files.
+*.swp
+*~
 
 # Ignores test results in HTML format.
 *.htm
