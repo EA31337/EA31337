@@ -2198,22 +2198,6 @@ int GetTrailingMethod(int order_type, ENUM_ORDER_PROPERTY_DOUBLE mode) {
 }
 
 /**
- * Calculate open positions (in volume).
- */
-int CalculateCurrentOrders(string _symbol) {
-   int buys=0, sells=0;
-
-   for (int i = 0; i < OrdersTotal(); i++) {
-      if (Order::OrderSelect(i, SELECT_BY_POS, MODE_TRADES) == false) break;
-      if (Order::OrderSymbol() == _symbol && CheckOurMagicNumber()){
-         if (Order::OrderType() == ORDER_TYPE_BUY)  buys++;
-         if (Order::OrderType() == ORDER_TYPE_SELL) sells++;
-        }
-     }
-   if (buys > 0) return(buys); else return(-sells); // Return orders volume
-}
-
-/**
  * Return total number of opened orders (based on the EA magic number)
  * @todo: Move to Orders.
  */
