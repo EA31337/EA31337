@@ -12,6 +12,7 @@ Account *account;
 Chart *chart;
 Collection *strats;
 Log *logger;
+Mail *mail;
 Market *market;
 Stats *total_stats, *hourly_stats;
 SummaryReport *summary_report; // For summary report.
@@ -383,6 +384,7 @@ void DeinitVars() {
   Object::Delete(summary_report);
   Object::Delete(ticker);
   Object::Delete(terminal);
+  Object::Delete(mail);
   Object::Delete(market);
   Object::Delete(strats);
   for (int tfi = 0; tfi < FINAL_ENUM_TIMEFRAMES_INDEX; tfi++) {
@@ -1089,7 +1091,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, Strategy *_strat, double trade_volume = 0,
       if (VerboseInfo) Order::OrderPrint();
       Msg::ShowText(StringFormat("%s: %s", Order::OrderTypeToString(Order::OrderType()), GetAccountTextDetails()), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
       if (SoundAlert && Terminal::IsRealtime()) PlaySound(SoundFileAtOpen);
-      if (SendEmailEachOrder) SendEmailExecuteOrder();
+      if (SendEmailEachOrder && !Terminal::IsRealtime()) mail.SendMailExecuteOrder();
 
       if (SmartQueueActive && total_orders >= max_orders) OrderQueueClear(); // Clear queue if we're reached the limit again, so we can start fresh.
    } else {
@@ -1800,7 +1802,7 @@ bool UpdateTrailingStops(Trade *_trade) {
             if (!result && err_code > 0) {
              if (VerboseErrors) Print(__FUNCTION__, ": Error: OrderModify(): [MinimalizeLosses] ", Terminal::GetErrorText(err_code));
                if (VerboseDebug)
-                 Print(__FUNCTION__ + ": Error: OrderModify(", OrderTicket(), ", ", OrderOpenPrice(), ", ", OrderOpenPrice() - Order::OrderCommission() * Point, ", ", OrderTakeProfit(), ", ", 0, ", ", Order::GetOrderColor(EMPTY, ColorBuy, ColorSell), "); ");
+                 Print(__FUNCTION__ + ": Error: OrderModify(", Order::OrderTicket(), ", ", Order::OrderOpenPrice(), ", ", OrderOpenPrice() - Order::OrderCommission() * Point, ", ", OrderTakeProfit(), ", ", 0, ", ", Order::GetOrderColor(EMPTY, ColorBuy, ColorSell), "); ");
             } else {
               if (VerboseTrace) Print(__FUNCTION__ + ": MinimalizeLosses: ", Order::OrderTypeToString((ENUM_ORDER_TYPE) OrderType()));
             }
@@ -3157,6 +3159,7 @@ bool InitClasses() {
   // Initialize main classes.
   account = new Account();
   logger = new Log(V_DEBUG);
+  mail = new Mail();
   market = new Market(_Symbol, logger);
 
   // Initialize the current chart.
@@ -4037,31 +4040,6 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
 }
 
 /**
- * Send e-mail about the order.
- */
-bool SendEmailExecuteOrder(string sep = "<br>\n") {
-  bool _res = false;
-  if (!Terminal::IsRealtime()) {
-    return _res;
-  }
-  string mail_title = "Trading Info - " + ea_name;
-  string body = "Trade Information" + sep;
-  body += sep + StringFormat("Event: %s", "Trade Opened");
-  body += sep + StringFormat("Currency Pair: %s", _Symbol);
-  body += sep + StringFormat("Time: %s", DateTime::TimeToStr(time_current, TIME_DATE|TIME_MINUTES|TIME_SECONDS));
-  body += sep + StringFormat("Order Type: %s", Order::OrderTypeToString((ENUM_ORDER_TYPE) OrderType()));
-  body += sep + StringFormat("Price: %s", DoubleToStr(OrderOpenPrice(), Digits));
-  body += sep + StringFormat("Lot size: %g", Order::OrderLots());
-  body += sep + StringFormat("Comment: %s", OrderComment());
-  body += sep + StringFormat("Account Balance: %s", Convert::ValueWithCurrency(account.AccountBalance()));
-  body += sep + StringFormat("Account Equity: %s", Convert::ValueWithCurrency(account.AccountEquity()));
-  if (account.AccountCredit() > 0) {
-    body += sep + StringFormat("Account Credit: %s", Convert::ValueWithCurrency(account.AccountCredit()));
-  }
-  return SendMail(mail_title, body);
-}
-
-/**
  * Get order statistics in percentage for each strategy.
  */
 string GetOrdersStats(string sep = "\n") {
@@ -4580,7 +4558,7 @@ bool CheckHistory() {
   double total_profit = 0;
   int pos;
   #ifdef __profiler__ PROFILER_START #endif
-  for (pos = last_history_check; pos < HistoryTotal(); pos++) {
+  for (pos = last_history_check; pos < Orders::OrdersHistoryTotal(); pos++) {
     if (!Order::OrderSelect(pos, SELECT_BY_POS, MODE_HISTORY)) continue;
     if (Order::OrderCloseTime() > last_history_check && CheckOurMagicNumber()) {
       total_profit =+ OrderCalc();
