@@ -1533,7 +1533,11 @@ Strategy *GetStratByIndiType(ENUM_INDICATOR_TYPE _indi, Chart *_chart) {
       return _strat;
     }
   }
-  return InitStratByIndiType(_indi, _chart.GetTf());
+  Strategy* result = InitStratByIndiType(_indi, _chart.GetTf());
+  
+  strats.Add(result);
+  
+  return result;
 }
 
 /**
@@ -1800,7 +1804,7 @@ bool UpdateTrailingStops(Trade *_trade) {
             if (!result && err_code > 0) {
              if (VerboseErrors) Print(__FUNCTION__, ": Error: OrderModify(): [MinimalizeLosses] ", Terminal::GetErrorText(err_code));
                if (VerboseDebug)
-                 Print(__FUNCTION__ + ": Error: OrderModify(", OrderTicket(), ", ", OrderOpenPrice(), ", ", OrderOpenPrice() - Order::OrderCommission() * Point, ", ", OrderTakeProfit(), ", ", 0, ", ", Order::GetOrderColor(EMPTY, ColorBuy, ColorSell), "); ");
+                 Print(__FUNCTION__ + ": Error: OrderModify(", Order::OrderTicket(), ", ", OrderOpenPrice(), ", ", OrderOpenPrice() - Order::OrderCommission() * Point, ", ", OrderTakeProfit(), ", ", 0, ", ", Order::GetOrderColor(EMPTY, ColorBuy, ColorSell), "); ");
             } else {
               if (VerboseTrace) Print(__FUNCTION__ + ": MinimalizeLosses: ", Order::OrderTypeToString((ENUM_ORDER_TYPE) OrderType()));
             }
@@ -4596,7 +4600,7 @@ bool CheckHistory() {
   double total_profit = 0;
   int pos;
   #ifdef __profiler__ PROFILER_START #endif
-  for (pos = last_history_check; pos < HistoryTotal(); pos++) {
+  for (pos = last_history_check; pos < Orders::OrdersHistoryTotal(); pos++) {
     if (!Order::OrderSelect(pos, SELECT_BY_POS, MODE_HISTORY)) continue;
     if (Order::OrderCloseTime() > last_history_check && CheckOurMagicNumber()) {
       total_profit =+ OrderCalc();
