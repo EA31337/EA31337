@@ -486,7 +486,7 @@ string InitInfo(bool startup = false, string sep = "\n") {
       market.GetVolumeDigits(),
       market.GetSpreadInPips(),
       market.GetSpreadInPts(),
-      account.GetAccountStopoutLevel(VerboseErrors),
+      account.GetAccountStopoutLevel(),
       market.GetTradeDistanceInPts(),
       market.GetTradeDistanceInPips(),
       sep);
@@ -1209,7 +1209,7 @@ bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, Strategy *_strat, double volume = E
     last_msg = Msg::ShowText(StringFormat("%s: Maximum open and pending orders per type has reached the limit (MaxOrdersPerType).", _strat.GetName()), "Info", __FUNCTION__, __LINE__, VerboseInfo);
     OrderQueueAdd((uint) _strat.GetId(), cmd);
     result = false;
-  } else if (!account.CheckFreeMargin(cmd, volume)) {
+  } else if (!account.GetAccountFreeMarginCheck(cmd, volume)) {
     last_err = Msg::ShowText("No money to open more orders.", "Error", __FUNCTION__, __LINE__, VerboseInfo | VerboseErrors, PrintLogOnChart);
     if (VerboseDebug) PrintFormat("%s:%d: %s: Volume: %g", __FUNCTION__, __LINE__, _strat.GetName(), volume);
     result = false;
@@ -3975,7 +3975,7 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
   // Prepare text for Stop Out.
   string stop_out_level = StringFormat("%d", account.AccountStopoutLevel());
   if (account.AccountStopoutMode() == 0) stop_out_level += "%"; else stop_out_level += account.AccountCurrency();
-  stop_out_level += StringFormat(" (%.1f)", account.GetAccountStopoutLevel(VerboseErrors));
+  stop_out_level += StringFormat(" (%.1f)", account.GetAccountStopoutLevel());
   // Prepare text to display max orders.
   string text_max_orders = StringFormat("Max orders: %d [Per type: %d]", max_orders, GetMaxOrdersPerType());
   #ifdef __advanced__
@@ -4635,13 +4635,13 @@ bool OpenOrderCondition(ENUM_ORDER_TYPE cmd, int sid, datetime time, int method)
   double qclose = _chart.GetClose(tf, qshift);
   double qhighest = _chart.GetPeakPrice(MODE_HIGH, qshift); // Get the high price since queued.
   double qlowest = _chart.GetPeakPrice(MODE_LOW, qshift); // Get the lowest price since queued.
-  double diff = fmax(qhighest - market.GetOpen(), market.GetOpen() - qlowest);
+  double diff = fmax(qhighest - _chart.GetOpen(), _chart.GetOpen() - qlowest);
   if (VerboseTrace) PrintFormat("%s(%s, %d, %s, %d)", __FUNCTION__, EnumToString(cmd), sid, DateTime::TimeToStr(time), method);
   if (method != 0) {
-    if (METHOD(method,0)) result &= (cmd == ORDER_TYPE_BUY && qopen < market.GetOpen()) || (cmd == ORDER_TYPE_SELL && qopen > market.GetOpen());
-    if (METHOD(method,1)) result &= (cmd == ORDER_TYPE_BUY && qclose < market.GetClose()) || (cmd == ORDER_TYPE_SELL && qclose > market.GetClose());
-    if (METHOD(method,2)) result &= (cmd == ORDER_TYPE_BUY && qlowest < market.GetLow()) || (cmd == ORDER_TYPE_SELL && qlowest > market.GetLow());
-    if (METHOD(method,3)) result &= (cmd == ORDER_TYPE_BUY && qhighest > market.GetHigh()) || (cmd == ORDER_TYPE_SELL && qhighest < market.GetHigh());
+    if (METHOD(method,0)) result &= (cmd == ORDER_TYPE_BUY && qopen < _chart.GetOpen()) || (cmd == ORDER_TYPE_SELL && qopen > _chart.GetOpen());
+    if (METHOD(method,1)) result &= (cmd == ORDER_TYPE_BUY && qclose < _chart.GetClose()) || (cmd == ORDER_TYPE_SELL && qclose > _chart.GetClose());
+    if (METHOD(method,2)) result &= (cmd == ORDER_TYPE_BUY && qlowest < _chart.GetLow()) || (cmd == ORDER_TYPE_SELL && qlowest > _chart.GetLow());
+    if (METHOD(method,3)) result &= (cmd == ORDER_TYPE_BUY && qhighest > _chart.GetHigh()) || (cmd == ORDER_TYPE_SELL && qhighest < _chart.GetHigh());
     if (METHOD(method,4)) result &= UpdateIndicator(_chart, INDI_SAR) && CheckMarketEvent(_chart, cmd, C_SAR_BUY_SELL, 0, 0, 0);
     if (METHOD(method,5)) result &= UpdateIndicator(_chart, INDI_DEMARKER) && CheckMarketEvent(_chart, cmd, C_DEMARKER_BUY_SELL, 0, 0.5, 0);
     if (METHOD(method,6)) result &= UpdateIndicator(_chart, INDI_RSI) && CheckMarketEvent(_chart, cmd, C_RSI_BUY_SELL, 0, 30, 0);
