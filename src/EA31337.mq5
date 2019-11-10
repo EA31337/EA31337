@@ -1535,7 +1535,11 @@ Strategy *GetStratByIndiType(ENUM_INDICATOR_TYPE _indi, Chart *_chart) {
       return _strat;
     }
   }
-  return InitStratByIndiType(_indi, _chart.GetTf());
+  Strategy* result = InitStratByIndiType(_indi, _chart.GetTf());
+  
+  strats.Add(result);
+  
+  return result;
 }
 
 /**
