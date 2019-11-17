@@ -1,0 +1,24 @@
+---
+# Changes to documentation.
+docs:
+  - '*.md'
+  - '*.txt'
+  - 'docs/*'
+# Continuous Integration changes.
+CI:
+  - '.travis.yml'
+  - 'appveyor.yml'
+# Changes to Docker files.
+Docker:
+  - 'Dockerfile'
+  - 'docker-compose.yml'
+# Changes to Git files.
+git:
+  - '.github/*'
+  - '.git*'
+# Changes to MQL4 code files.
+MQL4:
+  - '*.mq4'
+# Changes to MQL5 code files.
+MQL5:
+  - '*.mq5'
