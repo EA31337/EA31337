@@ -28,7 +28,7 @@ env:
   - |
     DOCKER_LOGIN='eval [[ -n $DOCKER_PASSWORD ]] && docker login -u $DOCKER_USERNAME --password-stdin <<<$DOCKER_PASSWORD || exit 0'
     DOCKER_REPO="ea31337/ea31337:${TRAVIS_BRANCH//master/latest}"
-    DOCKER_BUILD="DOCKER_BUILDKIT=1 docker build --build-arg UID=$UID --target ea31337 -t ${DOCKER_REPO} ."
+    DOCKER_BUILD="docker build --build-arg UID=$UID --target ea31337 -t ${DOCKER_REPO} ."
     DOCKER_COPY="docker run -v $CWD:/opt/workspace:rw ${DOCKER_REPO} cp -frv /opt/EA/*.ex4 /opt/workspace"
     CMD="${DOCKER_LOGIN} && ${DOCKER_BUILD}; [[ $TRAVIS_PULL_REQUEST = false ]] || exit 0; $DOCKER_COPY; docker push $DOCKER_REPO"
     DEPLOY=1
