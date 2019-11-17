@@ -13,7 +13,7 @@ SHELL:=/usr/bin/env bash
 		Optimize Lite-Optimize Advanced-Optimize Rider-Optimize \
 		All Lite-All Advanced-All Rider-All
 
-MQL=metaeditor.exe
+MTE=metaeditor64.exe
 SRC=src
 MQL4=$(wildcard $(SRC)/*.mq4)
 MQL5=$(wildcard $(SRC)/*.mq5)
@@ -27,7 +27,7 @@ MKFILE=$(abspath $(lastword $(MAKEFILE_LIST)))
 CWD=$(notdir $(patsubst %/,%,$(dir $(MKFILE))))
 
 requirements:
-	type -a git ex wine &> /dev/null
+	type -a git ex wine64 &> /dev/null
 
 Lite:								$(OUT)/$(EA)-Lite-%.ex4
 Advanced:						$(OUT)/$(EA)-Advanced-%.ex4
@@ -49,14 +49,14 @@ Lite-All:						Lite Lite-Release Lite-Backtest Lite-Optimize
 Advanced-All:				Advanced Advanced-Release Advanced-Backtest Advanced-Optimize
 Rider-All:					Rider Rider-Release Rider-Backtest Rider-Optimize
 
-All:								requirements $(MQL) Lite-All Advanced-All Rider-All
+All:								requirements $(MTE) Lite-All Advanced-All Rider-All
 
-test: requirements set-mode $(MQL)
-	wine metaeditor.exe /s /i:$(SRC) /mql4 $(MQL4)
-	wine metaeditor.exe /s /i:$(SRC) /mql5 $(MQL4)
+test: requirements set-mode $(MTE)
+	wine64 $(MTE) .exe /s /i:$(SRC) /mql4 $(MQL4)
+	wine64 $(MTE) /s /i:$(SRC) /mql5 $(MQL4)
 
-metaeditor.exe:
-	curl -LO https://github.com/EA31337/MetaEditor/raw/master/metaeditor.exe
+$(MTE):
+	curl -LO https://github.com/EA31337/MetaEditor/raw/master/$(MTE)
 
 # E.g.: make set-mode MODE="__advanced__"
 set-mode:
@@ -115,36 +115,36 @@ clean-src:
 	@echo Cleaning src...
 	find $(SRC)/ -maxdepth 1 '(' -name '*.ex4' -or -name '*.ex5' ')' -delete -print
 
-EA: metaeditor.exe \
+EA: $(MTE) \
 		clean-all \
 		$(OUT)/$(EA)-Lite-%.ex4 \
 		$(OUT)/$(EA)-Advanced-%.ex4 \
 		$(OUT)/$(EA)-Rider-%.ex4
 
-Release: metaeditor.exe \
+Release: $(MTE) \
 		clean-all \
 		$(OUT)/$(EA)-Lite-Release-%.ex4 \
 		$(OUT)/$(EA)-Advanced-Release-%.ex4 \
 		$(OUT)/$(EA)-Rider-Release-%.ex4
 
-Backtest: metaeditor.exe \
+Backtest: $(MTE) \
 		clean-all \
 		$(OUT)/$(EA)-Lite-Backtest-%.ex4 \
 		$(OUT)/$(EA)-Advanced-Backtest-%.ex4 \
 		$(OUT)/$(EA)-Rider-Backtest-%.ex4
 
-Optimize: metaeditor.exe \
+Optimize: $(MTE) \
 		clean-all \
 		$(OUT)/$(EA)-Lite-Optimize-%.ex4 \
 		$(OUT)/$(EA)-Advanced-Optimize-%.ex4 \
 		$(OUT)/$(EA)-Rider-Optimize-%.ex4
 
-compile-mql4: requirements $(MQL) metaeditor.exe $(SRC)/$(EA).mq4 $(SRC)/include/EA31337/ea-mode.mqh clean-src
-	file='$(MQL4)'; wine metaeditor.exe /mql4 /log:CON /compile:"$${file//\//\\}" /inc:"$(SRC)" || true
+compile-mql4: requirements $(MTE) $(SRC)/$(EA).mq4 $(SRC)/include/EA31337/ea-mode.mqh clean-src
+	file='$(MQL4)'; wine64 $(MTE) /log:CON /compile:"$${file//\//\\}" /inc:"$(SRC)" || true
 	test -s $(SRC)/$(EA).ex4 && echo $(MQL4) compiled.
 
-compile-mql5: requirements $(MQL) metaeditor.exe $(SRC)/$(EA).mq4 $(SRC)/include/EA31337/ea-mode.mqh clean-src
-	file='$(MQL5)'; wine metaeditor.exe /mql5 /log:CON /compile:"$${file//\//\\}" /inc:"$(SRC)" || true
+compile-mql5: requirements $(MTE) $(SRC)/$(EA).mq4 $(SRC)/include/EA31337/ea-mode.mqh clean-src
+	file='$(MQL5)'; wine64 $(MTE) /log:CON /compile:"$${file//\//\\}" /inc:"$(SRC)" || true
 	test -s $(SRC)/$(EA).ex5 && @echo $(MQL5) compiled.
 
 $(OUT)/$(EA)-Lite-%.ex4: \
