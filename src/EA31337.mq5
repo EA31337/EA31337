@@ -12,6 +12,7 @@ Account *account;
 Chart *chart;
 Collection *strats;
 Log *logger;
+Mail *mail;
 Market *market;
 Stats *total_stats, *hourly_stats;
 SummaryReport *summary_report; // For summary report.
@@ -383,6 +384,7 @@ void DeinitVars() {
   Object::Delete(summary_report);
   Object::Delete(ticker);
   Object::Delete(terminal);
+  Object::Delete(mail);
   Object::Delete(market);
   Object::Delete(strats);
   for (int tfi = 0; tfi < FINAL_ENUM_TIMEFRAMES_INDEX; tfi++) {
@@ -484,7 +486,7 @@ string InitInfo(bool startup = false, string sep = "\n") {
       market.GetVolumeDigits(),
       market.GetSpreadInPips(),
       market.GetSpreadInPts(),
-      account.GetAccountStopoutLevel(VerboseErrors),
+      account.GetAccountStopoutLevel(),
       market.GetTradeDistanceInPts(),
       market.GetTradeDistanceInPips(),
       sep);
@@ -1089,7 +1091,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, Strategy *_strat, double trade_volume = 0,
       if (VerboseInfo) Order::OrderPrint();
       Msg::ShowText(StringFormat("%s: %s", Order::OrderTypeToString(Order::OrderType()), GetAccountTextDetails()), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
       if (SoundAlert && Terminal::IsRealtime()) PlaySound(SoundFileAtOpen);
-      if (SendEmailEachOrder) SendEmailExecuteOrder();
+      if (SendEmailEachOrder && !Terminal::IsRealtime()) mail.SendMailExecuteOrder();
 
       if (SmartQueueActive && total_orders >= max_orders) OrderQueueClear(); // Clear queue if we're reached the limit again, so we can start fresh.
    } else {
@@ -1207,7 +1209,7 @@ bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, Strategy *_strat, double volume = E
     last_msg = Msg::ShowText(StringFormat("%s: Maximum open and pending orders per type has reached the limit (MaxOrdersPerType).", _strat.GetName()), "Info", __FUNCTION__, __LINE__, VerboseInfo);
     OrderQueueAdd((uint) _strat.GetId(), cmd);
     result = false;
-  } else if (!account.CheckFreeMargin(cmd, volume)) {
+  } else if (!account.GetAccountFreeMarginCheck(cmd, volume)) {
     last_err = Msg::ShowText("No money to open more orders.", "Error", __FUNCTION__, __LINE__, VerboseInfo | VerboseErrors, PrintLogOnChart);
     if (VerboseDebug) PrintFormat("%s:%d: %s: Volume: %g", __FUNCTION__, __LINE__, _strat.GetName(), volume);
     result = false;
@@ -1804,7 +1806,7 @@ bool UpdateTrailingStops(Trade *_trade) {
             if (!result && err_code > 0) {
              if (VerboseErrors) Print(__FUNCTION__, ": Error: OrderModify(): [MinimalizeLosses] ", Terminal::GetErrorText(err_code));
                if (VerboseDebug)
-                 Print(__FUNCTION__ + ": Error: OrderModify(", Order::OrderTicket(), ", ", OrderOpenPrice(), ", ", OrderOpenPrice() - Order::OrderCommission() * Point, ", ", OrderTakeProfit(), ", ", 0, ", ", Order::GetOrderColor(EMPTY, ColorBuy, ColorSell), "); ");
+                 Print(__FUNCTION__ + ": Error: OrderModify(", Order::OrderTicket(), ", ", Order::OrderOpenPrice(), ", ", OrderOpenPrice() - Order::OrderCommission() * Point, ", ", OrderTakeProfit(), ", ", 0, ", ", Order::GetOrderColor(EMPTY, ColorBuy, ColorSell), "); ");
             } else {
               if (VerboseTrace) Print(__FUNCTION__ + ": MinimalizeLosses: ", Order::OrderTypeToString((ENUM_ORDER_TYPE) OrderType()));
             }
@@ -3161,6 +3163,7 @@ bool InitClasses() {
   // Initialize main classes.
   account = new Account();
   logger = new Log(V_DEBUG);
+  mail = new Mail();
   market = new Market(_Symbol, logger);
 
   // Initialize the current chart.
@@ -3976,7 +3979,7 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
   // Prepare text for Stop Out.
   string stop_out_level = StringFormat("%d", account.AccountStopoutLevel());
   if (account.AccountStopoutMode() == 0) stop_out_level += "%"; else stop_out_level += account.AccountCurrency();
-  stop_out_level += StringFormat(" (%.1f)", account.GetAccountStopoutLevel(VerboseErrors));
+  stop_out_level += StringFormat(" (%.1f)", account.GetAccountStopoutLevel());
   // Prepare text to display max orders.
   string text_max_orders = StringFormat("Max orders: %d [Per type: %d]", max_orders, GetMaxOrdersPerType());
   #ifdef __advanced__
@@ -4038,31 +4041,6 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
     ChartRedraw(); // Redraws the current chart forcedly.
   }
   return output;
-}
-
-/**
- * Send e-mail about the order.
- */
-bool SendEmailExecuteOrder(string sep = "<br>\n") {
-  bool _res = false;
-  if (!Terminal::IsRealtime()) {
-    return _res;
-  }
-  string mail_title = "Trading Info - " + ea_name;
-  string body = "Trade Information" + sep;
-  body += sep + StringFormat("Event: %s", "Trade Opened");
-  body += sep + StringFormat("Currency Pair: %s", _Symbol);
-  body += sep + StringFormat("Time: %s", DateTime::TimeToStr(time_current, TIME_DATE|TIME_MINUTES|TIME_SECONDS));
-  body += sep + StringFormat("Order Type: %s", Order::OrderTypeToString((ENUM_ORDER_TYPE) OrderType()));
-  body += sep + StringFormat("Price: %s", DoubleToStr(OrderOpenPrice(), Digits));
-  body += sep + StringFormat("Lot size: %g", Order::OrderLots());
-  body += sep + StringFormat("Comment: %s", OrderComment());
-  body += sep + StringFormat("Account Balance: %s", Convert::ValueWithCurrency(account.AccountBalance()));
-  body += sep + StringFormat("Account Equity: %s", Convert::ValueWithCurrency(account.AccountEquity()));
-  if (account.AccountCredit() > 0) {
-    body += sep + StringFormat("Account Credit: %s", Convert::ValueWithCurrency(account.AccountCredit()));
-  }
-  return SendMail(mail_title, body);
 }
 
 /**
@@ -4661,13 +4639,13 @@ bool OpenOrderCondition(ENUM_ORDER_TYPE cmd, int sid, datetime time, int method)
   double qclose = _chart.GetClose(tf, qshift);
   double qhighest = _chart.GetPeakPrice(MODE_HIGH, qshift); // Get the high price since queued.
   double qlowest = _chart.GetPeakPrice(MODE_LOW, qshift); // Get the lowest price since queued.
-  double diff = fmax(qhighest - market.GetOpen(), market.GetOpen() - qlowest);
+  double diff = fmax(qhighest - _chart.GetOpen(), _chart.GetOpen() - qlowest);
   if (VerboseTrace) PrintFormat("%s(%s, %d, %s, %d)", __FUNCTION__, EnumToString(cmd), sid, DateTime::TimeToStr(time), method);
   if (method != 0) {
-    if (METHOD(method,0)) result &= (cmd == ORDER_TYPE_BUY && qopen < market.GetOpen()) || (cmd == ORDER_TYPE_SELL && qopen > market.GetOpen());
-    if (METHOD(method,1)) result &= (cmd == ORDER_TYPE_BUY && qclose < market.GetClose()) || (cmd == ORDER_TYPE_SELL && qclose > market.GetClose());
-    if (METHOD(method,2)) result &= (cmd == ORDER_TYPE_BUY && qlowest < market.GetLow()) || (cmd == ORDER_TYPE_SELL && qlowest > market.GetLow());
-    if (METHOD(method,3)) result &= (cmd == ORDER_TYPE_BUY && qhighest > market.GetHigh()) || (cmd == ORDER_TYPE_SELL && qhighest < market.GetHigh());
+    if (METHOD(method,0)) result &= (cmd == ORDER_TYPE_BUY && qopen < _chart.GetOpen()) || (cmd == ORDER_TYPE_SELL && qopen > _chart.GetOpen());
+    if (METHOD(method,1)) result &= (cmd == ORDER_TYPE_BUY && qclose < _chart.GetClose()) || (cmd == ORDER_TYPE_SELL && qclose > _chart.GetClose());
+    if (METHOD(method,2)) result &= (cmd == ORDER_TYPE_BUY && qlowest < _chart.GetLow()) || (cmd == ORDER_TYPE_SELL && qlowest > _chart.GetLow());
+    if (METHOD(method,3)) result &= (cmd == ORDER_TYPE_BUY && qhighest > _chart.GetHigh()) || (cmd == ORDER_TYPE_SELL && qhighest < _chart.GetHigh());
     if (METHOD(method,4)) result &= UpdateIndicator(_chart, INDI_SAR) && CheckMarketEvent(_chart, cmd, C_SAR_BUY_SELL, 0, 0, 0);
     if (METHOD(method,5)) result &= UpdateIndicator(_chart, INDI_DEMARKER) && CheckMarketEvent(_chart, cmd, C_DEMARKER_BUY_SELL, 0, 0.5, 0);
     if (METHOD(method,6)) result &= UpdateIndicator(_chart, INDI_RSI) && CheckMarketEvent(_chart, cmd, C_RSI_BUY_SELL, 0, 30, 0);
