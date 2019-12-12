@@ -20,9 +20,6 @@ Ticker *ticker; // For parsing ticks.
 Terminal *terminal;
 Trade *trade[FINAL_ENUM_TIMEFRAMES_INDEX];
 
-// Auxiliary objects.
-Order empty_order;
-
 // Market/session variables.
 double pip_size, ea_lot_size;
 double last_ask, last_bid;
@@ -63,8 +60,8 @@ int worse_strategy[FINAL_STAT_PERIOD_TYPE_ENTRY], best_strategy[FINAL_ENUM_TIMEF
 bool ea_active = false; bool ea_expired = false;
 double ea_risk_ratio; string rr_text; // Vars for calculation risk ratio.
 double ea_margin_risk_level[3]; // For margin risk (all/buy/sell);
-uint max_orders = 10, daily_orders; // Maximum orders available to open.
-uint max_order_slippage; // Maximum price slippage for buy or sell orders (in points)
+unsigned long max_orders = 10, daily_orders; // Maximum orders available to open.
+unsigned int max_order_slippage; // Maximum price slippage for buy or sell orders (in points)
 int err_code; // Error code.
 string last_err, last_msg, last_debug, last_trace;
 string ea_last_order;
@@ -528,13 +525,14 @@ string InitInfo(bool startup = false, string sep = "\n") {
 bool EA_Trade(Trade *_trade) {
   DEBUG_CHECKPOINT_RESET
   #ifdef __profiler__ PROFILER_START #endif
-  Strategy *strat;
   bool order_placed = false;
+  int sid;
+  Strategy *strat;
   ENUM_ORDER_TYPE _cmd = EMPTY;
   ENUM_TIMEFRAMES tf = _trade.Chart().GetTf();
   if (VerboseTrace) _trade.Logger().Trace(StringFormat("%s:%d: %s", __FUNCTION__, __LINE__, DateTime::TimeToStr(_trade.Chart().GetBarTime())));
 
-  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+  for (sid = 0; sid < strats.GetSize(); sid++) {
     strat = ((Strategy *) strats.GetByIndex(sid));
 
     if (strat.GetTf() == tf && strat.IsEnabled() && !strat.IsSuspended()) {
@@ -1050,7 +1048,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, Strategy *_strat, double trade_volume = 0,
     }
 
   trade_volume = market.NormalizeLots(trade_volume);
-  order_ticket = empty_order.OrderSend(
+  order_ticket = Order::OrderSend(
       market.GetSymbol(),
       cmd,
       trade_volume,
@@ -1138,7 +1136,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, Strategy *_strat, double trade_volume = 0,
      if (err_code == ERR_TRADE_TOO_MANY_ORDERS) {
        // On some trade servers, the total amount of open and pending orders can be limited. If this limit has been exceeded, no new order will be opened.
        //MaxOrders = total_orders; // So we're setting new fixed limit for total orders which is allowed. // @fixme
-       Msg::ShowText(StringFormat("Total orders: %d, Max orders: %d, Broker Limit: %d", OrdersTotal(), total_orders, AccountInfoInteger(ACCOUNT_LIMIT_ORDERS)), "Error", __FUNCTION__, __LINE__, VerboseErrors);
+       Msg::ShowText(StringFormat("Total orders: %d, Max orders: %d, Broker Limit: %d", Trade::OrdersTotal(), total_orders, AccountInfoInteger(ACCOUNT_LIMIT_ORDERS)), "Error", __FUNCTION__, __LINE__, VerboseErrors);
        retry = false;
      }
      if (err_code == ERR_INVALID_TRADE_VOLUME) { // OrderSend error 131
@@ -1194,7 +1192,7 @@ bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, Strategy *_strat, double volume = E
   if (volume < market.GetVolumeMin()) {
     last_trace = Msg::ShowText(StringFormat("%s: Lot size = %.2f", _strat.GetName(), volume), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
     result = false;
-  } else if (!account.Trades().IsNewOrderAllowed()) {
+  } else if (!_strat.Trade().IsOrderAllowed()) {
     last_msg = Msg::ShowText("Maximum open and pending orders has reached the limit set by the broker.", "Info", __FUNCTION__, __LINE__, VerboseInfo);
     result = false;
   } else if (total_orders >= max_orders) {
@@ -1408,12 +1406,12 @@ double OrderCalc(ulong ticket_no = 0) {
  *   strategy_type (int) - strategy type, see ENUM_STRATEGY_TYPE
  */
 int CloseOrdersByType(ENUM_ORDER_TYPE cmd, ulong strategy_id, ENUM_MARKET_EVENT _close_signal, bool only_profitable = false) {
+   int order;
    int orders_total = 0;
    int order_failed = 0;
    double profit_total = 0.0;
    Market::RefreshRates();
-   int order;
-   for (order = 0; order < OrdersTotal(); order++) {
+   for (order = 0; order < Trade::OrdersTotal(); order++) {
       if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
         if ((int) strategy_id == GetIdByMagic() && Order::OrderSymbol() == Symbol() && (ENUM_ORDER_TYPE) OrderType() == cmd) {
           if (only_profitable && Order::GetOrderProfit() < 0) continue;
@@ -1528,8 +1526,9 @@ Strategy *InitStratByIndiType(ENUM_INDICATOR_TYPE _indi, ENUM_TIMEFRAMES _tf) {
  * Get strategy instance via indicator type.
  */
 Strategy *GetStratByIndiType(ENUM_INDICATOR_TYPE _indi, Chart *_chart) {
+  int _sid;
   Strategy *_strat;
-  for (uint _sid = 0; _sid < strats.GetSize(); _sid++) {
+  for (_sid = 0; _sid < strats.GetSize(); _sid++) {
     _strat = ((Strategy *) strats.GetByIndex(_sid));
     if (_strat.Data().GetIndicatorType() == _indi && _strat.GetTf() == _chart.GetTf()) {
       return _strat;
@@ -1711,7 +1710,8 @@ bool CheckMarketEvent(Chart *_chart, ENUM_ORDER_TYPE cmd = EMPTY, ENUM_MARKET_EV
  */
 bool CheckMinPipGap(int sid) {
   double diff;
-  for (int order = 0; order < OrdersTotal(); order++) {
+  int order;
+  for (order = 0; order < Trade::OrdersTotal(); order++) {
     if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
        if (Order::OrderMagicNumber() == MagicNumber + sid && Order::OrderSymbol() == market.GetSymbol()) {
          diff = Convert::GetValueDiffInPips(Order::OrderOpenPrice(), market.GetOpenOffer(Order::OrderType()), true);
@@ -1743,7 +1743,8 @@ bool CheckMinPipGap(int sid) {
  */
 void CheckOrders() {
   double elapsed_mins;
-  for (uint i = 0; i < Orders::OrdersTotal(); i++) {
+  int i;
+  for (i = 0; i < Trade::OrdersTotal(); i++) {
     if (!Order::OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) { continue; }
     if (CheckOurMagicNumber() && Order::OrderOpenTime() > 0 && CloseOrderAfterXHours != 0) {
       elapsed_mins = ((double) (TimeCurrent() - Order::OrderOpenTime()) / 60);
@@ -1776,7 +1777,7 @@ bool UpdateTrailingStops(Trade *_trade) {
   double prev_sl, prev_tp;
   double new_sl, new_tp;
   double trail_sl, trail_tp;
-  int sid;
+  int i, sid;
 
    // Check if bar time has been changed since last time.
    /*
@@ -1790,7 +1791,7 @@ bool UpdateTrailingStops(Trade *_trade) {
   #ifdef __profiler__ PROFILER_START #endif
 
    market.RefreshRates();
-   for (int i = 0; i < OrdersTotal(); i++) {
+   for (i = 0; i < Trade::OrdersTotal(); i++) {
      if (!Order::OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) { continue; }
       if (Order::OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
         sid = OrderMagicNumber() - MagicNumber;
@@ -2208,8 +2209,8 @@ int GetTrailingMethod(int order_type, ENUM_ORDER_PROPERTY_DOUBLE mode) {
  * @todo: Move to Orders.
  */
 int GetTotalOrders(bool ours = true) {
-  int total = 0;
-  for (int order = 0; order < OrdersTotal(); order++) {
+  int order, total = 0;
+  for (order = 0; order < Trade::OrdersTotal(); order++) {
     if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol()) {
       if (CheckOurMagicNumber()) {
         if (ours) total++;
@@ -2223,12 +2224,13 @@ int GetTotalOrders(bool ours = true) {
 }
 
 // Return total number of orders per strategy type. See: ENUM_STRATEGY_TYPE.
-int GetTotalOrdersByType(uint order_type) {
+int GetTotalOrdersByType(unsigned int order_type) {
+  int order;
   static datetime last_access = time_current;
   if (Cache && open_orders[order_type] > 0 && last_access == time_current) { return open_orders[order_type]; } else { last_access = time_current; }; // Return cached if available.
   open_orders[order_type] = 0;
   // ArrayFill(open_orders[order_type], 0, ArraySize(open_orders), 0); // Reset open_orders array.
-  for (int order = 0; order < OrdersTotal(); order++) {
+  for (order = 0; order < Trade::OrdersTotal(); order++) {
    if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
      if (Order::OrderSymbol() == Symbol() && Order::OrderMagicNumber() == MagicNumber + order_type) {
        open_orders[order_type]++;
@@ -2244,7 +2246,8 @@ int GetTotalOrdersByType(uint order_type) {
  */
 double GetTotalProfitByType(ENUM_ORDER_TYPE cmd = NULL, int order_type = NULL) {
   double total = 0;
-  for (int i = 0; i < OrdersTotal(); i++) {
+  int i;
+  for (i = 0; i < Trade::OrdersTotal(); i++) {
     if (Order::OrderSelect(i, SELECT_BY_POS, MODE_TRADES) == false) break;
     if (Order::OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
        if (Order::OrderType() == cmd) total += Order::GetOrderProfit();
@@ -2405,9 +2408,9 @@ uint GetMaxOrdersPerDay() {
 /**
  * Calculate number of maximum of orders allowed to open.
  */
-uint GetMaxOrders(double volume_size) {
-  uint _result = 0;
-  uint _limit = account.GetLimitOrders();
+unsigned long GetMaxOrders(double volume_size) {
+  unsigned long _result = 0;
+  unsigned long _limit = account.GetLimitOrders();
   #ifdef __advanced__
     _result = MaxOrders > 0 ? (MaxOrdersPerDay > 0 ? fmin(MaxOrders, GetMaxOrdersPerDay()) : MaxOrders) : trade[chart.TfToIndex()].CalcMaxOrders(volume_size, ea_risk_ratio, max_orders, GetMaxOrdersPerDay());
   #else
@@ -2426,10 +2429,11 @@ int GetMaxOrdersPerType() {
 /**
  * Get number of active strategies.
  */
-int GetNoOfStrategies() {
-  int result = 0;
+unsigned int GetNoOfStrategies() {
+  int sid;
+  unsigned int result = 0;
   Strategy *_strat;
-  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+  for (sid = 0; sid < strats.GetSize(); sid++) {
     _strat = ((Strategy *) strats.GetByIndex(sid));
     result += _strat.IsEnabled() && !_strat.IsSuspended() ? 1 : 0;
   }
@@ -2719,10 +2723,10 @@ void StartNewDay(Trade *_trade) {
   // Print and reset strategy stats.
   string strategy_stats = "Daily strategy stats: ";
   Strategy *_strat;
-  uint j;
-  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+  int j, sid;
+  for (sid = 0; sid < strats.GetSize(); sid++) {
     _strat = ((Strategy *) strats.GetByIndex(sid));
-    j = (uint) _strat.GetId();
+    j = (int) _strat.GetId();
     if (stats[j][DAILY_PROFIT] != 0) strategy_stats += StringFormat("%s: %.1f pips; ", _strat.GetName(), stats[j][DAILY_PROFIT]);
     stats[j][DAILY_PROFIT]  = 0;
   }
@@ -2760,10 +2764,10 @@ void StartNewWeek(Trade *_trade) {
   // Reset strategy stats.
   string strategy_stats = "Weekly strategy stats: ";
   Strategy *_strat;
-  uint j;
-  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+  int j, sid;
+  for (sid = 0; sid < strats.GetSize(); sid++) {
     _strat = ((Strategy *) strats.GetByIndex(sid));
-    j = (uint) _strat.GetId();
+    j = (int) _strat.GetId();
     if (stats[j][WEEKLY_PROFIT] != 0) strategy_stats += StringFormat("%s: %.1f pips; ", _strat.GetName(), stats[j][WEEKLY_PROFIT]);
     stats[j][WEEKLY_PROFIT]  = 0;
   }
@@ -2787,10 +2791,10 @@ void StartNewMonth(Trade *_trade) {
   // Reset strategy stats.
   string strategy_stats = "Monthly strategy stats: ";
   Strategy *_strat;
-  uint j;
-  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+  int j, sid;
+  for (sid = 0; sid < strats.GetSize(); sid++) {
     _strat = ((Strategy *) strats.GetByIndex(sid));
-    j = (uint) _strat.GetId();
+    j = (int) _strat.GetId();
     if (stats[j][MONTHLY_PROFIT] != 0) strategy_stats += StringFormat("%s: %.1f pips; ", _strat.GetName(), stats[j][MONTHLY_PROFIT]);
     stats[j][MONTHLY_PROFIT]  = 0;
   }
@@ -3106,8 +3110,9 @@ bool InitStrategies() {
   if ((ZigZag_Active_Tf & M15B) == M15B) { strats.Add(Stg_ZigZag::Init_M15()); }
   if ((ZigZag_Active_Tf & M30B) == M30B) { strats.Add(Stg_ZigZag::Init_M30()); }
 
+  int sid;
   Strategy *_strat;
-  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+  for (sid = 0; sid < strats.GetSize(); sid++) {
 
     // Validate strategy.
     _strat = ((Strategy *) strats.GetByIndex(sid));
@@ -3551,7 +3556,8 @@ void CheckAccConditions(Chart *_chart) {
   #ifdef __profiler__ PROFILER_START #endif
 
   bool result = false;
-  for (int i = 0; i < ArrayRange(acc_conditions, 0); i++) {
+  int i;
+  for (i = 0; i < ArrayRange(acc_conditions, 0); i++) {
     if (AccCondition(acc_conditions[i][0]) && MarketCondition(_chart, acc_conditions[i][1]) && acc_conditions[i][2] != A_NONE) {
       ActionExecute(acc_conditions[i][2], i);
     }
@@ -3601,10 +3607,10 @@ string GetStrategyComment(Strategy *_strat) {
 string GetStrategyReport(string sep = "\n") {
   string output = "Strategy stats:" + sep;
   Strategy *_strat;
-  uint id;
-  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+  int id, sid;
+  for (sid = 0; sid < strats.GetSize(); sid++) {
     _strat = ((Strategy *) strats.GetByIndex(sid));
-    id = (uint) _strat.GetId();
+    id = (int) _strat.GetId();
     if (info[id][TOTAL_ORDERS] > 0) {
       output += StringFormat("Profit factor: %.2f, ",
                 GetStrategyProfitFactor(id));
@@ -3653,7 +3659,8 @@ void UpdateStrategyFactor(uint period) {
  * Update strategy lot size.
  */
 void UpdateStrategyLotSize() {
-  for (int i = 0; i < ArrayRange(conf, 0); i++) {
+  int i;
+  for (i = 0; i < ArrayRange(conf, 0); i++) {
     conf[i][LOT_SIZE] = ea_lot_size * conf[i][FACTOR];
   }
 }
@@ -3674,10 +3681,11 @@ double GetStrategyProfitFactor(int sid) {
  */
 double GetStrategySignalLevel(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _tf, double _default = 0.0) {
   DEBUG_CHECKPOINT_ADD
-  double _result = _default;
   bool _found = false;
+  double _result = _default;
+  int sid;
   Strategy *_strat;
-  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+  for (sid = 0; sid < strats.GetSize(); sid++) {
     _strat = ((Strategy *) strats.GetByIndex(sid));
     if (_strat.Data().GetIndicatorType() == _indicator && _strat.GetTf() == _tf) {
       _result = _strat.GetSignalLevel1();
@@ -3705,8 +3713,9 @@ ulong GetStrategySignalMethod(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _t
   DEBUG_CHECKPOINT_ADD
   ulong _result = _default;
   bool _found = false;
+  int sid;
   Strategy *_strat;
-  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+  for (sid = 0; sid < strats.GetSize(); sid++) {
     _strat = ((Strategy *) strats.GetByIndex(sid));
     if (_strat.Data().GetIndicatorType() == _indicator && _strat.GetTf() == _tf) {
       _result = _strat.GetSignalOpenMethod1();
@@ -3738,12 +3747,13 @@ ENUM_TIMEFRAMES GetStrategyTimeframe(uint _sid) {
 /**
  * Get strategy id based on the indicator and tf.
  */
-ulong GetStrategyViaIndicator(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _tf) {
+unsigned long GetStrategyViaIndicator(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _tf) {
   DEBUG_CHECKPOINT_ADD
-  ulong _result = EMPTY;
   bool _found = false;
+  int _id;
+  unsigned long _result = EMPTY;
   Strategy *_strat;
-  for (uint _id = 0; _id < strats.GetSize(); _id++) {
+  for (_id = 0; _id < strats.GetSize(); _id++) {
     _strat = ((Strategy *) strats.GetByIndex(_id));
     if (_strat.Data().GetIndicatorType() == _indicator && _strat.GetTf() == _tf) {
       _result = _strat.GetId();
@@ -3769,7 +3779,8 @@ ulong GetStrategyViaIndicator(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _t
  */
 double GetTotalProfit() {
   double total_profit = 0;
-  for (int id = 0; id < ArrayRange(stats, 0); id++) {
+  int id;
+  for (id = 0; id < ArrayRange(stats, 0); id++) {
     total_profit += stats[id][TOTAL_NET_PROFIT];
   }
   return total_profit;
@@ -3850,7 +3861,8 @@ string GetHourlyProfit(string sep = ", ") {
   // @fixme
   string output = "Hourly profit (total: @fixme): ";
   #endif
-  for (int h = 0; h < hour_of_day; h++) {
+  int h;
+  for (h = 0; h < hour_of_day; h++) {
     output += StringFormat("%d: %.1fp%s", h, hourly_profit[day_of_year][h], h < hour_of_day ? sep : "");
   }
   return output;
@@ -4056,10 +4068,10 @@ string GetOrdersStats(string sep = "\n") {
   string orders_per_type = "Stats: "; // Display open orders per type.
   if (total_orders > 0) {
     Strategy *_strat;
-    uint sid;
-    for (uint i = 0; i < strats.GetSize(); i++) {
+    int i, sid;
+    for (i = 0; i < strats.GetSize(); i++) {
       _strat = ((Strategy *) strats.GetByIndex(i));
-      sid = (uint) _strat.GetId();
+      sid = (int) _strat.GetId();
       if (open_orders[sid] > 0) {
         orders_per_type += StringFormat("%s: %.1f%% ", _strat.GetName(), MathFloor(100 / total_orders * open_orders[sid]));
       }
@@ -4134,9 +4146,10 @@ string GetRiskRatioText() {
  */
 bool ActionCloseMostProfitableOrder(int reason_id = EMPTY, int min_profit = EMPTY){
   bool result = false;
-  ulong selected_ticket = 0;
+  unsigned long selected_ticket = 0;
   double max_ticket_profit = 0, curr_ticket_profit = 0;
-  for (int order = 0; order < OrdersTotal(); order++) {
+  int order;
+  for (order = 0; order < Trade::OrdersTotal(); order++) {
     if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES))
      if (Order::OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
       curr_ticket_profit = Order::GetOrderProfit();
@@ -4161,9 +4174,10 @@ bool ActionCloseMostProfitableOrder(int reason_id = EMPTY, int min_profit = EMPT
  * Execute action to close most unprofitable order.
  */
 bool ActionCloseMostUnprofitableOrder(int reason_id = EMPTY){
-  ulong selected_ticket = 0;
   double ticket_profit = 0;
-  for (int order = 0; order < OrdersTotal(); order++) {
+  int order;
+  unsigned long selected_ticket = 0;
+  for (order = 0; order < Trade::OrdersTotal(); order++) {
     if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES))
      if (Order::OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
        if (Order::GetOrderProfit() < ticket_profit) {
@@ -4187,9 +4201,9 @@ bool ActionCloseMostUnprofitableOrder(int reason_id = EMPTY){
  */
 bool ActionCloseAllProfitableOrders(int reason_id = EMPTY){
   bool result = false;
-  int selected_orders = 0;
+  int order, selected_orders = 0;
   double ticket_profit = 0, total_profit = 0;
-  for (int order = 0; order < OrdersTotal(); order++) {
+  for (order = 0; order < Trade::OrdersTotal(); order++) {
     if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
        ticket_profit = Order::GetOrderProfit();
        if (ticket_profit > 0) {
@@ -4214,7 +4228,7 @@ bool ActionCloseAllUnprofitableOrders(int reason_id = EMPTY){
   bool result = false;
   int selected_orders = 0;
   double ticket_profit = 0, total_profit = 0;
-  for (int order = 0; order < OrdersTotal(); order++) {
+  for (int order = 0; order < Trade::OrdersTotal(); order++) {
     if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
        ticket_profit = Order::GetOrderProfit();
        if (ticket_profit < 0) {
@@ -4240,7 +4254,7 @@ bool ActionCloseAllOrdersByType(ENUM_ORDER_TYPE cmd = EMPTY, int reason_id = EMP
   #ifdef __profiler__ PROFILER_START #endif
   int selected_orders = 0;
   double ticket_profit = 0, total_profit = 0;
-  for (int order = 0; order < OrdersTotal(); order++) {
+  for (int order = 0; order < Trade::OrdersTotal(); order++) {
     if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
        if (Order::OrderType() == cmd) {
          TaskAddCloseOrder(Order::OrderTicket(), reason_id);
@@ -4275,7 +4289,7 @@ bool ActionCloseAllOrdersByType(ENUM_ORDER_TYPE cmd = EMPTY, int reason_id = EMP
 int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = true) {
   #ifdef __profiler__ PROFILER_START #endif
    int processed = 0;
-   int total = OrdersTotal();
+   int total = Trade::OrdersTotal();
    double total_profit = 0;
    for (int order = 0; order < total; order++) {
       if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && Order::OrderTicket() > 0) {
@@ -4310,8 +4324,9 @@ bool ActionExecute(int aid, int id = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   #ifdef __profiler__ PROFILER_START #endif
   bool result = false;
-  int reason_id = (id != EMPTY ? acc_conditions[id][0] : EMPTY); // Account id condition.
   int mid = (id != EMPTY ? acc_conditions[id][1] : EMPTY); // Market id condition.
+  int reason_id = (id != EMPTY ? acc_conditions[id][0] : EMPTY); // Account id condition.
+  int sid;
   ENUM_ORDER_TYPE cmd;
   switch (aid) {
     case A_NONE: /* 0 */
@@ -4355,13 +4370,13 @@ bool ActionExecute(int aid, int id = EMPTY) {
       result = ActionCloseAllOrders(reason_id);
       break;
     case A_SUSPEND_STRATEGIES: /* 11 */
-      for (uint sid = 0; sid < strats.GetSize(); sid++) {
+      for (sid = 0; sid < strats.GetSize(); sid++) {
         ((Strategy *) strats.GetByIndex(sid)).Suspended(true);
       }
       result = true;
       break;
     case A_UNSUSPEND_STRATEGIES: /* 12 */
-      for (uint sid = 0; sid < strats.GetSize(); sid++) {
+      for (sid = 0; sid < strats.GetSize(); sid++) {
         ((Strategy *) strats.GetByIndex(sid)).Suspended(false);
       }
       result = true;
@@ -4545,7 +4560,8 @@ bool TicketAdd(int ticket_no) {
  */
 bool TicketRemove(int ticket_no) {
   DEBUG_CHECKPOINT_ADD
-  for (int i = 0; i < ArraySize(tickets); i++) {
+  int i;
+  for (i = 0; i < ArraySize(tickets); i++) {
     if (tickets[i] == ticket_no) {
       tickets[i] = 0; // Remove the ticket number from the array slot.
       return (true); // Ticket has been removed successfully.
@@ -4562,7 +4578,7 @@ bool CheckHistory() {
   double total_profit = 0;
   int pos;
   #ifdef __profiler__ PROFILER_START #endif
-  for (pos = last_history_check; pos < Orders::OrdersHistoryTotal(); pos++) {
+  for (pos = last_history_check; pos < account.OrdersHistoryTotal(); pos++) {
     if (!Order::OrderSelect(pos, SELECT_BY_POS, MODE_HISTORY)) continue;
     if (Order::OrderCloseTime() > last_history_check && CheckOurMagicNumber()) {
       total_profit =+ OrderCalc();
