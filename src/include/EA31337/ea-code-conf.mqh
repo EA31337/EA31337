@@ -3,8 +3,8 @@
 //|                       Copyright 2016-2019, 31337 Investments Ltd |
 //|                                       https://github.com/EA31337 |
 //+------------------------------------------------------------------+
-#property copyright "Copyright 2016-2019, kenorb"
-#property link      "https://github.com/EA31337"
+//property copyright "Copyright 2016-2019, kenorb"
+//property link      "https://github.com/EA31337"
 
 //+------------------------------------------------------------------+
 //| Predefined code configurations.

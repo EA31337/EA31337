@@ -16,8 +16,8 @@
 // User input params.
 string __BWMFI_Parameters__ = "-- Settings for the Market Facilitation Index indicator --"; // >>> BWMFI <<<
 uint BWMFI_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-ENUM_TRAIL_TYPE BWMFI_TrailingStopMethod = 22; // Trail stop method
-ENUM_TRAIL_TYPE BWMFI_TrailingProfitMethod = 1; // Trail profit method
+ENUM_TRAIL_TYPE BWMFI_TrailingStopMethod = (ENUM_TRAIL_TYPE)22; // Trail stop method
+ENUM_TRAIL_TYPE BWMFI_TrailingProfitMethod = (ENUM_TRAIL_TYPE)1; // Trail profit method
 double BWMFI_SignalLevel = 0.00000000; // Signal level
 INPUT uint BWMFI_Shift = 0; // Shift (relative to the current bar, 0 - default)
 int BWMFI1_SignalMethod = 0; // Signal method for M1 (0-

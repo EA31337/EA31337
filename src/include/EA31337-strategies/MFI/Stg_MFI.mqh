@@ -16,8 +16,8 @@
 // User input params.
 INPUT string __MFI_Parameters__ = "-- Settings for the Money Flow Index indicator --"; // >>> MFI <<<
 INPUT uint MFI_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-INPUT ENUM_TRAIL_TYPE MFI_TrailingStopMethod = 7; // Trail stop method
-INPUT ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = 22; // Trail profit method
+INPUT ENUM_TRAIL_TYPE MFI_TrailingStopMethod = (ENUM_TRAIL_TYPE)7; // Trail stop method
+INPUT ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = (ENUM_TRAIL_TYPE)22; // Trail profit method
 INPUT int MFI_Period_M1 = 2; // Period for M1
 INPUT int MFI_Period_M5 = 22; // Period for M5
 INPUT int MFI_Period_M15 = 8; // Period for M15
@@ -30,19 +30,19 @@ INPUT int MFI15_SignalMethod = 0; // Signal method for M15 (0-1)
 INPUT int MFI30_SignalMethod = 0; // Signal method for M30 (0-1)
 INPUT int MFI1_OpenCondition1 = 874; // Open condition 1 for M1 (0-1023)
 INPUT int MFI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-INPUT ENUM_MARKET_EVENT MFI1_CloseCondition = 14; // Close condition for M1
+INPUT ENUM_MARKET_EVENT MFI1_CloseCondition = (ENUM_MARKET_EVENT)14; // Close condition for M1
 
 INPUT int MFI5_OpenCondition1 = 1; // Open condition 1 for M5 (0-1023)
 INPUT int MFI5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-INPUT ENUM_MARKET_EVENT MFI5_CloseCondition = 2; // Close condition for M5
+INPUT ENUM_MARKET_EVENT MFI5_CloseCondition = (ENUM_MARKET_EVENT)2; // Close condition for M5
 
 INPUT int MFI15_OpenCondition1 = 292; // Open condition 1 for M15 (0-)
 INPUT int MFI15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-INPUT ENUM_MARKET_EVENT MFI15_CloseCondition = 1; // Close condition for M15
+INPUT ENUM_MARKET_EVENT MFI15_CloseCondition = (ENUM_MARKET_EVENT)1; // Close condition for M15
 
 INPUT int MFI30_OpenCondition1 = 777; // Open condition 1 for M30 (0-)
 INPUT int MFI30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-INPUT ENUM_MARKET_EVENT MFI30_CloseCondition = 3; // Close condition for M30
+INPUT ENUM_MARKET_EVENT MFI30_CloseCondition = (ENUM_MARKET_EVENT)3; // Close condition for M30
 
 INPUT double MFI1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 INPUT double MFI5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)

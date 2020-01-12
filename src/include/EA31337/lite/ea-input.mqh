@@ -39,8 +39,8 @@ extern uint     StopLossMax = 40; // Max Stop loss (in pips, 0 = auto)
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
-ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 0; // Default trail stop method (0 = none)
-ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 0; // Default trail profit method
+ENUM_TRAIL_TYPE DefaultTrailingStopMethod = (ENUM_TRAIL_TYPE)0; // Default trail stop method (0 = none)
+ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = (ENUM_TRAIL_TYPE)0; // Default trail profit method
 extern int TrailingStop = 50; // Extra trailing stop (in pips)
 extern int TrailingProfit = 0; // Extra trailing profit (in pips)
 extern double TrailingStopAddPerMinute = 0.3; // Decrease trail stop per minute (pip/min)
@@ -87,25 +87,25 @@ extern int SmartQueueFilter = 72; // QueueAI: Method for filtering the orders (0
 extern string __EA_Account_Conditions__ = "-- Account conditions --"; // >>> CONDITIONS & ACTIONS <<<
 extern bool Account_Conditions_Active = 0; // Enable account conditions (don't enable for multibot trading)
 // Condition 5 - Equity 1% high
-extern ENUM_ACC_CONDITION Account_Condition_1 = 5; // 1. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_1 = 5; // 1. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_1 = 10; // 1. Action to take
+extern ENUM_ACC_CONDITION Account_Condition_1 = (ENUM_ACC_CONDITION)5; // 1. Account condition
+extern ENUM_MARKET_CONDITION Market_Condition_1 = (ENUM_MARKET_CONDITION)5; // 1. Market condition
+extern ENUM_ACTION_TYPE Action_On_Condition_1 = (ENUM_ACTION_TYPE)10; // 1. Action to take
 // Condition 6 - Equity 10% high
-extern ENUM_ACC_CONDITION Account_Condition_2 = 0; // 2. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_2 = 8; // 2. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_2 = 7; // 2. Action to take
+extern ENUM_ACC_CONDITION Account_Condition_2 = (ENUM_ACC_CONDITION)0; // 2. Account condition
+extern ENUM_MARKET_CONDITION Market_Condition_2 = (ENUM_MARKET_CONDITION)8; // 2. Market condition
+extern ENUM_ACTION_TYPE Action_On_Condition_2 = (ENUM_ACTION_TYPE)7; // 2. Action to take
 // Condition 10 - 50% Margin Used
-extern ENUM_ACC_CONDITION Account_Condition_3 = 0; // 3. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_3 = 1; // 3. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_3 = 0; // 3. Action to take
+extern ENUM_ACC_CONDITION Account_Condition_3 = (ENUM_ACC_CONDITION)0; // 3. Account condition
+extern ENUM_MARKET_CONDITION Market_Condition_3 = (ENUM_MARKET_CONDITION)1; // 3. Market condition
+extern ENUM_ACTION_TYPE Action_On_Condition_3 = (ENUM_ACTION_TYPE)0; // 3. Action to take
 // Condition 17 - Max. daily balance < max. weekly
-extern ENUM_ACC_CONDITION Account_Condition_4 = 17; // 4. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_4 = 16; // 4. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_4 = 7; // 4. Action to take
+extern ENUM_ACC_CONDITION Account_Condition_4 = (ENUM_ACC_CONDITION)17; // 4. Account condition
+extern ENUM_MARKET_CONDITION Market_Condition_4 = (ENUM_MARKET_CONDITION)16; // 4. Market condition
+extern ENUM_ACTION_TYPE Action_On_Condition_4 = (ENUM_ACTION_TYPE)7; // 4. Action to take
 //
-extern ENUM_ACC_CONDITION Account_Condition_5 = 0; // 5. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_5 = 0; // 5. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_5 = 0; // 5. Action to take
+extern ENUM_ACC_CONDITION Account_Condition_5 = (ENUM_ACC_CONDITION)0; // 5. Account condition
+extern ENUM_MARKET_CONDITION Market_Condition_5 = (ENUM_MARKET_CONDITION)0; // 5. Market condition
+extern ENUM_ACTION_TYPE Action_On_Condition_5 = (ENUM_ACTION_TYPE)0; // 5. Action to take
 
 extern int Account_Condition_MinProfitCloseOrder = 20; // Min pip profit on action to close
 

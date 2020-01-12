@@ -16,8 +16,8 @@
 // User input params.
 string __ATR_Parameters__ = "-- Settings for the Average True Range indicator --"; // >>> ATR <<<
 uint ATR_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-ENUM_TRAIL_TYPE ATR_TrailingStopMethod = 7; // Trail stop method
-ENUM_TRAIL_TYPE ATR_TrailingProfitMethod = 22; // Trail profit method
+ENUM_TRAIL_TYPE ATR_TrailingStopMethod = (ENUM_TRAIL_TYPE)7; // Trail stop method
+ENUM_TRAIL_TYPE ATR_TrailingProfitMethod = (ENUM_TRAIL_TYPE)22; // Trail profit method
 int ATR_Period_M1 = 14; // Period for M1
 int ATR_Period_M5 = 14; // Period for M5
 int ATR_Period_M15 = 14; // Period for M15
@@ -30,16 +30,16 @@ int ATR15_SignalMethod = 0; // Signal method for M15 (0-31)
 int ATR30_SignalMethod = 0; // Signal method for M30 (0-31)
 int ATR1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int ATR1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-ENUM_MARKET_EVENT ATR1_CloseCondition = 1; // Close condition for M1
+ENUM_MARKET_EVENT ATR1_CloseCondition = (ENUM_MARKET_EVENT)1; // Close condition for M1
 int ATR5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
 int ATR5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-ENUM_MARKET_EVENT ATR5_CloseCondition = 1; // Close condition for M5
+ENUM_MARKET_EVENT ATR5_CloseCondition = (ENUM_MARKET_EVENT)1; // Close condition for M5
 int ATR15_OpenCondition1 = 292; // Open condition 1 for M15 (0-)
 int ATR15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-ENUM_MARKET_EVENT ATR15_CloseCondition = 1; // Close condition for M15
+ENUM_MARKET_EVENT ATR15_CloseCondition = (ENUM_MARKET_EVENT)1; // Close condition for M15
 int ATR30_OpenCondition1 = 292; // Open condition 1 for M30 (0-)
 int ATR30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-ENUM_MARKET_EVENT ATR30_CloseCondition = 1; // Close condition for M30
+ENUM_MARKET_EVENT ATR30_CloseCondition = (ENUM_MARKET_EVENT)1; // Close condition for M30
 double ATR1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 double ATR5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 double ATR15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)

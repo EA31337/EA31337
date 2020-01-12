@@ -221,14 +221,18 @@ void UpdateTicks() {
  * Update existing opened orders.
  */
 void UpdateOrders(Trade *_trade) {
-  #ifdef __profiler__ PROFILER_START #endif
+#ifdef __profiler__
+  PROFILER_START
+#endif
   if (total_orders > 0) {
     CheckOrders();
     UpdateTrailingStops(_trade);
     CheckAccConditions(_trade.Chart());
     TaskProcessList();
   }
-  #ifdef __profiler__ PROFILER_STOP #endif
+#ifdef __profiler__
+  PROFILER_STOP
+#endif
 }
 
 /**
@@ -280,8 +284,10 @@ int OnInit() {
      session_initiated = true;
   }
 
-  #ifdef __profiler__ PROFILER_SET_MIN(10) #endif
-  #ifdef __profiler__ PROFILER_START #endif
+#ifdef __profiler__
+  PROFILER_SET_MIN(10)
+  PROFILER_START
+#endif
 
   session_initiated &= InitClasses();
   session_initiated &= InitVariables();
@@ -306,7 +312,9 @@ int OnInit() {
   }
 
   ChartRedraw();
-  #ifdef __profiler__ PROFILER_STOP_PRINT #endif
+#ifdef __profiler__
+  PROFILER_STOP_PRINT
+#endif
   return (session_initiated ? INIT_SUCCEEDED : INIT_FAILED);
 } // end: OnInit()
 
@@ -333,7 +341,9 @@ void OnDeinit(const int reason) {
       // Show final account details.
       Msg::ShowText(GetSummaryText(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
 
-      #ifdef __profiler__ PROFILER_PRINT #endif
+    #ifdef __profiler__
+      PROFILER_PRINT
+    #endif
 
       // Save ticks if recorded.
       if (RecordTicksToCSV) {
@@ -388,7 +398,9 @@ void DeinitVars() {
   for (int tfi = 0; tfi < FINAL_ENUM_TIMEFRAMES_INDEX; tfi++) {
     Object::Delete(trade[tfi]);
   }
-  #ifdef __profiler__ PROFILER_DEINIT #endif
+#ifdef __profiler__
+  PROFILER_DEINIT
+#endif
 }
 
 /**
@@ -525,7 +537,9 @@ string InitInfo(bool startup = false, string sep = "\n") {
  */
 bool EA_Trade(Trade *_trade) {
   DEBUG_CHECKPOINT_RESET
-  #ifdef __profiler__ PROFILER_START #endif
+#ifdef __profiler__
+  PROFILER_START
+#endif
   Strategy *strat;
   bool order_placed = false;
   ENUM_ORDER_TYPE _cmd = EMPTY;
@@ -587,7 +601,9 @@ bool EA_Trade(Trade *_trade) {
   }
 
   last_traded = TimeCurrent();
-  #ifdef __profiler__ PROFILER_STOP #endif
+#ifdef __profiler__
+  PROFILER_STOP
+#endif
   return order_placed;
 }
 
@@ -701,7 +717,9 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
     case PERIOD_M30: wpr_period = WPR_Period_M30; break;
   }
 
-  #ifdef __profiler__ PROFILER_START #endif
+#ifdef __profiler__
+  PROFILER_START
+#endif
   switch (type) {
     case INDI_AC: // Calculates the Bill Williams' Accelerator/Decelerator oscillator.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++)
@@ -966,7 +984,9 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
   } // end: switch
 
   //processed[type][index] = chart.GetBarTime(tf);
-  #ifdef __profiler__ PROFILER_STOP #endif
+#ifdef __profiler__
+  PROFILER_STOP
+#endif
   DEBUG_CHECKPOINT_POP
   return (success);
 }
@@ -994,7 +1014,9 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, Strategy *_strat, double trade_volume = 0,
   double trade_volume_max = market.GetVolumeMax();
   Trade *_trade = _strat.Trade();
 
-  #ifdef __profiler__ PROFILER_START #endif
+#ifdef __profiler__
+  PROFILER_START
+#endif
 
   // if (VerboseTrace) Print(__FUNCTION__);
   if (trade_volume <= market.GetVolumeMin()) {
@@ -1169,7 +1191,9 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, Strategy *_strat, double trade_volume = 0,
      if (retry) TaskAddOrderOpen(cmd, trade_volume, sid); // Will re-try again. // warning 43: possible loss of data due to type conversion
      info[sid][TOTAL_ERRORS]++;
    } // end-if: order_ticket
-  #ifdef __profiler__ PROFILER_STOP #endif
+#ifdef __profiler__
+  PROFILER_STOP
+#endif
   return (result);
 }
 
@@ -1324,7 +1348,9 @@ bool CloseOrder(ulong ticket_no = NULL, int reason_id = EMPTY, ENUM_MARKET_EVENT
         "Debug", __FUNCTION__, __LINE__, VerboseDebug);
     return (false);
   }
-  #ifdef __profiler__ PROFILER_START #endif
+#ifdef __profiler__
+  PROFILER_START
+#endif
   double close_price = NormalizeDouble(market.GetCloseOffer(), market.GetDigits());
   result = Order::OrderClose(ticket_no, OrderLots(), close_price, max_order_slippage, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell));
   // if (VerboseTrace) Print(__FUNCTION__ + ": CloseOrder request. Reason: " + reason + "; Result=" + result + " @ " + TimeCurrent() + "(" + TimeToStr(TimeCurrent()) + "), ticket# " + ticket_no);
@@ -1354,7 +1380,9 @@ bool CloseOrder(ulong ticket_no = NULL, int reason_id = EMPTY, ENUM_MARKET_EVENT
     if (id < 0) info[id][TOTAL_ERRORS]++;
   } // end-if: !result
   DEBUG_CHECKPOINT_POP
-  #ifdef __profiler__ PROFILER_STOP #endif
+#ifdef __profiler__
+  PROFILER_STOP
+#endif
   return result;
 }
 
@@ -1441,13 +1469,17 @@ bool UpdateStats() {
   // Check if bar time has been changed since last check.
   // int bar_time = iTime(NULL, PERIOD_M1, 0);
   // CheckStats(last_pip_change, MAX_TICK);
-  #ifdef __profiler__ PROFILER_START #endif
+#ifdef __profiler__
+  PROFILER_START
+#endif
   CheckStats(High[0], MAX_HIGH);
   CheckStats(account.AccountBalance(), MAX_BALANCE);
   CheckStats(account.AccountEquity(), MAX_EQUITY);
   CheckStats(total_orders, MAX_ORDERS);
   CheckStats(market.GetSpreadInPts(), MAX_SPREAD);
-  #ifdef __profiler__ PROFILER_STOP #endif
+#ifdef __profiler__
+  PROFILER_STOP
+#endif
   return (true);
 }
 
@@ -1561,6 +1593,7 @@ bool CheckMarketEvent(Chart *_chart, ENUM_ORDER_TYPE cmd = EMPTY, ENUM_MARKET_EV
   ENUM_TIMEFRAMES tf = _chart.GetTf();
   if (cmd == EMPTY || condition == C_EVENT_NONE) return (false);
   if (VerboseTrace) terminal.Logger().Trace(StringFormat("%s(%s, %d)", EnumToString(cmd), _chart.TfToString(), condition), __FUNCTION_LINE__);
+#define GetStratByIndiType(A, B) (*GetStratByIndiType(A, B))
   switch (condition) {
     case C_AC_BUY_SELL:
       result = GetStratByIndiType(INDI_AC, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
@@ -1785,7 +1818,9 @@ bool UpdateTrailingStops(Trade *_trade) {
      last_trail_update = bar_time;
    }*/
 
-  #ifdef __profiler__ PROFILER_START #endif
+#ifdef __profiler__
+  PROFILER_START
+#endif
 
    market.RefreshRates();
    for (int i = 0; i < OrdersTotal(); i++) {
@@ -1877,7 +1912,9 @@ bool UpdateTrailingStops(Trade *_trade) {
         }
       }
   } // end: for
-  #ifdef __profiler__ PROFILER_STOP #endif
+#ifdef __profiler__
+  PROFILER_STOP
+#endif
   return result;
 }
 
@@ -2305,7 +2342,9 @@ bool CheckOurMagicNumber(int magic_number = NULL) {
  */
 bool TradeAllowed() {
   bool _result = true;
-  #ifdef __profiler__ PROFILER_START #endif
+#ifdef __profiler__
+  PROFILER_START
+#endif
   if (chart.GetBars() < 100) {
     last_err = Msg::ShowText("Bars less than 100, not trading yet.", "Error", __FUNCTION__, __LINE__, VerboseErrors);
     if (PrintLogOnChart) DisplayInfoOnChart();
@@ -2357,7 +2396,9 @@ bool TradeAllowed() {
   }
 
   ea_active = _result;
-  #ifdef __profiler__ PROFILER_STOP #endif
+#ifdef __profiler__
+  PROFILER_STOP
+#endif
   return (_result);
 }
 
@@ -2614,7 +2655,9 @@ double GetRiskRatio() {
  * Executed for every hour.
  */
 void StartNewHour(Trade *_trade) {
-  #ifdef __profiler__ PROFILER_START #endif
+#ifdef __profiler__
+  PROFILER_START
+#endif
 
   CheckHistory(); // Process closed orders for the previous hour.
 
@@ -2668,7 +2711,9 @@ void StartNewHour(Trade *_trade) {
 
   // Reset messages and errors.
   // Message(NULL);
-  #ifdef __profiler__ PROFILER_STOP #endif
+#ifdef __profiler__
+  PROFILER_STOP
+#endif
 }
 
 /**
@@ -2963,7 +3008,9 @@ bool InitVariables() {
  */
 bool InitStrategies() {
   bool init = true;
-  #ifdef __profiler__ PROFILER_START #endif
+#ifdef __profiler__
+  PROFILER_START
+#endif
 
   // Initialize/reset strategy arrays.
   ArrayInitialize(info, 0);  // Reset strategy info.
@@ -3164,7 +3211,9 @@ bool InitStrategies() {
   PrintFormat("%s(): FIXME: ArrSetValueD();", __FUNCTION_LINE__);
   #endif
 
-  #ifdef __profiler__ PROFILER_STOP #endif
+#ifdef __profiler__
+  PROFILER_STOP
+#endif
   return init || !ValidateSettings;
 }
 
@@ -3172,7 +3221,9 @@ bool InitStrategies() {
  * Init classes.
  */
 bool InitClasses() {
-  #ifdef __profiler__ PROFILER_START #endif
+#ifdef __profiler__
+  PROFILER_START
+#endif
 
   // Initialize main classes.
   account = new Account();
@@ -3216,7 +3267,9 @@ bool InitClasses() {
   strats = new Collection();
   summary_report = new SummaryReport();
 
-  #ifdef __profiler__ PROFILER_STOP #endif
+#ifdef __profiler__
+  PROFILER_STOP
+#endif
   return market.GetSymbol() == _Symbol;
 }
 
@@ -3225,7 +3278,9 @@ bool InitClasses() {
  */
 void UpdateVariables() {
   DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
+#ifdef __profiler__
+  PROFILER_START
+#endif
   time_current = TimeCurrent();
   //curr_bar_time = chart.GetBarTime(PERIOD_M1);
   last_close_profit = EMPTY;
@@ -3244,7 +3299,9 @@ void UpdateVariables() {
   double curr_rsi = Indi_RSI::iRSI(market.GetSymbol(), TrendPeriod, rsi_period, RSI_Applied_Price, 0);
   curr_trend = fabs(curr_rsi - 50) > 10 ? (double) (1.0 / 50) * (curr_rsi - 50) : 0;
   // PrintFormat("Curr Trend: %g (%g: %g/%g), RSI: %g", curr_trend, (double) (1.0 / 50) * (curr_rsi - 50), 1 / 50, curr_rsi - 50, curr_rsi);
-  #ifdef __profiler__ PROFILER_STOP #endif
+#ifdef __profiler__
+  PROFILER_STOP
+#endif
 }
 
 /* END: VARIABLE FUNCTIONS */
@@ -3561,7 +3618,9 @@ void CheckAccConditions(Chart *_chart) {
   }
   _last_check = DateTime::TimeTradeServer();
 
-  #ifdef __profiler__ PROFILER_START #endif
+#ifdef __profiler__
+  PROFILER_START
+#endif
 
   bool result = false;
   for (int i = 0; i < ArrayRange(acc_conditions, 0); i++) {
@@ -3569,7 +3628,9 @@ void CheckAccConditions(Chart *_chart) {
       ActionExecute(acc_conditions[i][2], i);
     }
   } // end: for
-  #ifdef __profiler__ PROFILER_STOP #endif
+#ifdef __profiler__
+  PROFILER_STOP
+#endif
 }
 
 /**
@@ -4275,7 +4336,9 @@ bool ActionCloseAllUnprofitableOrders(int reason_id = EMPTY){
  */
 bool ActionCloseAllOrdersByType(ENUM_ORDER_TYPE cmd = EMPTY, int reason_id = EMPTY){
   if (cmd == EMPTY) return (false);
-  #ifdef __profiler__ PROFILER_START #endif
+#ifdef __profiler__
+  PROFILER_START
+#endif
   int selected_orders = 0;
   double ticket_profit = 0, total_profit = 0;
   for (int order = 0; order < OrdersTotal(); order++) {
@@ -4292,7 +4355,9 @@ bool ActionCloseAllOrdersByType(ENUM_ORDER_TYPE cmd = EMPTY, int reason_id = EMP
     Msg::ShowText(StringFormat("Queued %d orders to close with expected profit of %g pips.", selected_orders, total_profit)
     , "Info", __FUNCTION__, __LINE__, VerboseInfo);
   }
-  #ifdef __profiler__ PROFILER_STOP #endif
+#ifdef __profiler__
+  PROFILER_STOP
+#endif
   return (true);
 }
 
@@ -4311,7 +4376,9 @@ bool ActionCloseAllOrdersByType(ENUM_ORDER_TYPE cmd = EMPTY, int reason_id = EMP
  *     therefore closing all make the things more predictable and to avoid any suprices.
  */
 int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = true) {
-  #ifdef __profiler__ PROFILER_START #endif
+#ifdef __profiler__
+  PROFILER_START
+#endif
    int processed = 0;
    int total = OrdersTotal();
    double total_profit = 0;
@@ -4332,7 +4399,9 @@ int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = true) {
     Msg::ShowText(StringFormat("Queued %d orders out of %d for closure.", processed, total),
       "Info", __FUNCTION__, __LINE__, VerboseInfo);
    }
-  #ifdef __profiler__ PROFILER_STOP #endif
+#ifdef __profiler__
+  PROFILER_STOP
+#endif
    return (processed > 0);
 }
 
@@ -4346,7 +4415,9 @@ int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = true) {
  */
 bool ActionExecute(int aid, int id = EMPTY) {
   DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
+#ifdef __profiler__
+  PROFILER_START
+#endif
   bool result = false;
   int reason_id = (id != EMPTY ? acc_conditions[id][0] : EMPTY); // Account id condition.
   int mid = (id != EMPTY ? acc_conditions[id][1] : EMPTY); // Market id condition.
@@ -4452,7 +4523,9 @@ bool ActionExecute(int aid, int id = EMPTY) {
         ActionIdToText(aid), aid, ReasonIdToText(reason_id), reason_id),
       "Warning", __FUNCTION__, __LINE__, VerboseErrors);
   }
-  #ifdef __profiler__ PROFILER_STOP #endif
+  #ifdef __profiler__
+    PROFILER_STOP
+  #endif
   return result;
 }
 
@@ -4599,7 +4672,9 @@ bool TicketRemove(int ticket_no) {
 bool CheckHistory() {
   double total_profit = 0;
   int pos;
-  #ifdef __profiler__ PROFILER_START #endif
+#ifdef
+  __profiler__ PROFILER_START
+#endif
   for (pos = last_history_check; pos < Orders::OrdersHistoryTotal(); pos++) {
     if (!Order::OrderSelect(pos, SELECT_BY_POS, MODE_HISTORY)) continue;
     if (Order::OrderCloseTime() > last_history_check && CheckOurMagicNumber()) {
@@ -4608,7 +4683,9 @@ bool CheckHistory() {
   }
   hourly_profit[day_of_year][hour_of_day] = total_profit; // Update hourly profit.
   last_history_check = pos;
-  #ifdef __profiler__ PROFILER_STOP #endif
+#ifdef __profiler__
+  PROFILER_STOP
+#endif
   return (true);
 }
 
@@ -4947,7 +5024,9 @@ bool TaskRun(int job_id) {
 bool TaskProcessList(bool with_force = false) {
   int total_run = 0, total_failed = 0, total_removed = 0;
   int no_elem = 8;
-  #ifdef __profiler__ PROFILER_START #endif
+#ifdef __profiler__
+  PROFILER_START
+#endif
 
 /* @todo
    // Check if bar time has been changed since last time.
@@ -4976,7 +5055,9 @@ bool TaskProcessList(bool with_force = false) {
    } // end: for
    if (VerboseDebug && total_run+total_failed > 0)
      Print(__FUNCTION__, ": Processed ", total_run+total_failed, " jobs (", total_run, " run, ", total_failed, " failed (", total_removed, " removed)).");
-  #ifdef __profiler__ PROFILER_STOP #endif
+#ifdef __profiler__
+  PROFILER_STOP
+#endif
   return true;
 }
 
