@@ -2396,12 +2396,12 @@ void CheckStats(double value, int type, bool max = true) {
  *   Returns daily order limit when positive. When zero, it means unlimited.
  */
 #ifdef __advanced__
-uint GetMaxOrdersPerDay() {
+unsigned int GetMaxOrdersPerDay() {
   if (MaxOrdersPerDay <= 0) return 0;
   int hours_left = (24 - hour_of_day);
   int curr_allowed_limit = (int) floor((MaxOrdersPerDay - daily_orders) / hours_left);
   // Message(StringFormat("Hours left: (%d - %d) / %d= %d", MaxOrdersPerDay, daily_orders, hours_left, curr_allowed_limit));
-  return fmin(fmax((total_orders - daily_orders), 1) + curr_allowed_limit, MaxOrdersPerDay);
+  return (unsigned int) fmin(fmax((total_orders - daily_orders), 1) + curr_allowed_limit, MaxOrdersPerDay);
 }
 #endif
 
