@@ -6,133 +6,138 @@
 
 /**
  * @file
- * Implements WPR strategy.
+ * Implements WPR strategy based on the Larry Williams' Percent Range indicator.
  */
 
 // Includes.
-#include "../../EA31337-classes/Indicators/Indi_WPR.mqh"
-#include "../../EA31337-classes/Strategy.mqh"
+#include <EA31337-classes/Indicators/Indi_WPR.mqh>
+#include <EA31337-classes/Strategy.mqh>
 
 // User input params.
-INPUT string __WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --"; // >>> WPR <<<
-INPUT uint WPR_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-INPUT int WPR_Period_M1 = 11; // Period for M1
-INPUT int WPR_Period_M5 = 5; // Period for M5
-INPUT int WPR_Period_M15 = 5; // Period for M15
-INPUT int WPR_Period_M30 = 8; // Period for M30
-INPUT int WPR_Shift = 0; // Shift
-INPUT int WPR_SignalLevel = 20; // Signal level
-INPUT ENUM_TRAIL_TYPE WPR_TrailingStopMethod = 22; // Trail stop method
-INPUT ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = 11; // Trail profit method
-INPUT int WPR1_SignalMethod = -46; // Signal method for M1 (-63-63)
-INPUT int WPR5_SignalMethod = -40; // Signal method for M5 (-63-63)
-INPUT int WPR15_SignalMethod = -60; // Signal method for M15 (-63-63)
-INPUT int WPR30_SignalMethod = 0; // Signal method for M30 (-63-63)
-INPUT int WPR1_OpenCondition1 = 874; // Open condition 1 for M1 (0-1023)
-INPUT int WPR1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
-INPUT ENUM_MARKET_EVENT WPR1_CloseCondition = 1; // Close condition for M1
-INPUT int WPR5_OpenCondition1 = 680; // Open condition 1 for M5 (0-1023)
-INPUT int WPR5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
-INPUT ENUM_MARKET_EVENT WPR5_CloseCondition = 1; // Close condition for M5
-INPUT int WPR15_OpenCondition1 = 98; // Open condition 1 for M15 (0-1023)
-INPUT int WPR15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
-INPUT ENUM_MARKET_EVENT WPR15_CloseCondition = 1; // Close condition for M15
-INPUT int WPR30_OpenCondition1 = 292; // Open condition 1 for M30 (0-1023)
-INPUT int WPR30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
-INPUT ENUM_MARKET_EVENT WPR30_CloseCondition = 1; // Close condition for M30
-INPUT double WPR1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-INPUT double WPR5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-INPUT double WPR15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-INPUT double WPR30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+INPUT string __WPR_Parameters__ = "-- WPR strategy params --";  // >>> WPR <<<
+INPUT int WPR_Period = 11;                                      // Period
+INPUT int WPR_Shift = 0;                                        // Shift
+INPUT int WPR_SignalOpenMethod = -46;                           // Signal open method (-63-63)
+INPUT double WPR_SignalOpenLevel = 20;                             // Signal open level
+INPUT int WPR_SignalOpenFilterMethod = 20;                             // Signal open filter method
+INPUT int WPR_SignalOpenBoostMethod = 20;                             // Signal open boost method
+INPUT int WPR_SignalCloseMethod = -46;                          // Signal close method (-63-63)
+INPUT int WPR_SignalCloseLevel = 20;                            // Signal close level
+INPUT int WPR_PriceLimitMethod = 0;                             // Price limit method
+INPUT double WPR_PriceLimitLevel = 0;                           // Price limit level
+INPUT double WPR_MaxSpread = 6.0;                               // Max spread to trade (pips)
+
+// Struct to define strategy parameters to override.
+struct Stg_WPR_Params : Stg_Params {
+  unsigned int WPR_Period;
+  int WPR_Shift;
+  int WPR_SignalOpenMethod;
+  double WPR_SignalOpenLevel;
+  int WPR_SignalOpenFilterMethod;
+  int WPR_SignalOpenBoostMethod;
+  int WPR_SignalCloseMethod;
+  double WPR_SignalCloseLevel;
+  int WPR_PriceLimitMethod;
+  double WPR_PriceLimitLevel;
+  double WPR_MaxSpread;
+
+  // Constructor: Set default param values.
+  Stg_WPR_Params()
+      : WPR_Period(::WPR_Period),
+        WPR_Shift(::WPR_Shift),
+        WPR_SignalOpenMethod(::WPR_SignalOpenMethod),
+        WPR_SignalOpenLevel(::WPR_SignalOpenLevel),
+        WPR_SignalOpenFilterMethod(::WPR_SignalOpenFilterMethod),
+        WPR_SignalOpenBoostMethod(::WPR_SignalOpenBoostMethod),
+        WPR_SignalCloseMethod(::WPR_SignalCloseMethod),
+        WPR_SignalCloseLevel(::WPR_SignalCloseLevel),
+        WPR_PriceLimitMethod(::WPR_PriceLimitMethod),
+        WPR_PriceLimitLevel(::WPR_PriceLimitLevel),
+        WPR_MaxSpread(::WPR_MaxSpread) {}
+};
+
+// Loads pair specific param values.
+#include "sets/EURUSD_H1.h"
+#include "sets/EURUSD_H4.h"
+#include "sets/EURUSD_M1.h"
+#include "sets/EURUSD_M15.h"
+#include "sets/EURUSD_M30.h"
+#include "sets/EURUSD_M5.h"
 
 class Stg_WPR : public Strategy {
+ public:
+  Stg_WPR(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
-  public:
-
-  void Stg_WPR(StgParams &_params, string _name) : Strategy(_params, _name) {}
-
-  static Stg_WPR *Init_M1() {
-    ChartParams cparams1(PERIOD_M1);
-    IndicatorParams wpr_iparams(10, INDI_WPR);
-    WPR_Params wpr1_iparams(WPR_Period_M1);
-    StgParams wpr1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_WPR(wpr1_iparams, wpr_iparams, cparams1), NULL, NULL);
-    wpr1_sparams.SetSignals(WPR1_SignalMethod, WPR1_OpenCondition1, WPR1_OpenCondition2, WPR1_CloseCondition, NULL, WPR_SignalLevel, NULL);
-    wpr1_sparams.SetStops(WPR_TrailingProfitMethod, WPR_TrailingStopMethod);
-    wpr1_sparams.SetMaxSpread(WPR1_MaxSpread);
-    wpr1_sparams.SetId(WPR1);
-    return (new Stg_WPR(wpr1_sparams, "WPR1"));
-  }
-  static Stg_WPR *Init_M5() {
-    ChartParams cparams5(PERIOD_M5);
-    IndicatorParams wpr_iparams(10, INDI_WPR);
-    WPR_Params wpr5_iparams(WPR_Period_M5);
-    StgParams wpr5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_WPR(wpr5_iparams, wpr_iparams, cparams5), NULL, NULL);
-    wpr5_sparams.SetSignals(WPR5_SignalMethod, WPR5_OpenCondition1, WPR5_OpenCondition2, WPR5_CloseCondition, NULL, WPR_SignalLevel, NULL);
-    wpr5_sparams.SetStops(WPR_TrailingProfitMethod, WPR_TrailingStopMethod);
-    wpr5_sparams.SetMaxSpread(WPR5_MaxSpread);
-    wpr5_sparams.SetId(WPR5);
-    return (new Stg_WPR(wpr5_sparams, "WPR5"));
-  }
-  static Stg_WPR *Init_M15() {
-    ChartParams cparams15(PERIOD_M15);
-    IndicatorParams wpr_iparams(10, INDI_WPR);
-    WPR_Params wpr15_iparams(WPR_Period_M15);
-    StgParams wpr15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_WPR(wpr15_iparams, wpr_iparams, cparams15), NULL, NULL);
-    wpr15_sparams.SetSignals(WPR15_SignalMethod, WPR15_OpenCondition1, WPR15_OpenCondition2, WPR15_CloseCondition, NULL, WPR_SignalLevel, NULL);
-    wpr15_sparams.SetStops(WPR_TrailingProfitMethod, WPR_TrailingStopMethod);
-    wpr15_sparams.SetMaxSpread(WPR15_MaxSpread);
-    wpr15_sparams.SetId(WPR15);
-    return (new Stg_WPR(wpr15_sparams, "WPR15"));
-  }
-  static Stg_WPR *Init_M30() {
-    ChartParams cparams30(PERIOD_M30);
-    IndicatorParams wpr_iparams(10, INDI_WPR);
-    WPR_Params wpr30_iparams(WPR_Period_M30);
-    StgParams wpr30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_WPR(wpr30_iparams, wpr_iparams, cparams30), NULL, NULL);
-    wpr30_sparams.SetSignals(WPR30_SignalMethod, WPR30_OpenCondition1, WPR30_OpenCondition2, WPR30_CloseCondition, NULL, WPR_SignalLevel, NULL);
-    wpr30_sparams.SetStops(WPR_TrailingProfitMethod, WPR_TrailingStopMethod);
-    wpr30_sparams.SetMaxSpread(WPR30_MaxSpread);
-    wpr30_sparams.SetId(WPR30);
-    return (new Stg_WPR(wpr30_sparams, "WPR30"));
-  }
-  static Stg_WPR *Init(ENUM_TIMEFRAMES _tf) {
+  static Stg_WPR *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
+    // Initialize strategy initial values.
+    Stg_WPR_Params _params;
     switch (_tf) {
-      case PERIOD_M1:  return Init_M1();
-      case PERIOD_M5:  return Init_M5();
-      case PERIOD_M15: return Init_M15();
-      case PERIOD_M30: return Init_M30();
-      default: return NULL;
+      case PERIOD_M1: {
+        Stg_WPR_EURUSD_M1_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M5: {
+        Stg_WPR_EURUSD_M5_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M15: {
+        Stg_WPR_EURUSD_M15_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M30: {
+        Stg_WPR_EURUSD_M30_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_H1: {
+        Stg_WPR_EURUSD_H1_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_H4: {
+        Stg_WPR_EURUSD_H4_Params _new_params;
+        _params = _new_params;
+      }
     }
+    // Initialize strategy parameters.
+    ChartParams cparams(_tf);
+    WPR_Params wpr_params(_params.WPR_Period);
+    IndicatorParams wpr_iparams(10, INDI_WPR);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_WPR(wpr_params, wpr_iparams, cparams), NULL, NULL);
+    sparams.logger.SetLevel(_log_level);
+    sparams.SetMagicNo(_magic_no);
+    sparams.SetSignals(_params.WPR_SignalOpenMethod, _params.WPR_SignalOpenLevel, _params.WPR_SignalCloseMethod,
+_params.WPR_SignalOpenFilterMethod, _params.WPR_SignalOpenBoostMethod,
+                       _params.WPR_SignalCloseLevel);
+    sparams.SetMaxSpread(_params.WPR_MaxSpread);
+    // Initialize strategy instance.
+    Strategy *_strat = new Stg_WPR(sparams, "WPR");
+    return _strat;
   }
 
   /**
    * Check if WPR indicator is on buy or sell.
    *
    * @param
-   *   cmd (int) - type of trade order command
+   *   _cmd (int) - type of trade order command
    *   period (int) - period to check for
-   *   _signal_method (int) - signal method to use by using bitwise AND operation
-   *   _signal_level1 (double) - signal level to consider the signal
+   *   _method (int) - signal method to use by using bitwise AND operation
+   *   _level (double) - signal level to consider the signal
    */
-  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  bool SignalOpen(ENUM_ORDER_TYPE _cmd, int _method = 0, double _level = 0.0) {
     bool _result = false;
-    double wpr_0 = ((Indi_WPR *) this.Data()).GetValue(0);
-    double wpr_1 = ((Indi_WPR *) this.Data()).GetValue(1);
-    double wpr_2 = ((Indi_WPR *) this.Data()).GetValue(2);
-    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    double wpr_0 = ((Indi_WPR *)this.Data()).GetValue(0);
+    double wpr_1 = ((Indi_WPR *)this.Data()).GetValue(1);
+    double wpr_2 = ((Indi_WPR *)this.Data()).GetValue(2);
 
-    switch (cmd) {
+    switch (_cmd) {
       case ORDER_TYPE_BUY:
-        _result = wpr_0 > 50 + _signal_level1;
-        if (_signal_method != 0) {
-          if (METHOD(_signal_method, 0)) _result &= wpr_0 < wpr_1;
-          if (METHOD(_signal_method, 1)) _result &= wpr_1 < wpr_2;
-          if (METHOD(_signal_method, 2)) _result &= wpr_1 > 50 + _signal_level1;
-          if (METHOD(_signal_method, 3)) _result &= wpr_2  > 50 + _signal_level1;
-          if (METHOD(_signal_method, 4)) _result &= wpr_1 - wpr_0 > wpr_2 - wpr_1;
-          if (METHOD(_signal_method, 5)) _result &= wpr_1 > 50 + _signal_level1 + _signal_level1 / 2;
+        _result = wpr_0 > 50 + _level;
+        if (_method != 0) {
+          if (METHOD(_method, 0)) _result &= wpr_0 < wpr_1;
+          if (METHOD(_method, 1)) _result &= wpr_1 < wpr_2;
+          if (METHOD(_method, 2)) _result &= wpr_1 > 50 + _level;
+          if (METHOD(_method, 3)) _result &= wpr_2 > 50 + _level;
+          if (METHOD(_method, 4)) _result &= wpr_1 - wpr_0 > wpr_2 - wpr_1;
+          if (METHOD(_method, 5)) _result &= wpr_1 > 50 + _level + _level / 2;
         }
         /* @todo
            //30. Williams Percent Range
@@ -145,20 +150,72 @@ class Stg_WPR : public Strategy {
         */
         break;
       case ORDER_TYPE_SELL:
-        _result = wpr_0 < 50 - _signal_level1;
-        if (_signal_method != 0) {
-          if (METHOD(_signal_method, 0)) _result &= wpr_0 > wpr_1;
-          if (METHOD(_signal_method, 1)) _result &= wpr_1 > wpr_2;
-          if (METHOD(_signal_method, 2)) _result &= wpr_1 < 50 - _signal_level1;
-          if (METHOD(_signal_method, 3)) _result &= wpr_2  < 50 - _signal_level1;
-          if (METHOD(_signal_method, 4)) _result &= wpr_0 - wpr_1 > wpr_1 - wpr_2;
-          if (METHOD(_signal_method, 5)) _result &= wpr_1 > 50 - _signal_level1 - _signal_level1 / 2;
+        _result = wpr_0 < 50 - _level;
+        if (_method != 0) {
+          if (METHOD(_method, 0)) _result &= wpr_0 > wpr_1;
+          if (METHOD(_method, 1)) _result &= wpr_1 > wpr_2;
+          if (METHOD(_method, 2)) _result &= wpr_1 < 50 - _level;
+          if (METHOD(_method, 3)) _result &= wpr_2 < 50 - _level;
+          if (METHOD(_method, 4)) _result &= wpr_0 - wpr_1 > wpr_1 - wpr_2;
+          if (METHOD(_method, 5)) _result &= wpr_1 > 50 - _level - _level / 2;
         }
         break;
     }
-    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
     return _result;
   }
 
-};
+  /**
+   * Check strategy's opening signal additional filter.
+   */
+  bool SignalOpenFilter(ENUM_ORDER_TYPE _cmd, int _method = 0) {
+    bool _result = true;
+    if (_method != 0) {
+      // if (METHOD(_method, 0)) _result &= Trade().IsTrend(_cmd);
+      // if (METHOD(_method, 1)) _result &= Trade().IsPivot(_cmd);
+      // if (METHOD(_method, 2)) _result &= Trade().IsPeakHours(_cmd);
+      // if (METHOD(_method, 3)) _result &= Trade().IsRoundNumber(_cmd);
+      // if (METHOD(_method, 4)) _result &= Trade().IsHedging(_cmd);
+      // if (METHOD(_method, 5)) _result &= Trade().IsPeakBar(_cmd);
+    }
+    return _result;
+  }
 
+  /**
+   * Gets strategy's lot size boost (when enabled).
+   */
+  double SignalOpenBoost(ENUM_ORDER_TYPE _cmd, int _method = 0) {
+    bool _result = 1.0;
+    if (_method != 0) {
+      // if (METHOD(_method, 0)) if (Trade().IsTrend(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 1)) if (Trade().IsPivot(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 2)) if (Trade().IsPeakHours(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 3)) if (Trade().IsRoundNumber(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 4)) if (Trade().IsHedging(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 5)) if (Trade().IsPeakBar(_cmd)) _result *= 1.1;
+    }
+    return _result;
+  }
+
+  /**
+   * Check strategy's closing signal.
+   */
+  bool SignalClose(ENUM_ORDER_TYPE _cmd, int _method = 0, double _level = 0.0) {
+    return SignalOpen(Order::NegateOrderType(_cmd), _method, _level);
+  }
+
+  /**
+   * Gets price limit value for profit take or stop loss.
+   */
+  double PriceLimit(ENUM_ORDER_TYPE _cmd, ENUM_ORDER_TYPE_VALUE _mode, int _method = 0, double _level = 0.0) {
+    double _trail = _level * Market().GetPipSize();
+    int _direction = Order::OrderDirection(_cmd) * (_mode == ORDER_TYPE_SL ? -1 : 1);
+    double _default_value = Market().GetCloseOffer(_cmd) + _trail * _method * _direction;
+    double _result = _default_value;
+    switch (_method) {
+      case 0: {
+        // @todo
+      }
+    }
+    return _result;
+  }
+};

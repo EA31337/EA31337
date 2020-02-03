@@ -6,147 +6,212 @@
 
 /**
  * @file
- * Implements ZigZag strategy.
+ * Implements ZigZag strategy based on the ZigZag indicator.
  */
 
 // Includes.
-#include "../../EA31337-classes/Indicators/Indi_ZigZag.mqh"
-#include "../../EA31337-classes/Strategy.mqh"
+#include <EA31337-classes/Indicators/Indi_ZigZag.mqh>
+#include <EA31337-classes/Strategy.mqh>
 
 // User input params.
-string __ZigZag_Parameters__ = "-- Settings for the ZigZag indicator --"; // >>> ZIGZAG <<<
-uint ZigZag_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-uint ZigZag_Depth = 0; // Depth
-uint ZigZag_Deviation = 0; // Deviation
-uint ZigZag_Backstep = 0; // Deviation
-uint ZigZag_Shift = 0; // Shift (relative to the current bar)
-ENUM_TRAIL_TYPE ZigZag_TrailingStopMethod = 22; // Trail stop method
-ENUM_TRAIL_TYPE ZigZag_TrailingProfitMethod = 1; // Trail profit method
-double ZigZag_SignalLevel = 0.00000000; // Signal level
-int ZigZag1_SignalMethod = 0; // Signal method for M1 (0-31)
-int ZigZag5_SignalMethod = 0; // Signal method for M5 (0-31)
-int ZigZag15_SignalMethod = 0; // Signal method for M15 (0-31)
-int ZigZag30_SignalMethod = 0; // Signal method for M30 (0-31)
-int ZigZag1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
-int ZigZag1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-ENUM_MARKET_EVENT ZigZag1_CloseCondition = C_ZIGZAG_BUY_SELL; // Close condition for M1
-int ZigZag5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
-int ZigZag5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-ENUM_MARKET_EVENT ZigZag5_CloseCondition = C_ZIGZAG_BUY_SELL; // Close condition for M5
-int ZigZag15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
-int ZigZag15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-ENUM_MARKET_EVENT ZigZag15_CloseCondition = C_ZIGZAG_BUY_SELL; // Close condition for M15
-int ZigZag30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
-int ZigZag30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-ENUM_MARKET_EVENT ZigZag30_CloseCondition = C_ZIGZAG_BUY_SELL; // Close condition for M30
-double ZigZag1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-double ZigZag5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-double ZigZag15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-double ZigZag30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+INPUT string __ZigZag_Parameters__ = "-- ZigZag strategy params --";  // >>> ZIGZAG <<<
+INPUT int ZigZag_Depth = 0;                                           // Depth
+INPUT int ZigZag_Deviation = 0;                                       // Deviation
+INPUT int ZigZag_Backstep = 0;                                        // Deviation
+INPUT int ZigZag_Shift = 0;                                           // Shift (relative to the current bar)
+INPUT int ZigZag_SignalOpenMethod = 0;                                // Signal open method (0-31)
+INPUT double ZigZag_SignalOpenLevel = 0.00000000;                     // Signal open level
+INPUT int ZigZag_SignalOpenFilterMethod = 0.00000000;                     // Signal open filter method
+INPUT int ZigZag_SignalOpenBoostMethod = 0.00000000;                     // Signal open boost method
+INPUT int ZigZag_SignalCloseMethod = 0;                               // Signal close method (0-31)
+INPUT double ZigZag_SignalCloseLevel = 0.00000000;                    // Signal close level
+INPUT int ZigZag_PriceLimitMethod = 0;                                // Price limit method
+INPUT double ZigZag_PriceLimitLevel = 0;                              // Price limit level
+INPUT double ZigZag_MaxSpread = 6.0;                                  // Max spread to trade (pips)
+
+// Struct to define strategy parameters to override.
+struct Stg_ZigZag_Params : Stg_Params {
+  int ZigZag_Depth;
+  int ZigZag_Deviation;
+  int ZigZag_Backstep;
+  int ZigZag_Shift;
+  int ZigZag_SignalOpenMethod;
+  double ZigZag_SignalOpenLevel;
+  int ZigZag_SignalOpenFilterMethod;
+  int ZigZag_SignalOpenBoostMethod;
+  int ZigZag_SignalCloseMethod;
+  double ZigZag_SignalCloseLevel;
+  int ZigZag_PriceLimitMethod;
+  double ZigZag_PriceLimitLevel;
+  double ZigZag_MaxSpread;
+
+  // Constructor: Set default param values.
+  Stg_ZigZag_Params()
+      : ZigZag_Depth(::ZigZag_Depth),
+        ZigZag_Deviation(::ZigZag_Deviation),
+        ZigZag_Backstep(::ZigZag_Backstep),
+        ZigZag_Shift(::ZigZag_Shift),
+        ZigZag_SignalOpenMethod(::ZigZag_SignalOpenMethod),
+        ZigZag_SignalOpenLevel(::ZigZag_SignalOpenLevel),
+        ZigZag_SignalOpenFilterMethod(::ZigZag_SignalOpenFilterMethod),
+        ZigZag_SignalOpenBoostMethod(::ZigZag_SignalOpenBoostMethod),
+        ZigZag_SignalCloseMethod(::ZigZag_SignalCloseMethod),
+        ZigZag_SignalCloseLevel(::ZigZag_SignalCloseLevel),
+        ZigZag_PriceLimitMethod(::ZigZag_PriceLimitMethod),
+        ZigZag_PriceLimitLevel(::ZigZag_PriceLimitLevel),
+        ZigZag_MaxSpread(::ZigZag_MaxSpread) {}
+};
+
+// Loads pair specific param values.
+#include "sets/EURUSD_H1.h"
+#include "sets/EURUSD_H4.h"
+#include "sets/EURUSD_M1.h"
+#include "sets/EURUSD_M15.h"
+#include "sets/EURUSD_M30.h"
+#include "sets/EURUSD_M5.h"
 
 class Stg_ZigZag : public Strategy {
+ public:
+  Stg_ZigZag(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
-  public:
-
-  void Stg_ZigZag(StgParams &_params, string _name) : Strategy(_params, _name) {}
-
-  static Stg_ZigZag *Init_M1() {
-    ChartParams cparams1(PERIOD_M1);
-    IndicatorParams zigzag_iparams(10, INDI_ZIGZAG);
-    ZigZag_Params zigzag1_iparams(ZigZag_Depth, ZigZag_Deviation, ZigZag_Backstep);
-    StgParams zigzag1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_ZigZag(zigzag1_iparams, zigzag_iparams, cparams1), NULL, NULL);
-    zigzag1_sparams.SetSignals(ZigZag1_SignalMethod, ZigZag1_OpenCondition1, ZigZag1_OpenCondition2, ZigZag1_CloseCondition, NULL, ZigZag_SignalLevel, NULL);
-    zigzag1_sparams.SetStops(ZigZag_TrailingProfitMethod, ZigZag_TrailingStopMethod);
-    zigzag1_sparams.SetMaxSpread(ZigZag1_MaxSpread);
-    zigzag1_sparams.SetId(ZIGZAG1);
-    return (new Stg_ZigZag(zigzag1_sparams, "ZigZag1"));
-  }
-  static Stg_ZigZag *Init_M5() {
-    ChartParams cparams5(PERIOD_M5);
-    IndicatorParams zigzag_iparams(10, INDI_ZIGZAG);
-    ZigZag_Params zigzag5_iparams(ZigZag_Depth, ZigZag_Deviation, ZigZag_Backstep);
-    StgParams zigzag5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_ZigZag(zigzag5_iparams, zigzag_iparams, cparams5), NULL, NULL);
-    zigzag5_sparams.SetSignals(ZigZag5_SignalMethod, ZigZag5_OpenCondition1, ZigZag5_OpenCondition2, ZigZag5_CloseCondition, NULL, ZigZag_SignalLevel, NULL);
-    zigzag5_sparams.SetStops(ZigZag_TrailingProfitMethod, ZigZag_TrailingStopMethod);
-    zigzag5_sparams.SetMaxSpread(ZigZag5_MaxSpread);
-    zigzag5_sparams.SetId(ZIGZAG5);
-    return (new Stg_ZigZag(zigzag5_sparams, "ZigZag5"));
-  }
-  static Stg_ZigZag *Init_M15() {
-    ChartParams cparams15(PERIOD_M15);
-    IndicatorParams zigzag_iparams(10, INDI_ZIGZAG);
-    ZigZag_Params zigzag15_iparams(ZigZag_Depth, ZigZag_Deviation, ZigZag_Backstep);
-    StgParams zigzag15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_ZigZag(zigzag15_iparams, zigzag_iparams, cparams15), NULL, NULL);
-    zigzag15_sparams.SetSignals(ZigZag15_SignalMethod, ZigZag15_OpenCondition1, ZigZag15_OpenCondition2, ZigZag15_CloseCondition, NULL, ZigZag_SignalLevel, NULL);
-    zigzag15_sparams.SetStops(ZigZag_TrailingProfitMethod, ZigZag_TrailingStopMethod);
-    zigzag15_sparams.SetMaxSpread(ZigZag15_MaxSpread);
-    zigzag15_sparams.SetId(ZIGZAG15);
-    return (new Stg_ZigZag(zigzag15_sparams, "ZigZag15"));
-  }
-  static Stg_ZigZag *Init_M30() {
-    ChartParams cparams30(PERIOD_M30);
-    IndicatorParams zigzag_iparams(10, INDI_ZIGZAG);
-    ZigZag_Params zigzag30_iparams(ZigZag_Depth, ZigZag_Deviation, ZigZag_Backstep);
-    StgParams zigzag30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_ZigZag(zigzag30_iparams, zigzag_iparams, cparams30), NULL, NULL);
-    zigzag30_sparams.SetSignals(ZigZag30_SignalMethod, ZigZag30_OpenCondition1, ZigZag30_OpenCondition2, ZigZag30_CloseCondition, NULL, ZigZag_SignalLevel, NULL);
-    zigzag30_sparams.SetStops(ZigZag_TrailingProfitMethod, ZigZag_TrailingStopMethod);
-    zigzag30_sparams.SetMaxSpread(ZigZag30_MaxSpread);
-    zigzag30_sparams.SetId(ZIGZAG30);
-    return (new Stg_ZigZag(zigzag30_sparams, "ZigZag30"));
-  }
-  static Stg_ZigZag *Init(ENUM_TIMEFRAMES _tf) {
+  static Stg_ZigZag *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
+    // Initialize strategy initial values.
+    Stg_ZigZag_Params _params;
     switch (_tf) {
-      case PERIOD_M1:  return Init_M1();
-      case PERIOD_M5:  return Init_M5();
-      case PERIOD_M15: return Init_M15();
-      case PERIOD_M30: return Init_M30();
-      default: return NULL;
+      case PERIOD_M1: {
+        Stg_ZigZag_EURUSD_M1_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M5: {
+        Stg_ZigZag_EURUSD_M5_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M15: {
+        Stg_ZigZag_EURUSD_M15_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M30: {
+        Stg_ZigZag_EURUSD_M30_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_H1: {
+        Stg_ZigZag_EURUSD_H1_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_H4: {
+        Stg_ZigZag_EURUSD_H4_Params _new_params;
+        _params = _new_params;
+      }
     }
+    // Initialize strategy parameters.
+    ChartParams cparams(_tf);
+    ZigZag_Params zz_params(_params.ZigZag_Depth, _params.ZigZag_Deviation, _params.ZigZag_Backstep);
+    IndicatorParams zz_iparams(10, INDI_ZIGZAG);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_ZigZag(zz_params, zz_iparams, cparams), NULL, NULL);
+    sparams.logger.SetLevel(_log_level);
+    sparams.SetMagicNo(_magic_no);
+    sparams.SetSignals(_params.ZigZag_SignalOpenMethod, _params.ZigZag_SignalOpenMethod,
+_params.ZigZag_SignalOpenFilterMethod, _params.ZigZag_SignalOpenBoostMethod,
+                       _params.ZigZag_SignalCloseMethod, _params.ZigZag_SignalCloseMethod);
+    sparams.SetMaxSpread(_params.ZigZag_MaxSpread);
+    // Initialize strategy instance.
+    Strategy *_strat = new Stg_ZigZag(sparams, "ZigZag");
+    return _strat;
   }
 
   /**
    * Check if ZigZag indicator is on buy or sell.
    *
    * @param
-   *   cmd (int) - type of trade order command
+   *   _cmd (int) - type of trade order command
    *   period (int) - period to check for
-   *   _signal_method (int) - signal method to use by using bitwise AND operation
-   *   _signal_level1 (double) - signal level to consider the signal
+   *   _method (int) - signal method to use by using bitwise AND operation
+   *   _level (double) - signal level to consider the signal
    */
-  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  bool SignalOpen(ENUM_ORDER_TYPE _cmd, int _method = 0, double _level = 0.0) {
     bool _result = false;
-    double zigzag_0 = ((Indi_ZigZag *) this.Data()).GetValue(0);
-    double zigzag_1 = ((Indi_ZigZag *) this.Data()).GetValue(1);
-    double zigzag_2 = ((Indi_ZigZag *) this.Data()).GetValue(2);
-    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-    switch (cmd) {
+    double zigzag_0 = ((Indi_ZigZag *)this.Data()).GetValue(0);
+    double zigzag_1 = ((Indi_ZigZag *)this.Data()).GetValue(1);
+    double zigzag_2 = ((Indi_ZigZag *)this.Data()).GetValue(2);
+    switch (_cmd) {
       case ORDER_TYPE_BUY:
         /*
           bool _result = ZigZag_0[LINE_LOWER] != 0.0 || ZigZag_1[LINE_LOWER] != 0.0 || ZigZag_2[LINE_LOWER] != 0.0;
-          if (METHOD(_signal_method, 0)) _result &= Open[CURR] > Close[CURR];
-          if (METHOD(_signal_method, 1)) _result &= !ZigZag_On_Sell(tf);
-          if (METHOD(_signal_method, 2)) _result &= ZigZag_On_Buy(fmin(period + 1, M30));
-          if (METHOD(_signal_method, 3)) _result &= ZigZag_On_Buy(M30);
-          if (METHOD(_signal_method, 4)) _result &= ZigZag_2[LINE_LOWER] != 0.0;
-          if (METHOD(_signal_method, 5)) _result &= !ZigZag_On_Sell(M30);
+          if (METHOD(_method, 0)) _result &= Open[CURR] > Close[CURR];
+          if (METHOD(_method, 1)) _result &= !ZigZag_On_Sell(tf);
+          if (METHOD(_method, 2)) _result &= ZigZag_On_Buy(fmin(period + 1, M30));
+          if (METHOD(_method, 3)) _result &= ZigZag_On_Buy(M30);
+          if (METHOD(_method, 4)) _result &= ZigZag_2[LINE_LOWER] != 0.0;
+          if (METHOD(_method, 5)) _result &= !ZigZag_On_Sell(M30);
           */
-      break;
+        break;
       case ORDER_TYPE_SELL:
         /*
           bool _result = ZigZag_0[LINE_UPPER] != 0.0 || ZigZag_1[LINE_UPPER] != 0.0 || ZigZag_2[LINE_UPPER] != 0.0;
-          if (METHOD(_signal_method, 0)) _result &= Open[CURR] < Close[CURR];
-          if (METHOD(_signal_method, 1)) _result &= !ZigZag_On_Buy(tf);
-          if (METHOD(_signal_method, 2)) _result &= ZigZag_On_Sell(fmin(period + 1, M30));
-          if (METHOD(_signal_method, 3)) _result &= ZigZag_On_Sell(M30);
-          if (METHOD(_signal_method, 4)) _result &= ZigZag_2[LINE_UPPER] != 0.0;
-          if (METHOD(_signal_method, 5)) _result &= !ZigZag_On_Buy(M30);
+          if (METHOD(_method, 0)) _result &= Open[CURR] < Close[CURR];
+          if (METHOD(_method, 1)) _result &= !ZigZag_On_Buy(tf);
+          if (METHOD(_method, 2)) _result &= ZigZag_On_Sell(fmin(period + 1, M30));
+          if (METHOD(_method, 3)) _result &= ZigZag_On_Sell(M30);
+          if (METHOD(_method, 4)) _result &= ZigZag_2[LINE_UPPER] != 0.0;
+          if (METHOD(_method, 5)) _result &= !ZigZag_On_Buy(M30);
           */
-      break;
+        break;
     }
     return _result;
   }
 
-};
+  /**
+   * Check strategy's opening signal additional filter.
+   */
+  bool SignalOpenFilter(ENUM_ORDER_TYPE _cmd, int _method = 0) {
+    bool _result = true;
+    if (_method != 0) {
+      // if (METHOD(_method, 0)) _result &= Trade().IsTrend(_cmd);
+      // if (METHOD(_method, 1)) _result &= Trade().IsPivot(_cmd);
+      // if (METHOD(_method, 2)) _result &= Trade().IsPeakHours(_cmd);
+      // if (METHOD(_method, 3)) _result &= Trade().IsRoundNumber(_cmd);
+      // if (METHOD(_method, 4)) _result &= Trade().IsHedging(_cmd);
+      // if (METHOD(_method, 5)) _result &= Trade().IsPeakBar(_cmd);
+    }
+    return _result;
+  }
 
+  /**
+   * Gets strategy's lot size boost (when enabled).
+   */
+  double SignalOpenBoost(ENUM_ORDER_TYPE _cmd, int _method = 0) {
+    bool _result = 1.0;
+    if (_method != 0) {
+      // if (METHOD(_method, 0)) if (Trade().IsTrend(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 1)) if (Trade().IsPivot(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 2)) if (Trade().IsPeakHours(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 3)) if (Trade().IsRoundNumber(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 4)) if (Trade().IsHedging(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 5)) if (Trade().IsPeakBar(_cmd)) _result *= 1.1;
+    }
+    return _result;
+  }
+
+  /**
+   * Check strategy's closing signal.
+   */
+  bool SignalClose(ENUM_ORDER_TYPE _cmd, int _method = 0, double _level = 0.0) {
+    return SignalOpen(Order::NegateOrderType(_cmd), _method, _level);
+  }
+
+  /**
+   * Gets price limit value for profit take or stop loss.
+   */
+  double PriceLimit(ENUM_ORDER_TYPE _cmd, ENUM_ORDER_TYPE_VALUE _mode, int _method = 0, double _level = 0.0) {
+    double _trail = _level * Market().GetPipSize();
+    int _direction = Order::OrderDirection(_cmd) * (_mode == ORDER_TYPE_SL ? -1 : 1);
+    double _default_value = Market().GetCloseOffer(_cmd) + _trail * _method * _direction;
+    double _result = _default_value;
+    switch (_method) {
+      case 0: {
+        // @todo
+      }
+    }
+    return _result;
+  }
+};

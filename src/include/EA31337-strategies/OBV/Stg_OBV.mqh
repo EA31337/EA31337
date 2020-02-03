@@ -6,127 +6,188 @@
 
 /**
  * @file
- * Implements OBV strategy.
+ * Implements OBV strategy based on the On Balance Volume indicator.
  */
 
 // Includes.
-#include "../../EA31337-classes/Indicators/Indi_OBV.mqh"
-#include "../../EA31337-classes/Strategy.mqh"
+#include <EA31337-classes/Indicators/Indi_OBV.mqh>
+#include <EA31337-classes/Strategy.mqh>
 
 // User input params.
-string __OBV_Parameters__ = "-- Settings for the On Balance Volume indicator --"; // >>> OBV <<<
-uint OBV_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-ENUM_TRAIL_TYPE OBV_TrailingStopMethod = 22; // Trail stop method
-ENUM_TRAIL_TYPE OBV_TrailingProfitMethod = 1; // Trail profit method
-ENUM_APPLIED_PRICE OBV_Applied_Price = PRICE_CLOSE; // Applied Price
-double OBV_SignalLevel = 0.00000000; // Signal level
-int OBV1_SignalMethod = 0; // Signal method for M1 (0-
-int OBV5_SignalMethod = 0; // Signal method for M5 (0-
-int OBV15_SignalMethod = 0; // Signal method for M15 (0-
-int OBV30_SignalMethod = 0; // Signal method for M30 (0-
-int OBV1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
-int OBV1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-ENUM_MARKET_EVENT OBV1_CloseCondition = C_OBV_BUY_SELL; // Close condition for M1
-int OBV5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
-int OBV5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-ENUM_MARKET_EVENT OBV5_CloseCondition = C_OBV_BUY_SELL; // Close condition for M5
-int OBV15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
-int OBV15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-ENUM_MARKET_EVENT OBV15_CloseCondition = C_OBV_BUY_SELL; // Close condition for M15
-int OBV30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
-int OBV30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-ENUM_MARKET_EVENT OBV30_CloseCondition = C_OBV_BUY_SELL; // Close condition for M30
-double OBV1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-double OBV5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-double OBV15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-double OBV30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+INPUT string __OBV_Parameters__ = "-- OBV strategy params --";  // >>> OBV <<<
+INPUT ENUM_APPLIED_PRICE OBV_Applied_Price = PRICE_CLOSE;       // Applied Price
+INPUT int OBV_Shift = 0;                                        // Shift
+INPUT int OBV_SignalOpenMethod = 0;                             // Signal open method (0-
+INPUT double OBV_SignalOpenLevel = 0.00000000;                  // Signal open level
+INPUT int OBV_SignalOpenFilterMethod = 0.00000000;                  // Signal open filter method
+INPUT int OBV_SignalOpenBoostMethod = 0.00000000;                  // Signal open boost method
+INPUT int OBV_SignalCloseMethod = 0;                            // Signal close method (0-
+INPUT double OBV_SignalCloseLevel = 0.00000000;                 // Signal close level
+INPUT int OBV_PriceLimitMethod = 0;                             // Price limit method
+INPUT double OBV_PriceLimitLevel = 0;                           // Price limit level
+INPUT double OBV_MaxSpread = 6.0;                               // Max spread to trade (pips)
+
+// Struct to define strategy parameters to override.
+struct Stg_OBV_Params : Stg_Params {
+  ENUM_APPLIED_PRICE OBV_Applied_Price;
+  int OBV_Shift;
+  int OBV_SignalOpenMethod;
+  double OBV_SignalOpenLevel;
+  int OBV_SignalOpenFilterMethod;
+  int OBV_SignalOpenBoostMethod;
+  int OBV_SignalCloseMethod;
+  double OBV_SignalCloseLevel;
+  int OBV_PriceLimitMethod;
+  double OBV_PriceLimitLevel;
+  double OBV_MaxSpread;
+
+  // Constructor: Set default param values.
+  Stg_OBV_Params()
+      : OBV_Applied_Price(::OBV_Applied_Price),
+        OBV_Shift(::OBV_Shift),
+        OBV_SignalOpenMethod(::OBV_SignalOpenMethod),
+        OBV_SignalOpenLevel(::OBV_SignalOpenLevel),
+        OBV_SignalOpenFilterMethod(::OBV_SignalOpenFilterMethod),
+        OBV_SignalOpenBoostMethod(::OBV_SignalOpenBoostMethod),
+        OBV_SignalCloseMethod(::OBV_SignalCloseMethod),
+        OBV_SignalCloseLevel(::OBV_SignalCloseLevel),
+        OBV_PriceLimitMethod(::OBV_PriceLimitMethod),
+        OBV_PriceLimitLevel(::OBV_PriceLimitLevel),
+        OBV_MaxSpread(::OBV_MaxSpread) {}
+};
+
+// Loads pair specific param values.
+#include "sets/EURUSD_H1.h"
+#include "sets/EURUSD_H4.h"
+#include "sets/EURUSD_M1.h"
+#include "sets/EURUSD_M15.h"
+#include "sets/EURUSD_M30.h"
+#include "sets/EURUSD_M5.h"
 
 class Stg_OBV : public Strategy {
+ public:
+  Stg_OBV(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
-  public:
-
-  void Stg_OBV(StgParams &_params, string _name) : Strategy(_params, _name) {}
-
-  static Stg_OBV *Init_M1() {
-    ChartParams cparams1(PERIOD_M1);
-    IndicatorParams obv_iparams(10, INDI_OBV);
-    OBV_Params obv1_iparams(OBV_Applied_Price); // @fixme: MQL5
-    StgParams obv1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_OBV(obv1_iparams, obv_iparams, cparams1), NULL, NULL);
-    obv1_sparams.SetSignals(OBV1_SignalMethod, OBV1_OpenCondition1, OBV1_OpenCondition2, OBV1_CloseCondition, NULL, OBV_SignalLevel, NULL);
-    obv1_sparams.SetStops(OBV_TrailingProfitMethod, OBV_TrailingStopMethod);
-    obv1_sparams.SetMaxSpread(OBV1_MaxSpread);
-    obv1_sparams.SetId(OBV1);
-    return (new Stg_OBV(obv1_sparams, "OBV1"));
-  }
-  static Stg_OBV *Init_M5() {
-    ChartParams cparams5(PERIOD_M5);
-    IndicatorParams obv_iparams(10, INDI_OBV);
-    OBV_Params obv5_iparams(OBV_Applied_Price); // @fixme: MQL5
-    StgParams obv5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_OBV(obv5_iparams, obv_iparams, cparams5), NULL, NULL);
-    obv5_sparams.SetSignals(OBV5_SignalMethod, OBV5_OpenCondition1, OBV5_OpenCondition2, OBV5_CloseCondition, NULL, OBV_SignalLevel, NULL);
-    obv5_sparams.SetStops(OBV_TrailingProfitMethod, OBV_TrailingStopMethod);
-    obv5_sparams.SetMaxSpread(OBV5_MaxSpread);
-    obv5_sparams.SetId(OBV5);
-    return (new Stg_OBV(obv5_sparams, "OBV5"));
-  }
-  static Stg_OBV *Init_M15() {
-    ChartParams cparams15(PERIOD_M15);
-    IndicatorParams obv_iparams(10, INDI_OBV);
-    OBV_Params obv15_iparams(OBV_Applied_Price); // @fixme: MQL5
-    StgParams obv15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_OBV(obv15_iparams, obv_iparams, cparams15), NULL, NULL);
-    obv15_sparams.SetSignals(OBV15_SignalMethod, OBV15_OpenCondition1, OBV15_OpenCondition2, OBV15_CloseCondition, NULL, OBV_SignalLevel, NULL);
-    obv15_sparams.SetStops(OBV_TrailingProfitMethod, OBV_TrailingStopMethod);
-    obv15_sparams.SetMaxSpread(OBV15_MaxSpread);
-    obv15_sparams.SetId(OBV15);
-    return (new Stg_OBV(obv15_sparams, "OBV15"));
-  }
-  static Stg_OBV *Init_M30() {
-    ChartParams cparams30(PERIOD_M30);
-    IndicatorParams obv_iparams(10, INDI_OBV);
-    OBV_Params obv30_iparams(OBV_Applied_Price); // @fixme: MQL5
-    StgParams obv30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_OBV(obv30_iparams, obv_iparams, cparams30), NULL, NULL);
-    obv30_sparams.SetSignals(OBV30_SignalMethod, OBV30_OpenCondition1, OBV30_OpenCondition2, OBV30_CloseCondition, NULL, OBV_SignalLevel, NULL);
-    obv30_sparams.SetStops(OBV_TrailingProfitMethod, OBV_TrailingStopMethod);
-    obv30_sparams.SetMaxSpread(OBV30_MaxSpread);
-    obv30_sparams.SetId(OBV30);
-    return (new Stg_OBV(obv30_sparams, "OBV30"));
-  }
-  static Stg_OBV *Init(ENUM_TIMEFRAMES _tf) {
+  static Stg_OBV *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
+    // Initialize strategy initial values.
+    Stg_OBV_Params _params;
     switch (_tf) {
-      case PERIOD_M1:  return Init_M1();
-      case PERIOD_M5:  return Init_M5();
-      case PERIOD_M15: return Init_M15();
-      case PERIOD_M30: return Init_M30();
-      default: return NULL;
+      case PERIOD_M1: {
+        Stg_OBV_EURUSD_M1_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M5: {
+        Stg_OBV_EURUSD_M5_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M15: {
+        Stg_OBV_EURUSD_M15_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M30: {
+        Stg_OBV_EURUSD_M30_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_H1: {
+        Stg_OBV_EURUSD_H1_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_H4: {
+        Stg_OBV_EURUSD_H4_Params _new_params;
+        _params = _new_params;
+      }
     }
+    // Initialize strategy parameters.
+    ChartParams cparams(_tf);
+    OBV_Params obv_params(_params.OBV_Applied_Price);
+    IndicatorParams obv_iparams(10, INDI_OBV);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_OBV(obv_params, obv_iparams, cparams), NULL, NULL);
+    sparams.logger.SetLevel(_log_level);
+    sparams.SetMagicNo(_magic_no);
+    sparams.SetSignals(_params.OBV_SignalOpenMethod, _params.OBV_SignalOpenLevel, _params.OBV_SignalCloseMethod,
+_params.OBV_SignalOpenFilterMethod, _params.OBV_SignalOpenBoostMethod,
+                       _params.OBV_SignalCloseLevel);
+    sparams.SetMaxSpread(_params.OBV_MaxSpread);
+    // Initialize strategy instance.
+    Strategy *_strat = new Stg_OBV(sparams, "OBV");
+    return _strat;
   }
 
   /**
    * Check if OBV indicator is on buy or sell.
    *
    * @param
-   *   cmd (int) - type of trade order command
+   *   _cmd (int) - type of trade order command
    *   period (int) - period to check for
-   *   _signal_method (int) - signal method to use by using bitwise AND operation
-   *   _signal_level1 (double) - signal level to consider the signal
+   *   _method (int) - signal method to use by using bitwise AND operation
+   *   _level (double) - signal level to consider the signal
    */
-  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  bool SignalOpen(ENUM_ORDER_TYPE _cmd, int _method = 0, double _level = 0.0) {
     bool _result = false;
-    double obv_0 = ((Indi_OBV *) this.Data()).GetValue(0);
-    double obv_1 = ((Indi_OBV *) this.Data()).GetValue(1);
-    double obv_2 = ((Indi_OBV *) this.Data()).GetValue(2);
-    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-    switch (cmd) {
+    double obv_0 = ((Indi_OBV *)this.Data()).GetValue(0);
+    double obv_1 = ((Indi_OBV *)this.Data()).GetValue(1);
+    double obv_2 = ((Indi_OBV *)this.Data()).GetValue(2);
+    switch (_cmd) {
       case ORDER_TYPE_BUY:
         break;
       case ORDER_TYPE_SELL:
         break;
     }
-    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
     return _result;
   }
 
-};
+  /**
+   * Check strategy's opening signal additional filter.
+   */
+  bool SignalOpenFilter(ENUM_ORDER_TYPE _cmd, int _method = 0) {
+    bool _result = true;
+    if (_method != 0) {
+      // if (METHOD(_method, 0)) _result &= Trade().IsTrend(_cmd);
+      // if (METHOD(_method, 1)) _result &= Trade().IsPivot(_cmd);
+      // if (METHOD(_method, 2)) _result &= Trade().IsPeakHours(_cmd);
+      // if (METHOD(_method, 3)) _result &= Trade().IsRoundNumber(_cmd);
+      // if (METHOD(_method, 4)) _result &= Trade().IsHedging(_cmd);
+      // if (METHOD(_method, 5)) _result &= Trade().IsPeakBar(_cmd);
+    }
+    return _result;
+  }
 
+  /**
+   * Gets strategy's lot size boost (when enabled).
+   */
+  double SignalOpenBoost(ENUM_ORDER_TYPE _cmd, int _method = 0) {
+    bool _result = 1.0;
+    if (_method != 0) {
+      // if (METHOD(_method, 0)) if (Trade().IsTrend(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 1)) if (Trade().IsPivot(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 2)) if (Trade().IsPeakHours(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 3)) if (Trade().IsRoundNumber(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 4)) if (Trade().IsHedging(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 5)) if (Trade().IsPeakBar(_cmd)) _result *= 1.1;
+    }
+    return _result;
+  }
+
+  /**
+   * Check strategy's closing signal.
+   */
+  bool SignalClose(ENUM_ORDER_TYPE _cmd, int _method = 0, double _level = 0.0) {
+    return SignalOpen(Order::NegateOrderType(_cmd), _method, _level);
+  }
+
+  /**
+   * Gets price limit value for profit take or stop loss.
+   */
+  double PriceLimit(ENUM_ORDER_TYPE _cmd, ENUM_ORDER_TYPE_VALUE _mode, int _method = 0, double _level = 0.0) {
+    double _trail = _level * Market().GetPipSize();
+    int _direction = Order::OrderDirection(_cmd) * (_mode == ORDER_TYPE_SL ? -1 : 1);
+    double _default_value = Market().GetCloseOffer(_cmd) + _trail * _method * _direction;
+    double _result = _default_value;
+    switch (_method) {
+      case 0: {
+        // @todo
+      }
+    }
+    return _result;
+  }
+};

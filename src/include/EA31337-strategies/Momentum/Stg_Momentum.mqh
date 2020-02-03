@@ -6,128 +6,191 @@
 
 /**
  * @file
- * Implements Momentum strategy.
+ * Implements Momentum strategy based on the Momentum indicator.
  */
 
 // Includes.
-#include "../../EA31337-classes/Indicators/Indi_Momentum.mqh"
-#include "../../EA31337-classes/Strategy.mqh"
+#include <EA31337-classes/Indicators/Indi_Momentum.mqh>
+#include <EA31337-classes/Strategy.mqh>
 
 // User input params.
-string __Momentum_Parameters__ = "-- Settings for the Momentum indicator --"; // >>> MOMENTUM <<<
-uint Momentum_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-ENUM_TRAIL_TYPE Momentum_TrailingStopMethod = 22; // Trail stop method
-ENUM_TRAIL_TYPE Momentum_TrailingProfitMethod = 1; // Trail profit method
-int Momentum_Period = 12; // Period Fast
-ENUM_APPLIED_PRICE Momentum_Applied_Price = PRICE_CLOSE; // Applied Price
-double Momentum_SignalLevel = 0.00000000; // Signal level
-int Momentum1_SignalMethod = 0; // Signal method for M1 (0-
-int Momentum5_SignalMethod = 0; // Signal method for M5 (0-
-int Momentum15_SignalMethod = 0; // Signal method for M15 (0-
-int Momentum30_SignalMethod = 0; // Signal method for M30 (0-
-int Momentum1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
-int Momentum1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
-ENUM_MARKET_EVENT Momentum1_CloseCondition = C_MOMENTUM_BUY_SELL; // Close condition for M1
-int Momentum5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
-int Momentum5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-ENUM_MARKET_EVENT Momentum5_CloseCondition = C_MOMENTUM_BUY_SELL; // Close condition for M5
-int Momentum15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
-int Momentum15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-ENUM_MARKET_EVENT Momentum15_CloseCondition = C_MOMENTUM_BUY_SELL; // Close condition for M15
-int Momentum30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
-int Momentum30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-ENUM_MARKET_EVENT Momentum30_CloseCondition = C_MOMENTUM_BUY_SELL; // Close condition for M30
-double Momentum1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-double Momentum5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-double Momentum15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-double Momentum30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+string __Momentum_Parameters__ = "-- Momentum strategy params --";  // >>> MOMENTUM <<<
+int Momentum_Period = 12;                                           // Averaging period
+ENUM_APPLIED_PRICE Momentum_Applied_Price = PRICE_CLOSE;            // Applied Price
+int Momentum_Shift = 0;                                             // Shift
+double Momentum_SignalOpenLevel = 0.00000000;                       // Signal open level
+int Momentum_SignalOpenFilterMethod = 0.00000000;                       // Signal open filter method
+int Momentum_SignalOpenBoostMethod = 0.00000000;                       // Signal open boost method
+int Momentum_SignalOpenMethod = 0;                                  // Signal open method (0-
+double Momentum_SignalCloseLevel = 0.00000000;                      // Signal close level
+int Momentum_SignalCloseMethod = 0;                                 // Signal close method (0-
+INPUT int Momentum_PriceLimitMethod = 0;                            // Price limit method
+INPUT double Momentum_PriceLimitLevel = 0;                          // Price limit level
+double Momentum_MaxSpread = 6.0;                                    // Max spread to trade (pips)
+
+// Struct to define strategy parameters to override.
+struct Stg_Momentum_Params : Stg_Params {
+  unsigned int Momentum_Period;
+  ENUM_APPLIED_PRICE Momentum_Applied_Price;
+  int Momentum_Shift;
+  int Momentum_SignalOpenMethod;
+  double Momentum_SignalOpenLevel;
+  int Momentum_SignalOpenFilterMethod;
+  int Momentum_SignalOpenBoostMethod;
+  int Momentum_SignalCloseMethod;
+  double Momentum_SignalCloseLevel;
+  int Momentum_PriceLimitMethod;
+  double Momentum_PriceLimitLevel;
+  double Momentum_MaxSpread;
+
+  // Constructor: Set default param values.
+  Stg_Momentum_Params()
+      : Momentum_Period(::Momentum_Period),
+        Momentum_Applied_Price(::Momentum_Applied_Price),
+        Momentum_Shift(::Momentum_Shift),
+        Momentum_SignalOpenMethod(::Momentum_SignalOpenMethod),
+        Momentum_SignalOpenLevel(::Momentum_SignalOpenLevel),
+        Momentum_SignalOpenFilterMethod(::Momentum_SignalOpenFilterMethod),
+        Momentum_SignalOpenBoostMethod(::Momentum_SignalOpenBoostMethod),
+        Momentum_SignalCloseMethod(::Momentum_SignalCloseMethod),
+        Momentum_SignalCloseLevel(::Momentum_SignalCloseLevel),
+        Momentum_PriceLimitMethod(::Momentum_PriceLimitMethod),
+        Momentum_PriceLimitLevel(::Momentum_PriceLimitLevel),
+        Momentum_MaxSpread(::Momentum_MaxSpread) {}
+};
+
+// Loads pair specific param values.
+#include "sets/EURUSD_H1.h"
+#include "sets/EURUSD_H4.h"
+#include "sets/EURUSD_M1.h"
+#include "sets/EURUSD_M15.h"
+#include "sets/EURUSD_M30.h"
+#include "sets/EURUSD_M5.h"
 
 class Stg_Momentum : public Strategy {
+ public:
+  Stg_Momentum(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
-  public:
-
-  void Stg_Momentum(StgParams &_params, string _name) : Strategy(_params, _name) {}
-
-  static Stg_Momentum *Init_M1() {
-    ChartParams cparams1(PERIOD_M1);
-    IndicatorParams mom_iparams(10, INDI_MOMENTUM);
-    Momentum_Params mom1_iparams(Momentum_Period, Momentum_Applied_Price);
-    StgParams mom1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Momentum(mom1_iparams, mom_iparams, cparams1), NULL, NULL);
-    mom1_sparams.SetSignals(Momentum1_SignalMethod, Momentum1_OpenCondition1, Momentum1_OpenCondition2, Momentum1_CloseCondition, NULL, Momentum_SignalLevel, NULL);
-    mom1_sparams.SetStops(Momentum_TrailingProfitMethod, Momentum_TrailingStopMethod);
-    mom1_sparams.SetMaxSpread(Momentum1_MaxSpread);
-    mom1_sparams.SetId(MOM1);
-    return (new Stg_Momentum(mom1_sparams, "Momentum1"));
-  }
-  static Stg_Momentum *Init_M5() {
-    ChartParams cparams5(PERIOD_M5);
-    IndicatorParams mom_iparams(10, INDI_MOMENTUM);
-    Momentum_Params mom5_iparams(Momentum_Period, Momentum_Applied_Price);
-    StgParams mom5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Momentum(mom5_iparams, mom_iparams, cparams5), NULL, NULL);
-    mom5_sparams.SetSignals(Momentum5_SignalMethod, Momentum5_OpenCondition1, Momentum5_OpenCondition2, Momentum5_CloseCondition, NULL, Momentum_SignalLevel, NULL);
-    mom5_sparams.SetStops(Momentum_TrailingProfitMethod, Momentum_TrailingStopMethod);
-    mom5_sparams.SetMaxSpread(Momentum5_MaxSpread);
-    mom5_sparams.SetId(MOM5);
-    return (new Stg_Momentum(mom5_sparams, "Momentum5"));
-  }
-  static Stg_Momentum *Init_M15() {
-    ChartParams cparams15(PERIOD_M15);
-    IndicatorParams mom_iparams(10, INDI_MOMENTUM);
-    Momentum_Params mom15_iparams(Momentum_Period, Momentum_Applied_Price);
-    StgParams mom15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Momentum(mom15_iparams, mom_iparams, cparams15), NULL, NULL);
-    mom15_sparams.SetSignals(Momentum15_SignalMethod, Momentum15_OpenCondition1, Momentum15_OpenCondition2, Momentum15_CloseCondition, NULL, Momentum_SignalLevel, NULL);
-    mom15_sparams.SetStops(Momentum_TrailingProfitMethod, Momentum_TrailingStopMethod);
-    mom15_sparams.SetMaxSpread(Momentum15_MaxSpread);
-    mom15_sparams.SetId(MOM15);
-    return (new Stg_Momentum(mom15_sparams, "Momentum15"));
-  }
-  static Stg_Momentum *Init_M30() {
-    ChartParams cparams30(PERIOD_M30);
-    IndicatorParams mom_iparams(10, INDI_MOMENTUM);
-    Momentum_Params mom30_iparams(Momentum_Period, Momentum_Applied_Price);
-    StgParams mom30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Momentum(mom30_iparams, mom_iparams, cparams30), NULL, NULL);
-    mom30_sparams.SetSignals(Momentum30_SignalMethod, Momentum30_OpenCondition1, Momentum30_OpenCondition2, Momentum30_CloseCondition, NULL, Momentum_SignalLevel, NULL);
-    mom30_sparams.SetStops(Momentum_TrailingProfitMethod, Momentum_TrailingStopMethod);
-    mom30_sparams.SetMaxSpread(Momentum30_MaxSpread);
-    mom30_sparams.SetId(MOM30);
-    return (new Stg_Momentum(mom30_sparams, "Momentum30"));
-  }
-  static Stg_Momentum *Init(ENUM_TIMEFRAMES _tf) {
+  static Stg_Momentum *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
+    // Initialize strategy initial values.
+    Stg_Momentum_Params _params;
     switch (_tf) {
-      case PERIOD_M1:  return Init_M1();
-      case PERIOD_M5:  return Init_M5();
-      case PERIOD_M15: return Init_M15();
-      case PERIOD_M30: return Init_M30();
-      default: return NULL;
+      case PERIOD_M1: {
+        Stg_Momentum_EURUSD_M1_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M5: {
+        Stg_Momentum_EURUSD_M5_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M15: {
+        Stg_Momentum_EURUSD_M15_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M30: {
+        Stg_Momentum_EURUSD_M30_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_H1: {
+        Stg_Momentum_EURUSD_H1_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_H4: {
+        Stg_Momentum_EURUSD_H4_Params _new_params;
+        _params = _new_params;
+      }
     }
+    // Initialize strategy parameters.
+    ChartParams cparams(_tf);
+    Momentum_Params mom_params(_params.Momentum_Period, _params.Momentum_Applied_Price);
+    IndicatorParams mom_iparams(10, INDI_MOMENTUM);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_Momentum(mom_params, mom_iparams, cparams), NULL, NULL);
+    sparams.logger.SetLevel(_log_level);
+    sparams.SetMagicNo(_magic_no);
+    sparams.SetSignals(_params.Momentum_SignalOpenMethod, _params.Momentum_SignalOpenMethod,
+_params.Momentum_SignalOpenFilterMethod, _params.Momentum_SignalOpenBoostMethod,
+                       _params.Momentum_SignalCloseMethod, _params.Momentum_SignalCloseMethod);
+    sparams.SetMaxSpread(_params.Momentum_MaxSpread);
+    // Initialize strategy instance.
+    Strategy *_strat = new Stg_Momentum(sparams, "Momentum");
+    return _strat;
   }
 
   /**
    * Check if Momentum indicator is on buy or sell.
    *
    * @param
-   *   cmd (int) - type of trade order command
+   *   _cmd (int) - type of trade order command
    *   period (int) - period to check for
-   *   _signal_method (int) - signal method to use by using bitwise AND operation
-   *   _signal_level1 (double) - signal level to consider the signal
+   *   _method (int) - signal method to use by using bitwise AND operation
+   *   _level (double) - signal level to consider the signal
    */
-  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  bool SignalOpen(ENUM_ORDER_TYPE _cmd, int _method = 0, double _level = 0.0) {
     bool _result = false;
-    double momentum_0 = ((Indi_Momentum *) this.Data()).GetValue(0);
-    double momentum_1 = ((Indi_Momentum *) this.Data()).GetValue(1);
-    double momentum_2 = ((Indi_Momentum *) this.Data()).GetValue(2);
-    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-    switch (cmd) {
+    double momentum_0 = ((Indi_Momentum *)this.Data()).GetValue(0);
+    double momentum_1 = ((Indi_Momentum *)this.Data()).GetValue(1);
+    double momentum_2 = ((Indi_Momentum *)this.Data()).GetValue(2);
+    switch (_cmd) {
       case ORDER_TYPE_BUY:
         break;
       case ORDER_TYPE_SELL:
         break;
     }
-    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
     return _result;
   }
 
-};
+  /**
+   * Check strategy's opening signal additional filter.
+   */
+  bool SignalOpenFilter(ENUM_ORDER_TYPE _cmd, int _method = 0) {
+    bool _result = true;
+    if (_method != 0) {
+      // if (METHOD(_method, 0)) _result &= Trade().IsTrend(_cmd);
+      // if (METHOD(_method, 1)) _result &= Trade().IsPivot(_cmd);
+      // if (METHOD(_method, 2)) _result &= Trade().IsPeakHours(_cmd);
+      // if (METHOD(_method, 3)) _result &= Trade().IsRoundNumber(_cmd);
+      // if (METHOD(_method, 4)) _result &= Trade().IsHedging(_cmd);
+      // if (METHOD(_method, 5)) _result &= Trade().IsPeakBar(_cmd);
+    }
+    return _result;
+  }
 
+  /**
+   * Gets strategy's lot size boost (when enabled).
+   */
+  double SignalOpenBoost(ENUM_ORDER_TYPE _cmd, int _method = 0) {
+    bool _result = 1.0;
+    if (_method != 0) {
+      // if (METHOD(_method, 0)) if (Trade().IsTrend(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 1)) if (Trade().IsPivot(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 2)) if (Trade().IsPeakHours(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 3)) if (Trade().IsRoundNumber(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 4)) if (Trade().IsHedging(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 5)) if (Trade().IsPeakBar(_cmd)) _result *= 1.1;
+    }
+    return _result;
+  }
+
+  /**
+   * Check strategy's closing signal.
+   */
+  bool SignalClose(ENUM_ORDER_TYPE _cmd, int _method = 0, double _level = 0.0) {
+    return SignalOpen(Order::NegateOrderType(_cmd), _method, _level);
+  }
+
+  /**
+   * Gets price limit value for profit take or stop loss.
+   */
+  double PriceLimit(ENUM_ORDER_TYPE _cmd, ENUM_ORDER_TYPE_VALUE _mode, int _method = 0, double _level = 0.0) {
+    double _trail = _level * Market().GetPipSize();
+    int _direction = Order::OrderDirection(_cmd) * (_mode == ORDER_TYPE_SL ? -1 : 1);
+    double _default_value = Market().GetCloseOffer(_cmd) + _trail * _method * _direction;
+    double _result = _default_value;
+    switch (_method) {
+      case 0: {
+        // @todo
+      }
+    }
+    return _result;
+  }
+};

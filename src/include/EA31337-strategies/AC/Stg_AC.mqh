@@ -6,144 +6,206 @@
 
 /**
  * @file
- * Implements AC strategy.
+ * Implements AC strategy based on the Bill Williams' Accelerator/Decelerator oscillator.
  */
 
 // Includes.
-#include "../../EA31337-classes/Indicators/Indi_AC.mqh"
-#include "../../EA31337-classes/Strategy.mqh"
+#include <EA31337-classes/Indicators/Indi_AC.mqh>
+#include <EA31337-classes/Strategy.mqh>
 
 // User input params.
-INPUT string __AC_Parameters__ = "-- Settings for the Bill Williams' Accelerator/Decelerator oscillator --"; // >>> AC <<<
-INPUT uint AC_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-INPUT ENUM_TRAIL_TYPE AC_TrailingStopMethod = 3; // Trail stop method
-INPUT ENUM_TRAIL_TYPE AC_TrailingProfitMethod = 22; // Trail profit method
-INPUT double AC_SignalLevel = 0.0004; // Signal level (>0.0001)
-INPUT uint AC_Shift = 0; // Shift (relative to the current bar, 0 - default)
-INPUT int AC1_SignalMethod = 1; // Signal method for M1 (0-1)
-INPUT int AC5_SignalMethod = 1; // Signal method for M5 (0-1)
-INPUT int AC15_SignalMethod = 0; // Signal method for M15 (0-1)
-INPUT int AC30_SignalMethod = 1; // Signal method for M30 (0-1)
-INPUT int AC1_OpenCondition1 = 777; // Open condition 1 for M1 (0-1023)
-INPUT int AC1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-INPUT ENUM_MARKET_EVENT AC1_CloseCondition = 26; // Close condition for M1
-INPUT int AC5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
-INPUT int AC5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-INPUT ENUM_MARKET_EVENT AC5_CloseCondition = 24; // Close condition for M5
-INPUT int AC15_OpenCondition1 = 1; // Open condition 1 for M15 (0-)
-INPUT int AC15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-INPUT ENUM_MARKET_EVENT AC15_CloseCondition = 1; // Close condition for M15
-INPUT int AC30_OpenCondition1 = 389; // Open condition 1 for M30 (0-)
-INPUT int AC30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-INPUT ENUM_MARKET_EVENT AC30_CloseCondition = 29; // Close condition for M30
-INPUT double AC1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-INPUT double AC5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-INPUT double AC15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-INPUT double AC30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+INPUT string __AC_Parameters__ = "-- AC strategy params --";  // >>> AC <<<
+INPUT int AC_Shift = 0;                                       // Shift (relative to the current bar, 0 - default)
+INPUT int AC_SignalOpenMethod = 1;                            // Signal open method (0-1)
+INPUT double AC_SignalOpenLevel = 0.0004;                     // Signal open level (>0.0001)
+INPUT int AC_SignalOpenFilterMethod = 0;                      // Signal open filter method
+INPUT int AC_SignalOpenBoostMethod = 0;                       // Signal open boost method
+INPUT int AC_SignalCloseMethod = 0;                           // Signal close method
+INPUT double AC_SignalCloseLevel = 0.0004;                    // Signal close level (>0.0001)
+INPUT int AC_PriceLimitMethod = 0;                            // Price limit method
+INPUT double AC_PriceLimitLevel = 0;                          // Price limit level
+INPUT double AC_MaxSpread = 6.0;                              // Max spread to trade (pips)
+
+// Struct to define strategy parameters to override.
+struct Stg_AC_Params : Stg_Params {
+  unsigned int AC_Period;
+  ENUM_APPLIED_PRICE AC_Applied_Price;
+  int AC_Shift;
+  int AC_SignalOpenMethod;
+  double AC_SignalOpenLevel;
+  int AC_SignalOpenFilterMethod;
+  int AC_SignalOpenBoostMethod;
+  int AC_SignalCloseMethod;
+  double AC_SignalCloseLevel;
+  int AC_PriceLimitMethod;
+  double AC_PriceLimitLevel;
+  double AC_MaxSpread;
+
+  // Constructor: Set default param values.
+  Stg_AC_Params()
+      : AC_Shift(::AC_Shift),
+        AC_SignalOpenMethod(::AC_SignalOpenMethod),
+        AC_SignalOpenLevel(::AC_SignalOpenLevel),
+        AC_SignalOpenFilterMethod(::AC_SignalOpenFilterMethod),
+        AC_SignalOpenBoostMethod(::AC_SignalOpenBoostMethod),
+        AC_SignalCloseMethod(::AC_SignalCloseMethod),
+        AC_SignalCloseLevel(::AC_SignalCloseLevel),
+        AC_PriceLimitMethod(::AC_PriceLimitMethod),
+        AC_PriceLimitLevel(::AC_PriceLimitLevel),
+        AC_MaxSpread(::AC_MaxSpread) {}
+};
+
+// Loads pair specific param values.
+#include "sets/EURUSD_H1.h"
+#include "sets/EURUSD_H4.h"
+#include "sets/EURUSD_M1.h"
+#include "sets/EURUSD_M15.h"
+#include "sets/EURUSD_M30.h"
+#include "sets/EURUSD_M5.h"
 
 class Stg_AC : public Strategy {
+ public:
+  Stg_AC(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
-  public:
-
-  void Stg_AC(StgParams &_params, string _name) : Strategy(_params, _name) {}
-
-  static Stg_AC *Init_M1() {
-    ChartParams cparams1(PERIOD_M1);
-    IndicatorParams ac_iparams(10, INDI_AC);
-    StgParams ac1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_AC(ac_iparams, cparams1), NULL, NULL);
-    ac1_sparams.SetSignals(AC1_SignalMethod, AC1_OpenCondition1, AC1_OpenCondition2, AC1_CloseCondition, NULL, AC_SignalLevel, NULL);
-    ac1_sparams.SetStops(AC_TrailingProfitMethod, AC_TrailingStopMethod);
-    ac1_sparams.SetMaxSpread(AC1_MaxSpread);
-    ac1_sparams.SetId(AC1);
-    return (new Stg_AC(ac1_sparams, "AC1"));
-  }
-  static Stg_AC *Init_M5() {
-    ChartParams cparams5(PERIOD_M5);
-    IndicatorParams ac_iparams(10, INDI_AC);
-    StgParams ac5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_AC(ac_iparams, cparams5), NULL, NULL);
-    ac5_sparams.SetSignals(AC5_SignalMethod, AC5_OpenCondition1, AC5_OpenCondition2, AC5_CloseCondition, NULL, AC_SignalLevel, NULL);
-    ac5_sparams.SetStops(AC_TrailingProfitMethod, AC_TrailingStopMethod);
-    ac5_sparams.SetMaxSpread(AC5_MaxSpread);
-    ac5_sparams.SetId(AC5);
-    return (new Stg_AC(ac5_sparams, "AC5"));
-  }
-  static Stg_AC *Init_M15() {
-    ChartParams cparams15(PERIOD_M15);
-    IndicatorParams ac_iparams(10, INDI_AC);
-    StgParams ac15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_AC(ac_iparams, cparams15), NULL, NULL);
-    ac15_sparams.SetSignals(AC15_SignalMethod, AC15_OpenCondition1, AC15_OpenCondition2, AC15_CloseCondition, NULL, AC_SignalLevel, NULL);
-    ac15_sparams.SetStops(AC_TrailingProfitMethod, AC_TrailingStopMethod);
-    ac15_sparams.SetMaxSpread(AC15_MaxSpread);
-    ac15_sparams.SetId(AC15);
-    return (new Stg_AC(ac15_sparams, "AC15"));
-  }
-  static Stg_AC *Init_M30() {
-    ChartParams cparams30(PERIOD_M30);
-    IndicatorParams ac_iparams(10, INDI_AC);
-    StgParams ac30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_AC(ac_iparams, cparams30), NULL, NULL);
-    ac30_sparams.SetSignals(AC30_SignalMethod, AC30_OpenCondition1, AC30_OpenCondition2, AC30_CloseCondition, NULL, AC_SignalLevel, NULL);
-    ac30_sparams.SetStops(AC_TrailingProfitMethod, AC_TrailingStopMethod);
-    ac30_sparams.SetMaxSpread(AC30_MaxSpread);
-    ac30_sparams.SetId(AC30);
-    return (new Stg_AC(ac30_sparams, "AC30"));
-  }
-  static Stg_AC *Init(ENUM_TIMEFRAMES _tf) {
+  static Stg_AC *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
+    // Initialize strategy initial values.
+    Stg_AC_Params _params;
     switch (_tf) {
-      case PERIOD_M1:  return Init_M1();
-      case PERIOD_M5:  return Init_M5();
-      case PERIOD_M15: return Init_M15();
-      case PERIOD_M30: return Init_M30();
-      default: return NULL;
+      case PERIOD_M1: {
+        Stg_AC_EURUSD_M1_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M5: {
+        Stg_AC_EURUSD_M5_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M15: {
+        Stg_AC_EURUSD_M15_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M30: {
+        Stg_AC_EURUSD_M30_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_H1: {
+        Stg_AC_EURUSD_H1_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_H4: {
+        Stg_AC_EURUSD_H4_Params _new_params;
+        _params = _new_params;
+      }
     }
+    // Initialize strategy parameters.
+    ChartParams cparams(_tf);
+    IndicatorParams ac_iparams(10, INDI_AC);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_AC(ac_iparams, cparams), NULL, NULL);
+    sparams.logger.SetLevel(_log_level);
+    sparams.SetMagicNo(_magic_no);
+    sparams.SetSignals(_params.AC_SignalOpenMethod, _params.AC_SignalOpenLevel, _params.AC_SignalOpenFilterMethod,
+                       _params.AC_SignalOpenBoostMethod, _params.AC_SignalCloseMethod, _params.AC_SignalCloseLevel);
+    sparams.SetMaxSpread(_params.AC_MaxSpread);
+    // Initialize strategy instance.
+    Strategy *_strat = new Stg_AC(sparams, "AC");
+    return _strat;
   }
 
   /**
-   * Check if AC indicator is on buy or sell.
+   * Check strategy's opening signal.
    *
-   * @param
-   *   _chart (Chart) - given chart to check
-   *   cmd (int) - type of trade order command
-   *   _signal_method (int) - signal method to use by using bitwise AND operation
-   *   _signal_level1 (float) - signal level to use
    */
-  bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  bool SignalOpen(ENUM_ORDER_TYPE _cmd, int _method = 0, double _level = 0.0) {
     bool _result = false;
-    double ac_0 = ((Indi_AC *) this.Data()).GetValue(0);
-    double ac_1 = ((Indi_AC *) this.Data()).GetValue(1);
-    double ac_2 = ((Indi_AC *) this.Data()).GetValue(2);
-    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    double ac_0 = ((Indi_AC *)this.Data()).GetValue(0);
+    double ac_1 = ((Indi_AC *)this.Data()).GetValue(1);
+    double ac_2 = ((Indi_AC *)this.Data()).GetValue(2);
     bool is_valid = fmin(fmin(ac_0, ac_1), ac_2) != 0;
     switch (_cmd) {
       /*
-        //1. Acceleration/Deceleration — AC
-        //Buy: if the indicator is above zero and 2 consecutive columns are green or if the indicator is below zero and 3 consecutive columns are green
-        //Sell: if the indicator is below zero and 2 consecutive columns are red or if the indicator is above zero and 3 consecutive columns are red
-        if ((iAC(NULL,piac,0)>=0&&iAC(NULL,piac,0)>iAC(NULL,piac,1)&&iAC(NULL,piac,1)>iAC(NULL,piac,2))||(iAC(NULL,piac,0)<=0
+        //1. Acceleration/Deceleration - AC
+        //Buy: if the indicator is above zero and 2 consecutive columns are green or if the indicator is below zero and
+        3 consecutive columns are green
+        //Sell: if the indicator is below zero and 2 consecutive columns are red or if the indicator is above zero and 3
+        consecutive columns are red if
+        ((iAC(NULL,piac,0)>=0&&iAC(NULL,piac,0)>iAC(NULL,piac,1)&&iAC(NULL,piac,1)>iAC(NULL,piac,2))||(iAC(NULL,piac,0)<=0
         && iAC(NULL,piac,0)>iAC(NULL,piac,1)&&iAC(NULL,piac,1)>iAC(NULL,piac,2)&&iAC(NULL,piac,2)>iAC(NULL,piac,3)))
-        if ((iAC(NULL,piac,0)<=0&&iAC(NULL,piac,0)<iAC(NULL,piac,1)&&iAC(NULL,piac,1)<iAC(NULL,piac,2))||(iAC(NULL,piac,0)>=0
+        if
+        ((iAC(NULL,piac,0)<=0&&iAC(NULL,piac,0)<iAC(NULL,piac,1)&&iAC(NULL,piac,1)<iAC(NULL,piac,2))||(iAC(NULL,piac,0)>=0
         && iAC(NULL,piac,0)<iAC(NULL,piac,1)&&iAC(NULL,piac,1)<iAC(NULL,piac,2)&&iAC(NULL,piac,2)<iAC(NULL,piac,3)))
       */
       case ORDER_TYPE_BUY:
-        _result = ac_0 > _signal_level1 && ac_0 > ac_1;
-        if (_signal_method != 0) {
+        _result = ac_0 > _level && ac_0 > ac_1;
+        if (_method != 0) {
           _result &= is_valid;
-          if (METHOD(_signal_method, 0)) _result &= ac_1 > ac_2; // @todo: one more bar.
-          //if (METHOD(_signal_method, 0)) _result &= ac_1 > ac_2;
+          if (METHOD(_method, 0)) _result &= ac_1 > ac_2;  // @todo: one more bar.
+          // if (METHOD(_method, 0)) _result &= ac_1 > ac_2;
         }
-      break;
+        break;
       case ORDER_TYPE_SELL:
-        _result = ac_0 < -_signal_level1 && ac_0 < ac_1;
-        if (_signal_method != 0) {
+        _result = ac_0 < -_level && ac_0 < ac_1;
+        if (_method != 0) {
           _result &= is_valid;
-          if (METHOD(_signal_method, 0)) _result &= ac_1 < ac_2; // @todo: one more bar.
-          //if (METHOD(_signal_method, 0)) _result &= ac_1 < ac_2;
+          if (METHOD(_method, 0)) _result &= ac_1 < ac_2;  // @todo: one more bar.
+          // if (METHOD(_method, 0)) _result &= ac_1 < ac_2;
         }
-      break;
+        break;
     }
-    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == _cmd;
     return _result;
   }
 
+  /**
+   * Check strategy's opening signal additional filter.
+   */
+  bool SignalOpenFilter(ENUM_ORDER_TYPE _cmd, int _method = 0) {
+    bool _result = true;
+    if (_method != 0) {
+      // if (METHOD(_method, 0)) _result &= Trade().IsTrend(_cmd);
+      // if (METHOD(_method, 1)) _result &= Trade().IsPivot(_cmd);
+      // if (METHOD(_method, 2)) _result &= Trade().IsPeakHours(_cmd);
+      // if (METHOD(_method, 3)) _result &= Trade().IsRoundNumber(_cmd);
+      // if (METHOD(_method, 4)) _result &= Trade().IsHedging(_cmd);
+      // if (METHOD(_method, 5)) _result &= Trade().IsPeakBar(_cmd);
+    }
+    return _result;
+  }
+
+  /**
+   * Gets strategy's lot size boost (when enabled).
+   */
+  double SignalOpenBoost(ENUM_ORDER_TYPE _cmd, int _method = 0) {
+    bool _result = 1.0;
+    if (_method != 0) {
+      // if (METHOD(_method, 0)) if (Trade().IsTrend(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 1)) if (Trade().IsPivot(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 2)) if (Trade().IsPeakHours(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 3)) if (Trade().IsRoundNumber(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 4)) if (Trade().IsHedging(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 5)) if (Trade().IsPeakBar(_cmd)) _result *= 1.1;
+    }
+    return _result;
+  }
+
+  /**
+   * Check strategy's closing signal.
+   *
+   */
+  bool SignalClose(ENUM_ORDER_TYPE _cmd, int _method = 0, double _level = 0.0) {
+    return SignalOpen(Order::NegateOrderType(_cmd), _method, _level);
+  }
+
+  /**
+   * Gets price limit value for profit take or stop loss.
+   */
+  double PriceLimit(ENUM_ORDER_TYPE _cmd, ENUM_ORDER_TYPE_VALUE _mode, int _method = 0, double _level = 0.0) {
+    double _trail = _level * Market().GetPipSize();
+    int _direction = Order::OrderDirection(_cmd) * (_mode == ORDER_TYPE_SL ? -1 : 1);
+    double _default_value = Market().GetCloseOffer(_cmd) + _trail * _method * _direction;
+    double _result = _default_value;
+    switch (_method) {
+      case 0: {
+        // @todo
+      }
+    }
+    return _result;
+  }
 };

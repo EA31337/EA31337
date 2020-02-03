@@ -6,149 +6,203 @@
 
 /**
  * @file
- * Implements ATR strategy.
+ * Implements ATR strategy based on the Average True Range indicator.
  */
 
 // Includes.
-#include "../../EA31337-classes/Indicators/Indi_ATR.mqh"
-#include "../../EA31337-classes/Strategy.mqh"
+#include <EA31337-classes/Indicators/Indi_ATR.mqh>
+#include <EA31337-classes/Strategy.mqh>
 
 // User input params.
-string __ATR_Parameters__ = "-- Settings for the Average True Range indicator --"; // >>> ATR <<<
-uint ATR_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-ENUM_TRAIL_TYPE ATR_TrailingStopMethod = 7; // Trail stop method
-ENUM_TRAIL_TYPE ATR_TrailingProfitMethod = 22; // Trail profit method
-int ATR_Period_M1 = 14; // Period for M1
-int ATR_Period_M5 = 14; // Period for M5
-int ATR_Period_M15 = 14; // Period for M15
-int ATR_Period_M30 = 14; // Period for M30
-double ATR_SignalLevel = 0.00000000; // Signal level
-uint ATR_Shift = 0; // Shift (relative to the current bar, 0 - default)
-int ATR1_SignalMethod = 0; // Signal method for M1 (0-31)
-int ATR5_SignalMethod = 0; // Signal method for M5 (0-31)
-int ATR15_SignalMethod = 0; // Signal method for M15 (0-31)
-int ATR30_SignalMethod = 0; // Signal method for M30 (0-31)
-int ATR1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
-int ATR1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-ENUM_MARKET_EVENT ATR1_CloseCondition = 1; // Close condition for M1
-int ATR5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
-int ATR5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-ENUM_MARKET_EVENT ATR5_CloseCondition = 1; // Close condition for M5
-int ATR15_OpenCondition1 = 292; // Open condition 1 for M15 (0-)
-int ATR15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-ENUM_MARKET_EVENT ATR15_CloseCondition = 1; // Close condition for M15
-int ATR30_OpenCondition1 = 292; // Open condition 1 for M30 (0-)
-int ATR30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-ENUM_MARKET_EVENT ATR30_CloseCondition = 1; // Close condition for M30
-double ATR1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-double ATR5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-double ATR15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-double ATR30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+INPUT string __ATR_Parameters__ = "-- ATR strategy params --";  // >>> ATR <<<
+INPUT int ATR_Period = 14;                                      // Period
+INPUT int ATR_Shift = 0;                                        // Shift (relative to the current bar, 0 - default)
+INPUT int ATR_SignalOpenMethod = 0;                             // Signal open method (0-31)
+INPUT double ATR_SignalOpenLevel = 0;                           // Signal open level
+INPUT int ATR_SignalOpenFilterMethod = 0;                           // Signal open filter method
+INPUT int ATR_SignalOpenBoostMethod = 0;                           // Signal open boost method
+INPUT int ATR_SignalCloseMethod = 0;                            // Signal close method
+INPUT double ATR_SignalCloseLevel = 0;                          // Signal close level
+INPUT int ATR_PriceLimitMethod = 0;                             // Price limit method
+INPUT double ATR_PriceLimitLevel = 0;                           // Price limit level
+INPUT double ATR_MaxSpread = 6.0;                               // Max spread to trade (pips)
+
+// Struct to define strategy parameters to override.
+struct Stg_ATR_Params : Stg_Params {
+  unsigned int ATR_Period;
+  ENUM_APPLIED_PRICE ATR_Applied_Price;
+  int ATR_Shift;
+  int ATR_SignalOpenMethod;
+  double ATR_SignalOpenLevel;
+  int ATR_SignalOpenFilterMethod;
+  int ATR_SignalOpenBoostMethod;
+  int ATR_SignalCloseMethod;
+  double ATR_SignalCloseLevel;
+  int ATR_PriceLimitMethod;
+  double ATR_PriceLimitLevel;
+  double ATR_MaxSpread;
+
+  // Constructor: Set default param values.
+  Stg_ATR_Params()
+      : ATR_Period(::ATR_Period),
+        ATR_Shift(::ATR_Shift),
+        ATR_SignalOpenMethod(::ATR_SignalOpenMethod),
+        ATR_SignalOpenLevel(::ATR_SignalOpenLevel),
+        ATR_SignalOpenFilterMethod(::ATR_SignalOpenFilterMethod),
+        ATR_SignalOpenBoostMethod(::ATR_SignalOpenBoostMethod),
+        ATR_SignalCloseMethod(::ATR_SignalCloseMethod),
+        ATR_SignalCloseLevel(::ATR_SignalCloseLevel),
+        ATR_PriceLimitMethod(::ATR_PriceLimitMethod),
+        ATR_PriceLimitLevel(::ATR_PriceLimitLevel),
+        ATR_MaxSpread(::ATR_MaxSpread) {}
+};
+
+// Loads pair specific param values.
+#include "sets/EURUSD_H1.h"
+#include "sets/EURUSD_H4.h"
+#include "sets/EURUSD_M1.h"
+#include "sets/EURUSD_M15.h"
+#include "sets/EURUSD_M30.h"
+#include "sets/EURUSD_M5.h"
 
 class Stg_ATR : public Strategy {
+ public:
+  Stg_ATR(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
-  public:
-
-  void Stg_ATR(StgParams &_params, string _name) : Strategy(_params, _name) {}
-
-  static Stg_ATR *Init_M1() {
-    ChartParams cparams1(PERIOD_M1);
-    IndicatorParams atr_iparams(10, INDI_ATR);
-    ATR_Params atr1_iparams(ATR_Period_M1);
-    StgParams atr1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_ATR(atr1_iparams, atr_iparams, cparams1), NULL, NULL);
-    atr1_sparams.SetSignals(ATR1_SignalMethod, ATR1_OpenCondition1, ATR1_OpenCondition2, ATR1_CloseCondition, NULL, ATR_SignalLevel, NULL);
-    atr1_sparams.SetStops(ATR_TrailingProfitMethod, ATR_TrailingStopMethod);
-    atr1_sparams.SetMaxSpread(ATR1_MaxSpread);
-    atr1_sparams.SetId(ATR1);
-    return (new Stg_ATR(atr1_sparams, "ATR1"));
-  }
-  static Stg_ATR *Init_M5() {
-    ChartParams cparams5(PERIOD_M5);
-    IndicatorParams atr_iparams(10, INDI_ATR);
-    ATR_Params atr5_iparams(ATR_Period_M5);
-    StgParams atr5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_ATR(atr5_iparams, atr_iparams, cparams5), NULL, NULL);
-    atr5_sparams.SetSignals(ATR5_SignalMethod, ATR5_OpenCondition1, ATR5_OpenCondition2, ATR5_CloseCondition, NULL, ATR_SignalLevel, NULL);
-    atr5_sparams.SetStops(ATR_TrailingProfitMethod, ATR_TrailingStopMethod);
-    atr5_sparams.SetMaxSpread(ATR5_MaxSpread);
-    atr5_sparams.SetId(ATR5);
-    return (new Stg_ATR(atr5_sparams, "ATR5"));
-  }
-  static Stg_ATR *Init_M15() {
-    ChartParams cparams15(PERIOD_M15);
-    IndicatorParams atr_iparams(10, INDI_ATR);
-    ATR_Params atr15_iparams(ATR_Period_M15);
-    StgParams atr15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_ATR(atr15_iparams, atr_iparams, cparams15), NULL, NULL);
-    atr15_sparams.SetSignals(ATR15_SignalMethod, ATR15_OpenCondition1, ATR15_OpenCondition2, ATR15_CloseCondition, NULL, ATR_SignalLevel, NULL);
-    atr15_sparams.SetStops(ATR_TrailingProfitMethod, ATR_TrailingStopMethod);
-    atr15_sparams.SetMaxSpread(ATR15_MaxSpread);
-    atr15_sparams.SetId(ATR15);
-    return (new Stg_ATR(atr15_sparams, "ATR15"));
-  }
-  static Stg_ATR *Init_M30() {
-    ChartParams cparams30(PERIOD_M30);
-    IndicatorParams atr_iparams(10, INDI_ATR);
-    ATR_Params atr30_iparams(ATR_Period_M30);
-    StgParams atr30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_ATR(atr30_iparams, atr_iparams, cparams30), NULL, NULL);
-    atr30_sparams.SetSignals(ATR30_SignalMethod, ATR30_OpenCondition1, ATR30_OpenCondition2, ATR30_CloseCondition, NULL, ATR_SignalLevel, NULL);
-    atr30_sparams.SetStops(ATR_TrailingProfitMethod, ATR_TrailingStopMethod);
-    atr30_sparams.SetMaxSpread(ATR30_MaxSpread);
-    atr30_sparams.SetId(ATR30);
-    return (new Stg_ATR(atr30_sparams, "ATR30"));
-  }
-  static Stg_ATR *Init(ENUM_TIMEFRAMES _tf) {
+  static Stg_ATR *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
+    // Initialize strategy initial values.
+    Stg_ATR_Params _params;
     switch (_tf) {
-      case PERIOD_M1:  return Init_M1();
-      case PERIOD_M5:  return Init_M5();
-      case PERIOD_M15: return Init_M15();
-      case PERIOD_M30: return Init_M30();
-      default: return NULL;
+      case PERIOD_M1: {
+        Stg_ATR_EURUSD_M1_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M5: {
+        Stg_ATR_EURUSD_M5_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M15: {
+        Stg_ATR_EURUSD_M15_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M30: {
+        Stg_ATR_EURUSD_M30_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_H1: {
+        Stg_ATR_EURUSD_H1_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_H4: {
+        Stg_ATR_EURUSD_H4_Params _new_params;
+        _params = _new_params;
+      }
     }
+    // Initialize strategy parameters.
+    ChartParams cparams(_tf);
+    ATR_Params atr_params(_params.ATR_Period);
+    IndicatorParams atr_iparams(10, INDI_ATR);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_ATR(atr_params, atr_iparams, cparams), NULL, NULL);
+    sparams.logger.SetLevel(_log_level);
+    sparams.SetMagicNo(_magic_no);
+    sparams.SetSignals(_params.ATR_SignalOpenMethod, _params.ATR_SignalOpenLevel,
+    _params.ATR_SignalOpenFilterMethod,
+    _params.ATR_SignalOpenBoostMethod,
+    _params.ATR_SignalCloseMethod,
+                       _params.ATR_SignalCloseLevel);
+    sparams.SetMaxSpread(_params.ATR_MaxSpread);
+    // Initialize strategy instance.
+    Strategy *_strat = new Stg_ATR(sparams, "ATR");
+    return _strat;
   }
 
   /**
-   * Check if ATR indicator is on buy or sell.
-   *
-   * @param
-   *   cmd (int) - type of trade order command
-   *   period (int) - period to check for
-   *   _signal_method (int) - signal method to use by using bitwise AND operation
-   *   _signal_level1 (double) - signal level to consider the signal
+   * Check strategy's opening signal.
    */
-  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  bool SignalOpen(ENUM_ORDER_TYPE _cmd, int _method = 0, double _level = 0.0) {
     bool _result = false;
-    double atr_0 = ((Indi_ATR *) this.Data()).GetValue(0);
-    double atr_1 = ((Indi_ATR *) this.Data()).GetValue(1);
-    double atr_2 = ((Indi_ATR *) this.Data()).GetValue(2);
-    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-    switch (cmd) {
+    double atr_0 = ((Indi_ATR *)this.Data()).GetValue(0);
+    double atr_1 = ((Indi_ATR *)this.Data()).GetValue(1);
+    double atr_2 = ((Indi_ATR *)this.Data()).GetValue(2);
+    switch (_cmd) {
       //   if(iATR(NULL,0,12,0)>iATR(NULL,0,20,0)) return(0);
       /*
         //6. Average True Range - ATR
         //Doesn't give independent signals. Is used to define volatility (trend strength).
         //principle: trend must be strengthened. Together with that ATR grows.
-        //Because of the chart form it is inconvenient to analyze rise/fall. Only exceeding of threshold value is checked.
-        //Flag is 1 when ATR is above threshold value (i.e. there is a trend), 0 - when ATR is below threshold value, -1 - never.
-        if (iATR(NULL,piatr,piatru,0)>=minatr)
-        {f6=1;}
+        //Because of the chart form it is inconvenient to analyze rise/fall. Only exceeding of threshold value is
+        checked.
+        //Flag is 1 when ATR is above threshold value (i.e. there is a trend), 0 - when ATR is below threshold value, -1
+        - never. if (iATR(NULL,piatr,piatru,0)>=minatr) {f6=1;}
       */
       case ORDER_TYPE_BUY:
-        //bool _result = atr_0;
+        // bool _result = atr_0;
         /*
-          if (METHOD(_signal_method, 0)) _result &= Open[CURR] > Close[CURR];
+          if (METHOD(_method, 0)) _result &= Open[CURR] > Close[CURR];
           */
-      break;
+        break;
       case ORDER_TYPE_SELL:
         /*
           bool _result = ATR_0[LINE_UPPER] != 0.0 || ATR_1[LINE_UPPER] != 0.0 || ATR_2[LINE_UPPER] != 0.0;
-          if (METHOD(_signal_method, 0)) _result &= Open[CURR] < Close[CURR];
+          if (METHOD(_method, 0)) _result &= Open[CURR] < Close[CURR];
         */
-      break;
+        break;
     }
-    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
     return _result;
   }
 
-};
+  /**
+   * Check strategy's opening signal additional filter.
+   */
+  bool SignalOpenFilter(ENUM_ORDER_TYPE _cmd, int _method = 0) {
+    bool _result = true;
+    if (_method != 0) {
+      // if (METHOD(_method, 0)) _result &= Trade().IsTrend(_cmd);
+      // if (METHOD(_method, 1)) _result &= Trade().IsPivot(_cmd);
+      // if (METHOD(_method, 2)) _result &= Trade().IsPeakHours(_cmd);
+      // if (METHOD(_method, 3)) _result &= Trade().IsRoundNumber(_cmd);
+      // if (METHOD(_method, 4)) _result &= Trade().IsHedging(_cmd);
+      // if (METHOD(_method, 5)) _result &= Trade().IsPeakBar(_cmd);
+    }
+    return _result;
+  }
 
+  /**
+   * Gets strategy's lot size boost (when enabled).
+   */
+  double SignalOpenBoost(ENUM_ORDER_TYPE _cmd, int _method = 0) {
+    bool _result = 1.0;
+    if (_method != 0) {
+      // if (METHOD(_method, 0)) if (Trade().IsTrend(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 1)) if (Trade().IsPivot(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 2)) if (Trade().IsPeakHours(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 3)) if (Trade().IsRoundNumber(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 4)) if (Trade().IsHedging(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 5)) if (Trade().IsPeakBar(_cmd)) _result *= 1.1;
+    }
+    return _result;
+  }
+
+  /**
+   * Check strategy's closing signal.
+   */
+  bool SignalClose(ENUM_ORDER_TYPE _cmd, int _method = 0, double _level = 0.0) {
+    return SignalOpen(Order::NegateOrderType(_cmd), _method, _level);
+  }
+
+  /**
+   * Gets price limit value for profit take or stop loss.
+   */
+  double PriceLimit(ENUM_ORDER_TYPE _cmd, ENUM_ORDER_TYPE_VALUE _mode, int _method = 0, double _level = 0.0) {
+    double _trail = _level * Market().GetPipSize();
+    int _direction = Order::OrderDirection(_cmd) * (_mode == ORDER_TYPE_SL ? -1 : 1);
+    double _default_value = Market().GetCloseOffer(_cmd) + _trail * _method * _direction;
+    double _result = _default_value;
+    switch (_method) {
+      case 0: {
+        // @todo
+      }
+    }
+    return _result;
+  }
+};

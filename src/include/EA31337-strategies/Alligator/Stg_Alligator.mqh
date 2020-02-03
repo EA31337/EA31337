@@ -6,204 +6,295 @@
 
 /**
  * @file
- * Implements Alligator strategy.
+ * Implements Alligator strategy based on the Alligator indicator.
  */
 
 // Includes.
-#include "..\..\EA31337-classes\Indicators\Indi_Alligator.mqh"
-#include "..\..\EA31337-classes\Strategy.mqh"
+#include <EA31337-classes/Indicators/Indi_Alligator.mqh>
+#include <EA31337-classes/Strategy.mqh>
 
 // User input params.
-INPUT string __Alligator_Parameters__ = "-- Settings for the Alligator indicator --"; // >>> ALLIGATOR <<<
-INPUT uint Alligator_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-INPUT int Alligator_Period_Jaw = 16; // Jaw Period
-INPUT int Alligator_Period_Teeth = 8; // Teeth Period
-INPUT int Alligator_Period_Lips = 6; // Lips Period
-INPUT int Alligator_Shift_Jaw = 5; // Jaw Shift
-INPUT int Alligator_Shift_Teeth = 7; // Teeth Shift
-INPUT int Alligator_Shift_Lips = 5; // Lips Shift
-INPUT ENUM_MA_METHOD Alligator_MA_Method = 2; // MA Method
-INPUT ENUM_APPLIED_PRICE Alligator_Applied_Price = 4; // Applied Price
-INPUT int Alligator_Shift = 2; // Shift
-INPUT ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = 7; // Trail stop method
-INPUT ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = 25; // Trail profit method
-INPUT double Alligator_SignalLevel = 0.1; // Signal level
-INPUT int Alligator1_SignalMethod = 19; // Signal method for M1 (-63-63)
-INPUT int Alligator5_SignalMethod = 27; // Signal method for M5 (-63-63)
-INPUT int Alligator15_SignalMethod = 20; // Signal method for M15 (-63-63)
-INPUT int Alligator30_SignalMethod = 16; // Signal method for M30 (-63-63)
-INPUT int Alligator1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
-INPUT int Alligator1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
-INPUT ENUM_MARKET_EVENT Alligator1_CloseCondition = 4; // Close condition for M1
-INPUT int Alligator5_OpenCondition1 = 777; // Open condition 1 for M5 (0-1023)
-INPUT int Alligator5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
-INPUT ENUM_MARKET_EVENT Alligator5_CloseCondition = 4; // Close condition for M5
-INPUT int Alligator15_OpenCondition1 = 98; // Open condition 1 for M15 (0-1023)
-INPUT int Alligator15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
-INPUT ENUM_MARKET_EVENT Alligator15_CloseCondition = 5; // Close condition for M15
-INPUT int Alligator30_OpenCondition1 = 1; // Open condition 1 for M30 (0-1023)
-INPUT int Alligator30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
-INPUT ENUM_MARKET_EVENT Alligator30_CloseCondition = 11; // Close condition for M30
-INPUT double Alligator1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-INPUT double Alligator5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-INPUT double Alligator15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-INPUT double Alligator30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+INPUT string __Alligator_Parameters__ = "-- Alligator strategy params --";  // >>> ALLIGATOR <<<
+INPUT int Alligator_Period_Jaw = 16;                                        // Jaw Period
+INPUT int Alligator_Period_Teeth = 8;                                       // Teeth Period
+INPUT int Alligator_Period_Lips = 6;                                        // Lips Period
+INPUT int Alligator_Shift_Jaw = 5;                                          // Jaw Shift
+INPUT int Alligator_Shift_Teeth = 7;                                        // Teeth Shift
+INPUT int Alligator_Shift_Lips = 5;                                         // Lips Shift
+INPUT ENUM_MA_METHOD Alligator_MA_Method = 2;                               // MA Method
+INPUT ENUM_APPLIED_PRICE Alligator_Applied_Price = 4;                       // Applied Price
+INPUT int Alligator_Shift = 2;                                              // Shift
+INPUT int Alligator_SignalOpenMethod = 0;                                   // Signal open method (-63-63)
+INPUT double Alligator_SignalOpenLevel = 36;                                // Signal open level (-49-49)
+INPUT int Alligator_SignalOpenFilterMethod = 36;                         // Signal open filter method
+INPUT int Alligator_SignalOpenBoostMethod = 36;                          // Signal open filter method
+INPUT int Alligator_SignalCloseMethod = 0;                                  // Signal close method (-63-63)
+INPUT double Alligator_SignalCloseLevel = 36;                               // Signal close level (-49-49)
+INPUT int Alligator_PriceLimitMethod = 0;                                   // Price limit method
+INPUT double Alligator_PriceLimitLevel = 0;                                 // Price limit level
+INPUT double Alligator_MaxSpread = 0;                                       // Max spread to trade (pips)
+
+// Struct to define strategy parameters to override.
+struct Stg_Alligator_Params : Stg_Params {
+  unsigned int Alligator_Period_Jaw;
+  unsigned int Alligator_Period_Teeth;
+  unsigned int Alligator_Period_Lips;
+  int Alligator_Shift_Jaw;
+  int Alligator_Shift_Teeth;
+  int Alligator_Shift_Lips;
+  ENUM_MA_METHOD Alligator_MA_Method;
+  ENUM_APPLIED_PRICE Alligator_Applied_Price;
+  int Alligator_Shift;
+  int Alligator_SignalOpenMethod;
+  double Alligator_SignalOpenLevel;
+  int Alligator_SignalOpenFilterMethod;
+  int Alligator_SignalOpenBoostMethod;
+  int Alligator_SignalCloseMethod;
+  double Alligator_SignalCloseLevel;
+  int Alligator_PriceLimitMethod;
+  double Alligator_PriceLimitLevel;
+  double Alligator_MaxSpread;
+
+  // Constructor: Set default param values.
+  Stg_Alligator_Params()
+      : Alligator_Period_Jaw(::Alligator_Period_Jaw),
+        Alligator_Period_Teeth(::Alligator_Period_Teeth),
+        Alligator_Period_Lips(::Alligator_Period_Lips),
+        Alligator_Shift_Jaw(::Alligator_Shift_Jaw),
+        Alligator_Shift_Teeth(::Alligator_Shift_Teeth),
+        Alligator_Shift_Lips(::Alligator_Shift_Lips),
+        Alligator_MA_Method(::Alligator_MA_Method),
+        Alligator_Applied_Price(::Alligator_Applied_Price),
+        Alligator_Shift(::Alligator_Shift),
+        Alligator_SignalOpenMethod(::Alligator_SignalOpenMethod),
+        Alligator_SignalOpenLevel(::Alligator_SignalOpenLevel),
+        Alligator_SignalOpenFilterMethod(::Alligator_SignalOpenFilterMethod),
+        Alligator_SignalOpenBoostMethod(::Alligator_SignalOpenBoostMethod),
+        Alligator_SignalCloseMethod(::Alligator_SignalCloseMethod),
+        Alligator_SignalCloseLevel(::Alligator_SignalCloseLevel),
+        Alligator_PriceLimitMethod(::Alligator_PriceLimitMethod),
+        Alligator_PriceLimitLevel(::Alligator_PriceLimitLevel),
+        Alligator_MaxSpread(::Alligator_MaxSpread) {}
+  void Init() {}
+};
+
+// Loads pair specific param values.
+#include "sets/EURUSD_H1.h"
+#include "sets/EURUSD_H4.h"
+#include "sets/EURUSD_M1.h"
+#include "sets/EURUSD_M15.h"
+#include "sets/EURUSD_M30.h"
+#include "sets/EURUSD_M5.h"
 
 class Stg_Alligator : public Strategy {
+ public:
+  Stg_Alligator(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
-  public:
-
-  void Stg_Alligator(StgParams &_params, string _name) : Strategy(_params, _name) {}
-
-  static Stg_Alligator *Init_M1() {
-    ChartParams cparams1(PERIOD_M1);
-    IndicatorParams alli_iparams(10, INDI_ALLIGATOR);
-    Alligator_Params alli1_iparams(
-      Alligator_Period_Jaw, Alligator_Shift_Jaw,
-      Alligator_Period_Teeth, Alligator_Shift_Teeth,
-      Alligator_Period_Lips, Alligator_Shift_Lips,
-      Alligator_MA_Method, Alligator_Applied_Price);
-    StgParams alli1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Alligator(alli1_iparams, alli_iparams, cparams1), NULL, NULL);
-    alli1_sparams.SetSignals(Alligator1_SignalMethod, Alligator1_OpenCondition1, Alligator1_OpenCondition2, Alligator1_CloseCondition, NULL, Alligator_SignalLevel, NULL);
-    alli1_sparams.SetStops(Alligator_TrailingProfitMethod, Alligator_TrailingStopMethod);
-    alli1_sparams.SetMaxSpread(Alligator1_MaxSpread);
-    alli1_sparams.SetId(ALLIGATOR1);
-    return (new Stg_Alligator(alli1_sparams, "Alligator1"));
-  }
-  static Stg_Alligator *Init_M5() {
-    ChartParams cparams5(PERIOD_M5);
-    IndicatorParams alli_iparams(10, INDI_ALLIGATOR);
-    Alligator_Params alli5_iparams(
-      Alligator_Period_Jaw, Alligator_Shift_Jaw,
-      Alligator_Period_Teeth, Alligator_Shift_Teeth,
-      Alligator_Period_Lips, Alligator_Shift_Lips,
-      Alligator_MA_Method, Alligator_Applied_Price);
-    StgParams alli5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Alligator(alli5_iparams, alli_iparams, cparams5), NULL, NULL);
-    alli5_sparams.SetSignals(Alligator5_SignalMethod, Alligator5_OpenCondition1, Alligator5_OpenCondition2, Alligator5_CloseCondition, NULL, Alligator_SignalLevel, NULL);
-    alli5_sparams.SetStops(Alligator_TrailingProfitMethod, Alligator_TrailingStopMethod);
-    alli5_sparams.SetMaxSpread(Alligator5_MaxSpread);
-    alli5_sparams.SetId(ALLIGATOR5);
-    return (new Stg_Alligator(alli5_sparams, "Alligator5"));
-  }
-  static Stg_Alligator *Init_M15() {
-    ChartParams cparams15(PERIOD_M15);
-    IndicatorParams alli_iparams(10, INDI_ALLIGATOR);
-    Alligator_Params alli15_iparams(
-      Alligator_Period_Jaw, Alligator_Shift_Jaw,
-      Alligator_Period_Teeth, Alligator_Shift_Teeth,
-      Alligator_Period_Lips, Alligator_Shift_Lips,
-      Alligator_MA_Method, Alligator_Applied_Price);
-    StgParams alli15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Alligator(alli15_iparams, alli_iparams, cparams15), NULL, NULL);
-    alli15_sparams.SetSignals(Alligator15_SignalMethod, Alligator15_OpenCondition1, Alligator15_OpenCondition2, Alligator15_CloseCondition, NULL, Alligator_SignalLevel, NULL);
-    alli15_sparams.SetStops(Alligator_TrailingProfitMethod, Alligator_TrailingStopMethod);
-    alli15_sparams.SetMaxSpread(Alligator15_MaxSpread);
-    alli15_sparams.SetId(ALLIGATOR15);
-    return (new Stg_Alligator(alli15_sparams, "Alligator15"));
-  }
-  static Stg_Alligator *Init_M30() {
-    ChartParams cparams30(PERIOD_M30);
-    IndicatorParams alli_iparams(10, INDI_ALLIGATOR);
-    Alligator_Params alli30_iparams(
-      Alligator_Period_Jaw, Alligator_Shift_Jaw,
-      Alligator_Period_Teeth, Alligator_Shift_Teeth,
-      Alligator_Period_Lips, Alligator_Shift_Lips,
-      Alligator_MA_Method, Alligator_Applied_Price);
-    StgParams alli30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Alligator(alli30_iparams, alli_iparams, cparams30), NULL, NULL);
-    alli30_sparams.SetSignals(Alligator30_SignalMethod, Alligator30_OpenCondition1, Alligator30_OpenCondition2, Alligator30_CloseCondition, NULL, Alligator_SignalLevel, NULL);
-    alli30_sparams.SetStops(Alligator_TrailingProfitMethod, Alligator_TrailingStopMethod);
-    alli30_sparams.SetMaxSpread(Alligator30_MaxSpread);
-    alli30_sparams.SetId(ALLIGATOR30);
-    return (new Stg_Alligator(alli30_sparams, "Alligator30"));
-  }
-  static Stg_Alligator *Init(ENUM_TIMEFRAMES _tf) {
+  static Stg_Alligator *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
+    // Initialize strategy initial values.
+    Stg_Alligator_Params _params;
     switch (_tf) {
-      case PERIOD_M1:  return Init_M1();
-      case PERIOD_M5:  return Init_M5();
-      case PERIOD_M15: return Init_M15();
-      case PERIOD_M30: return Init_M30();
-      default: return NULL;
+      case PERIOD_M1: {
+        Stg_Alligator_EURUSD_M1_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M5: {
+        Stg_Alligator_EURUSD_M5_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M15: {
+        Stg_Alligator_EURUSD_M15_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M30: {
+        Stg_Alligator_EURUSD_M30_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_H1: {
+        Stg_Alligator_EURUSD_H1_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_H4: {
+        Stg_Alligator_EURUSD_H4_Params _new_params;
+        _params = _new_params;
+      }
     }
+    // Initialize strategy parameters.
+    ChartParams cparams(_tf);
+    Alligator_Params alli_params(_params.Alligator_Period_Jaw, _params.Alligator_Shift_Jaw,
+                                 _params.Alligator_Period_Teeth, _params.Alligator_Shift_Teeth,
+                                 _params.Alligator_Period_Lips, _params.Alligator_Shift_Lips,
+                                 _params.Alligator_MA_Method, _params.Alligator_Applied_Price);
+    IndicatorParams alli_iparams(10, INDI_ALLIGATOR);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_Alligator(alli_params, alli_iparams, cparams), NULL, NULL);
+    sparams.logger.SetLevel(_log_level);
+    sparams.SetMagicNo(_magic_no);
+    sparams.SetSignals(_params.Alligator_SignalOpenMethod, _params.Alligator_SignalOpenLevel,
+                       _params.Alligator_SignalOpenFilterMethod, _params.Alligator_SignalOpenFilterMethod,
+
+                       _params.Alligator_SignalCloseMethod, _params.Alligator_SignalCloseLevel);
+    sparams.SetPriceLimits(_params.Alligator_PriceLimitMethod, _params.Alligator_PriceLimitLevel);
+    sparams.SetMaxSpread(_params.Alligator_MaxSpread);
+    // Initialize strategy instance.
+    Strategy *_strat = new Stg_Alligator(sparams, "Alligator");
+    return _strat;
   }
 
   /**
-   * Check if Alligator indicator is on buy or sell.
-   *
-   * @param
-   *   cmd (int) - type of trade order command
-   *   period (int) - period to check for
-   *   _signal_method (int) - signal method to use by using bitwise AND operation
-   *   _signal_level1 (double) - signal level to consider the signal
+   * Check strategy's opening signal.
    */
-  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
-    // [x][0] - The Blue line (Alligator's Jaw), [x][1] - The Red Line (Alligator's Teeth), [x][2] - The Green Line (Alligator's Lips)
+  bool SignalOpen(ENUM_ORDER_TYPE _cmd, int _method = 0, double _level = 0.0) {
+    // [x][0] - The Blue line (Alligator's Jaw), [x][1] - The Red Line (Alligator's Teeth), [x][2] - The Green Line
+    // (Alligator's Lips)
     bool _result = false;
-    double alligator_0_jaw   = ((Indi_Alligator *) this.Data()).GetValue(LINE_JAW, 0);
-    double alligator_0_teeth = ((Indi_Alligator *) this.Data()).GetValue(LINE_TEETH, 0);
-    double alligator_0_lips  = ((Indi_Alligator *) this.Data()).GetValue(LINE_LIPS, 0);
-    double alligator_1_jaw   = ((Indi_Alligator *) this.Data()).GetValue(LINE_JAW, 1);
-    double alligator_1_teeth = ((Indi_Alligator *) this.Data()).GetValue(LINE_TEETH, 1);
-    double alligator_1_lips  = ((Indi_Alligator *) this.Data()).GetValue(LINE_LIPS, 1);
-    double alligator_2_jaw   = ((Indi_Alligator *) this.Data()).GetValue(LINE_JAW, 2);
-    double alligator_2_teeth = ((Indi_Alligator *) this.Data()).GetValue(LINE_TEETH, 2);
-    double alligator_2_lips  = ((Indi_Alligator *) this.Data()).GetValue(LINE_LIPS, 2);
-    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-    double gap = _signal_level1 * pip_size;
-    switch(cmd) {
+    double alligator_0_jaw = ((Indi_Alligator *)this.Data()).GetValue(LINE_JAW, 0);
+    double alligator_0_teeth = ((Indi_Alligator *)this.Data()).GetValue(LINE_TEETH, 0);
+    double alligator_0_lips = ((Indi_Alligator *)this.Data()).GetValue(LINE_LIPS, 0);
+    double alligator_1_jaw = ((Indi_Alligator *)this.Data()).GetValue(LINE_JAW, 1);
+    double alligator_1_teeth = ((Indi_Alligator *)this.Data()).GetValue(LINE_TEETH, 1);
+    double alligator_1_lips = ((Indi_Alligator *)this.Data()).GetValue(LINE_LIPS, 1);
+    double alligator_2_jaw = ((Indi_Alligator *)this.Data()).GetValue(LINE_JAW, 2);
+    double alligator_2_teeth = ((Indi_Alligator *)this.Data()).GetValue(LINE_TEETH, 2);
+    double alligator_2_lips = ((Indi_Alligator *)this.Data()).GetValue(LINE_LIPS, 2);
+    double _level_pips = _level * Chart().GetPipSize();
+    switch (_cmd) {
       case ORDER_TYPE_BUY:
-        _result = (
-          alligator_0_lips > alligator_0_teeth + gap && // Check if Lips are above Teeth ...
-          alligator_0_teeth > alligator_0_jaw + gap // ... Teeth are above Jaw ...
-          );
-        if (_signal_method != 0) {
-          if (METHOD(_signal_method, 0)) _result &= (
-            alligator_0_lips > alligator_1_lips && // Check if Lips increased.
-            alligator_0_teeth > alligator_1_teeth && // Check if Teeth increased.
-            alligator_0_jaw > alligator_1_jaw // // Check if Jaw increased.
+        _result = (alligator_0_lips > alligator_0_teeth + _level_pips &&  // Check if Lips are above Teeth ...
+                   alligator_0_teeth > alligator_0_jaw + _level_pips      // ... Teeth are above Jaw ...
+        );
+        if (_method != 0) {
+          if (METHOD(_method, 0))
+            _result &= (alligator_0_lips > alligator_1_lips &&    // Check if Lips increased.
+                        alligator_0_teeth > alligator_1_teeth &&  // Check if Teeth increased.
+                        alligator_0_jaw > alligator_1_jaw         // // Check if Jaw increased.
             );
-          if (METHOD(_signal_method, 1)) _result &= (
-            alligator_1_lips > alligator_2_lips && // Check if Lips increased.
-            alligator_1_teeth > alligator_2_teeth && // Check if Teeth increased.
-            alligator_1_jaw > alligator_2_jaw // // Check if Jaw increased.
+          if (METHOD(_method, 1))
+            _result &= (alligator_1_lips > alligator_2_lips &&    // Check if Lips increased.
+                        alligator_1_teeth > alligator_2_teeth &&  // Check if Teeth increased.
+                        alligator_1_jaw > alligator_2_jaw         // // Check if Jaw increased.
             );
-          if (METHOD(_signal_method, 2)) _result &= alligator_0_lips > alligator_2_lips; // Check if Lips increased.
-          if (METHOD(_signal_method, 3)) _result &= alligator_0_lips - alligator_0_teeth > alligator_0_teeth - alligator_0_jaw;
-          if (METHOD(_signal_method, 4)) _result &= (
-            alligator_2_lips <= alligator_2_teeth || // Check if Lips are below Teeth and ...
-            alligator_2_lips <= alligator_2_jaw || // ... Lips are below Jaw and ...
-            alligator_2_teeth <= alligator_2_jaw // ... Teeth are below Jaw ...
+          if (METHOD(_method, 2)) _result &= alligator_0_lips > alligator_2_lips;  // Check if Lips increased.
+          if (METHOD(_method, 3)) _result &= alligator_0_lips - alligator_0_teeth > alligator_0_teeth - alligator_0_jaw;
+          if (METHOD(_method, 4))
+            _result &= (alligator_2_lips <= alligator_2_teeth ||  // Check if Lips are below Teeth and ...
+                        alligator_2_lips <= alligator_2_jaw ||    // ... Lips are below Jaw and ...
+                        alligator_2_teeth <= alligator_2_jaw      // ... Teeth are below Jaw ...
             );
         }
         break;
       case ORDER_TYPE_SELL:
-        _result = (
-          alligator_0_lips + gap < alligator_0_teeth && // Check if Lips are below Teeth and ...
-          alligator_0_teeth + gap < alligator_0_jaw // ... Teeth are below Jaw ...
-          );
-        if (_signal_method != 0) {
-          if (METHOD(_signal_method, 0)) _result &= (
-            alligator_0_lips < alligator_1_lips && // Check if Lips decreased.
-            alligator_0_teeth < alligator_1_teeth && // Check if Teeth decreased.
-            alligator_0_jaw < alligator_1_jaw // // Check if Jaw decreased.
+        _result = (alligator_0_lips + _level_pips < alligator_0_teeth &&  // Check if Lips are below Teeth and ...
+                   alligator_0_teeth + _level_pips < alligator_0_jaw      // ... Teeth are below Jaw ...
+        );
+        if (_method != 0) {
+          if (METHOD(_method, 0))
+            _result &= (alligator_0_lips < alligator_1_lips &&    // Check if Lips decreased.
+                        alligator_0_teeth < alligator_1_teeth &&  // Check if Teeth decreased.
+                        alligator_0_jaw < alligator_1_jaw         // // Check if Jaw decreased.
             );
-          if (METHOD(_signal_method, 1)) _result &= (
-            alligator_1_lips < alligator_2_lips && // Check if Lips decreased.
-            alligator_1_teeth < alligator_2_teeth && // Check if Teeth decreased.
-            alligator_1_jaw < alligator_2_jaw // // Check if Jaw decreased.
+          if (METHOD(_method, 1))
+            _result &= (alligator_1_lips < alligator_2_lips &&    // Check if Lips decreased.
+                        alligator_1_teeth < alligator_2_teeth &&  // Check if Teeth decreased.
+                        alligator_1_jaw < alligator_2_jaw         // // Check if Jaw decreased.
             );
-          if (METHOD(_signal_method, 2)) _result &= alligator_0_lips < alligator_2_lips; // Check if Lips decreased.
-          if (METHOD(_signal_method, 3)) _result &= alligator_0_teeth - alligator_0_lips > alligator_0_jaw - alligator_0_teeth;
-          if (METHOD(_signal_method, 4)) _result &= (
-            alligator_2_lips >= alligator_2_teeth || // Check if Lips are above Teeth ...
-            alligator_2_lips >= alligator_2_jaw || // ... Lips are above Jaw ...
-            alligator_2_teeth >= alligator_2_jaw // ... Teeth are above Jaw ...
+          if (METHOD(_method, 2)) _result &= alligator_0_lips < alligator_2_lips;  // Check if Lips decreased.
+          if (METHOD(_method, 3)) _result &= alligator_0_teeth - alligator_0_lips > alligator_0_jaw - alligator_0_teeth;
+          if (METHOD(_method, 4))
+            _result &= (alligator_2_lips >= alligator_2_teeth ||  // Check if Lips are above Teeth ...
+                        alligator_2_lips >= alligator_2_jaw ||    // ... Lips are above Jaw ...
+                        alligator_2_teeth >= alligator_2_jaw      // ... Teeth are above Jaw ...
             );
         }
         break;
     }
-    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
     return _result;
   }
 
+  /**
+   * Check strategy's opening signal additional filter.
+   */
+  bool SignalOpenFilter(ENUM_ORDER_TYPE _cmd, int _method = 0) {
+    bool _result = true;
+    if (_method != 0) {
+      // if (METHOD(_method, 0)) _result &= Trade().IsTrend(_cmd);
+      // if (METHOD(_method, 1)) _result &= Trade().IsPivot(_cmd);
+      // if (METHOD(_method, 2)) _result &= Trade().IsPeakHours(_cmd);
+      // if (METHOD(_method, 3)) _result &= Trade().IsRoundNumber(_cmd);
+      // if (METHOD(_method, 4)) _result &= Trade().IsHedging(_cmd);
+      // if (METHOD(_method, 5)) _result &= Trade().IsPeakBar(_cmd);
+    }
+    return _result;
+  }
+
+  /**
+   * Gets strategy's lot size boost (when enabled).
+   */
+  double SignalOpenBoost(ENUM_ORDER_TYPE _cmd, int _method = 0) {
+    bool _result = 1.0;
+    if (_method != 0) {
+      // if (METHOD(_method, 0)) if (Trade().IsTrend(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 1)) if (Trade().IsPivot(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 2)) if (Trade().IsPeakHours(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 3)) if (Trade().IsRoundNumber(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 4)) if (Trade().IsHedging(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 5)) if (Trade().IsPeakBar(_cmd)) _result *= 1.1;
+    }
+    return _result;
+  }
+
+  /**
+   * Check strategy's closing signal.
+   */
+  bool SignalClose(ENUM_ORDER_TYPE _cmd, int _method = 0, double _level = 0.0) {
+    return SignalOpen(Order::NegateOrderType(_cmd), _method, _level);
+  }
+
+  /**
+   * Gets price limit value for profit take or stop loss.
+   */
+  double PriceLimit(ENUM_ORDER_TYPE _cmd, ENUM_ORDER_TYPE_VALUE _mode, int _method = 0, double _level = 0.0) {
+    double _trail = _level * Market().GetPipSize();
+    int _direction = Order::OrderDirection(_cmd) * (_mode == ORDER_TYPE_SL ? -1 : 1);
+    double _default_value = Market().GetCloseOffer(_cmd) + _trail * _method * _direction;
+    double _result = _default_value;
+    double alligator_0_jaw = ((Indi_Alligator *)this.Data()).GetValue(LINE_JAW, 0);
+    double alligator_0_teeth = ((Indi_Alligator *)this.Data()).GetValue(LINE_TEETH, 0);
+    double alligator_0_lips = ((Indi_Alligator *)this.Data()).GetValue(LINE_LIPS, 0);
+    double alligator_1_jaw = ((Indi_Alligator *)this.Data()).GetValue(LINE_JAW, 1);
+    double alligator_1_teeth = ((Indi_Alligator *)this.Data()).GetValue(LINE_TEETH, 1);
+    double alligator_1_lips = ((Indi_Alligator *)this.Data()).GetValue(LINE_LIPS, 1);
+    double alligator_2_jaw = ((Indi_Alligator *)this.Data()).GetValue(LINE_JAW, 2);
+    double alligator_2_teeth = ((Indi_Alligator *)this.Data()).GetValue(LINE_TEETH, 2);
+    double alligator_2_lips = ((Indi_Alligator *)this.Data()).GetValue(LINE_LIPS, 2);
+    switch (_method) {
+      case 0: {
+        _result = alligator_0_jaw + _trail * _direction;
+      }
+      case 1: {
+        _result = alligator_0_teeth + _trail * _direction;
+      }
+      case 2: {
+        _result = alligator_0_lips + _trail * _direction;
+      }
+      case 3: {
+        _result = alligator_1_jaw + _trail * _direction;
+      }
+      case 4: {
+        _result = alligator_1_teeth + _trail * _direction;
+      }
+      case 5: {
+        _result = alligator_1_lips + _trail * _direction;
+      }
+      case 6: {
+        _result = alligator_2_jaw + _trail * _direction;
+      }
+      case 7: {
+        _result = alligator_2_teeth + _trail * _direction;
+      }
+      case 8: {
+        _result = alligator_2_lips + _trail * _direction;
+      }
+    }
+    return _result;
+  }
 };

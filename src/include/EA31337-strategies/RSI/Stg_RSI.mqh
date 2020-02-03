@@ -6,161 +6,211 @@
 
 /**
  * @file
- * Implements RSI strategy.
+ * Implements RSI strategy based on Relative Strength Index indicator.
  */
 
 // Includes.
-#include "../../EA31337-classes/Indicators/Indi_RSI.mqh"
-#include "../../EA31337-classes/Strategy.mqh"
+#include <EA31337-classes/Indicators/Indi_RSI.mqh>
+#include <EA31337-classes/Strategy.mqh>
 
 // User input params.
-INPUT string __RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --"; // >>> RSI <<<
-INPUT uint RSI_Active_Tf = 12; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-INPUT int RSI_Period_M1 = 32; // Period for M1
-INPUT int RSI_Period_M5 = 2; // Period for M5
-INPUT int RSI_Period_M15 = 2; // Period for M15
-INPUT int RSI_Period_M30 = 2; // Period for M30
-INPUT ENUM_APPLIED_PRICE RSI_Applied_Price = 3; // Applied Price
-INPUT uint RSI_Shift = 0; // Shift
-INPUT ENUM_TRAIL_TYPE RSI_TrailingStopMethod = 6; // Trail stop method
-INPUT ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = 11; // Trail profit method
-INPUT int RSI_SignalLevel = 36; // Signal level (-49-49)
-INPUT int RSI1_SignalMethod = -63; // Signal method for M1 (-63-63)
-INPUT int RSI5_SignalMethod = -61; // Signal method for M5 (-63-63)
-INPUT int RSI15_SignalMethod = -63; // Signal method for M15 (-63-63)
-INPUT int RSI30_SignalMethod = 0; // Signal method for M30 (-63-63)
-INPUT int RSI1_OpenCondition1 = 1; // Open condition 1 for M1 (0-1023)
-INPUT int RSI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
-INPUT ENUM_MARKET_EVENT RSI1_CloseCondition = 1; // Close condition for M1
-INPUT int RSI5_OpenCondition1 = 1; // Open condition 1 for M5 (0-1023)
-INPUT int RSI5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
-INPUT ENUM_MARKET_EVENT RSI5_CloseCondition = 31; // Close condition for M5
-INPUT int RSI15_OpenCondition1 = 389; // Open condition 1 for M15 (0-1023)
-INPUT int RSI15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
-INPUT ENUM_MARKET_EVENT RSI15_CloseCondition = 1; // Close condition for M15
-INPUT int RSI30_OpenCondition1 = 195; // Open condition 1 for M30 (0-1023)
-INPUT int RSI30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
-INPUT ENUM_MARKET_EVENT RSI30_CloseCondition = 1; // Close condition for M30
-double RSI1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-double RSI5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-double RSI15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-double RSI30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+INPUT string __RSI_Parameters__ = "-- RSI strategy params --";  // >>> RSI <<<
+INPUT int RSI_Period = 2;                                       // Period
+INPUT ENUM_APPLIED_PRICE RSI_Applied_Price = 3;                 // Applied Price
+INPUT int RSI_Shift = 0;                                        // Shift
+INPUT int RSI_SignalOpenMethod = 0;                             // Signal open method (-63-63)
+INPUT double RSI_SignalOpenLevel = 36;                          // Signal open level (-49-49)
+INPUT int RSI_SignalOpenFilterMethod = 36;                          // Signal open filter method (-49-49)
+INPUT int RSI_SignalOpenBoostMethod = 36;                          // Signal open boost method (-49-49)
+INPUT int RSI_SignalCloseMethod = 0;                            // Signal close method (-63-63)
+INPUT double RSI_SignalCloseLevel = 36;                         // Signal close level (-49-49)
+INPUT int RSI_PriceLimitMethod = 0;                             // Price limit method
+INPUT double RSI_PriceLimitLevel = 0;                           // Price limit level
+INPUT double RSI_MaxSpread = 0;                                 // Max spread to trade (pips)
+
+// Struct to define strategy parameters to override.
+struct Stg_RSI_Params : Stg_Params {
+  unsigned int RSI_Period;
+  ENUM_APPLIED_PRICE RSI_Applied_Price;
+  int RSI_Shift;
+  int RSI_SignalOpenMethod;
+  double RSI_SignalOpenLevel;
+  int RSI_SignalOpenFilterMethod;
+  int RSI_SignalOpenBoostMethod;
+  int RSI_SignalCloseMethod;
+  double RSI_SignalCloseLevel;
+  int RSI_PriceLimitMethod;
+  double RSI_PriceLimitLevel;
+  double RSI_MaxSpread;
+
+  // Constructor: Set default param values.
+  Stg_RSI_Params()
+      : RSI_Period(::RSI_Period),
+        RSI_Applied_Price(::RSI_Applied_Price),
+        RSI_Shift(::RSI_Shift),
+        RSI_SignalOpenMethod(::RSI_SignalOpenMethod),
+        RSI_SignalOpenLevel(::RSI_SignalOpenLevel),
+        RSI_SignalOpenFilterMethod(::RSI_SignalOpenFilterMethod),
+        RSI_SignalOpenBoostMethod(::RSI_SignalOpenBoostMethod),
+        RSI_SignalCloseMethod(::RSI_SignalCloseMethod),
+        RSI_SignalCloseLevel(::RSI_SignalCloseLevel),
+        RSI_PriceLimitMethod(::RSI_PriceLimitMethod),
+        RSI_PriceLimitLevel(::RSI_PriceLimitLevel),
+        RSI_MaxSpread(::RSI_MaxSpread) {}
+  void Init() {}
+};
+
+// Loads pair specific param values.
+#include "sets/EURUSD_H1.h"
+#include "sets/EURUSD_H4.h"
+#include "sets/EURUSD_M1.h"
+#include "sets/EURUSD_M15.h"
+#include "sets/EURUSD_M30.h"
+#include "sets/EURUSD_M5.h"
 
 class Stg_RSI : public Strategy {
+ public:
+  Stg_RSI(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
-  public:
-
-  void Stg_RSI(StgParams &_params, string _name) : Strategy(_params, _name) {}
-
-  static Stg_RSI *Init_M1() {
-    ChartParams cparams1(PERIOD_M1);
-    IndicatorParams rsi_iparams(10, INDI_RSI);
-    RSI_Params rsi1_iparams(RSI_Period_M1, RSI_Applied_Price);
-    StgParams rsi1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_RSI(rsi1_iparams, rsi_iparams, cparams1), NULL, NULL);
-    rsi1_sparams.SetSignals(RSI1_SignalMethod, RSI1_OpenCondition1, RSI1_OpenCondition2, RSI1_CloseCondition, NULL, RSI_SignalLevel, NULL);
-    rsi1_sparams.SetStops(RSI_TrailingProfitMethod, RSI_TrailingStopMethod);
-    rsi1_sparams.SetMaxSpread(RSI1_MaxSpread);
-    rsi1_sparams.SetId(RSI1);
-    return (new Stg_RSI(rsi1_sparams, "RSI1"));
-  }
-  static Stg_RSI *Init_M5() {
-    ChartParams cparams5(PERIOD_M5);
-    IndicatorParams rsi_iparams(10, INDI_RSI);
-    RSI_Params rsi5_iparams(RSI_Period_M5, RSI_Applied_Price);
-    StgParams rsi5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_RSI(rsi5_iparams, rsi_iparams, cparams5), NULL, NULL);
-    rsi5_sparams.SetSignals(RSI5_SignalMethod, RSI5_OpenCondition1, RSI5_OpenCondition2, RSI5_CloseCondition, NULL, RSI_SignalLevel, NULL);
-    rsi5_sparams.SetStops(RSI_TrailingProfitMethod, RSI_TrailingStopMethod);
-    rsi5_sparams.SetMaxSpread(RSI5_MaxSpread);
-    rsi5_sparams.SetId(RSI5);
-    return (new Stg_RSI(rsi5_sparams, "RSI5"));
-  }
-  static Stg_RSI *Init_M15() {
-    ChartParams cparams15(PERIOD_M15);
-    IndicatorParams rsi_iparams(10, INDI_RSI);
-    RSI_Params rsi15_iparams(RSI_Period_M15, RSI_Applied_Price);
-    StgParams rsi15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_RSI(rsi15_iparams, rsi_iparams, cparams15), NULL, NULL);
-    rsi15_sparams.SetSignals(RSI15_SignalMethod, RSI15_OpenCondition1, RSI15_OpenCondition2, RSI15_CloseCondition, NULL, RSI_SignalLevel, NULL);
-    rsi15_sparams.SetStops(RSI_TrailingProfitMethod, RSI_TrailingStopMethod);
-    rsi15_sparams.SetMaxSpread(RSI15_MaxSpread);
-    rsi15_sparams.SetId(RSI15);
-    return (new Stg_RSI(rsi15_sparams, "RSI15"));
-  }
-  static Stg_RSI *Init_M30() {
-    ChartParams cparams30(PERIOD_M30);
-    IndicatorParams rsi_iparams(10, INDI_RSI);
-    RSI_Params rsi30_iparams(RSI_Period_M30, RSI_Applied_Price);
-    StgParams rsi30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_RSI(rsi30_iparams, rsi_iparams, cparams30), NULL, NULL);
-    rsi30_sparams.SetSignals(RSI30_SignalMethod, RSI30_OpenCondition1, RSI30_OpenCondition2, RSI30_CloseCondition, NULL, RSI_SignalLevel, NULL);
-    rsi30_sparams.SetStops(RSI_TrailingProfitMethod, RSI_TrailingStopMethod);
-    rsi30_sparams.SetMaxSpread(RSI30_MaxSpread);
-    rsi30_sparams.SetId(RSI30);
-    return (new Stg_RSI(rsi30_sparams, "RSI30"));
-  }
-  static Stg_RSI *Init(ENUM_TIMEFRAMES _tf) {
+  /**
+   * Initialize strategy's instance.
+   */
+  static Stg_RSI *Init(ENUM_TIMEFRAMES _tf = NULL, unsigned long _magic_no = 0, ENUM_LOG_LEVEL _log_level = V_INFO) {
+    // Initialize strategy initial values.
+    Stg_RSI_Params _params;
     switch (_tf) {
-      case PERIOD_M1:  return Init_M1();
-      case PERIOD_M5:  return Init_M5();
-      case PERIOD_M15: return Init_M15();
-      case PERIOD_M30: return Init_M30();
-      default: return NULL;
+      case PERIOD_M1: {
+        Stg_RSI_EURUSD_M1_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M5: {
+        Stg_RSI_EURUSD_M5_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M15: {
+        Stg_RSI_EURUSD_M15_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M30: {
+        Stg_RSI_EURUSD_M30_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_H1: {
+        Stg_RSI_EURUSD_H1_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_H4: {
+        Stg_RSI_EURUSD_H4_Params _new_params;
+        _params = _new_params;
+      }
     }
+    // Initialize strategy parameters.
+    ChartParams cparams(_tf);
+    RSI_Params rsi_params(_params.RSI_Period, _params.RSI_Applied_Price);
+    IndicatorParams rsi_iparams(10, INDI_RSI);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_RSI(rsi_params, rsi_iparams, cparams), NULL, NULL);
+    sparams.logger.SetLevel(_log_level);
+    sparams.SetMagicNo(_magic_no > 0 ? _magic_no : rand());
+    sparams.SetSignals(_params.RSI_SignalOpenMethod, _params.RSI_SignalOpenLevel, _params.RSI_SignalCloseMethod,
+_params.RSI_SignalOpenFilterMethod, _params.RSI_SignalOpenBoostMethod,
+                       _params.RSI_SignalCloseLevel);
+    sparams.SetPriceLimits(_params.RSI_PriceLimitMethod, _params.RSI_PriceLimitLevel);
+    sparams.SetMaxSpread(_params.RSI_MaxSpread);
+    // Initialize strategy instance.
+    Strategy *_strat = new Stg_RSI(sparams, "RSI");
+    return _strat;
   }
 
   /**
-   * Check if RSI indicator is on buy.
-   *
-   * @param
-   *   _cmd (int) - type of trade order command
-   *   _signal_method (int) - signal method to use by using bitwise AND operation
-   *   _signal_level1 - 1st signal level to consider the signal
-   *   _signal_level2 - 2nd signal level to consider the signal
-   * @result bool
-   * Returns true on signal for the given _cmd, otherwise false.
+   * Check strategy's opening signal.
    */
-  bool SignalOpen(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  bool SignalOpen(ENUM_ORDER_TYPE _cmd, int _method, double _level) {
     bool _result = false;
-    double rsi_0 = ((Indi_RSI *) this.Data()).GetValue(0);
-    double rsi_1 = ((Indi_RSI *) this.Data()).GetValue(1);
-    double rsi_2 = ((Indi_RSI *) this.Data()).GetValue(2);
-    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
+    double rsi_0 = ((Indi_RSI *)this.Data()).GetValue(0);
+    double rsi_1 = ((Indi_RSI *)this.Data()).GetValue(1);
+    double rsi_2 = ((Indi_RSI *)this.Data()).GetValue(2);
     bool is_valid = fmin(fmin(rsi_0, rsi_1), rsi_2) > 0;
     switch (_cmd) {
       case ORDER_TYPE_BUY:
-        _result = rsi_0 > 0 && rsi_0 < (50 - _signal_level1);
-        if (_result && VerboseDebug) {
-          PrintFormat("RSI %s on buy: %g < %g", this.Chart().TfToString(), rsi_0, 50 - _signal_level1);
-        }
-        if (_signal_method != 0) {
+        _result = rsi_0 > 0 && rsi_0 < (50 - _level);
+        if (_method != 0) {
           _result &= is_valid;
-          if (METHOD(_signal_method, 0)) _result &= rsi_0 < rsi_1;
-          if (METHOD(_signal_method, 1)) _result &= rsi_1 < rsi_2;
-          if (METHOD(_signal_method, 2)) _result &= rsi_1 < (50 - _signal_level1);
-          if (METHOD(_signal_method, 3)) _result &= rsi_2  < (50 - _signal_level1);
-          if (METHOD(_signal_method, 4)) _result &= rsi_0 - rsi_1 > rsi_1 - rsi_2;
-          if (METHOD(_signal_method, 5)) _result &= rsi_2 > 50;
+          if (METHOD(_method, 0)) _result &= rsi_0 < rsi_1;
+          if (METHOD(_method, 1)) _result &= rsi_1 < rsi_2;
+          if (METHOD(_method, 2)) _result &= rsi_1 < (50 - _level);
+          if (METHOD(_method, 3)) _result &= rsi_2 < (50 - _level);
+          if (METHOD(_method, 4)) _result &= rsi_0 - rsi_1 > rsi_1 - rsi_2;
+          if (METHOD(_method, 5)) _result &= rsi_2 > 50;
         }
         break;
       case ORDER_TYPE_SELL:
-        _result = rsi_0 > 0 && rsi_0 > (50 + _signal_level1);
-        if (_result && VerboseDebug) {
-          PrintFormat("RSI %s on sell: %g > %g", this.Chart().TfToString(), rsi_0, 50 + _signal_level1);
-        }
-        if (_signal_method != 0) {
+        _result = rsi_0 > 0 && rsi_0 > (50 + _level);
+        if (_method != 0) {
           _result &= is_valid;
-          if (METHOD(_signal_method, 0)) _result &= rsi_0 > rsi_1;
-          if (METHOD(_signal_method, 1)) _result &= rsi_1 > rsi_2;
-          if (METHOD(_signal_method, 2)) _result &= rsi_1 > (50 + _signal_level1);
-          if (METHOD(_signal_method, 3)) _result &= rsi_2  > (50 + _signal_level1);
-          if (METHOD(_signal_method, 4)) _result &= rsi_1 - rsi_0 > rsi_2 - rsi_1;
-          if (METHOD(_signal_method, 5)) _result &= rsi_2 < 50;
+          if (METHOD(_method, 0)) _result &= rsi_0 > rsi_1;
+          if (METHOD(_method, 1)) _result &= rsi_1 > rsi_2;
+          if (METHOD(_method, 2)) _result &= rsi_1 > (50 + _level);
+          if (METHOD(_method, 3)) _result &= rsi_2 > (50 + _level);
+          if (METHOD(_method, 4)) _result &= rsi_1 - rsi_0 > rsi_2 - rsi_1;
+          if (METHOD(_method, 5)) _result &= rsi_2 < 50;
         }
         break;
     }
-    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == _cmd;
     return _result;
   }
 
-};
+  /**
+   * Check strategy's opening signal additional filter.
+   */
+  bool SignalOpenFilter(ENUM_ORDER_TYPE _cmd, int _method = 0) {
+    bool _result = true;
+    if (_method != 0) {
+      // if (METHOD(_method, 0)) _result &= Trade().IsTrend(_cmd);
+      // if (METHOD(_method, 1)) _result &= Trade().IsPivot(_cmd);
+      // if (METHOD(_method, 2)) _result &= Trade().IsPeakHours(_cmd);
+      // if (METHOD(_method, 3)) _result &= Trade().IsRoundNumber(_cmd);
+      // if (METHOD(_method, 4)) _result &= Trade().IsHedging(_cmd);
+      // if (METHOD(_method, 5)) _result &= Trade().IsPeakBar(_cmd);
+    }
+    return _result;
+  }
 
+  /**
+   * Gets strategy's lot size boost (when enabled).
+   */
+  double SignalOpenBoost(ENUM_ORDER_TYPE _cmd, int _method = 0) {
+    bool _result = 1.0;
+    if (_method != 0) {
+      // if (METHOD(_method, 0)) if (Trade().IsTrend(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 1)) if (Trade().IsPivot(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 2)) if (Trade().IsPeakHours(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 3)) if (Trade().IsRoundNumber(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 4)) if (Trade().IsHedging(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 5)) if (Trade().IsPeakBar(_cmd)) _result *= 1.1;
+    }
+    return _result;
+  }
+
+  /**
+   * Check strategy's closing signal.
+   */
+  bool SignalClose(ENUM_ORDER_TYPE _cmd, int _method, double _level) {
+    return SignalOpen(Order::NegateOrderType(_cmd), _method, _level);
+  }
+
+  /**
+   * Gets price limit value for profit take or stop loss.
+   */
+  double PriceLimit(ENUM_ORDER_TYPE _cmd, ENUM_ORDER_TYPE_VALUE _mode, int _method = 0, double _level = 0.0) {
+    double _trail = _level * Market().GetPipSize();
+    int _direction = Order::OrderDirection(_cmd) * (_mode == ORDER_TYPE_SL ? -1 : 1);
+    double _default_value = Market().GetCloseOffer(_cmd) + _trail * _method * _direction;
+    double _result = _default_value;
+    switch (_method) {
+      case 0: {
+        // @todo
+      }
+    }
+    return _result;
+  }
+};

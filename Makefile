@@ -14,6 +14,7 @@ SHELL:=/usr/bin/env bash
 		All Lite-All Advanced-All Rider-All
 
 MTE=metaeditor64.exe
+MTV=5.0.0.2280
 SRC=src
 MQL4=$(wildcard $(SRC)/*.mq4)
 MQL5=$(wildcard $(SRC)/*.mq5)
@@ -56,7 +57,9 @@ test: requirements set-mode $(MTE)
 	wine64 $(MTE) /s /i:$(SRC) /mql5 $(MQL4)
 
 $(MTE):
-	curl -LO https://github.com/EA31337/MetaEditor/raw/master/$(MTE)
+	curl -LO https://github.com/EA31337/MT-Platforms/releases/download/$(MTV)/mt-$(MTV).zip
+	unzip mt-$(MTV).zip */$(MTE)
+	cp -v */$(MTE) .
 
 # E.g.: make set-mode MODE="__advanced__"
 set-mode:

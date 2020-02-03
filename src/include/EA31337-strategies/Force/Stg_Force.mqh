@@ -6,105 +6,117 @@
 
 /**
  * @file
- * Implements Force strategy.
+ * Implements Force strategy for the Force Index indicator.
  */
 
 // Includes.
-#include "../../EA31337-classes/Indicators/Indi_Force.mqh"
-#include "../../EA31337-classes/Strategy.mqh"
+#include <EA31337-classes/Indicators/Indi_Force.mqh>
+#include <EA31337-classes/Strategy.mqh>
 
 // User input params.
-INPUT string __Force_Parameters__ = "-- Settings for the Force Index indicator --"; // >>> FORCE <<<
-INPUT uint Force_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-INPUT ENUM_TRAIL_TYPE Force_TrailingStopMethod = 7; // Trail stop method
-INPUT ENUM_TRAIL_TYPE Force_TrailingProfitMethod = 22; // Trail profit method
-INPUT int Force_Period_M1 = 38; // Period for M1
-INPUT int Force_Period_M5 = 38; // Period for M5
-INPUT int Force_Period_M15 = 12; // Period for M15
-INPUT int Force_Period_M30 = 38; // Period for M30
-INPUT ENUM_MA_METHOD Force_MA_Method = 0; // MA Method
-INPUT ENUM_APPLIED_PRICE Force_Applied_Price = 2; // Applied Price
-INPUT double Force_SignalLevel = 0; // Signal level
-INPUT uint Force_Shift = 1; // Shift (relative to the current bar, 0 - default)
-INPUT int Force1_SignalMethod = 0; // Signal method for M1 (0-
-INPUT int Force5_SignalMethod = 0; // Signal method for M5 (0-
-INPUT int Force15_SignalMethod = 0; // Signal method for M15 (0-
-INPUT int Force30_SignalMethod = 0; // Signal method for M30 (0-
-INPUT int Force1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
-INPUT int Force1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-INPUT ENUM_MARKET_EVENT Force1_CloseCondition = 1; // Close condition for M1
-INPUT int Force5_OpenCondition1 = 680; // Open condition 1 for M5 (0-1023)
-INPUT int Force5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-INPUT ENUM_MARKET_EVENT Force5_CloseCondition = 1; // Close condition for M5
-INPUT int Force15_OpenCondition1 = 292; // Open condition 1 for M15 (0-)
-INPUT int Force15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-INPUT ENUM_MARKET_EVENT Force15_CloseCondition = 1; // Close condition for M15
-INPUT int Force30_OpenCondition1 = 777; // Open condition 1 for M30 (0-)
-INPUT int Force30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-INPUT ENUM_MARKET_EVENT Force30_CloseCondition = 1; // Close condition for M30
-INPUT double Force1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-INPUT double Force5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-INPUT double Force15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-INPUT double Force30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+INPUT string __Force_Parameters__ = "-- Force strategy params --";  // >>> FORCE <<<
+INPUT int Force_Period = 38;                                        // Period
+INPUT ENUM_MA_METHOD Force_MA_Method = 0;                           // MA Method
+INPUT ENUM_APPLIED_PRICE Force_Applied_Price = 2;                   // Applied Price
+INPUT int Force_Shift = 1;                                          // Shift (relative to the current bar, 0 - default)
+INPUT int Force_SignalOpenMethod = 0;                               // Signal open method (0-
+INPUT double Force_SignalOpenLevel = 0;                             // Signal open level
+INPUT int Force_SignalOpenFilterMethod = 0;                             // Signal open filter method
+INPUT int Force_SignalOpenBoostMethod = 0;                             // Signal open boost method
+INPUT int Force_SignalCloseMethod = 0;                              // Signal close method (0-
+INPUT double Force_SignalCloseLevel = 0;                            // Signal close level
+INPUT int Force_PriceLimitMethod = 0;                               // Price limit method
+INPUT double Force_PriceLimitLevel = 0;                             // Price limit level
+INPUT double Force_MaxSpread = 6.0;                                 // Max spread to trade (pips)
+
+// Struct to define strategy parameters to override.
+struct Stg_Force_Params : Stg_Params {
+  unsigned int Force_Period;
+  ENUM_MA_METHOD Force_MA_Method;
+  ENUM_APPLIED_PRICE Force_Applied_Price;
+  int Force_Shift;
+  int Force_SignalOpenMethod;
+  double Force_SignalOpenLevel;
+  int Force_SignalOpenFilterMethod;
+  int Force_SignalOpenBoostMethod;
+  int Force_SignalCloseMethod;
+  double Force_SignalCloseLevel;
+  int Force_PriceLimitMethod;
+  double Force_PriceLimitLevel;
+  double Force_MaxSpread;
+
+  // Constructor: Set default param values.
+  Stg_Force_Params()
+      : Force_Period(::Force_Period),
+        Force_MA_Method(::Force_MA_Method),
+        Force_Applied_Price(::Force_Applied_Price),
+        Force_Shift(::Force_Shift),
+        Force_SignalOpenMethod(::Force_SignalOpenMethod),
+        Force_SignalOpenLevel(::Force_SignalOpenLevel),
+        Force_SignalOpenFilterMethod(::Force_SignalOpenFilterMethod),
+        Force_SignalOpenBoostMethod(::Force_SignalOpenBoostMethod),
+        Force_SignalCloseMethod(::Force_SignalCloseMethod),
+        Force_SignalCloseLevel(::Force_SignalCloseLevel),
+        Force_PriceLimitMethod(::Force_PriceLimitMethod),
+        Force_PriceLimitLevel(::Force_PriceLimitLevel),
+        Force_MaxSpread(::Force_MaxSpread) {}
+};
+
+// Loads pair specific param values.
+#include "sets/EURUSD_H1.h"
+#include "sets/EURUSD_H4.h"
+#include "sets/EURUSD_M1.h"
+#include "sets/EURUSD_M15.h"
+#include "sets/EURUSD_M30.h"
+#include "sets/EURUSD_M5.h"
 
 class Stg_Force : public Strategy {
+ public:
+  Stg_Force(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
-  public:
-
-  void Stg_Force(StgParams &_params, string _name) : Strategy(_params, _name) {}
-
-  static Stg_Force *Init_M1() {
-    ChartParams cparams1(PERIOD_M1);
-    IndicatorParams force_iparams(10, INDI_FORCE);
-    Force_Params force1_iparams(Force_Period_M1, Force_MA_Method, Force_Applied_Price);
-    StgParams force1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_Force(force1_iparams, force_iparams, cparams1), NULL, NULL);
-    force1_sparams.SetSignals(Force1_SignalMethod, Force1_OpenCondition1, Force1_OpenCondition2, Force1_CloseCondition, NULL, Force_SignalLevel, NULL);
-    force1_sparams.SetStops(Force_TrailingProfitMethod, Force_TrailingStopMethod);
-    force1_sparams.SetMaxSpread(Force1_MaxSpread);
-    force1_sparams.SetId(FORCE1);
-    return (new Stg_Force(force1_sparams, "Force1"));
-  }
-  static Stg_Force *Init_M5() {
-    ChartParams cparams5(PERIOD_M5);
-    IndicatorParams force_iparams(10, INDI_FORCE);
-    Force_Params force5_iparams(Force_Period_M5, Force_MA_Method, Force_Applied_Price);
-    StgParams force5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_Force(force5_iparams, force_iparams, cparams5), NULL, NULL);
-    force5_sparams.SetSignals(Force5_SignalMethod, Force5_OpenCondition1, Force5_OpenCondition2, Force5_CloseCondition, NULL, Force_SignalLevel, NULL);
-    force5_sparams.SetStops(Force_TrailingProfitMethod, Force_TrailingStopMethod);
-    force5_sparams.SetMaxSpread(Force5_MaxSpread);
-    force5_sparams.SetId(FORCE5);
-    return (new Stg_Force(force5_sparams, "Force5"));
-  }
-  static Stg_Force *Init_M15() {
-    ChartParams cparams15(PERIOD_M15);
-    IndicatorParams force_iparams(10, INDI_FORCE);
-    Force_Params force15_iparams(Force_Period_M15, Force_MA_Method, Force_Applied_Price);
-    StgParams force15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_Force(force15_iparams, force_iparams, cparams15), NULL, NULL);
-    force15_sparams.SetSignals(Force15_SignalMethod, Force15_OpenCondition1, Force15_OpenCondition2, Force15_CloseCondition, NULL, Force_SignalLevel, NULL);
-    force15_sparams.SetStops(Force_TrailingProfitMethod, Force_TrailingStopMethod);
-    force15_sparams.SetMaxSpread(Force15_MaxSpread);
-    force15_sparams.SetId(FORCE15);
-    return (new Stg_Force(force15_sparams, "Force15"));
-  }
-  static Stg_Force *Init_M30() {
-    ChartParams cparams30(PERIOD_M30);
-    IndicatorParams force_iparams(10, INDI_FORCE);
-    Force_Params force30_iparams(Force_Period_M30, Force_MA_Method, Force_Applied_Price);
-    StgParams force30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_Force(force30_iparams, force_iparams, cparams30), NULL, NULL);
-    force30_sparams.SetSignals(Force30_SignalMethod, Force30_OpenCondition1, Force30_OpenCondition2, Force30_CloseCondition, NULL, Force_SignalLevel, NULL);
-    force30_sparams.SetStops(Force_TrailingProfitMethod, Force_TrailingStopMethod);
-    force30_sparams.SetMaxSpread(Force30_MaxSpread);
-    force30_sparams.SetId(FORCE30);
-    return (new Stg_Force(force30_sparams, "Force30"));
-  }
-  static Stg_Force *Init(ENUM_TIMEFRAMES _tf) {
+  static Stg_Force *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
+    // Initialize strategy initial values.
+    Stg_Force_Params _params;
     switch (_tf) {
-      case PERIOD_M1:  return Init_M1();
-      case PERIOD_M5:  return Init_M5();
-      case PERIOD_M15: return Init_M15();
-      case PERIOD_M30: return Init_M30();
-      default: return NULL;
+      case PERIOD_M1: {
+        Stg_Force_EURUSD_M1_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M5: {
+        Stg_Force_EURUSD_M5_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M15: {
+        Stg_Force_EURUSD_M15_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M30: {
+        Stg_Force_EURUSD_M30_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_H1: {
+        Stg_Force_EURUSD_H1_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_H4: {
+        Stg_Force_EURUSD_H4_Params _new_params;
+        _params = _new_params;
+      }
     }
+    // Initialize strategy parameters.
+    ChartParams cparams(_tf);
+    Force_Params force_params(_params.Force_Period, _params.Force_MA_Method, _params.Force_Applied_Price);
+    IndicatorParams force_iparams(10, INDI_FORCE);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_Force(force_params, force_iparams, cparams), NULL, NULL);
+    sparams.logger.SetLevel(_log_level);
+    sparams.SetMagicNo(_magic_no);
+    sparams.SetSignals(_params.Force_SignalOpenMethod, _params.Force_SignalOpenLevel, _params.Force_SignalCloseMethod,
+_params.Force_SignalOpenFilterMethod, _params.Force_SignalOpenBoostMethod,
+                       _params.Force_SignalCloseLevel);
+    sparams.SetMaxSpread(_params.Force_MaxSpread);
+    // Initialize strategy instance.
+    Strategy *_strat = new Stg_Force(sparams, "Force");
+    return _strat;
   }
 
   /**
@@ -113,31 +125,81 @@ class Stg_Force : public Strategy {
    * Note: To use the indicator it should be correlated with another trend indicator.
    *
    * @param
-   *   cmd (int) - type of trade order command
+   *   _cmd (int) - type of trade order command
    *   period (int) - period to check for
-   *   _signal_method (int) - signal method to use by using bitwise AND operation
-   *   _signal_level1 (double) - signal level to consider the signal
+   *   _method (int) - signal method to use by using bitwise AND operation
+   *   _level (double) - signal level to consider the signal
    */
-  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  bool SignalOpen(ENUM_ORDER_TYPE _cmd, int _method = 0, double _level = 0.0) {
     bool _result = false;
-    double force_0 = ((Indi_Force *) this.Data()).GetValue(0);
-    double force_1 = ((Indi_Force *) this.Data()).GetValue(1);
-    double force_2 = ((Indi_Force *) this.Data()).GetValue(2);
-    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-    switch (cmd) {
+    double force_0 = ((Indi_Force *)this.Data()).GetValue(0);
+    double force_1 = ((Indi_Force *)this.Data()).GetValue(1);
+    double force_2 = ((Indi_Force *)this.Data()).GetValue(2);
+    switch (_cmd) {
       case ORDER_TYPE_BUY:
         // FI recommends to buy (i.e. FI<0).
-        _result = force_0 < -_signal_level1;
+        _result = force_0 < -_level;
         break;
       case ORDER_TYPE_SELL:
         // FI recommends to sell (i.e. FI>0).
-        _result = force_0 > _signal_level1;
+        _result = force_0 > _level;
         break;
     }
-    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
     return _result;
   }
 
+  /**
+   * Check strategy's opening signal additional filter.
+   */
+  bool SignalOpenFilter(ENUM_ORDER_TYPE _cmd, int _method = 0) {
+    bool _result = true;
+    if (_method != 0) {
+      // if (METHOD(_method, 0)) _result &= Trade().IsTrend(_cmd);
+      // if (METHOD(_method, 1)) _result &= Trade().IsPivot(_cmd);
+      // if (METHOD(_method, 2)) _result &= Trade().IsPeakHours(_cmd);
+      // if (METHOD(_method, 3)) _result &= Trade().IsRoundNumber(_cmd);
+      // if (METHOD(_method, 4)) _result &= Trade().IsHedging(_cmd);
+      // if (METHOD(_method, 5)) _result &= Trade().IsPeakBar(_cmd);
+    }
+    return _result;
+  }
+
+  /**
+   * Gets strategy's lot size boost (when enabled).
+   */
+  double SignalOpenBoost(ENUM_ORDER_TYPE _cmd, int _method = 0) {
+    bool _result = 1.0;
+    if (_method != 0) {
+      // if (METHOD(_method, 0)) if (Trade().IsTrend(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 1)) if (Trade().IsPivot(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 2)) if (Trade().IsPeakHours(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 3)) if (Trade().IsRoundNumber(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 4)) if (Trade().IsHedging(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 5)) if (Trade().IsPeakBar(_cmd)) _result *= 1.1;
+    }
+    return _result;
+  }
+
+  /**
+   * Check strategy's closing signal.
+   */
+  bool SignalClose(ENUM_ORDER_TYPE _cmd, int _method = 0, double _level = 0.0) {
+    return SignalOpen(Order::NegateOrderType(_cmd), _method, _level);
+  }
+
+  /**
+   * Gets price limit value for profit take or stop loss.
+   */
+  double PriceLimit(ENUM_ORDER_TYPE _cmd, ENUM_ORDER_TYPE_VALUE _mode, int _method = 0, double _level = 0.0) {
+    double _trail = _level * Market().GetPipSize();
+    int _direction = Order::OrderDirection(_cmd) * (_mode == ORDER_TYPE_SL ? -1 : 1);
+    double _default_value = Market().GetCloseOffer(_cmd) + _trail * _method * _direction;
+    double _result = _default_value;
+    switch (_method) {
+      case 0: {
+        // @todo
+      }
+    }
+    return _result;
+  }
 };

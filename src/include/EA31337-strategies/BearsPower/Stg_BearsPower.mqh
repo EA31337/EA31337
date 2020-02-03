@@ -6,130 +6,186 @@
 
 /**
  * @file
- * Implements BearsPower strategy.
+ * Implements BearsPower strategy based on the Bears Power indicator.
  */
 
 // Includes.
-#include "../../EA31337-classes/Indicators/Indi_BearsPower.mqh"
-#include "../../EA31337-classes/Strategy.mqh"
+#include <EA31337-classes/Indicators/Indi_BearsPower.mqh>
+#include <EA31337-classes/Strategy.mqh>
 
 // User input params.
-string __BearsPower_Parameters__ = "-- Settings for the Bears Power indicator --"; // >>> BEARS POWER <<<
-uint BearsPower_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-ENUM_TRAIL_TYPE BearsPower_TrailingStopMethod = 22; // Trail stop method
-ENUM_TRAIL_TYPE BearsPower_TrailingProfitMethod = 1; // Trail profit method
-int BearsPower_Period = 13; // Period
-ENUM_APPLIED_PRICE BearsPower_Applied_Price = PRICE_CLOSE; // Applied Price
-double BearsPower_SignalLevel = 0.00000000; // Signal level
-uint BearsPower_Shift = 0; // Shift (relative to the current bar, 0 - default)
-int BearsPower1_SignalMethod = 0; // Signal method for M1 (0-
-int BearsPower5_SignalMethod = 0; // Signal method for M5 (0-
-int BearsPower15_SignalMethod = 0; // Signal method for M15 (0-
-int BearsPower30_SignalMethod = 0; // Signal method for M30 (0-
-int BearsPower1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
-int BearsPower1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-ENUM_MARKET_EVENT BearsPower1_CloseCondition = C_BEARSPOWER_BUY_SELL; // Close condition for M1
-int BearsPower5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
-int BearsPower5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-ENUM_MARKET_EVENT BearsPower5_CloseCondition = C_BEARSPOWER_BUY_SELL; // Close condition for M5
-int BearsPower15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
-int BearsPower15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-ENUM_MARKET_EVENT BearsPower15_CloseCondition = C_BEARSPOWER_BUY_SELL; // Close condition for M15
-int BearsPower30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
-int BearsPower30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-ENUM_MARKET_EVENT BearsPower30_CloseCondition = C_BEARSPOWER_BUY_SELL; // Close condition for M30
-double BearsPower1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
-double BearsPower5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
-double BearsPower15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
-double BearsPower30_MaxSpread = 10.0; // Max spread to trade for M30 (pips)
+INPUT string __BearsPower_Parameters__ = "-- BearsPower strategy params --";  // >>> BEARS POWER <<<
+INPUT int BearsPower_Period = 13;                                             // Period
+INPUT ENUM_APPLIED_PRICE BearsPower_Applied_Price = PRICE_CLOSE;              // Applied Price
+INPUT int BearsPower_Shift = 0;                         // Shift (relative to the current bar, 0 - default)
+INPUT int BearsPower_SignalOpenMethod = 0;              // Signal open method (0-
+INPUT double BearsPower_SignalOpenLevel = 0.00000000;   // Signal open level
+INPUT int BearsPower_SignalOpenFilterMethod = 0;   // Signal filter method
+INPUT int BearsPower_SignalOpenBoostMethod = 0;   // Signal boost method
+INPUT int BearsPower_SignalCloseMethod = 0;             // Signal close method
+INPUT double BearsPower_SignalCloseLevel = 0.00000000;  // Signal close level
+INPUT int BearsPower_PriceLimitMethod = 0;              // Price limit method
+INPUT double BearsPower_PriceLimitLevel = 0;            // Price limit level
+INPUT double BearsPower_MaxSpread = 6.0;                // Max spread to trade (pips)
+
+// Struct to define strategy parameters to override.
+struct Stg_BearsPower_Params : Stg_Params {
+  unsigned int BearsPower_Period;
+  ENUM_APPLIED_PRICE BearsPower_Applied_Price;
+  int BearsPower_Shift;
+  int BearsPower_SignalOpenMethod;
+  double BearsPower_SignalOpenLevel;
+  int BearsPower_SignalOpenFilterMethod;
+  int BearsPower_SignalOpenBoostMethod;
+  int BearsPower_SignalCloseMethod;
+  double BearsPower_SignalCloseLevel;
+  double BearsPower_PriceLimitLevel;
+  int BearsPower_PriceLimitMethod;
+  double BearsPower_MaxSpread;
+
+  // Constructor: Set default param values.
+  Stg_BearsPower_Params()
+      : BearsPower_Period(::BearsPower_Period),
+        BearsPower_Applied_Price(::BearsPower_Applied_Price),
+        BearsPower_Shift(::BearsPower_Shift),
+        BearsPower_SignalOpenMethod(::BearsPower_SignalOpenMethod),
+        BearsPower_SignalOpenLevel(::BearsPower_SignalOpenLevel),
+        BearsPower_SignalOpenFilterMethod(::BearsPower_SignalOpenFilterMethod),
+        BearsPower_SignalOpenBoostMethod(::BearsPower_SignalOpenBoostMethod),
+        BearsPower_SignalCloseMethod(::BearsPower_SignalCloseMethod),
+        BearsPower_SignalCloseLevel(::BearsPower_SignalCloseLevel),
+        BearsPower_PriceLimitMethod(::BearsPower_PriceLimitMethod),
+        BearsPower_PriceLimitLevel(::BearsPower_PriceLimitLevel),
+        BearsPower_MaxSpread(::BearsPower_MaxSpread) {}
+};
+
+// Loads pair specific param values.
+#include "sets/EURUSD_H1.h"
+#include "sets/EURUSD_H4.h"
+#include "sets/EURUSD_M1.h"
+#include "sets/EURUSD_M15.h"
+#include "sets/EURUSD_M30.h"
+#include "sets/EURUSD_M5.h"
 
 class Stg_BearsPower : public Strategy {
+ public:
+  Stg_BearsPower(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
-  public:
-
-  void Stg_BearsPower(StgParams &_params, string _name) : Strategy(_params, _name) {}
-
-  static Stg_BearsPower *Init_M1() {
-    ChartParams cparams1(PERIOD_M1);
-    IndicatorParams bearspower_iparams(10, INDI_BEARS);
-    BearsPower_Params bearspower1_iparams(BearsPower_Period, BearsPower_Applied_Price);
-    StgParams bearspower1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_BearsPower(bearspower1_iparams, bearspower_iparams, cparams1), NULL, NULL);
-    bearspower1_sparams.SetSignals(BearsPower1_SignalMethod, BearsPower1_OpenCondition1, BearsPower1_OpenCondition2, BearsPower1_CloseCondition, NULL, BearsPower_SignalLevel, NULL);
-    bearspower1_sparams.SetStops(BearsPower_TrailingProfitMethod, BearsPower_TrailingStopMethod);
-    bearspower1_sparams.SetMaxSpread(BearsPower1_MaxSpread);
-    bearspower1_sparams.SetId(BEARSPOWER1);
-    return (new Stg_BearsPower(bearspower1_sparams, "BearsPower1"));
-  }
-  static Stg_BearsPower *Init_M5() {
-    ChartParams cparams5(PERIOD_M5);
-    IndicatorParams bearspower_iparams(10, INDI_BEARS);
-    BearsPower_Params bearspower5_iparams(BearsPower_Period, BearsPower_Applied_Price);
-    StgParams bearspower5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_BearsPower(bearspower5_iparams, bearspower_iparams, cparams5), NULL, NULL);
-    bearspower5_sparams.SetSignals(BearsPower5_SignalMethod, BearsPower5_OpenCondition1, BearsPower5_OpenCondition2, BearsPower5_CloseCondition, NULL, BearsPower_SignalLevel, NULL);
-    bearspower5_sparams.SetStops(BearsPower_TrailingProfitMethod, BearsPower_TrailingStopMethod);
-    bearspower5_sparams.SetMaxSpread(BearsPower5_MaxSpread);
-    bearspower5_sparams.SetId(BEARSPOWER5);
-    return (new Stg_BearsPower(bearspower5_sparams, "BearsPower5"));
-  }
-  static Stg_BearsPower *Init_M15() {
-    ChartParams cparams15(PERIOD_M15);
-    IndicatorParams bearspower_iparams(10, INDI_BEARS);
-    BearsPower_Params bearspower15_iparams(BearsPower_Period, BearsPower_Applied_Price);
-    StgParams bearspower15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_BearsPower(bearspower15_iparams, bearspower_iparams, cparams15), NULL, NULL);
-    bearspower15_sparams.SetSignals(BearsPower15_SignalMethod, BearsPower15_OpenCondition1, BearsPower15_OpenCondition2, BearsPower15_CloseCondition, NULL, BearsPower_SignalLevel, NULL);
-    bearspower15_sparams.SetStops(BearsPower_TrailingProfitMethod, BearsPower_TrailingStopMethod);
-    bearspower15_sparams.SetMaxSpread(BearsPower15_MaxSpread);
-    bearspower15_sparams.SetId(BEARSPOWER15);
-    return (new Stg_BearsPower(bearspower15_sparams, "BearsPower15"));
-  }
-  static Stg_BearsPower *Init_M30() {
-    ChartParams cparams30(PERIOD_M30);
-    IndicatorParams bearspower_iparams(10, INDI_BEARS);
-    BearsPower_Params bearspower30_iparams(BearsPower_Period, BearsPower_Applied_Price);
-    StgParams bearspower30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_BearsPower(bearspower30_iparams, bearspower_iparams, cparams30), NULL, NULL);
-    bearspower30_sparams.SetSignals(BearsPower30_SignalMethod, BearsPower30_OpenCondition1, BearsPower30_OpenCondition2, BearsPower30_CloseCondition, NULL, BearsPower_SignalLevel, NULL);
-    bearspower30_sparams.SetStops(BearsPower_TrailingProfitMethod, BearsPower_TrailingStopMethod);
-    bearspower30_sparams.SetMaxSpread(BearsPower30_MaxSpread);
-    bearspower30_sparams.SetId(BEARSPOWER30);
-    return (new Stg_BearsPower(bearspower30_sparams, "BearsPower30"));
-  }
-  static Stg_BearsPower *Init(ENUM_TIMEFRAMES _tf) {
+  static Stg_BearsPower *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
+    // Initialize strategy initial values.
+    Stg_BearsPower_Params _params;
     switch (_tf) {
-      case PERIOD_M1:  return Init_M1();
-      case PERIOD_M5:  return Init_M5();
-      case PERIOD_M15: return Init_M15();
-      case PERIOD_M30: return Init_M30();
-      default: return NULL;
+      case PERIOD_M1: {
+        Stg_BearsPower_EURUSD_M1_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M5: {
+        Stg_BearsPower_EURUSD_M5_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M15: {
+        Stg_BearsPower_EURUSD_M15_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M30: {
+        Stg_BearsPower_EURUSD_M30_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_H1: {
+        Stg_BearsPower_EURUSD_H1_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_H4: {
+        Stg_BearsPower_EURUSD_H4_Params _new_params;
+        _params = _new_params;
+      }
     }
+    // Initialize strategy parameters.
+    ChartParams cparams(_tf);
+    BearsPower_Params bp_params(_params.BearsPower_Period, _params.BearsPower_Applied_Price);
+    IndicatorParams bp_iparams(10, INDI_BEARS);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_BearsPower(bp_params, bp_iparams, cparams), NULL, NULL);
+    sparams.logger.SetLevel(_log_level);
+    sparams.SetMagicNo(_magic_no);
+    sparams.SetSignals(_params.BearsPower_SignalOpenMethod, _params.BearsPower_SignalOpenMethod,_params.BearsPower_SignalOpenFilterMethod,_params.BearsPower_SignalOpenBoostMethod,
+                       _params.BearsPower_SignalCloseMethod, _params.BearsPower_SignalCloseMethod);
+    sparams.SetMaxSpread(_params.BearsPower_MaxSpread);
+    // Initialize strategy instance.
+    Strategy *_strat = new Stg_BearsPower(sparams, "BearsPower");
+    return _strat;
   }
 
   /**
-   * Check if BearsPower indicator is on buy or sell.
-   *
-   * @param
-   *   cmd (int) - type of trade order command
-   *   period (int) - period to check for
-   *   _signal_method (int) - signal method to use by using bitwise AND operation
-   *   _signal_level1 (double) - signal level to consider the signal
+   * Check strategy's opening signal.
    */
-  bool SignalOpen(ENUM_ORDER_TYPE cmd, long _signal_method = EMPTY, double _signal_level1 = EMPTY, double _signal_level2 = EMPTY) {
+  bool SignalOpen(ENUM_ORDER_TYPE _cmd, int _method = 0, double _level = 0.0) {
     bool _result = false;
-    double bears_0 = ((Indi_BearsPower *) this.Data()).GetValue(0);
-    double bears_1 = ((Indi_BearsPower *) this.Data()).GetValue(1);
-    double bears_2 = ((Indi_BearsPower *) this.Data()).GetValue(2);
-    if (_signal_method == EMPTY) _signal_method = GetSignalBaseMethod();
-    if (_signal_level1 == EMPTY) _signal_level1 = GetSignalLevel1();
-    if (_signal_level2 == EMPTY) _signal_level2 = GetSignalLevel2();
-    switch (cmd) {
+    double bears_0 = ((Indi_BearsPower *)this.Data()).GetValue(0);
+    double bears_1 = ((Indi_BearsPower *)this.Data()).GetValue(1);
+    double bears_2 = ((Indi_BearsPower *)this.Data()).GetValue(2);
+    switch (_cmd) {
       case ORDER_TYPE_BUY:
         // @todo
-      break;
+        break;
       case ORDER_TYPE_SELL:
         // @todo
-      break;
+        break;
     }
-    _result &= _signal_method <= 0 || Convert::ValueToOp(curr_trend) == cmd;
     return _result;
   }
 
+  /**
+   * Check strategy's opening signal additional filter.
+   */
+  bool SignalOpenFilter(ENUM_ORDER_TYPE _cmd, int _method = 0) {
+    bool _result = true;
+    if (_method != 0) {
+      // if (METHOD(_method, 0)) _result &= Trade().IsTrend(_cmd);
+      // if (METHOD(_method, 1)) _result &= Trade().IsPivot(_cmd);
+      // if (METHOD(_method, 2)) _result &= Trade().IsPeakHours(_cmd);
+      // if (METHOD(_method, 3)) _result &= Trade().IsRoundNumber(_cmd);
+      // if (METHOD(_method, 4)) _result &= Trade().IsHedging(_cmd);
+      // if (METHOD(_method, 5)) _result &= Trade().IsPeakBar(_cmd);
+    }
+    return _result;
+  }
+
+  /**
+   * Gets strategy's lot size boost (when enabled).
+   */
+  double SignalOpenBoost(ENUM_ORDER_TYPE _cmd, int _method = 0) {
+    bool _result = 1.0;
+    if (_method != 0) {
+      // if (METHOD(_method, 0)) if (Trade().IsTrend(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 1)) if (Trade().IsPivot(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 2)) if (Trade().IsPeakHours(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 3)) if (Trade().IsRoundNumber(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 4)) if (Trade().IsHedging(_cmd)) _result *= 1.1;
+      // if (METHOD(_method, 5)) if (Trade().IsPeakBar(_cmd)) _result *= 1.1;
+    }
+    return _result;
+  }
+
+  /**
+   * Check strategy's closing signal.
+   */
+  bool SignalClose(ENUM_ORDER_TYPE _cmd, int _method = 0, double _level = 0.0) {
+    return SignalOpen(Order::NegateOrderType(_cmd), _method, _level);
+  }
+
+  /**
+   * Gets price limit value for profit take or stop loss.
+   */
+  double PriceLimit(ENUM_ORDER_TYPE _cmd, ENUM_ORDER_TYPE_VALUE _mode, int _method = 0, double _level = 0.0) {
+    double _trail = _level * Market().GetPipSize();
+    int _direction = Order::OrderDirection(_cmd) * (_mode == ORDER_TYPE_SL ? -1 : 1);
+    double _default_value = Market().GetCloseOffer(_cmd) + _trail * _method * _direction;
+    double _result = _default_value;
+    switch (_method) {
+      case 0: {
+        // @todo
+      }
+    }
+    return _result;
+  }
 };
