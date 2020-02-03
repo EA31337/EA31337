@@ -4650,7 +4650,8 @@ bool TicketRemove(int ticket_no) {
 bool CheckHistory() {
   double total_profit = 0;
   int pos;
-#ifdef __profiler__ PROFILER_START
+#ifdef __profiler__
+  PROFILER_START
 #endif
   for (pos = last_history_check; pos < account.OrdersHistoryTotal(); pos++) {
     if (!Order::OrderSelect(pos, SELECT_BY_POS, MODE_HISTORY)) continue;
