@@ -9,7 +9,7 @@
 #   - Validate with `git diff --check`.
 #   - Deny applying with `git apply --whitespace=error-all`.
 #   - Fix automatically with `git apply --whitespace=fix`.
-[attr]MQLtext    text eol=lf whitespace=blank-at-eol,-blank-at-eof,-space-before-tab,tab-in-indent,tabwidth=2
+[attr]text       text eol=lf whitespace=blank-at-eol,-blank-at-eof,-space-before-tab,tab-in-indent,tabwidth=2
 [attr]utf16      working-tree-encoding=UTF-16 text diff merge eol=CRLF
 
 # Shorthand for binary files.
@@ -19,6 +19,8 @@
 
 # Define text file attributes.
 *.exe     binary
-*.h       MQLtext diff=c
-*.mq?     MQLtext diff=c
+*.h       text diff=c
+*.json    text diff=c
+*.mq?     text diff=c
 *.mqproj  utf16 diff=c
+*.txt     text diff=c
