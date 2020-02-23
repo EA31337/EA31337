@@ -19,7 +19,6 @@
 
 # Define text file attributes.
 *.exe     binary
-*.mq4     MQLtext diff=c
-*.mq5     MQLtext diff=c
-*.mqh     MQLtext diff=c
+*.h       MQLtext diff=c
+*.mq?     MQLtext diff=c
 *.mqproj  utf16 diff=c
