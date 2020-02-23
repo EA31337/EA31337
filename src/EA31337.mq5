@@ -1233,7 +1233,7 @@ bool CloseOrder(unsigned long ticket_no = NULL, int reason_id = EMPTY, ENUM_MARK
   }
   #ifdef __profiler__ PROFILER_START #endif
   double close_price = NormalizeDouble(market.GetCloseOffer(), market.GetDigits());
-  result = Order::OrderClose(ticket_no, OrderLots(), close_price, max_order_slippage, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell));
+  result = Order::OrderClose(ticket_no, Order::OrderLots(), close_price, max_order_slippage, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell));
   // if (VerboseTrace) Print(__FUNCTION__ + ": CloseOrder request. Reason: " + reason + "; Result=" + result + " @ " + TimeCurrent() + "(" + TimeToStr(TimeCurrent()) + "), ticket# " + ticket_no);
   if (result) {
     total_orders--;
@@ -1253,7 +1253,7 @@ bool CloseOrder(unsigned long ticket_no = NULL, int reason_id = EMPTY, ENUM_MARK
   } else {
     err_code = GetLastError();
     if (VerboseErrors) Print(__FUNCTION__, ": Error: Ticket: ", ticket_no, "; Error: ", terminal.GetErrorText(err_code)); // @fixme: CloseOrder: Error: Ticket: 10958; Error: Invalid ticket. OrderClose error 4108.
-    if (VerboseDebug) PrintFormat("Error: OrderClose(%d, %f, %f, %f, %d);", ticket_no, OrderLots(), close_price, max_order_slippage, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell));
+    if (VerboseDebug) PrintFormat("Error: OrderClose(%d, %f, %f, %f, %d);", ticket_no, Order::OrderLots(), close_price, max_order_slippage, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell));
     if (VerboseDebug) Print(__FUNCTION__ + ": " + GetMarketTextDetails());
     Order::OrderPrint();
     if (retry) TaskAddCloseOrder(ticket_no, reason_id); // Add task to re-try.
@@ -1320,7 +1320,7 @@ int CloseOrdersByType(ENUM_ORDER_TYPE cmd, unsigned long strategy_id, ENUM_MARKE
    Market::RefreshRates();
    for (order = 0; order < Trade::OrdersTotal(); order++) {
       if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
-        if ((int) strategy_id == GetIdByMagic() && Order::OrderSymbol() == Symbol() && (ENUM_ORDER_TYPE) OrderType() == cmd) {
+        if ((int) strategy_id == GetIdByMagic() && Order::OrderSymbol() == Symbol() && (ENUM_ORDER_TYPE) Order::OrderType() == cmd) {
           if (only_profitable && Order::GetOrderProfit() < 0) continue;
           if (CloseOrder(NULL, R_CLOSE_SIGNAL, _close_signal)) {
              orders_total++;
@@ -1700,7 +1700,7 @@ bool UpdateTrailingStops(Trade *_trade) {
    for (i = 0; i < Trade::OrdersTotal(); i++) {
      if (!Order::OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) { continue; }
       if (Order::OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
-        sid = OrderMagicNumber() - MagicNumber;
+        sid = (int) Order::OrderMagicNumber() - MagicNumber;
         // order_stop_loss = NormalizeDouble(Misc::If(Order::OrderDirection(OrderType()) > 0 || OrderStopLoss() != 0.0, OrderStopLoss(), 999999), pip_digits);
         // FIXME
         // Make sure we get the minimum distance to StopLevel and freezing distance.
@@ -1713,9 +1713,9 @@ bool UpdateTrailingStops(Trade *_trade) {
             if (!result && err_code > 0) {
              if (VerboseErrors) Print(__FUNCTION__, ": Error: OrderModify(): [MinimalizeLosses] ", Terminal::GetErrorText(err_code));
                if (VerboseDebug)
-                 Print(__FUNCTION__ + ": Error: OrderModify(", Order::OrderTicket(), ", ", Order::OrderOpenPrice(), ", ", OrderOpenPrice() - Order::OrderCommission() * Point, ", ", OrderTakeProfit(), ", ", 0, ", ", Order::GetOrderColor(EMPTY, ColorBuy, ColorSell), "); ");
+                 Print(__FUNCTION__ + ": Error: OrderModify(", Order::OrderTicket(), ", ", Order::OrderOpenPrice(), ", ", Order::OrderOpenPrice() - Order::OrderCommission() * Point, ", ", Order::OrderTakeProfit(), ", ", 0, ", ", Order::GetOrderColor(EMPTY, ColorBuy, ColorSell), "); ");
             } else {
-              if (VerboseTrace) Print(__FUNCTION__ + ": MinimalizeLosses: ", Order::OrderTypeToString((ENUM_ORDER_TYPE) OrderType()));
+              if (VerboseTrace) Print(__FUNCTION__ + ": MinimalizeLosses: ", Order::OrderTypeToString((ENUM_ORDER_TYPE) Order::OrderType()));
             }
           }
         }
@@ -1813,13 +1813,13 @@ double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_
   Chart *_chart = _strat.Chart();
   ENUM_TIMEFRAMES tf = _chart.GetTf();
   uint period = _chart.TfToIndex();
-  string symbol = existing ? OrderSymbol() : _chart.GetSymbol();
+  string symbol = existing ? Order::OrderSymbol() : _chart.GetSymbol();
   double diff;
   bool one_way; // Move trailing stop only in one mode.
   double new_value = 0;
   double extra_trail = 0;
-  if (existing && TrailingStopAddPerMinute > 0 && OrderOpenTime() > 0) {
-    double min_elapsed = (double) ((TimeCurrent() - OrderOpenTime()) / 60);
+  if (existing && TrailingStopAddPerMinute > 0 && Order::OrderOpenTime() > 0) {
+    double min_elapsed = (double) ((TimeCurrent() - Order::OrderOpenTime()) / 60);
     extra_trail =+ min_elapsed * TrailingStopAddPerMinute;
     if (VerboseDebug) {
       PrintFormat("%s:%d: extra_trail += %g * %g => %g",
@@ -1894,7 +1894,7 @@ double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_
      case T2_HALF_PEAK_OPEN:
        if (existing) {
          // Get the number of bars for the tf since open. Zero means that the order was opened during the current bar.
-         int BarShiftOfTradeOpen = iBarShift(symbol, tf, OrderOpenTime(), false);
+         int BarShiftOfTradeOpen = iBarShift(symbol, tf, Order::OrderOpenTime(), false);
          // Get the high price from the bar with the given tf index
          double highest_open = _chart.GetPeakPrice(BarShiftOfTradeOpen + 1, MODE_HIGH);
          double lowest_open = _chart.GetPeakPrice(BarShiftOfTradeOpen + 1, MODE_LOW);
@@ -2118,7 +2118,7 @@ int GetTrailingMethod(int order_type, ENUM_ORDER_PROPERTY_DOUBLE mode) {
 int GetTotalOrders(bool ours = true) {
   int order, total = 0;
   for (order = 0; order < Trade::OrdersTotal(); order++) {
-    if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol()) {
+    if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && Order::OrderSymbol() == Symbol()) {
       if (CheckOurMagicNumber()) {
         if (ours) total++;
       } else {
@@ -2192,7 +2192,7 @@ ENUM_ORDER_TYPE GetCmdByOrders() {
  * For given magic number, check if it is ours.
  */
 bool CheckOurMagicNumber(int magic_number = NULL) {
-  if (magic_number == NULL) magic_number = OrderMagicNumber();
+  if (magic_number == NULL) magic_number = (int) Order::OrderMagicNumber();
   return (magic_number >= MagicNumber && magic_number < MagicNumber + FINAL_STRATEGY_TYPE_ENTRY);
 }
 
@@ -4581,7 +4581,7 @@ void ApplyStrategyMultiplierFactor(uint period = DAILY, int direction = 0, doubl
  * Return strategy id by order magic number.
  */
 int GetIdByMagic(int magic = -1) {
-  if (magic == -1) magic = OrderMagicNumber();
+  if (magic == -1) magic = (int) Order::OrderMagicNumber();
   int id = magic - MagicNumber;
   return CheckOurMagicNumber(magic) ? id : -1;
 }
@@ -4943,7 +4943,7 @@ bool ActionCloseAllProfitableOrders(int reason_id = EMPTY){
   int order, selected_orders = 0;
   double ticket_profit = 0, total_profit = 0;
   for (order = 0; order < Trade::OrdersTotal(); order++) {
-    if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
+    if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && Order::OrderSymbol() == Symbol() && CheckOurMagicNumber())
        ticket_profit = Order::GetOrderProfit();
        if (ticket_profit > 0) {
          result = TaskAddCloseOrder(Order::OrderTicket(), reason_id);
@@ -4968,7 +4968,7 @@ bool ActionCloseAllUnprofitableOrders(int reason_id = EMPTY){
   int selected_orders = 0;
   double ticket_profit = 0, total_profit = 0;
   for (int order = 0; order < Trade::OrdersTotal(); order++) {
-    if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
+    if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && Order::OrderSymbol() == Symbol() && CheckOurMagicNumber())
        ticket_profit = Order::GetOrderProfit();
        if (ticket_profit < 0) {
          result = TaskAddCloseOrder(Order::OrderTicket(), reason_id);
@@ -4994,7 +4994,7 @@ bool ActionCloseAllOrdersByType(ENUM_ORDER_TYPE cmd = EMPTY, int reason_id = EMP
   int selected_orders = 0;
   double ticket_profit = 0, total_profit = 0;
   for (int order = 0; order < Trade::OrdersTotal(); order++) {
-    if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && CheckOurMagicNumber())
+    if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && Order::OrderSymbol() == Symbol() && CheckOurMagicNumber())
        if (Order::OrderType() == cmd) {
          TaskAddCloseOrder(Order::OrderTicket(), reason_id);
          selected_orders++;
@@ -5031,7 +5031,7 @@ int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = true) {
    int total = Trade::OrdersTotal();
    double total_profit = 0;
    for (int order = 0; order < total; order++) {
-      if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && Order::OrderTicket() > 0) {
+      if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && Order::OrderSymbol() == Symbol() && Order::OrderTicket() > 0) {
          if (only_ours && !CheckOurMagicNumber()) continue;
          total_profit += Order::GetOrderProfit();
          TaskAddCloseOrder(Order::OrderTicket(), reason_id); // Add task to re-try.
