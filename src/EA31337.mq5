@@ -2401,7 +2401,7 @@ uint GetMaxOrdersPerDay() {
   int hours_left = (24 - hour_of_day);
   int curr_allowed_limit = (int) floor((MaxOrdersPerDay - daily_orders) / hours_left);
   // Message(StringFormat("Hours left: (%d - %d) / %d= %d", MaxOrdersPerDay, daily_orders, hours_left, curr_allowed_limit));
-  return fmin(fmax((total_orders - daily_orders), 1) + curr_allowed_limit, MaxOrdersPerDay);
+  return (uint) fmin(fmax((total_orders - daily_orders), 1) + curr_allowed_limit, MaxOrdersPerDay);
 }
 #endif
 
