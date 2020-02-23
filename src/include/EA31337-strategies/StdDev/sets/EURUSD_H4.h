@@ -22,4 +22,4 @@ struct Stg_StdDev_EURUSD_H4_Params : Stg_StdDev_Params {
     StdDev_PriceLimitLevel = 0;
     StdDev_MaxSpread = 10;
   }
-};
+} stg_stddev_h4;

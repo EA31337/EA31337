@@ -22,4 +22,4 @@ struct Stg_StdDev_EURUSD_M5_Params : Stg_StdDev_Params {
     StdDev_PriceLimitLevel = 0;
     StdDev_MaxSpread = 3;
   }
-};
+} stg_stddev_m5;

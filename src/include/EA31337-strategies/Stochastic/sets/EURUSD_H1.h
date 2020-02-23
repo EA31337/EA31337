@@ -23,4 +23,4 @@ struct Stg_Stochastic_EURUSD_H1_Params : Stg_Stochastic_Params {
     Stochastic_PriceLimitLevel = 0;
     Stochastic_MaxSpread = 6;
   }
-};
+} stg_stoch_h1;

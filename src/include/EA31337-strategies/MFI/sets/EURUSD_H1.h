@@ -19,4 +19,4 @@ struct Stg_MFI_EURUSD_H1_Params : Stg_MFI_Params {
     MFI_PriceLimitLevel = 0;
     MFI_MaxSpread = 6;
   }
-};
+} stg_mfi_h1;

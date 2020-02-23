@@ -21,4 +21,4 @@ struct Stg_ZigZag_EURUSD_H1_Params : Stg_ZigZag_Params {
     ZigZag_PriceLimitLevel = 0;
     ZigZag_MaxSpread = 6;
   }
-};
+} stg_zigzag_h1;

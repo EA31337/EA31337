@@ -20,8 +20,8 @@ INPUT ENUM_APPLIED_PRICE BullsPower_Applied_Price = PRICE_CLOSE;              //
 INPUT int BullsPower_Shift = 0;                         // Shift (relative to the current bar, 0 - default)
 INPUT int BullsPower_SignalOpenMethod = 0;              // Signal open method (0-
 INPUT double BullsPower_SignalOpenLevel = 0.00000000;   // Signal open level
-INPUT int BullsPower_SignalOpenFilterMethod = 0;   // Signal filter method
-INPUT int BullsPower_SignalOpenBoostMethod = 0;   // Signal boost method
+INPUT int BullsPower_SignalOpenFilterMethod = 0;        // Signal filter method
+INPUT int BullsPower_SignalOpenBoostMethod = 0;         // Signal boost method
 INPUT int BullsPower_SignalCloseMethod = 0;             // Signal close method
 INPUT double BullsPower_SignalCloseLevel = 0.00000000;  // Signal close level
 INPUT int BullsPower_PriceLimitMethod = 0;              // Price limit method
@@ -74,31 +74,9 @@ class Stg_BullsPower : public Strategy {
   static Stg_BullsPower *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
     Stg_BullsPower_Params _params;
-    switch (_tf) {
-      case PERIOD_M1: {
-        Stg_BullsPower_EURUSD_M1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M5: {
-        Stg_BullsPower_EURUSD_M5_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M15: {
-        Stg_BullsPower_EURUSD_M15_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M30: {
-        Stg_BullsPower_EURUSD_M30_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H1: {
-        Stg_BullsPower_EURUSD_H1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H4: {
-        Stg_BullsPower_EURUSD_H4_Params _new_params;
-        _params = _new_params;
-      }
+    if (!Terminal::IsOptimization()) {
+      SetParamsByTf<Stg_BullsPower_Params>(_params, _tf, stg_bulls_m1, stg_bulls_m5, stg_bulls_m15, stg_bulls_m30,
+                                           stg_bulls_h1, stg_bulls_h4, stg_bulls_h4);
     }
     // Initialize strategy parameters.
     ChartParams cparams(_tf);
@@ -107,7 +85,8 @@ class Stg_BullsPower : public Strategy {
     StgParams sparams(new Trade(_tf, _Symbol), new Indi_BullsPower(bp_params, bp_iparams, cparams), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
-    sparams.SetSignals(_params.BullsPower_SignalOpenMethod, _params.BullsPower_SignalOpenMethod,_params.BullsPower_SignalOpenFilterMethod,_params.BullsPower_SignalOpenBoostMethod,
+    sparams.SetSignals(_params.BullsPower_SignalOpenMethod, _params.BullsPower_SignalOpenMethod,
+                       _params.BullsPower_SignalOpenFilterMethod, _params.BullsPower_SignalOpenBoostMethod,
                        _params.BullsPower_SignalCloseMethod, _params.BullsPower_SignalCloseMethod);
     sparams.SetMaxSpread(_params.BullsPower_MaxSpread);
     // Initialize strategy instance.
@@ -165,7 +144,6 @@ class Stg_BullsPower : public Strategy {
     }
     return _result;
   }
-
 
   /**
    * Check strategy's closing signal.

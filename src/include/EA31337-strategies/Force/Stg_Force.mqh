@@ -21,8 +21,8 @@ INPUT ENUM_APPLIED_PRICE Force_Applied_Price = 2;                   // Applied P
 INPUT int Force_Shift = 1;                                          // Shift (relative to the current bar, 0 - default)
 INPUT int Force_SignalOpenMethod = 0;                               // Signal open method (0-
 INPUT double Force_SignalOpenLevel = 0;                             // Signal open level
-INPUT int Force_SignalOpenFilterMethod = 0;                             // Signal open filter method
-INPUT int Force_SignalOpenBoostMethod = 0;                             // Signal open boost method
+INPUT int Force_SignalOpenFilterMethod = 0;                         // Signal open filter method
+INPUT int Force_SignalOpenBoostMethod = 0;                          // Signal open boost method
 INPUT int Force_SignalCloseMethod = 0;                              // Signal close method (0-
 INPUT double Force_SignalCloseLevel = 0;                            // Signal close level
 INPUT int Force_PriceLimitMethod = 0;                               // Price limit method
@@ -77,31 +77,9 @@ class Stg_Force : public Strategy {
   static Stg_Force *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
     Stg_Force_Params _params;
-    switch (_tf) {
-      case PERIOD_M1: {
-        Stg_Force_EURUSD_M1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M5: {
-        Stg_Force_EURUSD_M5_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M15: {
-        Stg_Force_EURUSD_M15_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M30: {
-        Stg_Force_EURUSD_M30_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H1: {
-        Stg_Force_EURUSD_H1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H4: {
-        Stg_Force_EURUSD_H4_Params _new_params;
-        _params = _new_params;
-      }
+    if (!Terminal::IsOptimization()) {
+      SetParamsByTf<Stg_Force_Params>(_params, _tf, stg_force_m1, stg_force_m5, stg_force_m15, stg_force_m30,
+                                      stg_force_h1, stg_force_h4, stg_force_h4);
     }
     // Initialize strategy parameters.
     ChartParams cparams(_tf);
@@ -111,7 +89,7 @@ class Stg_Force : public Strategy {
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.Force_SignalOpenMethod, _params.Force_SignalOpenLevel, _params.Force_SignalCloseMethod,
-_params.Force_SignalOpenFilterMethod, _params.Force_SignalOpenBoostMethod,
+                       _params.Force_SignalOpenFilterMethod, _params.Force_SignalOpenBoostMethod,
                        _params.Force_SignalCloseLevel);
     sparams.SetMaxSpread(_params.Force_MaxSpread);
     // Initialize strategy instance.

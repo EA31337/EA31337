@@ -18,9 +18,9 @@ INPUT string __WPR_Parameters__ = "-- WPR strategy params --";  // >>> WPR <<<
 INPUT int WPR_Period = 11;                                      // Period
 INPUT int WPR_Shift = 0;                                        // Shift
 INPUT int WPR_SignalOpenMethod = -46;                           // Signal open method (-63-63)
-INPUT double WPR_SignalOpenLevel = 20;                             // Signal open level
-INPUT int WPR_SignalOpenFilterMethod = 20;                             // Signal open filter method
-INPUT int WPR_SignalOpenBoostMethod = 20;                             // Signal open boost method
+INPUT double WPR_SignalOpenLevel = 20;                          // Signal open level
+INPUT int WPR_SignalOpenFilterMethod = 20;                      // Signal open filter method
+INPUT int WPR_SignalOpenBoostMethod = 20;                       // Signal open boost method
 INPUT int WPR_SignalCloseMethod = -46;                          // Signal close method (-63-63)
 INPUT int WPR_SignalCloseLevel = 20;                            // Signal close level
 INPUT int WPR_PriceLimitMethod = 0;                             // Price limit method
@@ -71,31 +71,9 @@ class Stg_WPR : public Strategy {
   static Stg_WPR *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
     Stg_WPR_Params _params;
-    switch (_tf) {
-      case PERIOD_M1: {
-        Stg_WPR_EURUSD_M1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M5: {
-        Stg_WPR_EURUSD_M5_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M15: {
-        Stg_WPR_EURUSD_M15_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M30: {
-        Stg_WPR_EURUSD_M30_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H1: {
-        Stg_WPR_EURUSD_H1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H4: {
-        Stg_WPR_EURUSD_H4_Params _new_params;
-        _params = _new_params;
-      }
+    if (!Terminal::IsOptimization()) {
+      SetParamsByTf<Stg_WPR_Params>(_params, _tf, stg_wpr_m1, stg_wpr_m5, stg_wpr_m15, stg_wpr_m30, stg_wpr_h1,
+                                    stg_wpr_h4, stg_wpr_h4);
     }
     // Initialize strategy parameters.
     ChartParams cparams(_tf);
@@ -105,7 +83,7 @@ class Stg_WPR : public Strategy {
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.WPR_SignalOpenMethod, _params.WPR_SignalOpenLevel, _params.WPR_SignalCloseMethod,
-_params.WPR_SignalOpenFilterMethod, _params.WPR_SignalOpenBoostMethod,
+                       _params.WPR_SignalOpenFilterMethod, _params.WPR_SignalOpenBoostMethod,
                        _params.WPR_SignalCloseLevel);
     sparams.SetMaxSpread(_params.WPR_MaxSpread);
     // Initialize strategy instance.

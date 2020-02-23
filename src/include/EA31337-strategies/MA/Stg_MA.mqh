@@ -22,7 +22,7 @@ ENUM_APPLIED_PRICE MA_Applied_Price = 6;                // Applied Price
 int MA_Shift = 0;                                       // Shift
 int MA_SignalOpenMethod = 48;                           // Signal open method (-127-127)
 double MA_SignalOpenLevel = -0.6;                       // Signal open level
-int MA_SignalOpenFilterMethod = 0;                       // Signal open filter method
+int MA_SignalOpenFilterMethod = 0;                      // Signal open filter method
 int MA_SignalOpenBoostMethod = 0;                       // Signal open boost method
 int MA_SignalCloseMethod = 48;                          // Signal close method (-127-127)
 double MA_SignalCloseLevel = -0.6;                      // Signal close level
@@ -80,31 +80,9 @@ class Stg_MA : public Strategy {
   static Stg_MA *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
     Stg_MA_Params _params;
-    switch (_tf) {
-      case PERIOD_M1: {
-        Stg_MA_EURUSD_M1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M5: {
-        Stg_MA_EURUSD_M5_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M15: {
-        Stg_MA_EURUSD_M15_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M30: {
-        Stg_MA_EURUSD_M30_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H1: {
-        Stg_MA_EURUSD_H1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H4: {
-        Stg_MA_EURUSD_H4_Params _new_params;
-        _params = _new_params;
-      }
+    if (!Terminal::IsOptimization()) {
+      SetParamsByTf<Stg_MA_Params>(_params, _tf, stg_ma_m1, stg_ma_m5, stg_ma_m15, stg_ma_m30, stg_ma_h1, stg_ma_h4,
+                                   stg_ma_h4);
     }
     // Initialize strategy parameters.
     ChartParams cparams(_tf);
@@ -114,7 +92,7 @@ class Stg_MA : public Strategy {
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.MA_SignalOpenMethod, _params.MA_SignalOpenLevel, _params.MA_SignalCloseMethod,
-_params.MA_SignalOpenFilterMethod, _params.MA_SignalOpenBoostMethod,
+                       _params.MA_SignalOpenFilterMethod, _params.MA_SignalOpenBoostMethod,
                        _params.MA_SignalCloseLevel);
     sparams.SetMaxSpread(_params.MA_MaxSpread);
     // Initialize strategy instance.
@@ -131,36 +109,36 @@ _params.MA_SignalOpenFilterMethod, _params.MA_SignalOpenBoostMethod,
     double ma_1 = ((Indi_MA *)Data()).GetValue(1);
     double ma_2 = ((Indi_MA *)Data()).GetValue(2);
     double gap = _level * Market().GetPipSize();
-/*
-    switch (_cmd) {
-      case ORDER_TYPE_BUY:
-        _result = ma_0_fast > ma_0_medium + gap;
-        _result &= ma_0_medium > ma_0_slow;
-        if (_method != 0) {
-          if (METHOD(_method, 0)) _result &= ma_0_fast > ma_0_slow + gap;
-          if (METHOD(_method, 1)) _result &= ma_0_medium > ma_0_slow;
-          if (METHOD(_method, 2)) _result &= ma_0_slow > ma_1_slow;
-          if (METHOD(_method, 3)) _result &= ma_0_fast > ma_1_fast;
-          if (METHOD(_method, 4)) _result &= ma_0_fast - ma_0_medium > ma_0_medium - ma_0_slow;
-          if (METHOD(_method, 5)) _result &= (ma_1_medium < ma_1_slow || ma_2_medium < ma_2_slow);
-          if (METHOD(_method, 6)) _result &= (ma_1_fast < ma_1_medium || ma_2_fast < ma_2_medium);
+    /*
+        switch (_cmd) {
+          case ORDER_TYPE_BUY:
+            _result = ma_0_fast > ma_0_medium + gap;
+            _result &= ma_0_medium > ma_0_slow;
+            if (_method != 0) {
+              if (METHOD(_method, 0)) _result &= ma_0_fast > ma_0_slow + gap;
+              if (METHOD(_method, 1)) _result &= ma_0_medium > ma_0_slow;
+              if (METHOD(_method, 2)) _result &= ma_0_slow > ma_1_slow;
+              if (METHOD(_method, 3)) _result &= ma_0_fast > ma_1_fast;
+              if (METHOD(_method, 4)) _result &= ma_0_fast - ma_0_medium > ma_0_medium - ma_0_slow;
+              if (METHOD(_method, 5)) _result &= (ma_1_medium < ma_1_slow || ma_2_medium < ma_2_slow);
+              if (METHOD(_method, 6)) _result &= (ma_1_fast < ma_1_medium || ma_2_fast < ma_2_medium);
+            }
+            break;
+          case ORDER_TYPE_SELL:
+            _result = ma_0_fast < ma_0_medium - gap;
+            _result &= ma_0_medium < ma_0_slow;
+            if (_method != 0) {
+              if (METHOD(_method, 0)) _result &= ma_0_fast < ma_0_slow - gap;
+              if (METHOD(_method, 1)) _result &= ma_0_medium < ma_0_slow;
+              if (METHOD(_method, 2)) _result &= ma_0_slow < ma_1_slow;
+              if (METHOD(_method, 3)) _result &= ma_0_fast < ma_1_fast;
+              if (METHOD(_method, 4)) _result &= ma_0_medium - ma_0_fast > ma_0_slow - ma_0_medium;
+              if (METHOD(_method, 5)) _result &= (ma_1_medium > ma_1_slow || ma_2_medium > ma_2_slow);
+              if (METHOD(_method, 6)) _result &= (ma_1_fast > ma_1_medium || ma_2_fast > ma_2_medium);
+            }
+            break;
         }
-        break;
-      case ORDER_TYPE_SELL:
-        _result = ma_0_fast < ma_0_medium - gap;
-        _result &= ma_0_medium < ma_0_slow;
-        if (_method != 0) {
-          if (METHOD(_method, 0)) _result &= ma_0_fast < ma_0_slow - gap;
-          if (METHOD(_method, 1)) _result &= ma_0_medium < ma_0_slow;
-          if (METHOD(_method, 2)) _result &= ma_0_slow < ma_1_slow;
-          if (METHOD(_method, 3)) _result &= ma_0_fast < ma_1_fast;
-          if (METHOD(_method, 4)) _result &= ma_0_medium - ma_0_fast > ma_0_slow - ma_0_medium;
-          if (METHOD(_method, 5)) _result &= (ma_1_medium > ma_1_slow || ma_2_medium > ma_2_slow);
-          if (METHOD(_method, 6)) _result &= (ma_1_fast > ma_1_medium || ma_2_fast > ma_2_medium);
-        }
-        break;
-    }
-*/
+    */
     return _result;
   }
 

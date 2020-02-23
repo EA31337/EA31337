@@ -19,4 +19,4 @@ struct Stg_WPR_EURUSD_H4_Params : Stg_WPR_Params {
     WPR_PriceLimitLevel = 0;
     WPR_MaxSpread = 10;
   }
-};
+} stg_wpr_h4;

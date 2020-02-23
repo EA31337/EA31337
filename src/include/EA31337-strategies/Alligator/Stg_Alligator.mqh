@@ -26,8 +26,8 @@ INPUT ENUM_APPLIED_PRICE Alligator_Applied_Price = 4;                       // A
 INPUT int Alligator_Shift = 2;                                              // Shift
 INPUT int Alligator_SignalOpenMethod = 0;                                   // Signal open method (-63-63)
 INPUT double Alligator_SignalOpenLevel = 36;                                // Signal open level (-49-49)
-INPUT int Alligator_SignalOpenFilterMethod = 36;                         // Signal open filter method
-INPUT int Alligator_SignalOpenBoostMethod = 36;                          // Signal open filter method
+INPUT int Alligator_SignalOpenFilterMethod = 36;                            // Signal open filter method
+INPUT int Alligator_SignalOpenBoostMethod = 36;                             // Signal open filter method
 INPUT int Alligator_SignalCloseMethod = 0;                                  // Signal close method (-63-63)
 INPUT double Alligator_SignalCloseLevel = 36;                               // Signal close level (-49-49)
 INPUT int Alligator_PriceLimitMethod = 0;                                   // Price limit method
@@ -93,31 +93,9 @@ class Stg_Alligator : public Strategy {
   static Stg_Alligator *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
     Stg_Alligator_Params _params;
-    switch (_tf) {
-      case PERIOD_M1: {
-        Stg_Alligator_EURUSD_M1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M5: {
-        Stg_Alligator_EURUSD_M5_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M15: {
-        Stg_Alligator_EURUSD_M15_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M30: {
-        Stg_Alligator_EURUSD_M30_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H1: {
-        Stg_Alligator_EURUSD_H1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H4: {
-        Stg_Alligator_EURUSD_H4_Params _new_params;
-        _params = _new_params;
-      }
+    if (!Terminal::IsOptimization()) {
+      SetParamsByTf<Stg_Alligator_Params>(_params, _tf, stg_alli_m1, stg_alli_m5, stg_alli_m15, stg_alli_m30,
+                                          stg_alli_h1, stg_alli_h4, stg_alli_h4);
     }
     // Initialize strategy parameters.
     ChartParams cparams(_tf);

@@ -21,4 +21,4 @@ struct Stg_Force_EURUSD_M15_Params : Stg_Force_Params {
     Force_PriceLimitLevel = 0;
     Force_MaxSpread = 4;
   }
-};
+} stg_force_m15;

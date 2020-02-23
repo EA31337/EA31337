@@ -22,4 +22,4 @@ struct Stg_Bands_EURUSD_M15_Params : Stg_Bands_Params {
     Bands_PriceLimitLevel = 0;
     Bands_MaxSpread = 4;
   }
-};
+} stg_bands_m15;

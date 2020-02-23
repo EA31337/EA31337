@@ -20,4 +20,4 @@ struct Stg_ATR_EURUSD_M1_Params : Stg_ATR_Params {
     ATR_PriceLimitLevel = 0;
     ATR_MaxSpread = 0;
   }
-};
+} stg_atr_m1;

@@ -20,4 +20,4 @@ struct Stg_RSI_EURUSD_H4_Params : Stg_RSI_Params {
     RSI_PriceLimitLevel = 0;
     RSI_MaxSpread = 10;
   }
-};
+} stg_rsi_h4;

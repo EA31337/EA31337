@@ -19,4 +19,4 @@ struct Stg_DeMarker_EURUSD_M30_Params : Stg_DeMarker_Params {
     DeMarker_PriceLimitLevel = 0;
     DeMarker_MaxSpread = 5;
   }
-};
+} stg_dm_m30;

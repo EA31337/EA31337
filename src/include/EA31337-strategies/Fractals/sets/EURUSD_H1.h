@@ -18,4 +18,4 @@ struct Stg_Fractals_EURUSD_H1_Params : Stg_Fractals_Params {
     Fractals_PriceLimitLevel = 0;
     Fractals_MaxSpread = 6;
   }
-};
+} stg_fractals_h1;

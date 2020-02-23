@@ -22,4 +22,4 @@ struct Stg_MA_EURUSD_H4_Params : Stg_MA_Params {
     MA_PriceLimitLevel = 0;
     MA_MaxSpread = 10;
   }
-};
+} stg_ma_h4;

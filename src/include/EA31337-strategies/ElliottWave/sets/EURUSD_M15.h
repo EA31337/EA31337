@@ -20,4 +20,4 @@ struct Stg_ElliottWave_EURUSD_M15_Params : Stg_ElliottWave_Params {
     ElliottWave_PriceLimitLevel = 0;
     ElliottWave_MaxSpread = 4;
   }
-};
+} stg_elli_m15;

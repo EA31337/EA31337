@@ -20,4 +20,4 @@ struct Stg_BearsPower_EURUSD_H1_Params : Stg_BearsPower_Params {
     BearsPower_PriceLimitLevel = 0;
     BearsPower_MaxSpread = 0;
   }
-};
+} stg_bears_h1;

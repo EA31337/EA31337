@@ -20,4 +20,4 @@ struct Stg_BullsPower_EURUSD_M1_Params : Stg_BullsPower_Params {
     BullsPower_PriceLimitLevel = 0;
     BullsPower_MaxSpread = 0;
   }
-};
+} stg_bulls_m1;

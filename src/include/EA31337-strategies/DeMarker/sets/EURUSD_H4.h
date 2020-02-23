@@ -19,4 +19,4 @@ struct Stg_DeMarker_EURUSD_H4_Params : Stg_DeMarker_Params {
     DeMarker_PriceLimitLevel = 0;
     DeMarker_MaxSpread = 10;
   }
-};
+} stg_dm_h4;

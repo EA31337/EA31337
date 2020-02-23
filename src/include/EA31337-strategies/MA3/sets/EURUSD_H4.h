@@ -24,4 +24,4 @@ struct Stg_MA3_EURUSD_H4_Params : Stg_MA3_Params {
     MA3_PriceLimitLevel = 0;
     MA3_MaxSpread = 10;
   }
-};
+} stg_ma3_h4;

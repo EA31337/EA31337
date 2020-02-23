@@ -22,8 +22,8 @@ INPUT ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_CLOSE;        // Applied Pri
 INPUT int MACD_Shift = 3;                                         // Shift
 INPUT int MACD_SignalOpenMethod = -26;                            // Signal open method (-31-31)
 INPUT double MACD_SignalOpenLevel = 0.1;                          // Signal open level
-INPUT int MACD_SignalOpenFilterMethod = 0;                          // Signal open filter method
-INPUT int MACD_SignalOpenBoostMethod = 0;                          // Signal open boost method
+INPUT int MACD_SignalOpenFilterMethod = 0;                        // Signal open filter method
+INPUT int MACD_SignalOpenBoostMethod = 0;                         // Signal open boost method
 INPUT int MACD_SignalCloseMethod = -26;                           // Signal close method (-31-31)
 INPUT double MACD_SignalCloseLevel = 0.1;                         // Signal close level
 INPUT int MACD_PriceLimitMethod = 0;                              // Price limit method
@@ -80,31 +80,9 @@ class Stg_MACD : public Strategy {
   static Stg_MACD *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
     Stg_MACD_Params _params;
-    switch (_tf) {
-      case PERIOD_M1: {
-        Stg_MACD_EURUSD_M1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M5: {
-        Stg_MACD_EURUSD_M5_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M15: {
-        Stg_MACD_EURUSD_M15_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M30: {
-        Stg_MACD_EURUSD_M30_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H1: {
-        Stg_MACD_EURUSD_H1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H4: {
-        Stg_MACD_EURUSD_H4_Params _new_params;
-        _params = _new_params;
-      }
+    if (!Terminal::IsOptimization()) {
+      SetParamsByTf<Stg_MACD_Params>(_params, _tf, stg_macd_m1, stg_macd_m5, stg_macd_m15, stg_macd_m30, stg_macd_h1,
+                                     stg_macd_h4, stg_macd_h4);
     }
     // Initialize strategy parameters.
     ChartParams cparams(_tf);
@@ -115,7 +93,7 @@ class Stg_MACD : public Strategy {
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.MACD_SignalOpenMethod, _params.MACD_SignalOpenLevel, _params.MACD_SignalCloseMethod,
-_params.MACD_SignalOpenFilterMethod, _params.MACD_SignalOpenBoostMethod,
+                       _params.MACD_SignalOpenFilterMethod, _params.MACD_SignalOpenBoostMethod,
                        _params.MACD_SignalCloseLevel);
     sparams.SetMaxSpread(_params.MACD_MaxSpread);
     // Initialize strategy instance.

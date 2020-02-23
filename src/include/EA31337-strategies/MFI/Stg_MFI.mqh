@@ -19,8 +19,8 @@ INPUT int MFI_Period = 2;                                       // Period
 INPUT int MFI_Shift = 0;                                        // Shift (relative to the current bar, 0 - default)
 INPUT int MFI_SignalOpenMethod = 0;                             // Signal open method (0-1)
 INPUT double MFI_SignalOpenLevel = 0.9;                         // Signal open level
-INPUT int MFI_SignalOpenFilterMethod = 0;                         // Signal open filter method
-INPUT int MFI_SignalOpenBoostMethod = 0;                         // Signal open boost method
+INPUT int MFI_SignalOpenFilterMethod = 0;                       // Signal open filter method
+INPUT int MFI_SignalOpenBoostMethod = 0;                        // Signal open boost method
 INPUT int MFI_SignalCloseMethod = 0;                            // Signal close method (0-1)
 INPUT double MFI_SignalCloseLevel = 0.9;                        // Signal close level
 INPUT int MFI_PriceLimitMethod = 0;                             // Price limit method
@@ -71,31 +71,9 @@ class Stg_MFI : public Strategy {
   static Stg_MFI *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
     Stg_MFI_Params _params;
-    switch (_tf) {
-      case PERIOD_M1: {
-        Stg_MFI_EURUSD_M1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M5: {
-        Stg_MFI_EURUSD_M5_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M15: {
-        Stg_MFI_EURUSD_M15_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M30: {
-        Stg_MFI_EURUSD_M30_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H1: {
-        Stg_MFI_EURUSD_H1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H4: {
-        Stg_MFI_EURUSD_H4_Params _new_params;
-        _params = _new_params;
-      }
+    if (!Terminal::IsOptimization()) {
+      SetParamsByTf<Stg_MFI_Params>(_params, _tf, stg_mfi_m1, stg_mfi_m5, stg_mfi_m15, stg_mfi_m30, stg_mfi_h1,
+                                    stg_mfi_h4, stg_mfi_h4);
     }
     // Initialize strategy parameters.
     ChartParams cparams(_tf);
@@ -105,7 +83,7 @@ class Stg_MFI : public Strategy {
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.MFI_SignalOpenMethod, _params.MFI_SignalOpenLevel, _params.MFI_SignalCloseMethod,
-_params.MFI_SignalOpenFilterMethod, _params.MFI_SignalOpenBoostMethod,
+                       _params.MFI_SignalOpenFilterMethod, _params.MFI_SignalOpenBoostMethod,
                        _params.MFI_SignalCloseLevel);
     sparams.SetMaxSpread(_params.MFI_MaxSpread);
     // Initialize strategy instance.

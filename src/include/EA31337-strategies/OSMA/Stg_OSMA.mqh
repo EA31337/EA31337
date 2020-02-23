@@ -22,7 +22,7 @@ INPUT ENUM_APPLIED_PRICE OsMA_Applied_Price = 4;                  // Applied Pri
 INPUT int OsMA_Shift = 0;                                         // Shift
 INPUT int OsMA_SignalOpenMethod = 120;                            // Signal open method (0-
 INPUT double OsMA_SignalOpenLevel = -0.2;                         // Signal open level
-INPUT int OsMA_SignalOpenFilterMethod = 0;                         // Signal open filter method
+INPUT int OsMA_SignalOpenFilterMethod = 0;                        // Signal open filter method
 INPUT int OsMA_SignalOpenBoostMethod = 0;                         // Signal open boost method
 INPUT int OsMA_SignalCloseMethod = 120;                           // Signal close method (0-
 INPUT double OsMA_SignalCloseLevel = -0.2;                        // Signal close level
@@ -80,31 +80,9 @@ class Stg_OsMA : public Strategy {
   static Stg_OsMA *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
     Stg_OsMA_Params _params;
-    switch (_tf) {
-      case PERIOD_M1: {
-        Stg_OsMA_EURUSD_M1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M5: {
-        Stg_OsMA_EURUSD_M5_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M15: {
-        Stg_OsMA_EURUSD_M15_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M30: {
-        Stg_OsMA_EURUSD_M30_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H1: {
-        Stg_OsMA_EURUSD_H1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H4: {
-        Stg_OsMA_EURUSD_H4_Params _new_params;
-        _params = _new_params;
-      }
+    if (!Terminal::IsOptimization()) {
+      SetParamsByTf<Stg_OsMA_Params>(_params, _tf, stg_osma_m1, stg_osma_m5, stg_osma_m15, stg_osma_m30, stg_osma_h1,
+                                     stg_osma_h4, stg_osma_h4);
     }
     // Initialize strategy parameters.
     ChartParams cparams(_tf);
@@ -115,7 +93,7 @@ class Stg_OsMA : public Strategy {
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.OsMA_SignalOpenMethod, _params.OsMA_SignalOpenLevel, _params.OsMA_SignalCloseMethod,
-_params.OsMA_SignalOpenFilterMethod, _params.OsMA_SignalOpenBoostMethod,
+                       _params.OsMA_SignalOpenFilterMethod, _params.OsMA_SignalOpenBoostMethod,
                        _params.OsMA_SignalCloseLevel);
     sparams.SetMaxSpread(_params.OsMA_MaxSpread);
     // Initialize strategy instance.

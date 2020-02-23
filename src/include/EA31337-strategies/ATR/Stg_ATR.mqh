@@ -19,8 +19,8 @@ INPUT int ATR_Period = 14;                                      // Period
 INPUT int ATR_Shift = 0;                                        // Shift (relative to the current bar, 0 - default)
 INPUT int ATR_SignalOpenMethod = 0;                             // Signal open method (0-31)
 INPUT double ATR_SignalOpenLevel = 0;                           // Signal open level
-INPUT int ATR_SignalOpenFilterMethod = 0;                           // Signal open filter method
-INPUT int ATR_SignalOpenBoostMethod = 0;                           // Signal open boost method
+INPUT int ATR_SignalOpenFilterMethod = 0;                       // Signal open filter method
+INPUT int ATR_SignalOpenBoostMethod = 0;                        // Signal open boost method
 INPUT int ATR_SignalCloseMethod = 0;                            // Signal close method
 INPUT double ATR_SignalCloseLevel = 0;                          // Signal close level
 INPUT int ATR_PriceLimitMethod = 0;                             // Price limit method
@@ -72,31 +72,9 @@ class Stg_ATR : public Strategy {
   static Stg_ATR *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
     Stg_ATR_Params _params;
-    switch (_tf) {
-      case PERIOD_M1: {
-        Stg_ATR_EURUSD_M1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M5: {
-        Stg_ATR_EURUSD_M5_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M15: {
-        Stg_ATR_EURUSD_M15_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M30: {
-        Stg_ATR_EURUSD_M30_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H1: {
-        Stg_ATR_EURUSD_H1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H4: {
-        Stg_ATR_EURUSD_H4_Params _new_params;
-        _params = _new_params;
-      }
+    if (!Terminal::IsOptimization()) {
+      SetParamsByTf<Stg_ATR_Params>(_params, _tf, stg_atr_m1, stg_atr_m5, stg_atr_m15, stg_atr_m30, stg_atr_h1,
+                                    stg_atr_h4, stg_atr_h4);
     }
     // Initialize strategy parameters.
     ChartParams cparams(_tf);
@@ -105,11 +83,8 @@ class Stg_ATR : public Strategy {
     StgParams sparams(new Trade(_tf, _Symbol), new Indi_ATR(atr_params, atr_iparams, cparams), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
-    sparams.SetSignals(_params.ATR_SignalOpenMethod, _params.ATR_SignalOpenLevel,
-    _params.ATR_SignalOpenFilterMethod,
-    _params.ATR_SignalOpenBoostMethod,
-    _params.ATR_SignalCloseMethod,
-                       _params.ATR_SignalCloseLevel);
+    sparams.SetSignals(_params.ATR_SignalOpenMethod, _params.ATR_SignalOpenLevel, _params.ATR_SignalOpenFilterMethod,
+                       _params.ATR_SignalOpenBoostMethod, _params.ATR_SignalCloseMethod, _params.ATR_SignalCloseLevel);
     sparams.SetMaxSpread(_params.ATR_MaxSpread);
     // Initialize strategy instance.
     Strategy *_strat = new Stg_ATR(sparams, "ATR");

@@ -19,4 +19,4 @@ struct Stg_OBV_EURUSD_H1_Params : Stg_OBV_Params {
     OBV_PriceLimitLevel = 0;
     OBV_MaxSpread = 6;
   }
-};
+} stg_obv_h1;

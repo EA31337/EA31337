@@ -20,4 +20,4 @@ struct Stg_ADX_EURUSD_M15_Params : Stg_ADX_Params {
     ADX_PriceLimitLevel = 0;
     ADX_MaxSpread = 0;
   }
-};
+} stg_adx_m15;

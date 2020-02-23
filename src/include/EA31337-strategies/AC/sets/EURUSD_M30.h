@@ -18,4 +18,4 @@ struct Stg_AC_EURUSD_M30_Params : Stg_AC_Params {
     AC_PriceLimitLevel = 0;
     AC_MaxSpread = 0;
   }
-};
+} stg_ac_m30;

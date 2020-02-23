@@ -18,8 +18,8 @@ INPUT string __Awesome_Parameters__ = "-- Awesome strategy params --";  // >>> A
 INPUT int Awesome_Shift = 0;                     // Shift (relative to the current bar, 0 - default)
 INPUT int Awesome_SignalOpenMethod = 0;          // Signal open method (0-1)
 INPUT double Awesome_SignalOpenLevel = 0.0004;   // Signal open level (>0.0001)
-INPUT int Awesome_SignalOpenFilterMethod = 0;          // Signal open filter method (0-1)
-INPUT int Awesome_SignalOpenBoostMethod = 0;          // Signal open boost method (0-1)
+INPUT int Awesome_SignalOpenFilterMethod = 0;    // Signal open filter method (0-1)
+INPUT int Awesome_SignalOpenBoostMethod = 0;     // Signal open boost method (0-1)
 INPUT double Awesome_SignalCloseLevel = 0.0004;  // Signal close level (>0.0001)
 INPUT int Awesome_SignalCloseMethod = 0;         // Signal close method
 INPUT int Awesome_PriceLimitMethod = 0;          // Price limit method
@@ -70,31 +70,9 @@ class Stg_Awesome : public Strategy {
   static Stg_Awesome *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
     Stg_Awesome_Params _params;
-    switch (_tf) {
-      case PERIOD_M1: {
-        Stg_Awesome_EURUSD_M1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M5: {
-        Stg_Awesome_EURUSD_M5_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M15: {
-        Stg_Awesome_EURUSD_M15_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M30: {
-        Stg_Awesome_EURUSD_M30_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H1: {
-        Stg_Awesome_EURUSD_H1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H4: {
-        Stg_Awesome_EURUSD_H4_Params _new_params;
-        _params = _new_params;
-      }
+    if (!Terminal::IsOptimization()) {
+      SetParamsByTf<Stg_Awesome_Params>(_params, _tf, stg_ao_m1, stg_ao_m5, stg_ao_m15, stg_ao_m30, stg_ao_h1,
+                                        stg_ao_h4, stg_ao_h4);
     }
     // Initialize strategy parameters.
     ChartParams cparams(_tf);
@@ -102,7 +80,8 @@ class Stg_Awesome : public Strategy {
     StgParams sparams(new Trade(_tf, _Symbol), new Indi_AO(ao_iparams, cparams), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
-    sparams.SetSignals(_params.Awesome_SignalOpenMethod, _params.Awesome_SignalOpenLevel, _params.Awesome_SignalOpenFilterMethod,_params.Awesome_SignalOpenBoostMethod,
+    sparams.SetSignals(_params.Awesome_SignalOpenMethod, _params.Awesome_SignalOpenLevel,
+                       _params.Awesome_SignalOpenFilterMethod, _params.Awesome_SignalOpenBoostMethod,
                        _params.Awesome_SignalCloseMethod, _params.Awesome_SignalCloseMethod);
     sparams.SetMaxSpread(_params.Awesome_MaxSpread);
     // Initialize strategy instance.

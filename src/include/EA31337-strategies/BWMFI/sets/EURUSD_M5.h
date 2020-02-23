@@ -18,4 +18,4 @@ struct Stg_BWMFI_EURUSD_M5_Params : Stg_BWMFI_Params {
     BWMFI_PriceLimitLevel = 0;
     BWMFI_MaxSpread = 0;
   }
-};
+} stg_bwmfi_m5;

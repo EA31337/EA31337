@@ -18,4 +18,4 @@ struct Stg_Awesome_EURUSD_M15_Params : Stg_Awesome_Params {
     Awesome_PriceLimitLevel = 0;
     Awesome_MaxSpread = 0;
   }
-};
+} stg_ao_m15;

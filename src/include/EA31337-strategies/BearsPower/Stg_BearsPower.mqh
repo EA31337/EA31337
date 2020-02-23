@@ -20,8 +20,8 @@ INPUT ENUM_APPLIED_PRICE BearsPower_Applied_Price = PRICE_CLOSE;              //
 INPUT int BearsPower_Shift = 0;                         // Shift (relative to the current bar, 0 - default)
 INPUT int BearsPower_SignalOpenMethod = 0;              // Signal open method (0-
 INPUT double BearsPower_SignalOpenLevel = 0.00000000;   // Signal open level
-INPUT int BearsPower_SignalOpenFilterMethod = 0;   // Signal filter method
-INPUT int BearsPower_SignalOpenBoostMethod = 0;   // Signal boost method
+INPUT int BearsPower_SignalOpenFilterMethod = 0;        // Signal filter method
+INPUT int BearsPower_SignalOpenBoostMethod = 0;         // Signal boost method
 INPUT int BearsPower_SignalCloseMethod = 0;             // Signal close method
 INPUT double BearsPower_SignalCloseLevel = 0.00000000;  // Signal close level
 INPUT int BearsPower_PriceLimitMethod = 0;              // Price limit method
@@ -74,31 +74,9 @@ class Stg_BearsPower : public Strategy {
   static Stg_BearsPower *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
     Stg_BearsPower_Params _params;
-    switch (_tf) {
-      case PERIOD_M1: {
-        Stg_BearsPower_EURUSD_M1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M5: {
-        Stg_BearsPower_EURUSD_M5_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M15: {
-        Stg_BearsPower_EURUSD_M15_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M30: {
-        Stg_BearsPower_EURUSD_M30_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H1: {
-        Stg_BearsPower_EURUSD_H1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H4: {
-        Stg_BearsPower_EURUSD_H4_Params _new_params;
-        _params = _new_params;
-      }
+    if (!Terminal::IsOptimization()) {
+      SetParamsByTf<Stg_BearsPower_Params>(_params, _tf, stg_bears_m1, stg_bears_m5, stg_bears_m15, stg_bears_m30,
+                                           stg_bears_h1, stg_bears_h4, stg_bears_h4);
     }
     // Initialize strategy parameters.
     ChartParams cparams(_tf);
@@ -107,7 +85,8 @@ class Stg_BearsPower : public Strategy {
     StgParams sparams(new Trade(_tf, _Symbol), new Indi_BearsPower(bp_params, bp_iparams, cparams), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
-    sparams.SetSignals(_params.BearsPower_SignalOpenMethod, _params.BearsPower_SignalOpenMethod,_params.BearsPower_SignalOpenFilterMethod,_params.BearsPower_SignalOpenBoostMethod,
+    sparams.SetSignals(_params.BearsPower_SignalOpenMethod, _params.BearsPower_SignalOpenMethod,
+                       _params.BearsPower_SignalOpenFilterMethod, _params.BearsPower_SignalOpenBoostMethod,
                        _params.BearsPower_SignalCloseMethod, _params.BearsPower_SignalCloseMethod);
     sparams.SetMaxSpread(_params.BearsPower_MaxSpread);
     // Initialize strategy instance.

@@ -26,4 +26,4 @@ struct Stg_Gator_EURUSD_H4_Params : Stg_Gator_Params {
     Gator_PriceLimitLevel = 0;
     Gator_MaxSpread = 10;
   }
-};
+} stg_gator_h4;

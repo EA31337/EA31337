@@ -22,8 +22,8 @@ INPUT ENUM_APPLIED_PRICE StdDev_Applied_Price = PRICE_CLOSE;          // Applied
 INPUT int StdDev_Shift = 0;                                           // Shift
 INPUT int StdDev_SignalOpenMethod = 0;                                // Signal open method (0-
 INPUT double StdDev_SignalOpenLevel = 0.00000000;                     // Signal open level
-INPUT int StdDev_SignalOpenFilterMethod = 0.00000000;                     // Signal open filter method
-INPUT int StdDev_SignalOpenBoostMethod = 0.00000000;                     // Signal open boost method
+INPUT int StdDev_SignalOpenFilterMethod = 0.00000000;                 // Signal open filter method
+INPUT int StdDev_SignalOpenBoostMethod = 0.00000000;                  // Signal open boost method
 INPUT int StdDev_SignalCloseMethod = 0;                               // Signal close method (0-
 INPUT double StdDev_SignalCloseLevel = 0.00000000;                    // Signal close level
 INPUT int StdDev_PriceLimitMethod = 0;                                // Price limit method
@@ -80,31 +80,9 @@ class Stg_StdDev : public Strategy {
   static Stg_StdDev *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
     Stg_StdDev_Params _params;
-    switch (_tf) {
-      case PERIOD_M1: {
-        Stg_StdDev_EURUSD_M1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M5: {
-        Stg_StdDev_EURUSD_M5_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M15: {
-        Stg_StdDev_EURUSD_M15_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M30: {
-        Stg_StdDev_EURUSD_M30_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H1: {
-        Stg_StdDev_EURUSD_H1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H4: {
-        Stg_StdDev_EURUSD_H4_Params _new_params;
-        _params = _new_params;
-      }
+    if (!Terminal::IsOptimization()) {
+      SetParamsByTf<Stg_StdDev_Params>(_params, _tf, stg_stddev_m1, stg_stddev_m5, stg_stddev_m15, stg_stddev_m30,
+                                       stg_stddev_h1, stg_stddev_h4, stg_stddev_h4);
     }
     // Initialize strategy parameters.
     ChartParams cparams(_tf);
@@ -115,7 +93,7 @@ class Stg_StdDev : public Strategy {
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.StdDev_SignalOpenMethod, _params.StdDev_SignalOpenMethod,
-_params.StdDev_SignalOpenFilterMethod, _params.StdDev_SignalOpenBoostMethod,
+                       _params.StdDev_SignalOpenFilterMethod, _params.StdDev_SignalOpenBoostMethod,
                        _params.StdDev_SignalCloseMethod, _params.StdDev_SignalCloseMethod);
     sparams.SetMaxSpread(_params.StdDev_MaxSpread);
     // Initialize strategy instance.

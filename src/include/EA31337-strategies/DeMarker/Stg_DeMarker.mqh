@@ -19,8 +19,8 @@ INPUT int DeMarker_Period = 68;                                           // Per
 INPUT int DeMarker_Shift = 1;                                             // Shift
 INPUT int DeMarker_SignalOpenMethod = 12;                                 // Signal open method (-31-31)
 INPUT double DeMarker_SignalOpenLevel = 0.5;                              // Signal open level (0.0-0.5)
-INPUT int DeMarker_SignalOpenFilterMethod = 0;                              // Signal open filter method
-INPUT int DeMarker_SignalOpenBoostMethod = 0;                              // Signal open boost method
+INPUT int DeMarker_SignalOpenFilterMethod = 0;                            // Signal open filter method
+INPUT int DeMarker_SignalOpenBoostMethod = 0;                             // Signal open boost method
 INPUT int DeMarker_SignalCloseMethod = 0;                                 // Signal close method (-63-63)
 INPUT double DeMarker_SignalCloseLevel = 0.5;                             // Signal close level (0.0-0.5)
 INPUT int DeMarker_PriceLimitMethod = 0;                                  // Price limit method
@@ -71,31 +71,9 @@ class Stg_DeMarker : public Strategy {
   static Stg_DeMarker *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
     Stg_DeMarker_Params _params;
-    switch (_tf) {
-      case PERIOD_M1: {
-        Stg_DeMarker_EURUSD_M1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M5: {
-        Stg_DeMarker_EURUSD_M5_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M15: {
-        Stg_DeMarker_EURUSD_M15_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M30: {
-        Stg_DeMarker_EURUSD_M30_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H1: {
-        Stg_DeMarker_EURUSD_H1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H4: {
-        Stg_DeMarker_EURUSD_H4_Params _new_params;
-        _params = _new_params;
-      }
+    if (!Terminal::IsOptimization()) {
+      SetParamsByTf<Stg_DeMarker_Params>(_params, _tf, stg_dm_m1, stg_dm_m5, stg_dm_m15, stg_dm_m30, stg_dm_h1,
+                                         stg_dm_h4, stg_dm_h4);
     }
     // Initialize strategy parameters.
     ChartParams cparams(_tf);
@@ -105,7 +83,7 @@ class Stg_DeMarker : public Strategy {
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.DeMarker_SignalOpenMethod, _params.DeMarker_SignalOpenLevel,
-_params.DeMarker_SignalOpenFilterMethod, _params.DeMarker_SignalOpenBoostMethod,
+                       _params.DeMarker_SignalOpenFilterMethod, _params.DeMarker_SignalOpenBoostMethod,
                        _params.DeMarker_SignalCloseMethod, _params.DeMarker_SignalCloseMethod);
     sparams.SetMaxSpread(_params.DeMarker_MaxSpread);
     // Initialize strategy instance.

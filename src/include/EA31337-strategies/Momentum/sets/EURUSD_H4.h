@@ -20,4 +20,4 @@ struct Stg_Momentum_EURUSD_H4_Params : Stg_Momentum_Params {
     Momentum_PriceLimitLevel = 0;
     Momentum_MaxSpread = 10;
   }
-};
+} stg_mom_h4;

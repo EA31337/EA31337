@@ -19,8 +19,8 @@ int Momentum_Period = 12;                                           // Averaging
 ENUM_APPLIED_PRICE Momentum_Applied_Price = PRICE_CLOSE;            // Applied Price
 int Momentum_Shift = 0;                                             // Shift
 double Momentum_SignalOpenLevel = 0.00000000;                       // Signal open level
-int Momentum_SignalOpenFilterMethod = 0.00000000;                       // Signal open filter method
-int Momentum_SignalOpenBoostMethod = 0.00000000;                       // Signal open boost method
+int Momentum_SignalOpenFilterMethod = 0.00000000;                   // Signal open filter method
+int Momentum_SignalOpenBoostMethod = 0.00000000;                    // Signal open boost method
 int Momentum_SignalOpenMethod = 0;                                  // Signal open method (0-
 double Momentum_SignalCloseLevel = 0.00000000;                      // Signal close level
 int Momentum_SignalCloseMethod = 0;                                 // Signal close method (0-
@@ -74,31 +74,9 @@ class Stg_Momentum : public Strategy {
   static Stg_Momentum *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
     Stg_Momentum_Params _params;
-    switch (_tf) {
-      case PERIOD_M1: {
-        Stg_Momentum_EURUSD_M1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M5: {
-        Stg_Momentum_EURUSD_M5_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M15: {
-        Stg_Momentum_EURUSD_M15_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M30: {
-        Stg_Momentum_EURUSD_M30_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H1: {
-        Stg_Momentum_EURUSD_H1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H4: {
-        Stg_Momentum_EURUSD_H4_Params _new_params;
-        _params = _new_params;
-      }
+    if (!Terminal::IsOptimization()) {
+      SetParamsByTf<Stg_Momentum_Params>(_params, _tf, stg_mom_m1, stg_mom_m5, stg_mom_m15, stg_mom_m30, stg_mom_h1,
+                                         stg_mom_h4, stg_mom_h4);
     }
     // Initialize strategy parameters.
     ChartParams cparams(_tf);
@@ -108,7 +86,7 @@ class Stg_Momentum : public Strategy {
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.Momentum_SignalOpenMethod, _params.Momentum_SignalOpenMethod,
-_params.Momentum_SignalOpenFilterMethod, _params.Momentum_SignalOpenBoostMethod,
+                       _params.Momentum_SignalOpenFilterMethod, _params.Momentum_SignalOpenBoostMethod,
                        _params.Momentum_SignalCloseMethod, _params.Momentum_SignalCloseMethod);
     sparams.SetMaxSpread(_params.Momentum_MaxSpread);
     // Initialize strategy instance.

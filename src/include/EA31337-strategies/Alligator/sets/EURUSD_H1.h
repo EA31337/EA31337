@@ -26,4 +26,4 @@ struct Stg_Alligator_EURUSD_H1_Params : Stg_Alligator_Params {
     Alligator_PriceLimitLevel = 0;
     Alligator_MaxSpread = 6;
   }
-};
+} stg_alli_h1;

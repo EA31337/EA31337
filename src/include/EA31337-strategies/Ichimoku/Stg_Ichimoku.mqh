@@ -21,8 +21,8 @@ INPUT int Ichimoku_Period_Senkou_Span_B = 52;                             // Per
 INPUT int Ichimoku_Shift = 0;                                             // Shift
 INPUT int Ichimoku_SignalOpenMethod = 0;                                  // Signal open method (0-
 INPUT double Ichimoku_SignalOpenLevel = 0.00000000;                       // Signal open level
-INPUT int Ichimoku_SignalOpenFilterMethod = 0.00000000;                       // Signal open filter method
-INPUT int Ichimoku_SignalOpenBoostMethod = 0.00000000;                       // Signal open boost method
+INPUT int Ichimoku_SignalOpenFilterMethod = 0.00000000;                   // Signal open filter method
+INPUT int Ichimoku_SignalOpenBoostMethod = 0.00000000;                    // Signal open boost method
 INPUT int Ichimoku_SignalCloseMethod = 0;                                 // Signal close method (0-
 INPUT double Ichimoku_SignalCloseLevel = 0.00000000;                      // Signal close level
 INPUT int Ichimoku_PriceLimitMethod = 0;                                  // Price limit method
@@ -77,31 +77,9 @@ class Stg_Ichimoku : public Strategy {
   static Stg_Ichimoku *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
     Stg_Ichimoku_Params _params;
-    switch (_tf) {
-      case PERIOD_M1: {
-        Stg_Ichimoku_EURUSD_M1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M5: {
-        Stg_Ichimoku_EURUSD_M5_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M15: {
-        Stg_Ichimoku_EURUSD_M15_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M30: {
-        Stg_Ichimoku_EURUSD_M30_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H1: {
-        Stg_Ichimoku_EURUSD_H1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H4: {
-        Stg_Ichimoku_EURUSD_H4_Params _new_params;
-        _params = _new_params;
-      }
+    if (!Terminal::IsOptimization()) {
+      SetParamsByTf<Stg_Ichimoku_Params>(_params, _tf, stg_ichi_m1, stg_ichi_m5, stg_ichi_m15, stg_ichi_m30,
+                                         stg_ichi_h1, stg_ichi_h4, stg_ichi_h4);
     }
     // Initialize strategy parameters.
     ChartParams cparams(_tf);
@@ -112,7 +90,7 @@ class Stg_Ichimoku : public Strategy {
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.Ichimoku_SignalOpenMethod, _params.Ichimoku_SignalOpenMethod,
-_params.Ichimoku_SignalOpenFilterMethod, _params.Ichimoku_SignalOpenBoostMethod,
+                       _params.Ichimoku_SignalOpenFilterMethod, _params.Ichimoku_SignalOpenBoostMethod,
                        _params.Ichimoku_SignalCloseMethod, _params.Ichimoku_SignalCloseMethod);
     sparams.SetMaxSpread(_params.Ichimoku_MaxSpread);
     // Initialize strategy instance.

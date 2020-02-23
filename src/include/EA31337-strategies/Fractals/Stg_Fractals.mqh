@@ -17,9 +17,9 @@
 INPUT string __Fractals_Parameters__ = "-- Fractals strategy params --";  // >>> FRACTALS <<<
 INPUT int Fractals_Shift = 0;                                             // Shift
 INPUT int Fractals_SignalOpenMethod = 3;                                  // Signal open method (-3-3)
-INPUT double Fractals_SignalOpenLevel = 0;                                   // Signal open level
-INPUT int Fractals_SignalOpenFilterMethod = 0;                                   // Signal open filter method
-INPUT int Fractals_SignalOpenBoostMethod = 0;                                   // Signal open boost method
+INPUT double Fractals_SignalOpenLevel = 0;                                // Signal open level
+INPUT int Fractals_SignalOpenFilterMethod = 0;                            // Signal open filter method
+INPUT int Fractals_SignalOpenBoostMethod = 0;                             // Signal open boost method
 INPUT int Fractals_SignalCloseMethod = 3;                                 // Signal close method (-3-3)
 INPUT int Fractals_SignalCloseLevel = 0;                                  // Signal close level
 INPUT int Fractals_PriceLimitMethod = 0;                                  // Price limit method
@@ -68,31 +68,9 @@ class Stg_Fractals : public Strategy {
   static Stg_Fractals *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
     Stg_Fractals_Params _params;
-    switch (_tf) {
-      case PERIOD_M1: {
-        Stg_Fractals_EURUSD_M1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M5: {
-        Stg_Fractals_EURUSD_M5_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M15: {
-        Stg_Fractals_EURUSD_M15_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M30: {
-        Stg_Fractals_EURUSD_M30_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H1: {
-        Stg_Fractals_EURUSD_H1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H4: {
-        Stg_Fractals_EURUSD_H4_Params _new_params;
-        _params = _new_params;
-      }
+    if (!Terminal::IsOptimization()) {
+      SetParamsByTf<Stg_Fractals_Params>(_params, _tf, stg_fractals_m1, stg_fractals_m5, stg_fractals_m15,
+                                         stg_fractals_m30, stg_fractals_h1, stg_fractals_h4, stg_fractals_h4);
     }
     // Initialize strategy parameters.
     ChartParams cparams(_tf);
@@ -101,7 +79,7 @@ class Stg_Fractals : public Strategy {
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.Fractals_SignalOpenMethod, _params.Fractals_SignalOpenMethod,
-_params.Fractals_SignalOpenFilterMethod, _params.Fractals_SignalOpenBoostMethod,
+                       _params.Fractals_SignalOpenFilterMethod, _params.Fractals_SignalOpenBoostMethod,
                        _params.Fractals_SignalCloseMethod, _params.Fractals_SignalCloseMethod);
     sparams.SetMaxSpread(_params.Fractals_MaxSpread);
     // Initialize strategy instance.

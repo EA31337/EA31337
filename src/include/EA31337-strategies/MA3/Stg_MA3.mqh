@@ -13,22 +13,21 @@
 #include "../../EA31337-classes/Indicators/Indi_MA.mqh"
 #include "../../EA31337-classes/Strategy.mqh"
 
-
 // User params.
 string __MA3_Parameters__ = "-- MA strategy params --";  // >>> MA <<<
-int MA3_Period_Fast = 12;                                     // Period Fast
-int MA3_Period_Medium = 12;                                     // Period Medium
-int MA3_Period_Slow = 12;                                     // Period Slow
+int MA3_Period_Fast = 12;                                // Period Fast
+int MA3_Period_Medium = 12;                              // Period Medium
+int MA3_Period_Slow = 12;                                // Period Slow
 int MA3_MA_Shift = 0;                                    // MA Shift
-int MA3_MA_Shift_Fast = 0;                                    // MA Shift Fast
-int MA3_MA_Shift_Medium = 0;                                    // MA Shift Medium
-int MA3_MA_Shift_Slow = 0;                                    // MA Shift Slow
+int MA3_MA_Shift_Fast = 0;                               // MA Shift Fast
+int MA3_MA_Shift_Medium = 0;                             // MA Shift Medium
+int MA3_MA_Shift_Slow = 0;                               // MA Shift Slow
 ENUM_MA_METHOD MA3_Method = 1;                           // MA Method
 ENUM_APPLIED_PRICE MA3_Applied_Price = 6;                // Applied Price
 int MA3_Shift = 0;                                       // Shift
 int MA3_SignalOpenMethod = 48;                           // Signal open method (-127-127)
 double MA3_SignalOpenLevel = -0.6;                       // Signal open level
-int MA3_SignalOpenFilterMethod = 0;                       // Signal open filter method
+int MA3_SignalOpenFilterMethod = 0;                      // Signal open filter method
 int MA3_SignalOpenBoostMethod = 0;                       // Signal open boost method
 int MA3_SignalCloseMethod = 48;                          // Signal close method (-127-127)
 double MA3_SignalCloseLevel = -0.6;                      // Signal close level
@@ -96,43 +95,24 @@ class Stg_MA3 : public Strategy {
   static Stg_MA3 *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
     Stg_MA3_Params _params;
-    switch (_tf) {
-      case PERIOD_M1: {
-        Stg_MA3_EURUSD_M1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M5: {
-        Stg_MA3_EURUSD_M5_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M15: {
-        Stg_MA3_EURUSD_M15_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M30: {
-        Stg_MA3_EURUSD_M30_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H1: {
-        Stg_MA3_EURUSD_H1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H4: {
-        Stg_MA3_EURUSD_H4_Params _new_params;
-        _params = _new_params;
-      }
+    if (!Terminal::IsOptimization()) {
+      SetParamsByTf<Stg_MA3_Params>(_params, _tf, stg_ma3_m1, stg_ma3_m5, stg_ma3_m15, stg_ma3_m30, stg_ma3_h1,
+                                    stg_ma3_h4, stg_ma3_h4);
     }
     // Initialize strategy parameters.
     ChartParams cparams(_tf);
-    MA_Params ma_params_fast(_params.MA3_Period_Fast, _params.MA3_MA_Shift_Fast, _params.MA3_Method, _params.MA3_Applied_Price);
-    MA_Params ma_params_medium(_params.MA3_Period_Medium, _params.MA3_MA_Shift_Medium, _params.MA3_Method, _params.MA3_Applied_Price);
-    MA_Params ma_params_slow(_params.MA3_Period_Slow, _params.MA3_MA_Shift_Slow, _params.MA3_Method, _params.MA3_Applied_Price);
+    MA_Params ma_params_fast(_params.MA3_Period_Fast, _params.MA3_MA_Shift_Fast, _params.MA3_Method,
+                             _params.MA3_Applied_Price);
+    MA_Params ma_params_medium(_params.MA3_Period_Medium, _params.MA3_MA_Shift_Medium, _params.MA3_Method,
+                               _params.MA3_Applied_Price);
+    MA_Params ma_params_slow(_params.MA3_Period_Slow, _params.MA3_MA_Shift_Slow, _params.MA3_Method,
+                             _params.MA3_Applied_Price);
     IndicatorParams ma_iparams(10, INDI_MA);
     StgParams sparams(new Trade(_tf, _Symbol), new Indi_MA(ma_params_fast, ma_iparams, cparams), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.MA3_SignalOpenMethod, _params.MA3_SignalOpenLevel, _params.MA3_SignalCloseMethod,
-_params.MA3_SignalOpenFilterMethod, _params.MA3_SignalOpenBoostMethod,
+                       _params.MA3_SignalOpenFilterMethod, _params.MA3_SignalOpenBoostMethod,
                        _params.MA3_SignalCloseLevel);
     sparams.SetMaxSpread(_params.MA3_MaxSpread);
     // Initialize strategy instance.
@@ -163,36 +143,36 @@ _params.MA3_SignalOpenFilterMethod, _params.MA3_SignalOpenBoostMethod,
     double ma_2 = ((Indi_MA *) this.Data()).GetValue(2);
     */
     double gap = _level * Market().GetPipSize();
-/*
-    switch (cmd) {
-      case ORDER_TYPE_BUY:
-        _result = ma_0_fast > ma_0_medium + gap;
-        _result &= ma_0_medium > ma_0_slow;
-        if (_signal_method != 0) {
-          if (METHOD(_signal_method, 0)) _result &= ma_0_fast > ma_0_slow + gap;
-          if (METHOD(_signal_method, 1)) _result &= ma_0_medium > ma_0_slow;
-          if (METHOD(_signal_method, 2)) _result &= ma_0_slow > ma_1_slow;
-          if (METHOD(_signal_method, 3)) _result &= ma_0_fast > ma_1_fast;
-          if (METHOD(_signal_method, 4)) _result &= ma_0_fast - ma_0_medium > ma_0_medium - ma_0_slow;
-          if (METHOD(_signal_method, 5)) _result &= (ma_1_medium < ma_1_slow || ma_2_medium < ma_2_slow);
-          if (METHOD(_signal_method, 6)) _result &= (ma_1_fast < ma_1_medium || ma_2_fast < ma_2_medium);
+    /*
+        switch (cmd) {
+          case ORDER_TYPE_BUY:
+            _result = ma_0_fast > ma_0_medium + gap;
+            _result &= ma_0_medium > ma_0_slow;
+            if (_signal_method != 0) {
+              if (METHOD(_signal_method, 0)) _result &= ma_0_fast > ma_0_slow + gap;
+              if (METHOD(_signal_method, 1)) _result &= ma_0_medium > ma_0_slow;
+              if (METHOD(_signal_method, 2)) _result &= ma_0_slow > ma_1_slow;
+              if (METHOD(_signal_method, 3)) _result &= ma_0_fast > ma_1_fast;
+              if (METHOD(_signal_method, 4)) _result &= ma_0_fast - ma_0_medium > ma_0_medium - ma_0_slow;
+              if (METHOD(_signal_method, 5)) _result &= (ma_1_medium < ma_1_slow || ma_2_medium < ma_2_slow);
+              if (METHOD(_signal_method, 6)) _result &= (ma_1_fast < ma_1_medium || ma_2_fast < ma_2_medium);
+            }
+            break;
+          case ORDER_TYPE_SELL:
+            _result = ma_0_fast < ma_0_medium - gap;
+            _result &= ma_0_medium < ma_0_slow;
+            if (_signal_method != 0) {
+              if (METHOD(_signal_method, 0)) _result &= ma_0_fast < ma_0_slow - gap;
+              if (METHOD(_signal_method, 1)) _result &= ma_0_medium < ma_0_slow;
+              if (METHOD(_signal_method, 2)) _result &= ma_0_slow < ma_1_slow;
+              if (METHOD(_signal_method, 3)) _result &= ma_0_fast < ma_1_fast;
+              if (METHOD(_signal_method, 4)) _result &= ma_0_medium - ma_0_fast > ma_0_slow - ma_0_medium;
+              if (METHOD(_signal_method, 5)) _result &= (ma_1_medium > ma_1_slow || ma_2_medium > ma_2_slow);
+              if (METHOD(_signal_method, 6)) _result &= (ma_1_fast > ma_1_medium || ma_2_fast > ma_2_medium);
+            }
+            break;
         }
-        break;
-      case ORDER_TYPE_SELL:
-        _result = ma_0_fast < ma_0_medium - gap;
-        _result &= ma_0_medium < ma_0_slow;
-        if (_signal_method != 0) {
-          if (METHOD(_signal_method, 0)) _result &= ma_0_fast < ma_0_slow - gap;
-          if (METHOD(_signal_method, 1)) _result &= ma_0_medium < ma_0_slow;
-          if (METHOD(_signal_method, 2)) _result &= ma_0_slow < ma_1_slow;
-          if (METHOD(_signal_method, 3)) _result &= ma_0_fast < ma_1_fast;
-          if (METHOD(_signal_method, 4)) _result &= ma_0_medium - ma_0_fast > ma_0_slow - ma_0_medium;
-          if (METHOD(_signal_method, 5)) _result &= (ma_1_medium > ma_1_slow || ma_2_medium > ma_2_slow);
-          if (METHOD(_signal_method, 6)) _result &= (ma_1_fast > ma_1_medium || ma_2_fast > ma_2_medium);
-        }
-        break;
-    }
-*/
+    */
     return _result;
   }
 

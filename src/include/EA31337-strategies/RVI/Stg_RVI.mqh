@@ -20,8 +20,8 @@ INPUT ENUM_SIGNAL_LINE RVI_Mode = 0;                            // Indicator lin
 INPUT int RVI_Shift = 2;                                        // Shift
 INPUT int RVI_SignalOpenMethod = 0;                             // Signal open method (0-
 INPUT double RVI_SignalOpenLevel = 0.00000000;                  // Signal open level
-INPUT int RVI_SignalOpenFilterMethod = 0.00000000;                  // Signal open filter method
-INPUT int RVI_SignalOpenBoostMethod = 0.00000000;                  // Signal open boost method
+INPUT int RVI_SignalOpenFilterMethod = 0.00000000;              // Signal open filter method
+INPUT int RVI_SignalOpenBoostMethod = 0.00000000;               // Signal open boost method
 INPUT int RVI_SignalCloseMethod = 0;                            // Signal close method (0-
 INPUT double RVI_SignalCloseLevel = 0.00000000;                 // Signal close level
 INPUT int RVI_PriceLimitMethod = 0;                             // Price limit method
@@ -74,31 +74,9 @@ class Stg_RVI : public Strategy {
   static Stg_RVI *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
     Stg_RVI_Params _params;
-    switch (_tf) {
-      case PERIOD_M1: {
-        Stg_RVI_EURUSD_M1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M5: {
-        Stg_RVI_EURUSD_M5_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M15: {
-        Stg_RVI_EURUSD_M15_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M30: {
-        Stg_RVI_EURUSD_M30_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H1: {
-        Stg_RVI_EURUSD_H1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H4: {
-        Stg_RVI_EURUSD_H4_Params _new_params;
-        _params = _new_params;
-      }
+    if (!Terminal::IsOptimization()) {
+      SetParamsByTf<Stg_RVI_Params>(_params, _tf, stg_rvi_m1, stg_rvi_m5, stg_rvi_m15, stg_rvi_m30, stg_rvi_h1,
+                                    stg_rvi_h4, stg_rvi_h4);
     }
     // Initialize strategy parameters.
     ChartParams cparams(_tf);
@@ -108,7 +86,7 @@ class Stg_RVI : public Strategy {
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.RVI_SignalOpenMethod, _params.RVI_SignalOpenLevel, _params.RVI_SignalCloseMethod,
-_params.RVI_SignalOpenFilterMethod, _params.RVI_SignalOpenBoostMethod,
+                       _params.RVI_SignalOpenFilterMethod, _params.RVI_SignalOpenBoostMethod,
                        _params.RVI_SignalCloseLevel);
     sparams.SetMaxSpread(_params.RVI_MaxSpread);
     // Initialize strategy instance.

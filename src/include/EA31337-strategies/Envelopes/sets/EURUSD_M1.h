@@ -16,11 +16,11 @@ struct Stg_Envelopes_EURUSD_M1_Params : Stg_Envelopes_Params {
     Envelopes_Applied_Price = 3;
     Envelopes_Shift = 0;
     Envelopes_SignalOpenMethod = 0;
-    Envelopes_SignalOpenLevel = 36;
+    Envelopes_SignalOpenLevel = 0;
     Envelopes_SignalCloseMethod = 0;
-    Envelopes_SignalCloseLevel = 36;
+    Envelopes_SignalCloseLevel = 0;
     Envelopes_PriceLimitMethod = 0;
     Envelopes_PriceLimitLevel = 0;
     Envelopes_MaxSpread = 2;
   }
-};
+} stg_env_m1;

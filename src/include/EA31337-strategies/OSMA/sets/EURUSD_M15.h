@@ -22,4 +22,4 @@ struct Stg_OsMA_EURUSD_M15_Params : Stg_OsMA_Params {
     OsMA_PriceLimitLevel = 0;
     OsMA_MaxSpread = 4;
   }
-};
+} stg_osma_m15;

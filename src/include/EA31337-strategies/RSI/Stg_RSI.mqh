@@ -20,8 +20,8 @@ INPUT ENUM_APPLIED_PRICE RSI_Applied_Price = 3;                 // Applied Price
 INPUT int RSI_Shift = 0;                                        // Shift
 INPUT int RSI_SignalOpenMethod = 0;                             // Signal open method (-63-63)
 INPUT double RSI_SignalOpenLevel = 36;                          // Signal open level (-49-49)
-INPUT int RSI_SignalOpenFilterMethod = 36;                          // Signal open filter method (-49-49)
-INPUT int RSI_SignalOpenBoostMethod = 36;                          // Signal open boost method (-49-49)
+INPUT int RSI_SignalOpenFilterMethod = 36;                      // Signal open filter method (-49-49)
+INPUT int RSI_SignalOpenBoostMethod = 36;                       // Signal open boost method (-49-49)
 INPUT int RSI_SignalCloseMethod = 0;                            // Signal close method (-63-63)
 INPUT double RSI_SignalCloseLevel = 36;                         // Signal close level (-49-49)
 INPUT int RSI_PriceLimitMethod = 0;                             // Price limit method
@@ -78,31 +78,9 @@ class Stg_RSI : public Strategy {
   static Stg_RSI *Init(ENUM_TIMEFRAMES _tf = NULL, unsigned long _magic_no = 0, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
     Stg_RSI_Params _params;
-    switch (_tf) {
-      case PERIOD_M1: {
-        Stg_RSI_EURUSD_M1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M5: {
-        Stg_RSI_EURUSD_M5_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M15: {
-        Stg_RSI_EURUSD_M15_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M30: {
-        Stg_RSI_EURUSD_M30_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H1: {
-        Stg_RSI_EURUSD_H1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H4: {
-        Stg_RSI_EURUSD_H4_Params _new_params;
-        _params = _new_params;
-      }
+    if (!Terminal::IsOptimization()) {
+      SetParamsByTf<Stg_RSI_Params>(_params, _tf, stg_rsi_m1, stg_rsi_m5, stg_rsi_m15, stg_rsi_m30, stg_rsi_h1,
+                                    stg_rsi_h4, stg_rsi_h4);
     }
     // Initialize strategy parameters.
     ChartParams cparams(_tf);
@@ -112,7 +90,7 @@ class Stg_RSI : public Strategy {
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no > 0 ? _magic_no : rand());
     sparams.SetSignals(_params.RSI_SignalOpenMethod, _params.RSI_SignalOpenLevel, _params.RSI_SignalCloseMethod,
-_params.RSI_SignalOpenFilterMethod, _params.RSI_SignalOpenBoostMethod,
+                       _params.RSI_SignalOpenFilterMethod, _params.RSI_SignalOpenBoostMethod,
                        _params.RSI_SignalCloseLevel);
     sparams.SetPriceLimits(_params.RSI_PriceLimitMethod, _params.RSI_PriceLimitLevel);
     sparams.SetMaxSpread(_params.RSI_MaxSpread);

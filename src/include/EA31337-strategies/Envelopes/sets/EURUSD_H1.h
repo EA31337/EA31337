@@ -10,17 +10,17 @@ struct Stg_Envelopes_EURUSD_H1_Params : Stg_Envelopes_Params {
     symbol = "EURUSD";
     tf = PERIOD_H1;
     Envelopes_MA_Period = 6;
-    Envelopes_Deviation = 0.5;
+    Envelopes_Deviation = 0.2;
     Envelopes_MA_Method = 0;
     Envelopes_MA_Shift = 0;
     Envelopes_Applied_Price = 3;
     Envelopes_Shift = 0;
     Envelopes_SignalOpenMethod = 0;
-    Envelopes_SignalOpenLevel = 36;
-    Envelopes_SignalCloseMethod = 1;
-    Envelopes_SignalCloseLevel = 36;
+    Envelopes_SignalOpenLevel = 0;
+    Envelopes_SignalCloseMethod = 0;
+    Envelopes_SignalCloseLevel = 0;
     Envelopes_PriceLimitMethod = 0;
     Envelopes_PriceLimitLevel = 0;
     Envelopes_MaxSpread = 6;
   }
-};
+} stg_env_h1;

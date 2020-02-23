@@ -19,8 +19,8 @@ INPUT ENUM_APPLIED_PRICE OBV_Applied_Price = PRICE_CLOSE;       // Applied Price
 INPUT int OBV_Shift = 0;                                        // Shift
 INPUT int OBV_SignalOpenMethod = 0;                             // Signal open method (0-
 INPUT double OBV_SignalOpenLevel = 0.00000000;                  // Signal open level
-INPUT int OBV_SignalOpenFilterMethod = 0.00000000;                  // Signal open filter method
-INPUT int OBV_SignalOpenBoostMethod = 0.00000000;                  // Signal open boost method
+INPUT int OBV_SignalOpenFilterMethod = 0.00000000;              // Signal open filter method
+INPUT int OBV_SignalOpenBoostMethod = 0.00000000;               // Signal open boost method
 INPUT int OBV_SignalCloseMethod = 0;                            // Signal close method (0-
 INPUT double OBV_SignalCloseLevel = 0.00000000;                 // Signal close level
 INPUT int OBV_PriceLimitMethod = 0;                             // Price limit method
@@ -71,31 +71,9 @@ class Stg_OBV : public Strategy {
   static Stg_OBV *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
     Stg_OBV_Params _params;
-    switch (_tf) {
-      case PERIOD_M1: {
-        Stg_OBV_EURUSD_M1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M5: {
-        Stg_OBV_EURUSD_M5_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M15: {
-        Stg_OBV_EURUSD_M15_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M30: {
-        Stg_OBV_EURUSD_M30_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H1: {
-        Stg_OBV_EURUSD_H1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H4: {
-        Stg_OBV_EURUSD_H4_Params _new_params;
-        _params = _new_params;
-      }
+    if (!Terminal::IsOptimization()) {
+      SetParamsByTf<Stg_OBV_Params>(_params, _tf, stg_obv_m1, stg_obv_m5, stg_obv_m15, stg_obv_m30, stg_obv_h1,
+                                    stg_obv_h4, stg_obv_h4);
     }
     // Initialize strategy parameters.
     ChartParams cparams(_tf);
@@ -105,7 +83,7 @@ class Stg_OBV : public Strategy {
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.OBV_SignalOpenMethod, _params.OBV_SignalOpenLevel, _params.OBV_SignalCloseMethod,
-_params.OBV_SignalOpenFilterMethod, _params.OBV_SignalOpenBoostMethod,
+                       _params.OBV_SignalOpenFilterMethod, _params.OBV_SignalOpenBoostMethod,
                        _params.OBV_SignalCloseLevel);
     sparams.SetMaxSpread(_params.OBV_MaxSpread);
     // Initialize strategy instance.

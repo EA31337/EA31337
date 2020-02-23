@@ -18,4 +18,4 @@ struct Stg_AD_EURUSD_M15_Params : Stg_AD_Params {
     AD_PriceLimitLevel = 0;
     AD_MaxSpread = 0;
   }
-};
+} stg_ad_m15;

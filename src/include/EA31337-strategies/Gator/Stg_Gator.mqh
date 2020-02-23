@@ -26,8 +26,8 @@ INPUT ENUM_APPLIED_PRICE Gator_Applied_Price = 3;                   // Applied P
 INPUT int Gator_Shift = 2;                                          // Shift
 INPUT int Gator_SignalOpenMethod = 0;                               // Signal open method (0-
 INPUT double Gator_SignalOpenLevel = 0.00000000;                    // Signal open level
-INPUT int Gator_SignalOpenFilterMethod = 0.00000000;                    // Signal open filter method
-INPUT int Gator_SignalOpenBoostMethod = 0.00000000;                    // Signal open boost method
+INPUT int Gator_SignalOpenFilterMethod = 0.00000000;                // Signal open filter method
+INPUT int Gator_SignalOpenBoostMethod = 0.00000000;                 // Signal open boost method
 INPUT int Gator_SignalCloseMethod = 0;                              // Signal close method (0-
 INPUT double Gator_SignalCloseLevel = 0.00000000;                   // Signal close level
 INPUT int Gator_PriceLimitMethod = 0;                               // Price limit method
@@ -92,31 +92,9 @@ class Stg_Gator : public Strategy {
   static Stg_Gator *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
     Stg_Gator_Params _params;
-    switch (_tf) {
-      case PERIOD_M1: {
-        Stg_Gator_EURUSD_M1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M5: {
-        Stg_Gator_EURUSD_M5_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M15: {
-        Stg_Gator_EURUSD_M15_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M30: {
-        Stg_Gator_EURUSD_M30_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H1: {
-        Stg_Gator_EURUSD_H1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H4: {
-        Stg_Gator_EURUSD_H4_Params _new_params;
-        _params = _new_params;
-      }
+    if (!Terminal::IsOptimization()) {
+      SetParamsByTf<Stg_Gator_Params>(_params, _tf, stg_gator_m1, stg_gator_m5, stg_gator_m15, stg_gator_m30,
+                                      stg_gator_h1, stg_gator_h4, stg_gator_h4);
     }
     // Initialize strategy parameters.
     ChartParams cparams(_tf);
@@ -128,7 +106,7 @@ class Stg_Gator : public Strategy {
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.Gator_SignalOpenMethod, _params.Gator_SignalOpenLevel, _params.Gator_SignalCloseMethod,
-_params.Gator_SignalOpenFilterMethod, _params.Gator_SignalOpenBoostMethod,
+                       _params.Gator_SignalOpenFilterMethod, _params.Gator_SignalOpenBoostMethod,
                        _params.Gator_SignalCloseLevel);
     sparams.SetMaxSpread(_params.Gator_MaxSpread);
     // Initialize strategy instance.

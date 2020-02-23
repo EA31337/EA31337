@@ -191,14 +191,14 @@ class Stg_SAR : public Strategy {
     double gap = _level * Market().GetPipSize();
     double _diff = 0;
     switch (_method) {
-      case 0: {
+      case 0:
         _diff = fabs(open_0 - sar_0);
         _result = open_0 + (_diff + _trail) * _direction;
-      }
-      case 1: {
+        break;
+      case 1:
         _diff = fmax(fabs(open_0 - fmax(sar_0, sar_1)), fabs(open_0 - fmin(sar_0, sar_1)));
         _result = open_0 + (_diff + _trail) * _direction;
-      }
+        break;
     }
     return _result;
   }

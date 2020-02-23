@@ -20,4 +20,4 @@ struct Stg_CCI_EURUSD_H4_Params : Stg_CCI_Params {
     CCI_PriceLimitLevel = 0;
     CCI_MaxSpread = 10;
   }
-};
+} stg_cci_h4;

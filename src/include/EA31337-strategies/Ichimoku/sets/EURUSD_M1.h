@@ -21,4 +21,4 @@ struct Stg_Ichimoku_EURUSD_M1_Params : Stg_Ichimoku_Params {
     Ichimoku_PriceLimitLevel = 0;
     Ichimoku_MaxSpread = 2;
   }
-};
+} stg_ichi_m1;

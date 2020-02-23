@@ -22,4 +22,4 @@ struct Stg_MACD_EURUSD_H4_Params : Stg_MACD_Params {
     MACD_PriceLimitLevel = 0;
     MACD_MaxSpread = 10;
   }
-};
+} stg_macd_h4;

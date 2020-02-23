@@ -18,8 +18,8 @@ INPUT string __BWMFI_Parameters__ = "-- BWMFI strategy params --";  // >>> BWMFI
 INPUT int BWMFI_Shift = 0;                                          // Shift (relative to the current bar, 0 - default)
 INPUT int BWMFI_SignalOpenMethod = 0;                               // Signal open method (0-1)
 INPUT double BWMFI_SignalOpenLevel = 0.0004;                        // Signal open level (>0.0001)
-INPUT int BWMFI_SignalOpenFilterMethod = 0;                        // Signal open filter method
-INPUT int BWMFI_SignalOpenBoostMethod = 0;                        // Signal open boost method
+INPUT int BWMFI_SignalOpenFilterMethod = 0;                         // Signal open filter method
+INPUT int BWMFI_SignalOpenBoostMethod = 0;                          // Signal open boost method
 INPUT int BWMFI_SignalCloseMethod = 0;                              // Signal close method
 INPUT double BWMFI_SignalCloseLevel = 0.0004;                       // Signal close level (>0.0001)
 INPUT int BWMFI_PriceLimitMethod = 0;                               // Price limit method
@@ -68,31 +68,9 @@ class Stg_BWMFI : public Strategy {
   static Stg_BWMFI *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
     Stg_BWMFI_Params _params;
-    switch (_tf) {
-      case PERIOD_M1: {
-        Stg_BWMFI_EURUSD_M1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M5: {
-        Stg_BWMFI_EURUSD_M5_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M15: {
-        Stg_BWMFI_EURUSD_M15_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M30: {
-        Stg_BWMFI_EURUSD_M30_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H1: {
-        Stg_BWMFI_EURUSD_H1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H4: {
-        Stg_BWMFI_EURUSD_H4_Params _new_params;
-        _params = _new_params;
-      }
+    if (!Terminal::IsOptimization()) {
+      SetParamsByTf<Stg_BWMFI_Params>(_params, _tf, stg_bwmfi_m1, stg_bwmfi_m5, stg_bwmfi_m15, stg_bwmfi_m30,
+                                      stg_bwmfi_h1, stg_bwmfi_h4, stg_bwmfi_h4);
     }
     // Initialize strategy parameters.
     ChartParams cparams(_tf);
@@ -100,8 +78,9 @@ class Stg_BWMFI : public Strategy {
     StgParams sparams(new Trade(_tf, _Symbol), new Indi_BWMFI(bwmfi_iparams, cparams), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
-    sparams.SetSignals(_params.BWMFI_SignalOpenMethod, _params.BWMFI_SignalOpenLevel, _params.BWMFI_SignalOpenFilterMethod, _params.BWMFI_SignalOpenBoostMethod, _params.BWMFI_SignalCloseMethod,
-                       _params.BWMFI_SignalCloseLevel);
+    sparams.SetSignals(_params.BWMFI_SignalOpenMethod, _params.BWMFI_SignalOpenLevel,
+                       _params.BWMFI_SignalOpenFilterMethod, _params.BWMFI_SignalOpenBoostMethod,
+                       _params.BWMFI_SignalCloseMethod, _params.BWMFI_SignalCloseLevel);
     sparams.SetMaxSpread(_params.BWMFI_MaxSpread);
     // Initialize strategy instance.
     Strategy *_strat = new Stg_BWMFI(sparams, "BWMFI");

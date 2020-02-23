@@ -23,8 +23,8 @@ INPUT ENUM_STO_PRICE Stochastic_Price_Field = 0;                // Price (0 - Lo
 INPUT int Stochastic_Shift = 0;                                 // Shift (relative to the current bar)
 INPUT int Stochastic_SignalOpenMethod = 0;                      // Signal open method (0-
 INPUT double Stochastic_SignalOpenLevel = 0.00000000;           // Signal open level
-INPUT int Stochastic_SignalOpenFilterMethod = 0.00000000;           // Signal open filter method
-INPUT int Stochastic_SignalOpenBoostMethod = 0.00000000;           // Signal open boost method
+INPUT int Stochastic_SignalOpenFilterMethod = 0.00000000;       // Signal open filter method
+INPUT int Stochastic_SignalOpenBoostMethod = 0.00000000;        // Signal open boost method
 INPUT int Stochastic_SignalCloseMethod = 0;                     // Signal close method (0-
 INPUT double Stochastic_SignalCloseLevel = 0.00000000;          // Signal close level
 INPUT int Stochastic_PriceLimitMethod = 0;                      // Price limit method
@@ -50,20 +50,22 @@ struct Stg_Stochastic_Params : Stg_Params {
   double Stochastic_MaxSpread;
 
   // Constructor: Set default param values.
-  Stg_Stochastic_Params() :
-    Stochastic_KPeriod(::Stochastic_KPeriod),
-    Stochastic_DPeriod(::Stochastic_DPeriod),
-    Stochastic_Slowing(::Stochastic_Slowing),
-    Stochastic_MA_Method(::Stochastic_MA_Method),
-    Stochastic_Price_Field(::Stochastic_Price_Field),
-    Stochastic_Shift(::Stochastic_Shift), Stochastic_SignalOpenMethod(::Stochastic_SignalOpenMethod),
-      Stochastic_SignalOpenLevel(::Stochastic_SignalOpenLevel),
-      Stochastic_SignalOpenFilterMethod(::Stochastic_SignalOpenFilterMethod),
-      Stochastic_SignalOpenBoostMethod(::Stochastic_SignalOpenBoostMethod),
-      Stochastic_SignalCloseMethod(::Stochastic_SignalCloseMethod),
-      Stochastic_SignalCloseLevel(::Stochastic_SignalCloseLevel),
-      Stochastic_PriceLimitMethod(::Stochastic_PriceLimitMethod),
-      Stochastic_PriceLimitLevel(::Stochastic_PriceLimitLevel), Stochastic_MaxSpread(::Stochastic_MaxSpread) {}
+  Stg_Stochastic_Params()
+      : Stochastic_KPeriod(::Stochastic_KPeriod),
+        Stochastic_DPeriod(::Stochastic_DPeriod),
+        Stochastic_Slowing(::Stochastic_Slowing),
+        Stochastic_MA_Method(::Stochastic_MA_Method),
+        Stochastic_Price_Field(::Stochastic_Price_Field),
+        Stochastic_Shift(::Stochastic_Shift),
+        Stochastic_SignalOpenMethod(::Stochastic_SignalOpenMethod),
+        Stochastic_SignalOpenLevel(::Stochastic_SignalOpenLevel),
+        Stochastic_SignalOpenFilterMethod(::Stochastic_SignalOpenFilterMethod),
+        Stochastic_SignalOpenBoostMethod(::Stochastic_SignalOpenBoostMethod),
+        Stochastic_SignalCloseMethod(::Stochastic_SignalCloseMethod),
+        Stochastic_SignalCloseLevel(::Stochastic_SignalCloseLevel),
+        Stochastic_PriceLimitMethod(::Stochastic_PriceLimitMethod),
+        Stochastic_PriceLimitLevel(::Stochastic_PriceLimitLevel),
+        Stochastic_MaxSpread(::Stochastic_MaxSpread) {}
 };
 
 // Loads pair specific param values.
@@ -81,41 +83,20 @@ class Stg_Stochastic : public Strategy {
   static Stg_Stochastic *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
     Stg_Stochastic_Params _params;
-    switch (_tf) {
-      case PERIOD_M1: {
-        Stg_Stochastic_EURUSD_M1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M5: {
-        Stg_Stochastic_EURUSD_M5_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M15: {
-        Stg_Stochastic_EURUSD_M15_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_M30: {
-        Stg_Stochastic_EURUSD_M30_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H1: {
-        Stg_Stochastic_EURUSD_H1_Params _new_params;
-        _params = _new_params;
-      }
-      case PERIOD_H4: {
-        Stg_Stochastic_EURUSD_H4_Params _new_params;
-        _params = _new_params;
-      }
+    if (!Terminal::IsOptimization()) {
+      SetParamsByTf<Stg_Stochastic_Params>(_params, _tf, stg_stoch_m1, stg_stoch_m5, stg_stoch_m15, stg_stoch_m30,
+                                           stg_stoch_h1, stg_stoch_h4, stg_stoch_h4);
     }
     // Initialize strategy parameters.
     ChartParams cparams(_tf);
-    Stoch_Params stoch_params(_params.Stochastic_KPeriod, _params.Stochastic_DPeriod, _params.Stochastic_Slowing, _params.Stochastic_MA_Method, _params.Stochastic_Price_Field);
+    Stoch_Params stoch_params(_params.Stochastic_KPeriod, _params.Stochastic_DPeriod, _params.Stochastic_Slowing,
+                              _params.Stochastic_MA_Method, _params.Stochastic_Price_Field);
     IndicatorParams stoch_iparams(10, INDI_STOCHASTIC);
     StgParams sparams(new Trade(_tf, _Symbol), new Indi_Stochastic(stoch_params, stoch_iparams, cparams), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.Stochastic_SignalOpenMethod, _params.Stochastic_SignalOpenMethod,
-_params.Stochastic_SignalOpenFilterMethod, _params.Stochastic_SignalOpenBoostMethod,
+                       _params.Stochastic_SignalOpenFilterMethod, _params.Stochastic_SignalOpenBoostMethod,
                        _params.Stochastic_SignalCloseMethod, _params.Stochastic_SignalCloseMethod);
     sparams.SetMaxSpread(_params.Stochastic_MaxSpread);
     // Initialize strategy instance.

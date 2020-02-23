@@ -20,4 +20,4 @@ struct Stg_RVI_EURUSD_M30_Params : Stg_RVI_Params {
     RVI_PriceLimitLevel = 0;
     RVI_MaxSpread = 5;
   }
-};
+} stg_rvi_m30;
