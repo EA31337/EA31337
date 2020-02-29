@@ -30,7 +30,7 @@ INPUT double ZigZag_PriceLimitLevel = 0;                              // Price l
 INPUT double ZigZag_MaxSpread = 6.0;                                  // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_ZigZag_Params : Stg_Params {
+struct Stg_ZigZag_Params : StgParams {
   int ZigZag_Depth;
   int ZigZag_Deviation;
   int ZigZag_Backstep;
@@ -82,10 +82,9 @@ class Stg_ZigZag : public Strategy {
                                        stg_zigzag_h1, stg_zigzag_h4, stg_zigzag_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    ZigZag_Params zz_params(_params.ZigZag_Depth, _params.ZigZag_Deviation, _params.ZigZag_Backstep);
-    IndicatorParams zz_iparams(10, INDI_ZIGZAG);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_ZigZag(zz_params, zz_iparams, cparams), NULL, NULL);
+    ZigZagParams zz_params(_params.ZigZag_Depth, _params.ZigZag_Deviation, _params.ZigZag_Backstep);
+    zz_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_ZigZag(zz_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.ZigZag_SignalOpenMethod, _params.ZigZag_SignalOpenMethod,

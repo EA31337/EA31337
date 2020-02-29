@@ -30,7 +30,7 @@ INPUT double Ichimoku_PriceLimitLevel = 0;                                // Pri
 INPUT double Ichimoku_MaxSpread = 6.0;                                    // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_Ichimoku_Params : Stg_Params {
+struct Stg_Ichimoku_Params : StgParams {
   int Ichimoku_Period_Tenkan_Sen;
   int Ichimoku_Period_Kijun_Sen;
   int Ichimoku_Period_Senkou_Span_B;
@@ -82,11 +82,10 @@ class Stg_Ichimoku : public Strategy {
                                          stg_ichi_h1, stg_ichi_h4, stg_ichi_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    Ichimoku_Params ichi_params(_params.Ichimoku_Period_Tenkan_Sen, _params.Ichimoku_Period_Kijun_Sen,
+    IchimokuParams ichi_params(_params.Ichimoku_Period_Tenkan_Sen, _params.Ichimoku_Period_Kijun_Sen,
                                 _params.Ichimoku_Period_Senkou_Span_B);
-    IndicatorParams ichi_iparams(10, INDI_ICHIMOKU);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_Ichimoku(ichi_params, ichi_iparams, cparams), NULL, NULL);
+    ichi_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_Ichimoku(ichi_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.Ichimoku_SignalOpenMethod, _params.Ichimoku_SignalOpenMethod,

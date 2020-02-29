@@ -29,7 +29,7 @@ INPUT double CCI_PriceLimitLevel = 0;                           // Price limit l
 double CCI_MaxSpread = 6.0;                                     // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_CCI_Params : Stg_Params {
+struct Stg_CCI_Params : StgParams {
   unsigned int CCI_Period;
   ENUM_APPLIED_PRICE CCI_Applied_Price;
   int CCI_Shift;
@@ -79,10 +79,9 @@ class Stg_CCI : public Strategy {
                                     stg_cci_h4, stg_cci_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    CCI_Params cci_params(_params.CCI_Period, _params.CCI_Applied_Price);
-    IndicatorParams cci_iparams(10, INDI_CCI);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_CCI(cci_params, cci_iparams, cparams), NULL, NULL);
+    CCIParams cci_params(_params.CCI_Period, _params.CCI_Applied_Price);
+    cci_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_CCI(cci_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.CCI_SignalOpenMethod, _params.CCI_SignalOpenLevel, _params.CCI_SignalOpenFilterMethod,

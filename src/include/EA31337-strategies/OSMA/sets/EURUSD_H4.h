@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_OsMA_EURUSD_H4_Params : Stg_OsMA_Params {
   Stg_OsMA_EURUSD_H4_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_H4;
     OsMA_Period_Fast = 12;
     OsMA_Period_Slow = 26;
     OsMA_Period_Signal = 9;

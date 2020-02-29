@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_OBV_EURUSD_M15_Params : Stg_OBV_Params {
   Stg_OBV_EURUSD_M15_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_M15;
     OBV_Applied_Price = 3;
     OBV_Shift = 0;
     OBV_SignalOpenMethod = -63;

@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_Envelopes_EURUSD_M5_Params : Stg_Envelopes_Params {
   Stg_Envelopes_EURUSD_M5_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_M5;
     Envelopes_MA_Period = 6;
     Envelopes_Deviation = 0.6;
     Envelopes_MA_Method = 0;

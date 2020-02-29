@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_WPR_EURUSD_H1_Params : Stg_WPR_Params {
   Stg_WPR_EURUSD_H1_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_H1;
     WPR_Period = 2;
     WPR_Shift = 0;
     WPR_SignalOpenMethod = 0;

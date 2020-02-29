@@ -31,7 +31,7 @@ INPUT double OsMA_PriceLimitLevel = 0;                            // Price limit
 INPUT double OsMA_MaxSpread = 6.0;                                // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_OsMA_Params : Stg_Params {
+struct Stg_OsMA_Params : StgParams {
   int OsMA_Period_Fast;
   int OsMA_Period_Slow;
   int OsMA_Period_Signal;
@@ -85,11 +85,10 @@ class Stg_OsMA : public Strategy {
                                      stg_osma_h4, stg_osma_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    OsMA_Params osma_params(_params.OsMA_Period_Fast, _params.OsMA_Period_Slow, _params.OsMA_Period_Signal,
+    OsMAParams osma_params(_params.OsMA_Period_Fast, _params.OsMA_Period_Slow, _params.OsMA_Period_Signal,
                             _params.OsMA_Applied_Price);
-    IndicatorParams osma_iparams(10, INDI_OSMA);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_OsMA(osma_params, osma_iparams, cparams), NULL, NULL);
+    osma_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_OsMA(osma_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.OsMA_SignalOpenMethod, _params.OsMA_SignalOpenLevel, _params.OsMA_SignalCloseMethod,

@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_ATR_EURUSD_H4_Params : Stg_ATR_Params {
   Stg_ATR_EURUSD_H4_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_H4;
     ATR_Period = 14;
     ATR_Applied_Price = 1;
     ATR_Shift = 0;

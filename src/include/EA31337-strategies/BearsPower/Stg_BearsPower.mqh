@@ -29,7 +29,7 @@ INPUT double BearsPower_PriceLimitLevel = 0;            // Price limit level
 INPUT double BearsPower_MaxSpread = 6.0;                // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_BearsPower_Params : Stg_Params {
+struct Stg_BearsPower_Params : StgParams {
   unsigned int BearsPower_Period;
   ENUM_APPLIED_PRICE BearsPower_Applied_Price;
   int BearsPower_Shift;
@@ -79,10 +79,9 @@ class Stg_BearsPower : public Strategy {
                                            stg_bears_h1, stg_bears_h4, stg_bears_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    BearsPower_Params bp_params(_params.BearsPower_Period, _params.BearsPower_Applied_Price);
-    IndicatorParams bp_iparams(10, INDI_BEARS);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_BearsPower(bp_params, bp_iparams, cparams), NULL, NULL);
+    BearsPowerParams bp_params(_params.BearsPower_Period, _params.BearsPower_Applied_Price);
+    bp_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_BearsPower(bp_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.BearsPower_SignalOpenMethod, _params.BearsPower_SignalOpenMethod,

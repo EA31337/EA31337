@@ -28,7 +28,7 @@ INPUT double DeMarker_PriceLimitLevel = 0;                                // Pri
 INPUT double DeMarker_MaxSpread = 6.0;                                    // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_DeMarker_Params : Stg_Params {
+struct Stg_DeMarker_Params : StgParams {
   unsigned int DeMarker_Period;
   int DeMarker_Shift;
   int DeMarker_SignalOpenMethod;
@@ -76,10 +76,9 @@ class Stg_DeMarker : public Strategy {
                                          stg_dm_h4, stg_dm_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    DeMarker_Params dm_params(_params.DeMarker_Period);
-    IndicatorParams dm_iparams(10, INDI_DEMARKER);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_DeMarker(dm_params, dm_iparams, cparams), NULL, NULL);
+    DeMarkerParams dm_params(_params.DeMarker_Period);
+    dm_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_DeMarker(dm_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.DeMarker_SignalOpenMethod, _params.DeMarker_SignalOpenLevel,

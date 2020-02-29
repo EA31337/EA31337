@@ -29,7 +29,7 @@ INPUT double SAR_PriceLimitLevel = 0;                           // Price limit l
 INPUT double SAR_MaxSpread = 6.0;                               // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_SAR_Params : Stg_Params {
+struct Stg_SAR_Params : StgParams {
   double SAR_Step;
   double SAR_Maximum_Stop;
   int SAR_Shift;
@@ -79,10 +79,9 @@ class Stg_SAR : public Strategy {
                                     stg_sar_h4, stg_sar_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    SAR_Params sar_params(_params.SAR_Step, _params.SAR_Maximum_Stop);
-    IndicatorParams sar_iparams(10, INDI_SAR);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_SAR(sar_params, sar_iparams, cparams), NULL, NULL);
+    SARParams sar_params(_params.SAR_Step, _params.SAR_Maximum_Stop);
+    sar_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_SAR(sar_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.SAR_SignalOpenMethod, _params.SAR_SignalOpenLevel, _params.SAR_SignalOpenFilterMethod,

@@ -29,7 +29,7 @@ INPUT double RSI_PriceLimitLevel = 0;                           // Price limit l
 INPUT double RSI_MaxSpread = 0;                                 // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_RSI_Params : Stg_Params {
+struct Stg_RSI_Params : StgParams {
   unsigned int RSI_Period;
   ENUM_APPLIED_PRICE RSI_Applied_Price;
   int RSI_Shift;
@@ -83,10 +83,9 @@ class Stg_RSI : public Strategy {
                                     stg_rsi_h4, stg_rsi_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    RSI_Params rsi_params(_params.RSI_Period, _params.RSI_Applied_Price);
-    IndicatorParams rsi_iparams(10, INDI_RSI);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_RSI(rsi_params, rsi_iparams, cparams), NULL, NULL);
+    RSIParams rsi_params(_params.RSI_Period, _params.RSI_Applied_Price);
+    rsi_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_RSI(rsi_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no > 0 ? _magic_no : rand());
     sparams.SetSignals(_params.RSI_SignalOpenMethod, _params.RSI_SignalOpenLevel, _params.RSI_SignalCloseMethod,

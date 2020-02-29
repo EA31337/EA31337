@@ -28,7 +28,7 @@ INPUT double WPR_PriceLimitLevel = 0;                           // Price limit l
 INPUT double WPR_MaxSpread = 6.0;                               // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_WPR_Params : Stg_Params {
+struct Stg_WPR_Params : StgParams {
   unsigned int WPR_Period;
   int WPR_Shift;
   int WPR_SignalOpenMethod;
@@ -76,10 +76,9 @@ class Stg_WPR : public Strategy {
                                     stg_wpr_h4, stg_wpr_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    WPR_Params wpr_params(_params.WPR_Period);
-    IndicatorParams wpr_iparams(10, INDI_WPR);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_WPR(wpr_params, wpr_iparams, cparams), NULL, NULL);
+    WPRParams wpr_params(_params.WPR_Period);
+    wpr_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_WPR(wpr_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.WPR_SignalOpenMethod, _params.WPR_SignalOpenLevel, _params.WPR_SignalCloseMethod,

@@ -31,7 +31,7 @@ INPUT double StdDev_PriceLimitLevel = 0;                              // Price l
 INPUT double StdDev_MaxSpread = 6.0;                                  // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_StdDev_Params : Stg_Params {
+struct Stg_StdDev_Params : StgParams {
   unsigned int StdDev_MA_Period;
   int StdDev_MA_Shift;
   ENUM_MA_METHOD StdDev_MA_Method;
@@ -85,11 +85,10 @@ class Stg_StdDev : public Strategy {
                                        stg_stddev_h1, stg_stddev_h4, stg_stddev_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    StdDev_Params stddev_params(_params.StdDev_MA_Period, _params.StdDev_MA_Shift, _params.StdDev_MA_Method,
+    StdDevParams stddev_params(_params.StdDev_MA_Period, _params.StdDev_MA_Shift, _params.StdDev_MA_Method,
                                 _params.StdDev_Applied_Price);
-    IndicatorParams stddev_iparams(10, INDI_STDDEV);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_StdDev(stddev_params, stddev_iparams, cparams), NULL, NULL);
+    stddev_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_StdDev(stddev_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.StdDev_SignalOpenMethod, _params.StdDev_SignalOpenMethod,

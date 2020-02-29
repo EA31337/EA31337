@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_BWMFI_EURUSD_M5_Params : Stg_BWMFI_Params {
   Stg_BWMFI_EURUSD_M5_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_M5;
     BWMFI_Shift = 0;
     BWMFI_SignalOpenMethod = 0;
     BWMFI_SignalOpenLevel = 0;

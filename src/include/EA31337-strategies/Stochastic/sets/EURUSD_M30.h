@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_Stochastic_EURUSD_M30_Params : Stg_Stochastic_Params {
   Stg_Stochastic_EURUSD_M30_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_M30;
     Stochastic_KPeriod = 5;
     Stochastic_DPeriod = 5;
     Stochastic_Slowing = 5;

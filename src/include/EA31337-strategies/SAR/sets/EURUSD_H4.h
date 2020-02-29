@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_SAR_EURUSD_H4_Params : Stg_SAR_Params {
   Stg_SAR_EURUSD_H4_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_H4;
     SAR_Step = 0.05;
     SAR_Maximum_Stop = 0.4;
     SAR_Shift = 0;

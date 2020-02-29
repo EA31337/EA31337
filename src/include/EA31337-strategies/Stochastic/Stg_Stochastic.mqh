@@ -32,7 +32,7 @@ INPUT double Stochastic_PriceLimitLevel = 0;                    // Price limit l
 INPUT double Stochastic_MaxSpread = 6.0;                        // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_Stochastic_Params : Stg_Params {
+struct Stg_Stochastic_Params : StgParams {
   int Stochastic_KPeriod;
   int Stochastic_DPeriod;
   int Stochastic_Slowing;
@@ -88,11 +88,10 @@ class Stg_Stochastic : public Strategy {
                                            stg_stoch_h1, stg_stoch_h4, stg_stoch_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    Stoch_Params stoch_params(_params.Stochastic_KPeriod, _params.Stochastic_DPeriod, _params.Stochastic_Slowing,
+    StochParams stoch_params(_params.Stochastic_KPeriod, _params.Stochastic_DPeriod, _params.Stochastic_Slowing,
                               _params.Stochastic_MA_Method, _params.Stochastic_Price_Field);
-    IndicatorParams stoch_iparams(10, INDI_STOCHASTIC);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_Stochastic(stoch_params, stoch_iparams, cparams), NULL, NULL);
+    stoch_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_Stochastic(stoch_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.Stochastic_SignalOpenMethod, _params.Stochastic_SignalOpenMethod,

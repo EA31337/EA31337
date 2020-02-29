@@ -27,7 +27,7 @@ INPUT double Awesome_PriceLimitLevel = 0;        // Price limit level
 INPUT double Awesome_MaxSpread = 6.0;            // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_Awesome_Params : Stg_Params {
+struct Stg_Awesome_Params : StgParams {
   unsigned int Awesome_Period;
   ENUM_APPLIED_PRICE Awesome_Applied_Price;
   int Awesome_Shift;
@@ -75,9 +75,8 @@ class Stg_Awesome : public Strategy {
                                         stg_ao_h4, stg_ao_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    IndicatorParams ao_iparams(10, INDI_AO);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_AO(ao_iparams, cparams), NULL, NULL);
+    AOParams ao_params(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_AO(ao_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.Awesome_SignalOpenMethod, _params.Awesome_SignalOpenLevel,

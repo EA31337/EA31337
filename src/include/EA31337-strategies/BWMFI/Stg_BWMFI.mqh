@@ -27,7 +27,7 @@ INPUT double BWMFI_PriceLimitLevel = 0;                             // Price lim
 INPUT double BWMFI_MaxSpread = 6.0;                                 // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_BWMFI_Params : Stg_Params {
+struct Stg_BWMFI_Params : StgParams {
   int BWMFI_Shift;
   int BWMFI_SignalOpenMethod;
   double BWMFI_SignalOpenLevel;
@@ -73,9 +73,8 @@ class Stg_BWMFI : public Strategy {
                                       stg_bwmfi_h1, stg_bwmfi_h4, stg_bwmfi_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    IndicatorParams bwmfi_iparams(10, INDI_BWMFI);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_BWMFI(bwmfi_iparams, cparams), NULL, NULL);
+    BWMFIParams bwmfi_params(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_BWMFI(bwmfi_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.BWMFI_SignalOpenMethod, _params.BWMFI_SignalOpenLevel,

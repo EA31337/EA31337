@@ -27,7 +27,7 @@ INPUT double Fractals_PriceLimitLevel = 0;                                // Pri
 INPUT double Fractals_MaxSpread = 6.0;                                    // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_Fractals_Params : Stg_Params {
+struct Stg_Fractals_Params : StgParams {
   int Fractals_Shift;
   int Fractals_SignalOpenMethod;
   double Fractals_SignalOpenLevel;
@@ -73,9 +73,8 @@ class Stg_Fractals : public Strategy {
                                          stg_fractals_m30, stg_fractals_h1, stg_fractals_h4, stg_fractals_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    IndicatorParams fractals_iparams(10, INDI_FRACTALS);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_Fractals(fractals_iparams, cparams), NULL, NULL);
+    FractalsParams fractals_params(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_Fractals(fractals_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.Fractals_SignalOpenMethod, _params.Fractals_SignalOpenMethod,

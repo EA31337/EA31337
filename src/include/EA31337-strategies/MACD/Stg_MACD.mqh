@@ -31,7 +31,7 @@ INPUT double MACD_PriceLimitLevel = 0;                            // Price limit
 INPUT double MACD_MaxSpread = 6.0;                                // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_MACD_Params : Stg_Params {
+struct Stg_MACD_Params : StgParams {
   int MACD_Period_Fast;
   int MACD_Period_Slow;
   int MACD_Period_Signal;
@@ -85,11 +85,10 @@ class Stg_MACD : public Strategy {
                                      stg_macd_h4, stg_macd_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    MACD_Params macd_params(_params.MACD_Period_Fast, _params.MACD_Period_Slow, _params.MACD_Period_Signal,
+    MACDParams macd_params(_params.MACD_Period_Fast, _params.MACD_Period_Slow, _params.MACD_Period_Signal,
                             _params.MACD_Applied_Price);
-    IndicatorParams macd_iparams(10, INDI_MACD);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_MACD(macd_params, macd_iparams, cparams), NULL, NULL);
+    macd_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_MACD(macd_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.MACD_SignalOpenMethod, _params.MACD_SignalOpenLevel, _params.MACD_SignalCloseMethod,

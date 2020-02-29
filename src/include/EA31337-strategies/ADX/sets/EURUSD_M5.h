@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_ADX_EURUSD_M5_Params : Stg_ADX_Params {
   Stg_ADX_EURUSD_M5_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_M5;
     ADX_Period = 14;
     ADX_Applied_Price = 1;
     ADX_Shift = 0;

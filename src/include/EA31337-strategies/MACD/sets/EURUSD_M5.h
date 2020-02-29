@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_MACD_EURUSD_M5_Params : Stg_MACD_Params {
   Stg_MACD_EURUSD_M5_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_M5;
     MACD_Period_Fast = 12;
     MACD_Period_Slow = 26;
     MACD_Period_Signal = 9;

@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_MA_EURUSD_M30_Params : Stg_MA_Params {
   Stg_MA_EURUSD_M30_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_M30;
     MA_Period = 2;
     MA_MA_Shift = 0;
     MA_Method = 1;

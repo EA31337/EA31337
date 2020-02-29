@@ -27,7 +27,7 @@ INPUT double AC_PriceLimitLevel = 0;                          // Price limit lev
 INPUT double AC_MaxSpread = 6.0;                              // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_AC_Params : Stg_Params {
+struct Stg_AC_Params : StgParams {
   unsigned int AC_Period;
   ENUM_APPLIED_PRICE AC_Applied_Price;
   int AC_Shift;
@@ -75,9 +75,8 @@ class Stg_AC : public Strategy {
                                    stg_ac_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    IndicatorParams ac_iparams(10, INDI_AC);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_AC(ac_iparams, cparams), NULL, NULL);
+    ACParams ac_params(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_AC(ac_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.AC_SignalOpenMethod, _params.AC_SignalOpenLevel, _params.AC_SignalOpenFilterMethod,

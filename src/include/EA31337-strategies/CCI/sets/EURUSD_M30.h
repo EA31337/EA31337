@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_CCI_EURUSD_M30_Params : Stg_CCI_Params {
   Stg_CCI_EURUSD_M30_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_M30;
     CCI_Period = 2;
     CCI_Applied_Price = 3;
     CCI_Shift = 0;

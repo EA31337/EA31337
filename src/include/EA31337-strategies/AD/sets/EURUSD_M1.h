@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_AD_EURUSD_M1_Params : Stg_AD_Params {
   Stg_AD_EURUSD_M1_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_M1;
     AD_Shift = 0;
     AD_SignalOpenMethod = 0;
     AD_SignalOpenLevel = 0;

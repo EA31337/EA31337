@@ -27,7 +27,7 @@ INPUT double AD_PriceLimitLevel = 0;                          // Price limit lev
 INPUT double AD_MaxSpread = 6.0;                              // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_AD_Params : Stg_Params {
+struct Stg_AD_Params : StgParams {
   unsigned int AD_Period;
   ENUM_APPLIED_PRICE AD_Applied_Price;
   int AD_Shift;
@@ -75,9 +75,8 @@ class Stg_AD : public Strategy {
                                    stg_ad_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    IndicatorParams ad_iparams(10, INDI_AD);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_AD(ad_iparams, cparams), NULL, NULL);
+    ADParams ad_params(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_AD(ad_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.AD_SignalOpenMethod, _params.AD_SignalOpenLevel, _params.AD_SignalOpenFilterMethod,

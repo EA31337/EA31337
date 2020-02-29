@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_ElliottWave_EURUSD_M5_Params : Stg_ElliottWave_Params {
   Stg_ElliottWave_EURUSD_M5_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_M5;
     ElliottWave_Period = 2;
     ElliottWave_Applied_Price = 3;
     ElliottWave_Shift = 0;

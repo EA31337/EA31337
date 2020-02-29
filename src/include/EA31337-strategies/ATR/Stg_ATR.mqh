@@ -28,7 +28,7 @@ INPUT double ATR_PriceLimitLevel = 0;                           // Price limit l
 INPUT double ATR_MaxSpread = 6.0;                               // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_ATR_Params : Stg_Params {
+struct Stg_ATR_Params : StgParams {
   unsigned int ATR_Period;
   ENUM_APPLIED_PRICE ATR_Applied_Price;
   int ATR_Shift;
@@ -77,10 +77,9 @@ class Stg_ATR : public Strategy {
                                     stg_atr_h4, stg_atr_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    ATR_Params atr_params(_params.ATR_Period);
-    IndicatorParams atr_iparams(10, INDI_ATR);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_ATR(atr_params, atr_iparams, cparams), NULL, NULL);
+    ATRParams atr_params(_params.ATR_Period);
+    atr_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_ATR(atr_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.ATR_SignalOpenMethod, _params.ATR_SignalOpenLevel, _params.ATR_SignalOpenFilterMethod,

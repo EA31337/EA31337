@@ -32,7 +32,7 @@ INPUT double ElliottWave_PriceLimitLevel = 0;        // Price limit level
 INPUT double ElliottWave_MaxSpread = 6.0;            // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_ElliottWave_Params : Stg_Params {
+struct Stg_ElliottWave_Params : StgParams {
   unsigned int ElliottWave_Period;
   ENUM_APPLIED_PRICE ElliottWave_Applied_Price;
   int ElliottWave_Shift;
@@ -82,11 +82,10 @@ class Stg_ElliottWave : public Strategy {
                                             stg_elli_h1, stg_elli_h4, stg_elli_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
     /*
     ElliottWave_Params ew_params(_params.ElliottWave_Period, _params.ElliottWave_Applied_Price);
-    IndicatorParams ew_iparams(10, INDI_ELLIOTTWAVE);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_ElliottWave(ew_params, ew_iparams, cparams), NULL, NULL);
+    ew_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_ElliottWave(ew_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.ElliottWave_SignalOpenMethod, _params.ElliottWave_SignalOpenLevel,

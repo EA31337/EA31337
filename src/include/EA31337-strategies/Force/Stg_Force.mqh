@@ -30,7 +30,7 @@ INPUT double Force_PriceLimitLevel = 0;                             // Price lim
 INPUT double Force_MaxSpread = 6.0;                                 // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_Force_Params : Stg_Params {
+struct Stg_Force_Params : StgParams {
   unsigned int Force_Period;
   ENUM_MA_METHOD Force_MA_Method;
   ENUM_APPLIED_PRICE Force_Applied_Price;
@@ -82,10 +82,9 @@ class Stg_Force : public Strategy {
                                       stg_force_h1, stg_force_h4, stg_force_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    Force_Params force_params(_params.Force_Period, _params.Force_MA_Method, _params.Force_Applied_Price);
-    IndicatorParams force_iparams(10, INDI_FORCE);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_Force(force_params, force_iparams, cparams), NULL, NULL);
+    ForceParams force_params(_params.Force_Period, _params.Force_MA_Method, _params.Force_Applied_Price);
+    force_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_Force(force_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.Force_SignalOpenMethod, _params.Force_SignalOpenLevel, _params.Force_SignalCloseMethod,

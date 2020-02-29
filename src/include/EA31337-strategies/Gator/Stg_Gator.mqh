@@ -35,7 +35,7 @@ INPUT double Gator_PriceLimitLevel = 0;                             // Price lim
 INPUT double Gator_MaxSpread = 6.0;                                 // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_Gator_Params : Stg_Params {
+struct Stg_Gator_Params : StgParams {
   int Gator_Period_Jaw;
   int Gator_Period_Teeth;
   int Gator_Period_Lips;
@@ -97,12 +97,11 @@ class Stg_Gator : public Strategy {
                                       stg_gator_h1, stg_gator_h4, stg_gator_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    Gator_Params gator_params(_params.Gator_Period_Jaw, _params.Gator_Period_Teeth, _params.Gator_Period_Lips,
+    GatorParams gator_params(_params.Gator_Period_Jaw, _params.Gator_Period_Teeth, _params.Gator_Period_Lips,
                               _params.Gator_Shift_Jaw, _params.Gator_Shift_Teeth, _params.Gator_Shift_Lips,
                               _params.Gator_MA_Method, _params.Gator_Applied_Price);
-    IndicatorParams gator_iparams(10, INDI_GATOR);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_Gator(gator_params, gator_iparams, cparams), NULL, NULL);
+    gator_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_Gator(gator_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.Gator_SignalOpenMethod, _params.Gator_SignalOpenLevel, _params.Gator_SignalCloseMethod,

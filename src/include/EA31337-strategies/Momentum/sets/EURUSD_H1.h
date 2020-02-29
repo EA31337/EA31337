@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_Momentum_EURUSD_H1_Params : Stg_Momentum_Params {
   Stg_Momentum_EURUSD_H1_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_H1;
     Momentum_Period = 2;
     Momentum_Applied_Price = 3;
     Momentum_Shift = 0;

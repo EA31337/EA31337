@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_Awesome_EURUSD_M15_Params : Stg_Awesome_Params {
   Stg_Awesome_EURUSD_M15_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_M15;
     Awesome_Shift = 0;
     Awesome_SignalOpenMethod = 0;
     Awesome_SignalOpenLevel = 0;

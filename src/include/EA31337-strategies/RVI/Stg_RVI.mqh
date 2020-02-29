@@ -29,7 +29,7 @@ INPUT double RVI_PriceLimitLevel = 0;                           // Price limit l
 INPUT double RVI_MaxSpread = 6.0;                               // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_RVI_Params : Stg_Params {
+struct Stg_RVI_Params : StgParams {
   unsigned int RVI_Period;
   ENUM_SIGNAL_LINE RVI_Mode;
   int RVI_Shift;
@@ -79,10 +79,9 @@ class Stg_RVI : public Strategy {
                                     stg_rvi_h4, stg_rvi_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    RVI_Params rvi_params(_params.RVI_Period);
-    IndicatorParams rvi_iparams(10, INDI_RVI);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_RVI(rvi_params, rvi_iparams, cparams), NULL, NULL);
+    RVIParams rvi_params(_params.RVI_Period);
+    rvi_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_RVI(rvi_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.RVI_SignalOpenMethod, _params.RVI_SignalOpenLevel, _params.RVI_SignalCloseMethod,

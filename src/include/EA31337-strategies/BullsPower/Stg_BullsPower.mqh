@@ -29,7 +29,7 @@ INPUT double BullsPower_PriceLimitLevel = 0;            // Price limit level
 INPUT double BullsPower_MaxSpread = 6.0;                // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_BullsPower_Params : Stg_Params {
+struct Stg_BullsPower_Params : StgParams {
   unsigned int BullsPower_Period;
   ENUM_APPLIED_PRICE BullsPower_Applied_Price;
   int BullsPower_Shift;
@@ -79,10 +79,9 @@ class Stg_BullsPower : public Strategy {
                                            stg_bulls_h1, stg_bulls_h4, stg_bulls_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    BullsPower_Params bp_params(_params.BullsPower_Period, _params.BullsPower_Applied_Price);
-    IndicatorParams bp_iparams(10, INDI_BULLS);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_BullsPower(bp_params, bp_iparams, cparams), NULL, NULL);
+    BullsPowerParams bp_params(_params.BullsPower_Period, _params.BullsPower_Applied_Price);
+    bp_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_BullsPower(bp_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.BullsPower_SignalOpenMethod, _params.BullsPower_SignalOpenMethod,

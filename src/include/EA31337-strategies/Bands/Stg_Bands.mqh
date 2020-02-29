@@ -31,7 +31,7 @@ INPUT double Bands_PriceLimitLevel = 0;                             // Price lim
 INPUT double Bands_MaxSpread = 0;                                   // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_Bands_Params : Stg_Params {
+struct Stg_Bands_Params : StgParams {
   unsigned int Bands_Period;
   double Bands_Deviation;
   int Bands_HShift;
@@ -86,10 +86,9 @@ class Stg_Bands : public Strategy {
                                       stg_bands_h1, stg_bands_h4, stg_bands_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    Bands_Params bands_params(_params.Bands_Period, _params.Bands_Deviation, Bands_HShift, Bands_Applied_Price);
-    IndicatorParams bands_iparams(10, INDI_BANDS);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_Bands(bands_params, bands_iparams, cparams), NULL, NULL);
+    BandsParams bands_params(_params.Bands_Period, _params.Bands_Deviation, Bands_HShift, Bands_Applied_Price);
+    bands_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_Bands(bands_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.Bands_SignalOpenMethod, _params.Bands_SignalOpenLevel,

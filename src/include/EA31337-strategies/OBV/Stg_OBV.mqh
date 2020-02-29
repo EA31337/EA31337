@@ -28,7 +28,7 @@ INPUT double OBV_PriceLimitLevel = 0;                           // Price limit l
 INPUT double OBV_MaxSpread = 6.0;                               // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_OBV_Params : Stg_Params {
+struct Stg_OBV_Params : StgParams {
   ENUM_APPLIED_PRICE OBV_Applied_Price;
   int OBV_Shift;
   int OBV_SignalOpenMethod;
@@ -76,10 +76,9 @@ class Stg_OBV : public Strategy {
                                     stg_obv_h4, stg_obv_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    OBV_Params obv_params(_params.OBV_Applied_Price);
-    IndicatorParams obv_iparams(10, INDI_OBV);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_OBV(obv_params, obv_iparams, cparams), NULL, NULL);
+    OBVParams obv_params(_params.OBV_Applied_Price);
+    obv_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_OBV(obv_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.OBV_SignalOpenMethod, _params.OBV_SignalOpenLevel, _params.OBV_SignalCloseMethod,

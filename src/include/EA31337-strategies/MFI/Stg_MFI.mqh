@@ -28,7 +28,7 @@ INPUT double MFI_PriceLimitLevel = 0;                           // Price limit l
 INPUT double MFI_MaxSpread = 6.0;                               // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_MFI_Params : Stg_Params {
+struct Stg_MFI_Params : StgParams {
   unsigned int MFI_Period;
   int MFI_Shift;
   int MFI_SignalOpenMethod;
@@ -76,10 +76,9 @@ class Stg_MFI : public Strategy {
                                     stg_mfi_h4, stg_mfi_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    MFI_Params mfi_params(_params.MFI_Period);
-    IndicatorParams mfi_iparams(10, INDI_MFI);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_MFI(mfi_params, mfi_iparams, cparams), NULL, NULL);
+    MFIParams mfi_params(_params.MFI_Period);
+    mfi_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_MFI(mfi_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.MFI_SignalOpenMethod, _params.MFI_SignalOpenLevel, _params.MFI_SignalCloseMethod,

@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_Ichimoku_EURUSD_H1_Params : Stg_Ichimoku_Params {
   Stg_Ichimoku_EURUSD_H1_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_H1;
     Ichimoku_Period_Tenkan_Sen = 9;
     Ichimoku_Period_Kijun_Sen = 26;
     Ichimoku_Period_Senkou_Span_B = 52;

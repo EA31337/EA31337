@@ -36,7 +36,7 @@ double MA3_PriceLimitLevel = 0;                          // Price limit level
 double MA3_MaxSpread = 6.0;                              // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_MA3_Params : Stg_Params {
+struct Stg_MA3_Params : StgParams {
   unsigned int MA3_Period_Fast;
   unsigned int MA3_Period_Medium;
   unsigned int MA3_Period_Slow;
@@ -100,15 +100,16 @@ class Stg_MA3 : public Strategy {
                                     stg_ma3_h4, stg_ma3_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    MA_Params ma_params_fast(_params.MA3_Period_Fast, _params.MA3_MA_Shift_Fast, _params.MA3_Method,
+    MAParams ma_params_fast(_params.MA3_Period_Fast, _params.MA3_MA_Shift_Fast, _params.MA3_Method,
                              _params.MA3_Applied_Price);
-    MA_Params ma_params_medium(_params.MA3_Period_Medium, _params.MA3_MA_Shift_Medium, _params.MA3_Method,
+    MAParams ma_params_medium(_params.MA3_Period_Medium, _params.MA3_MA_Shift_Medium, _params.MA3_Method,
                                _params.MA3_Applied_Price);
-    MA_Params ma_params_slow(_params.MA3_Period_Slow, _params.MA3_MA_Shift_Slow, _params.MA3_Method,
+    MAParams ma_params_slow(_params.MA3_Period_Slow, _params.MA3_MA_Shift_Slow, _params.MA3_Method,
                              _params.MA3_Applied_Price);
-    IndicatorParams ma_iparams(10, INDI_MA);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_MA(ma_params_fast, ma_iparams, cparams), NULL, NULL);
+    ma_params_fast.SetTf(_tf);
+    ma_params_medium.SetTf(_tf);
+    ma_params_slow.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_MA(ma_params_fast), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.MA3_SignalOpenMethod, _params.MA3_SignalOpenLevel, _params.MA3_SignalCloseMethod,

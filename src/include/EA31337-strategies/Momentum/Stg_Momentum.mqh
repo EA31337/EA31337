@@ -29,7 +29,7 @@ INPUT double Momentum_PriceLimitLevel = 0;                          // Price lim
 double Momentum_MaxSpread = 6.0;                                    // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_Momentum_Params : Stg_Params {
+struct Stg_Momentum_Params : StgParams {
   unsigned int Momentum_Period;
   ENUM_APPLIED_PRICE Momentum_Applied_Price;
   int Momentum_Shift;
@@ -79,10 +79,9 @@ class Stg_Momentum : public Strategy {
                                          stg_mom_h4, stg_mom_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    Momentum_Params mom_params(_params.Momentum_Period, _params.Momentum_Applied_Price);
-    IndicatorParams mom_iparams(10, INDI_MOMENTUM);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_Momentum(mom_params, mom_iparams, cparams), NULL, NULL);
+    MomentumParams mom_params(_params.Momentum_Period, _params.Momentum_Applied_Price);
+    mom_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_Momentum(mom_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.Momentum_SignalOpenMethod, _params.Momentum_SignalOpenMethod,

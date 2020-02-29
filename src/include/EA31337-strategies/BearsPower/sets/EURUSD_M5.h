@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_BearsPower_EURUSD_M5_Params : Stg_BearsPower_Params {
   Stg_BearsPower_EURUSD_M5_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_M5;
     BearsPower_Period = 13;
     BearsPower_Applied_Price = 1;
     BearsPower_Shift = 0;

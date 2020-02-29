@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_BullsPower_EURUSD_M1_Params : Stg_BullsPower_Params {
   Stg_BullsPower_EURUSD_M1_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_M1;
     BullsPower_Period = 13;
     BullsPower_Applied_Price = 1;
     BullsPower_Shift = 0;

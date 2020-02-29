@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_RVI_EURUSD_M30_Params : Stg_RVI_Params {
   Stg_RVI_EURUSD_M30_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_M30;
     RVI_Period = 2;
     RVI_Mode = 0;
     RVI_Shift = 0;

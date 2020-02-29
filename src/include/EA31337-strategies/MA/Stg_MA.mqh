@@ -31,7 +31,7 @@ double MA_PriceLimitLevel = 0;                          // Price limit level
 double MA_MaxSpread = 6.0;                              // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_MA_Params : Stg_Params {
+struct Stg_MA_Params : StgParams {
   unsigned int MA_Period;
   int MA_MA_Shift;
   ENUM_MA_METHOD MA_Method;
@@ -85,10 +85,9 @@ class Stg_MA : public Strategy {
                                    stg_ma_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    MA_Params ma_params(_params.MA_Period, _params.MA_MA_Shift, _params.MA_Method, _params.MA_Applied_Price);
-    IndicatorParams ma_iparams(10, INDI_MA);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_MA(ma_params, ma_iparams, cparams), NULL, NULL);
+    MAParams ma_params(_params.MA_Period, _params.MA_MA_Shift, _params.MA_Method, _params.MA_Applied_Price);
+    ma_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_MA(ma_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.MA_SignalOpenMethod, _params.MA_SignalOpenLevel, _params.MA_SignalCloseMethod,

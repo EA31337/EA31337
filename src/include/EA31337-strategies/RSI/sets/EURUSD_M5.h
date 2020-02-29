@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_RSI_EURUSD_M5_Params : Stg_RSI_Params {
   Stg_RSI_EURUSD_M5_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_M5;
     RSI_Period = 2;
     RSI_Applied_Price = 3;
     RSI_Shift = 0;

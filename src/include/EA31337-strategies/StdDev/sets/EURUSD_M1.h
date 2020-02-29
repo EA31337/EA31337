@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_StdDev_EURUSD_M1_Params : Stg_StdDev_Params {
   Stg_StdDev_EURUSD_M1_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_M1;
     StdDev_MA_Period = 10;
     StdDev_MA_Shift = 0;
     StdDev_MA_Method = 0;

@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_ZigZag_EURUSD_M5_Params : Stg_ZigZag_Params {
   Stg_ZigZag_EURUSD_M5_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_M5;
     ZigZag_Depth = 0;
     ZigZag_Deviation = 0;
     ZigZag_Backstep = 0;

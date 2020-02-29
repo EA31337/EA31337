@@ -32,7 +32,7 @@ INPUT double Envelopes_PriceLimitLevel = 0;                                 // P
 INPUT double Envelopes_MaxSpread = 6.0;                                     // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_Envelopes_Params : Stg_Params {
+struct Stg_Envelopes_Params : StgParams {
   int Envelopes_MA_Period;
   double Envelopes_Deviation;
   ENUM_MA_METHOD Envelopes_MA_Method;
@@ -88,11 +88,10 @@ class Stg_Envelopes : public Strategy {
                                           stg_env_h4, stg_env_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    Envelopes_Params env_params(_params.Envelopes_MA_Period, _params.Envelopes_MA_Shift, _params.Envelopes_MA_Method,
+    EnvelopesParams env_params(_params.Envelopes_MA_Period, _params.Envelopes_MA_Shift, _params.Envelopes_MA_Method,
                                 _params.Envelopes_Applied_Price, _params.Envelopes_Deviation);
-    IndicatorParams env_iparams(10, INDI_ENVELOPES);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_Envelopes(env_params, env_iparams, cparams), NULL, NULL);
+    env_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_Envelopes(env_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.Envelopes_SignalOpenMethod, _params.Envelopes_SignalOpenLevel,

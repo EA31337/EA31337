@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_DeMarker_EURUSD_H4_Params : Stg_DeMarker_Params {
   Stg_DeMarker_EURUSD_H4_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_H4;
     DeMarker_Period = 2;
     DeMarker_Shift = 0;
     DeMarker_SignalOpenMethod = 0;

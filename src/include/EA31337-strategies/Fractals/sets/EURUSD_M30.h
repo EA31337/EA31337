@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_Fractals_EURUSD_M30_Params : Stg_Fractals_Params {
   Stg_Fractals_EURUSD_M30_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_M30;
     Fractals_Shift = 0;
     Fractals_SignalOpenMethod = 0;
     Fractals_SignalOpenLevel = 36;

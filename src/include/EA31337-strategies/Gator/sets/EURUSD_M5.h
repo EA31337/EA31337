@@ -7,8 +7,6 @@
 // Defines strategy's parameter values for the given pair symbol and timeframe.
 struct Stg_Gator_EURUSD_M5_Params : Stg_Gator_Params {
   Stg_Gator_EURUSD_M5_Params() {
-    symbol = "EURUSD";
-    tf = PERIOD_M5;
     Gator_Period_Jaw = 6;
     Gator_Period_Teeth = 10;
     Gator_Period_Lips = 8;

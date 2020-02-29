@@ -35,7 +35,7 @@ INPUT double Alligator_PriceLimitLevel = 0;                                 // P
 INPUT double Alligator_MaxSpread = 0;                                       // Max spread to trade (pips)
 
 // Struct to define strategy parameters to override.
-struct Stg_Alligator_Params : Stg_Params {
+struct Stg_Alligator_Params : StgParams {
   unsigned int Alligator_Period_Jaw;
   unsigned int Alligator_Period_Teeth;
   unsigned int Alligator_Period_Lips;
@@ -98,13 +98,12 @@ class Stg_Alligator : public Strategy {
                                           stg_alli_h1, stg_alli_h4, stg_alli_h4);
     }
     // Initialize strategy parameters.
-    ChartParams cparams(_tf);
-    Alligator_Params alli_params(_params.Alligator_Period_Jaw, _params.Alligator_Shift_Jaw,
+    AlligatorParams alli_params(_params.Alligator_Period_Jaw, _params.Alligator_Shift_Jaw,
                                  _params.Alligator_Period_Teeth, _params.Alligator_Shift_Teeth,
                                  _params.Alligator_Period_Lips, _params.Alligator_Shift_Lips,
                                  _params.Alligator_MA_Method, _params.Alligator_Applied_Price);
-    IndicatorParams alli_iparams(10, INDI_ALLIGATOR);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_Alligator(alli_params, alli_iparams, cparams), NULL, NULL);
+    alli_params.SetTf(_tf);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_Alligator(alli_params), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.Alligator_SignalOpenMethod, _params.Alligator_SignalOpenLevel,
