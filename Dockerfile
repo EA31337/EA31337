@@ -75,3 +75,13 @@ RUN usermod -u $UID ubuntu
 # Copy EA files.
 USER ubuntu
 COPY --from=ea31337 --chown=ubuntu:root "/opt/EA" "/opt/EA"
+
+# EURUSD 2019
+FROM ea31337/ea-tester:EURUSD-2019-DS as ea31337-eurusd-2019
+# Adjust the user's UID.
+ARG UID=1000
+USER root
+RUN usermod -u $UID ubuntu
+# Copy EA files.
+USER ubuntu
+COPY --from=ea31337 --chown=ubuntu:root "/opt/EA" "/opt/EA"

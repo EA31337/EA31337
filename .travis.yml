@@ -11,19 +11,19 @@ env:
   - CWD=$TRAVIS_BUILD_DIR
   matrix:
   - CMD="cd docker/tests/lite;
-         docker-compose build --build-arg UID=$UID lite_test_2018_01 lite_test_2018_02;
-         docker-compose run lite_test_2018_01;
-         docker-compose run lite_test_2018_02;
+         docker-compose build --build-arg UID=$UID lite_test_2019_01 lite_test_2019_02;
+         docker-compose run lite_test_2019_01;
+         docker-compose run lite_test_2019_02;
          "
   - CMD="cd docker/tests/advanced;
-         docker-compose build --build-arg UID=$UID advanced_test_2018_01 advanced_test_2018_02;
-         docker-compose run advanced_test_2018_01;
-         docker-compose run advanced_test_2018_02;
+         docker-compose build --build-arg UID=$UID advanced_test_2019_01 advanced_test_2019_02;
+         docker-compose run advanced_test_2019_01;
+         docker-compose run advanced_test_2019_02;
          "
   - CMD="cd docker/tests/rider;
-         docker-compose build --build-arg UID=$UID rider_test_2018_01 rider_test_2018_02;
-         docker-compose run rider_test_2018_01;
-         docker-compose run rider_test_2018_02;
+         docker-compose build --build-arg UID=$UID rider_test_2019_01 rider_test_2019_02;
+         docker-compose run rider_test_2019_01;
+         docker-compose run rider_test_2019_02;
          "
   - |
     DOCKER_LOGIN='eval [[ -n $DOCKER_PASSWORD ]] && docker login -u $DOCKER_USERNAME --password-stdin <<<$DOCKER_PASSWORD || exit 0'

@@ -1,147 +1,147 @@
 version: '3.4'
 services:
-  lite_test_2018_01:
+  lite_test_2019_01:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
+    image: ea31337:eurusd-2019
     build:
       context: ../../..
-      target: ea31337-eurusd-2018
+      target: ea31337-eurusd-2019
     volumes:
     - ./_results:/opt/_results:rw
 #   - ../../../../EA-Tester/scripts:/opt/scripts
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 01
-      TEST_REPORT_NAME: EA31337_Lite_201801
-  lite_test_2018_02:
+      TEST_REPORT_NAME: EA31337_Lite_201901
+  lite_test_2019_02:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
+    image: ea31337:eurusd-2019
     build:
       context: ../../..
-      target: ea31337-eurusd-2018
+      target: ea31337-eurusd-2019
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 02
-      TEST_REPORT_NAME: EA31337_Lite_201802
-  lite_test_2018_03:
+      TEST_REPORT_NAME: EA31337_Lite_201902
+  lite_test_2019_03:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
+    image: ea31337:eurusd-2019
     build:
       context: ../../..
-      target: ea31337-eurusd-2018
+      target: ea31337-eurusd-2019
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 03
-      TEST_REPORT_NAME: EA31337_Lite_201803
-  lite_test_2018_04:
+      TEST_REPORT_NAME: EA31337_Lite_201903
+  lite_test_2019_04:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
+    image: ea31337:eurusd-2019
     build:
       context: ../../..
-      target: ea31337-eurusd-2018
+      target: ea31337-eurusd-2019
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 04
-      TEST_REPORT_NAME: EA31337_Lite_201804
-  lite_test_2018_05:
+      TEST_REPORT_NAME: EA31337_Lite_201904
+  lite_test_2019_05:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
+    image: ea31337:eurusd-2019
     build:
       context: ../../..
-      target: ea31337-eurusd-2018
+      target: ea31337-eurusd-2019
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 05
-      TEST_REPORT_NAME: EA31337_Lite_201805
-  lite_test_2018_06:
+      TEST_REPORT_NAME: EA31337_Lite_201905
+  lite_test_2019_06:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
+    image: ea31337:eurusd-2019
     build:
       context: ../../..
-      target: ea31337-eurusd-2018
+      target: ea31337-eurusd-2019
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 06
-      TEST_REPORT_NAME: EA31337_Lite_201806
-  lite_test_2018_07:
+      TEST_REPORT_NAME: EA31337_Lite_201906
+  lite_test_2019_07:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
+    image: ea31337:eurusd-2019
     build:
       context: ../../..
-      target: ea31337-eurusd-2018
+      target: ea31337-eurusd-2019
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 07
-      TEST_REPORT_NAME: EA31337_Lite_201807
-  lite_test_2018_08:
+      TEST_REPORT_NAME: EA31337_Lite_201907
+  lite_test_2019_08:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
+    image: ea31337:eurusd-2019
     build:
       context: ../../..
-      target: ea31337-eurusd-2018
+      target: ea31337-eurusd-2019
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 08
-      TEST_REPORT_NAME: EA31337_Lite_201808
-  lite_test_2018_09:
+      TEST_REPORT_NAME: EA31337_Lite_201908
+  lite_test_2019_09:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
+    image: ea31337:eurusd-2019
     build:
       context: ../../..
-      target: ea31337-eurusd-2018
+      target: ea31337-eurusd-2019
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 09
-      TEST_REPORT_NAME: EA31337_Lite_201809
-  lite_test_2018_10:
+      TEST_REPORT_NAME: EA31337_Lite_201909
+  lite_test_2019_10:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
+    image: ea31337:eurusd-2019
     build:
       context: ../../..
-      target: ea31337-eurusd-2018
+      target: ea31337-eurusd-2019
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 10
-      TEST_REPORT_NAME: EA31337_Lite_201810
-  lite_test_2018_11:
+      TEST_REPORT_NAME: EA31337_Lite_201910
+  lite_test_2019_11:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
+    image: ea31337:eurusd-2019
     build:
       context: ../../..
-      target: ea31337-eurusd-2018
+      target: ea31337-eurusd-2019
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 11
-      TEST_REPORT_NAME: EA31337_Lite_201811
-  lite_test_2018_12:
+      TEST_REPORT_NAME: EA31337_Lite_201911
+  lite_test_2019_12:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
+    image: ea31337:eurusd-2019
     build:
       context: ../../..
-      target: ea31337-eurusd-2018
+      target: ea31337-eurusd-2019
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 12
-      TEST_REPORT_NAME: EA31337_Lite_201812
+      TEST_REPORT_NAME: EA31337_Lite_201912
