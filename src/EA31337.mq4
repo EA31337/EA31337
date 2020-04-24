@@ -185,7 +185,7 @@ int worse_strategy[FINAL_STAT_PERIOD_TYPE_ENTRY], best_strategy[FINAL_ENUM_TIMEF
 bool ea_active = false; bool ea_expired = false;
 double ea_risk_ratio; string rr_text; // Vars for calculation risk ratio.
 double ea_margin_risk_level[3]; // For margin risk (all/buy/sell);
-uint max_orders = 10, daily_orders; // Maximum orders available to open.
+unsigned long max_orders = 10, daily_orders; // Maximum orders available to open.
 uint max_order_slippage; // Maximum price slippage for buy or sell orders (in points)
 int err_code; // Error code.
 string last_err, last_msg, last_debug, last_trace;
@@ -607,7 +607,7 @@ string InitInfo(bool startup = false, string sep = "\n") {
       market.GetVolumeDigits(),
       market.GetSpreadInPips(),
       market.GetSpreadInPts(),
-      account.GetAccountStopoutLevel(VerboseErrors),
+      account.GetAccountStopoutLevel(),
       market.GetTradeDistanceInPts(),
       market.GetTradeDistanceInPips(),
       sep);
@@ -655,7 +655,7 @@ bool EA_Trade(Trade *_trade) {
   ENUM_TIMEFRAMES tf = _trade.Chart().GetTf();
   if (VerboseTrace) _trade.Logger().Trace(StringFormat("%s:%d: %s", __FUNCTION__, __LINE__, DateTime::TimeToStr(_trade.Chart().GetBarTime())));
 
-  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+  for (int sid = 0; sid < strats.GetSize(); sid++) {
     strat = ((Strategy *) strats.GetByIndex(sid));
 
     if (strat.GetTf() == tf && strat.IsEnabled() && !strat.IsSuspended()) {
@@ -1319,7 +1319,7 @@ bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, Strategy *_strat, double volume = E
   if (volume < market.GetVolumeMin()) {
     last_trace = Msg::ShowText(StringFormat("%s: Lot size = %.2f", _strat.GetName(), volume), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
     result = false;
-  } else if (!account.Trades().IsNewOrderAllowed()) {
+  } else if (!_strat.Trade().IsOrderAllowed()) {
     last_msg = Msg::ShowText("Maximum open and pending orders has reached the limit set by the broker.", "Info", __FUNCTION__, __LINE__, VerboseInfo);
     result = false;
   } else if (total_orders >= max_orders) {
@@ -1333,7 +1333,7 @@ bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, Strategy *_strat, double volume = E
     last_msg = Msg::ShowText(StringFormat("%s: Maximum open and pending orders per type has reached the limit (MaxOrdersPerType).", _strat.GetName()), "Info", __FUNCTION__, __LINE__, VerboseInfo);
     OrderQueueAdd((uint) _strat.GetId(), cmd);
     result = false;
-  } else if (!account.CheckFreeMargin(cmd, volume)) {
+  } else if (!account.GetAccountFreeMarginCheck(cmd, volume)) {
     last_err = Msg::ShowText("No money to open more orders.", "Error", __FUNCTION__, __LINE__, VerboseInfo | VerboseErrors, PrintLogOnChart);
     if (VerboseDebug) PrintFormat("%s:%d: %s: Volume: %g", __FUNCTION__, __LINE__, _strat.GetName(), volume);
     result = false;
@@ -3714,7 +3714,7 @@ bool CheckMinPipGap(int sid) {
  */
 void CheckOrders() {
   double elapsed_mins;
-  for (uint i = 0; i < Orders::OrdersTotal(); i++) {
+  for (int i = 0; i < Trade::OrdersTotal(); i++) {
     if (!Order::OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) { continue; }
     if (CheckOurMagicNumber() && Order::OrderOpenTime() > 0 && CloseOrderAfterXHours != 0) {
       elapsed_mins = ((double) (TimeCurrent() - Order::OrderOpenTime()) / 60);
@@ -4401,16 +4401,16 @@ uint GetMaxOrdersPerDay() {
   int hours_left = (24 - hour_of_day);
   int curr_allowed_limit = (int) floor((MaxOrdersPerDay - daily_orders) / hours_left);
   // Message(StringFormat("Hours left: (%d - %d) / %d= %d", MaxOrdersPerDay, daily_orders, hours_left, curr_allowed_limit));
-  return fmin(fmax((total_orders - daily_orders), 1) + curr_allowed_limit, MaxOrdersPerDay);
+  return (uint) fmin(fmax((total_orders - daily_orders), 1) + curr_allowed_limit, MaxOrdersPerDay);
 }
 #endif
 
 /**
  * Calculate number of maximum of orders allowed to open.
  */
-uint GetMaxOrders(double volume_size) {
-  uint _result = 0;
-  uint _limit = account.GetLimitOrders();
+unsigned long GetMaxOrders(double volume_size) {
+  unsigned long _result = 0;
+  unsigned long _limit = (int) account.GetLimitOrders();
   #ifdef __advanced__
     _result = MaxOrders > 0 ? (MaxOrdersPerDay > 0 ? fmin(MaxOrders, GetMaxOrdersPerDay()) : MaxOrders) : trade[chart.TfToIndex()].CalcMaxOrders(volume_size, ea_risk_ratio, max_orders, GetMaxOrdersPerDay());
   #else
@@ -4432,7 +4432,7 @@ int GetMaxOrdersPerType() {
 int GetNoOfStrategies() {
   int result = 0;
   Strategy *_strat;
-  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+  for (int sid = 0; sid < strats.GetSize(); sid++) {
     _strat = ((Strategy *) strats.GetByIndex(sid));
     result += _strat.IsEnabled() && !_strat.IsSuspended() ? 1 : 0;
   }
@@ -4745,7 +4745,7 @@ void StartNewDay(Trade *_trade) {
   string strategy_stats = "Daily strategy stats: ";
   Strategy *_strat;
   uint j;
-  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+  for (int sid = 0; sid < strats.GetSize(); sid++) {
     _strat = ((Strategy *) strats.GetByIndex(sid));
     j = (uint) _strat.GetId();
     if (stats[j][DAILY_PROFIT] != 0) strategy_stats += StringFormat("%s: %.1f pips; ", _strat.GetName(), stats[j][DAILY_PROFIT]);
@@ -4801,7 +4801,7 @@ void StartNewWeek(Trade *_trade) {
   string strategy_stats = "Weekly strategy stats: ";
   Strategy *_strat;
   uint j;
-  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+  for (int sid = 0; sid < strats.GetSize(); sid++) {
     _strat = ((Strategy *) strats.GetByIndex(sid));
     j = (uint) _strat.GetId();
     if (stats[j][WEEKLY_PROFIT] != 0) strategy_stats += StringFormat("%s: %.1f pips; ", _strat.GetName(), stats[j][WEEKLY_PROFIT]);
@@ -4836,7 +4836,7 @@ void StartNewMonth(Trade *_trade) {
   string strategy_stats = "Monthly strategy stats: ";
   Strategy *_strat;
   uint j;
-  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+  for (int sid = 0; sid < strats.GetSize(); sid++) {
     _strat = ((Strategy *) strats.GetByIndex(sid));
     j = (uint) _strat.GetId();
     if (stats[j][MONTHLY_PROFIT] != 0) strategy_stats += StringFormat("%s: %.1f pips; ", _strat.GetName(), stats[j][MONTHLY_PROFIT]);
@@ -6168,7 +6168,7 @@ bool InitStrategies() {
   }
 
   Strategy *_strat;
-  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+  for (int sid = 0; sid < strats.GetSize(); sid++) {
 
     // Validate strategy.
     _strat = ((Strategy *) strats.GetByIndex(sid));
@@ -6662,7 +6662,7 @@ string GetStrategyReport(string sep = "\n") {
   string output = "Strategy stats:" + sep;
   Strategy *_strat;
   uint id;
-  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+  for (int sid = 0; sid < strats.GetSize(); sid++) {
     _strat = ((Strategy *) strats.GetByIndex(sid));
     id = (uint) _strat.GetId();
     if (info[id][TOTAL_ORDERS] > 0) {
@@ -6737,7 +6737,7 @@ double GetStrategySignalLevel(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _t
   double _result = _default;
   bool _found = false;
   Strategy *_strat;
-  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+  for (int sid = 0; sid < strats.GetSize(); sid++) {
     _strat = ((Strategy *) strats.GetByIndex(sid));
     if (_strat.Data().GetIndicatorType() == _indicator && _strat.GetTf() == _tf) {
       _result = _strat.GetSignalLevel1();
@@ -6766,7 +6766,7 @@ ulong GetStrategySignalMethod(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _t
   ulong _result = _default;
   bool _found = false;
   Strategy *_strat;
-  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+  for (int sid = 0; sid < strats.GetSize(); sid++) {
     _strat = ((Strategy *) strats.GetByIndex(sid));
     if (_strat.Data().GetIndicatorType() == _indicator && _strat.GetTf() == _tf) {
       _result = _strat.GetSignalOpenMethod1();
@@ -6803,7 +6803,7 @@ ulong GetStrategyViaIndicator(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _t
   ulong _result = EMPTY;
   bool _found = false;
   Strategy *_strat;
-  for (uint sid = 0; sid < strats.GetSize(); sid++) {
+  for (int sid = 0; sid < strats.GetSize(); sid++) {
     _strat = ((Strategy *) strats.GetByIndex(sid));
     if (_strat.Data().GetIndicatorType() == _indicator && _strat.GetTf() == _tf) {
       _result = _strat.GetId();
@@ -7039,7 +7039,7 @@ string DisplayInfoOnChart(bool on_chart = true, string sep = "\n") {
   // Prepare text for Stop Out.
   string stop_out_level = StringFormat("%d", account.AccountStopoutLevel());
   if (account.AccountStopoutMode() == 0) stop_out_level += "%"; else stop_out_level += account.AccountCurrency();
-  stop_out_level += StringFormat(" (%.1f)", account.GetAccountStopoutLevel(VerboseErrors));
+  stop_out_level += StringFormat(" (%.1f)", account.GetAccountStopoutLevel());
   // Prepare text to display max orders.
   string text_max_orders = StringFormat("Max orders: %d [Per type: %d]", max_orders, GetMaxOrdersPerType());
   #ifdef __advanced__
@@ -7142,7 +7142,7 @@ string GetOrdersStats(string sep = "\n") {
   if (total_orders > 0) {
     Strategy *_strat;
     uint sid;
-    for (uint i = 0; i < strats.GetSize(); i++) {
+    for (int i = 0; i < strats.GetSize(); i++) {
       _strat = ((Strategy *) strats.GetByIndex(i));
       sid = (uint) _strat.GetId();
       if (open_orders[sid] > 0) {
@@ -7440,13 +7440,13 @@ bool ActionExecute(int aid, int id = EMPTY) {
       result = ActionCloseAllOrders(reason_id);
       break;
     case A_SUSPEND_STRATEGIES: /* 11 */
-      for (uint sid = 0; sid < strats.GetSize(); sid++) {
+      for (int sid = 0; sid < strats.GetSize(); sid++) {
         ((Strategy *) strats.GetByIndex(sid)).Suspended(true);
       }
       result = true;
       break;
     case A_UNSUSPEND_STRATEGIES: /* 12 */
-      for (uint sid = 0; sid < strats.GetSize(); sid++) {
+      for (int sid = 0; sid < strats.GetSize(); sid++) {
         ((Strategy *) strats.GetByIndex(sid)).Suspended(false);
       }
       result = true;
@@ -7724,13 +7724,13 @@ bool OpenOrderCondition(ENUM_ORDER_TYPE cmd, int sid, datetime time, int method)
   double qclose = _chart.GetClose(tf, qshift);
   double qhighest = _chart.GetPeakPrice(MODE_HIGH, qshift); // Get the high price since queued.
   double qlowest = _chart.GetPeakPrice(MODE_LOW, qshift); // Get the lowest price since queued.
-  double diff = fmax(qhighest - market.GetOpen(), market.GetOpen() - qlowest);
+  double diff = fmax(qhighest - _chart.GetOpen(), _chart.GetOpen() - qlowest);
   if (VerboseTrace) PrintFormat("%s(%s, %d, %s, %d)", __FUNCTION__, EnumToString(cmd), sid, DateTime::TimeToStr(time), method);
   if (method != 0) {
-    if (METHOD(method,0)) result &= (cmd == ORDER_TYPE_BUY && qopen < market.GetOpen()) || (cmd == ORDER_TYPE_SELL && qopen > market.GetOpen());
-    if (METHOD(method,1)) result &= (cmd == ORDER_TYPE_BUY && qclose < market.GetClose()) || (cmd == ORDER_TYPE_SELL && qclose > market.GetClose());
-    if (METHOD(method,2)) result &= (cmd == ORDER_TYPE_BUY && qlowest < market.GetLow()) || (cmd == ORDER_TYPE_SELL && qlowest > market.GetLow());
-    if (METHOD(method,3)) result &= (cmd == ORDER_TYPE_BUY && qhighest > market.GetHigh()) || (cmd == ORDER_TYPE_SELL && qhighest < market.GetHigh());
+    if (METHOD(method,0)) result &= (cmd == ORDER_TYPE_BUY && qopen < _chart.GetOpen()) || (cmd == ORDER_TYPE_SELL && qopen > _chart.GetOpen());
+    if (METHOD(method,1)) result &= (cmd == ORDER_TYPE_BUY && qclose < _chart.GetClose()) || (cmd == ORDER_TYPE_SELL && qclose > _chart.GetClose());
+    if (METHOD(method,2)) result &= (cmd == ORDER_TYPE_BUY && qlowest < _chart.GetLow()) || (cmd == ORDER_TYPE_SELL && qlowest > _chart.GetLow());
+    if (METHOD(method,3)) result &= (cmd == ORDER_TYPE_BUY && qhighest > _chart.GetHigh()) || (cmd == ORDER_TYPE_SELL && qhighest < _chart.GetHigh());
     if (METHOD(method,4)) result &= UpdateIndicator(_chart, INDI_SAR) && Stg_SAR::SignalOpen(_chart, cmd, 0, 0);
     if (METHOD(method,5)) result &= UpdateIndicator(_chart, INDI_DEMARKER) && Stg_DeMarker::SignalOpen(_chart, cmd, 0, 0);
     if (METHOD(method,6)) result &= UpdateIndicator(_chart, INDI_RSI) && Stg_RSI::SignalOpen(_chart, cmd, 0, 0);
