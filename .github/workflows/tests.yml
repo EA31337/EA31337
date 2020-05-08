@@ -2,17 +2,31 @@
 name: Tests
 
 on:
-  - pull_request
-  - push
+  pull_request:
+    paths-ignore:
+      - '*.md'
+  push:
+    branches:
+      - 'master'
+      - 'ci'
+      - '*dev*'
+    paths-ignore:
+      - '*.md'
 
 jobs:
   Lite:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Monthly Tests (Lite)
-        working-directory: docker/tests/lite
-        run: docker-compose up
-        env:
-          COMPOSE_DOCKER_CLI_BUILD: 1
-          DOCKER_BUILDKIT: 1
+      - name: Test 2018.01
+        uses: ea31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 1
+          BtYears: 2018
+      - name: Test 2018.02
+        uses: ea31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 2
+          BtYears: 2018
