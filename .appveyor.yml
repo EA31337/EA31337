@@ -1,37 +1,39 @@
+# yamllint disable rule:line-length
+---
 environment:
   EAFILE: src/EA31337.mq4
   matrix:
-  - MODE: __lite__
-  - MODE: __advanced__
-  - MODE: __rider__
-  - MODE: __backtest__
-  - MODE: __optimize__
-  - MODE: __profiler__
-  - MODE: __noinput__
-  - MODE: __limited__
-  - MODE: __release__
-  - MODE: __debug__
-  - MODE: __trace__
-  - MODE: __experimental__
+    - MODE: __lite__
+    - MODE: __advanced__
+    - MODE: __rider__
+    - MODE: __backtest__
+    - MODE: __optimize__
+    - MODE: __profiler__
+    - MODE: __noinput__
+    - MODE: __limited__
+    - MODE: __release__
+    - MODE: __debug__
+    - MODE: __trace__
+    - MODE: __experimental__
 init:
-- ps: iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
+  - ps: iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
 install:
-- appveyor DownloadFile https://github.com/EA31337/MetaEditor/raw/master/metaeditor64.exe
-- scoop install ruby python
-- ps: scoop install shellcheck
+  - appveyor DownloadFile https://github.com/EA31337/MetaEditor/raw/master/metaeditor64.exe
+  - scoop install ruby python
+  - ps: scoop install shellcheck
 before_test:
-- git submodule update --init
-- shellcheck --version
-- ruby --version
-- echo ^#define %MODE% >> src/include/EA31337/ea-mode.mqh
+  - git submodule update --init
+  - shellcheck --version
+  - ruby --version
+  - echo ^#define %MODE% >> src/include/EA31337/ea-mode.mqh
 test_script:
-- ps: Get-ChildItem -File scripts | Foreach {shellcheck $_.fullname}
-- ps: Copy-Item "$env:EAFILE" -Destination "$env:EAFILE.mq5"
-- metaeditor64 /s /compile:. /inc:. /log:mql.log || exit /b 0
-- type mql.log
-- ruby -e "if File.open('mql.log', mode:'rb:BOM|UTF-16LE').readlines.grep(Regexp.new '[1-9] error'.encode(Encoding::UTF_16LE)) {exit 1}; end"
-- ruby -e "if File.open('mql.log', mode:'rb:BOM|UTF-16LE').readlines.grep(Regexp.new '[1-9] warning'.encode(Encoding::UTF_16LE)) {exit 1}; end"
-- ruby -e "if File.open('mql.log', mode:'rb:BOM|UTF-16LE').readlines.grep(Regexp.new '[1-9][0-9] error'.encode(Encoding::UTF_16LE)) {exit 1}; end"
-- ruby -e "if File.open('mql.log', mode:'rb:BOM|UTF-16LE').readlines.grep(Regexp.new '[1-9][0-9] warning'.encode(Encoding::UTF_16LE)) {exit 1}; end"
+  - ps: Get-ChildItem -File scripts | Foreach {shellcheck $_.fullname}
+  - ps: Copy-Item "$env:EAFILE" -Destination "$env:EAFILE.mq5"
+  - metaeditor64 /s /compile:. /inc:. /log:mql.log || exit /b 0
+  - type mql.log
+  - ruby -e "if File.open('mql.log', mode:'rb:BOM|UTF-16LE').readlines.grep(Regexp.new '[1-9] error'.encode(Encoding::UTF_16LE)) {exit 1}; end"
+  - ruby -e "if File.open('mql.log', mode:'rb:BOM|UTF-16LE').readlines.grep(Regexp.new '[1-9] warning'.encode(Encoding::UTF_16LE)) {exit 1}; end"
+  - ruby -e "if File.open('mql.log', mode:'rb:BOM|UTF-16LE').readlines.grep(Regexp.new '[1-9][0-9] error'.encode(Encoding::UTF_16LE)) {exit 1}; end"
+  - ruby -e "if File.open('mql.log', mode:'rb:BOM|UTF-16LE').readlines.grep(Regexp.new '[1-9][0-9] warning'.encode(Encoding::UTF_16LE)) {exit 1}; end"
 build: off
 platform: x86
