@@ -15,7 +15,6 @@ Please follow [Wiki Home page](https://github.com/EA31337/EA31337/wiki) for the 
 
 | Type            | Status      |
 | --------------: |:-----------:|
-| Travis CI build | [![Build Status](https://api.travis-ci.org/EA31337/EA31337.svg?branch=master)](https://travis-ci.org/EA31337/EA31337) |
 | AppVeyor build  | [![Build status](https://ci.appveyor.com/api/projects/status/63qnd959vxl44102?svg=true)](https://ci.appveyor.com/project/kenorb/ea31337/branch/master) |
 
 # About the project
