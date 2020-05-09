@@ -40,13 +40,14 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
+      - name: Sets mode
+        run: "make set-advanced"
       - name: Test 2018.01
         uses: ea31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 1
           BtYears: 2018
-          RunOnStart: '(cd $GITHUB_WORKSPACE && make set-advanced)'
           RunOnWarning: 'show_logs && parse_results $@ && exit 0'
       - name: Test 2018.02
         uses: ea31337/mql-tester-action@master
@@ -54,5 +55,4 @@ jobs:
           TestExpert: EA31337
           BtMonths: 2
           BtYears: 2018
-          RunOnStart: '(cd $GITHUB_WORKSPACE && make set-advanced)'
           RunOnWarning: 'show_logs && parse_results $@ && exit 0'
