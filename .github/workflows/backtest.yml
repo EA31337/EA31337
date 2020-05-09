@@ -1,0 +1,61 @@
+---
+name: Backtest
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/backtest.yml'
+      - '*.mq?'
+  push:
+    branches:
+      - 'master'
+      - 'ci'
+      - '*dev*'
+    paths:
+      - '.github/workflows/backtest.yml'
+      - '*.mq?'
+
+jobs:
+  Lite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Backtest 2018
+        uses: ea31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 1-12
+          BtYears: 2018
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+  Advanced:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Sets mode
+        run: "make set-advanced"
+      - name: Backtest 2018
+        uses: ea31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 1-12
+          BtYears: 2018
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+  Rider:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Sets mode
+        run: "make set-rider"
+      - name: Backtest 2018
+        uses: ea31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 1-12
+          BtYears: 2018
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
