@@ -1,7 +1,12 @@
-[![](https://img.shields.io/github/release/EA31337/EA31337.svg?logo=github)](https://github.com/EA31337/EA31337/releases)
-[![](https://img.shields.io/badge/news-Telegram-0088CC.svg?logo=telegram)](https://t.me/EA31337_News)
-[![](https://img.shields.io/badge/chat-Telegram-0088CC.svg?logo=telegram)](https://t.me/EA31337)
-[![](https://img.shields.io/github/license/EA31337/EA31337.svg)](https://tldrlegal.com/license/gnu-general-public-license-v3-(gpl-3))
+[![Release][github-release-image]][github-release-link]
+[![][license-image]][license-link]
+[![Status][appveyor-ci-build-link]][appveyor-ci-build-image]
+[![Status][gha-image-tests-master]][gha-link-tests-master]
+[![Status][gha-image-backtest-master]][gha-link-backtest-master]
+[![Status][gha-image-lint-master]][gha-link-lint-master]
+[![][tg-channel-image]][tg-channel-link]
+[![][tg-chat-image]][tg-chat-link]
+[![Edit][gitpod-image]][gitpod-link]
 
 # Introduction
 
@@ -10,13 +15,6 @@ Introducing EA31337, an advanced trading robot for Forex markets written in MQL.
 The EA (_Expert Advisor_) implements the coordinated algorithm which prioritising and managing multi-timeframe strategies with fully user customizable parameters, which takes the currency trading on the next level. It makes real-time trading a hassle-free experience.
 
 Please follow [Wiki Home page](https://github.com/EA31337/EA31337/wiki) for the available documentation pages.
-
-# Build status
-
-| Type            | Status      |
-| --------------: |:-----------:|
-| Travis CI build | [![Build Status](https://api.travis-ci.org/EA31337/EA31337.svg?branch=master)](https://travis-ci.org/EA31337/EA31337) |
-| AppVeyor build  | [![Build status](https://ci.appveyor.com/api/projects/status/63qnd959vxl44102?svg=true)](https://ci.appveyor.com/project/kenorb/ea31337/branch/master) |
 
 # About the project
 
@@ -209,3 +207,31 @@ Trading any financial market involves risk. All forms of trading carry a high le
 NFA and CTFC Required Disclaimers: Trading in the Foreign Exchange market as well as in Futures Market and Options or in the Stock Market is a challenging opportunity where above average returns are available for educated and experienced investors who are willing to take above average risk. However, before deciding to participate in Foreign Exchange (FX) trading or in Trading Futures, Options or stocks, you should carefully consider your investment objectives, level of experience and risk appetite. Do not invest money you cannot afford to lose.
 
 CFTC RULE 4.41 - HYPOTHETICAL OR SIMULATED PERFORMANCE RESULTS HAVE CERTAIN LIMITATIONS. UNLIKE AN ACTUAL PERFORMANCE RECORD, SIMULATED RESULTS DO NOT REPRESENT ACTUAL TRADING. ALSO, SINCE THE TRADES HAVE NOT BEEN EXECUTED, THE RESULTS MAY HAVE UNDER-OR-OVER COMPENSATED FOR THE IMPACT, IF ANY, OF CERTAIN MARKET FACTORS, SUCH AS LACK OF LIQUIDITY. SIMULATED TRADING PROGRAMS IN GENERAL ARE ALSO SUBJECT TO THE FACT THAT THEY ARE DESIGNED WITH THE BENEFIT OF HINDSIGHT. NO REPRESENTATION IS BEING MADE THAN ANY ACCOUNT WILL OR IS LIKELY TO ACHIEVE PROFIT OR LOSSES SIMILAR TO THOSE SHOWN.
+
+<!-- Named links -->
+
+[github-release-image]: https://img.shields.io/github/release/EA31337/EA31337.svg?logo=github
+[github-release-link]: https://github.com/EA31337/EA31337/releases
+[docker-build-image]: https://images.microbadger.com/badges/image/ea31337/mql-tester-action-action.svg
+[docker-build-link]: https://microbadger.com/images/ea31337/mql-tester-action-action
+<!-- Telegram links -->
+[tg-channel-image]: https://img.shields.io/badge/Telegram-news-0088CC.svg?logo=telegram
+[tg-channel-link]: https://t.me/EA31337_News
+[tg-chat-image]: https://img.shields.io/badge/Telegram-chat-0088CC.svg?logo=telegram
+[tg-chat-link]: https://t.me/EA31337
+<!-- AppVeyor CI build links -->
+[appveyor-ci-build-link]: https://ci.appveyor.com/api/projects/status/63qnd959vxl44102/branch/master?svg=true
+[appveyor-ci-build-image]: https://ci.appveyor.com/project/kenorb/ea31337
+<!-- GitHub Actions build links -->
+[gha-link-tests-master]: https://github.com/EA31337/EA31337/actions?query=workflow%3ATests+branch%3Amaster
+[gha-image-tests-master]: https://github.com/EA31337/EA31337/workflows/Tests/badge.svg?branch=master
+[gha-link-backtest-master]: https://github.com/EA31337/EA31337/actions?query=workflow%3ABacktest+branch%3Amaster
+[gha-image-backtest-master]: https://github.com/EA31337/EA31337/workflows/Backtest/badge.svg?branch=master
+[gha-link-lint-master]: https://github.com/EA31337/EA31337/actions?query=workflow%3ALint+branch%3Amaster
+[gha-image-lint-master]: https://github.com/EA31337/EA31337/workflows/Lint/badge.svg?branch=master
+<!-- Gitpod links -->
+[gitpod-image]: https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod
+[gitpod-link]: https://gitpod.io/#https://github.com/EA31337/EA31337
+<!-- License links -->
+[license-image]: https://img.shields.io/github/license/EA31337/EA31337.svg
+[license-link]: https://tldrlegal.com/license/gnu-general-public-license-v3-(gpl-3)

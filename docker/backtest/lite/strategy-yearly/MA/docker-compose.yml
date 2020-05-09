@@ -1,3 +1,4 @@
+---
 version: '3.4'
 services:
   MA_Backtest_2018:

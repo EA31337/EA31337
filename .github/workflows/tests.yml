@@ -1,0 +1,85 @@
+---
+name: Tests
+
+on:
+  pull_request:
+    paths-ignore:
+      - '*.json'
+      - '*.md'
+      - '*.txt'
+      - '.git*'
+      - '.yamllint'
+      - 'LICENSE'
+  push:
+    branches:
+      - 'master'
+      - 'ci'
+      - '*dev*'
+    paths-ignore:
+      - '*.md'
+
+jobs:
+  Lite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Test 2018.01
+        uses: ea31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 1
+          BtYears: 2018
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+      - name: Test 2018.02
+        uses: ea31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 2
+          BtYears: 2018
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+  Advanced:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Sets mode
+        run: "make set-advanced"
+      - name: Test 2018.01
+        uses: ea31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 1
+          BtYears: 2018
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+      - name: Test 2018.02
+        uses: ea31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 2
+          BtYears: 2018
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+  Rider:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Sets mode
+        run: "make set-rider"
+      - name: Test 2018.01
+        uses: ea31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 1
+          BtYears: 2018
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+      - name: Test 2018.02
+        uses: ea31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 2
+          BtYears: 2018
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'

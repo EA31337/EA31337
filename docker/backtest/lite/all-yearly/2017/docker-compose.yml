@@ -1,3 +1,4 @@
+---
 version: '3.4'
 services:
   lite_backtest_2017_100k:

@@ -1,147 +1,148 @@
+---
 version: '3.4'
 services:
-  advanced_test_2018_01:
+  advanced_test_2019_01:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
+    image: ea31337:eurusd-2019
     build:
       context: ../../..
-      target: ea31337-eurusd-2018
+      target: ea31337-eurusd-2019
     volumes:
     - ./_results:/opt/_results:rw
 #   - ../../../../EA-Tester/scripts:/opt/scripts
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 01
-      TEST_REPORT_NAME: EA31337_Advanced_201801
-  advanced_test_2018_02:
+      TEST_REPORT_NAME: EA31337_Advanced_201901
+  advanced_test_2019_02:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
+    image: ea31337:eurusd-2019
     build:
       context: ../../..
-      target: ea31337-eurusd-2018
+      target: ea31337-eurusd-2019
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 02
-      TEST_REPORT_NAME: EA31337_Advanced_201802
-  advanced_test_2018_03:
+      TEST_REPORT_NAME: EA31337_Advanced_201902
+  advanced_test_2019_03:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
+    image: ea31337:eurusd-2019
     build:
       context: ../../..
-      target: ea31337-eurusd-2018
+      target: ea31337-eurusd-2019
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 03
-      TEST_REPORT_NAME: EA31337_Advanced_201803
-  advanced_test_2018_04:
+      TEST_REPORT_NAME: EA31337_Advanced_201903
+  advanced_test_2019_04:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
+    image: ea31337:eurusd-2019
     build:
       context: ../../..
-      target: ea31337-eurusd-2018
+      target: ea31337-eurusd-2019
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 04
-      TEST_REPORT_NAME: EA31337_Advanced_201804
-  advanced_test_2018_05:
+      TEST_REPORT_NAME: EA31337_Advanced_201904
+  advanced_test_2019_05:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
+    image: ea31337:eurusd-2019
     build:
       context: ../../..
-      target: ea31337-eurusd-2018
+      target: ea31337-eurusd-2019
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 05
-      TEST_REPORT_NAME: EA31337_Advanced_201805
-  advanced_test_2018_06:
+      TEST_REPORT_NAME: EA31337_Advanced_201905
+  advanced_test_2019_06:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
+    image: ea31337:eurusd-2019
     build:
       context: ../../..
-      target: ea31337-eurusd-2018
+      target: ea31337-eurusd-2019
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 06
-      TEST_REPORT_NAME: EA31337_Advanced_201806
-  advanced_test_2018_07:
+      TEST_REPORT_NAME: EA31337_Advanced_201906
+  advanced_test_2019_07:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
+    image: ea31337:eurusd-2019
     build:
       context: ../../..
-      target: ea31337-eurusd-2018
+      target: ea31337-eurusd-2019
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 07
-      TEST_REPORT_NAME: EA31337_Advanced_201807
-  advanced_test_2018_08:
+      TEST_REPORT_NAME: EA31337_Advanced_201907
+  advanced_test_2019_08:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
+    image: ea31337:eurusd-2019
     build:
       context: ../../..
-      target: ea31337-eurusd-2018
+      target: ea31337-eurusd-2019
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 08
-      TEST_REPORT_NAME: EA31337_Advanced_201808
-  advanced_test_2018_09:
+      TEST_REPORT_NAME: EA31337_Advanced_201908
+  advanced_test_2019_09:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
+    image: ea31337:eurusd-2019
     build:
       context: ../../..
-      target: ea31337-eurusd-2018
+      target: ea31337-eurusd-2019
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 09
-      TEST_REPORT_NAME: EA31337_Advanced_201809
-  advanced_test_2018_10:
+      TEST_REPORT_NAME: EA31337_Advanced_201909
+  advanced_test_2019_10:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
+    image: ea31337:eurusd-2019
     build:
       context: ../../..
-      target: ea31337-eurusd-2018
+      target: ea31337-eurusd-2019
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 10
-      TEST_REPORT_NAME: EA31337_Advanced_201810
-  advanced_test_2018_11:
+      TEST_REPORT_NAME: EA31337_Advanced_201910
+  advanced_test_2019_11:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
+    image: ea31337:eurusd-2019
     build:
       context: ../../..
-      target: ea31337-eurusd-2018
+      target: ea31337-eurusd-2019
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 11
-      TEST_REPORT_NAME: EA31337_Advanced_201811
-  advanced_test_2018_12:
+      TEST_REPORT_NAME: EA31337_Advanced_201911
+  advanced_test_2019_12:
     command: run_backtest -v
-    image: ea31337:eurusd-2018
+    image: ea31337:eurusd-2019
     build:
       context: ../../..
-      target: ea31337-eurusd-2018
+      target: ea31337-eurusd-2019
     volumes:
     - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 12
-      TEST_REPORT_NAME: EA31337_Advanced_201812
+      TEST_REPORT_NAME: EA31337_Advanced_201912
