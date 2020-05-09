@@ -4,7 +4,12 @@ name: Tests
 on:
   pull_request:
     paths-ignore:
+      - '*.json'
       - '*.md'
+      - '*.txt'
+      - '.git*'
+      - '.yamllint'
+      - 'LICENSE'
   push:
     branches:
       - 'master'
