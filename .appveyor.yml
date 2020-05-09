@@ -20,14 +20,11 @@ init:
 install:
   - appveyor DownloadFile https://github.com/EA31337/MT-Platforms/releases/download/5.0.0.2361/mt-5.0.0.2361.zip && unzip -q *.zip && cp -v */metaeditor*.exe .
   - scoop install ruby python
-  - ps: scoop install shellcheck
 before_test:
   - git submodule update --init
-  - shellcheck --version
   - ruby --version
   - echo ^#define %MODE% > src/include/EA31337/ea-mode.mqh
 test_script:
-  - ps: Get-ChildItem -File scripts | Foreach {shellcheck $_.fullname}
   - ps: Copy-Item "$env:EAFILE" -Destination "$env:EAFILE.mq5"
   - metaeditor64 /s /compile:. /inc:. /log:mql.log || exit /b 0
   - type mql.log
