@@ -29,6 +29,7 @@ jobs:
           BtMonths: 1-12
           BtYears: 2018
           RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+          RunOnSuccess: 'git diff'
   Advanced:
     runs-on: ubuntu-latest
     steps:
@@ -44,6 +45,7 @@ jobs:
           BtMonths: 1-12
           BtYears: 2018
           RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+          RunOnSuccess: 'git diff'
   Rider:
     runs-on: ubuntu-latest
     steps:
@@ -59,3 +61,4 @@ jobs:
           BtMonths: 1-12
           BtYears: 2018
           RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+          RunOnSuccess: 'git diff'
