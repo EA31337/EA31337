@@ -23,7 +23,7 @@ jobs:
         with:
           submodules: 'recursive'
       - name: Backtest 2018
-        uses: ea31337/mql-tester-action@master
+        uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 1-12
@@ -39,7 +39,7 @@ jobs:
       - name: Sets mode
         run: "make set-advanced"
       - name: Backtest 2018
-        uses: ea31337/mql-tester-action@master
+        uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 1-12
@@ -55,7 +55,7 @@ jobs:
       - name: Sets mode
         run: "make set-rider"
       - name: Backtest 2018
-        uses: ea31337/mql-tester-action@master
+        uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 1-12

@@ -26,7 +26,7 @@ jobs:
         with:
           submodules: 'recursive'
       - name: Test 2018.01
-        uses: ea31337/mql-tester-action@master
+        uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 1
@@ -34,7 +34,7 @@ jobs:
           RunOnWarning: 'show_logs && parse_results $@ && exit 0'
           RunOnSuccess: 'git diff'
       - name: Test 2018.02
-        uses: ea31337/mql-tester-action@master
+        uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 2
@@ -50,7 +50,7 @@ jobs:
       - name: Sets mode
         run: "make set-advanced"
       - name: Test 2018.01
-        uses: ea31337/mql-tester-action@master
+        uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 1
@@ -58,7 +58,7 @@ jobs:
           RunOnWarning: 'show_logs && parse_results $@ && exit 0'
           RunOnSuccess: 'git diff'
       - name: Test 2018.02
-        uses: ea31337/mql-tester-action@master
+        uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 2
@@ -74,7 +74,7 @@ jobs:
       - name: Sets mode
         run: "make set-rider"
       - name: Test 2018.01
-        uses: ea31337/mql-tester-action@master
+        uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 1
@@ -82,7 +82,7 @@ jobs:
           RunOnWarning: 'show_logs && parse_results $@ && exit 0'
           RunOnSuccess: 'git diff'
       - name: Test 2018.02
-        uses: ea31337/mql-tester-action@master
+        uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 2
