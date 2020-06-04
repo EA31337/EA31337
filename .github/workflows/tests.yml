@@ -32,6 +32,7 @@ jobs:
           BtMonths: 1
           BtYears: 2018
           RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+          RunOnSuccess: 'git diff'
       - name: Test 2018.02
         uses: ea31337/mql-tester-action@master
         with:
@@ -39,6 +40,7 @@ jobs:
           BtMonths: 2
           BtYears: 2018
           RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+          RunOnSuccess: 'git diff'
   Advanced:
     runs-on: ubuntu-latest
     steps:
@@ -54,6 +56,7 @@ jobs:
           BtMonths: 1
           BtYears: 2018
           RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+          RunOnSuccess: 'git diff'
       - name: Test 2018.02
         uses: ea31337/mql-tester-action@master
         with:
@@ -61,6 +64,7 @@ jobs:
           BtMonths: 2
           BtYears: 2018
           RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+          RunOnSuccess: 'git diff'
   Rider:
     runs-on: ubuntu-latest
     steps:
@@ -76,6 +80,7 @@ jobs:
           BtMonths: 1
           BtYears: 2018
           RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+          RunOnSuccess: 'git diff'
       - name: Test 2018.02
         uses: ea31337/mql-tester-action@master
         with:
@@ -83,3 +88,4 @@ jobs:
           BtMonths: 2
           BtYears: 2018
           RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+          RunOnSuccess: 'git diff'
