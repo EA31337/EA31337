@@ -8,7 +8,7 @@ RUN usermod -u $UID ubuntu
 # Copy EA files.
 USER ubuntu
 COPY --chown=ubuntu:root ./ /opt/src
-RUN cp '/home/ubuntu/.wine/drive_c/Program Files/MetaTrader 4/metaeditor.exe' /opt/src/
+RUN cp '/home/ubuntu/.wine/drive_c/MetaTrader 4/metaeditor.exe' /opt/src/
 
 # Build Lite version.
 FROM ea31337-src as ea31337-lite
