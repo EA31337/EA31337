@@ -4,9 +4,9 @@ name: Tests
 on:
   pull_request:
     paths-ignore:
-      - '*.json'
-      - '*.md'
-      - '*.txt'
+      - '**/*.json'
+      - '**/*.md'
+      - '**/*.txt'
       - '.git*'
       - '.yamllint'
       - 'LICENSE'
@@ -16,7 +16,7 @@ on:
       - 'ci'
       - '*dev*'
     paths-ignore:
-      - '*.md'
+      - '**/*.md'
 
 jobs:
   Lite:

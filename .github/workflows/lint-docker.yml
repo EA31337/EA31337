@@ -5,15 +5,15 @@ name: Lint Docker
 on:
   pull_request:
     paths-ignore:
-      - '*.json'
-      - '*.md'
-      - '*.txt'
+      - '**/*.json'
+      - '**/*.md'
+      - '**/*.txt'
       - '.git*'
       - '.yamllint'
       - 'LICENSE'
   push:
     paths:
-      - '*.y?ml'
+      - '**/*.y?ml'
       - '.github/workflows/lint-docker.yml'
 
 jobs:
