@@ -20,6 +20,8 @@ jobs:
   DockerCompose:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
       - name: Validates Docker Compose files
         run: find . -name docker-compose.yml -print -exec docker-compose -f {} config -q ';'
