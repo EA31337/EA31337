@@ -1,0 +1,30 @@
+---
+name: Tests Docker
+
+on:
+  pull_request:
+    paths-ignore:
+      - '**/*.json'
+      - '**/*.md'
+      - '**/*.txt'
+      - '.git*'
+      - '.yamllint'
+      - 'LICENSE'
+  push:
+    branches:
+      - 'master'
+      - 'ci'
+      - '*dev*'
+    paths-ignore:
+      - '**/*.md'
+
+jobs:
+  Lite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Run tests
+        working-directory: docker/tests/lite
+        run: docker-compose up --build
