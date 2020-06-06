@@ -1,0 +1,25 @@
+# yamllint disable rule:line-length
+---
+name: Lint Docker
+
+on:
+  pull_request:
+    paths-ignore:
+      - '*.json'
+      - '*.md'
+      - '*.txt'
+      - '.git*'
+      - '.yamllint'
+      - 'LICENSE'
+  push:
+    paths:
+      - '*.y?ml'
+      - '.github/workflows/lint-docker.yml'
+
+jobs:
+  DockerCompose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Validates Docker Compose files
+        run: find . -name docker-compose.yml -print -exec docker-compose -f {} config -q ';'
