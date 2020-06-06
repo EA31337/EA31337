@@ -6,6 +6,7 @@ on:
     paths:
       - '**/*.mq?'
       - '.github/workflows/compile.yml'
+      - '.github/workflows/scripts/compile.ps1'
       - 'src/include/**'
   push:
     branches:
@@ -15,6 +16,7 @@ on:
     paths:
       - '**/*.mq?'
       - '.github/workflows/compile.yml'
+      - '.github/workflows/scripts/compile.ps1'
       - 'src/include/**'
 
 jobs:
@@ -24,5 +26,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
-      - run: ./.github/workflows/compile.ps1
+      - name: Compile
+        run: .\.github\workflows\scripts\compile.ps1
         shell: powershell
