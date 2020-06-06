@@ -25,5 +25,5 @@ jobs:
         run: |
           find . -name docker-compose.yml -print |
             while read file; do
-              docker-compose -f $file config -q;
+              docker-compose -f $file config -q || exit 1
             done
