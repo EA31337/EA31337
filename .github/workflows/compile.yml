@@ -1,0 +1,28 @@
+---
+name: Compile
+
+on:
+  pull_request:
+    paths:
+      - '**/*.mq?'
+      - '.github/workflows/compile.yml'
+      - 'src/include/**'
+  push:
+    branches:
+      - 'master'
+      - 'ci'
+      - '*dev*'
+    paths:
+      - '**/*.mq?'
+      - '.github/workflows/compile.yml'
+      - 'src/include/**'
+
+jobs:
+  Compile:
+    runs-on: windows-2019
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - run: ./.github/workflows/compile.ps1
+        shell: powershell
