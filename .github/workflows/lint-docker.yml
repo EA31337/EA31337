@@ -24,4 +24,8 @@ jobs:
         with:
           submodules: 'recursive'
       - name: Validates Docker Compose files
-        run: find . -name docker-compose.yml -print -exec docker-compose -f {} config -q ';'
+        run: |
+          find . -name docker-compose.yml -print |
+            while read file; do
+              docker-compose -f $file config -q;
+            done
