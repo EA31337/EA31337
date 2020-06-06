@@ -41,6 +41,22 @@ jobs:
           BtYears: 2018
           RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
           RunOnSuccess: 'git diff'
+      - name: Test 2019.01
+        uses: fx31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 1
+          BtYears: 2019
+          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnSuccess: 'git diff'
+      - name: Test 2019.02
+        uses: fx31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 2
+          BtYears: 2019
+          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnSuccess: 'git diff'
   Advanced:
     runs-on: ubuntu-latest
     steps:
@@ -65,6 +81,22 @@ jobs:
           BtYears: 2018
           RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
           RunOnSuccess: 'git diff'
+      - name: Test 2019.01
+        uses: fx31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 1
+          BtYears: 2019
+          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnSuccess: 'git diff'
+      - name: Test 2019.02
+        uses: fx31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 2
+          BtYears: 2019
+          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnSuccess: 'git diff'
   Rider:
     runs-on: ubuntu-latest
     steps:
@@ -87,5 +119,21 @@ jobs:
           TestExpert: EA31337
           BtMonths: 2
           BtYears: 2018
+          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnSuccess: 'git diff'
+      - name: Test 2019.01
+        uses: fx31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 1
+          BtYears: 2019
+          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnSuccess: 'git diff'
+      - name: Test 2019.02
+        uses: fx31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 2
+          BtYears: 2019
           RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
           RunOnSuccess: 'git diff'
