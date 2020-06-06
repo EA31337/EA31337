@@ -49,6 +49,7 @@ jobs:
           BtYears: 2019
           RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
           RunOnSuccess: 'git diff'
+        if: false
       - name: Test 2019.02
         uses: fx31337/mql-tester-action@master
         with:
@@ -57,6 +58,7 @@ jobs:
           BtYears: 2019
           RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
           RunOnSuccess: 'git diff'
+        if: false
   Advanced:
     runs-on: ubuntu-latest
     steps:
@@ -89,6 +91,7 @@ jobs:
           BtYears: 2019
           RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
           RunOnSuccess: 'git diff'
+        if: false
       - name: Test 2019.02
         uses: fx31337/mql-tester-action@master
         with:
@@ -97,6 +100,7 @@ jobs:
           BtYears: 2019
           RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
           RunOnSuccess: 'git diff'
+        if: false
   Rider:
     runs-on: ubuntu-latest
     steps:
@@ -129,6 +133,7 @@ jobs:
           BtYears: 2019
           RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
           RunOnSuccess: 'git diff'
+        if: false
       - name: Test 2019.02
         uses: fx31337/mql-tester-action@master
         with:
@@ -137,3 +142,4 @@ jobs:
           BtYears: 2019
           RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
           RunOnSuccess: 'git diff'
+        if: false
