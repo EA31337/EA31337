@@ -32,8 +32,10 @@ jobs:
           submodules: 'recursive'
       - name: Build image for 2018
         env:
+          COMPOSE_DOCKER_CLI_BUILD: 1
           DOCKER_BUILDKIT: 1
-        run: docker build --target=ea31337-eurusd-2018 .
+        run: docker-compose build
+        working-directory: docker/tests/lite
       - name: Run test for 2018.01
         env:
           COMPOSE_DOCKER_CLI_BUILD: 1
