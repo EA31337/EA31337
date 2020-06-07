@@ -1,6 +1,5 @@
 # Prepare source code.
 FROM ea31337/ea-tester:dev as ea31337-src
-MAINTAINER kenorb
 # Adjust the user's UID.
 ARG UID=1001
 USER root
@@ -36,7 +35,6 @@ RUN make Rider-Optimize
 
 # Build all versions.
 FROM ea31337-src as ea31337
-MAINTAINER kenorb
 WORKDIR /opt/EA
 COPY --from=ea31337-lite --chown=ubuntu:root "/opt/src/*.ex?" "/opt/EA/"
 COPY --from=ea31337-advanced --chown=ubuntu:root "/opt/src/*.ex?" "/opt/EA/"
