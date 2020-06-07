@@ -1,6 +1,5 @@
 # Ignores compiled binary files.
-*.ex4
-*.ex5
+*.ex?
 
 # Ignores temporary files.
 *.swp
@@ -8,9 +7,6 @@
 
 # Ignores test results in HTML format.
 *.htm
-
-# Ignores binary files.
-*.ex?
 
 # Ignores Finder metadata files on Mac
 .DS_Store
