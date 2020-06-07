@@ -1,44 +1,44 @@
 # Prepare source code.
-FROM ea31337/ea-tester:dev as ea31337-src
+FROM ea31337/ea-tester:dev as ea31337-ea
 # Adjust the user's UID.
 ARG UID=1001
 USER root
 RUN usermod -u $UID ubuntu
 # Copy EA files.
 USER ubuntu
-COPY --chown=ubuntu:root ./ /opt/src
-RUN cp '/home/ubuntu/.wine/drive_c/MetaTrader 4/metaeditor.exe' /opt/src/
+COPY --chown=ubuntu:root ./ /opt/EA
+RUN cp '/home/ubuntu/.wine/drive_c/MetaTrader 4/metaeditor.exe' /opt/EA/
 
 # Build Lite version.
-FROM ea31337-src as ea31337-lite
-WORKDIR /opt/src
+FROM ea31337-ea as ea31337-lite
+WORKDIR /opt/EA
 RUN make Lite
 RUN make Lite-Release
 RUN make Lite-Backtest
 RUN make Lite-Optimize
 
 # Build Advanced version.
-FROM ea31337-src as ea31337-advanced
-WORKDIR /opt/src
+FROM ea31337-ea as ea31337-advanced
+WORKDIR /opt/EA
 RUN make Advanced
 RUN make Advanced-Release
 RUN make Advanced-Backtest
 RUN make Advanced-Optimize
 
 # Build Rider version.
-FROM ea31337-src as ea31337-rider
-WORKDIR /opt/src
+FROM ea31337-ea as ea31337-rider
+WORKDIR /opt/EA
 RUN make Rider
 RUN make Rider-Release
 RUN make Rider-Backtest
 RUN make Rider-Optimize
 
 # Build all versions.
-FROM ea31337-src as ea31337
+FROM ea31337-ea as ea31337
 WORKDIR /opt/EA
-COPY --from=ea31337-lite --chown=ubuntu:root "/opt/src/*.ex?" "/opt/EA/"
-COPY --from=ea31337-advanced --chown=ubuntu:root "/opt/src/*.ex?" "/opt/EA/"
-COPY --from=ea31337-rider --chown=ubuntu:root "/opt/src/*.ex?" "/opt/EA/"
+COPY --from=ea31337-lite --chown=ubuntu:root "/opt/EA/*.ex?" "/opt/EA/"
+COPY --from=ea31337-advanced --chown=ubuntu:root "/opt/EA/*.ex?" "/opt/EA/"
+COPY --from=ea31337-rider --chown=ubuntu:root "/opt/EA/*.ex?" "/opt/EA/"
 
 # Build-time metadata as defined at http://label-schema.org
 ARG BUILD_DATE
