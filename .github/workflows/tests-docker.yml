@@ -16,7 +16,12 @@ on:
       - 'ci'
       - '*dev*'
     paths-ignore:
+      - '**/*.json'
       - '**/*.md'
+      - '**/*.txt'
+      - '.git*'
+      - '.yamllint'
+      - 'LICENSE'
 
 jobs:
   Lite:
@@ -25,9 +30,19 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
-      - name: Run tests
+      - name: Build image for 2018
+        env:
+          DOCKER_BUILDKIT: 1
+        run: docker build --target=ea31337-eurusd-2018 .
+      - name: Run test for 2018.01
         env:
           COMPOSE_DOCKER_CLI_BUILD: 1
           DOCKER_BUILDKIT: 1
-        run: docker-compose up --build
+        run: docker-compose run lite_test_2018_01
+        working-directory: docker/tests/lite
+      - name: Run test for 2018.02
+        env:
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          DOCKER_BUILDKIT: 1
+        run: docker-compose run lite_test_2018_02
         working-directory: docker/tests/lite
