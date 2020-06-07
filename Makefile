@@ -26,6 +26,7 @@ FILE=$(lastword $(MAKEFILE_LIST)) # Determine this Makefile's path.
 OUT=.
 MKFILE=$(abspath $(lastword $(MAKEFILE_LIST)))
 CWD=$(notdir $(patsubst %/,%,$(dir $(MKFILE))))
+WINEDEBUG=fixme-all
 
 requirements:
 	type -a git ex wine64 &> /dev/null
