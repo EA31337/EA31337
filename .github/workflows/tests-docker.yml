@@ -26,5 +26,8 @@ jobs:
         with:
           submodules: 'recursive'
       - name: Run tests
-        working-directory: docker/tests/lite
+        env:
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          DOCKER_BUILDKIT: 1
         run: docker-compose up --build
+        working-directory: docker/tests/lite
