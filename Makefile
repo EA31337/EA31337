@@ -21,7 +21,7 @@ MQL5=$(wildcard $(SRC)/*.mq5)
 EA=EA31337
 EX4=$(SRC)/$(EA).ex4
 EX5=$(SRC)/$(EA).ex5
-VER=$(shell grep 'define ea_version' $(SRC)/include/EA31337/ea-properties.mqh | grep -o '[0-9].*[0-9]')
+VER=v$(shell grep 'define ea_version' $(SRC)/include/EA31337/ea-properties.mqh | grep -o '[0-9].*[0-9]')
 FILE=$(lastword $(MAKEFILE_LIST)) # Determine this Makefile's path.
 OUT=.
 MKFILE=$(abspath $(lastword $(MAKEFILE_LIST)))
@@ -155,73 +155,73 @@ $(OUT)/$(EA)-Lite-%.ex4: \
 		set-lite \
 		compile-mql4 \
 		set-none
-		cp -v "$(EX4)" "$(OUT)/$(EA)-Lite-v$(VER).ex4"
+		cp -v "$(EX4)" "$(OUT)/$(EA)-Lite-$(VER).ex4"
 
 $(OUT)/$(EA)-Advanced-%.ex4: \
 		set-advanced \
 		compile-mql4 \
 		set-none
-		cp -v "$(EX4)" "$(OUT)/$(EA)-Advanced-v$(VER).ex4"
+		cp -v "$(EX4)" "$(OUT)/$(EA)-Advanced-$(VER).ex4"
 
 $(OUT)/$(EA)-Rider-%.ex4: \
 		set-rider \
 		compile-mql4 \
 		set-none
-		cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-v$(VER).ex4"
+		cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-$(VER).ex4"
 
 $(OUT)/$(EA)-Lite-Release-%.ex4: \
 		set-lite-release \
 		compile-mql4 \
 		set-none
-		cp -v "$(EX4)" "$(OUT)/$(EA)-Lite-Release-v$(VER).ex4"
+		cp -v "$(EX4)" "$(OUT)/$(EA)-Lite-Release-$(VER).ex4"
 
 $(OUT)/$(EA)-Advanced-Release-%.ex4: \
 		set-advanced-release \
 		compile-mql4 \
 		set-none
-		cp -v "$(EX4)" "$(OUT)/$(EA)-Advanced-Release-v$(VER).ex4"
+		cp -v "$(EX4)" "$(OUT)/$(EA)-Advanced-Release-$(VER).ex4"
 
 $(OUT)/$(EA)-Rider-Release-%.ex4: \
 		set-rider-release \
 		compile-mql4 \
 		set-none
-		cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-Release-v$(VER).ex4"
+		cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-Release-$(VER).ex4"
 
 $(OUT)/$(EA)-Lite-Backtest-%.ex4: \
 		set-lite-backtest \
 		compile-mql4 \
 		set-none
-		cp -v "$(EX4)" "$(OUT)/$(EA)-Lite-Backtest-v$(VER).ex4"
+		cp -v "$(EX4)" "$(OUT)/$(EA)-Lite-Backtest-$(VER).ex4"
 
 $(OUT)/$(EA)-Advanced-Backtest-%.ex4: \
 		set-advanced-backtest \
 		compile-mql4 \
 		set-none
-		cp -v "$(EX4)" "$(OUT)/$(EA)-Advanced-Backtest-v$(VER).ex4"
+		cp -v "$(EX4)" "$(OUT)/$(EA)-Advanced-Backtest-$(VER).ex4"
 
 $(OUT)/$(EA)-Rider-Backtest-%.ex4: \
 		set-rider-backtest \
 		compile-mql4 \
 		set-none
-		cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-Backtest-v$(VER).ex4"
+		cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-Backtest-$(VER).ex4"
 
 $(OUT)/$(EA)-Lite-Optimize-%.ex4: \
 		set-lite-optimize \
 		compile-mql4 \
 		set-none
-		cp -v "$(EX4)" "$(OUT)/$(EA)-Lite-Optimize-v$(VER).ex4"
+		cp -v "$(EX4)" "$(OUT)/$(EA)-Lite-Optimize-$(VER).ex4"
 
 $(OUT)/$(EA)-Advanced-Optimize-%.ex4: \
 		set-advanced-optimize \
 		compile-mql4 \
 		set-none
-		cp -v "$(EX4)" "$(OUT)/$(EA)-Advanced-Optimize-v$(VER).ex4"
+		cp -v "$(EX4)" "$(OUT)/$(EA)-Advanced-Optimize-$(VER).ex4"
 
 $(OUT)/$(EA)-Rider-Optimize-%.ex4: \
 		set-rider-optimize \
 		compile-mql4 \
 		set-none
-		cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-Optimize-v$(VER).ex4"
+		cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-Optimize-$(VER).ex4"
 
 mt4-install:
 		install -v "$(EX4)" "$(shell find ~/.wine -name terminal.exe -execdir pwd ';' -quit)/MQL4/Experts"
