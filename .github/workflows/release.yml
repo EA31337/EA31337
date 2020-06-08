@@ -1,0 +1,83 @@
+---
+name: Release
+
+on:
+  push:
+    branches:
+      - 'v*'
+    paths:
+      - '.github/workflows/release.y?ml'
+      - '**/*.mq?'
+    tags:
+      - 'v*'
+  release:
+    types:
+      - prereleased
+      - published
+      - unpublished
+
+jobs:
+  Lite-Tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Test 2018.01-02
+        uses: fx31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 1-2
+          BtYears: 2018
+          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnSuccess: 'git diff'
+        if: false
+  Advanced-Tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Sets mode
+        run: "make set-advanced"
+      - name: Test 2018.01-02
+        uses: fx31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 1-2
+          BtYears: 2018
+          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnSuccess: 'git diff'
+        if: false
+  Rider-Tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Sets mode
+        run: "make set-rider"
+      - name: Test 2018.01-02
+        uses: fx31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 1-2
+          BtYears: 2018
+          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnSuccess: 'git diff'
+        if: false
+  Lite-Release:
+    runs-on: ubuntu-latest
+    needs: Lite-Tests
+    container:
+      image: ea31337/ea-tester
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - run: pwd
+      - run: id
+      - run: ls /github/workspace
+      - run: ls ${{ github.workspace }}
+      - name: Compile
+        run: make -C "${{ github.workspace }}" VER=Dev Lite-Release
