@@ -1,0 +1,23 @@
+---
+version: '3.4'
+services:
+  lite:
+    entrypoint: ['make', '-C', '/opt/EA', '-e', 'VER=Dev', 'Lite']
+    image: ea31337/ea-tester:latest
+    volumes:
+      - '../../..:/opt/EA:rw'
+  lite_backtest:
+    entrypoint: ['make', '-C', '/opt/EA', '-e', 'VER=Dev', 'Lite-Backtest']
+    image: ea31337/ea-tester:latest
+    volumes:
+      - '../../..:/opt/EA:rw'
+  lite_optimize:
+    entrypoint: ['make', '-C', '/opt/EA', '-e', 'VER=Dev', 'Lite-Optimize']
+    image: ea31337/ea-tester:latest
+    volumes:
+      - '../../..:/opt/EA:rw'
+  lite_release:
+    entrypoint: ['make', '-C', '/opt/EA', '-e', 'VER=Dev', 'Lite-Release']
+    image: ea31337/ea-tester:latest
+    volumes:
+      - '../../..:/opt/EA:rw'

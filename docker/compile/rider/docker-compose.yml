@@ -1,0 +1,23 @@
+---
+version: '3.4'
+services:
+  rider:
+    entrypoint: ['make', '-C', '/opt/EA', '-e', 'VER=Dev', 'Rider']
+    image: ea31337/ea-tester:latest
+    volumes:
+      - '../../..:/opt/EA:rw'
+  rider_backtest:
+    entrypoint: ['make', '-C', '/opt/EA', '-e', 'VER=Dev', 'Rider-Backtest']
+    image: ea31337/ea-tester:latest
+    volumes:
+      - '../../..:/opt/EA:rw'
+  rider_optimize:
+    entrypoint: ['make', '-C', '/opt/EA', '-e', 'VER=Dev', 'Rider-Optimize']
+    image: ea31337/ea-tester:latest
+    volumes:
+      - '../../..:/opt/EA:rw'
+  rider_release:
+    entrypoint: ['make', '-C', '/opt/EA', '-e', 'VER=Dev', 'Rider-Release']
+    image: ea31337/ea-tester:latest
+    volumes:
+      - '../../..:/opt/EA:rw'
