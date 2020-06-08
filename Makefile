@@ -59,7 +59,7 @@ test: requirements set-mode $(MTE)
 
 $(MTE):
 	curl -LO https://github.com/EA31337/MT-Platforms/releases/download/$(MTV)/mt-$(MTV).zip
-	unzip mt-$(MTV).zip */$(MTE)
+	unzip -o mt-$(MTV).zip */$(MTE)
 	cp -v */$(MTE) .
 
 # E.g.: make set-mode MODE="__advanced__"
