@@ -17,67 +17,72 @@ on:
       - unpublished
 
 jobs:
-  Lite-Tests:
+  Lite:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
-      - name: Test 2018.01-02
-        uses: fx31337/mql-tester-action@master
-        with:
-          TestExpert: EA31337
-          BtMonths: 1-2
-          BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
-          RunOnSuccess: 'git diff'
-        if: false
-  Advanced-Tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: 'recursive'
-      - name: Sets mode
-        run: "make set-advanced"
-      - name: Test 2018.01-02
-        uses: fx31337/mql-tester-action@master
-        with:
-          TestExpert: EA31337
-          BtMonths: 1-2
-          BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
-          RunOnSuccess: 'git diff'
-        if: false
-  Rider-Tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: 'recursive'
-      - name: Sets mode
-        run: "make set-rider"
-      - name: Test 2018.01-02
-        uses: fx31337/mql-tester-action@master
-        with:
-          TestExpert: EA31337
-          BtMonths: 1-2
-          BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
-          RunOnSuccess: 'git diff'
-        if: false
-  Lite-Release:
-    runs-on: ubuntu-latest
-    needs: Lite-Tests
-    container:
-      image: ea31337/ea-tester
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: 'recursive'
-      - run: pwd
-      - run: id
-      - run: ls /github/workspace
-      - run: ls ${{ github.workspace }}
       - name: Compile
-        run: make -C "${{ github.workspace }}" VER=Dev Lite-Release
+        run: docker-compose run lite
+        working-directory: docker/compile/lite
+      - name: Adjust filename
+        run: mv -v *.ex4 "EA31337-Lite-${GITHUB_BRANCH##*/}.ex4"
+        env:
+          GITHUB_BRANCH: ${{ github.ref }}
+      - name: Test 2018.01
+        uses: fx31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337-Lite
+          BtMonths: 1
+          BtYears: 2018
+          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnSuccess: 'git diff'
+      - name: Check results
+        run: git diff
+  Advanced:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Compile
+        run: docker-compose run advanced
+        working-directory: docker/compile/advanced
+      - name: Adjust filename
+        run: mv -v *.ex4 "EA31337-Advanced-${GITHUB_BRANCH##*/}.ex4"
+        env:
+          GITHUB_BRANCH: ${{ github.ref }}
+      - name: Test 2018.01
+        uses: fx31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337-Advanced
+          BtMonths: 1
+          BtYears: 2018
+          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnSuccess: 'git diff'
+      - name: Check results
+        run: git diff
+  Rider:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Compile
+        run: docker-compose run rider
+        working-directory: docker/compile/rider
+      - name: Adjust filename
+        run: mv -v *.ex4 "EA31337-Rider-${GITHUB_BRANCH##*/}.ex4"
+        env:
+          GITHUB_BRANCH: ${{ github.ref }}
+      - name: Test 2018.01
+        uses: fx31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337-Rider
+          BtMonths: 1
+          BtYears: 2018
+          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnSuccess: 'git diff'
+      - name: Check results
+        run: git diff
