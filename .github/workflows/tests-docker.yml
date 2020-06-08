@@ -3,25 +3,15 @@ name: Tests Docker
 
 on:
   pull_request:
-    paths-ignore:
-      - '**/*.json'
-      - '**/*.md'
-      - '**/*.txt'
-      - '.git*'
-      - '.yamllint'
-      - 'LICENSE'
+    paths:
+      - '**/*.h'
+      - '**/*.mq?'
+      - '.github/workflows/tests-docker.yml'
   push:
-    branches:
-      - 'master'
-      - 'ci'
-      - '*dev*'
-    paths-ignore:
-      - '**/*.json'
-      - '**/*.md'
-      - '**/*.txt'
-      - '.git*'
-      - '.yamllint'
-      - 'LICENSE'
+    paths:
+      - '**/*.h'
+      - '**/*.mq?'
+      - '.github/workflows/tests-docker.yml'
 
 jobs:
   Lite:
