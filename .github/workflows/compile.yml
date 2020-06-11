@@ -6,7 +6,6 @@ on:
     paths:
       - '**/*.mq?'
       - '.github/workflows/compile.yml'
-      - '.github/workflows/scripts/compile.ps1'
       - 'src/include/**'
   push:
     branches:
@@ -16,17 +15,42 @@ on:
     paths:
       - '**/*.mq?'
       - '.github/workflows/compile.yml'
-      - '.github/workflows/scripts/compile.ps1'
       - 'src/include/**'
 
 jobs:
-  Compile:
+  Lite:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
-      - name: Compile
+      - name: Enables Lite
+        run: echo '#define __release__' > src/include/EA31337/ea-mode.mqh
+      - name: Compiles EA
+        uses: fx31337/mql-compile-action@master
+        with:
+          verbose: true
+  Advanced:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Enables Advanced
+        run: echo '#define __advanced__' > src/include/EA31337/ea-mode.mqh
+      - name: Compiles EA
+        uses: fx31337/mql-compile-action@master
+        with:
+          verbose: true
+  Rider:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Enables Rider
+        run: echo '#define __rider__' > src/include/EA31337/ea-mode.mqh
+      - name: Compiles EA
         uses: fx31337/mql-compile-action@master
         with:
           verbose: true
