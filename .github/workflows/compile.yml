@@ -21,11 +21,12 @@ on:
 
 jobs:
   Compile:
-    runs-on: windows-2019
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
       - name: Compile
-        run: .\.github\workflows\scripts\compile.ps1
-        shell: powershell
+        uses: fx31337/mql-compile-action@master
+        with:
+          verbose: true
