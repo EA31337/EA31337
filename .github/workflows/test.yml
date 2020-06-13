@@ -3,13 +3,11 @@ name: Test
 
 on:
   pull_request:
-    paths-ignore:
-      - '**/*.json'
-      - '**/*.md'
-      - '**/*.txt'
-      - '.git*'
-      - '.yamllint'
-      - 'LICENSE'
+    paths:
+      - '**/*.h'
+      - '**/*.mq?'
+      - '.github/workflows/test.yml'
+      - 'src/include/**'
   push:
     paths:
       - '**/*.h'
@@ -18,12 +16,91 @@ on:
       - 'src/include/**'
 
 jobs:
-  Lite:
-    runs-on: ubuntu-latest
+  Compile-Lite:
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
+      - name: Enables Lite mode
+        run: echo '#define __release__' > src/include/EA31337/ea-mode.mqh
+      - name: Compiles EA (MQL4)
+        uses: fx31337/mql-compile-action@master
+        with:
+          path: src\EA31337.mq4
+          verbose: true
+      - name: Compiles EA (MQL5)
+        uses: fx31337/mql-compile-action@master
+        with:
+          path: src\EA31337.mq5
+          verbose: true
+      - name: Prints compiled files
+        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
+        shell: powershell
+      - name: Uploads artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ea-lite
+          path: 'src\*.ex?'
+  Compile-Advanced:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Enables Advanced mode
+        run: echo '#define __advanced__' > src/include/EA31337/ea-mode.mqh
+      - name: Compiles EA (MQL4)
+        uses: fx31337/mql-compile-action@master
+        with:
+          path: src\EA31337.mq4
+          verbose: true
+      - name: Compiles EA (MQL5)
+        uses: fx31337/mql-compile-action@master
+        with:
+          path: src\EA31337.mq5
+          verbose: true
+      - name: Prints compiled files
+        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
+        shell: powershell
+      - name: Uploads artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ea-advanced
+          path: 'src\*.ex?'
+  Compile-Rider:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Enables Rider mode
+        run: echo '#define __rider__' > src/include/EA31337/ea-mode.mqh
+      - name: Compiles EA (MQL4)
+        uses: fx31337/mql-compile-action@master
+        with:
+          path: src\EA31337.mq4
+          verbose: true
+      - name: Compiles EA (MQL5)
+        uses: fx31337/mql-compile-action@master
+        with:
+          path: src\EA31337.mq5
+          verbose: true
+      - name: Prints compiled files
+        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
+        shell: powershell
+      - name: Uploads artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ea-rider
+          path: 'src\*.ex?'
+  Test-Lite:
+    needs: Compile-Lite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: ea-lite
       - name: Test 2018.01
         uses: fx31337/mql-tester-action@master
         with:
@@ -31,7 +108,6 @@ jobs:
           BtMonths: 1
           BtYears: 2018
           RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
-          RunOnSuccess: 'git diff'
       - name: Test 2018.02
         uses: fx31337/mql-tester-action@master
         with:
@@ -39,7 +115,6 @@ jobs:
           BtMonths: 2
           BtYears: 2018
           RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
-          RunOnSuccess: 'git diff'
       - name: Test 2019.01
         uses: fx31337/mql-tester-action@master
         with:
@@ -47,7 +122,6 @@ jobs:
           BtMonths: 1
           BtYears: 2019
           RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
-          RunOnSuccess: 'git diff'
         if: false
       - name: Test 2019.02
         uses: fx31337/mql-tester-action@master
@@ -56,16 +130,14 @@ jobs:
           BtMonths: 2
           BtYears: 2019
           RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
-          RunOnSuccess: 'git diff'
         if: false
-  Advanced:
+  Test-Advanced:
+    needs: Compile-Advanced
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
         with:
-          submodules: 'recursive'
-      - name: Sets mode
-        run: "make set-advanced"
+          name: ea-advanced
       - name: Test 2018.01
         uses: fx31337/mql-tester-action@master
         with:
@@ -73,7 +145,6 @@ jobs:
           BtMonths: 1
           BtYears: 2018
           RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
-          RunOnSuccess: 'git diff'
       - name: Test 2018.02
         uses: fx31337/mql-tester-action@master
         with:
@@ -81,7 +152,6 @@ jobs:
           BtMonths: 2
           BtYears: 2018
           RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
-          RunOnSuccess: 'git diff'
       - name: Test 2019.01
         uses: fx31337/mql-tester-action@master
         with:
@@ -89,7 +159,6 @@ jobs:
           BtMonths: 1
           BtYears: 2019
           RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
-          RunOnSuccess: 'git diff'
         if: false
       - name: Test 2019.02
         uses: fx31337/mql-tester-action@master
@@ -98,16 +167,14 @@ jobs:
           BtMonths: 2
           BtYears: 2019
           RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
-          RunOnSuccess: 'git diff'
         if: false
-  Rider:
+  Test-Rider:
+    needs: Compile-Rider
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
         with:
-          submodules: 'recursive'
-      - name: Sets mode
-        run: "make set-rider"
+          name: ea-rider
       - name: Test 2018.01
         uses: fx31337/mql-tester-action@master
         with:
@@ -115,7 +182,6 @@ jobs:
           BtMonths: 1
           BtYears: 2018
           RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
-          RunOnSuccess: 'git diff'
       - name: Test 2018.02
         uses: fx31337/mql-tester-action@master
         with:
@@ -123,7 +189,6 @@ jobs:
           BtMonths: 2
           BtYears: 2018
           RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
-          RunOnSuccess: 'git diff'
       - name: Test 2019.01
         uses: fx31337/mql-tester-action@master
         with:
@@ -131,7 +196,6 @@ jobs:
           BtMonths: 1
           BtYears: 2019
           RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
-          RunOnSuccess: 'git diff'
         if: false
       - name: Test 2019.02
         uses: fx31337/mql-tester-action@master
@@ -140,5 +204,4 @@ jobs:
           BtMonths: 2
           BtYears: 2019
           RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
-          RunOnSuccess: 'git diff'
         if: false
