@@ -1,5 +1,5 @@
 ---
-name: Tests Docker
+name: Test Docker
 
 on:
   pull_request:
