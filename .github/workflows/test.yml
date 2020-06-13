@@ -11,12 +11,11 @@ on:
       - '.yamllint'
       - 'LICENSE'
   push:
-    branches:
-      - 'master'
-      - 'ci'
-      - '*dev*'
-    paths-ignore:
-      - '**/*.md'
+    paths:
+      - '**/*.h'
+      - '**/*.mq?'
+      - '.github/workflows/test.yml'
+      - 'src/include/**'
 
 jobs:
   Lite:
