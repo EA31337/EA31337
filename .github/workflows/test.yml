@@ -34,6 +34,10 @@ jobs:
         with:
           path: src\EA31337.mq5
           verbose: true
+      - name: Moves file (MQL4)
+        run: mv -v src\*.ex4 "EA31337-Lite-${{ github.sha }}.ex4"
+      - name: Moves file (MQL5)
+        run: mv -v src\*.ex5 "EA31337-Lite-${{ github.sha }}.ex5"
       - name: Prints compiled files
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
         shell: powershell
@@ -41,7 +45,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ea-lite
-          path: 'src\*.ex?'
+          path: '*.ex?'
   Compile-Advanced:
     runs-on: windows-latest
     steps:
@@ -60,6 +64,10 @@ jobs:
         with:
           path: src\EA31337.mq5
           verbose: true
+      - name: Moves file (MQL4)
+        run: mv -v src\*.ex4 "EA31337-Advanced-${{ github.sha }}.ex4"
+      - name: Moves file (MQL5)
+        run: mv -v src\*.ex5 "EA31337-Advanced-${{ github.sha }}.ex5"
       - name: Prints compiled files
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
         shell: powershell
@@ -67,7 +75,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ea-advanced
-          path: 'src\*.ex?'
+          path: '*.ex?'
   Compile-Rider:
     runs-on: windows-latest
     steps:
@@ -86,6 +94,10 @@ jobs:
         with:
           path: src\EA31337.mq5
           verbose: true
+      - name: Moves file (MQL4)
+        run: mv -v src\*.ex4 "EA31337-Rider-${{ github.sha }}.ex4"
+      - name: Moves file (MQL5)
+        run: mv -v src\*.ex5 "EA31337-Rider-${{ github.sha }}.ex5"
       - name: Prints compiled files
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
         shell: powershell
@@ -93,7 +105,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ea-rider
-          path: 'src\*.ex?'
+          path: '*.ex?'
   Test-Lite:
     needs: Compile-Lite
     runs-on: ubuntu-latest
