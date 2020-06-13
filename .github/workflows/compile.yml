@@ -18,7 +18,7 @@ on:
       - 'src/include/**'
 
 jobs:
-  Lite:
+  Compile-Lite:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -28,9 +28,10 @@ jobs:
         run: echo '#define __release__' > src/include/EA31337/ea-mode.mqh
       - name: Compiles EA
         uses: fx31337/mql-compile-action@master
-        with:
-          verbose: true
-  Advanced:
+      - name: Prints compiled files
+        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
+        shell: powershell
+  Compile-Advanced:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -40,9 +41,10 @@ jobs:
         run: echo '#define __advanced__' > src/include/EA31337/ea-mode.mqh
       - name: Compiles EA
         uses: fx31337/mql-compile-action@master
-        with:
-          verbose: true
-  Rider:
+      - name: Prints compiled files
+        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
+        shell: powershell
+  Compile-Rider:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -52,5 +54,6 @@ jobs:
         run: echo '#define __rider__' > src/include/EA31337/ea-mode.mqh
       - name: Compiles EA
         uses: fx31337/mql-compile-action@master
-        with:
-          verbose: true
+      - name: Prints compiled files
+        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
+        shell: powershell
