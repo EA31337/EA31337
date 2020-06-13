@@ -1,7 +1,7 @@
 [![Release][github-release-image]][github-release-link]
 [![][license-image]][license-link]
 [![Status][appveyor-ci-build-link]][appveyor-ci-build-image]
-[![Status][gha-image-tests-master]][gha-link-tests-master]
+[![Status][gha-image-test-master]][gha-link-test-master]
 [![Status][gha-image-backtest-master]][gha-link-backtest-master]
 [![Status][gha-image-lint-master]][gha-link-lint-master]
 [![][tg-channel-image]][tg-channel-link]
@@ -223,8 +223,8 @@ CFTC RULE 4.41 - HYPOTHETICAL OR SIMULATED PERFORMANCE RESULTS HAVE CERTAIN LIMI
 [appveyor-ci-build-link]: https://ci.appveyor.com/api/projects/status/63qnd959vxl44102/branch/master?svg=true
 [appveyor-ci-build-image]: https://ci.appveyor.com/project/kenorb/ea31337
 <!-- GitHub Actions build links -->
-[gha-link-tests-master]: https://github.com/EA31337/EA31337/actions?query=workflow%3ATests+branch%3Amaster
-[gha-image-tests-master]: https://github.com/EA31337/EA31337/workflows/Tests/badge.svg?branch=master
+[gha-link-test-master]: https://github.com/EA31337/EA31337/actions?query=workflow%3ATest+branch%3Amaster
+[gha-image-test-master]: https://github.com/EA31337/EA31337/workflows/Test/badge.svg?branch=master
 [gha-link-backtest-master]: https://github.com/EA31337/EA31337/actions?query=workflow%3ABacktest+branch%3Amaster
 [gha-image-backtest-master]: https://github.com/EA31337/EA31337/workflows/Backtest/badge.svg?branch=master
 [gha-link-lint-master]: https://github.com/EA31337/EA31337/actions?query=workflow%3ALint+branch%3Amaster
