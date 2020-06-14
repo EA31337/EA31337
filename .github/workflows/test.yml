@@ -119,21 +119,21 @@ jobs:
           TestExpert: EA31337
           BtMonths: 1
           BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
       - name: Test 2018.02
         uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 2
           BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
       - name: Test 2019.01
         uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 1
           BtYears: 2019
-          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
         if: false
       - name: Test 2019.02
         uses: fx31337/mql-tester-action@master
@@ -141,7 +141,7 @@ jobs:
           TestExpert: EA31337
           BtMonths: 2
           BtYears: 2019
-          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
         if: false
   Test-Advanced:
     needs: Compile-Advanced
@@ -156,21 +156,21 @@ jobs:
           TestExpert: EA31337
           BtMonths: 1
           BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
       - name: Test 2018.02
         uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 2
           BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
       - name: Test 2019.01
         uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 1
           BtYears: 2019
-          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
         if: false
       - name: Test 2019.02
         uses: fx31337/mql-tester-action@master
@@ -178,7 +178,7 @@ jobs:
           TestExpert: EA31337
           BtMonths: 2
           BtYears: 2019
-          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
         if: false
   Test-Rider:
     needs: Compile-Rider
@@ -193,21 +193,21 @@ jobs:
           TestExpert: EA31337
           BtMonths: 1
           BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
       - name: Test 2018.02
         uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 2
           BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
       - name: Test 2019.01
         uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 1
           BtYears: 2019
-          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
         if: false
       - name: Test 2019.02
         uses: fx31337/mql-tester-action@master
@@ -215,5 +215,5 @@ jobs:
           TestExpert: EA31337
           BtMonths: 2
           BtYears: 2019
-          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
         if: false
