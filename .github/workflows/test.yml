@@ -1,3 +1,4 @@
+# yamllint disable rule:line-length
 ---
 name: Test
 
@@ -125,6 +126,7 @@ jobs:
           BtMonths: 1
           BtYears: 2018
           RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+        if: false
       - name: Test 2018.02
         uses: fx31337/mql-tester-action@master
         with:
@@ -132,6 +134,7 @@ jobs:
           BtMonths: 2
           BtYears: 2018
           RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+        if: false
       - name: Test 2019.01
         uses: fx31337/mql-tester-action@master
         with:
@@ -162,6 +165,7 @@ jobs:
           BtMonths: 1
           BtYears: 2018
           RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+        if: false
       - name: Test 2018.02
         uses: fx31337/mql-tester-action@master
         with:
@@ -169,6 +173,7 @@ jobs:
           BtMonths: 2
           BtYears: 2018
           RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+        if: false
       - name: Test 2019.01
         uses: fx31337/mql-tester-action@master
         with:
@@ -199,6 +204,7 @@ jobs:
           BtMonths: 1
           BtYears: 2018
           RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+        if: false
       - name: Test 2018.02
         uses: fx31337/mql-tester-action@master
         with:
@@ -206,6 +212,7 @@ jobs:
           BtMonths: 2
           BtYears: 2018
           RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+        if: false
       - name: Test 2019.01
         uses: fx31337/mql-tester-action@master
         with:
@@ -222,25 +229,36 @@ jobs:
           BtYears: 2019
           RunOnWarning: 'show_logs && parse_results $@ && exit 0'
         if: false
-  Create-Release:
+  Release:
     needs: [Compile-Lite, Compile-Advanced, Compile-Rider]
     runs-on: ubuntu-latest
     steps:
-      - name: Prints github.ref
-        run: echo ${{ github.ref }}
+
+      - name: Get the current branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: myref
+      - name: Prints github.ref and extracted branch
+        run: >
+          echo
+          Ref=${{ github.ref }};
+          Branch=${{ steps.myref.outputs.branch }}
+
       - name: Create Development Release
         id: release_dev
-        if: endsWith( github.ref, '-dev' )
+        if: >
+          startsWith(github.ref, 'refs/heads/v') &&
+          endsWith(github.ref, '-dev')
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Development Release ${{ github.ref }}
+          tag_name: ${{ steps.myref.outputs.branch }}-beta
+          release_name: Development Release (${{ steps.myref.outputs.branch }})
           body: |
             This is the latest development version for testing purposes (not suitable for trading).
             Please use the stable release instead.
-          draft: true
+          draft: false
           prerelease: true
       - name: Create Tagged Release
         id: release_tag
@@ -249,43 +267,55 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ steps.myref.outputs.branch }}
+          release_name: EA31337 ${{ steps.myref.outputs.branch }}
           body: |
             This is the latest pre-released version.
             Use it with caution.
           draft: false
           prerelease: true
-  Release-Lite:
-    needs: Create-Release
-    runs-on: ubuntu-latest
-    steps:
+
       - uses: actions/download-artifact@v2
         with:
           name: ea-lite
-      - name: Adjust filename
-        run: mv -v *.ex4 "EA31337-Lite-${GITHUB_BRANCH##*/}.ex4"
+      - name: Upload Release Assets
+        id: upload-lite
+        if: startsWith(github.ref, 'refs/heads/v') && endsWith(github.ref, '-dev')
+        uses: actions/upload-release-asset@v1
         env:
-          GITHUB_BRANCH: ${{ github.ref }}
-  Release-Advanced:
-    needs: Create-Release
-    runs-on: ubuntu-latest
-    steps:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.release_dev.outputs.upload_url }}
+          asset_path: EA31337-Lite-${{ github.sha }}.ex4
+          asset_name: EA31337-Lite-${{ steps.myref.outputs.branch }}.ex4
+          asset_content_type: application/octet-stream
+
       - uses: actions/download-artifact@v2
         with:
           name: ea-advanced
-      - name: Adjust filename
-        run: mv -v *.ex4 "EA31337-Advanced-${GITHUB_BRANCH##*/}.ex4"
+      - name: Upload Release Assets
+        id: upload-advanced
+        if: startsWith(github.ref, 'refs/heads/v') && endsWith(github.ref, '-dev')
+        uses: actions/upload-release-asset@v1
         env:
-          GITHUB_BRANCH: ${{ github.ref }}
-  Release-Rider:
-    needs: Create-Release
-    runs-on: ubuntu-latest
-    steps:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.release_dev.outputs.upload_url }}
+          asset_path: EA31337-Advanced-${{ github.sha }}.ex4
+          asset_name: EA31337-Advanced-${{ steps.myref.outputs.branch }}.ex4
+          asset_content_type: application/octet-stream
+
       - uses: actions/download-artifact@v2
         with:
           name: ea-rider
-      - name: Adjust filename
-        run: mv -v *.ex4 "EA31337-Rider-${GITHUB_BRANCH##*/}.ex4"
+      - name: Upload Release Assets
+        id: upload-rider
+        if: startsWith(github.ref, 'refs/heads/v') && endsWith(github.ref, '-dev')
+        uses: actions/upload-release-asset@v1
         env:
-          GITHUB_BRANCH: ${{ github.ref }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.release_dev.outputs.upload_url }}
+          asset_path: EA31337-Rider-${{ github.sha }}.ex4
+          asset_name: EA31337-Rider-${{ steps.myref.outputs.branch }}.ex4
+          asset_content_type: application/octet-stream
