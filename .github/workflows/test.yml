@@ -244,22 +244,32 @@ jobs:
           Ref=${{ github.ref }};
           Branch=${{ steps.myref.outputs.branch }}
 
+      - uses: actions/download-artifact@v2
+        with:
+          name: ea-lite
+      - uses: actions/download-artifact@v2
+        with:
+          name: ea-advanced
+      - uses: actions/download-artifact@v2
+        with:
+          name: ea-rider
+
       - name: Create Development Release
-        id: release_dev
+        uses: softprops/action-gh-release@v1
         if: >
           startsWith(github.ref, 'refs/heads/v') &&
           endsWith(github.ref, '-dev')
-        uses: actions/create-release@v1
+        with:
+          files: |
+            EA31337-Lite-${{ github.sha }}.ex4
+            EA31337-Advanced-${{ github.sha }}.ex4
+            EA31337-Rider-${{ github.sha }}.ex4
+          name: Development Release (${{ steps.myref.outputs.branch }})
+          prerelease: true
+          tag_name: ${{ steps.myref.outputs.branch }}-beta
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.myref.outputs.branch }}-beta
-          release_name: Development Release (${{ steps.myref.outputs.branch }})
-          body: |
-            This is the latest development version for testing purposes (not suitable for trading).
-            Please use the stable release instead.
-          draft: false
-          prerelease: true
+
       - name: Create Tagged Release
         id: release_tag
         if: contains( github.ref, 'refs/tags/v' )
@@ -274,48 +284,3 @@ jobs:
             Use it with caution.
           draft: false
           prerelease: true
-
-      - uses: actions/download-artifact@v2
-        with:
-          name: ea-lite
-      - name: Upload Release Assets
-        id: upload-lite
-        if: startsWith(github.ref, 'refs/heads/v') && endsWith(github.ref, '-dev')
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.release_dev.outputs.upload_url }}
-          asset_path: EA31337-Lite-${{ github.sha }}.ex4
-          asset_name: EA31337-Lite-${{ steps.myref.outputs.branch }}.ex4
-          asset_content_type: application/octet-stream
-
-      - uses: actions/download-artifact@v2
-        with:
-          name: ea-advanced
-      - name: Upload Release Assets
-        id: upload-advanced
-        if: startsWith(github.ref, 'refs/heads/v') && endsWith(github.ref, '-dev')
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.release_dev.outputs.upload_url }}
-          asset_path: EA31337-Advanced-${{ github.sha }}.ex4
-          asset_name: EA31337-Advanced-${{ steps.myref.outputs.branch }}.ex4
-          asset_content_type: application/octet-stream
-
-      - uses: actions/download-artifact@v2
-        with:
-          name: ea-rider
-      - name: Upload Release Assets
-        id: upload-rider
-        if: startsWith(github.ref, 'refs/heads/v') && endsWith(github.ref, '-dev')
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.release_dev.outputs.upload_url }}
-          asset_path: EA31337-Rider-${{ github.sha }}.ex4
-          asset_name: EA31337-Rider-${{ steps.myref.outputs.branch }}.ex4
-          asset_content_type: application/octet-stream
