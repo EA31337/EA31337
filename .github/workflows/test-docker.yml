@@ -30,11 +30,13 @@ jobs:
         env:
           COMPOSE_DOCKER_CLI_BUILD: 1
           DOCKER_BUILDKIT: 1
-        run: docker-compose run lite_test_2018_01
+          RUN_ON_WARNING: 'show_logs && parse_results $@ && exit 0'
+        run: docker-compose run -e RUN_ON_WARNING lite_test_2018_01
         working-directory: docker/tests/lite
       - name: Run test for 2018.02
         env:
           COMPOSE_DOCKER_CLI_BUILD: 1
           DOCKER_BUILDKIT: 1
-        run: docker-compose run lite_test_2018_02
+          RUN_ON_WARNING: 'show_logs && parse_results $@ && exit 0'
+        run: docker-compose run -e RUN_ON_WARNING lite_test_2018_02
         working-directory: docker/tests/lite
