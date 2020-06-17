@@ -1,0 +1,23 @@
+---
+version: '3.4'
+services:
+  advanced:
+    entrypoint: ['make', '-C', '/opt/EA', '-e', 'VER=Dev', 'Advanced']
+    image: ea31337/ea-tester:latest
+    volumes:
+      - '../../..:/opt/EA:rw'
+  advanced_backtest:
+    entrypoint: ['make', '-C', '/opt/EA', '-e', 'VER=Dev', 'Advanced-Backtest']
+    image: ea31337/ea-tester:latest
+    volumes:
+      - '../../..:/opt/EA:rw'
+  advanced_optimize:
+    entrypoint: ['make', '-C', '/opt/EA', '-e', 'VER=Dev', 'Advanced-Optimize']
+    image: ea31337/ea-tester:latest
+    volumes:
+      - '../../..:/opt/EA:rw'
+  advanced_release:
+    entrypoint: ['make', '-C', '/opt/EA', '-e', 'VER=Dev', 'Advanced-Release']
+    image: ea31337/ea-tester:latest
+    volumes:
+      - '../../..:/opt/EA:rw'

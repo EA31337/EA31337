@@ -153,4 +153,3 @@ class Stg_OSMA : public Strategy {
   }
 
 };
-

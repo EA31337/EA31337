@@ -152,4 +152,3 @@ class Stg_DeMarker : public Strategy {
   }
 
 };
-

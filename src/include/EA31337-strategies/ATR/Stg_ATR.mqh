@@ -151,4 +151,3 @@ class Stg_ATR : public Strategy {
   }
 
 };
-

@@ -254,4 +254,3 @@ bool ReadAndCheckHeader(int handle,int period,int& bars)
    return(true);
   }
 //+------------------------------------------------------------------+
-

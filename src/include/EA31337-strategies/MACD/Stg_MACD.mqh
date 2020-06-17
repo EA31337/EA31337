@@ -173,4 +173,3 @@ class Stg_MACD : public Strategy {
   }
 
 };
-

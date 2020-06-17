@@ -1,0 +1,139 @@
+---
+name: Test Docker
+
+on:
+  pull_request:
+    paths:
+      - '**/*.h'
+      - '**/*.mq?'
+      - '.github/workflows/test-docker.yml'
+  push:
+    paths:
+      - '**/*.h'
+      - '**/*.mq?'
+      - '.github/workflows/test-docker.yml'
+
+jobs:
+
+  Lite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Build image for 2018
+        env:
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          DOCKER_BUILDKIT: 1
+        run: docker-compose build
+        working-directory: docker/tests/lite
+      - name: Run test for 2018.01
+        env:
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          DOCKER_BUILDKIT: 1
+        run: docker-compose run lite_test_2018_01
+        working-directory: docker/tests/lite
+        if: false
+      - name: Run test for 2018.02
+        env:
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          DOCKER_BUILDKIT: 1
+        run: docker-compose run lite_test_2018_02
+        working-directory: docker/tests/lite
+        if: false
+      - name: Run test for 2019.01
+        env:
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          DOCKER_BUILDKIT: 1
+        run: docker-compose run lite_test_2019_01
+        working-directory: docker/tests/lite
+        if: false
+      - name: Run test for 2019.02
+        env:
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          DOCKER_BUILDKIT: 1
+        run: docker-compose run lite_test_2019_02
+        working-directory: docker/tests/lite
+        if: false
+
+  Advanced:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Build image for 2018
+        env:
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          DOCKER_BUILDKIT: 1
+        run: docker-compose build
+        working-directory: docker/tests/advanced
+      - name: Run test for 2018.01
+        env:
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          DOCKER_BUILDKIT: 1
+        run: docker-compose run advanced_test_2018_01
+        working-directory: docker/tests/advanced
+        if: false
+      - name: Run test for 2018.02
+        env:
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          DOCKER_BUILDKIT: 1
+        run: docker-compose run advanced_test_2018_02
+        working-directory: docker/tests/advanced
+        if: false
+      - name: Run test for 2019.01
+        env:
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          DOCKER_BUILDKIT: 1
+        run: docker-compose run advanced_test_2019_01
+        working-directory: docker/tests/advanced
+        if: false
+      - name: Run test for 2019.02
+        env:
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          DOCKER_BUILDKIT: 1
+        run: docker-compose run advanced_test_2019_02
+        working-directory: docker/tests/advanced
+        if: false
+
+  Rider:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Build image for 2018
+        env:
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          DOCKER_BUILDKIT: 1
+        run: docker-compose build
+        working-directory: docker/tests/rider
+      - name: Run test for 2018.01
+        env:
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          DOCKER_BUILDKIT: 1
+        run: docker-compose run rider_test_2018_01
+        working-directory: docker/tests/rider
+        if: false
+      - name: Run test for 2018.02
+        env:
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          DOCKER_BUILDKIT: 1
+        run: docker-compose run rider_test_2018_02
+        working-directory: docker/tests/rider
+        if: false
+      - name: Run test for 2019.01
+        env:
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          DOCKER_BUILDKIT: 1
+        run: docker-compose run rider_test_2019_01
+        working-directory: docker/tests/rider
+        if: false
+      - name: Run test for 2019.02
+        env:
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          DOCKER_BUILDKIT: 1
+        run: docker-compose run rider_test_2019_02
+        working-directory: docker/tests/rider
+        if: false

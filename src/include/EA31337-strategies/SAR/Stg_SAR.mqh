@@ -153,4 +153,3 @@ class Stg_SAR : public Strategy {
   }
 
 };
-

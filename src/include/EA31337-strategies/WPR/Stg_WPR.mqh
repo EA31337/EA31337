@@ -161,4 +161,3 @@ class Stg_WPR : public Strategy {
   }
 
 };
-

@@ -1,0 +1,285 @@
+# yamllint disable rule:line-length
+---
+name: Test
+
+on:
+  pull_request:
+    paths:
+      - '**/*.h'
+      - '**/*.mq?'
+      - '.github/workflows/test.yml'
+      - 'src/include/**'
+  push:
+    paths:
+      - '**/*.h'
+      - '**/*.mq?'
+      - '.github/workflows/test.yml'
+      - 'src/include/**'
+  release:
+    types:
+      - prereleased
+      - published
+      - unpublished
+
+jobs:
+  Compile-Lite:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Enables Lite mode
+        run: echo '#define __release__' > src/include/EA31337/ea-mode.mqh
+      - name: Compiles EA (MQL4)
+        uses: fx31337/mql-compile-action@master
+        with:
+          path: src\EA31337.mq4
+          verbose: true
+      - name: Compiles EA (MQL5)
+        uses: fx31337/mql-compile-action@master
+        with:
+          path: src\EA31337.mq5
+          verbose: true
+      - name: Moves file (MQL4)
+        run: mv -v src\*.ex4 "EA31337-Lite-${{ github.sha }}.ex4"
+      - name: Moves file (MQL5)
+        run: mv -v src\*.ex5 "EA31337-Lite-${{ github.sha }}.ex5"
+      - name: Prints compiled files
+        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
+        shell: powershell
+      - name: Uploads artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ea-lite
+          path: '*.ex?'
+  Compile-Advanced:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Enables Advanced mode
+        run: echo '#define __advanced__' > src/include/EA31337/ea-mode.mqh
+      - name: Compiles EA (MQL4)
+        uses: fx31337/mql-compile-action@master
+        with:
+          path: src\EA31337.mq4
+          verbose: true
+      - name: Compiles EA (MQL5)
+        uses: fx31337/mql-compile-action@master
+        with:
+          path: src\EA31337.mq5
+          verbose: true
+      - name: Moves file (MQL4)
+        run: mv -v src\*.ex4 "EA31337-Advanced-${{ github.sha }}.ex4"
+      - name: Moves file (MQL5)
+        run: mv -v src\*.ex5 "EA31337-Advanced-${{ github.sha }}.ex5"
+      - name: Prints compiled files
+        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
+        shell: powershell
+      - name: Uploads artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ea-advanced
+          path: '*.ex?'
+  Compile-Rider:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Enables Rider mode
+        run: echo '#define __rider__' > src/include/EA31337/ea-mode.mqh
+      - name: Compiles EA (MQL4)
+        uses: fx31337/mql-compile-action@master
+        with:
+          path: src\EA31337.mq4
+          verbose: true
+      - name: Compiles EA (MQL5)
+        uses: fx31337/mql-compile-action@master
+        with:
+          path: src\EA31337.mq5
+          verbose: true
+      - name: Moves file (MQL4)
+        run: mv -v src\*.ex4 "EA31337-Rider-${{ github.sha }}.ex4"
+      - name: Moves file (MQL5)
+        run: mv -v src\*.ex5 "EA31337-Rider-${{ github.sha }}.ex5"
+      - name: Prints compiled files
+        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
+        shell: powershell
+      - name: Uploads artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ea-rider
+          path: '*.ex?'
+  Test-Lite:
+    needs: Compile-Lite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: ea-lite
+      - name: Test 2018.01
+        uses: fx31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 1
+          BtYears: 2018
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+      - name: Test 2018.02
+        uses: fx31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 2
+          BtYears: 2018
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+      - name: Test 2019.01
+        uses: fx31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 1
+          BtYears: 2019
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+        if: false
+      - name: Test 2019.02
+        uses: fx31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 2
+          BtYears: 2019
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+        if: false
+  Test-Advanced:
+    needs: Compile-Advanced
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: ea-advanced
+      - name: Test 2018.01
+        uses: fx31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 1
+          BtYears: 2018
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+      - name: Test 2018.02
+        uses: fx31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 2
+          BtYears: 2018
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+      - name: Test 2019.01
+        uses: fx31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 1
+          BtYears: 2019
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+        if: false
+      - name: Test 2019.02
+        uses: fx31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 2
+          BtYears: 2019
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+        if: false
+  Test-Rider:
+    needs: Compile-Rider
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: ea-rider
+      - name: Test 2018.01
+        uses: fx31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 1
+          BtYears: 2018
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+      - name: Test 2018.02
+        uses: fx31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 2
+          BtYears: 2018
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+      - name: Test 2019.01
+        uses: fx31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 1
+          BtYears: 2019
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+        if: false
+      - name: Test 2019.02
+        uses: fx31337/mql-tester-action@master
+        with:
+          TestExpert: EA31337
+          BtMonths: 2
+          BtYears: 2019
+          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+        if: false
+  Release:
+    if: github.event_name == 'push'
+    needs: [Compile-Lite, Compile-Advanced, Compile-Rider]
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Get the current branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: myref
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: ea-lite
+      - uses: actions/download-artifact@v2
+        with:
+          name: ea-advanced
+      - uses: actions/download-artifact@v2
+        with:
+          name: ea-rider
+      - name: Adjust EA filenames for release
+        run: >
+          mv -v EA31337-Lite-${{ github.sha }}.ex4 EA31337-Lite-${GITHUB_REF#refs/heads/}.ex4 &&
+          mv -v EA31337-Advanced-${{ github.sha }}.ex4 EA31337-Advanced-${GITHUB_REF#refs/heads/}.ex4 &&
+          mv -v EA31337-Rider-${{ github.sha }}.ex4 EA31337-Rider-${GITHUB_REF#refs/heads/}.ex4
+
+      - name: Create version file
+        run: echo ${{ github.sha }} > version.txt
+        shell: bash
+
+      - name: Create Development Release
+        uses: softprops/action-gh-release@v1
+        if: >
+          startsWith(github.ref, 'refs/heads/v') &&
+          endsWith(github.ref, '-dev')
+        with:
+          files: |
+            EA31337-Lite-${{ steps.myref.outputs.branch }}.ex4
+            EA31337-Advanced-${{ steps.myref.outputs.branch }}.ex4
+            EA31337-Rider-${{ steps.myref.outputs.branch }}.ex4
+            *.txt
+          name: Development Release (${{ steps.myref.outputs.branch }})
+          prerelease: true
+          tag_name: ${{ steps.myref.outputs.branch }}-beta
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Tag Release
+        uses: softprops/action-gh-release@v1
+        if: contains( github.ref, 'refs/tags/v' )
+        with:
+          files: |
+            EA31337-Lite-${{ steps.myref.outputs.branch }}.ex4
+            EA31337-Advanced-${{ steps.myref.outputs.branch }}.ex4
+            EA31337-Rider-${{ steps.myref.outputs.branch }}.ex4
+          name: EA31337 ${{ steps.myref.outputs.branch }}
+          prerelease: true
+          tag_name: ${{ steps.myref.outputs.branch }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

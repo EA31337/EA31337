@@ -146,4 +146,3 @@ class Stg_Fractals : public Strategy {
   }
 
 };
-

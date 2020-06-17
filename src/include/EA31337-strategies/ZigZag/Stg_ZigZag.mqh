@@ -149,4 +149,3 @@ class Stg_ZigZag : public Strategy {
   }
 
 };
-

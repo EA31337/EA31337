@@ -5,7 +5,7 @@ on:
   pull_request:
     paths:
       - '.github/workflows/backtest.yml'
-      - '*.mq?'
+      - '**/*.mq?'
   push:
     branches:
       - 'master'
@@ -13,7 +13,7 @@ on:
       - '*dev*'
     paths:
       - '.github/workflows/backtest.yml'
-      - '*.mq?'
+      - '**/*.mq?'
 
 jobs:
   Lite:
@@ -23,12 +23,13 @@ jobs:
         with:
           submodules: 'recursive'
       - name: Backtest 2018
-        uses: ea31337/mql-tester-action@master
+        uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 1-12
           BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnSuccess: 'git diff'
   Advanced:
     runs-on: ubuntu-latest
     steps:
@@ -38,12 +39,13 @@ jobs:
       - name: Sets mode
         run: "make set-advanced"
       - name: Backtest 2018
-        uses: ea31337/mql-tester-action@master
+        uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 1-12
           BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnSuccess: 'git diff'
   Rider:
     runs-on: ubuntu-latest
     steps:
@@ -53,9 +55,10 @@ jobs:
       - name: Sets mode
         run: "make set-rider"
       - name: Backtest 2018
-        uses: ea31337/mql-tester-action@master
+        uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 1-12
           BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@ && git diff && exit 0'
+          RunOnSuccess: 'git diff'
