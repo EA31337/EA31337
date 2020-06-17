@@ -150,4 +150,3 @@ class Stg_StdDev : public Strategy {
   }
 
 };
-

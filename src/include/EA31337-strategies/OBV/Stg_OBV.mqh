@@ -129,4 +129,3 @@ class Stg_OBV : public Strategy {
   }
 
 };
-

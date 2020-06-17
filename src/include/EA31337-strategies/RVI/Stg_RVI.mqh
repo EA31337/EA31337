@@ -144,4 +144,3 @@ class Stg_RVI : public Strategy {
   }
 
 };
-

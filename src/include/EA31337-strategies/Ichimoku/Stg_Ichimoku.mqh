@@ -172,4 +172,3 @@ class Stg_Ichimoku : public Strategy {
   }
 
 };
-

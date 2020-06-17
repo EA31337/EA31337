@@ -177,4 +177,3 @@ class Stg_Stoch : public Strategy {
   }
 
 };
-

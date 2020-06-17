@@ -130,4 +130,3 @@ class Stg_Momentum : public Strategy {
   }
 
 };
-

@@ -50,7 +50,6 @@ Calculated variables: Pip size: 0.0001, EA lot size: 0.1, Points per pip: 10, Pi
 EA params: Risk ratio: 1, Risk margin per order: 1%, Risk margin in total: 10%
 Strategies: Active strategies: 10 of 125, Max orders: 45 (per type: 8)
 
-Timeframes: M1; M2; M3; M4; M5; M6; M10; M12; M15; M20; M30; H1; H2; H3; H4; H6; H8; H12; D1; W1; MN1; 
+Timeframes: M1; M2; M3; M4; M5; M6; M10; M12; M15; M20; M30; H1; H2; H3; H4; H6; H8; H12; D1; W1; MN1;
 Datetime: Hour of day: 21, Day of week: 0, Day of month: 1, Day of year: 91, Month: 4, Year: 2018
 ACCOUNT: Time: 2018.04.01 21:00:18; Balance: $10000.00; Equity: $10000.00; Credit: $0.00; Margin Used/Free: $0.00/$10000.00; Risk: 1.0;
-

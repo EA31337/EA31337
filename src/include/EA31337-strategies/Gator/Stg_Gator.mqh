@@ -173,4 +173,3 @@ class Stg_Gator : public Strategy {
   }
 
 };
-

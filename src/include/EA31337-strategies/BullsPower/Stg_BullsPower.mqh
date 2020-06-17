@@ -133,4 +133,3 @@ class Stg_BullsPower : public Strategy {
   }
 
 };
-
