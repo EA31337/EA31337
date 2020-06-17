@@ -1,0 +1,26 @@
+---
+repos:
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.1.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-byte-order-marker
+      - id: check-case-conflict
+      - id: check-executables-have-shebangs
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+        exclude: '^.+/.+\.txt$'
+
+  - repo: https://github.com/igorshubovych/markdownlint-cli.git
+    rev: v0.23.1
+    hooks:
+      - id: markdownlint
+
+  - repo: https://github.com/adrienverge/yamllint.git
+    rev: v1.23.0
+    hooks:
+      - id: yamllint
+        args: ["-c", ".yamllint", "-s"]
