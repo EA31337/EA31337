@@ -3,9 +3,10 @@
 [![Release][github-release-image]][github-release-link]
 [![License][license-image]][license-link]
 [![Status][appveyor-ci-build-link]][appveyor-ci-build-image]
+[![Status][gha-image-check-master]][gha-link-check-master]
+[![Status][gha-image-lint-master]][gha-link-lint-master]
 [![Status][gha-image-test-master]][gha-link-test-master]
 [![Status][gha-image-backtest-master]][gha-link-backtest-master]
-[![Status][gha-image-lint-master]][gha-link-lint-master]
 [![Channel][tg-channel-image]][tg-channel-link]
 [![Chat][tg-chat-image]][tg-chat-link]
 [![Edit][gitpod-image]][gitpod-link]
@@ -316,12 +317,14 @@ NO REPRESENTATION IS BEING MADE THAN ANY ACCOUNT WILL OR IS LIKELY TO ACHIEVE PR
 [appveyor-ci-build-link]: https://ci.appveyor.com/api/projects/status/63qnd959vxl44102/branch/master?svg=true
 [appveyor-ci-build-image]: https://ci.appveyor.com/project/kenorb/ea31337
 
+[gha-link-check-master]: https://github.com/EA31337/EA31337/actions?query=workflow%3ACheck+branch%3Amaster
+[gha-image-check-master]: https://github.com/EA31337/EA31337/workflows/Check/badge.svg?branch=master
+[gha-link-lint-master]: https://github.com/EA31337/EA31337/actions?query=workflow%3ALint+branch%3Amaster
+[gha-image-lint-master]: https://github.com/EA31337/EA31337/workflows/Lint/badge.svg?branch=master
 [gha-link-test-master]: https://github.com/EA31337/EA31337/actions?query=workflow%3ATest+branch%3Amaster
 [gha-image-test-master]: https://github.com/EA31337/EA31337/workflows/Test/badge.svg?branch=master
 [gha-link-backtest-master]: https://github.com/EA31337/EA31337/actions?query=workflow%3ABacktest+branch%3Amaster
 [gha-image-backtest-master]: https://github.com/EA31337/EA31337/workflows/Backtest/badge.svg?branch=master
-[gha-link-lint-master]: https://github.com/EA31337/EA31337/actions?query=workflow%3ALint+branch%3Amaster
-[gha-image-lint-master]: https://github.com/EA31337/EA31337/workflows/Lint/badge.svg?branch=master
 
 [gitpod-image]: https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod
 [gitpod-link]: https://gitpod.io/#https://github.com/EA31337/EA31337
