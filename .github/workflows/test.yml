@@ -125,30 +125,28 @@ jobs:
           TestExpert: EA31337
           BtMonths: 1
           BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@'
       - name: Test 2018.02
         uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 2
           BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@'
       - name: Test 2019.01
         uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 1
           BtYears: 2019
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
-        if: false
+          RunOnWarning: 'show_logs && parse_results $@'
       - name: Test 2019.02
         uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 2
           BtYears: 2019
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
-        if: false
+          RunOnWarning: 'show_logs && parse_results $@'
   Test-Advanced:
     needs: Compile-Advanced
     runs-on: ubuntu-latest
@@ -162,30 +160,28 @@ jobs:
           TestExpert: EA31337
           BtMonths: 1
           BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@'
       - name: Test 2018.02
         uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 2
           BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@'
       - name: Test 2019.01
         uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 1
           BtYears: 2019
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
-        if: false
+          RunOnWarning: 'show_logs && parse_results $@'
       - name: Test 2019.02
         uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 2
           BtYears: 2019
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
-        if: false
+          RunOnWarning: 'show_logs && parse_results $@'
   Test-Rider:
     needs: Compile-Rider
     runs-on: ubuntu-latest
@@ -199,30 +195,28 @@ jobs:
           TestExpert: EA31337
           BtMonths: 1
           BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@'
       - name: Test 2018.02
         uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 2
           BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@'
       - name: Test 2019.01
         uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 1
           BtYears: 2019
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
-        if: false
+          RunOnWarning: 'show_logs && parse_results $@'
       - name: Test 2019.02
         uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 2
           BtYears: 2019
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
-        if: false
+          RunOnWarning: 'show_logs && parse_results $@'
   Release:
     if: github.event_name == 'push'
     needs: [Compile-Lite, Compile-Advanced, Compile-Rider]
