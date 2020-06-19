@@ -8,9 +8,9 @@ RUN usermod -u $UID ubuntu
 USER ubuntu
 COPY --chown=ubuntu:root ./ /opt/EA
 # Download MTE.
-RUN curl -LO https://github.com/EA31337/MT-Platforms/releases/download/5.0.0.2361/mt-5.0.0.2361.zip && \
-    unzip -q *.zip && \
-    cp -v */metaeditor*.exe /opt/EA
+RUN curl -LO "https://github.com/EA31337/MT-Platforms/releases/download/5.0.0.2361/mt-5.0.0.2361.zip" && \
+    unzip -q -- *.zip && \
+    cp -v -- */metaeditor*.exe /opt/EA
 
 # Build Lite version.
 FROM ea31337-ea as ea31337-lite
