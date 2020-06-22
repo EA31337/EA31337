@@ -125,30 +125,28 @@ jobs:
           TestExpert: EA31337
           BtMonths: 1
           BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@'
       - name: Test 2018.02
         uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 2
           BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@'
       - name: Test 2019.01
         uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 1
           BtYears: 2019
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
-        if: false
+          RunOnWarning: 'show_logs && parse_results $@'
       - name: Test 2019.02
         uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 2
           BtYears: 2019
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
-        if: false
+          RunOnWarning: 'show_logs && parse_results $@'
   Test-Advanced:
     needs: Compile-Advanced
     runs-on: ubuntu-latest
@@ -162,30 +160,28 @@ jobs:
           TestExpert: EA31337
           BtMonths: 1
           BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@'
       - name: Test 2018.02
         uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 2
           BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@'
       - name: Test 2019.01
         uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 1
           BtYears: 2019
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
-        if: false
+          RunOnWarning: 'show_logs && parse_results $@'
       - name: Test 2019.02
         uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 2
           BtYears: 2019
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
-        if: false
+          RunOnWarning: 'show_logs && parse_results $@'
   Test-Rider:
     needs: Compile-Rider
     runs-on: ubuntu-latest
@@ -199,30 +195,28 @@ jobs:
           TestExpert: EA31337
           BtMonths: 1
           BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@'
       - name: Test 2018.02
         uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 2
           BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
+          RunOnWarning: 'show_logs && parse_results $@'
       - name: Test 2019.01
         uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 1
           BtYears: 2019
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
-        if: false
+          RunOnWarning: 'show_logs && parse_results $@'
       - name: Test 2019.02
         uses: fx31337/mql-tester-action@master
         with:
           TestExpert: EA31337
           BtMonths: 2
           BtYears: 2019
-          RunOnWarning: 'show_logs && parse_results $@ && exit 0'
-        if: false
+          RunOnWarning: 'show_logs && parse_results $@'
   Release:
     if: github.event_name == 'push'
     needs: [Compile-Lite, Compile-Advanced, Compile-Rider]
@@ -246,8 +240,11 @@ jobs:
       - name: Adjust EA filenames for release
         run: >
           mv -v EA31337-Lite-${{ github.sha }}.ex4 EA31337-Lite-${GITHUB_REF#refs/heads/}.ex4 &&
+          mv -v EA31337-Lite-${{ github.sha }}.ex5 EA31337-Lite-${GITHUB_REF#refs/heads/}.ex5 &&
           mv -v EA31337-Advanced-${{ github.sha }}.ex4 EA31337-Advanced-${GITHUB_REF#refs/heads/}.ex4 &&
-          mv -v EA31337-Rider-${{ github.sha }}.ex4 EA31337-Rider-${GITHUB_REF#refs/heads/}.ex4
+          mv -v EA31337-Advanced-${{ github.sha }}.ex5 EA31337-Advanced-${GITHUB_REF#refs/heads/}.ex5 &&
+          mv -v EA31337-Rider-${{ github.sha }}.ex4 EA31337-Rider-${GITHUB_REF#refs/heads/}.ex4 &&
+          mv -v EA31337-Rider-${{ github.sha }}.ex5 EA31337-Rider-${GITHUB_REF#refs/heads/}.ex5
 
       - name: Create version file
         run: echo ${{ github.sha }} > version.txt
@@ -260,9 +257,9 @@ jobs:
           endsWith(github.ref, '-dev')
         with:
           files: |
-            EA31337-Lite-${{ steps.myref.outputs.branch }}.ex4
-            EA31337-Advanced-${{ steps.myref.outputs.branch }}.ex4
-            EA31337-Rider-${{ steps.myref.outputs.branch }}.ex4
+            EA31337-Lite-${{ steps.myref.outputs.branch }}.ex?
+            EA31337-Advanced-${{ steps.myref.outputs.branch }}.ex?
+            EA31337-Rider-${{ steps.myref.outputs.branch }}.ex?
             *.txt
           name: Development Release (${{ steps.myref.outputs.branch }})
           prerelease: true
@@ -275,9 +272,9 @@ jobs:
         if: contains( github.ref, 'refs/tags/v' )
         with:
           files: |
-            EA31337-Lite-${{ steps.myref.outputs.branch }}.ex4
-            EA31337-Advanced-${{ steps.myref.outputs.branch }}.ex4
-            EA31337-Rider-${{ steps.myref.outputs.branch }}.ex4
+            EA31337-Lite-${{ steps.myref.outputs.branch }}.ex?
+            EA31337-Advanced-${{ steps.myref.outputs.branch }}.ex?
+            EA31337-Rider-${{ steps.myref.outputs.branch }}.ex?
           name: EA31337 ${{ steps.myref.outputs.branch }}
           prerelease: true
           tag_name: ${{ steps.myref.outputs.branch }}

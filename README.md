@@ -35,7 +35,7 @@ These scam brokers still appearing on their live MT4 app, about which they reall
 (as long as the scammers pay them for the licence), so please be careful.
 For that reason, I've stopped using MetaTrader platform for my daily trading,
 apart of the time when maintaining this project.
-For more details, please read the following [FPA court submission][scam-broker-fpa-link1] (guilty case).
+For more details, please read the following [FPA court submission][scam-broker-fpa-link] (guilty case).
 
 ### Usage
 

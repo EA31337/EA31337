@@ -4,10 +4,13 @@ FROM ea31337/ea-tester:dev as ea31337-ea
 ARG UID=1001
 USER root
 RUN usermod -u $UID ubuntu
-# Copy EA files.
+# Copy files.
 USER ubuntu
 COPY --chown=ubuntu:root ./ /opt/EA
-RUN cp '/home/ubuntu/.wine/drive_c/MetaTrader 4/metaeditor.exe' /opt/EA/
+# Download MTE.
+RUN curl -LO "https://github.com/EA31337/MT-Platforms/releases/download/5.0.0.2361/mt-5.0.0.2361.zip" && \
+    unzip -q -- *.zip && \
+    cp -v -- */metaeditor*.exe /opt/EA
 
 # Build Lite version.
 FROM ea31337-ea as ea31337-lite
