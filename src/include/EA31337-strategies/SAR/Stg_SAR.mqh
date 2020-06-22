@@ -15,12 +15,12 @@
 
 // User input params.
 INPUT string __SAR_Parameters__ = "-- Settings for the Parabolic Stop and Reverse system indicator --"; // >>> SAR <<<
-INPUT uint SAR_Active_Tf = 8; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+INPUT uint SAR_Active_Tf = 14; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 INPUT double SAR_Step = 0.05; // Step
 INPUT double SAR_Maximum_Stop = 0.4; // Maximum stop
 INPUT int SAR_Shift = 0; // Shift
-INPUT ENUM_TRAIL_TYPE SAR_TrailingStopMethod = 7; // Trail stop method
-INPUT ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = 11; // Trail profit method
+INPUT ENUM_TRAIL_TYPE SAR_TrailingStopMethod = 3; // Trail stop method
+INPUT ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = 1; // Trail profit method
 INPUT double SAR_SignalLevel = 0; // Signal level
 INPUT int SAR1_SignalMethod = 91; // Signal method for M1 (-127-127)
 INPUT int SAR5_SignalMethod = 25; // Signal method for M5 (-127-127)

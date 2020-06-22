@@ -17,7 +17,7 @@
 INPUT string __WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --"; // >>> WPR <<<
 INPUT uint WPR_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 INPUT int WPR_Period_M1 = 11; // Period for M1
-INPUT int WPR_Period_M5 = 5; // Period for M5
+INPUT int WPR_Period_M5 = 7; // Period for M5
 INPUT int WPR_Period_M15 = 5; // Period for M15
 INPUT int WPR_Period_M30 = 8; // Period for M30
 INPUT int WPR_Shift = 0; // Shift

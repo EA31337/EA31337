@@ -16,15 +16,15 @@
 // User input params.
 INPUT string __RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --"; // >>> RSI <<<
 INPUT uint RSI_Active_Tf = 12; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-INPUT int RSI_Period_M1 = 32; // Period for M1
-INPUT int RSI_Period_M5 = 2; // Period for M5
-INPUT int RSI_Period_M15 = 2; // Period for M15
+INPUT int RSI_Period_M1 = 36; // Period for M1
+INPUT int RSI_Period_M5 = 10; // Period for M5
+INPUT int RSI_Period_M15 = 4; // Period for M15
 INPUT int RSI_Period_M30 = 2; // Period for M30
-INPUT ENUM_APPLIED_PRICE RSI_Applied_Price = 3; // Applied Price
-INPUT uint RSI_Shift = 0; // Shift
+INPUT ENUM_APPLIED_PRICE RSI_Applied_Price = (ENUM_APPLIED_PRICE) 0; // Applied Price
+INPUT uint RSI_Shift = 4; // Shift
 INPUT ENUM_TRAIL_TYPE RSI_TrailingStopMethod = 6; // Trail stop method
 INPUT ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = 11; // Trail profit method
-INPUT int RSI_SignalLevel = 36; // Signal level (-49-49)
+INPUT int RSI_SignalLevel = 40; // Signal level (-49-49)
 INPUT int RSI1_SignalMethod = -63; // Signal method for M1 (-63-63)
 INPUT int RSI5_SignalMethod = -61; // Signal method for M5 (-63-63)
 INPUT int RSI15_SignalMethod = -63; // Signal method for M15 (-63-63)
