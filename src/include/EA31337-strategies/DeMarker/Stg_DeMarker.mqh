@@ -16,13 +16,13 @@
 // User input params.
 INPUT string __DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --"; // >>> DEMARKER <<<
 INPUT uint DeMarker_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-INPUT int DeMarker_Period_M1 = 68; // Period for M1
-INPUT int DeMarker_Period_M5 = 76; // Period for M5
-INPUT int DeMarker_Period_M15 = 26; // Period for M15
-INPUT int DeMarker_Period_M30 = 14; // Period for M30
+INPUT int DeMarker_Period_M1 = 72; // Period for M1
+INPUT int DeMarker_Period_M5 = 60; // Period for M5
+INPUT int DeMarker_Period_M15 = 38; // Period for M15
+INPUT int DeMarker_Period_M30 = 26; // Period for M30
 INPUT int DeMarker_Shift = 1; // Shift
-INPUT double DeMarker_SignalLevel = 0.5; // Signal level (0.0-0.5)
-INPUT ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = 23; // Trail stop method
+INPUT double DeMarker_SignalLevel = 0.4; // Signal level (0.0-0.5)
+INPUT ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = 2; // Trail stop method
 INPUT ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = 22; // Trail profit method
 INPUT int DeMarker1_SignalMethod = 12; // Signal method for M1 (-31-31)
 INPUT int DeMarker5_SignalMethod = 12; // Signal method for M5 (-31-31)
