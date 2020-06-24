@@ -15,16 +15,16 @@
 
 // User input params.
 INPUT string __WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --"; // >>> WPR <<<
-INPUT uint WPR_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-INPUT int WPR_Period_M1 = 11; // Period for M1
-INPUT int WPR_Period_M5 = 7; // Period for M5
-INPUT int WPR_Period_M15 = 5; // Period for M15
-INPUT int WPR_Period_M30 = 8; // Period for M30
-INPUT int WPR_Shift = 0; // Shift
+INPUT uint WPR_Active_Tf = 5; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+INPUT int WPR_Period_M1 = 18; // Period for M1
+INPUT int WPR_Period_M5 = 14; // Period for M5
+INPUT int WPR_Period_M15 = 8; // Period for M15
+INPUT int WPR_Period_M30 = 2; // Period for M30
+INPUT int WPR_Shift = 2; // Shift
 INPUT int WPR_SignalLevel = 20; // Signal level
-INPUT ENUM_TRAIL_TYPE WPR_TrailingStopMethod = 22; // Trail stop method
-INPUT ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = 11; // Trail profit method
-INPUT int WPR1_SignalMethod = -46; // Signal method for M1 (-63-63)
+INPUT ENUM_TRAIL_TYPE WPR_TrailingStopMethod = 23; // Trail stop method
+INPUT ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = 24; // Trail profit method
+INPUT int WPR1_SignalMethod = 1; // Signal method for M1 (-63-63)
 INPUT int WPR5_SignalMethod = -40; // Signal method for M5 (-63-63)
 INPUT int WPR15_SignalMethod = -60; // Signal method for M15 (-63-63)
 INPUT int WPR30_SignalMethod = 0; // Signal method for M30 (-63-63)

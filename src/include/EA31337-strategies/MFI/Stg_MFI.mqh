@@ -18,11 +18,11 @@ INPUT string __MFI_Parameters__ = "-- Settings for the Money Flow Index indicato
 INPUT uint MFI_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 INPUT ENUM_TRAIL_TYPE MFI_TrailingStopMethod = 9; // Trail stop method
 INPUT ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = 22; // Trail profit method
-INPUT int MFI_Period_M1 = 14; // Period for M1
-INPUT int MFI_Period_M5 = 28; // Period for M5
-INPUT int MFI_Period_M15 = 30; // Period for M15
-INPUT int MFI_Period_M30 = 6; // Period for M30
-INPUT double MFI_SignalLevel = 1.6; // Signal level
+INPUT int MFI_Period_M1 = 12; // Period for M1
+INPUT int MFI_Period_M5 = 30; // Period for M5
+INPUT int MFI_Period_M15 = 28; // Period for M15
+INPUT int MFI_Period_M30 = 10; // Period for M30
+INPUT double MFI_SignalLevel = 2; // Signal level
 INPUT uint MFI_Shift = 0; // Shift (relative to the current bar, 0 - default)
 INPUT int MFI1_SignalMethod = 1; // Signal method for M1 (0-1)
 INPUT int MFI5_SignalMethod = 1; // Signal method for M5 (0-1)

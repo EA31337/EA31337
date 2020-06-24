@@ -15,16 +15,16 @@
 
 // User input params.
 INPUT string __CCI_Parameters__ = "-- Settings for the Commodity Channel Index indicator --"; // >>> CCI <<<
-INPUT uint CCI_Active_Tf = 15; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+INPUT uint CCI_Active_Tf = 3; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 INPUT int CCI_Shift = 0; // Shift (0 for default)
 INPUT ENUM_TRAIL_TYPE CCI_TrailingStopMethod = 2; // Trail stop method
 INPUT ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = 1; // Trail profit method
 INPUT int CCI_Period_M1 = 14; // Period for M1
-INPUT int CCI_Period_M5 = 42; // Period for M5
-INPUT int CCI_Period_M15 = 14; // Period for M15
+INPUT int CCI_Period_M5 = 46; // Period for M5
+INPUT int CCI_Period_M15 = 18; // Period for M15
 INPUT int CCI_Period_M30 = 18; // Period for M30
 INPUT ENUM_APPLIED_PRICE CCI_Applied_Price = (ENUM_APPLIED_PRICE) 2; // Applied Price
-INPUT double CCI_SignalLevel = 99; // Signal level (100 by default)
+INPUT double CCI_SignalLevel = 95; // Signal level (100 by default)
 INPUT int CCI1_SignalMethod = 34; // Signal method for M1 (0-63)
 INPUT int CCI5_SignalMethod = 18; // Signal method for M5 (0-63)
 INPUT int CCI15_SignalMethod = 0; // Signal method for M15 (0-63)

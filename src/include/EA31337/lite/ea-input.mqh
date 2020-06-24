@@ -22,20 +22,20 @@ extern string __Trade_Parameters__ = "-- Trade parameters --"; // >>> TRADE <<<
 extern uint   MaxOrders = 0; // Max orders (0 = auto)
 extern uint   MaxOrdersPerType = 0; // Max orders per type (0 = auto)
 uint   MaxOrdersPerDay = 0; // Max orders per day (0 = unlimited)
-extern double LotSize = 0; // Lot size (0 = auto)
+extern double LotSize = 0.01; // Lot size (0 = auto)
 extern bool   TradeMicroLots = 1; // Trade micro lots?
 int           TrendMethod = 0; // Main trend method (0-255)
 extern int    MinVolumeToTrade = 2; // Min volume to trade
 extern int    MaxOrderPriceSlippage = 50; // Max price slippage (in pts)
 extern int    MaxTries = 5; // Max retries for opening orders
 extern double MinPipChangeToTrade = 0.0; // Min pip change to trade
-extern int    MinPipGap = 10; // Min gap between trades per type (in pips)
+extern int    MinPipGap = 30; // Min gap between trades per type (in pips)
 //extern uint   TickProcessMethod = 0; // Tick process method (0-8, 0 - all)
 
 //+------------------------------------------------------------------+
 extern string   __EA_Order_Parameters__ = "-- Profit and loss parameters --"; // >>> PROFIT/LOSS <<<
 extern uint     TakeProfitMax = 0; // Max Take profit (in pips, 0 = auto)
-extern uint     StopLossMax = 40; // Max Stop loss (in pips, 0 = auto)
+extern uint     StopLossMax = 0; // Max Stop loss (in pips, 0 = auto)
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
@@ -47,13 +47,13 @@ extern double TrailingStopAddPerMinute = 0.3; // Decrease trail stop per minute 
 
 //+------------------------------------------------------------------+
 extern string __EA_Risk_Parameters__ = "-- Risk management parameters --"; // >>> RISK <<
-extern double RiskMarginPerOrder = 1; // Risk margin per order (in %, 0-100, 0 - auto, -1 - off)
+extern double RiskMarginPerOrder = 0; // Risk margin per order (in %, 0-100, 0 - auto, -1 - off)
 extern double RiskMarginTotal = 5; // Risk margin in total (in %, 0-100, 0 - auto, -1 - off)
 extern double RiskRatio = 0; // Risk ratio (0 = auto, 1.0 = normal)
 extern int RiskRatioIncreaseMethod = 0; // Risk ratio increase method (0-255)
 extern int RiskRatioDecreaseMethod = 0; // Risk ratio decrease method (0-255)
-extern int InitNoOfDaysToWarmUp = 14; // Initial warm-up period (in days)
-extern double CloseOrderAfterXHours = 96; // Close order after X hours (>0 - all, <0 - only profitable 0 - off)
+extern int InitNoOfDaysToWarmUp = 28; // Initial warm-up period (in days)
+extern double CloseOrderAfterXHours = 0; // Close order after X hours (>0 - all, <0 - only profitable 0 - off)
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Profit__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGY PARAMS <<<
@@ -67,21 +67,21 @@ extern bool Boosting_Enabled = 0; // Enable boosting
 extern double BoostTrendFactor = 0.9; // Boost by trend factor
 extern bool StrategyBoostByPF = 1.1; // Boost strategy by its profit factor
 extern bool StrategyHandicapByPF = true; // Handicap by its low profit factor
-extern double BestDailyStrategyMultiplierFactor = 1.0; // Multiplier for the best daily strategy
-extern double BestWeeklyStrategyMultiplierFactor = 1.0; // Multiplier for the best weekly strategy
-extern double BestMonthlyStrategyMultiplierFactor = 1.0; // Multiplier for the best monthly strategy
-extern double WorseDailyStrategyMultiplierFactor = 1.0; // Multiplier for the worse daily strategy
-extern double WorseWeeklyStrategyMultiplierFactor = 1.0; // Multiplier for the worse weekly strategy
-extern double WorseMonthlyStrategyMultiplierFactor = 1.0; // Multiplier for the worse monthly strategy
+extern double BestDailyStrategyMultiplierFactor = 1; // Multiplier for the best daily strategy
+extern double BestWeeklyStrategyMultiplierFactor = 1; // Multiplier for the best weekly strategy
+extern double BestMonthlyStrategyMultiplierFactor = 1; // Multiplier for the best monthly strategy
+extern double WorseDailyStrategyMultiplierFactor = 1; // Multiplier for the worse daily strategy
+extern double WorseWeeklyStrategyMultiplierFactor = 1; // Multiplier for the worse weekly strategy
+extern double WorseMonthlyStrategyMultiplierFactor = 1; // Multiplier for the worse monthly strategy
 extern double ConWinsIncreaseFactor = 0.4; // Increase lot factor on consequent wins (in %, 0 - off)
 extern double ConLossesIncreaseFactor = 0.7; // Increase lot factor on consequent loses (in %, 0 - off)
 extern uint ConFactorOrdersLimit = 600; // No of orders to check on consequent wins/loses
 
 //+------------------------------------------------------------------+
 extern string __SmartQueue_Parameters__ = "-- Smart queue parameters --"; // >>> SMART QUEUE <<<
-extern bool SmartQueueActive = 1; // Activate QueueAI
-extern int SmartQueueMethod = 11; // QueueAI: Method for selecting the best order (0-15)
-extern int SmartQueueFilter = 72; // QueueAI: Method for filtering the orders (0-255)
+extern bool SmartQueueActive = 0; // Activate QueueAI
+extern int SmartQueueMethod = 0; // QueueAI: Method for selecting the best order (0-15)
+extern int SmartQueueFilter = 2; // QueueAI: Method for filtering the orders (0-255)
 
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions__ = "-- Account conditions --"; // >>> CONDITIONS & ACTIONS <<<

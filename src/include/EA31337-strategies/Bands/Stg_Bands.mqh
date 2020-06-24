@@ -15,16 +15,16 @@
 
 // User input params.
 INPUT string __Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --"; // >>> BANDS <<<
-INPUT uint Bands_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-INPUT int Bands_Period_M1 = 4; // Period for M1
-INPUT int Bands_Period_M5 = 14; // Period for M5
-INPUT int Bands_Period_M15 = 2; // Period for M15
-INPUT int Bands_Period_M30 = 2; // Period for M30
+INPUT uint Bands_Active_Tf = 12; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+INPUT int Bands_Period_M1 = 20; // Period for M1
+INPUT int Bands_Period_M5 = 12; // Period for M5
+INPUT int Bands_Period_M15 = 20; // Period for M15
+INPUT int Bands_Period_M30 = 20; // Period for M30
 INPUT ENUM_APPLIED_PRICE Bands_Applied_Price = (ENUM_APPLIED_PRICE) 0; // Applied Price
-INPUT double Bands_Deviation_M1 = 0; // Deviation for M1
-INPUT double Bands_Deviation_M5 = 0; // Deviation for M5
-INPUT double Bands_Deviation_M15 = 0; // Deviation for M15
-INPUT double Bands_Deviation_M30 = 0; // Deviation for M30
+INPUT double Bands_Deviation_M1 = 2; // Deviation for M1
+INPUT double Bands_Deviation_M5 = 2; // Deviation for M5
+INPUT double Bands_Deviation_M15 = 2; // Deviation for M15
+INPUT double Bands_Deviation_M30 = 2; // Deviation for M30
 INPUT int Bands_HShift = 0; // Horizontal shift
 INPUT int Bands_Shift = 0; // Shift (relative to the current bar, 0 - default)
 INPUT ENUM_TRAIL_TYPE Bands_TrailingStopMethod = 7; // Trail stop method
