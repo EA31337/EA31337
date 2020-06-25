@@ -1,0 +1,33 @@
+---
+version: '3.4'
+services:
+  lite_backtest_2019_100k:
+    command: run_backtest -v
+    image: ea31337/ea-tester:EURUSD-2019-DS
+    volumes:
+    - ../../../../..:/opt/EA
+    - ./_results:/opt/_results:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_DEPOSIT: 100000
+      TEST_REPORT_NAME: EA31337-Lite_2019_100k
+  lite_backtest_2019_10k:
+    command: run_backtest -v
+    image: ea31337/ea-tester:EURUSD-2019-DS
+    volumes:
+    - ../../../../..:/opt/EA
+    - ./_results:/opt/_results:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_DEPOSIT: 10000
+      TEST_REPORT_NAME: EA31337-Lite_2019_10k
+  lite_backtest_2019_1k:
+    command: run_backtest -v
+    image: ea31337/ea-tester:EURUSD-2019-DS
+    volumes:
+    - ../../../../..:/opt/EA
+    - ./_results:/opt/_results:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_DEPOSIT: 1000
+      TEST_REPORT_NAME: EA31337-Lite_2019_1k
