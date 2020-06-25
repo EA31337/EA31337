@@ -16,15 +16,15 @@
 // User input params.
 INPUT string __Force_Parameters__ = "-- Settings for the Force Index indicator --"; // >>> FORCE <<<
 INPUT uint Force_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-INPUT ENUM_TRAIL_TYPE Force_TrailingStopMethod = 2; // Trail stop method
+INPUT ENUM_TRAIL_TYPE Force_TrailingStopMethod = 1; // Trail stop method
 INPUT ENUM_TRAIL_TYPE Force_TrailingProfitMethod = 22; // Trail profit method
-INPUT int Force_Period_M1 = 22; // Period for M1
-INPUT int Force_Period_M5 = 38; // Period for M5
-INPUT int Force_Period_M15 = 4; // Period for M15
-INPUT int Force_Period_M30 = 26; // Period for M30
-INPUT ENUM_MA_METHOD Force_MA_Method = 0; // MA Method
-INPUT ENUM_APPLIED_PRICE Force_Applied_Price = (ENUM_APPLIED_PRICE) 0; // Applied Price
-INPUT double Force_SignalLevel = 0.1; // Signal level
+INPUT int Force_Period_M1 = 14; // Period for M1
+INPUT int Force_Period_M5 = 30; // Period for M5
+INPUT int Force_Period_M15 = 2; // Period for M15
+INPUT int Force_Period_M30 = 18; // Period for M30
+INPUT ENUM_MA_METHOD Force_MA_Method = 2; // MA Method
+INPUT ENUM_APPLIED_PRICE Force_Applied_Price = (ENUM_APPLIED_PRICE) 2; // Applied Price
+INPUT double Force_SignalLevel = 0.3; // Signal level
 INPUT uint Force_Shift = 0; // Shift (relative to the current bar, 0 - default)
 INPUT int Force1_SignalMethod = 0; // Signal method for M1 (0-
 INPUT int Force5_SignalMethod = 0; // Signal method for M5 (0-

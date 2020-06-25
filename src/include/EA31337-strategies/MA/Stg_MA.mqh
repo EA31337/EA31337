@@ -15,22 +15,22 @@
 
 // User input params.
 INPUT string __MA_Parameters__ = "-- Settings for the Moving Average indicator --"; // >>> MA <<<
-INPUT uint MA_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+INPUT uint MA_Active_Tf = 12; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 INPUT int MA_Period_Fast = 12; // Period Fast
 INPUT int MA_Period_Medium = 10; // Period Medium
 INPUT int MA_Period_Slow = 2; // Period Slow
-INPUT int MA_Shift = 10; // Shift
+INPUT int MA_Shift = 12; // Shift
 INPUT int MA_Shift_Fast = 12; // Shift Fast (+1)
 INPUT int MA_Shift_Medium = 8; // Shift Medium (+1)
-INPUT int MA_Shift_Slow = 6; // Shift Slow (+1)
+INPUT int MA_Shift_Slow = 5; // Shift Slow (+1)
 INPUT ENUM_MA_METHOD MA_Method = 1; // MA Method
 INPUT ENUM_APPLIED_PRICE MA_Applied_Price = (ENUM_APPLIED_PRICE) 3; // Applied Price
 INPUT ENUM_TRAIL_TYPE MA_TrailingStopMethod = 19; // Trail stop method
-INPUT ENUM_TRAIL_TYPE MA_TrailingProfitMethod = 16; // Trail profit method
+INPUT ENUM_TRAIL_TYPE MA_TrailingProfitMethod = 25; // Trail profit method
 INPUT double MA_SignalLevel = -0.6; // Signal level
 INPUT int MA1_SignalMethod = 48; // Signal method for M1 (-127-127)
-INPUT int MA5_SignalMethod = 21; // Signal method for M5 (-127-127)
-INPUT int MA15_SignalMethod = 16; // Signal method for M15 (-127-127)
+INPUT int MA5_SignalMethod = 0; // Signal method for M5 (-127-127)
+INPUT int MA15_SignalMethod = 2; // Signal method for M15 (-127-127)
 INPUT int MA30_SignalMethod = -127; // Signal method for M30 (-127-127)
 INPUT int MA1_OpenCondition1 = 874; // Open condition 1 for M1 (0-1023)
 INPUT int MA1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
