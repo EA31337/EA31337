@@ -1,4 +1,3 @@
-# yamllint disable rule:line-length
 ---
 name: Test
 
@@ -225,7 +224,9 @@ jobs:
 
       - name: Get the current branch name
         shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        run: >
+          echo "##[set-output name=branch;]"
+          "$(echo ${GITHUB_REF#refs/heads/})"
         id: myref
 
       - uses: actions/download-artifact@v2
@@ -239,12 +240,24 @@ jobs:
           name: ea-rider
       - name: Adjust EA filenames for release
         run: >
-          mv -v EA31337-Lite-${{ github.sha }}.ex4 EA31337-Lite-${GITHUB_REF#refs/heads/}.ex4 &&
-          mv -v EA31337-Lite-${{ github.sha }}.ex5 EA31337-Lite-${GITHUB_REF#refs/heads/}.ex5 &&
-          mv -v EA31337-Advanced-${{ github.sha }}.ex4 EA31337-Advanced-${GITHUB_REF#refs/heads/}.ex4 &&
-          mv -v EA31337-Advanced-${{ github.sha }}.ex5 EA31337-Advanced-${GITHUB_REF#refs/heads/}.ex5 &&
-          mv -v EA31337-Rider-${{ github.sha }}.ex4 EA31337-Rider-${GITHUB_REF#refs/heads/}.ex4 &&
-          mv -v EA31337-Rider-${{ github.sha }}.ex5 EA31337-Rider-${GITHUB_REF#refs/heads/}.ex5
+          mv -v
+          EA31337-Lite-${{ github.sha }}.ex4
+          EA31337-Lite-${GITHUB_REF#refs/heads/}.ex4 &&
+          mv -v
+          EA31337-Lite-${{ github.sha }}.ex5
+          EA31337-Lite-${GITHUB_REF#refs/heads/}.ex5 &&
+          mv -v
+          EA31337-Advanced-${{ github.sha }}.ex4
+          EA31337-Advanced-${GITHUB_REF#refs/heads/}.ex4 &&
+          mv -v
+          EA31337-Advanced-${{ github.sha }}.ex5
+          EA31337-Advanced-${GITHUB_REF#refs/heads/}.ex5 &&
+          mv -v
+          EA31337-Rider-${{ github.sha }}.ex4
+          EA31337-Rider-${GITHUB_REF#refs/heads/}.ex4 &&
+          mv -v
+          EA31337-Rider-${{ github.sha }}.ex5
+          EA31337-Rider-${GITHUB_REF#refs/heads/}.ex5
 
       - name: Create version file
         run: echo ${{ github.sha }} > version.txt
