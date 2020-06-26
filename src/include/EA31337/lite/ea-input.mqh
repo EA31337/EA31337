@@ -25,7 +25,7 @@ uint   MaxOrdersPerDay = 0; // Max orders per day (0 = unlimited)
 extern double LotSize = 0.01; // Lot size (0 = auto)
 extern bool   TradeMicroLots = 1; // Trade micro lots?
 int           TrendMethod = 0; // Main trend method (0-255)
-extern int    MinVolumeToTrade = 2; // Min volume to trade
+extern int    MinVolumeToTrade = 0; // Min volume to trade
 extern int    MaxOrderPriceSlippage = 50; // Max price slippage (in pts)
 extern int    MaxTries = 5; // Max retries for opening orders
 extern double MinPipChangeToTrade = 0.0; // Min pip change to trade
