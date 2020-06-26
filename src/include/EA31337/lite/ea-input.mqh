@@ -28,7 +28,7 @@ int           TrendMethod = 0; // Main trend method (0-255)
 extern int    MinVolumeToTrade = 0; // Min volume to trade
 extern int    MaxOrderPriceSlippage = 50; // Max price slippage (in pts)
 extern int    MaxTries = 5; // Max retries for opening orders
-extern double MinPipChangeToTrade = 0.0; // Min pip change to trade
+double MinPipChangeToTrade = 0.0; // Min pip change to trade
 extern int    MinPipGap = 30; // Min gap between trades per type (in pips)
 //extern uint   TickProcessMethod = 0; // Tick process method (0-8, 0 - all)
 
