@@ -7,12 +7,14 @@ on:
       - '**.h'
       - '**.mq?'
       - '.github/workflows/test.yml'
+      - 'src/*.mq?'
       - 'src/include/**'
   push:
     paths:
       - '**.h'
       - '**.mq?'
       - '.github/workflows/test.yml'
+      - 'src/*.mq?'
       - 'src/include/**'
   release:
     types:
