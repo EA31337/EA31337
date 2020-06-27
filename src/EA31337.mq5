@@ -2774,7 +2774,7 @@ void StartNewWeek(Trade *_trade) {
   }
   int _strat_reenabled = UnsuspendStrategies();
   if (_strat_reenabled > 0) {
-    PrintFormat("%(): Unsuspended %d strategies.", __FUNCTION_LINE__, _strat_reenabled);
+    PrintFormat("%s(): Unsuspended %d strategies.", __FUNCTION__, _strat_reenabled);
   }
   if (VerboseInfo) Print(strategy_stats);
 }
