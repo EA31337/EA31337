@@ -27,10 +27,10 @@ extern int    LotSizeIncreaseMethod = 202; // Lot size increase method (0-255)
 extern int    LotSizeDecreaseMethod = 167; // Lot size decrease method (0-255)
 extern bool   TradeMicroLots = 1; // Trade micro lots?
 int           TrendMethod = 0; // Main trend method (0-255)
-extern int    MinVolumeToTrade = 2; // Min volume to trade
+extern int    MinVolumeToTrade = 0; // Min volume to trade
 extern int    MaxOrderPriceSlippage = 50; // Max price slippage (in pts)
 extern int    MaxTries = 5; // Max retries for opening orders
-extern double MinPipChangeToTrade = 0.0; // Min pip change to trade
+double MinPipChangeToTrade = 0.0; // Min pip change to trade
 extern int    MinPipGap = 10; // Min gap between trades per type (in pips)
 extern int    MinIntervalSec = 0; // Min interval between subsequent trade signals (in sec)
 //extern uint   TickProcessMethod = 0; // Tick process method (0-8, 0 - all)
@@ -42,11 +42,11 @@ extern uint     StopLossMax = 40; // Max Stop loss (in pips, 0 = auto)
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
-extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 0; // Default trail stop method (0 = none)
-extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 0; // Default trail profit method (0 = none)
+extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 25; // Default trail stop method (0 = none)
+extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = -6; // Default trail profit method (0 = none)
 extern int TrailingStop = 50; // Extra trailing stop (in pips)
 extern int TrailingProfit = 0; // Extra trailing profit (in pips)
-extern double TrailingStopAddPerMinute = 0.1; // Decrease trail stop per minute (pip/min)
+double TrailingStopAddPerMinute = 0.0; // Decrease trail stop per minute (pip/min)
 
 //+------------------------------------------------------------------+
 extern string __EA_Risk_Parameters__ = "-- Risk management parameters --"; // >>> RISK <<
@@ -63,7 +63,7 @@ extern double MaxSpreadToTrade = 10.0; // Max spread to trade (in pips), 0 - dis
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Profit__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGY PARAMS <<<
-extern double ProfitFactorMinToTrade = 0.0; // Min. profit factor per strategy to trade
+extern double ProfitFactorMinToTrade = 0.5; // Min. profit factor per strategy to trade
 extern double ProfitFactorMaxToTrade = 0.0; // Max. profit factor per strategy to trade
 extern int InitNoOfOrdersToCalcPF = 20; // Initial number of orders to calculate profit factor
 

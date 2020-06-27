@@ -15,19 +15,19 @@
 
 // User input params.
 INPUT string __MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --"; // >>> MACD <<<
-INPUT uint MACD_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-INPUT int MACD_Period_Fast = 23; // Period Fast
-INPUT int MACD_Period_Slow = 21; // Period Slow
-INPUT int MACD_Period_Signal = 10; // Period for signal
-INPUT ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_CLOSE; // Applied Price
-INPUT int MACD_Shift = 3; // Shift
-INPUT ENUM_TRAIL_TYPE MACD_TrailingStopMethod = -1; // Trail stop method
-INPUT ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = -19; // Trail profit method
-INPUT double MACD_SignalLevel = 0.1; // Signal level
-INPUT int MACD1_SignalMethod = -26; // Signal method for M1 (-31-31)
-INPUT int MACD5_SignalMethod = -31; // Signal method for M5 (-31-31)
-INPUT int MACD15_SignalMethod = -25; // Signal method for M15 (-31-31)
-INPUT int MACD30_SignalMethod = 4; // Signal method for M30 (-31-31)
+INPUT uint MACD_Active_Tf = 4; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+INPUT int MACD_Period_Fast = 2; // Period Fast
+INPUT int MACD_Period_Slow = 24; // Period Slow
+INPUT int MACD_Period_Signal = 11; // Period for signal
+INPUT ENUM_APPLIED_PRICE MACD_Applied_Price = (ENUM_APPLIED_PRICE) 4; // Applied Price
+INPUT int MACD_Shift = 0; // Shift
+INPUT ENUM_TRAIL_TYPE MACD_TrailingStopMethod = 1; // Trail stop method
+INPUT ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = -13; // Trail profit method
+INPUT double MACD_SignalLevel = -0.3; // Signal level
+INPUT int MACD1_SignalMethod = -23; // Signal method for M1 (-31-31)
+INPUT int MACD5_SignalMethod = -15; // Signal method for M5 (-31-31)
+INPUT int MACD15_SignalMethod = -28; // Signal method for M15 (-31-31)
+INPUT int MACD30_SignalMethod = 2; // Signal method for M30 (-31-31)
 INPUT int MACD1_OpenCondition1 = 874; // Open condition 1 for M1 (0-1023)
 INPUT int MACD1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
 INPUT ENUM_MARKET_EVENT MACD1_CloseCondition = 1; // Close condition for M1

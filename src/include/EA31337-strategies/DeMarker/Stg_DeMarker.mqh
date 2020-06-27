@@ -15,19 +15,19 @@
 
 // User input params.
 INPUT string __DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --"; // >>> DEMARKER <<<
-INPUT uint DeMarker_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-INPUT int DeMarker_Period_M1 = 68; // Period for M1
-INPUT int DeMarker_Period_M5 = 76; // Period for M5
-INPUT int DeMarker_Period_M15 = 26; // Period for M15
-INPUT int DeMarker_Period_M30 = 14; // Period for M30
-INPUT int DeMarker_Shift = 1; // Shift
-INPUT double DeMarker_SignalLevel = 0.5; // Signal level (0.0-0.5)
-INPUT ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = 23; // Trail stop method
-INPUT ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = 22; // Trail profit method
-INPUT int DeMarker1_SignalMethod = 12; // Signal method for M1 (-31-31)
-INPUT int DeMarker5_SignalMethod = 12; // Signal method for M5 (-31-31)
-INPUT int DeMarker15_SignalMethod = 4; // Signal method for M15 (-31-31)
-INPUT int DeMarker30_SignalMethod = 12; // Signal method for M30 (-31-31)
+INPUT uint DeMarker_Active_Tf = 13; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+INPUT int DeMarker_Period_M1 = 58; // Period for M1
+INPUT int DeMarker_Period_M5 = 16; // Period for M5
+INPUT int DeMarker_Period_M15 = 16; // Period for M15
+INPUT int DeMarker_Period_M30 = 28; // Period for M30
+INPUT int DeMarker_Shift = 7; // Shift
+INPUT double DeMarker_SignalLevel = -0.1; // Signal level (0.0-0.5)
+INPUT ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = 17; // Trail stop method
+INPUT ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = -7; // Trail profit method
+INPUT int DeMarker1_SignalMethod = 4; // Signal method for M1 (-31-31)
+INPUT int DeMarker5_SignalMethod = -11; // Signal method for M5 (-31-31)
+INPUT int DeMarker15_SignalMethod = -8; // Signal method for M15 (-31-31)
+INPUT int DeMarker30_SignalMethod = -12; // Signal method for M30 (-31-31)
 INPUT int DeMarker1_OpenCondition1 = 680; // Open condition 1 for M1 (0-1023)
 INPUT int DeMarker1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
 INPUT ENUM_MARKET_EVENT DeMarker1_CloseCondition = 1; // Close condition for M1

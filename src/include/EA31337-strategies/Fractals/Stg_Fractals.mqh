@@ -15,14 +15,14 @@
 
 // User input params.
 INPUT string __Fractals_Parameters__ = "-- Settings for the Fractals indicator --"; // >>> FRACTALS <<<
-INPUT uint Fractals_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+INPUT uint Fractals_Active_Tf = 11; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 INPUT int Fractals_Shift = 0; // Shift
-INPUT ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = 1; // Trail stop method
-INPUT ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = 21; // Trail profit method
+INPUT ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = 23; // Trail stop method
+INPUT ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = -18; // Trail profit method
 /* @todo INPUT */ int Fractals_SignalLevel = 0; // Signal level
-INPUT int Fractals1_SignalMethod = 3; // Signal method for M1 (-3-3)
-INPUT int Fractals5_SignalMethod = 3; // Signal method for M5 (-3-3)
-INPUT int Fractals15_SignalMethod = 3; // Signal method for M15 (-3-3)
+INPUT int Fractals1_SignalMethod = 2; // Signal method for M1 (-3-3)
+INPUT int Fractals5_SignalMethod = 1; // Signal method for M5 (-3-3)
+INPUT int Fractals15_SignalMethod = -2; // Signal method for M15 (-3-3)
 INPUT int Fractals30_SignalMethod = -2; // Signal method for M30 (-3-3)
 INPUT int Fractals1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
 INPUT int Fractals1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
