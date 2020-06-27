@@ -10,7 +10,7 @@
 #   - Deny applying with `git apply --whitespace=error-all`.
 #   - Fix automatically with `git apply --whitespace=fix`.
 [attr]text       text eol=lf whitespace=blank-at-eol,-blank-at-eof,-space-before-tab,tab-in-indent,tabwidth=2
-[attr]utf16      working-tree-encoding=UTF-16 text diff merge eol=CRLF
+[attr]utf16      encoding=UTF-16LE-BOM diff merge eol=CRLF
 
 # Shorthand for binary files.
 # - Do not treat them as text.
