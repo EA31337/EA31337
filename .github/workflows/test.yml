@@ -4,14 +4,14 @@ name: Test
 on:
   pull_request:
     paths:
-      - '**/*.h'
-      - '**/*.mq?'
+      - '**.h'
+      - '**.mq?'
       - '.github/workflows/test.yml'
       - 'src/include/**'
   push:
     paths:
-      - '**/*.h'
-      - '**/*.mq?'
+      - '**.h'
+      - '**.mq?'
       - '.github/workflows/test.yml'
       - 'src/include/**'
   release:

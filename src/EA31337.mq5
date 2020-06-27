@@ -2772,7 +2772,27 @@ void StartNewWeek(Trade *_trade) {
     if (stats[j][WEEKLY_PROFIT] != 0) strategy_stats += StringFormat("%s: %.1f pips; ", _strat.GetName(), stats[j][WEEKLY_PROFIT]);
     stats[j][WEEKLY_PROFIT]  = 0;
   }
+  int _strat_reenabled = UnsuspendStrategies();
+  if (_strat_reenabled > 0) {
+    PrintFormat("%(): Unsuspended %d strategies.", __FUNCTION_LINE__, _strat_reenabled);
+  }
   if (VerboseInfo) Print(strategy_stats);
+}
+
+/**
+ * Unsuspend all strategies.
+ */
+int UnsuspendStrategies() {
+  int _counter = 0;
+  Strategy *_strat;
+  for (int _sid = 0; _sid < strats.GetSize(); _sid++) {
+    _strat = ((Strategy *) strats.GetByIndex(_sid));
+    if (_strat.IsSuspended()) {
+      _strat.Suspended(false);
+      _counter++;
+    }
+  }
+  return _counter;
 }
 
 /**
