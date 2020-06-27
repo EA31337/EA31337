@@ -15,15 +15,15 @@
 
 // User input params.
 INPUT string __ADX_Parameters__ = "-- Settings for the Average Directional Movement Index indicator --"; // >>> ADX <<<
-INPUT uint ADX_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-INPUT ENUM_TRAIL_TYPE ADX_TrailingStopMethod = 25; // Trail stop method
-INPUT ENUM_TRAIL_TYPE ADX_TrailingProfitMethod = 11; // Trail profit method
-INPUT uint ADX_Period_M1 = 16; // Period for M1
+INPUT uint ADX_Active_Tf = 12; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+INPUT ENUM_TRAIL_TYPE ADX_TrailingStopMethod = 17; // Trail stop method
+INPUT ENUM_TRAIL_TYPE ADX_TrailingProfitMethod = -10; // Trail profit method
+INPUT uint ADX_Period_M1 = 22; // Period for M1
 INPUT uint ADX_Period_M5 = 12; // Period for M5
-INPUT uint ADX_Period_M15 = 40; // Period for M15
-INPUT uint ADX_Period_M30 = 26; // Period for M30
-INPUT ENUM_APPLIED_PRICE ADX_Applied_Price = (ENUM_APPLIED_PRICE) 2; // Applied Price
-INPUT double ADX_SignalLevel = 17.8; // Signal level
+INPUT uint ADX_Period_M15 = 48; // Period for M15
+INPUT uint ADX_Period_M30 = 32; // Period for M30
+INPUT ENUM_APPLIED_PRICE ADX_Applied_Price = (ENUM_APPLIED_PRICE) 6; // Applied Price
+INPUT double ADX_SignalLevel = 18.3; // Signal level
 INPUT uint ADX_Shift = 0; // Shift (relative to the current bar, 0 - default)
 INPUT int ADX1_SignalMethod = 0; // Signal method for M1 (0-?)
 INPUT int ADX5_SignalMethod = 0; // Signal method for M5 (0-?)

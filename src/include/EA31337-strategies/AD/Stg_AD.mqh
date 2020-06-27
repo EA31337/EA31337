@@ -15,13 +15,13 @@
 
 // User input params.
 INPUT string __AD_Parameters__ = "-- Settings for the Accumulation/Distribution indicator --"; // >>> AD <<<
-INPUT uint AD_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+INPUT uint AD_Active_Tf = 4; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 INPUT ENUM_TRAIL_TYPE AD_TrailingStopMethod = 1; // Trail stop method
-INPUT ENUM_TRAIL_TYPE AD_TrailingProfitMethod = 9; // Trail profit method
+INPUT ENUM_TRAIL_TYPE AD_TrailingProfitMethod = 25; // Trail profit method
 INPUT double AD_SignalLevel = 0.00000000; // Signal level
 INPUT uint AD_Shift = 0; // Shift (relative to the current bar, 0 - default)
 INPUT int AD1_SignalMethod = 1; // Signal method for M1 (0-?)
-INPUT int AD5_SignalMethod = 1; // Signal method for M5 (0-?)
+INPUT int AD5_SignalMethod = -1; // Signal method for M5 (0-?)
 INPUT int AD15_SignalMethod = 1; // Signal method for M15 (0-?)
 INPUT int AD30_SignalMethod = -1; // Signal method for M30 (0-?)
 INPUT int AD1_OpenCondition1 = 583; // Open condition 1 for M1 (0-1023)

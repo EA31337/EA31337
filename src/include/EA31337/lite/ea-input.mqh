@@ -57,7 +57,7 @@ extern double CloseOrderAfterXHours = 0; // Close order after X hours (>0 - all,
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Profit__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGY PARAMS <<<
-extern double ProfitFactorMinToTrade = 0.5; // Min. profit factor per strategy to trade
+extern double ProfitFactorMinToTrade = 0.4; // Min. profit factor per strategy to trade
 extern double ProfitFactorMaxToTrade = 0.0; // Max. profit factor per strategy to trade
 extern int InitNoOfOrdersToCalcPF = 20; // Initial number of orders to calculate profit factor
 

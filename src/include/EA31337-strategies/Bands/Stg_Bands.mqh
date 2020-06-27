@@ -15,25 +15,25 @@
 
 // User input params.
 INPUT string __Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --"; // >>> BANDS <<<
-INPUT uint Bands_Active_Tf = 14; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-INPUT int Bands_Period_M1 = 42; // Period for M1
+INPUT uint Bands_Active_Tf = 15; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+INPUT int Bands_Period_M1 = 2; // Period for M1
 INPUT int Bands_Period_M5 = 2; // Period for M5
 INPUT int Bands_Period_M15 = 2; // Period for M15
 INPUT int Bands_Period_M30 = 4; // Period for M30
-INPUT ENUM_APPLIED_PRICE Bands_Applied_Price = (ENUM_APPLIED_PRICE) 0; // Applied Price
+INPUT ENUM_APPLIED_PRICE Bands_Applied_Price = (ENUM_APPLIED_PRICE) 3; // Applied Price
 INPUT double Bands_Deviation_M1 = 1.2; // Deviation for M1
 INPUT double Bands_Deviation_M5 = 1.2; // Deviation for M5
-INPUT double Bands_Deviation_M15 = 2; // Deviation for M15
+INPUT double Bands_Deviation_M15 = 1.2; // Deviation for M15
 INPUT double Bands_Deviation_M30 = 1.2; // Deviation for M30
 INPUT int Bands_HShift = 0; // Horizontal shift
 INPUT int Bands_Shift = 0; // Shift (relative to the current bar, 0 - default)
-INPUT ENUM_TRAIL_TYPE Bands_TrailingStopMethod = 1; // Trail stop method
-INPUT ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = 25; // Trail profit method
+INPUT ENUM_TRAIL_TYPE Bands_TrailingStopMethod = 9; // Trail stop method
+INPUT ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = 1; // Trail profit method
 INPUT int Bands_SignalLevel = 18; // Signal level
-INPUT int Bands1_SignalMethod = 71; // Signal method for M1 (-127-127)
-INPUT int Bands5_SignalMethod = 53; // Signal method for M5 (-127-127)
-INPUT int Bands15_SignalMethod = 120; // Signal method for M15 (-127-127)
-INPUT int Bands30_SignalMethod = 71; // Signal method for M30 (-127-127)
+INPUT int Bands1_SignalMethod = 36; // Signal method for M1 (-127-127)
+INPUT int Bands5_SignalMethod = 67; // Signal method for M5 (-127-127)
+INPUT int Bands15_SignalMethod = 57; // Signal method for M15 (-127-127)
+INPUT int Bands30_SignalMethod = 120; // Signal method for M30 (-127-127)
 INPUT int Bands1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
 INPUT int Bands1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
 INPUT ENUM_MARKET_EVENT Bands1_CloseCondition = 24; // Close condition for M1

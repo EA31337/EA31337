@@ -15,9 +15,9 @@
 
 // User input params.
 INPUT string __Force_Parameters__ = "-- Settings for the Force Index indicator --"; // >>> FORCE <<<
-INPUT uint Force_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
-INPUT ENUM_TRAIL_TYPE Force_TrailingStopMethod = 1; // Trail stop method
-INPUT ENUM_TRAIL_TYPE Force_TrailingProfitMethod = -25; // Trail profit method
+INPUT uint Force_Active_Tf = 4; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+INPUT ENUM_TRAIL_TYPE Force_TrailingStopMethod = 8; // Trail stop method
+INPUT ENUM_TRAIL_TYPE Force_TrailingProfitMethod = -7; // Trail profit method
 INPUT int Force_Period_M1 = 14; // Period for M1
 INPUT int Force_Period_M5 = 30; // Period for M5
 INPUT int Force_Period_M15 = 2; // Period for M15
