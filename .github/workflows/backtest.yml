@@ -123,6 +123,7 @@ jobs:
     if: >
       github.repository == 'EA31337/EA31337'
       && github.event_name != 'pull_request'
+      && false
     needs: Compile-Lite
     runs-on: ubuntu-latest
     steps:
@@ -158,6 +159,7 @@ jobs:
     if: >
       github.repository == 'EA31337/EA31337'
       && github.event_name != 'pull_request'
+      && false
     needs: Compile-Advanced
     runs-on: ubuntu-latest
     steps:
@@ -193,6 +195,7 @@ jobs:
     if: >
       github.repository == 'EA31337/EA31337'
       && github.event_name != 'pull_request'
+      && false
     needs: Compile-Rider
     runs-on: ubuntu-latest
     steps:
