@@ -11,7 +11,7 @@ on:
   push:
     branches:
       - 'master'
-      - 'dev'
+      - 'dev-backtest'
       - 'v1.*-dev'
     paths:
       - '**/*.h'
@@ -115,108 +115,108 @@ jobs:
         with:
           name: ea-rider
           path: '*.ex?'
-  Test-Lite:
+  Tests-Lite:
+    defaults:
+      run:
+        shell: bash
+        working-directory: docker/tests/lite
+    if: >
+      github.repository == 'EA31337/EA31337'
+      && github.event_name != 'pull_request'
     needs: Compile-Lite
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v2
+      - uses: actions/checkout@v2
         with:
-          name: ea-lite
-      - name: Test 2018.01
-        uses: fx31337/mql-tester-action@master
-        with:
-          TestExpert: EA31337
-          BtMonths: 1
-          BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@'
-      - name: Test 2018.02
-        uses: fx31337/mql-tester-action@master
-        with:
-          TestExpert: EA31337
-          BtMonths: 2
-          BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@'
-      - name: Test 2019.01
-        uses: fx31337/mql-tester-action@master
-        with:
-          TestExpert: EA31337
-          BtMonths: 1
-          BtYears: 2019
-          RunOnWarning: 'show_logs && parse_results $@'
-      - name: Test 2019.02
-        uses: fx31337/mql-tester-action@master
-        with:
-          TestExpert: EA31337
-          BtMonths: 2
-          BtYears: 2019
-          RunOnWarning: 'show_logs && parse_results $@'
-  Test-Advanced:
-    needs: Compile-Advanced
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v2
-        with:
-          name: ea-advanced
-      - name: Test 2018.01
-        uses: fx31337/mql-tester-action@master
-        with:
-          TestExpert: EA31337
-          BtMonths: 1
-          BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@'
-      - name: Test 2018.02
-        uses: fx31337/mql-tester-action@master
-        with:
-          TestExpert: EA31337
-          BtMonths: 2
-          BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@'
-      - name: Test 2019.01
-        uses: fx31337/mql-tester-action@master
-        with:
-          TestExpert: EA31337
-          BtMonths: 1
-          BtYears: 2019
-          RunOnWarning: 'show_logs && parse_results $@'
-      - name: Test 2019.02
-        uses: fx31337/mql-tester-action@master
-        with:
-          TestExpert: EA31337
-          BtMonths: 2
-          BtYears: 2019
-          RunOnWarning: 'show_logs && parse_results $@'
-  Test-Rider:
-    needs: Compile-Rider
-    runs-on: ubuntu-latest
-    steps:
+          # Otherwise, the token used is the GITHUB_TOKEN, instead of your personal token.
+          persist-credentials: false
+          # Otherwise, you will failed to push refs to dest repo.
+          fetch-depth: 0
       - uses: actions/download-artifact@v2
         with:
           name: ea-rider
-      - name: Test 2018.01
-        uses: fx31337/mql-tester-action@master
+      - run: docker-compose up
+      - name: Commit files
+        run: |
+          git config --local core.autocrlf false
+          git config --local user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --local user.name "${{ github.actor }}"
+          git pull origin ${{ github.ref }} --autostash --rebase -Xours
+          git commit -am "${{ github.workflow }}"
+      - name: Git Diff
+        run: NO_PAGER=1 git --no-pager diff HEAD^
+      - name: Push changes
+        uses: ad-m/github-push-action@master
         with:
-          TestExpert: EA31337
-          BtMonths: 1
-          BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@'
-      - name: Test 2018.02
-        uses: fx31337/mql-tester-action@master
+          branch: ${{ github.ref }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+  Tests-Advanced:
+    defaults:
+      run:
+        shell: bash
+        working-directory: docker/tests/advanced
+    if: >
+      github.repository == 'EA31337/EA31337'
+      && github.event_name != 'pull_request'
+    needs: Compile-Advanced
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
         with:
-          TestExpert: EA31337
-          BtMonths: 2
-          BtYears: 2018
-          RunOnWarning: 'show_logs && parse_results $@'
-      - name: Test 2019.01
-        uses: fx31337/mql-tester-action@master
+          # Otherwise, the token used is the GITHUB_TOKEN, instead of your personal token.
+          persist-credentials: false
+          # Otherwise, you will failed to push refs to dest repo.
+          fetch-depth: 0
+      - uses: actions/download-artifact@v2
         with:
-          TestExpert: EA31337
-          BtMonths: 1
-          BtYears: 2019
-          RunOnWarning: 'show_logs && parse_results $@'
-      - name: Test 2019.02
-        uses: fx31337/mql-tester-action@master
+          name: ea-rider
+      - run: docker-compose up
+      - name: Commit files
+        run: |
+          git config --local core.autocrlf false
+          git config --local user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --local user.name "${{ github.actor }}"
+          git pull origin ${{ github.ref }} --autostash --rebase -Xours
+          git commit -am "${{ github.workflow }}"
+      - name: Git Diff
+        run: NO_PAGER=1 git --no-pager diff HEAD^
+      - name: Push changes
+        uses: ad-m/github-push-action@master
         with:
-          TestExpert: EA31337
-          BtMonths: 2
-          BtYears: 2019
-          RunOnWarning: 'show_logs && parse_results $@'
+          branch: ${{ github.ref }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+  Tests-Rider:
+    defaults:
+      run:
+        shell: bash
+        working-directory: docker/tests/rider
+    if: >
+      github.repository == 'EA31337/EA31337'
+      && github.event_name != 'pull_request'
+    needs: Compile-Rider
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # Otherwise, the token used is the GITHUB_TOKEN, instead of your personal token.
+          persist-credentials: false
+          # Otherwise, you will failed to push refs to dest repo.
+          fetch-depth: 0
+      - uses: actions/download-artifact@v2
+        with:
+          name: ea-rider
+      - run: docker-compose up
+      - name: Commit files
+        run: |
+          git config --local core.autocrlf false
+          git config --local user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --local user.name "${{ github.actor }}"
+          git pull origin ${{ github.ref }} --autostash --rebase -Xours
+          git commit -am "${{ github.workflow }}"
+      - name: Git Diff
+        run: NO_PAGER=1 git --no-pager diff HEAD^
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          branch: ${{ github.ref }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
