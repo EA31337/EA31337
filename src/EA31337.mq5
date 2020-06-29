@@ -1330,7 +1330,7 @@ bool CloseOrder(ulong ticket_no = NULL, int reason_id = EMPTY, ENUM_MARKET_EVENT
   // if (VerboseTrace) Print(__FUNCTION__ + ": CloseOrder request. Reason: " + reason + "; Result=" + result + " @ " + TimeCurrent() + "(" + TimeToStr(TimeCurrent()) + "), ticket# " + ticket_no);
   if (result) {
     total_orders--;
-    last_close_profit = Order::GetOrderProfit();
+    last_close_profit = Order::GetOrderTotalProfit();
     if (SoundAlert) PlaySound(SoundFileAtClose);
     // TaskAddCalcStats(ticket_no); // Already done on CheckHistory().
     last_msg = StringFormat("Closed order %d with profit %g pips (%s)", ticket_no, Order::GetOrderProfitInPips(), ReasonIdToText(reason_id, _market_event));
@@ -1367,7 +1367,7 @@ double OrderCalc(ulong ticket_no = 0) {
   int id = GetIdByMagic();
   if (id < 0) return false;
   datetime close_time = Order::OrderCloseTime();
-  double profit = Order::GetOrderProfit();
+  double profit = Order::GetOrderTotalProfit();
   info[id][TOTAL_ORDERS]++;
   if (profit > 0) {
     info[id][TOTAL_ORDERS_WON]++;
@@ -1414,10 +1414,10 @@ int CloseOrdersByType(ENUM_ORDER_TYPE cmd, ulong strategy_id, ENUM_MARKET_EVENT 
    for (order = 0; order < Trade::OrdersTotal(); order++) {
       if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
         if ((int) strategy_id == GetIdByMagic() && Order::OrderSymbol() == Symbol() && (ENUM_ORDER_TYPE) Order::OrderType() == cmd) {
-          if (only_profitable && Order::GetOrderProfit() < 0) continue;
+          if (only_profitable && Order::GetOrderTotalProfit() < 0) continue;
           if (CloseOrder(NULL, R_CLOSE_SIGNAL, _close_signal)) {
              orders_total++;
-             profit_total += Order::GetOrderProfit();
+             profit_total += Order::GetOrderTotalProfit();
           } else {
             order_failed++;
             Msg::ShowText(StringFormat("Error: Order Pos: %d; Message: %s", order, terminal.GetLastErrorText()),
@@ -1754,7 +1754,7 @@ void CheckOrders() {
         }
       }
       else if (CloseOrderAfterXHours < 0 && elapsed_mins / 60 > -CloseOrderAfterXHours) {
-        if (Order::GetOrderProfit() > 0) {
+        if (Order::GetOrderTotalProfit() > 0) {
           TaskAddCloseOrder(Order::OrderTicket(), R_ORDER_EXPIRED);
         }
       }
@@ -2250,8 +2250,8 @@ double GetTotalProfitByType(ENUM_ORDER_TYPE cmd = NULL, int order_type = NULL) {
   for (i = 0; i < Trade::OrdersTotal(); i++) {
     if (Order::OrderSelect(i, SELECT_BY_POS, MODE_TRADES) == false) break;
     if (Order::OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
-       if (Order::OrderType() == cmd) total += Order::GetOrderProfit();
-       else if (Order::OrderMagicNumber() == MagicNumber + order_type) total += Order::GetOrderProfit();
+       if (Order::OrderType() == cmd) total += Order::GetOrderTotalProfit();
+       else if (Order::OrderMagicNumber() == MagicNumber + order_type) total += Order::GetOrderTotalProfit();
      }
   }
   return total;
@@ -4173,7 +4173,7 @@ bool ActionCloseMostProfitableOrder(int reason_id = EMPTY, int min_profit = EMPT
   for (order = 0; order < Trade::OrdersTotal(); order++) {
     if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES))
      if (Order::OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
-      curr_ticket_profit = Order::GetOrderProfit();
+      curr_ticket_profit = Order::GetOrderTotalProfit();
        if (curr_ticket_profit > max_ticket_profit) {
          selected_ticket = Order::OrderTicket();
          max_ticket_profit = curr_ticket_profit;
@@ -4201,9 +4201,9 @@ bool ActionCloseMostUnprofitableOrder(int reason_id = EMPTY){
   for (order = 0; order < Trade::OrdersTotal(); order++) {
     if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES))
      if (Order::OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
-       if (Order::GetOrderProfit() < ticket_profit) {
+       if (Order::GetOrderTotalProfit() < ticket_profit) {
          selected_ticket = Order::OrderTicket();
-         ticket_profit = Order::GetOrderProfit();
+         ticket_profit = Order::GetOrderTotalProfit();
        }
      }
   }
@@ -4226,7 +4226,7 @@ bool ActionCloseAllProfitableOrders(int reason_id = EMPTY){
   double ticket_profit = 0, total_profit = 0;
   for (order = 0; order < Trade::OrdersTotal(); order++) {
     if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && Order::OrderSymbol() == Symbol() && CheckOurMagicNumber())
-       ticket_profit = Order::GetOrderProfit();
+       ticket_profit = Order::GetOrderTotalProfit();
        if (ticket_profit > 0) {
          result = TaskAddCloseOrder(Order::OrderTicket(), reason_id);
          selected_orders++;
@@ -4251,7 +4251,7 @@ bool ActionCloseAllUnprofitableOrders(int reason_id = EMPTY){
   double ticket_profit = 0, total_profit = 0;
   for (int order = 0; order < Trade::OrdersTotal(); order++) {
     if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && Order::OrderSymbol() == Symbol() && CheckOurMagicNumber())
-       ticket_profit = Order::GetOrderProfit();
+       ticket_profit = Order::GetOrderTotalProfit();
        if (ticket_profit < 0) {
          result = TaskAddCloseOrder(Order::OrderTicket(), reason_id);
          selected_orders++;
@@ -4315,7 +4315,7 @@ int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = true) {
    for (int order = 0; order < total; order++) {
       if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && Order::OrderSymbol() == Symbol() && Order::OrderTicket() > 0) {
          if (only_ours && !CheckOurMagicNumber()) continue;
-         total_profit += Order::GetOrderProfit();
+         total_profit += Order::GetOrderTotalProfit();
          TaskAddCloseOrder(Order::OrderTicket(), reason_id); // Add task to re-try.
          processed++;
       } else {
