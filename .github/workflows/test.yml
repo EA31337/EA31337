@@ -16,11 +16,6 @@ on:
       - '.github/workflows/test.yml'
       - 'src/*.mq?'
       - 'src/include/**'
-  release:
-    types:
-      - prereleased
-      - published
-      - unpublished
 
 jobs:
   Compile-Lite:
