@@ -266,7 +266,7 @@ int OnInit() {
       return (INIT_PARAMETERS_INCORRECT);
     }
     #ifdef __release__
-    if (Terminal::IsRealtime() && account.GetLogin() <= 1) {
+    if (Terminal::IsRealtime() && Account::AccountNumber() <= 1) {
       // @todo: Fails when debugging.
       Msg::ShowText("EA requires on-line Terminal.", "Error", __FUNCTION__, __LINE__, VerboseErrors, true);
       ea_active = false;
@@ -3820,7 +3820,7 @@ int GetPeakStrategyValue(int key2, bool lowest) {
     if (!((Strategy*)strats.GetById(i)).IsEnabled()) {
       continue;
     }
-        
+
     if ((lowest && stats[i][key2] < peak) || (!lowest && stats[i][key2] > peak)) {
       peak = stats[i][key2];
       key1 = i;
@@ -4420,7 +4420,7 @@ bool ActionExecute(int aid, int id = EMPTY) {
         stats[i][TOTAL_GROSS_LOSS] = 0.0;
         stats[i][TOTAL_GROSS_PROFIT] = 0.0;
       }
-      
+
       result = true;
       break;
       /*
