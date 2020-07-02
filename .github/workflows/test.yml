@@ -4,21 +4,18 @@ name: Test
 on:
   pull_request:
     paths:
-      - '**/*.h'
-      - '**/*.mq?'
+      - '**.h'
+      - '**.mq?'
       - '.github/workflows/test.yml'
+      - 'src/*.mq?'
       - 'src/include/**'
   push:
     paths:
-      - '**/*.h'
-      - '**/*.mq?'
+      - '**.h'
+      - '**.mq?'
       - '.github/workflows/test.yml'
+      - 'src/*.mq?'
       - 'src/include/**'
-  release:
-    types:
-      - prereleased
-      - published
-      - unpublished
 
 jobs:
   Compile-Lite:

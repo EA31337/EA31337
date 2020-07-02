@@ -266,7 +266,7 @@ int OnInit() {
       return (INIT_PARAMETERS_INCORRECT);
     }
     #ifdef __release__
-    if (Terminal::IsRealtime() && account.GetLogin() <= 1) {
+    if (Terminal::IsRealtime() && Account::AccountNumber() <= 1) {
       // @todo: Fails when debugging.
       Msg::ShowText("EA requires on-line Terminal.", "Error", __FUNCTION__, __LINE__, VerboseErrors, true);
       ea_active = false;
@@ -1330,7 +1330,7 @@ bool CloseOrder(ulong ticket_no = NULL, int reason_id = EMPTY, ENUM_MARKET_EVENT
   // if (VerboseTrace) Print(__FUNCTION__ + ": CloseOrder request. Reason: " + reason + "; Result=" + result + " @ " + TimeCurrent() + "(" + TimeToStr(TimeCurrent()) + "), ticket# " + ticket_no);
   if (result) {
     total_orders--;
-    last_close_profit = Order::GetOrderProfit();
+    last_close_profit = Order::GetOrderTotalProfit();
     if (SoundAlert) PlaySound(SoundFileAtClose);
     // TaskAddCalcStats(ticket_no); // Already done on CheckHistory().
     last_msg = StringFormat("Closed order %d with profit %g pips (%s)", ticket_no, Order::GetOrderProfitInPips(), ReasonIdToText(reason_id, _market_event));
@@ -1367,7 +1367,7 @@ double OrderCalc(ulong ticket_no = 0) {
   int id = GetIdByMagic();
   if (id < 0) return false;
   datetime close_time = Order::OrderCloseTime();
-  double profit = Order::GetOrderProfit();
+  double profit = Order::GetOrderTotalProfit();
   info[id][TOTAL_ORDERS]++;
   if (profit > 0) {
     info[id][TOTAL_ORDERS_WON]++;
@@ -1414,10 +1414,10 @@ int CloseOrdersByType(ENUM_ORDER_TYPE cmd, ulong strategy_id, ENUM_MARKET_EVENT 
    for (order = 0; order < Trade::OrdersTotal(); order++) {
       if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES)) {
         if ((int) strategy_id == GetIdByMagic() && Order::OrderSymbol() == Symbol() && (ENUM_ORDER_TYPE) Order::OrderType() == cmd) {
-          if (only_profitable && Order::GetOrderProfit() < 0) continue;
+          if (only_profitable && Order::GetOrderTotalProfit() < 0) continue;
           if (CloseOrder(NULL, R_CLOSE_SIGNAL, _close_signal)) {
              orders_total++;
-             profit_total += Order::GetOrderProfit();
+             profit_total += Order::GetOrderTotalProfit();
           } else {
             order_failed++;
             Msg::ShowText(StringFormat("Error: Order Pos: %d; Message: %s", order, terminal.GetLastErrorText()),
@@ -1754,7 +1754,7 @@ void CheckOrders() {
         }
       }
       else if (CloseOrderAfterXHours < 0 && elapsed_mins / 60 > -CloseOrderAfterXHours) {
-        if (Order::GetOrderProfit() > 0) {
+        if (Order::GetOrderTotalProfit() > 0) {
           TaskAddCloseOrder(Order::OrderTicket(), R_ORDER_EXPIRED);
         }
       }
@@ -2250,8 +2250,8 @@ double GetTotalProfitByType(ENUM_ORDER_TYPE cmd = NULL, int order_type = NULL) {
   for (i = 0; i < Trade::OrdersTotal(); i++) {
     if (Order::OrderSelect(i, SELECT_BY_POS, MODE_TRADES) == false) break;
     if (Order::OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
-       if (Order::OrderType() == cmd) total += Order::GetOrderProfit();
-       else if (Order::OrderMagicNumber() == MagicNumber + order_type) total += Order::GetOrderProfit();
+       if (Order::OrderType() == cmd) total += Order::GetOrderTotalProfit();
+       else if (Order::OrderMagicNumber() == MagicNumber + order_type) total += Order::GetOrderTotalProfit();
      }
   }
   return total;
@@ -2772,7 +2772,27 @@ void StartNewWeek(Trade *_trade) {
     if (stats[j][WEEKLY_PROFIT] != 0) strategy_stats += StringFormat("%s: %.1f pips; ", _strat.GetName(), stats[j][WEEKLY_PROFIT]);
     stats[j][WEEKLY_PROFIT]  = 0;
   }
+  int _strat_reenabled = UnsuspendStrategies();
+  if (_strat_reenabled > 0) {
+    PrintFormat("%s(): Unsuspended %d strategies.", __FUNCTION__, _strat_reenabled);
+  }
   if (VerboseInfo) Print(strategy_stats);
+}
+
+/**
+ * Unsuspend all strategies.
+ */
+int UnsuspendStrategies() {
+  int _counter = 0;
+  Strategy *_strat;
+  for (int _sid = 0; _sid < strats.GetSize(); _sid++) {
+    _strat = ((Strategy *) strats.GetByIndex(_sid));
+    if (_strat.IsSuspended()) {
+      _strat.Suspended(false);
+      _counter++;
+    }
+  }
+  return _counter;
 }
 
 /**
@@ -3147,14 +3167,11 @@ bool InitStrategies() {
     Msg::ShowText("Initiation of strategies failed!", "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
   }
 
-  #ifdef __MQL4__
-  Array::ArrSetValueD(conf, FACTOR, 1.0);
-  Array::ArrSetValueD(conf, LOT_SIZE, ea_lot_size);
-  Array::ArrSetValueD(conf, PROFIT_FACTOR, GetDefaultProfitFactor());
-  #else
-  // @fixme
-  PrintFormat("%s(): FIXME: ArrSetValueD();", __FUNCTION_LINE__);
-  #endif
+  for (int i = 0; i < ArrayRange(conf, 0); i++) {
+    conf[i][FACTOR] = 1.0;
+    conf[i][LOT_SIZE] = ea_lot_size;
+    conf[i][PROFIT_FACTOR] = GetDefaultProfitFactor();
+  }
 
   #ifdef __profiler__ PROFILER_STOP #endif
   return init || !ValidateSettings;
@@ -3787,6 +3804,32 @@ double GetTotalProfit() {
   return total_profit;
 }
 
+int GetMaxStrategyValue(int key2) {
+  return GetPeakStrategyValue(key2, false);
+}
+
+int GetMinStrategyValue(int key2) {
+  return GetPeakStrategyValue(key2, true);
+}
+
+int GetPeakStrategyValue(int key2, bool lowest) {
+  int i;
+  int key1 = EMPTY;
+  double peak = lowest ? 999 : -999;
+  for (i = 0; i < ArrayRange(stats, 0); i++) {
+    if (!((Strategy*)strats.GetById(i)).IsEnabled()) {
+      continue;
+    }
+
+    if ((lowest && stats[i][key2] < peak) || (!lowest && stats[i][key2] > peak)) {
+      peak = stats[i][key2];
+      key1 = i;
+    }
+  }
+  return key1;
+}
+
+
 /**
  * Apply strategy multiplier factor based on the strategy profit or loss.
  */
@@ -3794,44 +3837,40 @@ void ApplyStrategyMultiplierFactor(uint period = DAILY, int direction = 0, doubl
   if (GetNoOfStrategies() <= 1 || factor == 1.0) return;
   int key = period == MONTHLY ? MONTHLY_PROFIT : (period == WEEKLY ? (int)WEEKLY_PROFIT : (int)DAILY_PROFIT);
   string period_name = period == MONTHLY ? "montly" : (period == WEEKLY ? "weekly" : "daily");
-  int new_strategy;
-  #ifdef __MQL4__
-  new_strategy = direction > 0 ? Array::GetArrKey1ByHighestKey2ValueD(stats, key) : Array::GetArrKey1ByLowestKey2ValueD(stats, key);
-  #else
-  // @fixme
-  new_strategy = EMPTY;
-  #endif
+  int new_strategy = direction <= 0 ? GetMinStrategyValue(key) : GetMaxStrategyValue(key);
   if (new_strategy == EMPTY) return;
   int previous = direction > 0 ? best_strategy[period] : worse_strategy[period];
   double new_factor = 1.0;
+  Strategy *new_strat = ((Strategy *) strats.GetById(new_strategy));
+  Strategy *prev_strat = previous != EMPTY ? ((Strategy *) strats.GetById(previous)) : NULL;
   if (direction > 0) { // Best strategy.
-    if (info[new_strategy][ACTIVE] && stats[new_strategy][key] > 10 && new_strategy != previous) { // Check if it's different than the previous one.
+    if (new_strat.IsEnabled() && stats[new_strategy][key] > 10 && new_strategy != previous) { // Check if it's different than the previous one.
       if (previous != EMPTY) {
-        if (!info[previous][ACTIVE]) info[previous][ACTIVE] = true;
+        prev_strat.Enabled();
         conf[previous][FACTOR] = GetDefaultProfitFactor(); // Set previous strategy multiplier factor to default.
         Msg::ShowText(StringFormat("Setting multiplier factor to default for strategy: %g", previous), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
       }
       best_strategy[period] = new_strategy; // Assign the new worse strategy.
-      info[new_strategy][ACTIVE] = true;
+      new_strat.Enabled();
       new_factor = GetDefaultProfitFactor() * factor;
       conf[new_strategy][FACTOR] = new_factor; // Apply multiplier factor for the new strategy.
      Msg::ShowText(StringFormat("Setting multiplier factor to %g for strategy: %d (period: %s)", new_factor, new_strategy, period_name), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
     }
   } else { // Worse strategy.
-    if (info[new_strategy][ACTIVE] && stats[new_strategy][key] < 10 && new_strategy != previous) { // Check if it's different than the previous one.
+    if (new_strat.IsEnabled() && stats[new_strategy][key] < 10 && new_strategy != previous) { // Check if it's different than the previous one.
       if (previous != EMPTY) {
-        if (!info[previous][ACTIVE]) info[previous][ACTIVE] = true;
+        prev_strat.Enabled();
         conf[previous][FACTOR] = GetDefaultProfitFactor(); // Set previous strategy multiplier factor to default.
         Msg::ShowText(StringFormat("Setting multiplier factor to default for strategy: %g to default.", previous), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
       }
       worse_strategy[period] = new_strategy; // Assign the new worse strategy.
       if (factor > 0) {
         new_factor = GetDefaultProfitFactor() * factor;
-        info[new_strategy][ACTIVE] = true;
+        new_strat.Enabled();
         conf[new_strategy][FACTOR] = new_factor; // Apply multiplier factor for the new strategy.
         Msg::ShowText(StringFormat("Setting multiplier factor to %g for strategy: %d (period: %s)", new_factor, new_strategy, period_name), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
       } else {
-        info[new_strategy][ACTIVE] = false;
+        new_strat.Enabled(false);
         //conf[new_strategy][FACTOR] = GetDefaultProfitFactor();
         Msg::ShowText(StringFormat("Disabling strategy: %d", new_strategy), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
       }
@@ -3887,19 +3926,15 @@ string GetDailyReport() {
 
   //output += GetAccountTextDetails() + "; " + GetOrdersStats();
 
-  #ifdef __MQL4__
   int key;
-  key = Array::GetArrKey1ByHighestKey2ValueD(stats, DAILY_PROFIT);
+  key = GetMaxStrategyValue(DAILY_PROFIT);
   if (key >= 0 && stats[key][DAILY_PROFIT] > 0) {
     output += StringFormat("Best: %s (%.2fp)", ((Strategy *) strats.GetById(key)).GetName(), stats[key][DAILY_PROFIT]);
   }
-  key = Array::GetArrKey1ByLowestKey2ValueD(stats, DAILY_PROFIT);
+  key = GetMinStrategyValue(DAILY_PROFIT);
   if (key >= 0 && stats[key][DAILY_PROFIT] < 0) {
     output += StringFormat("Worse: %s (%.2fp)", ((Strategy *) strats.GetById(key)).GetName(), stats[key][DAILY_PROFIT]);
   }
-  #else
-  // @fixme
-  #endif
 
   return output;
 }
@@ -3921,19 +3956,15 @@ string GetWeeklyReport() {
   output += StringFormat("Equity: %.2f; ",     weekly[MAX_EQUITY]);
   output += StringFormat("Balance: %.2f; ",    weekly[MAX_BALANCE]);
 
-  #ifdef __MQL4__
   int key;
-  key = Array::GetArrKey1ByHighestKey2ValueD(stats, WEEKLY_PROFIT);
+  key = GetMaxStrategyValue(WEEKLY_PROFIT);
   if (key >= 0 && stats[key][WEEKLY_PROFIT] > 0) {
     output += StringFormat("Best: %s (%.2fp)", ((Strategy *) strats.GetById(key)).GetName(), stats[key][WEEKLY_PROFIT]);
   }
-  key = Array::GetArrKey1ByLowestKey2ValueD(stats, WEEKLY_PROFIT);
+  key = GetMinStrategyValue(WEEKLY_PROFIT);
   if (key >= 0 && stats[key][WEEKLY_PROFIT] < 0) {
     output += StringFormat("Worse: %s (%.2fp)", ((Strategy *) strats.GetById(key)).GetName(), stats[key][WEEKLY_PROFIT]);
   }
-  #else
-  // @fixme
-  #endif
 
   return output;
 }
@@ -3955,19 +3986,15 @@ string GetMonthlyReport() {
   output += StringFormat("Equity: %.2f; ",     monthly[MAX_EQUITY]);
   output += StringFormat("Balance: %.2f; ",    monthly[MAX_BALANCE]);
 
-  #ifdef __MQL4__
   int key;
-  key = Array::GetArrKey1ByHighestKey2ValueD(stats, MONTHLY_PROFIT);
+  key = GetMaxStrategyValue(MONTHLY_PROFIT);
   if (key >= 0 && stats[key][MONTHLY_PROFIT] > 0) {
     output += StringFormat("Best: %s (%.2fp)", ((Strategy *) strats.GetById(key)).GetName(), stats[key][MONTHLY_PROFIT]);
   }
-  key = Array::GetArrKey1ByLowestKey2ValueD(stats, MONTHLY_PROFIT);
+  key = GetMinStrategyValue(MONTHLY_PROFIT);
   if (key >= 0 && stats[key][MONTHLY_PROFIT] < 0) {
     output += StringFormat("Worse: %s (%.2fp)", ((Strategy *) strats.GetById(key)).GetName(), stats[key][MONTHLY_PROFIT]);
   }
-  #else
-  // @fixme
-  #endif
 
   return output;
 }
@@ -4153,7 +4180,7 @@ bool ActionCloseMostProfitableOrder(int reason_id = EMPTY, int min_profit = EMPT
   for (order = 0; order < Trade::OrdersTotal(); order++) {
     if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES))
      if (Order::OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
-      curr_ticket_profit = Order::GetOrderProfit();
+      curr_ticket_profit = Order::GetOrderTotalProfit();
        if (curr_ticket_profit > max_ticket_profit) {
          selected_ticket = Order::OrderTicket();
          max_ticket_profit = curr_ticket_profit;
@@ -4181,9 +4208,9 @@ bool ActionCloseMostUnprofitableOrder(int reason_id = EMPTY){
   for (order = 0; order < Trade::OrdersTotal(); order++) {
     if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES))
      if (Order::OrderSymbol() == Symbol() && CheckOurMagicNumber()) {
-       if (Order::GetOrderProfit() < ticket_profit) {
+       if (Order::GetOrderTotalProfit() < ticket_profit) {
          selected_ticket = Order::OrderTicket();
-         ticket_profit = Order::GetOrderProfit();
+         ticket_profit = Order::GetOrderTotalProfit();
        }
      }
   }
@@ -4206,7 +4233,7 @@ bool ActionCloseAllProfitableOrders(int reason_id = EMPTY){
   double ticket_profit = 0, total_profit = 0;
   for (order = 0; order < Trade::OrdersTotal(); order++) {
     if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && Order::OrderSymbol() == Symbol() && CheckOurMagicNumber())
-       ticket_profit = Order::GetOrderProfit();
+       ticket_profit = Order::GetOrderTotalProfit();
        if (ticket_profit > 0) {
          result = TaskAddCloseOrder(Order::OrderTicket(), reason_id);
          selected_orders++;
@@ -4231,7 +4258,7 @@ bool ActionCloseAllUnprofitableOrders(int reason_id = EMPTY){
   double ticket_profit = 0, total_profit = 0;
   for (int order = 0; order < Trade::OrdersTotal(); order++) {
     if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && Order::OrderSymbol() == Symbol() && CheckOurMagicNumber())
-       ticket_profit = Order::GetOrderProfit();
+       ticket_profit = Order::GetOrderTotalProfit();
        if (ticket_profit < 0) {
          result = TaskAddCloseOrder(Order::OrderTicket(), reason_id);
          selected_orders++;
@@ -4295,7 +4322,7 @@ int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = true) {
    for (int order = 0; order < total; order++) {
       if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && Order::OrderSymbol() == Symbol() && Order::OrderTicket() > 0) {
          if (only_ours && !CheckOurMagicNumber()) continue;
-         total_profit += Order::GetOrderProfit();
+         total_profit += Order::GetOrderTotalProfit();
          TaskAddCloseOrder(Order::OrderTicket(), reason_id); // Add task to re-try.
          processed++;
       } else {
@@ -4328,7 +4355,9 @@ bool ActionExecute(int aid, int id = EMPTY) {
   int mid = (id != EMPTY ? acc_conditions[id][1] : EMPTY); // Market id condition.
   int reason_id = (id != EMPTY ? acc_conditions[id][0] : EMPTY); // Account id condition.
   int sid;
+  int i;
   ENUM_ORDER_TYPE cmd;
+
   switch (aid) {
     case A_NONE: /* 0 */
       result = true;
@@ -4383,14 +4412,15 @@ bool ActionExecute(int aid, int id = EMPTY) {
       result = true;
       break;
     case A_RESET_STRATEGY_STATS: /* 13 */
-      #ifdef __MQL4__
-      Array::ArrSetValueD(conf, PROFIT_FACTOR, GetDefaultProfitFactor());
-      Array::ArrSetValueD(stats, TOTAL_GROSS_LOSS,   0.0);
-      Array::ArrSetValueD(stats, TOTAL_GROSS_PROFIT, 0.0);
-      #else
-      // @fixme
-      if (VerboseDebug) PrintFormat("%s: FIXME: A_RESET_STRATEGY_STATS", __FUNCTION_LINE__);
-      #endif
+      for (i = 0; i < ArrayRange(conf, 0); i++) {
+        conf[i][PROFIT_FACTOR] = GetDefaultProfitFactor();
+      }
+
+      for (i = 0; i < ArrayRange(stats, 0); i++) {
+        stats[i][TOTAL_GROSS_LOSS] = 0.0;
+        stats[i][TOTAL_GROSS_PROFIT] = 0.0;
+      }
+
       result = true;
       break;
       /*
