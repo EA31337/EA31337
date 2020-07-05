@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          submodules: 'recursive'
+          submodules: recursive
       - name: Enables Lite mode
         run: echo '#define __release__' > src/include/EA31337/ea-mode.mqh
       - name: Compiles EA (MQL4)

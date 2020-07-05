@@ -1,0 +1,43 @@
+---
+name: Sync Fork
+
+# yamllint disable rule:truthy
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: "1 1 */7 * *"
+
+jobs:
+  Repo-Sync:
+    if: github.repository != 'EA31337/EA31337'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          path: upstream
+          persist-credentials: false
+          repository: EA31337/EA31337
+      - name: Configures Git
+        run: |
+          git config --local core.autocrlf false
+          git config --local user.email "${git_email}"
+          git config --local user.name "${{ github.actor }}"
+        env:
+          git_email: "${{ github.actor }}@users.noreply.github.com"
+      - name: Pulls files from upstream
+        run: |
+          git pull upstream --autostash --rebase -Xours
+      - name: Prints differences
+        run: NO_PAGER=1 git --no-pager diff HEAD^
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          branch: ${{ github.ref }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
