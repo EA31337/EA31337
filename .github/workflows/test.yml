@@ -6,16 +6,18 @@ on:
     paths:
       - '**.h'
       - '**.mq?'
-      - '.github/workflows/test.yml'
-      - 'src/*.mq?'
-      - 'src/include/**'
+      - .github/workflows/test.yml
+      - src/*.mq?
+      - src/*.mq[45h]
+      - src/include/**
   push:
     paths:
       - '**.h'
       - '**.mq?'
-      - '.github/workflows/test.yml'
-      - 'src/*.mq?'
-      - 'src/include/**'
+      - .github/workflows/test.yml
+      - src/*.mq?
+      - src/*.mq[45h]
+      - src/include/**
 
 jobs:
   Compile-Lite:

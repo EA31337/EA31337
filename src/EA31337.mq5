@@ -51,10 +51,11 @@ datetime last_traded;
 
 // Strategy variables.
 int info[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_INFO_ENTRY];
-double conf[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_VALUE_ENTRY], stats[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_STAT_ENTRY];
+double conf[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_VALUE_ENTRY];
+double stats[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_STAT_ENTRY];
 int open_orders[FINAL_STRATEGY_TYPE_ENTRY], closed_orders[FINAL_STRATEGY_TYPE_ENTRY];
 int tickets[]; // List of tickets to process.
-int worse_strategy[FINAL_STAT_PERIOD_TYPE_ENTRY], best_strategy[FINAL_ENUM_TIMEFRAMES_INDEX];
+int worse_strategy[FINAL_STAT_PERIOD_TYPE_ENTRY], best_strategy[FINAL_STAT_PERIOD_TYPE_ENTRY];
 
 // EA variables.
 bool ea_active = false; bool ea_expired = false;
@@ -1375,7 +1376,7 @@ double OrderCalc(ulong ticket_no = 0) {
     if (profit > daily[MAX_PROFIT])   daily[MAX_PROFIT] = profit;
     if (profit > weekly[MAX_PROFIT])  weekly[MAX_PROFIT] = profit;
     if (profit > monthly[MAX_PROFIT]) monthly[MAX_PROFIT] = profit;
-  } else {
+  } else if (profit < 0) {
     info[id][TOTAL_ORDERS_LOSS]++;
     stats[id][TOTAL_GROSS_LOSS] += profit;
     if (profit < daily[MAX_LOSS])     daily[MAX_LOSS] = profit;
@@ -3450,8 +3451,8 @@ bool AccCondition(int condition = C_ACC_NONE) {
       return Array::GetArrSumKey1(hourly_profit, day_of_year, 10) > 0;
       #else
       // @fixme
-      last_cname = "TodayInProfit(@FIXME)";
-      return False;
+      last_cname = "?";
+      return  False;
       #endif
     case C_ACC_CDAY_IN_LOSS: // Check if current day in loss.
       #ifdef __MQL4__
@@ -3804,66 +3805,77 @@ double GetTotalProfit() {
   return total_profit;
 }
 
-int GetMaxStrategyValue(int key2) {
-  return GetPeakStrategyValue(key2, false);
+int GetMaxStrategyValue(int _key2, double &_result) {
+  return GetPeakStrategyValue(_key2, _result, false);
 }
 
-int GetMinStrategyValue(int key2) {
-  return GetPeakStrategyValue(key2, true);
+int GetMinStrategyValue(int _key2, double &_result) {
+  return GetPeakStrategyValue(_key2, _result, true);
 }
 
-int GetPeakStrategyValue(int key2, bool lowest) {
-  int i;
-  int key1 = EMPTY;
-  double peak = lowest ? 999 : -999;
-  for (i = 0; i < ArrayRange(stats, 0); i++) {
-    if (!((Strategy*)strats.GetById(i)).IsEnabled()) {
+int GetPeakStrategyValue(int _key2, double &_peak, bool lowest) {
+  int _key1 = EMPTY;
+  _peak = lowest ? DBL_MAX : -DBL_MAX;
+  for (int i = 0; i < ArrayRange(stats, 0); i++) {
+    if (!((Strategy*) strats.GetById(i)).IsEnabled()) {
       continue;
     }
 
-    if ((lowest && stats[i][key2] < peak) || (!lowest && stats[i][key2] > peak)) {
-      peak = stats[i][key2];
-      key1 = i;
+    if ((lowest && stats[i][_key2] < _peak) || (!lowest && stats[i][_key2] > _peak)) {
+      _peak = stats[i][_key2];
+      _key1 = i;
     }
   }
-  return key1;
+  _peak = _key1 == EMPTY ? NULL : (lowest ? fmin(_peak, 0) : fmax(_peak, 0));
+  return _key1;
 }
-
 
 /**
  * Apply strategy multiplier factor based on the strategy profit or loss.
  */
-void ApplyStrategyMultiplierFactor(uint period = DAILY, int direction = 0, double factor = 1.0) {
-  if (GetNoOfStrategies() <= 1 || factor == 1.0) return;
-  int key = period == MONTHLY ? MONTHLY_PROFIT : (period == WEEKLY ? (int)WEEKLY_PROFIT : (int)DAILY_PROFIT);
-  string period_name = period == MONTHLY ? "montly" : (period == WEEKLY ? "weekly" : "daily");
-  int new_strategy = direction <= 0 ? GetMinStrategyValue(key) : GetMaxStrategyValue(key);
-  if (new_strategy == EMPTY) return;
-  int previous = direction > 0 ? best_strategy[period] : worse_strategy[period];
+void ApplyStrategyMultiplierFactor(ENUM_STAT_PERIOD_TYPE _period_index = DAILY, int direction = 0, double factor = 1.0) {
+  if (GetNoOfStrategies() <= 1 || factor == 1.0) {
+    return;
+  }
+  double _sprofit = NULL;
+  ENUM_STRATEGY_STAT_VALUE _stat_key =
+    _period_index == MONTHLY
+    ? MONTHLY_PROFIT
+    : (_period_index == WEEKLY ? WEEKLY_PROFIT : DAILY_PROFIT);
+  int new_strategy =
+    direction <= 0
+    ? GetMinStrategyValue(_stat_key, _sprofit)
+    : GetMaxStrategyValue(_stat_key, _sprofit);
+  if (new_strategy == EMPTY || _sprofit == 0) {
+    // No new strategy has been selected, or with zero profit.
+    return;
+  }
+  string period_name = _period_index == MONTHLY ? "montly" : (_period_index == WEEKLY ? "weekly" : "daily");
+  int previous = direction > 0 ? best_strategy[_period_index] : worse_strategy[_period_index];
   double new_factor = 1.0;
   Strategy *new_strat = ((Strategy *) strats.GetById(new_strategy));
   Strategy *prev_strat = previous != EMPTY ? ((Strategy *) strats.GetById(previous)) : NULL;
   if (direction > 0) { // Best strategy.
-    if (new_strat.IsEnabled() && stats[new_strategy][key] > 10 && new_strategy != previous) { // Check if it's different than the previous one.
+    if (new_strat.IsEnabled() && _sprofit > 10 && new_strategy != previous) { // Check if it's different than the previous one.
       if (previous != EMPTY) {
         prev_strat.Enabled();
         conf[previous][FACTOR] = GetDefaultProfitFactor(); // Set previous strategy multiplier factor to default.
         Msg::ShowText(StringFormat("Setting multiplier factor to default for strategy: %g", previous), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
       }
-      best_strategy[period] = new_strategy; // Assign the new worse strategy.
+      best_strategy[_period_index] = new_strategy; // Assign the new worse strategy.
       new_strat.Enabled();
       new_factor = GetDefaultProfitFactor() * factor;
       conf[new_strategy][FACTOR] = new_factor; // Apply multiplier factor for the new strategy.
-     Msg::ShowText(StringFormat("Setting multiplier factor to %g for strategy: %d (period: %s)", new_factor, new_strategy, period_name), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
+      Msg::ShowText(StringFormat("Setting multiplier factor to %g for strategy: %d (period: %s)", new_factor, new_strategy, period_name), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
     }
   } else { // Worse strategy.
-    if (new_strat.IsEnabled() && stats[new_strategy][key] < 10 && new_strategy != previous) { // Check if it's different than the previous one.
+    if (new_strat.IsEnabled() && _sprofit < 10 && new_strategy != previous) { // Check if it's different than the previous one.
       if (previous != EMPTY) {
         prev_strat.Enabled();
         conf[previous][FACTOR] = GetDefaultProfitFactor(); // Set previous strategy multiplier factor to default.
         Msg::ShowText(StringFormat("Setting multiplier factor to default for strategy: %g to default.", previous), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
       }
-      worse_strategy[period] = new_strategy; // Assign the new worse strategy.
+      worse_strategy[_period_index] = new_strategy; // Assign the new worse strategy.
       if (factor > 0) {
         new_factor = GetDefaultProfitFactor() * factor;
         new_strat.Enabled();
@@ -3923,18 +3935,9 @@ string GetDailyReport() {
   output += StringFormat("Profit: %.2f; ",     daily[MAX_PROFIT]);
   output += StringFormat("Equity: %.2f; ",     daily[MAX_EQUITY]);
   output += StringFormat("Balance: %.2f; ",    daily[MAX_BALANCE]);
+  output += GetPeakStrategyText(DAILY_PROFIT);
 
   //output += GetAccountTextDetails() + "; " + GetOrdersStats();
-
-  int key;
-  key = GetMaxStrategyValue(DAILY_PROFIT);
-  if (key >= 0 && stats[key][DAILY_PROFIT] > 0) {
-    output += StringFormat("Best: %s (%.2fp)", ((Strategy *) strats.GetById(key)).GetName(), stats[key][DAILY_PROFIT]);
-  }
-  key = GetMinStrategyValue(DAILY_PROFIT);
-  if (key >= 0 && stats[key][DAILY_PROFIT] < 0) {
-    output += StringFormat("Worse: %s (%.2fp)", ((Strategy *) strats.GetById(key)).GetName(), stats[key][DAILY_PROFIT]);
-  }
 
   return output;
 }
@@ -3955,16 +3958,7 @@ string GetWeeklyReport() {
   output += StringFormat("Profit: %.2f; ",     weekly[MAX_PROFIT]);
   output += StringFormat("Equity: %.2f; ",     weekly[MAX_EQUITY]);
   output += StringFormat("Balance: %.2f; ",    weekly[MAX_BALANCE]);
-
-  int key;
-  key = GetMaxStrategyValue(WEEKLY_PROFIT);
-  if (key >= 0 && stats[key][WEEKLY_PROFIT] > 0) {
-    output += StringFormat("Best: %s (%.2fp)", ((Strategy *) strats.GetById(key)).GetName(), stats[key][WEEKLY_PROFIT]);
-  }
-  key = GetMinStrategyValue(WEEKLY_PROFIT);
-  if (key >= 0 && stats[key][WEEKLY_PROFIT] < 0) {
-    output += StringFormat("Worse: %s (%.2fp)", ((Strategy *) strats.GetById(key)).GetName(), stats[key][WEEKLY_PROFIT]);
-  }
+  output += GetPeakStrategyText(WEEKLY_PROFIT);
 
   return output;
 }
@@ -3985,18 +3979,27 @@ string GetMonthlyReport() {
   output += StringFormat("Profit: %.2f; ",     monthly[MAX_PROFIT]);
   output += StringFormat("Equity: %.2f; ",     monthly[MAX_EQUITY]);
   output += StringFormat("Balance: %.2f; ",    monthly[MAX_BALANCE]);
-
-  int key;
-  key = GetMaxStrategyValue(MONTHLY_PROFIT);
-  if (key >= 0 && stats[key][MONTHLY_PROFIT] > 0) {
-    output += StringFormat("Best: %s (%.2fp)", ((Strategy *) strats.GetById(key)).GetName(), stats[key][MONTHLY_PROFIT]);
-  }
-  key = GetMinStrategyValue(MONTHLY_PROFIT);
-  if (key >= 0 && stats[key][MONTHLY_PROFIT] < 0) {
-    output += StringFormat("Worse: %s (%.2fp)", ((Strategy *) strats.GetById(key)).GetName(), stats[key][MONTHLY_PROFIT]);
-  }
+  output += GetPeakStrategyText(MONTHLY_PROFIT);
 
   return output;
+}
+
+/**
+ * Returns best and worse strategies in text format.
+ */
+string GetPeakStrategyText(ENUM_STRATEGY_STAT_VALUE _stat_type) {
+  string _output = "";
+  int _sid;
+  double _sprofit = 0;
+  _sid = GetMaxStrategyValue(_stat_type, _sprofit);
+  if (_sid >= 0 && stats[_sid][_stat_type] > 0) {
+    _output += StringFormat("Best: %s (%.2fp)", ((Strategy *) strats.GetById(_sid)).GetName(), _sprofit);
+  }
+  _sid = GetMinStrategyValue(_stat_type, _sprofit);
+  if (_sid >= 0 && stats[_sid][_stat_type] < 0) {
+    _output += StringFormat("Worse: %s (%.2fp)", ((Strategy *) strats.GetById(_sid)).GetName(), _sprofit);
+  }
+  return _output;
 }
 
 /**
