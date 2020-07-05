@@ -3601,8 +3601,12 @@ double GetStrategyLotSize(int sid, ENUM_ORDER_TYPE cmd) {
   if (Boosting_Enabled) {
     double pf = GetStrategyProfitFactor(sid);
     if (pf > 0) {
-      if (StrategyBoostByPF && pf > 1.0) trade_lot *= fmax(GetStrategyProfitFactor(sid), 1.0);
-      else if (StrategyHandicapByPF && pf < 1.0) trade_lot *= fmin(GetStrategyProfitFactor(sid), 1.0);
+      if (StrategyBoostByPF && pf > 1.0) {
+        trade_lot *= fmax(GetStrategyProfitFactor(sid), 1.0);
+      }
+      else if (StrategyHandicapByPF && pf < 1.0) {
+        trade_lot *= fmin(GetStrategyProfitFactor(sid), 1.0);
+      }
     }
     if (Convert::ValueToOp(curr_trend) == cmd && BoostTrendFactor != 1.0) {
       if (VerboseDebug) PrintFormat("%s:%d: %s: Factor: %g, Trade lot: %g, Final trade lot: %g",
@@ -3688,7 +3692,9 @@ void UpdateStrategyLotSize() {
  * Calculate strategy profit factor.
  */
 double GetStrategyProfitFactor(int sid) {
-  if (info[sid][TOTAL_ORDERS] > InitNoOfOrdersToCalcPF && stats[sid][TOTAL_GROSS_LOSS] < 0) {
+  if (info[sid][TOTAL_ORDERS] > InitNoOfOrdersToCalcPF
+    && stats[sid][TOTAL_GROSS_PROFIT] != 0
+    && stats[sid][TOTAL_GROSS_LOSS] != 0) {
     return stats[sid][TOTAL_GROSS_PROFIT] / -stats[sid][TOTAL_GROSS_LOSS];
   } else {
     return 1.0; // @todo?
