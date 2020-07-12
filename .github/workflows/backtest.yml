@@ -66,11 +66,10 @@ jobs:
         with:
           name: ${{ matrix.mode }}
           path: '*.ex?'
-  Backtest-Lite:
+  Backtest:
     defaults:
       run:
         shell: bash
-        working-directory: docker/backtest/lite/all-yearly/2019
     if: >
       github.repository == 'EA31337/EA31337'
       && github.event_name != 'pull_request'
@@ -80,88 +79,22 @@ jobs:
       matrix:
         mode:
           - Lite
-        test:
-          - lite_backtest_2019_1k
-          - lite_backtest_2019_10k
-          - lite_backtest_2019_100k
-        year:
-          - 2019
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
-        with:
-          name: ${{ matrix.mode }}
-      - run: docker-compose run ${{ matrix.test }}
-      - name: Git Diff
-        run: NO_PAGER=1 git --no-pager diff HEAD^
-      - name: Uploads results
-        uses: actions/upload-artifact@v2
-        with:
-          name: Results-${{ matrix.mode }}-${{ matrix.year }}
-          path: _results
-  Backtest-Advanced:
-    defaults:
-      run:
-        shell: bash
-        working-directory: docker/backtest/advanced/all-yearly/2019
-    if: >
-      github.repository == 'EA31337/EA31337'
-      && github.event_name != 'pull_request'
-      && false
-    needs: Compile
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        mode:
           - Advanced
-        test:
-          - advanced_backtest_2019_1k
-          - advanced_backtest_2019_10k
-          - advanced_backtest_2019_100k
-        year:
-          - 2019
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
-        with:
-          name: ${{ matrix.mode }}
-      - run: docker-compose run ${{ matrix.test }}
-      - name: Git Diff
-        run: NO_PAGER=1 git --no-pager diff HEAD^
-      - name: Uploads results
-        uses: actions/upload-artifact@v2
-        with:
-          name: Results-${{ matrix.mode }}-${{ matrix.year }}
-          path: _results
-  Backtest-Rider:
-    defaults:
-      run:
-        shell: bash
-        working-directory: docker/backtest/rider/all-yearly/2019
-    if: >
-      github.repository == 'EA31337/EA31337'
-      && github.event_name != 'pull_request'
-      && false
-    needs: Compile
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        mode:
           - Rider
-        test:
-          - rider_backtest_2019_1k
-          - rider_backtest_2019_10k
-          - rider_backtest_2019_100k
         year:
           - 2019
+        deposit:
+          - 1k
+          - 10k
+          - 100k
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
         with:
           name: ${{ matrix.mode }}
-      - run: docker-compose run ${{ matrix.test }}
-      - name: Git Diff
-        run: NO_PAGER=1 git --no-pager diff HEAD^
+      - run: docker-compose run ${{ matrix.mode }}_backtest_${{ matrix.year }}_${{ matrix.deposit }}
+        working-directory: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}
+      - run: git diff
       - name: Uploads results
         uses: actions/upload-artifact@v2
         with:
@@ -176,7 +109,7 @@ jobs:
       github.repository == 'EA31337/EA31337'
       && github.event_name != 'pull_request'
       && false
-    needs: [Backtest-Lite, Backtest-Advanced, Backtest-Rider]
+    needs: Backtest
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
