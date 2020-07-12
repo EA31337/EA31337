@@ -92,7 +92,6 @@ jobs:
           name: ${{ matrix.mode }}
       - run: docker-compose run ${{ matrix.mode }}_${{ matrix.year }}_${{ matrix.deposit }}
         working-directory: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}
-      - run: git diff || git status
       - name: Uploads results
         uses: actions/upload-artifact@v2
         with:
