@@ -101,7 +101,7 @@ jobs:
         with:
           name: Results-${{ matrix.mode }}-${{ matrix.year }}
           path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
-  Commit-Results:
+  Publish-Results:
     defaults:
       run:
         shell: bash
@@ -109,7 +109,6 @@ jobs:
     if: >
       github.repository == 'EA31337/EA31337'
       && github.event_name != 'pull_request'
-      && false
     needs: Backtest
     runs-on: ubuntu-latest
     strategy:
@@ -120,6 +119,7 @@ jobs:
           - Rider
         year:
           - 2019
+      max-parallel: 1
     steps:
       - uses: actions/checkout@v2
         with:
@@ -128,14 +128,14 @@ jobs:
           fetch-depth: 0
       - uses: actions/download-artifact@v2
         with:
-          name: Results-Lite-2019
+          name: Results-${{ matrix.mode }}-${{ matrix.year }}
           path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
       - name: Commit files
         run: |
           git config --local core.autocrlf false
           git config --local user.email $git_email
           git config --local user.name "${{ github.actor }}"
-          git pull origin ${{ github.ref }} --autostash --rebase -Xours
+          git pull origin "${{ github.ref }}" --autostash --rebase -Xours
           git commit -am "${{ github.workflow }} Results"
         env:
           git_email: "${{ github.actor }}@users.noreply.github.com"
