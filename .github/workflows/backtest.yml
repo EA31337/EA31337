@@ -70,9 +70,6 @@ jobs:
       run:
         shell: bash
         working-directory: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}
-    if: >
-      github.repository == 'EA31337/EA31337'
-      && github.event_name != 'pull_request'
     needs: Compile
     runs-on: ubuntu-latest
     strategy:
@@ -105,9 +102,6 @@ jobs:
       run:
         shell: bash
         working-directory: docker/backtest
-    if: >
-      github.repository == 'EA31337/EA31337'
-      && github.event_name != 'pull_request'
     needs: Backtest
     runs-on: ubuntu-latest
     strategy:
