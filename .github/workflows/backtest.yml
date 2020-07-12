@@ -80,8 +80,8 @@ jobs:
       matrix:
         mode:
           - Lite
-          # - Advanced
-          # - Rider
+          - Advanced
+          - Rider
         year:
           - 2019
         deposit:
@@ -135,8 +135,10 @@ jobs:
           git config --local core.autocrlf false
           git config --local user.email $git_email
           git config --local user.name "${{ github.actor }}"
+          git add . && git add --renormalize .
           git pull origin "${{ github.ref }}" --autostash --rebase -Xours
-          git commit -am "${{ github.workflow }} Results"
+          git commit -a \
+          -m "${{ matrix.mode }}: Backtest Results for ${{ matrix.year }}"
         env:
           git_email: "${{ github.actor }}@users.noreply.github.com"
       - name: Push changes
