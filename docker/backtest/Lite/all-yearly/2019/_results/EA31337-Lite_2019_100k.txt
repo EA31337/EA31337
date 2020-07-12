@@ -2,20 +2,20 @@
 
 
                                                                 Strategy Tester Report
-                                                               EA31337-Lite-v1.079-dev
+                                                EA31337-Lite-178dd835420be7905e015931bb1a6b9977eacdff
                                                                      (Build 1260)
 
 Symbol                             EURUSD (Euro vs US Dollar)
-Period                             30 Minutes (M30) 2019.01.04 00:00 - 2019.12.30 23:30 (2019.01.01 - 2019.12.31)
+Period                             1 Minute (M1) 2019.01.01 23:42 - 2019.12.30 23:59 (2019.01.01 - 2019.12.31)
 Model                              Every tick (the most precise method based on all available least timeframes)
                                    __EA_Parameters__="-- Input EA parameters for EA31337 Lite v1.079 --"; __Trade_Parameters__="-- Trade parameters -
-                                   -"; MaxOrders=0; MaxOrdersPerType=0; LotSize=0.01; TradeMicroLots=true; MinVolumeToTrade=2;
-                                   MaxOrderPriceSlippage=50; MaxTries=5; MinPipChangeToTrade=0; MinPipGap=30; __EA_Order_Parameters__="-- Profit and
-                                   loss parameters --"; TakeProfitMax=0; StopLossMax=0; __EA_Trailing_Parameters__="-- Profit and loss trailing
-                                   parameters --"; TrailingStop=50; TrailingProfit=0; TrailingStopAddPerMinute=0.3; __EA_Risk_Parameters__="-- Risk
-                                   management parameters --"; RiskMarginPerOrder=0; RiskMarginTotal=5; RiskRatio=0; RiskRatioIncreaseMethod=0;
-                                   RiskRatioDecreaseMethod=0; InitNoOfDaysToWarmUp=28; CloseOrderAfterXHours=0; __Strategy_Profit__="-- Per strategy
-                                   parameters (0 to disable) --"; ProfitFactorMinToTrade=0.9; ProfitFactorMaxToTrade=0; InitNoOfOrdersToCalcPF=20;
+                                   -"; MaxOrders=0; MaxOrdersPerType=0; LotSize=0.01; TradeMicroLots=true; MinVolumeToTrade=0;
+                                   MaxOrderPriceSlippage=50; MaxTries=5; MinPipGap=30; __EA_Order_Parameters__="-- Profit and loss parameters --";
+                                   TakeProfitMax=0; StopLossMax=0; __EA_Trailing_Parameters__="-- Profit and loss trailing parameters --";
+                                   TrailingStop=50; TrailingProfit=0; __EA_Risk_Parameters__="-- Risk management parameters --";
+                                   RiskMarginPerOrder=0; RiskMarginTotal=5; RiskRatio=0; RiskRatioIncreaseMethod=0; RiskRatioDecreaseMethod=0;
+                                   InitNoOfDaysToWarmUp=28; CloseOrderAfterXHours=0; __Strategy_Profit__="-- Per strategy parameters (0 to disable) -
+                                   -"; ProfitFactorMinToTrade=0.4; ProfitFactorMaxToTrade=0; InitNoOfOrdersToCalcPF=20;
                                    __Strategy_Boosting_Parameters__="-- Strategy boosting parameters (set 1.0 for default) --";
                                    Boosting_Enabled=false; BoostTrendFactor=0.9; StrategyBoostByPF=true; StrategyHandicapByPF=true;
                                    BestDailyStrategyMultiplierFactor=1; BestWeeklyStrategyMultiplierFactor=1; BestMonthlyStrategyMultiplierFactor=1;
@@ -37,29 +37,30 @@ Parameters                         __EA_Account_Conditions_Params__="-- Account 
                                    RecordTicksToCSV=false; AccountConditionToDisable=0; DisableCloseConditions=false; __EA_Constants__="-- Constants
                                    --"; MagicNumber=31337; __Other_Parameters__="-- Other parameters --"; __Strategy_Parameters__="-- Strategy
                                    parameters --"; __AC_Parameters__="-- Settings for the Bill Williams' Accelerator/Decelerator oscillator --";
-                                   AC_Active_Tf=0; AC_TrailingStopMethod=1; AC_TrailingProfitMethod=-25; AC_SignalLevel=0.0004; AC_Shift=0;
-                                   AC1_SignalMethod=-1; AC5_SignalMethod=-1; AC15_SignalMethod=1; AC30_SignalMethod=1; AC1_OpenCondition1=777;
+                                   AC_Active_Tf=4; AC_TrailingStopMethod=18; AC_TrailingProfitMethod=25; AC_SignalLevel=0.0004; AC_Shift=0;
+                                   AC1_SignalMethod=-1; AC5_SignalMethod=-1; AC15_SignalMethod=1; AC30_SignalMethod=0; AC1_OpenCondition1=777;
                                    AC1_OpenCondition2=0; AC1_CloseCondition=26; AC5_OpenCondition1=971; AC5_OpenCondition2=0; AC5_CloseCondition=24;
                                    AC15_OpenCondition1=1; AC15_OpenCondition2=0; AC15_CloseCondition=1; AC30_OpenCondition1=389;
                                    AC30_OpenCondition2=0; AC30_CloseCondition=29; AC1_MaxSpread=6; AC5_MaxSpread=7; AC15_MaxSpread=8;
-                                   AC30_MaxSpread=10; __AD_Parameters__="-- Settings for the Accumulation/Distribution indicator --"; AD_Active_Tf=0;
-                                   AD_TrailingStopMethod=1; AD_TrailingProfitMethod=9; AD_SignalLevel=0; AD_Shift=0; AD1_SignalMethod=1;
-                                   AD5_SignalMethod=1; AD15_SignalMethod=1; AD30_SignalMethod=-1; AD1_OpenCondition1=583; AD1_OpenCondition2=0;
+                                   AC30_MaxSpread=10; __AD_Parameters__="-- Settings for the Accumulation/Distribution indicator --"; AD_Active_Tf=4;
+                                   AD_TrailingStopMethod=1; AD_TrailingProfitMethod=25; AD_SignalLevel=0; AD_Shift=0; AD1_SignalMethod=1;
+                                   AD5_SignalMethod=-1; AD15_SignalMethod=1; AD30_SignalMethod=-1; AD1_OpenCondition1=583; AD1_OpenCondition2=0;
                                    AD1_CloseCondition=2; AD5_OpenCondition1=486; AD5_OpenCondition2=0; AD5_CloseCondition=3; AD15_OpenCondition1=292;
-                                   AD15_OpenCondition2=0; AD15_CloseCondition=1; AD30_OpenCondition1=292;
-Bars in test                 12401 Ticks modelled                     124394759 Modelling quality                                              89.28%
+                                   AD15_OpenCondition2=0; AD15_CloseCondition=1; AD30_OpenCondition1=292; AD30_OpenCondition2=0;
+                                   AD30_CloseCondition=24;
+Bars in test                371692 Ticks modelled                     126198471 Modelling quality                                              24.99%
 Mismatched charts errors         0
 Initial deposit          100000.00                                              Spread                                                             10
-Total net profit           -452.57 Gross profit                         8238.62 Gross loss                                                   -8691.19
-Profit factor                 0.95 Expected payoff                        -0.68
-Absolute drawdown           794.26 Maximal drawdown             1460.23 (1.45%) Relative drawdown                                     1.45% (1460.23)
-Total trades                   667 Short positions (won %)         489 (75.05%) Long positions (won %)                                   178 (64.04%)
-                                   Profit trades (% of total)      481 (72.11%) Loss trades (% of total)                                 186 (27.89%)
-                           Largest profit trade                           39.19 loss trade                                                    -119.37
-                           Average profit trade                           17.13 loss trade                                                     -46.73
-                           Maximum consecutive wins (profit in      23 (317.63) consecutive losses (loss in money)                        7 (-363.43)
+Total net profit           -949.78 Gross profit                        13422.39 Gross loss                                                  -14372.17
+Profit factor                 0.93 Expected payoff                        -0.50
+Absolute drawdown          1632.01 Maximal drawdown             1715.26 (1.71%) Relative drawdown                                     1.71% (1715.26)
+Total trades                  1907 Short positions (won %)        1373 (39.04%) Long positions (won %)                                   534 (28.46%)
+                                   Profit trades (% of total)      688 (36.08%) Loss trades (% of total)                                1219 (63.92%)
+                           Largest profit trade                          254.56 loss trade                                                    -238.32
+                           Average profit trade                           19.51 loss trade                                                     -11.79
+                           Maximum consecutive wins (profit in        7 (77.37) consecutive losses (loss in money)                       19 (-213.80)
                                    money)
-                           Maximal consecutive profit (count of     377.18 (19) consecutive loss (count of losses)                        -363.43 (7)
+                           Maximal consecutive profit (count of      406.38 (4) consecutive loss (count of losses)                       -445.05 (10)
                                    wins)
-                           Average consecutive wins                           5 consecutive losses                                                  2
+                           Average consecutive wins                           2 consecutive losses                                                  3
                                                                        [Graph]
