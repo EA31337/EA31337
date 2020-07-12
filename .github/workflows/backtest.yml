@@ -70,7 +70,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: docker/backtest/BT-${{ matrix.mode }}/all-yearly/${{ matrix.year }}
+        working-directory: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}
     if: >
       github.repository == 'EA31337/EA31337'
       && github.event_name != 'pull_request'
@@ -94,13 +94,13 @@ jobs:
         with:
           name: ${{ matrix.mode }}
       - run: docker-compose run ${{ matrix.mode }}_${{ matrix.year }}_${{ matrix.deposit }}
-        working-directory: docker/backtest/BT-${{ matrix.mode }}/all-yearly/${{ matrix.year }}
+        working-directory: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}
       - run: git diff
       - name: Uploads results
         uses: actions/upload-artifact@v2
         with:
           name: Results-${{ matrix.mode }}-${{ matrix.year }}
-          path: docker/backtest/BT-${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
+          path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
   Commit-Results:
     defaults:
       run:
@@ -112,6 +112,14 @@ jobs:
       && false
     needs: Backtest
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mode:
+          - Lite
+          - Advanced
+          - Rider
+        year:
+          - 2019
     steps:
       - uses: actions/checkout@v2
         with:
@@ -121,15 +129,7 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: Results-Lite-2019
-          path: docker/backtest/lite/all-yearly/2019
-      - uses: actions/download-artifact@v2
-        with:
-          name: Results-Advanced-2019
-          path: docker/backtest/advanced/all-yearly/2019
-      - uses: actions/download-artifact@v2
-        with:
-          name: Results-Rider-2019
-          path: docker/backtest/rider/all-yearly/2019
+          path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
       - name: Commit files
         run: |
           git config --local core.autocrlf false
