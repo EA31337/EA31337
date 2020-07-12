@@ -119,11 +119,10 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: docker/tests/lite
+        working-directory: docker/backtest/lite/all-yearly/2019
     if: >
       github.repository == 'EA31337/EA31337'
       && github.event_name != 'pull_request'
-      && false
     needs: Compile-Lite
     runs-on: ubuntu-latest
     steps:
@@ -135,7 +134,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/download-artifact@v2
         with:
-          name: ea-rider
+          name: ea-lite
       - run: docker-compose up
       - name: Commit files
         run: |
@@ -155,7 +154,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: docker/tests/advanced
+        working-directory: docker/backtest/advanced/all-yearly/2019
     if: >
       github.repository == 'EA31337/EA31337'
       && github.event_name != 'pull_request'
@@ -171,7 +170,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/download-artifact@v2
         with:
-          name: ea-rider
+          name: ea-advanced
       - run: docker-compose up
       - name: Commit files
         run: |
@@ -191,7 +190,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: docker/tests/rider
+        working-directory: docker/backtest/rider/all-yearly/2019
     if: >
       github.repository == 'EA31337/EA31337'
       && github.event_name != 'pull_request'
