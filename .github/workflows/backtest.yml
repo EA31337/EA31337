@@ -12,8 +12,7 @@ on:
   push:
     branches:
       - 'master'
-      - 'dev-backtest'
-      - 'v1.*-dev'
+      - '*-backtest'
     paths:
       - '**/*.h'
       - '**/*.mq?'
