@@ -145,3 +145,5 @@ jobs:
         with:
           branch: ${{ github.ref }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run git diff
+        run: NO_PAGER=1 git --no-pager diff HEAD^
