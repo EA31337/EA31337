@@ -69,7 +69,8 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}
+        working-directory: >
+          docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}
     needs: Compile
     runs-on: ubuntu-latest
     strategy:

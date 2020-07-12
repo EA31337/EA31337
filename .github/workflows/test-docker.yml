@@ -1,6 +1,7 @@
 ---
 name: Test Docker
 
+# yamllint disable rule:truthy
 on:
   pull_request:
     paths:

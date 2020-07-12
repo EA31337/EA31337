@@ -1,6 +1,7 @@
 ---
 name: Test
 
+# yamllint disable rule:truthy
 on:
   pull_request:
     paths:
