@@ -1,0 +1,7 @@
+# The mdl/markdownlint configuration file.
+
+# Ignores the following rules:
+# "~MD013" - line length should be no more than 120 characters
+# Refs: https://github.com/markdownlint/markdownlint/blob/master/docs/RULES.md
+
+rules "~MD013"

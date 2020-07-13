@@ -1,6 +1,7 @@
 ---
 name: Backtest
 
+# yamllint disable rule:truthy
 on:
   pull_request:
     paths:
@@ -11,8 +12,7 @@ on:
   push:
     branches:
       - 'master'
-      - 'dev-backtest'
-      - 'v1.*-dev'
+      - '*-backtest'
     paths:
       - '**/*.h'
       - '**/*.mq?'
@@ -25,73 +25,23 @@ on:
       - unpublished
 
 jobs:
-  Compile-Lite:
+  Compile:
     runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: 'recursive'
-      - name: Enables Lite mode
-        run: echo '#define __release__' > src/include/EA31337/ea-mode.mqh
-      - name: Compiles EA (MQL4)
-        uses: fx31337/mql-compile-action@master
-        with:
-          path: src\EA31337.mq4
-          verbose: true
-      - name: Compiles EA (MQL5)
-        uses: fx31337/mql-compile-action@master
-        with:
-          path: src\EA31337.mq5
-          verbose: true
-      - name: Moves file (MQL4)
-        run: mv -v src\*.ex4 "EA31337-Lite-${{ github.sha }}.ex4"
-      - name: Moves file (MQL5)
-        run: mv -v src\*.ex5 "EA31337-Lite-${{ github.sha }}.ex5"
-      - name: Prints compiled files
-        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
-        shell: powershell
-      - name: Uploads artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: ea-lite
-          path: '*.ex?'
-  Compile-Advanced:
-    runs-on: windows-latest
+    strategy:
+      matrix:
+        mode:
+          - Lite
+          - Advanced
+          - Rider
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
       - name: Enables Advanced mode
+        if: matrix.mode == 'Advanced'
         run: echo '#define __advanced__' > src/include/EA31337/ea-mode.mqh
-      - name: Compiles EA (MQL4)
-        uses: fx31337/mql-compile-action@master
-        with:
-          path: src\EA31337.mq4
-          verbose: true
-      - name: Compiles EA (MQL5)
-        uses: fx31337/mql-compile-action@master
-        with:
-          path: src\EA31337.mq5
-          verbose: true
-      - name: Moves file (MQL4)
-        run: mv -v src\*.ex4 "EA31337-Advanced-${{ github.sha }}.ex4"
-      - name: Moves file (MQL5)
-        run: mv -v src\*.ex5 "EA31337-Advanced-${{ github.sha }}.ex5"
-      - name: Prints compiled files
-        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
-        shell: powershell
-      - name: Uploads artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: ea-advanced
-          path: '*.ex?'
-  Compile-Rider:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: 'recursive'
       - name: Enables Rider mode
+        if: matrix.mode == 'Rider'
         run: echo '#define __rider__' > src/include/EA31337/ea-mode.mqh
       - name: Compiles EA (MQL4)
         uses: fx31337/mql-compile-action@master
@@ -104,122 +54,101 @@ jobs:
           path: src\EA31337.mq5
           verbose: true
       - name: Moves file (MQL4)
-        run: mv -v src\*.ex4 "EA31337-Rider-${{ github.sha }}.ex4"
+        run: mv -v src\*.ex4 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex4"
       - name: Moves file (MQL5)
-        run: mv -v src\*.ex5 "EA31337-Rider-${{ github.sha }}.ex5"
+        run: mv -v src\*.ex5 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex5"
       - name: Prints compiled files
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
         shell: powershell
       - name: Uploads artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: ea-rider
+          name: ${{ matrix.mode }}
           path: '*.ex?'
-  Tests-Lite:
+  Backtest:
     defaults:
       run:
         shell: bash
-        working-directory: docker/tests/lite
+        working-directory: >
+          docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}
+    needs: Compile
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mode:
+          - Lite
+          - Advanced
+          - Rider
+        year:
+          - 2019
+        deposit:
+          - 1k
+          - 10k
+          - 100k
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: ${{ matrix.mode }}
+      - run: docker-compose run ${{ matrix.mode }}_${{ matrix.year }}_${{ matrix.deposit }}
+        working-directory: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}
+      - name: Uploads results
+        uses: actions/upload-artifact@v2
+        with:
+          name: Results-${{ matrix.mode }}-${{ matrix.year }}
+          path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
+  Publish-Results:
+    defaults:
+      run:
+        shell: bash
+        working-directory: docker/backtest
     if: >
       github.repository == 'EA31337/EA31337'
-      && github.event_name != 'pull_request'
-      && false
-    needs: Compile-Lite
+      && github.event_name == 'pull_request'
+    needs: Backtest
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mode:
+          - Lite
+          - Advanced
+          - Rider
+        year:
+          - 2019
+      max-parallel: 1
     steps:
       - uses: actions/checkout@v2
         with:
-          # Otherwise, the token used is the GITHUB_TOKEN, instead of your personal token.
           persist-credentials: false
           # Otherwise, you will failed to push refs to dest repo.
           fetch-depth: 0
+          ref: refs/heads/${{ github.head_ref }}
       - uses: actions/download-artifact@v2
         with:
-          name: ea-rider
-      - run: docker-compose up
+          name: Results-${{ matrix.mode }}-${{ matrix.year }}
+          path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
       - name: Commit files
         run: |
           git config --local core.autocrlf false
-          git config --local user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --local user.email $git_email
           git config --local user.name "${{ github.actor }}"
-          git pull origin ${{ github.ref }} --autostash --rebase -Xours
-          git commit -am "${{ github.workflow }}"
-      - name: Git Diff
-        run: NO_PAGER=1 git --no-pager diff HEAD^
-      - name: Push changes
+          git add . && git add --renormalize .
+          git pull origin "${{ github.ref }}" --autostash --rebase -Xours
+          git commit -a \
+          -m "${{ matrix.mode }}: Backtest Results for ${{ matrix.year }}"
+        env:
+          git_email: "${{ github.actor }}@users.noreply.github.com"
+      - name: Push changes (not PR)
+        if: github.event_name != 'pull_request'
         uses: ad-m/github-push-action@master
         with:
           branch: ${{ github.ref }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-  Tests-Advanced:
-    defaults:
-      run:
-        shell: bash
-        working-directory: docker/tests/advanced
-    if: >
-      github.repository == 'EA31337/EA31337'
-      && github.event_name != 'pull_request'
-      && false
-    needs: Compile-Advanced
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          # Otherwise, the token used is the GITHUB_TOKEN, instead of your personal token.
-          persist-credentials: false
-          # Otherwise, you will failed to push refs to dest repo.
-          fetch-depth: 0
-      - uses: actions/download-artifact@v2
-        with:
-          name: ea-rider
-      - run: docker-compose up
-      - name: Commit files
-        run: |
-          git config --local core.autocrlf false
-          git config --local user.email "${{ github.actor }}@users.noreply.github.com"
-          git config --local user.name "${{ github.actor }}"
-          git pull origin ${{ github.ref }} --autostash --rebase -Xours
-          git commit -am "${{ github.workflow }}"
-      - name: Git Diff
-        run: NO_PAGER=1 git --no-pager diff HEAD^
-      - name: Push changes
+      - name: Push changes (PR)
+        if: github.event_name == 'pull_request'
         uses: ad-m/github-push-action@master
         with:
-          branch: ${{ github.ref }}
+          branch: refs/heads/${{ github.head_ref }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-  Tests-Rider:
-    defaults:
-      run:
-        shell: bash
-        working-directory: docker/tests/rider
-    if: >
-      github.repository == 'EA31337/EA31337'
-      && github.event_name != 'pull_request'
-      && false
-    needs: Compile-Rider
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          # Otherwise, the token used is the GITHUB_TOKEN, instead of your personal token.
-          persist-credentials: false
-          # Otherwise, you will failed to push refs to dest repo.
-          fetch-depth: 0
-      - uses: actions/download-artifact@v2
-        with:
-          name: ea-rider
-      - run: docker-compose up
-      - name: Commit files
-        run: |
-          git config --local core.autocrlf false
-          git config --local user.email "${{ github.actor }}@users.noreply.github.com"
-          git config --local user.name "${{ github.actor }}"
-          git pull origin ${{ github.ref }} --autostash --rebase -Xours
-          git commit -am "${{ github.workflow }}"
-      - name: Git Diff
+      - name: Run git diff
         run: NO_PAGER=1 git --no-pager diff HEAD^
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          branch: ${{ github.ref }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}

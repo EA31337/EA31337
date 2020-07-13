@@ -2,6 +2,7 @@
 ---
 name: Lint Docker
 
+# yamllint disable rule:truthy
 on:
   pull_request:
     paths-ignore:

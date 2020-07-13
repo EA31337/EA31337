@@ -8,5 +8,8 @@
 # Ignores test results in HTML format.
 *.htm
 
+# Ignores test result logs.
+*.log
+
 # Ignores Finder metadata files on Mac
 .DS_Store

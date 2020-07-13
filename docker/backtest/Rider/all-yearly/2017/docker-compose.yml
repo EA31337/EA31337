@@ -1,0 +1,33 @@
+---
+version: '3.4'
+services:
+  Rider_2017_100k:
+    command: run_backtest -v
+    image: ea31337/ea-tester:EURUSD-2017-DS
+    volumes:
+    - ../../../../..:/opt/EA
+    - ./_results:/opt/_results:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_DEPOSIT: 100000
+      TEST_REPORT_NAME: EA31337-Rider_2017_100k
+  Rider_2017_10k:
+    command: run_backtest -v
+    image: ea31337/ea-tester:EURUSD-2017-DS
+    volumes:
+    - ../../../../..:/opt/EA
+    - ./_results:/opt/_results:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_DEPOSIT: 10000
+      TEST_REPORT_NAME: EA31337-Rider_2017_10k
+  Rider_2017_1k:
+    command: run_backtest -v
+    image: ea31337/ea-tester:EURUSD-2017-DS
+    volumes:
+    - ../../../../..:/opt/EA
+    - ./_results:/opt/_results:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_DEPOSIT: 1000
+      TEST_REPORT_NAME: EA31337-Rider_2017_1k
