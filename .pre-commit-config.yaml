@@ -12,12 +12,24 @@ repos:
       - id: check-yaml
       - id: end-of-file-fixer
       - id: trailing-whitespace
-        args: [--markdown-linebreak-ext=md]
 
   - repo: https://github.com/igorshubovych/markdownlint-cli.git
     rev: v0.23.1
     hooks:
       - id: markdownlint
+
+  - repo: https://github.com/jumanjihouse/pre-commit-hooks
+    rev: master  # or specific git tag
+    hooks:
+      - id: forbid-binary
+        exclude: (\.ico|\.mqproj)$
+      # - id: git-check     # Configure in .gitattributes
+      #   exclude: \.txt$
+      - id: markdownlint  # Configure in .mdlrc
+      # - id: require-ascii
+      - id: script-must-have-extension
+      # - id: shellcheck
+      - id: shfmt
 
   - repo: https://github.com/adrienverge/yamllint.git
     rev: v1.23.0
