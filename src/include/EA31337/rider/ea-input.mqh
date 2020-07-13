@@ -58,7 +58,7 @@ extern int RiskRatioDecreaseMethod = 0; // Risk ratio decrease method (0-255)
 extern int InitNoOfDaysToWarmUp = 14; // Initial warm-up period (in days)
 extern double CloseOrderAfterXHours = 0; // Close order after X hours (>0 - all, <0 - only profitable 0 - off)
 
-extern bool ApplySpreadLimits = true; // Apply strategy spread limits
+extern bool ApplySpreadLimits = 1; // Apply strategy spread limits
 extern double MaxSpreadToTrade = 10.0; // Max spread to trade (in pips), 0 - disable limit
 
 //+------------------------------------------------------------------+
@@ -72,7 +72,7 @@ extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameter
 extern bool Boosting_Enabled = 0; // Enable boosting
 extern double BoostTrendFactor = 0.9; // Boost by trend factor
 extern bool StrategyBoostByPF = 1.1; // Boost strategy by its profit factor
-extern bool StrategyHandicapByPF = true; // Handicap by its low profit factor
+extern bool StrategyHandicapByPF = 1; // Handicap by its low profit factor
 extern double BestDailyStrategyMultiplierFactor = 1.0; // Multiplier for the best daily strategy
 extern double BestWeeklyStrategyMultiplierFactor = 1.0; // Multiplier for the best weekly strategy
 extern double BestMonthlyStrategyMultiplierFactor = 1.0; // Multiplier for the best monthly strategy
@@ -218,7 +218,7 @@ extern int Account_Condition_MinProfitCloseOrder = 20; // Min pip profit on acti
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions_Params__ = "-- Account conditions parameters --"; // >>> CONDITIONS & ACTIONS PARAMS <<<
 extern int MarketSpecificHour = 3; // Specific hour used for conditions (0-23)
-extern bool CloseConditionOnlyProfitable = true; // Apply close condition only for profitable orders
+extern bool CloseConditionOnlyProfitable = 1; // Apply close condition only for profitable orders
 extern int CloseConditionCustom1Method = 0; // Custom 1 indicator-based close condition (0-1023)
 extern int CloseConditionCustom2Method = 0; // Custom 2 indicator-based close condition (0-1023)
 extern int CloseConditionCustom3Method = 0; // Custom 3 indicator-based close condition (0-1023)

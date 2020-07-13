@@ -66,7 +66,7 @@ extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameter
 extern bool Boosting_Enabled = 0; // Enable boosting
 extern double BoostTrendFactor = 0.9; // Boost by trend factor
 extern bool StrategyBoostByPF = 1.1; // Boost strategy by its profit factor
-extern bool StrategyHandicapByPF = true; // Handicap by its low profit factor
+extern bool StrategyHandicapByPF = 0; // Handicap by its low profit factor
 extern double BestDailyStrategyMultiplierFactor = 1; // Multiplier for the best daily strategy
 extern double BestWeeklyStrategyMultiplierFactor = 1; // Multiplier for the best weekly strategy
 extern double BestMonthlyStrategyMultiplierFactor = 1; // Multiplier for the best monthly strategy
@@ -112,7 +112,7 @@ extern int Account_Condition_MinProfitCloseOrder = 20; // Min pip profit on acti
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions_Params__ = "-- Account conditions parameters --"; // >>> CONDITIONS & ACTIONS PARAMS <<<
 extern int MarketSpecificHour = 10; // Specific hour used for conditions (0-23)
-extern bool CloseConditionOnlyProfitable = 1; // Apply close condition only for profitable orders
+extern bool CloseConditionOnlyProfitable = 0; // Apply close condition only for profitable orders
 
 //+------------------------------------------------------------------+
 extern string __Experimental_Parameters__ = "-- Experimental parameters (not safe) --"; // >>> EXPERIMENTAL <<<
