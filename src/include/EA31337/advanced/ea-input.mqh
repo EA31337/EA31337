@@ -4,7 +4,7 @@
 //|                                       https://github.com/EA31337 |
 //|                                                     ea-input.mqh |
 //+------------------------------------------------------------------+
-#property copyright "Copyright 2019, kenorb" // ©
+#property copyright "Copyright 2020, kenorb"
 #property link      "https://github.com/EA31337"
 
 //+------------------------------------------------------------------+

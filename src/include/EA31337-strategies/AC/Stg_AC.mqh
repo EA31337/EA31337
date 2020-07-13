@@ -117,7 +117,7 @@ class Stg_AC : public Strategy {
     bool is_valid = fmin(fmin(ac_0, ac_1), ac_2) != 0;
     switch (_cmd) {
       /*
-        //1. Acceleration/Deceleration — AC
+        //1. Acceleration/Deceleration - AC
         //Buy: if the indicator is above zero and 2 consecutive columns are green or if the indicator is below zero and 3 consecutive columns are green
         //Sell: if the indicator is below zero and 2 consecutive columns are red or if the indicator is above zero and 3 consecutive columns are red
         if ((iAC(NULL,piac,0)>=0&&iAC(NULL,piac,0)>iAC(NULL,piac,1)&&iAC(NULL,piac,1)>iAC(NULL,piac,2))||(iAC(NULL,piac,0)<=0
