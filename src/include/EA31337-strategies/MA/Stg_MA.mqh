@@ -15,7 +15,6 @@
 
 // User input params.
 INPUT string __MA_Parameters__ = "-- Settings for the Moving Average indicator --"; // >>> MA <<<
-INPUT uint MA_Active_Tf = 15; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 INPUT int MA_Period_Fast = 12; // Period Fast
 INPUT int MA_Period_Medium = 10; // Period Medium
 INPUT int MA_Period_Slow = 2; // Period Slow

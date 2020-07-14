@@ -15,7 +15,6 @@
 
 // User input params.
 INPUT string __MFI_Parameters__ = "-- Settings for the Money Flow Index indicator --"; // >>> MFI <<<
-INPUT uint MFI_Active_Tf = 5; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 INPUT ENUM_TRAIL_TYPE MFI_TrailingStopMethod = 25; // Trail stop method
 INPUT ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = -25; // Trail profit method
 INPUT int MFI_Period_M1 = 16; // Period for M1

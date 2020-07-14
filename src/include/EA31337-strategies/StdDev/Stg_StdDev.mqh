@@ -15,7 +15,6 @@
 
 // User input params.
 string __StdDev_Parameters__ = "-- Settings for the Standard Deviation indicator --"; // >>> STDDEV <<<
-uint StdDev_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 int StdDev_MA_Period = 10; // Period
 int StdDev_MA_Shift = 0; // Shift
 ENUM_MA_METHOD StdDev_MA_Method = 1; // MA Method
