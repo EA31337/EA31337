@@ -15,7 +15,6 @@
 
 // User input params.
 string __Stochastic_Parameters__ = "-- Settings for the Stochastic Oscillator --"; // >>> STOCHASTIC <<<
-uint Stochastic_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 uint Stochastic_KPeriod = 5; // K line period
 uint Stochastic_DPeriod = 5; // D line period
 uint Stochastic_Slowing = 5; // Slowing
