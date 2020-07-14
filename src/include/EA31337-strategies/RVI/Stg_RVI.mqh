@@ -15,7 +15,6 @@
 
 // User input params.
 string __RVI_Parameters__ = "-- Settings for the Relative Vigor Index indicator --"; // >>> RVI <<<
-uint RVI_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 uint RVI_Period = 10; // Period
 ENUM_TRAIL_TYPE RVI_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE RVI_TrailingProfitMethod = 1; // Trail profit method
