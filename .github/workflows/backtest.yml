@@ -117,6 +117,7 @@ jobs:
           - Advanced
           - Rider
         year:
+          - 2018
           - 2019
       max-parallel: 1
     steps:
