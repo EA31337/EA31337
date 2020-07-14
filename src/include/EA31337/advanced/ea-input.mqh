@@ -46,7 +46,7 @@ ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 0; // Default trail stop method (0 =
 ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 0; // Default trail profit method
 extern int TrailingStop = 50; // Extra trailing stop (in pips)
 extern int TrailingProfit = 0; // Extra trailing profit (in pips)
-double TrailingStopAddPerMinute = 0.3; // Decrease trail stop per minute (pip/min)
+double TrailingStopAddPerMinute = 0; // Decrease trail stop per minute (pip/min)
 
 //+------------------------------------------------------------------+
 extern string __EA_Risk_Parameters__ = "-- Risk management parameters --"; // >>> RISK <<
