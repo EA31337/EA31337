@@ -15,7 +15,6 @@
 
 // User input params.
 INPUT string __SAR_Parameters__ = "-- Settings for the Parabolic Stop and Reverse system indicator --"; // >>> SAR <<<
-INPUT uint SAR_Active_Tf = 7; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 INPUT double SAR_Step = 0.09; // Step
 INPUT double SAR_Maximum_Stop = 0.3; // Maximum stop
 INPUT int SAR_Shift = 0; // Shift

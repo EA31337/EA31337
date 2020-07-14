@@ -15,7 +15,6 @@
 
 // User input params.
 INPUT string __Alligator_Parameters__ = "-- Settings for the Alligator indicator --"; // >>> ALLIGATOR <<<
-INPUT uint Alligator_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 INPUT int Alligator_Period_Jaw = 12; // Jaw Period
 INPUT int Alligator_Period_Teeth = 4; // Teeth Period
 INPUT int Alligator_Period_Lips = 6; // Lips Period

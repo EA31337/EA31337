@@ -84,6 +84,39 @@ extern double ConLossesIncreaseFactor = 0.7; // Increase lot factor on consequen
 extern uint ConFactorOrdersLimit = 600; // No of orders to check on consequent wins/loses
 
 //+------------------------------------------------------------------+
+input static string __Strategy_Timeframes__ = "-- Strategy's timeframes --"; // >>> STRATEGY'S TIMEFRAMES (1-255: M1=1,M5=2,M15=4,M30=8,H1=16,H2=32,H4=64...) <<<
+extern unsigned int AC_Active_Tf = 10; // AC: Activate timeframes
+extern unsigned int AD_Active_Tf = 10; // AD: Activate timeframes
+extern unsigned int ADX_Active_Tf = 12; // ADX: Activate timeframes
+extern unsigned int Alligator_Active_Tf = 0; // Alligator: Activate timeframes
+extern unsigned int Bands_Active_Tf = 15; // Bands: Activate timeframes
+extern unsigned int CCI_Active_Tf = 12; // CCI: Activate timeframes
+extern unsigned int DeMarker_Active_Tf = 13; // DeMarker: Activate timeframes
+extern unsigned int Envelopes_Active_Tf = 12; // Envelopes: Activate timeframes
+extern unsigned int Force_Active_Tf = 4; // Force: Activate timeframes
+extern unsigned int Fractals_Active_Tf = 11; // Fractals: Activate timeframes
+extern unsigned int MACD_Active_Tf = 4; // MACD: Activate timeframes
+extern unsigned int MA_Active_Tf = 15; // MA: Activate timeframes
+extern unsigned int MFI_Active_Tf = 5; // MFI: Activate timeframes
+extern unsigned int RSI_Active_Tf = 7; // RSI: Activate timeframes
+extern unsigned int SAR_Active_Tf = 7; // SAR: Activate timeframes
+extern unsigned int WPR_Active_Tf = 7; // WPR: Activate timeframes
+unsigned int ATR_Active_Tf = 0; // ATR: Activate timeframes
+unsigned int Awesome_Active_Tf = 0; // Awesome: Activate timeframes
+unsigned int BWMFI_Active_Tf = 0; // BWMFI: Activate timeframes
+unsigned int BearsPower_Active_Tf = 0; // BearsPower: Activate timeframes
+unsigned int BullsPower_Active_Tf = 0; // BullsPower: Activate timeframes
+unsigned int Gator_Active_Tf = 0; // Gator: Activate timeframes
+unsigned int Ichimoku_Active_Tf = 0; // Ichimoku: Activate timeframes
+unsigned int Momentum_Active_Tf = 0; // Momentum: Activate timeframes
+unsigned int OBV_Active_Tf = 0; // OBV: Activate timeframes
+unsigned int OSMA_Active_Tf = 0; // OSMA: Activate timeframes
+unsigned int RVI_Active_Tf = 0; // RVI: Activate timeframes
+unsigned int StdDev_Active_Tf = 0; // StdDev: Activate timeframes
+unsigned int Stochastic_Active_Tf = 0; // Stochastic: Activate timeframes
+unsigned int ZigZag_Active_Tf = 0; // ZigZag: Activate timeframes
+
+//+------------------------------------------------------------------+
 extern string __SmartQueue_Parameters__ = "-- Smart queue parameters --"; // >>> SMART QUEUE <<<
 extern bool SmartQueueActive = 1; // Activate QueueAI
 extern int SmartQueueMethod = 11; // QueueAI: Method for selecting the best order (0-15)

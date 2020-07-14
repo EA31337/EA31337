@@ -15,7 +15,6 @@
 
 // User input params.
 INPUT string __Bands_Parameters__ = "-- Settings for the Bollinger Bands indicator --"; // >>> BANDS <<<
-INPUT uint Bands_Active_Tf = 15; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 INPUT int Bands_Period_M1 = 2; // Period for M1
 INPUT int Bands_Period_M5 = 18; // Period for M5
 INPUT int Bands_Period_M15 = 2; // Period for M15

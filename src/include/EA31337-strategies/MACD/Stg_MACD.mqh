@@ -15,7 +15,6 @@
 
 // User input params.
 INPUT string __MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --"; // >>> MACD <<<
-INPUT uint MACD_Active_Tf = 4; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 INPUT int MACD_Period_Fast = 2; // Period Fast
 INPUT int MACD_Period_Slow = 24; // Period Slow
 INPUT int MACD_Period_Signal = 11; // Period for signal

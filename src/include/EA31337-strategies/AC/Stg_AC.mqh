@@ -15,7 +15,6 @@
 
 // User input params.
 INPUT string __AC_Parameters__ = "-- Settings for the Bill Williams' Accelerator/Decelerator oscillator --"; // >>> AC <<<
-INPUT uint AC_Active_Tf = 10; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 INPUT ENUM_TRAIL_TYPE AC_TrailingStopMethod = 1; // Trail stop method
 INPUT ENUM_TRAIL_TYPE AC_TrailingProfitMethod = -7; // Trail profit method
 INPUT double AC_SignalLevel = 0.0004; // Signal level (>0.0001)

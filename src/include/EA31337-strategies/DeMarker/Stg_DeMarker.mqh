@@ -15,7 +15,6 @@
 
 // User input params.
 INPUT string __DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --"; // >>> DEMARKER <<<
-INPUT uint DeMarker_Active_Tf = 13; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 INPUT int DeMarker_Period_M1 = 58; // Period for M1
 INPUT int DeMarker_Period_M5 = 16; // Period for M5
 INPUT int DeMarker_Period_M15 = 16; // Period for M15
