@@ -37,16 +37,16 @@ extern int    MinIntervalSec = 0; // Min interval between subsequent trade signa
 
 //+------------------------------------------------------------------+
 extern string   __EA_Order_Parameters__ = "-- Profit and loss parameters --"; // >>> PROFIT/LOSS <<<
-extern uint     TakeProfitMax = 20; // Max Take profit (in pips, 0 = auto)
-extern uint     StopLossMax = 20; // Max Stop loss (in pips, 0 = auto)
+extern uint     TakeProfitMax = 0; // Max Take profit (in pips, 0 = auto)
+extern uint     StopLossMax = 60; // Max Stop loss (in pips, 0 = auto)
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
 ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 0; // Default trail stop method (0 = none)
 ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 0; // Default trail profit method
-extern int TrailingStop = 50; // Extra trailing stop (in pips)
+extern int TrailingStop = 30; // Extra trailing stop (in pips)
 extern int TrailingProfit = 0; // Extra trailing profit (in pips)
-double TrailingStopAddPerMinute = 0; // Decrease trail stop per minute (pip/min)
+double TrailingStopAddPerMinute = 0.3; // Decrease trail stop per minute (pip/min)
 
 //+------------------------------------------------------------------+
 extern string __EA_Risk_Parameters__ = "-- Risk management parameters --"; // >>> RISK <<
@@ -63,7 +63,7 @@ extern double MaxSpreadToTrade = 10.0; // Max spread to trade (in pips), 0 - dis
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Profit__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGY PARAMS <<<
-extern double ProfitFactorMinToTrade = 0.8; // Min. profit factor per strategy to trade
+extern double ProfitFactorMinToTrade = 0.7; // Min. profit factor per strategy to trade
 extern double ProfitFactorMaxToTrade = 0.0; // Max. profit factor per strategy to trade
 extern int InitNoOfOrdersToCalcPF = 20; // Initial number of orders to calculate profit factor
 
@@ -85,22 +85,22 @@ extern uint ConFactorOrdersLimit = 600; // No of orders to check on consequent w
 
 //+------------------------------------------------------------------+
 input static string __Strategy_Timeframes__ = "-- Strategy's timeframes --"; // >>> STRATEGY'S TIMEFRAMES (1-255: M1=1,M5=2,M15=4,M30=8,H1=16,H2=32,H4=64...) <<<
-extern unsigned int AC_Active_Tf = 10; // AC: Activate timeframes
-extern unsigned int AD_Active_Tf = 10; // AD: Activate timeframes
-extern unsigned int ADX_Active_Tf = 12; // ADX: Activate timeframes
-extern unsigned int Alligator_Active_Tf = 0; // Alligator: Activate timeframes
-extern unsigned int Bands_Active_Tf = 15; // Bands: Activate timeframes
+extern unsigned int AC_Active_Tf = 14; // AC: Activate timeframes
+extern unsigned int AD_Active_Tf = 0; // AD: Activate timeframes
+extern unsigned int ADX_Active_Tf = 0; // ADX: Activate timeframes
+extern unsigned int Alligator_Active_Tf = 4; // Alligator: Activate timeframes
+extern unsigned int Bands_Active_Tf = 3; // Bands: Activate timeframes
 extern unsigned int CCI_Active_Tf = 12; // CCI: Activate timeframes
-extern unsigned int DeMarker_Active_Tf = 13; // DeMarker: Activate timeframes
-extern unsigned int Envelopes_Active_Tf = 12; // Envelopes: Activate timeframes
+extern unsigned int DeMarker_Active_Tf = 8; // DeMarker: Activate timeframes
+extern unsigned int Envelopes_Active_Tf = 3; // Envelopes: Activate timeframes
 extern unsigned int Force_Active_Tf = 4; // Force: Activate timeframes
-extern unsigned int Fractals_Active_Tf = 11; // Fractals: Activate timeframes
-extern unsigned int MACD_Active_Tf = 4; // MACD: Activate timeframes
-extern unsigned int MA_Active_Tf = 15; // MA: Activate timeframes
+extern unsigned int Fractals_Active_Tf = 0; // Fractals: Activate timeframes
+extern unsigned int MACD_Active_Tf = 0; // MACD: Activate timeframes
+extern unsigned int MA_Active_Tf = 0; // MA: Activate timeframes
 extern unsigned int MFI_Active_Tf = 5; // MFI: Activate timeframes
-extern unsigned int RSI_Active_Tf = 7; // RSI: Activate timeframes
-extern unsigned int SAR_Active_Tf = 7; // SAR: Activate timeframes
-extern unsigned int WPR_Active_Tf = 7; // WPR: Activate timeframes
+extern unsigned int RSI_Active_Tf = 3; // RSI: Activate timeframes
+extern unsigned int SAR_Active_Tf = 0; // SAR: Activate timeframes
+extern unsigned int WPR_Active_Tf = 4; // WPR: Activate timeframes
 unsigned int ATR_Active_Tf = 0; // ATR: Activate timeframes
 unsigned int Awesome_Active_Tf = 0; // Awesome: Activate timeframes
 unsigned int BWMFI_Active_Tf = 0; // BWMFI: Activate timeframes
