@@ -15,7 +15,6 @@
 
 // User input params.
 string __Gator_Parameters__ = "-- Settings for the Gator oscillator --"; // >>> GATOR <<<
-uint Gator_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 int Gator_Period_Jaw = 6; // Jaw Period
 int Gator_Period_Teeth = 10; // Teeth Period
 int Gator_Period_Lips = 8; // Lips Period

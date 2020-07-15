@@ -15,7 +15,6 @@
 
 // User input params.
 string __Awesome_Parameters__ = "-- Settings for the Awesome oscillator --"; // >>> AWESOME <<<
-uint Awesome_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 ENUM_TRAIL_TYPE Awesome_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE Awesome_TrailingProfitMethod = 1; // Trail profit method
 double Awesome_SignalLevel = 0.00000000; // Signal level

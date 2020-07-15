@@ -1646,7 +1646,8 @@ bool CheckMarketEvent(Chart *_chart, ENUM_ORDER_TYPE cmd = EMPTY, ENUM_MARKET_EV
       result = GetStratByIndiType(INDI_WPR, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
       break;
     case C_ZIGZAG_BUY_SELL:
-      result = GetStratByIndiType(INDI_ZIGZAG, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
+      //result = GetStratByIndiType(INDI_ZIGZAG, _chart).SignalOpen(cmd, _bm, _sl1, _sl2);
+      result = False;
       break;
     case C_MA_FAST_SLOW_OPP: // MA Fast&Slow are in opposite directions.
       UpdateIndicator(_chart, INDI_MA);
