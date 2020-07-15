@@ -1,33 +1,75 @@
 ---
 version: '3.4'
 services:
-  Advanced_2019_100k:
+  Advanced_2019_1k_s1:
     command: run_backtest -v
-    image: ea31337/ea-tester:EURUSD-2019-DS
-    volumes:
-    - ../../../../..:/opt/EA
-    - ./_results:/opt/_results:rw
-    env_file: ../EA-Tester.ini
-    environment:
-      BT_DEPOSIT: 100000
-      TEST_REPORT_NAME: EA31337-Advanced_2019_100k
-  Advanced_2019_10k:
-    command: run_backtest -v
-    image: ea31337/ea-tester:EURUSD-2019-DS
-    volumes:
-    - ../../../../..:/opt/EA
-    - ./_results:/opt/_results:rw
-    env_file: ../EA-Tester.ini
-    environment:
-      BT_DEPOSIT: 10000
-      TEST_REPORT_NAME: EA31337-Advanced_2019_10k
-  Advanced_2019_1k:
-    command: run_backtest -v
-    image: ea31337/ea-tester:EURUSD-2019-DS
+    image: ea31337/ea-tester:dev
     volumes:
     - ../../../../..:/opt/EA
     - ./_results:/opt/_results:rw
     env_file: ../EA-Tester.ini
     environment:
       BT_DEPOSIT: 1000
-      TEST_REPORT_NAME: EA31337-Advanced_2019_1k
+      BT_SPREAD: 1
+      BT_YEARS: 2019
+      TEST_REPORT_NAME: EA31337-Advanced_2019_1000USD_spread1
+  Advanced_2019_10k_s1:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+    - ../../../../..:/opt/EA
+    - ./_results:/opt/_results:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_DEPOSIT: 10000
+      BT_SPREAD: 1
+      BT_YEARS: 2019
+      TEST_REPORT_NAME: EA31337-Advanced_2019_10000USD_spread1
+  Advanced_2019_100k_s1:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+    - ../../../../..:/opt/EA
+    - ./_results:/opt/_results:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_DEPOSIT: 100000
+      BT_SPREAD: 1
+      BT_YEARS: 2019
+      TEST_REPORT_NAME: EA31337-Advanced_2019_100000USD_spread1
+  Advanced_2019_1k_s10:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+    - ../../../../..:/opt/EA
+    - ./_results:/opt/_results:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_DEPOSIT: 1000
+      BT_SPREAD: 10
+      BT_YEARS: 2019
+      TEST_REPORT_NAME: EA31337-Advanced_2019_1000USD_spread10
+  Advanced_2019_10k_s10:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+    - ../../../../..:/opt/EA
+    - ./_results:/opt/_results:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_DEPOSIT: 10000
+      BT_SPREAD: 10
+      BT_YEARS: 2019
+      TEST_REPORT_NAME: EA31337-Advanced_2019_10000USD_spread10
+  Advanced_2019_100k_s10:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+    - ../../../../..:/opt/EA
+    - ./_results:/opt/_results:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_DEPOSIT: 100000
+      BT_SPREAD: 10
+      BT_YEARS: 2019
+      TEST_REPORT_NAME: EA31337-Advanced_2019_100000USD_spread10

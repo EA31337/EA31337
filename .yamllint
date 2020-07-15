@@ -2,6 +2,7 @@
 extends: default
 
 ignore: |
+  .git
   docker/**/*.yml
 
 rules:

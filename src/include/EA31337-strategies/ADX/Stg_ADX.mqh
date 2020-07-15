@@ -15,7 +15,6 @@
 
 // User input params.
 INPUT string __ADX_Parameters__ = "-- Settings for the Average Directional Movement Index indicator --"; // >>> ADX <<<
-INPUT uint ADX_Active_Tf = 12; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 INPUT ENUM_TRAIL_TYPE ADX_TrailingStopMethod = 17; // Trail stop method
 INPUT ENUM_TRAIL_TYPE ADX_TrailingProfitMethod = -10; // Trail profit method
 INPUT uint ADX_Period_M1 = 22; // Period for M1
