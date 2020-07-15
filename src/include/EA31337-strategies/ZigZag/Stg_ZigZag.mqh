@@ -15,7 +15,6 @@
 
 // User input params.
 string __ZigZag_Parameters__ = "-- Settings for the ZigZag indicator --"; // >>> ZIGZAG <<<
-uint ZigZag_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 uint ZigZag_Depth = 0; // Depth
 uint ZigZag_Deviation = 0; // Deviation
 uint ZigZag_Backstep = 0; // Deviation

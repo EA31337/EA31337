@@ -15,7 +15,6 @@
 
 // User input params.
 INPUT string __Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --"; // >>> ENVELOPES <<<
-INPUT uint Envelopes_Active_Tf = 12; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 INPUT int Envelopes_MA_Period_M1 = 2; // Period for M1
 INPUT int Envelopes_MA_Period_M5 = 2; // Period for M5
 INPUT int Envelopes_MA_Period_M15 = 2; // Period for M15
