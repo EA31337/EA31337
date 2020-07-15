@@ -5,18 +5,17 @@ name: Backtest
 on:
   push:
     branches:
-      - 'master'
-      - '*-backtest'
+      - 'v*-backtest'
     paths:
       - '**.h'
       - '**.mq?'
       - '.github/workflows/backtest.yml'
       - 'src/include/**'
+    tags:
+      - v[12].*
   release:
     types:
-      - prereleased
       - published
-      - unpublished
 
 jobs:
 
