@@ -15,7 +15,6 @@
 
 // User input params.
 INPUT string __CCI_Parameters__ = "-- Settings for the Commodity Channel Index indicator --"; // >>> CCI <<<
-INPUT uint CCI_Active_Tf = 12; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 INPUT int CCI_Shift = 0; // Shift (0 for default)
 INPUT ENUM_TRAIL_TYPE CCI_TrailingStopMethod = 8; // Trail stop method
 INPUT ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = -13; // Trail profit method
