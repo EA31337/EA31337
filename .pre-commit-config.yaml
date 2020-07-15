@@ -11,7 +11,9 @@ repos:
       - id: check-merge-conflict
       - id: check-yaml
       - id: end-of-file-fixer
+        exclude: \.txt$
       - id: trailing-whitespace
+        exclude: \.txt$
 
   - repo: https://github.com/igorshubovych/markdownlint-cli.git
     rev: v0.23.1

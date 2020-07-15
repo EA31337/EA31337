@@ -1,21 +1,15 @@
 ---
 name: Backtest
 
-# yamllint disable rule:truthy
+# yamllint disable-line rule:truthy
 on:
-  pull_request:
-    paths:
-      - '**/*.h'
-      - '**/*.mq?'
-      - '.github/workflows/backtest.yml'
-      - 'src/include/**'
   push:
     branches:
       - 'master'
       - '*-backtest'
     paths:
-      - '**/*.h'
-      - '**/*.mq?'
+      - '**.h'
+      - '**.mq?'
       - '.github/workflows/backtest.yml'
       - 'src/include/**'
   release:
@@ -25,6 +19,7 @@ on:
       - unpublished
 
 jobs:
+
   Compile:
     runs-on: windows-latest
     strategy:
@@ -65,38 +60,40 @@ jobs:
         with:
           name: ${{ matrix.mode }}
           path: '*.ex?'
+
   Backtest:
     defaults:
       run:
         shell: bash
-        working-directory: >
-          docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}
     needs: Compile
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
         mode:
           - Lite
           - Advanced
           - Rider
-        year:
-          - 2019
-        deposit:
-          - 1k
-          - 10k
-          - 100k
+        year: [2018, 2019]
+        deposit: [1k, 10k, 100k]
+        spread: [1, 10]
+
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
         with:
           name: ${{ matrix.mode }}
-      - run: docker-compose run ${{ matrix.mode }}_${{ matrix.year }}_${{ matrix.deposit }}
+      # yamllint disable-line rule:line-length
+      - run: docker-compose run ${{ matrix.mode }}_${{ matrix.year }}_${{ matrix.deposit }}_s${{ matrix.spread }}
+        # yamllint disable-line rule:line-length
         working-directory: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}
       - name: Uploads results
         uses: actions/upload-artifact@v2
         with:
           name: Results-${{ matrix.mode }}-${{ matrix.year }}
+          # yamllint disable-line rule:line-length
           path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
+
   Publish-Results:
     defaults:
       run:
@@ -114,6 +111,7 @@ jobs:
           - Advanced
           - Rider
         year:
+          - 2018
           - 2019
       max-parallel: 1
     steps:
@@ -126,6 +124,7 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: Results-${{ matrix.mode }}-${{ matrix.year }}
+          # yamllint disable-line rule:line-length
           path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
       - name: Commit files
         run: |
