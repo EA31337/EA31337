@@ -3,12 +3,6 @@ name: Backtest
 
 # yamllint disable-line rule:truthy
 on:
-  pull_request:
-    paths:
-      - '**.h'
-      - '**.mq?'
-      - '.github/workflows/backtest.yml'
-      - 'src/include/**'
   push:
     branches:
       - 'master'
