@@ -15,7 +15,6 @@
 
 // User input params.
 INPUT string __RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --"; // >>> RSI <<<
-INPUT uint RSI_Active_Tf = 7; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 INPUT int RSI_Period_M1 = 8; // Period for M1
 INPUT int RSI_Period_M5 = 14; // Period for M5
 INPUT int RSI_Period_M15 = 6; // Period for M15

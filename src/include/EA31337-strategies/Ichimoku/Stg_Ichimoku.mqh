@@ -15,7 +15,6 @@
 
 // User input params.
 string __Ichimoku_Parameters__ = "-- Settings for the Ichimoku Kinko Hyo indicator --"; // >>> ICHIMOKU <<<
-uint Ichimoku_Active_Tf = 0; // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 ENUM_TRAIL_TYPE Ichimoku_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE Ichimoku_TrailingProfitMethod = 1; // Trail profit method
 int Ichimoku_Period_Tenkan_Sen = 9; // Period Tenkan Sen
