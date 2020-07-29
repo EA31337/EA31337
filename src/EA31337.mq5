@@ -1068,6 +1068,7 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, Strategy *_strat, double trade_volume = 0,
         Order::OrderPrint();
         if (retry) TaskAddOrderOpen(cmd, trade_volume, sid); // Will re-try again.
         info[sid][TOTAL_ERRORS]++;
+        ResetLastError();
         return (false);
       }
       Msg::ShowText(
@@ -1323,6 +1324,7 @@ bool CloseOrder(ulong ticket_no = NULL, int reason_id = EMPTY, ENUM_MARKET_EVENT
     DEBUG_CHECKPOINT_POP
     Msg::ShowText(StringFormat("Error: Ticket No: %d; Message: %s", ticket_no, terminal.GetLastErrorText()),
         "Debug", __FUNCTION__, __LINE__, VerboseDebug);
+    ResetLastError();
     return (false);
   }
   #ifdef __profiler__ PROFILER_START #endif
@@ -1746,8 +1748,11 @@ bool CheckMinPipGap(int sid) {
 void CheckOrders() {
   double elapsed_mins;
   int i;
+  ResetLastError();
   for (i = 0; i < Trade::OrdersTotal(); i++) {
-    if (!Order::OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) { continue; }
+    if (!Order::OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) {
+      continue;
+    }
     if (CheckOurMagicNumber() && Order::OrderOpenTime() > 0 && CloseOrderAfterXHours != 0) {
       elapsed_mins = ((double) (TimeCurrent() - Order::OrderOpenTime()) / 60);
       if (CloseOrderAfterXHours > 0) {
@@ -1767,6 +1772,7 @@ void CheckOrders() {
       */
     }
   } // end: for
+  ResetLastError();
 }
 
 /**
