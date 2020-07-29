@@ -1,0 +1,49 @@
+---
+name: Compile
+
+# yamllint disable-line rule:truthy
+on:
+  pull_request:
+    paths-ignore:
+      - '**.md'
+  push:
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  Compile:
+
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        mode:
+          - Lite
+          - Advanced
+          - Rider
+
+    steps:
+
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+
+      - name: Enables Advanced mode
+        if: matrix.mode == 'Advanced'
+        run: echo '#define __advanced__' > src/include/EA31337/ea-mode.mqh
+
+      - name: Enables Rider mode
+        if: matrix.mode == 'Rider'
+        run: echo '#define __rider__' > src/include/EA31337/ea-mode.mqh
+
+      - name: Compiles EA (MQL4)
+        uses: fx31337/mql-compile-action@master
+        with:
+          path: src\EA31337.mq4
+          verbose: true
+
+      - name: Compiles EA (MQL5)
+        uses: fx31337/mql-compile-action@master
+        with:
+          path: src\EA31337.mq5
+          verbose: true
