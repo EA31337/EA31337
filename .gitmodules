@@ -22,6 +22,3 @@
 [submodule "EA31337-Advanced-Sets"]
 	path = sets/Advanced
 	url = git@github.com:EA31337/EA31337-Advanced-Sets.git
-[submodule "Jenkins-config"]
-	path = conf/Jenkins
-	url = git@github.com:EA31337/Jenkins-config.git
