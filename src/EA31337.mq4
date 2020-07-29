@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                 EA31337 - multi-strategy advanced trading robot. |
-//|                            Copyright 2016, 31337 Investments Ltd |
+//|                       Copyright 2016-2020, 31337 Investments Ltd |
 //|                                       https://github.com/EA31337 |
 //+------------------------------------------------------------------+
 
@@ -8,29 +8,30 @@
 //| EA includes.
 //+------------------------------------------------------------------+
 
-#include <EA\ea-mode.mqh>
-#include <EA\ea-code-conf.mqh>
-#include <EA\ea-defaults.mqh>
-#include <EA\ea-properties.mqh>
-#include <EA\ea-enums.mqh>
+#include "include\EA\ea-mql5.mqh"
+#include "include\EA\ea-mode.mqh"
+#include "include\EA\ea-code-conf.mqh"
+#include "include\EA\ea-defaults.mqh"
+#include "include\EA\ea-properties.mqh"
+#include "include\EA\ea-enums.mqh"
 #ifdef __advanced__
   #ifdef __rider__
-    #include <EA\rider\ea-conf.mqh>
+    #include "include\EA\rider\ea-conf.mqh"
   #else
-    #include <EA\advanced\ea-conf.mqh>
+    #include "include\EA\advanced\ea-conf.mqh"
   #endif
 #else
-  #include <EA\lite\ea-conf.mqh>
+  #include "include\EA\lite\ea-conf.mqh"
 #endif
 
 #ifdef __MQL4__
-   #include <EA\MQL4\stdlib.mq4> // Used for: ErrorDescription(), RGB(), CompareDoubles(), DoubleToStrMorePrecision(), IntegerToHexString()
+   #include "include\EA\MQL4\stdlib.mq4" // Used for: ErrorDescription(), RGB(), CompareDoubles(), DoubleToStrMorePrecision(), IntegerToHexString()
    #include <stderror.mqh>
    // #include "debug.mqh"
 #else
    #include <StdLibErr.mqh>
    #include <Trade\AccountInfo.mqh>
-   #include <MQL5-MQL4\MQL4Common.mqh> // Provides common MQL4 back-compability for MQL5.
+   #include "include\MQL5-MQL4\MQL4Common.mqh" // Provides common MQL4 back-compability for MQL5.
 #endif
 //+------------------------------------------------------------------+
 //| EA properties.
@@ -50,27 +51,27 @@
 //+------------------------------------------------------------------+
 //| Include public classes.
 //+------------------------------------------------------------------+
-#include <EA\public-classes\Account.mqh>
-#include <EA\public-classes\Arrays.mqh>
-#include <EA\public-classes\Backtest.mqh>
-#include <EA\public-classes\Check.mqh>
-#include <EA\public-classes\Convert.mqh>
-#include <EA\public-classes\DateTime.mqh>
-#include <EA\public-classes\Draw.mqh>
-#include <EA\public-classes\Errors.mqh>
-#include <EA\public-classes\File.mqh>
-#include <EA\public-classes\Order.mqh>
-#include <EA\public-classes\Orders.mqh>
-#include <EA\public-classes\Market.mqh>
-#include <EA\public-classes\Misc.mqh>
-#include <EA\public-classes\Msg.mqh>
-#include <EA\public-classes\Report.mqh>
-#include <EA\public-classes\Stats.mqh>
-#include <EA\public-classes\Strategy.mqh>
-#include <EA\public-classes\SummaryReport.mqh>
-#include <EA\public-classes\Terminal.mqh>
-#include <EA\public-classes\Tests.mqh>
-#include <EA\public-classes\Ticks.mqh>
+#include "include\EA\public-classes\Account.mqh"
+#include "include\EA\public-classes\Arrays.mqh"
+#include "include\EA\public-classes\Backtest.mqh"
+#include "include\EA\public-classes\Check.mqh"
+#include "include\EA\public-classes\Convert.mqh"
+#include "include\EA\public-classes\DateTime.mqh"
+#include "include\EA\public-classes\Draw.mqh"
+#include "include\EA\public-classes\Errors.mqh"
+#include "include\EA\public-classes\File.mqh"
+#include "include\EA\public-classes\Order.mqh"
+#include "include\EA\public-classes\Orders.mqh"
+#include "include\EA\public-classes\Market.mqh"
+#include "include\EA\public-classes\Misc.mqh"
+#include "include\EA\public-classes\Msg.mqh"
+#include "include\EA\public-classes\Report.mqh"
+#include "include\EA\public-classes\Stats.mqh"
+//#include "include\EA\public-classes\Strategy.mqh"
+#include "include\EA\public-classes\SummaryReport.mqh"
+#include "include\EA\public-classes\Terminal.mqh"
+#include "include\EA\public-classes\Tests.mqh"
+#include "include\EA\public-classes\Ticks.mqh"
 
 //#property tester_file "trade_patterns.csv"    // file with the data to be read by an Expert Advisor
 
@@ -81,12 +82,12 @@ extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v"
 
 #ifdef __advanced__ // Include default input settings based on the mode.
   #ifdef __rider__
-    #include <EA\rider\ea-input.mqh>
+    #include "include\EA\rider\ea-input.mqh"
   #else
-    #include <EA\advanced\ea-input.mqh>
+    #include "include\EA\advanced\ea-input.mqh"
   #endif
 #else
-  #include <EA\lite\ea-input.mqh>
+  #include "include\EA\lite\ea-input.mqh"
 #endif
 
 /*
@@ -969,8 +970,8 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
    double close_price = NormalizeDouble(Market::GetClosePrice(cmd), Market::GetDigits());
    // Get the fixed stops.
    // @todo: Test GetOpenPrice vs GetClosePrice
-   double stoploss   = StopLoss   > 0 ? NormalizeDouble(open_price - (StopLoss + TrailingStop) * pip_size * Convert::OpToValue(cmd), Digits) : 0;
-   double takeprofit = TakeProfit > 0 ? NormalizeDouble(close_price + (TakeProfit + TrailingProfit) * pip_size * Convert::OpToValue(cmd), Digits) : 0;
+   double stoploss   = StopLoss   > 0 ? NormalizeDouble(open_price - (StopLoss + TrailingStop) * pip_size * Convert::OrderTypeToValue(cmd), Digits) : 0;
+   double takeprofit = TakeProfit > 0 ? NormalizeDouble(close_price + (TakeProfit + TrailingProfit) * pip_size * Convert::OrderTypeToValue(cmd), Digits) : 0;
    // Get the dynamic trailing stops.
    double stoploss_trail   = GetTrailingValue(cmd, -1, sid);
    double takeprofit_trail = GetTrailingValue(cmd, +1, sid);
@@ -1119,7 +1120,7 @@ int ExecuteOrder(int cmd, int sid, double trade_volume = EMPTY, string order_com
  * Check if we can open new order.
  */
 bool OpenOrderIsAllowed(int cmd, int sid = EMPTY, double volume = EMPTY) {
-  int result = TRUE;
+  bool result = TRUE;
   string err;
   // if (VerboseTrace) Print(__FUNCTION__);
   if (volume < market_minlot) {
@@ -3142,7 +3143,7 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
         __FUNCTION__, min_elapsed, TrailingStopAddPerMinute, extra_trail);
     }
   }
-  int factor = (Convert::OpToValue(cmd) == direction ? +1 : -1);
+  int factor = (Convert::OrderTypeToValue(cmd) == direction ? +1 : -1);
   double trail = (TrailingStop + extra_trail) * pip_size;
   double default_trail = (cmd == OP_BUY ? Bid : Ask) + trail * factor;
   int method = GetTrailingMethod(order_type, direction);
@@ -3319,12 +3320,12 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
      case T1_BANDS: // 25: Current Bands value.
      case T2_BANDS:
        UpdateIndicator(BANDS, tf);
-       new_value = Convert::OpToValue(cmd) == direction ? bands[period][CURR][BANDS_UPPER] : bands[period][CURR][BANDS_LOWER];
+       new_value = Convert::OrderTypeToValue(cmd) == direction ? bands[period][CURR][BANDS_UPPER] : bands[period][CURR][BANDS_LOWER];
        break;
      case T1_BANDS_PEAK: // 26: Lowest/highest Bands value.
      case T2_BANDS_PEAK:
        UpdateIndicator(BANDS, tf);
-       new_value = (Convert::OpToValue(cmd) == direction
+       new_value = (Convert::OrderTypeToValue(cmd) == direction
          ? fmax(fmax(bands[period][CURR][BANDS_UPPER], bands[period][PREV][BANDS_UPPER]), bands[period][FAR][BANDS_UPPER])
          : fmin(fmin(bands[period][CURR][BANDS_LOWER], bands[period][PREV][BANDS_LOWER]), bands[period][FAR][BANDS_LOWER])
          );
@@ -3332,7 +3333,7 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
      case T1_ENVELOPES: // 27: Current Envelopes value. // FIXME
      case T2_ENVELOPES:
        UpdateIndicator(ENVELOPES, tf);
-       new_value = Convert::OpToValue(cmd) == direction ? envelopes[period][CURR][UPPER] : envelopes[period][CURR][LOWER];
+       new_value = Convert::OrderTypeToValue(cmd) == direction ? envelopes[period][CURR][UPPER] : envelopes[period][CURR][LOWER];
        break;
      default:
        Msg::ShowText(StringFormat("Unknown trailing stop method: %d", method), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
@@ -3360,12 +3361,12 @@ double GetTrailingValue(int cmd, int direction = -1, int order_type = 0, double 
     if (direction < 0) {
       // Move trailing stop only one direction.
       if (previous == 0) previous = default_trail;
-      if (Convert::OpToValue(cmd) == direction) new_value = (new_value < previous || previous == 0) ? new_value : previous;
+      if (Convert::OrderTypeToValue(cmd) == direction) new_value = (new_value < previous || previous == 0) ? new_value : previous;
       else new_value = (new_value > previous || previous == 0) ? new_value : previous;
     }
     else if (direction > 0) {
       // Move profit take only one direction.
-      if (Convert::OpToValue(cmd) == direction) new_value = (new_value > previous || previous == 0) ? new_value : previous;
+      if (Convert::OrderTypeToValue(cmd) == direction) new_value = (new_value > previous || previous == 0) ? new_value : previous;
       else new_value = (new_value < previous || previous == 0) ? new_value : previous;
     }
   }
@@ -3552,12 +3553,12 @@ double GetTotalProfitByType(int cmd = NULL, int order_type = NULL) {
 /**
  * Get profitable side and return trade operation type (OP_BUY/OP_SELL).
  */
-bool GetProfitableSide() {
+ENUM_ORDER_TYPE GetProfitableSide() {
   double buys = GetTotalProfitByType(OP_BUY);
   double sells = GetTotalProfitByType(OP_SELL);
   if (buys > sells) return OP_BUY;
   if (sells > buys) return OP_SELL;
-  return (EMPTY);
+  return (ENUM_ORDER_TYPE) NULL;
 }
 
 // Calculate open positions.
@@ -3751,7 +3752,7 @@ void CheckStats(double value, int type, bool max = true) {
  */
 color GetOrderColor(int cmd = -1) {
   if (cmd == -1) cmd = OrderType();
-  return Convert::OpToValue(cmd) > 0 ? ColorBuy : ColorSell;
+  return Convert::OrderTypeToValue(cmd) > 0 ? ColorBuy : ColorSell;
 }
 
 /**
