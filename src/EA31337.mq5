@@ -1354,7 +1354,12 @@ bool CloseOrder(ulong ticket_no = NULL, int reason_id = EMPTY, ENUM_MARKET_EVENT
     Order::OrderPrint();
     if (retry) TaskAddCloseOrder(ticket_no, reason_id); // Add task to re-try.
     int id = GetIdByMagic();
-    if (id < 0) info[id][TOTAL_ERRORS]++;
+    if (id > 0) {
+      info[id][TOTAL_ERRORS]++;
+    }
+    else {
+      // DebugBreak(); // @fixme
+    }
   } // end-if: !result
   DEBUG_CHECKPOINT_POP
   #ifdef __profiler__ PROFILER_STOP #endif
@@ -2217,14 +2222,17 @@ int GetTrailingMethod(int order_type, ENUM_ORDER_PROPERTY_DOUBLE mode) {
  * @todo: Move to Orders.
  */
 int GetTotalOrders(bool ours = true) {
-  int order, total = 0;
-  for (order = 0; order < Trade::OrdersTotal(); order++) {
+  int total = 0;
+  for (int order = 0; order < Trade::OrdersTotal(); order++) {
     if (Order::OrderSelect(order, SELECT_BY_POS, MODE_TRADES) && Order::OrderSymbol() == Symbol()) {
       if (CheckOurMagicNumber()) {
         if (ours) total++;
       } else {
         if (!ours) total++;
       }
+    }
+    else {
+      ResetLastError();
     }
   }
   if (ours) total_orders = total; // Re-calculate global variables.
@@ -4648,7 +4656,7 @@ bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
   DEBUG_CHECKPOINT_ADD
   bool result = true;
   int queue_size = OrderQueueCount();
-  long sorted_queue[][2];
+  long _queue[][2];
   int sid;
   ENUM_ORDER_TYPE cmd;
   datetime time;
@@ -4656,32 +4664,29 @@ bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
   if (method == EMPTY) method = SmartQueueMethod;
   if (filter == EMPTY) filter = SmartQueueFilter;
   if (queue_size > 1) {
-    int selected_qid = EMPTY, curr_qid = EMPTY;
-    ArrayResize(sorted_queue, queue_size, 100);
+    int selected_qid = EMPTY, curr_qid = EMPTY, selected_highest = 0;
+    ArrayResize(_queue, queue_size, 100);
     for (int i = 0; i < queue_size; i++) {
       curr_qid = OrderQueueNext(curr_qid);
       if (curr_qid == EMPTY) break;
-      sorted_queue[i][0] = GetOrderQueueKeyValue((int) order_queue[curr_qid][Q_SID], method, curr_qid);
-      sorted_queue[i][1] = curr_qid++;
+      int _key = GetOrderQueueKeyValue((int) order_queue[curr_qid][Q_SID], method, curr_qid);
+      _queue[i][0] = _key;
+      _queue[i][1] = curr_qid++;
+      selected_highest = _queue[i][0] > _queue[selected_highest][0] ? i : selected_highest;
     }
-    // Sort array by first dimension (descending).
-    #ifdef __MQL4__
-    ArraySort(sorted_queue, WHOLE_ARRAY, 0, MODE_DESCEND);
-    #else
-    if (VerboseDebug) PrintFormat("%s: FIXME: ArraySort();", __FUNCTION_LINE__);
-    // @fixme
-    #endif
-    for (int i = 0; i < queue_size; i++) {
-      selected_qid = (int) sorted_queue[i][1];
+
+    if (selected_highest != EMPTY) {
+      selected_qid = (int) _queue[selected_highest][1];
       cmd = (ENUM_ORDER_TYPE) order_queue[selected_qid][Q_CMD];
       sid = (int) order_queue[selected_qid][Q_SID];
       time = (datetime) order_queue[selected_qid][Q_TIME];
       volume = GetStrategyLotSize(sid, cmd);
-      if (!OpenOrderCondition(cmd, sid, time, filter)) continue;
-      if (OpenOrderIsAllowed(cmd, strats.GetById(sid), volume)) {
-        string comment = GetStrategyComment(strats.GetById(sid)) + " [AIQueued]";
-        result &= ExecuteOrder(cmd, sid, volume, comment);
-        break;
+
+      if (OpenOrderCondition(cmd, sid, time, filter)) {
+        if (OpenOrderIsAllowed(cmd, strats.GetById(sid), volume)) {
+          string comment = GetStrategyComment(strats.GetById(sid)) + " [AIQueued]";
+          result &= ExecuteOrder(cmd, sid, volume, comment);
+        }
       }
     }
   }
