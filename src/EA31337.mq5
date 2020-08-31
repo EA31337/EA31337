@@ -133,12 +133,12 @@ void OnTick() {
 
   MqlTick _tick = market.GetTick();
   bool _tick_procesed = false;
-  for (ENUM_TIMEFRAMES_INDEX tfi = 0; tfi < FINAL_ENUM_TIMEFRAMES_INDEX; tfi++) {
-    if (Object::IsDynamic(trade[tfi]) && trade[tfi].Chart().IsValidTf()) {
-      if (trade[tfi].Chart().IsNewBar()) {
-        trade[tfi].Market().SetTick(_tick);
-        ProcessBar(trade[tfi]);
-        _tick_procesed = true;
+  if (trade[M1].Chart().IsNewBar()) {
+    for (ENUM_TIMEFRAMES_INDEX tfi = 0; tfi < FINAL_ENUM_TIMEFRAMES_INDEX; tfi++) {
+      if (Object::IsDynamic(trade[tfi]) && trade[tfi].Chart().IsValidTf()) {
+          trade[tfi].Market().SetTick(_tick);
+          ProcessBar(trade[tfi]);
+          _tick_procesed = true;
       }
     }
   }
