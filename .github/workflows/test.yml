@@ -19,8 +19,6 @@ on:
       - src/*.mq?
       - src/*.mq[45h]
       - src/include/**
-    tags:
-      - v[12].*
 
 jobs:
   Compile:
