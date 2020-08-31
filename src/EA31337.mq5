@@ -128,7 +128,6 @@ double zigzag[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
 //| Expert tick function                                             |
 //+------------------------------------------------------------------+
 void OnTick() {
-  //#ifdef __trace__ PrintFormat("%s: Ask=%g/Bid=%g", __FUNCTION__, Ask, Bid); #endif
   if (!session_initiated) return;
   //#ifdef __profiler__ PROFILER_START #endif
 
@@ -157,25 +156,6 @@ void OnTick() {
  */
 void ProcessBar(Trade *_trade) {
 
-  // Parse a tick.
-  /*
-  if (!ticker.Process(_trade.Chart(), TickProcessMethod)) {
-    // Ignore a tick according to the method.
-    return;
-  }
-  */
-
-  /* @fixme: Disabled.
-  // Check if we should ignore the tick based on the price change.
-  if (last_pip_change < MinPipChangeToTrade) {
-    if (last_bar_time == trade.GetBarTime(PERIOD_M1)) {
-      return;
-    }
-  }
-  else {
-    last_bar_time = trade.GetBarTime(PERIOD_M1);
-  }
-  */
   if (!Object::IsDynamic(_trade)) {
     PrintFormat("%s: Error: Trade object not valid!", __FUNCTION_LINE__);
   }
@@ -365,10 +345,6 @@ void OnDeinit(const int reason) {
 
   }
   DeinitVars();
-  // #ifdef _DEBUG
-  // DEBUG("n=" + n + " : " +  DoubleToStrMorePrecision(val,19) );
-  // DEBUG("CLOSEDEBUGFILE");
-  // #endif
 } // end: OnDeinit()
 
 /**
@@ -414,11 +390,6 @@ double OnTester() {
  */
 void OnTesterPass() {
   Print("Calling ", __FUNCTION__, ".");
-  /*
-  if (ProfilingMinTime > 0) {
-    // Print("PROFILER: ", timers.ToString(0));
-  }
-  */
 }
 
 /**
@@ -2665,8 +2636,6 @@ void StartNewHour(Trade *_trade) {
   if (Boosting_Enabled) UpdateStrategyFactor(DAILY);
 
   #ifdef __advanced__
-  // Check if RSI period needs re-calculation.
-  // if (RSI_DynamicPeriod) RSI_CheckPeriod();
   // Check for dynamic spread configuration.
   if (DynamicSpreadConf) {
     // TODO: SpreadRatio, MinPipChangeToTrade, MinPipGap
@@ -2932,12 +2901,6 @@ bool InitVariables() {
     Msg::ShowText(StringFormat("Account free margin is %g!", account.AccountFreeMargin()), "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
     return (false);
   }
-  /* @fixme: https://travis-ci.org/EA31337-Tester/EA31337-Lite-Sets/builds/140302386
-  if (account.AccountMargin() <= 0) {
-    Msg::ShowText(StringFormat("Account margin is %g!", account.AccountMargin()), "Error", __FUNCTION__, __LINE__, VerboseErrors);
-    return (false);
-  }
-  */
 
   init_spread = market.GetSpreadInPts(); // @todo
 
