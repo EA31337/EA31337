@@ -131,9 +131,11 @@ void OnTick() {
   if (!session_initiated) return;
   //#ifdef __profiler__ PROFILER_START #endif
 
-  MqlTick _tick = market.GetTick();
   bool _tick_procesed = false;
-  if (trade[M1].Chart().IsNewBar()) {
+  static MqlTick _last_tick = {0};
+  MqlTick _tick = market.GetTick();
+  if (_tick.time % 60 < _last_tick.time % 60) {
+    // Process a tick per minute.
     for (ENUM_TIMEFRAMES_INDEX tfi = 0; tfi < FINAL_ENUM_TIMEFRAMES_INDEX; tfi++) {
       if (Object::IsDynamic(trade[tfi]) && trade[tfi].Chart().IsValidTf()) {
           trade[tfi].Market().SetTick(_tick);
@@ -147,7 +149,10 @@ void OnTick() {
       terminal.Logger().Flush(false);
     }
   }
-  UpdateTicks();
+  else {
+    UpdateTicks();
+  }
+  _last_tick = _tick;
   //#ifdef __profiler__ PROFILER_STOP #endif
 } // end: OnTick()
 
