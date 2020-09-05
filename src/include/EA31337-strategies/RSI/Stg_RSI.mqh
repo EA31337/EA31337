@@ -15,19 +15,19 @@
 
 // User input params.
 INPUT string __RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --"; // >>> RSI <<<
-INPUT int RSI_Period_M1 = 8; // Period for M1
-INPUT int RSI_Period_M5 = 14; // Period for M5
-INPUT int RSI_Period_M15 = 6; // Period for M15
-INPUT int RSI_Period_M30 = 4; // Period for M30
-INPUT ENUM_APPLIED_PRICE RSI_Applied_Price = (ENUM_APPLIED_PRICE) 2; // Applied Price
-INPUT uint RSI_Shift = 2; // Shift
-INPUT ENUM_TRAIL_TYPE RSI_TrailingStopMethod = 8; // Trail stop method
-INPUT ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = -11; // Trail profit method
-INPUT int RSI_SignalLevel = 42; // Signal level (-49-49)
-INPUT int RSI1_SignalMethod = -58; // Signal method for M1 (-63-63)
-INPUT int RSI5_SignalMethod = -63; // Signal method for M5 (-63-63)
-INPUT int RSI15_SignalMethod = -42; // Signal method for M15 (-63-63)
-INPUT int RSI30_SignalMethod = -39; // Signal method for M30 (-63-63)
+INPUT int RSI_Period_M1 = 12; // Period for M1
+INPUT int RSI_Period_M5 = 18; // Period for M5
+INPUT int RSI_Period_M15 = 10; // Period for M15
+INPUT int RSI_Period_M30 = 6; // Period for M30
+INPUT ENUM_APPLIED_PRICE RSI_Applied_Price = (ENUM_APPLIED_PRICE) 1; // Applied Price
+INPUT uint RSI_Shift = 1; // Shift
+INPUT ENUM_TRAIL_TYPE RSI_TrailingStopMethod = 7; // Trail stop method
+INPUT ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = 1; // Trail profit method
+INPUT int RSI_SignalLevel = 50; // Signal level (-49-49)
+INPUT int RSI1_SignalMethod = -57; // Signal method for M1 (-63-63)
+INPUT int RSI5_SignalMethod = -60; // Signal method for M5 (-63-63)
+INPUT int RSI15_SignalMethod = -36; // Signal method for M15 (-63-63)
+INPUT int RSI30_SignalMethod = -42; // Signal method for M30 (-63-63)
 INPUT int RSI1_OpenCondition1 = 1; // Open condition 1 for M1 (0-1023)
 INPUT int RSI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
 INPUT ENUM_MARKET_EVENT RSI1_CloseCondition = 1; // Close condition for M1

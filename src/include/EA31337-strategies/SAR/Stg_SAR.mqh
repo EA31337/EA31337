@@ -15,16 +15,16 @@
 
 // User input params.
 INPUT string __SAR_Parameters__ = "-- Settings for the Parabolic Stop and Reverse system indicator --"; // >>> SAR <<<
-INPUT double SAR_Step = 0.09; // Step
-INPUT double SAR_Maximum_Stop = 0.3; // Maximum stop
+INPUT double SAR_Step = 0.01; // Step
+INPUT double SAR_Maximum_Stop = 0; // Maximum stop
 INPUT int SAR_Shift = 0; // Shift
-INPUT ENUM_TRAIL_TYPE SAR_TrailingStopMethod = 1; // Trail stop method
-INPUT ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = 6; // Trail profit method
+INPUT ENUM_TRAIL_TYPE SAR_TrailingStopMethod = -6; // Trail stop method
+INPUT ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = -17; // Trail profit method
 INPUT double SAR_SignalLevel = 0; // Signal level
-INPUT int SAR1_SignalMethod = -106; // Signal method for M1 (-127-127)
-INPUT int SAR5_SignalMethod = 28; // Signal method for M5 (-127-127)
-INPUT int SAR15_SignalMethod = -120; // Signal method for M15 (-127-127)
-INPUT int SAR30_SignalMethod = -127; // Signal method for M30 (-127-127)
+INPUT int SAR1_SignalMethod = -85; // Signal method for M1 (-127-127)
+INPUT int SAR5_SignalMethod = 21; // Signal method for M5 (-127-127)
+INPUT int SAR15_SignalMethod = -127; // Signal method for M15 (-127-127)
+INPUT int SAR30_SignalMethod = -113; // Signal method for M30 (-127-127)
 INPUT int SAR1_OpenCondition1 = 680;
 INPUT int SAR1_OpenCondition2 = 0;
 INPUT ENUM_MARKET_EVENT SAR1_CloseCondition = 1; // Close condition for M1

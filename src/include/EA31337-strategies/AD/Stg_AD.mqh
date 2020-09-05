@@ -15,14 +15,14 @@
 
 // User input params.
 INPUT string __AD_Parameters__ = "-- Settings for the Accumulation/Distribution indicator --"; // >>> AD <<<
-INPUT ENUM_TRAIL_TYPE AD_TrailingStopMethod = 15; // Trail stop method
+INPUT ENUM_TRAIL_TYPE AD_TrailingStopMethod = 11; // Trail stop method
 INPUT ENUM_TRAIL_TYPE AD_TrailingProfitMethod = -5; // Trail profit method
 INPUT double AD_SignalLevel = 0.00000000; // Signal level
 INPUT uint AD_Shift = 0; // Shift (relative to the current bar, 0 - default)
 INPUT int AD1_SignalMethod = -1; // Signal method for M1 (0-?)
-INPUT int AD5_SignalMethod = -1; // Signal method for M5 (0-?)
-INPUT int AD15_SignalMethod = -1; // Signal method for M15 (0-?)
-INPUT int AD30_SignalMethod = -1; // Signal method for M30 (0-?)
+INPUT int AD5_SignalMethod = 1; // Signal method for M5 (0-?)
+INPUT int AD15_SignalMethod = 1; // Signal method for M15 (0-?)
+INPUT int AD30_SignalMethod = 1; // Signal method for M30 (0-?)
 INPUT int AD1_OpenCondition1 = 583; // Open condition 1 for M1 (0-1023)
 INPUT int AD1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
 INPUT ENUM_MARKET_EVENT AD1_CloseCondition = 2; // Close condition for M1
