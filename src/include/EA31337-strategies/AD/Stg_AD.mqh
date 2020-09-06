@@ -19,10 +19,18 @@ INPUT ENUM_TRAIL_TYPE AD_TrailingStopMethod = 11; // Trail stop method
 INPUT ENUM_TRAIL_TYPE AD_TrailingProfitMethod = -4; // Trail profit method
 INPUT double AD_SignalLevel = 0.00000000; // Signal level
 INPUT uint AD_Shift = 0; // Shift (relative to the current bar, 0 - default)
+#ifndef __advanced__
 INPUT int AD1_SignalMethod = 1; // Signal method for M1 (0-?)
 INPUT int AD5_SignalMethod = 1; // Signal method for M5 (0-?)
 INPUT int AD15_SignalMethod = 1; // Signal method for M15 (0-?)
 INPUT int AD30_SignalMethod = 1; // Signal method for M30 (0-?)
+#else
+int AD1_SignalMethod = 0; // Signal method for M1 (0-?)
+int AD5_SignalMethod = 0; // Signal method for M5 (0-?)
+int AD15_SignalMethod = 0; // Signal method for M15 (0-?)
+int AD30_SignalMethod = 0; // Signal method for M30 (0-?)
+#endif
+#ifdef __advanced__
 INPUT int AD1_OpenCondition1 = 583; // Open condition 1 for M1 (0-1023)
 INPUT int AD1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
 INPUT ENUM_MARKET_EVENT AD1_CloseCondition = 2; // Close condition for M1
@@ -35,6 +43,20 @@ INPUT ENUM_MARKET_EVENT AD15_CloseCondition = 1; // Close condition for M15
 INPUT int AD30_OpenCondition1 = 292; // Open condition 1 for M30 (0-)
 INPUT int AD30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
 INPUT ENUM_MARKET_EVENT AD30_CloseCondition = 24; // Close condition for M30
+#else
+int AD1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int AD1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+ENUM_MARKET_EVENT AD1_CloseCondition = C_AD_BUY_SELL; // Close condition for M1
+int AD5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int AD5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+ENUM_MARKET_EVENT AD5_CloseCondition = C_AD_BUY_SELL; // Close condition for M5
+int AD15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int AD15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+ENUM_MARKET_EVENT AD15_CloseCondition = C_AD_BUY_SELL; // Close condition for M15
+int AD30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int AD30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+ENUM_MARKET_EVENT AD30_CloseCondition = C_AD_BUY_SELL; // Close condition for M30
+#endif
 INPUT double AD1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 INPUT double AD5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 INPUT double AD15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
