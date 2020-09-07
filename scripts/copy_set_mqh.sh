@@ -25,6 +25,6 @@ while read -r opt; do
   eval "$opt"
   value=${!name}
   dest_file=$(grep -lwr "$name" "$ROOT"/src/include/EA31337/"$mode"/*.mqh "$ROOT"/src/include/EA31337-strategies/*/*.mqh)
-  ex "+%s@\\<$name\\s\\?=[^-.0-9]\\+\\zs[-.0-9]\\+\\ze@$value@" -scwq "$dest_file"
+  ex "+%s@^\(extern\|input\|INPUT\).*\\<$name\\s\\?=[^-.0-9]\\+\\zs[-.0-9]\\+\\ze@$value@" -scwq "$dest_file"
 done < <(find "$ROOT/docker/optimization/$mode" -name "*.set" -exec grep -hA99 Optimization {} ';' | grep -o "^\w[^=,]\\+=[-.0-9]\\+")
 echo "done."
