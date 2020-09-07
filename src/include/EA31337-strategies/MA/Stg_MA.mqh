@@ -27,10 +27,18 @@ INPUT ENUM_APPLIED_PRICE MA_Applied_Price = (ENUM_APPLIED_PRICE) 5; // Applied P
 INPUT ENUM_TRAIL_TYPE MA_TrailingStopMethod = 4; // Trail stop method
 INPUT ENUM_TRAIL_TYPE MA_TrailingProfitMethod = -8; // Trail profit method
 INPUT double MA_SignalLevel = -1.1; // Signal level
+#ifndef __advanced__
 INPUT int MA1_SignalMethod = -7; // Signal method for M1 (-127-127)
 INPUT int MA5_SignalMethod = 63; // Signal method for M5 (-127-127)
 INPUT int MA15_SignalMethod = 2; // Signal method for M15 (-127-127)
 INPUT int MA30_SignalMethod = -127; // Signal method for M30 (-127-127)
+#else
+int MA1_SignalMethod = 0; // Signal method for M1 (-127-127)
+int MA5_SignalMethod = 0; // Signal method for M5 (-127-127)
+int MA15_SignalMethod = 0; // Signal method for M15 (-127-127)
+int MA30_SignalMethod = 0; // Signal method for M30 (-127-127)
+#endif
+#ifdef __advanced__
 INPUT int MA1_OpenCondition1 = 874; // Open condition 1 for M1 (0-1023)
 INPUT int MA1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
 INPUT ENUM_MARKET_EVENT MA1_CloseCondition = 24; // Close condition for M1
@@ -43,6 +51,20 @@ INPUT ENUM_MARKET_EVENT MA15_CloseCondition = 24; // Close condition for M15
 INPUT int MA30_OpenCondition1 = 195; // Open condition 1 for M30 (0-1023)
 INPUT int MA30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
 INPUT ENUM_MARKET_EVENT MA30_CloseCondition = 1; // Close condition for M30
+#else
+int MA1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int MA1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+ENUM_MARKET_EVENT MA1_CloseCondition = C_MA_BUY_SELL; // Close condition for M1
+int MA5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int MA5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+ENUM_MARKET_EVENT MA5_CloseCondition = C_MA_BUY_SELL; // Close condition for M5
+int MA15_OpenCondition1 = 0; // Open condition 1 for M15 (0-1023)
+int MA15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+ENUM_MARKET_EVENT MA15_CloseCondition = C_MA_BUY_SELL; // Close condition for M15
+int MA30_OpenCondition1 = 0; // Open condition 1 for M30 (0-1023)
+int MA30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+ENUM_MARKET_EVENT MA30_CloseCondition = C_MA_BUY_SELL; // Close condition for M30
+#endif
 INPUT double MA1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 INPUT double MA5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 INPUT double MA15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)

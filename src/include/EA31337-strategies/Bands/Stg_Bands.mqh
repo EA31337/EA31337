@@ -29,10 +29,18 @@ INPUT int Bands_Shift = 1; // Shift (relative to the current bar, 0 - default)
 INPUT ENUM_TRAIL_TYPE Bands_TrailingStopMethod = 15; // Trail stop method
 INPUT ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = -6; // Trail profit method
 INPUT int Bands_SignalLevel = 18; // Signal level
+#ifndef __advanced__
 INPUT int Bands1_SignalMethod = 36; // Signal method for M1 (-127-127)
 INPUT int Bands5_SignalMethod = 28; // Signal method for M5 (-127-127)
 INPUT int Bands15_SignalMethod = 64; // Signal method for M15 (-127-127)
 INPUT int Bands30_SignalMethod = 64; // Signal method for M30 (-127-127)
+#else
+int Bands1_SignalMethod = 0; // Signal method for M1 (-127-127)
+int Bands5_SignalMethod = 0; // Signal method for M5 (-127-127)
+int Bands15_SignalMethod = 0; // Signal method for M15 (-127-127)
+int Bands30_SignalMethod = 0; // Signal method for M30 (-127-127)
+#endif
+#ifdef __advanced__
 INPUT int Bands1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
 INPUT int Bands1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
 INPUT ENUM_MARKET_EVENT Bands1_CloseCondition = 24; // Close condition for M1
@@ -45,6 +53,20 @@ INPUT ENUM_MARKET_EVENT Bands15_CloseCondition = 2; // Close condition for M15
 INPUT int Bands30_OpenCondition1 = 292; // Open condition 1 for M30 (0-1023)
 INPUT int Bands30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
 INPUT ENUM_MARKET_EVENT Bands30_CloseCondition = 1; // Close condition for M30
+#else
+int Bands1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int Bands1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+ENUM_MARKET_EVENT Bands1_CloseCondition = C_BANDS_BUY_SELL; // Close condition for M1
+int Bands5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int Bands5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+ENUM_MARKET_EVENT Bands5_CloseCondition = C_BANDS_BUY_SELL; // Close condition for M5
+int Bands15_OpenCondition1 = 0; // Open condition 1 for M15 (0-1023)
+int Bands15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+ENUM_MARKET_EVENT Bands15_CloseCondition = C_BANDS_BUY_SELL; // Close condition for M15
+int Bands30_OpenCondition1 = 0; // Open condition 1 for M30 (0-1023)
+int Bands30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+ENUM_MARKET_EVENT Bands30_CloseCondition = C_BANDS_BUY_SELL; // Close condition for M30
+#endif
 INPUT double Bands1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 INPUT double Bands5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 INPUT double Bands15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)

@@ -23,22 +23,44 @@ int ATR_Period_M15 = 14; // Period for M15
 int ATR_Period_M30 = 14; // Period for M30
 double ATR_SignalLevel = 0.00000000; // Signal level
 uint ATR_Shift = 0; // Shift (relative to the current bar, 0 - default)
+#ifndef __advanced__
 int ATR1_SignalMethod = 0; // Signal method for M1 (0-31)
 int ATR5_SignalMethod = 0; // Signal method for M5 (0-31)
 int ATR15_SignalMethod = 0; // Signal method for M15 (0-31)
 int ATR30_SignalMethod = 0; // Signal method for M30 (0-31)
+#else
+int ATR1_SignalMethod = 0; // Signal method for M1 (0-31)
+int ATR5_SignalMethod = 0; // Signal method for M5 (0-31)
+int ATR15_SignalMethod = 0; // Signal method for M15 (0-31)
+int ATR30_SignalMethod = 0; // Signal method for M30 (0-31)
+#endif
+#ifdef __advanced__
 int ATR1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int ATR1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-ENUM_MARKET_EVENT ATR1_CloseCondition = 1; // Close condition for M1
-int ATR5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
+ENUM_MARKET_EVENT ATR1_CloseCondition = C_ATR_BUY_SELL; // Close condition for M1
+int ATR5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
 int ATR5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-ENUM_MARKET_EVENT ATR5_CloseCondition = 1; // Close condition for M5
-int ATR15_OpenCondition1 = 292; // Open condition 1 for M15 (0-)
+ENUM_MARKET_EVENT ATR5_CloseCondition = C_ATR_BUY_SELL; // Close condition for M5
+int ATR15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
 int ATR15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-ENUM_MARKET_EVENT ATR15_CloseCondition = 1; // Close condition for M15
-int ATR30_OpenCondition1 = 292; // Open condition 1 for M30 (0-)
+ENUM_MARKET_EVENT ATR15_CloseCondition = C_ATR_BUY_SELL; // Close condition for M15
+int ATR30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
 int ATR30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-ENUM_MARKET_EVENT ATR30_CloseCondition = 1; // Close condition for M30
+ENUM_MARKET_EVENT ATR30_CloseCondition = C_ATR_BUY_SELL; // Close condition for M30
+#else
+int ATR1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int ATR1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+ENUM_MARKET_EVENT ATR1_CloseCondition = C_ATR_BUY_SELL; // Close condition for M1
+int ATR5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int ATR5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+ENUM_MARKET_EVENT ATR5_CloseCondition = C_ATR_BUY_SELL; // Close condition for M5
+int ATR15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int ATR15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+ENUM_MARKET_EVENT ATR15_CloseCondition = C_ATR_BUY_SELL; // Close condition for M15
+int ATR30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int ATR30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+ENUM_MARKET_EVENT ATR30_CloseCondition = C_ATR_BUY_SELL; // Close condition for M30
+#endif
 double ATR1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 double ATR5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 double ATR15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)

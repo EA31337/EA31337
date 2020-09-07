@@ -22,10 +22,18 @@ int OSMA_Period_Slow = 6; // Period Slow
 int OSMA_Period_Signal = 9; // Period for signal
 ENUM_APPLIED_PRICE OSMA_Applied_Price = (ENUM_APPLIED_PRICE) 4; // Applied Price
 double OSMA_SignalLevel = -0.2; // Signal level
-int OSMA1_SignalMethod = 120; // Signal method for M1 (0-
-int OSMA5_SignalMethod = 49; // Signal method for M5 (0-
-int OSMA15_SignalMethod = -71; // Signal method for M15 (0-
-int OSMA30_SignalMethod = -95; // Signal method for M30 (0-
+#ifndef __advanced__
+int OSMA1_SignalMethod = 0; // Signal method for M1 (0-
+int OSMA5_SignalMethod = 0; // Signal method for M5 (0-
+int OSMA15_SignalMethod = 0; // Signal method for M15 (0-
+int OSMA30_SignalMethod = 0; // Signal method for M30 (0-
+#else
+int OSMA1_SignalMethod = 0; // Signal method for M1 (0-
+int OSMA5_SignalMethod = 0; // Signal method for M5 (0-
+int OSMA15_SignalMethod = 0; // Signal method for M15 (0-
+int OSMA30_SignalMethod = 0; // Signal method for M30 (0-
+#endif
+#ifdef __advanced__
 int OSMA1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int OSMA1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
 ENUM_MARKET_EVENT OSMA1_CloseCondition = C_OSMA_BUY_SELL; // Close condition for M1
@@ -38,6 +46,20 @@ ENUM_MARKET_EVENT OSMA15_CloseCondition = C_OSMA_BUY_SELL; // Close condition fo
 int OSMA30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
 int OSMA30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
 ENUM_MARKET_EVENT OSMA30_CloseCondition = C_OSMA_BUY_SELL; // Close condition for M30
+#else
+int OSMA1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int OSMA1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+ENUM_MARKET_EVENT OSMA1_CloseCondition = C_OSMA_BUY_SELL; // Close condition for M1
+int OSMA5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int OSMA5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+ENUM_MARKET_EVENT OSMA5_CloseCondition = C_OSMA_BUY_SELL; // Close condition for M5
+int OSMA15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int OSMA15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+ENUM_MARKET_EVENT OSMA15_CloseCondition = C_OSMA_BUY_SELL; // Close condition for M15
+int OSMA30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int OSMA30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+ENUM_MARKET_EVENT OSMA30_CloseCondition = C_OSMA_BUY_SELL; // Close condition for M30
+#endif
 double OSMA1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 double OSMA5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 double OSMA15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)

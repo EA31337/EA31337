@@ -23,10 +23,18 @@ INPUT int WPR_Shift = 2; // Shift
 INPUT int WPR_SignalLevel = 20; // Signal level
 INPUT ENUM_TRAIL_TYPE WPR_TrailingStopMethod = 7; // Trail stop method
 INPUT ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = 25; // Trail profit method
+#ifndef __advanced__
 INPUT int WPR1_SignalMethod = -32; // Signal method for M1 (-63-63)
 INPUT int WPR5_SignalMethod = -32; // Signal method for M5 (-63-63)
 INPUT int WPR15_SignalMethod = -30; // Signal method for M15 (-63-63)
 INPUT int WPR30_SignalMethod = -30; // Signal method for M30 (-63-63)
+#else
+int WPR1_SignalMethod = 0; // Signal method for M1 (-63-63)
+int WPR5_SignalMethod = 0; // Signal method for M5 (-63-63)
+int WPR15_SignalMethod = 0; // Signal method for M15 (-63-63)
+int WPR30_SignalMethod = 0; // Signal method for M30 (-63-63)
+#endif
+#ifdef __advanced__
 INPUT int WPR1_OpenCondition1 = 874; // Open condition 1 for M1 (0-1023)
 INPUT int WPR1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
 INPUT ENUM_MARKET_EVENT WPR1_CloseCondition = 1; // Close condition for M1
@@ -39,6 +47,20 @@ INPUT ENUM_MARKET_EVENT WPR15_CloseCondition = 1; // Close condition for M15
 INPUT int WPR30_OpenCondition1 = 292; // Open condition 1 for M30 (0-1023)
 INPUT int WPR30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
 INPUT ENUM_MARKET_EVENT WPR30_CloseCondition = 1; // Close condition for M30
+#else
+int WPR1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int WPR1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+ENUM_MARKET_EVENT WPR1_CloseCondition = C_WPR_BUY_SELL; // Close condition for M1
+int WPR5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int WPR5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+ENUM_MARKET_EVENT WPR5_CloseCondition = C_WPR_BUY_SELL; // Close condition for M5
+int WPR15_OpenCondition1 = 0; // Open condition 1 for M15 (0-1023)
+int WPR15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+ENUM_MARKET_EVENT WPR15_CloseCondition = C_WPR_BUY_SELL; // Close condition for M15
+int WPR30_OpenCondition1 = 0; // Open condition 1 for M30 (0-1023)
+int WPR30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+ENUM_MARKET_EVENT WPR30_CloseCondition = C_WPR_BUY_SELL; // Close condition for M30
+#endif
 INPUT double WPR1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 INPUT double WPR5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 INPUT double WPR15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)

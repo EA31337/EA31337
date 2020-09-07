@@ -23,10 +23,18 @@ INPUT int DeMarker_Shift = 13; // Shift
 INPUT double DeMarker_SignalLevel = 0.4; // Signal level (0.0-0.5)
 INPUT ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = 20; // Trail stop method
 INPUT ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = -4; // Trail profit method
+#ifndef __advanced__
 INPUT int DeMarker1_SignalMethod = 14; // Signal method for M1 (-31-31)
 INPUT int DeMarker5_SignalMethod = -20; // Signal method for M5 (-31-31)
 INPUT int DeMarker15_SignalMethod = -18; // Signal method for M15 (-31-31)
 INPUT int DeMarker30_SignalMethod = -16; // Signal method for M30 (-31-31)
+#else
+int DeMarker1_SignalMethod = 0; // Signal method for M1 (-31-31)
+int DeMarker5_SignalMethod = 0; // Signal method for M5 (-31-31)
+int DeMarker15_SignalMethod = 0; // Signal method for M15 (-31-31)
+int DeMarker30_SignalMethod = 0; // Signal method for M30 (-31-31)
+#endif
+#ifdef __advanced__
 INPUT int DeMarker1_OpenCondition1 = 680; // Open condition 1 for M1 (0-1023)
 INPUT int DeMarker1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
 INPUT ENUM_MARKET_EVENT DeMarker1_CloseCondition = 1; // Close condition for M1
@@ -39,6 +47,20 @@ INPUT ENUM_MARKET_EVENT DeMarker15_CloseCondition = 1; // Close condition for M1
 INPUT int DeMarker30_OpenCondition1 = 195; // Open condition 1 for M30 (0-1023)
 INPUT int DeMarker30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
 INPUT ENUM_MARKET_EVENT DeMarker30_CloseCondition = 1; // Close condition for M30
+#else
+int DeMarker1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int DeMarker1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+ENUM_MARKET_EVENT DeMarker1_CloseCondition = C_DEMARKER_BUY_SELL; // Close condition for M1
+int DeMarker5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int DeMarker5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+ENUM_MARKET_EVENT DeMarker5_CloseCondition = C_DEMARKER_BUY_SELL; // Close condition for M5
+int DeMarker15_OpenCondition1 = 0; // Open condition 1 for M15 (0-1023)
+int DeMarker15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+ENUM_MARKET_EVENT DeMarker15_CloseCondition = C_DEMARKER_BUY_SELL; // Close condition for M15
+int DeMarker30_OpenCondition1 = 0; // Open condition 1 for M30 (0-1023)
+int DeMarker30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+ENUM_MARKET_EVENT DeMarker30_CloseCondition = C_DEMARKER_BUY_SELL; // Close condition for M30
+#endif
 INPUT double DeMarker1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 INPUT double DeMarker5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 INPUT double DeMarker15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)

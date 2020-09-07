@@ -23,10 +23,18 @@ int StdDev_Shift = 0; // Shift
 ENUM_TRAIL_TYPE StdDev_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE StdDev_TrailingProfitMethod = 1; // Trail profit method
 double StdDev_SignalLevel = 0.00000000; // Signal level
+#ifndef __advanced__
 int StdDev1_SignalMethod = 0; // Signal method for M1 (0-
 int StdDev5_SignalMethod = 0; // Signal method for M5 (0-
 int StdDev15_SignalMethod = 0; // Signal method for M15 (0-
 int StdDev30_SignalMethod = 0; // Signal method for M30 (0-
+#else
+int StdDev1_SignalMethod = 0; // Signal method for M1 (0-
+int StdDev5_SignalMethod = 0; // Signal method for M5 (0-
+int StdDev15_SignalMethod = 0; // Signal method for M15 (0-
+int StdDev30_SignalMethod = 0; // Signal method for M30 (0-
+#endif
+#ifdef __advanced__
 int StdDev1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int StdDev1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
 ENUM_MARKET_EVENT StdDev1_CloseCondition = C_STDDEV_BUY_SELL; // Close condition for M1
@@ -39,6 +47,20 @@ ENUM_MARKET_EVENT StdDev15_CloseCondition = C_STDDEV_BUY_SELL; // Close conditio
 int StdDev30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
 int StdDev30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
 ENUM_MARKET_EVENT StdDev30_CloseCondition = C_STDDEV_BUY_SELL; // Close condition for M30
+#else
+int StdDev1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int StdDev1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+ENUM_MARKET_EVENT StdDev1_CloseCondition = C_STDDEV_BUY_SELL; // Close condition for M1
+int StdDev5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int StdDev5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+ENUM_MARKET_EVENT StdDev5_CloseCondition = C_STDDEV_BUY_SELL; // Close condition for M5
+int StdDev15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int StdDev15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+ENUM_MARKET_EVENT StdDev15_CloseCondition = C_STDDEV_BUY_SELL; // Close condition for M15
+int StdDev30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int StdDev30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+ENUM_MARKET_EVENT StdDev30_CloseCondition = C_STDDEV_BUY_SELL; // Close condition for M30
+#endif
 double StdDev1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 double StdDev5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 double StdDev15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
