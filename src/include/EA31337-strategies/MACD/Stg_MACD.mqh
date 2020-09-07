@@ -24,10 +24,10 @@ INPUT ENUM_TRAIL_TYPE MACD_TrailingStopMethod = 10; // Trail stop method
 INPUT ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = -20; // Trail profit method
 INPUT double MACD_SignalLevel = 0; // Signal level
 #ifndef __advanced__
-INPUT int MACD1_SignalMethod = 18; // Signal method for M1 (-7-7)
-INPUT int MACD5_SignalMethod = 0; // Signal method for M5 (-7-7)
-INPUT int MACD15_SignalMethod = -28; // Signal method for M15 (-7-7)
-INPUT int MACD30_SignalMethod = -28; // Signal method for M30 (-7-7)
+INPUT int MACD1_SignalMethod = 7; // Signal method for M1 (-7-7)
+INPUT int MACD5_SignalMethod = 7; // Signal method for M5 (-7-7)
+INPUT int MACD15_SignalMethod = 7; // Signal method for M15 (-7-7)
+INPUT int MACD30_SignalMethod = 7; // Signal method for M30 (-7-7)
 #else
 int MACD1_SignalMethod = 0; // Signal method for M1 (-7-7)
 int MACD5_SignalMethod = 0; // Signal method for M5 (-7-7)

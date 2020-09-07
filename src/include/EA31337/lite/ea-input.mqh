@@ -29,7 +29,7 @@ extern int    MinVolumeToTrade = 0; // Min volume to trade
 extern int    MaxOrderPriceSlippage = 50; // Max price slippage (in pts)
 extern int    MaxTries = 5; // Max retries for opening orders
 double MinPipChangeToTrade = 0; // Min pip change to trade
-extern int    MinPipGap = 50; // Min gap between trades per type (in pips)
+extern int    MinPipGap = 70; // Min gap between trades per type (in pips)
 //extern uint   TickProcessMethod = 0; // Tick process method (0-8, 0 - all)
 
 //+------------------------------------------------------------------+
@@ -41,8 +41,8 @@ extern uint     StopLossMax = 40; // Max Stop loss (in pips, 0 = auto)
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
 ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 0; // Default trail stop method (0 = none)
 ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 0; // Default trail profit method
-extern int TrailingStop = 40; // Extra trailing stop (in pips)
-extern int TrailingProfit = 0; // Extra trailing profit (in pips)
+extern int TrailingStop = 60; // Extra trailing stop (in pips)
+extern int TrailingProfit = 10; // Extra trailing profit (in pips)
 double TrailingStopAddPerMinute = 0.0; // Decrease trail stop per minute (pip/min)
 
 //+------------------------------------------------------------------+
@@ -57,45 +57,45 @@ extern double CloseOrderAfterXHours = 72; // Close order after X hours (>0 - all
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Profit__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGY PARAMS <<<
-extern double ProfitFactorMinToTrade = 0.7; // Min. profit factor per strategy to trade
+extern double ProfitFactorMinToTrade = 0.9; // Min. profit factor per strategy to trade
 extern double ProfitFactorMaxToTrade = 0.0; // Max. profit factor per strategy to trade
 extern int InitNoOfOrdersToCalcPF = 20; // Initial number of orders to calculate profit factor
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameters (set 1.0 for default) --"; // >>> BOOSTING <<<
 extern bool Boosting_Enabled = 0; // Enable boosting
-extern double BoostTrendFactor = 0.7; // Boost by trend factor
+extern double BoostTrendFactor = 0.5; // Boost by trend factor
 extern bool StrategyBoostByPF = 1.1; // Boost strategy by its profit factor
 extern bool StrategyHandicapByPF = 0; // Handicap by its low profit factor
 extern double BestDailyStrategyMultiplierFactor = 0.7; // Multiplier for the best daily strategy
 extern double BestWeeklyStrategyMultiplierFactor = 1.5; // Multiplier for the best weekly strategy
 extern double BestMonthlyStrategyMultiplierFactor = 1; // Multiplier for the best monthly strategy
-extern double WorseDailyStrategyMultiplierFactor = 0.2; // Multiplier for the worse daily strategy
+extern double WorseDailyStrategyMultiplierFactor = 0.1; // Multiplier for the worse daily strategy
 extern double WorseWeeklyStrategyMultiplierFactor = 0.5; // Multiplier for the worse weekly strategy
 extern double WorseMonthlyStrategyMultiplierFactor = 1; // Multiplier for the worse monthly strategy
 extern double ConWinsIncreaseFactor = -0.1; // Increase lot factor on consequent wins (in %, 0 - off)
 extern double ConLossesIncreaseFactor = 0.2; // Increase lot factor on consequent loses (in %, 0 - off)
-extern uint ConFactorOrdersLimit = 200; // No of orders to check on consequent wins/loses
+extern uint ConFactorOrdersLimit = 100; // No of orders to check on consequent wins/loses
 
 //+------------------------------------------------------------------+
 input static string __Strategy_Timeframes__ = "-- Strategy's timeframes --"; // >>> STRATEGY'S TIMEFRAMES (1-255: M1=1,M5=2,M15=4,M30=8,H1=16,H2=32,H4=64...) <<<
-extern unsigned int AC_Active_Tf = 11; // AC: Activate timeframes
+extern unsigned int AC_Active_Tf = 1; // AC: Activate timeframes
 extern unsigned int AD_Active_Tf = 8; // AD: Activate timeframes
 extern unsigned int ADX_Active_Tf = 12; // ADX: Activate timeframes
+extern unsigned int ATR_Active_Tf = 0; // ATR: Activate timeframes
 extern unsigned int Alligator_Active_Tf = 0; // Alligator: Activate timeframes
 extern unsigned int Bands_Active_Tf = 10; // Bands: Activate timeframes
-extern unsigned int CCI_Active_Tf = 10; // CCI: Activate timeframes
-extern unsigned int DeMarker_Active_Tf = 0; // DeMarker: Activate timeframes
+extern unsigned int CCI_Active_Tf = 0; // CCI: Activate timeframes
+extern unsigned int DeMarker_Active_Tf = 1; // DeMarker: Activate timeframes
 extern unsigned int Envelopes_Active_Tf = 10; // Envelopes: Activate timeframes
 extern unsigned int Force_Active_Tf = 9; // Force: Activate timeframes
 extern unsigned int Fractals_Active_Tf = 10; // Fractals: Activate timeframes
 extern unsigned int MACD_Active_Tf = 1; // MACD: Activate timeframes
-extern unsigned int MA_Active_Tf = 11; // MA: Activate timeframes
+extern unsigned int MA_Active_Tf = 0; // MA: Activate timeframes
 extern unsigned int MFI_Active_Tf = 9; // MFI: Activate timeframes
-extern unsigned int RSI_Active_Tf = 9; // RSI: Activate timeframes
+extern unsigned int RSI_Active_Tf = 0; // RSI: Activate timeframes
 extern unsigned int SAR_Active_Tf = 11; // SAR: Activate timeframes
 extern unsigned int WPR_Active_Tf = 11; // WPR: Activate timeframes
-unsigned int ATR_Active_Tf = 0; // ATR: Activate timeframes
 unsigned int Awesome_Active_Tf = 0; // Awesome: Activate timeframes
 unsigned int BWMFI_Active_Tf = 0; // BWMFI: Activate timeframes
 unsigned int BearsPower_Active_Tf = 0; // BearsPower: Activate timeframes
@@ -113,19 +113,19 @@ unsigned int ZigZag_Active_Tf = 0; // ZigZag: Activate timeframes
 //+------------------------------------------------------------------+
 extern string __SmartQueue_Parameters__ = "-- Smart queue parameters --"; // >>> SMART QUEUE <<<
 extern bool SmartQueueActive = 0; // Activate QueueAI
-extern int SmartQueueMethod = 2; // QueueAI: Method for selecting the best order (0-15)
-extern int SmartQueueFilter = 6; // QueueAI: Method for filtering the orders (0-255)
+extern int SmartQueueMethod = 11; // QueueAI: Method for selecting the best order (0-15)
+extern int SmartQueueFilter = 30; // QueueAI: Method for filtering the orders (0-255)
 
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions__ = "-- Account conditions --"; // >>> CONDITIONS & ACTIONS <<<
 extern bool Account_Conditions_Active = 0; // Enable account conditions (don't enable for multibot trading)
 // Condition 5 - Equity 1% high
-extern ENUM_ACC_CONDITION Account_Condition_1 = 2; // 1. Account condition
+extern ENUM_ACC_CONDITION Account_Condition_1 = 5; // 1. Account condition
 extern ENUM_MARKET_CONDITION Market_Condition_1 = 8; // 1. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_1 = 0; // 1. Action to take
+extern ENUM_ACTION_TYPE Action_On_Condition_1 = 4; // 1. Action to take
 // Condition 6 - Equity 10% high
 extern ENUM_ACC_CONDITION Account_Condition_2 = 6; // 2. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_2 = 1; // 2. Market condition
+extern ENUM_MARKET_CONDITION Market_Condition_2 = 3; // 2. Market condition
 extern ENUM_ACTION_TYPE Action_On_Condition_2 = 0; // 2. Action to take
 // Condition 10 - 50% Margin Used
 extern ENUM_ACC_CONDITION Account_Condition_3 = 10; // 3. Account condition
@@ -191,7 +191,7 @@ extern string SoundFileAtClose = "alert.wav"; // Sound: on order close
 //+------------------------------------------------------------------+
 
 extern string __Optimization_Parameters__ = "-- Optimization parameters --"; // >>> OPTIMIZATION <<<
-extern ENUM_TIMEFRAMES TrendPeriod = 30; // Period for trend calculation
+extern ENUM_TIMEFRAMES TrendPeriod = (ENUM_TIMEFRAMES) 240; // Period for trend calculation
 
 extern string __Backtest_Parameters__ = "-- Testing & troubleshooting parameters --"; // >>> TESTING <<<
 #ifndef __backtest__

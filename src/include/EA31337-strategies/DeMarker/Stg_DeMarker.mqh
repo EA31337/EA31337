@@ -15,19 +15,19 @@
 
 // User input params.
 INPUT string __DeMarker_Parameters__ = "-- Settings for the DeMarker indicator --"; // >>> DEMARKER <<<
-INPUT int DeMarker_Period_M1 = 38; // Period for M1
-INPUT int DeMarker_Period_M5 = 20; // Period for M5
-INPUT int DeMarker_Period_M15 = 20; // Period for M15
-INPUT int DeMarker_Period_M30 = 20; // Period for M30
-INPUT int DeMarker_Shift = 13; // Shift
-INPUT double DeMarker_SignalLevel = 0.4; // Signal level (0.0-0.5)
-INPUT ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = 20; // Trail stop method
-INPUT ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = -4; // Trail profit method
+INPUT int DeMarker_Period_M1 = 54; // Period for M1
+INPUT int DeMarker_Period_M5 = 34; // Period for M5
+INPUT int DeMarker_Period_M15 = 32; // Period for M15
+INPUT int DeMarker_Period_M30 = 14; // Period for M30
+INPUT int DeMarker_Shift = 5; // Shift
+INPUT double DeMarker_SignalLevel = 0.5; // Signal level (0.0-0.5)
+INPUT ENUM_TRAIL_TYPE DeMarker_TrailingStopMethod = 17; // Trail stop method
+INPUT ENUM_TRAIL_TYPE DeMarker_TrailingProfitMethod = 15; // Trail profit method
 #ifndef __advanced__
-INPUT int DeMarker1_SignalMethod = 14; // Signal method for M1 (-31-31)
-INPUT int DeMarker5_SignalMethod = -20; // Signal method for M5 (-31-31)
-INPUT int DeMarker15_SignalMethod = -18; // Signal method for M15 (-31-31)
-INPUT int DeMarker30_SignalMethod = -16; // Signal method for M30 (-31-31)
+INPUT int DeMarker1_SignalMethod = 7; // Signal method for M1 (-31-31)
+INPUT int DeMarker5_SignalMethod = -16; // Signal method for M5 (-31-31)
+INPUT int DeMarker15_SignalMethod = -16; // Signal method for M15 (-31-31)
+INPUT int DeMarker30_SignalMethod = -18; // Signal method for M30 (-31-31)
 #else
 int DeMarker1_SignalMethod = 0; // Signal method for M1 (-31-31)
 int DeMarker5_SignalMethod = 0; // Signal method for M5 (-31-31)
