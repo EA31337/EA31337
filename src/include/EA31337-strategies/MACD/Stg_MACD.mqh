@@ -24,15 +24,15 @@ INPUT ENUM_TRAIL_TYPE MACD_TrailingStopMethod = 10; // Trail stop method
 INPUT ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = -20; // Trail profit method
 INPUT double MACD_SignalLevel = 0; // Signal level
 #ifndef __advanced__
-INPUT int MACD1_SignalMethod = 18; // Signal method for M1 (-31-31)
-INPUT int MACD5_SignalMethod = 0; // Signal method for M5 (-31-31)
-INPUT int MACD15_SignalMethod = -28; // Signal method for M15 (-31-31)
-INPUT int MACD30_SignalMethod = -28; // Signal method for M30 (-31-31)
+INPUT int MACD1_SignalMethod = 18; // Signal method for M1 (-7-7)
+INPUT int MACD5_SignalMethod = 0; // Signal method for M5 (-7-7)
+INPUT int MACD15_SignalMethod = -28; // Signal method for M15 (-7-7)
+INPUT int MACD30_SignalMethod = -28; // Signal method for M30 (-7-7)
 #else
-int MACD1_SignalMethod = 0; // Signal method for M1 (-31-31)
-int MACD5_SignalMethod = 0; // Signal method for M5 (-31-31)
-int MACD15_SignalMethod = 0; // Signal method for M15 (-31-31)
-int MACD30_SignalMethod = 0; // Signal method for M30 (-31-31)
+int MACD1_SignalMethod = 0; // Signal method for M1 (-7-7)
+int MACD5_SignalMethod = 0; // Signal method for M5 (-7-7)
+int MACD15_SignalMethod = 0; // Signal method for M15 (-7-7)
+int MACD30_SignalMethod = 0; // Signal method for M30 (-7-7)
 #endif
 #ifdef __advanced__
 INPUT int MACD1_OpenCondition1 = 874; // Open condition 1 for M1 (0-1023)
@@ -174,8 +174,6 @@ class Stg_MACD : public Strategy {
           if (METHOD(_signal_method, 0)) _result &= macd_2_main < macd_2_signal;
           if (METHOD(_signal_method, 1)) _result &= macd_0_main >= 0;
           if (METHOD(_signal_method, 2)) _result &= macd_1_main < 0;
-          if (METHOD(_signal_method, 3)) _result &= ma_fast[this.Chart().TfToIndex()][CURR] > ma_fast[this.Chart().TfToIndex()][PREV];
-          if (METHOD(_signal_method, 4)) _result &= ma_fast[this.Chart().TfToIndex()][CURR] > ma_medium[this.Chart().TfToIndex()][CURR];
         }
         break;
       case ORDER_TYPE_SELL:
@@ -184,8 +182,6 @@ class Stg_MACD : public Strategy {
           if (METHOD(_signal_method, 0)) _result &= macd_2_main > macd_2_signal;
           if (METHOD(_signal_method, 1)) _result &= macd_0_main <= 0;
           if (METHOD(_signal_method, 2)) _result &= macd_1_main > 0;
-          if (METHOD(_signal_method, 3)) _result &= ma_fast[this.Chart().TfToIndex()][CURR] < ma_fast[this.Chart().TfToIndex()][PREV];
-          if (METHOD(_signal_method, 4)) _result &= ma_fast[this.Chart().TfToIndex()][CURR] < ma_medium[this.Chart().TfToIndex()][CURR];
         }
         break;
     }
