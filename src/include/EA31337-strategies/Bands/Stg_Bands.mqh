@@ -28,7 +28,7 @@ INPUT int Bands_HShift = 0; // Horizontal shift
 INPUT int Bands_Shift = 0; // Shift (relative to the current bar, 0 - default)
 INPUT ENUM_TRAIL_TYPE Bands_TrailingStopMethod = 15; // Trail stop method
 INPUT ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = -6; // Trail profit method
-INPUT int Bands_SignalLevel = 18; // Signal level
+INPUT double Bands_SignalLevel = 18; // Signal level
 #ifndef __advanced__
 INPUT int Bands1_SignalMethod = 36; // Signal method for M1 (-127-127)
 INPUT int Bands5_SignalMethod = 28; // Signal method for M5 (-127-127)
