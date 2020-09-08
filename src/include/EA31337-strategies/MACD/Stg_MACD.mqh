@@ -15,14 +15,14 @@
 
 // User input params.
 INPUT string __MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --"; // >>> MACD <<<
-INPUT int MACD_Period_Fast = 2; // Period Fast
-INPUT int MACD_Period_Slow = 20; // Period Slow
-INPUT int MACD_Period_Signal = 11; // Period for signal
-INPUT ENUM_APPLIED_PRICE MACD_Applied_Price = (ENUM_APPLIED_PRICE) 2; // Applied Price
+INPUT int MACD_Period_Fast = 6; // Period Fast
+INPUT int MACD_Period_Slow = 24; // Period Slow
+INPUT int MACD_Period_Signal = 15; // Period for signal
+INPUT ENUM_APPLIED_PRICE MACD_Applied_Price = (ENUM_APPLIED_PRICE) 1; // Applied Price
 INPUT int MACD_Shift = 0; // Shift
 INPUT ENUM_TRAIL_TYPE MACD_TrailingStopMethod = 10; // Trail stop method
 INPUT ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = -20; // Trail profit method
-INPUT double MACD_SignalLevel = 0; // Signal level
+INPUT double MACD_SignalLevel = 0.8; // Signal level
 #ifndef __advanced__
 INPUT int MACD1_SignalMethod = 7; // Signal method for M1 (-7-7)
 INPUT int MACD5_SignalMethod = 7; // Signal method for M5 (-7-7)

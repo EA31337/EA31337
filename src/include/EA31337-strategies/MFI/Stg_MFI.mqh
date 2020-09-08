@@ -15,19 +15,19 @@
 
 // User input params.
 INPUT string __MFI_Parameters__ = "-- Settings for the Money Flow Index indicator --"; // >>> MFI <<<
-INPUT ENUM_TRAIL_TYPE MFI_TrailingStopMethod = 12; // Trail stop method
+INPUT ENUM_TRAIL_TYPE MFI_TrailingStopMethod = 9; // Trail stop method
 INPUT ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = 21; // Trail profit method
-INPUT int MFI_Period_M1 = 22; // Period for M1
-INPUT int MFI_Period_M5 = 40; // Period for M5
-INPUT int MFI_Period_M15 = 32; // Period for M15
-INPUT int MFI_Period_M30 = 2; // Period for M30
-INPUT double MFI_SignalLevel = 2.6; // Signal level
+INPUT int MFI_Period_M1 = 30; // Period for M1
+INPUT int MFI_Period_M5 = 48; // Period for M5
+INPUT int MFI_Period_M15 = 30; // Period for M15
+INPUT int MFI_Period_M30 = 8; // Period for M30
+INPUT double MFI_SignalLevel = 3.1; // Signal level
 INPUT uint MFI_Shift = 0; // Shift (relative to the current bar, 0 - default)
 #ifndef __advanced__
-INPUT int MFI1_SignalMethod = -1; // Signal method for M1 (0-1)
+INPUT int MFI1_SignalMethod = 1; // Signal method for M1 (0-1)
 INPUT int MFI5_SignalMethod = 1; // Signal method for M5 (0-1)
 INPUT int MFI15_SignalMethod = 1; // Signal method for M15 (0-1)
-INPUT int MFI30_SignalMethod = -1; // Signal method for M30 (0-1)
+INPUT int MFI30_SignalMethod = 1; // Signal method for M30 (0-1)
 #else
 int MFI1_SignalMethod = 0; // Signal method for M1 (0-1)
 int MFI5_SignalMethod = 0; // Signal method for M5 (0-1)

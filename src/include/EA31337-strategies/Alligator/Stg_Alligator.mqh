@@ -15,18 +15,18 @@
 
 // User input params.
 INPUT string __Alligator_Parameters__ = "-- Settings for the Alligator indicator --"; // >>> ALLIGATOR <<<
-INPUT int Alligator_Period_Jaw = 10; // Jaw Period
+INPUT int Alligator_Period_Jaw = 18; // Jaw Period
 INPUT int Alligator_Period_Teeth = 8; // Teeth Period
-INPUT int Alligator_Period_Lips = 6; // Lips Period
-INPUT int Alligator_Shift_Jaw = 1; // Jaw Shift
-INPUT int Alligator_Shift_Teeth = 9; // Teeth Shift
-INPUT int Alligator_Shift_Lips = 1; // Lips Shift
+INPUT int Alligator_Period_Lips = 14; // Lips Period
+INPUT int Alligator_Shift_Jaw = 0; // Jaw Shift
+INPUT int Alligator_Shift_Teeth = 10; // Teeth Shift
+INPUT int Alligator_Shift_Lips = 0; // Lips Shift
 INPUT ENUM_MA_METHOD Alligator_MA_Method = 2; // MA Method
 INPUT ENUM_APPLIED_PRICE Alligator_Applied_Price = (ENUM_APPLIED_PRICE) 3; // Applied Price
 INPUT int Alligator_Shift = 0; // Shift
-INPUT ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = 17; // Trail stop method
-INPUT ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = 21; // Trail profit method
-INPUT double Alligator_SignalLevel = 0.6; // Signal level
+INPUT ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = 13; // Trail stop method
+INPUT ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = 10; // Trail profit method
+INPUT double Alligator_SignalLevel = 0.8; // Signal level
 #ifndef __advanced__
 INPUT int Alligator1_SignalMethod = 0; // Signal method for M1 (-63-63)
 INPUT int Alligator5_SignalMethod = 1; // Signal method for M5 (-63-63)

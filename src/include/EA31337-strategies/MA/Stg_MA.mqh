@@ -15,9 +15,9 @@
 
 // User input params.
 INPUT string __MA_Parameters__ = "-- Settings for the Moving Average indicator --"; // >>> MA <<<
-INPUT int MA_Period_Fast = 12; // Period Fast
-INPUT int MA_Period_Medium = 10; // Period Medium
-INPUT int MA_Period_Slow = 2; // Period Slow
+INPUT int MA_Period_Fast = 4; // Period Fast
+INPUT int MA_Period_Medium = 12; // Period Medium
+INPUT int MA_Period_Slow = 22; // Period Slow
 INPUT int MA_Shift = 13; // Shift
 INPUT int MA_Shift_Fast = 11; // Shift Fast (+1)
 INPUT int MA_Shift_Medium = 11; // Shift Medium (+1)

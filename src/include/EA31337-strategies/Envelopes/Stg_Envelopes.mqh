@@ -16,24 +16,24 @@
 // User input params.
 INPUT string __Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --"; // >>> ENVELOPES <<<
 INPUT int Envelopes_MA_Period_M1 = 2; // Period for M1
-INPUT int Envelopes_MA_Period_M5 = 12; // Period for M5
-INPUT int Envelopes_MA_Period_M15 = 2; // Period for M15
+INPUT int Envelopes_MA_Period_M5 = 28; // Period for M5
+INPUT int Envelopes_MA_Period_M15 = 12; // Period for M15
 INPUT int Envelopes_MA_Period_M30 = 2; // Period for M30
-INPUT double Envelopes_Deviation_M1 = 0.3; // Deviation for M1
-INPUT double Envelopes_Deviation_M5 = 0.2; // Deviation for M5
-INPUT double Envelopes_Deviation_M15 = 0.6; // Deviation for M15
-INPUT double Envelopes_Deviation_M30 = 0.6; // Deviation for M30
-INPUT ENUM_MA_METHOD Envelopes_MA_Method = 3; // MA Method
-INPUT int Envelopes_MA_Shift = 0; // MA Shift
+INPUT double Envelopes_Deviation_M1 = 0.2; // Deviation for M1
+INPUT double Envelopes_Deviation_M5 = 0.6; // Deviation for M5
+INPUT double Envelopes_Deviation_M15 = 0.4; // Deviation for M15
+INPUT double Envelopes_Deviation_M30 = 0.4; // Deviation for M30
+INPUT ENUM_MA_METHOD Envelopes_MA_Method = 2; // MA Method
+INPUT int Envelopes_MA_Shift = 7; // MA Shift
 INPUT ENUM_APPLIED_PRICE Envelopes_Applied_Price = (ENUM_APPLIED_PRICE) 2; // Applied Price
-INPUT int Envelopes_Shift = 5; // Shift
-INPUT ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = 2; // Trail stop method
-INPUT ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = -3; // Trail profit method
+INPUT int Envelopes_Shift = 0; // Shift
+INPUT ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = 25; // Trail stop method
+INPUT ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = -4; // Trail profit method
 /* @todo INPUT */ int Envelopes_SignalLevel = 0; // Signal level
 #ifndef __advanced__
 INPUT int Envelopes1_SignalMethod = -13; // Signal method for M1 (-127-127)
-INPUT int Envelopes5_SignalMethod = 34; // Signal method for M5 (-127-127)
-INPUT int Envelopes15_SignalMethod = -127; // Signal method for M15 (-127-127)
+INPUT int Envelopes5_SignalMethod = 69; // Signal method for M5 (-127-127)
+INPUT int Envelopes15_SignalMethod = -120; // Signal method for M15 (-127-127)
 INPUT int Envelopes30_SignalMethod = 36; // Signal method for M30 (-127-127)
 #else
 int Envelopes1_SignalMethod = 0; // Signal method for M1 (-127-127)

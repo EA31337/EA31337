@@ -23,7 +23,7 @@ INPUT ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = -14; // Trail profit metho
 INPUT int Fractals1_SignalMethod = 3; // Signal method for M1 (-3-3)
 INPUT int Fractals5_SignalMethod = 3; // Signal method for M5 (-3-3)
 INPUT int Fractals15_SignalMethod = 1; // Signal method for M15 (-3-3)
-INPUT int Fractals30_SignalMethod = 1; // Signal method for M30 (-3-3)
+INPUT int Fractals30_SignalMethod = 3; // Signal method for M30 (-3-3)
 #else
 int Fractals1_SignalMethod = 0; // Signal method for M1 (-3-3)
 int Fractals5_SignalMethod = 0; // Signal method for M5 (-3-3)
