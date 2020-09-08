@@ -3806,7 +3806,7 @@ int GetPeakStrategyValue(int _key2, double &_peak, bool lowest) {
   int _key1 = EMPTY;
   _peak = lowest ? DBL_MAX : -DBL_MAX;
   for (int i = 0; i < ArrayRange(stats, 0); i++) {
-    if (!((Strategy*) strats.GetById(i)).IsEnabled()) {
+    if (strats.GetById(i) == NULL || !((Strategy*) strats.GetById(i)).IsEnabled()) {
       continue;
     }
 
