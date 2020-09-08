@@ -15,17 +15,17 @@
 
 // User input params.
 INPUT string __Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --"; // >>> ENVELOPES <<<
-INPUT int Envelopes_MA_Period_M1 = 2; // Period for M1
-INPUT int Envelopes_MA_Period_M5 = 28; // Period for M5
-INPUT int Envelopes_MA_Period_M15 = 12; // Period for M15
-INPUT int Envelopes_MA_Period_M30 = 2; // Period for M30
-INPUT double Envelopes_Deviation_M1 = 0.2; // Deviation for M1
-INPUT double Envelopes_Deviation_M5 = 0.6; // Deviation for M5
-INPUT double Envelopes_Deviation_M15 = 0.4; // Deviation for M15
-INPUT double Envelopes_Deviation_M30 = 0.4; // Deviation for M30
+INPUT int Envelopes_MA_Period_M1 = 20; // Period for M1
+INPUT int Envelopes_MA_Period_M5 = 22; // Period for M5
+INPUT int Envelopes_MA_Period_M15 = 20; // Period for M15
+INPUT int Envelopes_MA_Period_M30 = 10; // Period for M30
+INPUT double Envelopes_Deviation_M1 = 0.5; // Deviation for M1
+INPUT double Envelopes_Deviation_M5 = 0.5; // Deviation for M5
+INPUT double Envelopes_Deviation_M15 = 0.5; // Deviation for M15
+INPUT double Envelopes_Deviation_M30 = 0.5; // Deviation for M30
 INPUT ENUM_MA_METHOD Envelopes_MA_Method = 2; // MA Method
 INPUT int Envelopes_MA_Shift = 7; // MA Shift
-INPUT ENUM_APPLIED_PRICE Envelopes_Applied_Price = (ENUM_APPLIED_PRICE) 2; // Applied Price
+INPUT ENUM_APPLIED_PRICE Envelopes_Applied_Price = (ENUM_APPLIED_PRICE) 3; // Applied Price
 INPUT int Envelopes_Shift = 0; // Shift
 INPUT ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = 25; // Trail stop method
 INPUT ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = -4; // Trail profit method

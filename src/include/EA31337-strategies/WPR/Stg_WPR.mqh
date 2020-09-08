@@ -15,12 +15,12 @@
 
 // User input params.
 INPUT string __WPR_Parameters__ = "-- Settings for the Larry Williams' Percent Range indicator --"; // >>> WPR <<<
-INPUT int WPR_Period_M1 = 10; // Period for M1
-INPUT int WPR_Period_M5 = 8; // Period for M5
+INPUT int WPR_Period_M1 = 2; // Period for M1
+INPUT int WPR_Period_M5 = 2; // Period for M5
 INPUT int WPR_Period_M15 = 2; // Period for M15
 INPUT int WPR_Period_M30 = 2; // Period for M30
-INPUT int WPR_Shift = 2; // Shift
-INPUT int WPR_SignalLevel = 20; // Signal level
+INPUT int WPR_Shift = 0; // Shift
+INPUT int WPR_SignalLevel = 0; // Signal level
 INPUT ENUM_TRAIL_TYPE WPR_TrailingStopMethod = 1; // Trail stop method
 INPUT ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = 9; // Trail profit method
 #ifndef __advanced__

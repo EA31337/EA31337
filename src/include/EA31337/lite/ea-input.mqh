@@ -53,11 +53,11 @@ extern double RiskRatio = 0; // Risk ratio (0 = auto, 1.0 = normal)
 extern int RiskRatioIncreaseMethod = 0; // Risk ratio increase method (0-255)
 extern int RiskRatioDecreaseMethod = 0; // Risk ratio decrease method (0-255)
 extern int InitNoOfDaysToWarmUp = 21; // Initial warm-up period (in days)
-extern double CloseOrderAfterXHours = 72; // Close order after X hours (>0 - all, <0 - only profitable 0 - off)
+extern double CloseOrderAfterXHours = 96; // Close order after X hours (>0 - all, <0 - only profitable 0 - off)
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Profit__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGY PARAMS <<<
-extern double ProfitFactorMinToTrade = 0.9; // Min. profit factor per strategy to trade
+extern double ProfitFactorMinToTrade = 1; // Min. profit factor per strategy to trade
 extern double ProfitFactorMaxToTrade = 0.0; // Max. profit factor per strategy to trade
 extern int InitNoOfOrdersToCalcPF = 20; // Initial number of orders to calculate profit factor
 
@@ -79,14 +79,14 @@ extern uint ConFactorOrdersLimit = 100; // No of orders to check on consequent w
 
 //+------------------------------------------------------------------+
 input static string __Strategy_Timeframes__ = "-- Strategy's timeframes --"; // >>> STRATEGY'S TIMEFRAMES (1-255: M1=1,M5=2,M15=4,M30=8,H1=16,H2=32,H4=64...) <<<
-extern unsigned int AC_Active_Tf = 1; // AC: Activate timeframes
-extern unsigned int AD_Active_Tf = 10; // AD: Activate timeframes
+extern unsigned int AC_Active_Tf = 0; // AC: Activate timeframes
+extern unsigned int AD_Active_Tf = 0; // AD: Activate timeframes
 extern unsigned int ADX_Active_Tf = 0; // ADX: Activate timeframes
 extern unsigned int ATR_Active_Tf = 0; // ATR: Activate timeframes
 extern unsigned int Alligator_Active_Tf = 0; // Alligator: Activate timeframes
 extern unsigned int Bands_Active_Tf = 10; // Bands: Activate timeframes
 extern unsigned int CCI_Active_Tf = 13; // CCI: Activate timeframes
-extern unsigned int DeMarker_Active_Tf = 1; // DeMarker: Activate timeframes
+extern unsigned int DeMarker_Active_Tf = 0; // DeMarker: Activate timeframes
 extern unsigned int Envelopes_Active_Tf = 10; // Envelopes: Activate timeframes
 extern unsigned int Force_Active_Tf = 0; // Force: Activate timeframes
 extern unsigned int Fractals_Active_Tf = 0; // Fractals: Activate timeframes
