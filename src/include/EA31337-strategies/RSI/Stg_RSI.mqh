@@ -37,17 +37,17 @@ int RSI30_SignalMethod = 0; // Signal method for M30 (-63-63)
 #endif
 #ifdef __advanced__
 INPUT int RSI1_OpenCondition1 = 1; // Open condition 1 for M1 (0-1023)
-INPUT int RSI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
-INPUT ENUM_MARKET_EVENT RSI1_CloseCondition = 1; // Close condition for M1
+INPUT int RSI1_OpenCondition2 = 777; // Open condition 2 for M1 (0-1023)
+INPUT ENUM_MARKET_EVENT RSI1_CloseCondition = 24; // Close condition for M1
 INPUT int RSI5_OpenCondition1 = 1; // Open condition 1 for M5 (0-1023)
-INPUT int RSI5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
-INPUT ENUM_MARKET_EVENT RSI5_CloseCondition = 31; // Close condition for M5
-INPUT int RSI15_OpenCondition1 = 389; // Open condition 1 for M15 (0-1023)
-INPUT int RSI15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
-INPUT ENUM_MARKET_EVENT RSI15_CloseCondition = 1; // Close condition for M15
-INPUT int RSI30_OpenCondition1 = 195; // Open condition 1 for M30 (0-1023)
-INPUT int RSI30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
-INPUT ENUM_MARKET_EVENT RSI30_CloseCondition = 1; // Close condition for M30
+INPUT int RSI5_OpenCondition2 = 1; // Open condition 2 for M5 (0-1023)
+INPUT ENUM_MARKET_EVENT RSI5_CloseCondition = 13; // Close condition for M5
+INPUT int RSI15_OpenCondition1 = 1; // Open condition 1 for M15 (0-1023)
+INPUT int RSI15_OpenCondition2 = 1; // Open condition 2 for M15 (0-1023)
+INPUT ENUM_MARKET_EVENT RSI15_CloseCondition = 11; // Close condition for M15
+INPUT int RSI30_OpenCondition1 = 1; // Open condition 1 for M30 (0-1023)
+INPUT int RSI30_OpenCondition2 = 1; // Open condition 2 for M30 (0-1023)
+INPUT ENUM_MARKET_EVENT RSI30_CloseCondition = 20; // Close condition for M30
 #else
 int RSI1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int RSI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)

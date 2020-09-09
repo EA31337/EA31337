@@ -39,18 +39,18 @@ int Alligator15_SignalMethod = 0; // Signal method for M15 (-63-63)
 int Alligator30_SignalMethod = 0; // Signal method for M30 (-63-63)
 #endif
 #ifdef __advanced__
-INPUT int Alligator1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
-INPUT int Alligator1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
-INPUT ENUM_MARKET_EVENT Alligator1_CloseCondition = 4; // Close condition for M1
-INPUT int Alligator5_OpenCondition1 = 777; // Open condition 1 for M5 (0-1023)
-INPUT int Alligator5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
-INPUT ENUM_MARKET_EVENT Alligator5_CloseCondition = 4; // Close condition for M5
-INPUT int Alligator15_OpenCondition1 = 98; // Open condition 1 for M15 (0-1023)
-INPUT int Alligator15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
-INPUT ENUM_MARKET_EVENT Alligator15_CloseCondition = 5; // Close condition for M15
-INPUT int Alligator30_OpenCondition1 = 1; // Open condition 1 for M30 (0-1023)
-INPUT int Alligator30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
-INPUT ENUM_MARKET_EVENT Alligator30_CloseCondition = 11; // Close condition for M30
+INPUT int Alligator1_OpenCondition1 = 583; // Open condition 1 for M1 (0-1023)
+INPUT int Alligator1_OpenCondition2 = 971; // Open condition 2 for M1 (0-1023)
+INPUT ENUM_MARKET_EVENT Alligator1_CloseCondition = 20; // Close condition for M1
+INPUT int Alligator5_OpenCondition1 = 486; // Open condition 1 for M5 (0-1023)
+INPUT int Alligator5_OpenCondition2 = 971; // Open condition 2 for M5 (0-1023)
+INPUT ENUM_MARKET_EVENT Alligator5_CloseCondition = 32; // Close condition for M5
+INPUT int Alligator15_OpenCondition1 = 971; // Open condition 1 for M15 (0-1023)
+INPUT int Alligator15_OpenCondition2 = 874; // Open condition 2 for M15 (0-1023)
+INPUT ENUM_MARKET_EVENT Alligator15_CloseCondition = 29; // Close condition for M15
+INPUT int Alligator30_OpenCondition1 = 971; // Open condition 1 for M30 (0-1023)
+INPUT int Alligator30_OpenCondition2 = 680; // Open condition 2 for M30 (0-1023)
+INPUT ENUM_MARKET_EVENT Alligator30_CloseCondition = 12; // Close condition for M30
 #else
 int Alligator1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int Alligator1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
