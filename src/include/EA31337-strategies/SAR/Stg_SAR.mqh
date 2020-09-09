@@ -22,10 +22,10 @@ INPUT ENUM_TRAIL_TYPE SAR_TrailingStopMethod = 6; // Trail stop method
 INPUT ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = 21; // Trail profit method
 INPUT double SAR_SignalLevel = 0; // Signal level
 #ifndef __advanced__
-INPUT int SAR1_SignalMethod = -87; // Signal method for M1 (-127-127)
-INPUT int SAR5_SignalMethod = 27; // Signal method for M5 (-127-127)
-INPUT int SAR15_SignalMethod = -103; // Signal method for M15 (-127-127)
-INPUT int SAR30_SignalMethod = -99; // Signal method for M30 (-127-127)
+INPUT int SAR1_SignalMethod = -95; // Signal method for M1 (-127-127)
+INPUT int SAR5_SignalMethod = 1; // Signal method for M5 (-127-127)
+INPUT int SAR15_SignalMethod = -97; // Signal method for M15 (-127-127)
+INPUT int SAR30_SignalMethod = -97; // Signal method for M30 (-127-127)
 #else
 int SAR1_SignalMethod = 0; // Signal method for M1 (-127-127)
 int SAR5_SignalMethod = 0; // Signal method for M5 (-127-127)

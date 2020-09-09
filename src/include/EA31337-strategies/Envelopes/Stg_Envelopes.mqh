@@ -15,24 +15,24 @@
 
 // User input params.
 INPUT string __Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --"; // >>> ENVELOPES <<<
-INPUT int Envelopes_MA_Period_M1 = 20; // Period for M1
-INPUT int Envelopes_MA_Period_M5 = 22; // Period for M5
-INPUT int Envelopes_MA_Period_M15 = 20; // Period for M15
+INPUT int Envelopes_MA_Period_M1 = 4; // Period for M1
+INPUT int Envelopes_MA_Period_M5 = 16; // Period for M5
+INPUT int Envelopes_MA_Period_M15 = 36; // Period for M15
 INPUT int Envelopes_MA_Period_M30 = 10; // Period for M30
-INPUT double Envelopes_Deviation_M1 = 0.5; // Deviation for M1
+INPUT double Envelopes_Deviation_M1 = 0.6; // Deviation for M1
 INPUT double Envelopes_Deviation_M5 = 0.5; // Deviation for M5
-INPUT double Envelopes_Deviation_M15 = 0.5; // Deviation for M15
-INPUT double Envelopes_Deviation_M30 = 0.5; // Deviation for M30
+INPUT double Envelopes_Deviation_M15 = 0.6; // Deviation for M15
+INPUT double Envelopes_Deviation_M30 = 0.6; // Deviation for M30
 INPUT ENUM_MA_METHOD Envelopes_MA_Method = 2; // MA Method
 INPUT int Envelopes_MA_Shift = 7; // MA Shift
 INPUT ENUM_APPLIED_PRICE Envelopes_Applied_Price = (ENUM_APPLIED_PRICE) 3; // Applied Price
 INPUT int Envelopes_Shift = 0; // Shift
-INPUT ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = 25; // Trail stop method
-INPUT ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = -4; // Trail profit method
+INPUT ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = 2; // Trail stop method
+INPUT ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = -11; // Trail profit method
 /* @todo INPUT */ int Envelopes_SignalLevel = 0; // Signal level
 #ifndef __advanced__
 INPUT int Envelopes1_SignalMethod = -13; // Signal method for M1 (-127-127)
-INPUT int Envelopes5_SignalMethod = 69; // Signal method for M5 (-127-127)
+INPUT int Envelopes5_SignalMethod = 34; // Signal method for M5 (-127-127)
 INPUT int Envelopes15_SignalMethod = -120; // Signal method for M15 (-127-127)
 INPUT int Envelopes30_SignalMethod = 36; // Signal method for M30 (-127-127)
 #else

@@ -17,18 +17,18 @@
 INPUT string __CCI_Parameters__ = "-- Settings for the Commodity Channel Index indicator --"; // >>> CCI <<<
 INPUT int CCI_Shift = 0; // Shift (0 for default)
 INPUT ENUM_TRAIL_TYPE CCI_TrailingStopMethod = 1; // Trail stop method
-INPUT ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = -25; // Trail profit method
+INPUT ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = 25; // Trail profit method
 INPUT int CCI_Period_M1 = 3; // Period for M1
-INPUT int CCI_Period_M5 = 24; // Period for M5
-INPUT int CCI_Period_M15 = 15; // Period for M15
+INPUT int CCI_Period_M5 = 32; // Period for M5
+INPUT int CCI_Period_M15 = 13; // Period for M15
 INPUT int CCI_Period_M30 = 18; // Period for M30
 INPUT ENUM_APPLIED_PRICE CCI_Applied_Price = (ENUM_APPLIED_PRICE) 6; // Applied Price
-INPUT double CCI_SignalLevel = 111; // Signal level (100 by default)
+INPUT double CCI_SignalLevel = 113; // Signal level (100 by default)
 #ifndef __advanced__
 INPUT int CCI1_SignalMethod = -63; // Signal method for M1 (0-63)
 INPUT int CCI5_SignalMethod = -24; // Signal method for M5 (0-63)
-INPUT int CCI15_SignalMethod = -51; // Signal method for M15 (0-63)
-INPUT int CCI30_SignalMethod = -45; // Signal method for M30 (0-63)
+INPUT int CCI15_SignalMethod = -45; // Signal method for M15 (0-63)
+INPUT int CCI30_SignalMethod = -48; // Signal method for M30 (0-63)
 #else
 int CCI1_SignalMethod = 0; // Signal method for M1 (0-63)
 int CCI5_SignalMethod = 0; // Signal method for M5 (0-63)

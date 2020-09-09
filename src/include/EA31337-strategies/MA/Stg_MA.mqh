@@ -15,23 +15,23 @@
 
 // User input params.
 INPUT string __MA_Parameters__ = "-- Settings for the Moving Average indicator --"; // >>> MA <<<
-INPUT int MA_Period_Fast = 4; // Period Fast
-INPUT int MA_Period_Medium = 12; // Period Medium
-INPUT int MA_Period_Slow = 22; // Period Slow
-INPUT int MA_Shift = 13; // Shift
-INPUT int MA_Shift_Fast = 11; // Shift Fast (+1)
-INPUT int MA_Shift_Medium = 11; // Shift Medium (+1)
-INPUT int MA_Shift_Slow = 6; // Shift Slow (+1)
+INPUT int MA_Period_Fast = 2; // Period Fast
+INPUT int MA_Period_Medium = 10; // Period Medium
+INPUT int MA_Period_Slow = 20; // Period Slow
+INPUT int MA_Shift = 11; // Shift
+INPUT int MA_Shift_Fast = 9; // Shift Fast (+1)
+INPUT int MA_Shift_Medium = 9; // Shift Medium (+1)
+INPUT int MA_Shift_Slow = 4; // Shift Slow (+1)
 INPUT ENUM_MA_METHOD MA_Method = 1; // MA Method
-INPUT ENUM_APPLIED_PRICE MA_Applied_Price = (ENUM_APPLIED_PRICE) 1; // Applied Price
-INPUT ENUM_TRAIL_TYPE MA_TrailingStopMethod = 23; // Trail stop method
-INPUT ENUM_TRAIL_TYPE MA_TrailingProfitMethod = 24; // Trail profit method
-INPUT double MA_SignalLevel = -0.9; // Signal level
+INPUT ENUM_APPLIED_PRICE MA_Applied_Price = (ENUM_APPLIED_PRICE) 0; // Applied Price
+INPUT ENUM_TRAIL_TYPE MA_TrailingStopMethod = 1; // Trail stop method
+INPUT ENUM_TRAIL_TYPE MA_TrailingProfitMethod = 1; // Trail profit method
+INPUT double MA_SignalLevel = -1.1; // Signal level
 #ifndef __advanced__
 INPUT int MA1_SignalMethod = -7; // Signal method for M1 (-127-127)
-INPUT int MA5_SignalMethod = 84; // Signal method for M5 (-127-127)
-INPUT int MA15_SignalMethod = 72; // Signal method for M15 (-127-127)
-INPUT int MA30_SignalMethod = -113; // Signal method for M30 (-127-127)
+INPUT int MA5_SignalMethod = 49; // Signal method for M5 (-127-127)
+INPUT int MA15_SignalMethod = 37; // Signal method for M15 (-127-127)
+INPUT int MA30_SignalMethod = -127; // Signal method for M30 (-127-127)
 #else
 int MA1_SignalMethod = 0; // Signal method for M1 (-127-127)
 int MA5_SignalMethod = 0; // Signal method for M5 (-127-127)

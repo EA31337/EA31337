@@ -16,8 +16,8 @@
 // User input params.
 INPUT string __Fractals_Parameters__ = "-- Settings for the Fractals indicator --"; // >>> FRACTALS <<<
 INPUT int Fractals_Shift = 0; // Shift
-INPUT ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = 1; // Trail stop method
-INPUT ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = 15; // Trail profit method
+INPUT ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = 8; // Trail stop method
+INPUT ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = -25; // Trail profit method
 /* @todo INPUT */ int Fractals_SignalLevel = 0; // Signal level
 #ifndef __advanced__
 INPUT int Fractals1_SignalMethod = 3; // Signal method for M1 (-3-3)

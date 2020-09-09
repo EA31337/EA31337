@@ -16,7 +16,7 @@
 // User input params.
 INPUT string __AD_Parameters__ = "-- Settings for the Accumulation/Distribution indicator --"; // >>> AD <<<
 INPUT ENUM_TRAIL_TYPE AD_TrailingStopMethod = 8; // Trail stop method
-INPUT ENUM_TRAIL_TYPE AD_TrailingProfitMethod = 24; // Trail profit method
+INPUT ENUM_TRAIL_TYPE AD_TrailingProfitMethod = -25; // Trail profit method
 INPUT double AD_SignalLevel = 0.00000000; // Signal level
 INPUT uint AD_Shift = 0; // Shift (relative to the current bar, 0 - default)
 #ifndef __advanced__
