@@ -37,16 +37,16 @@ int MFI30_SignalMethod = 0; // Signal method for M30 (0-1)
 #ifdef __advanced__
 INPUT int MFI1_OpenCondition1 = 874; // Open condition 1 for M1 (0-1023)
 INPUT int MFI1_OpenCondition2 = 971; // Open condition 2 for M1 (0-)
-INPUT ENUM_MARKET_EVENT MFI1_CloseCondition = 20; // Close condition for M1
-INPUT int MFI5_OpenCondition1 = 1; // Open condition 1 for M5 (0-1023)
-INPUT int MFI5_OpenCondition2 = 680; // Open condition 2 for M5 (0-)
-INPUT ENUM_MARKET_EVENT MFI5_CloseCondition = 11; // Close condition for M5
-INPUT int MFI15_OpenCondition1 = 292; // Open condition 1 for M15 (0-)
+INPUT ENUM_MARKET_EVENT MFI1_CloseCondition = 18; // Close condition for M1
+INPUT int MFI5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
+INPUT int MFI5_OpenCondition2 = 971; // Open condition 2 for M5 (0-)
+INPUT ENUM_MARKET_EVENT MFI5_CloseCondition = 24; // Close condition for M5
+INPUT int MFI15_OpenCondition1 = 1; // Open condition 1 for M15 (0-)
 INPUT int MFI15_OpenCondition2 = 1; // Open condition 2 for M15 (0-)
 INPUT ENUM_MARKET_EVENT MFI15_CloseCondition = 1; // Close condition for M15
-INPUT int MFI30_OpenCondition1 = 777; // Open condition 1 for M30 (0-)
-INPUT int MFI30_OpenCondition2 = 1; // Open condition 2 for M30 (0-)
-INPUT ENUM_MARKET_EVENT MFI30_CloseCondition = 12; // Close condition for M30
+INPUT int MFI30_OpenCondition1 = 971; // Open condition 1 for M30 (0-)
+INPUT int MFI30_OpenCondition2 = 971; // Open condition 2 for M30 (0-)
+INPUT ENUM_MARKET_EVENT MFI30_CloseCondition = 14; // Close condition for M30
 #else
 int MFI1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int MFI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)

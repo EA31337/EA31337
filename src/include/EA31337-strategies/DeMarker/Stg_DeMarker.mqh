@@ -35,18 +35,18 @@ int DeMarker15_SignalMethod = 0; // Signal method for M15 (-31-31)
 int DeMarker30_SignalMethod = 0; // Signal method for M30 (-31-31)
 #endif
 #ifdef __advanced__
-INPUT int DeMarker1_OpenCondition1 = 98; // Open condition 1 for M1 (0-1023)
+INPUT int DeMarker1_OpenCondition1 = 583; // Open condition 1 for M1 (0-1023)
 INPUT int DeMarker1_OpenCondition2 = 98; // Open condition 2 for M1 (0-1023)
-INPUT ENUM_MARKET_EVENT DeMarker1_CloseCondition = 4; // Close condition for M1
-INPUT int DeMarker5_OpenCondition1 = 98; // Open condition 1 for M5 (0-1023)
-INPUT int DeMarker5_OpenCondition2 = 971; // Open condition 2 for M5 (0-1023)
-INPUT ENUM_MARKET_EVENT DeMarker5_CloseCondition = 11; // Close condition for M5
-INPUT int DeMarker15_OpenCondition1 = 583; // Open condition 1 for M15 (0-1023)
-INPUT int DeMarker15_OpenCondition2 = 971; // Open condition 2 for M15 (0-1023)
-INPUT ENUM_MARKET_EVENT DeMarker15_CloseCondition = 11; // Close condition for M15
-INPUT int DeMarker30_OpenCondition1 = 583; // Open condition 1 for M30 (0-1023)
-INPUT int DeMarker30_OpenCondition2 = 971; // Open condition 2 for M30 (0-1023)
-INPUT ENUM_MARKET_EVENT DeMarker30_CloseCondition = 29; // Close condition for M30
+INPUT ENUM_MARKET_EVENT DeMarker1_CloseCondition = 14; // Close condition for M1
+INPUT int DeMarker5_OpenCondition1 = 292; // Open condition 1 for M5 (0-1023)
+INPUT int DeMarker5_OpenCondition2 = 98; // Open condition 2 for M5 (0-1023)
+INPUT ENUM_MARKET_EVENT DeMarker5_CloseCondition = 4; // Close condition for M5
+INPUT int DeMarker15_OpenCondition1 = 98; // Open condition 1 for M15 (0-1023)
+INPUT int DeMarker15_OpenCondition2 = 389; // Open condition 2 for M15 (0-1023)
+INPUT ENUM_MARKET_EVENT DeMarker15_CloseCondition = 24; // Close condition for M15
+INPUT int DeMarker30_OpenCondition1 = 486; // Open condition 1 for M30 (0-1023)
+INPUT int DeMarker30_OpenCondition2 = 98; // Open condition 2 for M30 (0-1023)
+INPUT ENUM_MARKET_EVENT DeMarker30_CloseCondition = 12; // Close condition for M30
 #else
 int DeMarker1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int DeMarker1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)

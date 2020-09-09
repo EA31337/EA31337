@@ -41,10 +41,10 @@ int Alligator30_SignalMethod = 0; // Signal method for M30 (-63-63)
 #ifdef __advanced__
 INPUT int Alligator1_OpenCondition1 = 583; // Open condition 1 for M1 (0-1023)
 INPUT int Alligator1_OpenCondition2 = 971; // Open condition 2 for M1 (0-1023)
-INPUT ENUM_MARKET_EVENT Alligator1_CloseCondition = 20; // Close condition for M1
+INPUT ENUM_MARKET_EVENT Alligator1_CloseCondition = 26; // Close condition for M1
 INPUT int Alligator5_OpenCondition1 = 486; // Open condition 1 for M5 (0-1023)
 INPUT int Alligator5_OpenCondition2 = 971; // Open condition 2 for M5 (0-1023)
-INPUT ENUM_MARKET_EVENT Alligator5_CloseCondition = 32; // Close condition for M5
+INPUT ENUM_MARKET_EVENT Alligator5_CloseCondition = 4; // Close condition for M5
 INPUT int Alligator15_OpenCondition1 = 971; // Open condition 1 for M15 (0-1023)
 INPUT int Alligator15_OpenCondition2 = 874; // Open condition 2 for M15 (0-1023)
 INPUT ENUM_MARKET_EVENT Alligator15_CloseCondition = 29; // Close condition for M15

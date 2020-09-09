@@ -69,32 +69,32 @@ extern int InitNoOfOrdersToCalcPF = 20; // Initial number of orders to calculate
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameters (set 1.0 for default) --"; // >>> BOOSTING <<<
-extern bool Boosting_Enabled = 1; // Enable boosting
-extern double BoostTrendFactor = 0.9; // Boost by trend factor
+extern bool Boosting_Enabled = 0; // Enable boosting
+extern double BoostTrendFactor = 0.3; // Boost by trend factor
 extern bool StrategyBoostByPF = 1.1; // Boost strategy by its profit factor
 extern bool StrategyHandicapByPF = 0; // Handicap by its low profit factor
-extern double BestDailyStrategyMultiplierFactor = 1.0; // Multiplier for the best daily strategy
-extern double BestWeeklyStrategyMultiplierFactor = 1.0; // Multiplier for the best weekly strategy
-extern double BestMonthlyStrategyMultiplierFactor = 1.0; // Multiplier for the best monthly strategy
-extern double WorseDailyStrategyMultiplierFactor = 1.0; // Multiplier for the worse daily strategy
-extern double WorseWeeklyStrategyMultiplierFactor = 1.0; // Multiplier for the worse weekly strategy
-extern double WorseMonthlyStrategyMultiplierFactor = 1.0; // Multiplier for the worse monthly strategy
-extern double ConWinsIncreaseFactor = 0.4; // Increase lot factor on consequent wins (in %, 0 - off)
-extern double ConLossesIncreaseFactor = 0.7; // Increase lot factor on consequent loses (in %, 0 - off)
-extern uint ConFactorOrdersLimit = 600; // No of orders to check on consequent wins/loses
+extern double BestDailyStrategyMultiplierFactor = 0.3; // Multiplier for the best daily strategy
+extern double BestWeeklyStrategyMultiplierFactor = 0.5; // Multiplier for the best weekly strategy
+extern double BestMonthlyStrategyMultiplierFactor = 0.5; // Multiplier for the best monthly strategy
+extern double WorseDailyStrategyMultiplierFactor = 0; // Multiplier for the worse daily strategy
+extern double WorseWeeklyStrategyMultiplierFactor = 0; // Multiplier for the worse weekly strategy
+extern double WorseMonthlyStrategyMultiplierFactor = 0.5; // Multiplier for the worse monthly strategy
+extern double ConWinsIncreaseFactor = -1; // Increase lot factor on consequent wins (in %, 0 - off)
+extern double ConLossesIncreaseFactor = -0.7; // Increase lot factor on consequent loses (in %, 0 - off)
+extern uint ConFactorOrdersLimit = 0; // No of orders to check on consequent wins/loses
 
 //+------------------------------------------------------------------+
 input static string __Strategy_Timeframes__ = "-- Strategy's timeframes --"; // >>> STRATEGY'S TIMEFRAMES (1-255: M1=1,M5=2,M15=4,M30=8,H1=16,H2=32,H4=64...) <<<
 extern unsigned int AC_Active_Tf = 8; // AC: Activate timeframes
-extern unsigned int AD_Active_Tf = 0; // AD: Activate timeframes
+extern unsigned int AD_Active_Tf = 8; // AD: Activate timeframes
 extern unsigned int ADX_Active_Tf = 0; // ADX: Activate timeframes
 extern unsigned int Alligator_Active_Tf = 4; // Alligator: Activate timeframes
-extern unsigned int Bands_Active_Tf = 3; // Bands: Activate timeframes
+extern unsigned int Bands_Active_Tf = 8; // Bands: Activate timeframes
 extern unsigned int CCI_Active_Tf = 12; // CCI: Activate timeframes
 extern unsigned int DeMarker_Active_Tf = 8; // DeMarker: Activate timeframes
 extern unsigned int Envelopes_Active_Tf = 3; // Envelopes: Activate timeframes
 extern unsigned int Force_Active_Tf = 4; // Force: Activate timeframes
-extern unsigned int Fractals_Active_Tf = 0; // Fractals: Activate timeframes
+extern unsigned int Fractals_Active_Tf = 8; // Fractals: Activate timeframes
 extern unsigned int MACD_Active_Tf = 0; // MACD: Activate timeframes
 extern unsigned int MA_Active_Tf = 0; // MA: Activate timeframes
 extern unsigned int MFI_Active_Tf = 5; // MFI: Activate timeframes
