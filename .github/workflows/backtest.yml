@@ -11,8 +11,6 @@ on:
       - '**.mq?'
       - '.github/workflows/backtest.yml'
       - 'src/include/**'
-    tags:
-      - v[12].*
   release:
     types:
       - published
