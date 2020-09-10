@@ -16,12 +16,12 @@
 // User input params.
 INPUT string __MFI_Parameters__ = "-- Settings for the Money Flow Index indicator --"; // >>> MFI <<<
 INPUT ENUM_TRAIL_TYPE MFI_TrailingStopMethod = 9; // Trail stop method
-INPUT ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = 16; // Trail profit method
-INPUT int MFI_Period_M1 = 46; // Period for M1
-INPUT int MFI_Period_M5 = 62; // Period for M5
+INPUT ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = 15; // Trail profit method
+INPUT int MFI_Period_M1 = 50; // Period for M1
+INPUT int MFI_Period_M5 = 54; // Period for M5
 INPUT int MFI_Period_M15 = 24; // Period for M15
-INPUT int MFI_Period_M30 = 16; // Period for M30
-INPUT double MFI_SignalLevel = 4; // Signal level
+INPUT int MFI_Period_M30 = 12; // Period for M30
+INPUT double MFI_SignalLevel = 4.5; // Signal level
 INPUT uint MFI_Shift = 0; // Shift (relative to the current bar, 0 - default)
 #ifndef __advanced__
 INPUT int MFI1_SignalMethod = 1; // Signal method for M1 (0-1)
@@ -37,16 +37,16 @@ int MFI30_SignalMethod = 0; // Signal method for M30 (0-1)
 #ifdef __advanced__
 INPUT int MFI1_OpenCondition1 = 874; // Open condition 1 for M1 (0-1023)
 INPUT int MFI1_OpenCondition2 = 971; // Open condition 2 for M1 (0-)
-INPUT ENUM_MARKET_EVENT MFI1_CloseCondition = 18; // Close condition for M1
+INPUT ENUM_MARKET_EVENT MFI1_CloseCondition = 29; // Close condition for M1
 INPUT int MFI5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
 INPUT int MFI5_OpenCondition2 = 971; // Open condition 2 for M5 (0-)
-INPUT ENUM_MARKET_EVENT MFI5_CloseCondition = 24; // Close condition for M5
+INPUT ENUM_MARKET_EVENT MFI5_CloseCondition = 1; // Close condition for M5
 INPUT int MFI15_OpenCondition1 = 1; // Open condition 1 for M15 (0-)
 INPUT int MFI15_OpenCondition2 = 1; // Open condition 2 for M15 (0-)
 INPUT ENUM_MARKET_EVENT MFI15_CloseCondition = 1; // Close condition for M15
 INPUT int MFI30_OpenCondition1 = 971; // Open condition 1 for M30 (0-)
 INPUT int MFI30_OpenCondition2 = 971; // Open condition 2 for M30 (0-)
-INPUT ENUM_MARKET_EVENT MFI30_CloseCondition = 14; // Close condition for M30
+INPUT ENUM_MARKET_EVENT MFI30_CloseCondition = 11; // Close condition for M30
 #else
 int MFI1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int MFI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)

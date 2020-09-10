@@ -16,19 +16,19 @@
 // User input params.
 INPUT string __RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --"; // >>> RSI <<<
 INPUT int RSI_Period_M1 = 14; // Period for M1
-INPUT int RSI_Period_M5 = 6; // Period for M5
-INPUT int RSI_Period_M15 = 4; // Period for M15
+INPUT int RSI_Period_M5 = 8; // Period for M5
+INPUT int RSI_Period_M15 = 6; // Period for M15
 INPUT int RSI_Period_M30 = 4; // Period for M30
-INPUT ENUM_APPLIED_PRICE RSI_Applied_Price = (ENUM_APPLIED_PRICE) 4; // Applied Price
+INPUT ENUM_APPLIED_PRICE RSI_Applied_Price = (ENUM_APPLIED_PRICE) 1; // Applied Price
 INPUT uint RSI_Shift = 0; // Shift
-INPUT ENUM_TRAIL_TYPE RSI_TrailingStopMethod = 6; // Trail stop method
-INPUT ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = 19; // Trail profit method
-INPUT int RSI_SignalLevel = 40; // Signal level (-49-49)
+INPUT ENUM_TRAIL_TYPE RSI_TrailingStopMethod = 9; // Trail stop method
+INPUT ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = -21; // Trail profit method
+INPUT int RSI_SignalLevel = 42; // Signal level (-49-49)
 #ifndef __advanced__
-INPUT int RSI1_SignalMethod = -39; // Signal method for M1 (-63-63)
-INPUT int RSI5_SignalMethod = -27; // Signal method for M5 (-63-63)
-INPUT int RSI15_SignalMethod = -24; // Signal method for M15 (-63-63)
-INPUT int RSI30_SignalMethod = -51; // Signal method for M30 (-63-63)
+INPUT int RSI1_SignalMethod = -48; // Signal method for M1 (-63-63)
+INPUT int RSI5_SignalMethod = -24; // Signal method for M5 (-63-63)
+INPUT int RSI15_SignalMethod = -30; // Signal method for M15 (-63-63)
+INPUT int RSI30_SignalMethod = -63; // Signal method for M30 (-63-63)
 #else
 int RSI1_SignalMethod = 0; // Signal method for M1 (-63-63)
 int RSI5_SignalMethod = 0; // Signal method for M5 (-63-63)
@@ -38,16 +38,16 @@ int RSI30_SignalMethod = 0; // Signal method for M30 (-63-63)
 #ifdef __advanced__
 INPUT int RSI1_OpenCondition1 = 98; // Open condition 1 for M1 (0-1023)
 INPUT int RSI1_OpenCondition2 = 292; // Open condition 2 for M1 (0-1023)
-INPUT ENUM_MARKET_EVENT RSI1_CloseCondition = 11; // Close condition for M1
-INPUT int RSI5_OpenCondition1 = 1; // Open condition 1 for M5 (0-1023)
+INPUT ENUM_MARKET_EVENT RSI1_CloseCondition = 12; // Close condition for M1
+INPUT int RSI5_OpenCondition1 = 583; // Open condition 1 for M5 (0-1023)
 INPUT int RSI5_OpenCondition2 = 195; // Open condition 2 for M5 (0-1023)
-INPUT ENUM_MARKET_EVENT RSI5_CloseCondition = 12; // Close condition for M5
+INPUT ENUM_MARKET_EVENT RSI5_CloseCondition = 11; // Close condition for M5
 INPUT int RSI15_OpenCondition1 = 874; // Open condition 1 for M15 (0-1023)
 INPUT int RSI15_OpenCondition2 = 292; // Open condition 2 for M15 (0-1023)
-INPUT ENUM_MARKET_EVENT RSI15_CloseCondition = 12; // Close condition for M15
-INPUT int RSI30_OpenCondition1 = 1; // Open condition 1 for M30 (0-1023)
-INPUT int RSI30_OpenCondition2 = 1; // Open condition 2 for M30 (0-1023)
-INPUT ENUM_MARKET_EVENT RSI30_CloseCondition = 14; // Close condition for M30
+INPUT ENUM_MARKET_EVENT RSI15_CloseCondition = 18; // Close condition for M15
+INPUT int RSI30_OpenCondition1 = 292; // Open condition 1 for M30 (0-1023)
+INPUT int RSI30_OpenCondition2 = 195; // Open condition 2 for M30 (0-1023)
+INPUT ENUM_MARKET_EVENT RSI30_CloseCondition = 11; // Close condition for M30
 #else
 int RSI1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int RSI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)

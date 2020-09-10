@@ -20,8 +20,8 @@ INPUT int WPR_Period_M5 = 2; // Period for M5
 INPUT int WPR_Period_M15 = 2; // Period for M15
 INPUT int WPR_Period_M30 = 2; // Period for M30
 INPUT int WPR_Shift = 0; // Shift
-INPUT int WPR_SignalLevel = -20; // Signal level
-INPUT ENUM_TRAIL_TYPE WPR_TrailingStopMethod = 1; // Trail stop method
+INPUT int WPR_SignalLevel = -40; // Signal level
+INPUT ENUM_TRAIL_TYPE WPR_TrailingStopMethod = 9; // Trail stop method
 INPUT ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = 9; // Trail profit method
 #ifndef __advanced__
 INPUT int WPR1_SignalMethod = -32; // Signal method for M1 (-63-63)
@@ -36,16 +36,16 @@ int WPR30_SignalMethod = 0; // Signal method for M30 (-63-63)
 #endif
 #ifdef __advanced__
 INPUT int WPR1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
-INPUT int WPR1_OpenCondition2 = 98; // Open condition 2 for M1 (0-1023)
-INPUT ENUM_MARKET_EVENT WPR1_CloseCondition = 1; // Close condition for M1
+INPUT int WPR1_OpenCondition2 = 486; // Open condition 2 for M1 (0-1023)
+INPUT ENUM_MARKET_EVENT WPR1_CloseCondition = 12; // Close condition for M1
 INPUT int WPR5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
-INPUT int WPR5_OpenCondition2 = 98; // Open condition 2 for M5 (0-1023)
-INPUT ENUM_MARKET_EVENT WPR5_CloseCondition = 13; // Close condition for M5
-INPUT int WPR15_OpenCondition1 = 583; // Open condition 1 for M15 (0-1023)
-INPUT int WPR15_OpenCondition2 = 98; // Open condition 2 for M15 (0-1023)
-INPUT ENUM_MARKET_EVENT WPR15_CloseCondition = 4; // Close condition for M15
+INPUT int WPR5_OpenCondition2 = 971; // Open condition 2 for M5 (0-1023)
+INPUT ENUM_MARKET_EVENT WPR5_CloseCondition = 4; // Close condition for M5
+INPUT int WPR15_OpenCondition1 = 195; // Open condition 1 for M15 (0-1023)
+INPUT int WPR15_OpenCondition2 = 971; // Open condition 2 for M15 (0-1023)
+INPUT ENUM_MARKET_EVENT WPR15_CloseCondition = 3; // Close condition for M15
 INPUT int WPR30_OpenCondition1 = 680; // Open condition 1 for M30 (0-1023)
-INPUT int WPR30_OpenCondition2 = 971; // Open condition 2 for M30 (0-1023)
+INPUT int WPR30_OpenCondition2 = 195; // Open condition 2 for M30 (0-1023)
 INPUT ENUM_MARKET_EVENT WPR30_CloseCondition = 1; // Close condition for M30
 #else
 int WPR1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)

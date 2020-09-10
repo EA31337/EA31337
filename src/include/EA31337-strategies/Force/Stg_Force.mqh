@@ -15,16 +15,16 @@
 
 // User input params.
 INPUT string __Force_Parameters__ = "-- Settings for the Force Index indicator --"; // >>> FORCE <<<
-INPUT ENUM_TRAIL_TYPE Force_TrailingStopMethod = 5; // Trail stop method
-INPUT ENUM_TRAIL_TYPE Force_TrailingProfitMethod = -6; // Trail profit method
+INPUT ENUM_TRAIL_TYPE Force_TrailingStopMethod = 16; // Trail stop method
+INPUT ENUM_TRAIL_TYPE Force_TrailingProfitMethod = -5; // Trail profit method
 INPUT int Force_Period_M1 = 2; // Period for M1
-INPUT int Force_Period_M5 = 28; // Period for M5
-INPUT int Force_Period_M15 = 24; // Period for M15
-INPUT int Force_Period_M30 = 24; // Period for M30
-INPUT ENUM_MA_METHOD Force_MA_Method = 2; // MA Method
+INPUT int Force_Period_M5 = 20; // Period for M5
+INPUT int Force_Period_M15 = 32; // Period for M15
+INPUT int Force_Period_M30 = 18; // Period for M30
+INPUT ENUM_MA_METHOD Force_MA_Method = 3; // MA Method
 INPUT ENUM_APPLIED_PRICE Force_Applied_Price = (ENUM_APPLIED_PRICE) 2; // Applied Price
 INPUT double Force_SignalLevel = 1.3; // Signal level
-INPUT uint Force_Shift = 1; // Shift (relative to the current bar, 0 - default)
+INPUT uint Force_Shift = 0; // Shift (relative to the current bar, 0 - default)
 #ifndef __advanced__
 INPUT int Force1_SignalMethod = 0; // Signal method for M1 (0-
 INPUT int Force5_SignalMethod = 0; // Signal method for M5 (0-
@@ -46,9 +46,9 @@ INPUT ENUM_MARKET_EVENT Force5_CloseCondition = 1; // Close condition for M5
 INPUT int Force15_OpenCondition1 = 1; // Open condition 1 for M15 (0-)
 INPUT int Force15_OpenCondition2 = 1; // Open condition 2 for M15 (0-)
 INPUT ENUM_MARKET_EVENT Force15_CloseCondition = 1; // Close condition for M15
-INPUT int Force30_OpenCondition1 = 98; // Open condition 1 for M30 (0-)
+INPUT int Force30_OpenCondition1 = 680; // Open condition 1 for M30 (0-)
 INPUT int Force30_OpenCondition2 = 777; // Open condition 2 for M30 (0-)
-INPUT ENUM_MARKET_EVENT Force30_CloseCondition = 3; // Close condition for M30
+INPUT ENUM_MARKET_EVENT Force30_CloseCondition = 1; // Close condition for M30
 #else
 int Force1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int Force1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)

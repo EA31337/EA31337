@@ -15,8 +15,8 @@
 
 // User input params.
 INPUT string __AD_Parameters__ = "-- Settings for the Accumulation/Distribution indicator --"; // >>> AD <<<
-INPUT ENUM_TRAIL_TYPE AD_TrailingStopMethod = 8; // Trail stop method
-INPUT ENUM_TRAIL_TYPE AD_TrailingProfitMethod = -25; // Trail profit method
+INPUT ENUM_TRAIL_TYPE AD_TrailingStopMethod = 2; // Trail stop method
+INPUT ENUM_TRAIL_TYPE AD_TrailingProfitMethod = 3; // Trail profit method
 INPUT double AD_SignalLevel = 0.00000000; // Signal level
 INPUT uint AD_Shift = 0; // Shift (relative to the current bar, 0 - default)
 #ifndef __advanced__
@@ -33,16 +33,16 @@ int AD30_SignalMethod = 0; // Signal method for M30 (0-?)
 #ifdef __advanced__
 INPUT int AD1_OpenCondition1 = 807; // Open condition 1 for M1 (0-1023)
 INPUT int AD1_OpenCondition2 = 187; // Open condition 2 for M1 (0-)
-INPUT ENUM_MARKET_EVENT AD1_CloseCondition = 15; // Close condition for M1
-INPUT int AD5_OpenCondition1 = 993; // Open condition 1 for M5 (0-1023)
+INPUT ENUM_MARKET_EVENT AD1_CloseCondition = 3; // Close condition for M1
+INPUT int AD5_OpenCondition1 = 497; // Open condition 1 for M5 (0-1023)
 INPUT int AD5_OpenCondition2 = 187; // Open condition 2 for M5 (0-)
-INPUT ENUM_MARKET_EVENT AD5_CloseCondition = 24; // Close condition for M5
+INPUT ENUM_MARKET_EVENT AD5_CloseCondition = 13; // Close condition for M5
 INPUT int AD15_OpenCondition1 = 1; // Open condition 1 for M15 (0-)
 INPUT int AD15_OpenCondition2 = 1; // Open condition 2 for M15 (0-)
 INPUT ENUM_MARKET_EVENT AD15_CloseCondition = 1; // Close condition for M15
 INPUT int AD30_OpenCondition1 = 466; // Open condition 1 for M30 (0-)
 INPUT int AD30_OpenCondition2 = 404; // Open condition 2 for M30 (0-)
-INPUT ENUM_MARKET_EVENT AD30_CloseCondition = 1; // Close condition for M30
+INPUT ENUM_MARKET_EVENT AD30_CloseCondition = 11; // Close condition for M30
 #else
 int AD1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int AD1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)

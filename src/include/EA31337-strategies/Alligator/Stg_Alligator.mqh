@@ -15,23 +15,23 @@
 
 // User input params.
 INPUT string __Alligator_Parameters__ = "-- Settings for the Alligator indicator --"; // >>> ALLIGATOR <<<
-INPUT int Alligator_Period_Jaw = 34; // Jaw Period
+INPUT int Alligator_Period_Jaw = 38; // Jaw Period
 INPUT int Alligator_Period_Teeth = 8; // Teeth Period
-INPUT int Alligator_Period_Lips = 26; // Lips Period
+INPUT int Alligator_Period_Lips = 34; // Lips Period
 INPUT int Alligator_Shift_Jaw = 0; // Jaw Shift
 INPUT int Alligator_Shift_Teeth = 10; // Teeth Shift
 INPUT int Alligator_Shift_Lips = 1; // Lips Shift
 INPUT ENUM_MA_METHOD Alligator_MA_Method = 2; // MA Method
 INPUT ENUM_APPLIED_PRICE Alligator_Applied_Price = (ENUM_APPLIED_PRICE) 3; // Applied Price
 INPUT int Alligator_Shift = 0; // Shift
-INPUT ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = 8; // Trail stop method
-INPUT ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = -3; // Trail profit method
+INPUT ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = 22; // Trail stop method
+INPUT ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = 8; // Trail profit method
 INPUT double Alligator_SignalLevel = 0.5; // Signal level
 #ifndef __advanced__
-INPUT int Alligator1_SignalMethod = 18; // Signal method for M1 (-63-63)
-INPUT int Alligator5_SignalMethod = 10; // Signal method for M5 (-63-63)
-INPUT int Alligator15_SignalMethod = 28; // Signal method for M15 (-63-63)
-INPUT int Alligator30_SignalMethod = 9; // Signal method for M30 (-63-63)
+INPUT int Alligator1_SignalMethod = 1; // Signal method for M1 (-63-63)
+INPUT int Alligator5_SignalMethod = 9; // Signal method for M5 (-63-63)
+INPUT int Alligator15_SignalMethod = 18; // Signal method for M15 (-63-63)
+INPUT int Alligator30_SignalMethod = 20; // Signal method for M30 (-63-63)
 #else
 int Alligator1_SignalMethod = 0; // Signal method for M1 (-63-63)
 int Alligator5_SignalMethod = 0; // Signal method for M5 (-63-63)
@@ -40,17 +40,17 @@ int Alligator30_SignalMethod = 0; // Signal method for M30 (-63-63)
 #endif
 #ifdef __advanced__
 INPUT int Alligator1_OpenCondition1 = 583; // Open condition 1 for M1 (0-1023)
-INPUT int Alligator1_OpenCondition2 = 971; // Open condition 2 for M1 (0-1023)
-INPUT ENUM_MARKET_EVENT Alligator1_CloseCondition = 26; // Close condition for M1
+INPUT int Alligator1_OpenCondition2 = 583; // Open condition 2 for M1 (0-1023)
+INPUT ENUM_MARKET_EVENT Alligator1_CloseCondition = 12; // Close condition for M1
 INPUT int Alligator5_OpenCondition1 = 486; // Open condition 1 for M5 (0-1023)
-INPUT int Alligator5_OpenCondition2 = 971; // Open condition 2 for M5 (0-1023)
-INPUT ENUM_MARKET_EVENT Alligator5_CloseCondition = 4; // Close condition for M5
-INPUT int Alligator15_OpenCondition1 = 971; // Open condition 1 for M15 (0-1023)
-INPUT int Alligator15_OpenCondition2 = 874; // Open condition 2 for M15 (0-1023)
-INPUT ENUM_MARKET_EVENT Alligator15_CloseCondition = 29; // Close condition for M15
-INPUT int Alligator30_OpenCondition1 = 971; // Open condition 1 for M30 (0-1023)
+INPUT int Alligator5_OpenCondition2 = 777; // Open condition 2 for M5 (0-1023)
+INPUT ENUM_MARKET_EVENT Alligator5_CloseCondition = 13; // Close condition for M5
+INPUT int Alligator15_OpenCondition1 = 292; // Open condition 1 for M15 (0-1023)
+INPUT int Alligator15_OpenCondition2 = 1; // Open condition 2 for M15 (0-1023)
+INPUT ENUM_MARKET_EVENT Alligator15_CloseCondition = 15; // Close condition for M15
+INPUT int Alligator30_OpenCondition1 = 389; // Open condition 1 for M30 (0-1023)
 INPUT int Alligator30_OpenCondition2 = 680; // Open condition 2 for M30 (0-1023)
-INPUT ENUM_MARKET_EVENT Alligator30_CloseCondition = 12; // Close condition for M30
+INPUT ENUM_MARKET_EVENT Alligator30_CloseCondition = 11; // Close condition for M30
 #else
 int Alligator1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int Alligator1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)

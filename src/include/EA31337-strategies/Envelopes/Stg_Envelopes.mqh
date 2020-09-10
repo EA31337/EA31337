@@ -15,13 +15,13 @@
 
 // User input params.
 INPUT string __Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --"; // >>> ENVELOPES <<<
-INPUT int Envelopes_MA_Period_M1 = 4; // Period for M1
+INPUT int Envelopes_MA_Period_M1 = 2; // Period for M1
 INPUT int Envelopes_MA_Period_M5 = 16; // Period for M5
-INPUT int Envelopes_MA_Period_M15 = 36; // Period for M15
+INPUT int Envelopes_MA_Period_M15 = 38; // Period for M15
 INPUT int Envelopes_MA_Period_M30 = 10; // Period for M30
-INPUT double Envelopes_Deviation_M1 = 0.6; // Deviation for M1
+INPUT double Envelopes_Deviation_M1 = 0.4; // Deviation for M1
 INPUT double Envelopes_Deviation_M5 = 0.5; // Deviation for M5
-INPUT double Envelopes_Deviation_M15 = 0.6; // Deviation for M15
+INPUT double Envelopes_Deviation_M15 = 0.7; // Deviation for M15
 INPUT double Envelopes_Deviation_M30 = 0.6; // Deviation for M30
 INPUT ENUM_MA_METHOD Envelopes_MA_Method = 2; // MA Method
 INPUT int Envelopes_MA_Shift = 7; // MA Shift
@@ -44,16 +44,16 @@ int Envelopes30_SignalMethod = 0; // Signal method for M30 (-127-127)
 #ifdef __advanced__
 INPUT int Envelopes1_OpenCondition1 = 1; // Open condition 1 for M1 (0-1023)
 INPUT int Envelopes1_OpenCondition2 = 1; // Open condition 2 for M1 (0-1023)
-INPUT ENUM_MARKET_EVENT Envelopes1_CloseCondition = 2; // Close condition for M1
+INPUT ENUM_MARKET_EVENT Envelopes1_CloseCondition = 20; // Close condition for M1
 INPUT int Envelopes5_OpenCondition1 = 292; // Open condition 1 for M5 (0-1023)
 INPUT int Envelopes5_OpenCondition2 = 1; // Open condition 2 for M5 (0-1023)
 INPUT ENUM_MARKET_EVENT Envelopes5_CloseCondition = 1; // Close condition for M5
 INPUT int Envelopes15_OpenCondition1 = 292; // Open condition 1 for M15 (0-1023)
 INPUT int Envelopes15_OpenCondition2 = 1; // Open condition 2 for M15 (0-1023)
-INPUT ENUM_MARKET_EVENT Envelopes15_CloseCondition = 19; // Close condition for M15
+INPUT ENUM_MARKET_EVENT Envelopes15_CloseCondition = 20; // Close condition for M15
 INPUT int Envelopes30_OpenCondition1 = 292; // Open condition 1 for M30 (0-1023)
 INPUT int Envelopes30_OpenCondition2 = 98; // Open condition 2 for M30 (0-1023)
-INPUT ENUM_MARKET_EVENT Envelopes30_CloseCondition = 12; // Close condition for M30
+INPUT ENUM_MARKET_EVENT Envelopes30_CloseCondition = 11; // Close condition for M30
 #else
 int Envelopes1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int Envelopes1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)

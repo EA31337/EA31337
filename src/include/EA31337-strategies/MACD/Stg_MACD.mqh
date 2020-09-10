@@ -16,18 +16,18 @@
 // User input params.
 INPUT string __MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --"; // >>> MACD <<<
 INPUT int MACD_Period_Fast = 4; // Period Fast
-INPUT int MACD_Period_Slow = 26; // Period Slow
-INPUT int MACD_Period_Signal = 23; // Period for signal
-INPUT ENUM_APPLIED_PRICE MACD_Applied_Price = (ENUM_APPLIED_PRICE) 2; // Applied Price
+INPUT int MACD_Period_Slow = 22; // Period Slow
+INPUT int MACD_Period_Signal = 27; // Period for signal
+INPUT ENUM_APPLIED_PRICE MACD_Applied_Price = (ENUM_APPLIED_PRICE) 6; // Applied Price
 INPUT int MACD_Shift = 0; // Shift
-INPUT ENUM_TRAIL_TYPE MACD_TrailingStopMethod = 1; // Trail stop method
+INPUT ENUM_TRAIL_TYPE MACD_TrailingStopMethod = 7; // Trail stop method
 INPUT ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = 25; // Trail profit method
-INPUT double MACD_SignalLevel = 1.3; // Signal level
+INPUT double MACD_SignalLevel = 1.7; // Signal level
 #ifndef __advanced__
-INPUT int MACD1_SignalMethod = -1; // Signal method for M1 (-7-7)
-INPUT int MACD5_SignalMethod = 1; // Signal method for M5 (-7-7)
-INPUT int MACD15_SignalMethod = 5; // Signal method for M15 (-7-7)
-INPUT int MACD30_SignalMethod = 7; // Signal method for M30 (-7-7)
+INPUT int MACD1_SignalMethod = 7; // Signal method for M1 (-7-7)
+INPUT int MACD5_SignalMethod = 7; // Signal method for M5 (-7-7)
+INPUT int MACD15_SignalMethod = 3; // Signal method for M15 (-7-7)
+INPUT int MACD30_SignalMethod = -1; // Signal method for M30 (-7-7)
 #else
 int MACD1_SignalMethod = 0; // Signal method for M1 (-7-7)
 int MACD5_SignalMethod = 0; // Signal method for M5 (-7-7)
@@ -35,18 +35,18 @@ int MACD15_SignalMethod = 0; // Signal method for M15 (-7-7)
 int MACD30_SignalMethod = 0; // Signal method for M30 (-7-7)
 #endif
 #ifdef __advanced__
-INPUT int MACD1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
+INPUT int MACD1_OpenCondition1 = 874; // Open condition 1 for M1 (0-1023)
 INPUT int MACD1_OpenCondition2 = 971; // Open condition 2 for M1 (0-1023)
-INPUT ENUM_MARKET_EVENT MACD1_CloseCondition = 24; // Close condition for M1
-INPUT int MACD5_OpenCondition1 = 680; // Open condition 1 for M5 (0-1023)
+INPUT ENUM_MARKET_EVENT MACD1_CloseCondition = 12; // Close condition for M1
+INPUT int MACD5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
 INPUT int MACD5_OpenCondition2 = 971; // Open condition 2 for M5 (0-1023)
 INPUT ENUM_MARKET_EVENT MACD5_CloseCondition = 4; // Close condition for M5
-INPUT int MACD15_OpenCondition1 = 486; // Open condition 1 for M15 (0-1023)
+INPUT int MACD15_OpenCondition1 = 874; // Open condition 1 for M15 (0-1023)
 INPUT int MACD15_OpenCondition2 = 971; // Open condition 2 for M15 (0-1023)
-INPUT ENUM_MARKET_EVENT MACD15_CloseCondition = 4; // Close condition for M15
-INPUT int MACD30_OpenCondition1 = 777; // Open condition 1 for M30 (0-1023)
-INPUT int MACD30_OpenCondition2 = 486; // Open condition 2 for M30 (0-1023)
-INPUT ENUM_MARKET_EVENT MACD30_CloseCondition = 4; // Close condition for M30
+INPUT ENUM_MARKET_EVENT MACD15_CloseCondition = 24; // Close condition for M15
+INPUT int MACD30_OpenCondition1 = 292; // Open condition 1 for M30 (0-1023)
+INPUT int MACD30_OpenCondition2 = 971; // Open condition 2 for M30 (0-1023)
+INPUT ENUM_MARKET_EVENT MACD30_CloseCondition = 11; // Close condition for M30
 #else
 int MACD1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int MACD1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
