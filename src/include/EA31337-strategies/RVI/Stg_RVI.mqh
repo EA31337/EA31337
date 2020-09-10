@@ -16,8 +16,13 @@
 // User input params.
 string __RVI_Parameters__ = "-- Settings for the Relative Vigor Index indicator --"; // >>> RVI <<<
 uint RVI_Period = 10; // Period
+#ifndef __rider__
 ENUM_TRAIL_TYPE RVI_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE RVI_TrailingProfitMethod = 1; // Trail profit method
+#else
+ENUM_TRAIL_TYPE RVI_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE RVI_TrailingProfitMethod = 0; // Trail profit method
+#endif
 int RVI_Shift = 2; // Shift
 double RVI_SignalLevel = 0.00000000; // Signal level
 #ifndef __advanced__

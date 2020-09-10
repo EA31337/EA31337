@@ -15,8 +15,13 @@
 
 // User input params.
 INPUT string __Force_Parameters__ = "-- Settings for the Force Index indicator --"; // >>> FORCE <<<
+#ifndef __rider__
 INPUT ENUM_TRAIL_TYPE Force_TrailingStopMethod = 16; // Trail stop method
 INPUT ENUM_TRAIL_TYPE Force_TrailingProfitMethod = -5; // Trail profit method
+#else
+ENUM_TRAIL_TYPE Force_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE Force_TrailingProfitMethod = 0; // Trail profit method
+#endif
 INPUT int Force_Period_M1 = 2; // Period for M1
 INPUT int Force_Period_M5 = 20; // Period for M5
 INPUT int Force_Period_M15 = 32; // Period for M15

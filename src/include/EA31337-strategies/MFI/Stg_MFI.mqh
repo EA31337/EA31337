@@ -15,8 +15,13 @@
 
 // User input params.
 INPUT string __MFI_Parameters__ = "-- Settings for the Money Flow Index indicator --"; // >>> MFI <<<
+#ifndef __rider__
 INPUT ENUM_TRAIL_TYPE MFI_TrailingStopMethod = 9; // Trail stop method
 INPUT ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = 15; // Trail profit method
+#else
+ENUM_TRAIL_TYPE MFI_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = 0; // Trail profit method
+#endif
 INPUT int MFI_Period_M1 = 50; // Period for M1
 INPUT int MFI_Period_M5 = 54; // Period for M5
 INPUT int MFI_Period_M15 = 24; // Period for M15

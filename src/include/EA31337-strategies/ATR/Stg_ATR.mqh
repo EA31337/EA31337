@@ -15,8 +15,13 @@
 
 // User input params.
 string __ATR_Parameters__ = "-- Settings for the Average True Range indicator --"; // >>> ATR <<<
+#ifndef __rider__
 ENUM_TRAIL_TYPE ATR_TrailingStopMethod = 7; // Trail stop method
 ENUM_TRAIL_TYPE ATR_TrailingProfitMethod = 22; // Trail profit method
+#else
+ENUM_TRAIL_TYPE ATR_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE ATR_TrailingProfitMethod = 0; // Trail profit method
+#endif
 int ATR_Period_M1 = 14; // Period for M1
 int ATR_Period_M5 = 14; // Period for M5
 int ATR_Period_M15 = 14; // Period for M15

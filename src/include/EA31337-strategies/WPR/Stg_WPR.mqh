@@ -21,8 +21,13 @@ INPUT int WPR_Period_M15 = 2; // Period for M15
 INPUT int WPR_Period_M30 = 2; // Period for M30
 INPUT int WPR_Shift = 0; // Shift
 INPUT int WPR_SignalLevel = -40; // Signal level
+#ifndef __rider__
 INPUT ENUM_TRAIL_TYPE WPR_TrailingStopMethod = 9; // Trail stop method
 INPUT ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = 9; // Trail profit method
+#else
+ENUM_TRAIL_TYPE WPR_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE WPR_TrailingProfitMethod = 0; // Trail profit method
+#endif
 #ifndef __advanced__
 INPUT int WPR1_SignalMethod = -32; // Signal method for M1 (-63-63)
 INPUT int WPR5_SignalMethod = -32; // Signal method for M5 (-63-63)

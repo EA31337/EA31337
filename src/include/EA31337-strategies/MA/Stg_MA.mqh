@@ -24,8 +24,13 @@ INPUT int MA_Shift_Medium = 9; // Shift Medium (+1)
 INPUT int MA_Shift_Slow = 4; // Shift Slow (+1)
 INPUT ENUM_MA_METHOD MA_Method = 1; // MA Method
 INPUT ENUM_APPLIED_PRICE MA_Applied_Price = (ENUM_APPLIED_PRICE) 0; // Applied Price
+#ifndef __rider__
 INPUT ENUM_TRAIL_TYPE MA_TrailingStopMethod = 1; // Trail stop method
 INPUT ENUM_TRAIL_TYPE MA_TrailingProfitMethod = 1; // Trail profit method
+#else
+ENUM_TRAIL_TYPE MA_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE MA_TrailingProfitMethod = 0; // Trail profit method
+#endif
 INPUT double MA_SignalLevel = -1.1; // Signal level
 #ifndef __advanced__
 INPUT int MA1_SignalMethod = -7; // Signal method for M1 (-127-127)

@@ -24,8 +24,13 @@ int Gator_Shift_Lips = 5; // Lips Shift
 ENUM_MA_METHOD Gator_MA_Method = 2; // MA Method
 ENUM_APPLIED_PRICE Gator_Applied_Price = (ENUM_APPLIED_PRICE) 3; // Applied Price
 int Gator_Shift = 2; // Shift
+#ifndef __rider__
 ENUM_TRAIL_TYPE Gator_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE Gator_TrailingProfitMethod = 1; // Trail profit method
+#else
+ENUM_TRAIL_TYPE Gator_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE Gator_TrailingProfitMethod = 0; // Trail profit method
+#endif
 double Gator_SignalLevel = 0.00000000; // Signal level
 #ifndef __advanced__
 int Gator1_SignalMethod = 0; // Signal method for M1 (0-

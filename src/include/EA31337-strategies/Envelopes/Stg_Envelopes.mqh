@@ -27,8 +27,13 @@ INPUT ENUM_MA_METHOD Envelopes_MA_Method = 2; // MA Method
 INPUT int Envelopes_MA_Shift = 7; // MA Shift
 INPUT ENUM_APPLIED_PRICE Envelopes_Applied_Price = (ENUM_APPLIED_PRICE) 3; // Applied Price
 INPUT int Envelopes_Shift = 0; // Shift
+#ifndef __rider__
 INPUT ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = 2; // Trail stop method
 INPUT ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = -11; // Trail profit method
+#else
+ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = 0; // Trail profit method
+#endif
 /* @todo INPUT */ int Envelopes_SignalLevel = 0; // Signal level
 #ifndef __advanced__
 INPUT int Envelopes1_SignalMethod = -13; // Signal method for M1 (-127-127)

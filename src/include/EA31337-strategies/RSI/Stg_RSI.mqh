@@ -21,8 +21,13 @@ INPUT int RSI_Period_M15 = 6; // Period for M15
 INPUT int RSI_Period_M30 = 4; // Period for M30
 INPUT ENUM_APPLIED_PRICE RSI_Applied_Price = (ENUM_APPLIED_PRICE) 1; // Applied Price
 INPUT uint RSI_Shift = 0; // Shift
+#ifndef __rider__
 INPUT ENUM_TRAIL_TYPE RSI_TrailingStopMethod = 9; // Trail stop method
 INPUT ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = -21; // Trail profit method
+#else
+ENUM_TRAIL_TYPE RSI_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = 0; // Trail profit method
+#endif
 INPUT int RSI_SignalLevel = 42; // Signal level (-49-49)
 #ifndef __advanced__
 INPUT int RSI1_SignalMethod = -48; // Signal method for M1 (-63-63)

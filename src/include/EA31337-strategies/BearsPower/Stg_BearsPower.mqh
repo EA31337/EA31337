@@ -15,8 +15,13 @@
 
 // User input params.
 string __BearsPower_Parameters__ = "-- Settings for the Bears Power indicator --"; // >>> BEARS POWER <<<
+#ifndef __rider__
 ENUM_TRAIL_TYPE BearsPower_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE BearsPower_TrailingProfitMethod = 1; // Trail profit method
+#else
+ENUM_TRAIL_TYPE BearsPower_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE BearsPower_TrailingProfitMethod = 0; // Trail profit method
+#endif
 int BearsPower_Period = 13; // Period
 ENUM_APPLIED_PRICE BearsPower_Applied_Price = PRICE_CLOSE; // Applied Price
 double BearsPower_SignalLevel = 0.00000000; // Signal level

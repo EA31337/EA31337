@@ -15,8 +15,13 @@
 
 // User input params.
 string __OBV_Parameters__ = "-- Settings for the On Balance Volume indicator --"; // >>> OBV <<<
+#ifndef __rider__
 ENUM_TRAIL_TYPE OBV_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE OBV_TrailingProfitMethod = 1; // Trail profit method
+#else
+ENUM_TRAIL_TYPE OBV_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE OBV_TrailingProfitMethod = 0; // Trail profit method
+#endif
 ENUM_APPLIED_PRICE OBV_Applied_Price = PRICE_CLOSE; // Applied Price
 double OBV_SignalLevel = 0.00000000; // Signal level
 #ifndef __advanced__

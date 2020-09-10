@@ -15,8 +15,13 @@
 
 // User input params.
 string __Ichimoku_Parameters__ = "-- Settings for the Ichimoku Kinko Hyo indicator --"; // >>> ICHIMOKU <<<
+#ifndef __rider__
 ENUM_TRAIL_TYPE Ichimoku_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE Ichimoku_TrailingProfitMethod = 1; // Trail profit method
+#else
+ENUM_TRAIL_TYPE Ichimoku_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE Ichimoku_TrailingProfitMethod = 0; // Trail profit method
+#endif
 int Ichimoku_Period_Tenkan_Sen = 9; // Period Tenkan Sen
 int Ichimoku_Period_Kijun_Sen = 26; // Period Kijun Sen
 int Ichimoku_Period_Senkou_Span_B = 52; // Period Senkou Span B

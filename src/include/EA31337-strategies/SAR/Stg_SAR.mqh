@@ -18,8 +18,13 @@ INPUT string __SAR_Parameters__ = "-- Settings for the Parabolic Stop and Revers
 INPUT double SAR_Step = 0.01; // Step
 INPUT double SAR_Maximum_Stop = 0.1; // Maximum stop
 INPUT int SAR_Shift = 4; // Shift
+#ifndef __rider__
 INPUT ENUM_TRAIL_TYPE SAR_TrailingStopMethod = 9; // Trail stop method
 INPUT ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = 25; // Trail profit method
+#else
+ENUM_TRAIL_TYPE SAR_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = 0; // Trail profit method
+#endif
 INPUT double SAR_SignalLevel = 0; // Signal level
 #ifndef __advanced__
 INPUT int SAR1_SignalMethod = -88; // Signal method for M1 (-127-127)

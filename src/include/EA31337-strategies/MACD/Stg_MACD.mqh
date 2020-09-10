@@ -20,8 +20,13 @@ INPUT int MACD_Period_Slow = 22; // Period Slow
 INPUT int MACD_Period_Signal = 27; // Period for signal
 INPUT ENUM_APPLIED_PRICE MACD_Applied_Price = (ENUM_APPLIED_PRICE) 6; // Applied Price
 INPUT int MACD_Shift = 0; // Shift
+#ifndef __rider__
 INPUT ENUM_TRAIL_TYPE MACD_TrailingStopMethod = 7; // Trail stop method
 INPUT ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = 25; // Trail profit method
+#else
+ENUM_TRAIL_TYPE MACD_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = 0; // Trail profit method
+#endif
 INPUT double MACD_SignalLevel = 1.7; // Signal level
 #ifndef __advanced__
 INPUT int MACD1_SignalMethod = 7; // Signal method for M1 (-7-7)

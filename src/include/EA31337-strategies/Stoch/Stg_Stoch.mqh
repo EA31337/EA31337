@@ -21,8 +21,13 @@ uint Stochastic_Slowing = 5; // Slowing
 ENUM_MA_METHOD Stochastic_MA_Method = MODE_SMA; // Moving Average method
 ENUM_STO_PRICE Stochastic_Price_Field = 0; // Price (0 - Low/High or 1 - Close/Close)
 uint Stochastic_Shift = 0; // Shift (relative to the current bar)
+#ifndef __rider__
 ENUM_TRAIL_TYPE Stochastic_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE Stochastic_TrailingProfitMethod = 1; // Trail profit method
+#else
+ENUM_TRAIL_TYPE Stochastic_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE Stochastic_TrailingProfitMethod = 0; // Trail profit method
+#endif
 double Stochastic_SignalLevel = 0.00000000; // Signal level
 #ifndef __advanced__
 int Stochastic1_SignalMethod = 0; // Signal method for M1 (0-

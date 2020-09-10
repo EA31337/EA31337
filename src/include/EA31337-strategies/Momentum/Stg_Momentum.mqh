@@ -15,8 +15,13 @@
 
 // User input params.
 string __Momentum_Parameters__ = "-- Settings for the Momentum indicator --"; // >>> MOMENTUM <<<
+#ifndef __rider__
 ENUM_TRAIL_TYPE Momentum_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE Momentum_TrailingProfitMethod = 1; // Trail profit method
+#else
+ENUM_TRAIL_TYPE Momentum_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE Momentum_TrailingProfitMethod = 0; // Trail profit method
+#endif
 int Momentum_Period = 12; // Period Fast
 ENUM_APPLIED_PRICE Momentum_Applied_Price = PRICE_CLOSE; // Applied Price
 double Momentum_SignalLevel = 0.00000000; // Signal level

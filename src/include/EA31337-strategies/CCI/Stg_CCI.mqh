@@ -16,8 +16,13 @@
 // User input params.
 INPUT string __CCI_Parameters__ = "-- Settings for the Commodity Channel Index indicator --"; // >>> CCI <<<
 INPUT int CCI_Shift = 0; // Shift (0 for default)
+#ifndef __rider__
 INPUT ENUM_TRAIL_TYPE CCI_TrailingStopMethod = 9; // Trail stop method
 INPUT ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = 25; // Trail profit method
+#else
+ENUM_TRAIL_TYPE CCI_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = 0; // Trail profit method
+#endif
 INPUT int CCI_Period_M1 = 3; // Period for M1
 INPUT int CCI_Period_M5 = 40; // Period for M5
 INPUT int CCI_Period_M15 = 19; // Period for M15

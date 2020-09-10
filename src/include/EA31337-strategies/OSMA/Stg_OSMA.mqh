@@ -15,8 +15,13 @@
 
 // User input params.
 string __OSMA_Parameters__ = "-- Settings for the Moving Average of Oscillator indicator --"; // >>> OSMA <<<
+#ifndef __rider__
 ENUM_TRAIL_TYPE OSMA_TrailingStopMethod = 25; // Trail stop method
 ENUM_TRAIL_TYPE OSMA_TrailingProfitMethod = 1; // Trail profit method
+#else
+ENUM_TRAIL_TYPE OSMA_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE OSMA_TrailingProfitMethod = 0; // Trail profit method
+#endif
 int OSMA_Period_Fast = 8; // Period Fast
 int OSMA_Period_Slow = 6; // Period Slow
 int OSMA_Period_Signal = 9; // Period for signal

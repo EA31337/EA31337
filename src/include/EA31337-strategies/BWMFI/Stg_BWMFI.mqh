@@ -15,8 +15,13 @@
 
 // User input params.
 string __BWMFI_Parameters__ = "-- Settings for the Market Facilitation Index indicator --"; // >>> BWMFI <<<
+#ifndef __rider__
 ENUM_TRAIL_TYPE BWMFI_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE BWMFI_TrailingProfitMethod = 1; // Trail profit method
+#else
+ENUM_TRAIL_TYPE BWMFI_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE BWMFI_TrailingProfitMethod = 0; // Trail profit method
+#endif
 double BWMFI_SignalLevel = 0.00000000; // Signal level
 INPUT uint BWMFI_Shift = 0; // Shift (relative to the current bar, 0 - default)
 #ifndef __advanced__

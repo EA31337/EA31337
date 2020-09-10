@@ -15,8 +15,13 @@
 
 // User input params.
 INPUT string __AC_Parameters__ = "-- Settings for the Bill Williams' Accelerator/Decelerator oscillator --"; // >>> AC <<<
+#ifndef __rider__
 INPUT ENUM_TRAIL_TYPE AC_TrailingStopMethod = 1; // Trail stop method
 INPUT ENUM_TRAIL_TYPE AC_TrailingProfitMethod = -4; // Trail profit method
+#else
+ENUM_TRAIL_TYPE AC_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE AC_TrailingProfitMethod = 0; // Trail profit method
+#endif
 INPUT double AC_SignalLevel = 0.0004; // Signal level (>0.0001)
 INPUT uint AC_Shift = 0; // Shift (relative to the current bar, 0 - default)
 #ifndef __advanced__

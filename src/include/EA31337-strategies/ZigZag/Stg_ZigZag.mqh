@@ -19,8 +19,13 @@ uint ZigZag_Depth = 0; // Depth
 uint ZigZag_Deviation = 0; // Deviation
 uint ZigZag_Backstep = 0; // Deviation
 uint ZigZag_Shift = 0; // Shift (relative to the current bar)
+#ifndef __rider__
 ENUM_TRAIL_TYPE ZigZag_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE ZigZag_TrailingProfitMethod = 1; // Trail profit method
+#else
+ENUM_TRAIL_TYPE ZigZag_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE ZigZag_TrailingProfitMethod = 0; // Trail profit method
+#endif
 double ZigZag_SignalLevel = 0.00000000; // Signal level
 #ifndef __advanced__
 int ZigZag1_SignalMethod = 0; // Signal method for M1 (0-31)

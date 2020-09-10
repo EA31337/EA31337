@@ -24,8 +24,13 @@ INPUT int Alligator_Shift_Lips = 1; // Lips Shift
 INPUT ENUM_MA_METHOD Alligator_MA_Method = 2; // MA Method
 INPUT ENUM_APPLIED_PRICE Alligator_Applied_Price = (ENUM_APPLIED_PRICE) 3; // Applied Price
 INPUT int Alligator_Shift = 0; // Shift
+#ifndef __rider__
 INPUT ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = 22; // Trail stop method
 INPUT ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = 8; // Trail profit method
+#else
+ENUM_TRAIL_TYPE Alligator_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE Alligator_TrailingProfitMethod = 0; // Trail profit method
+#endif
 INPUT double Alligator_SignalLevel = 0.5; // Signal level
 #ifndef __advanced__
 INPUT int Alligator1_SignalMethod = 1; // Signal method for M1 (-63-63)

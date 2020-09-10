@@ -15,8 +15,13 @@
 
 // User input params.
 string __Awesome_Parameters__ = "-- Settings for the Awesome oscillator --"; // >>> AWESOME <<<
+#ifndef __rider__
 ENUM_TRAIL_TYPE Awesome_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE Awesome_TrailingProfitMethod = 1; // Trail profit method
+#else
+ENUM_TRAIL_TYPE Awesome_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE Awesome_TrailingProfitMethod = 0; // Trail profit method
+#endif
 double Awesome_SignalLevel = 0.00000000; // Signal level
 uint Awesome_Shift = 0; // Shift (relative to the current bar, 0 - default)
 #ifndef __advanced__

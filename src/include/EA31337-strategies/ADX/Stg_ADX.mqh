@@ -15,8 +15,13 @@
 
 // User input params.
 INPUT string __ADX_Parameters__ = "-- Settings for the Average Directional Movement Index indicator --"; // >>> ADX <<<
+#ifndef __rider__
 INPUT ENUM_TRAIL_TYPE ADX_TrailingStopMethod = 11; // Trail stop method
 INPUT ENUM_TRAIL_TYPE ADX_TrailingProfitMethod = -8; // Trail profit method
+#else
+ENUM_TRAIL_TYPE ADX_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE ADX_TrailingProfitMethod = 0; // Trail profit method
+#endif
 INPUT uint ADX_Period_M1 = 92; // Period for M1
 INPUT uint ADX_Period_M5 = 66; // Period for M5
 INPUT uint ADX_Period_M15 = 54; // Period for M15
