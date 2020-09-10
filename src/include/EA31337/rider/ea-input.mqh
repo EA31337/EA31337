@@ -42,7 +42,7 @@ extern uint     StopLossMax = 80; // Max Stop loss (in pips, 0 = auto)
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
-extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 22; // Default trail stop method (0 = none)
+extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 8; // Default trail stop method (0 = none)
 extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = -22; // Default trail profit method (0 = none)
 extern int TrailingStop = 20; // Extra trailing stop (in pips)
 extern int TrailingProfit = 0; // Extra trailing profit (in pips)
@@ -85,22 +85,22 @@ extern uint ConFactorOrdersLimit = 600; // No of orders to check on consequent w
 
 //+------------------------------------------------------------------+
 input static string __Strategy_Timeframes__ = "-- Strategy's timeframes --"; // >>> STRATEGY'S TIMEFRAMES (1-255: M1=1,M5=2,M15=4,M30=8,H1=16,H2=32,H4=64...) <<<
-extern unsigned int AC_Active_Tf = 0; // AC: Activate timeframes
-extern unsigned int AD_Active_Tf = 8; // AD: Activate timeframes
-extern unsigned int ADX_Active_Tf = 0; // ADX: Activate timeframes
-extern unsigned int Alligator_Active_Tf = 0; // Alligator: Activate timeframes
-extern unsigned int Bands_Active_Tf = 8; // Bands: Activate timeframes
-extern unsigned int CCI_Active_Tf = 12; // CCI: Activate timeframes
-extern unsigned int DeMarker_Active_Tf = 1; // DeMarker: Activate timeframes
-extern unsigned int Envelopes_Active_Tf = 3; // Envelopes: Activate timeframes
+extern unsigned int AC_Active_Tf = 15; // AC: Activate timeframes
+extern unsigned int AD_Active_Tf = 15; // AD: Activate timeframes
+extern unsigned int ADX_Active_Tf = 15; // ADX: Activate timeframes
+extern unsigned int Alligator_Active_Tf = 15; // Alligator: Activate timeframes
+extern unsigned int Bands_Active_Tf = 15; // Bands: Activate timeframes
+extern unsigned int CCI_Active_Tf = 15; // CCI: Activate timeframes
+extern unsigned int DeMarker_Active_Tf = 15; // DeMarker: Activate timeframes
+extern unsigned int Envelopes_Active_Tf = 15; // Envelopes: Activate timeframes
 extern unsigned int Force_Active_Tf = 4; // Force: Activate timeframes
-extern unsigned int Fractals_Active_Tf = 8; // Fractals: Activate timeframes
-extern unsigned int MACD_Active_Tf = 1; // MACD: Activate timeframes
-extern unsigned int MA_Active_Tf = 0; // MA: Activate timeframes
+extern unsigned int Fractals_Active_Tf = 15; // Fractals: Activate timeframes
+extern unsigned int MACD_Active_Tf = 15; // MACD: Activate timeframes
+extern unsigned int MA_Active_Tf = 15; // MA: Activate timeframes
 extern unsigned int MFI_Active_Tf = 5; // MFI: Activate timeframes
-extern unsigned int RSI_Active_Tf = 1; // RSI: Activate timeframes
-extern unsigned int SAR_Active_Tf = 7; // SAR: Activate timeframes
-extern unsigned int WPR_Active_Tf = 3; // WPR: Activate timeframes
+extern unsigned int RSI_Active_Tf = 15; // RSI: Activate timeframes
+extern unsigned int SAR_Active_Tf = 15; // SAR: Activate timeframes
+extern unsigned int WPR_Active_Tf = 15; // WPR: Activate timeframes
 unsigned int ATR_Active_Tf = 0; // ATR: Activate timeframes
 unsigned int Awesome_Active_Tf = 0; // Awesome: Activate timeframes
 unsigned int BWMFI_Active_Tf = 0; // BWMFI: Activate timeframes
