@@ -150,7 +150,7 @@ extern bool CloseConditionOnlyProfitable = 1; // Apply close condition only for 
 //+------------------------------------------------------------------+
 extern string __Experimental_Parameters__ = "-- Experimental parameters (not safe) --"; // >>> EXPERIMENTAL <<<
 // Set stop loss to zero, once the order is profitable.
-extern bool MinimalizeLosses = 1; // Minimalize losses?
+extern bool MinimalizeLosses = 0; // Minimalize losses?
 int HourAfterPeak = 18; // Hour after peak
 int ManualGMToffset = 0; // Manual GMT Offset
 // How often trailing stop should be updated (in seconds). FIXME: Fix relative delay in backtesting.
