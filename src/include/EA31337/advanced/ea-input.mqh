@@ -38,7 +38,7 @@ extern int    MinIntervalSec = 0; // Min interval between subsequent trade signa
 //+------------------------------------------------------------------+
 extern string   __EA_Order_Parameters__ = "-- Profit and loss parameters --"; // >>> PROFIT/LOSS <<<
 extern uint     TakeProfitMax = 0; // Max Take profit (in pips, 0 = auto)
-extern uint     StopLossMax = 0; // Max Stop loss (in pips, 0 = auto)
+extern uint     StopLossMax = 120; // Max Stop loss (in pips, 0 = auto)
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
@@ -63,7 +63,7 @@ extern double MaxSpreadToTrade = 10.0; // Max spread to trade (in pips), 0 - dis
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Profit__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGY PARAMS <<<
-extern double ProfitFactorMinToTrade = 0.6; // Min. profit factor per strategy to trade
+extern double ProfitFactorMinToTrade = 0.7; // Min. profit factor per strategy to trade
 extern double ProfitFactorMaxToTrade = 0.0; // Max. profit factor per strategy to trade
 extern int InitNoOfOrdersToCalcPF = 10; // Initial number of orders to calculate profit factor
 
@@ -118,7 +118,7 @@ unsigned int ZigZag_Active_Tf = 0; // ZigZag: Activate timeframes
 
 //+------------------------------------------------------------------+
 extern string __SmartQueue_Parameters__ = "-- Smart queue parameters --"; // >>> SMART QUEUE <<<
-extern bool SmartQueueActive = 0; // Activate QueueAI
+extern bool SmartQueueActive = 1; // Activate QueueAI
 extern int SmartQueueMethod = 5; // QueueAI: Method for selecting the best order (0-15)
 extern int SmartQueueFilter = 30; // QueueAI: Method for filtering the orders (0-255)
 

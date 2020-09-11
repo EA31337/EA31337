@@ -112,7 +112,7 @@ unsigned int ZigZag_Active_Tf = 0; // ZigZag: Activate timeframes
 
 //+------------------------------------------------------------------+
 extern string __SmartQueue_Parameters__ = "-- Smart queue parameters --"; // >>> SMART QUEUE <<<
-extern bool SmartQueueActive = 0; // Activate QueueAI
+extern bool SmartQueueActive = 1; // Activate QueueAI
 extern int SmartQueueMethod = 11; // QueueAI: Method for selecting the best order (0-15)
 extern int SmartQueueFilter = 30; // QueueAI: Method for filtering the orders (0-255)
 

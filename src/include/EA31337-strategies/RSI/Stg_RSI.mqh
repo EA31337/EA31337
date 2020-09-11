@@ -15,11 +15,11 @@
 
 // User input params.
 INPUT string __RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --"; // >>> RSI <<<
-INPUT int RSI_Period_M1 = 14; // Period for M1
-INPUT int RSI_Period_M5 = 8; // Period for M5
-INPUT int RSI_Period_M15 = 6; // Period for M15
+INPUT int RSI_Period_M1 = 8; // Period for M1
+INPUT int RSI_Period_M5 = 6; // Period for M5
+INPUT int RSI_Period_M15 = 4; // Period for M15
 INPUT int RSI_Period_M30 = 4; // Period for M30
-INPUT ENUM_APPLIED_PRICE RSI_Applied_Price = (ENUM_APPLIED_PRICE) 1; // Applied Price
+INPUT ENUM_APPLIED_PRICE RSI_Applied_Price = (ENUM_APPLIED_PRICE) 5; // Applied Price
 INPUT uint RSI_Shift = 0; // Shift
 #ifndef __rider__
 INPUT ENUM_TRAIL_TYPE RSI_TrailingStopMethod = 9; // Trail stop method

@@ -16,19 +16,19 @@
 // User input params.
 INPUT string __Force_Parameters__ = "-- Settings for the Force Index indicator --"; // >>> FORCE <<<
 #ifndef __rider__
-INPUT ENUM_TRAIL_TYPE Force_TrailingStopMethod = 16; // Trail stop method
+INPUT ENUM_TRAIL_TYPE Force_TrailingStopMethod = 17; // Trail stop method
 INPUT ENUM_TRAIL_TYPE Force_TrailingProfitMethod = -5; // Trail profit method
 #else
 ENUM_TRAIL_TYPE Force_TrailingStopMethod = 0; // Trail stop method
 ENUM_TRAIL_TYPE Force_TrailingProfitMethod = 0; // Trail profit method
 #endif
-INPUT int Force_Period_M1 = 2; // Period for M1
+INPUT int Force_Period_M1 = 14; // Period for M1
 INPUT int Force_Period_M5 = 20; // Period for M5
-INPUT int Force_Period_M15 = 32; // Period for M15
-INPUT int Force_Period_M30 = 18; // Period for M30
-INPUT ENUM_MA_METHOD Force_MA_Method = 3; // MA Method
-INPUT ENUM_APPLIED_PRICE Force_Applied_Price = (ENUM_APPLIED_PRICE) 2; // Applied Price
-INPUT double Force_SignalLevel = 1.3; // Signal level
+INPUT int Force_Period_M15 = 14; // Period for M15
+INPUT int Force_Period_M30 = 16; // Period for M30
+INPUT ENUM_MA_METHOD Force_MA_Method = 0; // MA Method
+INPUT ENUM_APPLIED_PRICE Force_Applied_Price = (ENUM_APPLIED_PRICE) 1; // Applied Price
+INPUT double Force_SignalLevel = 1.2; // Signal level
 INPUT uint Force_Shift = 0; // Shift (relative to the current bar, 0 - default)
 #ifndef __advanced__
 INPUT int Force1_SignalMethod = 0; // Signal method for M1 (0-

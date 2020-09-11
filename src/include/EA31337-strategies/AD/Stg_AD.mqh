@@ -16,8 +16,8 @@
 // User input params.
 INPUT string __AD_Parameters__ = "-- Settings for the Accumulation/Distribution indicator --"; // >>> AD <<<
 #ifndef __rider__
-INPUT ENUM_TRAIL_TYPE AD_TrailingStopMethod = 2; // Trail stop method
-INPUT ENUM_TRAIL_TYPE AD_TrailingProfitMethod = 3; // Trail profit method
+INPUT ENUM_TRAIL_TYPE AD_TrailingStopMethod = 20; // Trail stop method
+INPUT ENUM_TRAIL_TYPE AD_TrailingProfitMethod = -14; // Trail profit method
 #else
 ENUM_TRAIL_TYPE AD_TrailingStopMethod = 0; // Trail stop method
 ENUM_TRAIL_TYPE AD_TrailingProfitMethod = 0; // Trail profit method

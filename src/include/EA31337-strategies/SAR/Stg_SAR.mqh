@@ -16,10 +16,10 @@
 // User input params.
 INPUT string __SAR_Parameters__ = "-- Settings for the Parabolic Stop and Reverse system indicator --"; // >>> SAR <<<
 INPUT double SAR_Step = 0.01; // Step
-INPUT double SAR_Maximum_Stop = 0.1; // Maximum stop
-INPUT int SAR_Shift = 4; // Shift
+INPUT double SAR_Maximum_Stop = 0.3; // Maximum stop
+INPUT int SAR_Shift = 0; // Shift
 #ifndef __rider__
-INPUT ENUM_TRAIL_TYPE SAR_TrailingStopMethod = 9; // Trail stop method
+INPUT ENUM_TRAIL_TYPE SAR_TrailingStopMethod = 8; // Trail stop method
 INPUT ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = 25; // Trail profit method
 #else
 ENUM_TRAIL_TYPE SAR_TrailingStopMethod = 0; // Trail stop method

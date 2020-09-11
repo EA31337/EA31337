@@ -43,7 +43,7 @@ extern uint     StopLossMax = 80; // Max Stop loss (in pips, 0 = auto)
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
 extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 8; // Default trail stop method (0 = none)
-extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 11; // Default trail profit method (0 = none)
+extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = -22; // Default trail profit method (0 = none)
 extern int TrailingStop = 20; // Extra trailing stop (in pips)
 extern int TrailingProfit = 0; // Extra trailing profit (in pips)
 double TrailingStopAddPerMinute = 0.1; // Decrease trail stop per minute (pip/min)
@@ -55,7 +55,7 @@ extern double RiskMarginTotal = 5; // Risk margin in total (in %, 0-100, 0 - aut
 extern double RiskRatio = 0; // Risk ratio (0 = auto, 1.0 = normal)
 extern int RiskRatioIncreaseMethod = 0; // Risk ratio increase method (0-255)
 extern int RiskRatioDecreaseMethod = 0; // Risk ratio decrease method (0-255)
-extern int InitNoOfDaysToWarmUp = 28; // Initial warm-up period (in days)
+extern int InitNoOfDaysToWarmUp = 14; // Initial warm-up period (in days)
 extern double CloseOrderAfterXHours = 72; // Close order after X hours (>0 - all, <0 - only profitable 0 - off)
 
 extern bool ApplySpreadLimits = 1; // Apply strategy spread limits
@@ -118,7 +118,7 @@ unsigned int ZigZag_Active_Tf = 0; // ZigZag: Activate timeframes
 
 //+------------------------------------------------------------------+
 extern string __SmartQueue_Parameters__ = "-- Smart queue parameters --"; // >>> SMART QUEUE <<<
-extern bool SmartQueueActive = 0; // Activate QueueAI
+extern bool SmartQueueActive = 1; // Activate QueueAI
 extern int SmartQueueMethod = 11; // QueueAI: Method for selecting the best order (0-15)
 extern int SmartQueueFilter = 30; // QueueAI: Method for filtering the orders (0-255)
 

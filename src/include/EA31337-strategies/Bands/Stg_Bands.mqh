@@ -27,7 +27,7 @@ INPUT double Bands_Deviation_M30 = 0.1; // Deviation for M30
 INPUT int Bands_HShift = 4; // Horizontal shift
 INPUT int Bands_Shift = 0; // Shift (relative to the current bar, 0 - default)
 #ifndef __rider__
-INPUT ENUM_TRAIL_TYPE Bands_TrailingStopMethod = 9; // Trail stop method
+INPUT ENUM_TRAIL_TYPE Bands_TrailingStopMethod = 10; // Trail stop method
 INPUT ENUM_TRAIL_TYPE Bands_TrailingProfitMethod = -25; // Trail profit method
 #else
 ENUM_TRAIL_TYPE Bands_TrailingStopMethod = 0; // Trail stop method
