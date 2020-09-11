@@ -535,12 +535,13 @@ bool EA_Trade(Trade *_trade) {
         if (_cmd == ORDER_TYPE_SELL && !CheckMarketCondition1(strat.Chart(), ORDER_TYPE_SELL, strat.GetSignalOpenMethod1())) _cmd = EMPTY;
       }
 
-      if (Object::IsDynamic(trade[Chart::TfToIndex(TrendPeriod)]) && strat.GetSignalOpenMethod2() != 0) {
+      if (_cmd != EMPTY && Object::IsDynamic(trade[Chart::TfToIndex(TrendPeriod)]) && strat.GetSignalOpenMethod2() != 0) {
         if (_cmd == ORDER_TYPE_BUY  && CheckMarketCondition1(trade[Chart::TfToIndex(TrendPeriod)].Chart(), ORDER_TYPE_SELL, strat.GetSignalOpenMethod2(), false)) _cmd = EMPTY;
         if (_cmd == ORDER_TYPE_SELL && CheckMarketCondition1(trade[Chart::TfToIndex(TrendPeriod)].Chart(), ORDER_TYPE_BUY,  strat.GetSignalOpenMethod2(), false)) _cmd = EMPTY;
       }
 
       if (_cmd != EMPTY) {
+        ResetLastError();
         order_placed &= ExecuteOrder(_cmd, strat);
         if (VerboseDebug) {
           strat.Logger().Debug(StringFormat("%s:%d: %s %s on %s at %s: %s",
