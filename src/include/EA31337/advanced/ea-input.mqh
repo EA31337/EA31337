@@ -69,14 +69,14 @@ extern int InitNoOfOrdersToCalcPF = 10; // Initial number of orders to calculate
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameters (set 1.0 for default) --"; // >>> BOOSTING <<<
-extern bool Boosting_Enabled = 1; // Enable boosting
+extern bool Boosting_Enabled = 0; // Enable boosting
 extern double BoostTrendFactor = 0.5; // Boost by trend factor
 extern bool StrategyBoostByPF = 1.1; // Boost strategy by its profit factor
 extern bool StrategyHandicapByPF = 0; // Handicap by its low profit factor
 extern double BestDailyStrategyMultiplierFactor = 0.1; // Multiplier for the best daily strategy
-extern double BestWeeklyStrategyMultiplierFactor = 0.6; // Multiplier for the best weekly strategy
+extern double BestWeeklyStrategyMultiplierFactor = 0.1; // Multiplier for the best weekly strategy
 extern double BestMonthlyStrategyMultiplierFactor = 1; // Multiplier for the best monthly strategy
-extern double WorseDailyStrategyMultiplierFactor = 1; // Multiplier for the worse daily strategy
+extern double WorseDailyStrategyMultiplierFactor = 0.1; // Multiplier for the worse daily strategy
 extern double WorseWeeklyStrategyMultiplierFactor = 1; // Multiplier for the worse weekly strategy
 extern double WorseMonthlyStrategyMultiplierFactor = 1.4; // Multiplier for the worse monthly strategy
 extern double ConWinsIncreaseFactor = -1.5; // Increase lot factor on consequent wins (in %, 0 - off)

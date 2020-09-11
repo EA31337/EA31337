@@ -29,13 +29,13 @@ extern int    MinVolumeToTrade = 0; // Min volume to trade
 extern int    MaxOrderPriceSlippage = 50; // Max price slippage (in pts)
 extern int    MaxTries = 5; // Max retries for opening orders
 double MinPipChangeToTrade = 0; // Min pip change to trade
-extern int    MinPipGap = 90; // Min gap between trades per type (in pips)
+extern int    MinPipGap = 70; // Min gap between trades per type (in pips)
 //extern uint   TickProcessMethod = 0; // Tick process method (0-8, 0 - all)
 
 //+------------------------------------------------------------------+
 extern string   __EA_Order_Parameters__ = "-- Profit and loss parameters --"; // >>> PROFIT/LOSS <<<
 extern uint     TakeProfitMax = 0; // Max Take profit (in pips, 0 = auto)
-extern uint     StopLossMax = 40; // Max Stop loss (in pips, 0 = auto)
+extern uint     StopLossMax = 80; // Max Stop loss (in pips, 0 = auto)
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
@@ -57,7 +57,7 @@ extern double CloseOrderAfterXHours = 72; // Close order after X hours (>0 - all
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Profit__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGY PARAMS <<<
-extern double ProfitFactorMinToTrade = 1; // Min. profit factor per strategy to trade
+extern double ProfitFactorMinToTrade = 0.8; // Min. profit factor per strategy to trade
 extern double ProfitFactorMaxToTrade = 0.0; // Max. profit factor per strategy to trade
 extern int InitNoOfOrdersToCalcPF = 20; // Initial number of orders to calculate profit factor
 
@@ -79,22 +79,22 @@ extern uint ConFactorOrdersLimit = 1000; // No of orders to check on consequent 
 
 //+------------------------------------------------------------------+
 input static string __Strategy_Timeframes__ = "-- Strategy's timeframes --"; // >>> STRATEGY'S TIMEFRAMES (1-255: M1=1,M5=2,M15=4,M30=8,H1=16,H2=32,H4=64...) <<<
-extern unsigned int AC_Active_Tf = 15; // AC: Activate timeframes
-extern unsigned int AD_Active_Tf = 14; // AD: Activate timeframes
-extern unsigned int ADX_Active_Tf = 12; // ADX: Activate timeframes
+extern unsigned int AC_Active_Tf = 0; // AC: Activate timeframes
+extern unsigned int AD_Active_Tf = 0; // AD: Activate timeframes
+extern unsigned int ADX_Active_Tf = 9; // ADX: Activate timeframes
 extern unsigned int ATR_Active_Tf = 0; // ATR: Activate timeframes
-extern unsigned int Alligator_Active_Tf = 8; // Alligator: Activate timeframes
-extern unsigned int Bands_Active_Tf = 14; // Bands: Activate timeframes
+extern unsigned int Alligator_Active_Tf = 0; // Alligator: Activate timeframes
+extern unsigned int Bands_Active_Tf = 0; // Bands: Activate timeframes
 extern unsigned int CCI_Active_Tf = 2; // CCI: Activate timeframes
-extern unsigned int DeMarker_Active_Tf = 2; // DeMarker: Activate timeframes
-extern unsigned int Envelopes_Active_Tf = 4; // Envelopes: Activate timeframes
-extern unsigned int Force_Active_Tf = 8; // Force: Activate timeframes
-extern unsigned int Fractals_Active_Tf = 15; // Fractals: Activate timeframes
-extern unsigned int MACD_Active_Tf = 15; // MACD: Activate timeframes
+extern unsigned int DeMarker_Active_Tf = 14; // DeMarker: Activate timeframes
+extern unsigned int Envelopes_Active_Tf = 12; // Envelopes: Activate timeframes
+extern unsigned int Force_Active_Tf = 0; // Force: Activate timeframes
+extern unsigned int Fractals_Active_Tf = 0; // Fractals: Activate timeframes
+extern unsigned int MACD_Active_Tf = 4; // MACD: Activate timeframes
 extern unsigned int MA_Active_Tf = 0; // MA: Activate timeframes
-extern unsigned int MFI_Active_Tf = 15; // MFI: Activate timeframes
-extern unsigned int RSI_Active_Tf = 12; // RSI: Activate timeframes
-extern unsigned int SAR_Active_Tf = 7; // SAR: Activate timeframes
+extern unsigned int MFI_Active_Tf = 0; // MFI: Activate timeframes
+extern unsigned int RSI_Active_Tf = 4; // RSI: Activate timeframes
+extern unsigned int SAR_Active_Tf = 0; // SAR: Activate timeframes
 extern unsigned int WPR_Active_Tf = 0; // WPR: Activate timeframes
 unsigned int Awesome_Active_Tf = 0; // Awesome: Activate timeframes
 unsigned int BWMFI_Active_Tf = 0; // BWMFI: Activate timeframes
@@ -145,7 +145,7 @@ extern int Account_Condition_MinProfitCloseOrder = 20; // Min pip profit on acti
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions_Params__ = "-- Account conditions parameters --"; // >>> CONDITIONS & ACTIONS PARAMS <<<
 extern int MarketSpecificHour = 10; // Specific hour used for conditions (0-23)
-extern bool CloseConditionOnlyProfitable = 1; // Apply close condition only for profitable orders
+extern bool CloseConditionOnlyProfitable = 0; // Apply close condition only for profitable orders
 
 //+------------------------------------------------------------------+
 extern string __Experimental_Parameters__ = "-- Experimental parameters (not safe) --"; // >>> EXPERIMENTAL <<<
