@@ -47,7 +47,7 @@ INPUT ENUM_MARKET_EVENT SAR5_CloseCondition = 1; // Close condition for M5
 INPUT int SAR15_OpenCondition1 = 874; // Open condition 1 for M15 (0-1023)
 INPUT int SAR15_OpenCondition2 = 874; // Open condition 2 for M15 (0-1023)
 INPUT ENUM_MARKET_EVENT SAR15_CloseCondition = 20; // Close condition for M15
-INPUT int SAR30_OpenCondition1 = 680; // Open condition 1 for M30 (0-1023)
+INPUT int SAR30_OpenCondition1 = 98; // Open condition 1 for M30 (0-1023)
 INPUT int SAR30_OpenCondition2 = 874; // Open condition 2 for M30 (0-1023)
 INPUT ENUM_MARKET_EVENT SAR30_CloseCondition = 12; // Close condition for M30
 #else

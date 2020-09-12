@@ -42,7 +42,7 @@ extern uint     StopLossMax = 80; // Max Stop loss (in pips, 0 = auto)
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
-extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = -22; // Default trail stop method (0 = none)
+extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 9; // Default trail stop method (0 = none)
 extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = -6; // Default trail profit method (0 = none)
 extern int TrailingStop = 40; // Extra trailing stop (in pips)
 extern int TrailingProfit = 0; // Extra trailing profit (in pips)

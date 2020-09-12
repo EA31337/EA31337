@@ -49,7 +49,7 @@ INPUT ENUM_MARKET_EVENT MFI5_CloseCondition = 1; // Close condition for M5
 INPUT int MFI15_OpenCondition1 = 1; // Open condition 1 for M15 (0-)
 INPUT int MFI15_OpenCondition2 = 1; // Open condition 2 for M15 (0-)
 INPUT ENUM_MARKET_EVENT MFI15_CloseCondition = 1; // Close condition for M15
-INPUT int MFI30_OpenCondition1 = 680; // Open condition 1 for M30 (0-)
+INPUT int MFI30_OpenCondition1 = 777; // Open condition 1 for M30 (0-)
 INPUT int MFI30_OpenCondition2 = 971; // Open condition 2 for M30 (0-)
 INPUT ENUM_MARKET_EVENT MFI30_CloseCondition = 11; // Close condition for M30
 #else

@@ -51,7 +51,7 @@ INPUT ENUM_MARKET_EVENT Force5_CloseCondition = 1; // Close condition for M5
 INPUT int Force15_OpenCondition1 = 1; // Open condition 1 for M15 (0-)
 INPUT int Force15_OpenCondition2 = 1; // Open condition 2 for M15 (0-)
 INPUT ENUM_MARKET_EVENT Force15_CloseCondition = 1; // Close condition for M15
-INPUT int Force30_OpenCondition1 = 874; // Open condition 1 for M30 (0-)
+INPUT int Force30_OpenCondition1 = 292; // Open condition 1 for M30 (0-)
 INPUT int Force30_OpenCondition2 = 777; // Open condition 2 for M30 (0-)
 INPUT ENUM_MARKET_EVENT Force30_CloseCondition = 1; // Close condition for M30
 #else

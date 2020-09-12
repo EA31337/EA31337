@@ -53,7 +53,7 @@ extern double RiskRatio = 0; // Risk ratio (0 = auto, 1.0 = normal)
 extern int RiskRatioIncreaseMethod = 0; // Risk ratio increase method (0-255)
 extern int RiskRatioDecreaseMethod = 0; // Risk ratio decrease method (0-255)
 extern int InitNoOfDaysToWarmUp = 7; // Initial warm-up period (in days)
-extern double CloseOrderAfterXHours = 72; // Close order after X hours (>0 - all, <0 - only profitable 0 - off)
+extern double CloseOrderAfterXHours = 96; // Close order after X hours (>0 - all, <0 - only profitable 0 - off)
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Profit__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGY PARAMS <<<
@@ -64,18 +64,18 @@ extern int InitNoOfOrdersToCalcPF = 20; // Initial number of orders to calculate
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameters (set 1.0 for default) --"; // >>> BOOSTING <<<
 extern bool Boosting_Enabled = 1; // Enable boosting
-extern double BoostTrendFactor = 0.2; // Boost by trend factor
+extern double BoostTrendFactor = 0.3; // Boost by trend factor
 extern bool StrategyBoostByPF = 1.1; // Boost strategy by its profit factor
 extern bool StrategyHandicapByPF = 0; // Handicap by its low profit factor
 extern double BestDailyStrategyMultiplierFactor = 0.1; // Multiplier for the best daily strategy
 extern double BestWeeklyStrategyMultiplierFactor = 0.5; // Multiplier for the best weekly strategy
 extern double BestMonthlyStrategyMultiplierFactor = 0.1; // Multiplier for the best monthly strategy
-extern double WorseDailyStrategyMultiplierFactor = 1.1; // Multiplier for the worse daily strategy
+extern double WorseDailyStrategyMultiplierFactor = 0.2; // Multiplier for the worse daily strategy
 extern double WorseWeeklyStrategyMultiplierFactor = 0.4; // Multiplier for the worse weekly strategy
 extern double WorseMonthlyStrategyMultiplierFactor = 0; // Multiplier for the worse monthly strategy
-extern double ConWinsIncreaseFactor = -0.7; // Increase lot factor on consequent wins (in %, 0 - off)
-extern double ConLossesIncreaseFactor = -1.2; // Increase lot factor on consequent loses (in %, 0 - off)
-extern uint ConFactorOrdersLimit = 100; // No of orders to check on consequent wins/loses
+extern double ConWinsIncreaseFactor = -0.4; // Increase lot factor on consequent wins (in %, 0 - off)
+extern double ConLossesIncreaseFactor = -1.7; // Increase lot factor on consequent loses (in %, 0 - off)
+extern uint ConFactorOrdersLimit = 900; // No of orders to check on consequent wins/loses
 
 //+------------------------------------------------------------------+
 input static string __Strategy_Timeframes__ = "-- Strategy's timeframes --"; // >>> STRATEGY'S TIMEFRAMES (1-255: M1=1,M5=2,M15=4,M30=8,H1=16,H2=32,H4=64...) <<<
