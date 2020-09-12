@@ -37,14 +37,14 @@ extern int    MinIntervalSec = 0; // Min interval between subsequent trade signa
 
 //+------------------------------------------------------------------+
 extern string   __EA_Order_Parameters__ = "-- Profit and loss parameters --"; // >>> PROFIT/LOSS <<<
-extern uint     TakeProfitMax = 0; // Max Take profit (in pips, 0 = auto)
+extern uint     TakeProfitMax = 20; // Max Take profit (in pips, 0 = auto)
 extern uint     StopLossMax = 80; // Max Stop loss (in pips, 0 = auto)
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
 extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = -22; // Default trail stop method (0 = none)
 extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = -6; // Default trail profit method (0 = none)
-extern int TrailingStop = 20; // Extra trailing stop (in pips)
+extern int TrailingStop = 40; // Extra trailing stop (in pips)
 extern int TrailingProfit = 0; // Extra trailing profit (in pips)
 double TrailingStopAddPerMinute = 0.1; // Decrease trail stop per minute (pip/min)
 
@@ -70,18 +70,18 @@ extern int InitNoOfOrdersToCalcPF = 20; // Initial number of orders to calculate
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameters (set 1.0 for default) --"; // >>> BOOSTING <<<
 extern bool Boosting_Enabled = 0; // Enable boosting
-extern double BoostTrendFactor = 0.9; // Boost by trend factor
+extern double BoostTrendFactor = 0.5; // Boost by trend factor
 extern bool StrategyBoostByPF = 1.1; // Boost strategy by its profit factor
 extern bool StrategyHandicapByPF = 0; // Handicap by its low profit factor
-extern double BestDailyStrategyMultiplierFactor = 1.0; // Multiplier for the best daily strategy
-extern double BestWeeklyStrategyMultiplierFactor = 1.0; // Multiplier for the best weekly strategy
-extern double BestMonthlyStrategyMultiplierFactor = 1.0; // Multiplier for the best monthly strategy
-extern double WorseDailyStrategyMultiplierFactor = 1.0; // Multiplier for the worse daily strategy
-extern double WorseWeeklyStrategyMultiplierFactor = 1.0; // Multiplier for the worse weekly strategy
-extern double WorseMonthlyStrategyMultiplierFactor = 1.0; // Multiplier for the worse monthly strategy
-extern double ConWinsIncreaseFactor = 0.4; // Increase lot factor on consequent wins (in %, 0 - off)
-extern double ConLossesIncreaseFactor = 0.7; // Increase lot factor on consequent loses (in %, 0 - off)
-extern uint ConFactorOrdersLimit = 600; // No of orders to check on consequent wins/loses
+extern double BestDailyStrategyMultiplierFactor = 0.1; // Multiplier for the best daily strategy
+extern double BestWeeklyStrategyMultiplierFactor = 0.1; // Multiplier for the best weekly strategy
+extern double BestMonthlyStrategyMultiplierFactor = 1.4; // Multiplier for the best monthly strategy
+extern double WorseDailyStrategyMultiplierFactor = 1; // Multiplier for the worse daily strategy
+extern double WorseWeeklyStrategyMultiplierFactor = 1; // Multiplier for the worse weekly strategy
+extern double WorseMonthlyStrategyMultiplierFactor = 1.4; // Multiplier for the worse monthly strategy
+extern double ConWinsIncreaseFactor = -1.5; // Increase lot factor on consequent wins (in %, 0 - off)
+extern double ConLossesIncreaseFactor = -1.2; // Increase lot factor on consequent loses (in %, 0 - off)
+extern uint ConFactorOrdersLimit = 0; // No of orders to check on consequent wins/loses
 
 //+------------------------------------------------------------------+
 input static string __Strategy_Timeframes__ = "-- Strategy's timeframes --"; // >>> STRATEGY'S TIMEFRAMES (1-255: M1=1,M5=2,M15=4,M30=8,H1=16,H2=32,H4=64...) <<<

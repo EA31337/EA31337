@@ -37,7 +37,7 @@ extern int    MinIntervalSec = 0; // Min interval between subsequent trade signa
 
 //+------------------------------------------------------------------+
 extern string   __EA_Order_Parameters__ = "-- Profit and loss parameters --"; // >>> PROFIT/LOSS <<<
-extern uint     TakeProfitMax = 0; // Max Take profit (in pips, 0 = auto)
+extern uint     TakeProfitMax = 20; // Max Take profit (in pips, 0 = auto)
 extern uint     StopLossMax = 0; // Max Stop loss (in pips, 0 = auto)
 
 //+------------------------------------------------------------------+
