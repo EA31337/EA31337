@@ -39,16 +39,16 @@ int SAR30_SignalMethod = 0; // Signal method for M30 (-127-127)
 #endif
 #ifdef __advanced__
 INPUT int SAR1_OpenCondition1 = 874;
-INPUT int SAR1_OpenCondition2 = 0;
+INPUT int SAR1_OpenCondition2 = 971;
 INPUT ENUM_MARKET_EVENT SAR1_CloseCondition = 20; // Close condition for M1
 INPUT int SAR5_OpenCondition1 = 874; // Open condition 1 for M1 (0-1023)
-INPUT int SAR5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+INPUT int SAR5_OpenCondition2 = 971; // Open condition 2 for M5 (0-1023)
 INPUT ENUM_MARKET_EVENT SAR5_CloseCondition = 1; // Close condition for M5
 INPUT int SAR15_OpenCondition1 = 874; // Open condition 1 for M15 (0-1023)
-INPUT int SAR15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+INPUT int SAR15_OpenCondition2 = 874; // Open condition 2 for M15 (0-1023)
 INPUT ENUM_MARKET_EVENT SAR15_CloseCondition = 20; // Close condition for M15
 INPUT int SAR30_OpenCondition1 = 680; // Open condition 1 for M30 (0-1023)
-INPUT int SAR30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+INPUT int SAR30_OpenCondition2 = 874; // Open condition 2 for M30 (0-1023)
 INPUT ENUM_MARKET_EVENT SAR30_CloseCondition = 12; // Close condition for M30
 #else
 int SAR1_OpenCondition1 = 0;
