@@ -148,7 +148,7 @@ jobs:
           EA31337-${{ matrix.mode }}-${GITHUB_REF#refs/heads/}.ex5
 
       - name: Create version file
-        run: echo ${{ github.sha }} > sha.txt
+        run: echo ${{ github.sha }} > version.txt
         shell: bash
 
       - name: Create Development Release
