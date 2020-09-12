@@ -1317,11 +1317,7 @@ bool CloseOrder(ulong ticket_no = NULL, int reason_id = EMPTY, ENUM_MARKET_EVENT
     Message(last_msg);
     Msg::ShowText(last_msg, "Info", __FUNCTION__, __LINE__, VerboseInfo);
     last_debug = Msg::ShowText(Order::OrderTypeToString((ENUM_ORDER_TYPE) Order::OrderType()), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
-    #ifdef __advanced__
       if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(Order::GetOrderProfitInPips(), 0) + " pips, reason: " + ReasonIdToText(reason_id, _market_event) + "; " + Order::OrderTypeToString((ENUM_ORDER_TYPE) Order::OrderType()));
-    #else
-      if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(Order::GetOrderProfitInPips(), 0) + " pips; " + Order::OrderTypeToString((ENUM_ORDER_TYPE) Order::OrderType()));
-    #endif
     if (SmartQueueActive) OrderQueueProcess();
   } else {
     err_code = GetLastError();
@@ -4150,9 +4146,7 @@ string GetRiskRatioText() {
   else if (ea_risk_ratio > 5.0) text = "Extremely high (risky!)";
   else if (ea_risk_ratio > 2.0) text = "Very high";
   else if (ea_risk_ratio > 1.4) text = "High";
-  #ifdef __advanced__
-    if (StringLen(rr_text) > 0) text += " - reason: " + rr_text;
-  #endif
+  if (StringLen(rr_text) > 0) text += " - reason: " + rr_text;
   return text;
 }
 
