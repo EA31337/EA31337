@@ -41,17 +41,17 @@ int ADX15_SignalMethod = 0; // Signal method for M15 (0-?)
 int ADX30_SignalMethod = 0; // Signal method for M30 (0-?)
 #endif
 #ifdef __advanced__
-INPUT int ADX1_OpenCondition1 = 342; // Open condition 1 for M1 (0-1023)
-INPUT int ADX1_OpenCondition2 = 218; // Open condition 2 for M1 (0-)
+INPUT int ADX1_OpenCondition1 = 683; // Open condition 1 for M1 (0-1023)
+INPUT int ADX1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
 INPUT ENUM_MARKET_EVENT ADX1_CloseCondition = 12; // Close condition for M1
-INPUT int ADX5_OpenCondition1 = 807; // Open condition 1 for M5 (0-1023)
-INPUT int ADX5_OpenCondition2 = 962; // Open condition 2 for M5 (0-)
+INPUT int ADX5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+INPUT int ADX5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
 INPUT ENUM_MARKET_EVENT ADX5_CloseCondition = 13; // Close condition for M5
 INPUT int ADX15_OpenCondition1 = 1; // Open condition 1 for M15 (0-)
-INPUT int ADX15_OpenCondition2 = 1; // Open condition 2 for M15 (0-)
+INPUT int ADX15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
 INPUT ENUM_MARKET_EVENT ADX15_CloseCondition = 1; // Close condition for M15
-INPUT int ADX30_OpenCondition1 = 404; // Open condition 1 for M30 (0-)
-INPUT int ADX30_OpenCondition2 = 280; // Open condition 2 for M30 (0-)
+INPUT int ADX30_OpenCondition1 = 776; // Open condition 1 for M30 (0-)
+INPUT int ADX30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
 INPUT ENUM_MARKET_EVENT ADX30_CloseCondition = 11; // Close condition for M30
 #else
 int ADX1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)

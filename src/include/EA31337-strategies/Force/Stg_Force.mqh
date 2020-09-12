@@ -43,16 +43,16 @@ int Force30_SignalMethod = 0; // Signal method for M30 (0-
 #endif
 #ifdef __advanced__
 INPUT int Force1_OpenCondition1 = 1; // Open condition 1 for M1 (0-1023)
-INPUT int Force1_OpenCondition2 = 1; // Open condition 2 for M1 (0-)
+INPUT int Force1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
 INPUT ENUM_MARKET_EVENT Force1_CloseCondition = 1; // Close condition for M1
-INPUT int Force5_OpenCondition1 = 98; // Open condition 1 for M5 (0-1023)
-INPUT int Force5_OpenCondition2 = 1; // Open condition 2 for M5 (0-)
+INPUT int Force5_OpenCondition1 = 486; // Open condition 1 for M5 (0-1023)
+INPUT int Force5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
 INPUT ENUM_MARKET_EVENT Force5_CloseCondition = 1; // Close condition for M5
 INPUT int Force15_OpenCondition1 = 1; // Open condition 1 for M15 (0-)
-INPUT int Force15_OpenCondition2 = 1; // Open condition 2 for M15 (0-)
+INPUT int Force15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
 INPUT ENUM_MARKET_EVENT Force15_CloseCondition = 1; // Close condition for M15
-INPUT int Force30_OpenCondition1 = 680; // Open condition 1 for M30 (0-)
-INPUT int Force30_OpenCondition2 = 777; // Open condition 2 for M30 (0-)
+INPUT int Force30_OpenCondition1 = 874; // Open condition 1 for M30 (0-)
+INPUT int Force30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
 INPUT ENUM_MARKET_EVENT Force30_CloseCondition = 1; // Close condition for M30
 #else
 int Force1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)

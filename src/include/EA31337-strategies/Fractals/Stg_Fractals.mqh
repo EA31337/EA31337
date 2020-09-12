@@ -37,16 +37,16 @@ int Fractals30_SignalMethod = 0; // Signal method for M30 (-3-3)
 #endif
 #ifdef __advanced__
 INPUT int Fractals1_OpenCondition1 = 874; // Open condition 1 for M1 (0-1023)
-INPUT int Fractals1_OpenCondition2 = 971; // Open condition 2 for M1 (0-)
+INPUT int Fractals1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
 INPUT ENUM_MARKET_EVENT Fractals1_CloseCondition = 20; // Close condition for M1
 INPUT int Fractals5_OpenCondition1 = 874; // Open condition 1 for M5 (0-1023)
-INPUT int Fractals5_OpenCondition2 = 971; // Open condition 2 for M5 (0-)
+INPUT int Fractals5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
 INPUT ENUM_MARKET_EVENT Fractals5_CloseCondition = 1; // Close condition for M5
 INPUT int Fractals15_OpenCondition1 = 874; // Open condition 1 for M15 (0-)
-INPUT int Fractals15_OpenCondition2 = 971; // Open condition 2 for M15 (0-)
+INPUT int Fractals15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
 INPUT ENUM_MARKET_EVENT Fractals15_CloseCondition = 14; // Close condition for M15
-INPUT int Fractals30_OpenCondition1 = 680; // Open condition 1 for M30 (0-)
-INPUT int Fractals30_OpenCondition2 = 971; // Open condition 2 for M30 (0-)
+INPUT int Fractals30_OpenCondition1 = 971; // Open condition 1 for M30 (0-)
+INPUT int Fractals30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
 INPUT ENUM_MARKET_EVENT Fractals30_CloseCondition = 11; // Close condition for M30
 #else
 int Fractals1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)

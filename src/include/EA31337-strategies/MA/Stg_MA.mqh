@@ -45,16 +45,16 @@ int MA30_SignalMethod = 0; // Signal method for M30 (-127-127)
 #endif
 #ifdef __advanced__
 INPUT int MA1_OpenCondition1 = 1; // Open condition 1 for M1 (0-1023)
-INPUT int MA1_OpenCondition2 = 1; // Open condition 2 for M1 (0-1023)
+INPUT int MA1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
 INPUT ENUM_MARKET_EVENT MA1_CloseCondition = 14; // Close condition for M1
 INPUT int MA5_OpenCondition1 = 1; // Open condition 1 for M5 (0-1023)
-INPUT int MA5_OpenCondition2 = 971; // Open condition 2 for M5 (0-1023)
+INPUT int MA5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
 INPUT ENUM_MARKET_EVENT MA5_CloseCondition = 1; // Close condition for M5
 INPUT int MA15_OpenCondition1 = 1; // Open condition 1 for M15 (0-1023)
-INPUT int MA15_OpenCondition2 = 1; // Open condition 2 for M15 (0-1023)
+INPUT int MA15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
 INPUT ENUM_MARKET_EVENT MA15_CloseCondition = 1; // Close condition for M15
 INPUT int MA30_OpenCondition1 = 1; // Open condition 1 for M30 (0-1023)
-INPUT int MA30_OpenCondition2 = 1; // Open condition 2 for M30 (0-1023)
+INPUT int MA30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
 INPUT ENUM_MARKET_EVENT MA30_CloseCondition = 5; // Close condition for M30
 #else
 int MA1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)

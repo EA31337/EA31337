@@ -38,7 +38,7 @@ extern int    MinIntervalSec = 0; // Min interval between subsequent trade signa
 //+------------------------------------------------------------------+
 extern string   __EA_Order_Parameters__ = "-- Profit and loss parameters --"; // >>> PROFIT/LOSS <<<
 extern uint     TakeProfitMax = 0; // Max Take profit (in pips, 0 = auto)
-extern uint     StopLossMax = 120; // Max Stop loss (in pips, 0 = auto)
+extern uint     StopLossMax = 0; // Max Stop loss (in pips, 0 = auto)
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
@@ -63,20 +63,20 @@ extern double MaxSpreadToTrade = 10.0; // Max spread to trade (in pips), 0 - dis
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Profit__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGY PARAMS <<<
-extern double ProfitFactorMinToTrade = 0.7; // Min. profit factor per strategy to trade
+extern double ProfitFactorMinToTrade = 0.6; // Min. profit factor per strategy to trade
 extern double ProfitFactorMaxToTrade = 0.0; // Max. profit factor per strategy to trade
 extern int InitNoOfOrdersToCalcPF = 10; // Initial number of orders to calculate profit factor
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameters (set 1.0 for default) --"; // >>> BOOSTING <<<
-extern bool Boosting_Enabled = 0; // Enable boosting
+extern bool Boosting_Enabled = 1; // Enable boosting
 extern double BoostTrendFactor = 0.5; // Boost by trend factor
 extern bool StrategyBoostByPF = 1.1; // Boost strategy by its profit factor
 extern bool StrategyHandicapByPF = 0; // Handicap by its low profit factor
 extern double BestDailyStrategyMultiplierFactor = 0.1; // Multiplier for the best daily strategy
 extern double BestWeeklyStrategyMultiplierFactor = 0.1; // Multiplier for the best weekly strategy
-extern double BestMonthlyStrategyMultiplierFactor = 1; // Multiplier for the best monthly strategy
-extern double WorseDailyStrategyMultiplierFactor = 0.1; // Multiplier for the worse daily strategy
+extern double BestMonthlyStrategyMultiplierFactor = 1.4; // Multiplier for the best monthly strategy
+extern double WorseDailyStrategyMultiplierFactor = 1; // Multiplier for the worse daily strategy
 extern double WorseWeeklyStrategyMultiplierFactor = 1; // Multiplier for the worse weekly strategy
 extern double WorseMonthlyStrategyMultiplierFactor = 1.4; // Multiplier for the worse monthly strategy
 extern double ConWinsIncreaseFactor = -1.5; // Increase lot factor on consequent wins (in %, 0 - off)
@@ -85,8 +85,8 @@ extern uint ConFactorOrdersLimit = 0; // No of orders to check on consequent win
 
 //+------------------------------------------------------------------+
 input static string __Strategy_Timeframes__ = "-- Strategy's timeframes --"; // >>> STRATEGY'S TIMEFRAMES (1-255: M1=1,M5=2,M15=4,M30=8,H1=16,H2=32,H4=64...) <<<
-extern unsigned int AC_Active_Tf = 3; // AC: Activate timeframes
-extern unsigned int AD_Active_Tf = 2; // AD: Activate timeframes
+extern unsigned int AC_Active_Tf = 15; // AC: Activate timeframes
+extern unsigned int AD_Active_Tf = 0; // AD: Activate timeframes
 extern unsigned int ADX_Active_Tf = 0; // ADX: Activate timeframes
 extern unsigned int Alligator_Active_Tf = 2; // Alligator: Activate timeframes
 extern unsigned int Bands_Active_Tf = 2; // Bands: Activate timeframes
@@ -118,7 +118,7 @@ unsigned int ZigZag_Active_Tf = 0; // ZigZag: Activate timeframes
 
 //+------------------------------------------------------------------+
 extern string __SmartQueue_Parameters__ = "-- Smart queue parameters --"; // >>> SMART QUEUE <<<
-extern bool SmartQueueActive = 1; // Activate QueueAI
+extern bool SmartQueueActive = 0; // Activate QueueAI
 extern int SmartQueueMethod = 5; // QueueAI: Method for selecting the best order (0-15)
 extern int SmartQueueFilter = 30; // QueueAI: Method for filtering the orders (0-255)
 

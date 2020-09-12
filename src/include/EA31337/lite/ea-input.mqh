@@ -19,8 +19,8 @@
 
 //+------------------------------------------------------------------+
 extern string __Trade_Parameters__ = "-- Trade parameters --"; // >>> TRADE <<<
-extern uint   MaxOrders = 5; // Max orders (0 = auto)
-extern uint   MaxOrdersPerType = 2; // Max orders per type (0 = auto)
+extern uint   MaxOrders = 0; // Max orders (0 = auto)
+extern uint   MaxOrdersPerType = 0; // Max orders per type (0 = auto)
 uint   MaxOrdersPerDay = 0; // Max orders per day (0 = unlimited)
 extern double LotSize = 0; // Lot size (0 = auto)
 extern bool   TradeMicroLots = 1; // Trade micro lots?
@@ -41,7 +41,7 @@ extern uint     StopLossMax = 80; // Max Stop loss (in pips, 0 = auto)
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
 ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 0; // Default trail stop method (0 = none)
 ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 0; // Default trail profit method
-extern int TrailingStop = 50; // Extra trailing stop (in pips)
+extern int TrailingStop = 60; // Extra trailing stop (in pips)
 extern int TrailingProfit = 0; // Extra trailing profit (in pips)
 double TrailingStopAddPerMinute = 0.0; // Decrease trail stop per minute (pip/min)
 
@@ -57,25 +57,25 @@ extern double CloseOrderAfterXHours = 72; // Close order after X hours (>0 - all
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Profit__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGY PARAMS <<<
-extern double ProfitFactorMinToTrade = 0.8; // Min. profit factor per strategy to trade
+extern double ProfitFactorMinToTrade = 0.9; // Min. profit factor per strategy to trade
 extern double ProfitFactorMaxToTrade = 0.0; // Max. profit factor per strategy to trade
 extern int InitNoOfOrdersToCalcPF = 20; // Initial number of orders to calculate profit factor
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameters (set 1.0 for default) --"; // >>> BOOSTING <<<
 extern bool Boosting_Enabled = 1; // Enable boosting
-extern double BoostTrendFactor = 0.1; // Boost by trend factor
+extern double BoostTrendFactor = 0.2; // Boost by trend factor
 extern bool StrategyBoostByPF = 1.1; // Boost strategy by its profit factor
 extern bool StrategyHandicapByPF = 0; // Handicap by its low profit factor
-extern double BestDailyStrategyMultiplierFactor = 0.2; // Multiplier for the best daily strategy
+extern double BestDailyStrategyMultiplierFactor = 0.1; // Multiplier for the best daily strategy
 extern double BestWeeklyStrategyMultiplierFactor = 0.5; // Multiplier for the best weekly strategy
-extern double BestMonthlyStrategyMultiplierFactor = 0.2; // Multiplier for the best monthly strategy
-extern double WorseDailyStrategyMultiplierFactor = 0.2; // Multiplier for the worse daily strategy
-extern double WorseWeeklyStrategyMultiplierFactor = 1.4; // Multiplier for the worse weekly strategy
-extern double WorseMonthlyStrategyMultiplierFactor = 0.4; // Multiplier for the worse monthly strategy
-extern double ConWinsIncreaseFactor = -1; // Increase lot factor on consequent wins (in %, 0 - off)
-extern double ConLossesIncreaseFactor = -0.7; // Increase lot factor on consequent loses (in %, 0 - off)
-extern uint ConFactorOrdersLimit = 1000; // No of orders to check on consequent wins/loses
+extern double BestMonthlyStrategyMultiplierFactor = 0.1; // Multiplier for the best monthly strategy
+extern double WorseDailyStrategyMultiplierFactor = 1.1; // Multiplier for the worse daily strategy
+extern double WorseWeeklyStrategyMultiplierFactor = 0.4; // Multiplier for the worse weekly strategy
+extern double WorseMonthlyStrategyMultiplierFactor = 0; // Multiplier for the worse monthly strategy
+extern double ConWinsIncreaseFactor = -0.7; // Increase lot factor on consequent wins (in %, 0 - off)
+extern double ConLossesIncreaseFactor = -1.2; // Increase lot factor on consequent loses (in %, 0 - off)
+extern uint ConFactorOrdersLimit = 100; // No of orders to check on consequent wins/loses
 
 //+------------------------------------------------------------------+
 input static string __Strategy_Timeframes__ = "-- Strategy's timeframes --"; // >>> STRATEGY'S TIMEFRAMES (1-255: M1=1,M5=2,M15=4,M30=8,H1=16,H2=32,H4=64...) <<<
@@ -113,8 +113,8 @@ unsigned int ZigZag_Active_Tf = 0; // ZigZag: Activate timeframes
 //+------------------------------------------------------------------+
 extern string __SmartQueue_Parameters__ = "-- Smart queue parameters --"; // >>> SMART QUEUE <<<
 extern bool SmartQueueActive = 1; // Activate QueueAI
-extern int SmartQueueMethod = 11; // QueueAI: Method for selecting the best order (0-15)
-extern int SmartQueueFilter = 30; // QueueAI: Method for filtering the orders (0-255)
+extern int SmartQueueMethod = 7; // QueueAI: Method for selecting the best order (0-15)
+extern int SmartQueueFilter = 6; // QueueAI: Method for filtering the orders (0-255)
 
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions__ = "-- Account conditions --"; // >>> CONDITIONS & ACTIONS <<<
@@ -132,9 +132,9 @@ extern ENUM_ACC_CONDITION Account_Condition_3 = 10; // 3. Account condition
 extern ENUM_MARKET_CONDITION Market_Condition_3 = 1; // 3. Market condition
 extern ENUM_ACTION_TYPE Action_On_Condition_3 = 0; // 3. Action to take
 // Condition 17 - Max. daily balance < max. weekly
-extern ENUM_ACC_CONDITION Account_Condition_4 = 20; // 4. Account condition
-extern ENUM_MARKET_CONDITION Market_Condition_4 = 15; // 4. Market condition
-extern ENUM_ACTION_TYPE Action_On_Condition_4 = 0; // 4. Action to take
+extern ENUM_ACC_CONDITION Account_Condition_4 = 19; // 4. Account condition
+extern ENUM_MARKET_CONDITION Market_Condition_4 = 11; // 4. Market condition
+extern ENUM_ACTION_TYPE Action_On_Condition_4 = 9; // 4. Action to take
 //
 extern ENUM_ACC_CONDITION Account_Condition_5 = 0; // 5. Account condition
 extern ENUM_MARKET_CONDITION Market_Condition_5 = 0; // 5. Market condition

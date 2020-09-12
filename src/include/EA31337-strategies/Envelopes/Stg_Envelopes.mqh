@@ -47,17 +47,17 @@ int Envelopes15_SignalMethod = 0; // Signal method for M15 (-127-127)
 int Envelopes30_SignalMethod = 0; // Signal method for M30 (-127-127)
 #endif
 #ifdef __advanced__
-INPUT int Envelopes1_OpenCondition1 = 1; // Open condition 1 for M1 (0-1023)
-INPUT int Envelopes1_OpenCondition2 = 1; // Open condition 2 for M1 (0-1023)
+INPUT int Envelopes1_OpenCondition1 = 680; // Open condition 1 for M1 (0-1023)
+INPUT int Envelopes1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
 INPUT ENUM_MARKET_EVENT Envelopes1_CloseCondition = 20; // Close condition for M1
-INPUT int Envelopes5_OpenCondition1 = 292; // Open condition 1 for M5 (0-1023)
-INPUT int Envelopes5_OpenCondition2 = 1; // Open condition 2 for M5 (0-1023)
+INPUT int Envelopes5_OpenCondition1 = 389; // Open condition 1 for M5 (0-1023)
+INPUT int Envelopes5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
 INPUT ENUM_MARKET_EVENT Envelopes5_CloseCondition = 1; // Close condition for M5
-INPUT int Envelopes15_OpenCondition1 = 292; // Open condition 1 for M15 (0-1023)
-INPUT int Envelopes15_OpenCondition2 = 1; // Open condition 2 for M15 (0-1023)
+INPUT int Envelopes15_OpenCondition1 = 1; // Open condition 1 for M15 (0-1023)
+INPUT int Envelopes15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
 INPUT ENUM_MARKET_EVENT Envelopes15_CloseCondition = 20; // Close condition for M15
-INPUT int Envelopes30_OpenCondition1 = 292; // Open condition 1 for M30 (0-1023)
-INPUT int Envelopes30_OpenCondition2 = 98; // Open condition 2 for M30 (0-1023)
+INPUT int Envelopes30_OpenCondition1 = 98; // Open condition 1 for M30 (0-1023)
+INPUT int Envelopes30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
 INPUT ENUM_MARKET_EVENT Envelopes30_CloseCondition = 11; // Close condition for M30
 #else
 int Envelopes1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
