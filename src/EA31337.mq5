@@ -2453,7 +2453,6 @@ double GetLotSizeAuto(uint _method = 0, bool smooth = true) {
     }
   }
 
-  #ifdef __advanced__
   if (Boosting_Enabled) {
     if (LotSizeIncreaseMethod != 0) {
       if (METHOD(LotSizeIncreaseMethod, 0)) if (AccCondition(C_ACC_IN_PROFIT))      new_lot_size *= 1.1;
@@ -2477,7 +2476,6 @@ double GetLotSizeAuto(uint _method = 0, bool smooth = true) {
       if (METHOD(LotSizeDecreaseMethod, 7)) if (AccCondition(C_ACC_PDAY_IN_PROFIT)) new_lot_size *= 0.9;
     }
   }
-  #endif
 
   if (smooth && ea_lot_size > 0) {
     // Increase only by average of the previous and new (which should prevent sudden increases).

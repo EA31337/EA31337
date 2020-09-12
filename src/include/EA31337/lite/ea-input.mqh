@@ -23,6 +23,8 @@ extern uint   MaxOrders = 0; // Max orders (0 = auto)
 extern uint   MaxOrdersPerType = 0; // Max orders per type (0 = auto)
 uint   MaxOrdersPerDay = 0; // Max orders per day (0 = unlimited)
 extern double LotSize = 0; // Lot size (0 = auto)
+extern int    LotSizeIncreaseMethod = 0; // Lot size increase method (0-255)
+extern int    LotSizeDecreaseMethod = 0; // Lot size decrease method (0-255)
 extern bool   TradeMicroLots = 1; // Trade micro lots?
 int           TrendMethod = 0; // Main trend method (0-255)
 extern int    MinVolumeToTrade = 0; // Min volume to trade
@@ -71,8 +73,8 @@ extern double BestDailyStrategyMultiplierFactor = 0.1; // Multiplier for the bes
 extern double BestWeeklyStrategyMultiplierFactor = 0.5; // Multiplier for the best weekly strategy
 extern double BestMonthlyStrategyMultiplierFactor = 0.1; // Multiplier for the best monthly strategy
 extern double WorseDailyStrategyMultiplierFactor = 0.2; // Multiplier for the worse daily strategy
-extern double WorseWeeklyStrategyMultiplierFactor = 0.4; // Multiplier for the worse weekly strategy
-extern double WorseMonthlyStrategyMultiplierFactor = 0; // Multiplier for the worse monthly strategy
+extern double WorseWeeklyStrategyMultiplierFactor = 0.2; // Multiplier for the worse weekly strategy
+extern double WorseMonthlyStrategyMultiplierFactor = 0.1; // Multiplier for the worse monthly strategy
 extern double ConWinsIncreaseFactor = -0.4; // Increase lot factor on consequent wins (in %, 0 - off)
 extern double ConLossesIncreaseFactor = -1.7; // Increase lot factor on consequent loses (in %, 0 - off)
 extern uint ConFactorOrdersLimit = 900; // No of orders to check on consequent wins/loses
