@@ -23,8 +23,8 @@ extern uint   MaxOrders = 0; // Max orders (0 = auto)
 extern uint   MaxOrdersPerType = 0; // Max orders per type (0 = auto)
 extern uint   MaxOrdersPerDay = 0; // Max orders per day (0 = unlimited)
 extern double LotSize = 0; // Lot size (0 = auto)
-extern int    LotSizeIncreaseMethod = 202; // Lot size increase method (0-255)
-extern int    LotSizeDecreaseMethod = 167; // Lot size decrease method (0-255)
+extern int    LotSizeIncreaseMethod = 0; // Lot size increase method (0-255)
+extern int    LotSizeDecreaseMethod = 0; // Lot size decrease method (0-255)
 extern bool   TradeMicroLots = 1; // Trade micro lots?
 int           TrendMethod = 0; // Main trend method (0-255)
 extern int    MinVolumeToTrade = 0; // Min volume to trade

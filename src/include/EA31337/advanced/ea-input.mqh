@@ -20,11 +20,11 @@
 //+------------------------------------------------------------------+
 extern string __Trade_Parameters__ = "-- Trade parameters --"; // >>> TRADE <<<
 extern uint   MaxOrders = 0; // Max orders (0 = auto)
-extern uint   MaxOrdersPerType = 6; // Max orders per type (0 = auto)
+extern uint   MaxOrdersPerType = 0; // Max orders per type (0 = auto)
 extern uint   MaxOrdersPerDay = 0; // Max orders per day (0 = unlimited)
-extern double LotSize = 0.01; // Lot size (0 = auto)
-extern int    LotSizeIncreaseMethod = 202; // Lot size increase method (0-255)
-extern int    LotSizeDecreaseMethod = 167; // Lot size decrease method (0-255)
+extern double LotSize = 0; // Lot size (0 = auto)
+extern int    LotSizeIncreaseMethod = 0; // Lot size increase method (0-255)
+extern int    LotSizeDecreaseMethod = 0; // Lot size decrease method (0-255)
 extern bool   TradeMicroLots = 1; // Trade micro lots?
 int           TrendMethod = 0; // Main trend method (0-255)
 extern int    MinVolumeToTrade = 0; // Min volume to trade
@@ -56,7 +56,7 @@ extern double RiskRatio = 0; // Risk ratio (0 = auto, 1.0 = normal)
 extern int RiskRatioIncreaseMethod = 0; // Risk ratio increase method (0-255)
 extern int RiskRatioDecreaseMethod = 0; // Risk ratio decrease method (0-255)
 extern int InitNoOfDaysToWarmUp = 21; // Initial warm-up period (in days)
-extern double CloseOrderAfterXHours = 0; // Close order after X hours (>0 - all, <0 - only profitable 0 - off)
+extern double CloseOrderAfterXHours = 48; // Close order after X hours (>0 - all, <0 - only profitable 0 - off)
 
 extern bool ApplySpreadLimits = 1; // Apply strategy spread limits
 extern double MaxSpreadToTrade = 10.0; // Max spread to trade (in pips), 0 - disable limit
