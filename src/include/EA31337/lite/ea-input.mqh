@@ -79,18 +79,18 @@ extern uint ConFactorOrdersLimit = 100; // No of orders to check on consequent w
 
 //+------------------------------------------------------------------+
 input static string __Strategy_Timeframes__ = "-- Strategy's timeframes --"; // >>> STRATEGY'S TIMEFRAMES (1-255: M1=1,M5=2,M15=4,M30=8,H1=16,H2=32,H4=64...) <<<
-extern unsigned int AC_Active_Tf = 0; // AC: Activate timeframes
+extern unsigned int AC_Active_Tf = 4; // AC: Activate timeframes
 extern unsigned int AD_Active_Tf = 0; // AD: Activate timeframes
-extern unsigned int ADX_Active_Tf = 15; // ADX: Activate timeframes
+extern unsigned int ADX_Active_Tf = 9; // ADX: Activate timeframes
 extern unsigned int ATR_Active_Tf = 0; // ATR: Activate timeframes
 extern unsigned int Alligator_Active_Tf = 0; // Alligator: Activate timeframes
 extern unsigned int Bands_Active_Tf = 0; // Bands: Activate timeframes
 extern unsigned int CCI_Active_Tf = 2; // CCI: Activate timeframes
 extern unsigned int DeMarker_Active_Tf = 6; // DeMarker: Activate timeframes
 extern unsigned int Envelopes_Active_Tf = 12; // Envelopes: Activate timeframes
-extern unsigned int Force_Active_Tf = 2; // Force: Activate timeframes
-extern unsigned int Fractals_Active_Tf = 1; // Fractals: Activate timeframes
-extern unsigned int MACD_Active_Tf = 4; // MACD: Activate timeframes
+extern unsigned int Force_Active_Tf = 0; // Force: Activate timeframes
+extern unsigned int Fractals_Active_Tf = 0; // Fractals: Activate timeframes
+extern unsigned int MACD_Active_Tf = 0; // MACD: Activate timeframes
 extern unsigned int MA_Active_Tf = 0; // MA: Activate timeframes
 extern unsigned int MFI_Active_Tf = 0; // MFI: Activate timeframes
 extern unsigned int RSI_Active_Tf = 4; // RSI: Activate timeframes
