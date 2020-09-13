@@ -1,0 +1,67 @@
+
+
+
+                                                                Strategy Tester Report
+                                              EA31337-Advanced-90c0bec4945c47ed8204bb9c47d48f14949bcdf0
+                                                                     (Build 1260)
+
+ Symbol                            EURUSD (Euro vs US Dollar)
+ Period                            1 Minute (M1) 2019.03.01 00:00 - 2019.03.29 20:59 (2019.03.01 - 2019.03.31)
+ Model                             Every tick (the most precise method based on all available least timeframes)
+                                   __EA_Parameters__="-- Input EA parameters for EA31337 Advanced v1.080 --"; __Trade_Parameters__="-- Trade
+                                   parameters --"; MaxOrders=0; MaxOrdersPerType=0; MaxOrdersPerDay=0; LotSize=0; LotSizeIncreaseMethod=0;
+                                   LotSizeDecreaseMethod=0; TradeMicroLots=true; MinVolumeToTrade=0; MaxOrderPriceSlippage=50; MaxTries=5;
+                                   MinPipGap=10; MinIntervalSec=0; __EA_Order_Parameters__="-- Profit and loss parameters --"; TakeProfitMax=0;
+                                   StopLossMax=60; __EA_Trailing_Parameters__="-- Profit and loss trailing parameters --"; TrailingStop=50;
+                                   TrailingProfit=0; __EA_Risk_Parameters__="-- Risk management parameters --"; RiskMarginPerOrder=1;
+                                   RiskMarginTotal=5; RiskRatio=0; RiskRatioIncreaseMethod=0; RiskRatioDecreaseMethod=0; InitNoOfDaysToWarmUp=21;
+                                   CloseOrderAfterXHours=120; ApplySpreadLimits=true; MaxSpreadToTrade=10; __Strategy_Profit__="-- Per strategy
+                                   parameters (0 to disable) --"; ProfitFactorMinToTrade=0.2; ProfitFactorMaxToTrade=0; InitNoOfOrdersToCalcPF=10;
+                                   __Strategy_Boosting_Parameters__="-- Strategy boosting parameters (set 1.0 for default) --";
+                                   Boosting_Enabled=false; BoostTrendFactor=0.5; StrategyBoostByPF=true; StrategyHandicapByPF=false;
+                                   BestDailyStrategyMultiplierFactor=0.1; BestWeeklyStrategyMultiplierFactor=0.1;
+                                   BestMonthlyStrategyMultiplierFactor=1.4; WorseDailyStrategyMultiplierFactor=0;
+                                   WorseWeeklyStrategyMultiplierFactor=0.1; WorseMonthlyStrategyMultiplierFactor=0.4; ConWinsIncreaseFactor=-1.5;
+                                   ConLossesIncreaseFactor=-1.2; ConFactorOrdersLimit=0; __Strategy_Timeframes__="-- Strategy's timeframes --";
+                                   AC_Active_Tf=1; AD_Active_Tf=0; ADX_Active_Tf=3; Alligator_Active_Tf=5; Bands_Active_Tf=5; CCI_Active_Tf=5;
+                                   DeMarker_Active_Tf=10; Envelopes_Active_Tf=5; Force_Active_Tf=1; Fractals_Active_Tf=7; MACD_Active_Tf=1;
+                                   MA_Active_Tf=0; MFI_Active_Tf=11; RSI_Active_Tf=1; SAR_Active_Tf=9; WPR_Active_Tf=7; __SmartQueue_Parameters__="-
+                                   - Smart queue parameters --"; SmartQueueActive=false; SmartQueueMethod=5; SmartQueueFilter=30;
+                                   __EA_Account_Conditions__="-- Account conditions --"; Account_Conditions_Active=false; Account_Condition_1=2;
+ Parameters                        Market_Condition_1=14; Action_On_Condition_1=1; Account_Condition_2=0; Market_Condition_2=8;
+                                   Action_On_Condition_2=7; Account_Condition_3=0; Market_Condition_3=1; Action_On_Condition_3=0;
+                                   Account_Condition_4=17; Market_Condition_4=16; Action_On_Condition_4=7; Account_Condition_5=0;
+                                   Market_Condition_5=0; Action_On_Condition_5=0; Account_Condition_6=6; Market_Condition_6=0;
+                                   Action_On_Condition_6=0; Account_Condition_7=7; Market_Condition_7=0; Action_On_Condition_7=0;
+                                   Account_Condition_8=8; Market_Condition_8=0; Action_On_Condition_8=0; Account_Condition_9=9;
+                                   Market_Condition_9=0; Action_On_Condition_9=0; Account_Condition_10=10; Market_Condition_10=0;
+                                   Action_On_Condition_10=0; Account_Condition_11=11; Market_Condition_11=0; Action_On_Condition_11=0;
+                                   Account_Condition_12=12; Market_Condition_12=0; Action_On_Condition_12=0; Account_Condition_13=13;
+                                   Market_Condition_13=0; Action_On_Condition_13=0; Account_Condition_14=14; Market_Condition_14=0;
+                                   Action_On_Condition_14=0; Account_Condition_15=15; Market_Condition_15=0; Action_On_Condition_15=0;
+                                   Account_Condition_16=16; Market_Condition_16=0; Action_On_Condition_16=0; Account_Condition_17=17;
+                                   Market_Condition_17=0; Action_On_Condition_17=0; Account_Condition_18=18; Market_Condition_18=0;
+                                   Action_On_Condition_18=0; Account_Condition_19=19; Market_Condition_19=0; Action_On_Condition_19=0;
+                                   Account_Condition_20=20; Market_Condition_20=0; Action_On_Condition_20=0; Account_Condition_21=21;
+                                   Market_Condition_21=0; Action_On_Condition_21=0; Account_Condition_22=22; Market_Condition_22=0;
+                                   Action_On_Condition_22=0; Account_Condition_23=23; Market_Condition_23=0; Action_On_Condition_23=0;
+                                   Account_Condition_24=24; Market_Condition_24=0; Action_On_Condition_24=0; Account_Condition_25=25;
+                                   Market_Condition_25=0; Action_On_Condition_25=0; Account_Condition_26=26; Market_Condition_26=0;
+                                   Action_On_Condition_26=0; Account_Condition_27=27; Market_Condition_27=0; Action_On_Condition_27=0;
+                                   Account_Condition_28=0; Market_Condition_28=0; Action_On_Condition_28=0; AC_Shift=0;
+ Bars in test                31110 Ticks modelled                     13221402 Modelling quality                                              25.00%
+ Mismatched charts errors        0
+ Initial deposit          10000.00                                             Spread                                                             10
+ Total net profit          2152.19 Gross profit                        2686.81 Gross loss                                                    -534.62
+ Profit factor                5.03 Expected payoff                        8.44
+ Absolute drawdown           10.10 Maximal drawdown             369.70 (3.12%) Relative drawdown                                      3.35% (349.60)
+ Total trades                  255 Short positions (won %)        203 (52.22%) Long positions (won %)                                    52 (42.31%)
+                                   Profit trades (% of total)     128 (50.20%) Loss trades (% of total)                                 127 (49.80%)
+                           Largest profit trade                         169.98 loss trade                                                     -56.10
+                           Average profit trade                          20.99 loss trade                                                      -4.21
+                           Maximum consecutive wins (profit in     12 (344.76) consecutive losses (loss in money)                        20 (-27.50)
+                                   money)
+                           Maximal consecutive profit (count of     770.58 (7) consecutive loss (count of losses)                        -82.70 (10)
+                                   wins)
+                           Average consecutive wins                          3 consecutive losses                                                  3
+                                                                       [Graph]
