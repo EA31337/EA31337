@@ -65,10 +65,10 @@ extern int InitNoOfOrdersToCalcPF = 20; // Initial number of orders to calculate
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameters (set 1.0 for default) --"; // >>> BOOSTING <<<
-extern bool Boosting_Enabled = 0; // Enable boosting
+extern bool Boosting_Enabled = 1; // Enable boosting
 extern double BoostTrendFactor = 0.5; // Boost by trend factor
 extern bool StrategyBoostByPF = 1.1; // Boost strategy by its profit factor
-extern bool StrategyHandicapByPF = 1; // Handicap by its low profit factor
+extern bool StrategyHandicapByPF = 0; // Handicap by its low profit factor
 extern double BestDailyStrategyMultiplierFactor = 0.4; // Multiplier for the best daily strategy
 extern double BestWeeklyStrategyMultiplierFactor = 0.1; // Multiplier for the best weekly strategy
 extern double BestMonthlyStrategyMultiplierFactor = 0.5; // Multiplier for the best monthly strategy
@@ -120,7 +120,7 @@ extern int SmartQueueFilter = 6; // QueueAI: Method for filtering the orders (0-
 
 //+------------------------------------------------------------------+
 extern string __EA_Account_Conditions__ = "-- Account conditions --"; // >>> CONDITIONS & ACTIONS <<<
-extern bool Account_Conditions_Active = 1; // Enable account conditions (don't enable for multibot trading)
+extern bool Account_Conditions_Active = 0; // Enable account conditions (don't enable for multibot trading)
 // Condition 5 - Equity 1% high
 extern ENUM_ACC_CONDITION Account_Condition_1 = 5; // 1. Account condition
 extern ENUM_MARKET_CONDITION Market_Condition_1 = 8; // 1. Market condition
