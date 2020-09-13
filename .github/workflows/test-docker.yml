@@ -9,6 +9,7 @@ on:
     paths:
       - '**.h'
       - '**.mq?'
+      - '**.yml'
       - '.github/workflows/test-docker.yml'
       - 'src/include/**'
 

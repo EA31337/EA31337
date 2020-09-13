@@ -9,7 +9,7 @@ services:
       - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
-      BT_MONTHS: 01
+      BT_MONTHS: 1
       TEST_REPORT_NAME: EA31337_Rider_201801
   Rider_2018_2:
     command: run_backtest -v
@@ -19,7 +19,7 @@ services:
       - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
-      BT_MONTHS: 02
+      BT_MONTHS: 2
       TEST_REPORT_NAME: EA31337_Rider_201802
   Rider_2018_3:
     command: run_backtest -v
@@ -29,7 +29,7 @@ services:
       - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
-      BT_MONTHS: 03
+      BT_MONTHS: 3
       TEST_REPORT_NAME: EA31337_Rider_201803
   Rider_2018_4:
     command: run_backtest -v
@@ -39,7 +39,7 @@ services:
       - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
-      BT_MONTHS: 04
+      BT_MONTHS: 4
       TEST_REPORT_NAME: EA31337_Rider_201804
   Rider_2018_5:
     command: run_backtest -v
@@ -49,7 +49,7 @@ services:
       - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
-      BT_MONTHS: 05
+      BT_MONTHS: 5
       TEST_REPORT_NAME: EA31337_Rider_201805
   Rider_2018_6:
     command: run_backtest -v
@@ -59,7 +59,7 @@ services:
       - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
-      BT_MONTHS: 06
+      BT_MONTHS: 6
       TEST_REPORT_NAME: EA31337_Rider_201806
   Rider_2018_7:
     command: run_backtest -v
@@ -69,7 +69,7 @@ services:
       - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
-      BT_MONTHS: 07
+      BT_MONTHS: 7
       TEST_REPORT_NAME: EA31337_Rider_201807
   Rider_2018_8:
     command: run_backtest -v
@@ -79,7 +79,7 @@ services:
       - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
-      BT_MONTHS: 08
+      BT_MONTHS: 8
       TEST_REPORT_NAME: EA31337_Rider_201808
   Rider_2018_9:
     command: run_backtest -v
@@ -89,7 +89,7 @@ services:
       - ./_results:/opt/_results:rw
     env_file: EA-Tester.ini
     environment:
-      BT_MONTHS: 09
+      BT_MONTHS: 9
       TEST_REPORT_NAME: EA31337_Rider_201809
   Rider_2018_10:
     command: run_backtest -v
