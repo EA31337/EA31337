@@ -37,14 +37,14 @@ extern int    MinIntervalSec = 0; // Min interval between subsequent trade signa
 
 //+------------------------------------------------------------------+
 extern string   __EA_Order_Parameters__ = "-- Profit and loss parameters --"; // >>> PROFIT/LOSS <<<
-extern uint     TakeProfitMax = 60; // Max Take profit (in pips, 0 = auto)
-extern uint     StopLossMax = 40; // Max Stop loss (in pips, 0 = auto)
+extern uint     TakeProfitMax = 100; // Max Take profit (in pips, 0 = auto)
+extern uint     StopLossMax = 60; // Max Stop loss (in pips, 0 = auto)
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
 extern ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 6; // Default trail stop method (0 = none)
 extern ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 24; // Default trail profit method (0 = none)
-extern int TrailingStop = 40; // Extra trailing stop (in pips)
+extern int TrailingStop = 20; // Extra trailing stop (in pips)
 extern int TrailingProfit = 0; // Extra trailing profit (in pips)
 double TrailingStopAddPerMinute = 0.1; // Decrease trail stop per minute (pip/min)
 
@@ -305,7 +305,7 @@ extern string SoundFileAtClose = "alert.wav"; // Sound: on order close
 //+------------------------------------------------------------------+
 
 extern string __Optimization_Parameters__ = "-- Optimization parameters --"; // >>> OPTIMIZATION <<<
-extern ENUM_TIMEFRAMES TrendPeriod = PERIOD_H4; // Period for trend calculation
+extern ENUM_TIMEFRAMES TrendPeriod = PERIOD_D1; // Period for trend calculation
 
 extern string __Backtest_Parameters__ = "-- Testing & troubleshooting parameters --"; // >>> TESTING <<<
 #ifndef __backtest__
