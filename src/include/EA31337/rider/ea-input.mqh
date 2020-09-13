@@ -85,21 +85,21 @@ extern uint ConFactorOrdersLimit = 300; // No of orders to check on consequent w
 
 //+------------------------------------------------------------------+
 input static string __Strategy_Timeframes__ = "-- Strategy's timeframes --"; // >>> STRATEGY'S TIMEFRAMES (1-255: M1=1,M5=2,M15=4,M30=8,H1=16,H2=32,H4=64...) <<<
-extern unsigned int AC_Active_Tf = 10; // AC: Activate timeframes
-extern unsigned int AD_Active_Tf = 2; // AD: Activate timeframes
+extern unsigned int AC_Active_Tf = 2; // AC: Activate timeframes
+extern unsigned int AD_Active_Tf = 0; // AD: Activate timeframes
 extern unsigned int ADX_Active_Tf = 0; // ADX: Activate timeframes
-extern unsigned int Alligator_Active_Tf = 6; // Alligator: Activate timeframes
-extern unsigned int Bands_Active_Tf = 6; // Bands: Activate timeframes
-extern unsigned int CCI_Active_Tf = 6; // CCI: Activate timeframes
+extern unsigned int Alligator_Active_Tf = 4; // Alligator: Activate timeframes
+extern unsigned int Bands_Active_Tf = 4; // Bands: Activate timeframes
+extern unsigned int CCI_Active_Tf = 4; // CCI: Activate timeframes
 extern unsigned int DeMarker_Active_Tf = 2; // DeMarker: Activate timeframes
 extern unsigned int Envelopes_Active_Tf = 4; // Envelopes: Activate timeframes
 extern unsigned int Force_Active_Tf = 2; // Force: Activate timeframes
 extern unsigned int Fractals_Active_Tf = 2; // Fractals: Activate timeframes
-extern unsigned int MACD_Active_Tf = 0; // MACD: Activate timeframes
-extern unsigned int MA_Active_Tf = 2; // MA: Activate timeframes
+extern unsigned int MACD_Active_Tf = 1; // MACD: Activate timeframes
+extern unsigned int MA_Active_Tf = 0; // MA: Activate timeframes
 extern unsigned int MFI_Active_Tf = 0; // MFI: Activate timeframes
 extern unsigned int RSI_Active_Tf = 0; // RSI: Activate timeframes
-extern unsigned int SAR_Active_Tf = 0; // SAR: Activate timeframes
+extern unsigned int SAR_Active_Tf = 1; // SAR: Activate timeframes
 extern unsigned int WPR_Active_Tf = 0; // WPR: Activate timeframes
 unsigned int ATR_Active_Tf = 0; // ATR: Activate timeframes
 unsigned int Awesome_Active_Tf = 0; // Awesome: Activate timeframes
