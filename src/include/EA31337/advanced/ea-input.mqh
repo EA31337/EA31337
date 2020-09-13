@@ -69,7 +69,7 @@ extern int InitNoOfOrdersToCalcPF = 10; // Initial number of orders to calculate
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameters (set 1.0 for default) --"; // >>> BOOSTING <<<
-extern bool Boosting_Enabled = 1; // Enable boosting
+extern bool Boosting_Enabled = 0; // Enable boosting
 extern double BoostTrendFactor = 0.5; // Boost by trend factor
 extern bool StrategyBoostByPF = 1.1; // Boost strategy by its profit factor
 extern bool StrategyHandicapByPF = 0; // Handicap by its low profit factor
