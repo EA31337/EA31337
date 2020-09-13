@@ -1,7 +1,7 @@
 ---
 version: '3.4'
 services:
-  Rider_2018_01:
+  Rider_2018_1:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
@@ -11,7 +11,7 @@ services:
     environment:
       BT_MONTHS: 01
       TEST_REPORT_NAME: EA31337_Rider_201801
-  Rider_2018_02:
+  Rider_2018_2:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
@@ -21,7 +21,7 @@ services:
     environment:
       BT_MONTHS: 02
       TEST_REPORT_NAME: EA31337_Rider_201802
-  Rider_2018_03:
+  Rider_2018_3:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
@@ -31,7 +31,7 @@ services:
     environment:
       BT_MONTHS: 03
       TEST_REPORT_NAME: EA31337_Rider_201803
-  Rider_2018_04:
+  Rider_2018_4:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
@@ -41,7 +41,7 @@ services:
     environment:
       BT_MONTHS: 04
       TEST_REPORT_NAME: EA31337_Rider_201804
-  Rider_2018_05:
+  Rider_2018_5:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
@@ -51,7 +51,7 @@ services:
     environment:
       BT_MONTHS: 05
       TEST_REPORT_NAME: EA31337_Rider_201805
-  Rider_2018_06:
+  Rider_2018_6:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
@@ -61,7 +61,7 @@ services:
     environment:
       BT_MONTHS: 06
       TEST_REPORT_NAME: EA31337_Rider_201806
-  Rider_2018_07:
+  Rider_2018_7:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
@@ -71,7 +71,7 @@ services:
     environment:
       BT_MONTHS: 07
       TEST_REPORT_NAME: EA31337_Rider_201807
-  Rider_2018_08:
+  Rider_2018_8:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
@@ -81,7 +81,7 @@ services:
     environment:
       BT_MONTHS: 08
       TEST_REPORT_NAME: EA31337_Rider_201808
-  Rider_2018_09:
+  Rider_2018_9:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
