@@ -66,6 +66,7 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         mode:
           - Lite
@@ -99,6 +100,7 @@ jobs:
     if: >
       github.repository == 'EA31337/EA31337'
       && github.event_name == 'pull_request'
+      && ${{ always() }}
     needs: Backtest
     runs-on: ubuntu-latest
     strategy:
