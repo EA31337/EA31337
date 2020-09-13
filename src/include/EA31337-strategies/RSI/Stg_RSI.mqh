@@ -41,18 +41,18 @@ int RSI15_SignalMethod = 0; // Signal method for M15 (-63-63)
 int RSI30_SignalMethod = 0; // Signal method for M30 (-63-63)
 #endif
 #ifdef __advanced__
-INPUT int RSI1_OpenCondition1 = 195; // Open condition 1 for M1 (0-1023)
-INPUT int RSI1_OpenCondition2 = 292; // Open condition 2 for M1 (0-1023)
-INPUT ENUM_MARKET_EVENT RSI1_CloseCondition = 12; // Close condition for M1
-INPUT int RSI5_OpenCondition1 = 680; // Open condition 1 for M5 (0-1023)
-INPUT int RSI5_OpenCondition2 = 195; // Open condition 2 for M5 (0-1023)
-INPUT ENUM_MARKET_EVENT RSI5_CloseCondition = 11; // Close condition for M5
-INPUT int RSI15_OpenCondition1 = 971; // Open condition 1 for M15 (0-1023)
+INPUT int RSI1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+INPUT int RSI1_OpenCondition2 = 195; // Open condition 2 for M1 (0-1023)
+INPUT ENUM_MARKET_EVENT RSI1_CloseCondition = 1; // Close condition for M1
+INPUT int RSI5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+INPUT int RSI5_OpenCondition2 = 292; // Open condition 2 for M5 (0-1023)
+INPUT ENUM_MARKET_EVENT RSI5_CloseCondition = 2; // Close condition for M5
+INPUT int RSI15_OpenCondition1 = 0; // Open condition 1 for M15 (0-1023)
 INPUT int RSI15_OpenCondition2 = 292; // Open condition 2 for M15 (0-1023)
-INPUT ENUM_MARKET_EVENT RSI15_CloseCondition = 18; // Close condition for M15
-INPUT int RSI30_OpenCondition1 = 777; // Open condition 1 for M30 (0-1023)
-INPUT int RSI30_OpenCondition2 = 195; // Open condition 2 for M30 (0-1023)
-INPUT ENUM_MARKET_EVENT RSI30_CloseCondition = 11; // Close condition for M30
+INPUT ENUM_MARKET_EVENT RSI15_CloseCondition = 4; // Close condition for M15
+INPUT int RSI30_OpenCondition1 = 583; // Open condition 1 for M30 (0-1023)
+INPUT int RSI30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+INPUT ENUM_MARKET_EVENT RSI30_CloseCondition = 1; // Close condition for M30
 #else
 int RSI1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int RSI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)

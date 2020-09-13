@@ -31,19 +31,19 @@ extern int    MinVolumeToTrade = 0; // Min volume to trade
 extern int    MaxOrderPriceSlippage = 50; // Max price slippage (in pts)
 extern int    MaxTries = 5; // Max retries for opening orders
 double MinPipChangeToTrade = 0; // Min pip change to trade
-extern int    MinPipGap = 80; // Min gap between trades per type (in pips)
+extern int    MinPipGap = 70; // Min gap between trades per type (in pips)
 //extern uint   TickProcessMethod = 0; // Tick process method (0-8, 0 - all)
 
 //+------------------------------------------------------------------+
 extern string   __EA_Order_Parameters__ = "-- Profit and loss parameters --"; // >>> PROFIT/LOSS <<<
 extern uint     TakeProfitMax = 0; // Max Take profit (in pips, 0 = auto)
-extern uint     StopLossMax = 60; // Max Stop loss (in pips, 0 = auto)
+extern uint     StopLossMax = 40; // Max Stop loss (in pips, 0 = auto)
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
 ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 0; // Default trail stop method (0 = none)
 ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 0; // Default trail profit method
-extern int TrailingStop = 80; // Extra trailing stop (in pips)
+extern int TrailingStop = 100; // Extra trailing stop (in pips)
 extern int TrailingProfit = 0; // Extra trailing profit (in pips)
 double TrailingStopAddPerMinute = 0.0; // Decrease trail stop per minute (pip/min)
 
@@ -54,36 +54,36 @@ extern double RiskMarginTotal = 5; // Risk margin in total (in %, 0-100, 0 - aut
 extern double RiskRatio = 0; // Risk ratio (0 = auto, 1.0 = normal)
 extern int RiskRatioIncreaseMethod = 0; // Risk ratio increase method (0-255)
 extern int RiskRatioDecreaseMethod = 0; // Risk ratio decrease method (0-255)
-extern int InitNoOfDaysToWarmUp = 7; // Initial warm-up period (in days)
-extern double CloseOrderAfterXHours = 96; // Close order after X hours (>0 - all, <0 - only profitable 0 - off)
+extern int InitNoOfDaysToWarmUp = 28; // Initial warm-up period (in days)
+extern double CloseOrderAfterXHours = 120; // Close order after X hours (>0 - all, <0 - only profitable 0 - off)
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Profit__ = "-- Per strategy parameters (0 to disable) --"; // >>> STRATEGY PARAMS <<<
-extern double ProfitFactorMinToTrade = 0.9; // Min. profit factor per strategy to trade
+extern double ProfitFactorMinToTrade = 1; // Min. profit factor per strategy to trade
 extern double ProfitFactorMaxToTrade = 0.0; // Max. profit factor per strategy to trade
 extern int InitNoOfOrdersToCalcPF = 20; // Initial number of orders to calculate profit factor
 
 //+------------------------------------------------------------------+
 extern string __Strategy_Boosting_Parameters__ = "-- Strategy boosting parameters (set 1.0 for default) --"; // >>> BOOSTING <<<
-extern bool Boosting_Enabled = 1; // Enable boosting
-extern double BoostTrendFactor = 0.3; // Boost by trend factor
+extern bool Boosting_Enabled = 0; // Enable boosting
+extern double BoostTrendFactor = 0.5; // Boost by trend factor
 extern bool StrategyBoostByPF = 1.1; // Boost strategy by its profit factor
-extern bool StrategyHandicapByPF = 0; // Handicap by its low profit factor
-extern double BestDailyStrategyMultiplierFactor = 0.1; // Multiplier for the best daily strategy
-extern double BestWeeklyStrategyMultiplierFactor = 0.5; // Multiplier for the best weekly strategy
-extern double BestMonthlyStrategyMultiplierFactor = 0.1; // Multiplier for the best monthly strategy
-extern double WorseDailyStrategyMultiplierFactor = 0.2; // Multiplier for the worse daily strategy
-extern double WorseWeeklyStrategyMultiplierFactor = 0.2; // Multiplier for the worse weekly strategy
-extern double WorseMonthlyStrategyMultiplierFactor = 0.1; // Multiplier for the worse monthly strategy
+extern bool StrategyHandicapByPF = 1; // Handicap by its low profit factor
+extern double BestDailyStrategyMultiplierFactor = 0.4; // Multiplier for the best daily strategy
+extern double BestWeeklyStrategyMultiplierFactor = 0.1; // Multiplier for the best weekly strategy
+extern double BestMonthlyStrategyMultiplierFactor = 0.5; // Multiplier for the best monthly strategy
+extern double WorseDailyStrategyMultiplierFactor = 0.4; // Multiplier for the worse daily strategy
+extern double WorseWeeklyStrategyMultiplierFactor = 0; // Multiplier for the worse weekly strategy
+extern double WorseMonthlyStrategyMultiplierFactor = 0; // Multiplier for the worse monthly strategy
 extern double ConWinsIncreaseFactor = -0.4; // Increase lot factor on consequent wins (in %, 0 - off)
-extern double ConLossesIncreaseFactor = -1.7; // Increase lot factor on consequent loses (in %, 0 - off)
-extern uint ConFactorOrdersLimit = 900; // No of orders to check on consequent wins/loses
+extern double ConLossesIncreaseFactor = -2.2; // Increase lot factor on consequent loses (in %, 0 - off)
+extern uint ConFactorOrdersLimit = 0; // No of orders to check on consequent wins/loses
 
 //+------------------------------------------------------------------+
 input static string __Strategy_Timeframes__ = "-- Strategy's timeframes --"; // >>> STRATEGY'S TIMEFRAMES (1-255: M1=1,M5=2,M15=4,M30=8,H1=16,H2=32,H4=64...) <<<
-extern unsigned int AC_Active_Tf = 4; // AC: Activate timeframes
+extern unsigned int AC_Active_Tf = 0; // AC: Activate timeframes
 extern unsigned int AD_Active_Tf = 0; // AD: Activate timeframes
-extern unsigned int ADX_Active_Tf = 9; // ADX: Activate timeframes
+extern unsigned int ADX_Active_Tf = 12; // ADX: Activate timeframes
 extern unsigned int ATR_Active_Tf = 0; // ATR: Activate timeframes
 extern unsigned int Alligator_Active_Tf = 0; // Alligator: Activate timeframes
 extern unsigned int Bands_Active_Tf = 0; // Bands: Activate timeframes
