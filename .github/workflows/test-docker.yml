@@ -102,7 +102,7 @@ jobs:
       run:
         shell: bash
         working-directory: docker/tests
-    if: github.repository == 'EA31337/EA31337'
+    if: github.repository == 'EA31337/EA31337' && ${{ always() }}
     needs: Test
     runs-on: ubuntu-latest
     strategy:
