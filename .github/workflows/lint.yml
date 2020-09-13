@@ -1,8 +1,7 @@
-# yamllint disable rule:line-length
 ---
 name: Lint
 
-# yamllint disable rule:truthy
+# yamllint disable-line rule:truthy
 on:
   - pull_request
   - push

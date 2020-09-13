@@ -1,7 +1,7 @@
 ---
 name: PR Labeller
 
-# yamllint disable rule:truthy
+# yamllint disable-line rule:truthy
 on:
   - pull_request
 
