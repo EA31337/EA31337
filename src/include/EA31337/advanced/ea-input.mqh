@@ -38,13 +38,13 @@ extern int    MinIntervalSec = 0; // Min interval between subsequent trade signa
 //+------------------------------------------------------------------+
 extern string   __EA_Order_Parameters__ = "-- Profit and loss parameters --"; // >>> PROFIT/LOSS <<<
 extern uint     TakeProfitMax = 0; // Max Take profit (in pips, 0 = auto)
-extern uint     StopLossMax = 40; // Max Stop loss (in pips, 0 = auto)
+extern uint     StopLossMax = 60; // Max Stop loss (in pips, 0 = auto)
 
 //+------------------------------------------------------------------+
 extern string __EA_Trailing_Parameters__ = "-- Profit and loss trailing parameters --"; // >>> TRAILINGS <<<
 ENUM_TRAIL_TYPE DefaultTrailingStopMethod = 0; // Default trail stop method (0 = none)
 ENUM_TRAIL_TYPE DefaultTrailingProfitMethod = 0; // Default trail profit method
-extern int TrailingStop = 30; // Extra trailing stop (in pips)
+extern int TrailingStop = 50; // Extra trailing stop (in pips)
 extern int TrailingProfit = 0; // Extra trailing profit (in pips)
 double TrailingStopAddPerMinute = 0.3; // Decrease trail stop per minute (pip/min)
 
@@ -56,7 +56,7 @@ extern double RiskRatio = 0; // Risk ratio (0 = auto, 1.0 = normal)
 extern int RiskRatioIncreaseMethod = 0; // Risk ratio increase method (0-255)
 extern int RiskRatioDecreaseMethod = 0; // Risk ratio decrease method (0-255)
 extern int InitNoOfDaysToWarmUp = 21; // Initial warm-up period (in days)
-extern double CloseOrderAfterXHours = 48; // Close order after X hours (>0 - all, <0 - only profitable 0 - off)
+extern double CloseOrderAfterXHours = 120; // Close order after X hours (>0 - all, <0 - only profitable 0 - off)
 
 extern bool ApplySpreadLimits = 1; // Apply strategy spread limits
 extern double MaxSpreadToTrade = 10.0; // Max spread to trade (in pips), 0 - disable limit
