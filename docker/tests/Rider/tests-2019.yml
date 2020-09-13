@@ -10,6 +10,7 @@ services:
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 1
+      BT_YEARS: 2019
       TEST_REPORT_NAME: EA31337_Rider_201901
   Rider_2019_2:
     command: run_backtest -v
@@ -20,6 +21,7 @@ services:
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 2
+      BT_YEARS: 2019
       TEST_REPORT_NAME: EA31337_Rider_201902
   Rider_2019_3:
     command: run_backtest -v
@@ -30,6 +32,7 @@ services:
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 3
+      BT_YEARS: 2019
       TEST_REPORT_NAME: EA31337_Rider_201903
   Rider_2019_4:
     command: run_backtest -v
@@ -40,6 +43,7 @@ services:
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 4
+      BT_YEARS: 2019
       TEST_REPORT_NAME: EA31337_Rider_201904
   Rider_2019_5:
     command: run_backtest -v
@@ -50,6 +54,7 @@ services:
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 5
+      BT_YEARS: 2019
       TEST_REPORT_NAME: EA31337_Rider_201905
   Rider_2019_6:
     command: run_backtest -v
@@ -60,6 +65,7 @@ services:
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 6
+      BT_YEARS: 2019
       TEST_REPORT_NAME: EA31337_Rider_201906
   Rider_2019_7:
     command: run_backtest -v
@@ -70,6 +76,7 @@ services:
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 7
+      BT_YEARS: 2019
       TEST_REPORT_NAME: EA31337_Rider_201907
   Rider_2019_8:
     command: run_backtest -v
@@ -80,6 +87,7 @@ services:
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 8
+      BT_YEARS: 2019
       TEST_REPORT_NAME: EA31337_Rider_201908
   Rider_2019_9:
     command: run_backtest -v
@@ -90,6 +98,7 @@ services:
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 9
+      BT_YEARS: 2019
       TEST_REPORT_NAME: EA31337_Rider_201909
   Rider_2019_10:
     command: run_backtest -v
@@ -100,6 +109,7 @@ services:
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 10
+      BT_YEARS: 2019
       TEST_REPORT_NAME: EA31337_Rider_201910
   Rider_2019_11:
     command: run_backtest -v
@@ -110,6 +120,7 @@ services:
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 11
+      BT_YEARS: 2019
       TEST_REPORT_NAME: EA31337_Rider_201911
   Rider_2019_12:
     command: run_backtest -v
@@ -120,4 +131,5 @@ services:
     env_file: EA-Tester.ini
     environment:
       BT_MONTHS: 12
+      BT_YEARS: 2019
       TEST_REPORT_NAME: EA31337_Rider_201912
