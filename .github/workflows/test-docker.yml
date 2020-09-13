@@ -1,140 +1,158 @@
 ---
 name: Test Docker
 
-# yamllint disable rule:truthy
+# yamllint disable-line rule:truthy
 on:
-  pull_request:
-    paths:
-      - '**/*.h'
-      - '**/*.mq?'
-      - '.github/workflows/test-docker.yml'
   push:
+    branches:
+      - 'v*-test'
     paths:
-      - '**/*.h'
-      - '**/*.mq?'
+      - '**.h'
+      - '**.mq?'
+      - '**.yml'
       - '.github/workflows/test-docker.yml'
+      - 'src/include/**'
 
 jobs:
 
-  Lite:
-    runs-on: ubuntu-latest
+  Compile:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        mode:
+          - Lite
+          - Advanced
+          - Rider
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
-      - name: Build image for 2018
-        env:
-          COMPOSE_DOCKER_CLI_BUILD: 1
-          DOCKER_BUILDKIT: 1
-        run: docker-compose build
-        working-directory: docker/tests/lite
-      - name: Run test for 2018.01
-        env:
-          COMPOSE_DOCKER_CLI_BUILD: 1
-          DOCKER_BUILDKIT: 1
-        run: docker-compose run lite_test_2018_01
-        working-directory: docker/tests/lite
-        if: false
-      - name: Run test for 2018.02
-        env:
-          COMPOSE_DOCKER_CLI_BUILD: 1
-          DOCKER_BUILDKIT: 1
-        run: docker-compose run lite_test_2018_02
-        working-directory: docker/tests/lite
-        if: false
-      - name: Run test for 2019.01
-        env:
-          COMPOSE_DOCKER_CLI_BUILD: 1
-          DOCKER_BUILDKIT: 1
-        run: docker-compose run lite_test_2019_01
-        working-directory: docker/tests/lite
-        if: false
-      - name: Run test for 2019.02
-        env:
-          COMPOSE_DOCKER_CLI_BUILD: 1
-          DOCKER_BUILDKIT: 1
-        run: docker-compose run lite_test_2019_02
-        working-directory: docker/tests/lite
-        if: false
+      - name: Enables Advanced mode
+        if: matrix.mode == 'Advanced'
+        run: echo '#define __advanced__' > src/include/EA31337/ea-mode.mqh
+      - name: Enables Rider mode
+        if: matrix.mode == 'Rider'
+        run: echo '#define __rider__' > src/include/EA31337/ea-mode.mqh
+      - name: Compiles EA (MQL4)
+        uses: fx31337/mql-compile-action@master
+        with:
+          path: src\EA31337.mq4
+          verbose: true
+      - name: Compiles EA (MQL5)
+        uses: fx31337/mql-compile-action@master
+        with:
+          path: src\EA31337.mq5
+          verbose: true
+      - name: Moves file (MQL4)
+        run: mv -v src\*.ex4 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex4"
+      - name: Moves file (MQL5)
+        run: mv -v src\*.ex5 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex5"
+      - name: Prints compiled files
+        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
+        shell: powershell
+      - name: Uploads artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.mode }}
+          path: '*.ex?'
 
-  Advanced:
+  Test:
+    defaults:
+      run:
+        shell: bash
+    needs: Compile
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: 'recursive'
-      - name: Build image for 2018
-        env:
-          COMPOSE_DOCKER_CLI_BUILD: 1
-          DOCKER_BUILDKIT: 1
-        run: docker-compose build
-        working-directory: docker/tests/advanced
-      - name: Run test for 2018.01
-        env:
-          COMPOSE_DOCKER_CLI_BUILD: 1
-          DOCKER_BUILDKIT: 1
-        run: docker-compose run advanced_test_2018_01
-        working-directory: docker/tests/advanced
-        if: false
-      - name: Run test for 2018.02
-        env:
-          COMPOSE_DOCKER_CLI_BUILD: 1
-          DOCKER_BUILDKIT: 1
-        run: docker-compose run advanced_test_2018_02
-        working-directory: docker/tests/advanced
-        if: false
-      - name: Run test for 2019.01
-        env:
-          COMPOSE_DOCKER_CLI_BUILD: 1
-          DOCKER_BUILDKIT: 1
-        run: docker-compose run advanced_test_2019_01
-        working-directory: docker/tests/advanced
-        if: false
-      - name: Run test for 2019.02
-        env:
-          COMPOSE_DOCKER_CLI_BUILD: 1
-          DOCKER_BUILDKIT: 1
-        run: docker-compose run advanced_test_2019_02
-        working-directory: docker/tests/advanced
-        if: false
 
-  Rider:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        mode:
+          - Lite
+          - Advanced
+          - Rider
+        month: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        year: [2019]
+
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
         with:
-          submodules: 'recursive'
-      - name: Build image for 2018
+          name: ${{ matrix.mode }}
+      # yamllint disable-line rule:line-length
+      - run: docker-compose run ${{ matrix.mode }}_${{ matrix.year }}_${{ matrix.month }}
+        working-directory: docker/tests/${{ matrix.mode }}
+      - name: Uploads results
+        uses: actions/upload-artifact@v2
+        with:
+          # yamllint disable-line rule:line-length
+          name: Results-${{ matrix.mode }}
+          # yamllint disable-line rule:line-length
+          path: docker/tests/${{ matrix.mode }}/_results
+      - name: Uploads results (retry on failure)
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          # yamllint disable-line rule:line-length
+          name: Results-${{ matrix.mode }}
+          # yamllint disable-line rule:line-length
+          path: docker/tests/${{ matrix.mode }}/_results
+
+  Publish-Results:
+    defaults:
+      run:
+        shell: bash
+        working-directory: docker/tests
+    if: github.repository == 'EA31337/EA31337' && ${{ always() }}
+    needs: Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mode:
+          - Lite
+          - Advanced
+          - Rider
+      max-parallel: 1
+    steps:
+      - uses: actions/checkout@v2
+        if: github.event_name != 'pull_request'
+        with:
+          persist-credentials: false
+          # Otherwise, you will failed to push refs to dest repo.
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+      - uses: actions/checkout@v2
+        if: github.event_name == 'pull_request'
+        with:
+          persist-credentials: false
+          # Otherwise, you will failed to push refs to dest repo.
+          fetch-depth: 0
+          ref: refs/heads/${{ github.head_ref }}
+      - uses: actions/download-artifact@v2
+        with:
+          name: Results-${{ matrix.mode }}
+          path: docker/tests/${{ matrix.mode }}/_results
+      - name: Commit files
+        run: |
+          git config --local core.autocrlf false
+          git config --local user.email $git_email
+          git config --local user.name "${{ github.actor }}"
+          git add . && git add --renormalize .
+          git pull origin "${{ github.ref }}" --autostash --rebase -Xours
+          git commit -a \
+          -m "${{ matrix.mode }}: Monthly test results"
         env:
-          COMPOSE_DOCKER_CLI_BUILD: 1
-          DOCKER_BUILDKIT: 1
-        run: docker-compose build
-        working-directory: docker/tests/rider
-      - name: Run test for 2018.01
-        env:
-          COMPOSE_DOCKER_CLI_BUILD: 1
-          DOCKER_BUILDKIT: 1
-        run: docker-compose run rider_test_2018_01
-        working-directory: docker/tests/rider
-        if: false
-      - name: Run test for 2018.02
-        env:
-          COMPOSE_DOCKER_CLI_BUILD: 1
-          DOCKER_BUILDKIT: 1
-        run: docker-compose run rider_test_2018_02
-        working-directory: docker/tests/rider
-        if: false
-      - name: Run test for 2019.01
-        env:
-          COMPOSE_DOCKER_CLI_BUILD: 1
-          DOCKER_BUILDKIT: 1
-        run: docker-compose run rider_test_2019_01
-        working-directory: docker/tests/rider
-        if: false
-      - name: Run test for 2019.02
-        env:
-          COMPOSE_DOCKER_CLI_BUILD: 1
-          DOCKER_BUILDKIT: 1
-        run: docker-compose run rider_test_2019_02
-        working-directory: docker/tests/rider
-        if: false
+          git_email: "${{ github.actor }}@users.noreply.github.com"
+      - name: Push changes (not PR)
+        if: github.event_name != 'pull_request'
+        uses: ad-m/github-push-action@master
+        with:
+          branch: ${{ github.ref }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push changes (PR)
+        if: github.event_name == 'pull_request'
+        uses: ad-m/github-push-action@master
+        with:
+          branch: refs/heads/${{ github.head_ref }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run git diff
+        run: NO_PAGER=1 git --no-pager diff HEAD^

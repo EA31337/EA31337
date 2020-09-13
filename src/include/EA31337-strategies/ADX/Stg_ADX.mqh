@@ -15,31 +15,58 @@
 
 // User input params.
 INPUT string __ADX_Parameters__ = "-- Settings for the Average Directional Movement Index indicator --"; // >>> ADX <<<
-INPUT ENUM_TRAIL_TYPE ADX_TrailingStopMethod = 17; // Trail stop method
-INPUT ENUM_TRAIL_TYPE ADX_TrailingProfitMethod = -10; // Trail profit method
-INPUT uint ADX_Period_M1 = 22; // Period for M1
-INPUT uint ADX_Period_M5 = 12; // Period for M5
-INPUT uint ADX_Period_M15 = 48; // Period for M15
-INPUT uint ADX_Period_M30 = 32; // Period for M30
-INPUT ENUM_APPLIED_PRICE ADX_Applied_Price = (ENUM_APPLIED_PRICE) 6; // Applied Price
-INPUT double ADX_SignalLevel = 18.3; // Signal level
+#ifndef __rider__
+INPUT ENUM_TRAIL_TYPE ADX_TrailingStopMethod = 11; // Trail stop method
+INPUT ENUM_TRAIL_TYPE ADX_TrailingProfitMethod = -8; // Trail profit method
+#else
+ENUM_TRAIL_TYPE ADX_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE ADX_TrailingProfitMethod = 0; // Trail profit method
+#endif
+INPUT uint ADX_Period_M1 = 92; // Period for M1
+INPUT uint ADX_Period_M5 = 66; // Period for M5
+INPUT uint ADX_Period_M15 = 54; // Period for M15
+INPUT uint ADX_Period_M30 = 94; // Period for M30
+INPUT ENUM_APPLIED_PRICE ADX_Applied_Price = (ENUM_APPLIED_PRICE) 4; // Applied Price
+INPUT double ADX_SignalLevel = 20.5; // Signal level
 INPUT uint ADX_Shift = 0; // Shift (relative to the current bar, 0 - default)
-INPUT int ADX1_SignalMethod = 0; // Signal method for M1 (0-?)
-INPUT int ADX5_SignalMethod = 0; // Signal method for M5 (0-?)
-INPUT int ADX15_SignalMethod = 0; // Signal method for M15 (0-?)
-INPUT int ADX30_SignalMethod = 0; // Signal method for M30 (0-?)
-INPUT int ADX1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
+#ifndef __advanced__
+INPUT int ADX1_SignalMethod = 1; // Signal method for M1 (0-?)
+INPUT int ADX5_SignalMethod = 1; // Signal method for M5 (0-?)
+INPUT int ADX15_SignalMethod = 1; // Signal method for M15 (0-?)
+INPUT int ADX30_SignalMethod = -1; // Signal method for M30 (0-?)
+#else
+int ADX1_SignalMethod = 0; // Signal method for M1 (0-?)
+int ADX5_SignalMethod = 0; // Signal method for M5 (0-?)
+int ADX15_SignalMethod = 0; // Signal method for M15 (0-?)
+int ADX30_SignalMethod = 0; // Signal method for M30 (0-?)
+#endif
+#ifdef __advanced__
+INPUT int ADX1_OpenCondition1 = 683; // Open condition 1 for M1 (0-1023)
 INPUT int ADX1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-INPUT ENUM_MARKET_EVENT ADX1_CloseCondition = 13; // Close condition for M1
-INPUT int ADX5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
-INPUT int ADX5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-INPUT ENUM_MARKET_EVENT ADX5_CloseCondition = 11; // Close condition for M5
+INPUT ENUM_MARKET_EVENT ADX1_CloseCondition = 12; // Close condition for M1
+INPUT int ADX5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+INPUT int ADX5_OpenCondition2 = 838; // Open condition 2 for M5 (0-)
+INPUT ENUM_MARKET_EVENT ADX5_CloseCondition = 14; // Close condition for M5
 INPUT int ADX15_OpenCondition1 = 1; // Open condition 1 for M15 (0-)
-INPUT int ADX15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+INPUT int ADX15_OpenCondition2 = 1; // Open condition 2 for M15 (0-)
 INPUT ENUM_MARKET_EVENT ADX15_CloseCondition = 1; // Close condition for M15
-INPUT int ADX30_OpenCondition1 = 292; // Open condition 1 for M30 (0-)
-INPUT int ADX30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+INPUT int ADX30_OpenCondition1 = 32; // Open condition 1 for M30 (0-)
+INPUT int ADX30_OpenCondition2 = 900; // Open condition 2 for M30 (0-)
 INPUT ENUM_MARKET_EVENT ADX30_CloseCondition = 24; // Close condition for M30
+#else
+int ADX1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int ADX1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+ENUM_MARKET_EVENT ADX1_CloseCondition = C_ADX_BUY_SELL; // Close condition for M1
+int ADX5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int ADX5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+ENUM_MARKET_EVENT ADX5_CloseCondition = C_ADX_BUY_SELL; // Close condition for M5
+int ADX15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int ADX15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+ENUM_MARKET_EVENT ADX15_CloseCondition = C_ADX_BUY_SELL; // Close condition for M15
+int ADX30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int ADX30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+ENUM_MARKET_EVENT ADX30_CloseCondition = C_ADX_BUY_SELL; // Close condition for M30
+#endif
 INPUT double ADX1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 INPUT double ADX5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 INPUT double ADX15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)

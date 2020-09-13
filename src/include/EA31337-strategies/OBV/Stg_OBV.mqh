@@ -15,14 +15,27 @@
 
 // User input params.
 string __OBV_Parameters__ = "-- Settings for the On Balance Volume indicator --"; // >>> OBV <<<
+#ifndef __rider__
 ENUM_TRAIL_TYPE OBV_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE OBV_TrailingProfitMethod = 1; // Trail profit method
+#else
+ENUM_TRAIL_TYPE OBV_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE OBV_TrailingProfitMethod = 0; // Trail profit method
+#endif
 ENUM_APPLIED_PRICE OBV_Applied_Price = PRICE_CLOSE; // Applied Price
 double OBV_SignalLevel = 0.00000000; // Signal level
+#ifndef __advanced__
 int OBV1_SignalMethod = 0; // Signal method for M1 (0-
 int OBV5_SignalMethod = 0; // Signal method for M5 (0-
 int OBV15_SignalMethod = 0; // Signal method for M15 (0-
 int OBV30_SignalMethod = 0; // Signal method for M30 (0-
+#else
+int OBV1_SignalMethod = 0; // Signal method for M1 (0-
+int OBV5_SignalMethod = 0; // Signal method for M5 (0-
+int OBV15_SignalMethod = 0; // Signal method for M15 (0-
+int OBV30_SignalMethod = 0; // Signal method for M30 (0-
+#endif
+#ifdef __advanced__
 int OBV1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int OBV1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
 ENUM_MARKET_EVENT OBV1_CloseCondition = C_OBV_BUY_SELL; // Close condition for M1
@@ -35,6 +48,20 @@ ENUM_MARKET_EVENT OBV15_CloseCondition = C_OBV_BUY_SELL; // Close condition for 
 int OBV30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
 int OBV30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
 ENUM_MARKET_EVENT OBV30_CloseCondition = C_OBV_BUY_SELL; // Close condition for M30
+#else
+int OBV1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int OBV1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+ENUM_MARKET_EVENT OBV1_CloseCondition = C_OBV_BUY_SELL; // Close condition for M1
+int OBV5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int OBV5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+ENUM_MARKET_EVENT OBV5_CloseCondition = C_OBV_BUY_SELL; // Close condition for M5
+int OBV15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int OBV15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+ENUM_MARKET_EVENT OBV15_CloseCondition = C_OBV_BUY_SELL; // Close condition for M15
+int OBV30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int OBV30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+ENUM_MARKET_EVENT OBV30_CloseCondition = C_OBV_BUY_SELL; // Close condition for M30
+#endif
 double OBV1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 double OBV5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 double OBV15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)

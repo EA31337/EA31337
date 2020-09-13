@@ -16,30 +16,57 @@
 // User input params.
 INPUT string __RSI_Parameters__ = "-- Settings for the Relative Strength Index indicator --"; // >>> RSI <<<
 INPUT int RSI_Period_M1 = 8; // Period for M1
-INPUT int RSI_Period_M5 = 14; // Period for M5
-INPUT int RSI_Period_M15 = 6; // Period for M15
+INPUT int RSI_Period_M5 = 6; // Period for M5
+INPUT int RSI_Period_M15 = 4; // Period for M15
 INPUT int RSI_Period_M30 = 4; // Period for M30
-INPUT ENUM_APPLIED_PRICE RSI_Applied_Price = (ENUM_APPLIED_PRICE) 2; // Applied Price
-INPUT uint RSI_Shift = 2; // Shift
-INPUT ENUM_TRAIL_TYPE RSI_TrailingStopMethod = 8; // Trail stop method
-INPUT ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = -11; // Trail profit method
+INPUT ENUM_APPLIED_PRICE RSI_Applied_Price = (ENUM_APPLIED_PRICE) 5; // Applied Price
+INPUT uint RSI_Shift = 0; // Shift
+#ifndef __rider__
+INPUT ENUM_TRAIL_TYPE RSI_TrailingStopMethod = 9; // Trail stop method
+INPUT ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = -21; // Trail profit method
+#else
+ENUM_TRAIL_TYPE RSI_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE RSI_TrailingProfitMethod = 0; // Trail profit method
+#endif
 INPUT int RSI_SignalLevel = 42; // Signal level (-49-49)
-INPUT int RSI1_SignalMethod = -58; // Signal method for M1 (-63-63)
-INPUT int RSI5_SignalMethod = -63; // Signal method for M5 (-63-63)
-INPUT int RSI15_SignalMethod = -42; // Signal method for M15 (-63-63)
-INPUT int RSI30_SignalMethod = -39; // Signal method for M30 (-63-63)
-INPUT int RSI1_OpenCondition1 = 1; // Open condition 1 for M1 (0-1023)
-INPUT int RSI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+#ifndef __advanced__
+INPUT int RSI1_SignalMethod = -48; // Signal method for M1 (-63-63)
+INPUT int RSI5_SignalMethod = -24; // Signal method for M5 (-63-63)
+INPUT int RSI15_SignalMethod = -30; // Signal method for M15 (-63-63)
+INPUT int RSI30_SignalMethod = -63; // Signal method for M30 (-63-63)
+#else
+int RSI1_SignalMethod = 0; // Signal method for M1 (-63-63)
+int RSI5_SignalMethod = 0; // Signal method for M5 (-63-63)
+int RSI15_SignalMethod = 0; // Signal method for M15 (-63-63)
+int RSI30_SignalMethod = 0; // Signal method for M30 (-63-63)
+#endif
+#ifdef __advanced__
+INPUT int RSI1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+INPUT int RSI1_OpenCondition2 = 195; // Open condition 2 for M1 (0-1023)
 INPUT ENUM_MARKET_EVENT RSI1_CloseCondition = 1; // Close condition for M1
-INPUT int RSI5_OpenCondition1 = 1; // Open condition 1 for M5 (0-1023)
-INPUT int RSI5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
-INPUT ENUM_MARKET_EVENT RSI5_CloseCondition = 31; // Close condition for M5
-INPUT int RSI15_OpenCondition1 = 389; // Open condition 1 for M15 (0-1023)
-INPUT int RSI15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
-INPUT ENUM_MARKET_EVENT RSI15_CloseCondition = 1; // Close condition for M15
-INPUT int RSI30_OpenCondition1 = 195; // Open condition 1 for M30 (0-1023)
+INPUT int RSI5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+INPUT int RSI5_OpenCondition2 = 292; // Open condition 2 for M5 (0-1023)
+INPUT ENUM_MARKET_EVENT RSI5_CloseCondition = 2; // Close condition for M5
+INPUT int RSI15_OpenCondition1 = 0; // Open condition 1 for M15 (0-1023)
+INPUT int RSI15_OpenCondition2 = 292; // Open condition 2 for M15 (0-1023)
+INPUT ENUM_MARKET_EVENT RSI15_CloseCondition = 4; // Close condition for M15
+INPUT int RSI30_OpenCondition1 = 583; // Open condition 1 for M30 (0-1023)
 INPUT int RSI30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
 INPUT ENUM_MARKET_EVENT RSI30_CloseCondition = 1; // Close condition for M30
+#else
+int RSI1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int RSI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+ENUM_MARKET_EVENT RSI1_CloseCondition = C_RSI_BUY_SELL; // Close condition for M1
+int RSI5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int RSI5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+ENUM_MARKET_EVENT RSI5_CloseCondition = C_RSI_BUY_SELL; // Close condition for M5
+int RSI15_OpenCondition1 = 0; // Open condition 1 for M15 (0-1023)
+int RSI15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+ENUM_MARKET_EVENT RSI15_CloseCondition = C_RSI_BUY_SELL; // Close condition for M15
+int RSI30_OpenCondition1 = 0; // Open condition 1 for M30 (0-1023)
+int RSI30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+ENUM_MARKET_EVENT RSI30_CloseCondition = C_RSI_BUY_SELL; // Close condition for M30
+#endif
 double RSI1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 double RSI5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 double RSI15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)

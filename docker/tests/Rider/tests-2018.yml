@@ -1,0 +1,123 @@
+---
+version: '3.4'
+services:
+  Rider_2018_1:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_MONTHS: 1
+      TEST_REPORT_NAME: EA31337_Rider_201801
+  Rider_2018_2:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_MONTHS: 2
+      TEST_REPORT_NAME: EA31337_Rider_201802
+  Rider_2018_3:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_MONTHS: 3
+      TEST_REPORT_NAME: EA31337_Rider_201803
+  Rider_2018_4:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_MONTHS: 4
+      TEST_REPORT_NAME: EA31337_Rider_201804
+  Rider_2018_5:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_MONTHS: 5
+      TEST_REPORT_NAME: EA31337_Rider_201805
+  Rider_2018_6:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_MONTHS: 6
+      TEST_REPORT_NAME: EA31337_Rider_201806
+  Rider_2018_7:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_MONTHS: 7
+      TEST_REPORT_NAME: EA31337_Rider_201807
+  Rider_2018_8:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_MONTHS: 8
+      TEST_REPORT_NAME: EA31337_Rider_201808
+  Rider_2018_9:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_MONTHS: 9
+      TEST_REPORT_NAME: EA31337_Rider_201809
+  Rider_2018_10:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_MONTHS: 10
+      TEST_REPORT_NAME: EA31337_Rider_201810
+  Rider_2018_11:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_MONTHS: 11
+      TEST_REPORT_NAME: EA31337_Rider_201811
+  Rider_2018_12:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_MONTHS: 12
+      TEST_REPORT_NAME: EA31337_Rider_201812

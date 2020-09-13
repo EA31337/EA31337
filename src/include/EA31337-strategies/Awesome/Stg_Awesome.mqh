@@ -15,14 +15,27 @@
 
 // User input params.
 string __Awesome_Parameters__ = "-- Settings for the Awesome oscillator --"; // >>> AWESOME <<<
+#ifndef __rider__
 ENUM_TRAIL_TYPE Awesome_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE Awesome_TrailingProfitMethod = 1; // Trail profit method
+#else
+ENUM_TRAIL_TYPE Awesome_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE Awesome_TrailingProfitMethod = 0; // Trail profit method
+#endif
 double Awesome_SignalLevel = 0.00000000; // Signal level
 uint Awesome_Shift = 0; // Shift (relative to the current bar, 0 - default)
+#ifndef __advanced__
 int Awesome1_SignalMethod = 0; // Signal method for M1 (0-31)
 int Awesome5_SignalMethod = 0; // Signal method for M5 (0-31)
 int Awesome15_SignalMethod = 0; // Signal method for M15 (0-31)
 int Awesome30_SignalMethod = 0; // Signal method for M30 (0-31)
+#else
+int Awesome1_SignalMethod = 0; // Signal method for M1 (0-31)
+int Awesome5_SignalMethod = 0; // Signal method for M5 (0-31)
+int Awesome15_SignalMethod = 0; // Signal method for M15 (0-31)
+int Awesome30_SignalMethod = 0; // Signal method for M30 (0-31)
+#endif
+#ifdef __advanced__
 int Awesome1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int Awesome1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
 ENUM_MARKET_EVENT Awesome1_CloseCondition = C_AWESOME_BUY_SELL; // Close condition for M1
@@ -35,6 +48,20 @@ ENUM_MARKET_EVENT Awesome15_CloseCondition = C_AWESOME_BUY_SELL; // Close condit
 int Awesome30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
 int Awesome30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
 ENUM_MARKET_EVENT Awesome30_CloseCondition = C_AWESOME_BUY_SELL; // Close condition for M30
+#else
+int Awesome1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int Awesome1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+ENUM_MARKET_EVENT Awesome1_CloseCondition = C_AWESOME_BUY_SELL; // Close condition for M1
+int Awesome5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int Awesome5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+ENUM_MARKET_EVENT Awesome5_CloseCondition = C_AWESOME_BUY_SELL; // Close condition for M5
+int Awesome15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int Awesome15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+ENUM_MARKET_EVENT Awesome15_CloseCondition = C_AWESOME_BUY_SELL; // Close condition for M15
+int Awesome30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int Awesome30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+ENUM_MARKET_EVENT Awesome30_CloseCondition = C_AWESOME_BUY_SELL; // Close condition for M30
+#endif
 double Awesome1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 double Awesome5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 double Awesome15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)

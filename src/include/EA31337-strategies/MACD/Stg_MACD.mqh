@@ -16,29 +16,56 @@
 // User input params.
 INPUT string __MACD_Parameters__ = "-- Settings for the Moving Averages Convergence/Divergence indicator --"; // >>> MACD <<<
 INPUT int MACD_Period_Fast = 2; // Period Fast
-INPUT int MACD_Period_Slow = 24; // Period Slow
-INPUT int MACD_Period_Signal = 11; // Period for signal
-INPUT ENUM_APPLIED_PRICE MACD_Applied_Price = (ENUM_APPLIED_PRICE) 4; // Applied Price
+INPUT int MACD_Period_Slow = 20; // Period Slow
+INPUT int MACD_Period_Signal = 29; // Period for signal
+INPUT ENUM_APPLIED_PRICE MACD_Applied_Price = (ENUM_APPLIED_PRICE) 2; // Applied Price
 INPUT int MACD_Shift = 0; // Shift
+#ifndef __rider__
 INPUT ENUM_TRAIL_TYPE MACD_TrailingStopMethod = 1; // Trail stop method
-INPUT ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = -13; // Trail profit method
-INPUT double MACD_SignalLevel = -0.3; // Signal level
-INPUT int MACD1_SignalMethod = -23; // Signal method for M1 (-31-31)
-INPUT int MACD5_SignalMethod = -15; // Signal method for M5 (-31-31)
-INPUT int MACD15_SignalMethod = -28; // Signal method for M15 (-31-31)
-INPUT int MACD30_SignalMethod = 2; // Signal method for M30 (-31-31)
+INPUT ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = 8; // Trail profit method
+#else
+ENUM_TRAIL_TYPE MACD_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = 0; // Trail profit method
+#endif
+INPUT double MACD_SignalLevel = 2; // Signal level
+#ifndef __advanced__
+INPUT int MACD1_SignalMethod = 7; // Signal method for M1 (-7-7)
+INPUT int MACD5_SignalMethod = 7; // Signal method for M5 (-7-7)
+INPUT int MACD15_SignalMethod = 3; // Signal method for M15 (-7-7)
+INPUT int MACD30_SignalMethod = -1; // Signal method for M30 (-7-7)
+#else
+int MACD1_SignalMethod = 0; // Signal method for M1 (-7-7)
+int MACD5_SignalMethod = 0; // Signal method for M5 (-7-7)
+int MACD15_SignalMethod = 0; // Signal method for M15 (-7-7)
+int MACD30_SignalMethod = 0; // Signal method for M30 (-7-7)
+#endif
+#ifdef __advanced__
 INPUT int MACD1_OpenCondition1 = 874; // Open condition 1 for M1 (0-1023)
 INPUT int MACD1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
-INPUT ENUM_MARKET_EVENT MACD1_CloseCondition = 1; // Close condition for M1
-INPUT int MACD5_OpenCondition1 = 680; // Open condition 1 for M5 (0-1023)
+INPUT ENUM_MARKET_EVENT MACD1_CloseCondition = 24; // Close condition for M1
+INPUT int MACD5_OpenCondition1 = 486; // Open condition 1 for M5 (0-1023)
 INPUT int MACD5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
-INPUT ENUM_MARKET_EVENT MACD5_CloseCondition = 1; // Close condition for M5
-INPUT int MACD15_OpenCondition1 = 486; // Open condition 1 for M15 (0-1023)
+INPUT ENUM_MARKET_EVENT MACD5_CloseCondition = 2; // Close condition for M5
+INPUT int MACD15_OpenCondition1 = 874; // Open condition 1 for M15 (0-1023)
 INPUT int MACD15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
-INPUT ENUM_MARKET_EVENT MACD15_CloseCondition = 1; // Close condition for M15
-INPUT int MACD30_OpenCondition1 = 777; // Open condition 1 for M30 (0-1023)
-INPUT int MACD30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
-INPUT ENUM_MARKET_EVENT MACD30_CloseCondition = 1; // Close condition for M30
+INPUT ENUM_MARKET_EVENT MACD15_CloseCondition = 3; // Close condition for M15
+INPUT int MACD30_OpenCondition1 = 0; // Open condition 1 for M30 (0-1023)
+INPUT int MACD30_OpenCondition2 = 971; // Open condition 2 for M30 (0-1023)
+INPUT ENUM_MARKET_EVENT MACD30_CloseCondition = 3; // Close condition for M30
+#else
+int MACD1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int MACD1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+ENUM_MARKET_EVENT MACD1_CloseCondition = C_MACD_BUY_SELL; // Close condition for M1
+int MACD5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int MACD5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+ENUM_MARKET_EVENT MACD5_CloseCondition = C_MACD_BUY_SELL; // Close condition for M5
+int MACD15_OpenCondition1 = 0; // Open condition 1 for M15 (0-1023)
+int MACD15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+ENUM_MARKET_EVENT MACD15_CloseCondition = C_MACD_BUY_SELL; // Close condition for M15
+int MACD30_OpenCondition1 = 0; // Open condition 1 for M30 (0-1023)
+int MACD30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+ENUM_MARKET_EVENT MACD30_CloseCondition = C_MACD_BUY_SELL; // Close condition for M30
+#endif
 INPUT double MACD1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 INPUT double MACD5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 INPUT double MACD15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
@@ -152,8 +179,6 @@ class Stg_MACD : public Strategy {
           if (METHOD(_signal_method, 0)) _result &= macd_2_main < macd_2_signal;
           if (METHOD(_signal_method, 1)) _result &= macd_0_main >= 0;
           if (METHOD(_signal_method, 2)) _result &= macd_1_main < 0;
-          if (METHOD(_signal_method, 3)) _result &= ma_fast[this.Chart().TfToIndex()][CURR] > ma_fast[this.Chart().TfToIndex()][PREV];
-          if (METHOD(_signal_method, 4)) _result &= ma_fast[this.Chart().TfToIndex()][CURR] > ma_medium[this.Chart().TfToIndex()][CURR];
         }
         break;
       case ORDER_TYPE_SELL:
@@ -162,8 +187,6 @@ class Stg_MACD : public Strategy {
           if (METHOD(_signal_method, 0)) _result &= macd_2_main > macd_2_signal;
           if (METHOD(_signal_method, 1)) _result &= macd_0_main <= 0;
           if (METHOD(_signal_method, 2)) _result &= macd_1_main > 0;
-          if (METHOD(_signal_method, 3)) _result &= ma_fast[this.Chart().TfToIndex()][CURR] < ma_fast[this.Chart().TfToIndex()][PREV];
-          if (METHOD(_signal_method, 4)) _result &= ma_fast[this.Chart().TfToIndex()][CURR] < ma_medium[this.Chart().TfToIndex()][CURR];
         }
         break;
     }

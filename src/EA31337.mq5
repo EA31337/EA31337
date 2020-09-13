@@ -128,18 +128,19 @@ double zigzag[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
 //| Expert tick function                                             |
 //+------------------------------------------------------------------+
 void OnTick() {
-  //#ifdef __trace__ PrintFormat("%s: Ask=%g/Bid=%g", __FUNCTION__, Ask, Bid); #endif
   if (!session_initiated) return;
   //#ifdef __profiler__ PROFILER_START #endif
 
-  MqlTick _tick = market.GetTick();
   bool _tick_procesed = false;
-  for (ENUM_TIMEFRAMES_INDEX tfi = 0; tfi < FINAL_ENUM_TIMEFRAMES_INDEX; tfi++) {
-    if (Object::IsDynamic(trade[tfi]) && trade[tfi].Chart().IsValidTf()) {
-      if (trade[tfi].Chart().IsNewBar()) {
-        trade[tfi].Market().SetTick(_tick);
-        ProcessBar(trade[tfi]);
-        _tick_procesed = true;
+  static MqlTick _last_tick = {0};
+  MqlTick _tick = market.GetTick();
+  if (_tick.time % 60 < _last_tick.time % 60) {
+    // Process a tick per minute.
+    for (ENUM_TIMEFRAMES_INDEX tfi = 0; tfi < FINAL_ENUM_TIMEFRAMES_INDEX; tfi++) {
+      if (Object::IsDynamic(trade[tfi]) && trade[tfi].Chart().IsValidTf()) {
+          trade[tfi].Market().SetTick(_tick);
+          ProcessBar(trade[tfi]);
+          _tick_procesed = true;
       }
     }
   }
@@ -148,7 +149,10 @@ void OnTick() {
       terminal.Logger().Flush(false);
     }
   }
-  UpdateTicks();
+  else {
+    UpdateTicks();
+  }
+  _last_tick = _tick;
   //#ifdef __profiler__ PROFILER_STOP #endif
 } // end: OnTick()
 
@@ -157,25 +161,6 @@ void OnTick() {
  */
 void ProcessBar(Trade *_trade) {
 
-  // Parse a tick.
-  /*
-  if (!ticker.Process(_trade.Chart(), TickProcessMethod)) {
-    // Ignore a tick according to the method.
-    return;
-  }
-  */
-
-  /* @fixme: Disabled.
-  // Check if we should ignore the tick based on the price change.
-  if (last_pip_change < MinPipChangeToTrade) {
-    if (last_bar_time == trade.GetBarTime(PERIOD_M1)) {
-      return;
-    }
-  }
-  else {
-    last_bar_time = trade.GetBarTime(PERIOD_M1);
-  }
-  */
   if (!Object::IsDynamic(_trade)) {
     PrintFormat("%s: Error: Trade object not valid!", __FUNCTION_LINE__);
   }
@@ -365,10 +350,6 @@ void OnDeinit(const int reason) {
 
   }
   DeinitVars();
-  // #ifdef _DEBUG
-  // DEBUG("n=" + n + " : " +  DoubleToStrMorePrecision(val,19) );
-  // DEBUG("CLOSEDEBUGFILE");
-  // #endif
 } // end: OnDeinit()
 
 /**
@@ -414,11 +395,6 @@ double OnTester() {
  */
 void OnTesterPass() {
   Print("Calling ", __FUNCTION__, ".");
-  /*
-  if (ProfilingMinTime > 0) {
-    // Print("PROFILER: ", timers.ToString(0));
-  }
-  */
 }
 
 /**
@@ -559,12 +535,13 @@ bool EA_Trade(Trade *_trade) {
         if (_cmd == ORDER_TYPE_SELL && !CheckMarketCondition1(strat.Chart(), ORDER_TYPE_SELL, strat.GetSignalOpenMethod1())) _cmd = EMPTY;
       }
 
-      if (Object::IsDynamic(trade[Chart::TfToIndex(TrendPeriod)]) && strat.GetSignalOpenMethod2() != 0) {
+      if (_cmd != EMPTY && Object::IsDynamic(trade[Chart::TfToIndex(TrendPeriod)]) && strat.GetSignalOpenMethod2() != 0) {
         if (_cmd == ORDER_TYPE_BUY  && CheckMarketCondition1(trade[Chart::TfToIndex(TrendPeriod)].Chart(), ORDER_TYPE_SELL, strat.GetSignalOpenMethod2(), false)) _cmd = EMPTY;
         if (_cmd == ORDER_TYPE_SELL && CheckMarketCondition1(trade[Chart::TfToIndex(TrendPeriod)].Chart(), ORDER_TYPE_BUY,  strat.GetSignalOpenMethod2(), false)) _cmd = EMPTY;
       }
 
       if (_cmd != EMPTY) {
+        ResetLastError();
         order_placed &= ExecuteOrder(_cmd, strat);
         if (VerboseDebug) {
           strat.Logger().Debug(StringFormat("%s:%d: %s %s on %s at %s: %s",
@@ -1340,11 +1317,7 @@ bool CloseOrder(ulong ticket_no = NULL, int reason_id = EMPTY, ENUM_MARKET_EVENT
     Message(last_msg);
     Msg::ShowText(last_msg, "Info", __FUNCTION__, __LINE__, VerboseInfo);
     last_debug = Msg::ShowText(Order::OrderTypeToString((ENUM_ORDER_TYPE) Order::OrderType()), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
-    #ifdef __advanced__
       if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(Order::GetOrderProfitInPips(), 0) + " pips, reason: " + ReasonIdToText(reason_id, _market_event) + "; " + Order::OrderTypeToString((ENUM_ORDER_TYPE) Order::OrderType()));
-    #else
-      if (VerboseDebug) Print(__FUNCTION__, ": Closed order " + IntegerToString(ticket_no) + " with profit " + DoubleToStr(Order::GetOrderProfitInPips(), 0) + " pips; " + Order::OrderTypeToString((ENUM_ORDER_TYPE) Order::OrderType()));
-    #endif
     if (SmartQueueActive) OrderQueueProcess();
   } else {
     err_code = GetLastError();
@@ -2476,7 +2449,6 @@ double GetLotSizeAuto(uint _method = 0, bool smooth = true) {
     }
   }
 
-  #ifdef __advanced__
   if (Boosting_Enabled) {
     if (LotSizeIncreaseMethod != 0) {
       if (METHOD(LotSizeIncreaseMethod, 0)) if (AccCondition(C_ACC_IN_PROFIT))      new_lot_size *= 1.1;
@@ -2500,7 +2472,6 @@ double GetLotSizeAuto(uint _method = 0, bool smooth = true) {
       if (METHOD(LotSizeDecreaseMethod, 7)) if (AccCondition(C_ACC_PDAY_IN_PROFIT)) new_lot_size *= 0.9;
     }
   }
-  #endif
 
   if (smooth && ea_lot_size > 0) {
     // Increase only by average of the previous and new (which should prevent sudden increases).
@@ -2665,8 +2636,6 @@ void StartNewHour(Trade *_trade) {
   if (Boosting_Enabled) UpdateStrategyFactor(DAILY);
 
   #ifdef __advanced__
-  // Check if RSI period needs re-calculation.
-  // if (RSI_DynamicPeriod) RSI_CheckPeriod();
   // Check for dynamic spread configuration.
   if (DynamicSpreadConf) {
     // TODO: SpreadRatio, MinPipChangeToTrade, MinPipGap
@@ -2932,12 +2901,6 @@ bool InitVariables() {
     Msg::ShowText(StringFormat("Account free margin is %g!", account.AccountFreeMargin()), "Error", __FUNCTION__, __LINE__, VerboseErrors, PrintLogOnChart, ValidateSettings);
     return (false);
   }
-  /* @fixme: https://travis-ci.org/EA31337-Tester/EA31337-Lite-Sets/builds/140302386
-  if (account.AccountMargin() <= 0) {
-    Msg::ShowText(StringFormat("Account margin is %g!", account.AccountMargin()), "Error", __FUNCTION__, __LINE__, VerboseErrors);
-    return (false);
-  }
-  */
 
   init_spread = market.GetSpreadInPts(); // @todo
 
@@ -3838,7 +3801,7 @@ int GetPeakStrategyValue(int _key2, double &_peak, bool lowest) {
   int _key1 = EMPTY;
   _peak = lowest ? DBL_MAX : -DBL_MAX;
   for (int i = 0; i < ArrayRange(stats, 0); i++) {
-    if (!((Strategy*) strats.GetById(i)).IsEnabled()) {
+    if (strats.GetById(i) == NULL || !((Strategy*) strats.GetById(i)).IsEnabled()) {
       continue;
     }
 
@@ -4183,9 +4146,7 @@ string GetRiskRatioText() {
   else if (ea_risk_ratio > 5.0) text = "Extremely high (risky!)";
   else if (ea_risk_ratio > 2.0) text = "Very high";
   else if (ea_risk_ratio > 1.4) text = "High";
-  #ifdef __advanced__
-    if (StringLen(rr_text) > 0) text += " - reason: " + rr_text;
-  #endif
+  if (StringLen(rr_text) > 0) text += " - reason: " + rr_text;
   return text;
 }
 

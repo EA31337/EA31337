@@ -11,8 +11,6 @@ on:
       - '**.mq?'
       - '.github/workflows/backtest.yml'
       - 'src/include/**'
-    tags:
-      - v[12].*
   release:
     types:
       - published
@@ -68,6 +66,7 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         mode:
           - Lite
@@ -101,6 +100,7 @@ jobs:
     if: >
       github.repository == 'EA31337/EA31337'
       && github.event_name == 'pull_request'
+      && ${{ always() }}
     needs: Backtest
     runs-on: ubuntu-latest
     strategy:
@@ -115,6 +115,14 @@ jobs:
       max-parallel: 1
     steps:
       - uses: actions/checkout@v2
+        if: github.event_name != 'pull_request'
+        with:
+          persist-credentials: false
+          # Otherwise, you will failed to push refs to dest repo.
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+      - uses: actions/checkout@v2
+        if: github.event_name == 'pull_request'
         with:
           persist-credentials: false
           # Otherwise, you will failed to push refs to dest repo.
@@ -144,6 +152,21 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Push changes (PR)
         if: github.event_name == 'pull_request'
+        uses: ad-m/github-push-action@master
+        with:
+          branch: refs/heads/${{ github.head_ref }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Re-pull on failure
+        if: ${{ failure() }}
+        run: git pull origin ${{ github.ref }} --autostash --rebase -X ours
+      - name: Re-push changes on failure (not PR)
+        if: ${{ failure() }} && github.event_name != 'pull_request'
+        uses: ad-m/github-push-action@master
+        with:
+          branch: ${{ github.ref }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Re-push changes on failure (PR)
+        if: ${{ failure() }} && github.event_name == 'pull_request'
         uses: ad-m/github-push-action@master
         with:
           branch: refs/heads/${{ github.head_ref }}

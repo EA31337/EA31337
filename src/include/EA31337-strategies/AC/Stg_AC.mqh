@@ -15,26 +15,53 @@
 
 // User input params.
 INPUT string __AC_Parameters__ = "-- Settings for the Bill Williams' Accelerator/Decelerator oscillator --"; // >>> AC <<<
-INPUT ENUM_TRAIL_TYPE AC_TrailingStopMethod = 1; // Trail stop method
-INPUT ENUM_TRAIL_TYPE AC_TrailingProfitMethod = -7; // Trail profit method
+#ifndef __rider__
+INPUT ENUM_TRAIL_TYPE AC_TrailingStopMethod = 3; // Trail stop method
+INPUT ENUM_TRAIL_TYPE AC_TrailingProfitMethod = 8; // Trail profit method
+#else
+ENUM_TRAIL_TYPE AC_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE AC_TrailingProfitMethod = 0; // Trail profit method
+#endif
 INPUT double AC_SignalLevel = 0.0004; // Signal level (>0.0001)
 INPUT uint AC_Shift = 0; // Shift (relative to the current bar, 0 - default)
+#ifndef __advanced__
 INPUT int AC1_SignalMethod = -1; // Signal method for M1 (0-1)
-INPUT int AC5_SignalMethod = -1; // Signal method for M5 (0-1)
+INPUT int AC5_SignalMethod = 1; // Signal method for M5 (0-1)
 INPUT int AC15_SignalMethod = 1; // Signal method for M15 (0-1)
-INPUT int AC30_SignalMethod = -1; // Signal method for M30 (0-1)
-INPUT int AC1_OpenCondition1 = 777; // Open condition 1 for M1 (0-1023)
-INPUT int AC1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-INPUT ENUM_MARKET_EVENT AC1_CloseCondition = 26; // Close condition for M1
-INPUT int AC5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
+INPUT int AC30_SignalMethod = 1; // Signal method for M30 (0-1)
+#else
+int AC1_SignalMethod = 0; // Signal method for M1 (0-1)
+int AC5_SignalMethod = 0; // Signal method for M5 (0-1)
+int AC15_SignalMethod = 0; // Signal method for M15 (0-1)
+int AC30_SignalMethod = 0; // Signal method for M30 (0-1)
+#endif
+#ifdef __advanced__
+INPUT int AC1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+INPUT int AC1_OpenCondition2 = 514; // Open condition 2 for M1 (0-)
+INPUT ENUM_MARKET_EVENT AC1_CloseCondition = 24; // Close condition for M1
+INPUT int AC5_OpenCondition1 = 58; // Open condition 1 for M5 (0-1023)
 INPUT int AC5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-INPUT ENUM_MARKET_EVENT AC5_CloseCondition = 24; // Close condition for M5
+INPUT ENUM_MARKET_EVENT AC5_CloseCondition = 12; // Close condition for M5
 INPUT int AC15_OpenCondition1 = 1; // Open condition 1 for M15 (0-)
-INPUT int AC15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+INPUT int AC15_OpenCondition2 = 1; // Open condition 2 for M15 (0-)
 INPUT ENUM_MARKET_EVENT AC15_CloseCondition = 1; // Close condition for M15
-INPUT int AC30_OpenCondition1 = 389; // Open condition 1 for M30 (0-)
-INPUT int AC30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-INPUT ENUM_MARKET_EVENT AC30_CloseCondition = 29; // Close condition for M30
+INPUT int AC30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+INPUT int AC30_OpenCondition2 = 286; // Open condition 2 for M30 (0-)
+INPUT ENUM_MARKET_EVENT AC30_CloseCondition = 3; // Close condition for M30
+#else
+int AC1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int AC1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+ENUM_MARKET_EVENT AC1_CloseCondition = C_AC_BUY_SELL; // Close condition for M1
+int AC5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int AC5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+ENUM_MARKET_EVENT AC5_CloseCondition = C_AC_BUY_SELL; // Close condition for M5
+int AC15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int AC15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+ENUM_MARKET_EVENT AC15_CloseCondition = C_AC_BUY_SELL; // Close condition for M15
+int AC30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int AC30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+ENUM_MARKET_EVENT AC30_CloseCondition = C_AC_BUY_SELL; // Close condition for M30
+#endif
 INPUT double AC1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 INPUT double AC5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 INPUT double AC15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)

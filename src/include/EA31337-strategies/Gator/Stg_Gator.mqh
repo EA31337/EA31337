@@ -24,13 +24,26 @@ int Gator_Shift_Lips = 5; // Lips Shift
 ENUM_MA_METHOD Gator_MA_Method = 2; // MA Method
 ENUM_APPLIED_PRICE Gator_Applied_Price = (ENUM_APPLIED_PRICE) 3; // Applied Price
 int Gator_Shift = 2; // Shift
+#ifndef __rider__
 ENUM_TRAIL_TYPE Gator_TrailingStopMethod = 22; // Trail stop method
 ENUM_TRAIL_TYPE Gator_TrailingProfitMethod = 1; // Trail profit method
+#else
+ENUM_TRAIL_TYPE Gator_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE Gator_TrailingProfitMethod = 0; // Trail profit method
+#endif
 double Gator_SignalLevel = 0.00000000; // Signal level
+#ifndef __advanced__
 int Gator1_SignalMethod = 0; // Signal method for M1 (0-
 int Gator5_SignalMethod = 0; // Signal method for M5 (0-
 int Gator15_SignalMethod = 0; // Signal method for M15 (0-
 int Gator30_SignalMethod = 0; // Signal method for M30 (0-
+#else
+int Gator1_SignalMethod = 0; // Signal method for M1 (0-
+int Gator5_SignalMethod = 0; // Signal method for M5 (0-
+int Gator15_SignalMethod = 0; // Signal method for M15 (0-
+int Gator30_SignalMethod = 0; // Signal method for M30 (0-
+#endif
+#ifdef __advanced__
 int Gator1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
 int Gator1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
 ENUM_MARKET_EVENT Gator1_CloseCondition = C_GATOR_BUY_SELL; // Close condition // Close condition for M1
@@ -43,6 +56,20 @@ ENUM_MARKET_EVENT Gator15_CloseCondition = C_GATOR_BUY_SELL; // Close condition 
 int Gator30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
 int Gator30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
 ENUM_MARKET_EVENT Gator30_CloseCondition = C_GATOR_BUY_SELL; // Close condition for M30
+#else
+int Gator1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int Gator1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+ENUM_MARKET_EVENT Gator1_CloseCondition = C_GATOR_BUY_SELL; // Close condition // Close condition for M1
+int Gator5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int Gator5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+ENUM_MARKET_EVENT Gator5_CloseCondition = C_GATOR_BUY_SELL; // Close condition for M5
+int Gator15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int Gator15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+ENUM_MARKET_EVENT Gator15_CloseCondition = C_GATOR_BUY_SELL; // Close condition for M15
+int Gator30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int Gator30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+ENUM_MARKET_EVENT Gator30_CloseCondition = C_GATOR_BUY_SELL; // Close condition for M30
+#endif
 double Gator1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 double Gator5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 double Gator15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)

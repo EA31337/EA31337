@@ -16,40 +16,63 @@
 // User input params.
 INPUT string __Envelopes_Parameters__ = "-- Settings for the Envelopes indicator --"; // >>> ENVELOPES <<<
 INPUT int Envelopes_MA_Period_M1 = 2; // Period for M1
-INPUT int Envelopes_MA_Period_M5 = 2; // Period for M5
-INPUT int Envelopes_MA_Period_M15 = 2; // Period for M15
-INPUT int Envelopes_MA_Period_M30 = 6; // Period for M30
+INPUT int Envelopes_MA_Period_M5 = 16; // Period for M5
+INPUT int Envelopes_MA_Period_M15 = 38; // Period for M15
+INPUT int Envelopes_MA_Period_M30 = 10; // Period for M30
 INPUT double Envelopes_Deviation_M1 = 0.2; // Deviation for M1
-INPUT double Envelopes_Deviation_M5 = 0.2; // Deviation for M5
-INPUT double Envelopes_Deviation_M15 = 0; // Deviation for M15
-INPUT double Envelopes_Deviation_M30 = 0.3; // Deviation for M30
-INPUT ENUM_MA_METHOD Envelopes_MA_Method = 3; // MA Method
-INPUT int Envelopes_MA_Shift = 4; // MA Shift
-INPUT ENUM_APPLIED_PRICE Envelopes_Applied_Price = (ENUM_APPLIED_PRICE) 1; // Applied Price
+INPUT double Envelopes_Deviation_M5 = 0.4; // Deviation for M5
+INPUT double Envelopes_Deviation_M15 = 0.7; // Deviation for M15
+INPUT double Envelopes_Deviation_M30 = 0.5; // Deviation for M30
+INPUT ENUM_MA_METHOD Envelopes_MA_Method = 2; // MA Method
+INPUT int Envelopes_MA_Shift = 7; // MA Shift
+INPUT ENUM_APPLIED_PRICE Envelopes_Applied_Price = (ENUM_APPLIED_PRICE) 3; // Applied Price
 INPUT int Envelopes_Shift = 0; // Shift
-INPUT ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = 9; // Trail stop method
-INPUT ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = 7; // Trail profit method
+#ifndef __rider__
+INPUT ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = 2; // Trail stop method
+INPUT ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = -11; // Trail profit method
+#else
+ENUM_TRAIL_TYPE Envelopes_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE Envelopes_TrailingProfitMethod = 0; // Trail profit method
+#endif
 /* @todo INPUT */ int Envelopes_SignalLevel = 0; // Signal level
-INPUT int Envelopes1_SignalMethod = -27; // Signal method for M1 (-127-127)
-INPUT int Envelopes5_SignalMethod = 55; // Signal method for M5 (-127-127)
-INPUT int Envelopes15_SignalMethod = -34; // Signal method for M15 (-127-127)
-INPUT int Envelopes30_SignalMethod = 57; // Signal method for M30 (-127-127)
-INPUT int Envelopes1_OpenCondition1 = 1; // Open condition 1 for M1 (0-1023)
-INPUT int Envelopes1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
-INPUT ENUM_MARKET_EVENT Envelopes1_CloseCondition = 13; // Close condition for M1
-//
-INPUT int Envelopes5_OpenCondition1 = 1; // Open condition 1 for M5 (0-1023)
+#ifndef __advanced__
+INPUT int Envelopes1_SignalMethod = -13; // Signal method for M1 (-127-127)
+INPUT int Envelopes5_SignalMethod = 34; // Signal method for M5 (-127-127)
+INPUT int Envelopes15_SignalMethod = -120; // Signal method for M15 (-127-127)
+INPUT int Envelopes30_SignalMethod = 36; // Signal method for M30 (-127-127)
+#else
+int Envelopes1_SignalMethod = 0; // Signal method for M1 (-127-127)
+int Envelopes5_SignalMethod = 0; // Signal method for M5 (-127-127)
+int Envelopes15_SignalMethod = 0; // Signal method for M15 (-127-127)
+int Envelopes30_SignalMethod = 0; // Signal method for M30 (-127-127)
+#endif
+#ifdef __advanced__
+INPUT int Envelopes1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+INPUT int Envelopes1_OpenCondition2 = 292; // Open condition 2 for M1 (0-1023)
+INPUT ENUM_MARKET_EVENT Envelopes1_CloseCondition = 1; // Close condition for M1
+INPUT int Envelopes5_OpenCondition1 = 583; // Open condition 1 for M5 (0-1023)
 INPUT int Envelopes5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
-INPUT ENUM_MARKET_EVENT Envelopes5_CloseCondition = 7; // Close condition for M5
-//
+INPUT ENUM_MARKET_EVENT Envelopes5_CloseCondition = 3; // Close condition for M5
 INPUT int Envelopes15_OpenCondition1 = 292; // Open condition 1 for M15 (0-1023)
 INPUT int Envelopes15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
-INPUT ENUM_MARKET_EVENT Envelopes15_CloseCondition = 29; // Close condition for M15
-//
-INPUT int Envelopes30_OpenCondition1 = 292; // Open condition 1 for M30 (0-1023)
-INPUT int Envelopes30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
-INPUT ENUM_MARKET_EVENT Envelopes30_CloseCondition = 29; // Close condition for M30
-//
+INPUT ENUM_MARKET_EVENT Envelopes15_CloseCondition = 12; // Close condition for M15
+INPUT int Envelopes30_OpenCondition1 = 389; // Open condition 1 for M30 (0-1023)
+INPUT int Envelopes30_OpenCondition2 = 1; // Open condition 2 for M30 (0-1023)
+INPUT ENUM_MARKET_EVENT Envelopes30_CloseCondition = 1; // Close condition for M30
+#else
+int Envelopes1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int Envelopes1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+ENUM_MARKET_EVENT Envelopes1_CloseCondition = C_ENVELOPES_BUY_SELL; // Close condition for M1
+int Envelopes5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int Envelopes5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+ENUM_MARKET_EVENT Envelopes5_CloseCondition = C_ENVELOPES_BUY_SELL; // Close condition for M5
+int Envelopes15_OpenCondition1 = 0; // Open condition 1 for M15 (0-1023)
+int Envelopes15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+ENUM_MARKET_EVENT Envelopes15_CloseCondition = C_ENVELOPES_BUY_SELL; // Close condition for M15
+int Envelopes30_OpenCondition1 = 0; // Open condition 1 for M30 (0-1023)
+int Envelopes30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+ENUM_MARKET_EVENT Envelopes30_CloseCondition = C_ENVELOPES_BUY_SELL; // Close condition for M30
+#endif
 INPUT double Envelopes1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 INPUT double Envelopes5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 INPUT double Envelopes15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)

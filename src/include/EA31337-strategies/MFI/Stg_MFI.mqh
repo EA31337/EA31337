@@ -15,34 +15,57 @@
 
 // User input params.
 INPUT string __MFI_Parameters__ = "-- Settings for the Money Flow Index indicator --"; // >>> MFI <<<
+#ifndef __rider__
 INPUT ENUM_TRAIL_TYPE MFI_TrailingStopMethod = 25; // Trail stop method
-INPUT ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = -25; // Trail profit method
-INPUT int MFI_Period_M1 = 16; // Period for M1
-INPUT int MFI_Period_M5 = 24; // Period for M5
-INPUT int MFI_Period_M15 = 42; // Period for M15
-INPUT int MFI_Period_M30 = 2; // Period for M30
-INPUT double MFI_SignalLevel = 2.5; // Signal level
+INPUT ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = 15; // Trail profit method
+#else
+ENUM_TRAIL_TYPE MFI_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE MFI_TrailingProfitMethod = 0; // Trail profit method
+#endif
+INPUT int MFI_Period_M1 = 46; // Period for M1
+INPUT int MFI_Period_M5 = 46; // Period for M5
+INPUT int MFI_Period_M15 = 22; // Period for M15
+INPUT int MFI_Period_M30 = 10; // Period for M30
+INPUT double MFI_SignalLevel = 4.1; // Signal level
 INPUT uint MFI_Shift = 0; // Shift (relative to the current bar, 0 - default)
+#ifndef __advanced__
 INPUT int MFI1_SignalMethod = 1; // Signal method for M1 (0-1)
 INPUT int MFI5_SignalMethod = 1; // Signal method for M5 (0-1)
-INPUT int MFI15_SignalMethod = 0; // Signal method for M15 (0-1)
+INPUT int MFI15_SignalMethod = 1; // Signal method for M15 (0-1)
 INPUT int MFI30_SignalMethod = 1; // Signal method for M30 (0-1)
+#else
+int MFI1_SignalMethod = 0; // Signal method for M1 (0-1)
+int MFI5_SignalMethod = 0; // Signal method for M5 (0-1)
+int MFI15_SignalMethod = 0; // Signal method for M15 (0-1)
+int MFI30_SignalMethod = 0; // Signal method for M30 (0-1)
+#endif
+#ifdef __advanced__
 INPUT int MFI1_OpenCondition1 = 874; // Open condition 1 for M1 (0-1023)
 INPUT int MFI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-INPUT ENUM_MARKET_EVENT MFI1_CloseCondition = 14; // Close condition for M1
-
-INPUT int MFI5_OpenCondition1 = 1; // Open condition 1 for M5 (0-1023)
-INPUT int MFI5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-INPUT ENUM_MARKET_EVENT MFI5_CloseCondition = 2; // Close condition for M5
-
-INPUT int MFI15_OpenCondition1 = 292; // Open condition 1 for M15 (0-)
-INPUT int MFI15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+INPUT ENUM_MARKET_EVENT MFI1_CloseCondition = 24; // Close condition for M1
+INPUT int MFI5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+INPUT int MFI5_OpenCondition2 = 583; // Open condition 2 for M5 (0-)
+INPUT ENUM_MARKET_EVENT MFI5_CloseCondition = 3; // Close condition for M5
+INPUT int MFI15_OpenCondition1 = 1; // Open condition 1 for M15 (0-)
+INPUT int MFI15_OpenCondition2 = 1; // Open condition 2 for M15 (0-)
 INPUT ENUM_MARKET_EVENT MFI15_CloseCondition = 1; // Close condition for M15
-
-INPUT int MFI30_OpenCondition1 = 777; // Open condition 1 for M30 (0-)
-INPUT int MFI30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-INPUT ENUM_MARKET_EVENT MFI30_CloseCondition = 3; // Close condition for M30
-
+INPUT int MFI30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+INPUT int MFI30_OpenCondition2 = 583; // Open condition 2 for M30 (0-)
+INPUT ENUM_MARKET_EVENT MFI30_CloseCondition = 14; // Close condition for M30
+#else
+int MFI1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int MFI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+ENUM_MARKET_EVENT MFI1_CloseCondition = C_MFI_BUY_SELL; // Close condition for M1
+int MFI5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int MFI5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+ENUM_MARKET_EVENT MFI5_CloseCondition = C_MFI_BUY_SELL; // Close condition for M5
+int MFI15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int MFI15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+ENUM_MARKET_EVENT MFI15_CloseCondition = C_MFI_BUY_SELL; // Close condition for M15
+int MFI30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int MFI30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+ENUM_MARKET_EVENT MFI30_CloseCondition = C_MFI_BUY_SELL; // Close condition for M30
+#endif
 INPUT double MFI1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 INPUT double MFI5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 INPUT double MFI15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)

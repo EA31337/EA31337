@@ -1,7 +1,7 @@
 ---
 name: Sync Fork
 
-# yamllint disable rule:truthy
+# yamllint disable-line rule:truthy
 on:
   push:
     branches:

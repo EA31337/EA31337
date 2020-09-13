@@ -15,28 +15,55 @@
 
 // User input params.
 INPUT string __SAR_Parameters__ = "-- Settings for the Parabolic Stop and Reverse system indicator --"; // >>> SAR <<<
-INPUT double SAR_Step = 0.09; // Step
+INPUT double SAR_Step = 0.01; // Step
 INPUT double SAR_Maximum_Stop = 0.3; // Maximum stop
 INPUT int SAR_Shift = 0; // Shift
-INPUT ENUM_TRAIL_TYPE SAR_TrailingStopMethod = 1; // Trail stop method
-INPUT ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = 6; // Trail profit method
+#ifndef __rider__
+INPUT ENUM_TRAIL_TYPE SAR_TrailingStopMethod = 8; // Trail stop method
+INPUT ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = 25; // Trail profit method
+#else
+ENUM_TRAIL_TYPE SAR_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE SAR_TrailingProfitMethod = 0; // Trail profit method
+#endif
 INPUT double SAR_SignalLevel = 0; // Signal level
-INPUT int SAR1_SignalMethod = -106; // Signal method for M1 (-127-127)
-INPUT int SAR5_SignalMethod = 28; // Signal method for M5 (-127-127)
-INPUT int SAR15_SignalMethod = -120; // Signal method for M15 (-127-127)
-INPUT int SAR30_SignalMethod = -127; // Signal method for M30 (-127-127)
-INPUT int SAR1_OpenCondition1 = 680;
-INPUT int SAR1_OpenCondition2 = 0;
-INPUT ENUM_MARKET_EVENT SAR1_CloseCondition = 1; // Close condition for M1
-INPUT int SAR5_OpenCondition1 = 680; // Open condition 1 for M1 (0-1023)
+#ifndef __advanced__
+INPUT int SAR1_SignalMethod = -88; // Signal method for M1 (-127-127)
+INPUT int SAR5_SignalMethod = 11; // Signal method for M5 (-127-127)
+INPUT int SAR15_SignalMethod = -97; // Signal method for M15 (-127-127)
+INPUT int SAR30_SignalMethod = -97; // Signal method for M30 (-127-127)
+#else
+int SAR1_SignalMethod = 0; // Signal method for M1 (-127-127)
+int SAR5_SignalMethod = 0; // Signal method for M5 (-127-127)
+int SAR15_SignalMethod = 0; // Signal method for M15 (-127-127)
+int SAR30_SignalMethod = 0; // Signal method for M30 (-127-127)
+#endif
+#ifdef __advanced__
+INPUT int SAR1_OpenCondition1 = 874; // Open condition 1 for M1 (0-1023)
+INPUT int SAR1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+INPUT ENUM_MARKET_EVENT SAR1_CloseCondition = 24; // Close condition for M1
+INPUT int SAR5_OpenCondition1 = 874; // Open condition 1 for M1 (0-1023)
 INPUT int SAR5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
-INPUT ENUM_MARKET_EVENT SAR5_CloseCondition = 1; // Close condition for M5
-INPUT int SAR15_OpenCondition1 = 389; // Open condition 1 for M15 (0-1023)
-INPUT int SAR15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
-INPUT ENUM_MARKET_EVENT SAR15_CloseCondition = 1; // Close condition for M15
-INPUT int SAR30_OpenCondition1 = 389; // Open condition 1 for M30 (0-1023)
-INPUT int SAR30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
-INPUT ENUM_MARKET_EVENT SAR30_CloseCondition = 1; // Close condition for M30
+INPUT ENUM_MARKET_EVENT SAR5_CloseCondition = 24; // Close condition for M5
+INPUT int SAR15_OpenCondition1 = 971; // Open condition 1 for M15 (0-1023)
+INPUT int SAR15_OpenCondition2 = 971; // Open condition 2 for M15 (0-1023)
+INPUT ENUM_MARKET_EVENT SAR15_CloseCondition = 24; // Close condition for M15
+INPUT int SAR30_OpenCondition1 = 98; // Open condition 1 for M30 (0-1023)
+INPUT int SAR30_OpenCondition2 = 583; // Open condition 2 for M30 (0-1023)
+INPUT ENUM_MARKET_EVENT SAR30_CloseCondition = 3; // Close condition for M30
+#else
+int SAR1_OpenCondition1 = 0;
+int SAR1_OpenCondition2 = 0;
+ENUM_MARKET_EVENT SAR1_CloseCondition = C_SAR_BUY_SELL; // Close condition for M1
+int SAR5_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int SAR5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+ENUM_MARKET_EVENT SAR5_CloseCondition = C_SAR_BUY_SELL; // Close condition for M5
+int SAR15_OpenCondition1 = 0; // Open condition 1 for M15 (0-1023)
+int SAR15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+ENUM_MARKET_EVENT SAR15_CloseCondition = C_SAR_BUY_SELL; // Close condition for M15
+int SAR30_OpenCondition1 = 0; // Open condition 1 for M30 (0-1023)
+int SAR30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+ENUM_MARKET_EVENT SAR30_CloseCondition = C_SAR_BUY_SELL; // Close condition for M30
+#endif
 INPUT double SAR1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 INPUT double SAR5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 INPUT double SAR15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)

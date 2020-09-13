@@ -16,30 +16,57 @@
 // User input params.
 INPUT string __CCI_Parameters__ = "-- Settings for the Commodity Channel Index indicator --"; // >>> CCI <<<
 INPUT int CCI_Shift = 0; // Shift (0 for default)
-INPUT ENUM_TRAIL_TYPE CCI_TrailingStopMethod = 8; // Trail stop method
-INPUT ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = -13; // Trail profit method
-INPUT int CCI_Period_M1 = 2; // Period for M1
-INPUT int CCI_Period_M5 = 38; // Period for M5
-INPUT int CCI_Period_M15 = 10; // Period for M15
-INPUT int CCI_Period_M30 = 10; // Period for M30
-INPUT ENUM_APPLIED_PRICE CCI_Applied_Price = (ENUM_APPLIED_PRICE) 2; // Applied Price
-INPUT double CCI_SignalLevel = 111; // Signal level (100 by default)
+#ifndef __rider__
+INPUT ENUM_TRAIL_TYPE CCI_TrailingStopMethod = 9; // Trail stop method
+INPUT ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = 25; // Trail profit method
+#else
+ENUM_TRAIL_TYPE CCI_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE CCI_TrailingProfitMethod = 0; // Trail profit method
+#endif
+INPUT int CCI_Period_M1 = 3; // Period for M1
+INPUT int CCI_Period_M5 = 40; // Period for M5
+INPUT int CCI_Period_M15 = 19; // Period for M15
+INPUT int CCI_Period_M30 = 18; // Period for M30
+INPUT ENUM_APPLIED_PRICE CCI_Applied_Price = (ENUM_APPLIED_PRICE) 6; // Applied Price
+INPUT double CCI_SignalLevel = 119; // Signal level (100 by default)
+#ifndef __advanced__
 INPUT int CCI1_SignalMethod = -63; // Signal method for M1 (0-63)
-INPUT int CCI5_SignalMethod = -30; // Signal method for M5 (0-63)
-INPUT int CCI15_SignalMethod = -39; // Signal method for M15 (0-63)
-INPUT int CCI30_SignalMethod = -31; // Signal method for M30 (0-63)
-INPUT int CCI1_OpenCondition1 = 680; // Open condition 1 for M1 (0-1023)
-INPUT int CCI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
-INPUT ENUM_MARKET_EVENT CCI1_CloseCondition = 31; // Close condition for M1
-INPUT int CCI5_OpenCondition1 = 389; // Open condition 1 for M5 (0-1023)
-INPUT int CCI5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
-INPUT ENUM_MARKET_EVENT CCI5_CloseCondition = 5; // Close condition for M5
-INPUT int CCI15_OpenCondition1 = 292; // Open condition 1 for M15 (0-1023)
-INPUT int CCI15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
-INPUT ENUM_MARKET_EVENT CCI15_CloseCondition = 5; // Close condition for M15
-INPUT int CCI30_OpenCondition1 = 292; // Open condition 1 for M30 (0-1023)
-INPUT int CCI30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
-INPUT ENUM_MARKET_EVENT CCI30_CloseCondition = 5; // Close condition for M30
+INPUT int CCI5_SignalMethod = -27; // Signal method for M5 (0-63)
+INPUT int CCI15_SignalMethod = -36; // Signal method for M15 (0-63)
+INPUT int CCI30_SignalMethod = -54; // Signal method for M30 (0-63)
+#else
+int CCI1_SignalMethod = 0; // Signal method for M1 (0-63)
+int CCI5_SignalMethod = 0; // Signal method for M5 (0-63)
+int CCI15_SignalMethod = 0; // Signal method for M15 (0-63)
+int CCI30_SignalMethod = 0; // Signal method for M30 (0-63)
+#endif
+#ifdef __advanced__
+INPUT int CCI1_OpenCondition1 = 98; // Open condition 1 for M1 (0-1023)
+INPUT int CCI1_OpenCondition2 = 98; // Open condition 2 for M1 (0-1023)
+INPUT ENUM_MARKET_EVENT CCI1_CloseCondition = 1; // Close condition for M1
+INPUT int CCI5_OpenCondition1 = 680; // Open condition 1 for M5 (0-1023)
+INPUT int CCI5_OpenCondition2 = 98; // Open condition 2 for M5 (0-1023)
+INPUT ENUM_MARKET_EVENT CCI5_CloseCondition = 2; // Close condition for M5
+INPUT int CCI15_OpenCondition1 = 971; // Open condition 1 for M15 (0-1023)
+INPUT int CCI15_OpenCondition2 = 98; // Open condition 2 for M15 (0-1023)
+INPUT ENUM_MARKET_EVENT CCI15_CloseCondition = 4; // Close condition for M15
+INPUT int CCI30_OpenCondition1 = 971; // Open condition 1 for M30 (0-1023)
+INPUT int CCI30_OpenCondition2 = 98; // Open condition 2 for M30 (0-1023)
+INPUT ENUM_MARKET_EVENT CCI30_CloseCondition = 7; // Close condition for M30
+#else
+int CCI1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int CCI1_OpenCondition2 = 0; // Open condition 2 for M1 (0-1023)
+ENUM_MARKET_EVENT CCI1_CloseCondition = C_CCI_BUY_SELL; // Close condition for M1
+int CCI5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int CCI5_OpenCondition2 = 0; // Open condition 2 for M5 (0-1023)
+ENUM_MARKET_EVENT CCI5_CloseCondition = C_CCI_BUY_SELL; // Close condition for M5
+int CCI15_OpenCondition1 = 0; // Open condition 1 for M15 (0-1023)
+int CCI15_OpenCondition2 = 0; // Open condition 2 for M15 (0-1023)
+ENUM_MARKET_EVENT CCI15_CloseCondition = C_CCI_BUY_SELL; // Close condition for M15
+int CCI30_OpenCondition1 = 0; // Open condition 1 for M30 (0-1023)
+int CCI30_OpenCondition2 = 0; // Open condition 2 for M30 (0-1023)
+ENUM_MARKET_EVENT CCI30_CloseCondition = C_CCI_BUY_SELL; // Close condition for M30
+#endif
 double CCI1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 double CCI5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 double CCI15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)

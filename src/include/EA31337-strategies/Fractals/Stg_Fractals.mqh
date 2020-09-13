@@ -16,25 +16,52 @@
 // User input params.
 INPUT string __Fractals_Parameters__ = "-- Settings for the Fractals indicator --"; // >>> FRACTALS <<<
 INPUT int Fractals_Shift = 0; // Shift
-INPUT ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = 23; // Trail stop method
-INPUT ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = -18; // Trail profit method
+#ifndef __rider__
+INPUT ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = 9; // Trail stop method
+INPUT ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = 25; // Trail profit method
+#else
+ENUM_TRAIL_TYPE Fractals_TrailingStopMethod = 0; // Trail stop method
+ENUM_TRAIL_TYPE Fractals_TrailingProfitMethod = 0; // Trail profit method
+#endif
 /* @todo INPUT */ int Fractals_SignalLevel = 0; // Signal level
-INPUT int Fractals1_SignalMethod = 2; // Signal method for M1 (-3-3)
-INPUT int Fractals5_SignalMethod = 1; // Signal method for M5 (-3-3)
-INPUT int Fractals15_SignalMethod = -2; // Signal method for M15 (-3-3)
-INPUT int Fractals30_SignalMethod = -2; // Signal method for M30 (-3-3)
+#ifndef __advanced__
+INPUT int Fractals1_SignalMethod = 3; // Signal method for M1 (-3-3)
+INPUT int Fractals5_SignalMethod = 3; // Signal method for M5 (-3-3)
+INPUT int Fractals15_SignalMethod = 1; // Signal method for M15 (-3-3)
+INPUT int Fractals30_SignalMethod = 1; // Signal method for M30 (-3-3)
+#else
+int Fractals1_SignalMethod = 0; // Signal method for M1 (-3-3)
+int Fractals5_SignalMethod = 0; // Signal method for M5 (-3-3)
+int Fractals15_SignalMethod = 0; // Signal method for M15 (-3-3)
+int Fractals30_SignalMethod = 0; // Signal method for M30 (-3-3)
+#endif
+#ifdef __advanced__
 INPUT int Fractals1_OpenCondition1 = 971; // Open condition 1 for M1 (0-1023)
-INPUT int Fractals1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
-INPUT ENUM_MARKET_EVENT Fractals1_CloseCondition = 11; // Close condition for M1
-INPUT int Fractals5_OpenCondition1 = 971; // Open condition 1 for M5 (0-1023)
+INPUT int Fractals1_OpenCondition2 = 971; // Open condition 2 for M1 (0-)
+INPUT ENUM_MARKET_EVENT Fractals1_CloseCondition = 1; // Close condition for M1
+INPUT int Fractals5_OpenCondition1 = 874; // Open condition 1 for M5 (0-1023)
 INPUT int Fractals5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
-INPUT ENUM_MARKET_EVENT Fractals5_CloseCondition = 1; // Close condition for M5
-INPUT int Fractals15_OpenCondition1 = 486; // Open condition 1 for M15 (0-)
-INPUT int Fractals15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
-INPUT ENUM_MARKET_EVENT Fractals15_CloseCondition = 15; // Close condition for M15
-INPUT int Fractals30_OpenCondition1 = 195; // Open condition 1 for M30 (0-)
-INPUT int Fractals30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
-INPUT ENUM_MARKET_EVENT Fractals30_CloseCondition = 1; // Close condition for M30
+INPUT ENUM_MARKET_EVENT Fractals5_CloseCondition = 11; // Close condition for M5
+INPUT int Fractals15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+INPUT int Fractals15_OpenCondition2 = 971; // Open condition 2 for M15 (0-)
+INPUT ENUM_MARKET_EVENT Fractals15_CloseCondition = 4; // Close condition for M15
+INPUT int Fractals30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+INPUT int Fractals30_OpenCondition2 = 486; // Open condition 2 for M30 (0-)
+INPUT ENUM_MARKET_EVENT Fractals30_CloseCondition = 20; // Close condition for M30
+#else
+int Fractals1_OpenCondition1 = 0; // Open condition 1 for M1 (0-1023)
+int Fractals1_OpenCondition2 = 0; // Open condition 2 for M1 (0-)
+ENUM_MARKET_EVENT Fractals1_CloseCondition = C_FRACTALS_BUY_SELL; // Close condition for M1
+int Fractals5_OpenCondition1 = 0; // Open condition 1 for M5 (0-1023)
+int Fractals5_OpenCondition2 = 0; // Open condition 2 for M5 (0-)
+ENUM_MARKET_EVENT Fractals5_CloseCondition = C_FRACTALS_BUY_SELL; // Close condition for M5
+int Fractals15_OpenCondition1 = 0; // Open condition 1 for M15 (0-)
+int Fractals15_OpenCondition2 = 0; // Open condition 2 for M15 (0-)
+ENUM_MARKET_EVENT Fractals15_CloseCondition = C_FRACTALS_BUY_SELL; // Close condition for M15
+int Fractals30_OpenCondition1 = 0; // Open condition 1 for M30 (0-)
+int Fractals30_OpenCondition2 = 0; // Open condition 2 for M30 (0-)
+ENUM_MARKET_EVENT Fractals30_CloseCondition = C_FRACTALS_BUY_SELL; // Close condition for M30
+#endif
 INPUT double Fractals1_MaxSpread  =  6.0; // Max spread to trade for M1 (pips)
 INPUT double Fractals5_MaxSpread  =  7.0; // Max spread to trade for M5 (pips)
 INPUT double Fractals15_MaxSpread =  8.0; // Max spread to trade for M15 (pips)
