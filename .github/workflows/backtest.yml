@@ -91,6 +91,13 @@ jobs:
           name: Results-${{ matrix.mode }}-${{ matrix.year }}
           # yamllint disable-line rule:line-length
           path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
+      - name: Re-uploads results on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: Results-${{ matrix.mode }}-${{ matrix.year }}
+          # yamllint disable-line rule:line-length
+          path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
 
   Publish-Results:
     defaults:
@@ -159,17 +166,3 @@ jobs:
       - name: Re-pull on failure
         if: ${{ failure() }}
         run: git pull origin ${{ github.ref }} --autostash --rebase -X ours
-      - name: Re-push changes on failure (not PR)
-        if: ${{ failure() }} && github.event_name != 'pull_request'
-        uses: ad-m/github-push-action@master
-        with:
-          branch: ${{ github.ref }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Re-push changes on failure (PR)
-        if: ${{ failure() }} && github.event_name == 'pull_request'
-        uses: ad-m/github-push-action@master
-        with:
-          branch: refs/heads/${{ github.head_ref }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Run git diff
-        run: NO_PAGER=1 git --no-pager diff HEAD^
