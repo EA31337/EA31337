@@ -72,7 +72,7 @@ jobs:
           - Lite
           - Advanced
           - Rider
-        year: [2018, 2019]
+        year: [2019]
         deposit: [1k, 10k, 100k]
         spread: [1, 10]
 
@@ -117,7 +117,6 @@ jobs:
           - Advanced
           - Rider
         year:
-          - 2018
           - 2019
       max-parallel: 1
     steps:
