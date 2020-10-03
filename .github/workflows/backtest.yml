@@ -63,7 +63,7 @@ jobs:
       run:
         shell: bash
     needs: Compile
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     strategy:
       fail-fast: false
