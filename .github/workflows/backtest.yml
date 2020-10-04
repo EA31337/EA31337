@@ -79,6 +79,9 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: ${{ matrix.mode }}
+      - name: Removes old results
+        # yamllint disable-line rule:line-length
+        run: rm -fr "docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results"/*
       # yamllint disable-line rule:line-length
       - run: docker-compose run ${{ matrix.mode }}_${{ matrix.year }}_${{ matrix.deposit }}_s${{ matrix.spread }}
         # yamllint disable-line rule:line-length
@@ -118,6 +121,9 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: ${{ matrix.mode }}
+      - name: Removes old results
+        # yamllint disable-line rule:line-length
+        run: rm -fr "docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results"/*
       # yamllint disable-line rule:line-length
       - run: docker-compose run ${{ matrix.mode }}_${{ matrix.year }}_${{ matrix.deposit }}_s${{ matrix.spread }}
         # yamllint disable-line rule:line-length
@@ -157,6 +163,9 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: ${{ matrix.mode }}
+      - name: Removes old results
+        # yamllint disable-line rule:line-length
+        run: rm -fr "docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results"/*
       # yamllint disable-line rule:line-length
       - run: docker-compose run ${{ matrix.mode }}_${{ matrix.year }}_${{ matrix.deposit }}_s${{ matrix.spread }}
         # yamllint disable-line rule:line-length
