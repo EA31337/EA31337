@@ -58,7 +58,46 @@ jobs:
           name: ${{ matrix.mode }}
           path: '*.ex?'
 
-  Backtest:
+  Backtest-Lite:
+    defaults:
+      run:
+        shell: bash
+    needs: Compile
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        mode:
+          - Lite
+        year: [2019]
+        deposit: [1k, 10k, 100k]
+        spread: [1, 10]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: ${{ matrix.mode }}
+      # yamllint disable-line rule:line-length
+      - run: docker-compose run ${{ matrix.mode }}_${{ matrix.year }}_${{ matrix.deposit }}_s${{ matrix.spread }}
+        # yamllint disable-line rule:line-length
+        working-directory: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}
+      - name: Uploads results
+        uses: actions/upload-artifact@v2
+        with:
+          name: Results-${{ matrix.mode }}-${{ matrix.year }}
+          # yamllint disable-line rule:line-length
+          path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
+      - name: Re-uploads results on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: Results-${{ matrix.mode }}-${{ matrix.year }}
+          # yamllint disable-line rule:line-length
+          path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
+
+  Backtest-Advanced:
     defaults:
       run:
         shell: bash
@@ -69,8 +108,45 @@ jobs:
       fail-fast: false
       matrix:
         mode:
-          - Lite
           - Advanced
+        year: [2019]
+        deposit: [1k, 10k, 100k]
+        spread: [1, 10]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: ${{ matrix.mode }}
+      # yamllint disable-line rule:line-length
+      - run: docker-compose run ${{ matrix.mode }}_${{ matrix.year }}_${{ matrix.deposit }}_s${{ matrix.spread }}
+        # yamllint disable-line rule:line-length
+        working-directory: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}
+      - name: Uploads results
+        uses: actions/upload-artifact@v2
+        with:
+          name: Results-${{ matrix.mode }}-${{ matrix.year }}
+          # yamllint disable-line rule:line-length
+          path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
+      - name: Re-uploads results on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: Results-${{ matrix.mode }}-${{ matrix.year }}
+          # yamllint disable-line rule:line-length
+          path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
+
+  Backtest-Rider:
+    defaults:
+      run:
+        shell: bash
+    needs: Compile
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        mode:
           - Rider
         year: [2019]
         deposit: [1k, 10k, 100k]
@@ -99,6 +175,7 @@ jobs:
           # yamllint disable-line rule:line-length
           path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
 
+
   Publish-Results:
     defaults:
       run:
@@ -108,7 +185,7 @@ jobs:
       github.repository == 'EA31337/EA31337'
       && github.event_name == 'pull_request'
       && ${{ always() }}
-    needs: Backtest
+    needs: [Backtest-Lite, Backtest-Advanced, Backtest-Rider]
     runs-on: ubuntu-latest
     strategy:
       matrix:
