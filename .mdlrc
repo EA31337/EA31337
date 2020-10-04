@@ -4,4 +4,4 @@
 # "~MD013" - line length should be no more than 120 characters
 # Refs: https://github.com/markdownlint/markdownlint/blob/master/docs/RULES.md
 
-rules "~MD013"
+rules "~MD013,~MD024"

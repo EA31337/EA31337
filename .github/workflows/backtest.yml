@@ -58,7 +58,7 @@ jobs:
           name: ${{ matrix.mode }}
           path: '*.ex?'
 
-  Backtest:
+  Backtest-Lite:
     defaults:
       run:
         shell: bash
@@ -70,9 +70,7 @@ jobs:
       matrix:
         mode:
           - Lite
-          - Advanced
-          - Rider
-        year: [2018, 2019]
+        year: [2019]
         deposit: [1k, 10k, 100k]
         spread: [1, 10]
 
@@ -91,6 +89,92 @@ jobs:
           name: Results-${{ matrix.mode }}-${{ matrix.year }}
           # yamllint disable-line rule:line-length
           path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
+      - name: Re-uploads results on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: Results-${{ matrix.mode }}-${{ matrix.year }}
+          # yamllint disable-line rule:line-length
+          path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
+
+  Backtest-Advanced:
+    defaults:
+      run:
+        shell: bash
+    needs: Compile
+    runs-on: self-hosted
+
+    strategy:
+      fail-fast: false
+      matrix:
+        mode:
+          - Advanced
+        year: [2019]
+        deposit: [1k, 10k, 100k]
+        spread: [1, 10]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: ${{ matrix.mode }}
+      # yamllint disable-line rule:line-length
+      - run: docker-compose run ${{ matrix.mode }}_${{ matrix.year }}_${{ matrix.deposit }}_s${{ matrix.spread }}
+        # yamllint disable-line rule:line-length
+        working-directory: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}
+      - name: Uploads results
+        uses: actions/upload-artifact@v2
+        with:
+          name: Results-${{ matrix.mode }}-${{ matrix.year }}
+          # yamllint disable-line rule:line-length
+          path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
+      - name: Re-uploads results on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: Results-${{ matrix.mode }}-${{ matrix.year }}
+          # yamllint disable-line rule:line-length
+          path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
+
+  Backtest-Rider:
+    defaults:
+      run:
+        shell: bash
+    needs: Compile
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        mode:
+          - Rider
+        year: [2019]
+        deposit: [1k, 10k, 100k]
+        spread: [1, 10]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: ${{ matrix.mode }}
+      # yamllint disable-line rule:line-length
+      - run: docker-compose run ${{ matrix.mode }}_${{ matrix.year }}_${{ matrix.deposit }}_s${{ matrix.spread }}
+        # yamllint disable-line rule:line-length
+        working-directory: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}
+      - name: Uploads results
+        uses: actions/upload-artifact@v2
+        with:
+          name: Results-${{ matrix.mode }}-${{ matrix.year }}
+          # yamllint disable-line rule:line-length
+          path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
+      - name: Re-uploads results on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: Results-${{ matrix.mode }}-${{ matrix.year }}
+          # yamllint disable-line rule:line-length
+          path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
+
 
   Publish-Results:
     defaults:
@@ -101,7 +185,7 @@ jobs:
       github.repository == 'EA31337/EA31337'
       && github.event_name == 'pull_request'
       && ${{ always() }}
-    needs: Backtest
+    needs: [Backtest-Lite, Backtest-Advanced, Backtest-Rider]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -110,7 +194,6 @@ jobs:
           - Advanced
           - Rider
         year:
-          - 2018
           - 2019
       max-parallel: 1
     steps:
@@ -159,17 +242,3 @@ jobs:
       - name: Re-pull on failure
         if: ${{ failure() }}
         run: git pull origin ${{ github.ref }} --autostash --rebase -X ours
-      - name: Re-push changes on failure (not PR)
-        if: ${{ failure() }} && github.event_name != 'pull_request'
-        uses: ad-m/github-push-action@master
-        with:
-          branch: ${{ github.ref }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Re-push changes on failure (PR)
-        if: ${{ failure() }} && github.event_name == 'pull_request'
-        uses: ad-m/github-push-action@master
-        with:
-          branch: refs/heads/${{ github.head_ref }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Run git diff
-        run: NO_PAGER=1 git --no-pager diff HEAD^
