@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                  EA31337 - multi-strategy advanced trading robot |
-//|                       Copyright 2016-2020, 31337 Investments Ltd |
+//|                       Copyright 2016-2021, 31337 Investments Ltd |
 //|                                       https://github.com/EA31337 |
 //+------------------------------------------------------------------+
 
@@ -23,7 +23,7 @@
 #endif
 
 // Includes version specific user input params.
-extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v" + ea_version + " --"; // >>> EA31337 <<<
+input static string __EA_Parameters__ = "-- input EA parameters for " + ea_name + " v" + ea_version + " --"; // >>> EA31337 <<<
 #ifdef __advanced__ // Include default input settings based on the mode.
   #ifdef __rider__
     #include "EA31337/rider/ea-input.mqh"
@@ -42,16 +42,19 @@ extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v"
 #include "EA31337-classes/Condition.mqh"
 #include "EA31337-classes/Convert.mqh"
 #include "EA31337-classes/DateTime.mqh"
+#include "EA31337-classes/Dict.mqh"
 // #include "EA31337-classes/Draw.mqh"
 #include "EA31337-classes/File.mqh"
-#include "EA31337-classes/Order.mqh"
-#include "EA31337-classes/Orders.mqh"
+#include "EA31337-classes/Indicator.mqh"
+#include "EA31337-classes/Log.mqh"
+#include "EA31337-classes/MD5.mqh"
 #include "EA31337-classes/Mail.mqh"
 #include "EA31337-classes/Market.mqh"
 #include "EA31337-classes/Math.mqh"
-#include "EA31337-classes/MD5.mqh"
 #include "EA31337-classes/Misc.mqh"
 #include "EA31337-classes/Msg.mqh"
+#include "EA31337-classes/Order.mqh"
+#include "EA31337-classes/Orders.mqh"
 #include "EA31337-classes/Report.mqh"
 #include "EA31337-classes/Stats.mqh"
 #include "EA31337-classes/Strategy.mqh"
@@ -66,6 +69,38 @@ extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v"
 #include "EA31337-classes/Profiler.mqh"
 #endif
 
-// Includes strategies.
-INPUT string __Strategy_Parameters__ = "-- Strategy parameters --"; // >>> STRATEGIES <<<
-#include "EA31337-strategies/strategies.mqh"
+// Includes indicator classes.
+#include "EA31337-classes/Indicators/Indi_AC.mqh"
+#include "EA31337-classes/Indicators/Indi_AD.mqh"
+#include "EA31337-classes/Indicators/Indi_ADX.mqh"
+#include "EA31337-classes/Indicators/Indi_Alligator.mqh"
+#include "EA31337-classes/Indicators/Indi_AO.mqh"
+#include "EA31337-classes/Indicators/Indi_ATR.mqh"
+#include "EA31337-classes/Indicators/Indi_Bands.mqh"
+#include "EA31337-classes/Indicators/Indi_BearsPower.mqh"
+#include "EA31337-classes/Indicators/Indi_BullsPower.mqh"
+#include "EA31337-classes/Indicators/Indi_BWMFI.mqh"
+#include "EA31337-classes/Indicators/Indi_CCI.mqh"
+#include "EA31337-classes/Indicators/Indi_DeMarker.mqh"
+#include "EA31337-classes/Indicators/Indi_Envelopes.mqh"
+#include "EA31337-classes/Indicators/Indi_Force.mqh"
+#include "EA31337-classes/Indicators/Indi_Fractals.mqh"
+#include "EA31337-classes/Indicators/Indi_Gator.mqh"
+#include "EA31337-classes/Indicators/Indi_HeikenAshi.mqh"
+#include "EA31337-classes/Indicators/Indi_Ichimoku.mqh"
+#include "EA31337-classes/Indicators/Indi_MA.mqh"
+#include "EA31337-classes/Indicators/Indi_MACD.mqh"
+#include "EA31337-classes/Indicators/Indi_MFI.mqh"
+#include "EA31337-classes/Indicators/Indi_Momentum.mqh"
+#include "EA31337-classes/Indicators/Indi_OBV.mqh"
+#include "EA31337-classes/Indicators/Indi_OsMA.mqh"
+#include "EA31337-classes/Indicators/Indi_RSI.mqh"
+#include "EA31337-classes/Indicators/Indi_RVI.mqh"
+#include "EA31337-classes/Indicators/Indi_SAR.mqh"
+#include "EA31337-classes/Indicators/Indi_StdDev.mqh"
+// #include "EA31337-classes/Indicators/Indi_Stochastic.mqh"
+#include "EA31337-classes/Indicators/Indi_WPR.mqh"
+
+// Strategy includes.
+INPUT string __Strategy_Parameters__ = "-- Strategy parameters --";  // >>> STRATEGIES <<<
+#include "EA31337-strategies/strategies.h"
