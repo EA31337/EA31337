@@ -8,7 +8,7 @@
 	path = sets/Lite
 	url = https://github.com/EA31337/EA31337-Lite-Sets.git
 [submodule "EA31337-classes"]
-	path = src/include/EA31337-classes
+	path = src/include/classes
 	url = https://github.com/EA31337/EA31337-classes.git
 [submodule "EA31337-Advanced-Sets"]
 	path = sets/Advanced
@@ -25,3 +25,6 @@
 [submodule "Rider-optimization-tests"]
 	path = docker/optimization/rider
 	url = https://github.com/EA31337/EA31337-Rider-optimization-tests
+[submodule "strategies"]
+	path = src/include/strategies
+	url = https://github.com/EA31337/EA31337-strategies.git
