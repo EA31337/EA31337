@@ -4,218 +4,6 @@
 //|                                       https://github.com/EA31337 |
 //+------------------------------------------------------------------+
 
-// Includes.
-#include "includes.mqh"
-
-// Class variables.
-Account *account;
-Chart *chart;
-Collection *strats;
-Log *logger;
-Mail *mail;
-Market *market;
-Stats *total_stats, *hourly_stats;
-SummaryReport *summary_report;  // For summary report.
-Ticker *ticker;                 // For parsing ticks.
-Terminal *terminal;
-Trade *trade[FINAL_ENUM_TIMEFRAMES_INDEX];
-
-// Market/session variables.
-double pip_size, ea_lot_size;
-double last_ask, last_bid;
-uint order_freezelevel;                                 // Order freeze level in points.
-double curr_spread;                                     // Broker current spread in pips.
-double curr_trend;                                      // Current trend.
-double ea_risk_margin_per_order, ea_risk_margin_total;  // Risk marigin in percent.
-uint pts_per_pip;                                       // Number points per pip.
-int gmt_offset = 0;  // Current difference between GMT time and the local computer time in seconds, taking into account
-                     // switch to winter or summer time. Depends on the time settings of your computer.
-// double total_sl, total_tp; // Total SL/TP points.
-
-// Account variables.
-string account_type;
-double init_balance;  // Initial account balance.
-long init_spread;     // Initial spread.
-
-// State variables.
-bool session_initiated = false;
-bool session_active = false;
-
-// Time-based variables.
-// Bar time: initial, current and last one to check if bar has been changed since the last time.
-datetime curr_bar_time;
-datetime time_current = (int)EMPTY_VALUE;
-int hour_of_day, day_of_week, day_of_month, day_of_year, month, year;
-datetime last_order_time = 0;
-int last_history_check = 0;  // Last ticket position processed.
-datetime last_traded;
-
-// Strategy variables.
-int info[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_INFO_ENTRY];
-double conf[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_VALUE_ENTRY];
-double stats[FINAL_STRATEGY_TYPE_ENTRY][FINAL_STRATEGY_STAT_ENTRY];
-int open_orders[FINAL_STRATEGY_TYPE_ENTRY], closed_orders[FINAL_STRATEGY_TYPE_ENTRY];
-int tickets[]; // List of tickets to process.
-int worse_strategy[FINAL_STAT_PERIOD_TYPE_ENTRY], best_strategy[FINAL_STAT_PERIOD_TYPE_ENTRY];
-
-// EA variables.
-bool ea_active = false; bool ea_expired = false;
-double ea_risk_ratio; string rr_text; // Vars for calculation risk ratio.
-double ea_margin_risk_level[3]; // For margin risk (all/buy/sell);
-unsigned long max_orders = 10, daily_orders; // Maximum orders available to open.
-unsigned int max_order_slippage; // Maximum price slippage for buy or sell orders (in points)
-int err_code; // Error code.
-string last_err, last_msg, last_debug, last_trace;
-string ea_last_order;
-double last_pip_change; // Last tick change in pips.
-double last_close_profit = EMPTY;
-// int last_trail_update = 0, last_indicators_update = 0, last_stats_update = 0;
-int todo_queue[][8];
-datetime last_queue_process = 0;
-uint total_orders = 0; // Number of total orders currently open.
-double daily[FINAL_VALUE_TYPE_ENTRY], weekly[FINAL_VALUE_TYPE_ENTRY], monthly[FINAL_VALUE_TYPE_ENTRY];
-double hourly_profit[367][24]; // Keep track of hourly profit.
-
-// Used for writing the report file.
-string log[];
-
-// Condition and actions.
-int acc_conditions[30][3];
-string last_cname;
-
-// Order queue.
-long order_queue[][FINAL_ORDER_QUEUE_ENTRY];
-
-// For debugging purposes.
-string stacktrace = "";
-#define DEBUG_CHECKPOINT_RESET stacktrace = __FUNCTION__;
-#define DEBUG_CHECKPOINT_ADD  stacktrace += ">" + __FUNCTION__ + ":" + (string) __LINE__;
-#define DEBUG_CHECKPOINT_POP  stacktrace += "<";
-#define DEBUG_STACK_PRINT  Print(stacktrace);
-#define DEBUG_STACK_GET    stacktrace
-
-// Indicator variables.
-double iac[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
-double ad[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
-double adx[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_ADX_LINE_ENTRY];
-double alligator[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_GATOR_LINE_ENTRY];
-double atr[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
-double awesome[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
-double bands[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_BANDS_LINE_ENTRY];
-double bwmfi[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
-double bpower[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][ORDER_TYPE_SELL + 1];
-double cci[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
-double demarker[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
-double envelopes[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_LO_UP_LINE_ENTRY];
-double force[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
-double fractals[H4][FINAL_ENUM_INDICATOR_INDEX][FINAL_LO_UP_LINE_ENTRY];
-double gator[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_GATOR_LINE_ENTRY];
-double ichimoku[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_ICHIMOKU_LINE_ENTRY];
-double ma_fast[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX], ma_medium[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX], ma_slow[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
-double macd[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_SIGNAL_LINE_ENTRY];
-double mfi[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
-double momentum[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
-double obv[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
-double osma[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
-double rsi[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX], rsi_stats[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_LO_UP_LINE_ENTRY];
-double rvi[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_SIGNAL_LINE_ENTRY];
-double sar[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX]; int sar_week[FINAL_ENUM_TIMEFRAMES_INDEX][7][2];
-double stddev[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
-double stochastic[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX][FINAL_SIGNAL_LINE_ENTRY];
-double wpr[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
-double zigzag[FINAL_ENUM_TIMEFRAMES_INDEX][FINAL_ENUM_INDICATOR_INDEX];
-
-//+------------------------------------------------------------------+
-//| Expert tick function                                             |
-//+------------------------------------------------------------------+
-void OnTick() {
-  if (!session_initiated) return;
-  //#ifdef __profiler__ PROFILER_START #endif
-
-  bool _tick_procesed = false;
-  static MqlTick _last_tick = {0};
-  MqlTick _tick = market.GetTick();
-  if (_tick.time % 60 < _last_tick.time % 60) {
-    // Process a tick per minute.
-    for (ENUM_TIMEFRAMES_INDEX tfi = 0; tfi < FINAL_ENUM_TIMEFRAMES_INDEX; tfi++) {
-      if (Object::IsDynamic(trade[tfi]) && trade[tfi].Chart().IsValidTf()) {
-          trade[tfi].Market().SetTick(_tick);
-          ProcessBar(trade[tfi]);
-          _tick_procesed = true;
-      }
-    }
-  }
-  if (_tick_procesed) {
-    if (!terminal.IsOptimization()) {
-      terminal.Logger().Flush(false);
-    }
-  }
-  else {
-    UpdateTicks();
-  }
-  _last_tick = _tick;
-  //#ifdef __profiler__ PROFILER_STOP #endif
-} // end: OnTick()
-
-/**
- * Process a new bar.
- */
-void ProcessBar(Trade *_trade) {
-
-  if (!Object::IsDynamic(_trade)) {
-    PrintFormat("%s: Error: Trade object not valid!", __FUNCTION_LINE__);
-  }
-  else if (!Object::IsDynamic(_trade.Chart())) {
-    PrintFormat("%s: Error: Chart object not valid!", __FUNCTION_LINE__);
-  }
-
-  if (TradeAllowed()) {
-    last_ask = market.GetLastAsk();
-    last_bid = market.GetLastBid();
-    last_pip_change = market.GetLastPriceChangeInPips();
-    if (hour_of_day != DateTime::Hour()) {
-      StartNewHour(_trade);
-    }
-    UpdateVariables();
-    EA_Trade(_trade);
-    UpdateOrders(_trade);
-    UpdateStats();
-  }
-
-  if (PrintLogOnChart) {
-    // Update stats on chart.
-    DisplayInfoOnChart();
-  }
-}
-
-/**
- * Update ticks.
- */
-void UpdateTicks() {
-  if (!terminal.IsOptimization()) {
-    // Update stats.
-    if (RecordTicksToCSV) {
-      total_stats.OnTick();
-      hourly_stats.OnTick();
-      ticker.Add(market.GetLastTick());
-    }
-  }
-}
-
-/**
- * Update existing opened orders.
- */
-void UpdateOrders(Trade *_trade) {
-  #ifdef __profiler__ PROFILER_START #endif
-  if (total_orders > 0) {
-    CheckOrders();
-    UpdateTrailingStops(_trade);
-    CheckAccConditions(_trade.Chart());
-    TaskProcessList();
-  }
-  #ifdef __profiler__ PROFILER_STOP #endif
-}
-
 /**
  * Process orders.
  *
@@ -239,7 +27,7 @@ void UpdateMarginRiskLevel() {
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
 //+------------------------------------------------------------------+
-int OnInit() {
+int OnInitLegacy() {
   string err;
   if (VerboseInfo) PrintFormat("%s v%s (%s) initializing...", ea_name, ea_version, ea_link);
   if (!session_initiated) {
@@ -265,8 +53,6 @@ int OnInit() {
      session_initiated = true;
   }
 
-  #ifdef __profiler__ PROFILER_SET_MIN(10) #endif
-  #ifdef __profiler__ PROFILER_START #endif
 
   session_initiated &= InitClasses();
   session_initiated &= InitVariables();
@@ -291,143 +77,8 @@ int OnInit() {
   }
 
   ChartRedraw();
-  #ifdef __profiler__ PROFILER_STOP_PRINT #endif
   return (session_initiated ? INIT_SUCCEEDED : INIT_FAILED);
 } // end: OnInit()
-
-//+------------------------------------------------------------------+
-//| Expert deinitialization function                                 |
-//+------------------------------------------------------------------+
-void OnDeinit(const int reason) {
-  time_current = TimeCurrent();
-
-  // Flush logs.
-  if (Object::IsDynamic(terminal) && Object::IsDynamic(terminal.Logger())) {
-    terminal.Logger().Flush(false);
-  }
-
-  Msg::ShowText(StringFormat("reason = %d", reason), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
-
-  // Also: _UninitReason.
-  Msg::ShowText(
-      StringFormat("EA deinitializing, reason: %s (code: %s)", Terminal::GetUninitReasonText(reason), IntegerToString(reason)),
-      "Info", __FUNCTION__, __LINE__, VerboseInfo);
-
-  if (session_initiated) {
-    if (!terminal.IsOptimization()) {
-      // Show final account details.
-      Msg::ShowText(GetSummaryText(), "Info", __FUNCTION__, __LINE__, VerboseInfo);
-
-      #ifdef __profiler__ PROFILER_PRINT #endif
-
-      // Save ticks if recorded.
-      if (RecordTicksToCSV) {
-        ticker.SaveToCSV();
-      }
-
-      if (WriteReport) {
-        // if (reason == REASON_CHARTCHANGE)
-        string filename;
-        Chart *_chart = trade[chart.TfToIndex()].Chart();
-        OHLC first_bar = _chart.LoadOHLC();
-        summary_report.CalculateSummary();
-        // @todo: Calculate average spread from stats[sid][AVG_SPREAD].
-        filename = StringFormat(
-            "%s-%.f%s-%s-%s-%dspread-%s-report.txt",
-            market.GetSymbol(), summary_report.GetInitDeposit(), account.GetCurrency(),
-            DateTime::TimeToStr(first_bar.time, TIME_DATE), DateTime::TimeToStr(_chart.iTime(), TIME_DATE),
-            init_spread, chart.TfToString());
-            // ea_name, _Symbol, summary.init_deposit, account.AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE), Period());
-            // ea_name, _Symbol, init_balance, account.AccountCurrency(), init_spread, TimeToStr(time_current, TIME_DATE|TIME_MINUTES), Period());
-        string data = summary_report.GetReport();
-        data += GetStatReport();
-        data += GetStrategyReport();
-        data += Array::ArrToString(log, "\n", "Report log:\n");
-        Report::WriteReport(filename, data, VerboseInfo); // Todo: Add: Errors::GetUninitReasonText(reason)
-        Msg::ShowText(StringFormat("Saved report as: %s", filename), "Info", __FUNCTION__, __LINE__, VerboseInfo);
-      }
-
-    }
-
-  }
-  DeinitVars();
-} // end: OnDeinit()
-
-/**
- * Deinitialize global variables.
- */
-void DeinitVars() {
-  Object::Delete(account);
-  Object::Delete(hourly_stats);
-  Object::Delete(logger);
-  Object::Delete(total_stats);
-  Object::Delete(summary_report);
-  Object::Delete(ticker);
-  Object::Delete(terminal);
-  Object::Delete(mail);
-  Object::Delete(market);
-  Object::Delete(strats);
-  for (int tfi = 0; tfi < FINAL_ENUM_TIMEFRAMES_INDEX; tfi++) {
-    Object::Delete(trade[tfi]);
-  }
-  #ifdef __profiler__ PROFILER_DEINIT #endif
-}
-
-/**
- * Test completion event handler.
- *
- * Returns calculated value that is used as the Custom max criterion in the genetic optimization of input parameters.
- *
- * @see: https://www.mql5.com/en/docs/basis/function/events
- */
-/*
-double OnTester() {
-  if (ProfilingMinTime > 0) {
-  }
-}
-*/
-
-/**
- * Implements handler of the TesterPass event (MQL5 only).
- *
- * Invoked when a frame is received during EA optimization in the strategy tester.
- *
- * @see: https://www.mql5.com/en/docs/basis/function/events
- */
-void OnTesterPass() {
-  Print("Calling ", __FUNCTION__, ".");
-}
-
-/**
- * Implements handler of the TesterInit event (MQL5 only).
- *
- * Invoked with the start of optimization in the strategy tester.
- *
- * @see: https://www.mql5.com/en/docs/basis/function/events
- */
-void OnTesterInit() {
-  //if (VerboseDebug)
-  Print("Calling ", __FUNCTION__, ".");
-  #ifdef __MQL5__
-    // Specifies the use of input variable when optimizing: value, change step, initial and final values.
-    // @see: https://www.mql5.com/en/docs/optimization_frames/parametersetrange
-    //ParameterSetRange(LotSize, 0, 0.0, 0.01, 0.01, 0.1);
-  #endif
-}
-
-/**
- * Implements handler of the TesterDeinit event (MQL5 only).
- *
- * Invoked after the end of optimization of an Expert Advisor in the strategy tester.
- *
- * @see: https://www.mql5.com/en/docs/basis/function/events
- */
-void OnTesterDeinit() {
-  //if (VerboseDebug)
-  Print("Calling ", __FUNCTION__, ".");
-}
-
-// @todo: OnTradeTransaction (https://www.mql5.com/en/docs/basis/function/events).
 
 /**
  * Print init variables and constants.
@@ -498,367 +149,6 @@ string InitInfo(bool startup = false, string sep = "\n") {
 }
 
 /**
- * Main function to trade.
- */
-bool EA_Trade(Trade *_trade) {
-  DEBUG_CHECKPOINT_RESET
-  #ifdef __profiler__ PROFILER_START #endif
-  bool order_placed = false;
-  int sid;
-  Strategy *strat;
-  ENUM_ORDER_TYPE _cmd = EMPTY;
-  ENUM_TIMEFRAMES tf = _trade.Chart().GetTf();
-  if (VerboseTrace) _trade.Logger().Trace(StringFormat("%s:%d: %s", __FUNCTION__, __LINE__, DateTime::TimeToStr(_trade.Chart().GetBarTime())));
-
-  for (sid = 0; sid < strats.GetSize(); sid++) {
-    strat = ((Strategy *) strats.GetByIndex(sid));
-
-    if (strat.GetTf() == tf && strat.IsEnabled() && !strat.IsSuspended()) {
-      if (strat.SignalOpen(ORDER_TYPE_BUY)) {
-        _cmd = ORDER_TYPE_BUY;
-      } else if (strat.SignalOpen(ORDER_TYPE_SELL)) {
-        _cmd = ORDER_TYPE_SELL;
-      } else {
-        _cmd = EMPTY;
-      }
-
-      /*
-      if (!DisableCloseConditions) {
-        if (CheckMarketEvent(strat.Chart(), ORDER_TYPE_BUY,  strat.GetSignalCloseMethod1())) {
-          CloseOrdersByType(ORDER_TYPE_SELL, strat.GetId(), (ENUM_MARKET_EVENT) ((Dict<string, int> *) strat.GetDataSI()).GetByKey("CloseCondition"), CloseConditionOnlyProfitable);
-        }
-        if (CheckMarketEvent(strat.Chart(), ORDER_TYPE_SELL, strat.GetSignalCloseMethod1())) {
-          CloseOrdersByType(ORDER_TYPE_BUY,  strat.GetId(), (ENUM_MARKET_EVENT) ((Dict<string, int> *) strat.GetDataSI()).GetByKey("CloseCondition"), CloseConditionOnlyProfitable);
-        }
-      }
-      */
-
-      if (strat.GetSignalOpenMethod1() != 0) {
-        if (_cmd == ORDER_TYPE_BUY  && !CheckMarketCondition1(strat.Chart(), ORDER_TYPE_BUY,  strat.GetSignalOpenMethod1())) _cmd = EMPTY;
-        if (_cmd == ORDER_TYPE_SELL && !CheckMarketCondition1(strat.Chart(), ORDER_TYPE_SELL, strat.GetSignalOpenMethod1())) _cmd = EMPTY;
-      }
-
-      // if (_cmd != EMPTY && Object::IsDynamic(trade[Chart::TfToIndex(TrendPeriod)]) && strat.GetSignalOpenMethod2() != 0) {
-      /*
-      if (Object::IsDynamic(trade[Chart::TfToIndex(TrendPeriod)]) && strat.GetSignalOpenMethod2() != 0) {
-        if (_cmd == ORDER_TYPE_BUY  && CheckMarketCondition1(trade[Chart::TfToIndex(TrendPeriod)].Chart(), ORDER_TYPE_SELL, strat.GetSignalOpenMethod2(), false)) _cmd = EMPTY;
-        if (_cmd == ORDER_TYPE_SELL && CheckMarketCondition1(trade[Chart::TfToIndex(TrendPeriod)].Chart(), ORDER_TYPE_BUY,  strat.GetSignalOpenMethod2(), false)) _cmd = EMPTY;
-      }
-      */
-
-      if (_cmd != EMPTY) {
-        ResetLastError();
-        order_placed &= ExecuteOrder(_cmd, strat);
-        if (VerboseDebug) {
-          strat.Logger().Debug(StringFormat("%s:%d: %s %s on %s at %s: %s",
-            __FUNCTION__, __LINE__, strat.GetName(),
-            Chart::TfToString((ENUM_TIMEFRAMES) strat.GetTf()),
-            Order::OrderTypeToString(_cmd),
-            DateTime::TimeToStr(TimeCurrent()),
-            order_placed ? "SUCCESS" : "IGNORE"
-          ));
-        }
-      } // end: if
-    } // end: if
-  } // end: for
-
-  if (SmartQueueActive && !order_placed && total_orders <= max_orders) {
-    order_placed &= OrderQueueProcess();
-  }
-
-  if (order_placed) {
-    ProcessOrders();
-  }
-
-  last_traded = TimeCurrent();
-  #ifdef __profiler__ PROFILER_STOP #endif
-  return order_placed;
-}
-
-/**
- * Update specific indicator.
- * Gukkuk im Versteck
- */
-bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
-  DEBUG_CHECKPOINT_ADD
-  bool success = true;
-  int i; string text = __FUNCTION__ + ": ";
-  ENUM_TIMEFRAMES tf = _chart.GetTf();
-  uint index = _chart.TfToIndex();
-  string symbol = _chart.GetSymbol();
-  int shift = 0;
-
-  #ifdef __profiler__ PROFILER_START #endif
-  switch (type) {
-    case INDI_AC: // Calculates the Bill Williams' Accelerator/Decelerator oscillator.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++)
-        iac[index][i] = Indi_AC::iAC(symbol, tf, i + AC_Shift);
-      break;
-    case INDI_AD: // Calculates the Accumulation/Distribution indicator.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++)
-        ad[index][i] = Indi_AD::iAD(symbol, tf, i + AD_Shift);
-      break;
-    case INDI_ADX: // Calculates the Average Directional Movement Index indicator.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        adx[index][i][LINE_MAIN_ADX] = Indi_ADX::iADX(symbol, tf, ADX_Period_M30, ADX_Applied_Price, LINE_MAIN_ADX, i + ADX_Shift); // Base indicator line
-        adx[index][i][LINE_PLUSDI]   = Indi_ADX::iADX(symbol, tf, ADX_Period_M30, ADX_Applied_Price, LINE_PLUSDI, i + ADX_Shift);   // +DI indicator line
-        adx[index][i][LINE_MINUSDI]  = Indi_ADX::iADX(symbol, tf, ADX_Period_M30, ADX_Applied_Price, LINE_MINUSDI, i + ADX_Shift);  // -DI indicator line
-      }
-      break;
-    case INDI_ALLIGATOR: // Calculates the Alligator indicator.
-      // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        shift = i + Alligator_Shift;
-        alligator[index][i][LINE_LIPS]  = Indi_MA::iMA(symbol, tf, Alligator_Period_Lips,  Alligator_Shift_Lips,  Alligator_MA_Method, Alligator_Applied_Price, shift);
-        alligator[index][i][LINE_TEETH] = Indi_MA::iMA(symbol, tf, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_MA_Method, Alligator_Applied_Price, shift);
-        alligator[index][i][LINE_JAW]   = Indi_MA::iMA(symbol, tf, Alligator_Period_Jaw,   Alligator_Shift_Jaw,   Alligator_MA_Method, Alligator_Applied_Price, shift);
-
-      }
-      success = (bool) alligator[index][CURR][LINE_JAW] + alligator[index][PREV][LINE_JAW] + alligator[index][FAR][LINE_JAW];
-      /* Note: This is equivalent to:
-        alligator[index][i][LINE_TEETH] = iAlligator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORJAW,   Alligator_Shift);
-        alligator[index][i][LINE_TEETH] = iAlligator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORTEETH, Alligator_Shift);
-        alligator[index][i][LINE_LIPS]  = iAlligator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, MODE_GATORLIPS,  Alligator_Shift);
-       */
-      #ifdef __MQL4__
-      if (VerboseDebug) PrintFormat("Alligator M%d: %s", tf, Array::ArrToString3D(alligator, ",", Digits));
-      #endif
-      break;
-    case INDI_ATR: // Calculates the Average True Range indicator.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        atr[index][i] = Indi_ATR::iATR(symbol, tf, ATR_Period_M30, i + ATR_Shift);
-      }
-      break;
-    case INDI_AO: // Calculates the Awesome oscillator.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        awesome[index][i] = Indi_AO::iAO(symbol, tf, i + Awesome_Shift);
-      }
-      break;
-    case INDI_BANDS: // Calculates the Bollinger Bands indicator.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        bands[index][i][BAND_BASE]  = Indi_Bands::iBands(symbol, tf, Bands_Period_M30, Bands_Deviation_M30, Bands_HShift, Bands_Applied_Price, BAND_BASE,  i + Bands_Shift);
-        bands[index][i][BAND_UPPER] = Indi_Bands::iBands(symbol, tf, Bands_Period_M30, Bands_Deviation_M30, Bands_HShift, Bands_Applied_Price, BAND_UPPER, i + Bands_Shift);
-        bands[index][i][BAND_LOWER] = Indi_Bands::iBands(symbol, tf, Bands_Period_M30, Bands_Deviation_M30, Bands_HShift, Bands_Applied_Price, BAND_LOWER, i + Bands_Shift);
-      }
-      success = (bool)bands[index][CURR][BAND_BASE];
-      #ifdef __MQL4__
-      if (VerboseDebug) PrintFormat("Bands M%d: %s", tf, Array::ArrToString3D(bands, ",", Digits));
-      #endif
-      break;
-    case INDI_BEARS: // Calculates the Bears Power and Bulls Power indicators.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        bpower[index][i][ORDER_TYPE_SELL] = Indi_BearsPower::iBearsPower(symbol, tf, BearsPower_Period, BearsPower_Applied_Price, i + BearsPower_Shift);
-      }
-      success = (bool)(bpower[index][CURR][ORDER_TYPE_BUY] || bpower[index][CURR][ORDER_TYPE_SELL]);
-      // Message("Bulls: " + bpower[index][CURR][ORDER_TYPE_BUY] + ", Bears: " + bpower[index][CURR][ORDER_TYPE_SELL]);
-      break;
-    case INDI_BULLS: // Calculates the Bulls Power and Bulls Power indicators.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        bpower[index][i][ORDER_TYPE_BUY]  = Indi_BullsPower::iBullsPower(symbol, tf, BullsPower_Period, BullsPower_Applied_Price, i + BullsPower_Shift);
-      }
-      success = (bool)(bpower[index][CURR][ORDER_TYPE_BUY] || bpower[index][CURR][ORDER_TYPE_SELL]);
-      // Message("Bulls: " + bpower[index][CURR][ORDER_TYPE_BUY] + ", Bears: " + bpower[index][CURR][ORDER_TYPE_SELL]);
-      break;
-    case INDI_BWMFI: // Calculates the Market Facilitation Index indicator.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        bwmfi[index][i] = Indi_BWMFI::iBWMFI(symbol, tf, i + BWMFI_Shift);
-      }
-      success = (bool) bwmfi[index][CURR];
-      break;
-    case INDI_CCI: // Calculates the Commodity Channel Index indicator.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        cci[index][i] = Indi_CCI::iCCI(symbol, tf, CCI_Period_M30, CCI_Applied_Price, i + CCI_Shift);
-      }
-      success = (bool) cci[index][CURR];
-      break;
-    case INDI_DEMARKER: // Calculates the DeMarker indicator.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        demarker[index][i] = Indi_DeMarker::iDeMarker(symbol, tf, DeMarker_Period_M30, i + DeMarker_Shift);
-      }
-      // success = (bool) demarker[index][CURR] + demarker[index][PREV] + demarker[index][FAR];
-      // PrintFormat("Period: %d, DeMarker: %g", period, demarker[index][CURR]);
-      #ifdef __MQL4__
-      if (VerboseDebug) PrintFormat("%s: DeMarker M%d: %s", DateTime::TimeToStr(_chart.GetBarTime(tf)), tf, Array::ArrToString2D(demarker, ",", Digits));
-      #endif
-      break;
-    case INDI_ENVELOPES: // Calculates the Envelopes indicator.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        envelopes[index][i][LINE_MAIN]  = Indi_Envelopes::iEnvelopes(symbol, tf, Envelopes_MA_Period_M30, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation_M30, LINE_MAIN,  i + Envelopes_Shift);
-        envelopes[index][i][LINE_UPPER] = Indi_Envelopes::iEnvelopes(symbol, tf, Envelopes_MA_Period_M30, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation_M30, LINE_UPPER, i + Envelopes_Shift);
-        envelopes[index][i][LINE_LOWER] = Indi_Envelopes::iEnvelopes(symbol, tf, Envelopes_MA_Period_M30, Envelopes_MA_Method, Envelopes_MA_Shift, Envelopes_Applied_Price, Envelopes_Deviation_M30, LINE_LOWER, i + Envelopes_Shift);
-      }
-      success = (bool) envelopes[index][CURR][LINE_MAIN];
-      #ifdef __MQL4__
-      if (VerboseDebug) PrintFormat("Envelopes M%d: %s", tf, Array::ArrToString3D(envelopes, ",", Digits));
-      #endif
-      break;
-    case INDI_FORCE: // Calculates the Force Index indicator.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        force[index][i] = Indi_Force::iForce(symbol, tf, Force_Period_M30, Force_MA_Method, Force_Applied_Price, i + Force_Shift);
-      }
-      success = (bool) force[index][CURR];
-      break;
-    case INDI_FRACTALS: // Calculates the Fractals indicator.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        fractals[index][i][LINE_LOWER] = Indi_Fractals::iFractals(symbol, tf, LINE_LOWER, i + Fractals_Shift);
-        fractals[index][i][LINE_UPPER] = Indi_Fractals::iFractals(symbol, tf, LINE_UPPER, i + Fractals_Shift);
-      }
-      #ifdef __MQL4__
-      if (VerboseDebug) PrintFormat("Fractals M%d: %s", tf, Array::ArrToString3D(fractals, ",", Digits));
-      #endif
-      break;
-    case INDI_GATOR: // Calculates the Gator oscillator.
-      // Colors: Alligator's Jaw - Blue, Alligator's Teeth - Red, Alligator's Lips - Green.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        gator[index][i][LINE_LIPS]  = Indi_Gator::iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, LINE_LIPS,  Alligator_Shift);
-        gator[index][i][LINE_TEETH] = Indi_Gator::iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Teeth, Alligator_Shift_Teeth, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, LINE_TEETH, Alligator_Shift);
-        gator[index][i][LINE_JAW]   = Indi_Gator::iGator(symbol, tf, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Jaw, Alligator_Shift_Jaw, Alligator_Period_Lips, Alligator_Shift_Lips, Alligator_MA_Method, Alligator_Applied_Price, LINE_JAW,   Alligator_Shift);
-      }
-      success = (bool)gator[index][CURR][LINE_JAW];
-      break;
-    case INDI_ICHIMOKU: // Calculates the Ichimoku Kinko Hyo indicator.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        ichimoku[index][i][LINE_TENKANSEN]   = Indi_Ichimoku::iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, LINE_TENKANSEN, i);
-        ichimoku[index][i][LINE_KIJUNSEN]    = Indi_Ichimoku::iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, LINE_KIJUNSEN, i);
-        ichimoku[index][i][LINE_SENKOUSPANA] = Indi_Ichimoku::iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, LINE_SENKOUSPANA, i);
-        ichimoku[index][i][LINE_SENKOUSPANB] = Indi_Ichimoku::iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, LINE_SENKOUSPANB, i);
-        ichimoku[index][i][LINE_CHIKOUSPAN]  = Indi_Ichimoku::iIchimoku(symbol, tf, Ichimoku_Period_Tenkan_Sen, Ichimoku_Period_Kijun_Sen, Ichimoku_Period_Senkou_Span_B, LINE_CHIKOUSPAN, i);
-      }
-      success = (bool)ichimoku[index][CURR][LINE_TENKANSEN];
-      break;
-    case INDI_MA: // Calculates the Moving Average indicator.
-      // Calculate MA Fast.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        shift = i + MA_Shift;
-        ma_fast[index][i]   = Indi_MA::iMA(symbol, tf, MA_Period_Fast,   MA_Shift_Fast,   MA_Method, MA_Applied_Price, shift);
-        ma_medium[index][i] = Indi_MA::iMA(symbol, tf, MA_Period_Medium, MA_Shift_Medium, MA_Method, MA_Applied_Price, shift);
-        ma_slow[index][i]   = Indi_MA::iMA(symbol, tf, MA_Period_Slow,   MA_Shift_Slow,   MA_Method, MA_Applied_Price, shift);
-        /*
-        if (tf == Period() && i < FINAL_ENUM_INDICATOR_INDEX - 1) {
-          Draw::TLine(StringFormat("%s%s%d", symbol, "MA Fast", i),   ma_fast[index][i],   ma_fast[index][i+1],    iTime(NULL, 0, shift), iTime(NULL, 0, shift+1), clrBlue);
-          Draw::TLine(StringFormat("%s%s%d", symbol, "MA Medium", i), ma_medium[index][i], ma_medium[index][i+1],  iTime(NULL, 0, shift), iTime(NULL, 0, shift+1), clrYellow);
-          Draw::TLine(StringFormat("%s%s%d", symbol, "MA Slow", i),   ma_slow[index][i],   ma_slow[index][i+1],    iTime(NULL, 0, shift), iTime(NULL, 0, shift+1), clrGray);
-        }
-        */
-      }
-      success = (bool) ma_fast[index][CURR] || ma_medium[index][CURR] || ma_slow[index][CURR];
-      #ifdef __MQL4__
-      if (VerboseDebug) PrintFormat("MA Fast M%d: %s", tf, Array::ArrToString2D(ma_fast, ",", Digits));
-      if (VerboseDebug) PrintFormat("MA Medium M%d: %s", tf, Array::ArrToString2D(ma_medium, ",", Digits));
-      if (VerboseDebug) PrintFormat("MA Slow M%d: %s", tf, Array::ArrToString2D(ma_slow, ",", Digits));
-      #endif
-      // if (VerboseDebug && Check::IsVisualMode()) Draw::DrawMA(tf);
-      break;
-    case INDI_MACD: // Calculates the Moving Averages Convergence/Divergence indicator.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        shift = i + MACD_Shift;
-        macd[index][i][LINE_MAIN]   = Indi_MACD::iMACD(symbol, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price, LINE_MAIN,   shift);
-        macd[index][i][LINE_SIGNAL] = Indi_MACD::iMACD(symbol, tf, MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price, LINE_SIGNAL, shift);
-      }
-      #ifdef __MQL4__
-      if (VerboseDebug) PrintFormat("MACD M%d: %s", tf, Array::ArrToString3D(macd, ",", Digits));
-      #endif
-      success = (bool)macd[index][CURR][LINE_MAIN];
-      break;
-    case INDI_MFI: // Calculates the Money Flow Index indicator.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        mfi[index][i] = Indi_MFI::iMFI(symbol, tf, MFI_Period_M30, i + MFI_Shift);
-      }
-      success = (bool)mfi[index][CURR];
-      break;
-    case INDI_MOMENTUM: // Calculates the Momentum indicator.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        momentum[index][i] = Indi_Momentum::iMomentum(symbol, tf, Momentum_Period, Momentum_Applied_Price, i);
-      }
-      success = (bool)momentum[index][CURR];
-      break;
-    case INDI_OBV: // Calculates the On Balance Volume indicator.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        obv[index][i] = Indi_OBV::iOBV(symbol, tf, OBV_Applied_Price, i);
-      }
-      success = (bool) obv[index][CURR];
-      break;
-    case INDI_OSMA: // Calculates the Moving Average of Oscillator indicator.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        osma[index][i] = Indi_OsMA::iOsMA(symbol, tf, OSMA_Period_Fast, OSMA_Period_Slow, OSMA_Period_Signal, OSMA_Applied_Price, i);
-      }
-      success = (bool) osma[index][CURR];
-      break;
-    case INDI_RSI: // Calculates the Relative Strength Index indicator.
-      // int rsi_period = RSI_Period; // Not used at the moment.
-      // sid = GetStrategyViaIndicator(RSI, tf); rsi_period = info[sid][CUSTOM_PERIOD]; // Not used at the moment.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        rsi[index][i] = Indi_RSI::iRSI(symbol, tf, RSI_Period_M30, RSI_Applied_Price, i + RSI_Shift);
-        if (rsi[index][i] > rsi_stats[index][LINE_UPPER]) rsi_stats[index][LINE_UPPER] = rsi[index][i]; // Calculate maximum value.
-        if (rsi[index][i] < rsi_stats[index][LINE_LOWER] || rsi_stats[index][LINE_LOWER] == 0) rsi_stats[index][LINE_LOWER] = rsi[index][i]; // Calculate minimum value.
-      }
-      // Calculate average value.
-      rsi_stats[index][0] = (rsi_stats[index][0] > 0 ? (rsi_stats[index][0] + rsi[index][0] + rsi[index][1] + rsi[index][2]) / 4 : (rsi[index][0] + rsi[index][1] + rsi[index][2]) / 3);
-      #ifdef __MQL4__
-      if (VerboseDebug) PrintFormat("%s: RSI %s: %s", DateTime::TimeToStr(_chart.GetBarTime()), _chart.TfToString(), Array::ArrToString2D(rsi, ",", Digits));
-      #endif
-      success = (bool) rsi[index][CURR] + rsi[index][PREV] + rsi[index][FAR];
-      break;
-    case INDI_RVI: // Calculates the Relative Strength Index indicator.
-      rvi[index][CURR][LINE_MAIN]   = Indi_RVI::iRVI(symbol, tf, 10, LINE_MAIN, CURR);
-      rvi[index][PREV][LINE_MAIN]   = Indi_RVI::iRVI(symbol, tf, 10, LINE_MAIN, PREV + RVI_Shift);
-      rvi[index][FAR][LINE_MAIN]    = Indi_RVI::iRVI(symbol, tf, 10, LINE_MAIN, FAR + RVI_Shift);
-      rvi[index][CURR][LINE_SIGNAL] = Indi_RVI::iRVI(symbol, tf, 10, LINE_SIGNAL, CURR);
-      rvi[index][PREV][LINE_SIGNAL] = Indi_RVI::iRVI(symbol, tf, 10, LINE_SIGNAL, PREV + RVI_Shift);
-      rvi[index][FAR][LINE_SIGNAL]  = Indi_RVI::iRVI(symbol, tf, 10, LINE_SIGNAL, FAR + RVI_Shift);
-      success = (bool) rvi[index][CURR][LINE_MAIN];
-      break;
-    case INDI_SAR: // Calculates the Parabolic Stop and Reverse system indicator.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        sar[index][i] = Indi_SAR::iSAR(symbol, tf, SAR_Step, SAR_Maximum_Stop, i + SAR_Shift);
-      }
-      #ifdef __MQL4__
-      if (VerboseDebug) PrintFormat("SAR M%d: %s", tf, Array::ArrToString2D(sar, ",", Digits));
-      #endif
-      success = (bool) sar[index][CURR] + sar[index][PREV] + sar[index][FAR];
-      break;
-    case INDI_STDDEV: // Calculates the Standard Deviation indicator.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        stddev[index][i] = Indi_StdDev::iStdDev(symbol, tf, StdDev_MA_Period, StdDev_MA_Shift, StdDev_MA_Method, StdDev_Applied_Price, i);
-      }
-      #ifdef __MQL4__
-      if (VerboseDebug) PrintFormat("StdDev M%d: %s", tf, Array::ArrToString2D(stddev, ",", Digits));
-      #endif
-      success = stddev[index][CURR];
-      break;
-    case INDI_STOCHASTIC: // Calculates the Stochastic Oscillator.
-      // TODO
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        // stochastic[index][i][LINE_MAIN]   = Indi_Stochastic::iStochastic(symbol, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, LINE_MAIN, i);
-        // stochastic[index][i][LINE_SIGNAL] = Indi_Stochastic::iStochastic(symbol, PERIOD_H1, 15, 9, 9, MODE_EMA, 0, LINE_SIGNAL, i);
-      }
-      #ifdef __MQL4__
-      if (VerboseDebug) PrintFormat("Stochastic M%d: %s", tf, Array::ArrToString3D(stochastic, ",", Digits));
-      #endif
-      success = stochastic[index][CURR][LINE_MAIN];
-      break;
-    case INDI_WPR: // Calculates the  Larry Williams' Percent Range.
-      // Update the Larry Williams' Percent Range indicator values.
-      for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
-        wpr[index][i] = -Indi_WPR::iWPR(symbol, tf, WPR_Period_M30, i + WPR_Shift);
-      }
-      #ifdef __MQL4__
-      if (VerboseDebug) PrintFormat("%s: WPR M%d: %s", DateTime::TimeToStr(_chart.GetBarTime()), tf, Array::ArrToString2D(wpr, ",", Digits));
-      #endif
-      success = (bool) wpr[index][CURR] + wpr[index][PREV] + wpr[index][FAR];
-      break;
-    case INDI_ZIGZAG: // Calculates the custom ZigZag indicator.
-      // TODO
-      break;
-  } // end: switch
-
-  //processed[type][index] = chart.GetBarTime(tf);
-  #ifdef __profiler__ PROFILER_STOP #endif
-  DEBUG_CHECKPOINT_POP
-  return (success);
-}
-
-/**
  * Execute trade order.
  *
  * @param
@@ -874,14 +164,12 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
  *     if true, re-try to open again after error/failure.
  */
 int ExecuteOrder(ENUM_ORDER_TYPE cmd, Strategy *_strat, double trade_volume = 0, string order_comment = "", bool retry = true) {
-  DEBUG_CHECKPOINT_ADD
   int sid = (int) _strat.GetId();
   bool result = false;
   long order_ticket;
   double trade_volume_max = market.GetVolumeMax();
   Trade *_trade = _strat.Trade();
 
-  #ifdef __profiler__ PROFILER_START #endif
 
   // if (VerboseTrace) Print(__FUNCTION__);
   if (trade_volume <= market.GetVolumeMin()) {
@@ -987,16 +275,6 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, Strategy *_strat, double trade_volume = 0,
 
       if (SmartQueueActive && total_orders >= max_orders) OrderQueueClear(); // Clear queue if we're reached the limit again, so we can start fresh.
    } else {
-     /* On ECN brokers you must open first and THEN set stops
-     int ticket = OrderSend(..., 0,0,...)
-     if (ticket < 0)
-       Alert("OrderSend failed: ", GetLastError());
-     else if (!Order::OrderSelect(ticket, SELECT_BY_TICKET))
-       Alert("OrderSelect failed: ", GetLastError());
-     else if (!OrderModify(OrderTicket(), OrderOpenPrice(), SL, TP, 0))
-       Alert("OrderModify failed: ", GetLastError());
-     @see: https://www.mql5.com/en/forum/141509
-     */
      result = false;
      info[sid][TOTAL_ERRORS]++;
      err_code = GetLastError();
@@ -1063,7 +341,6 @@ int ExecuteOrder(ENUM_ORDER_TYPE cmd, Strategy *_strat, double trade_volume = 0,
      if (retry) TaskAddOrderOpen(cmd, trade_volume, sid); // Will re-try again. // warning 43: possible loss of data due to type conversion
      info[sid][TOTAL_ERRORS]++;
    } // end-if: order_ticket
-  #ifdef __profiler__ PROFILER_STOP #endif
   return (result);
 }
 
@@ -1071,69 +348,6 @@ int ExecuteOrder(ENUM_ORDER_TYPE _cmd, uint _sid, double _trade_volume = 0, stri
   Strategy *_strat;
   _strat = ((Strategy *) strats.GetById(_sid));
   return ExecuteOrder(_cmd, _strat, _trade_volume = 0, _order_comment, _retry);
-}
-
-/**
- * Check if we can open new order.
- */
-bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, Strategy *_strat, double volume = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  bool result = true;
-  string err;
-  // if (VerboseTrace) Print(__FUNCTION__);
-  // total_sl = Orders::TotalSL(); // Convert::ValueToMoney(Orders::TotalSL(ORDER_TYPE_BUY)), Convert::ValueToMoney(Orders::TotalSL(ORDER_TYPE_SELL)
-  // total_tp = Orders::TotalTP(); // Convert::ValueToMoney(Orders::TotalSL(ORDER_TYPE_BUY)), Convert::ValueToMoney(Orders::TotalSL(ORDER_TYPE_SELL)
-  if (volume < market.GetVolumeMin()) {
-    last_trace = Msg::ShowText(StringFormat("%s: Lot size = %.2f", _strat.GetName(), volume), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
-    result = false;
-  } else if (!_strat.Trade().IsOrderAllowed()) {
-    last_msg = Msg::ShowText("Maximum open and pending orders has reached the limit set by the broker.", "Info", __FUNCTION__, __LINE__, VerboseInfo);
-    result = false;
-  } else if (total_orders >= max_orders) {
-    last_msg = Msg::ShowText(
-      StringFormat("Maximum open and pending orders has reached the limit (MaxOrders) [%d>=%d].", total_orders, max_orders),
-      "Info", __FUNCTION__, __LINE__, VerboseInfo
-      );
-    //PrintFormat("DEBUG: %s (%d vs %d)", _strat.GetName(), _strat.GetId(), (uint) _strat.GetId());
-    OrderQueueAdd((uint) _strat.GetId(), cmd);
-    result = false;
-  } else if (GetTotalOrdersByType((uint) _strat.GetId()) >= GetMaxOrdersPerType()) {
-    last_msg = Msg::ShowText(StringFormat("%s: Maximum open and pending orders per type has reached the limit (MaxOrdersPerType).", _strat.GetName()), "Info", __FUNCTION__, __LINE__, VerboseInfo);
-    OrderQueueAdd((uint) _strat.GetId(), cmd);
-    result = false;
-  } else if (!account.GetAccountFreeMarginCheck(cmd, volume)) {
-    last_err = Msg::ShowText("No money to open more orders.", "Error", __FUNCTION__, __LINE__, VerboseInfo | VerboseErrors, PrintLogOnChart);
-    if (VerboseDebug) PrintFormat("%s:%d: %s: Volume: %g", __FUNCTION__, __LINE__, _strat.GetName(), volume);
-    result = false;
-  } else if (!CheckMinPipGap((uint) _strat.GetId())) {
-    last_trace = Msg::ShowText(StringFormat("%s: Ignoring the executing order, because the distance between orders is too close [MinPipGap].", _strat.GetName()), "Debug", __FUNCTION__, __LINE__, VerboseDebug);
-    result = false;
-  } else if (!CheckProfitFactorLimits(_strat)) {
-    result = false;
-  } else if (RiskMarginTotal >= 0 && ea_margin_risk_level[Convert::OrderTypeBuyOrSell(cmd)] > GetRiskMarginInTotal() / 100) {
-    last_msg = Msg::ShowText(
-      StringFormat("Maximum margin risk for %s orders has reached the limit [%.2f>%.2f/100][RiskMarginTotal].",
-      Order::OrderTypeToString(cmd, true), ea_margin_risk_level[Convert::OrderTypeBuyOrSell(cmd)], GetRiskMarginInTotal()),
-      "Info", __FUNCTION__, __LINE__, VerboseInfo
-    );
-    result = false;
-  }
-
-  #ifdef __advanced__
-  if (ApplySpreadLimits && !CheckSpreadLimit(_strat)) {
-    last_trace = Msg::ShowText(StringFormat("%s: Not executing order, because the spread is too high. (spread = %.1f pips).", _strat.GetName(), curr_spread), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
-    result = false;
-  } else if (MinIntervalSec > 0 && time_current - last_order_time < MinIntervalSec) {
-    last_trace = Msg::ShowText(StringFormat("%s: There must be a %d sec minimum interval between subsequent trade signals.", _strat.GetName(), MinIntervalSec), "Trace", __FUNCTION__, __LINE__, VerboseTrace);
-    result = false;
-  } else if (MaxOrdersPerDay > 0 && daily_orders >= GetMaxOrdersPerDay()) {
-    last_err = Msg::ShowText("Maximum open and pending orders has reached the daily limit (MaxOrdersPerDay).", "Info", __FUNCTION__, __LINE__, VerboseInfo);
-    OrderQueueAdd((uint) _strat.GetId(), cmd);
-    result = false;
-  }
-  #endif
-  if (err != last_err) last_err = err;
-  return (result);
 }
 
 /**
@@ -1145,7 +359,6 @@ bool OpenOrderIsAllowed(ENUM_ORDER_TYPE cmd, Strategy *_strat, double volume = E
  *   If true, the profit factor is fine, otherwise return false.
  */
 bool CheckProfitFactorLimits(Strategy *_strat) {
-  DEBUG_CHECKPOINT_ADD
   //double _pf = _strat.GetProfitFactor(); // @fixme
   uint sid = (uint) _strat.GetId();
   double _pf = GetStrategyProfitFactor(sid);
@@ -1192,7 +405,6 @@ bool CheckProfitFactorLimits(Strategy *_strat) {
  *   If true, the spread is fine, otherwise return false.
  */
 bool CheckSpreadLimit(Strategy *_strat) {
-  DEBUG_CHECKPOINT_ADD
   double spread_limit = _strat.GetMaxSpread();
   spread_limit = spread_limit > 0 ? spread_limit : MaxSpreadToTrade;
   #ifdef __backtest__
@@ -1207,19 +419,16 @@ bool CheckSpreadLimit(Strategy *_strat) {
  * Close order.
  */
 bool CloseOrder(unsigned long ticket_no = NULL, int reason_id = EMPTY, ENUM_MARKET_EVENT _market_event = C_EVENT_NONE, bool retry = true) {
-  DEBUG_CHECKPOINT_ADD
   bool result = false;
   if (ticket_no == NULL) {
     ticket_no = Order::OrderTicket();
   }
   if (!Order::OrderSelect(ticket_no, SELECT_BY_TICKET, MODE_TRADES)) {
-    DEBUG_CHECKPOINT_POP
     Msg::ShowText(StringFormat("Error: Ticket No: %d; Message: %s", ticket_no, terminal.GetLastErrorText()),
         "Debug", __FUNCTION__, __LINE__, VerboseDebug);
     ResetLastError();
     return (false);
   }
-  #ifdef __profiler__ PROFILER_START #endif
   double close_price = NormalizeDouble(market.GetCloseOffer(), market.GetDigits());
   result = Order::OrderClose(ticket_no, Order::OrderLots(), close_price, max_order_slippage, Order::GetOrderColor(EMPTY, ColorBuy, ColorSell));
   // if (VerboseTrace) Print(__FUNCTION__ + ": CloseOrder request. Reason: " + reason + "; Result=" + result + " @ " + TimeCurrent() + "(" + TimeToStr(TimeCurrent()) + "), ticket# " + ticket_no);
@@ -1249,8 +458,6 @@ bool CloseOrder(unsigned long ticket_no = NULL, int reason_id = EMPTY, ENUM_MARK
       // DebugBreak(); // @fixme
     }
   } // end-if: !result
-  DEBUG_CHECKPOINT_POP
-  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -1337,13 +544,11 @@ bool UpdateStats() {
   // Check if bar time has been changed since last check.
   // int bar_time = iTime(NULL, PERIOD_M1, 0);
   // CheckStats(last_pip_change, MAX_TICK);
-  #ifdef __profiler__ PROFILER_START #endif
   CheckStats(High[0], MAX_HIGH);
   CheckStats(account.AccountBalance(), MAX_BALANCE);
   CheckStats(account.AccountEquity(), MAX_EQUITY);
   CheckStats(total_orders, MAX_ORDERS);
   CheckStats(market.GetSpreadInPts(), MAX_SPREAD);
-  #ifdef __profiler__ PROFILER_STOP #endif
   return (true);
 }
 
@@ -1357,7 +562,6 @@ bool UpdateStats() {
  *   default_value (bool) - default value to set, if false - return the opposite
  */
 bool CheckMarketCondition1(Chart *_chart, ENUM_ORDER_TYPE cmd, long condition = 0, bool default_value = true) {
-  DEBUG_CHECKPOINT_ADD
   bool result = true;
   if (condition == 0) {
     return result;
@@ -1448,7 +652,6 @@ Strategy *GetStratByIndiType(ENUM_INDICATOR_TYPE _indi, Chart *_chart) {
  */
 bool CheckMarketEvent(Chart *_chart, ENUM_ORDER_TYPE cmd = EMPTY, int condition = C_EVENT_NONE,
        int _bm = EMPTY, double _sl = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
   bool result = false;
 #ifdef __advanced__
   ulong condition2 = 0;
@@ -1593,7 +796,6 @@ bool CheckMarketEvent(Chart *_chart, ENUM_ORDER_TYPE cmd = EMPTY, int condition 
     default:
       result = false;
   }
-  DEBUG_CHECKPOINT_POP
   return result;
 }
 
@@ -1687,7 +889,6 @@ bool UpdateTrailingStops(Trade *_trade) {
      last_trail_update = bar_time;
    }*/
 
-  #ifdef __profiler__ PROFILER_START #endif
 
    market.RefreshRates();
    for (i = 0; i < Trade::OrdersTotal(); i++) {
@@ -1779,7 +980,6 @@ bool UpdateTrailingStops(Trade *_trade) {
         }
       }
   } // end: for
-  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -1801,7 +1001,6 @@ bool UpdateTrailingStops(Trade *_trade) {
  *    Set to true if the calculation is for particular existing order, so additional local variables are available.
  */
 double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_DOUBLE mode = ORDER_SL, int order_type = 0, double previous = 0, bool existing = false) {
-  DEBUG_CHECKPOINT_ADD
   Strategy *_strat = strats.GetById(order_type);
   Chart *_chart = _strat.Chart();
   ENUM_TIMEFRAMES tf = _chart.GetTf();
@@ -2092,9 +1291,7 @@ double GetTrailingValue(Trade *_trade, ENUM_ORDER_TYPE cmd, ENUM_ORDER_PROPERTY_
  * Get trailing method based on the strategy.
  */
 int GetTrailingMethod(int order_type, ENUM_ORDER_PROPERTY_DOUBLE mode) {
-  DEBUG_CHECKPOINT_ADD
   int stop_method = DefaultTrailingStopMethod, profit_method = DefaultTrailingProfitMethod;
-  DEBUG_CHECKPOINT_POP
   return mode == ORDER_TP ? profit_method : stop_method;
 }
 
@@ -2192,7 +1389,6 @@ bool CheckOurMagicNumber(int magic_number = NULL) {
  */
 bool TradeAllowed() {
   bool _result = true;
-  #ifdef __profiler__ PROFILER_START #endif
   if (chart.GetBars() < 100) {
     last_err = Msg::ShowText("Bars less than 100, not trading yet.", "Error", __FUNCTION__, __LINE__, VerboseErrors);
     if (PrintLogOnChart) DisplayInfoOnChart();
@@ -2244,7 +1440,6 @@ bool TradeAllowed() {
   }
 
   ea_active = _result;
-  #ifdef __profiler__ PROFILER_STOP #endif
   return (_result);
 }
 
@@ -2500,7 +1695,6 @@ double GetRiskRatio() {
  * Executed for every hour.
  */
 void StartNewHour(Trade *_trade) {
-  #ifdef __profiler__ PROFILER_START #endif
 
   CheckHistory(); // Process closed orders for the previous hour.
 
@@ -2552,7 +1746,6 @@ void StartNewHour(Trade *_trade) {
 
   // Reset messages and errors.
   // Message(NULL);
-  #ifdef __profiler__ PROFILER_STOP #endif
 }
 
 /**
@@ -2861,7 +2054,6 @@ bool InitVariables() {
  */
 bool InitStrategies() {
   bool init = true;
-  #ifdef __profiler__ PROFILER_START #endif
 
   // Initialize/reset strategy arrays.
   ArrayInitialize(info, 0);   // Reset strategy info.
@@ -3902,7 +3094,6 @@ bool InitStrategies() {
     conf[i][PROFIT_FACTOR] = GetDefaultProfitFactor();
   }
 
-  #ifdef __profiler__ PROFILER_STOP #endif
   return init || !ValidateSettings;
 }
 
@@ -3910,7 +3101,6 @@ bool InitStrategies() {
  * Init classes.
  */
 bool InitClasses() {
-  #ifdef __profiler__ PROFILER_START #endif
 
   // Initialize main classes.
   account = new Account();
@@ -3955,7 +3145,6 @@ bool InitClasses() {
   strats = new Collection();
   summary_report = new SummaryReport();
 
-  #ifdef __profiler__ PROFILER_STOP #endif
   return market.GetSymbol() == _Symbol;
 }
 
@@ -3963,8 +3152,6 @@ bool InitClasses() {
  * Update global variables.
  */
 void UpdateVariables() {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
   time_current = TimeCurrent();
   //curr_bar_time = chart.GetBarTime(PERIOD_M1);
   last_close_profit = EMPTY;
@@ -3975,7 +3162,6 @@ void UpdateVariables() {
   double curr_rsi = Indi_RSI::iRSI(market.GetSymbol(), TrendPeriod, RSI_Period_M30, RSI_Applied_Price, 0);
   curr_trend = fabs(curr_rsi - 50) > 10 ? (double) (1.0 / 50) * (curr_rsi - 50) : 0;
   // PrintFormat("Curr Trend: %g (%g: %g/%g), RSI: %g", curr_trend, (double) (1.0 / 50) * (curr_rsi - 50), 1 / 50, curr_rsi - 50, curr_rsi);
-  #ifdef __profiler__ PROFILER_STOP #endif
 }
 
 /* END: VARIABLE FUNCTIONS */
@@ -4292,7 +3478,6 @@ void CheckAccConditions(Chart *_chart) {
   }
   _last_check = DateTime::TimeTradeServer();
 
-  #ifdef __profiler__ PROFILER_START #endif
 
   bool result = false;
   int i;
@@ -4301,7 +3486,6 @@ void CheckAccConditions(Chart *_chart) {
       ActionExecute(acc_conditions[i][2], i);
     }
   } // end: for
-  #ifdef __profiler__ PROFILER_STOP #endif
 }
 
 /**
@@ -4425,7 +3609,6 @@ double GetStrategyProfitFactor(int sid) {
  * Fetch strategy signal level based on the indicator and timeframe.
  */
 double GetStrategySignalLevel(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _tf, double _default = 0.0) {
-  DEBUG_CHECKPOINT_ADD
   bool _found = false;
   double _result = _default;
   int sid;
@@ -4447,7 +3630,6 @@ double GetStrategySignalLevel(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _t
     DEBUG_STACK_PRINT
   }
 
-  DEBUG_CHECKPOINT_POP
   return _result;
 }
 
@@ -4455,7 +3637,6 @@ double GetStrategySignalLevel(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _t
  * Fetch strategy signal level based on the indicator and timeframe.
  */
 ulong GetStrategySignalMethod(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _tf, ulong _default = 0) {
-  DEBUG_CHECKPOINT_ADD
   ulong _result = _default;
   bool _found = false;
   int sid;
@@ -4477,7 +3658,6 @@ ulong GetStrategySignalMethod(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _t
     DEBUG_STACK_PRINT
   }
 
-  DEBUG_CHECKPOINT_POP
   return _result;
 }
 
@@ -4493,7 +3673,6 @@ ENUM_TIMEFRAMES GetStrategyTimeframe(uint _sid) {
  * Get strategy id based on the indicator and tf.
  */
 unsigned long GetStrategyViaIndicator(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEFRAMES _tf) {
-  DEBUG_CHECKPOINT_ADD
   bool _found = false;
   int _id;
   unsigned long _result = EMPTY;
@@ -4515,7 +3694,6 @@ unsigned long GetStrategyViaIndicator(ENUM_INDICATOR_TYPE _indicator, ENUM_TIMEF
     DEBUG_STACK_PRINT
   }
 
-  DEBUG_CHECKPOINT_POP
   return _result;
 }
 
@@ -5006,7 +4184,6 @@ bool ActionCloseAllUnprofitableOrders(int reason_id = EMPTY){
  */
 bool ActionCloseAllOrdersByType(ENUM_ORDER_TYPE cmd = EMPTY, int reason_id = EMPTY){
   if (cmd == EMPTY) return (false);
-  #ifdef __profiler__ PROFILER_START #endif
   int selected_orders = 0;
   double ticket_profit = 0, total_profit = 0;
   for (int order = 0; order < Trade::OrdersTotal(); order++) {
@@ -5023,7 +4200,6 @@ bool ActionCloseAllOrdersByType(ENUM_ORDER_TYPE cmd = EMPTY, int reason_id = EMP
     Msg::ShowText(StringFormat("Queued %d orders to close with expected profit of %g pips.", selected_orders, total_profit)
     , "Info", __FUNCTION__, __LINE__, VerboseInfo);
   }
-  #ifdef __profiler__ PROFILER_STOP #endif
   return (true);
 }
 
@@ -5042,7 +4218,6 @@ bool ActionCloseAllOrdersByType(ENUM_ORDER_TYPE cmd = EMPTY, int reason_id = EMP
  *     therefore closing all make the things more predictable and to avoid any suprices.
  */
 int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = true) {
-  #ifdef __profiler__ PROFILER_START #endif
    int processed = 0;
    int total = Trade::OrdersTotal();
    double total_profit = 0;
@@ -5063,7 +4238,6 @@ int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = true) {
     Msg::ShowText(StringFormat("Queued %d orders out of %d for closure.", processed, total),
       "Info", __FUNCTION__, __LINE__, VerboseInfo);
    }
-  #ifdef __profiler__ PROFILER_STOP #endif
    return (processed > 0);
 }
 
@@ -5076,8 +4250,6 @@ int ActionCloseAllOrders(int reason_id = EMPTY, bool only_ours = true) {
  * Note: Executing random actions can be potentially dangerous for the account if not used wisely.
  */
 bool ActionExecute(int aid, int id = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
-  #ifdef __profiler__ PROFILER_START #endif
   bool result = false;
   int mid = (id != EMPTY ? acc_conditions[id][1] : EMPTY); // Market id condition.
   int reason_id = (id != EMPTY ? acc_conditions[id][0] : EMPTY); // Account id condition.
@@ -5187,7 +4359,6 @@ bool ActionExecute(int aid, int id = EMPTY) {
         ActionIdToText(aid), aid, ReasonIdToText(reason_id), reason_id),
       "Warning", __FUNCTION__, __LINE__, VerboseErrors);
   }
-  #ifdef __profiler__ PROFILER_STOP #endif
   return result;
 }
 
@@ -5287,7 +4458,6 @@ string MarketIdToText(int mid) {
  * @todo: Move to Array class.
  */
 bool TicketAdd(int ticket_no) {
-  DEBUG_CHECKPOINT_ADD
   int i, slot = EMPTY;
   int size = ArraySize(tickets);
   // Check if ticket is already in the list and at the same time find the empty slot.
@@ -5317,7 +4487,6 @@ bool TicketAdd(int ticket_no) {
  * Remove ticket from the list after it has been processed.
  */
 bool TicketRemove(int ticket_no) {
-  DEBUG_CHECKPOINT_ADD
   int i;
   for (i = 0; i < ArraySize(tickets); i++) {
     if (tickets[i] == ticket_no) {
@@ -5335,7 +4504,6 @@ bool TicketRemove(int ticket_no) {
 bool CheckHistory() {
   double total_profit = 0;
   int pos;
-  #ifdef __profiler__ PROFILER_START #endif
   for (pos = last_history_check; pos < account.OrdersHistoryTotal(); pos++) {
     if (!Order::OrderSelect(pos, SELECT_BY_POS, MODE_HISTORY)) continue;
     if (Order::OrderCloseTime() > last_history_check && CheckOurMagicNumber()) {
@@ -5344,7 +4512,6 @@ bool CheckHistory() {
   }
   hourly_profit[day_of_year][hour_of_day] = total_profit; // Update hourly profit.
   last_history_check = pos;
-  #ifdef __profiler__ PROFILER_STOP #endif
   return (true);
 }
 
@@ -5356,7 +4523,6 @@ bool CheckHistory() {
  * Process AI queue of orders to see if we can open any trades.
  */
 bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
   bool result = true;
   int queue_size = OrderQueueCount();
   long _queue[][2];
@@ -5400,7 +4566,6 @@ bool OrderQueueProcess(int method = EMPTY, int filter = EMPTY) {
  * Check for the market condition to filter out the order queue.
  */
 bool OpenOrderCondition(ENUM_ORDER_TYPE cmd, int sid, datetime time, int method) {
-  DEBUG_CHECKPOINT_ADD
   bool result = true;
   ENUM_TIMEFRAMES tf = GetStrategyTimeframe(sid);
   uint tfi = Chart::TfToIndex(tf);
@@ -5429,7 +4594,6 @@ bool OpenOrderCondition(ENUM_ORDER_TYPE cmd, int sid, datetime time, int method)
  * Get key based on strategy id in order to prioritize the queue.
  */
 int GetOrderQueueKeyValue(int sid, int method, int qid) {
-  DEBUG_CHECKPOINT_ADD
   int key = 0;
   Strategy *_strat = ((Strategy *) strats.GetById(sid));
   switch (method) {
@@ -5461,7 +4625,6 @@ int GetOrderQueueKeyValue(int sid, int method, int qid) {
  * Get the next non-empty item from the queue.
  */
 int OrderQueueNext(int index = EMPTY) {
-  DEBUG_CHECKPOINT_ADD
   if (index == EMPTY) index = 0;
   for (int qid = index; qid < ArrayRange(order_queue, 0); qid++)
     if (order_queue[qid][Q_SID] != EMPTY) { return qid; }
@@ -5472,7 +4635,6 @@ int OrderQueueNext(int index = EMPTY) {
  * Add new order to the queue.
  */
 bool OrderQueueAdd(uint _sid, ENUM_ORDER_TYPE cmd) {
-  DEBUG_CHECKPOINT_ADD
   bool result = false;
   int qid = EMPTY, size = ArrayRange(order_queue, 0);
   for (int i = 0; i < size; i++) {
@@ -5501,7 +4663,6 @@ bool OrderQueueAdd(uint _sid, ENUM_ORDER_TYPE cmd) {
  * Clear queue from the orders.
  */
 void OrderQueueClear() {
-  DEBUG_CHECKPOINT_ADD
   ArrayFill(order_queue, 0, ArraySize(order_queue), EMPTY);
 }
 
@@ -5509,7 +4670,6 @@ void OrderQueueClear() {
  * Check how many orders are in the queue.
  */
 int OrderQueueCount() {
-  DEBUG_CHECKPOINT_ADD
   int counter = 0;
   for (int i = 0; i < ArrayRange(order_queue, 0); i++)
     if (order_queue[i][Q_SID] != EMPTY) counter++;
@@ -5680,7 +4840,6 @@ bool TaskRun(int job_id) {
 bool TaskProcessList(bool with_force = false) {
   int total_run = 0, total_failed = 0, total_removed = 0;
   int no_elem = 8;
-  #ifdef __profiler__ PROFILER_START #endif
 
 /* @todo
    // Check if bar time has been changed since last time.
@@ -5709,7 +4868,6 @@ bool TaskProcessList(bool with_force = false) {
    } // end: for
    if (VerboseDebug && total_run+total_failed > 0)
      Print(__FUNCTION__, ": Processed ", total_run+total_failed, " jobs (", total_run, " run, ", total_failed, " failed (", total_removed, " removed)).");
-  #ifdef __profiler__ PROFILER_STOP #endif
   return true;
 }
 
