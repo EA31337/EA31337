@@ -13,6 +13,7 @@
 #define ea_file __FILE__
 #define ea_date __DATE__
 #define ea_build __MQLBUILD__
+#define ea_configured (ea_name[6] == 55)
 
 // Includes version specific configuration.
 #ifdef __advanced__
@@ -34,3 +35,4 @@
 #property link ea_link
 #property copyright ea_copy
 #property icon "resources\\favicon.ico"
+#define ea_exists (ea_name[0] == 69)

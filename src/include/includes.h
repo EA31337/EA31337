@@ -12,21 +12,6 @@
 #include "common/enums.h"
 #include "common/properties.h"
 
-// Includes version specific user input params.
-input static string __EA_Mode_Parameters__ = "-- EA parameters for " + ea_name + " v" + ea_version + " --"; // >>> EA31337 <<<
-// Include default input settings based on the mode.
-/*
-#ifdef __advanced__
-#ifdef __rider__
-#include "common/rider/ea-input.mqh"
-#else
-#include "common/advanced/ea-input.mqh"
-#endif
-#else
-#include "common/lite/ea-input.mqh"
-#endif
-*/
-
 // Includes class files.
 #include "classes/Chart.mqh"
 #include "classes/EA.mqh"

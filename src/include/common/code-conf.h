@@ -14,7 +14,7 @@
 #define __noinput__
 #define __noinput2__
 #define __noinput3__
-#endif // __advanced__
+#endif  // __advanced__
 
 #ifdef __limited__
 #define __noboost__   // Disable boosting for limited mode.
@@ -66,3 +66,5 @@
 #undef __debug__         // Disable debug messages.
 #undef __trace__         // Disable trace messages.
 #endif
+
+#define ea_auth (ea_author[5] == 98)

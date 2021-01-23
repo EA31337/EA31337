@@ -70,6 +70,7 @@ void OnTick() {
   EAProcessResult _result = ea.ProcessTick();
   if (_result.stg_processed) {
     if (PrintLogOnChart) {
+      Comment("");
       // DisplayInfo();
     }
   }
@@ -164,7 +165,7 @@ void OnChartEvent(const int id,          // Event ID.
 ) {}
 
 // @todo: OnTradeTransaction (https://www.mql5.com/en/docs/basis/function/events).
-#endif // end: __MQL5__
+#endif  // end: __MQL5__
 
 /* Custom EA functions */
 
@@ -219,7 +220,7 @@ bool DisplayStartupInfo(bool _startup = false, string sep = "\n") {
  * Init EA.
  */
 bool InitEA() {
-  bool _initiated = true;
+  bool _initiated = ea_auth;
   EAParams ea_params(__FILE__, VerboseLevel);
   ea_params.SetChartInfoFreq(PrintLogOnChart ? 2 : 0);
   ea_params.SetName(ea_name);
@@ -239,8 +240,8 @@ bool InitEA() {
  * Init strategies.
  */
 bool InitStrategies() {
-  bool _result = true;
-  long _magic = MagicNumber;
+  bool _result = ea_exists;
+  long _magic = EA_MagicNumber;
   ResetLastError();
   _result &= ea.StrategyAdd<Stg_AC>(AC_Active_Tf);
   _result &= ea.StrategyAdd<Stg_AD>(AD_Active_Tf);
@@ -275,7 +276,7 @@ bool InitStrategies() {
   _result &= ea.StrategyAdd<Stg_ZigZag>(ZigZag_Active_Tf);
   _result &= GetLastError() == 0 || GetLastError() == 5053;  // @fixme: error 5053?
   ResetLastError();
-  return _result;
+  return _result && ea_configured;
 }
 
 /**
