@@ -11,16 +11,24 @@
 #include "common/properties.h"
 
 // Includes version specific user input params.
+input static string __EA_Mode_Parameters__ = "-- EA parameters for " + ea_name + " v" + ea_version + " --"; // >>> EA31337 <<<
+// Include default input settings based on the mode.
 /*
-input static string __EA_Parameters__ = "-- input EA parameters for " + ea_name + " v" + ea_version + " --"; // >>>
-EA31337 <<< #ifdef __advanced__ // Include default input settings based on the mode. #ifdef __rider__ #include
-"EA31337/rider/ea-input.mqh" #else #include "EA31337/advanced/ea-input.mqh" #endif #else #include
-"EA31337/lite/ea-input.mqh" #endif
+#ifdef __advanced__
+#ifdef __rider__
+#include "common/rider/ea-input.mqh"
+#else
+#include "common/advanced/ea-input.mqh"
+#endif
+#else
+#include "common/lite/ea-input.mqh"
+#endif
 */
 
 // Includes class files.
 #include "classes/Chart.mqh"
 #include "classes/EA.mqh"
+#include "classes/Msg.mqh"
 #include "classes/Terminal.mqh"
 #include "classes/Trade.mqh"
 
@@ -57,6 +65,13 @@ EA31337 <<< #ifdef __advanced__ // Include default input settings based on the m
 #include "classes/Indicators/Indi_WPR.mqh"
 #include "classes/Indicators/Indi_ZigZag.mqh"
 
+// Main user inputs.
+#include "inputs.h"
+
 // Strategy includes.
 INPUT string __Strategy_Parameters__ = "-- Strategy parameters --";  // >>> STRATEGIES <<<
 #include "strategies/strategies.h"
+
+// End of user inputs.
+input string __EA_Parameters__ =
+    "-- End of input parameters for " + ea_name + " v" + ea_version + " --";  // >>> EA31337 <<<

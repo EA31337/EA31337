@@ -69,6 +69,3 @@ input bool WriteSummaryReport = true;                                           
 
 input string __Other_Parameters__ = "-- Other parameters --";  // >>> OTHER PARAMETERS <<<
 input uint MagicNumber = 31337;                                // Starting EA magic number
-
-input string __EA_Parameters__ =
-    "-- End of input parameters for " + ea_name + " v" + ea_version + " --";  // >>> EA31337 <<<
