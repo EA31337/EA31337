@@ -4,10 +4,12 @@
 //|                                       https://github.com/EA31337 |
 //+------------------------------------------------------------------+
 
+// Sets EA mode (Lite, Advanced or Rider).
+#include "common/mode.h"
+
 // Includes common files.
 #include "common/code-conf.h"
 #include "common/enums.h"
-#include "common/mode.h"
 #include "common/properties.h"
 
 // Includes version specific user input params.

@@ -12,7 +12,7 @@
 //#define __advanced__  // Enable advanced configuration.
 //#define __rider__     // Activate rider strategy.
 
-// Other modes.
+// Other modes (currently not in use).
 //#define __backtest__     // For backtest only.
 //#define __optimize__     // For optimization only.
 //#define __profiler__     // Activate profiler.
