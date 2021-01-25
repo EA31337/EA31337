@@ -1,12 +1,12 @@
 //+------------------------------------------------------------------+
 //|                 EA31337 - multi-strategy advanced trading robot. |
-//|                       Copyright 2016-2020, 31337 Investments Ltd |
+//|                       Copyright 2016-2021, 31337 Investments Ltd |
 //|                                       https://github.com/EA31337 |
 //|                                                     ea-input.mqh |
 //+------------------------------------------------------------------+
 
 // Includes.
-#include "..\enums.h"
+#include "..\enum.h"
 
 //+------------------------------------------------------------------+
 //| User input variables.
@@ -46,3 +46,6 @@ input unsigned int StdDev_Active_Tf = 15;      // StdDev: Activated timeframes
 input unsigned int Stochastic_Active_Tf = 15;  // Stochastic: Activated timeframes
 input unsigned int WPR_Active_Tf = 15;         // WPR: Activated timeframes
 input unsigned int ZigZag_Active_Tf = 0;       // ZigZag: Activated timeframes
+
+extern string __Trade_Params__ = "-- EA's trade parameters --";  // >>> EA's TRADE <<<
+input double EA_LotSize = 0;                                     // Lot size (0 = auto)

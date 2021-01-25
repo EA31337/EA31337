@@ -1,12 +1,12 @@
 //+------------------------------------------------------------------+
 //|                 EA31337 - multi-strategy advanced trading robot. |
-//|                       Copyright 2016-2020, 31337 Investments Ltd |
+//|                       Copyright 2016-2021, 31337 Investments Ltd |
 //|                                       https://github.com/EA31337 |
 //|                                                     ea-input.mqh |
 //+------------------------------------------------------------------+
 
 // Includes.
-#include "..\enums.h"
+#include "..\enum.h"
 
 //+------------------------------------------------------------------+
 //| User input variables.
@@ -14,7 +14,7 @@
 
 // Includes strategies.
 input static string __Strategy_Timeframes__ =
-    "-- Strategy's timeframes --";  // >>> STRATEGY'S TIMEFRAMES (1-255: M1=1,M5=2,M15=4,M30=8,H1=16,H2=32,H4=64...) <<<
+    "-- Strategy's timeframes --";  // >>> STRATEGY'S TIMEFRAMES (1-255: M1=1,M5=2,M15=4,M30=8,H1=16,H4=32...) <<<
 input unsigned int AC_Active_Tf = 0;           // AC: Activated timeframes
 input unsigned int AD_Active_Tf = 0;           // AD: Activated timeframes
 input unsigned int ADX_Active_Tf = 15;         // ADX: Activated timeframes
@@ -46,3 +46,22 @@ input unsigned int StdDev_Active_Tf = 15;      // StdDev: Activated timeframes
 input unsigned int Stochastic_Active_Tf = 15;  // Stochastic: Activated timeframes
 input unsigned int WPR_Active_Tf = 15;         // WPR: Activated timeframes
 input unsigned int ZigZag_Active_Tf = 0;       // ZigZag: Activated timeframes
+
+input static string __EA_Stops__ = "-- EA's stop losses --";  // >>> EA's STOP LOSSES <<<
+input ENUM_STRATEGY EA_Stops_M1 = (ENUM_STRATEGY)0;   // Stop loss on M1
+input ENUM_STRATEGY EA_Stops_M5 = (ENUM_STRATEGY)0;   // Stop loss on M5
+input ENUM_STRATEGY EA_Stops_M15 = (ENUM_STRATEGY)0;  // Stop loss on M15
+input ENUM_STRATEGY EA_Stops_M30 = (ENUM_STRATEGY)0;  // Stop loss on M30
+// input ENUM_STRATEGY EA_Stops_H1 = (ENUM_STRATEGY)0;   // Stop loss on H1
+// input ENUM_STRATEGY EA_Stops_H4 = (ENUM_STRATEGY)0;   // Stop loss on H4
+
+input static string __EA_Order_Params__ = "-- EA's order params --";  // >>> EA's ORDERS <<<
+input int EA_OrderCloseTime_M1 = 0;   // Close time on M1 in mins (>0) or bars (<0)
+input int EA_OrderCloseTime_M5 = 0;   // Close time on M5 in mins (>0) or bars (<0)
+input int EA_OrderCloseTime_M15 = 0;  // Close time on M15 in mins (>0) or bars (<0)
+input int EA_OrderCloseTime_M30 = 0;  // Close time on M30 in mins (>0) or bars (<0)
+// input int EA_OrderCloseTime_H1 = 0;   // Close time on H1 in mins (>0) or bars (<0)
+// input int EA_OrderCloseTime_H4 = 0;   // Close time on H4 in mins (>0) or bars (<0)
+
+extern string __Trade_Params__ = "-- EA's trade parameters --";  // >>> EA's TRADE <<<
+input double EA_LotSize = 0;                                     // Lot size (0 = auto)

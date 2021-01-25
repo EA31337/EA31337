@@ -23,9 +23,6 @@
 //| Inputs.
 //+------------------------------------------------------------------+
 
-extern string __EA_Trade_Parameters__ = "-- Trade parameters --";  // >>> TRADE <<<
-input double EA_LotSize = 0;                                       // Lot size (0 = auto)
-
 // input string __Trade_Parameters__ = "-- Trade parameters --"; // >>> TRADE <<<
 // input ulong TimeframeFilter = 0; // Timeframes filter (0 - auto)
 // input double MinPipChangeToTrade = 0.4; // Min pip change to trade (0 = every tick)

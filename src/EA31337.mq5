@@ -240,43 +240,162 @@ bool InitEA() {
  * Init strategies.
  */
 bool InitStrategies() {
-  bool _result = ea_exists;
-  long _magic = EA_MagicNumber;
+  bool _res = ea_exists;
+  int _magic_step = FINAL_ENUM_TIMEFRAMES_INDEX;
+  long _magic_no = EA_MagicNumber;
   ResetLastError();
-  _result &= ea.StrategyAdd<Stg_AC>(AC_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_AD>(AD_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_ADX>(ADX_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_ATR>(ATR_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_Alligator>(Alligator_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_Awesome>(Awesome_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_BWMFI>(BWMFI_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_Bands>(Bands_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_BearsPower>(BearsPower_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_BullsPower>(BullsPower_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_CCI>(CCI_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_DeMarker>(DeMarker_Active_Tf);
-  // _result &= ea.StrategyAdd<Stg_ElliottWave>(ElliottWave_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_Envelopes>(Envelopes_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_Force>(Force_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_Fractals>(Fractals_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_Gator>(Gator_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_Ichimoku>(Ichimoku_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_MA>(MA_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_MACD>(MACD_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_MFI>(MFI_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_Momentum>(Momentum_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_OBV>(OBV_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_OsMA>(OSMA_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_RSI>(RSI_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_RVI>(RVI_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_SAR>(SAR_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_StdDev>(StdDev_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_Stochastic>(Stochastic_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_WPR>(WPR_Active_Tf);
-  _result &= ea.StrategyAdd<Stg_ZigZag>(ZigZag_Active_Tf);
-  _result &= GetLastError() == 0 || GetLastError() == 5053;  // @fixme: error 5053?
+  _res &= ea.StrategyAdd<Stg_AC>(AC_Active_Tf, STRAT_AC, _magic_no + STRAT_AC * _magic_step);
+  _res &= ea.StrategyAdd<Stg_AD>(AD_Active_Tf, STRAT_AD, _magic_no + STRAT_AD * _magic_step);
+  _res &= ea.StrategyAdd<Stg_ADX>(ADX_Active_Tf, STRAT_ADX, _magic_no + STRAT_ADX * _magic_step);
+  _res &= ea.StrategyAdd<Stg_ATR>(ATR_Active_Tf, STRAT_ATR, _magic_no + STRAT_ATR * _magic_step);
+  _res &=
+      ea.StrategyAdd<Stg_Alligator>(Alligator_Active_Tf, STRAT_ALLIGATOR, _magic_no + STRAT_ALLIGATOR * _magic_step);
+  _res &= ea.StrategyAdd<Stg_Awesome>(Awesome_Active_Tf, STRAT_AWESOME, _magic_no + STRAT_AWESOME * _magic_step);
+  _res &= ea.StrategyAdd<Stg_BWMFI>(BWMFI_Active_Tf, STRAT_BWMFI, _magic_no + STRAT_BWMFI * _magic_step);
+  _res &= ea.StrategyAdd<Stg_Bands>(Bands_Active_Tf, STRAT_BANDS, _magic_no + STRAT_BANDS * _magic_step);
+  _res &= ea.StrategyAdd<Stg_BearsPower>(BearsPower_Active_Tf, STRAT_BEARS_POWER,
+                                         _magic_no + STRAT_BEARS_POWER * _magic_step);
+  _res &= ea.StrategyAdd<Stg_BullsPower>(BullsPower_Active_Tf, STRAT_BULLS_POWER,
+                                         _magic_no + STRAT_BULLS_POWER * _magic_step);
+  _res &= ea.StrategyAdd<Stg_CCI>(CCI_Active_Tf, STRAT_CCI, _magic_no + STRAT_CCI * _magic_step);
+  _res &= ea.StrategyAdd<Stg_DeMarker>(DeMarker_Active_Tf, STRAT_DEMARKER, _magic_no + STRAT_DEMARKER * _magic_step);
+  // _res &= ea.StrategyAdd<Stg_ElliottWave>(_magic_no + ElliottWave_Active_Tf * _magic_step);
+  _res &=
+      ea.StrategyAdd<Stg_Envelopes>(Envelopes_Active_Tf, STRAT_ENVELOPES, _magic_no + STRAT_ENVELOPES * _magic_step);
+  _res &= ea.StrategyAdd<Stg_Force>(Force_Active_Tf, STRAT_FORCE, _magic_no + STRAT_FORCE * _magic_step);
+  _res &= ea.StrategyAdd<Stg_Fractals>(Fractals_Active_Tf, STRAT_FRACTALS, _magic_no + STRAT_FRACTALS * _magic_step);
+  _res &= ea.StrategyAdd<Stg_Gator>(Gator_Active_Tf, STRAT_GATOR, _magic_no + STRAT_GATOR * _magic_step);
+  _res &= ea.StrategyAdd<Stg_Ichimoku>(Ichimoku_Active_Tf, STRAT_ICHIMOKU, _magic_no + STRAT_ICHIMOKU * _magic_step);
+  _res &= ea.StrategyAdd<Stg_MA>(MA_Active_Tf, STRAT_MA, _magic_no + STRAT_MA * _magic_step);
+  _res &= ea.StrategyAdd<Stg_MACD>(MACD_Active_Tf, STRAT_MACD, _magic_no + STRAT_MACD * _magic_step);
+  _res &= ea.StrategyAdd<Stg_MFI>(MFI_Active_Tf, STRAT_MFI, _magic_no + STRAT_MFI * _magic_step);
+  _res &= ea.StrategyAdd<Stg_Momentum>(Momentum_Active_Tf, STRAT_MOMENTUM, _magic_no + STRAT_MOMENTUM * _magic_step);
+  _res &= ea.StrategyAdd<Stg_OBV>(OBV_Active_Tf, STRAT_OBV, _magic_no + STRAT_OBV * _magic_step);
+  _res &= ea.StrategyAdd<Stg_OsMA>(OSMA_Active_Tf, STRAT_OSMA, _magic_no + STRAT_OSMA * _magic_step);
+  _res &= ea.StrategyAdd<Stg_RSI>(RSI_Active_Tf, STRAT_RSI, _magic_no + STRAT_RSI * _magic_step);
+  _res &= ea.StrategyAdd<Stg_RVI>(RVI_Active_Tf, STRAT_RVI, _magic_no + STRAT_RVI * _magic_step);
+  _res &= ea.StrategyAdd<Stg_SAR>(SAR_Active_Tf, STRAT_SAR, _magic_no + STRAT_SAR * _magic_step);
+  _res &= ea.StrategyAdd<Stg_StdDev>(StdDev_Active_Tf, STRAT_STDDEV, _magic_no + STRAT_STDDEV * _magic_step);
+  _res &= ea.StrategyAdd<Stg_Stochastic>(Stochastic_Active_Tf, STRAT_STOCHASTIC,
+                                         _magic_no + STRAT_STOCHASTIC * _magic_step);
+  _res &= ea.StrategyAdd<Stg_WPR>(WPR_Active_Tf, STRAT_WPR, _magic_no + STRAT_WPR * _magic_step);
+  _res &= ea.StrategyAdd<Stg_ZigZag>(ZigZag_Active_Tf, STRAT_ZIGZAG, _magic_no + STRAT_ZIGZAG * _magic_step);
+#ifdef __advanced__
+#ifdef __rider__
+  // Init price stop methods for all timeframes.
+  if (EA_Stops != 0) {
+    Strategy *_strat_stops = ea.GetStrategy(PERIOD_M30, EA_Stops);
+    if (!_strat_stops) {
+      // @fixme: Load the missing strategy.
+    }
+    if (_strat_stops) {
+      for (DictObjectIterator<ENUM_TIMEFRAMES, DictStruct<long, Ref<Strategy>>> iter_tf = ea.GetStrategies().Begin();
+           iter_tf.IsValid(); ++iter_tf) {
+        ENUM_TIMEFRAMES _tf = iter_tf.Key();
+        for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategiesByTf(_tf).Begin(); iter.IsValid(); ++iter) {
+          Strategy *_strat = iter.Value().Ptr();
+          _strat.SetStops(_strat_stops, _strat_stops);
+        }
+      }
+    }
+  }
+  MqlParam _sargs[] = {{TYPE_INT}, {TYPE_INT}, {TYPE_INT}, {TYPE_INT}};
+  _sargs[0].integer_value = STRAT_ACTION_SET_PROP;
+  _sargs[1].integer_value = 0;
+  _sargs[2].integer_value = STRAT_PROP_PSM;
+  _sargs[3].integer_value = 1;
+  ea.ExecuteAction(EA_ACTION_STRATS_EXE_ACTION, _sargs);
+  _sargs[2].integer_value = STRAT_PROP_OCT;
+  _sargs[3].integer_value = EA_OrderCloseTime;
+  ea.ExecuteAction(EA_ACTION_STRATS_EXE_ACTION, _sargs);
+#else
+  // Init price stop methods for each timeframe.
+  if (EA_Stops_M1 != STRAT_NONE) {
+    Strategy *_strat_stops = ea.GetStrategy(PERIOD_M1, EA_Stops_M1);
+    if (!_strat_stops) {
+      // @fixme: Load the missing strategy.
+    }
+    if (_strat_stops) {
+      for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategiesByTf(PERIOD_M1).Begin(); iter.IsValid();
+           ++iter) {
+        Strategy *_strat = iter.Value().Ptr();
+        _strat.SetStops(_strat_stops, _strat_stops);
+      }
+    }
+  }
+  if (EA_Stops_M5 != STRAT_NONE) {
+    Strategy *_strat_stops = ea.GetStrategy(PERIOD_M5, EA_Stops_M5);
+    if (!_strat_stops) {
+      // @fixme: Load the missing strategy.
+    }
+    if (_strat_stops) {
+      for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategiesByTf(PERIOD_M5).Begin(); iter.IsValid();
+           ++iter) {
+        Strategy *_strat = iter.Value().Ptr();
+        _strat.SetStops(_strat_stops, _strat_stops);
+      }
+    }
+  }
+  if (EA_Stops_M15 != STRAT_NONE) {
+    Strategy *_strat_stops = ea.GetStrategy(PERIOD_M15, EA_Stops_M15);
+    if (!_strat_stops) {
+      // @fixme: Load the missing strategy.
+    }
+    if (_strat_stops) {
+      for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategiesByTf(PERIOD_M15).Begin(); iter.IsValid();
+           ++iter) {
+        Strategy *_strat = iter.Value().Ptr();
+        _strat.SetStops(_strat_stops, _strat_stops);
+      }
+    }
+  }
+  if (EA_Stops_M30 != STRAT_NONE) {
+    Strategy *_strat_stops = ea.GetStrategy(PERIOD_M30, EA_Stops_M30);
+    if (!_strat_stops) {
+      // @fixme: Load the missing strategy.
+    }
+    if (_strat_stops) {
+      for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategiesByTf(PERIOD_M30).Begin(); iter.IsValid();
+           ++iter) {
+        Strategy *_strat = iter.Value().Ptr();
+        _strat.SetStops(_strat_stops, _strat_stops);
+      }
+    }
+  }
+
+  // Update close method and time per timeframe.
+  MqlParam _sargs[] = {{TYPE_INT}, {TYPE_INT}, {TYPE_INT}, {TYPE_INT}};
+  // Update close method.
+  _sargs[0].integer_value = STRAT_ACTION_SET_PROP;
+  _sargs[1].integer_value = 0;  // All timeframes.
+  _sargs[2].integer_value = STRAT_PROP_PSM;
+  _sargs[3].integer_value = 1;
+  ea.ExecuteAction(EA_ACTION_STRATS_EXE_ACTION, _sargs);
+  // Update close time for M1.
+  _sargs[1].integer_value = PERIOD_M1;
+  _sargs[2].integer_value = STRAT_PROP_OCT;
+  _sargs[3].integer_value = EA_OrderCloseTime_M1;
+  ea.ExecuteAction(EA_ACTION_STRATS_EXE_ACTION, _sargs);
+  // Update close time for M5.
+  _sargs[1].integer_value = PERIOD_M5;
+  _sargs[2].integer_value = STRAT_PROP_OCT;
+  _sargs[3].integer_value = EA_OrderCloseTime_M5;
+  ea.ExecuteAction(EA_ACTION_STRATS_EXE_ACTION, _sargs);
+  // Update close time for M15.
+  _sargs[1].integer_value = PERIOD_M15;
+  _sargs[2].integer_value = STRAT_PROP_OCT;
+  _sargs[3].integer_value = EA_OrderCloseTime_M15;
+  ea.ExecuteAction(EA_ACTION_STRATS_EXE_ACTION, _sargs);
+  // Update close time for M30.
+  _sargs[1].integer_value = PERIOD_M30;
+  _sargs[2].integer_value = STRAT_PROP_OCT;
+  _sargs[3].integer_value = EA_OrderCloseTime_M30;
+  ea.ExecuteAction(EA_ACTION_STRATS_EXE_ACTION, _sargs);
+#endif                                                    // __rider__
+#endif                                                    // __advanced__
+  _res &= GetLastError() == 0 || GetLastError() == 5053;  // @fixme: error 5053?
   ResetLastError();
-  return _result && ea_configured;
+  return _res && ea_configured;
 }
 
 /**

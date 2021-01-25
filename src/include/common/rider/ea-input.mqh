@@ -6,7 +6,7 @@
 //+------------------------------------------------------------------+
 
 // Includes.
-#include "..\enums.h"
+#include "..\enum.h"
 
 //+------------------------------------------------------------------+
 //| User input variables.
@@ -46,3 +46,12 @@ input unsigned int StdDev_Active_Tf = 15;      // StdDev: Activated timeframes
 input unsigned int Stochastic_Active_Tf = 15;  // Stochastic: Activated timeframes
 input unsigned int WPR_Active_Tf = 15;         // WPR: Activated timeframes
 input unsigned int ZigZag_Active_Tf = 0;       // ZigZag: Activated timeframes
+
+input static string __EA_Stops__ = "-- EA's stop losses --";  // >>> EA's STOP LOSSES <<<
+input ENUM_STRATEGY EA_Stops = (ENUM_STRATEGY)10; // Stop loss
+
+input static string __EA_Order_Params__ = "-- EA's order params --";  // >>> EA's ORDERS <<<
+input int EA_OrderCloseTime = 0;   // Close time in mins (>0) or bars (<0)
+
+extern string __Trade_Params__ = "-- EA's trade parameters --";  // >>> EA's TRADE <<<
+input double EA_LotSize = 0;                                     // Lot size (0 = auto)

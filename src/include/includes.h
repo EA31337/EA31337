@@ -9,8 +9,8 @@
 
 // Includes common files.
 #include "common/code-conf.h"
-#include "common/enums.h"
-#include "common/properties.h"
+#include "common/enum.h"
+#include "common/property.h"
 
 // Includes class files.
 #include "classes/Chart.mqh"
@@ -51,6 +51,12 @@
 #include "classes/Indicators/Indi_Stochastic.mqh"
 #include "classes/Indicators/Indi_WPR.mqh"
 #include "classes/Indicators/Indi_ZigZag.mqh"
+
+// EA structs.
+#include "common/struct.h"
+
+// Strategy enums.
+#include "strategies/enum.h"
 
 // Main user inputs.
 #include "inputs.h"
