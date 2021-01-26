@@ -55,7 +55,7 @@ jobs:
       - name: Uploads artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ matrix.mode }}
+          name: EA31337-${{ matrix.mode }}
           path: '*.ex?'
 
   Backtest-Lite:
@@ -78,7 +78,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
         with:
-          name: ${{ matrix.mode }}
+          name: EA31337-${{ matrix.mode }}
       - name: Removes old results
         # yamllint disable-line rule:line-length
         run: rm -fr "docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results"/*
@@ -120,7 +120,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
         with:
-          name: ${{ matrix.mode }}
+          name: EA31337-${{ matrix.mode }}
       - name: Removes old results
         # yamllint disable-line rule:line-length
         run: rm -fr "docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results"/*
@@ -162,7 +162,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
         with:
-          name: ${{ matrix.mode }}
+          name: EA31337-${{ matrix.mode }}
       - name: Removes old results
         # yamllint disable-line rule:line-length
         run: rm -fr "docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results"/*

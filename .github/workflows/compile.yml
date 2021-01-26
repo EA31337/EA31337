@@ -47,3 +47,12 @@ jobs:
         with:
           path: src\EA31337.mq5
           verbose: true
+
+      - name: List compiled files
+        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: EA31337-${{ matrix.mode }}
+          path: 'src/*.ex?'
