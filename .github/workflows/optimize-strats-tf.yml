@@ -86,7 +86,7 @@ jobs:
     strategy:
       matrix:
         mode: [Lite, Advanced, Rider]
-        setfile: [AC_Active_Tf.set]
+        setfile: [Bands_Active_Tf.set, RSI_Active_Tf.set]
         # ${{ fromJson(needs.Process.outputs.sets-list) }}
     steps:
       - uses: actions/download-artifact@v2
