@@ -301,15 +301,8 @@ bool InitStrategies() {
       }
     }
   }
-  MqlParam _sargs[] = {{TYPE_INT}, {TYPE_INT}, {TYPE_INT}, {TYPE_INT}};
-  _sargs[0].integer_value = STRAT_ACTION_SET_PROP;
-  _sargs[1].integer_value = 0;
-  _sargs[2].integer_value = STRAT_PROP_PSM;
-  _sargs[3].integer_value = 1;
-  ea.ExecuteAction(EA_ACTION_STRATS_EXE_ACTION, _sargs);
-  _sargs[2].integer_value = STRAT_PROP_OCT;
-  _sargs[3].integer_value = EA_OrderCloseTime;
-  ea.ExecuteAction(EA_ACTION_STRATS_EXE_ACTION, _sargs);
+  EAPropertySet(STRAT_PROP_PSM, 1);
+  EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime);
 #else
   // Init price stop methods for each timeframe.
   if (EA_Stops_M1 != STRAT_NONE) {
@@ -365,34 +358,13 @@ bool InitStrategies() {
     }
   }
 
-  // Update close method and time per timeframe.
-  MqlParam _sargs[] = {{TYPE_INT}, {TYPE_INT}, {TYPE_INT}, {TYPE_INT}};
-  // Update close method.
-  _sargs[0].integer_value = STRAT_ACTION_SET_PROP;
-  _sargs[1].integer_value = 0;  // All timeframes.
-  _sargs[2].integer_value = STRAT_PROP_PSM;
-  _sargs[3].integer_value = 1;
-  ea.ExecuteAction(EA_ACTION_STRATS_EXE_ACTION, _sargs);
-  // Update close time for M1.
-  _sargs[1].integer_value = PERIOD_M1;
-  _sargs[2].integer_value = STRAT_PROP_OCT;
-  _sargs[3].integer_value = EA_OrderCloseTime_M1;
-  ea.ExecuteAction(EA_ACTION_STRATS_EXE_ACTION, _sargs);
-  // Update close time for M5.
-  _sargs[1].integer_value = PERIOD_M5;
-  _sargs[2].integer_value = STRAT_PROP_OCT;
-  _sargs[3].integer_value = EA_OrderCloseTime_M5;
-  ea.ExecuteAction(EA_ACTION_STRATS_EXE_ACTION, _sargs);
-  // Update close time for M15.
-  _sargs[1].integer_value = PERIOD_M15;
-  _sargs[2].integer_value = STRAT_PROP_OCT;
-  _sargs[3].integer_value = EA_OrderCloseTime_M15;
-  ea.ExecuteAction(EA_ACTION_STRATS_EXE_ACTION, _sargs);
-  // Update close time for M30.
-  _sargs[1].integer_value = PERIOD_M30;
-  _sargs[2].integer_value = STRAT_PROP_OCT;
-  _sargs[3].integer_value = EA_OrderCloseTime_M30;
-  ea.ExecuteAction(EA_ACTION_STRATS_EXE_ACTION, _sargs);
+  // Update price stop method.
+  EAPropertySet(STRAT_PROP_PSM, 1);
+  // Update order close times.
+  EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime_M1, PERIOD_M1);
+  EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime_M5, PERIOD_M5);
+  EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime_M15, PERIOD_M15);
+  EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime_M30, PERIOD_M30);
 #endif                                                    // __rider__
 #endif                                                    // __advanced__
   _res &= GetLastError() == 0 || GetLastError() == 5053;  // @fixme: error 5053?
