@@ -280,6 +280,8 @@ bool InitStrategies() {
                                          _magic_no + STRAT_STOCHASTIC * _magic_step);
   _res &= ea.StrategyAdd<Stg_WPR>(WPR_Active_Tf, STRAT_WPR, _magic_no + STRAT_WPR * _magic_step);
   _res &= ea.StrategyAdd<Stg_ZigZag>(ZigZag_Active_Tf, STRAT_ZIGZAG, _magic_no + STRAT_ZIGZAG * _magic_step);
+  // Update lot size.
+  EAPropertySet(STRAT_PROP_LS, EA_LotSize);
 #ifdef __advanced__
 #ifdef __rider__
   // Init price stop methods for all timeframes.
@@ -396,6 +398,32 @@ bool InitStrategies() {
   _res &= GetLastError() == 0 || GetLastError() == 5053;  // @fixme: error 5053?
   ResetLastError();
   return _res && ea_configured;
+}
+
+/**
+ * Set property for given EA's strategies.
+ */
+bool EAPropertySet(ENUM_STRATEGY_PROP_DBL _prop, double _value, int _tfs = 0) {
+  MqlParam _aargs[] = {{TYPE_INT}, {TYPE_INT}, {TYPE_INT}, {TYPE_DOUBLE}};
+  // Update close method.
+  _aargs[0].integer_value = STRAT_ACTION_SET_PROP;
+  _aargs[1].integer_value = _tfs;  // Which timeframes (0 - all).
+  _aargs[2].integer_value = _prop;
+  _aargs[3].double_value = _value;
+  return ea.ExecuteAction(EA_ACTION_STRATS_EXE_ACTION, _aargs);
+}
+
+/**
+ * Set property for given EA's strategies.
+ */
+bool EAPropertySet(ENUM_STRATEGY_PROP_INT _prop, int _value, int _tfs = 0) {
+  MqlParam _aargs[] = {{TYPE_INT}, {TYPE_INT}, {TYPE_INT}, {TYPE_INT}};
+  // Update close method.
+  _aargs[0].integer_value = STRAT_ACTION_SET_PROP;
+  _aargs[1].integer_value = _tfs;  // Which timeframes (0 - all).
+  _aargs[2].integer_value = _prop;
+  _aargs[3].integer_value = _value;
+  return ea.ExecuteAction(EA_ACTION_STRATS_EXE_ACTION, _aargs);
 }
 
 /**
