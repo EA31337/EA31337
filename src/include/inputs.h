@@ -23,6 +23,19 @@
 //| Inputs.
 //+------------------------------------------------------------------+
 
+// Include input params based on the EA mode.
+input static string __EA_Mode_Parameters__ =
+    "-- EA parameters for " + ea_name + " v" + ea_version + " --";  // >>> EA31337 <<<
+#ifdef __advanced__
+#ifdef __rider__
+#include "common/rider/inputs.mqh"
+#else
+#include "common/advanced/inputs.mqh"
+#endif
+#else
+#include "common/lite/inputs.mqh"
+#endif
+
 // input string __Trade_Parameters__ = "-- Trade parameters --"; // >>> TRADE <<<
 // input ulong TimeframeFilter = 0; // Timeframes filter (0 - auto)
 // input double MinPipChangeToTrade = 0.4; // Min pip change to trade (0 = every tick)
@@ -34,16 +47,3 @@ input ENUM_LOG_LEVEL VerboseLevel = V_INFO;                                     
 
 input string __EA_Other_Parameters__ = "-- Other parameters --";  // >>> OTHER PARAMETERS <<<
 input uint EA_MagicNumber = 31337;                                // Starting EA magic number
-
-// Include input params based on the EA mode.
-input static string __EA_Mode_Parameters__ =
-    "-- EA parameters for " + ea_name + " v" + ea_version + " --";  // >>> EA31337 <<<
-#ifdef __advanced__
-#ifdef __rider__
-#include "common/rider/ea-input.mqh"
-#else
-#include "common/advanced/ea-input.mqh"
-#endif
-#else
-#include "common/lite/ea-input.mqh"
-#endif

@@ -244,42 +244,11 @@ bool InitStrategies() {
   int _magic_step = FINAL_ENUM_TIMEFRAMES_INDEX;
   long _magic_no = EA_MagicNumber;
   ResetLastError();
-  _res &= ea.StrategyAdd<Stg_AC>(AC_Active_Tf, STRAT_AC, _magic_no + STRAT_AC * _magic_step);
-  _res &= ea.StrategyAdd<Stg_AD>(AD_Active_Tf, STRAT_AD, _magic_no + STRAT_AD * _magic_step);
-  _res &= ea.StrategyAdd<Stg_ADX>(ADX_Active_Tf, STRAT_ADX, _magic_no + STRAT_ADX * _magic_step);
-  _res &= ea.StrategyAdd<Stg_ATR>(ATR_Active_Tf, STRAT_ATR, _magic_no + STRAT_ATR * _magic_step);
-  _res &=
-      ea.StrategyAdd<Stg_Alligator>(Alligator_Active_Tf, STRAT_ALLIGATOR, _magic_no + STRAT_ALLIGATOR * _magic_step);
-  _res &= ea.StrategyAdd<Stg_Awesome>(Awesome_Active_Tf, STRAT_AWESOME, _magic_no + STRAT_AWESOME * _magic_step);
-  _res &= ea.StrategyAdd<Stg_BWMFI>(BWMFI_Active_Tf, STRAT_BWMFI, _magic_no + STRAT_BWMFI * _magic_step);
-  _res &= ea.StrategyAdd<Stg_Bands>(Bands_Active_Tf, STRAT_BANDS, _magic_no + STRAT_BANDS * _magic_step);
-  _res &= ea.StrategyAdd<Stg_BearsPower>(BearsPower_Active_Tf, STRAT_BEARS_POWER,
-                                         _magic_no + STRAT_BEARS_POWER * _magic_step);
-  _res &= ea.StrategyAdd<Stg_BullsPower>(BullsPower_Active_Tf, STRAT_BULLS_POWER,
-                                         _magic_no + STRAT_BULLS_POWER * _magic_step);
-  _res &= ea.StrategyAdd<Stg_CCI>(CCI_Active_Tf, STRAT_CCI, _magic_no + STRAT_CCI * _magic_step);
-  _res &= ea.StrategyAdd<Stg_DeMarker>(DeMarker_Active_Tf, STRAT_DEMARKER, _magic_no + STRAT_DEMARKER * _magic_step);
-  // _res &= ea.StrategyAdd<Stg_ElliottWave>(_magic_no + ElliottWave_Active_Tf * _magic_step);
-  _res &=
-      ea.StrategyAdd<Stg_Envelopes>(Envelopes_Active_Tf, STRAT_ENVELOPES, _magic_no + STRAT_ENVELOPES * _magic_step);
-  _res &= ea.StrategyAdd<Stg_Force>(Force_Active_Tf, STRAT_FORCE, _magic_no + STRAT_FORCE * _magic_step);
-  _res &= ea.StrategyAdd<Stg_Fractals>(Fractals_Active_Tf, STRAT_FRACTALS, _magic_no + STRAT_FRACTALS * _magic_step);
-  _res &= ea.StrategyAdd<Stg_Gator>(Gator_Active_Tf, STRAT_GATOR, _magic_no + STRAT_GATOR * _magic_step);
-  _res &= ea.StrategyAdd<Stg_Ichimoku>(Ichimoku_Active_Tf, STRAT_ICHIMOKU, _magic_no + STRAT_ICHIMOKU * _magic_step);
-  _res &= ea.StrategyAdd<Stg_MA>(MA_Active_Tf, STRAT_MA, _magic_no + STRAT_MA * _magic_step);
-  _res &= ea.StrategyAdd<Stg_MACD>(MACD_Active_Tf, STRAT_MACD, _magic_no + STRAT_MACD * _magic_step);
-  _res &= ea.StrategyAdd<Stg_MFI>(MFI_Active_Tf, STRAT_MFI, _magic_no + STRAT_MFI * _magic_step);
-  _res &= ea.StrategyAdd<Stg_Momentum>(Momentum_Active_Tf, STRAT_MOMENTUM, _magic_no + STRAT_MOMENTUM * _magic_step);
-  _res &= ea.StrategyAdd<Stg_OBV>(OBV_Active_Tf, STRAT_OBV, _magic_no + STRAT_OBV * _magic_step);
-  _res &= ea.StrategyAdd<Stg_OsMA>(OSMA_Active_Tf, STRAT_OSMA, _magic_no + STRAT_OSMA * _magic_step);
-  _res &= ea.StrategyAdd<Stg_RSI>(RSI_Active_Tf, STRAT_RSI, _magic_no + STRAT_RSI * _magic_step);
-  _res &= ea.StrategyAdd<Stg_RVI>(RVI_Active_Tf, STRAT_RVI, _magic_no + STRAT_RVI * _magic_step);
-  _res &= ea.StrategyAdd<Stg_SAR>(SAR_Active_Tf, STRAT_SAR, _magic_no + STRAT_SAR * _magic_step);
-  _res &= ea.StrategyAdd<Stg_StdDev>(StdDev_Active_Tf, STRAT_STDDEV, _magic_no + STRAT_STDDEV * _magic_step);
-  _res &= ea.StrategyAdd<Stg_Stochastic>(Stochastic_Active_Tf, STRAT_STOCHASTIC,
-                                         _magic_no + STRAT_STOCHASTIC * _magic_step);
-  _res &= ea.StrategyAdd<Stg_WPR>(WPR_Active_Tf, STRAT_WPR, _magic_no + STRAT_WPR * _magic_step);
-  _res &= ea.StrategyAdd<Stg_ZigZag>(ZigZag_Active_Tf, STRAT_ZIGZAG, _magic_no + STRAT_ZIGZAG * _magic_step);
+  // Initialize strategies per timeframe.
+  EAStrategyAdd(Strategy_M1, M1B);
+  EAStrategyAdd(Strategy_M5, M5B);
+  EAStrategyAdd(Strategy_M15, M15B);
+  EAStrategyAdd(Strategy_M30, M30B);
   // Update lot size.
   EAPropertySet(STRAT_PROP_LS, EA_LotSize);
 #ifdef __advanced__
@@ -365,8 +334,8 @@ bool InitStrategies() {
   EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime_M5, PERIOD_M5);
   EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime_M15, PERIOD_M15);
   EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime_M30, PERIOD_M30);
-#endif                                                    // __rider__
-#endif                                                    // __advanced__
+#endif  // __rider__
+#endif  // __advanced__
   _res &= GetLastError() == 0 || GetLastError() == 5053;  // @fixme: error 5053?
   ResetLastError();
   return _res && ea_configured;
@@ -396,6 +365,77 @@ bool EAPropertySet(ENUM_STRATEGY_PROP_INT _prop, int _value, int _tfs = 0) {
   _aargs[2].integer_value = _prop;
   _aargs[3].integer_value = _value;
   return ea.ExecuteAction(EA_ACTION_STRATS_EXE_ACTION, _aargs);
+}
+
+/**
+ * Adds strategy to the given timeframe.
+ */
+bool EAStrategyAdd(ENUM_STRATEGY _stg, int _tfs) {
+  unsigned int _magic_no = EA_MagicNumber + _stg * FINAL_ENUM_TIMEFRAMES_INDEX;
+  switch (_stg) {
+    case STRAT_AC:
+      return ea.StrategyAdd<Stg_AC>(_tfs, _stg, _magic_no);
+    case STRAT_AD:
+      return ea.StrategyAdd<Stg_AD>(_tfs, _stg, _magic_no);
+    case STRAT_ADX:
+      return ea.StrategyAdd<Stg_ADX>(_tfs, _stg, _magic_no);
+    case STRAT_ATR:
+      return ea.StrategyAdd<Stg_ATR>(_tfs, _stg, _magic_no);
+    case STRAT_ALLIGATOR:
+      return ea.StrategyAdd<Stg_Alligator>(_tfs, _stg, _magic_no);
+    case STRAT_AWESOME:
+      return ea.StrategyAdd<Stg_Awesome>(_tfs, _stg, _magic_no);
+    case STRAT_BWMFI:
+      return ea.StrategyAdd<Stg_BWMFI>(_tfs, _stg, _magic_no);
+    case STRAT_BANDS:
+      return ea.StrategyAdd<Stg_Bands>(_tfs, _stg, _magic_no);
+    case STRAT_BEARS_POWER:
+      return ea.StrategyAdd<Stg_BearsPower>(_tfs, _stg, _magic_no);
+    case STRAT_BULLS_POWER:
+      return ea.StrategyAdd<Stg_BullsPower>(_tfs, _stg, _magic_no);
+    case STRAT_CCI:
+      return ea.StrategyAdd<Stg_CCI>(_tfs, _stg, _magic_no);
+    case STRAT_DEMARKER:
+      return ea.StrategyAdd<Stg_DeMarker>(_tfs, _stg, _magic_no);
+    // case STRAT_EWO: return ea.StrategyAdd<Stg_ElliottWave>(_tfs, _stg, _magic_no);
+    case STRAT_ENVELOPES:
+      return ea.StrategyAdd<Stg_Envelopes>(_tfs, _stg, _magic_no);
+    case STRAT_FORCE:
+      return ea.StrategyAdd<Stg_Force>(_tfs, _stg, _magic_no);
+    case STRAT_FRACTALS:
+      return ea.StrategyAdd<Stg_Fractals>(_tfs, _stg, _magic_no);
+    case STRAT_GATOR:
+      return ea.StrategyAdd<Stg_Gator>(_tfs, _stg, _magic_no);
+    case STRAT_ICHIMOKU:
+      return ea.StrategyAdd<Stg_Ichimoku>(_tfs, _stg, _magic_no);
+    case STRAT_MA:
+      return ea.StrategyAdd<Stg_MA>(_tfs, _stg, _magic_no);
+    case STRAT_MACD:
+      return ea.StrategyAdd<Stg_MACD>(_tfs, _stg, _magic_no);
+    case STRAT_MFI:
+      return ea.StrategyAdd<Stg_MFI>(_tfs, _stg, _magic_no);
+    case STRAT_MOMENTUM:
+      return ea.StrategyAdd<Stg_Momentum>(_tfs, _stg, _magic_no);
+    case STRAT_OBV:
+      return ea.StrategyAdd<Stg_OBV>(_tfs, _stg, _magic_no);
+    case STRAT_OSMA:
+      return ea.StrategyAdd<Stg_OsMA>(_tfs, _stg, _magic_no);
+    case STRAT_RSI:
+      return ea.StrategyAdd<Stg_RSI>(_tfs, _stg, _magic_no);
+    case STRAT_RVI:
+      return ea.StrategyAdd<Stg_RVI>(_tfs, _stg, _magic_no);
+    case STRAT_SAR:
+      return ea.StrategyAdd<Stg_SAR>(_tfs, _stg, _magic_no);
+    case STRAT_STDDEV:
+      return ea.StrategyAdd<Stg_StdDev>(_tfs, _stg, _magic_no);
+    case STRAT_STOCHASTIC:
+      return ea.StrategyAdd<Stg_Stochastic>(_tfs, _stg, _magic_no);
+    case STRAT_WPR:
+      return ea.StrategyAdd<Stg_WPR>(_tfs, _stg, _magic_no);
+    case STRAT_ZIGZAG:
+      return ea.StrategyAdd<Stg_ZigZag>(_tfs, _stg, _magic_no);
+  }
+  return _stg == STRAT_NONE;
 }
 
 /**
