@@ -1,4 +1,5 @@
-Strategy_M30,1=0
+EA_OrderCloseTime=-20
+Strategy_M30,1=20
 Strategy_M30,2=0
 Strategy_M30,3=35
 Strategy_M30,F=1
