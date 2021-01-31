@@ -1,11 +1,11 @@
 ---
-name: Optimize Strategies TF
+name: Optimize Timeframes
 
 # yamllint disable-line rule:truthy
 on:
   push:
     branches:
-      - 'optimize-strats-tf'
+      - 'optimize-tf'
 
 jobs:
   Compile:
@@ -57,14 +57,17 @@ jobs:
           path: '*.ex?'
 
   Process:
-    env:
-      SETS_DIR: sets/optimize/strategies/tf
     outputs:
       sets-list: ${{ steps.get-sets.outputs.sets }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mode: [Lite, Advanced, Rider]
     steps:
       - uses: actions/checkout@v2
       - name: Set output with list of sets
+        env:
+          SETS_DIR: sets/optimize/${{ matrix.mode }}/tf
         id: get-sets
         run: |
           import glob, json, os
@@ -75,9 +78,11 @@ jobs:
       - name: Display output
         run: echo ${{ steps.get-sets.outputs.sets }}
       - name: Upload sets
+        env:
+          SETS_DIR: sets/optimize/${{ matrix.mode }}/tf
         uses: actions/upload-artifact@v2
         with:
-          name: sets
+          name: sets-${{ matrix.mode }}
           path: ${{ env.SETS_DIR }}
 
   Optimize:
@@ -85,9 +90,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        mode: [Lite, Advanced, Rider]
-        setfile: [Bands_Active_Tf.set, RSI_Active_Tf.set]
-        # ${{ fromJson(needs.Process.outputs.sets-list) }}
+        mode: [Lite]
+        setfile: ${{ fromJson(needs.Process.outputs.sets-list) }}
     steps:
       - uses: actions/download-artifact@v2
         with:
@@ -95,7 +99,7 @@ jobs:
           path: EA
       - uses: actions/download-artifact@v2
         with:
-          name: sets
+          name: sets-${{ matrix.mode }}
           path: sets
       - name: Display SET file
         run: cat sets/${{ matrix.setfile }}
