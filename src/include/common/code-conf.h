@@ -8,14 +8,6 @@
 //| Predefined code configurations.
 //+------------------------------------------------------------------+
 
-// Advanced mode.
-#ifndef __advanced__
-// Hides all strategy inputs for non-Advanced modes.
-#define __noinput__
-#define __noinput2__
-#define __noinput3__
-#endif  // __advanced__
-
 #ifdef __limited__
 #define __noboost__   // Disable boosting for limited mode.
 #define __nofactor__  // No booting factor for daily, weekly and monthly strategies.
@@ -34,10 +26,14 @@
 
 // Optimization mode.
 #ifdef __optimize__
+#define __input__    // Enable param inputs.
 #undef __backtest__  // Disable backtesting mode.
+#undef __config__    // Disable params from the config files.
 #undef __debug__     // Disable debug messages.
 #undef __disabled__  // Always shows inputs.
 #undef __trace__     // Disable trace messages.
+#else
+#define __config__   // Load params from the config files.
 #endif
 
 // Backtest mode.
