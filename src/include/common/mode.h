@@ -3,22 +3,22 @@
 //|                       Copyright 2016-2021, 31337 Investments Ltd |
 //|                                       https://github.com/EA31337 |
 //+------------------------------------------------------------------+
-//+------------------------------------------------------------------+
-//| EA version.
-//| Uncomment the line to activate the version.
-//+------------------------------------------------------------------+
 
-// Main modes (Lite, Advanced and Rider).
-//#define __advanced__  // Enable advanced configuration.
-//#define __rider__     // Activate rider strategy.
+// Main modes (Lite, Advanced or Rider).
+// Uncomment the line to activate the version.
+// For Lite (default), leave both modes commented out.
+//#define __advanced__  // Enables advanced configuration.
+//#define __rider__     // Activates rider strategy.
 
-// Other modes (currently not in use).
+// Enabled modes by default.
+#define __config__       // Loads params from the config files.
+
+// Optional modes (Uncomment to enable).
 //#define __backtest__     // For backtest only.
-//#define __config__       // Loads params from the config files.
-//#define __debug__        // Enable debugging.
+//#define __debug__        // Enables debugging.
 //#define __input__        // Enables user input params.
 //#define __optimize__     // For optimization only.
-//#define __profiler__     // Activate profiler.
-//#define __limited__      // Define safe options.
-//#define __release__      // Enable release settings.
-//#define __trace__        // Enable tracing.
+//#define __profiler__     // Activates profiler.
+//#define __limited__      // Defines safe options.
+//#define __release__      // Enables release settings.
+//#define __trace__        // Enables tracing.

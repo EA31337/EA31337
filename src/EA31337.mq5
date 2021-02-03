@@ -114,7 +114,7 @@ void OnTimer() {}
 void TesterInit() {}
 
 /**
- * "OnTester" event handler function (MQL5 only).
+ * "OnTester" event handler function.
  *
  * Invoked after a history testing of an Expert Advisor on the chosen interval is over.
  * It is called right before the call of OnDeinit().
@@ -124,7 +124,7 @@ void TesterInit() {}
  *
  * @see: https://www.mql5.com/en/docs/basis/function/events
  */
-double OnTester() { return 1.0; }
+// double OnTester() { return 1.0; }
 
 /**
  * "OnTesterPass" event handler function (MQL5 only).
