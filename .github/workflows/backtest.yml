@@ -63,7 +63,7 @@ jobs:
       run:
         shell: bash
     needs: Compile
-    runs-on: ubuntu-latest
+    runs-on: env.RUNS_ON != "" && env.RUNS_ON || "ubuntu-latest"
 
     strategy:
       fail-fast: false
@@ -105,7 +105,7 @@ jobs:
       run:
         shell: bash
     needs: Compile
-    runs-on: self-hosted
+    runs-on: env.RUNS_ON != "" && env.RUNS_ON || "ubuntu-latest"
 
     strategy:
       fail-fast: false
@@ -147,7 +147,7 @@ jobs:
       run:
         shell: bash
     needs: Compile
-    runs-on: ubuntu-latest
+    runs-on: env.RUNS_ON != "" && env.RUNS_ON || "ubuntu-latest"
 
     strategy:
       fail-fast: false

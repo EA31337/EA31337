@@ -94,7 +94,7 @@ jobs:
 
   Optimize:
     needs: [Compile, Process]
-    runs-on: ubuntu-latest
+    runs-on: env.RUNS_ON != "" && env.RUNS_ON || "ubuntu-latest"
     strategy:
       matrix:
         exclude:
