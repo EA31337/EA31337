@@ -85,7 +85,7 @@ jobs:
 
   Optimize:
     needs: [Compile, Process]
-    runs-on: env.RUNS_ON != "" && env.RUNS_ON || "ubuntu-latest"
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         mode: [Lite, Advanced, Rider]
