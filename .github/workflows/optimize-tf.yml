@@ -57,6 +57,8 @@ jobs:
           path: '*.ex?'
 
   Process:
+    env:
+      SETS_DIR: sets/optimize/${{ matrix.mode }}/tf
     outputs:
       sets-list: ${{ steps.get-sets.outputs.sets }}
     runs-on: ubuntu-latest
@@ -66,8 +68,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Set output with list of sets
-        env:
-          SETS_DIR: sets/optimize/${{ matrix.mode }}/tf
         id: get-sets
         run: |
           import glob, json, os
@@ -76,10 +76,8 @@ jobs:
           print("::set-output name=sets::{}".format(json.dumps(files)))
         shell: python
       - name: Display output
-        run: echo ${{ steps.get-sets.outputs.sets }}
+        run: echo "${{ toJson(steps.get-sets.outputs.sets) }}"
       - name: Upload sets
-        env:
-          SETS_DIR: sets/optimize/${{ matrix.mode }}/tf
         uses: actions/upload-artifact@v2
         with:
           name: sets-${{ matrix.mode }}

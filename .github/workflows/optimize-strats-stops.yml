@@ -61,10 +61,15 @@ jobs:
 
   Process:
     env:
-      SETS_DIR: sets/optimize/strategies/stops
+      MODE: ${{ matrix.mode }}
+      SETS_DIR: sets/optimize/${{ matrix.mode }}/stops
     outputs:
-      sets-list: ${{ steps.get-sets.outputs.sets }}
+      sets-Advanced: ${{ steps.get-sets.outputs.sets-Advanced }}
+      sets-Rider: ${{ steps.get-sets.outputs.sets-Rider }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mode: [Advanced, Rider]
     steps:
       - uses: actions/checkout@v2
       - name: Set output with list of sets
@@ -73,14 +78,18 @@ jobs:
           import glob, json, os
           os.chdir(os.getenv('SETS_DIR'))
           files = glob.glob("*.set")
-          print("::set-output name=sets::{}".format(json.dumps(files)))
+          mode = os.getenv('MODE')
+          sets = []
+          for file in files:
+            sets += [{'mode': mode, 'setfile': file}]
+          print("::set-output name=sets-{}::{}".format(mode, json.dumps(sets)))
         shell: python
-      - name: Display output
-        run: echo ${{ steps.get-sets.outputs.sets }}
+      - name: Display outputs
+        run: echo "${{ toJson(steps.get-sets.outputs) }}"
       - name: Upload sets
         uses: actions/upload-artifact@v2
         with:
-          name: sets
+          name: sets-${{ matrix.mode }}
           path: ${{ env.SETS_DIR }}
 
   Optimize:
@@ -88,8 +97,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        exclude:
+          - mode: Advanced
+            setfile: EA_Stops.set
+        include: ${{ fromJson(needs.Process.outputs.sets-Advanced) }}
         mode: [Advanced, Rider]
-        setfile: ${{ fromJson(needs.Process.outputs.sets-list) }}
+        setfile: [EA_Stops.set]
     steps:
       - uses: actions/download-artifact@v2
         with:
@@ -97,7 +110,7 @@ jobs:
           path: EA
       - uses: actions/download-artifact@v2
         with:
-          name: sets
+          name: sets-${{ matrix.mode }}
           path: sets
       - name: Display SET file
         run: cat sets/${{ matrix.setfile }}
@@ -105,7 +118,6 @@ jobs:
         with:
           BtDeposit: 100000
           BtDest: ${{ github.workspace }}/_results
-          BtDays: 1-12
           BtMonths: 11-12
           BtPair: EURUSD
           BtYears: 2019
