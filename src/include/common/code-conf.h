@@ -8,6 +8,11 @@
 //| Predefined code configurations.
 //+------------------------------------------------------------------+
 
+// Rider mode implies Advanced.
+#ifdef __rider__
+#define __advanced__
+#endif
+
 #ifdef __limited__
 #define __noboost__   // Disable boosting for limited mode.
 #define __nofactor__  // No booting factor for daily, weekly and monthly strategies.
