@@ -405,11 +405,14 @@ bool EAStrategyAdd(ENUM_STRATEGY _stg, int _tfs) {
       return ea.StrategyAdd<Stg_BullsPower>(_tfs, _stg, _magic_no);
     case STRAT_CCI:
       return ea.StrategyAdd<Stg_CCI>(_tfs, _stg, _magic_no);
+    case STRAT_DEMA:
+      return ea.StrategyAdd<Stg_DEMA>(_tfs, _stg, _magic_no);
     case STRAT_DEMARKER:
       return ea.StrategyAdd<Stg_DeMarker>(_tfs, _stg, _magic_no);
-    // case STRAT_EWO: return ea.StrategyAdd<Stg_ElliottWave>(_tfs, _stg, _magic_no);
     case STRAT_ENVELOPES:
       return ea.StrategyAdd<Stg_Envelopes>(_tfs, _stg, _magic_no);
+    case STRAT_EWO:
+      return ea.StrategyAdd<Stg_ElliottWave>(_tfs, _stg, _magic_no);
     case STRAT_FORCE:
       return ea.StrategyAdd<Stg_Force>(_tfs, _stg, _magic_no);
     case STRAT_FRACTALS:

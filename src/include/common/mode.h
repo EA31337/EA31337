@@ -7,7 +7,7 @@
 // Main modes (Lite, Advanced or Rider).
 // Uncomment the line to activate the version.
 // For Lite (default), leave both modes commented out.
-//#define __advanced__  // Enables advanced configuration.
+#define __advanced__  // Enables advanced configuration.
 //#define __rider__     // Activates rider strategy.
 
 // Enabled modes by default.
