@@ -1,3 +1,7 @@
+EA_OrderCloseTime_M1=-20
+EA_OrderCloseTime_M5=-20
+EA_OrderCloseTime_M15=-20
+EA_OrderCloseTime_M30=-20
 EA_Stops_M5,1=1
 EA_Stops_M5,2=0
 EA_Stops_M5,3=35
