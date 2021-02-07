@@ -1,0 +1,4 @@
+EA_OrderCloseTime,1=-40
+EA_OrderCloseTime,2=10
+EA_OrderCloseTime,3=40
+EA_OrderCloseTime,F=1
