@@ -34,8 +34,8 @@ input ENUM_STRATEGY Strategy_M5 = (ENUM_STRATEGY)22;                       // St
 input ENUM_STRATEGY Strategy_M15 = (ENUM_STRATEGY)35;                      // Strategy on M15
 input ENUM_STRATEGY Strategy_M30 = (ENUM_STRATEGY)0;                      // Strategy on M30
 
-input static string __EA_Stops__ = "-- EA's stop losses --";  // >>> EA's STOP LOSSES <<<
-input ENUM_STRATEGY EA_Stops = (ENUM_STRATEGY)10;             // Stop loss
+input static string __EA_Stops__ = "-- EA's stops --";  // >>> EA's STOPS (SL/TP) <<<
+input ENUM_STRATEGY EA_Stops = (ENUM_STRATEGY)STRAT_MFI;             // Stop loss
 
 input static string __EA_Order_Params__ = "-- EA's order params --";  // >>> EA's ORDERS <<<
 input int EA_OrderCloseTime = 0;                                      // Close time in mins (>0) or bars (<0)

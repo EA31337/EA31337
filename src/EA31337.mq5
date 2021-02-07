@@ -272,6 +272,9 @@ bool InitStrategies() {
       }
     }
   }
+  EAPropertySet(STRAT_PROP_PPL, 1);
+  EAPropertySet(STRAT_PROP_PPM, 1);
+  EAPropertySet(STRAT_PROP_PSL, 1);
   EAPropertySet(STRAT_PROP_PSM, 1);
   EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime);
 #else
@@ -338,6 +341,9 @@ bool InitStrategies() {
   }
 
   // Update price stop method.
+  EAPropertySet(STRAT_PROP_PPL, 1);
+  EAPropertySet(STRAT_PROP_PPM, 1);
+  EAPropertySet(STRAT_PROP_PSL, 1);
   EAPropertySet(STRAT_PROP_PSM, 1);
   // Update order close times.
   EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime_M1, PERIOD_M1);
