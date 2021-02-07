@@ -1,5 +1,5 @@
 EA_OrderCloseTime=-20
-Strategy_M1,1=0
+Strategy_M1,1=10
 Strategy_M1,2=0
 Strategy_M1,3=35
 Strategy_M1,F=1
