@@ -56,6 +56,18 @@ jobs:
           name: EA31337-${{ matrix.mode }}
           path: '*.ex?'
 
+  Env:
+    runs-on: ubuntu-latest
+    outputs:
+      runs-on: ${{ secrets.RUNS_ON != '' && secrets.RUNS_ON || 'ubuntu-latest' }}
+    steps:
+      - name: Display environment variables
+        run: echo "${{ toJson(env) }}"
+      - name: Display runner
+        run: echo "${{ toJson(runner) }}"
+      - name: Display runs-on
+        run: echo "${{ secrets.RUNS_ON != '' && secrets.RUNS_ON || 'ubuntu-latest' }}"
+
   Process:
     env:
       SETS_DIR: sets/optimize/${{ matrix.mode }}/tf
@@ -75,7 +87,7 @@ jobs:
           files = glob.glob("*.set")
           print("::set-output name=sets::{}".format(json.dumps(files)))
         shell: python
-      - name: Display output
+      - name: Display sets output
         run: echo "${{ toJson(steps.get-sets.outputs.sets) }}"
       - name: Upload sets
         uses: actions/upload-artifact@v2
@@ -85,10 +97,11 @@ jobs:
 
   Optimize:
     needs: [Compile, Process]
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         mode: [Lite, Advanced, Rider]
+        os: ${{ needs.Env.outputs.runs-on }}
         setfile: ${{ fromJson(needs.Process.outputs.sets-list) }}
     steps:
       - uses: actions/download-artifact@v2
