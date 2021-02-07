@@ -94,7 +94,7 @@ jobs:
 
   Optimize:
     needs: [Compile, Process]
-    runs-on: [self-hosted, linux]
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         exclude:

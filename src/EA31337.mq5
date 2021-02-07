@@ -350,8 +350,8 @@ bool InitStrategies() {
   EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime_M5, PERIOD_M5);
   EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime_M15, PERIOD_M15);
   EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime_M30, PERIOD_M30);
-#endif                                                    // __rider__
-#endif                                                    // __advanced__
+#endif  // __rider__
+#endif  // __advanced__
   _res &= GetLastError() == 0 || GetLastError() == 5053;  // @fixme: error 5053?
   ResetLastError();
   return _res && ea_configured;
