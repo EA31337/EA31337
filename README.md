@@ -4,7 +4,6 @@
 [![License][license-image]][license-link]
 [![Status][appveyor-ci-build-link]][appveyor-ci-build-image]
 [![Status][gha-image-check-master]][gha-link-check-master]
-[![Status][gha-image-lint-master]][gha-link-lint-master]
 [![Status][gha-image-test-master]][gha-link-test-master]
 [![Status][gha-image-backtest-master]][gha-link-backtest-master]
 [![Channel][tg-channel-image]][tg-channel-link]
@@ -319,8 +318,6 @@ NO REPRESENTATION IS BEING MADE THAN ANY ACCOUNT WILL OR IS LIKELY TO ACHIEVE PR
 
 [gha-link-check-master]: https://github.com/EA31337/EA31337/actions?query=workflow%3ACheck+branch%3Amaster
 [gha-image-check-master]: https://github.com/EA31337/EA31337/workflows/Check/badge.svg?branch=master
-[gha-link-lint-master]: https://github.com/EA31337/EA31337/actions?query=workflow%3ALint+branch%3Amaster
-[gha-image-lint-master]: https://github.com/EA31337/EA31337/workflows/Lint/badge.svg?branch=master
 [gha-link-test-master]: https://github.com/EA31337/EA31337/actions?query=workflow%3ATest+branch%3Amaster
 [gha-image-test-master]: https://github.com/EA31337/EA31337/workflows/Test/badge.svg?branch=master
 [gha-link-backtest-master]: https://github.com/EA31337/EA31337/actions?query=workflow%3ABacktest+branch%3Amaster
