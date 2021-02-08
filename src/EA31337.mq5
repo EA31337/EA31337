@@ -259,7 +259,9 @@ bool InitStrategies() {
     if (!_strat_stops) {
       EAStrategyAdd(EA_Stops, M30B);
       _strat_stops = ea.GetStrategy(PERIOD_M30, EA_Stops);
-      _strat_stops.Enabled(false);
+      if (_strat_stops) {
+        _strat_stops.Enabled(false);
+      }
     }
     if (_strat_stops) {
       for (DictObjectIterator<ENUM_TIMEFRAMES, DictStruct<long, Ref<Strategy>>> iter_tf = ea.GetStrategies().Begin();
@@ -284,7 +286,9 @@ bool InitStrategies() {
     if (!_strat_stops) {
       EAStrategyAdd(EA_Stops_M1, M1B);
       _strat_stops = ea.GetStrategy(PERIOD_M1, EA_Stops_M1);
-      _strat_stops.Enabled(false);
+      if (_strat_stops) {
+        _strat_stops.Enabled(false);
+      }
     }
     if (_strat_stops) {
       for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategiesByTf(PERIOD_M1).Begin(); iter.IsValid();
@@ -299,7 +303,9 @@ bool InitStrategies() {
     if (!_strat_stops) {
       EAStrategyAdd(EA_Stops_M5, M5B);
       _strat_stops = ea.GetStrategy(PERIOD_M5, EA_Stops_M5);
-      _strat_stops.Enabled(false);
+      if (_strat_stops) {
+        _strat_stops.Enabled(false);
+      }
     }
     if (_strat_stops) {
       for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategiesByTf(PERIOD_M5).Begin(); iter.IsValid();
@@ -314,7 +320,9 @@ bool InitStrategies() {
     if (!_strat_stops) {
       EAStrategyAdd(EA_Stops_M15, M15B);
       _strat_stops = ea.GetStrategy(PERIOD_M15, EA_Stops_M15);
-      _strat_stops.Enabled(false);
+      if (_strat_stops) {
+        _strat_stops.Enabled(false);
+      }
     }
     if (_strat_stops) {
       for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategiesByTf(PERIOD_M15).Begin(); iter.IsValid();
@@ -329,7 +337,9 @@ bool InitStrategies() {
     if (!_strat_stops) {
       EAStrategyAdd(EA_Stops_M30, M30B);
       _strat_stops = ea.GetStrategy(PERIOD_M30, EA_Stops_M30);
-      _strat_stops.Enabled(false);
+      if (_strat_stops) {
+        _strat_stops.Enabled(false);
+      }
     }
     if (_strat_stops) {
       for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategiesByTf(PERIOD_M30).Begin(); iter.IsValid();
