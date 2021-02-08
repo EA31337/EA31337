@@ -1,0 +1,174 @@
+---
+name: Optimize Strategies Stops
+
+# yamllint disable-line rule:truthy
+on:
+  push:
+    branches:
+      - 'optimize-strats-stops'
+
+jobs:
+  Compile:
+
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        mode: [Lite, Advanced, Rider]
+
+    steps:
+
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+
+      - name: Enables Advanced mode
+        if: matrix.mode == 'Advanced'
+        run: echo '#define __advanced__' > src/include/common/mode.h
+
+      - name: Enables Rider mode
+        if: matrix.mode == 'Rider'
+        run: echo '#define __rider__' > src/include/common/mode.h
+
+      - name: Enables optimization mode
+        run: echo '#define __optimize__' >> src/include/common/mode.h
+
+      - name: Compiles EA (MQL4)
+        uses: fx31337/mql-compile-action@master
+        with:
+          path: src\EA31337.mq4
+          verbose: true
+
+      - name: Compiles EA (MQL5)
+        uses: fx31337/mql-compile-action@master
+        with:
+          path: src\EA31337.mq5
+          verbose: true
+
+      - name: Moves file (MQL4)
+        run: mv -v src\*.ex4 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex4"
+      - name: Moves file (MQL5)
+        run: mv -v src\*.ex5 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex5"
+
+      - name: List compiled files
+        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: EA31337-${{ matrix.mode }}
+          path: '*.ex?'
+
+  Process:
+    env:
+      MODE: ${{ matrix.mode }}
+      SETS_DIR: sets/optimize/${{ matrix.mode }}/stops
+    outputs:
+      sets-Advanced: ${{ steps.get-sets.outputs.sets-Advanced }}
+      sets-Rider: ${{ steps.get-sets.outputs.sets-Rider }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mode: [Advanced, Rider]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set output with list of sets
+        id: get-sets
+        run: |
+          import glob, json, os
+          os.chdir(os.getenv('SETS_DIR'))
+          files = glob.glob("*.set")
+          mode = os.getenv('MODE')
+          sets = []
+          for file in files:
+            sets += [{'mode': mode, 'setfile': file}]
+          print("::set-output name=sets-{}::{}".format(mode, json.dumps(sets)))
+        shell: python
+      - name: Display outputs
+        run: echo "${{ toJson(steps.get-sets.outputs) }}"
+      - name: Upload sets
+        uses: actions/upload-artifact@v2
+        with:
+          name: sets-${{ matrix.mode }}
+          path: ${{ env.SETS_DIR }}
+
+  Optimize:
+    needs: [Compile, Process]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        exclude:
+          - mode: Advanced
+            setfile: EA_Stops.set
+        include: ${{ fromJson(needs.Process.outputs.sets-Advanced) }}
+        mode: [Advanced, Rider]
+        setfile: [EA_Stops.set]
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: EA31337-${{ matrix.mode }}
+          path: EA
+      - uses: actions/download-artifact@v2
+        with:
+          name: sets-${{ matrix.mode }}
+          path: sets
+      - name: Display SET file
+        run: cat sets/${{ matrix.setfile }}
+      - uses: ea31337/mql-tester-action@master
+        with:
+          BtDeposit: 100000
+          BtDest: ${{ github.workspace }}/_results
+          BtMonths: 11-12
+          BtPair: EURUSD
+          BtYears: 2019
+          OptFormatBrief: true
+          OptFormatJson: true
+          OptOptimize: true
+          OptVerbose: true
+          SetFile: ${{ github.workspace }}/sets/${{ matrix.setfile }}
+          SetParams: ${{ steps.data.outputs.param }}
+          TestExpert: EA31337-${{ matrix.mode }}
+          TestLimitOpts: maxdrawdown_enable=1,maxdrawdown=4
+          TestPeriod: M1
+          TestReportName: Report-EA31337-${{ matrix.mode }}
+      - name: Upload result files
+        uses: actions/upload-artifact@v2
+        with:
+          name: results
+          path: ./_results/*.*
+      - name: Process results
+        run: |
+          pwd
+          ls
+          jq --version
+          jq . _results/*.json
+          jq -r '(."Result params"/";")[0]' _results/*.json
+          jq -r '((."Result params"/";")[0]/"=")[0]'
+          jq -r '(."Result params"/";")[0]' _results/*.json \
+            >> $GITHUB_ENV
+          jq -r '"pname="+((."Result params"/";")[0]/"=")[0]' \
+            _results/*.json >> $GITHUB_ENV
+  Results:
+    needs: Optimize
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          # Otherwise, you will failed to push refs to dest repo.
+          fetch-depth: 0
+      - uses: actions/download-artifact@v2
+        with:
+          name: results
+          path: .results
+      - name: Parse results
+        run: |
+          cat << EOF >> $GITHUB_ENV
+          RES_DD=$(jq -rs '.[0]|."Drawdown %"' .results/*.json)
+          RES_PF=$(jq -rs '.[0]|."Profit factor"' .results/*.json)
+          RES_TT=$(jq -rs '.[0]|."Total trades"' .results/*.json)
+          EOF
+        shell: bash -ex {0}
+      - name: Check differences
+        id: git-details
+        run: echo "::set-output name=changed::$(git diff | wc -l)"

@@ -1,0 +1,11 @@
+EA_OrderCloseTime_M1=-20
+EA_OrderCloseTime_M5=-20
+EA_OrderCloseTime_M15=-20
+EA_OrderCloseTime_M30=-20
+EA_Stops_M30,1=1
+EA_Stops_M30,2=0
+EA_Stops_M30,3=35
+EA_Stops_M30,F=1
+Strategy_M1=0
+Strategy_M5=0
+Strategy_M15=0

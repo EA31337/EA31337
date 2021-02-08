@@ -1,0 +1,10 @@
+EA_OrderCloseTime=-20
+EA_Stops=0
+Strategy_M5,1=10
+Strategy_M5,2=0
+Strategy_M5,3=35
+Strategy_M5,F=1
+Strategy_M1=0
+Strategy_M5=0
+Strategy_M15=0
+Strategy_M30=0

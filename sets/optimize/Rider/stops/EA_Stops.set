@@ -1,0 +1,5 @@
+EA_OrderCloseTime=-20
+EA_Stops,1=1
+EA_Stops,2=0
+EA_Stops,3=35
+EA_Stops,F=1

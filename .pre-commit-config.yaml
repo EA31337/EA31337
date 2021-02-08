@@ -27,7 +27,8 @@ repos:
         exclude: (\.ico|\.mqproj)$
       # - id: git-check     # Configure in .gitattributes
       #   exclude: \.txt$
-      - id: markdownlint  # Configure in .mdlrc
+      # @fixme: https://github.com/jumanjihouse/pre-commit-hooks/issues/79
+      # - id: markdownlint  # Configure in .mdlrc
       # - id: require-ascii
       - id: script-must-have-extension
       # - id: shellcheck

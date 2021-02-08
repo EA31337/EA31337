@@ -1,27 +1,9 @@
-[submodule "VM"]
-	path = _VM
-	url = https://github.com/EA31337/FX-MT-VM.git
-[submodule "test_results"]
-	path = _test_results
-	url = https://github.com/EA31337/EA31337-Dev-Test-Results.git
-[submodule "EA31337-Lite-Sets"]
-	path = sets/Lite
-	url = https://github.com/EA31337/EA31337-Lite-Sets.git
 [submodule "EA31337-classes"]
-	path = src/include/EA31337-classes
+	path = src/include/classes
 	url = https://github.com/EA31337/EA31337-classes.git
-[submodule "EA31337-Advanced-Sets"]
-	path = sets/Advanced
-	url = https://github.com/EA31337/EA31337-Advanced-Sets.git
+[submodule "strategies"]
+	path = src/include/strategies
+	url = https://github.com/EA31337/EA31337-strategies.git
 [submodule "wiki"]
 	path = docs
 	url = https://github.com/EA31337/EA31337.wiki.git
-[submodule "Lite-optimization-tests"]
-	path = docker/optimization/lite
-	url = https://github.com/EA31337/EA31337-Lite-optimization-tests
-[submodule "Advanced-optimization-tests"]
-	path = docker/optimization/advanced
-	url = https://github.com/EA31337/EA31337-Advanced-optimization-tests
-[submodule "Rider-optimization-tests"]
-	path = docker/optimization/rider
-	url = https://github.com/EA31337/EA31337-Rider-optimization-tests

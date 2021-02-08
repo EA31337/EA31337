@@ -21,7 +21,7 @@ MQL5=$(wildcard $(SRC)/*.mq5)
 EA=EA31337
 EX4=$(SRC)/$(EA).ex4
 EX5=$(SRC)/$(EA).ex5
-VER=v$(shell grep 'define ea_version' $(SRC)/include/EA31337/ea-properties.mqh | grep -o '[0-9].*[0-9]')
+VER=v$(shell grep 'define ea_version' $(SRC)/include/common/properties.h | grep -o '[0-9].*[0-9]')
 FILE=$(lastword $(MAKEFILE_LIST)) # Determine this Makefile's path.
 OUT=.
 MKFILE=$(abspath $(lastword $(MAKEFILE_LIST)))
@@ -31,27 +31,27 @@ WINEDEBUG=fixme-all
 requirements:
 	type -a git ex wine64 &> /dev/null
 
-Lite:								$(OUT)/$(EA)-Lite-%.ex4
-Advanced:						$(OUT)/$(EA)-Advanced-%.ex4
-Rider:							$(OUT)/$(EA)-Rider-%.ex4
+Lite:				$(OUT)/$(EA)-Lite-%.ex4
+Advanced:			$(OUT)/$(EA)-Advanced-%.ex4
+Rider:				$(OUT)/$(EA)-Rider-%.ex4
 
 Lite-Release: 			$(OUT)/$(EA)-Lite-Release-%.ex4
 Advanced-Release:		$(OUT)/$(EA)-Advanced-Release-%.ex4
 Rider-Release:			$(OUT)/$(EA)-Rider-Release-%.ex4
 
 Lite-Backtest:			$(OUT)/$(EA)-Lite-Backtest-%.ex4
-Advanced-Backtest:	$(OUT)/$(EA)-Advanced-Backtest-%.ex4
+Advanced-Backtest:		$(OUT)/$(EA)-Advanced-Backtest-%.ex4
 Rider-Backtest:			$(OUT)/$(EA)-Rider-Backtest-%.ex4
 
 Lite-Optimize:			$(OUT)/$(EA)-Lite-Optimize-%.ex4
-Advanced-Optimize:	$(OUT)/$(EA)-Advanced-Optimize-%.ex4
+Advanced-Optimize:		$(OUT)/$(EA)-Advanced-Optimize-%.ex4
 Rider-Optimize:			$(OUT)/$(EA)-Rider-Optimize-%.ex4
 
-Lite-All:						Lite Lite-Release Lite-Backtest Lite-Optimize
-Advanced-All:				Advanced Advanced-Release Advanced-Backtest Advanced-Optimize
-Rider-All:					Rider Rider-Release Rider-Backtest Rider-Optimize
+Lite-All:			Lite Lite-Release Lite-Backtest Lite-Optimize
+Advanced-All:			Advanced Advanced-Release Advanced-Backtest Advanced-Optimize
+Rider-All:			Rider Rider-Release Rider-Backtest Rider-Optimize
 
-All:								requirements $(MTE) Lite-All Advanced-All Rider-All
+All:				requirements $(MTE) Lite-All Advanced-All Rider-All
 
 test: requirements set-mode $(MTE)
 	wine64 $(MTE) .exe /s /i:$(SRC) /mql4 $(MQL4)
@@ -65,14 +65,14 @@ $(MTE):
 # E.g.: make set-mode MODE="__advanced__"
 set-mode:
 ifdef MODE
-	test -w .git && git checkout -- $(SRC)/include/EA31337/ea-mode.mqh || true
-	ex +"%s@^\zs.*\ze#define \($(MODE)\)@@g" -scwq! $(SRC)/include/EA31337/ea-mode.mqh
+	test -w .git && git checkout -- $(SRC)/include/common/mode.h || true
+	ex +"%s@^\zs.*\ze#define \($(MODE)\)@@g" -scwq! $(SRC)/include/common/mode.h
 endif
 
 set-none:
 	@echo Reverting modes.
-	test -w .git && git checkout -- $(SRC)/include/EA31337/ea-mode.mqh || true
-	ex +":g@^#define@s@^@//" -scwq! $(SRC)/include/EA31337/ea-mode.mqh
+	test -w .git && git checkout -- $(SRC)/include/common/mode.h || true
+	ex +":g@^#define@s@^@//" -scwq! $(SRC)/include/common/mode.h
 
 set-lite: set-none
 	@$(MAKE) -f $(FILE)
@@ -143,11 +143,11 @@ Optimize: $(MTE) \
 		$(OUT)/$(EA)-Advanced-Optimize-%.ex4 \
 		$(OUT)/$(EA)-Rider-Optimize-%.ex4
 
-compile-mql4: requirements $(MTE) $(SRC)/$(EA).mq4 $(SRC)/include/EA31337/ea-mode.mqh clean-src
+compile-mql4: requirements $(MTE) $(SRC)/$(EA).mq4 $(SRC)/include/common/mode.h clean-src
 	file='$(MQL4)'; wine64 $(MTE) /log:CON /compile:"$${file//\//\\}" /inc:"$(SRC)" || true
 	test -s $(SRC)/$(EA).ex4 && echo $(MQL4) compiled.
 
-compile-mql5: requirements $(MTE) $(SRC)/$(EA).mq4 $(SRC)/include/EA31337/ea-mode.mqh clean-src
+compile-mql5: requirements $(MTE) $(SRC)/$(EA).mq4 $(SRC)/include/common/mode.h clean-src
 	file='$(MQL5)'; wine64 $(MTE) /log:CON /compile:"$${file//\//\\}" /inc:"$(SRC)" || true
 	test -s $(SRC)/$(EA).ex5 && @echo $(MQL5) compiled.
 
