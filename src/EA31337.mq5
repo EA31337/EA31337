@@ -69,9 +69,11 @@ void OnDeinit(const int reason) { DeinitVars(); }
 void OnTick() {
   EAProcessResult _result = ea.ProcessTick();
   if (_result.stg_processed) {
-    if (PrintLogOnChart) {
-      Comment("");
-      // DisplayInfo();
+    if (EA_DisplayDetailsOnChart && Terminal::IsVisualMode()) {
+      string _text = StringFormat("%s v%s by %s (%s)\n", ea_name, ea_version, ea_author, ea_link);
+      _text += SerializerConverter::FromObject(ea, SERIALIZER_FLAG_INCLUDE_DYNAMIC)
+                     .ToString<SerializerJson>();
+      Comment(_text);
     }
   }
 }
@@ -175,7 +177,7 @@ void OnChartEvent(const int id,          // Event ID.
 bool DisplayStartupInfo(bool _startup = false, string sep = "\n") {
   string _output = "";
   ResetLastError();
-  if (ea.GetState().IsOptimizationMode() || (ea.GetState().IsTestingMode() && !ea.GetState().IsTestingVisualMode())) {
+  if (ea.GetState().IsOptimizationMode() || (ea.GetState().IsTestingMode() && !ea.GetState().IsVisualMode())) {
     // Ignore chart updates when optimizing or testing in non-visual mode.
     return false;
   }
@@ -222,7 +224,7 @@ bool DisplayStartupInfo(bool _startup = false, string sep = "\n") {
 bool InitEA() {
   bool _initiated = ea_auth;
   EAParams ea_params(__FILE__, VerboseLevel);
-  ea_params.SetChartInfoFreq(PrintLogOnChart ? 2 : 0);
+  // ea_params.SetChartInfoFreq(PrintLogOnChart ? 2 : 0);
   ea_params.SetName(ea_name);
   ea_params.SetAuthor(StringFormat("%s (%s)", ea_author, ea_link));
   ea_params.SetDesc(ea_desc);
