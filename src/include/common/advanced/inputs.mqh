@@ -30,7 +30,7 @@
 // Includes strategies.
 input static string __Strategies_Active__ = "-- Active strategies --";     // >>> ACTIVE STRATEGIES <<<
 input ENUM_STRATEGY Strategy_M1 = (ENUM_STRATEGY)0;                        // Strategy on M1
-input ENUM_STRATEGY Strategy_M5 = (ENUM_STRATEGY)27;                       // Strategy on M5
+input ENUM_STRATEGY Strategy_M5 = (ENUM_STRATEGY)0;                        // Strategy on M5
 input ENUM_STRATEGY Strategy_M15 = (ENUM_STRATEGY)27;                      // Strategy on M15
 input ENUM_STRATEGY Strategy_M30 = (ENUM_STRATEGY)27;                      // Strategy on M30
 
