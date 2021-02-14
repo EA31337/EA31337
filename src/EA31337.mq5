@@ -225,10 +225,14 @@ bool InitEA() {
   bool _initiated = ea_auth;
   EAParams ea_params(__FILE__, VerboseLevel);
   // ea_params.SetChartInfoFreq(PrintLogOnChart ? 2 : 0);
-  ea_params.SetName(ea_name);
+  // EA params.
   ea_params.SetAuthor(StringFormat("%s (%s)", ea_author, ea_link));
   ea_params.SetDesc(ea_desc);
+  ea_params.SetName(ea_name);
   ea_params.SetVersion(ea_version);
+  // Risk params.
+  ea_params.SetRiskMarginMax(EA_Risk_MarginMax);
+  // Init instance.
   ea = new EA(ea_params);
   if (!ea.GetState().IsTradeAllowed()) {
     ea.Log().Error("Trading is not allowed for this symbol, please enable automated trading or check the settings!",

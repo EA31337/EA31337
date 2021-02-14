@@ -36,6 +36,9 @@ input static string __EA_Mode_Parameters__ =
 #include "common/lite/inputs.mqh"
 #endif
 
+extern string __EA_Risk_Params__ = "-- EA's risk management --";  // >>> EA's RISK <<<
+input float EA_Risk_MarginMax = 5.0f;                             // Max margin to risk (in %)
+
 // input string __Trade_Parameters__ = "-- Trade parameters --"; // >>> TRADE <<<
 // input ulong TimeframeFilter = 0; // Timeframes filter (0 - auto)
 // input double MinPipChangeToTrade = 0.4; // Min pip change to trade (0 = every tick)
