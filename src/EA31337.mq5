@@ -68,12 +68,15 @@ void OnDeinit(const int reason) { DeinitVars(); }
  */
 void OnTick() {
   EAProcessResult _result = ea.ProcessTick();
-  if (_result.stg_processed) {
+  if (_result.stg_processed || ea.GetState().new_periods > 0) {
     if (EA_DisplayDetailsOnChart && Terminal::IsVisualMode()) {
       string _text = StringFormat("%s v%s by %s (%s)\n", ea_name, ea_version, ea_author, ea_link);
       _text += SerializerConverter::FromObject(ea, SERIALIZER_FLAG_INCLUDE_DYNAMIC)
                      .ToString<SerializerJson>();
       Comment(_text);
+    }
+    if (ea.GetState().new_periods > 0) {
+      ea.Logger().Flush(10);
     }
   }
 }
