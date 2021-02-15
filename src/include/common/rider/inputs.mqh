@@ -1,5 +1,5 @@
 //+------------------------------------------------------------------+
-//|                 EA31337 - multi-strategy advanced trading robot. |
+//|                                                         inputs.h |
 //|                       Copyright 2016-2021, 31337 Investments Ltd |
 //|                                       https://github.com/EA31337 |
 //|                                                     ea-input.mqh |
@@ -28,14 +28,14 @@
 //+------------------------------------------------------------------+
 
 // Includes strategies.
-input static string __Strategies_Enabled__ = "-- Strategies Enabled --";  // >>> STRATEGIES ENABLED <<<
+input static string __Strategies_Active__ = "-- Active strategies --";     // >>> ACTIVE STRATEGIES <<<
 input ENUM_STRATEGY Strategy_M1 = (ENUM_STRATEGY)0;                        // Strategy on M1
-input ENUM_STRATEGY Strategy_M5 = (ENUM_STRATEGY)17;                       // Strategy on M5
+input ENUM_STRATEGY Strategy_M5 = (ENUM_STRATEGY)0;                        // Strategy on M5
 input ENUM_STRATEGY Strategy_M15 = (ENUM_STRATEGY)27;                      // Strategy on M15
 input ENUM_STRATEGY Strategy_M30 = (ENUM_STRATEGY)27;                      // Strategy on M30
 
 input static string __EA_Stops__ = "-- EA's stops --";  // >>> EA's STOPS (SL/TP) <<<
-input ENUM_STRATEGY EA_Stops = (ENUM_STRATEGY)16;                     // Stop loss
+input ENUM_STRATEGY EA_Stops = (ENUM_STRATEGY)19;                     // Stop loss
 
 input static string __EA_Order_Params__ = "-- EA's order params --";  // >>> EA's ORDERS <<<
 input int EA_OrderCloseTime = 0;                                      // Close time in mins (>0) or bars (<0)

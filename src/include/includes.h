@@ -9,6 +9,7 @@
 
 // Includes common files.
 #include "common/code-conf.h"
+#include "common/define.h"
 #include "common/enum.h"
 #include "common/property.h"
 
