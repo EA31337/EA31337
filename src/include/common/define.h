@@ -25,4 +25,3 @@
 #define ea_log_level V_INFO // Regular logging during user run.
 #endif // __optimize__
 #endif // __backtest__
-
