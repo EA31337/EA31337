@@ -44,7 +44,7 @@ input float EA_Risk_MarginMax = 5.0f;                             // Max margin 
 // input double MinPipChangeToTrade = 0.4; // Min pip change to trade (0 = every tick)
 
 input string __EA_Logging_Parameters__ = "-- Settings for logging & messages --";  // >>> LOGS & MESSAGES <<<
-input ENUM_LOG_LEVEL VerboseLevel = V_INFO;                                        // Level of log verbosity
+input ENUM_LOG_LEVEL VerboseLevel = ea_log_level;                                  // Level of log verbosity
 // input bool WriteSummaryReport = true;                                           // Write summary report on finish
 
 input string __EA_Other_Parameters__ = "-- Other parameters --";  // >>> OTHER PARAMETERS <<<

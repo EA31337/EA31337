@@ -1,5 +1,5 @@
 //+------------------------------------------------------------------+
-//|                 EA31337 - multi-strategy advanced trading robot. |
+//|                                                         inputs.h |
 //|                       Copyright 2016-2021, 31337 Investments Ltd |
 //|                                       https://github.com/EA31337 |
 //|                                                     ea-input.mqh |
