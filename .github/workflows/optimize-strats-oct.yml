@@ -8,6 +8,7 @@ on:
       - 'optimize-strats-oct'
 
 jobs:
+
   Compile:
 
     runs-on: windows-latest
@@ -21,18 +22,14 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
-
+      - name: Enables optimization mode
+        run: echo '#define __optimize__' > src/include/common/mode.h
       - name: Enables Advanced mode
         if: matrix.mode == 'Advanced'
-        run: echo '#define __advanced__' > src/include/common/mode.h
-
+        run: echo '#define __advanced__' >> src/include/common/mode.h
       - name: Enables Rider mode
         if: matrix.mode == 'Rider'
-        run: echo '#define __rider__' > src/include/common/mode.h
-
-      - name: Enables optimization mode
-        run: echo '#define __optimize__' >> src/include/common/mode.h
-
+        run: echo '#define __rider__' >> src/include/common/mode.h
       - name: Compiles EA (MQL4)
         uses: fx31337/mql-compile-action@master
         with:
