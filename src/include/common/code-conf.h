@@ -43,10 +43,6 @@
 #ifndef __input__
 #define __input__
 #endif
-#define __debug__
-#ifndef __profiler__
-#define __profiler__
-#endif
 #endif
 
 // Release mode.
