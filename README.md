@@ -1,29 +1,30 @@
 # EA31337
 
 [![Release][github-release-image]][github-release-link]
-[![License][license-image]][license-link]
-[![Status][appveyor-ci-build-link]][appveyor-ci-build-image]
+[![Channel][tg-channel-image]][tg-channel-link]
 [![Status][gha-image-check-master]][gha-link-check-master]
 [![Status][gha-image-test-master]][gha-link-test-master]
 [![Status][gha-image-backtest-master]][gha-link-backtest-master]
-[![Channel][tg-channel-image]][tg-channel-link]
-[![Chat][tg-chat-image]][tg-chat-link]
 [![Edit][gitpod-image]][gitpod-link]
+[![License][license-image]][license-link]
 
 ## Introduction
 
-Introducing EA31337, an advanced trading robot for Forex markets written in MQL.
-
-This EA (_Expert Advisor_) implements the coordinated algorithm to prioritise and manage multi-timeframe strategies
-with fully user customizable parameters, which takes the currency trading on the next level.
-It makes real-time trading a hassle-free experience.
-
-Please follow [Wiki Home page](https://github.com/EA31337/EA31337/wiki) for the available documentation pages.
+EA31337 is an advanced trading robot for Forex markets written in MQL.
 
 ## About the project
 
 The project aims to deliver fully working EA at the professional level
 with code compability for MQL4 and MQL5 at the same time.
+
+It implements algorithms for managing multiple strategies on different timeframes at once.
+
+Please follow [Wiki Home page](https://github.com/EA31337/EA31337/wiki) for the available documentation pages.
+
+This project utilizes the following sub-projects:
+
+- [EA31337 framework][gh-repo-classes]
+- [EA31337 strategies][gh-repo-strats]
 
 ### Disclamer
 
@@ -41,7 +42,7 @@ For more details, please read the following [FPA court submission][scam-broker-f
 You can freely use this project for education or research purposes.
 If you're planning to use it for trading, please take care, as neither it is the holy grail or making money machine.
 So if you're looking to double your investment in a short period with few clicks, this is not what you're looking for,
-and most likely you won't find at holy grail anywhere else.
+and most likely you won't find holy grail anywhere else.
 
 To use this project most efficiently, you'll have to invest some time to understand how it works and how you can use it.
 
@@ -51,77 +52,23 @@ To learn more about the usage, please check our [Wiki pages](https://github.com/
 
 The EA provides the following out-of-box features:
 
-- Over 30 optimised strategies on four different timeframes analysing the market in real-time.
-- An exceptional number of user customizable parameters (over 300).
-- _Task scheduler_ which queues and re-trades the rejected trades due to high volatility or broker requotes.
-- _Trade booster_ can increase lot ratio for successful strategies over current day, week or month.
-- _Trade booster_ can also handicap or disable non-successful strategy for a temporary period.
-- _Risk Ratio_ feature manages your risk automatically for the given equality/balance and the market conditions.
-- _Lot balancer_ computes precisely how much to invest (contract size) given your equality/balance ratio.
-- _Order balancer_ computes how many trades can be opened and with what size based on your free margin.
-- Optional _TradeWithTrend_ parameter minimalizes the risk by not trading against the market trends.
-- _Profit/stop trailing system_ dynamically sets order limits based on the market conditions (learn more below).
-- The unique _OpenMethod system_ enhances technical indicators and trades only on prosperous market conditions
-  (learn more below).
-- The powerful condition-action system gives you the full control what to do on specific market condition
-  (learn more below).
+- Over 35 optimised strategies on four different timeframes analysing the market in real-time.
 
 ### Strategies
 
-The robot comes with over 30 strategies coordinated and controlled by the central algorithm (engine).
-Each strategy analyses market on multiple timeframes (M1-M30) at the same time.
-The business analysis is based on over 30 major technical indicators in real-time.
+The robot comes with over 35 strategies coordinated and controlled by the central algorithm.
+Each strategy analyses market on multiple timeframes at the same time.
+The market analysis is based on over 30 major technical indicators in real-time.
 
 ### Profit/Stop Trailing system
 
 This unique profit-stop trailing system auto-controls when to take profit
 or when to close the order by specific market conditions based on the technical indicator analysis.
 
-Few examples of the conditionally controlled trailing system:
-
-- It can close the trade when the price reached higher highs of 50-200 bars.
-- It can close the order when specific indicator (out of 30) reached its peak.
-- It can close the trade when resistance level is reached.
-- It can set the order stop loss between low and high of last 200 bars.
-- It can set the order stop the same as slow moving average plus 20 pips.
-- It can take the profit when the price reaches SAR reversal points.
-- It can keep profit/stop trailings always 20 pips outside of upper and lower Bollinger Bands.
-
-There are over 27 possible trailing configurations.
-
 ### Open Method System
 
 The unique conditional system manages trades per given strategy and state of its technical indicators.
 In other words, each strategy uses unique configuration of technical indicators and conditions to buy and sell signals.
-
-Few examples:
-
-- lower/higher Bands are reached, but signal could only happen when the price will close outside or inside of bands
-  (128 different combinations of raising signal only for Bands),
-- RSI is reached certain level, but raise the signal only when the 3 last bars are beyond that limit
-  to avoid false signals (along with other 32 possible combinations),
-- raise SAR signal when previous SAR confirmed it (along with other similar 64 combinations),
-- and so on, which gives thousands of possibilities optimized on demand by our cloud system.
-
-### Condition-Action system
-
-Take the full control of your investments by creating own custom rules.
-
-Few examples of such rules:
-
-- React on big market drops in real-time, e.g. by closing all losing trades as soon as possible.
-- If equality is higher than 20% or 50%, close the profitable trade.
-- If equality is lower than 20%, get rid of most risking trades to prevent big drawdown.
-- If market goes opposite, close the most profitable position.
-- Relax and invest less after most profitable day of the month.
-- Close most profitable trade when your margin is used in 80-90%.
-- When Stop Out level is reached, close the most non-or-profitable position to avoid broker's Margin Call!
-- When equality is 20% above the balance, close all in profit only when the market goes opposite.
-- When market trend changes, close all non-trend positions,
-- Close profitable positions when your account reached max orders.
-
-There are over 27 account conditions, 14 market conditions and 11 actions to perform,
-which makes over 4000 condition-action possibilities.
 
 ### Using & Testing
 
@@ -186,7 +133,6 @@ Only run EA on live at your own risk, when you're happy with the backtest or res
 
 For the trading purposes, any timeframe can be used since EA reads data from multiple timeframes
 independently from the current chart.
-However, due to platform limitations, the M30 should be used when backtesting or optimizing.
 
 ### Input parameters
 
@@ -232,8 +178,9 @@ If you believe some information is outdated, you can propose new changes.
 
 ## Support
 
-- For bugs/features, raise a [new issue at GitHub](https://github.com/EA31337/EA31337/issues).
-- Join our [Telegram group][tg-chat-link] and [channel][tg-channel-link] for help.
+- For help, open a [new discussion][gh-discuss] to ask questions.
+- For bugs/features, raise a [new issue at GitHub][gh-issues].
+- Join our [Telegram channel][tg-channel-link] for news and discussion group for help.
 
 ## Legal
 
@@ -295,9 +242,6 @@ NO REPRESENTATION IS BEING MADE THAN ANY ACCOUNT WILL OR IS LIKELY TO ACHIEVE PR
 
 <!-- Named links -->
 
-[scam-broker-se-link]: https://money.stackexchange.com/q/91732/6888
-[scam-broker-fpa-link]: https://www.forexpeacearmy.com/community/threads/guilty-case-2018-060-kenorb-vs-tradeu2-com.54563/#post-312721
-
 [gh-wiki]: https://github.com/EA31337/EA31337/wiki
 [gh-wiki-start]: https://github.com/EA31337/EA31337/wiki/Before-you-start
 [gh-wiki-installation]: https://github.com/EA31337/EA31337/wiki/Installation
@@ -305,16 +249,9 @@ NO REPRESENTATION IS BEING MADE THAN ANY ACCOUNT WILL OR IS LIKELY TO ACHIEVE PR
 
 [github-release-image]: https://img.shields.io/github/release/EA31337/EA31337.svg?logo=github
 [github-release-link]: https://github.com/EA31337/EA31337/releases
-[docker-build-image]: https://images.microbadger.com/badges/image/ea31337/mql-tester-action-action.svg
-[docker-build-link]: https://microbadger.com/images/ea31337/mql-tester-action-action
 
-[tg-channel-image]: https://img.shields.io/badge/Telegram-news-0088CC.svg?logo=telegram
-[tg-channel-link]: https://t.me/EA31337_News
-[tg-chat-image]: https://img.shields.io/badge/Telegram-chat-0088CC.svg?logo=telegram
-[tg-chat-link]: https://t.me/EA31337
-
-[appveyor-ci-build-link]: https://ci.appveyor.com/api/projects/status/63qnd959vxl44102/branch/master?svg=true
-[appveyor-ci-build-image]: https://ci.appveyor.com/project/kenorb/ea31337
+[tg-channel-image]: https://img.shields.io/badge/Telegram-join-0088CC.svg?logo=telegram
+[tg-channel-link]: https://t.me/EA31337
 
 [gha-link-check-master]: https://github.com/EA31337/EA31337/actions?query=workflow%3ACheck+branch%3Amaster
 [gha-image-check-master]: https://github.com/EA31337/EA31337/workflows/Check/badge.svg?branch=master
@@ -326,5 +263,14 @@ NO REPRESENTATION IS BEING MADE THAN ANY ACCOUNT WILL OR IS LIKELY TO ACHIEVE PR
 [gitpod-image]: https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod
 [gitpod-link]: https://gitpod.io/#https://github.com/EA31337/EA31337
 
+[gh-repo-classes]: https://github.com/EA31337/EA31337-classes
+[gh-repo-strats]: https://github.com/EA31337/EA31337-strategies
+
+[gh-discuss]: https://github.com/EA31337/EA31337/discussions
+[gh-issues]: https://github.com/EA31337/EA31337/issues
+
 [license-image]: https://img.shields.io/github/license/EA31337/EA31337.svg
 [license-link]: https://tldrlegal.com/license/gnu-general-public-license-v3-(gpl-3)
+
+[scam-broker-se-link]: https://money.stackexchange.com/q/91732/6888
+[scam-broker-fpa-link]: https://www.forexpeacearmy.com/community/threads/guilty-case-2018-060-kenorb-vs-tradeu2-com.54563/#post-312721
