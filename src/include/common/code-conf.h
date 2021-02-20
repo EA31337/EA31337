@@ -40,16 +40,10 @@
 
 // Backtest mode.
 #ifdef __backtest__
-#ifndef __input__
-#define __input__
-#endif
 #endif
 
 // Release mode.
 #ifdef __release__
-#ifndef __input__
-#define __input__
-#endif
 #undef __disabled__      // Enable all strategies by default.
 #undef __backtest__      // Disable backtesting mode.
 #undef __optimize__      // Disable optimization mode.
