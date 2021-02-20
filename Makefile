@@ -14,14 +14,14 @@ SHELL:=/usr/bin/env bash
 		All Lite-All Advanced-All Rider-All
 
 MTE=metaeditor64.exe
-MTV=5.0.0.2280
+MTV=5.0.0.2375
 SRC=src
 MQL4=$(wildcard $(SRC)/*.mq4)
 MQL5=$(wildcard $(SRC)/*.mq5)
 EA=EA31337
 EX4=$(SRC)/$(EA).ex4
 EX5=$(SRC)/$(EA).ex5
-VER=v$(shell grep 'define ea_version' $(SRC)/include/common/properties.h | grep -o '[0-9].*[0-9]')
+VER=v$(shell grep 'define ea_version' $(SRC)/include/common/define.h | grep -o '[0-9].*[0-9]')
 FILE=$(lastword $(MAKEFILE_LIST)) # Determine this Makefile's path.
 OUT=.
 MKFILE=$(abspath $(lastword $(MAKEFILE_LIST)))
