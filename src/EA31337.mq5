@@ -227,7 +227,7 @@ bool DisplayStartupInfo(bool _startup = false, string sep = "\n") {
 bool InitEA() {
   bool _initiated = ea_auth;
   EAParams ea_params(__FILE__, VerboseLevel);
-  // ea_params.SetChartInfoFreq(PrintLogOnChart ? 2 : 0);
+  // ea_params.SetChartInfoFreq(EA_DisplayDetailsOnChart ? 2 : 0);
   // EA params.
   ea_params.SetAuthor(StringFormat("%s (%s)", ea_author, ea_link));
   ea_params.SetDesc(ea_desc);
