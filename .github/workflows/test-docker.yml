@@ -66,42 +66,50 @@ jobs:
     defaults:
       run:
         shell: bash
+    env:
+      TEST_NAME: ${{ matrix.mode }}_${{ matrix.test }}
     needs: Compile
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        mode:
-          - Lite
-          - Advanced
-          - Rider
-        month: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-        year: [2019]
+        mode: [Lite, Advanced, Rider]
+        test:
+          - 2019_01
+          - 2019_02
+          - 2019_03
+          - 2019_04
+          - 2019_05
+          - 2019_06
+          - 2019_07
+          - 2019_08
+          - 2019_09
+          - 2019_10
+          - 2019_11
+          - 2019_12
 
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
         with:
           name: ${{ matrix.mode }}
-      # yamllint disable-line rule:line-length
-      - run: docker-compose run ${{ matrix.mode }}_${{ matrix.year }}_${{ matrix.month }}
+      - name: Clean older test results
+        run: rm -v *.*
+        working-directory: docker/tests/${{ matrix.mode }}/_results
+      - run: docker-compose run $TEST_NAME
         working-directory: docker/tests/${{ matrix.mode }}
-      - name: Uploads results
+      - name: Uploads test results
         uses: actions/upload-artifact@v2
         with:
-          # yamllint disable-line rule:line-length
           name: Results-${{ matrix.mode }}
-          # yamllint disable-line rule:line-length
-          path: docker/tests/${{ matrix.mode }}/_results
-      - name: Uploads results (retry on failure)
+          path: docker/tests/${{ matrix.mode }}/_results/*.*
+      - name: Uploads test results (retry on failure)
         if: ${{ failure() }}
         uses: actions/upload-artifact@v2
         with:
-          # yamllint disable-line rule:line-length
           name: Results-${{ matrix.mode }}
-          # yamllint disable-line rule:line-length
-          path: docker/tests/${{ matrix.mode }}/_results
+          path: docker/tests/${{ matrix.mode }}/_results/*.*
 
   Publish-Results:
     defaults:

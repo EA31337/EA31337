@@ -1,7 +1,7 @@
 ---
 version: '3.4'
 services:
-  Advanced_2018_1:
+  Advanced_2018_01:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
@@ -11,7 +11,7 @@ services:
     environment:
       BT_MONTHS: 1
       TEST_REPORT_NAME: EA31337_Advanced_201801
-  Advanced_2018_2:
+  Advanced_2018_02:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
@@ -21,7 +21,7 @@ services:
     environment:
       BT_MONTHS: 2
       TEST_REPORT_NAME: EA31337_Advanced_201802
-  Advanced_2018_3:
+  Advanced_2018_03:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
@@ -31,7 +31,7 @@ services:
     environment:
       BT_MONTHS: 3
       TEST_REPORT_NAME: EA31337_Advanced_201803
-  Advanced_2018_4:
+  Advanced_2018_04:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
@@ -41,7 +41,7 @@ services:
     environment:
       BT_MONTHS: 4
       TEST_REPORT_NAME: EA31337_Advanced_201804
-  Advanced_2018_5:
+  Advanced_2018_05:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
@@ -51,7 +51,7 @@ services:
     environment:
       BT_MONTHS: 5
       TEST_REPORT_NAME: EA31337_Advanced_201805
-  Advanced_2018_6:
+  Advanced_2018_06:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
@@ -61,7 +61,7 @@ services:
     environment:
       BT_MONTHS: 6
       TEST_REPORT_NAME: EA31337_Advanced_201806
-  Advanced_2018_7:
+  Advanced_2018_07:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
@@ -71,7 +71,7 @@ services:
     environment:
       BT_MONTHS: 7
       TEST_REPORT_NAME: EA31337_Advanced_201807
-  Advanced_2018_8:
+  Advanced_2018_08:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
@@ -81,7 +81,7 @@ services:
     environment:
       BT_MONTHS: 8
       TEST_REPORT_NAME: EA31337_Advanced_201808
-  Advanced_2018_9:
+  Advanced_2018_09:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
