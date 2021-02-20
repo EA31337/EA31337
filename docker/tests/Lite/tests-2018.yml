@@ -1,7 +1,7 @@
 ---
 version: '3.4'
 services:
-  Lite_2018_1:
+  Lite_2018_01:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
@@ -11,7 +11,7 @@ services:
     environment:
       BT_MONTHS: 1
       TEST_REPORT_NAME: EA31337_Lite_201801
-  Lite_2018_2:
+  Lite_2018_02:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
@@ -21,7 +21,7 @@ services:
     environment:
       BT_MONTHS: 2
       TEST_REPORT_NAME: EA31337_Lite_201802
-  Lite_2018_3:
+  Lite_2018_03:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
@@ -31,7 +31,7 @@ services:
     environment:
       BT_MONTHS: 3
       TEST_REPORT_NAME: EA31337_Lite_201803
-  Lite_2018_4:
+  Lite_2018_04:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
@@ -41,7 +41,7 @@ services:
     environment:
       BT_MONTHS: 4
       TEST_REPORT_NAME: EA31337_Lite_201804
-  Lite_2018_5:
+  Lite_2018_05:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
@@ -51,7 +51,7 @@ services:
     environment:
       BT_MONTHS: 5
       TEST_REPORT_NAME: EA31337_Lite_201805
-  Lite_2018_6:
+  Lite_2018_06:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
@@ -61,7 +61,7 @@ services:
     environment:
       BT_MONTHS: 6
       TEST_REPORT_NAME: EA31337_Lite_201806
-  Lite_2018_7:
+  Lite_2018_07:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
@@ -71,7 +71,7 @@ services:
     environment:
       BT_MONTHS: 7
       TEST_REPORT_NAME: EA31337_Lite_201807
-  Lite_2018_8:
+  Lite_2018_08:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
@@ -81,7 +81,7 @@ services:
     environment:
       BT_MONTHS: 8
       TEST_REPORT_NAME: EA31337_Lite_201808
-  Lite_2018_9:
+  Lite_2018_09:
     command: run_backtest -v
     image: ea31337/ea-tester:dev
     volumes:
