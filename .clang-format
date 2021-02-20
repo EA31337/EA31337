@@ -1,4 +1,4 @@
 ---
-Language:        Cpp
-BasedOnStyle:    Google
-ColumnLimit:     120
+Language: Cpp
+BasedOnStyle: Google
+ColumnLimit: 120
