@@ -17,7 +17,7 @@
 //#define __backtest__     // For backtest only.
 //#define __debug__        // Enables debugging.
 //#define __input__        // Enables user input params.
-//#define __optimize__     // For optimization only.
+//#define __optimize__     // Optimization mode.
 //#define __profiler__     // Activates profiler.
 //#define __limited__      // Defines safe options.
 //#define __release__      // Enables release settings.
