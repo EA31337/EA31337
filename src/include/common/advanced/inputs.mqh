@@ -45,8 +45,8 @@ input ENUM_STRATEGY EA_Stops_M30 = (ENUM_STRATEGY)23;          // Stop loss on M
 input static string __EA_Order_Params__ = "-- EA's order params --";  // >>> EA's ORDERS <<<
 input int EA_OrderCloseTime_M1 = 0;                                   // Close time on M1 in mins (>0) or bars (<0)
 input int EA_OrderCloseTime_M5 = 0;                                   // Close time on M5 in mins (>0) or bars (<0)
-input int EA_OrderCloseTime_M15 = 0;                                  // Close time on M15 in mins (>0) or bars (<0)
-input int EA_OrderCloseTime_M30 = 0;                                  // Close time on M30 in mins (>0) or bars (<0)
+input int EA_OrderCloseTime_M15 = -20;                                // Close time on M15 in mins (>0) or bars (<0)
+input int EA_OrderCloseTime_M30 = -30;                                // Close time on M30 in mins (>0) or bars (<0)
 // input int EA_OrderCloseTime_H1 = 0;   // Close time on H1 in mins (>0) or bars (<0)
 // input int EA_OrderCloseTime_H4 = 0;   // Close time on H4 in mins (>0) or bars (<0)
 
