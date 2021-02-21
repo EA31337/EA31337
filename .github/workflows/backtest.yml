@@ -6,11 +6,6 @@ on:
   push:
     branches:
       - 'v*-backtest'
-    paths:
-      - '**.h'
-      - '**.mq?'
-      - '.github/workflows/backtest.yml'
-      - 'src/include/**'
   release:
     types:
       - published
@@ -70,8 +65,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mode:
-          - Lite
+        mode: [Lite]
         year: [2019]
         deposit: [1k, 10k, 100k]
         spread: [1, 10]
@@ -112,8 +106,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mode:
-          - Advanced
+        mode: [Advanced]
         year: [2019]
         deposit: [1k, 10k, 100k]
         spread: [1, 10]
@@ -154,8 +147,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mode:
-          - Rider
+        mode: [Rider]
         year: [2019]
         deposit: [1k, 10k, 100k]
         spread: [1, 10]
