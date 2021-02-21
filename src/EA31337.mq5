@@ -262,8 +262,9 @@ bool InitStrategies() {
   EAPropertySet(STRAT_PROP_LS, EA_LotSize);
   EAPropertySet(STRAT_PROP_SOF, EA_SignalOpenFilter);
 #ifdef __advanced__
-  EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime);
 #ifdef __rider__
+  // Disables order close time for Rider.
+  EAPropertySet(STRAT_PROP_OCT, 0);
   // Init price stop methods for all timeframes.
   if (EA_Stops != 0) {
     Strategy *_strat_stops = ea.GetStrategy(PERIOD_M30, EA_Stops);
@@ -290,6 +291,7 @@ bool InitStrategies() {
   EAPropertySet(STRAT_PROP_PSL, 1);
   EAPropertySet(STRAT_PROP_PSM, 1);
 #else // __rider__
+  EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime);
   // Init price stop methods for each timeframe.
   if (EA_Stops_M1 != STRAT_NONE) {
     Strategy *_strat_stops = ea.GetStrategy(PERIOD_M1, EA_Stops_M1);

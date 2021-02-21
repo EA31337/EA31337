@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        mode: [Advanced, Rider]
+        mode: [Advanced]
 
     steps:
 
@@ -65,7 +65,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        mode: [Advanced, Rider]
+        mode: [Advanced]
     steps:
       - uses: actions/checkout@v2
       - name: Set output with list of sets
@@ -89,7 +89,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        mode: [Advanced, Rider]
+        mode: [Advanced]
         setfile: ${{ fromJson(needs.Process.outputs.sets-list) }}
     steps:
       - uses: actions/download-artifact@v2
