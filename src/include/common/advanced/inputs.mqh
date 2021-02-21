@@ -52,3 +52,4 @@ input int EA_OrderCloseTime_M30 = 0;                                  // Close t
 
 extern string __Trade_Params__ = "-- EA's trade parameters --";  // >>> EA's TRADE <<<
 input double EA_LotSize = 0;                                     // Lot size (0 = auto)
+input int EA_SignalOpenFilter = 1;                               // Signal open filter

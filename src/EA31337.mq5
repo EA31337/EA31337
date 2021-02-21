@@ -260,6 +260,7 @@ bool InitStrategies() {
   EAStrategyAdd(Strategy_M30, M30B);
   // Update lot size.
   EAPropertySet(STRAT_PROP_LS, EA_LotSize);
+  EAPropertySet(STRAT_PROP_SOF, EA_SignalOpenFilter);
 #ifdef __advanced__
 #ifdef __rider__
   // Init price stop methods for all timeframes.
