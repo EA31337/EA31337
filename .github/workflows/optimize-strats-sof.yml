@@ -106,7 +106,7 @@ jobs:
         with:
           BtDeposit: 100000
           BtDest: ${{ github.workspace }}/_results
-          BtMonths: 8-12
+          BtMonths: 6-12
           BtPair: EURUSD
           BtYears: 2019
           OptFormatBrief: true
