@@ -262,6 +262,7 @@ bool InitStrategies() {
   EAPropertySet(STRAT_PROP_LS, EA_LotSize);
   EAPropertySet(STRAT_PROP_SOF, EA_SignalOpenFilter);
 #ifdef __advanced__
+  EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime);
 #ifdef __rider__
   // Init price stop methods for all timeframes.
   if (EA_Stops != 0) {
@@ -288,8 +289,7 @@ bool InitStrategies() {
   EAPropertySet(STRAT_PROP_PPM, 1);
   EAPropertySet(STRAT_PROP_PSL, 1);
   EAPropertySet(STRAT_PROP_PSM, 1);
-  EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime);
-#else
+#else // __rider__
   // Init price stop methods for each timeframe.
   if (EA_Stops_M1 != STRAT_NONE) {
     Strategy *_strat_stops = ea.GetStrategy(PERIOD_M1, EA_Stops_M1);
@@ -365,11 +365,6 @@ bool InitStrategies() {
   EAPropertySet(STRAT_PROP_PPM, 1);
   EAPropertySet(STRAT_PROP_PSL, 1);
   EAPropertySet(STRAT_PROP_PSM, 1);
-  // Update order close times.
-  EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime_M1, PERIOD_M1);
-  EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime_M5, PERIOD_M5);
-  EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime_M15, PERIOD_M15);
-  EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime_M30, PERIOD_M30);
 #endif  // __rider__
 #endif  // __advanced__
   _res &= GetLastError() == 0 || GetLastError() == 5053;  // @fixme: error 5053?

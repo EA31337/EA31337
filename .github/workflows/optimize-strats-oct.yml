@@ -61,8 +61,7 @@ jobs:
       MODE: ${{ matrix.mode }}
       SETS_DIR: sets/optimize/${{ matrix.mode }}/oct
     outputs:
-      sets-Advanced: ${{ steps.get-sets.outputs.sets-Advanced }}
-      sets-Rider: ${{ steps.get-sets.outputs.sets-Rider }}
+      sets-list: ${{ steps.get-sets.outputs.sets }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -75,11 +74,7 @@ jobs:
           import glob, json, os
           os.chdir(os.getenv('SETS_DIR'))
           files = glob.glob("*.set")
-          mode = os.getenv('MODE')
-          sets = []
-          for file in files:
-            sets += [{'mode': mode, 'setfile': file}]
-          print("::set-output name=sets-{}::{}".format(mode, json.dumps(sets)))
+          print("::set-output name=sets::{}".format(json.dumps(files)))
         shell: python
       - name: Display outputs
         run: echo "${{ toJson(steps.get-sets.outputs) }}"
@@ -94,12 +89,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        exclude:
-          - mode: Advanced
-            setfile: EA_OrderCloseTime.set
-        include: ${{ fromJson(needs.Process.outputs.sets-Advanced) }}
         mode: [Advanced, Rider]
-        setfile: [EA_OrderCloseTime.set]
+        setfile: ${{ fromJson(needs.Process.outputs.sets-list) }}
     steps:
       - uses: actions/download-artifact@v2
         with:
@@ -115,7 +106,7 @@ jobs:
         with:
           BtDeposit: 100000
           BtDest: ${{ github.workspace }}/_results
-          BtMonths: 6-12
+          BtMonths: 4-12
           BtPair: EURUSD
           BtYears: 2019
           OptFormatBrief: true
