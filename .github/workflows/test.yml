@@ -108,6 +108,7 @@ jobs:
           BtYears: ${{ matrix.year }}
           RunOnWarning: 'show_logs && parse_results $@'
           TestExpert: EA31337-${{ matrix.mode }}
+          TestPeriod: M1
 
   Release:
 
@@ -158,23 +159,3 @@ jobs:
           startsWith(github.ref, 'refs/heads/v') &&
           endsWith(github.ref, '-dev')
         with:
-          files: |
-            EA31337-${{ matrix.mode }}-${{ steps.myref.outputs.branch }}.ex?
-            *.txt
-          name: Development Release (${{ steps.myref.outputs.branch }})
-          prerelease: true
-          tag_name: ${{ steps.myref.outputs.branch }}-beta
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create Tag Release
-        uses: softprops/action-gh-release@v1
-        if: contains( github.ref, 'refs/tags/v' )
-        with:
-          files: |
-            EA31337-${{ matrix.mode }}-${{ steps.myref.outputs.branch }}.ex?
-          name: EA31337 ${{ steps.myref.outputs.branch }}
-          prerelease: true
-          tag_name: ${{ steps.myref.outputs.branch }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -90,6 +90,7 @@ jobs:
       fail-fast: false
       matrix:
         mode: [Lite, Advanced, Rider]
+        months: [1-4, 5-8, 9-12]
         setfile: ${{ fromJson(needs.Process.outputs.sets-list) }}
     steps:
       - uses: actions/download-artifact@v2
@@ -106,7 +107,7 @@ jobs:
         with:
           BtDeposit: 100000
           BtDest: ${{ github.workspace }}/_results
-          BtMonths: 7-12
+          BtMonths: ${{ matrix.months }}
           BtPair: EURUSD
           BtTestModel: 1
           BtYears: 2019
