@@ -93,6 +93,7 @@ jobs:
     needs: [Compile, Process]
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         exclude:
           - mode: Advanced
@@ -125,7 +126,7 @@ jobs:
           SetFile: ${{ github.workspace }}/sets/${{ matrix.setfile }}
           SetParams: ${{ steps.data.outputs.param }}
           TestExpert: EA31337-${{ matrix.mode }}
-          TestLimitOpts: maxdrawdown_enable=1,maxdrawdown=1
+          TestLimitOpts: maxdrawdown_enable=1,maxdrawdown=3
           TestPeriod: M1
           TestReportName: Report-EA31337-${{ matrix.mode }}
       - name: Upload result files

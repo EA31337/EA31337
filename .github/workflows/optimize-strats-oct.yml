@@ -88,6 +88,7 @@ jobs:
     needs: [Compile, Process]
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         mode: [Advanced]
         setfile: ${{ fromJson(needs.Process.outputs.sets-list) }}
