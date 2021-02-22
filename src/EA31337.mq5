@@ -71,8 +71,7 @@ void OnTick() {
   if (_result.stg_processed || ea.GetState().new_periods > 0) {
     if (EA_DisplayDetailsOnChart && Terminal::IsVisualMode()) {
       string _text = StringFormat("%s v%s by %s (%s)\n", ea_name, ea_version, ea_author, ea_link);
-      _text += SerializerConverter::FromObject(ea, SERIALIZER_FLAG_INCLUDE_DYNAMIC)
-                     .ToString<SerializerJson>();
+      _text += SerializerConverter::FromObject(ea, SERIALIZER_FLAG_INCLUDE_DYNAMIC).ToString<SerializerJson>();
       Comment(_text);
     }
     if (ea.GetState().new_periods > 0) {
@@ -290,7 +289,7 @@ bool InitStrategies() {
   EAPropertySet(STRAT_PROP_PPM, 1);
   EAPropertySet(STRAT_PROP_PSL, 1);
   EAPropertySet(STRAT_PROP_PSM, 1);
-#else // __rider__
+#else                                                     // __rider__
   EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime);
   // Init price stop methods for each timeframe.
   if (EA_Stops_M1 != STRAT_NONE) {
@@ -367,8 +366,8 @@ bool InitStrategies() {
   EAPropertySet(STRAT_PROP_PPM, 1);
   EAPropertySet(STRAT_PROP_PSL, 1);
   EAPropertySet(STRAT_PROP_PSM, 1);
-#endif  // __rider__
-#endif  // __advanced__
+#endif                                                    // __rider__
+#endif                                                    // __advanced__
   _res &= GetLastError() == 0 || GetLastError() == 5053;  // @fixme: error 5053?
   ResetLastError();
   return _res && ea_configured;
