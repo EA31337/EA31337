@@ -11,6 +11,19 @@ As the past performance is no guarantee of future results.
 
 Please find below the backtest results for the EA31337 trading robot.
 
+## v2.000
+
+### EURUSD (2019)
+
+| :chart_with_upwards_trend: 2019 | Lite | Advanced | Rider |
+| ------------------------------: | :--: | :------: | :---: |
+|   $1k, spread  1, lev. 1:100 | ![chart][lite_v2000_2019_1k_s1]    | ![chart][adv_v2000_2019_1k_s1]    | ![chart][rider_v2000_2019_1k_s1] |
+|   $1k, spread 10, lev. 1:100 | ![chart][lite_v2000_2019_1k_s10]   | ![chart][adv_v2000_2019_1k_s10]   | ![chart][rider_v2000_2019_1k_s10] |
+|  $10k, spread  1, lev. 1:100 | ![chart][lite_v2000_2019_10k_s1]   | ![chart][adv_v2000_2019_10k_s1]   | ![chart][rider_v2000_2019_10k_s1] |
+|  $10k, spread 10, lev. 1:100 | ![chart][lite_v2000_2019_10k_s10]  | ![chart][adv_v2000_2019_10k_s10]  | ![chart][rider_v2000_2019_10k_s10] |
+| $100k, spread  1, lev. 1:100 | ![chart][lite_v2000_2019_100k_s1]  | ![chart][adv_v2000_2019_100k_s1]  | ![chart][rider_v2000_2019_100k_s1] |
+| $100k, spread 10, lev. 1:100 | ![chart][lite_v2000_2019_100k_s10] | ![chart][adv_v2000_2019_100k_s10] | ![chart][rider_v2000_2019_100k_s10] |
+
 ## v1.080
 
 ### EURUSD (2019)
@@ -23,8 +36,6 @@ Please find below the backtest results for the EA31337 trading robot.
 |  $10k, spread 10, lev. 1:100 | ![chart][lite_v1080_2019_10k_s10]  | ![chart][adv_v1080_2019_10k_s10]  | ![chart][rider_v1080_2019_10k_s10] |
 | $100k, spread  1, lev. 1:100 | ![chart][lite_v1080_2019_100k_s1]  | ![chart][adv_v1080_2019_100k_s1]  | ![chart][rider_v1080_2019_100k_s1] |
 | $100k, spread 10, lev. 1:100 | ![chart][lite_v1080_2019_100k_s10] | ![chart][adv_v1080_2019_100k_s10] | ![chart][rider_v1080_2019_100k_s10] |
-
-Backtest build: [873368494][backtest_v1080_build].
 
 ## v1.079
 
@@ -39,8 +50,6 @@ Backtest build: [873368494][backtest_v1080_build].
 | $100k, spread  1, lev. 1:100 | ![chart][lite_v1079_2019_100k_s1]  | ![chart][adv_v1079_2019_100k_s1]  | ![chart][rider_v1079_2019_100k_s1] |
 | $100k, spread 10, lev. 1:100 | ![chart][lite_v1079_2019_100k_s10] | ![chart][adv_v1079_2019_100k_s10] | ![chart][rider_v1079_2019_100k_s10] |
 
-Backtest build: [873368494][backtest_v1079_build].
-
 ## v1.078
 
 ### EURUSD (2018)
@@ -52,6 +61,27 @@ Backtest build: [873368494][backtest_v1079_build].
 | $100k, spread 10, lev. 1:100 | ![chart][lite_v1078_2018_100k_s10] | ![chart][adv_v1078_2018_100k_s10] | ![chart][rider_v1078_2018_100k_s10] |
 
 <!-- Named links -->
+
+[lite_v2000_2019_1k_s1]: https://user-images.githubusercontent.com/266306/108912045-fcaa1200-761f-11eb-98df-24a8cef60a5e.gif
+[lite_v2000_2019_1k_s10]: https://user-images.githubusercontent.com/266306/108912047-fd42a880-761f-11eb-9c31-77578130c415.gif
+[lite_v2000_2019_10k_s1]: https://user-images.githubusercontent.com/266306/108912049-fd42a880-761f-11eb-9c10-f5a4f8093daf.gif
+[lite_v2000_2019_10k_s10]: https://user-images.githubusercontent.com/266306/108912050-fddb3f00-761f-11eb-8c5f-5fda7ddd49d5.gif
+[lite_v2000_2019_100k_s1]: https://user-images.githubusercontent.com/266306/108912052-fddb3f00-761f-11eb-8302-f0bb7e81ece8.gif
+[lite_v2000_2019_100k_s10]: https://user-images.githubusercontent.com/266306/108912055-fddb3f00-761f-11eb-8f8f-2449456e65de.gif
+
+[adv_v2000_2019_1k_s1]: https://user-images.githubusercontent.com/266306/108912122-1a777700-7620-11eb-86a5-2d03c1557572.gif
+[adv_v2000_2019_1k_s10]: https://user-images.githubusercontent.com/266306/108912124-1b100d80-7620-11eb-86f6-d2e98079dc88.gif
+[adv_v2000_2019_10k_s1]: https://user-images.githubusercontent.com/266306/108912125-1ba8a400-7620-11eb-9d74-b2e7231a50b5.gif
+[adv_v2000_2019_10k_s10]: https://user-images.githubusercontent.com/266306/108912127-1c413a80-7620-11eb-8add-592b74ca979d.gif
+[adv_v2000_2019_100k_s1]: https://user-images.githubusercontent.com/266306/108912128-1cd9d100-7620-11eb-9315-bc3c825c721f.gif
+[adv_v2000_2019_100k_s10]: https://user-images.githubusercontent.com/266306/108912130-1cd9d100-7620-11eb-8d24-35e8f9997823.gif
+
+[rider_v2000_2019_1k_s1]: https://user-images.githubusercontent.com/266306/108912154-26633900-7620-11eb-9a5d-90f29f97ae1f.gif
+[rider_v2000_2019_1k_s10]: https://user-images.githubusercontent.com/266306/108912155-26fbcf80-7620-11eb-8067-cb3ababa620f.gif
+[rider_v2000_2019_10k_s1]: https://user-images.githubusercontent.com/266306/108912156-27946600-7620-11eb-8e5d-03b13fc8937f.gif
+[rider_v2000_2019_10k_s10]: https://user-images.githubusercontent.com/266306/108912157-27946600-7620-11eb-9ce0-a655d2d723c2.gif
+[rider_v2000_2019_100k_s1]: https://user-images.githubusercontent.com/266306/108912158-282cfc80-7620-11eb-981d-a391680f7245.gif
+[rider_v2000_2019_100k_s10]: https://user-images.githubusercontent.com/266306/108912159-282cfc80-7620-11eb-86f7-ca5aa54b691f.gif
 
 [lite_v1080_2019_1k_s1]: https://user-images.githubusercontent.com/266306/93143436-de8ace00-f6df-11ea-9181-f0ad6b2f4b7a.gif
 [lite_v1080_2019_1k_s10]: https://user-images.githubusercontent.com/266306/93143438-dfbbfb00-f6df-11ea-80ba-bf28fd308d9e.gif
@@ -94,8 +124,6 @@ Backtest build: [873368494][backtest_v1079_build].
 [rider_v1079_2019_10k_s10]: https://user-images.githubusercontent.com/266306/87549495-c8dc3680-c6a5-11ea-8268-d31bd326c47b.gif
 [rider_v1079_2019_100k_s1]: https://user-images.githubusercontent.com/266306/87549503-cbd72700-c6a5-11ea-8fe0-e41c85bfa9ba.gif
 [rider_v1079_2019_100k_s10]: https://user-images.githubusercontent.com/266306/87549508-cf6aae00-c6a5-11ea-8064-aead7f922223.gif
-
-[backtest_v1079_build]: https://github.com/EA31337/EA31337/runs/873368494
 
 [lite_v1078_2018_1k_s10]: https://user-images.githubusercontent.com/266306/61831262-38d62900-ae65-11e9-87a2-874420e645c9.gif
 [lite_v1078_2018_10k_s10]: https://user-images.githubusercontent.com/266306/61831268-412e6400-ae65-11e9-8277-f2188c200320.gif
