@@ -17,11 +17,11 @@
 
 // Sets EA's log level based on the type of run.
 #ifdef __backtest__
-#define ea_log_level V_ERROR // Only errors for backtest run.
-#else // __backtest__
+#define ea_log_level V_ERROR  // Only errors for backtest run.
+#else                         // __backtest__
 #ifdef __optimize__
-#define ea_log_level V_NONE // No logging during optimization run.
-#else // __optimize__
-#define ea_log_level V_INFO // Regular logging during user run.
-#endif // __optimize__
-#endif // __backtest__
+#define ea_log_level V_NONE  // No logging during optimization run.
+#else                        // __optimize__
+#define ea_log_level V_INFO  // Regular logging during user run.
+#endif                       // __optimize__
+#endif                       // __backtest__

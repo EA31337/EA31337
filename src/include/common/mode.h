@@ -11,7 +11,7 @@
 //#define __rider__     // Activates rider strategy.
 
 // Enabled modes by default.
-#define __config__       // Loads params from the config files.
+#define __config__  // Loads params from the config files.
 
 // Optional modes (Uncomment to enable).
 //#define __backtest__     // For backtest only.

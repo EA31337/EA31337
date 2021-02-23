@@ -71,8 +71,7 @@ void OnTick() {
   if (_result.stg_processed || ea.GetState().new_periods > 0) {
     if (EA_DisplayDetailsOnChart && Terminal::IsVisualMode()) {
       string _text = StringFormat("%s v%s by %s (%s)\n", ea_name, ea_version, ea_author, ea_link);
-      _text += SerializerConverter::FromObject(ea, SERIALIZER_FLAG_INCLUDE_DYNAMIC)
-                     .ToString<SerializerJson>();
+      _text += SerializerConverter::FromObject(ea, SERIALIZER_FLAG_INCLUDE_DYNAMIC).ToString<SerializerJson>();
       Comment(_text);
     }
     if (ea.GetState().new_periods > 0) {
@@ -260,8 +259,11 @@ bool InitStrategies() {
   EAStrategyAdd(Strategy_M30, M30B);
   // Update lot size.
   EAPropertySet(STRAT_PROP_LS, EA_LotSize);
+  EAPropertySet(STRAT_PROP_SOF, EA_SignalOpenFilter);
 #ifdef __advanced__
 #ifdef __rider__
+  // Disables order close time for Rider.
+  EAPropertySet(STRAT_PROP_OCT, 0);
   // Init price stop methods for all timeframes.
   if (EA_Stops != 0) {
     Strategy *_strat_stops = ea.GetStrategy(PERIOD_M30, EA_Stops);
@@ -287,8 +289,8 @@ bool InitStrategies() {
   EAPropertySet(STRAT_PROP_PPM, 1);
   EAPropertySet(STRAT_PROP_PSL, 1);
   EAPropertySet(STRAT_PROP_PSM, 1);
+#else                                                     // __rider__
   EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime);
-#else
   // Init price stop methods for each timeframe.
   if (EA_Stops_M1 != STRAT_NONE) {
     Strategy *_strat_stops = ea.GetStrategy(PERIOD_M1, EA_Stops_M1);
@@ -364,13 +366,8 @@ bool InitStrategies() {
   EAPropertySet(STRAT_PROP_PPM, 1);
   EAPropertySet(STRAT_PROP_PSL, 1);
   EAPropertySet(STRAT_PROP_PSM, 1);
-  // Update order close times.
-  EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime_M1, PERIOD_M1);
-  EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime_M5, PERIOD_M5);
-  EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime_M15, PERIOD_M15);
-  EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime_M30, PERIOD_M30);
-#endif  // __rider__
-#endif  // __advanced__
+#endif                                                    // __rider__
+#endif                                                    // __advanced__
   _res &= GetLastError() == 0 || GetLastError() == 5053;  // @fixme: error 5053?
   ResetLastError();
   return _res && ea_configured;

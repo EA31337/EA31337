@@ -1,11 +1,11 @@
 ---
-name: Optimize Strategies OCT
+name: Optimize Strategies SOF
 
 # yamllint disable-line rule:truthy
 on:
   push:
     branches:
-      - 'optimize-strats-oct'
+      - 'optimize-strats-sof'
 
 jobs:
 
@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        mode: [Advanced]
+        mode: [Lite, Advanced, Rider]
 
     steps:
 
@@ -59,13 +59,13 @@ jobs:
   Process:
     env:
       MODE: ${{ matrix.mode }}
-      SETS_DIR: sets/optimize/${{ matrix.mode }}/oct
+      SETS_DIR: sets/optimize/${{ matrix.mode }}/sof
     outputs:
       sets-list: ${{ steps.get-sets.outputs.sets }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        mode: [Advanced]
+        mode: [Lite, Advanced, Rider]
     steps:
       - uses: actions/checkout@v2
       - name: Set output with list of sets
@@ -90,7 +90,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mode: [Advanced]
+        mode: [Lite, Advanced, Rider]
         setfile: ${{ fromJson(needs.Process.outputs.sets-list) }}
     steps:
       - uses: actions/download-artifact@v2
@@ -107,7 +107,7 @@ jobs:
         with:
           BtDeposit: 100000
           BtDest: ${{ github.workspace }}/_results
-          BtMonths: 4-12
+          BtMonths: 6-12
           BtPair: EURUSD
           BtYears: 2019
           OptFormatBrief: true
