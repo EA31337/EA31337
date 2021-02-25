@@ -38,11 +38,13 @@ jobs:
         with:
           submodules: 'recursive'
 
-      - name: Enables backtest mode
-        run: echo '#define __backtest__' > src/include/common/mode.h
+      - name: Enables release mode
+        run: echo '#define __release__' > src/include/common/mode.h
+
       - name: Enables Advanced mode
         if: matrix.mode == 'Advanced'
         run: echo '#define __advanced__' >> src/include/common/mode.h
+
       - name: Enables Rider mode
         if: matrix.mode == 'Rider'
         run: echo '#define __rider__' >> src/include/common/mode.h
@@ -69,7 +71,7 @@ jobs:
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
         shell: powershell
 
-      - name: Uploads artifacts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.mode }}
