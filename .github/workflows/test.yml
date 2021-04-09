@@ -93,7 +93,7 @@ jobs:
           - Advanced
           - Rider
         month: [1, 2]
-        year: [2020]
+        year: [2019]
 
     steps:
 
