@@ -69,7 +69,7 @@ void OnDeinit(const int reason) { DeinitVars(); }
 void OnTick() {
   EAProcessResult _result = ea.ProcessTick();
   if (_result.stg_processed || ea.GetState().new_periods > 0) {
-    if (EA_DisplayDetailsOnChart && Terminal::IsVisualMode()) {
+    if (EA_DisplayDetailsOnChart && (Terminal::IsVisualMode() || Terminal::IsRealtime())) {
       string _text = StringFormat("%s v%s by %s (%s)\n", ea_name, ea_version, ea_author, ea_link);
       _text += SerializerConverter::FromObject(ea, SERIALIZER_FLAG_INCLUDE_DYNAMIC).ToString<SerializerJson>();
       Comment(_text);
@@ -233,6 +233,7 @@ bool InitEA() {
   ea_params.SetName(ea_name);
   ea_params.SetVersion(ea_version);
   // Risk params.
+  ea_params.SetFlag(EA_PARAM_FLAG_LOTSIZE_AUTO, EA_LotSize <= 0);
   ea_params.SetRiskMarginMax(EA_Risk_MarginMax);
   // Init instance.
   ea = new EA(ea_params);
