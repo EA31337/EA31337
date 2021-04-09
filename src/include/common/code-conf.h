@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                                      code-conf.h |
-//|                       Copyright 2016-2020, 31337 Investments Ltd |
+//|                                 Copyright 2016-2021, EA31337 Ltd |
 //|                                       https://github.com/EA31337 |
 //+------------------------------------------------------------------+
 
@@ -42,7 +42,26 @@
 #ifdef __backtest__
 #endif
 
+// Property mode.
+#ifndef __property__
+#ifdef __MQL4__
+#define __property__  // Always load properties for MQL4.
+#else
+#ifdef __cli__
+#define __property__  // Load properties when compiling in CLI due to MQL5 bug.
+#endif
+#endif
+#endif
+
 // Release mode.
+#ifdef _RELEASE
+// Macro is defined when compiling in release mode.
+// @see: https://www.mql5.com/en/docs/basis/preprosessor/conditional_compilation
+#ifndef __release__
+#define __release__
+#endif
+#endif
+
 #ifdef __release__
 #undef __disabled__      // Enable all strategies by default.
 #undef __backtest__      // Disable backtesting mode.

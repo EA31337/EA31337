@@ -1,8 +1,9 @@
 //+------------------------------------------------------------------+
 //|                 EA31337 - multi-strategy advanced trading robot. |
-//|                       Copyright 2016-2021, 31337 Investments Ltd |
+//|                                 Copyright 2016-2021, EA31337 Ltd |
 //|                                       https://github.com/EA31337 |
 //+------------------------------------------------------------------+
+
 /*
  *  This file is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,14 +23,14 @@
 #include "include/includes.h"
 
 // EA properties.
-#property strict
-#property version ea_version
-#ifdef __MQL4__
+#ifdef __property__
+#property copyright ea_copy
 #property description ea_name
 #property description ea_desc
-#endif
+#property icon "resources/favicon.ico"
 #property link ea_link
-#property copyright ea_copy
+#property version ea_version
+#endif
 
 // Global variables.
 EA *ea;
@@ -290,11 +291,13 @@ bool InitStrategies() {
   EAPropertySet(STRAT_PROP_PPM, 1);
   EAPropertySet(STRAT_PROP_PSL, 1);
   EAPropertySet(STRAT_PROP_PSM, 1);
-#else                                                     // __rider__
+#else  // __rider__
   EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime);
   // Init price stop methods for each timeframe.
+  Strategy *_strat;
+  Strategy *_strat_stops;
   if (EA_Stops_M1 != STRAT_NONE) {
-    Strategy *_strat_stops = ea.GetStrategy(PERIOD_M1, EA_Stops_M1);
+    _strat_stops = ea.GetStrategy(PERIOD_M1, EA_Stops_M1);
     if (!_strat_stops) {
       EAStrategyAdd(EA_Stops_M1, M1B);
       _strat_stops = ea.GetStrategy(PERIOD_M1, EA_Stops_M1);
@@ -305,13 +308,13 @@ bool InitStrategies() {
     if (_strat_stops) {
       for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategiesByTf(PERIOD_M1).Begin(); iter.IsValid();
            ++iter) {
-        Strategy *_strat = iter.Value().Ptr();
+        _strat = iter.Value().Ptr();
         _strat.SetStops(_strat_stops, _strat_stops);
       }
     }
   }
   if (EA_Stops_M5 != STRAT_NONE) {
-    Strategy *_strat_stops = ea.GetStrategy(PERIOD_M5, EA_Stops_M5);
+    _strat_stops = ea.GetStrategy(PERIOD_M5, EA_Stops_M5);
     if (!_strat_stops) {
       EAStrategyAdd(EA_Stops_M5, M5B);
       _strat_stops = ea.GetStrategy(PERIOD_M5, EA_Stops_M5);
@@ -322,13 +325,13 @@ bool InitStrategies() {
     if (_strat_stops) {
       for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategiesByTf(PERIOD_M5).Begin(); iter.IsValid();
            ++iter) {
-        Strategy *_strat = iter.Value().Ptr();
+        _strat = iter.Value().Ptr();
         _strat.SetStops(_strat_stops, _strat_stops);
       }
     }
   }
   if (EA_Stops_M15 != STRAT_NONE) {
-    Strategy *_strat_stops = ea.GetStrategy(PERIOD_M15, EA_Stops_M15);
+    _strat_stops = ea.GetStrategy(PERIOD_M15, EA_Stops_M15);
     if (!_strat_stops) {
       EAStrategyAdd(EA_Stops_M15, M15B);
       _strat_stops = ea.GetStrategy(PERIOD_M15, EA_Stops_M15);
@@ -339,13 +342,13 @@ bool InitStrategies() {
     if (_strat_stops) {
       for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategiesByTf(PERIOD_M15).Begin(); iter.IsValid();
            ++iter) {
-        Strategy *_strat = iter.Value().Ptr();
+        _strat = iter.Value().Ptr();
         _strat.SetStops(_strat_stops, _strat_stops);
       }
     }
   }
   if (EA_Stops_M30 != STRAT_NONE) {
-    Strategy *_strat_stops = ea.GetStrategy(PERIOD_M30, EA_Stops_M30);
+    _strat_stops = ea.GetStrategy(PERIOD_M30, EA_Stops_M30);
     if (!_strat_stops) {
       EAStrategyAdd(EA_Stops_M30, M30B);
       _strat_stops = ea.GetStrategy(PERIOD_M30, EA_Stops_M30);
@@ -356,7 +359,7 @@ bool InitStrategies() {
     if (_strat_stops) {
       for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategiesByTf(PERIOD_M30).Begin(); iter.IsValid();
            ++iter) {
-        Strategy *_strat = iter.Value().Ptr();
+        _strat = iter.Value().Ptr();
         _strat.SetStops(_strat_stops, _strat_stops);
       }
     }
@@ -367,8 +370,8 @@ bool InitStrategies() {
   EAPropertySet(STRAT_PROP_PPM, 1);
   EAPropertySet(STRAT_PROP_PSL, 1);
   EAPropertySet(STRAT_PROP_PSM, 1);
-#endif                                                    // __rider__
-#endif                                                    // __advanced__
+#endif  // __rider__
+#endif  // __advanced__
   _res &= GetLastError() == 0 || GetLastError() == 5053;  // @fixme: error 5053?
   ResetLastError();
   return _res && ea_configured;

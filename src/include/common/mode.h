@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                                           mode.h |
-//|                       Copyright 2016-2021, 31337 Investments Ltd |
+//|                                 Copyright 2016-2021, EA31337 Ltd |
 //|                                       https://github.com/EA31337 |
 //+------------------------------------------------------------------+
 
@@ -15,10 +15,12 @@
 
 // Optional modes (Uncomment to enable).
 //#define __backtest__     // For backtest only.
+//#define __cli__          // Enables CLI mode.
 //#define __debug__        // Enables debugging.
 //#define __input__        // Enables user input params.
 //#define __optimize__     // Optimization mode.
 //#define __profiler__     // Activates profiler.
+//#define __property__     // Enables program properties.
 //#define __limited__      // Defines safe options.
 //#define __release__      // Enables release settings.
 //#define __trace__        // Enables tracing.

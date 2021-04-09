@@ -213,9 +213,9 @@ these TERMS OF USE and that you agree to be bound by such Terms of Use ("License
 
 ### Copyright information
 
-Copyright © 2016-2020 - 31337 Investments Ltd - All Rights Reserved
+Copyright © 2016-2021 - EA31337 Ltd - All Rights Reserved
 
-Author & Publisher: kenorb at 31337 Investments Ltd.
+Author & Publisher: kenorb at EA31337 Ltd.
 
 ### Disclaimer and Risk Warnings
 
