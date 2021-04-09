@@ -104,11 +104,11 @@ jobs:
         run: cat sets/${{ matrix.setfile }}
       - uses: ea31337/mql-tester-action@master
         with:
-          BtDeposit: 10000
+          BtDeposit: 100000
           BtDest: ${{ github.workspace }}/_results
           BtMonths: 6-12
           BtPair: EURUSD
-          BtYears: 2019
+          BtYears: 2020
           OptFormatBrief: true
           OptFormatJson: true
           OptOptimize: true
@@ -116,7 +116,7 @@ jobs:
           SetFile: ${{ github.workspace }}/sets/${{ matrix.setfile }}
           SetParams: ${{ steps.data.outputs.param }}
           TestExpert: EA31337-${{ matrix.mode }}
-          TestLimitOpts: maxdrawdown_enable=1,maxdrawdown=20
+          TestLimitOpts: maxdrawdown_enable=1,maxdrawdown=2
           TestPeriod: M1
           TestReportName: Report-EA31337-${{ matrix.mode }}
       - name: Upload result files

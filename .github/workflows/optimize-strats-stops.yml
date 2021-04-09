@@ -118,7 +118,7 @@ jobs:
           BtDest: ${{ github.workspace }}/_results
           BtMonths: 6-12
           BtPair: EURUSD
-          BtYears: 2019
+          BtYears: 2020
           OptFormatBrief: true
           OptFormatJson: true
           OptOptimize: true
@@ -126,7 +126,7 @@ jobs:
           SetFile: ${{ github.workspace }}/sets/${{ matrix.setfile }}
           SetParams: ${{ steps.data.outputs.param }}
           TestExpert: EA31337-${{ matrix.mode }}
-          TestLimitOpts: maxdrawdown_enable=1,maxdrawdown=3
+          TestLimitOpts: maxdrawdown_enable=1,maxdrawdown=2
           TestPeriod: M1
           TestReportName: Report-EA31337-${{ matrix.mode }}
       - name: Upload result files
