@@ -291,7 +291,7 @@ bool InitStrategies() {
   EAPropertySet(STRAT_PROP_PPM, 1);
   EAPropertySet(STRAT_PROP_PSL, 1);
   EAPropertySet(STRAT_PROP_PSM, 1);
-#else                                                     // __rider__
+#else  // __rider__
   EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime);
   // Init price stop methods for each timeframe.
   Strategy *_strat;
@@ -370,8 +370,8 @@ bool InitStrategies() {
   EAPropertySet(STRAT_PROP_PPM, 1);
   EAPropertySet(STRAT_PROP_PSL, 1);
   EAPropertySet(STRAT_PROP_PSM, 1);
-#endif                                                    // __rider__
-#endif                                                    // __advanced__
+#endif  // __rider__
+#endif  // __advanced__
   _res &= GetLastError() == 0 || GetLastError() == 5053;  // @fixme: error 5053?
   ResetLastError();
   return _res && ea_configured;
