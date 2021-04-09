@@ -28,8 +28,11 @@ jobs:
         with:
           submodules: 'recursive'
 
+      - name: Enables CLI mode
+        run: echo '#define __cli__' > src/include/common/mode.h
+
       - name: Enables release mode
-        run: echo '#define __release__' > src/include/common/mode.h
+        run: echo '#define __release__' >> src/include/common/mode.h
 
       - name: Enables Advanced mode
         if: matrix.mode == 'Advanced'
