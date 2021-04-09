@@ -233,6 +233,7 @@ bool InitEA() {
   ea_params.SetName(ea_name);
   ea_params.SetVersion(ea_version);
   // Risk params.
+  ea_params.SetFlag(EA_PARAM_FLAG_LOTSIZE_AUTO, EA_LotSize <= 0);
   ea_params.SetRiskMarginMax(EA_Risk_MarginMax);
   // Init instance.
   ea = new EA(ea_params);
