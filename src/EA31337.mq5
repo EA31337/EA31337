@@ -23,14 +23,14 @@
 #include "include/includes.h"
 
 // EA properties.
+#ifdef __property__
 #property copyright ea_copy
-#ifdef __MQL4__
 #property description ea_name
 #property description ea_desc
-#endif
 #property icon "resources/favicon.ico"
 #property link ea_link
 #property version ea_version
+#endif
 
 // Global variables.
 EA *ea;

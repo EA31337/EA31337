@@ -42,6 +42,16 @@
 #ifdef __backtest__
 #endif
 
+// Property mode.
+#ifndef __property__
+#ifdef __MQL4__
+#define __property__ // Always load properties for MQL4.
+#endif
+#ifdef __cli__
+#define __property__ // Load properties when compiling in CLI due to MQL5 bug.
+#endif
+#endif
+
 // Release mode.
 #ifdef _RELEASE
 // Macro is defined when compiling in release mode.
