@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                  EA31337 - multi-strategy advanced trading robot |
-//|                       Copyright 2016-2021, 31337 Investments Ltd |
+//|                                 Copyright 2016-2021, EA31337 Ltd |
 //|                                       https://github.com/EA31337 |
 //+------------------------------------------------------------------+
 
@@ -11,7 +11,6 @@
 #include "common/code-conf.h"
 #include "common/define.h"
 #include "common/enum.h"
-#include "common/property.h"
 
 // Includes class files.
 #include "classes/Chart.mqh"

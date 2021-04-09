@@ -1,8 +1,9 @@
 //+------------------------------------------------------------------+
 //|                 EA31337 - multi-strategy advanced trading robot. |
-//|                       Copyright 2016-2021, 31337 Investments Ltd |
+//|                                 Copyright 2016-2021, EA31337 Ltd |
 //|                                       https://github.com/EA31337 |
 //+------------------------------------------------------------------+
+
 /*
  *  This file is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,14 +23,14 @@
 #include "include/includes.h"
 
 // EA properties.
-#property strict
-#property version ea_version
+#property copyright ea_copy
 #ifdef __MQL4__
 #property description ea_name
 #property description ea_desc
 #endif
+#property icon "resources/favicon.ico"
 #property link ea_link
-#property copyright ea_copy
+#property version ea_version
 
 // Global variables.
 EA *ea;
