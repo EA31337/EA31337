@@ -43,6 +43,14 @@
 #endif
 
 // Release mode.
+#ifdef _RELEASE
+// Macro is defined when compiling in release mode.
+// @see: https://www.mql5.com/en/docs/basis/preprosessor/conditional_compilation
+#ifndef __release__
+#define __release__
+#endif
+#endif
+
 #ifdef __release__
 #undef __disabled__      // Enable all strategies by default.
 #undef __backtest__      // Disable backtesting mode.
