@@ -294,8 +294,10 @@ bool InitStrategies() {
 #else                                                     // __rider__
   EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime);
   // Init price stop methods for each timeframe.
+  Strategy *_strat;
+  Strategy *_strat_stops;
   if (EA_Stops_M1 != STRAT_NONE) {
-    Strategy *_strat_stops = ea.GetStrategy(PERIOD_M1, EA_Stops_M1);
+    _strat_stops = ea.GetStrategy(PERIOD_M1, EA_Stops_M1);
     if (!_strat_stops) {
       EAStrategyAdd(EA_Stops_M1, M1B);
       _strat_stops = ea.GetStrategy(PERIOD_M1, EA_Stops_M1);
@@ -306,13 +308,13 @@ bool InitStrategies() {
     if (_strat_stops) {
       for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategiesByTf(PERIOD_M1).Begin(); iter.IsValid();
            ++iter) {
-        Strategy *_strat = iter.Value().Ptr();
+        _strat = iter.Value().Ptr();
         _strat.SetStops(_strat_stops, _strat_stops);
       }
     }
   }
   if (EA_Stops_M5 != STRAT_NONE) {
-    Strategy *_strat_stops = ea.GetStrategy(PERIOD_M5, EA_Stops_M5);
+    _strat_stops = ea.GetStrategy(PERIOD_M5, EA_Stops_M5);
     if (!_strat_stops) {
       EAStrategyAdd(EA_Stops_M5, M5B);
       _strat_stops = ea.GetStrategy(PERIOD_M5, EA_Stops_M5);
@@ -323,13 +325,13 @@ bool InitStrategies() {
     if (_strat_stops) {
       for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategiesByTf(PERIOD_M5).Begin(); iter.IsValid();
            ++iter) {
-        Strategy *_strat = iter.Value().Ptr();
+        _strat = iter.Value().Ptr();
         _strat.SetStops(_strat_stops, _strat_stops);
       }
     }
   }
   if (EA_Stops_M15 != STRAT_NONE) {
-    Strategy *_strat_stops = ea.GetStrategy(PERIOD_M15, EA_Stops_M15);
+    _strat_stops = ea.GetStrategy(PERIOD_M15, EA_Stops_M15);
     if (!_strat_stops) {
       EAStrategyAdd(EA_Stops_M15, M15B);
       _strat_stops = ea.GetStrategy(PERIOD_M15, EA_Stops_M15);
@@ -340,13 +342,13 @@ bool InitStrategies() {
     if (_strat_stops) {
       for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategiesByTf(PERIOD_M15).Begin(); iter.IsValid();
            ++iter) {
-        Strategy *_strat = iter.Value().Ptr();
+        _strat = iter.Value().Ptr();
         _strat.SetStops(_strat_stops, _strat_stops);
       }
     }
   }
   if (EA_Stops_M30 != STRAT_NONE) {
-    Strategy *_strat_stops = ea.GetStrategy(PERIOD_M30, EA_Stops_M30);
+    _strat_stops = ea.GetStrategy(PERIOD_M30, EA_Stops_M30);
     if (!_strat_stops) {
       EAStrategyAdd(EA_Stops_M30, M30B);
       _strat_stops = ea.GetStrategy(PERIOD_M30, EA_Stops_M30);
@@ -357,7 +359,7 @@ bool InitStrategies() {
     if (_strat_stops) {
       for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategiesByTf(PERIOD_M30).Begin(); iter.IsValid();
            ++iter) {
-        Strategy *_strat = iter.Value().Ptr();
+        _strat = iter.Value().Ptr();
         _strat.SetStops(_strat_stops, _strat_stops);
       }
     }
