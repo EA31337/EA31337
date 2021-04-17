@@ -1,0 +1,135 @@
+---
+version: '3.4'
+services:
+  Advanced_2020_01:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_MONTHS: 1
+      BT_YEARS: 2020
+      TEST_REPORT_NAME: EA31337_Advanced_202001
+  Advanced_2020_02:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_MONTHS: 2
+      BT_YEARS: 2020
+      TEST_REPORT_NAME: EA31337_Advanced_202002
+  Advanced_2020_03:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_MONTHS: 3
+      BT_YEARS: 2020
+      TEST_REPORT_NAME: EA31337_Advanced_202003
+  Advanced_2020_04:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_MONTHS: 4
+      BT_YEARS: 2020
+      TEST_REPORT_NAME: EA31337_Advanced_202004
+  Advanced_2020_05:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_MONTHS: 5
+      BT_YEARS: 2020
+      TEST_REPORT_NAME: EA31337_Advanced_202005
+  Advanced_2020_06:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_MONTHS: 6
+      BT_YEARS: 2020
+      TEST_REPORT_NAME: EA31337_Advanced_202006
+  Advanced_2020_07:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_MONTHS: 7
+      BT_YEARS: 2020
+      TEST_REPORT_NAME: EA31337_Advanced_202007
+  Advanced_2020_08:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_MONTHS: 8
+      BT_YEARS: 2020
+      TEST_REPORT_NAME: EA31337_Advanced_202008
+  Advanced_2020_09:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_MONTHS: 9
+      BT_YEARS: 2020
+      TEST_REPORT_NAME: EA31337_Advanced_202009
+  Advanced_2020_10:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_MONTHS: 10
+      BT_YEARS: 2020
+      TEST_REPORT_NAME: EA31337_Advanced_202010
+  Advanced_2020_11:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_MONTHS: 11
+      BT_YEARS: 2020
+      TEST_REPORT_NAME: EA31337_Advanced_202011
+  Advanced_2020_12:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: EA-Tester.ini
+    environment:
+      BT_MONTHS: 12
+      BT_YEARS: 2020
+      TEST_REPORT_NAME: EA31337_Advanced_202012

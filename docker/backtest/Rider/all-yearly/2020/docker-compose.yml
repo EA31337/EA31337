@@ -1,0 +1,75 @@
+---
+version: '3.4'
+services:
+  Rider_2020_1k_s1:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_DEPOSIT: 1000
+      BT_SPREAD: 1
+      BT_YEARS: 2020
+      TEST_REPORT_NAME: EA31337-Rider_2020_1000USD_spread1
+  Rider_2020_10k_s1:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_DEPOSIT: 10000
+      BT_SPREAD: 1
+      BT_YEARS: 2020
+      TEST_REPORT_NAME: EA31337-Rider_2020_10000USD_spread1
+  Rider_2020_100k_s1:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_DEPOSIT: 100000
+      BT_SPREAD: 1
+      BT_YEARS: 2020
+      TEST_REPORT_NAME: EA31337-Rider_2020_100000USD_spread1
+  Rider_2020_1k_s10:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_DEPOSIT: 1000
+      BT_SPREAD: 10
+      BT_YEARS: 2020
+      TEST_REPORT_NAME: EA31337-Rider_2020_1000USD_spread10
+  Rider_2020_10k_s10:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_DEPOSIT: 10000
+      BT_SPREAD: 10
+      BT_YEARS: 2020
+      TEST_REPORT_NAME: EA31337-Rider_2020_10000USD_spread10
+  Rider_2020_100k_s10:
+    command: run_backtest -v
+    image: ea31337/ea-tester:dev
+    volumes:
+      - ../../../../..:/opt/EA
+      - ./_results:/opt/_results:rw
+    env_file: ../EA-Tester.ini
+    environment:
+      BT_DEPOSIT: 100000
+      BT_SPREAD: 10
+      BT_YEARS: 2020
+      TEST_REPORT_NAME: EA31337-Rider_2020_100000USD_spread10
