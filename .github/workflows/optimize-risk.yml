@@ -110,7 +110,7 @@ jobs:
           BtDest: ${{ github.workspace }}/_results
           BtMonths: 6-12
           BtPair: EURUSD
-          BtYears: 2019
+          BtYears: 2020
           OptFormatBrief: true
           OptFormatJson: true
           OptOptimize: true

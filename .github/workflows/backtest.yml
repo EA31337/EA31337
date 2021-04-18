@@ -68,7 +68,7 @@ jobs:
       fail-fast: false
       matrix:
         mode: [Lite]
-        year: [2019]
+        year: [2020]
         deposit: [1k, 10k, 100k]
         spread: [1, 10]
 
@@ -109,7 +109,7 @@ jobs:
       fail-fast: false
       matrix:
         mode: [Advanced]
-        year: [2019]
+        year: [2020]
         deposit: [1k, 10k, 100k]
         spread: [1, 10]
 
@@ -150,7 +150,7 @@ jobs:
       fail-fast: false
       matrix:
         mode: [Rider]
-        year: [2019]
+        year: [2020]
         deposit: [1k, 10k, 100k]
         spread: [1, 10]
 
@@ -199,7 +199,7 @@ jobs:
           - Advanced
           - Rider
         year:
-          - 2019
+          - 2020
       max-parallel: 1
     steps:
       - uses: actions/checkout@v2

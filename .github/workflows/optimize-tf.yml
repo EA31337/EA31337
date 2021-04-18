@@ -112,7 +112,7 @@ jobs:
           BtMonths: ${{ matrix.months }}
           BtPair: EURUSD
           BtTestModel: 1
-          BtYears: 2019
+          BtYears: 2020
           OptFormatBrief: true
           OptFormatJson: true
           OptOptimize: true
