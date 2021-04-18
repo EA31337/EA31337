@@ -2,31 +2,31 @@
 
 
                                                                 Strategy Tester Report
-                                                EA31337-Rider-ed239e34a79704b47d26d17634f6a36a3378cffd
+                                                EA31337-Rider-2a0ecb34d2b21d420dedc138b7c2a03c2a5b1558
                                                                      (Build 1280)
 
 Symbol                             EURUSD (Euro vs US Dollar)
 Period                             1 Minute (M1) 2020.01.01 23:41 - 2020.12.30 23:59 (2020.01.01 - 2020.12.31)
 Model                              Every tick (the most precise method based on all available least timeframes)
                                    __EA_Mode_Parameters__="-- EA parameters for EA31337 Rider v2.001 --"; __Strategies_Active__="-- Active strategies
-                                   --"; Strategy_M1=0; Strategy_M5=0; Strategy_M15=16; Strategy_M30=16; __EA_Stops__="-- EA's stops --"; EA_Stops=23;
-Parameters                         __Trade_Params__="-- EA's trade parameters --"; EA_LotSize=0; EA_SignalOpenFilter=16; __EA_Risk_Params__="-- EA's
+                                   --"; Strategy_M1=0; Strategy_M5=0; Strategy_M15=27; Strategy_M30=27; __EA_Stops__="-- EA's stops --"; EA_Stops=28;
+Parameters                         __Trade_Params__="-- EA's trade parameters --"; EA_LotSize=0; EA_SignalOpenFilter=48; __EA_Risk_Params__="-- EA's
                                    risk management --"; EA_Risk_MarginMax=10; __EA_Logging_Parameters__="-- Settings for logging & messages --";
                                    VerboseLevel=3; __EA_Other_Parameters__="-- Other parameters --"; EA_DisplayDetailsOnChart=true;
                                    EA_MagicNumber=31337; __EA_Parameters__="-- End of input parameters for EA31337 Rider v2.001 --";
 Bars in test                372155 Ticks modelled                     167831773 Modelling quality                                              24.99%
 Mismatched charts errors         0
 Initial deposit          100000.00                                              Spread                                                              1
-Total net profit          -6972.73 Gross profit                        13352.45 Gross loss                                                  -20325.18
-Profit factor                 0.66 Expected payoff                        -1.74
-Absolute drawdown          6972.73 Maximal drawdown             7127.06 (7.12%) Relative drawdown                                     7.12% (7127.06)
-Total trades                  4002 Short positions (won %)        1489 (55.54%) Long positions (won %)                                  2513 (53.20%)
-                                   Profit trades (% of total)     2164 (54.07%) Loss trades (% of total)                                1838 (45.93%)
-                           Largest profit trade                          105.60 loss trade                                                    -296.80
-                           Average profit trade                            6.17 loss trade                                                     -11.06
-                           Maximum consecutive wins (profit in      48 (268.80) consecutive losses (loss in money)                       42 (-334.40)
+Total net profit          -1231.36 Gross profit                         2241.47 Gross loss                                                   -3472.83
+Profit factor                 0.65 Expected payoff                       -22.39
+Absolute drawdown          3458.56 Maximal drawdown             3490.56 (3.49%) Relative drawdown                                     3.49% (3490.56)
+Total trades                    55 Short positions (won %)          43 (37.21%) Long positions (won %)                                    12 (41.67%)
+                                   Profit trades (% of total)       21 (38.18%) Loss trades (% of total)                                  34 (61.82%)
+                           Largest profit trade                          224.00 loss trade                                                    -338.40
+                           Average profit trade                          106.74 loss trade                                                    -102.14
+                           Maximum consecutive wins (profit in       7 (831.20) consecutive losses (loss in money)                      10 (-1976.83)
                                    money)
-                           Maximal consecutive profit (count of     915.20 (20) consecutive loss (count of losses)                        -700.80 (8)
+                           Maximal consecutive profit (count of      831.87 (5) consecutive loss (count of losses)                      -1976.83 (10)
                                    wins)
-                           Average consecutive wins                           3 consecutive losses                                                  3
+                           Average consecutive wins                           3 consecutive losses                                                  5
                                                                        [Graph]
