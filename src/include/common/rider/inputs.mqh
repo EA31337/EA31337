@@ -30,14 +30,14 @@
 input static string __Strategies_Active__ = "-- Active strategies --";     // >>> ACTIVE STRATEGIES <<<
 input ENUM_STRATEGY Strategy_M1 = (ENUM_STRATEGY)0;                        // Strategy on M1
 input ENUM_STRATEGY Strategy_M5 = (ENUM_STRATEGY)0;                        // Strategy on M5
-input ENUM_STRATEGY Strategy_M15 = (ENUM_STRATEGY)STRAT_FORCE;             // Strategy on M15
-input ENUM_STRATEGY Strategy_M30 = (ENUM_STRATEGY)STRAT_FORCE;             // Strategy on M30
+input ENUM_STRATEGY Strategy_M15 = (ENUM_STRATEGY)STRAT_RSI;               // Strategy on M15
+input ENUM_STRATEGY Strategy_M30 = (ENUM_STRATEGY)STRAT_RSI ;              // Strategy on M30
 
 input static string __EA_Stops__ = "-- EA's stops --";  // >>> EA's STOPS (SL/TP) <<<
-input ENUM_STRATEGY EA_Stops = (ENUM_STRATEGY)STRAT_MFI;                   // Stop loss
+input ENUM_STRATEGY EA_Stops = (ENUM_STRATEGY)STRAT_RVI;                   // Stop loss
 
 //input static string __EA_Order_Params__ = "-- EA's order params --";  // >>> EA's ORDERS <<<
 
 extern string __Trade_Params__ = "-- EA's trade parameters --";  // >>> EA's TRADE <<<
 input double EA_LotSize = 0;                                     // Lot size (0 = auto)
-input int EA_SignalOpenFilter = 16;                              // Signal open filter
+input int EA_SignalOpenFilter = 48;                              // Signal open filter
