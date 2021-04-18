@@ -6,12 +6,6 @@ on:
   push:
     branches:
       - 'v*-test'
-    paths:
-      - '**.h'
-      - '**.mq?'
-      - '**.yml'
-      - '.github/workflows/test-docker.yml'
-      - 'src/include/**'
 
 jobs:
 
