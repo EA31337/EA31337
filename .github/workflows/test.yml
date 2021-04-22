@@ -111,6 +111,5 @@ jobs:
           BtDigits: 5
           BtMonths: ${{ matrix.month }}
           BtYears: ${{ matrix.year }}
-          RunOnError: 'show_logs && parse_results $@; exit 0'
           TestExpert: EA31337-${{ matrix.mode }}
           TestPeriod: M1
