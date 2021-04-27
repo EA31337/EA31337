@@ -229,13 +229,13 @@ bool InitEA() {
   EAParams ea_params(__FILE__, VerboseLevel);
   // ea_params.SetChartInfoFreq(EA_DisplayDetailsOnChart ? 2 : 0);
   // EA params.
-  ea_params.SetAuthor(StringFormat("%s (%s)", ea_author, ea_link));
-  ea_params.SetDesc(ea_desc);
-  ea_params.SetName(ea_name);
-  ea_params.SetVersion(ea_version);
+  ea_params.Set(EA_PARAM_AUTHOR, StringFormat("%s (%s)", ea_author, ea_link));
+  ea_params.Set(EA_PARAM_DESC, ea_desc);
+  ea_params.Set(EA_PARAM_NAME, ea_name);
+  ea_params.Set(EA_PARAM_VER, ea_version);
   // Risk params.
+  ea_params.Set(EA_PARAM_RISK_MARGIN_MAX, EA_Risk_MarginMax);
   ea_params.SetFlag(EA_PARAM_FLAG_LOTSIZE_AUTO, EA_LotSize <= 0);
-  ea_params.SetRiskMarginMax(EA_Risk_MarginMax);
   // Init instance.
   ea = new EA(ea_params);
   if (!ea.GetState().IsTradeAllowed()) {
@@ -260,12 +260,12 @@ bool InitStrategies() {
   EAStrategyAdd(Strategy_M15, M15B);
   EAStrategyAdd(Strategy_M30, M30B);
   // Update lot size.
-  EAPropertySet(STRAT_PROP_LS, EA_LotSize);
-  EAPropertySet(STRAT_PROP_SOF, EA_SignalOpenFilter);
+  ea.Set(STRAT_PARAM_LS, EA_LotSize);
+  ea.Set(STRAT_PARAM_SOF, EA_SignalOpenFilter);
 #ifdef __advanced__
 #ifdef __rider__
   // Disables order close time for Rider.
-  EAPropertySet(STRAT_PROP_OCT, 0);
+  ea.Set(STRAT_PARAM_OCT, 0);
   // Init price stop methods for all timeframes.
   if (EA_Stops != 0) {
     Strategy *_strat_stops = ea.GetStrategy(PERIOD_M30, EA_Stops);
@@ -277,9 +277,9 @@ bool InitStrategies() {
       }
     }
     if (_strat_stops) {
-      for (DictObjectIterator<ENUM_TIMEFRAMES, DictStruct<long, Ref<Strategy>>> iter_tf = ea.GetStrategies().Begin();
-           iter_tf.IsValid(); ++iter_tf) {
-        ENUM_TIMEFRAMES _tf = iter_tf.Key();
+      for (DictObjectIterator<ENUM_TIMEFRAMES, DictStruct<long, Ref<Strategy>>> itf = ea.GetStrategies().Begin();
+           itf.IsValid(); ++itf) {
+        ENUM_TIMEFRAMES _tf = itf.Key();
         for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategiesByTf(_tf).Begin(); iter.IsValid(); ++iter) {
           Strategy *_strat = iter.Value().Ptr();
           _strat.SetStops(_strat_stops, _strat_stops);
@@ -287,12 +287,12 @@ bool InitStrategies() {
       }
     }
   }
-  EAPropertySet(STRAT_PROP_PPL, 1);
-  EAPropertySet(STRAT_PROP_PPM, 1);
-  EAPropertySet(STRAT_PROP_PSL, 1);
-  EAPropertySet(STRAT_PROP_PSM, 1);
+  ea.Set(STRAT_PARAM_PPL, 1);
+  ea.Set(STRAT_PARAM_PPM, 1);
+  ea.Set(STRAT_PARAM_PSL, 1);
+  ea.Set(STRAT_PARAM_PSM, 1);
 #else  // __rider__
-  EAPropertySet(STRAT_PROP_OCT, EA_OrderCloseTime);
+  ea.Set(STRAT_PARAM_OCT, EA_OrderCloseTime);
   // Init price stop methods for each timeframe.
   Strategy *_strat;
   Strategy *_strat_stops;
@@ -366,41 +366,15 @@ bool InitStrategies() {
   }
 
   // Update price stop method.
-  EAPropertySet(STRAT_PROP_PPL, 1);
-  EAPropertySet(STRAT_PROP_PPM, 1);
-  EAPropertySet(STRAT_PROP_PSL, 1);
-  EAPropertySet(STRAT_PROP_PSM, 1);
+  ea.Set(STRAT_PARAM_PPL, 1);
+  ea.Set(STRAT_PARAM_PPM, 1);
+  ea.Set(STRAT_PARAM_PSL, 1);
+  ea.Set(STRAT_PARAM_PSM, 1);
 #endif  // __rider__
 #endif  // __advanced__
   _res &= GetLastError() == 0 || GetLastError() == 5053;  // @fixme: error 5053?
   ResetLastError();
   return _res && ea_configured;
-}
-
-/**
- * Set property for given EA's strategies.
- */
-bool EAPropertySet(ENUM_STRATEGY_PROP_DBL _prop, double _value, int _tfs = 0) {
-  MqlParam _aargs[] = {{TYPE_INT}, {TYPE_INT}, {TYPE_INT}, {TYPE_DOUBLE}};
-  // Update close method.
-  _aargs[0].integer_value = STRAT_ACTION_SET_PROP;
-  _aargs[1].integer_value = _tfs;  // Which timeframes (0 - all).
-  _aargs[2].integer_value = _prop;
-  _aargs[3].double_value = _value;
-  return ea.ExecuteAction(EA_ACTION_STRATS_EXE_ACTION, _aargs);
-}
-
-/**
- * Set property for given EA's strategies.
- */
-bool EAPropertySet(ENUM_STRATEGY_PROP_INT _prop, int _value, int _tfs = 0) {
-  MqlParam _aargs[] = {{TYPE_INT}, {TYPE_INT}, {TYPE_INT}, {TYPE_INT}};
-  // Update close method.
-  _aargs[0].integer_value = STRAT_ACTION_SET_PROP;
-  _aargs[1].integer_value = _tfs;  // Which timeframes (0 - all).
-  _aargs[2].integer_value = _prop;
-  _aargs[3].integer_value = _value;
-  return ea.ExecuteAction(EA_ACTION_STRATS_EXE_ACTION, _aargs);
 }
 
 /**
