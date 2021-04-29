@@ -2,7 +2,7 @@
 
 
                                                                 Strategy Tester Report
-                                                EA31337-Rider-7c1a0ea0b6ed5592f51846cb831b3301187d833f
+                                                EA31337-Rider-67357b89f4ac8e8c7d7e52533d8b704b685d65ed
                                                                      (Build 1280)
 
   Symbol                            EURUSD (Euro vs US Dollar)
