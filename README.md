@@ -1,10 +1,11 @@
 # EA31337
 
 [![Release][github-release-image]][github-release-link]
-[![Channel][tg-channel-image]][tg-channel-link]
 [![Status][gha-image-check-master]][gha-link-check-master]
 [![Status][gha-image-test-master]][gha-link-test-master]
 [![Status][gha-image-backtest-master]][gha-link-backtest-master]
+[![Discuss][gh-discuss-badge]][gh-discuss-link]
+[![Channel][tg-channel-image]][tg-channel-link]
 [![Edit][gitpod-image]][gitpod-link]
 [![License][license-image]][license-link]
 
@@ -14,8 +15,7 @@ EA31337 is an advanced trading robot for Forex markets written in MQL.
 
 ## About the project
 
-The project aims to deliver fully working EA at the professional level
-with code compability for MQL4 and MQL5 at the same time.
+The project aims to deliver fully working EA at the professional level.
 
 It implements algorithms for managing multiple strategies on different timeframes at once.
 
@@ -25,6 +25,8 @@ This project utilizes the following sub-projects:
 
 - [EA31337 framework][gh-repo-classes]
 - [EA31337 strategies][gh-repo-strats]
+
+The source code is compatible with MQL4 and MQL5 and can run on MetaTrader 4 and 5.
 
 ### Usage
 
@@ -48,6 +50,8 @@ The EA provides the following out-of-box features:
 The robot comes with over 35 strategies coordinated and controlled by the central algorithm.
 Each strategy analyses market on multiple timeframes at the same time.
 The market analysis is based on over 30 major technical indicators in real-time.
+
+You are free to write your own custom strategies.
 
 ### Profit/Stop Trailing system
 
@@ -160,7 +164,7 @@ If you believe some information is outdated, you can propose new changes.
 
 ## Support
 
-- For help, open a [new discussion][gh-discuss] to ask questions.
+- For help, open a [new discussion][gh-discuss-link] to ask questions.
 - For bugs/features, raise a [new issue at GitHub][gh-issues].
 - Join our [Telegram channel][tg-channel-link] for news and discussion group for help.
 
@@ -232,9 +236,6 @@ NO REPRESENTATION IS BEING MADE THAN ANY ACCOUNT WILL OR IS LIKELY TO ACHIEVE PR
 [github-release-image]: https://img.shields.io/github/release/EA31337/EA31337.svg?logo=github
 [github-release-link]: https://github.com/EA31337/EA31337/releases
 
-[tg-channel-image]: https://img.shields.io/badge/Telegram-join-0088CC.svg?logo=telegram
-[tg-channel-link]: https://t.me/EA31337
-
 [gha-link-check-master]: https://github.com/EA31337/EA31337/actions?query=workflow%3ACheck+branch%3Amaster
 [gha-image-check-master]: https://github.com/EA31337/EA31337/workflows/Check/badge.svg?branch=master
 [gha-link-test-master]: https://github.com/EA31337/EA31337/actions?query=workflow%3ATest+branch%3Amaster
@@ -248,7 +249,11 @@ NO REPRESENTATION IS BEING MADE THAN ANY ACCOUNT WILL OR IS LIKELY TO ACHIEVE PR
 [gh-repo-classes]: https://github.com/EA31337/EA31337-classes
 [gh-repo-strats]: https://github.com/EA31337/EA31337-strategies
 
-[gh-discuss]: https://github.com/EA31337/EA31337/discussions
+[tg-channel-image]: https://img.shields.io/badge/Telegram-join-0088CC.svg?logo=telegram
+[tg-channel-link]: https://t.me/EA31337
+
+[gh-discuss-badge]: https://img.shields.io/badge/Discussions-Q&A-blue.svg?logo=github
+[gh-discuss-link]: https://github.com/EA31337/EA31337/discussions
 [gh-issues]: https://github.com/EA31337/EA31337/issues
 
 [license-image]: https://img.shields.io/github/license/EA31337/EA31337.svg
