@@ -26,17 +26,6 @@ This project utilizes the following sub-projects:
 - [EA31337 framework][gh-repo-classes]
 - [EA31337 strategies][gh-repo-strats]
 
-### Disclamer
-
-The project has been published for free (check [License](#LICENSE)) after _MQL5 Ltd_ decided to remove this EA
-from their [marketplace](https://www.mql5.com/en/market) with all associated seller accounts for no apparent reason,
-a day after network of [scam brokers][scam-broker-se-link] has been reported at their _Service Desk_.
-These scam brokers still appearing on their live MT4 app, about which they really don't care much
-(as long as the scammers pay them for the licence), so please be careful.
-For that reason, I've stopped using MetaTrader platform for my daily trading,
-apart of the time when maintaining this project.
-For more details, please read the following [FPA court submission][scam-broker-fpa-link] (guilty case).
-
 ### Usage
 
 You can freely use this project for education or research purposes.
@@ -133,13 +122,6 @@ Only run EA on live at your own risk, when you're happy with the backtest or res
 
 For the trading purposes, any timeframe can be used since EA reads data from multiple timeframes
 independently from the current chart.
-
-### Input parameters
-
-Input parameters has been documented at the following pages:
-
-- [Input parameters](https://github.com/mycognitive/ea31337/wiki/Input-parameters)
-- [Open methods](https://github.com/mycognitive/ea31337/wiki/Open-methods)
 
 ## Testing
 
