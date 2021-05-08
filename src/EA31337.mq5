@@ -48,7 +48,9 @@ int OnInit() {
   if (GetLastError() > 0) {
     ea.Log().Error("Error during initializing!", __FUNCTION_LINE__, Terminal::GetLastErrorText());
   }
-  DisplayStartupInfo(true);
+  if (EA_DisplayDetailsOnChart) {
+    DisplayStartupInfo(true);
+  }
   ea.Log().Flush();
   Chart::WindowRedraw();
   if (!_initiated) {
@@ -260,8 +262,8 @@ bool InitStrategies() {
   EAStrategyAdd(Strategy_M15, M15B);
   EAStrategyAdd(Strategy_M30, M30B);
   // Update lot size.
-  ea.Set(STRAT_PARAM_LS, EA_LotSize);
   ea.Set(STRAT_PARAM_SOF, EA_SignalOpenFilter);
+  ea.Set(TRADE_PARAM_LOT_SIZE, EA_LotSize);
 #ifdef __advanced__
 #ifdef __rider__
   // Disables order close time for Rider.
