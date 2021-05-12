@@ -5,5 +5,5 @@
 	path = src/include/strategies
 	url = https://github.com/EA31337/EA31337-strategies.git
 [submodule "wiki"]
-	path = wiki
+	path = docs/wiki
 	url = https://github.com/EA31337/EA31337.wiki.git
