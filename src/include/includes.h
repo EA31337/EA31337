@@ -14,10 +14,18 @@
 
 // Includes class files.
 #include "classes/Chart.mqh"
+#include "classes/Trade.mqh"
+#include "classes/Action.struct.h"
+#include "classes/Condition.struct.h"
 #include "classes/EA.mqh"
 #include "classes/Msg.mqh"
 #include "classes/Terminal.mqh"
-#include "classes/Trade.mqh"
+#include "classes/Condition.mqh"
+
+#ifdef __advanced__
+// Includes common EA actions.
+//#include "common/ea-actions.h"
+#endif
 
 // Includes indicator classes.
 #include "classes/Indicators/Indi_AC.mqh"

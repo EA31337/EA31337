@@ -43,6 +43,14 @@ input ENUM_STRATEGY Strategy_M30 = (ENUM_STRATEGY)STRAT_ENVELOPES;  // Strategy 
 input static string __EA_Stops__ = "-- EA's stops --";     // >>> EA's STOPS (SL/TP) <<<
 input ENUM_STRATEGY EA_Stops = (ENUM_STRATEGY)STRAT_MACD;  // Stop loss
 
+/* @todo
+input static string __EA_Actions__ = "-- EA's actions --";         // >>> EA's ACTIONS <<<
+input ENUM_EA_ADV_COND EA_Action1_If = EA_ADV_COND_NONE;           // 1: Action's condition
+input ENUM_EA_ADV_ACTION EA_Action1_Then = EA_ADV_ACTION_NONE;     // 1: Action to execute
+// input float EA_Action1_If_Arg = 0;                                 // 1: Action's condition argument
+// input float EA_Action1_Then_Arg = 0;                               // 1: Action's argument
+*/
+
 // input static string __EA_Order_Params__ = "-- EA's order params --";  // >>> EA's ORDERS <<<
 
 extern string __Trade_Params__ = "-- EA's trade parameters --";  // >>> EA's TRADE <<<
