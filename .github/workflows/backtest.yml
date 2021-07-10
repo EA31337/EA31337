@@ -67,6 +67,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        exclude:
+          - deposit: 1k
+            mode: Lite
+            spread: 10
+            year: 2020
         mode: [Lite]
         year: [2020]
         deposit: [1k, 10k, 100k]
@@ -108,6 +113,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        exclude:
+          - deposit: 1k
+            mode: Advanced
+            spread: 10
+            year: 2020
         mode: [Advanced]
         year: [2020]
         deposit: [1k, 10k, 100k]
@@ -149,6 +159,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        exclude:
+          - deposit: 1k
+            mode: Rider
+            spread: 10
+            year: 2020
         mode: [Rider]
         year: [2020]
         deposit: [1k, 10k, 100k]
