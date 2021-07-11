@@ -292,10 +292,6 @@ bool InitStrategies() {
       }
     }
   }
-  ea.Set(STRAT_PARAM_PPL, 0);
-  ea.Set(STRAT_PARAM_PPM, 0);
-  ea.Set(STRAT_PARAM_PSL, 0);
-  ea.Set(STRAT_PARAM_PSM, 0);
 #else
   ea.Set(STRAT_PARAM_OCT, EA_OrderCloseTime);
   // Init price stop methods for each timeframe.
