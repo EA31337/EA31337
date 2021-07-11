@@ -292,11 +292,7 @@ bool InitStrategies() {
       }
     }
   }
-  ea.Set(STRAT_PARAM_PPL, 1);
-  ea.Set(STRAT_PARAM_PPM, 1);
-  ea.Set(STRAT_PARAM_PSL, 1);
-  ea.Set(STRAT_PARAM_PSM, 1);
-#else  // __rider__
+#else
   ea.Set(STRAT_PARAM_OCT, EA_OrderCloseTime);
   // Init price stop methods for each timeframe.
   Strategy *_strat;
@@ -369,12 +365,6 @@ bool InitStrategies() {
       }
     }
   }
-
-  // Update price stop method.
-  ea.Set(STRAT_PARAM_PPL, 1);
-  ea.Set(STRAT_PARAM_PPM, 1);
-  ea.Set(STRAT_PARAM_PSL, 1);
-  ea.Set(STRAT_PARAM_PSM, 1);
 #endif  // __rider__
 #endif  // __advanced__
   _res &= GetLastError() == 0 || GetLastError() == 5053;  // @fixme: error 5053?
