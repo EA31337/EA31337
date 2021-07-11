@@ -34,5 +34,5 @@ input ENUM_STRATEGY Strategy_M15 = (ENUM_STRATEGY)STRAT_AWESOME;        // Strat
 input ENUM_STRATEGY Strategy_M30 = (ENUM_STRATEGY)STRAT_AWESOME;        // Strategy on M30
 
 extern string __Trade_Params__ = "-- EA's trade parameters --";  // >>> EA's TRADE <<<
-input double EA_LotSize = 0.01;                                  // Lot size (0 = auto)
-input int EA_SignalOpenFilter = 37;                              // Signal open filter
+input double EA_LotSize = 0;                                     // Lot size (0 = auto)
+input int EA_SignalOpenFilter = 40;                              // Signal open filter
