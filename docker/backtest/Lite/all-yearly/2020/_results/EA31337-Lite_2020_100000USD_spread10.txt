@@ -2,7 +2,7 @@
 
 
                                                                 Strategy Tester Report
-                                                EA31337-Lite-bfbf83eb974ebc02974a03add2bad67a8952b704
+                                                EA31337-Lite-97d0218c5c81382e2b9ba6e6a3573424270c0a1d
                                                                      (Build 1280)
 
  Symbol                             EURUSD (Euro vs US Dollar)
