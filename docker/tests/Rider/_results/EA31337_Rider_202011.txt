@@ -2,7 +2,7 @@
 
 
                                                                 Strategy Tester Report
-                                                EA31337-Rider-c15f4511b96834c2d3762fd7a52547f0b0bd2f4f
+                                                EA31337-Rider-97d0218c5c81382e2b9ba6e6a3573424270c0a1d
                                                                      (Build 1280)
 
   Symbol                            EURUSD (Euro vs US Dollar)
@@ -18,16 +18,16 @@
   Bars in test                29797 Ticks modelled                    17976212 Modelling quality                                              25.00%
   Mismatched charts errors        0
   Initial deposit          10000.00                                            Spread                                                             10
-  Total net profit            -5.47 Gross profit                         26.40 Gross loss                                                     -31.87
-  Profit factor                0.83 Expected payoff                      -0.23
-  Absolute drawdown           21.97 Maximal drawdown             31.30 (0.31%) Relative drawdown                                       0.31% (31.30)
-  Total trades                   24 Short positions (won %)          0 (0.00%) Long positions (won %)                                    24 (20.83%)
-                                    Profit trades (% of total)      5 (20.83%) Loss trades (% of total)                                  19 (79.17%)
-                            Largest profit trade                         13.60 loss trade                                                      -2.60
-                            Average profit trade                          5.28 loss trade                                                      -1.68
-                            Maximum consecutive wins (profit in      2 (12.60) consecutive losses (loss in money)                         7 (-12.60)
+  Total net profit            49.23 Gross profit                         57.70 Gross loss                                                      -8.47
+  Profit factor                6.81 Expected payoff                       2.05
+  Absolute drawdown           19.80 Maximal drawdown             41.80 (0.42%) Relative drawdown                                       0.42% (41.80)
+  Total trades                   24 Short positions (won %)          0 (0.00%) Long positions (won %)                                    24 (62.50%)
+                                    Profit trades (% of total)     15 (62.50%) Loss trades (% of total)                                   9 (37.50%)
+                            Largest profit trade                         13.60 loss trade                                                      -2.30
+                            Average profit trade                          3.85 loss trade                                                      -0.94
+                            Maximum consecutive wins (profit in      7 (35.10) consecutive losses (loss in money)                          3 (-2.60)
                                     money)
-                            Maximal consecutive profit (count of     13.60 (1) consecutive loss (count of losses)                         -12.60 (7)
+                            Maximal consecutive profit (count of     35.10 (7) consecutive loss (count of losses)                          -2.60 (3)
                                     wins)
-                            Average consecutive wins                         1 consecutive losses                                                  5
+                            Average consecutive wins                         3 consecutive losses                                                  2
                                                                        [Graph]
