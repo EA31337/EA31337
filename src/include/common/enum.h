@@ -14,13 +14,13 @@ enum ENUM_EA_ADV_ACTION {
 };
 enum ENUM_EA_ADV_COND {
   EA_ADV_COND_NONE = 0,              // (None)
-  EA_ADV_COND_ACC_EQUITY_01PC_HIGH,  // Acc. equity 1% high (no args)
-  EA_ADV_COND_ACC_EQUITY_01PC_LOW,   // Acc. equity 1% low (no args)
-  // EA_ADV_COND_ACC_EQUITY,         // Acc. equity (in %)
-  // EA_ADV_COND_ACC_MARGIN_FREE,    // Acc. margin free (in %)
-  // EA_ADV_COND_ACC_MARGIN_USED,    // Acc. margin free (in %)
+  EA_ADV_COND_ACC_EQUITY_01PC_HIGH,  // Equity>1% (no args)
+  EA_ADV_COND_ACC_EQUITY_01PC_LOW,   // Equity<1% (no args)
+  // EA_ADV_COND_ACC_EQUITY,         // Equity (in %)
+  // EA_ADV_COND_ACC_MARGIN_FREE,    // Free margin (in %)
+  // EA_ADV_COND_ACC_MARGIN_USED,    // Free margin (in %)
   // EA_ADV_COND_ORDER_IN_PROFIT,      // Order (any) in profit
-  EA_ADV_COND_TRADE_IS_PEAK,   // Price in peak (no args)
-  EA_ADV_COND_TRADE_IS_PIVOT,  // Price in pivot (no args)
+  EA_ADV_COND_TRADE_IS_PEAK,   // Price's peak (no args)
+  EA_ADV_COND_TRADE_IS_PIVOT,  // Price's pivot (no args)
 };
 #endif

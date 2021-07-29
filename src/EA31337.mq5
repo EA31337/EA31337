@@ -239,7 +239,7 @@ bool InitEA() {
   ea_params.Set(EA_PARAM_RISK_MARGIN_MAX, EA_Risk_MarginMax);
   ea_params.SetFlag(EA_PARAM_FLAG_LOTSIZE_AUTO, EA_LotSize <= 0);
 #ifdef __advanced__
-  // ActionsAdd(ea_params, EA_Action1_If, EA_Action1_Then);
+  _initiated &= ActionAdd(ea_params, EA_Action1_If, EA_Action1_Then);
 #endif
   // Init instance.
   ea = new EA(ea_params);

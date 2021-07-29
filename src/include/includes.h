@@ -22,8 +22,10 @@
 #include "classes/Terminal.mqh"
 #include "classes/Condition.mqh"
 
+// Includes common EA's functions.
 #ifdef __advanced__
 // Includes common EA actions.
+#include "common/funcs-adv.h"
 //#include "common/ea-actions.h"
 #endif
 
