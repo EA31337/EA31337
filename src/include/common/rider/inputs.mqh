@@ -33,19 +33,17 @@ input ENUM_STRATEGY Strategy_M5 = (ENUM_STRATEGY)STRAT_BANDS;           // Strat
 input ENUM_STRATEGY Strategy_M15 = (ENUM_STRATEGY)STRAT_AWESOME;        // Strategy on M15
 input ENUM_STRATEGY Strategy_M30 = (ENUM_STRATEGY)STRAT_AWESOME;        // Strategy on M30
 
-input static string __EA_Stops__ = "-- EA's stops --";    // >>> EA's STOPS (SL/TP) <<<
-input ENUM_STRATEGY EA_Stops = (ENUM_STRATEGY)STRAT_ADX;  // Stop loss
+input static string __EA_Stops__ = "-- EA's stops --";   // >>> EA's STOPS (SL/TP) <<<
+input ENUM_STRATEGY EA_Stops = (ENUM_STRATEGY)STRAT_MA;  // Stop loss
 
-/* @todo
-input static string __EA_Actions__ = "-- EA's actions --";         // >>> EA's ACTIONS <<<
-input ENUM_EA_ADV_COND EA_Action1_If = EA_ADV_COND_NONE;           // 1: Action's condition
-input ENUM_EA_ADV_ACTION EA_Action1_Then = EA_ADV_ACTION_NONE;     // 1: Action to execute
+input static string __EA_Actions__ = "-- EA's actions --";                  // >>> EA's ACTIONS <<<
+input ENUM_EA_ADV_COND EA_Action1_If = EA_ADV_COND_ACC_EQUITY_01PC_HIGH;    // 1: Action's condition
+input ENUM_EA_ADV_ACTION EA_Action1_Then = EA_ADV_ACTION_ORDERS_CLOSE_ALL;  // 1: Action to execute
 // input float EA_Action1_If_Arg = 0;                                 // 1: Action's condition argument
 // input float EA_Action1_Then_Arg = 0;                               // 1: Action's argument
-*/
 
 // input static string __EA_Order_Params__ = "-- EA's order params --";  // >>> EA's ORDERS <<<
 
-extern string __Trade_Params__ = "-- EA's trade parameters --";  // >>> EA's TRADE <<<
-input double EA_LotSize = 0;                                     // Lot size (0 = auto)
-input int EA_SignalOpenFilter = 40;                              // Signal open filter
+input string __Trade_Params__ = "-- EA's trade parameters --";  // >>> EA's TRADE <<<
+input double EA_LotSize = 0;                                    // Lot size (0 = auto)
+input int EA_SignalOpenFilter = 40;                             // Signal open filter

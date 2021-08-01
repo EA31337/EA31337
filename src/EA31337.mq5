@@ -269,7 +269,9 @@ bool InitStrategies() {
   ea.Set(TRADE_PARAM_LOT_SIZE, EA_LotSize);
 #ifdef __advanced__
 #ifdef __rider__
-  // Disables order close time for Rider.
+  // Disables strategy defined order closures for Rider.
+  ea.Set(STRAT_PARAM_OCL, 0);
+  ea.Set(STRAT_PARAM_OCP, 0);
   ea.Set(STRAT_PARAM_OCT, 0);
   // Init price stop methods for all timeframes.
   if (EA_Stops != 0) {
@@ -293,6 +295,8 @@ bool InitStrategies() {
     }
   }
 #else
+  ea.Set(STRAT_PARAM_OCL, EA_OrderCloseLoss);
+  ea.Set(STRAT_PARAM_OCP, EA_OrderCloseProfit);
   ea.Set(STRAT_PARAM_OCT, EA_OrderCloseTime);
   // Init price stop methods for each timeframe.
   Strategy *_strat;

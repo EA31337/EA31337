@@ -48,6 +48,8 @@ input ENUM_EA_ADV_ACTION EA_Action1_Then = EA_ADV_ACTION_NONE;  // 1: Action to 
 // input float EA_Action1_Then_Arg = 0;                               // 1: Action's argument
 
 input static string __EA_Order_Params__ = "-- EA's order params --";  // >>> EA's ORDERS <<<
+input float EA_OrderCloseLoss = 0;                                    // Close loss (in pips)
+input float EA_OrderCloseProfit = 0;                                  // Close profit (in pips)
 input int EA_OrderCloseTime = 0;                                      // Close time in mins (>0) or bars (<0)
 
 extern string __Trade_Params__ = "-- EA's trade parameters --";  // >>> EA's TRADE <<<
