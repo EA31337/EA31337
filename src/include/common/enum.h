@@ -16,6 +16,8 @@ enum ENUM_EA_ADV_COND {
   EA_ADV_COND_NONE = 0,              // (None)
   EA_ADV_COND_ACC_EQUITY_01PC_HIGH,  // Equity>1% (no args)
   EA_ADV_COND_ACC_EQUITY_01PC_LOW,   // Equity<1% (no args)
+  EA_ADV_COND_ACC_EQUITY_05PC_HIGH,  // Equity>5% (no args)
+  EA_ADV_COND_ACC_EQUITY_05PC_LOW,   // Equity<5% (no args)
   // EA_ADV_COND_ACC_EQUITY,         // Equity (in %)
   // EA_ADV_COND_ACC_MARGIN_FREE,    // Free margin (in %)
   // EA_ADV_COND_ACC_MARGIN_USED,    // Free margin (in %)

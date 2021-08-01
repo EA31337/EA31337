@@ -35,6 +35,12 @@ bool ActionAdd(EAParams &_params, ENUM_EA_ADV_COND _cond, ENUM_EA_ADV_ACTION _ac
     case EA_ADV_COND_ACC_EQUITY_01PC_LOW:
       _cond_entry = ConditionEntry(ACCOUNT_COND_EQUITY_01PC_LOW);
       break;
+    case EA_ADV_COND_ACC_EQUITY_05PC_HIGH:
+      _cond_entry = ConditionEntry(ACCOUNT_COND_EQUITY_05PC_HIGH);
+      break;
+    case EA_ADV_COND_ACC_EQUITY_05PC_LOW:
+      _cond_entry = ConditionEntry(ACCOUNT_COND_EQUITY_05PC_LOW);
+      break;
     case EA_ADV_COND_TRADE_IS_PEAK:
       _cond_entry = ConditionEntry(TRADE_COND_IS_PEAK);
       break;
