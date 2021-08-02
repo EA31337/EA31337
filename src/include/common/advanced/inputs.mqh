@@ -52,6 +52,7 @@ input float EA_OrderCloseLoss = 0;                                    // Close l
 input float EA_OrderCloseProfit = 0;                                  // Close profit (in pips)
 input int EA_OrderCloseTime = 0;                                      // Close time in mins (>0) or bars (<0)
 
-extern string __Trade_Params__ = "-- EA's trade parameters --";  // >>> EA's TRADE <<<
+input string __Trade_Params__ = "-- EA's trade parameters --";  // >>> EA's TRADE <<<
 input double EA_LotSize = 0;                                     // Lot size (0 = auto)
 input int EA_SignalOpenFilter = 40;                              // Signal open filter
+input int EA_SignalCloseFilter = 16;                             // Signal close filter (-127-127)

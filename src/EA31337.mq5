@@ -268,6 +268,7 @@ bool InitStrategies() {
   ea.Set(STRAT_PARAM_SOF, EA_SignalOpenFilter);
   ea.Set(TRADE_PARAM_LOT_SIZE, EA_LotSize);
 #ifdef __advanced__
+  ea.Set(STRAT_PARAM_SCF, EA_SignalCloseFilter);
 #ifdef __rider__
   // Disables strategy defined order closures for Rider.
   ea.Set(STRAT_PARAM_OCL, 0);
@@ -369,8 +370,8 @@ bool InitStrategies() {
       }
     }
   }
-#endif  // __rider__
-#endif  // __advanced__
+#endif                                                    // __rider__
+#endif                                                    // __advanced__
   _res &= GetLastError() == 0 || GetLastError() == 5053;  // @fixme: error 5053?
   ResetLastError();
   return _res && ea_configured;
