@@ -29,15 +29,15 @@
 // Includes strategies.
 input static string __Strategies_Active__ = "-- Active strategies --";  // >>> ACTIVE STRATEGIES <<<
 input ENUM_STRATEGY Strategy_M1 = (ENUM_STRATEGY)STRAT_NONE;            // Strategy on M1
-input ENUM_STRATEGY Strategy_M5 = (ENUM_STRATEGY)STRAT_ADX;             // Strategy on M5
-input ENUM_STRATEGY Strategy_M15 = (ENUM_STRATEGY)STRAT_AWESOME;        // Strategy on M15
-input ENUM_STRATEGY Strategy_M30 = (ENUM_STRATEGY)STRAT_AWESOME;        // Strategy on M30
+input ENUM_STRATEGY Strategy_M5 = (ENUM_STRATEGY)STRAT_NONE;            // Strategy on M5
+input ENUM_STRATEGY Strategy_M15 = (ENUM_STRATEGY)STRAT_MFI;            // Strategy on M15
+input ENUM_STRATEGY Strategy_M30 = (ENUM_STRATEGY)STRAT_MACD;           // Strategy on M30
 
-input static string __EA_Stops__ = "-- EA's stops --";               // >>> EA's STOPS (SL/TP) <<<
-input ENUM_STRATEGY EA_Stops_M1 = (ENUM_STRATEGY)STRAT_NONE;         // Stop loss on M1
-input ENUM_STRATEGY EA_Stops_M5 = (ENUM_STRATEGY)STRAT_ATR;          // Stop loss on M5
-input ENUM_STRATEGY EA_Stops_M15 = (ENUM_STRATEGY)STRAT_STOCHASTIC;  // Stop loss on M15
-input ENUM_STRATEGY EA_Stops_M30 = (ENUM_STRATEGY)STRAT_FORCE;       // Stop loss on M30
+input static string __EA_Stops__ = "-- EA's stops --";             // >>> EA's STOPS (SL/TP) <<<
+input ENUM_STRATEGY EA_Stops_M1 = (ENUM_STRATEGY)STRAT_NONE;       // Stop loss on M1
+input ENUM_STRATEGY EA_Stops_M5 = (ENUM_STRATEGY)STRAT_NONE;       // Stop loss on M5
+input ENUM_STRATEGY EA_Stops_M15 = (ENUM_STRATEGY)STRAT_MOMENTUM;  // Stop loss on M15
+input ENUM_STRATEGY EA_Stops_M30 = (ENUM_STRATEGY)STRAT_WPR;       // Stop loss on M30
 // input ENUM_STRATEGY EA_Stops_H1 = (ENUM_STRATEGY)0;   // Stop loss on H1
 // input ENUM_STRATEGY EA_Stops_H4 = (ENUM_STRATEGY)0;   // Stop loss on H4
 
@@ -53,6 +53,6 @@ input float EA_OrderCloseProfit = 0;                                  // Close p
 input int EA_OrderCloseTime = 0;                                      // Close time in mins (>0) or bars (<0)
 
 input string __Trade_Params__ = "-- EA's trade parameters --";  // >>> EA's TRADE <<<
-input double EA_LotSize = 0;                                     // Lot size (0 = auto)
-input int EA_SignalOpenFilter = 40;                              // Signal open filter
-input int EA_SignalCloseFilter = 16;                             // Signal close filter (-127-127)
+input double EA_LotSize = 0;                                    // Lot size (0 = auto)
+input int EA_SignalOpenFilter = 40;                             // Signal open filter
+input int EA_SignalCloseFilter = 16;                            // Signal close filter (-127-127)
