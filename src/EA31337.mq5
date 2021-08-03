@@ -191,16 +191,20 @@ bool DisplayStartupInfo(bool _startup = false, string sep = "\n") {
   _output += "MARKET: " + ea.Market().ToString() + sep;
   _output += "SYMBOL: " + ea.SymbolInfo().ToString() + sep;
   _output += "TERMINAL: " + ea.Terminal().ToString() + sep;
-  // Print strategies info.
-  /*
-  int sid;
-  Strategy *_strat;
-  _output += "STRATEGIES:" + sep;
-  for (sid = 0; sid < ea.strats.GetSize(); sid++) {
-    _strat = ((Strategy *)strats.GetByIndex(sid));
-    _output += _strat.ToString();
+#ifdef __advanced__
+  // Print enabled strategies info.
+  for (DictObjectIterator<ENUM_TIMEFRAMES, DictStruct<long, Ref<Strategy>>> _iter_tf = ea.GetStrategies().Begin();
+       _iter_tf.IsValid(); ++_iter_tf) {
+    ENUM_TIMEFRAMES _tf = _iter_tf.Key();
+    for (DictStructIterator<long, Ref<Strategy>> _iter(ea.GetStrategiesByTf(_tf).Begin()); _iter.IsValid(); ++_iter) {
+      Strategy *_strat = _iter.Value().Ptr();
+      string _sname = _strat.GetName() + "@" + ChartTf::TfToString(_tf);
+      _output += StringFormat("Strategy: %s: %s\n", _sname,
+                              SerializerConverter::FromObject(_strat, SERIALIZER_FLAG_INCLUDE_DYNAMIC)
+                                  .ToString<SerializerJson>(SERIALIZER_JSON_NO_WHITESPACES));
+    }
   }
-  */
+#endif
   if (_startup) {
     if (ea.GetState().IsTradeAllowed()) {
       if (!Terminal::HasError()) {
