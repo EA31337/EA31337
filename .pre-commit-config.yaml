@@ -2,7 +2,7 @@
 repos:
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.4.0
+    rev: v4.0.1
     hooks:
       - id: check-added-large-files
       - id: check-byte-order-marker
@@ -16,7 +16,7 @@ repos:
         exclude: \.txt$
 
   - repo: https://github.com/igorshubovych/markdownlint-cli.git
-    rev: v0.27.1
+    rev: v0.28.1
     hooks:
       - id: markdownlint
 
@@ -26,13 +26,16 @@ repos:
       - id: forbid-binary
         exclude: (\.ico|\.mqproj)$
       - id: git-check     # Configure in .gitattributes
+      #   exclude: \.txt$
       # @fixme: https://github.com/jumanjihouse/pre-commit-hooks/issues/79
       # - id: markdownlint  # Configure in .mdlrc
       - id: require-ascii
       - id: script-must-have-extension
+      # - id: shellcheck
+      - id: shfmt
 
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.26.1
+    rev: v1.26.2
     hooks:
       - id: yamllint
         args: ["-c", ".yamllint", "-s"]
