@@ -15,9 +15,10 @@ EA31337 is an advanced trading robot for Forex markets written in MQL.
 
 ## About the project
 
-The project aims to deliver fully working EA at the professional level.
+The project aims to deliver fully working EA at the advanced level.
 
-It implements algorithms for managing multiple strategies on different timeframes at once.
+It implements algorithm for managing multiple strategies
+on different timeframes at once.
 
 Please follow [Wiki Home page](https://github.com/EA31337/EA31337/wiki) for the available documentation pages.
 
@@ -47,9 +48,9 @@ The EA provides the following out-of-box features:
 
 ### Strategies
 
-The robot comes with over 35 strategies coordinated and controlled by the central algorithm.
-Each strategy analyses market on multiple timeframes at the same time.
-The market analysis is based on over 30 major technical indicators in real-time.
+The trading robot comes with over 35 strategies to choose from.
+Each strategy can analyse market on different timeframes independently.
+The market analysis is based on popular technical indicators.
 
 You are free to write your own custom strategies.
 
@@ -131,30 +132,13 @@ independently from the current chart.
 
 ### Backtesting
 
-Please be aware that backtesting is a very complex process and due to several MetaTrader 4 platform limitations,
-it cannot reliabily simulate the outcome.
+Please be aware that backtesting cannot reliabily simulate the future outcome.
 
 The backtesting has been documented at [Backtesting using MT4][gh-wiki-backtest] wiki page.
 
-Few notes to be aware when backtesting:
-
-- Please use M30 or M15 timeframe to have access to multiple timeframes at the same time,
-  as sometimes not all strategies would be activated (check the logs for details).
-  This is due to platform limitations/bugs.
-- Be aware that using [Birt's CSV2FXT.mq4](https://github.com/EA31337/Birt-CSV2FXT) script
-  to generate FXT files is [outdated](https://eareview.net/tick-data/faq-troubleshooting) method
-  and [buggy](https://github.com/EA31337/Birt-CSV2FXT/issues/3).
-- There is no such thing as 99% modelling quality.
-  It's a fake [hardcoded number](https://github.com/EA31337/MT-Formats/blob/master/fxt-405-refined.mqh#L53)
-  when your FXT files are read-only and it's often used by scammers as a selling point.
-- It's better to not set FXT/HST files as read-only, otherwise platform has no ability to validate
-  and correct the data. When you force platform to use corrupted data, you get non-reliable results.
-- When using generated FXT/HST files, run tests in off-line mode in order to not overlap your broker data
-  onto your existing data, otherwise you get data errors, then you'd need to start from scratch.
-
 ### SET Files
 
-By default, EA provides the best optimized settings for EURUSD symbol pair
+By default, EA provides the best known optimized settings for EURUSD symbol pair
 based on the performed optimization tests.
 
 ## Documentation
