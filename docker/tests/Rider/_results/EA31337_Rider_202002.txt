@@ -2,32 +2,32 @@
 
 
                                                                 Strategy Tester Report
-                                                EA31337-Rider-997fe38c1624aa2eb5831e40985f897543b13c2c
+                                                EA31337-Rider-38b4f7da5ba8a5db7168631a9740275f0f7af06f
                                                                      (Build 1280)
 
  Symbol                            EURUSD (Euro vs US Dollar)
  Period                            1 Minute (M1) 2020.02.02 22:01 - 2020.02.28 21:59 (2020.02.01 - 2020.02.29)
  Model                             Every tick (the most precise method based on all available least timeframes)
-                                   __EA_Mode_Parameters__="-- EA parameters for EA31337 Rider v2.004 --"; __Strategies_Active__="-- Active
-                                   strategies --"; Strategy_M1=0; Strategy_M5=7; Strategy_M15=6; Strategy_M30=6; __EA_Stops__="-- EA's stops --";
-                                   EA_Stops=3; __Trade_Params__="-- EA's trade parameters --"; EA_LotSize=0; EA_SignalOpenFilter=40;
- Parameters                        __EA_Risk_Params__="-- EA's risk management --"; EA_Risk_MarginMax=5; __EA_Logging_Parameters__="-- Settings for
-                                   logging & messages --"; VerboseLevel=3; __EA_Other_Parameters__="-- Other parameters --";
-                                   EA_DisplayDetailsOnChart=true; EA_MagicNumber=31337; __EA_Parameters__="-- End of input parameters for EA31337
-                                   Rider v2.004 --";
- Bars in test                29706 Ticks modelled                      6173879 Modelling quality                                              25.00%
+                                   __EA_Mode_Parameters__="-- EA parameters for EA31337 Rider v2.004 --"; __Strategies_Active__="-- Active strategies
+                                   --"; Strategy_M1=0; Strategy_M5=6; Strategy_M15=27; Strategy_M30=27; __EA_Stops__="-- EA's stops --"; EA_Stops=2;
+                                   __EA_Actions__="-- EA's actions --"; EA_Action1_If=0; EA_Action1_Then=0; __Trade_Params__="-- EA's trade
+ Parameters                        parameters --"; EA_LotSize=0; EA_SignalOpenFilter=40; EA_SignalCloseFilter=84; __EA_Risk_Params__="-- EA's risk
+                                   management --"; EA_Risk_MarginMax=5; __EA_Logging_Parameters__="-- Settings for logging & messages --";
+                                   VerboseLevel=3; __EA_Other_Parameters__="-- Other parameters --"; EA_DisplayDetailsOnChart=true;
+                                   EA_MagicNumber=31337; __EA_Parameters__="-- End of input parameters for EA31337 Rider v2.004 --";
+ Bars in test                29706 Ticks modelled                        6173879 Modelling quality                                             25.00%
  Mismatched charts errors        0
- Initial deposit          10000.00                                             Spread                                                             10
- Total net profit          -559.40 Gross profit                         669.10 Gross loss                                                   -1228.50
- Profit factor                0.54 Expected payoff                       -1.32
- Absolute drawdown          711.30 Maximal drawdown             844.40 (8.33%) Relative drawdown                                      8.33% (844.40)
- Total trades                  423 Short positions (won %)         41 (43.90%) Long positions (won %)                                   382 (42.41%)
-                                   Profit trades (% of total)     180 (42.55%) Loss trades (% of total)                                 243 (57.45%)
-                           Largest profit trade                          16.60 loss trade                                                     -29.80
-                           Average profit trade                           3.72 loss trade                                                      -5.06
-                           Maximum consecutive wins (profit in      23 (82.10) consecutive losses (loss in money)                        20 (-52.70)
+ Initial deposit          10000.00                                               Spread                                                            10
+ Total net profit          -448.15 Gross profit                           428.80 Gross loss                                                   -876.95
+ Profit factor                0.49 Expected payoff                         -2.73
+ Absolute drawdown         1055.64 Maximal drawdown             1117.24 (11.10%) Relative drawdown                                   11.10% (1117.24)
+ Total trades                  164 Short positions (won %)             0 (0.00%) Long positions (won %)                                  164 (50.00%)
+                                   Profit trades (% of total)        82 (50.00%) Loss trades (% of total)                                 82 (50.00%)
+                           Largest profit trade                            23.70 loss trade                                                   -133.07
+                           Average profit trade                             5.23 loss trade                                                    -10.69
+                           Maximum consecutive wins (profit in        16 (89.00) consecutive losses (loss in money)                       13 (-87.20)
                                    money)
-                           Maximal consecutive profit (count of    113.00 (10) consecutive loss (count of losses)                       -228.40 (11)
+                           Maximal consecutive profit (count of        97.50 (8) consecutive loss (count of losses)                       -265.65 (2)
                                    wins)
-                           Average consecutive wins                          4 consecutive losses                                                  5
+                           Average consecutive wins                            5 consecutive losses                                                 5
                                                                        [Graph]

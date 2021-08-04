@@ -191,16 +191,20 @@ bool DisplayStartupInfo(bool _startup = false, string sep = "\n") {
   _output += "MARKET: " + ea.Market().ToString() + sep;
   _output += "SYMBOL: " + ea.SymbolInfo().ToString() + sep;
   _output += "TERMINAL: " + ea.Terminal().ToString() + sep;
-  // Print strategies info.
-  /*
-  int sid;
-  Strategy *_strat;
-  _output += "STRATEGIES:" + sep;
-  for (sid = 0; sid < ea.strats.GetSize(); sid++) {
-    _strat = ((Strategy *)strats.GetByIndex(sid));
-    _output += _strat.ToString();
+#ifdef __advanced__
+  // Print enabled strategies info.
+  for (DictObjectIterator<ENUM_TIMEFRAMES, DictStruct<long, Ref<Strategy>>> _iter_tf = ea.GetStrategies().Begin();
+       _iter_tf.IsValid(); ++_iter_tf) {
+    ENUM_TIMEFRAMES _tf = _iter_tf.Key();
+    for (DictStructIterator<long, Ref<Strategy>> _iter(ea.GetStrategiesByTf(_tf).Begin()); _iter.IsValid(); ++_iter) {
+      Strategy *_strat = _iter.Value().Ptr();
+      string _sname = _strat.GetName() + "@" + ChartTf::TfToString(_tf);
+      _output += StringFormat("Strategy: %s: %s\n", _sname,
+                              SerializerConverter::FromObject(_strat, SERIALIZER_FLAG_INCLUDE_DYNAMIC)
+                                  .ToString<SerializerJson>(SERIALIZER_JSON_NO_WHITESPACES));
+    }
   }
-  */
+#endif
   if (_startup) {
     if (ea.GetState().IsTradeAllowed()) {
       if (!Terminal::HasError()) {
@@ -239,7 +243,7 @@ bool InitEA() {
   ea_params.Set(EA_PARAM_RISK_MARGIN_MAX, EA_Risk_MarginMax);
   ea_params.SetFlag(EA_PARAM_FLAG_LOTSIZE_AUTO, EA_LotSize <= 0);
 #ifdef __advanced__
-  // ActionsAdd(ea_params, EA_Action1_If, EA_Action1_Then);
+  _initiated &= ActionAdd(ea_params, EA_Action1_If, EA_Action1_Then);
 #endif
   // Init instance.
   ea = new EA(ea_params);
@@ -268,8 +272,11 @@ bool InitStrategies() {
   ea.Set(STRAT_PARAM_SOF, EA_SignalOpenFilter);
   ea.Set(TRADE_PARAM_LOT_SIZE, EA_LotSize);
 #ifdef __advanced__
+  ea.Set(STRAT_PARAM_SCF, EA_SignalCloseFilter);
 #ifdef __rider__
-  // Disables order close time for Rider.
+  // Disables strategy defined order closures for Rider.
+  ea.Set(STRAT_PARAM_OCL, 0);
+  ea.Set(STRAT_PARAM_OCP, 0);
   ea.Set(STRAT_PARAM_OCT, 0);
   // Init price stop methods for all timeframes.
   if (EA_Stops != 0) {
@@ -293,6 +300,8 @@ bool InitStrategies() {
     }
   }
 #else
+  ea.Set(STRAT_PARAM_OCL, EA_OrderCloseLoss);
+  ea.Set(STRAT_PARAM_OCP, EA_OrderCloseProfit);
   ea.Set(STRAT_PARAM_OCT, EA_OrderCloseTime);
   // Init price stop methods for each timeframe.
   Strategy *_strat;
@@ -365,8 +374,8 @@ bool InitStrategies() {
       }
     }
   }
-#endif  // __rider__
-#endif  // __advanced__
+#endif                                                    // __rider__
+#endif                                                    // __advanced__
   _res &= GetLastError() == 0 || GetLastError() == 5053;  // @fixme: error 5053?
   ResetLastError();
   return _res && ea_configured;
