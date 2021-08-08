@@ -190,7 +190,7 @@ bool DisplayStartupInfo(bool _startup = false, string sep = "\n") {
   _output += "EA: " + ea.ToString() + sep;
   _output += "MARKET: " + ea.Market().ToString() + sep;
   _output += "SYMBOL: " + ea.SymbolInfo().ToString() + sep;
-  _output += "TERMINAL: " + ea.Terminal().ToString() + sep;
+  _output += "TERMINAL: " + ea.GetTerminal().ToString() + sep;
 #ifdef __advanced__
   // Print enabled strategies info.
   for (DictObjectIterator<ENUM_TIMEFRAMES, DictStruct<long, Ref<Strategy>>> _iter_tf = ea.GetStrategies().Begin();
