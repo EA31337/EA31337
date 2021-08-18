@@ -269,7 +269,7 @@ bool InitStrategies() {
   EAStrategyAdd(Strategy_M15, M15B);
   EAStrategyAdd(Strategy_M30, M30B);
   // Update lot size.
-  ea.Set(STRAT_PARAM_SOF, EA_SignalOpenFilter);
+  ea.Set(STRAT_PARAM_SOFM, EA_SignalOpenFilter);
   ea.Set(TRADE_PARAM_LOT_SIZE, EA_LotSize);
 #ifdef __advanced__
   ea.Set(STRAT_PARAM_SCF, EA_SignalCloseFilter);

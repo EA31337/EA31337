@@ -55,6 +55,7 @@
 #include "classes/Indicators/Indi_Momentum.mqh"
 #include "classes/Indicators/Indi_OBV.mqh"
 #include "classes/Indicators/Indi_OsMA.mqh"
+#include "classes/Indicators/Indi_Pattern.mqh"
 #include "classes/Indicators/Indi_RSI.mqh"
 #include "classes/Indicators/Indi_RVI.mqh"
 #include "classes/Indicators/Indi_SAR.mqh"
