@@ -33,11 +33,15 @@ input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;                           // Strat
 input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;                           // Strategy on M5
 input ENUM_STRATEGY Strategy_M15 = STRAT_BANDS;                         // Strategy on M15
 input ENUM_STRATEGY Strategy_M30 = STRAT_BANDS;                         // Strategy on M30
+input ENUM_STRATEGY Strategy_H1 = STRAT_NONE;                           // Strategy on H1
+input ENUM_STRATEGY Strategy_H4 = STRAT_NONE;                           // Strategy on H4
 #else
 input group "Active strategy" input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;  // Strategy on M1
 input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;                                // Strategy on M5
 input ENUM_STRATEGY Strategy_M15 = STRAT_ZIGZAG;                             // Strategy on M15
 input ENUM_STRATEGY Strategy_M30 = STRAT_ZIGZAG;                             // Strategy on M30
+input ENUM_STRATEGY Strategy_H1 = STRAT_NONE;                                // Strategy on H1
+input ENUM_STRATEGY Strategy_H4 = STRAT_NONE;                                // Strategy on H4
 #endif
 
 #ifdef __MQL4__

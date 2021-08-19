@@ -36,6 +36,8 @@ input ENUM_STRATEGY Strategy_M1 = (ENUM_STRATEGY)STRAT_NONE;     // Strategy on 
 input ENUM_STRATEGY Strategy_M5 = (ENUM_STRATEGY)STRAT_AWESOME;  // Strategy on M5
 input ENUM_STRATEGY Strategy_M15 = (ENUM_STRATEGY)STRAT_RSI;     // Strategy on M15
 input ENUM_STRATEGY Strategy_M30 = (ENUM_STRATEGY)STRAT_RSI;     // Strategy on M30
+input ENUM_STRATEGY Strategy_H1 = STRAT_NONE;                    // Strategy on H1
+input ENUM_STRATEGY Strategy_H4 = STRAT_NONE;                    // Strategy on H4
 
 #ifdef __MQL4__
 input static string __Strategies_Stops__ = "-- Strategies' stops --";  // >>> STRATEGIES' STOPS <<<

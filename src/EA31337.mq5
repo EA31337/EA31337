@@ -268,6 +268,8 @@ bool InitStrategies() {
   EAStrategyAdd(Strategy_M5, M5B);
   EAStrategyAdd(Strategy_M15, M15B);
   EAStrategyAdd(Strategy_M30, M30B);
+  EAStrategyAdd(Strategy_H1, H1B);
+  EAStrategyAdd(Strategy_H4, H4B);
   // Update lot size.
   ea.Set(STRAT_PARAM_SOFM, EA_SignalOpenFilter);
   ea.Set(TRADE_PARAM_LOT_SIZE, EA_LotSize);
@@ -368,6 +370,40 @@ bool InitStrategies() {
     }
     if (_strat_stops) {
       for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategiesByTf(PERIOD_M30).Begin(); iter.IsValid();
+           ++iter) {
+        _strat = iter.Value().Ptr();
+        _strat.SetStops(_strat_stops, _strat_stops);
+      }
+    }
+  }
+  if (EA_Stops_H1 != STRAT_NONE) {
+    _strat_stops = ea.GetStrategy(PERIOD_H1, EA_Stops_H1);
+    if (!_strat_stops) {
+      EAStrategyAdd(EA_Stops_H1, H1B);
+      _strat_stops = ea.GetStrategy(PERIOD_H1, EA_Stops_H1);
+      if (_strat_stops) {
+        _strat_stops.Enabled(false);
+      }
+    }
+    if (_strat_stops) {
+      for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategiesByTf(PERIOD_H1).Begin(); iter.IsValid();
+           ++iter) {
+        _strat = iter.Value().Ptr();
+        _strat.SetStops(_strat_stops, _strat_stops);
+      }
+    }
+  }
+  if (EA_Stops_H4 != STRAT_NONE) {
+    _strat_stops = ea.GetStrategy(PERIOD_H4, EA_Stops_H4);
+    if (!_strat_stops) {
+      EAStrategyAdd(EA_Stops_H4, H4B);
+      _strat_stops = ea.GetStrategy(PERIOD_H4, EA_Stops_H4);
+      if (_strat_stops) {
+        _strat_stops.Enabled(false);
+      }
+    }
+    if (_strat_stops) {
+      for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategiesByTf(PERIOD_H4).Begin(); iter.IsValid();
            ++iter) {
         _strat = iter.Value().Ptr();
         _strat.SetStops(_strat_stops, _strat_stops);
