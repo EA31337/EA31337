@@ -35,7 +35,7 @@ input group "Active strategy"
 input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;    // Strategy on M1
 input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;    // Strategy on M5
 input ENUM_STRATEGY Strategy_M15 = STRAT_ATR;    // Strategy on M15
-input ENUM_STRATEGY Strategy_M30 = STRAT_ATR;    // Strategy on M30
+input ENUM_STRATEGY Strategy_M30 = STRAT_MACD;   // Strategy on M30
 input ENUM_STRATEGY Strategy_H1 = STRAT_STDDEV;  // Strategy on H1
 input ENUM_STRATEGY Strategy_H4 = STRAT_SAR;     // Strategy on H4
 
@@ -45,9 +45,9 @@ input static string __Strategies_Stops__ = "-- Strategies' stops --";  // >>> ST
 input group "Strategies' stops"
 #endif
 #ifdef __MQL4__
-input ENUM_STRATEGY EA_Stops = (ENUM_STRATEGY)STRAT_ZIGZAG;  // Stop loss
+input ENUM_STRATEGY EA_Stops = STRAT_ZIGZAG;  // Stop loss
 #else
-input ENUM_STRATEGY EA_Stops = (ENUM_STRATEGY)STRAT_DEMA;  // Stop loss
+input ENUM_STRATEGY EA_Stops = STRAT_DEMA;    // Stop loss
 #endif
 
 #ifdef __MQL4__
