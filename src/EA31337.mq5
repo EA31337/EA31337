@@ -275,6 +275,7 @@ bool InitStrategies() {
   ea.Set(TRADE_PARAM_LOT_SIZE, EA_LotSize);
 #ifdef __advanced__
   ea.Set(STRAT_PARAM_SCF, EA_SignalCloseFilter);
+  ea.Set(STRAT_PARAM_SOFT, EA_SignalOpenFilterTime);
 #ifdef __rider__
   // Disables strategy defined order closures for Rider.
   ea.Set(STRAT_PARAM_OCL, 0);

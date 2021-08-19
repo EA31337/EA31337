@@ -32,12 +32,12 @@ input static string __Strategies_Active__ = "-- Active strategies --";  // >>> A
 #else
 input group "Active strategy"
 #endif
-input ENUM_STRATEGY Strategy_M1 = (ENUM_STRATEGY)STRAT_NONE;     // Strategy on M1
-input ENUM_STRATEGY Strategy_M5 = (ENUM_STRATEGY)STRAT_AWESOME;  // Strategy on M5
-input ENUM_STRATEGY Strategy_M15 = (ENUM_STRATEGY)STRAT_RSI;     // Strategy on M15
-input ENUM_STRATEGY Strategy_M30 = (ENUM_STRATEGY)STRAT_RSI;     // Strategy on M30
-input ENUM_STRATEGY Strategy_H1 = STRAT_NONE;                    // Strategy on H1
-input ENUM_STRATEGY Strategy_H4 = STRAT_NONE;                    // Strategy on H4
+input ENUM_STRATEGY Strategy_M1 = (ENUM_STRATEGY)STRAT_NONE;            // Strategy on M1
+input ENUM_STRATEGY Strategy_M5 = (ENUM_STRATEGY)STRAT_AWESOME;         // Strategy on M5
+input ENUM_STRATEGY Strategy_M15 = (ENUM_STRATEGY)STRAT_RSI;            // Strategy on M15
+input ENUM_STRATEGY Strategy_M30 = (ENUM_STRATEGY)STRAT_RSI;            // Strategy on M30
+input ENUM_STRATEGY Strategy_H1 = STRAT_NONE;          // Strategy on H1
+input ENUM_STRATEGY Strategy_H4 = STRAT_NONE;          // Strategy on H4
 
 #ifdef __MQL4__
 input static string __Strategies_Stops__ = "-- Strategies' stops --";  // >>> STRATEGIES' STOPS <<<
@@ -63,5 +63,6 @@ input string __Strategies_Signal_Filters__ = "-- Strategies' signal filters --";
 #else
 input group "Strategies' signal filters"
 #endif
-input int EA_SignalOpenFilter = 40;   // Signal open filter
-input int EA_SignalCloseFilter = 84;  // Signal close filter (-127-127)
+input int EA_SignalOpenFilter = 40;                             // Signal open filter
+input int EA_SignalCloseFilter = 84;                            // Signal close filter (-127-127)
+input int EA_SignalOpenFilterTime = 10;                         // Signal open filter time (-255-255)
