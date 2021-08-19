@@ -190,7 +190,7 @@ bool DisplayStartupInfo(bool _startup = false, string sep = "\n") {
   _output += "EA: " + ea.ToString() + sep;
   _output += "MARKET: " + ea.Market().ToString() + sep;
   _output += "SYMBOL: " + ea.SymbolInfo().ToString() + sep;
-  _output += "TERMINAL: " + ea.Terminal().ToString() + sep;
+  _output += "TERMINAL: " + ea.GetTerminal().ToString() + sep;
 #ifdef __advanced__
   // Print enabled strategies info.
   for (DictObjectIterator<ENUM_TIMEFRAMES, DictStruct<long, Ref<Strategy>>> _iter_tf = ea.GetStrategies().Begin();
@@ -268,11 +268,14 @@ bool InitStrategies() {
   EAStrategyAdd(Strategy_M5, M5B);
   EAStrategyAdd(Strategy_M15, M15B);
   EAStrategyAdd(Strategy_M30, M30B);
+  EAStrategyAdd(Strategy_H1, H1B);
+  EAStrategyAdd(Strategy_H4, H4B);
   // Update lot size.
-  ea.Set(STRAT_PARAM_SOF, EA_SignalOpenFilter);
+  ea.Set(STRAT_PARAM_SOFM, EA_SignalOpenFilter);
   ea.Set(TRADE_PARAM_LOT_SIZE, EA_LotSize);
 #ifdef __advanced__
   ea.Set(STRAT_PARAM_SCF, EA_SignalCloseFilter);
+  ea.Set(STRAT_PARAM_SOFT, EA_SignalOpenFilterTime);
 #ifdef __rider__
   // Disables strategy defined order closures for Rider.
   ea.Set(STRAT_PARAM_OCL, 0);
@@ -280,10 +283,10 @@ bool InitStrategies() {
   ea.Set(STRAT_PARAM_OCT, 0);
   // Init price stop methods for all timeframes.
   if (EA_Stops != 0) {
-    Strategy *_strat_stops = ea.GetStrategy(PERIOD_M30, EA_Stops);
+    Strategy *_strat_stops = ea.GetStrategy(PERIOD_H4, EA_Stops);
     if (!_strat_stops) {
-      EAStrategyAdd(EA_Stops, M30B);
-      _strat_stops = ea.GetStrategy(PERIOD_M30, EA_Stops);
+      EAStrategyAdd(EA_Stops, H4B);
+      _strat_stops = ea.GetStrategy(PERIOD_H4, EA_Stops);
       if (_strat_stops) {
         _strat_stops.Enabled(false);
       }
@@ -374,6 +377,40 @@ bool InitStrategies() {
       }
     }
   }
+  if (EA_Stops_H1 != STRAT_NONE) {
+    _strat_stops = ea.GetStrategy(PERIOD_H1, EA_Stops_H1);
+    if (!_strat_stops) {
+      EAStrategyAdd(EA_Stops_H1, H1B);
+      _strat_stops = ea.GetStrategy(PERIOD_H1, EA_Stops_H1);
+      if (_strat_stops) {
+        _strat_stops.Enabled(false);
+      }
+    }
+    if (_strat_stops) {
+      for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategiesByTf(PERIOD_H1).Begin(); iter.IsValid();
+           ++iter) {
+        _strat = iter.Value().Ptr();
+        _strat.SetStops(_strat_stops, _strat_stops);
+      }
+    }
+  }
+  if (EA_Stops_H4 != STRAT_NONE) {
+    _strat_stops = ea.GetStrategy(PERIOD_H4, EA_Stops_H4);
+    if (!_strat_stops) {
+      EAStrategyAdd(EA_Stops_H4, H4B);
+      _strat_stops = ea.GetStrategy(PERIOD_H4, EA_Stops_H4);
+      if (_strat_stops) {
+        _strat_stops.Enabled(false);
+      }
+    }
+    if (_strat_stops) {
+      for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategiesByTf(PERIOD_H4).Begin(); iter.IsValid();
+           ++iter) {
+        _strat = iter.Value().Ptr();
+        _strat.SetStops(_strat_stops, _strat_stops);
+      }
+    }
+  }
 #endif                                                    // __rider__
 #endif                                                    // __advanced__
   _res &= GetLastError() == 0 || GetLastError() == 5053;  // @fixme: error 5053?
@@ -423,6 +460,8 @@ bool EAStrategyAdd(ENUM_STRATEGY _stg, int _tfs) {
       return ea.StrategyAdd<Stg_Fractals>(_tfs, _stg, _magic_no);
     case STRAT_GATOR:
       return ea.StrategyAdd<Stg_Gator>(_tfs, _stg, _magic_no);
+    case STRAT_HEIKEN_ASHI:
+      return ea.StrategyAdd<Stg_HeikenAshi>(_tfs, _stg, _magic_no);
     case STRAT_ICHIMOKU:
       return ea.StrategyAdd<Stg_Ichimoku>(_tfs, _stg, _magic_no);
     case STRAT_MA:
@@ -437,16 +476,26 @@ bool EAStrategyAdd(ENUM_STRATEGY _stg, int _tfs) {
       return ea.StrategyAdd<Stg_OBV>(_tfs, _stg, _magic_no);
     case STRAT_OSMA:
       return ea.StrategyAdd<Stg_OsMA>(_tfs, _stg, _magic_no);
+    case STRAT_PATTERN:
+      return ea.StrategyAdd<Stg_Pattern>(_tfs, _stg, _magic_no);
     case STRAT_RSI:
       return ea.StrategyAdd<Stg_RSI>(_tfs, _stg, _magic_no);
     case STRAT_RVI:
       return ea.StrategyAdd<Stg_RVI>(_tfs, _stg, _magic_no);
     case STRAT_SAR:
       return ea.StrategyAdd<Stg_SAR>(_tfs, _stg, _magic_no);
+    case STRAT_SAWA:
+      return ea.StrategyAdd<Stg_SAWA>(_tfs, _stg, _magic_no);
     case STRAT_STDDEV:
       return ea.StrategyAdd<Stg_StdDev>(_tfs, _stg, _magic_no);
     case STRAT_STOCHASTIC:
       return ea.StrategyAdd<Stg_Stochastic>(_tfs, _stg, _magic_no);
+    case STRAT_SVE_BB:
+      return ea.StrategyAdd<Stg_SVE_Bollinger_Bands>(_tfs, _stg, _magic_no);
+    case STRAT_TMAT_SVEBB:
+      return ea.StrategyAdd<Stg_TMAT_SVEBB>(_tfs, _stg, _magic_no);
+    case STRAT_TMA_TRUE:
+      return ea.StrategyAdd<Stg_TMA_True>(_tfs, _stg, _magic_no);
     case STRAT_WPR:
       return ea.StrategyAdd<Stg_WPR>(_tfs, _stg, _magic_no);
     case STRAT_ZIGZAG:

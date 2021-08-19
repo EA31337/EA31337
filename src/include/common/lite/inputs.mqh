@@ -27,13 +27,27 @@
 //+------------------------------------------------------------------+
 
 // Includes strategies.
+#ifdef __MQL4__
 input static string __Strategies_Active__ = "-- Active strategies --";  // >>> ACTIVE STRATEGIES <<<
-input ENUM_STRATEGY Strategy_M1 = (ENUM_STRATEGY)STRAT_NONE;            // Strategy on M1
-input ENUM_STRATEGY Strategy_M5 = (ENUM_STRATEGY)STRAT_NONE;            // Strategy on M5
-input ENUM_STRATEGY Strategy_M15 = (ENUM_STRATEGY)STRAT_AWESOME;        // Strategy on M15
-input ENUM_STRATEGY Strategy_M30 = (ENUM_STRATEGY)STRAT_AWESOME;        // Strategy on M30
+input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;                           // Strategy on M1
+input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;                           // Strategy on M5
+input ENUM_STRATEGY Strategy_M15 = STRAT_BANDS;                         // Strategy on M15
+input ENUM_STRATEGY Strategy_M30 = STRAT_BANDS;                         // Strategy on M30
+input ENUM_STRATEGY Strategy_H1 = STRAT_RSI;                            // Strategy on H1
+input ENUM_STRATEGY Strategy_H4 = STRAT_RSI;                            // Strategy on H4
+#else
+input group "Active strategy" input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;  // Strategy on M1
+input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;                                // Strategy on M5
+input ENUM_STRATEGY Strategy_M15 = STRAT_ZIGZAG;                             // Strategy on M15
+input ENUM_STRATEGY Strategy_M30 = STRAT_ZIGZAG;                             // Strategy on M30
+input ENUM_STRATEGY Strategy_H1 = STRAT_RSI;                                 // Strategy on H1
+input ENUM_STRATEGY Strategy_H4 = STRAT_RSI;                                 // Strategy on H4
+#endif
 
-extern string __Trade_Params__ = "-- EA's trade parameters --";  // >>> EA's TRADE <<<
-input double EA_LotSize = 0;                                     // Lot size (0 = auto)
-input int EA_SignalOpenFilter = 40;                              // Signal open filter
-int EA_SignalCloseFilter = 0;                                    // Signal close filter
+#ifdef __MQL4__
+input string __Trade_Params__ = "-- Trade parameters --";  // >>> TRADE <<<
+#else
+input group "Trade parameters"
+#endif
+input int EA_SignalOpenFilter = 40;  // Signal open filter
+int EA_SignalCloseFilter = 0;        // Signal close filter
