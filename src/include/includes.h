@@ -13,14 +13,14 @@
 #include "common/enum.h"
 
 // Includes class files.
-#include "classes/Chart.mqh"
-#include "classes/Trade.mqh"
 #include "classes/Action.struct.h"
+#include "classes/Chart.mqh"
+#include "classes/Condition.mqh"
 #include "classes/Condition.struct.h"
 #include "classes/EA.mqh"
 #include "classes/Msg.mqh"
 #include "classes/Terminal.mqh"
-#include "classes/Condition.mqh"
+#include "classes/Trade.mqh"
 
 // Includes common EA's functions.
 #ifdef __advanced__
@@ -74,9 +74,5 @@
 #include "inputs.h"
 
 // Strategy includes.
-INPUT string __Strategy_Parameters__ = "-- Strategy parameters --";  // >>> STRATEGIES <<<
+INPUT_GROUP("Strategy parameters");  // >>> STRATEGIES <<<
 #include "strategies/strategies.h"
-
-// End of user inputs.
-input string __EA_Parameters__ =
-    "-- End of input parameters for " + ea_name + " v" + ea_version + " --";  // >>> EA31337 <<<
