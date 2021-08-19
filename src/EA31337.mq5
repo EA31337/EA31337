@@ -283,10 +283,10 @@ bool InitStrategies() {
   ea.Set(STRAT_PARAM_OCT, 0);
   // Init price stop methods for all timeframes.
   if (EA_Stops != 0) {
-    Strategy *_strat_stops = ea.GetStrategy(PERIOD_M30, EA_Stops);
+    Strategy *_strat_stops = ea.GetStrategy(PERIOD_H4, EA_Stops);
     if (!_strat_stops) {
-      EAStrategyAdd(EA_Stops, M30B);
-      _strat_stops = ea.GetStrategy(PERIOD_M30, EA_Stops);
+      EAStrategyAdd(EA_Stops, H4B);
+      _strat_stops = ea.GetStrategy(PERIOD_H4, EA_Stops);
       if (_strat_stops) {
         _strat_stops.Enabled(false);
       }
