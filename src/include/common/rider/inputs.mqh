@@ -63,6 +63,6 @@ input string __Strategies_Signal_Filters__ = "-- Strategies' signal filters --";
 #else
 input group "Strategies' signal filters"
 #endif
-input int EA_SignalOpenFilter = 32;      // Signal open filter
+input int EA_SignalOpenFilter = 37;      // Signal open filter (-127-127)
 input int EA_SignalCloseFilter = 32;     // Signal close filter (-127-127)
 input int EA_SignalOpenFilterTime = 10;  // Signal open filter time (-255-255)
