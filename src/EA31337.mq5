@@ -459,6 +459,8 @@ bool EAStrategyAdd(ENUM_STRATEGY _stg, int _tfs) {
       return ea.StrategyAdd<Stg_Fractals>(_tfs, _stg, _magic_no);
     case STRAT_GATOR:
       return ea.StrategyAdd<Stg_Gator>(_tfs, _stg, _magic_no);
+    case STRAT_HEIKEN_ASHI:
+      return ea.StrategyAdd<Stg_HeikenAshi>(_tfs, _stg, _magic_no);
     case STRAT_ICHIMOKU:
       return ea.StrategyAdd<Stg_Ichimoku>(_tfs, _stg, _magic_no);
     case STRAT_MA:
@@ -473,16 +475,26 @@ bool EAStrategyAdd(ENUM_STRATEGY _stg, int _tfs) {
       return ea.StrategyAdd<Stg_OBV>(_tfs, _stg, _magic_no);
     case STRAT_OSMA:
       return ea.StrategyAdd<Stg_OsMA>(_tfs, _stg, _magic_no);
+    case STRAT_PATTERN:
+      return ea.StrategyAdd<Stg_Pattern>(_tfs, _stg, _magic_no);
     case STRAT_RSI:
       return ea.StrategyAdd<Stg_RSI>(_tfs, _stg, _magic_no);
     case STRAT_RVI:
       return ea.StrategyAdd<Stg_RVI>(_tfs, _stg, _magic_no);
     case STRAT_SAR:
       return ea.StrategyAdd<Stg_SAR>(_tfs, _stg, _magic_no);
+    case STRAT_SAWA:
+      return ea.StrategyAdd<Stg_SAWA>(_tfs, _stg, _magic_no);
     case STRAT_STDDEV:
       return ea.StrategyAdd<Stg_StdDev>(_tfs, _stg, _magic_no);
     case STRAT_STOCHASTIC:
       return ea.StrategyAdd<Stg_Stochastic>(_tfs, _stg, _magic_no);
+    case STRAT_SVE_BB:
+      return ea.StrategyAdd<Stg_SVE_Bollinger_Bands>(_tfs, _stg, _magic_no);
+    case STRAT_TMAT_SVEBB:
+      return ea.StrategyAdd<Stg_TMAT_SVEBB>(_tfs, _stg, _magic_no);
+    case STRAT_TMA_TRUE:
+      return ea.StrategyAdd<Stg_TMA_True>(_tfs, _stg, _magic_no);
     case STRAT_WPR:
       return ea.StrategyAdd<Stg_WPR>(_tfs, _stg, _magic_no);
     case STRAT_ZIGZAG:
