@@ -32,33 +32,33 @@ input static string __Strategies_Active__ = "-- Active strategies --";  // >>> A
 #else
 input group "Active strategies"
 #endif
-input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;            // Strategy on M1
-input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;            // Strategy on M5
-input ENUM_STRATEGY Strategy_M15 = STRAT_RVI;            // Strategy on M15
-input ENUM_STRATEGY Strategy_M30 = STRAT_ATR;         // Strategy on M30
-input ENUM_STRATEGY Strategy_H1 = STRAT_STOCHASTIC;          // Strategy on H1
-input ENUM_STRATEGY Strategy_H4 = STRAT_DEMARKER;          // Strategy on H4
+input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;       // Strategy on M1
+input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;       // Strategy on M5
+input ENUM_STRATEGY Strategy_M15 = STRAT_DEMARKER;  // Strategy on M15
+input ENUM_STRATEGY Strategy_M30 = STRAT_GATOR;     // Strategy on M30
+input ENUM_STRATEGY Strategy_H1 = STRAT_RSI;        // Strategy on H1
+input ENUM_STRATEGY Strategy_H4 = STRAT_SAR;        // Strategy on H4
 
 #ifdef __MQL4__
 input static string __Strategies_Stops__ = "-- Strategies' stops --";  // >>> STRATEGIES' STOPS <<<
 #else
 input group "Strategies' stops"
 #endif
-input ENUM_STRATEGY EA_Stops_M1 = STRAT_NONE;       // Stop loss on M1
-input ENUM_STRATEGY EA_Stops_M5 = STRAT_NONE;       // Stop loss on M5
-input ENUM_STRATEGY EA_Stops_M15 = STRAT_NONE;  // Stop loss on M15
-input ENUM_STRATEGY EA_Stops_M30 = STRAT_NONE;       // Stop loss on M30
-input ENUM_STRATEGY EA_Stops_H1 = STRAT_NONE;   // Stop loss on H1
-input ENUM_STRATEGY EA_Stops_H4 = STRAT_NONE;   // Stop loss on H4
+input ENUM_STRATEGY EA_Stops_M1 = STRAT_NONE;     // Stop loss on M1
+input ENUM_STRATEGY EA_Stops_M5 = STRAT_NONE;     // Stop loss on M5
+input ENUM_STRATEGY EA_Stops_M15 = STRAT_ZIGZAG;  // Stop loss on M15
+input ENUM_STRATEGY EA_Stops_M30 = STRAT_DEMA;    // Stop loss on M30
+input ENUM_STRATEGY EA_Stops_H1 = STRAT_ADX;      // Stop loss on H1
+input ENUM_STRATEGY EA_Stops_H4 = STRAT_ZIGZAG;   // Stop loss on H4
 
 #ifdef __MQL4__
 input string __Strategies_Signal_Filters__ = "-- Strategies' signal filters --";  // >>> STRATEGIES' SIGNAL FILTERS <<<
 #else
 input group "Strategies' signal filters"
 #endif
-input int EA_SignalOpenFilter = 40;                             // Signal open filter (-127-127)
-input int EA_SignalCloseFilter = 16;                            // Signal close filter (-127-127)
-input int EA_SignalOpenFilterTime = 10;                         // Signal open filter time (-255-255)
+input int EA_SignalOpenFilter = 40;      // Signal open filter (-127-127)
+input int EA_SignalCloseFilter = 48;     // Signal close filter (-127-127)
+input int EA_SignalOpenFilterTime = 10;  // Signal open filter time (-255-255)
 
 #ifdef __MQL4__
 input string __EA_Actions__ = "-- EA's actions --";  // >>> EA's ACTIONS <<<
@@ -75,6 +75,6 @@ input string __Order_Params__ = "-- Orders' limits --";  // >>> ORDERS' LIMITS <
 #else
 input group "Orders' limits"
 #endif
-input float EA_OrderCloseLoss = 0;                                    // Close loss (in pips)
-input float EA_OrderCloseProfit = 0;                                  // Close profit (in pips)
-input int EA_OrderCloseTime = 0;                                      // Close time in mins (>0) or bars (<0)
+input float EA_OrderCloseLoss = 0;    // Close loss (in pips)
+input float EA_OrderCloseProfit = 0;  // Close profit (in pips)
+input int EA_OrderCloseTime = -40;    // Close time in mins (>0) or bars (<0)
