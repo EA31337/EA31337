@@ -15,6 +15,9 @@ bool ActionAdd(EAParams &_params, ENUM_EA_ADV_COND _cond, ENUM_EA_ADV_ACTION _ac
     case EA_ADV_ACTION_ORDERS_CLOSE_ALL:
       _action_entry = ActionEntry(TRADE_ACTION_ORDERS_CLOSE_ALL);
       break;
+    case EA_ADV_ACTION_ORDERS_CLOSE_IN_PROFIT:
+      _action_entry = ActionEntry(TRADE_ACTION_ORDERS_CLOSE_IN_PROFIT);
+      break;
     case EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND:
       _action_entry = ActionEntry(TRADE_ACTION_ORDERS_CLOSE_IN_TREND);
       break;
@@ -41,12 +44,14 @@ bool ActionAdd(EAParams &_params, ENUM_EA_ADV_COND _cond, ENUM_EA_ADV_ACTION _ac
     case EA_ADV_COND_ACC_EQUITY_05PC_LOW:
       _cond_entry = ConditionEntry(ACCOUNT_COND_EQUITY_05PC_LOW);
       break;
+    /* Trade conditions not supported (yet).
     case EA_ADV_COND_TRADE_IS_PEAK:
       _cond_entry = ConditionEntry(TRADE_COND_IS_PEAK);
       break;
     case EA_ADV_COND_TRADE_IS_PIVOT:
       _cond_entry = ConditionEntry(TRADE_COND_IS_PIVOT);
       break;
+    */
     case EA_ADV_COND_NONE:
       // Empty condition.
       break;

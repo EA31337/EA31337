@@ -82,6 +82,7 @@ bool ActionsAdd(EAParams &_ea_params, ENUM_EA_ADV_COND _c1, ENUM_EA_ADV_ACTION _
         _centry1.args[0] = _centry1_args[0];
         break;
       */
+      /* Trade conditions not supported (yet).
       case EA_ADV_COND_TRADE_IS_PEAK:
         _centry1.type = COND_TYPE_TRADE;
         _centry1.cond_id = TRADE_COND_IS_PEAK;
@@ -90,6 +91,7 @@ bool ActionsAdd(EAParams &_ea_params, ENUM_EA_ADV_COND _c1, ENUM_EA_ADV_ACTION _
         _centry1.type = COND_TYPE_TRADE;
         _centry1.cond_id = TRADE_COND_IS_PIVOT;
         break;
+      */
       case EA_ADV_COND_NONE:
       default:
         break;
