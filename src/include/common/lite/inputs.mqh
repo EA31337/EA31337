@@ -29,13 +29,16 @@
 // Includes strategies.
 #ifdef __MQL4__
 input static string __Strategies_Active__ = "-- Active strategies --";  // >>> ACTIVE STRATEGIES <<<
+input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;                           // Strategy on M1
+input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;                           // Strategy on M5
+input ENUM_STRATEGY Strategy_M15 = STRAT_BANDS;                         // Strategy on M15
+input ENUM_STRATEGY Strategy_M30 = STRAT_BANDS;                         // Strategy on M30
 #else
-input group "Active strategy"
+input group "Active strategy" input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;  // Strategy on M1
+input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;                                // Strategy on M5
+input ENUM_STRATEGY Strategy_M15 = STRAT_ZIGZAG;                             // Strategy on M15
+input ENUM_STRATEGY Strategy_M30 = STRAT_ZIGZAG;                             // Strategy on M30
 #endif
-input ENUM_STRATEGY Strategy_M1 = (ENUM_STRATEGY)STRAT_NONE;      // Strategy on M1
-input ENUM_STRATEGY Strategy_M5 = (ENUM_STRATEGY)STRAT_NONE;      // Strategy on M5
-input ENUM_STRATEGY Strategy_M15 = (ENUM_STRATEGY)STRAT_AWESOME;  // Strategy on M15
-input ENUM_STRATEGY Strategy_M30 = (ENUM_STRATEGY)STRAT_AWESOME;  // Strategy on M30
 
 #ifdef __MQL4__
 input string __Trade_Params__ = "-- Trade parameters --";  // >>> TRADE <<<
