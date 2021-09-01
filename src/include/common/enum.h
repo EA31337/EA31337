@@ -8,17 +8,18 @@
 enum ENUM_EA_ADV_ACTION {
   EA_ADV_ACTION_NONE = 0,  // (None)
   // EA_ADV_ACTION_ORDER_CLOSE,                // Close selected active order
-  EA_ADV_ACTION_ORDERS_CLOSE_ALL,           // Close all active orders (no args)
-  EA_ADV_ACTION_ORDERS_CLOSE_IN_PROFIT,     // Close orders in profit (no args)
-  EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND,      // Close orders in trend (no args)
-  EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND_NOT,  // Close orders in not trend (no args)
+  EA_ADV_ACTION_ORDERS_CLOSE_ALL,           // Close all active orders
+  EA_ADV_ACTION_ORDERS_CLOSE_IN_PROFIT,     // Close orders in profit
+  EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND,      // Close orders in trend
+  EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND_NOT,  // Close orders in not trend
 };
 enum ENUM_EA_ADV_COND {
   EA_ADV_COND_NONE = 0,              // (None)
-  EA_ADV_COND_ACC_EQUITY_01PC_HIGH,  // Equity>1% (no args)
-  EA_ADV_COND_ACC_EQUITY_01PC_LOW,   // Equity<1% (no args)
-  EA_ADV_COND_ACC_EQUITY_05PC_HIGH,  // Equity>5% (no args)
-  EA_ADV_COND_ACC_EQUITY_05PC_LOW,   // Equity<5% (no args)
+  EA_ADV_COND_ACC_EQUITY_01PC_HIGH,  // Equity > 1%
+  EA_ADV_COND_ACC_EQUITY_01PC_LOW,   // Equity < 1%
+  EA_ADV_COND_ACC_EQUITY_05PC_HIGH,  // Equity > 5%
+  EA_ADV_COND_ACC_EQUITY_05PC_LOW,   // Equity < 5%
+  EA_ADV_COND_MARGIN_USED_10PC,      // Margin used > 10%
   // EA_ADV_COND_ACC_EQUITY,         // Equity (in %)
   // EA_ADV_COND_ACC_MARGIN_FREE,    // Free margin (in %)
   // EA_ADV_COND_ACC_MARGIN_USED,    // Free margin (in %)
