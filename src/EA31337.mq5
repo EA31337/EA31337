@@ -284,116 +284,18 @@ bool InitStrategies() {
   ea.Set(STRAT_PARAM_OCP, 0);
   ea.Set(STRAT_PARAM_OCT, 0);
   // Init price stop methods for all timeframes.
-  if (EA_Stops_Strat != 0) {
-    Strategy *_strat_stops =
-        ea.GetStrategyViaProp2<int, int>(STRAT_PARAM_TYPE, EA_Stops_Strat, STRAT_PARAM_TF, EA_Stops_Tf);
-    if (!_strat_stops) {
-      EAStrategyAdd(EA_Stops_Strat, 1 << ChartTf::TfToIndex(EA_Stops_Tf));
-      _strat_stops = ea.GetStrategyViaProp2<int, int>(STRAT_PARAM_TYPE, EA_Stops_Strat, STRAT_PARAM_TF, EA_Stops_Tf);
-      if (_strat_stops) {
-        _strat_stops.Enabled(false);
-      }
-    }
-    if (_strat_stops) {
-      for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategies().Begin(); iter.IsValid(); ++iter) {
-        Strategy *_strat = iter.Value().Ptr();
-        if (_strat.IsEnabled()) {
-          _strat.SetStops(_strat_stops, _strat_stops);
-        }
-      }
-    }
-  }
+  EAStrategyAddStops(NULL, EA_Stops_Strat, EA_Stops_Tf);
 #else
   ea.Set(STRAT_PARAM_OCL, EA_OrderCloseLoss);
   ea.Set(STRAT_PARAM_OCP, EA_OrderCloseProfit);
   ea.Set(STRAT_PARAM_OCT, EA_OrderCloseTime);
   // Init price stop methods for each timeframe.
-  Strategy *_strat;
-  Strategy *_strat_stops;
-  if (EA_Stops_M1 != STRAT_NONE) {
-    _strat_stops = ea.GetStrategyViaProp2<int, int>(STRAT_PARAM_TYPE, EA_Stops_M1, STRAT_PARAM_TF, PERIOD_M1);
-    if (!_strat_stops) {
-      EAStrategyAdd(EA_Stops_M1, 1 << M1);
-      _strat_stops = ea.GetStrategyViaProp2<int, int>(STRAT_PARAM_TYPE, EA_Stops_M1, STRAT_PARAM_TF, PERIOD_M1);
-      if (_strat_stops) {
-        _strat_stops.Enabled(false);
-      }
-    }
-    if (_strat_stops) {
-      _strat = ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_M1);
-      _strat.SetStops(_strat_stops, _strat_stops);
-    }
-  }
-  if (EA_Stops_M5 != STRAT_NONE) {
-    _strat_stops = ea.GetStrategyViaProp2<int, int>(STRAT_PARAM_TYPE, EA_Stops_M5, STRAT_PARAM_TF, PERIOD_M5);
-    if (!_strat_stops) {
-      EAStrategyAdd(EA_Stops_M5, 1 << M5);
-      _strat_stops = ea.GetStrategyViaProp2<int, int>(STRAT_PARAM_TYPE, EA_Stops_M5, STRAT_PARAM_TF, PERIOD_M5);
-      if (_strat_stops) {
-        _strat_stops.Enabled(false);
-      }
-    }
-    if (_strat_stops) {
-      _strat = ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_M5);
-      _strat.SetStops(_strat_stops, _strat_stops);
-    }
-  }
-  if (EA_Stops_M15 != STRAT_NONE) {
-    _strat_stops = ea.GetStrategyViaProp2<int, int>(STRAT_PARAM_TYPE, EA_Stops_M15, STRAT_PARAM_TF, PERIOD_M15);
-    if (!_strat_stops) {
-      EAStrategyAdd(EA_Stops_M15, 1 << M15);
-      _strat_stops = ea.GetStrategyViaProp2<int, int>(STRAT_PARAM_TYPE, EA_Stops_M15, STRAT_PARAM_TF, PERIOD_M15);
-      if (_strat_stops) {
-        _strat_stops.Enabled(false);
-      }
-    }
-    if (_strat_stops) {
-      _strat = ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_M15);
-      _strat.SetStops(_strat_stops, _strat_stops);
-    }
-  }
-  if (EA_Stops_M30 != STRAT_NONE) {
-    _strat_stops = ea.GetStrategyViaProp2<int, int>(STRAT_PARAM_TYPE, EA_Stops_M30, STRAT_PARAM_TF, PERIOD_M30);
-    if (!_strat_stops) {
-      EAStrategyAdd(EA_Stops_M30, 1 << M30);
-      _strat_stops = ea.GetStrategyViaProp2<int, int>(STRAT_PARAM_TYPE, EA_Stops_M30, STRAT_PARAM_TF, PERIOD_M30);
-      if (_strat_stops) {
-        _strat_stops.Enabled(false);
-      }
-    }
-    if (_strat_stops) {
-      _strat = ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_M30);
-      _strat.SetStops(_strat_stops, _strat_stops);
-    }
-  }
-  if (EA_Stops_H1 != STRAT_NONE) {
-    _strat_stops = ea.GetStrategyViaProp2<int, int>(STRAT_PARAM_TYPE, EA_Stops_H1, STRAT_PARAM_TF, PERIOD_H1);
-    if (!_strat_stops) {
-      EAStrategyAdd(EA_Stops_H1, 1 << H1);
-      _strat_stops = ea.GetStrategyViaProp2<int, int>(STRAT_PARAM_TYPE, EA_Stops_H1, STRAT_PARAM_TF, PERIOD_H1);
-      if (_strat_stops) {
-        _strat_stops.Enabled(false);
-      }
-    }
-    if (_strat_stops) {
-      _strat = ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_H1);
-      _strat.SetStops(_strat_stops, _strat_stops);
-    }
-  }
-  if (EA_Stops_H4 != STRAT_NONE) {
-    _strat_stops = ea.GetStrategyViaProp2<int, int>(STRAT_PARAM_TYPE, EA_Stops_H4, STRAT_PARAM_TF, PERIOD_H4);
-    if (!_strat_stops) {
-      EAStrategyAdd(EA_Stops_H4, 1 << H4);
-      _strat_stops = ea.GetStrategyViaProp2<int, int>(STRAT_PARAM_TYPE, EA_Stops_H4, STRAT_PARAM_TF, PERIOD_H4);
-      if (_strat_stops) {
-        _strat_stops.Enabled(false);
-      }
-    }
-    if (_strat_stops) {
-      _strat = ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_H4);
-      _strat.SetStops(_strat_stops, _strat_stops);
-    }
-  }
+  _res &= EAStrategyAddStops(ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_M1), EA_Stops_M1, PERIOD_M1);
+  _res &= EAStrategyAddStops(ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_M5), EA_Stops_M5, PERIOD_M5);
+  _res &= EAStrategyAddStops(ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_M15), EA_Stops_M15, PERIOD_M15);
+  _res &= EAStrategyAddStops(ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_M30), EA_Stops_M30, PERIOD_M30);
+  _res &= EAStrategyAddStops(ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_H1), EA_Stops_H1, PERIOD_H1);
+  _res &= EAStrategyAddStops(ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_H4), EA_Stops_H4, PERIOD_H4);
 #endif                                                    // __rider__
 #endif                                                    // __advanced__
   _res &= GetLastError() == 0 || GetLastError() == 5053;  // @fixme: error 5053?
@@ -485,6 +387,37 @@ bool EAStrategyAdd(ENUM_STRATEGY _stg, int _tfs) {
       return ea.StrategyAdd<Stg_ZigZag>(_tfs, _magic_no, _stg);
   }
   return _stg == STRAT_NONE;
+}
+
+/**
+ * Adds strategy stops.
+ */
+bool EAStrategyAddStops(Strategy *_strat = NULL, ENUM_STRATEGY _enum_stg_stops = STRAT_NONE, ENUM_TIMEFRAMES _tf = 0) {
+  bool _result = true;
+  if (_enum_stg_stops == STRAT_NONE) {
+    return _result;
+  }
+  Strategy *_strat_stops = ea.GetStrategyViaProp2<int, int>(STRAT_PARAM_TYPE, _enum_stg_stops, STRAT_PARAM_TF, _tf);
+  if (!_strat_stops) {
+    _result &= EAStrategyAdd(_enum_stg_stops, 1 << ChartTf::TfToIndex(_tf));
+    _strat_stops = ea.GetStrategyViaProp2<int, int>(STRAT_PARAM_TYPE, _enum_stg_stops, STRAT_PARAM_TF, _tf);
+    if (_strat_stops) {
+      _strat_stops.Enabled(false);
+    }
+  }
+  if (_strat_stops) {
+    if (_strat != NULL && _tf > 0) {
+      _strat.SetStops(_strat_stops, _strat_stops);
+    } else {
+      for (DictStructIterator<long, Ref<Strategy>> iter = ea.GetStrategies().Begin(); iter.IsValid(); ++iter) {
+        Strategy *_strat_ref = iter.Value().Ptr();
+        if (_strat_ref.IsEnabled()) {
+          _strat_ref.SetStops(_strat_stops, _strat_stops);
+        }
+      }
+    }
+  }
+  return _result;
 }
 
 /**
