@@ -29,25 +29,20 @@
 // Includes strategies.
 #ifdef __MQL4__
 input static string __Strategies_Active__ = "-- Active strategies --";  // >>> ACTIVE STRATEGIES <<<
-input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;                           // Strategy on M1
-input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;                           // Strategy on M5
-input ENUM_STRATEGY Strategy_M15 = STRAT_BANDS;                         // Strategy on M15
-input ENUM_STRATEGY Strategy_M30 = STRAT_BANDS;                         // Strategy on M30
-input ENUM_STRATEGY Strategy_H1 = STRAT_RSI;                            // Strategy on H1
-input ENUM_STRATEGY Strategy_H4 = STRAT_RSI;                            // Strategy on H4
 #else
-input group "Active strategy" input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;  // Strategy on M1
-input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;                                // Strategy on M5
-input ENUM_STRATEGY Strategy_M15 = STRAT_ZIGZAG;                             // Strategy on M15
-input ENUM_STRATEGY Strategy_M30 = STRAT_ZIGZAG;                             // Strategy on M30
-input ENUM_STRATEGY Strategy_H1 = STRAT_RSI;                                 // Strategy on H1
-input ENUM_STRATEGY Strategy_H4 = STRAT_RSI;                                 // Strategy on H4
+input group "Active strategy"
 #endif
+input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;    // Strategy on M1
+input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;    // Strategy on M5
+input ENUM_STRATEGY Strategy_M15 = STRAT_BANDS;  // Strategy on M15
+input ENUM_STRATEGY Strategy_M30 = STRAT_MFI;    // Strategy on M30
+input ENUM_STRATEGY Strategy_H1 = STRAT_CCI;     // Strategy on H1
+input ENUM_STRATEGY Strategy_H4 = STRAT_SAR;     // Strategy on H4
 
 #ifdef __MQL4__
 input string __Trade_Params__ = "-- Trade parameters --";  // >>> TRADE <<<
 #else
 input group "Trade parameters"
 #endif
-input int EA_SignalOpenFilter = 40;  // Signal open filter
-int EA_SignalCloseFilter = 0;        // Signal close filter
+int EA_SignalOpenFilterMethod = 32;  // Open Filter (1=!BarO,2=Trend,4=PP,8=OppO,16=Peak,32=BetterO,64=!Eq<1%)
+int EA_SignalCloseFilter = 0;        // Close filter

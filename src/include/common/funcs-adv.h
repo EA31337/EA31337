@@ -5,9 +5,9 @@
 //+------------------------------------------------------------------+
 
 /**
- * Add EA's action with the condition.
+ * Adds EA's task.
  */
-bool ActionAdd(EAParams &_params, ENUM_EA_ADV_COND _cond, ENUM_EA_ADV_ACTION _action) {
+TaskEntry GetTask(ENUM_EA_ADV_COND _cond, ENUM_EA_ADV_ACTION _action) {
   bool _result = true;
   ActionEntry _action_entry;
   ConditionEntry _cond_entry;
@@ -52,6 +52,9 @@ bool ActionAdd(EAParams &_params, ENUM_EA_ADV_COND _cond, ENUM_EA_ADV_ACTION _ac
       _cond_entry = ConditionEntry(TRADE_COND_IS_PIVOT);
       break;
     */
+    case EA_ADV_COND_MARGIN_USED_10PC:
+      _cond_entry = ConditionEntry(ACCOUNT_COND_MARGIN_USED_10PC);
+      break;
     case EA_ADV_COND_NONE:
       // Empty condition.
       break;
@@ -59,6 +62,5 @@ bool ActionAdd(EAParams &_params, ENUM_EA_ADV_COND _cond, ENUM_EA_ADV_ACTION _ac
       _result = false;
       break;
   }
-  _params.SetTaskEntry(TaskEntry(_action_entry, _cond_entry));
-  return true;
+  return TaskEntry(_action_entry, _cond_entry);
 }
