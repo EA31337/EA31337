@@ -1,0 +1,31 @@
+
+
+
+                                                                Strategy Tester Report
+                                                EA31337-Lite-f4e993a9c7bb1e659276574867d40bf24e280bba
+                                                                     (Build 1280)
+
+  Symbol                            EURUSD (Euro vs US Dollar)
+  Period                            1 Minute (M1) 2018.01.01 23:40 - 2018.12.30 23:59 (2018.01.01 - 2018.12.31)
+  Model                             Every tick (the most precise method based on all available least timeframes)
+                                    __EA_Params__=">> EA31337 Lite v2.005 build 1630605789 <<"; __Strategies_Active__="-- Active strategies --";
+                                    Strategy_M1=0; Strategy_M5=0; Strategy_M15=7; Strategy_M30=23; Strategy_H1=11; Strategy_H4=30;
+  Parameters                        __Trade_Params__="-- Trade parameters --"; __EA_Risk_Params__="-- EA's risk management --";
+                                    EA_Risk_MarginMax=5; __EA_Trade_Params__="-- EA's trade parameters --"; EA_LotSize=0; EA_MagicNumber=31337;
+                                    __Logging_Params__="-- EA's logging & messaging --"; VerboseLevel=1; EA_DisplayDetailsOnChart=true;
+  Bars in test               356589 Ticks modelled                    109229002 Modelling quality                                            24.99%
+  Mismatched charts errors        0
+  Initial deposit          10000.00                                             Spread                                                           10
+  Total net profit          -721.39 Gross profit                        1629.76 Gross loss                                                 -2351.15
+  Profit factor                0.69 Expected payoff                       -3.02
+  Absolute drawdown          749.12 Maximal drawdown             767.92 (7.66%) Relative drawdown                                    7.66% (767.92)
+  Total trades                  239 Short positions (won %)        102 (51.96%) Long positions (won %)                                 137 (53.28%)
+                                    Profit trades (% of total)     126 (52.72%) Loss trades (% of total)                               113 (47.28%)
+                            Largest profit trade                         138.38 loss trade                                                  -116.52
+                            Average profit trade                          12.93 loss trade                                                   -20.81
+                            Maximum consecutive wins (profit in       7 (71.10) consecutive losses (loss in money)                      6 (-129.63)
+                                    money)
+                            Maximal consecutive profit (count of     138.38 (1) consecutive loss (count of losses)                      -207.15 (2)
+                                    wins)
+                            Average consecutive wins                          2 consecutive losses                                                2
+                                                                       [Graph]
