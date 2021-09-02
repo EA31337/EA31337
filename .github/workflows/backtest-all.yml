@@ -1,0 +1,267 @@
+---
+name: Backtest
+
+# yamllint disable-line rule:truthy
+on:
+  push:
+    branches:
+      - 'v*-backtest-all'
+  release:
+    types:
+      - published
+
+jobs:
+
+  Compile:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        mode:
+          - Lite
+          - Advanced
+          - Rider
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Enables backtest mode
+        run: echo '#define __backtest__' > src/include/common/mode.h
+      - name: Enables CLI mode
+        run: echo '#define __cli__' >> src/include/common/mode.h
+      - name: Enables Advanced mode
+        if: matrix.mode == 'Advanced'
+        run: echo '#define __advanced__' >> src/include/common/mode.h
+      - name: Enables Rider mode
+        if: matrix.mode == 'Rider'
+        run: echo '#define __rider__' >> src/include/common/mode.h
+      - name: Compiles EA (MQL4)
+        uses: fx31337/mql-compile-action@master
+        with:
+          path: src\EA31337.mq4
+          verbose: true
+      - name: Compiles EA (MQL5)
+        uses: fx31337/mql-compile-action@master
+        with:
+          path: src\EA31337.mq5
+          verbose: true
+      - name: Moves file (MQL4)
+        run: mv -v src\*.ex4 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex4"
+      - name: Moves file (MQL5)
+        run: mv -v src\*.ex5 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex5"
+      - name: Prints compiled files
+        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
+        shell: powershell
+      - name: Uploads artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: EA31337-${{ matrix.mode }}
+          path: '*.ex?'
+
+  Backtest-Lite:
+    defaults:
+      run:
+        shell: bash
+    needs: Compile
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        exclude:
+          - deposit: 1k
+            mode: Lite
+            spread: 10
+            year: 2020
+        mode: [Lite]
+        year: [2017, 2018, 2019, 2020]
+        deposit: [1k, 10k, 100k]
+        spread: [1, 10]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: EA31337-${{ matrix.mode }}
+      - name: Removes old results
+        # yamllint disable-line rule:line-length
+        run: rm -fr "docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results"/*
+      # yamllint disable-line rule:line-length
+      - run: docker-compose run ${{ matrix.mode }}_${{ matrix.year }}_${{ matrix.deposit }}_s${{ matrix.spread }}
+        # yamllint disable-line rule:line-length
+        working-directory: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}
+      - name: Uploads results
+        uses: actions/upload-artifact@v2
+        with:
+          name: Results-${{ matrix.mode }}-${{ matrix.year }}
+          # yamllint disable-line rule:line-length
+          path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
+      - name: Re-uploads results on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: Results-${{ matrix.mode }}-${{ matrix.year }}
+          # yamllint disable-line rule:line-length
+          path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
+
+  Backtest-Advanced:
+    defaults:
+      run:
+        shell: bash
+    needs: Compile
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        exclude:
+          - deposit: 1k
+            mode: Advanced
+            spread: 10
+            year: 2020
+        mode: [Advanced]
+        year: [2017, 2018, 2019, 2020]
+        deposit: [1k, 10k, 100k]
+        spread: [1, 10]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: EA31337-${{ matrix.mode }}
+      - name: Removes old results
+        # yamllint disable-line rule:line-length
+        run: rm -fr "docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results"/*
+      # yamllint disable-line rule:line-length
+      - run: docker-compose run ${{ matrix.mode }}_${{ matrix.year }}_${{ matrix.deposit }}_s${{ matrix.spread }}
+        # yamllint disable-line rule:line-length
+        working-directory: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}
+      - name: Uploads results
+        uses: actions/upload-artifact@v2
+        with:
+          name: Results-${{ matrix.mode }}-${{ matrix.year }}
+          # yamllint disable-line rule:line-length
+          path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
+      - name: Re-uploads results on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: Results-${{ matrix.mode }}-${{ matrix.year }}
+          # yamllint disable-line rule:line-length
+          path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
+
+  Backtest-Rider:
+    defaults:
+      run:
+        shell: bash
+    needs: Compile
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        exclude:
+          - deposit: 1k
+            mode: Rider
+            spread: 10
+            year: 2020
+        mode: [Rider]
+        year: [2017, 2018, 2019, 2020]
+        deposit: [1k, 10k, 100k]
+        spread: [1, 10]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: EA31337-${{ matrix.mode }}
+      - name: Removes old results
+        # yamllint disable-line rule:line-length
+        run: rm -fr "docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results"/*
+      # yamllint disable-line rule:line-length
+      - run: docker-compose run ${{ matrix.mode }}_${{ matrix.year }}_${{ matrix.deposit }}_s${{ matrix.spread }}
+        # yamllint disable-line rule:line-length
+        working-directory: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}
+      - name: Uploads results
+        uses: actions/upload-artifact@v2
+        with:
+          name: Results-${{ matrix.mode }}-${{ matrix.year }}
+          # yamllint disable-line rule:line-length
+          path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
+      - name: Re-uploads results on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: Results-${{ matrix.mode }}-${{ matrix.year }}
+          # yamllint disable-line rule:line-length
+          path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
+
+
+  Publish-Results:
+    defaults:
+      run:
+        shell: bash
+        working-directory: docker/backtest
+    if: >
+      github.repository == 'EA31337/EA31337'
+      && github.event_name == 'pull_request'
+      && ${{ always() }}
+    needs: [Backtest-Lite, Backtest-Advanced, Backtest-Rider]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mode:
+          - Lite
+          - Advanced
+          - Rider
+        year:
+          - 2017
+          - 2018
+          - 2019
+          - 2020
+      max-parallel: 1
+    steps:
+      - uses: actions/checkout@v2
+        if: github.event_name != 'pull_request'
+        with:
+          persist-credentials: false
+          # Otherwise, you will failed to push refs to dest repo.
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+      - uses: actions/checkout@v2
+        if: github.event_name == 'pull_request'
+        with:
+          persist-credentials: false
+          # Otherwise, you will failed to push refs to dest repo.
+          fetch-depth: 0
+          ref: refs/heads/${{ github.head_ref }}
+      - uses: actions/download-artifact@v2
+        with:
+          name: Results-${{ matrix.mode }}-${{ matrix.year }}
+          # yamllint disable-line rule:line-length
+          path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
+      - name: Commit files
+        run: |
+          git config --local core.autocrlf false
+          git config --local user.email $git_email
+          git config --local user.name "${{ github.actor }}"
+          git add . && git add --renormalize .
+          git pull origin "${{ github.ref }}" --autostash --rebase -Xours
+          git commit -a \
+          -m "${{ matrix.mode }}: Backtest Results for ${{ matrix.year }}"
+        env:
+          git_email: "${{ github.actor }}@users.noreply.github.com"
+      - name: Push changes (not PR)
+        if: github.event_name != 'pull_request'
+        uses: ad-m/github-push-action@master
+        with:
+          branch: ${{ github.ref }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push changes (PR)
+        if: github.event_name == 'pull_request'
+        uses: ad-m/github-push-action@master
+        with:
+          branch: refs/heads/${{ github.head_ref }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Re-pull on failure
+        if: ${{ failure() }}
+        run: git pull origin ${{ github.ref }} --autostash --rebase -X ours
