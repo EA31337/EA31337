@@ -238,7 +238,7 @@ bool InitEA() {
   ea_params.SetFlag(EA_PARAM_FLAG_LOTSIZE_AUTO, EA_LotSize <= 0);
   // Init instance.
   ea = new EA(ea_params);
-  // ea.Set(TRADE_PARAM_RISK_MARGIN, EA_Risk_MarginMax); // @todo
+  ea.Set(TRADE_PARAM_RISK_MARGIN, EA_Risk_MarginMax);
   if (!ea.GetState().IsTradeAllowed()) {
     ea.GetLogger().Error(
         "Trading is not allowed for this symbol, please enable automated trading or check the settings!",

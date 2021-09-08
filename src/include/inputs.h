@@ -41,7 +41,7 @@ extern string __EA_Risk_Params__ = "-- EA's risk management --";  // >>> EA's RI
 #else
 input group "EA's risk management"
 #endif
-float EA_Risk_MarginMax = 1.0f;  // Max margin to risk (in %)
+input float EA_Risk_MarginMax = 1.0f;  // Max margin to risk (in %)
 
 #ifdef __MQL4__
 input string __EA_Trade_Params__ = "-- EA's trade parameters --";  // >>> EA's TRADE <<<
