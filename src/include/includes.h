@@ -26,7 +26,6 @@
 #ifdef __advanced__
 // Includes common EA actions.
 #include "common/funcs-adv.h"
-//#include "common/ea-actions.h"
 #endif
 
 // Includes indicator classes.
