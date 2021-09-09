@@ -26,7 +26,6 @@ bool ActionsAdd(EAParams &_ea_params, ENUM_EA_ADV_COND _c1, ENUM_EA_ADV_ACTION _
         break;
       */
       case EA_ADV_ACTION_ORDERS_CLOSE_ALL:
-        // EA_ACTION_STRATS_EXE_ACTION
         _aentry1.type = ACTION_TYPE_TRADE;
         _aentry1.action_id = TRADE_ACTION_ORDERS_CLOSE_ALL;
         break;

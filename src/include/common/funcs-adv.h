@@ -12,6 +12,20 @@ TaskEntry GetTask(ENUM_EA_ADV_COND _cond, ENUM_EA_ADV_ACTION _action) {
   ActionEntry _action_entry;
   ConditionEntry _cond_entry;
   switch (_action) {
+    /* @todo
+    case EA_ADV_ACTION_CLOSE_LEAST_LOSS:
+      _action_entry = ActionEntry(TRADE_ACTION_ORDER_CLOSE_LEAST_LOSS);
+      break;
+    case EA_ADV_ACTION_CLOSE_LEAST_PROFIT:
+      _action_entry = ActionEntry(TRADE_ACTION_ORDER_CLOSE_LEAST_PROFIT);
+      break;
+    */
+    case EA_ADV_ACTION_CLOSE_MOST_LOSS:
+      _action_entry = ActionEntry(TRADE_ACTION_ORDER_CLOSE_MOST_LOSS);
+      break;
+    case EA_ADV_ACTION_CLOSE_MOST_PROFIT:
+      _action_entry = ActionEntry(TRADE_ACTION_ORDER_CLOSE_MOST_PROFIT);
+      break;
     case EA_ADV_ACTION_ORDERS_CLOSE_ALL:
       _action_entry = ActionEntry(TRADE_ACTION_ORDERS_CLOSE_ALL);
       break;
