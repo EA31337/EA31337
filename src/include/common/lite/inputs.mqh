@@ -38,10 +38,3 @@ input ENUM_STRATEGY Strategy_M15 = STRAT_ALLIGATOR;   // Strategy on M15
 input ENUM_STRATEGY Strategy_M30 = STRAT_AWESOME;     // Strategy on M30
 input ENUM_STRATEGY Strategy_H1 = STRAT_BEARS_POWER;  // Strategy on H1
 input ENUM_STRATEGY Strategy_H4 = STRAT_SAR;          // Strategy on H4
-
-#ifdef __MQL4__
-// input string __Trade_Params__ = "-- Trade parameters --";  // >>> TRADE <<<
-#else
-// input group "Trade parameters"
-#endif
-int EA_SignalOpenFilterMethod = 32;  // Open (1=!BarO,2=Trend,4=PP,8=OppO,16=Peak,32=BetterO,64=!Eq<1%)
