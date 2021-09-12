@@ -33,29 +33,29 @@ input static string __Strategies_Active__ = "-- Active strategies --";  // >>> A
 input group "Active strategy"
 #endif
 input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;        // Strategy on M1
-input ENUM_STRATEGY Strategy_M5 = STRAT_STOCHASTIC;  // Strategy on M5
-input ENUM_STRATEGY Strategy_M15 = STRAT_ATR;        // Strategy on M15
-input ENUM_STRATEGY Strategy_M30 = STRAT_ADX;        // Strategy on M30
-input ENUM_STRATEGY Strategy_H1 = STRAT_MA;          // Strategy on H1
-input ENUM_STRATEGY Strategy_H4 = STRAT_ADX;         // Strategy on H4
+input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;        // Strategy on M5
+input ENUM_STRATEGY Strategy_M15 = STRAT_MA;         // Strategy on M15
+input ENUM_STRATEGY Strategy_M30 = STRAT_GATOR;      // Strategy on M30
+input ENUM_STRATEGY Strategy_H1 = STRAT_STOCHASTIC;  // Strategy on H1
+input ENUM_STRATEGY Strategy_H4 = STRAT_MOMENTUM;    // Strategy on H4
 
 #ifdef __MQL4__
 input static string __Strategies_Stops__ = "-- Strategies' stops --";  // >>> STRATEGIES' STOPS <<<
 #else
 input group "Strategies' stops"
 #endif
-input ENUM_STRATEGY EA_Stops_Strat = STRAT_MA;  // Stop loss strategy
-input ENUM_TIMEFRAMES EA_Stops_Tf = PERIOD_H3;  // Stop loss timeframe
+input ENUM_STRATEGY EA_Stops_Strat = STRAT_SAR;  // Stop loss strategy
+input ENUM_TIMEFRAMES EA_Stops_Tf = PERIOD_H4;   // Stop loss timeframe
 
 #ifdef __MQL4__
 input string __EA_Tasks__ = "-- EA's tasks --";  // >>> EA's TASKS <<<
 #else
 input group "EA's tasks"
 #endif
-input ENUM_EA_ADV_COND EA_Task1_If = EA_ADV_COND_ACC_EQUITY_01PC_HIGH;             // 1: Task's condition
-input ENUM_EA_ADV_ACTION EA_Task1_Then = EA_ADV_ACTION_ORDERS_CLOSE_IN_PROFIT;     // 1: Task's action
-input ENUM_EA_ADV_COND EA_Task2_If = EA_ADV_COND_ACC_EQUITY_05PC_LOW;              // 2: Task's condition
-input ENUM_EA_ADV_ACTION EA_Task2_Then = EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND_NOT;  // 2: Task's action
+input ENUM_EA_ADV_COND EA_Task1_If = EA_ADV_COND_ACC_EQUITY_05PC_HIGH;     // 1: Task's condition
+input ENUM_EA_ADV_ACTION EA_Task1_Then = EA_ADV_ACTION_CLOSE_MOST_PROFIT;  // 1: Task's action
+input ENUM_EA_ADV_COND EA_Task2_If = EA_ADV_COND_ACC_EQUITY_05PC_LOW;      // 2: Task's condition
+input ENUM_EA_ADV_ACTION EA_Task2_Then = EA_ADV_ACTION_CLOSE_MOST_PROFIT;  // 2: Task's action
 // input float EA_Task1_If_Arg = 0;                                 // 1: Task's condition argument
 // input float EA_Task1_Then_Arg = 0;                               // 1: Task's action argument
 
