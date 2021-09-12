@@ -37,6 +37,8 @@ input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;       // Strategy on M5
 input ENUM_STRATEGY Strategy_M15 = STRAT_AD;        // Strategy on M15
 input ENUM_STRATEGY Strategy_M30 = STRAT_ADX;       // Strategy on M30
 input ENUM_STRATEGY Strategy_H1 = STRAT_ALLIGATOR;  // Strategy on H1
+input ENUM_STRATEGY Strategy_H2 = STRAT_NONE;       // Strategy on H2
+input ENUM_STRATEGY Strategy_H3 = STRAT_NONE;       // Strategy on H3
 input ENUM_STRATEGY Strategy_H4 = STRAT_SAR;        // Strategy on H4
 
 #ifdef __MQL4__
@@ -49,6 +51,8 @@ input ENUM_STRATEGY EA_Stops_M5 = STRAT_NONE;        // Stop loss on M5
 input ENUM_STRATEGY EA_Stops_M15 = STRAT_ALLIGATOR;  // Stop loss on M15
 input ENUM_STRATEGY EA_Stops_M30 = STRAT_SAR;        // Stop loss on M30
 input ENUM_STRATEGY EA_Stops_H1 = STRAT_ENVELOPES;   // Stop loss on H1
+input ENUM_STRATEGY EA_Stops_H2 = STRAT_NONE;        // Stop loss on H2
+input ENUM_STRATEGY EA_Stops_H3 = STRAT_NONE;        // Stop loss on H3
 input ENUM_STRATEGY EA_Stops_H4 = STRAT_SAR;         // Stop loss on H4
 
 #ifdef __MQL4__

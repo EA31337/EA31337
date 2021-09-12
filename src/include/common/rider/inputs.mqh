@@ -37,6 +37,8 @@ input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;        // Strategy on M5
 input ENUM_STRATEGY Strategy_M15 = STRAT_MA;         // Strategy on M15
 input ENUM_STRATEGY Strategy_M30 = STRAT_GATOR;      // Strategy on M30
 input ENUM_STRATEGY Strategy_H1 = STRAT_STOCHASTIC;  // Strategy on H1
+input ENUM_STRATEGY Strategy_H2 = STRAT_NONE;        // Strategy on H2
+input ENUM_STRATEGY Strategy_H3 = STRAT_NONE;        // Strategy on H3
 input ENUM_STRATEGY Strategy_H4 = STRAT_MOMENTUM;    // Strategy on H4
 
 #ifdef __MQL4__
