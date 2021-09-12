@@ -52,6 +52,12 @@ TaskEntry GetTask(ENUM_EA_ADV_COND _cond, ENUM_EA_ADV_ACTION _action) {
     case EA_ADV_COND_ACC_EQUITY_01PC_LOW:
       _cond_entry = ConditionEntry(ACCOUNT_COND_EQUITY_01PC_LOW);
       break;
+    case EA_ADV_COND_ACC_EQUITY_02PC_HIGH:
+      _cond_entry = ConditionEntry(ACCOUNT_COND_EQUITY_02PC_HIGH);
+      break;
+    case EA_ADV_COND_ACC_EQUITY_02PC_LOW:
+      _cond_entry = ConditionEntry(ACCOUNT_COND_EQUITY_02PC_LOW);
+      break;
     case EA_ADV_COND_ACC_EQUITY_05PC_HIGH:
       _cond_entry = ConditionEntry(ACCOUNT_COND_EQUITY_05PC_HIGH);
       break;
