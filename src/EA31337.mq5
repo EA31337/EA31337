@@ -77,9 +77,6 @@ void OnTick() {
       _text += SerializerConverter::FromObject(ea, SERIALIZER_FLAG_INCLUDE_DYNAMIC).ToString<SerializerJson>();
       Comment(_text);
     }
-    if (ea.GetState().new_periods > 0) {
-      ea.GetLogger().Flush(10);
-    }
   }
 }
 

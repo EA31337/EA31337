@@ -7,7 +7,10 @@
 #ifdef __advanced__
 enum ENUM_EA_ADV_ACTION {
   EA_ADV_ACTION_NONE = 0,  // (None)
-  // EA_ADV_ACTION_ORDER_CLOSE,                // Close selected active order
+  // EA_ADV_ACTION_CLOSE_LEAST_LOSS,     // Close order with the least loss
+  // EA_ADV_ACTION_CLOSE_LEAST_PROFIT,   // Close order with the least profit
+  EA_ADV_ACTION_CLOSE_MOST_LOSS,      // Close order with the most loss
+  EA_ADV_ACTION_CLOSE_MOST_PROFIT,    // Close order with the most profit
   EA_ADV_ACTION_ORDERS_CLOSE_ALL,           // Close all active orders
   EA_ADV_ACTION_ORDERS_CLOSE_IN_PROFIT,     // Close orders in profit
   EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND,      // Close orders in trend
@@ -17,6 +20,8 @@ enum ENUM_EA_ADV_COND {
   EA_ADV_COND_NONE = 0,              // (None)
   EA_ADV_COND_ACC_EQUITY_01PC_HIGH,  // Equity > 1%
   EA_ADV_COND_ACC_EQUITY_01PC_LOW,   // Equity < 1%
+  EA_ADV_COND_ACC_EQUITY_02PC_HIGH,  // Equity > 2%
+  EA_ADV_COND_ACC_EQUITY_02PC_LOW,   // Equity < 2%
   EA_ADV_COND_ACC_EQUITY_05PC_HIGH,  // Equity > 5%
   EA_ADV_COND_ACC_EQUITY_05PC_LOW,   // Equity < 5%
   EA_ADV_COND_MARGIN_USED_10PC,      // Margin used > 10%
