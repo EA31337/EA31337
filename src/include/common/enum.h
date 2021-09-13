@@ -18,13 +18,14 @@ enum ENUM_EA_ADV_ACTION {
 };
 enum ENUM_EA_ADV_COND {
   EA_ADV_COND_NONE = 0,              // (None)
-  EA_ADV_COND_ACC_EQUITY_01PC_HIGH,  // Equity > 1%
-  EA_ADV_COND_ACC_EQUITY_01PC_LOW,   // Equity < 1%
-  EA_ADV_COND_ACC_EQUITY_02PC_HIGH,  // Equity > 2%
-  EA_ADV_COND_ACC_EQUITY_02PC_LOW,   // Equity < 2%
-  EA_ADV_COND_ACC_EQUITY_05PC_HIGH,  // Equity > 5%
-  EA_ADV_COND_ACC_EQUITY_05PC_LOW,   // Equity < 5%
-  EA_ADV_COND_MARGIN_USED_10PC,      // Margin used > 10%
+  EA_ADV_COND_TRADE_EQUITY_GT_01PC, // Equity > 1%
+  EA_ADV_COND_TRADE_EQUITY_LT_01PC, // Equity < 1%
+  EA_ADV_COND_TRADE_EQUITY_GT_02PC, // Equity > 2%
+  EA_ADV_COND_TRADE_EQUITY_LT_02PC, // Equity < 2%
+  EA_ADV_COND_TRADE_EQUITY_GT_05PC, // Equity > 5%
+  EA_ADV_COND_TRADE_EQUITY_LT_05PC, // Equity < 5%
+  EA_ADV_COND_TRADE_EQUITY_GT_10PC, // Equity > 10%
+  EA_ADV_COND_TRADE_EQUITY_LT_10PC, // Equity < 10%
   // EA_ADV_COND_ACC_EQUITY,         // Equity (in %)
   // EA_ADV_COND_ACC_MARGIN_FREE,    // Free margin (in %)
   // EA_ADV_COND_ACC_MARGIN_USED,    // Free margin (in %)

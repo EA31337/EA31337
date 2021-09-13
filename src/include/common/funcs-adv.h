@@ -46,24 +46,6 @@ TaskEntry GetTask(ENUM_EA_ADV_COND _cond, ENUM_EA_ADV_ACTION _action) {
       break;
   }
   switch (_cond) {
-    case EA_ADV_COND_ACC_EQUITY_01PC_HIGH:
-      _cond_entry = ConditionEntry(ACCOUNT_COND_EQUITY_01PC_HIGH);
-      break;
-    case EA_ADV_COND_ACC_EQUITY_01PC_LOW:
-      _cond_entry = ConditionEntry(ACCOUNT_COND_EQUITY_01PC_LOW);
-      break;
-    case EA_ADV_COND_ACC_EQUITY_02PC_HIGH:
-      _cond_entry = ConditionEntry(ACCOUNT_COND_EQUITY_02PC_HIGH);
-      break;
-    case EA_ADV_COND_ACC_EQUITY_02PC_LOW:
-      _cond_entry = ConditionEntry(ACCOUNT_COND_EQUITY_02PC_LOW);
-      break;
-    case EA_ADV_COND_ACC_EQUITY_05PC_HIGH:
-      _cond_entry = ConditionEntry(ACCOUNT_COND_EQUITY_05PC_HIGH);
-      break;
-    case EA_ADV_COND_ACC_EQUITY_05PC_LOW:
-      _cond_entry = ConditionEntry(ACCOUNT_COND_EQUITY_05PC_LOW);
-      break;
     /* Trade conditions not supported (yet).
     case EA_ADV_COND_TRADE_IS_PEAK:
       _cond_entry = ConditionEntry(TRADE_COND_IS_PEAK);
@@ -72,8 +54,29 @@ TaskEntry GetTask(ENUM_EA_ADV_COND _cond, ENUM_EA_ADV_ACTION _action) {
       _cond_entry = ConditionEntry(TRADE_COND_IS_PIVOT);
       break;
     */
-    case EA_ADV_COND_MARGIN_USED_10PC:
-      _cond_entry = ConditionEntry(ACCOUNT_COND_MARGIN_USED_10PC);
+    case EA_ADV_COND_TRADE_EQUITY_GT_01PC:
+      _cond_entry = ConditionEntry(TRADE_COND_ORDERS_PROFIT_GT_01PC);
+      break;
+    case EA_ADV_COND_TRADE_EQUITY_LT_01PC:
+      _cond_entry = ConditionEntry(TRADE_COND_ORDERS_PROFIT_LT_01PC);
+      break;
+    case EA_ADV_COND_TRADE_EQUITY_GT_02PC:
+      _cond_entry = ConditionEntry(TRADE_COND_ORDERS_PROFIT_GT_02PC);
+      break;
+    case EA_ADV_COND_TRADE_EQUITY_LT_02PC:
+      _cond_entry = ConditionEntry(TRADE_COND_ORDERS_PROFIT_LT_02PC);
+      break;
+    case EA_ADV_COND_TRADE_EQUITY_GT_05PC:
+      _cond_entry = ConditionEntry(TRADE_COND_ORDERS_PROFIT_GT_05PC);
+      break;
+    case EA_ADV_COND_TRADE_EQUITY_LT_05PC:
+      _cond_entry = ConditionEntry(TRADE_COND_ORDERS_PROFIT_LT_05PC);
+      break;
+    case EA_ADV_COND_TRADE_EQUITY_GT_10PC:
+      _cond_entry = ConditionEntry(TRADE_COND_ORDERS_PROFIT_GT_10PC);
+      break;
+    case EA_ADV_COND_TRADE_EQUITY_LT_10PC:
+      _cond_entry = ConditionEntry(TRADE_COND_ORDERS_PROFIT_LT_10PC);
       break;
     case EA_ADV_COND_NONE:
       // Empty condition.
