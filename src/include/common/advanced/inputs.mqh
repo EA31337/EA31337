@@ -32,28 +32,28 @@ input static string __Strategies_Active__ = "-- Active strategies --";  // >>> A
 #else
 input group "Active strategies"
 #endif
-input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;       // Strategy on M1
-input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;       // Strategy on M5
-input ENUM_STRATEGY Strategy_M15 = STRAT_AD;        // Strategy on M15
-input ENUM_STRATEGY Strategy_M30 = STRAT_ADX;       // Strategy on M30
-input ENUM_STRATEGY Strategy_H1 = STRAT_ALLIGATOR;  // Strategy on H1
-input ENUM_STRATEGY Strategy_H2 = STRAT_NONE;       // Strategy on H2
-input ENUM_STRATEGY Strategy_H3 = STRAT_NONE;       // Strategy on H3
-input ENUM_STRATEGY Strategy_H4 = STRAT_SAR;        // Strategy on H4
+input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;         // Strategy on M1
+input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;         // Strategy on M5
+input ENUM_STRATEGY Strategy_M15 = STRAT_NONE;        // Strategy on M15
+input ENUM_STRATEGY Strategy_M30 = STRAT_NONE;        // Strategy on M30
+input ENUM_STRATEGY Strategy_H1 = STRAT_RSI;          // Strategy on H1
+input ENUM_STRATEGY Strategy_H2 = STRAT_BULLS_POWER;  // Strategy on H2
+input ENUM_STRATEGY Strategy_H3 = STRAT_MA;           // Strategy on H3
+input ENUM_STRATEGY Strategy_H4 = STRAT_FORCE;        // Strategy on H4
 
 #ifdef __MQL4__
 input static string __Strategies_Stops__ = "-- Strategies' stops --";  // >>> STRATEGIES' STOPS <<<
 #else
 input group "Strategies' stops"
 #endif
-input ENUM_STRATEGY EA_Stops_M1 = STRAT_NONE;        // Stop loss on M1
-input ENUM_STRATEGY EA_Stops_M5 = STRAT_NONE;        // Stop loss on M5
-input ENUM_STRATEGY EA_Stops_M15 = STRAT_ALLIGATOR;  // Stop loss on M15
-input ENUM_STRATEGY EA_Stops_M30 = STRAT_SAR;        // Stop loss on M30
-input ENUM_STRATEGY EA_Stops_H1 = STRAT_ENVELOPES;   // Stop loss on H1
-input ENUM_STRATEGY EA_Stops_H2 = STRAT_NONE;        // Stop loss on H2
-input ENUM_STRATEGY EA_Stops_H3 = STRAT_NONE;        // Stop loss on H3
-input ENUM_STRATEGY EA_Stops_H4 = STRAT_SAR;         // Stop loss on H4
+input ENUM_STRATEGY EA_Stops_M1 = STRAT_NONE;   // Stop loss on M1
+input ENUM_STRATEGY EA_Stops_M5 = STRAT_NONE;   // Stop loss on M5
+input ENUM_STRATEGY EA_Stops_M15 = STRAT_NONE;  // Stop loss on M15
+input ENUM_STRATEGY EA_Stops_M30 = STRAT_NONE;  // Stop loss on M30
+input ENUM_STRATEGY EA_Stops_H1 = STRAT_RSI;    // Stop loss on H1
+input ENUM_STRATEGY EA_Stops_H2 = STRAT_ADX;    // Stop loss on H2
+input ENUM_STRATEGY EA_Stops_H3 = STRAT_SAR;    // Stop loss on H3
+input ENUM_STRATEGY EA_Stops_H4 = STRAT_CCI;    // Stop loss on H4
 
 #ifdef __MQL4__
 input string __Strategies_Filters__ = "-- Strategies' filters --";  // >>> STRATEGIES' FILTERS <<<
@@ -64,17 +64,17 @@ input int EA_SignalOpenFilterMethod = 32;   // Open (1=!BarO,2=Trend,4=PP,8=OppO
 input int EA_SignalCloseFilter = 32;        // Close (1=!BarO,2=!Trend,4=!PP,8=O>H,16=Peak,32=BetterO,64=Eq>1%)
 input int EA_SignalOpenFilterTime = 12;     // Time (1=CHGO,2=FR,4=HK,8=LON,16=NY,32=SY,64=TYJ,128=WGN)
 input int EA_SignalOpenStrategyFilter = 2;  // Strategy (0-EachSignal,1=FirstOnly,2=HourlyConfirmed)
-input int EA_TickFilterMethod = 7;  // Tick (1=PerMin,2=Peaks,4=PeaksMins,8=Unique,16=MiddleBar,32=Open,64=10thBar)
+input int EA_TickFilterMethod = 32;  // Tick (1=PerMin,2=Peaks,4=PeaksMins,8=Unique,16=MiddleBar,32=Open,64=10thBar)
 
 #ifdef __MQL4__
 input string __EA_Tasks__ = "-- EA's tasks --";  // >>> EA's TASKS <<<
 #else
 input group "EA's tasks"
 #endif
-input ENUM_EA_ADV_COND EA_Task1_If = EA_ADV_COND_NONE;        // 1: Task's condition
-input ENUM_EA_ADV_ACTION EA_Task1_Then = EA_ADV_ACTION_NONE;  // 1: Task's action
-input ENUM_EA_ADV_COND EA_Task2_If = EA_ADV_COND_NONE;        // 2: Task's condition
-input ENUM_EA_ADV_ACTION EA_Task2_Then = EA_ADV_ACTION_NONE;  // 2: Task's action
+input ENUM_EA_ADV_COND EA_Task1_If = EA_ADV_COND_TRADE_EQUITY_GT_05PC;     // 1: Task's condition
+input ENUM_EA_ADV_ACTION EA_Task1_Then = EA_ADV_ACTION_CLOSE_MOST_PROFIT;  // 1: Task's action
+input ENUM_EA_ADV_COND EA_Task2_If = EA_ADV_COND_NONE;                     // 2: Task's condition
+input ENUM_EA_ADV_ACTION EA_Task2_Then = EA_ADV_ACTION_NONE;               // 2: Task's action
 // input float EA_Task1_If_Arg = 0;                                 // 1: Task's condition argument
 // input float EA_Task1_Then_Arg = 0;                               // 1: Task's action argument
 
