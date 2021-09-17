@@ -34,8 +34,8 @@ input group "Active strategies"
 #endif
 input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;         // Strategy on M1
 input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;         // Strategy on M5
-input ENUM_STRATEGY Strategy_M15 = STRAT_NONE;        // Strategy on M15
-input ENUM_STRATEGY Strategy_M30 = STRAT_NONE;        // Strategy on M30
+input ENUM_STRATEGY Strategy_M15 = STRAT_PATTERN;     // Strategy on M15
+input ENUM_STRATEGY Strategy_M30 = STRAT_STDDEV;      // Strategy on M30
 input ENUM_STRATEGY Strategy_H1 = STRAT_RSI;          // Strategy on H1
 input ENUM_STRATEGY Strategy_H2 = STRAT_BULLS_POWER;  // Strategy on H2
 input ENUM_STRATEGY Strategy_H3 = STRAT_MA;           // Strategy on H3
@@ -46,14 +46,14 @@ input static string __Strategies_Stops__ = "-- Strategies' stops --";  // >>> ST
 #else
 input group "Strategies' stops"
 #endif
-input ENUM_STRATEGY EA_Stops_M1 = STRAT_NONE;   // Stop loss on M1
-input ENUM_STRATEGY EA_Stops_M5 = STRAT_NONE;   // Stop loss on M5
-input ENUM_STRATEGY EA_Stops_M15 = STRAT_NONE;  // Stop loss on M15
-input ENUM_STRATEGY EA_Stops_M30 = STRAT_NONE;  // Stop loss on M30
-input ENUM_STRATEGY EA_Stops_H1 = STRAT_RSI;    // Stop loss on H1
-input ENUM_STRATEGY EA_Stops_H2 = STRAT_ADX;    // Stop loss on H2
-input ENUM_STRATEGY EA_Stops_H3 = STRAT_SAR;    // Stop loss on H3
-input ENUM_STRATEGY EA_Stops_H4 = STRAT_CCI;    // Stop loss on H4
+input ENUM_STRATEGY EA_Stops_M1 = STRAT_NONE;       // Stop loss on M1
+input ENUM_STRATEGY EA_Stops_M5 = STRAT_NONE;       // Stop loss on M5
+input ENUM_STRATEGY EA_Stops_M15 = STRAT_ICHIMOKU;  // Stop loss on M15
+input ENUM_STRATEGY EA_Stops_M30 = STRAT_STDDEV;    // Stop loss on M30
+input ENUM_STRATEGY EA_Stops_H1 = STRAT_RSI;        // Stop loss on H1
+input ENUM_STRATEGY EA_Stops_H2 = STRAT_ADX;        // Stop loss on H2
+input ENUM_STRATEGY EA_Stops_H3 = STRAT_SAR;        // Stop loss on H3
+input ENUM_STRATEGY EA_Stops_H4 = STRAT_CCI;        // Stop loss on H4
 
 #ifdef __MQL4__
 input string __Strategies_Filters__ = "-- Strategies' filters --";  // >>> STRATEGIES' FILTERS <<<
