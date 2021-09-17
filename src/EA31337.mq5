@@ -272,6 +272,7 @@ bool InitStrategies() {
   EAStrategyAdd(Strategy_H4, 1 << H4);
   // Update lot size.
   ea.Set(STRAT_PARAM_LS, EA_LotSize);
+  ea.Set(STRAT_PARAM_TFM, 40);
 #ifdef __advanced__
   ea.Set(STRAT_PARAM_SOFM, EA_SignalOpenFilterMethod);
   ea.Set(STRAT_PARAM_SCF, EA_SignalCloseFilter);
