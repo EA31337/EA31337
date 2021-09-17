@@ -2,30 +2,30 @@
 
 
                                                                 Strategy Tester Report
-                                                EA31337-Lite-d673664b487e9ae8efc61c1f2cc2f6a34897af6e
-                                                                     (Build 1280)
+                                                EA31337-Lite-4dd19bb3399c1945f5f9f940d63f432e07b582ef
+                                                                     (Build 1320)
 
-  Symbol                            EURUSD (Euro vs US Dollar)
-  Period                            1 Minute (M1) 2020.01.01 23:41 - 2020.12.30 23:59 (2020.01.01 - 2020.12.31)
-  Model                             Every tick (the most precise method based on all available least timeframes)
-                                    __EA_Params__=">> EA31337 Lite v2.005 build 1630668756 <<"; __Strategies_Active__="-- Active strategies --";
-                                    Strategy_M1=0; Strategy_M5=0; Strategy_M15=7; Strategy_M30=23; Strategy_H1=11; Strategy_H4=30;
-  Parameters                        __Trade_Params__="-- Trade parameters --"; __EA_Risk_Params__="-- EA's risk management --";
-                                    __EA_Trade_Params__="-- EA's trade parameters --"; EA_LotSize=0; EA_MagicNumber=31337; __Logging_Params__="-
-                                    - EA's logging & messaging --"; VerboseLevel=1; EA_DisplayDetailsOnChart=true;
-  Bars in test               372155 Ticks modelled                    167831773 Modelling quality                                             24.99%
-  Mismatched charts errors        0
-  Initial deposit          10000.00                                             Spread                                                             1
-  Total net profit           364.30 Gross profit                        1981.15 Gross loss                                                  -1616.85
-  Profit factor                1.23 Expected payoff                        1.04
-  Absolute drawdown          179.57 Maximal drawdown             264.80 (2.63%) Relative drawdown                                     2.63% (264.80)
-  Total trades                  349 Short positions (won %)        167 (51.50%) Long positions (won %)                                  182 (53.30%)
-                                    Profit trades (% of total)     183 (52.44%) Loss trades (% of total)                                166 (47.56%)
-                            Largest profit trade                          76.70 loss trade                                                    -97.20
-                            Average profit trade                          10.83 loss trade                                                     -9.74
-                            Maximum consecutive wins (profit in      9 (161.22) consecutive losses (loss in money)                       9 (-148.80)
-                                    money)
-                            Maximal consecutive profit (count of     161.22 (9) consecutive loss (count of losses)                       -148.80 (9)
-                                    wins)
-                            Average consecutive wins                          2 consecutive losses                                                 2
+ Symbol                            EURUSD (Euro vs US Dollar)
+ Period                            1 Minute (M1) 2020.01.01 23:41 - 2020.12.30 23:59 (2020.01.01 - 2020.12.31)
+ Model                             Every tick (the most precise method based on all available least timeframes)
+                                   __EA_Params__=">> EA31337 Lite v2.006 build 1631917051 <<"; __Strategies_Active__="-- Active strategies --";
+                                   Strategy_M1=0; Strategy_M5=0; Strategy_M15=4; Strategy_M30=6; Strategy_H1=8; Strategy_H2=21; Strategy_H3=30;
+ Parameters                        Strategy_H4=30; __EA_Risk_Params__="-- EA's risk management --"; EA_Risk_MarginMax=1; __EA_Trade_Params__="-- EA's
+                                   trade parameters --"; EA_LotSize=0; EA_MagicNumber=31337; __Logging_Params__="-- EA's logging & messaging --";
+                                   VerboseLevel=1; EA_DisplayDetailsOnChart=true;
+ Bars in test               372155 Ticks modelled                      167831773 Modelling quality                                             24.99%
+ Mismatched charts errors        0
+ Initial deposit          10000.00                                               Spread                                                             1
+ Total net profit         16055.11 Gross profit                         45506.61 Gross loss                                                 -29451.50
+ Profit factor                1.55 Expected payoff                          6.01
+ Absolute drawdown          384.07 Maximal drawdown             4793.23 (18.64%) Relative drawdown                                   18.64% (4793.23)
+ Total trades                 2672 Short positions (won %)         1270 (71.26%) Long positions (won %)                                 1402 (73.11%)
+                                   Profit trades (% of total)      1930 (72.23%) Loss trades (% of total)                                742 (27.77%)
+                           Largest profit trade                           391.70 loss trade                                                   -319.23
+                           Average profit trade                            23.58 loss trade                                                    -39.69
+                           Maximum consecutive wins (profit in      31 (1404.71) consecutive losses (loss in money)                      15 (-963.92)
+                                   money)
+                           Maximal consecutive profit (count of     3001.92 (25) consecutive loss (count of losses)                     -1306.20 (11)
+                                   wins)
+                           Average consecutive wins                            6 consecutive losses                                                 2
                                                                        [Graph]
