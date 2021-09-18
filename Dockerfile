@@ -15,26 +15,26 @@ RUN curl -LO "https://github.com/EA31337/MT-Platforms/releases/download/5.0.0.23
 # Build Lite version.
 FROM ea31337-ea as ea31337-lite
 WORKDIR /opt/EA
-RUN make Lite
-RUN make Lite-Release
-RUN make Lite-Backtest
-RUN make Lite-Optimize
+RUN make Lite && \
+    make Lite-Release && \
+    make Lite-Backtest && \
+    make Lite-Optimize
 
 # Build Advanced version.
 FROM ea31337-ea as ea31337-advanced
 WORKDIR /opt/EA
-RUN make Advanced
-RUN make Advanced-Release
-RUN make Advanced-Backtest
-RUN make Advanced-Optimize
+RUN make Advanced && \
+    make Advanced-Release && \
+    make Advanced-Backtest && \
+    make Advanced-Optimize
 
 # Build Rider version.
 FROM ea31337-ea as ea31337-rider
 WORKDIR /opt/EA
-RUN make Rider
-RUN make Rider-Release
-RUN make Rider-Backtest
-RUN make Rider-Optimize
+RUN make Rider && \
+    make Rider-Release && \
+    make Rider-Backtest && \
+    make Rider-Optimize
 
 # Build all versions.
 FROM ea31337-ea as ea31337
