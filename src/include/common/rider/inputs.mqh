@@ -46,8 +46,8 @@ input static string __Strategies_Stops__ = "-- Strategies' stops --";  // >>> ST
 #else
 input group "Strategies' stops"
 #endif
-input ENUM_STRATEGY EA_Stops_Strat = STRAT_GATOR;  // Stop loss strategy
-input ENUM_TIMEFRAMES EA_Stops_Tf = PERIOD_H6;     // Stop loss timeframe
+input ENUM_STRATEGY EA_Stops_Strat = STRAT_ATR;  // Stop loss strategy
+input ENUM_TIMEFRAMES EA_Stops_Tf = PERIOD_H6;   // Stop loss timeframe
 
 #ifdef __MQL4__
 input string __EA_Tasks__ = "-- EA's tasks --";  // >>> EA's TASKS <<<
@@ -72,4 +72,4 @@ input int EA_SignalOpenFilterMethod = 32;   // Open (1=!BarO,2=Trend,4=PP,8=OppO
 input int EA_SignalCloseFilter = 32;        // Close (1=!BarO,2=!Trend,4=!PP,8=O>H,16=Peak,32=BetterO,64=Eq>1%)
 input int EA_SignalOpenFilterTime = 3;      // Time (1=CHGO,2=FR,4=HK,8=LON,16=NY,32=SY,64=TYJ,128=WGN)
 input int EA_SignalOpenStrategyFilter = 3;  // Strategy (0-EachSignal,1=FirstOnly,2=HourlyConfirmed)
-input int EA_TickFilterMethod = 56;  // Tick (1=PerMin,2=Peaks,4=PeaksMins,8=Unique,16=MiddleBar,32=Open,64=10thBar)
+input int EA_TickFilterMethod = 24;  // Tick (1=PerMin,2=Peaks,4=PeaksMins,8=Unique,16=MiddleBar,32=Open,64=10thBar)
