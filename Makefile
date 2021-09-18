@@ -14,7 +14,7 @@ SHELL:=/usr/bin/env bash
 		All Lite-All Advanced-All Rider-All
 
 MTE=metaeditor64.exe
-MTV=5.0.0.2375
+MTV=5.0.0.2361
 SRC=src
 MQL4=$(wildcard $(SRC)/*.mq4)
 MQL5=$(wildcard $(SRC)/*.mq5)
@@ -72,7 +72,7 @@ endif
 set-none:
 	@echo Reverting modes.
 	test -w .git && git checkout -- $(SRC)/include/common/mode.h || true
-	ex +":g@^#define@s@^@//" -scwq! $(SRC)/include/common/mode.h
+	test -w $(SRC) && ex +":g@^#define@s@^@//" -scwq! $(SRC)/include/common/mode.h || true
 
 set-lite: set-none
 	@$(MAKE) -f $(FILE)

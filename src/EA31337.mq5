@@ -267,11 +267,14 @@ bool InitStrategies() {
   EAStrategyAdd(Strategy_M15, 1 << M15);
   EAStrategyAdd(Strategy_M30, 1 << M30);
   EAStrategyAdd(Strategy_H1, 1 << H1);
+  EAStrategyAdd(Strategy_H2, 1 << H2);
+  EAStrategyAdd(Strategy_H3, 1 << H3);
   EAStrategyAdd(Strategy_H4, 1 << H4);
   // Update lot size.
   ea.Set(STRAT_PARAM_LS, EA_LotSize);
-  ea.Set(STRAT_PARAM_SOFM, EA_SignalOpenFilterMethod);
+  ea.Set(STRAT_PARAM_TFM, 40);
 #ifdef __advanced__
+  ea.Set(STRAT_PARAM_SOFM, EA_SignalOpenFilterMethod);
   ea.Set(STRAT_PARAM_SCF, EA_SignalCloseFilter);
   ea.Set(STRAT_PARAM_SOFT, EA_SignalOpenFilterTime);
   ea.Set(STRAT_PARAM_TFM, EA_TickFilterMethod);
@@ -293,6 +296,8 @@ bool InitStrategies() {
   _res &= EAStrategyAddStops(ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_M15), EA_Stops_M15, PERIOD_M15);
   _res &= EAStrategyAddStops(ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_M30), EA_Stops_M30, PERIOD_M30);
   _res &= EAStrategyAddStops(ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_H1), EA_Stops_H1, PERIOD_H1);
+  _res &= EAStrategyAddStops(ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_H2), EA_Stops_H2, PERIOD_H2);
+  _res &= EAStrategyAddStops(ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_H3), EA_Stops_H3, PERIOD_H3);
   _res &= EAStrategyAddStops(ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_H4), EA_Stops_H4, PERIOD_H4);
 #endif                                                    // __rider__
 #endif                                                    // __advanced__
