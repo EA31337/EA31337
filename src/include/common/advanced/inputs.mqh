@@ -46,24 +46,24 @@ input static string __Strategies_Stops__ = "-- Strategies' stops --";  // >>> ST
 #else
 input group "Strategies' stops"
 #endif
-input ENUM_STRATEGY EA_Stops_M1 = STRAT_NONE;       // Stop loss on M1
-input ENUM_STRATEGY EA_Stops_M5 = STRAT_NONE;       // Stop loss on M5
-input ENUM_STRATEGY EA_Stops_M15 = STRAT_ICHIMOKU;  // Stop loss on M15
-input ENUM_STRATEGY EA_Stops_M30 = STRAT_STDDEV;    // Stop loss on M30
-input ENUM_STRATEGY EA_Stops_H1 = STRAT_RSI;        // Stop loss on H1
-input ENUM_STRATEGY EA_Stops_H2 = STRAT_ADX;        // Stop loss on H2
-input ENUM_STRATEGY EA_Stops_H3 = STRAT_SAR;        // Stop loss on H3
-input ENUM_STRATEGY EA_Stops_H4 = STRAT_CCI;        // Stop loss on H4
+input ENUM_STRATEGY EA_Stops_M1 = STRAT_NONE;   // Stop loss on M1
+input ENUM_STRATEGY EA_Stops_M5 = STRAT_NONE;   // Stop loss on M5
+input ENUM_STRATEGY EA_Stops_M15 = STRAT_NONE;  // Stop loss on M15
+input ENUM_STRATEGY EA_Stops_M30 = STRAT_NONE;  // Stop loss on M30
+input ENUM_STRATEGY EA_Stops_H1 = STRAT_RSI;    // Stop loss on H1
+input ENUM_STRATEGY EA_Stops_H2 = STRAT_ADX;    // Stop loss on H2
+input ENUM_STRATEGY EA_Stops_H3 = STRAT_SAR;    // Stop loss on H3
+input ENUM_STRATEGY EA_Stops_H4 = STRAT_CCI;    // Stop loss on H4
 
 #ifdef __MQL4__
 input string __Strategies_Filters__ = "-- Strategies' filters --";  // >>> STRATEGIES' FILTERS <<<
 #else
 input group "Strategies' filters"
 #endif
-input int EA_SignalOpenFilterMethod = 32;   // Open (1=!BarO,2=Trend,4=PP,8=OppO,16=Peak,32=BetterO,64=!Eq<1%)
-input int EA_SignalCloseFilter = 32;        // Close (1=!BarO,2=!Trend,4=!PP,8=O>H,16=Peak,32=BetterO,64=Eq>1%)
-input int EA_SignalOpenFilterTime = 3;      // Time (1=CHGO,2=FR,4=HK,8=LON,16=NY,32=SY,64=TYJ,128=WGN)
-input int EA_SignalOpenStrategyFilter = 2;  // Strategy (0-EachSignal,1=FirstOnly,2=HourlyConfirmed)
+input int EA_SignalOpenFilterMethod = 32;  // Open (1=!BarO,2=Trend,4=PP,8=OppO,16=Peak,32=BetterO,64=!Eq<1%)
+input int EA_SignalCloseFilter = 32;       // Close (1=!BarO,2=!Trend,4=!PP,8=O>H,16=Peak,32=BetterO,64=Eq>1%)
+input int EA_SignalOpenFilterTime = 3;     // Time (1=CHGO,2=FR,4=HK,8=LON,16=NY,32=SY,64=TYJ,128=WGN)
+int EA_SignalOpenStrategyFilter = 0;       // Strategy (0-EachSignal,1=FirstOnly,2=HourlyConfirmed)
 input int EA_TickFilterMethod = 56;  // Tick (1=PerMin,2=Peaks,4=PeaksMins,8=Unique,16=MiddleBar,32=Open,64=10thBar)
 
 #ifdef __MQL4__
