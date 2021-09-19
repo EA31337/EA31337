@@ -42,7 +42,7 @@ extern string __EA_Risk_Params__ = "-- EA's risk management --";  // >>> EA's RI
 input group "EA's risk management"
 #endif
 #ifdef __rider__
-input float EA_Risk_MarginMax = 10.0f; // Max margin to risk (in %)
+input float EA_Risk_MarginMax = 2.5f;  // Max margin to risk (in %)
 #else
 input float EA_Risk_MarginMax = 1.0f;  // Max margin to risk (in %)
 #endif
