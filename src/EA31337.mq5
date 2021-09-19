@@ -246,8 +246,10 @@ bool InitEA() {
   if (_initiated) {
     TaskEntry _task1 = GetTask(EA_Task1_If, EA_Task1_Then);
     TaskEntry _task2 = GetTask(EA_Task2_If, EA_Task2_Then);
+    TaskEntry _task3 = GetTask(EA_Task3_If, EA_Task3_Then);
     _initiated &= ea.TaskAdd(_task1);
     _initiated &= ea.TaskAdd(_task2);
+    _initiated &= ea.TaskAdd(_task3);
   }
 #endif
   return _initiated;
