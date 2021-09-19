@@ -85,6 +85,6 @@ input string __Order_Params__ = "-- Orders' limits --";  // >>> ORDERS' LIMITS <
 #else
 input group "Orders' limits"
 #endif
-input float EA_OrderCloseLoss = 300;  // Close loss (in pips)
+input float EA_OrderCloseLoss = 200;  // Close loss (in pips)
 input float EA_OrderCloseProfit = 0;  // Close profit (in pips)
-input int EA_OrderCloseTime = -80;    // Close time in mins (>0) or bars (<0)
+input int EA_OrderCloseTime = -40;    // Close time in mins (>0) or bars (<0)
