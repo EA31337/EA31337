@@ -342,8 +342,11 @@ bool EAStrategyAdd(ENUM_STRATEGY _stg, int _tfs) {
       return ea.StrategyAdd<Stg_DeMarker>(_tfs, _magic_no, _stg);
     case STRAT_ENVELOPES:
       return ea.StrategyAdd<Stg_Envelopes>(_tfs, _magic_no, _stg);
+#ifndef ENUM_STRATEGY_DEFINED
+    // @todo: To be added soon.
     case STRAT_EWO:
       return ea.StrategyAdd<Stg_ElliottWave>(_tfs, _magic_no, _stg);
+#endif
     case STRAT_FORCE:
       return ea.StrategyAdd<Stg_Force>(_tfs, _magic_no, _stg);
     case STRAT_FRACTALS:
@@ -374,18 +377,24 @@ bool EAStrategyAdd(ENUM_STRATEGY _stg, int _tfs) {
       return ea.StrategyAdd<Stg_RVI>(_tfs, _magic_no, _stg);
     case STRAT_SAR:
       return ea.StrategyAdd<Stg_SAR>(_tfs, _magic_no, _stg);
+#ifndef ENUM_STRATEGY_DEFINED
+    // @todo: To be added soon.
     case STRAT_SAWA:
       return ea.StrategyAdd<Stg_SAWA>(_tfs, _magic_no, _stg);
+#endif
     case STRAT_STDDEV:
       return ea.StrategyAdd<Stg_StdDev>(_tfs, _magic_no, _stg);
     case STRAT_STOCHASTIC:
       return ea.StrategyAdd<Stg_Stochastic>(_tfs, _magic_no, _stg);
+#ifndef ENUM_STRATEGY_DEFINED
+    // @todo: To be added soon.
     case STRAT_SVE_BB:
       return ea.StrategyAdd<Stg_SVE_Bollinger_Bands>(_tfs, _magic_no, _stg);
     case STRAT_TMAT_SVEBB:
       return ea.StrategyAdd<Stg_TMAT_SVEBB>(_tfs, _magic_no, _stg);
     case STRAT_TMA_TRUE:
       return ea.StrategyAdd<Stg_TMA_True>(_tfs, _magic_no, _stg);
+#endif
     case STRAT_WPR:
       return ea.StrategyAdd<Stg_WPR>(_tfs, _magic_no, _stg);
     case STRAT_ZIGZAG:

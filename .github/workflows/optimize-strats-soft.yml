@@ -1,11 +1,11 @@
 ---
-name: Optimize Strategies SOF
+name: Optimize Strategies SOFT
 
 # yamllint disable-line rule:truthy
 on:
   push:
     branches:
-      - 'optimize-strats-sof'
+      - 'optimize-strats-soft'
 
 jobs:
 
@@ -61,7 +61,7 @@ jobs:
   Process:
     env:
       MODE: ${{ matrix.mode }}
-      SETS_DIR: sets/optimize/${{ matrix.mode }}/sof
+      SETS_DIR: sets/optimize/${{ matrix.mode }}/soft
     outputs:
       sets-list: ${{ steps.get-sets.outputs.sets }}
     runs-on: ubuntu-latest
