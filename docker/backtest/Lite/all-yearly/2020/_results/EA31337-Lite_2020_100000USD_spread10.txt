@@ -2,30 +2,30 @@
 
 
                                                                 Strategy Tester Report
-                                                EA31337-Lite-4dd19bb3399c1945f5f9f940d63f432e07b582ef
+                                                EA31337-Lite-dfbde61089eac5d8bc6a5bece198263b74aed2ac
                                                                      (Build 1320)
 
-Symbol                             EURUSD (Euro vs US Dollar)
-Period                             1 Minute (M1) 2020.01.01 23:41 - 2020.12.30 23:59 (2020.01.01 - 2020.12.31)
-Model                              Every tick (the most precise method based on all available least timeframes)
-                                   __EA_Params__=">> EA31337 Lite v2.006 build 1631917051 <<"; __Strategies_Active__="-- Active strategies --";
-                                   Strategy_M1=0; Strategy_M5=0; Strategy_M15=4; Strategy_M30=6; Strategy_H1=8; Strategy_H2=21; Strategy_H3=30;
-Parameters                         Strategy_H4=30; __EA_Risk_Params__="-- EA's risk management --"; EA_Risk_MarginMax=1; __EA_Trade_Params__="-- EA's
-                                   trade parameters --"; EA_LotSize=0; EA_MagicNumber=31337; __Logging_Params__="-- EA's logging & messaging --";
-                                   VerboseLevel=1; EA_DisplayDetailsOnChart=true;
-Bars in test                372155 Ticks modelled                     167831773 Modelling quality                                              24.99%
-Mismatched charts errors         0
-Initial deposit          100000.00                                              Spread                                                             10
-Total net profit          14613.51 Gross profit                        48587.51 Gross loss                                                  -33974.00
-Profit factor                 1.43 Expected payoff                         5.47
-Absolute drawdown           479.15 Maximal drawdown             5284.94 (4.59%) Relative drawdown                                     4.59% (5284.94)
-Total trades                  2672 Short positions (won %)        1270 (66.30%) Long positions (won %)                                  1402 (58.56%)
-                                   Profit trades (% of total)     1663 (62.24%) Loss trades (% of total)                                1009 (37.76%)
-                           Largest profit trade                          390.80 loss trade                                                    -320.13
-                           Average profit trade                           29.22 loss trade                                                     -33.67
-                           Maximum consecutive wins (profit in     27 (1479.01) consecutive losses (loss in money)                      22 (-1121.85)
-                                   money)
-                           Maximal consecutive profit (count of    1856.09 (19) consecutive loss (count of losses)                      -1316.10 (11)
-                                   wins)
-                           Average consecutive wins                           4 consecutive losses                                                  2
+  Symbol                             EURUSD (Euro vs US Dollar)
+  Period                             1 Minute (M1) 2020.01.01 23:41 - 2020.12.30 23:59 (2020.01.01 - 2020.12.31)
+  Model                              Every tick (the most precise method based on all available least timeframes)
+                                     __EA_Params__=">> EA31337 Lite v2.006 build 1632152642 <<"; __Strategies_Active__="-- Active strategies --";
+                                     Strategy_M1=0; Strategy_M5=0; Strategy_M15=4; Strategy_M30=6; Strategy_H1=8; Strategy_H2=21; Strategy_H3=30;
+  Parameters                         Strategy_H4=30; __EA_Risk_Params__="-- EA's risk management --"; EA_Risk_MarginMax=1.20000005;
+                                     __EA_Trade_Params__="-- EA's trade parameters --"; EA_LotSize=0; EA_MagicNumber=31337; __Logging_Params__="-
+                                     - EA's logging & messaging --"; VerboseLevel=1; EA_DisplayDetailsOnChart=true;
+  Bars in test                372155 Ticks modelled                     167831773 Modelling quality                                           24.99%
+  Mismatched charts errors         0
+  Initial deposit          100000.00                                              Spread                                                          10
+  Total net profit          14613.51 Gross profit                        48587.51 Gross loss                                               -33974.00
+  Profit factor                 1.43 Expected payoff                         5.47
+  Absolute drawdown           479.15 Maximal drawdown             5284.94 (4.59%) Relative drawdown                                  4.59% (5284.94)
+  Total trades                  2672 Short positions (won %)        1270 (66.30%) Long positions (won %)                               1402 (58.56%)
+                                     Profit trades (% of total)     1663 (62.24%) Loss trades (% of total)                             1009 (37.76%)
+                             Largest profit trade                          390.80 loss trade                                                 -320.13
+                             Average profit trade                           29.22 loss trade                                                  -33.67
+                             Maximum consecutive wins (profit in     27 (1479.01) consecutive losses (loss in money)                   22 (-1121.85)
+                                     money)
+                             Maximal consecutive profit (count of    1856.09 (19) consecutive loss (count of losses)                   -1316.10 (11)
+                                     wins)
+                             Average consecutive wins                           4 consecutive losses                                               2
                                                                        [Graph]
