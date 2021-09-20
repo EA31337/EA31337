@@ -2,30 +2,30 @@
 
 
                                                                 Strategy Tester Report
-                                                EA31337-Lite-10d8f5d8a284afcd9d043215db7f3bfc66900f35
-                                                                     (Build 1280)
+                                                EA31337-Lite-a05474312349d775b3bebe6aa71f3a7e0e7be692
+                                                                     (Build 1320)
 
   Symbol                            EURUSD (Euro vs US Dollar)
   Period                            1 Minute (M1) 2020.07.01 00:00 - 2020.07.30 23:59 (2020.07.01 - 2020.07.31)
   Model                             Every tick (the most precise method based on all available least timeframes)
-                                    __EA_Params__=">> EA31337 Lite v2.005 build 1630676712 <<"; __Strategies_Active__="-- Active strategies --";
-                                    Strategy_M1=0; Strategy_M5=0; Strategy_M15=7; Strategy_M30=23; Strategy_H1=11; Strategy_H4=30;
-  Parameters                        __Trade_Params__="-- Trade parameters --"; __EA_Risk_Params__="-- EA's risk management --";
+                                    __EA_Params__=">> EA31337 Lite v2.006 build 1632165039 <<"; __Strategies_Active__="-- Active strategies --";
+                                    Strategy_M1=0; Strategy_M5=0; Strategy_M15=4; Strategy_M30=6; Strategy_H1=8; Strategy_H2=21; Strategy_H3=30;
+  Parameters                        Strategy_H4=30; __EA_Risk_Params__="-- EA's risk management --"; EA_Risk_MarginMax=1.20000005;
                                     __EA_Trade_Params__="-- EA's trade parameters --"; EA_LotSize=0; EA_MagicNumber=31337; __Logging_Params__="-
                                     - EA's logging & messaging --"; VerboseLevel=3; EA_DisplayDetailsOnChart=true;
-  Bars in test                32531 Ticks modelled                     10582776 Modelling quality                                             25.00%
+  Bars in test                32531 Ticks modelled                       10582776 Modelling quality                                          25.00%
   Mismatched charts errors        0
-  Initial deposit          10000.00                                             Spread                                                            10
-  Total net profit            -7.78 Gross profit                         207.70 Gross loss                                                   -215.47
-  Profit factor                0.96 Expected payoff                       -0.39
-  Absolute drawdown          111.54 Maximal drawdown             209.14 (2.07%) Relative drawdown                                     2.07% (209.14)
-  Total trades                   20 Short positions (won %)         11 (36.36%) Long positions (won %)                                    9 (55.56%)
-                                    Profit trades (% of total)       9 (45.00%) Loss trades (% of total)                                 11 (55.00%)
-                            Largest profit trade                          66.80 loss trade                                                    -66.67
-                            Average profit trade                          23.08 loss trade                                                    -19.59
-                            Maximum consecutive wins (profit in       3 (39.50) consecutive losses (loss in money)                       5 (-141.57)
+  Initial deposit          10000.00                                               Spread                                                         10
+  Total net profit          3509.81 Gross profit                          4689.22 Gross loss                                               -1179.41
+  Profit factor                3.98 Expected payoff                         15.88
+  Absolute drawdown          629.76 Maximal drawdown             1128.12 (10.67%) Relative drawdown                                10.67% (1128.12)
+  Total trades                  221 Short positions (won %)           68 (64.71%) Long positions (won %)                               153 (81.70%)
+                                    Profit trades (% of total)       169 (76.47%) Loss trades (% of total)                              52 (23.53%)
+                            Largest profit trade                           108.73 loss trade                                                -168.82
+                            Average profit trade                            27.75 loss trade                                                 -22.68
+                            Maximum consecutive wins (profit in      24 (1186.22) consecutive losses (loss in money)                    8 (-186.07)
                                     money)
-                            Maximal consecutive profit (count of      75.50 (2) consecutive loss (count of losses)                       -141.57 (5)
+                            Maximal consecutive profit (count of     1186.22 (24) consecutive loss (count of losses)                    -456.67 (7)
                                     wins)
-                            Average consecutive wins                          2 consecutive losses                                                 2
+                            Average consecutive wins                            7 consecutive losses                                              2
                                                                        [Graph]
