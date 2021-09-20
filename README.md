@@ -20,8 +20,6 @@ The project aims to deliver fully working EA at the advanced level.
 It implements algorithm for managing multiple strategies
 on different timeframes at once.
 
-Please follow [Wiki Home page](https://github.com/EA31337/EA31337/wiki) for the available documentation pages.
-
 This project utilizes the following sub-projects:
 
 - [EA31337 framework][gh-repo-classes]
@@ -29,7 +27,7 @@ This project utilizes the following sub-projects:
 
 The source code is compatible with MQL4 and MQL5 and can run on MetaTrader 4 and 5.
 
-### Usage
+## Usage
 
 You can freely use this project for education or research purposes.
 If you're planning to use it for trading, please take care, as neither it is the holy grail or making money machine.
@@ -38,39 +36,57 @@ and most likely you won't find holy grail anywhere else.
 
 To use this project most efficiently, you'll have to invest some time to understand how it works and how you can use it.
 
-To learn more about the usage, please check our [Wiki pages](https://github.com/EA31337/EA31337/wiki).
+To learn more about the usage, please check the [Wiki pages](https://github.com/EA31337/EA31337/wiki).
 
-### Features
+## Features
 
 The EA provides the following out-of-box features:
 
-- Over 35 optimised strategies on four different timeframes analysing the market in real-time.
+- Dozens of trading strategies to choose from.
+- Support for multi-timeframe trading.
+- Risk and price stop management.
+- Plenty of user input parameters to adjust the settings.
+- Filtering system.
 
 ### Strategies
 
-The trading robot comes with over 35 strategies to choose from.
 Each strategy can analyse market on different timeframes independently.
 The market analysis is based on popular technical indicators.
 
-You are free to write your own custom strategies.
+Feel free to write your own custom strategies.
 
-### Profit/Stop Trailing system
+### Risk management
 
-This unique profit-stop trailing system auto-controls when to take profit
-or when to close the order by specific market conditions based on the technical indicator analysis.
+#### Price stop
 
-### Open Method System
+As part of the risk management, the EA's price stop algorithm decides
+when to close a trade with profit or to avoid further lose
+based on a specific market conditions such as technical indicator analysis.
 
-The unique conditional system manages trades per given strategy and state of its technical indicators.
-In other words, each strategy uses unique configuration of technical indicators and conditions to buy and sell signals.
+### Filtering system
+
+The unique filtering system controls
+when to open or close the trades based on set of conditions.
+
+The filters can be based on account, chart, market, indicator, active orders
+and several other conditions.
+
+You are free to customize these filters using Advanced parameters.
+
+## Before you start
 
 ### Using & Testing
 
 Please be strongly aware that combination of symbol pair, broker, their market gaps and market spreads
 can give completely results when trading variety of robots.
-The EA tries its best to detect the perfect conditions for its trading, however you need to backtest the robot first
-(or test it on demo account), before going into deep waters.
-We keep testing, optimizing and improving our bot, but it takes months and years to achieve the perfect shape.
+
+The EA tries its best to detect the perfect conditions for its trading,
+however you need to backtest the robot first
+(or test it on demo account for several weeks), before going into deep waters.
+
+EA is continuing to improve each release,
+which takes a lot of effort across many months and years,
+but it is never going to be perfect.
 
 ### Important tips
 
@@ -89,7 +105,7 @@ When using this EA for the trading purposes, please read the following tips:
   - Be aware that some brokers dynamically sets very high spreads (over 100) when the market is volatile,
     so best opportunity for EA could turn into the worse. In this case, you should blame broker, not EA.
   - Do not use brokers which doesn't allow hedging positions. The EA has not been tested for it.
-  - Watch out for brokers who steal pips by closing orders at a price which is less favourable to you by 1-2 pips
+  - Watch out for brokers who "steal" pips by closing orders at a price which is less favourable to you by 1-2 pips
     which can reduce the profits made by EA.
 - It's recommended to use VPS in order to run EA reliabily (24/7) as often restarts of EA
   or a trading terminal while trades are opened can drastically affect the expected results.
@@ -134,12 +150,17 @@ independently from the current chart.
 
 Please be aware that backtesting cannot reliabily simulate the future outcome.
 
-The backtesting has been documented at [Backtesting using MT4][gh-wiki-backtest] wiki page.
+Recommended platform for backtesting and optimization is MetaTrader 5 (not 4).
+
+The backtesting for MT4
+has been documented at [Backtesting using MT4][gh-wiki-backtest] wiki page.
 
 ### SET Files
 
 By default, EA provides the best known optimized settings for EURUSD symbol pair
-based on the performed optimization tests.
+based on the performed optimization tests before each release.
+
+Each release has slightly different, so don't mix old SET files for new EA.
 
 ## Documentation
 
