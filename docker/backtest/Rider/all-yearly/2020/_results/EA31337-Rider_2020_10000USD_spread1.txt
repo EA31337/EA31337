@@ -2,13 +2,13 @@
 
 
                                                                 Strategy Tester Report
-                                                EA31337-Rider-dfbde61089eac5d8bc6a5bece198263b74aed2ac
+                                                EA31337-Rider-3a3d062454d0c7470939c3dbb96d72d53af60407
                                                                      (Build 1320)
 
 Symbol                            EURUSD (Euro vs US Dollar)
 Period                            1 Minute (M1) 2020.01.01 23:41 - 2020.12.30 23:59 (2020.01.01 - 2020.12.31)
 Model                             Every tick (the most precise method based on all available least timeframes)
-                                  __EA_Params__=">> EA31337 Rider v2.006 build 1632152625 <<"; __Strategies_Active__="-- Active strategies --";
+                                  __EA_Params__=">> EA31337 Rider v2.006 build 1632158493 <<"; __Strategies_Active__="-- Active strategies --";
                                   Strategy_M1=0; Strategy_M5=0; Strategy_M15=1; Strategy_M30=14; Strategy_H1=24; Strategy_H2=9; Strategy_H3=5;
                                   Strategy_H4=27; __Strategies_Stops__="-- Strategies' stops --"; EA_Stops_Strat=13; EA_Stops_Tf=480; __EA_Tasks__="-
                                   - EA's tasks --"; EA_Task1_If=2; EA_Task1_Then=2; EA_Task2_If=3; EA_Task2_Then=2; EA_Task3_If=6; EA_Task3_Then=5;
