@@ -32,28 +32,28 @@ input static string __Strategies_Active__ = "-- Active strategies --";  // >>> A
 #else
 input group "Active strategies"
 #endif
-input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;         // Strategy on M1
-input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;         // Strategy on M5
-input ENUM_STRATEGY Strategy_M15 = STRAT_DEMARKER;    // Strategy on M15
-input ENUM_STRATEGY Strategy_M30 = STRAT_AWESOME;     // Strategy on M30
-input ENUM_STRATEGY Strategy_H1 = STRAT_BEARS_POWER;  // Strategy on H1
-input ENUM_STRATEGY Strategy_H2 = STRAT_MA;           // Strategy on H2
-input ENUM_STRATEGY Strategy_H3 = STRAT_SAR;          // Strategy on H3
-input ENUM_STRATEGY Strategy_H4 = STRAT_SAR;          // Strategy on H4
+input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;       // Strategy on M1
+input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;       // Strategy on M5
+input ENUM_STRATEGY Strategy_M15 = STRAT_DEMARKER;  // Strategy on M15
+input ENUM_STRATEGY Strategy_M30 = STRAT_AWESOME;   // Strategy on M30
+input ENUM_STRATEGY Strategy_H1 = STRAT_MA;         // Strategy on H1
+input ENUM_STRATEGY Strategy_H2 = STRAT_MA;         // Strategy on H2
+input ENUM_STRATEGY Strategy_H3 = STRAT_SAR;        // Strategy on H3
+input ENUM_STRATEGY Strategy_H4 = STRAT_SAR;        // Strategy on H4
 
 #ifdef __MQL4__
 input static string __Strategies_Stops__ = "-- Strategies' stops --";  // >>> STRATEGIES' STOPS <<<
 #else
 input group "Strategies' stops"
 #endif
-input ENUM_STRATEGY EA_Stops_M1 = STRAT_NONE;    // Stop loss on M1
-input ENUM_STRATEGY EA_Stops_M5 = STRAT_NONE;    // Stop loss on M5
-input ENUM_STRATEGY EA_Stops_M15 = STRAT_ALLIGATOR;   // Stop loss on M15
-input ENUM_STRATEGY EA_Stops_M30 = STRAT_ALLIGATOR;   // Stop loss on M30
-input ENUM_STRATEGY EA_Stops_H1 = STRAT_AD;      // Stop loss on H1
-input ENUM_STRATEGY EA_Stops_H2 = STRAT_ZIGZAG;  // Stop loss on H2
-input ENUM_STRATEGY EA_Stops_H3 = STRAT_SAR;     // Stop loss on H3
-input ENUM_STRATEGY EA_Stops_H4 = STRAT_MACD;    // Stop loss on H4
+input ENUM_STRATEGY EA_Stops_M1 = STRAT_NONE;     // Stop loss on M1
+input ENUM_STRATEGY EA_Stops_M5 = STRAT_NONE;     // Stop loss on M5
+input ENUM_STRATEGY EA_Stops_M15 = STRAT_GATOR;   // Stop loss on M15
+input ENUM_STRATEGY EA_Stops_M30 = STRAT_STDDEV;  // Stop loss on M30
+input ENUM_STRATEGY EA_Stops_H1 = STRAT_MA;       // Stop loss on H1
+input ENUM_STRATEGY EA_Stops_H2 = STRAT_FORCE;    // Stop loss on H2
+input ENUM_STRATEGY EA_Stops_H3 = STRAT_SAR;      // Stop loss on H3
+input ENUM_STRATEGY EA_Stops_H4 = STRAT_FORCE;    // Stop loss on H4
 
 #ifdef __MQL4__
 input string __Strategies_Filters__ = "-- Strategies' filters --";  // >>> STRATEGIES' FILTERS <<<
@@ -71,7 +71,7 @@ input string __EA_Tasks__ = "-- EA's tasks --";  // >>> EA's TASKS <<<
 #else
 input group "EA's tasks"
 #endif
-input ENUM_EA_ADV_COND EA_Task1_If = EA_ADV_COND_TRADE_EQUITY_GT_02PC;     // 1: Task's condition
+input ENUM_EA_ADV_COND EA_Task1_If = EA_ADV_COND_TRADE_EQUITY_GT_05PC;     // 1: Task's condition
 input ENUM_EA_ADV_ACTION EA_Task1_Then = EA_ADV_ACTION_CLOSE_MOST_PROFIT;  // 1: Task's action
 input ENUM_EA_ADV_COND EA_Task2_If = EA_ADV_COND_TRADE_EQUITY_GT_05PC;     // 2: Task's condition
 input ENUM_EA_ADV_ACTION EA_Task2_Then = EA_ADV_ACTION_CLOSE_MOST_PROFIT;  // 2: Task's action
