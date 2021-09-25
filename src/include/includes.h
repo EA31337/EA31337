@@ -32,6 +32,8 @@
 #include "classes/Indicators/Indi_AC.mqh"
 #include "classes/Indicators/Indi_AD.mqh"
 #include "classes/Indicators/Indi_ADX.mqh"
+#include "classes/Indicators/Indi_ADXW.mqh"
+#include "classes/Indicators/Indi_AMA.mqh"
 #include "classes/Indicators/Indi_AO.mqh"
 #include "classes/Indicators/Indi_ATR.mqh"
 #include "classes/Indicators/Indi_Alligator.mqh"
