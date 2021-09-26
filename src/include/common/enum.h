@@ -51,6 +51,7 @@ enum ENUM_STRATEGY {  // Define list of strategies.
   STRAT_BULLS_POWER,  // Bulls Power
   STRAT_BWMFI,        // BWMFI
   STRAT_CCI,          // CCI
+  STRAT_CHAIKIN,      // Chaikin
   STRAT_DEMA,         // DEMA
   STRAT_DEMARKER,     // DeMarker
   STRAT_ENVELOPES,    // Envelopes

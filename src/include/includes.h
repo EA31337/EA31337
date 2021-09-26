@@ -43,6 +43,7 @@
 #include "classes/Indicators/Indi_BearsPower.mqh"
 #include "classes/Indicators/Indi_BullsPower.mqh"
 #include "classes/Indicators/Indi_CCI.mqh"
+#include "classes/Indicators/Indi_CHO.mqh"
 #include "classes/Indicators/Indi_DEMA.mqh"
 #include "classes/Indicators/Indi_DeMarker.mqh"
 #include "classes/Indicators/Indi_Envelopes.mqh"
