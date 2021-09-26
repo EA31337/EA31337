@@ -67,6 +67,7 @@ enum ENUM_STRATEGY {  // Define list of strategies.
   STRAT_OBV,          // OBV
   STRAT_OSMA,         // OSMA
   STRAT_PATTERN,      // Pattern
+  STRAT_PIVOT,        // Pivot
   STRAT_RSI,          // RSI
   STRAT_RVI,          // RVI
   STRAT_SAR,          // SAR
