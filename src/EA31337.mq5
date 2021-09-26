@@ -320,6 +320,10 @@ bool EAStrategyAdd(ENUM_STRATEGY _stg, int _tfs) {
       return ea.StrategyAdd<Stg_AD>(_tfs, _magic_no, _stg);
     case STRAT_ADX:
       return ea.StrategyAdd<Stg_ADX>(_tfs, _magic_no, _stg);
+    case STRAT_AMA:
+      return ea.StrategyAdd<Stg_AMA>(_tfs, _magic_no, _stg);
+    case STRAT_ASI:
+      return ea.StrategyAdd<Stg_ASI>(_tfs, _magic_no, _stg);
     case STRAT_ATR:
       return ea.StrategyAdd<Stg_ATR>(_tfs, _magic_no, _stg);
     case STRAT_ALLIGATOR:
