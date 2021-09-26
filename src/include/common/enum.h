@@ -42,6 +42,8 @@ enum ENUM_STRATEGY {  // Define list of strategies.
   STRAT_AD,           // AD
   STRAT_ADX,          // ADX
   STRAT_ALLIGATOR,    // Alligator
+  STRAT_AMA,          // AMA
+  STRAT_ASI,          // ASI
   STRAT_ATR,          // ATR
   STRAT_AWESOME,      // Awesome
   STRAT_BANDS,        // Bands
@@ -49,6 +51,7 @@ enum ENUM_STRATEGY {  // Define list of strategies.
   STRAT_BULLS_POWER,  // Bulls Power
   STRAT_BWMFI,        // BWMFI
   STRAT_CCI,          // CCI
+  STRAT_CHAIKIN,      // Chaikin
   STRAT_DEMA,         // DEMA
   STRAT_DEMARKER,     // DeMarker
   STRAT_ENVELOPES,    // Envelopes
@@ -64,6 +67,7 @@ enum ENUM_STRATEGY {  // Define list of strategies.
   STRAT_OBV,          // OBV
   STRAT_OSMA,         // OSMA
   STRAT_PATTERN,      // Pattern
+  STRAT_PIVOT,        // Pivot
   STRAT_RSI,          // RSI
   STRAT_RVI,          // RVI
   STRAT_SAR,          // SAR
