@@ -32,13 +32,13 @@ input static string __Strategies_Active__ = "-- Active strategies --";  // >>> A
 #else
 input group "Active strategy"
 #endif
-input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;          // Strategy on M1
-input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;          // Strategy on M5
-input ENUM_STRATEGY Strategy_M15 = STRAT_HEIKEN_ASHI;  // Strategy on M15
-input ENUM_STRATEGY Strategy_M30 = STRAT_ALLIGATOR;    // Strategy on M30
-input ENUM_STRATEGY Strategy_H1 = STRAT_BULLS_POWER;   // Strategy on H1
-input ENUM_STRATEGY Strategy_H2 = STRAT_STDDEV;        // Strategy on H2
-input ENUM_STRATEGY Strategy_H3 = STRAT_SAR;           // Strategy on H3
-input ENUM_STRATEGY Strategy_H4 = STRAT_SAR;           // Strategy on H4
-input ENUM_STRATEGY Strategy_H6 = STRAT_FORCE;         // Strategy on H6
-input ENUM_STRATEGY Strategy_H8 = STRAT_RVI;           // Strategy on H8
+input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;         // Strategy on M1
+input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;         // Strategy on M5
+input ENUM_STRATEGY Strategy_M15 = STRAT_ZIGZAG;      // Strategy on M15
+input ENUM_STRATEGY Strategy_M30 = STRAT_BANDS;       // Strategy on M30
+input ENUM_STRATEGY Strategy_H1 = STRAT_BULLS_POWER;  // Strategy on H1
+input ENUM_STRATEGY Strategy_H2 = STRAT_STDDEV;       // Strategy on H2
+input ENUM_STRATEGY Strategy_H3 = STRAT_MFI;          // Strategy on H3
+input ENUM_STRATEGY Strategy_H4 = STRAT_SAR;          // Strategy on H4
+input ENUM_STRATEGY Strategy_H6 = STRAT_FORCE;        // Strategy on H6
+input ENUM_STRATEGY Strategy_H8 = STRAT_RVI;          // Strategy on H8
