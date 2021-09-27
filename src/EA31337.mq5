@@ -272,6 +272,8 @@ bool InitStrategies() {
   EAStrategyAdd(Strategy_H2, 1 << H2);
   EAStrategyAdd(Strategy_H3, 1 << H3);
   EAStrategyAdd(Strategy_H4, 1 << H4);
+  EAStrategyAdd(Strategy_H6, 1 << H6);
+  EAStrategyAdd(Strategy_H8, 1 << H8);
   // Update lot size.
   ea.Set(STRAT_PARAM_LS, EA_LotSize);
 #ifdef __advanced__
@@ -300,6 +302,8 @@ bool InitStrategies() {
   _res &= EAStrategyAddStops(ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_H2), EA_Stops_H2, PERIOD_H2);
   _res &= EAStrategyAddStops(ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_H3), EA_Stops_H3, PERIOD_H3);
   _res &= EAStrategyAddStops(ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_H4), EA_Stops_H4, PERIOD_H4);
+  _res &= EAStrategyAddStops(ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_H6), EA_Stops_H6, PERIOD_H6);
+  _res &= EAStrategyAddStops(ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_H8), EA_Stops_H8, PERIOD_H8);
 #endif                                                    // __rider__
 #endif                                                    // __advanced__
   _res &= GetLastError() == 0 || GetLastError() == 5053;  // @fixme: error 5053?

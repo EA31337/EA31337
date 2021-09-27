@@ -40,6 +40,8 @@ input ENUM_STRATEGY Strategy_H1 = STRAT_MOMENTUM;     // Strategy on H1
 input ENUM_STRATEGY Strategy_H2 = STRAT_BULLS_POWER;  // Strategy on H2
 input ENUM_STRATEGY Strategy_H3 = STRAT_ATR;          // Strategy on H3
 input ENUM_STRATEGY Strategy_H4 = STRAT_PATTERN;      // Strategy on H4
+input ENUM_STRATEGY Strategy_H6 = STRAT_NONE;         // Strategy on H6
+input ENUM_STRATEGY Strategy_H8 = STRAT_NONE;         // Strategy on H8
 
 #ifdef __MQL4__
 input static string __Strategies_Stops__ = "-- Strategies' stops --";  // >>> STRATEGIES' STOPS <<<

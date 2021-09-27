@@ -40,3 +40,5 @@ input ENUM_STRATEGY Strategy_H1 = STRAT_BULLS_POWER;   // Strategy on H1
 input ENUM_STRATEGY Strategy_H2 = STRAT_STDDEV;        // Strategy on H2
 input ENUM_STRATEGY Strategy_H3 = STRAT_SAR;           // Strategy on H3
 input ENUM_STRATEGY Strategy_H4 = STRAT_SAR;           // Strategy on H4
+input ENUM_STRATEGY Strategy_H6 = STRAT_FORCE;         // Strategy on H6
+input ENUM_STRATEGY Strategy_H8 = STRAT_RVI;           // Strategy on H8
