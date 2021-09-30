@@ -2,36 +2,36 @@
 
 
                                                                 Strategy Tester Report
-                                              EA31337-Advanced-a05474312349d775b3bebe6aa71f3a7e0e7be692
+                                              EA31337-Advanced-58b9e8cad168686994b94f8498d141b0750a3638
                                                                      (Build 1320)
 
- Symbol                            EURUSD (Euro vs US Dollar)
- Period                            1 Minute (M1) 2020.06.01 00:00 - 2020.06.29 23:59 (2020.06.01 - 2020.06.30)
- Model                             Every tick (the most precise method based on all available least timeframes)
-                                   __EA_Params__=">> EA31337 Advanced v2.006 build 1632165021 <<"; __Strategies_Active__="-- Active strategies --";
-                                   Strategy_M1=0; Strategy_M5=0; Strategy_M15=13; Strategy_M30=6; Strategy_H1=21; Strategy_H2=21; Strategy_H3=30;
-                                   Strategy_H4=30; __Strategies_Stops__="-- Strategies' stops --"; EA_Stops_M1=0; EA_Stops_M5=0; EA_Stops_M15=18;
-                                   EA_Stops_M30=32; EA_Stops_H1=21; EA_Stops_H2=16; EA_Stops_H3=30; EA_Stops_H4=16; __Strategies_Filters__="-
-                                   - Strategies' filters --"; EA_SignalOpenFilterMethod=32; EA_SignalCloseFilter=32; EA_SignalOpenFilterTime=3;
- Parameters                        EA_TickFilterMethod=60; __EA_Tasks__="-- EA's tasks --"; EA_Task1_If=3; EA_Task1_Then=2; EA_Task2_If=3;
-                                   EA_Task2_Then=2; EA_Task3_If=7; EA_Task3_Then=2; __Order_Params__="-- Orders' limits --"; EA_OrderCloseLoss=200;
-                                   EA_OrderCloseProfit=0; EA_OrderCloseTime=-40; __EA_Risk_Params__="-- EA's risk management --";
-                                   EA_Risk_MarginMax=1.20000005; __EA_Trade_Params__="-- EA's trade parameters --"; EA_LotSize=0;
-                                   EA_MagicNumber=31337; __Logging_Params__="-- EA's logging & messaging --"; VerboseLevel=3;
-                                   EA_DisplayDetailsOnChart=true;
- Bars in test                31152 Ticks modelled                        8707308 Modelling quality                                            25.00%
- Mismatched charts errors        0
- Initial deposit          10000.00                                               Spread                                                           10
- Total net profit         -4155.58 Gross profit                          5955.54 Gross loss                                                -10111.12
- Profit factor                0.59 Expected payoff                        -10.66
- Absolute drawdown         4852.19 Maximal drawdown             9850.14 (65.68%) Relative drawdown                                  65.68% (9850.14)
- Total trades                  390 Short positions (won %)          169 (37.28%) Long positions (won %)                                 221 (48.87%)
-                                   Profit trades (% of total)       171 (43.85%) Loss trades (% of total)                               219 (56.15%)
-                           Largest profit trade                           171.56 loss trade                                                  -206.34
-                           Average profit trade                            34.83 loss trade                                                   -46.17
-                           Maximum consecutive wins (profit in      21 (1721.71) consecutive losses (loss in money)                    31 (-1600.86)
-                                   money)
-                           Maximal consecutive profit (count of     1721.71 (21) consecutive loss (count of losses)                    -1600.86 (31)
-                                   wins)
-                           Average consecutive wins                            3 consecutive losses                                                4
+  Symbol                            EURUSD (Euro vs US Dollar)
+  Period                            1 Minute (M1) 2020.06.01 00:00 - 2020.06.29 23:59 (2020.06.01 - 2020.06.30)
+  Model                             Every tick (the most precise method based on all available least timeframes)
+                                    __EA_Params__=">> EA31337 Advanced v2.007 build 1633026384 <<"; __Strategies_Active__="-- Active strategies --";
+                                    Strategy_M1=0; Strategy_M5=0; Strategy_M15=37; Strategy_M30=9; Strategy_H1=11; Strategy_H2=34; Strategy_H3=25;
+                                    Strategy_H4=33; Strategy_H6=18; Strategy_H8=32; __Strategies_Stops__="-- Strategies' stops --"; EA_Stops_M1=0;
+                                    EA_Stops_M5=0; EA_Stops_M15=28; EA_Stops_M30=21; EA_Stops_H1=17; EA_Stops_H2=26; EA_Stops_H3=23; EA_Stops_H4=8;
+                                    EA_Stops_H6=8; EA_Stops_H8=33; __Strategies_Filters__="-- Strategies' filters --"; EA_SignalOpenFilterMethod=32;
+  Parameters                        EA_SignalCloseFilter=32; EA_SignalOpenFilterTime=3; EA_TickFilterMethod=32; __EA_Tasks__="-- EA's tasks --";
+                                    EA_Task1_If=3; EA_Task1_Then=2; EA_Task2_If=3; EA_Task2_Then=2; EA_Task3_If=7; EA_Task3_Then=2;
+                                    __Order_Params__="-- Orders' limits --"; EA_OrderCloseLoss=200; EA_OrderCloseProfit=0; EA_OrderCloseTime=-30;
+                                    __EA_Risk_Params__="-- EA's risk management --"; EA_Risk_MarginMax=1.20000005; __EA_Trade_Params__="-- EA's
+                                    trade parameters --"; EA_LotSize=0; EA_MagicNumber=31337; __Logging_Params__="-- EA's logging & messaging --";
+                                    VerboseLevel=3; EA_DisplayDetailsOnChart=true;
+  Bars in test                31152 Ticks modelled                      8707308 Modelling quality                                             25.00%
+  Mismatched charts errors        0
+  Initial deposit          10000.00                                             Spread                                                            10
+  Total net profit          -111.27 Gross profit                        2249.29 Gross loss                                                  -2360.56
+  Profit factor                0.95 Expected payoff                       -1.00
+  Absolute drawdown          491.17 Maximal drawdown             511.22 (5.10%) Relative drawdown                                     5.10% (511.22)
+  Total trades                  111 Short positions (won %)         37 (48.65%) Long positions (won %)                                   74 (48.65%)
+                                    Profit trades (% of total)      54 (48.65%) Loss trades (% of total)                                 57 (51.35%)
+                            Largest profit trade                         174.87 loss trade                                                   -250.22
+                            Average profit trade                          41.65 loss trade                                                    -41.41
+                            Maximum consecutive wins (profit in      8 (205.42) consecutive losses (loss in money)                       13 (-86.77)
+                                    money)
+                            Maximal consecutive profit (count of     215.76 (2) consecutive loss (count of losses)                       -366.72 (2)
+                                    wins)
+                            Average consecutive wins                          3 consecutive losses                                                 3
                                                                        [Graph]
