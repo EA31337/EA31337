@@ -70,8 +70,8 @@ input string __Strategies_Filters__ = "-- Strategies' filters --";  // >>> STRAT
 #else
 input group "Strategies' filters"
 #endif
-input int EA_SignalOpenFilterMethod = 32;   // Open (1=!BarO,2=Trend,4=PP,8=OppO,16=Peak,32=BetterO,64=!Eq<1%)
-input int EA_SignalCloseFilterMethod = 32;  // Close (1=!BarO,2=!Trend,4=!PP,8=O>H,16=Peak,32=BetterO,64=Eq>1%)
-input int EA_SignalOpenFilterTime = 3;      // Time (1=CHGO,2=FR,4=HK,8=LON,16=NY,32=SY,64=TYJ,128=WGN)
-int EA_SignalOpenStrategyFilter = 0;        // Strategy (0-EachSignal,1=FirstOnly,2=HourlyConfirmed)
+input int EA_SignalOpenFilterMethod = 32;    // Open (1=!BarO,2=Trend,4=PP,8=OppO,16=Peak,32=BetterO,64=!Eq<1%)
+input int EA_SignalCloseFilterMethod = -24;  // Close (1=!BarO,2=!Trend,4=!PP,8=O>H,16=Peak,32=BetterO,64=Eq>1%)
+input int EA_SignalOpenFilterTime = 3;       // Time (1=CHGO,2=FR,4=HK,8=LON,16=NY,32=SY,64=TYJ,128=WGN)
+int EA_SignalOpenStrategyFilter = 0;         // Strategy (0-EachSignal,1=FirstOnly,2=HourlyConfirmed)
 input int EA_TickFilterMethod = 32;  // Tick (1=PerMin,2=Peaks,4=PeaksMins,8=Unique,16=MiddleBar,32=Open,64=10thBar)
