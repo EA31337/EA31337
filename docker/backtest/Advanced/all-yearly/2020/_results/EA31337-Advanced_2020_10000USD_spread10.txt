@@ -2,13 +2,13 @@
 
 
                                                                 Strategy Tester Report
-                                              EA31337-Advanced-bc97d84a2ef3142aea9c8f0ee0d3e9b11539b53b
+                                              EA31337-Advanced-d5e38d3959274d196fdd8c4099c0541ce0657b5d
                                                                      (Build 1320)
 
 Symbol                            EURUSD (Euro vs US Dollar)
 Period                            1 Minute (M1) 2020.01.01 23:41 - 2020.12.30 23:59 (2020.01.01 - 2020.12.31)
 Model                             Every tick (the most precise method based on all available least timeframes)
-                                  __EA_Params__=">> EA31337 Advanced v2.007 build 1634510716 <<"; __Strategies_Active__="-- Active strategies --";
+                                  __EA_Params__=">> EA31337 Advanced v2.007 build 1635091147 <<"; __Strategies_Active__="-- Active strategies --";
                                   Strategy_M1=0; Strategy_M5=0; Strategy_M15=37; Strategy_M30=5; Strategy_H1=17; Strategy_H2=13; Strategy_H3=25;
                                   Strategy_H4=33; Strategy_H6=18; Strategy_H8=32; __Strategies_Stops__="-- Strategies' stops --"; EA_Stops_M1=0;
                                   EA_Stops_M5=0; EA_Stops_M15=28; EA_Stops_M30=21; EA_Stops_H1=17; EA_Stops_H2=26; EA_Stops_H3=23; EA_Stops_H4=8;
