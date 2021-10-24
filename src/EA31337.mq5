@@ -278,7 +278,7 @@ bool InitStrategies() {
   ea.Set(STRAT_PARAM_LS, EA_LotSize);
 #ifdef __advanced__
   ea.Set(STRAT_PARAM_SOFM, EA_SignalOpenFilterMethod);
-  ea.Set(STRAT_PARAM_SCF, EA_SignalCloseFilter);
+  ea.Set(STRAT_PARAM_SCFM, EA_SignalCloseFilterMethod);
   ea.Set(STRAT_PARAM_SOFT, EA_SignalOpenFilterTime);
   ea.Set(STRAT_PARAM_TFM, EA_TickFilterMethod);
   ea.Set(STRUCT_ENUM(EAParams, EA_PARAM_PROP_SIGNAL_FILTER), EA_SignalOpenStrategyFilter);
@@ -305,6 +305,8 @@ bool InitStrategies() {
   _res &= EAStrategyAddStops(ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_H6), EA_Stops_H6, PERIOD_H6);
   _res &= EAStrategyAddStops(ea.GetStrategyViaProp<int>(STRAT_PARAM_TF, PERIOD_H8), EA_Stops_H8, PERIOD_H8);
 #endif                                                    // __rider__
+#else                                                     // Lite
+  ea.Set(STRAT_PARAM_SCFM, -24);
 #endif                                                    // __advanced__
   _res &= GetLastError() == 0 || GetLastError() == 5053;  // @fixme: error 5053?
   ResetLastError();
