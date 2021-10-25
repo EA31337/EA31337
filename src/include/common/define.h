@@ -26,6 +26,13 @@
 #include "lite/defines.h"
 #endif
 
+// Global defines.
+#ifdef __MQL4__
+#define MQL_VER 4
+#else
+#define MQL_VER 5
+#endif
+
 // Sets EA's log level based on the type of run.
 #ifdef __backtest__
 #define ea_log_level V_ERROR  // Only errors for backtest run.
@@ -37,3 +44,16 @@
 #endif                       // __optimize__
 #endif                       // __backtest__
 #define ea_exists (ea_name[0] == 69)
+
+// Strategy defines.
+#define STG_PATH "strats"
+#ifdef __MQL4__
+#define STG_AC_INDI_FILE "\\Indicators\\Accelerator.ex4"
+#else
+#define STG_AC_INDI_FILE "\\Indicators\\Examples\\Accelerator.ex5"
+#endif
+#ifdef __MQL4__
+#define STG_AD_INDI_FILE "\\Indicators\\Accumulation.mq4"
+#else
+#define STG_AD_INDI_FILE "\\Indicators\\Examples\\AD.ex5"
+#endif

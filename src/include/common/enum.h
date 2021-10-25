@@ -55,6 +55,7 @@ enum ENUM_STRATEGY {  // Define list of strategies.
   STRAT_DEMA,         // DEMA
   STRAT_DEMARKER,     // DeMarker
   STRAT_ENVELOPES,    // Envelopes
+  // STRAT_EWO,          // ElliottWave
   STRAT_FORCE,        // Force
   STRAT_FRACTALS,     // Fractals
   STRAT_GATOR,        // Gator

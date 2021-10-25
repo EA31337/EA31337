@@ -451,3 +451,8 @@ bool EAStrategyAddStops(Strategy *_strat = NULL, ENUM_STRATEGY _enum_stg_stops =
  * Deinitialize global class variables.
  */
 void DeinitVars() { Object::Delete(ea); }
+
+// EA resources.
+#ifdef __resource__
+//#resource "Indicators\\Elliott_Wave_Oscillator2.ex" + (string)MQL_VER
+#endif
