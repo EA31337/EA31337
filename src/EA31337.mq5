@@ -380,6 +380,8 @@ bool EAStrategyAdd(ENUM_STRATEGY _stg, int _tfs) {
       return ea.StrategyAdd<Stg_OsMA>(_tfs, _magic_no, _stg);
     case STRAT_PATTERN:
       return ea.StrategyAdd<Stg_Pattern>(_tfs, _magic_no, _stg);
+    case STRAT_PINBAR:
+      return ea.StrategyAdd<Stg_Pinbar>(_tfs, _magic_no, _stg);
     case STRAT_PIVOT:
       return ea.StrategyAdd<Stg_Pivot>(_tfs, _magic_no, _stg);
     case STRAT_RSI:
