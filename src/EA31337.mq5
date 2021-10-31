@@ -54,7 +54,7 @@ int OnInit() {
   ea.GetLogger().Flush();
   Chart::WindowRedraw();
   if (!_initiated) {
-    ea.GetState().Enable(false);
+    ea.Set(STRUCT_ENUM(EAState, EA_STATE_FLAG_ENABLED), false);
   }
   return (_initiated ? INIT_SUCCEEDED : INIT_FAILED);
 }
@@ -200,7 +200,7 @@ bool DisplayStartupInfo(bool _startup = false, string sep = "\n") {
   }
 #endif
   if (_startup) {
-    if (ea.GetState().IsTradeAllowed()) {
+    if (ea.Get(STRUCT_ENUM(EAState, EA_STATE_FLAG_TRADE_ALLOWED))) {
       if (!Terminal::HasError()) {
         _output += sep + "Trading is allowed, waiting for new bars...";
       } else {
@@ -236,7 +236,7 @@ bool InitEA() {
   // Init instance.
   ea = new EA(ea_params);
   ea.Set(TRADE_PARAM_RISK_MARGIN, EA_Risk_MarginMax);
-  if (!ea.GetState().IsTradeAllowed()) {
+  if (!ea.Get(STRUCT_ENUM(EAState, EA_STATE_FLAG_TRADE_ALLOWED))) {
     ea.GetLogger().Error(
         "Trading is not allowed for this symbol, please enable automated trading or check the settings!",
         __FUNCTION_LINE__);

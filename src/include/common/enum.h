@@ -9,12 +9,14 @@ enum ENUM_EA_ADV_ACTION {
   EA_ADV_ACTION_NONE = 0,  // (None)
   // EA_ADV_ACTION_CLOSE_LEAST_LOSS,     // Close order with the least loss
   // EA_ADV_ACTION_CLOSE_LEAST_PROFIT,   // Close order with the least profit
-  EA_ADV_ACTION_CLOSE_MOST_LOSS,            // Close order with the most loss
-  EA_ADV_ACTION_CLOSE_MOST_PROFIT,          // Close order with the most profit
-  EA_ADV_ACTION_ORDERS_CLOSE_ALL,           // Close all active orders
-  EA_ADV_ACTION_ORDERS_CLOSE_IN_PROFIT,     // Close orders in profit
-  EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND,      // Close orders in trend
-  EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND_NOT,  // Close orders in not trend
+  EA_ADV_ACTION_CLOSE_MOST_LOSS,              // Close order with the most loss
+  EA_ADV_ACTION_CLOSE_MOST_PROFIT,            // Close order with the most profit
+  EA_ADV_ACTION_ORDERS_CLOSE_ALL,             // Close all active orders
+  EA_ADV_ACTION_ORDERS_CLOSE_IN_PROFIT,       // Close orders in profit
+  EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND,        // Close orders in trend
+  EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND_NOT,    // Close orders in not trend
+  EA_ADV_ACTION_ORDERS_CLOSE_SIDE_IN_LOSS,    // Close orders in loss side
+  EA_ADV_ACTION_ORDERS_CLOSE_SIDE_IN_PROFIT,  // Close orders in profit side
 };
 enum ENUM_EA_ADV_COND {
   EA_ADV_COND_NONE = 0,              // (None)

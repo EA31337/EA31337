@@ -38,6 +38,12 @@ TaskEntry GetTask(ENUM_EA_ADV_COND _cond, ENUM_EA_ADV_ACTION _action) {
     case EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND_NOT:
       _action_entry = ActionEntry(TRADE_ACTION_ORDERS_CLOSE_IN_TREND_NOT);
       break;
+    case EA_ADV_ACTION_ORDERS_CLOSE_SIDE_IN_LOSS:
+      _action_entry = ActionEntry(TRADE_ACTION_ORDERS_CLOSE_SIDE_IN_LOSS);
+      break;
+    case EA_ADV_ACTION_ORDERS_CLOSE_SIDE_IN_PROFIT:
+      _action_entry = ActionEntry(TRADE_ACTION_ORDERS_CLOSE_SIDE_IN_PROFIT);
+      break;
     case EA_ADV_ACTION_NONE:
       // Empty action.
       break;
