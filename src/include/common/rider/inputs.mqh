@@ -66,9 +66,9 @@ input ENUM_EA_ADV_ACTION EA_Task3_Then = EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND;  /
 // input static string __EA_Order_Params__ = "-- EA's order params --";  // >>> EA's ORDERS <<<
 
 #ifdef __MQL4__
-input string __Strategies_Filters__ = "-- Strategies' filters --";  // >>> STRATEGIES' FILTERS <<<
+input string __Signal_Filters__ = "-- Signal filters --";  // >>> SIGNAL FILTERS <<<
 #else
-input group "Strategies' filters"
+input group "Signal filters"
 #endif
 input int EA_SignalOpenFilterMethod = 32;    // Open (1=!BarO,2=Trend,4=PP,8=OppO,16=Peak,32=BetterO,64=!Eq<1%)
 input int EA_SignalCloseFilterMethod = 32;   // Close (1=!BarO,2=!Trend,4=!PP,8=O>H,16=Peak,32=BetterO,64=Eq>1%)
