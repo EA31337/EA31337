@@ -32,6 +32,28 @@
 #property version ea_version
 #endif
 
+// EA indicator resources.
+#ifdef __resource__
+#ifdef __MQL5__
+// Tester properties.
+#property tester_indicator "::" + INDI_EWO_OSC_PATH + "\\Elliott_Wave_Oscillator2" + MQL_EXT
+#property tester_indicator "::" + INDI_SVEBB_PATH + "\\SVE_Bollinger_Bands" + MQL_EXT
+#property tester_indicator "::" + INDI_TMA_CG_PATH + "\\TMA+CG_mladen_NRP" + MQL_EXT
+#property tester_indicator "::" + INDI_ATR_MA_TREND_PATH + "\\ATR_MA_Trend" + MQL_EXT
+#property tester_indicator "::" + INDI_TMA_TRUE_PATH + "\\TMA_True" + MQL_EXT
+#property tester_indicator "::" + INDI_SAWA_PATH + "\\SAWA" + MQL_EXT
+#property tester_indicator "::" + INDI_SUPERTREND_PATH + "\\SuperTrend" + MQL_EXT
+// Indicator resources.
+#resource INDI_EWO_OSC_PATH + "\\Elliott_Wave_Oscillator2" + MQL_EXT
+#resource INDI_SVEBB_PATH + "\\SVE_Bollinger_Bands" + MQL_EXT
+#resource INDI_TMA_CG_PATH + "\\TMA+CG_mladen_NRP" + MQL_EXT
+#resource INDI_ATR_MA_TREND_PATH + "\\ATR_MA_Trend" + MQL_EXT
+#resource INDI_TMA_TRUE_PATH + "\\TMA_True" + MQL_EXT
+#resource INDI_SAWA_PATH + "\\SAWA" + MQL_EXT
+#resource INDI_SUPERTREND_PATH + "\\SuperTrend" + MQL_EXT
+#endif
+#endif
+
 // Global variables.
 EA *ea;
 
@@ -71,10 +93,11 @@ void OnDeinit(const int reason) { DeinitVars(); }
  */
 void OnTick() {
   EAProcessResult _result = ea.ProcessTick();
-  if (_result.stg_processed > 0) {
+  if (_result.stg_processed_periods > 0) {
     if (EA_DisplayDetailsOnChart && (Terminal::IsVisualMode() || Terminal::IsRealtime())) {
       string _text = StringFormat("%s v%s by %s (%s)\n", ea_name, ea_version, ea_author, ea_link);
       _text += SerializerConverter::FromObject(ea, SERIALIZER_FLAG_INCLUDE_DYNAMIC).ToString<SerializerJson>();
+      _text += ea.GetLogger().ToString();
       Comment(_text);
     }
   }
@@ -185,8 +208,6 @@ bool DisplayStartupInfo(bool _startup = false, string sep = "\n") {
   }
   _output += "ACCOUNT: " + ea.Account().ToString() + sep;
   _output += "EA: " + ea.ToString() + sep;
-  _output += "MARKET: " + ea.Market().ToString() + sep;
-  _output += "SYMBOL: " + ea.SymbolInfo().ToString() + sep;
   _output += "TERMINAL: " + ea.GetTerminal().ToString() + sep;
 #ifdef __advanced__
   // Print enabled strategies info.
@@ -315,6 +336,7 @@ bool InitStrategies() {
  * Adds strategy to the given timeframe.
  */
 bool EAStrategyAdd(ENUM_STRATEGY _stg, int _tfs) {
+  bool _result = true;
   unsigned int _magic_no = EA_MagicNumber + _stg * FINAL_ENUM_TIMEFRAMES_INDEX;
   switch (_stg) {
     case STRAT_AC:
@@ -333,6 +355,10 @@ bool EAStrategyAdd(ENUM_STRATEGY _stg, int _tfs) {
       return ea.StrategyAdd<Stg_Alligator>(_tfs, _magic_no, _stg);
     case STRAT_AWESOME:
       return ea.StrategyAdd<Stg_Awesome>(_tfs, _magic_no, _stg);
+#ifdef __MQL5__
+      // case STRAT_ATR_MA_TREND:
+      // return ea.StrategyAdd<Stg_ATR_MA_Trend>(_tfs, _magic_no, _stg);
+#endif
     case STRAT_BWMFI:
       return ea.StrategyAdd<Stg_BWMFI>(_tfs, _magic_no, _stg);
     case STRAT_BANDS:
@@ -351,11 +377,8 @@ bool EAStrategyAdd(ENUM_STRATEGY _stg, int _tfs) {
       return ea.StrategyAdd<Stg_DeMarker>(_tfs, _magic_no, _stg);
     case STRAT_ENVELOPES:
       return ea.StrategyAdd<Stg_Envelopes>(_tfs, _magic_no, _stg);
-#ifndef ENUM_STRATEGY_DEFINED
-    // @todo: To be added soon.
     case STRAT_EWO:
       return ea.StrategyAdd<Stg_ElliottWave>(_tfs, _magic_no, _stg);
-#endif
     case STRAT_FORCE:
       return ea.StrategyAdd<Stg_Force>(_tfs, _magic_no, _stg);
     case STRAT_FRACTALS:
@@ -390,30 +413,38 @@ bool EAStrategyAdd(ENUM_STRATEGY _stg, int _tfs) {
       return ea.StrategyAdd<Stg_RVI>(_tfs, _magic_no, _stg);
     case STRAT_SAR:
       return ea.StrategyAdd<Stg_SAR>(_tfs, _magic_no, _stg);
-#ifndef ENUM_STRATEGY_DEFINED
-    // @todo: To be added soon.
-    case STRAT_SAWA:
-      return ea.StrategyAdd<Stg_SAWA>(_tfs, _magic_no, _stg);
-#endif
+    // case STRAT_SAWA:
+    // return ea.StrategyAdd<Stg_SAWA>(_tfs, _magic_no, _stg);
     case STRAT_STDDEV:
       return ea.StrategyAdd<Stg_StdDev>(_tfs, _magic_no, _stg);
     case STRAT_STOCHASTIC:
       return ea.StrategyAdd<Stg_Stochastic>(_tfs, _magic_no, _stg);
-#ifndef ENUM_STRATEGY_DEFINED
-    // @todo: To be added soon.
+#ifdef __MQL5__
+      // case STRAT_SUPERTREND:
+      // return ea.StrategyAdd<Stg_SuperTrend>(_tfs, _magic_no, _stg);
+#endif
     case STRAT_SVE_BB:
       return ea.StrategyAdd<Stg_SVE_Bollinger_Bands>(_tfs, _magic_no, _stg);
     case STRAT_TMAT_SVEBB:
       return ea.StrategyAdd<Stg_TMAT_SVEBB>(_tfs, _magic_no, _stg);
+    // case STRAT_TMA_CG:
+    // _result &= ea.StrategyAdd<Stg_TMA_CG>(_tfs, _magic_no, _stg);
     case STRAT_TMA_TRUE:
-      return ea.StrategyAdd<Stg_TMA_True>(_tfs, _magic_no, _stg);
-#endif
+      _result &= ea.StrategyAdd<Stg_TMA_True>(_tfs, _magic_no, _stg);
+      // _result &= ea.GetStrategy(_magic_no).Set(); @todo
+      break;
     case STRAT_WPR:
       return ea.StrategyAdd<Stg_WPR>(_tfs, _magic_no, _stg);
     case STRAT_ZIGZAG:
       return ea.StrategyAdd<Stg_ZigZag>(_tfs, _magic_no, _stg);
+    case STRAT_NONE:
+      break;
+    default:
+      SetUserError(ERR_INVALID_PARAMETER);
+      _result &= false;
+      break;
   }
-  return _stg == STRAT_NONE;
+  return _result;
 }
 
 /**
@@ -451,8 +482,3 @@ bool EAStrategyAddStops(Strategy *_strat = NULL, ENUM_STRATEGY _enum_stg_stops =
  * Deinitialize global class variables.
  */
 void DeinitVars() { Object::Delete(ea); }
-
-// EA resources.
-#ifdef __resource__
-//#resource "Indicators\\Elliott_Wave_Oscillator2.ex" + (string)MQL_VER
-#endif
