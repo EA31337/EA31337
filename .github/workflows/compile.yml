@@ -95,34 +95,37 @@ jobs:
 
       - uses: actions/download-artifact@v2
         with:
-          path: .
+          path: src
+
+      - name: List compiled files
+        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
 
       - name: Enables CLI mode
-        run: echo '#define __cli__' > src/include/common/mode.h
+        run: echo '#define __cli__' > include/common/mode.h
 
       - name: Enables Advanced mode
         if: matrix.mode == 'Advanced'
-        run: echo '#define __advanced__' >> src/include/common/mode.h
+        run: echo '#define __advanced__' >> include/common/mode.h
 
       - name: Enables Rider mode
         if: matrix.mode == 'Rider'
-        run: echo '#define __rider__' >> src/include/common/mode.h
+        run: echo '#define __rider__' >> include/common/mode.h
 
       - name: Enables custom mode
-        run: echo '#define ${{ matrix.mode2 }}' >> src/include/common/mode.h
+        run: echo '#define ${{ matrix.mode2 }}' >> include/common/mode.h
 
       - name: Compiles EA (MQL4)
         uses: fx31337/mql-compile-action@master
         with:
-          include: src
-          path: src\EA31337.mq4
+          include: .
+          path: src/EA31337.mq4
           verbose: true
 
       - name: Compiles EA (MQL5)
         uses: fx31337/mql-compile-action@master
         with:
-          include: src
-          path: src\EA31337.mq5
+          include: .
+          path: src/EA31337.mq5
           verbose: true
 
       - name: List compiled files
@@ -132,4 +135,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: EA31337-${{ matrix.mode }}
-          path: 'src/*.ex?'
+          path: '*.ex?'
