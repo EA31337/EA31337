@@ -52,11 +52,11 @@ jobs:
           path: Include/EA31337-classes
           ref: dev
           repository: EA31337/EA31337-classes
-      - name: Compile (build 2515)
+      - name: Compile (build 2361)
         uses: fx31337/mql-compile-action@master
         with:
           include: .
-          mt-version: 5.0.0.2515
+          mt-version: 5.0.0.2361
           path: src/indicators-other/${{ matrix.file }}
           verbose: true
       - name: List compiled files
