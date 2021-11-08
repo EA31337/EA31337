@@ -9,12 +9,14 @@ enum ENUM_EA_ADV_ACTION {
   EA_ADV_ACTION_NONE = 0,  // (None)
   // EA_ADV_ACTION_CLOSE_LEAST_LOSS,     // Close order with the least loss
   // EA_ADV_ACTION_CLOSE_LEAST_PROFIT,   // Close order with the least profit
-  EA_ADV_ACTION_CLOSE_MOST_LOSS,            // Close order with the most loss
-  EA_ADV_ACTION_CLOSE_MOST_PROFIT,          // Close order with the most profit
-  EA_ADV_ACTION_ORDERS_CLOSE_ALL,           // Close all active orders
-  EA_ADV_ACTION_ORDERS_CLOSE_IN_PROFIT,     // Close orders in profit
-  EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND,      // Close orders in trend
-  EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND_NOT,  // Close orders in not trend
+  EA_ADV_ACTION_CLOSE_MOST_LOSS,              // Close order with the most loss
+  EA_ADV_ACTION_CLOSE_MOST_PROFIT,            // Close order with the most profit
+  EA_ADV_ACTION_ORDERS_CLOSE_ALL,             // Close all active orders
+  EA_ADV_ACTION_ORDERS_CLOSE_IN_PROFIT,       // Close orders in profit
+  EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND,        // Close orders in trend
+  EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND_NOT,    // Close orders in not trend
+  EA_ADV_ACTION_ORDERS_CLOSE_SIDE_IN_LOSS,    // Close orders in loss side
+  EA_ADV_ACTION_ORDERS_CLOSE_SIDE_IN_PROFIT,  // Close orders in profit side
 };
 enum ENUM_EA_ADV_COND {
   EA_ADV_COND_NONE = 0,              // (None)
@@ -34,46 +36,3 @@ enum ENUM_EA_ADV_COND {
   // EA_ADV_COND_TRADE_IS_PIVOT,  // Price's pivot (no args)
 };
 #endif
-
-#define ENUM_STRATEGY_DEFINED
-enum ENUM_STRATEGY {  // Define list of strategies.
-  STRAT_NONE = 0,     // (None)
-  STRAT_AC,           // AC
-  STRAT_AD,           // AD
-  STRAT_ADX,          // ADX
-  STRAT_ALLIGATOR,    // Alligator
-  STRAT_AMA,          // AMA
-  STRAT_ASI,          // ASI
-  STRAT_ATR,          // ATR
-  STRAT_AWESOME,      // Awesome
-  STRAT_BANDS,        // Bands
-  STRAT_BEARS_POWER,  // Bear Power
-  STRAT_BULLS_POWER,  // Bulls Power
-  STRAT_BWMFI,        // BWMFI
-  STRAT_CCI,          // CCI
-  STRAT_CHAIKIN,      // Chaikin
-  STRAT_DEMA,         // DEMA
-  STRAT_DEMARKER,     // DeMarker
-  STRAT_ENVELOPES,    // Envelopes
-  // STRAT_EWO,          // ElliottWave
-  STRAT_FORCE,        // Force
-  STRAT_FRACTALS,     // Fractals
-  STRAT_GATOR,        // Gator
-  STRAT_HEIKEN_ASHI,  // Heiken Ashi
-  STRAT_ICHIMOKU,     // Ichimoku
-  STRAT_MA,           // MA
-  STRAT_MACD,         // MACD
-  STRAT_MFI,          // MFI
-  STRAT_MOMENTUM,     // Momentum
-  STRAT_OBV,          // OBV
-  STRAT_OSMA,         // OSMA
-  STRAT_PATTERN,      // Pattern
-  STRAT_PIVOT,        // Pivot
-  STRAT_RSI,          // RSI
-  STRAT_RVI,          // RVI
-  STRAT_SAR,          // SAR
-  STRAT_STDDEV,       // StdDev
-  STRAT_STOCHASTIC,   // Stochastic
-  STRAT_WPR,          // WPR
-  STRAT_ZIGZAG,       // ZigZag
-};

@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 
 // EA defines.
-#define ea_version "2.008"
+#define ea_version "2.009"
 #define ea_desc "Forex multi-strategy trading robot."
 #define ea_link "https://github.com/EA31337"
 #define ea_author "kenorb"
@@ -24,13 +24,6 @@
 #endif
 #else
 #include "lite/defines.h"
-#endif
-
-// Global defines.
-#ifdef __MQL4__
-#define MQL_VER 4
-#else
-#define MQL_VER 5
 #endif
 
 // Sets EA's log level based on the type of run.
