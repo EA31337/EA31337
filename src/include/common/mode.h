@@ -23,5 +23,5 @@
 //#define __profiler__     // Activates profiler.
 //#define __property__     // Enables program properties.
 //#define __release__      // Enables release settings.
-//#define __resource__     // Enables resources.
+#define __resource__     // Enables resources.
 //#define __trace__        // Enables tracing.
