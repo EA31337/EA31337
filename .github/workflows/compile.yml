@@ -11,8 +11,42 @@ on:
       - '**.md'
 
 jobs:
-  Compile:
+  Indicators-other:
+    runs-on: windows-latest
 
+    steps:
+
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+
+      - uses: actions/checkout@v2
+        with:
+          path: src/include/EA31337-classes
+          ref: v2.009
+          repository: EA31337/EA31337-classes
+
+      - name: Compiles indicators
+        uses: fx31337/mql-compile-action@master
+        with:
+          include: src
+          path: src\indicators-other
+          verbose: true
+
+      - name: List compiled files
+        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
+
+      - run: Get-Location
+
+      - name: Upload indicator artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: indicators-other
+          path: '**/*.ex?'
+
+  EA:
+
+    needs: [Indicators-other]
     runs-on: windows-latest
 
     strategy:
