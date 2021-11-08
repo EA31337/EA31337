@@ -21,6 +21,9 @@ jobs:
           - Lite
           - Advanced
           - Rider
+        mode2:
+          - __input__
+          - __resource__
 
     steps:
 
@@ -31,9 +34,6 @@ jobs:
       - name: Enables CLI mode
         run: echo '#define __cli__' > src/include/common/mode.h
 
-      - name: Enables release mode
-        run: echo '#define __release__' >> src/include/common/mode.h
-
       - name: Enables Advanced mode
         if: matrix.mode == 'Advanced'
         run: echo '#define __advanced__' >> src/include/common/mode.h
@@ -42,15 +42,20 @@ jobs:
         if: matrix.mode == 'Rider'
         run: echo '#define __rider__' >> src/include/common/mode.h
 
+      - name: Enables custom mode
+        run: echo '#define ${{ matrix.mode2 }}' >> src/include/common/mode.h
+
       - name: Compiles EA (MQL4)
         uses: fx31337/mql-compile-action@master
         with:
+          include: src
           path: src\EA31337.mq4
           verbose: true
 
       - name: Compiles EA (MQL5)
         uses: fx31337/mql-compile-action@master
         with:
+          include: src
           path: src\EA31337.mq5
           verbose: true
 
