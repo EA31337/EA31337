@@ -11,38 +11,13 @@ on:
       - '**.md'
 
 jobs:
-  GetList-IndicatorsOther:
-    defaults:
-      run:
-        shell: bash
-        working-directory: src/indicators-other
-    outputs:
-      indicators-other: ${{ steps.get-files.outputs.indicators-other }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: 'recursive'
-      - name: Set output with list of files
-        id: get-files
-        run: |
-          import glob, json, os
-          files = glob.glob("**/*.mq?")
-          print("::set-output name=indicators-other::{}".format(json.dumps(files)))
-        shell: python
-      - name: Display output
-        run: echo ${{ steps.get-files.outputs.indicators-other }}
 
   Compile-IndicatorsOther:
     defaults:
       run:
         shell: powershell
         working-directory: src/indicators-other
-    needs: [GetList-IndicatorsOther]
     runs-on: windows-latest
-    strategy:
-      matrix:
-        file: ${{ fromJson(needs.GetList-IndicatorsOther.outputs.indicators-other) }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -57,7 +32,7 @@ jobs:
         with:
           include: .
           mt-version: 5.0.0.2361
-          path: src/indicators-other/${{ matrix.file }}
+          path: src/indicators-other/**/*.mq?
           verbose: true
       - name: List compiled files
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
