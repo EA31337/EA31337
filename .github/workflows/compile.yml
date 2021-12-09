@@ -92,14 +92,14 @@ jobs:
       - name: Compiles EA (MQL4)
         uses: fx31337/mql-compile-action@master
         with:
-          include: .
+          include: src
           path: src/EA31337.mq4
           verbose: true
 
       - name: Compiles EA (MQL5)
         uses: fx31337/mql-compile-action@master
         with:
-          include: .
+          include: src
           path: src/EA31337.mq5
           verbose: true
 
