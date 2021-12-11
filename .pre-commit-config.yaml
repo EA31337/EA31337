@@ -16,7 +16,7 @@ repos:
         exclude: \.txt$
 
   - repo: https://github.com/igorshubovych/markdownlint-cli.git
-    rev: v0.28.1
+    rev: v0.30.0
     hooks:
       - id: markdownlint
 
