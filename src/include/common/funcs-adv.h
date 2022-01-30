@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                  EA31337 - multi-strategy advanced trading robot |
-//|                                 Copyright 2016-2021, EA31337 Ltd |
+//|                                 Copyright 2016-2022, EA31337 Ltd |
 //|                                       https://github.com/EA31337 |
 //+------------------------------------------------------------------+
 
@@ -52,6 +52,17 @@ TaskEntry GetTask(ENUM_EA_ADV_COND _cond, ENUM_EA_ADV_ACTION _action) {
       break;
   }
   switch (_cond) {
+    case EA_ADV_COND_EA_ON_NEW_DAY:
+      _cond_entry = ConditionEntry(EA_COND_ON_NEW_DAY);
+      break;
+    /* @todo: https://github.com/EA31337/EA31337-classes/issues/628
+    case EA_ADV_COND_EA_ON_NEW_WEEK:
+      _cond_entry = ConditionEntry(EA_COND_ON_NEW_WEEK);
+      break;
+    */
+    case EA_ADV_COND_EA_ON_NEW_MONTH:
+      _cond_entry = ConditionEntry(EA_COND_ON_NEW_MONTH);
+      break;
     /* Trade conditions not supported (yet).
     case EA_ADV_COND_TRADE_IS_PEAK:
       _cond_entry = ConditionEntry(TRADE_COND_IS_PEAK);

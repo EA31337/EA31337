@@ -22,5 +22,7 @@ jobs:
         env:
           # yamllint disable rule:line-length
           SHFMT_URL: https://github.com/mvdan/sh/releases/download/v3.1.1/shfmt_v3.1.1_linux_amd64
-      - uses: actions/setup-python@v1
-      - uses: pre-commit/action@v2.0.0
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.9.10
+      - uses: pre-commit/action@v2.0.3

@@ -6,6 +6,7 @@
 [![Status][gha-image-backtest-master]][gha-link-backtest-master]
 [![Discuss][gh-discuss-badge]][gh-discuss-link]
 [![Channel][tg-channel-image]][tg-channel-link]
+[![Twitter][twitter-image]][twitter-link]
 [![Edit][gitpod-image]][gitpod-link]
 [![License][license-image]][license-link]
 
@@ -257,12 +258,12 @@ NO REPRESENTATION IS BEING MADE THAN ANY ACCOUNT WILL OR IS LIKELY TO ACHIEVE PR
 [tg-channel-image]: https://img.shields.io/badge/Telegram-join-0088CC.svg?logo=telegram
 [tg-channel-link]: https://t.me/EA31337
 
+[twitter-image]: https://img.shields.io/badge/EA31337-Follow-1DA1F2.svg?logo=Twitter
+[twitter-link]: https://twitter.com/EA31337
+
 [gh-discuss-badge]: https://img.shields.io/badge/Discussions-Q&A-blue.svg?logo=github
 [gh-discuss-link]: https://github.com/EA31337/EA31337/discussions
 [gh-issues]: https://github.com/EA31337/EA31337/issues
 
 [license-image]: https://img.shields.io/github/license/EA31337/EA31337.svg
 [license-link]: https://tldrlegal.com/license/gnu-general-public-license-v3-(gpl-3)
-
-[scam-broker-se-link]: https://money.stackexchange.com/q/91732/6888
-[scam-broker-fpa-link]: https://www.forexpeacearmy.com/community/threads/guilty-case-2018-060-kenorb-vs-tradeu2-com.54563/#post-312721
