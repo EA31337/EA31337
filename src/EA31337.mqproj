@@ -1,9 +1,9 @@
 {
   "platform"    :"mt5",
   "program_type":"expert",
-  "copyright"   :"2016-2021, EA31337 Ltd",
+  "copyright"   :"2016-2022, EA31337 Ltd",
   "link"        :"https:\/\/github.com\/EA31337\/EA31337",
-  "version"     :"2.009",
+  "version"     :"2.010",
   "description" :"Forex multi-strategy trading robot",
   "icon"        :"resources\\favicon.ico",
   "optimize"    :"0",
