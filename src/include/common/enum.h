@@ -19,9 +19,9 @@ enum ENUM_EA_ADV_ACTION {
   EA_ADV_ACTION_ORDERS_CLOSE_SIDE_IN_PROFIT,  // Close orders in profit side
 };
 enum ENUM_EA_ADV_COND {
-  EA_ADV_COND_NONE = 0,              // (None)
-  EA_ADV_COND_EA_ON_NEW_DAY,         // On each day
-  EA_ADV_COND_EA_ON_NEW_WEEK,        // On each week
+  EA_ADV_COND_NONE = 0,       // (None)
+  EA_ADV_COND_EA_ON_NEW_DAY,  // On each day
+  // EA_ADV_COND_EA_ON_NEW_WEEK,        // On each week
   EA_ADV_COND_EA_ON_NEW_MONTH,       // On each month
   EA_ADV_COND_TRADE_EQUITY_GT_01PC,  // Equity > 1%
   EA_ADV_COND_TRADE_EQUITY_GT_02PC,  // Equity > 2%
