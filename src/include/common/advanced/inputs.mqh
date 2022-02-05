@@ -48,16 +48,16 @@ input static string __Strategies_Stops__ = "-- Strategies' stops --";  // >>> ST
 #else
 input group "Strategies' stops"
 #endif
-input ENUM_STRATEGY EA_Stops_M1 = STRAT_NONE;       // Stop loss on M1
-input ENUM_STRATEGY EA_Stops_M5 = STRAT_NONE;       // Stop loss on M5
-input ENUM_STRATEGY EA_Stops_M15 = STRAT_NONE;      // Stop loss on M15
-input ENUM_STRATEGY EA_Stops_M30 = STRAT_EWO;       // Stop loss on M30
-input ENUM_STRATEGY EA_Stops_H1 = STRAT_RVI;        // Stop loss on H1
-input ENUM_STRATEGY EA_Stops_H2 = STRAT_ASI;        // Stop loss on H2
-input ENUM_STRATEGY EA_Stops_H3 = STRAT_FORCE;      // Stop loss on H3
-input ENUM_STRATEGY EA_Stops_H4 = STRAT_PATTERN;    // Stop loss on H4
-input ENUM_STRATEGY EA_Stops_H6 = STRAT_ENVELOPES;  // Stop loss on H6
-input ENUM_STRATEGY EA_Stops_H8 = STRAT_FORCE;      // Stop loss on H8
+input ENUM_STRATEGY EA_Stops_M1 = STRAT_NONE;   // Stop loss on M1
+input ENUM_STRATEGY EA_Stops_M5 = STRAT_NONE;   // Stop loss on M5
+input ENUM_STRATEGY EA_Stops_M15 = STRAT_NONE;  // Stop loss on M15
+input ENUM_STRATEGY EA_Stops_M30 = STRAT_RSI;   // Stop loss on M30
+input ENUM_STRATEGY EA_Stops_H1 = STRAT_AC;     // Stop loss on H1
+input ENUM_STRATEGY EA_Stops_H2 = STRAT_PIVOT;  // Stop loss on H2
+input ENUM_STRATEGY EA_Stops_H3 = STRAT_FORCE;  // Stop loss on H3
+input ENUM_STRATEGY EA_Stops_H4 = STRAT_AC;     // Stop loss on H4
+input ENUM_STRATEGY EA_Stops_H6 = STRAT_MA;     // Stop loss on H6
+input ENUM_STRATEGY EA_Stops_H8 = STRAT_BANDS;  // Stop loss on H8
 
 #ifdef __MQL4__
 input string __Signal_Filters__ = "-- Signal filters --";  // >>> SIGNAL FILTERS <<<
