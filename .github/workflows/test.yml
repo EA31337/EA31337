@@ -21,8 +21,45 @@ on:
       - src/include/**
 
 jobs:
-  Compile:
 
+  Compile-IndicatorsOther:
+    defaults:
+      run:
+        shell: powershell
+        working-directory: src/indicators-other
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - uses: actions/checkout@v2
+        with:
+          path: Include/EA31337-classes
+          ref: dev
+          repository: EA31337/EA31337-classes
+      - name: Compile (build 2361)
+        uses: fx31337/mql-compile-action@master
+        with:
+          include: .
+          mt-version: 5.0.0.2361
+          path: src/indicators-other/**/*.mq?
+          verbose: true
+      - name: List compiled files
+        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
+      - run: Get-Location
+      - name: Upload indicator artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: indicators-other
+          path: '**/*.ex?'
+
+  Compile-EA:
+
+    defaults:
+      run:
+        shell: powershell
+        working-directory: src
+    needs: [Compile-IndicatorsOther]
     runs-on: windows-latest
 
     strategy:
@@ -31,6 +68,8 @@ jobs:
           - Lite
           - Advanced
           - Rider
+        mode2:
+          - __resource__
 
     steps:
 
@@ -38,47 +77,61 @@ jobs:
         with:
           submodules: 'recursive'
 
-      - name: Enables CLI mode
-        run: echo '#define __cli__' > src/include/common/mode.h
+      - uses: actions/download-artifact@v2
+        with:
+          name: indicators-other
+          path: .
 
-      - name: Enables release mode
-        run: echo '#define __release__' >> src/include/common/mode.h
+      - name: List compiled files
+        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
+
+      - run: Get-Location
+
+      # @fixme: https://github.com/actions/upload-artifact/issues/87
+      - name: Link indicators
+        run: New-Item -ItemType SymbolicLink -Path "../indicators-other" -Target "indicators-other"
+
+      - name: Enables CLI mode
+        run: echo '#define __cli__' > include/common/mode.h
 
       - name: Enables Advanced mode
         if: matrix.mode == 'Advanced'
-        run: echo '#define __advanced__' >> src/include/common/mode.h
+        run: echo '#define __advanced__' >> include/common/mode.h
 
       - name: Enables Rider mode
         if: matrix.mode == 'Rider'
-        run: echo '#define __rider__' >> src/include/common/mode.h
+        run: echo '#define __rider__' >> include/common/mode.h
+
+      - name: Enables custom mode
+        run: echo '#define ${{ matrix.mode2 }}' >> include/common/mode.h
 
       - name: Compiles EA (MQL4)
         uses: fx31337/mql-compile-action@master
         with:
-          path: src\EA31337.mq4
+          include: src
+          path: src/EA31337.mq4
           verbose: true
 
       - name: Compiles EA (MQL5)
         uses: fx31337/mql-compile-action@master
         with:
-          path: src\EA31337.mq5
+          include: src
+          path: src/EA31337.mq5
           verbose: true
 
       - name: Moves file (MQL4)
-        run: mv -v src\*.ex4 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex4"
-
+        run: mv -v *.ex4 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex4"
       - name: Moves file (MQL5)
-        run: mv -v src\*.ex5 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex5"
+        run: mv -v *.ex5 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex5"
 
-      - name: Prints compiled files
+      - name: List compiled files
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
-        shell: powershell
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ matrix.mode }}
-          path: '*.ex?'
+          name: EA31337-${{ matrix.mode }}
+          path: '**/EA*.ex?'
 
   Test:
 
@@ -86,7 +139,7 @@ jobs:
       run:
         shell: bash
 
-    needs: Compile
+    needs: Compile-EA
     runs-on: ubuntu-latest
 
     strategy:
@@ -103,7 +156,7 @@ jobs:
 
       - uses: actions/download-artifact@v2
         with:
-          name: ${{ matrix.mode }}
+          name: EA31337-${{ matrix.mode }}
 
       - name: Test ${{ matrix.year }}.${{ matrix.month }}
         uses: fx31337/mql-tester-action@master
