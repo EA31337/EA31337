@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           path: Include/EA31337-classes
-          ref: dev
+          ref: v2.010
           repository: EA31337/EA31337-classes
       - name: Compile (build 2361)
         uses: fx31337/mql-compile-action@master
