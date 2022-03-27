@@ -42,4 +42,4 @@ input ENUM_STRATEGY Strategy_H3 = STRAT_PINBAR;      // Strategy on H3
 input ENUM_STRATEGY Strategy_H4 = STRAT_OSMA;        // Strategy on H4
 input ENUM_STRATEGY Strategy_H6 = STRAT_RVI;         // Strategy on H6
 input ENUM_STRATEGY Strategy_H8 = STRAT_MFI;         // Strategy on H8
-input ENUM_STRATEGY Strategy_H12 = STRAT_NONE;       // Strategy on H12
+input ENUM_STRATEGY Strategy_H12 = STRAT_DEMARKER;   // Strategy on H12
