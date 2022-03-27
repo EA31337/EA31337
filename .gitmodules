@@ -1,12 +1,15 @@
 [submodule "classes"]
 	path = src/include/classes
 	url = https://github.com/EA31337/EA31337-classes.git
-[submodule "indicators-other"]
-	path = src/indicators-other
-	url = https://github.com/EA31337/EA31337-indicators-other
 [submodule "strategies"]
 	path = src/include/strategies
 	url = https://github.com/EA31337/EA31337-strategies.git
 [submodule "wiki"]
 	path = docs/wiki
 	url = https://github.com/EA31337/EA31337.wiki.git
+[submodule "indicators-common"]
+	path = src/indicators-common
+	url = https://github.com/EA31337/EA31337-indicators-common.git
+[submodule "indicators-other"]
+	path = src/indicators-other
+	url = https://github.com/EA31337/EA31337-indicators-other.git
