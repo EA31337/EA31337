@@ -35,10 +35,10 @@ input group "Active strategy"
 input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;      // Strategy on M1
 input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;      // Strategy on M5
 input ENUM_STRATEGY Strategy_M15 = STRAT_NONE;     // Strategy on M15
-input ENUM_STRATEGY Strategy_M30 = STRAT_PATTERN;  // Strategy on M30
-input ENUM_STRATEGY Strategy_H1 = STRAT_CHAIKIN;   // Strategy on H1
-input ENUM_STRATEGY Strategy_H2 = STRAT_FORCE;     // Strategy on H2
-input ENUM_STRATEGY Strategy_H3 = STRAT_DEMARKER;  // Strategy on H3
+input ENUM_STRATEGY Strategy_M30 = STRAT_MA;       // Strategy on M30
+input ENUM_STRATEGY Strategy_H1 = STRAT_ICHIMOKU;  // Strategy on H1
+input ENUM_STRATEGY Strategy_H2 = STRAT_AD;        // Strategy on H2
+input ENUM_STRATEGY Strategy_H3 = STRAT_AMA;       // Strategy on H3
 input ENUM_STRATEGY Strategy_H4 = STRAT_ASI;       // Strategy on H4
 input ENUM_STRATEGY Strategy_H6 = STRAT_PIVOT;     // Strategy on H6
 input ENUM_STRATEGY Strategy_H8 = STRAT_OBV;       // Strategy on H8
@@ -56,12 +56,12 @@ input string __EA_Tasks__ = "-- EA's tasks --";  // >>> EA's TASKS <<<
 #else
 input group "EA's tasks"
 #endif
-input ENUM_EA_ADV_COND EA_Task1_If = EA_ADV_COND_TRADE_EQUITY_GT_05PC;             // 1: Task's condition
-input ENUM_EA_ADV_ACTION EA_Task1_Then = EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND;      // 1: Task's action
-input ENUM_EA_ADV_COND EA_Task2_If = EA_ADV_COND_TRADE_EQUITY_GT_05PC;             // 2: Task's condition
-input ENUM_EA_ADV_ACTION EA_Task2_Then = EA_ADV_ACTION_ORDERS_CLOSE_SIDE_IN_LOSS;  // 2: Task's action
-input ENUM_EA_ADV_COND EA_Task3_If = EA_ADV_COND_TRADE_EQUITY_LT_05PC;             // 3: Task's condition
-input ENUM_EA_ADV_ACTION EA_Task3_Then = EA_ADV_ACTION_ORDERS_CLOSE_IN_PROFIT;     // 3: Task's action
+input ENUM_EA_ADV_COND EA_Task1_If = EA_ADV_COND_TRADE_EQUITY_GT_05PC;          // 1: Task's condition
+input ENUM_EA_ADV_ACTION EA_Task1_Then = EA_ADV_ACTION_ORDERS_CLOSE_IN_PROFIT;  // 1: Task's action
+input ENUM_EA_ADV_COND EA_Task2_If = EA_ADV_COND_TRADE_EQUITY_GT_02PC;          // 2: Task's condition
+input ENUM_EA_ADV_ACTION EA_Task2_Then = EA_ADV_ACTION_ORDERS_CLOSE_IN_PROFIT;  // 2: Task's action
+input ENUM_EA_ADV_COND EA_Task3_If = EA_ADV_COND_TRADE_EQUITY_LT_05PC;          // 3: Task's condition
+input ENUM_EA_ADV_ACTION EA_Task3_Then = EA_ADV_ACTION_ORDERS_CLOSE_IN_PROFIT;  // 3: Task's action
 
 // input static string __EA_Order_Params__ = "-- EA's order params --";  // >>> EA's ORDERS <<<
 
