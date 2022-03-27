@@ -2,7 +2,7 @@
 repos:
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1
+    rev: v4.1.0
     hooks:
       - id: check-added-large-files
       - id: check-byte-order-marker
@@ -16,12 +16,12 @@ repos:
         exclude: \.txt$
 
   - repo: https://github.com/igorshubovych/markdownlint-cli.git
-    rev: v0.30.0
+    rev: v0.31.1
     hooks:
       - id: markdownlint
 
   - repo: https://github.com/jumanjihouse/pre-commit-hooks
-    rev: 2.1.5
+    rev: 2.1.6
     hooks:
       - id: forbid-binary
         exclude: (\.ico|\.mqproj)$
