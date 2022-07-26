@@ -13,10 +13,7 @@
 #include "common/enum.h"
 
 // Includes class files.
-#include "classes/Action.struct.h"
 #include "classes/Chart.mqh"
-#include "classes/Condition.mqh"
-#include "classes/Condition.struct.h"
 #include "classes/EA.mqh"
 #include "classes/Msg.mqh"
 #include "classes/Terminal.mqh"
