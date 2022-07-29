@@ -266,12 +266,10 @@ bool InitEA() {
   }
 #ifdef __advanced__
   if (_initiated) {
-    TaskEntry _task1 = GetTask(EA_Task1_If, EA_Task1_Then);
-    TaskEntry _task2 = GetTask(EA_Task2_If, EA_Task2_Then);
-    TaskEntry _task3 = GetTask(EA_Task3_If, EA_Task3_Then);
-    _initiated &= ea.AddTask(_task1);
-    _initiated &= ea.AddTask(_task2);
-    _initiated &= ea.AddTask(_task3);
+    EATasks _ea_tasks(ea);
+    _initiated &= _ea_tasks.AddTask(EA_Task1_If, EA_Task1_Then);
+    _initiated &= _ea_tasks.AddTask(EA_Task2_If, EA_Task2_Then);
+    _initiated &= _ea_tasks.AddTask(EA_Task3_If, EA_Task3_Then);
   }
 #endif
   return _initiated;
