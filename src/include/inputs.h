@@ -49,6 +49,7 @@ input string __EA_Trade_Params__ = "-- EA's trade parameters --";  // >>> EA's T
 input group "EA's trade parameters"
 #endif
 input double EA_LotSize = 0;        // Lot size (0 = auto)
+input float EA_MaxSpread = 3.1f;    // Max spread to trade (in pips, 0 to disable)
 input uint EA_MagicNumber = 31337;  // Starting EA magic number
 
 #ifdef __MQL4__

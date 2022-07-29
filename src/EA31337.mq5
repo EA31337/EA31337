@@ -257,6 +257,8 @@ bool InitEA() {
   ea_params.SetFlag(EA_PARAM_FLAG_LOTSIZE_AUTO, EA_LotSize <= 0);
   // Init instance.
   ea = new EA(ea_params);
+  ea.Set(STRAT_PARAM_MAX_SPREAD, EA_MaxSpread);
+  ea.Set(TRADE_PARAM_MAX_SPREAD, EA_MaxSpread);
   ea.Set(TRADE_PARAM_RISK_MARGIN, EA_Risk_MarginMax);
   if (!ea.Get(STRUCT_ENUM(EAState, EA_STATE_FLAG_TRADE_ALLOWED))) {
     ea.GetLogger().Error(
