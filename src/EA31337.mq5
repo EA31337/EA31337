@@ -297,6 +297,9 @@ bool InitStrategies() {
   EAStrategyAdd(Strategy_H12, 1 << H12);
   // Update lot size.
   ea.Set(STRAT_PARAM_LS, EA_LotSize);
+  // Override max spread values.
+  ea.Set(STRAT_PARAM_MAX_SPREAD, EA_MaxSpread);
+  ea.Set(TRADE_PARAM_MAX_SPREAD, EA_MaxSpread);
 #ifdef __advanced__
   ea.Set(STRAT_PARAM_SOFM, EA_SignalOpenFilterMethod);
   ea.Set(STRAT_PARAM_SCFM, EA_SignalCloseFilterMethod);
