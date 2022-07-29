@@ -22,7 +22,7 @@
 // Includes common EA's functions.
 #ifdef __advanced__
 // Includes common EA actions.
-#include "common/funcs-adv.h"
+#include "common/tasks.h"
 #endif
 
 // Includes indicator classes.
