@@ -1,7 +1,7 @@
 {
   "Time": "7",
   "Title": "Strategy Tester Report",
-  "EA Name": "EA31337-Lite-d52606da9c6a3ede8fffaba8765b1878fc203918",
+  "EA Name": "EA31337-Lite-9d7c4086240dd9f9eb52ebf89736c38746f5dd14",
   "Build": "1359",
   "Symbol": "EURUSD (Euro vs US Dollar)",
   "Period": "1 Minute (M1)  2021.01.03 23:45 - 2021.12.30 23:59    (2021.01.01 - 2021.12.31)",
@@ -9,7 +9,7 @@
   "Initial deposit": "1000.00",
   "Spread": "1",
   "Modelling quality": "24.99%",
-  "Parameters": "__EA_Params__=&#34;&gt;&gt; EA31337 Lite v2.011 build 1671029155 &lt;&lt;&#34;; __Strategies_Active__=&#34;-- Active strategies --&#34;; Strategy_M1=0; Strategy_M5=0; Strategy_M15=7; Strategy_M30=24; Strategy_H1=4; Strategy_H2=17; Strategy_H3=7; Strategy_H4=4; Strategy_H6=31; Strategy_H8=1; Strategy_H12=35; __EA_Risk_Params__=&#34;-- EA&#39;s risk management --&#34;; EA_Risk_MarginMax=1.20000005; __EA_Trade_Params__=&#34;-- EA&#39;s trade parameters --&#34;; EA_LotSize=0; EA_MagicNumber=31337; __Logging_Params__=&#34;-- EA&#39;s logging &amp; messaging --&#34;; VerboseLevel=1; EA_DisplayDetailsOnChart=true; ,",
+  "Parameters": "__EA_Params__=&#34;&gt;&gt; EA31337 Lite v2.011 build 1671030004 &lt;&lt;&#34;; __Strategies_Active__=&#34;-- Active strategies --&#34;; Strategy_M1=0; Strategy_M5=0; Strategy_M15=7; Strategy_M30=24; Strategy_H1=4; Strategy_H2=17; Strategy_H3=7; Strategy_H4=4; Strategy_H6=31; Strategy_H8=1; Strategy_H12=35; __EA_Risk_Params__=&#34;-- EA&#39;s risk management --&#34;; EA_Risk_MarginMax=1.20000005; __EA_Trade_Params__=&#34;-- EA&#39;s trade parameters --&#34;; EA_LotSize=0; EA_MagicNumber=31337; __Logging_Params__=&#34;-- EA&#39;s logging &amp; messaging --&#34;; VerboseLevel=1; EA_DisplayDetailsOnChart=true; ,",
   "Bars in test": "364812",
   "Ticks modelled": "41698632",
   "Mismatched charts errors": "0",
