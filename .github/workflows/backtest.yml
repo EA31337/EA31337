@@ -137,9 +137,9 @@ jobs:
           - deposit: 1k
             mode: Lite
             spread: 10
-            year: 2020
+            year: 2021
         mode: [Lite]
-        year: [2020]
+        year: [2021]
         deposit: [1k, 10k, 100k]
         spread: [1, 10]
 
@@ -183,9 +183,9 @@ jobs:
           - deposit: 1k
             mode: Advanced
             spread: 10
-            year: 2020
+            year: 2021
         mode: [Advanced]
-        year: [2020]
+        year: [2021]
         deposit: [1k, 10k, 100k]
         spread: [1, 10]
 
@@ -229,9 +229,9 @@ jobs:
           - deposit: 1k
             mode: Rider
             spread: 10
-            year: 2020
+            year: 2021
         mode: [Rider]
-        year: [2020]
+        year: [2021]
         deposit: [1k, 10k, 100k]
         spread: [1, 10]
 
@@ -280,7 +280,7 @@ jobs:
           - Advanced
           - Rider
         year:
-          - 2020
+          - 2021
       max-parallel: 1
     steps:
       - uses: actions/checkout@v2

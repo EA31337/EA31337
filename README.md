@@ -7,8 +7,8 @@
 [![Discuss][gh-discuss-badge]][gh-discuss-link]
 [![Channel][tg-channel-image]][tg-channel-link]
 [![Twitter][twitter-image]][twitter-link]
-[![Edit][gitpod-image]][gitpod-link]
 [![License][license-image]][license-link]
+[![Edit][gh-edit-badge]][gh-edit-link]
 
 ## Introduction
 
@@ -234,6 +234,8 @@ NO REPRESENTATION IS BEING MADE THAN ANY ACCOUNT WILL OR IS LIKELY TO ACHIEVE PR
 
 <!-- Named links -->
 
+[gh-edit-badge]: https://img.shields.io/badge/GitHub-edit-purple.svg?logo=github
+[gh-edit-link]: https://github.dev/EA31337/EA31337
 [gh-wiki]: https://github.com/EA31337/EA31337/wiki
 [gh-wiki-start]: https://github.com/EA31337/EA31337/wiki/Before-you-start
 [gh-wiki-installation]: https://github.com/EA31337/EA31337/wiki/Installation
@@ -248,9 +250,6 @@ NO REPRESENTATION IS BEING MADE THAN ANY ACCOUNT WILL OR IS LIKELY TO ACHIEVE PR
 [gha-image-test-master]: https://github.com/EA31337/EA31337/workflows/Test/badge.svg?branch=master
 [gha-link-backtest-master]: https://github.com/EA31337/EA31337/actions?query=workflow%3ABacktest+branch%3Amaster
 [gha-image-backtest-master]: https://github.com/EA31337/EA31337/workflows/Backtest/badge.svg?branch=master
-
-[gitpod-image]: https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod
-[gitpod-link]: https://gitpod.io/#https://github.com/EA31337/EA31337
 
 [gh-repo-classes]: https://github.com/EA31337/EA31337-classes
 [gh-repo-strats]: https://github.com/EA31337/EA31337-strategies

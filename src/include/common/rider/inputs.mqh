@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                                         inputs.h |
-//|                                 Copyright 2016-2021, EA31337 Ltd |
+//|                                 Copyright 2016-2022, EA31337 Ltd |
 //|                                       https://github.com/EA31337 |
 //+------------------------------------------------------------------+
 
@@ -32,17 +32,17 @@ input static string __Strategies_Active__ = "-- Active strategies --";  // >>> A
 #else
 input group "Active strategy"
 #endif
-input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;      // Strategy on M1
-input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;      // Strategy on M5
-input ENUM_STRATEGY Strategy_M15 = STRAT_NONE;     // Strategy on M15
-input ENUM_STRATEGY Strategy_M30 = STRAT_MA;       // Strategy on M30
-input ENUM_STRATEGY Strategy_H1 = STRAT_ICHIMOKU;  // Strategy on H1
-input ENUM_STRATEGY Strategy_H2 = STRAT_AD;        // Strategy on H2
-input ENUM_STRATEGY Strategy_H3 = STRAT_AMA;       // Strategy on H3
-input ENUM_STRATEGY Strategy_H4 = STRAT_ASI;       // Strategy on H4
-input ENUM_STRATEGY Strategy_H6 = STRAT_PIVOT;     // Strategy on H6
-input ENUM_STRATEGY Strategy_H8 = STRAT_OBV;       // Strategy on H8
-input ENUM_STRATEGY Strategy_H12 = STRAT_MACD;     // Strategy on H12
+input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;        // Strategy on M1
+input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;        // Strategy on M5
+input ENUM_STRATEGY Strategy_M15 = STRAT_NONE;       // Strategy on M15
+input ENUM_STRATEGY Strategy_M30 = STRAT_NONE;       // Strategy on M30
+input ENUM_STRATEGY Strategy_H1 = STRAT_OSMA;        // Strategy on H1
+input ENUM_STRATEGY Strategy_H2 = STRAT_BANDS;       // Strategy on H2
+input ENUM_STRATEGY Strategy_H3 = STRAT_STOCHASTIC;  // Strategy on H3
+input ENUM_STRATEGY Strategy_H4 = STRAT_GATOR;       // Strategy on H4
+input ENUM_STRATEGY Strategy_H6 = STRAT_MFI;         // Strategy on H6
+input ENUM_STRATEGY Strategy_H8 = STRAT_BWMFI;       // Strategy on H8
+input ENUM_STRATEGY Strategy_H12 = STRAT_ALLIGATOR;  // Strategy on H12
 
 #ifdef __MQL4__
 input static string __Strategies_Stops__ = "-- Strategies' stops --";  // >>> STRATEGIES' STOPS <<<
