@@ -16,7 +16,7 @@ class EATasks {
     bool _result = true;
     string _symbol = ea.Get<string>(STRUCT_ENUM(EAParams, EA_PARAM_PROP_SYMBOL));
     ENUM_ACTION_TYPE _action_type;
-    ENUM_TASK_CONDITION_TYPE _cond_type;
+    ENUM_CONDITION_TYPE _cond_type;
     TaskActionEntry _action_entry;
     TaskConditionEntry _cond_entry;
     switch (_action) {
