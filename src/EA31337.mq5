@@ -266,12 +266,10 @@ bool InitEA() {
   }
 #ifdef __advanced__
   if (_initiated) {
-    TaskEntry _task1 = GetTask(EA_Task1_If, EA_Task1_Then);
-    TaskEntry _task2 = GetTask(EA_Task2_If, EA_Task2_Then);
-    TaskEntry _task3 = GetTask(EA_Task3_If, EA_Task3_Then);
-    _initiated &= ea.TaskAdd(_task1);
-    _initiated &= ea.TaskAdd(_task2);
-    _initiated &= ea.TaskAdd(_task3);
+    EATasks _ea_tasks(ea);
+    _initiated &= _ea_tasks.AddTask(EA_Task1_If, EA_Task1_Then);
+    _initiated &= _ea_tasks.AddTask(EA_Task2_If, EA_Task2_Then);
+    _initiated &= _ea_tasks.AddTask(EA_Task3_If, EA_Task3_Then);
   }
 #endif
   return _initiated;
@@ -299,6 +297,9 @@ bool InitStrategies() {
   EAStrategyAdd(Strategy_H12, 1 << H12);
   // Update lot size.
   ea.Set(STRAT_PARAM_LS, EA_LotSize);
+  // Override max spread values.
+  ea.Set(STRAT_PARAM_MAX_SPREAD, EA_MaxSpread);
+  ea.Set(TRADE_PARAM_MAX_SPREAD, EA_MaxSpread);
 #ifdef __advanced__
   ea.Set(STRAT_PARAM_SOFM, EA_SignalOpenFilterMethod);
   ea.Set(STRAT_PARAM_SCFM, EA_SignalCloseFilterMethod);
