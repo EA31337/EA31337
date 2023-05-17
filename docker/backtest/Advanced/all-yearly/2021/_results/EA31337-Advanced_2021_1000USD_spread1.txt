@@ -1,33 +1,33 @@
 
                                                                 Strategy Tester Report
-                                              EA31337-Advanced-2a9e7c6456af224607c410a6760d5a6d9c615919
+                                              EA31337-Advanced-63e3adf3f0e06b97a669c8842d2e4f0c70c0d461
                                                                      (Build 1359)
 
   Symbol                           EURUSD (Euro vs US Dollar)
   Period                           1 Minute (M1) 2021.01.03 23:45 - 2021.12.30 23:59 (2021.01.01 - 2021.12.31)
   Model                            Every tick (the most precise method based on all available least timeframes)
-                                   __EA_Params__=">> EA31337 Advanced v2.012 build 1671495964 <<"; __Strategies_Active__="-- Active strategies --";
+                                   __EA_Params__=">> EA31337 Advanced v2.012 build 1684288188 <<"; __Strategies_Active__="-- Active strategies --";
                                    Strategy_M1=0; Strategy_M5=0; Strategy_M15=23; Strategy_M30=23; Strategy_H1=4; Strategy_H2=32; Strategy_H3=32;
                                    Strategy_H4=32; Strategy_H6=4; Strategy_H8=35; Strategy_H12=23; __Strategies_Stops__="-- Strategies' stops --";
-                                   EA_Stops_M1=0; EA_Stops_M5=0; EA_Stops_M15=0; EA_Stops_M30=0; EA_Stops_H1=0; EA_Stops_H2=0; EA_Stops_H3=0;
+                                   EA_Stops_M1=0; EA_Stops_M5=0; EA_Stops_M15=1; EA_Stops_M30=0; EA_Stops_H1=0; EA_Stops_H2=0; EA_Stops_H3=0;
                                    EA_Stops_H4=0; EA_Stops_H6=0; EA_Stops_H8=0; EA_Stops_H12=0; __Signal_Filters__="-- Signal filters --";
   Parameters                       EA_SignalOpenFilterMethod=37; EA_SignalCloseFilterMethod=40; EA_SignalOpenFilterTime=3; EA_TickFilterMethod=32;
                                    __EA_Tasks__="-- EA's tasks --"; EA_Task1_If=5; EA_Task1_Then=3; EA_Task2_If=4; EA_Task2_Then=5; EA_Task3_If=9;
-                                   EA_Task3_Then=2; __Order_Params__="-- Orders' limits --"; EA_OrderCloseLoss=200; EA_OrderCloseProfit=0;
+                                   EA_Task3_Then=2; __Order_Params__="-- Orders' limits --"; EA_OrderCloseLoss=300; EA_OrderCloseProfit=0;
                                    EA_OrderCloseTime=0; __EA_Risk_Params__="-- EA's risk management --"; EA_Risk_MarginMax=1.20000005;
                                    __EA_Trade_Params__="-- EA's trade parameters --"; EA_LotSize=0; EA_MaxSpread=3.0999999; EA_MagicNumber=31337;
                                    __Logging_Params__="-- EA's logging & messaging --"; VerboseLevel=1; EA_DisplayDetailsOnChart=true;
-  Bars in test              364812 Ticks modelled                            41698632 Modelling quality                                      24.99%
+  Bars in test              364812 Ticks modelled                          41698632 Modelling quality                                        24.99%
   Mismatched charts errors       0
-  Initial deposit          1000.00                                                    Spread                                                      1
-  Total net profit           86.64 Gross profit                               1025.40 Gross loss                                            -938.76
-  Profit factor               1.09 Expected payoff                               0.42
-  Absolute drawdown          41.05 Maximal drawdown                   134.92 (11.30%) Relative drawdown                             11.30% (134.92)
-  Total trades                 204 Short positions (won %)                90 (50.00%) Long positions (won %)                           114 (53.51%)
-                                   Profit trades (% of total)            106 (51.96%) Loss trades (% of total)                          98 (48.04%)
-                           Largest profit trade                                 18.70 loss trade                                             -24.90
-                           Average profit trade                                  9.67 loss trade                                              -9.58
-                           Maximum consecutive wins (profit in money)       8 (85.99) consecutive losses (loss in money)                 9 (-79.21)
-                           Maximal consecutive profit (count of wins)       85.99 (8) consecutive loss (count of losses)                 -79.21 (9)
-                           Average consecutive wins                                 2 consecutive losses                                          2
+  Initial deposit          1000.00                                                  Spread                                                        1
+  Total net profit          113.18 Gross profit                              759.07 Gross loss                                              -645.89
+  Profit factor               1.18 Expected payoff                             0.82
+  Absolute drawdown          43.11 Maximal drawdown                   98.31 (8.44%) Relative drawdown                                 8.44% (98.31)
+  Total trades                 138 Short positions (won %)              63 (57.14%) Long positions (won %)                              75 (49.33%)
+                                   Profit trades (% of total)           73 (52.90%) Loss trades (% of total)                            65 (47.10%)
+                           Largest profit trade                               19.00 loss trade                                               -14.60
+                           Average profit trade                               10.40 loss trade                                                -9.94
+                           Maximum consecutive wins (profit in money)     7 (79.76) consecutive losses (loss in money)                   6 (-67.30)
+                           Maximal consecutive profit (count of wins)     79.76 (7) consecutive loss (count of losses)                   -67.30 (6)
+                           Average consecutive wins                               2 consecutive losses                                            2
                                                                        [Graph]
