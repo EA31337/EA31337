@@ -34,8 +34,8 @@ input group "Active strategy"
 #endif
 input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;         // Strategy on M1
 input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;         // Strategy on M5
-input ENUM_STRATEGY Strategy_M15 = STRAT_ICHIMOKU;    // Strategy on M15
-input ENUM_STRATEGY Strategy_M30 = STRAT_OBV;         // Strategy on M30
+input ENUM_STRATEGY Strategy_M15 = STRAT_ENVELOPES;   // Strategy on M15
+input ENUM_STRATEGY Strategy_M30 = STRAT_ICHIMOKU;    // Strategy on M30
 input ENUM_STRATEGY Strategy_H1 = STRAT_ENVELOPES;    // Strategy on H1
 input ENUM_STRATEGY Strategy_H2 = STRAT_RVI;          // Strategy on H2
 input ENUM_STRATEGY Strategy_H3 = STRAT_HEIKEN_ASHI;  // Strategy on H3
