@@ -51,7 +51,7 @@ input group "Strategies' stops"
 #endif
 input ENUM_STRATEGY EA_Stops_M1 = STRAT_NONE;   // Stop loss on M1
 input ENUM_STRATEGY EA_Stops_M5 = STRAT_NONE;   // Stop loss on M5
-input ENUM_STRATEGY EA_Stops_M15 = STRAT_NONE;  // Stop loss on M15
+input ENUM_STRATEGY EA_Stops_M15 = STRAT_AC;    // Stop loss on M15
 input ENUM_STRATEGY EA_Stops_M30 = STRAT_NONE;  // Stop loss on M30
 input ENUM_STRATEGY EA_Stops_H1 = STRAT_NONE;   // Stop loss on H1
 input ENUM_STRATEGY EA_Stops_H2 = STRAT_NONE;   // Stop loss on H2
@@ -91,6 +91,6 @@ input string __Order_Params__ = "-- Orders' limits --";  // >>> ORDERS' LIMITS <
 #else
 input group "Orders' limits"
 #endif
-input float EA_OrderCloseLoss = 200;  // Close loss (in pips)
+input float EA_OrderCloseLoss = 300;  // Close loss (in pips)
 input float EA_OrderCloseProfit = 0;  // Close profit (in pips)
 input int EA_OrderCloseTime = 0;      // Close time in mins (>0) or bars (<0)
