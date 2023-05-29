@@ -1,7 +1,7 @@
 //+------------------------------------------------------------------+
 //|                  EA31337 - multi-strategy advanced trading robot |
-//|                                 Copyright 2016-2022, EA31337 Ltd |
-//|                                       https://github.com/EA31337 |
+//|                                 Copyright 2016-2023, EA31337 Ltd |
+//|                                       https://ea31337.github.io/ |
 //+------------------------------------------------------------------+
 
 // Sets EA mode (Lite, Advanced or Rider).
@@ -22,12 +22,6 @@
 #include "classes/Terminal.mqh"
 #include "classes/Trade.mqh"
 
-// Includes common EA's functions.
-#ifdef __advanced__
-// Includes common EA actions.
-#include "common/funcs-adv.h"
-#endif
-
 // Includes indicator classes.
 #include "classes/Indicators/Bitwise/indicators.h"
 #include "classes/Indicators/Price/indicators.h"
@@ -45,4 +39,4 @@
 
 // Strategy includes.
 INPUT_GROUP("Strategy parameters");  // >>> STRATEGIES <<<
-#include "strategies/strategies.h"
+#include "strategies/includes.h"
