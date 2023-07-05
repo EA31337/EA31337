@@ -79,21 +79,18 @@ jobs:
       - run: Get-Location
 
       - name: Enables CLI mode
-        run: echo '#define __cli__' > src/include/common/mode.h
-
-      - name: Enables resource mode
-        run: echo '#define __resource__' > src/include/common/mode.h
+        run: echo '#define __cli__' > include/common/mode.h
 
       - name: Enables Advanced mode
         if: matrix.mode == 'Advanced'
-        run: echo '#define __advanced__' >> src/include/common/mode.h
+        run: echo '#define __advanced__' >> include/common/mode.h
 
       - name: Enables Rider mode
         if: matrix.mode == 'Rider'
-        run: echo '#define __rider__' >> src/include/common/mode.h
+        run: echo '#define __rider__' >> include/common/mode.h
 
       - name: Enables custom mode
-        run: echo '#define ${{ matrix.mode2 }}' >> src/include/common/mode.h
+        run: echo '#define ${{ matrix.mode2 }}' >> include/common/mode.h
 
       - name: Compiles EA (MQL4)
         uses: fx31337/mql-compile-action@master
