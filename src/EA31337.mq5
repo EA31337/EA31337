@@ -97,7 +97,7 @@ void OnTick() {
     if (EA_DisplayDetailsOnChart && (Terminal::IsVisualMode() || Terminal::IsRealtime())) {
       string _text = StringFormat("%s v%s by %s (%s)\n", ea_name, ea_version, ea_author, ea_link);
       _text +=
-          SerializerConverter::FromObject(ea, SERIALIZER_FLAG_INCLUDE_DYNAMIC).Precision(2).ToString<SerializerJson>();
+          SerializerConverter::FromObject(ea, SERIALIZER_FLAG_INCLUDE_DYNAMIC).Precision(2).ToString<SerializerJson>(SERIALIZER_JSON_NO_WHITESPACES);
       _text += ea.GetLogger().ToString();
       Comment(_text);
     }
