@@ -74,12 +74,10 @@ class EATasks {
         _cond_entry = TaskConditionEntry(EA_COND_ON_NEW_DAY);
         _cond_type = COND_TYPE_EA;
         break;
-      /* @todo: https://github.com/EA31337/EA31337-classes/issues/628
       case EA_ADV_COND_EA_ON_NEW_WEEK:
-        _cond_entry = ConditionEntry(EA_COND_ON_NEW_WEEK);
+        _cond_entry = TaskConditionEntry(EA_COND_ON_NEW_WEEK);
         _cond_type = COND_TYPE_EA;
         break;
-      */
       case EA_ADV_COND_EA_ON_NEW_MONTH:
         _cond_entry = TaskConditionEntry(EA_COND_ON_NEW_MONTH);
         _cond_type = COND_TYPE_EA;
