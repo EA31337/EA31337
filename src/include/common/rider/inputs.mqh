@@ -32,17 +32,17 @@ input static string __Strategies_Active__ = "-- Active strategies --";  // >>> A
 #else
 input group "Active strategy"
 #endif
-input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;        // Strategy on M1
-input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;        // Strategy on M5
-input ENUM_STRATEGY Strategy_M15 = STRAT_NONE;       // Strategy on M15
-input ENUM_STRATEGY Strategy_M30 = STRAT_NONE;       // Strategy on M30
-input ENUM_STRATEGY Strategy_H1 = STRAT_NONE;        // Strategy on H1
-input ENUM_STRATEGY Strategy_H2 = STRAT_BWMFI;       // Strategy on H2
-input ENUM_STRATEGY Strategy_H3 = STRAT_AMA;         // Strategy on H3
-input ENUM_STRATEGY Strategy_H4 = STRAT_PINBAR;      // Strategy on H4
-input ENUM_STRATEGY Strategy_H6 = STRAT_PIVOT;       // Strategy on H6
-input ENUM_STRATEGY Strategy_H8 = STRAT_PIVOT;       // Strategy on H8
-input ENUM_STRATEGY Strategy_H12 = STRAT_PIVOT;      // Strategy on H12
+input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;    // Strategy on M1
+input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;    // Strategy on M5
+input ENUM_STRATEGY Strategy_M15 = STRAT_NONE;   // Strategy on M15
+input ENUM_STRATEGY Strategy_M30 = STRAT_NONE;   // Strategy on M30
+input ENUM_STRATEGY Strategy_H1 = STRAT_NONE;    // Strategy on H1
+input ENUM_STRATEGY Strategy_H2 = STRAT_BWMFI;   // Strategy on H2
+input ENUM_STRATEGY Strategy_H3 = STRAT_AMA;     // Strategy on H3
+input ENUM_STRATEGY Strategy_H4 = STRAT_PINBAR;  // Strategy on H4
+input ENUM_STRATEGY Strategy_H6 = STRAT_PIVOT;   // Strategy on H6
+input ENUM_STRATEGY Strategy_H8 = STRAT_PIVOT;   // Strategy on H8
+input ENUM_STRATEGY Strategy_H12 = STRAT_PIVOT;  // Strategy on H12
 
 #ifdef __MQL4__
 input static string __Strategies_Stops__ = "-- Strategies' stops --";  // >>> STRATEGIES' STOPS <<<
@@ -57,12 +57,14 @@ input string __EA_Tasks__ = "-- EA's tasks --";  // >>> EA's TASKS <<<
 #else
 input group "EA's tasks"
 #endif
-input ENUM_EA_ADV_COND EA_Task1_If = EA_ADV_COND_TRADE_EQUITY_GT_05PC;          // 1: Task's condition
+input ENUM_EA_ADV_COND EA_Task1_If = EA_ADV_COND_TRADE_EQUITY_GT_05PC;             // 1: Task's condition
 input ENUM_EA_ADV_ACTION EA_Task1_Then = EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND_NOT;  // 1: Task's action
-input ENUM_EA_ADV_COND EA_Task2_If = EA_ADV_COND_TRADE_EQUITY_GT_02PC;          // 2: Task's condition
-input ENUM_EA_ADV_ACTION EA_Task2_Then = EA_ADV_ACTION_NONE;  // 2: Task's action
-input ENUM_EA_ADV_COND EA_Task3_If = EA_ADV_COND_TRADE_EQUITY_LT_05PC;          // 3: Task's condition
-input ENUM_EA_ADV_ACTION EA_Task3_Then = EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND;  // 3: Task's action
+input ENUM_EA_ADV_COND EA_Task2_If = EA_ADV_COND_TRADE_EQUITY_GT_02PC;             // 2: Task's condition
+input ENUM_EA_ADV_ACTION EA_Task2_Then = EA_ADV_ACTION_NONE;                       // 2: Task's action
+input ENUM_EA_ADV_COND EA_Task3_If = EA_ADV_COND_TRADE_EQUITY_LT_05PC;             // 3: Task's condition
+input ENUM_EA_ADV_ACTION EA_Task3_Then = EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND;      // 3: Task's action
+input ENUM_EA_ADV_COND EA_Task4_If = EA_ADV_COND_NONE;                             // 4: Task's condition
+input ENUM_EA_ADV_ACTION EA_Task4_Then = EA_ADV_ACTION_NONE;                       // 4: Task's action
 
 // input static string __EA_Order_Params__ = "-- EA's order params --";  // >>> EA's ORDERS <<<
 
@@ -73,6 +75,6 @@ input group "Signal filters"
 #endif
 input int EA_SignalOpenFilterMethod = 37;   // Open (1=!BarO,2=Trend,4=PP,8=OppO,16=Peak,32=BetterO,64=!Eq<1%)
 input int EA_SignalCloseFilterMethod = 40;  // Close (1=!BarO,2=!Trend,4=!PP,8=O>H,16=Peak,32=BetterO,64=Eq>1%)
-input int EA_SignalOpenFilterTime = 66;      // Time (1=CHGO,2=FR,4=HK,8=LON,16=NY,32=SY,64=TYJ,128=WGN)
+input int EA_SignalOpenFilterTime = 66;     // Time (1=CHGO,2=FR,4=HK,8=LON,16=NY,32=SY,64=TYJ,128=WGN)
 int EA_SignalOpenStrategyFilter = 0;        // Strategy (0-EachSignal,1=FirstOnly,2=HourlyConfirmed)
 input int EA_TickFilterMethod = 32;  // Tick (1=PerMin,2=Peaks,4=PeaksMins,8=Unique,16=MiddleBar,32=Open,64=10thBar)
