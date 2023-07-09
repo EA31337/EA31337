@@ -92,12 +92,27 @@ void OnDeinit(const int reason) { DeinitVars(); }
  * Invoked when a new tick for a symbol is received, to the chart of which the Expert Advisor is attached.
  */
 void OnTick() {
-  EAProcessResult _result = ea.ProcessTick();
-  if (_result.stg_processed_periods > 0) {
+  EAProcessResult _eres = ea.ProcessTick();
+  if (_eres.stg_processed_periods > 0) {
     if (EA_DisplayDetailsOnChart && (Terminal::IsVisualMode() || Terminal::IsRealtime())) {
       string _text = StringFormat("%s v%s by %s (%s)\n", ea_name, ea_version, ea_author, ea_link);
+      _text += SerializerConverter::FromObject(ea, SERIALIZER_FLAG_INCLUDE_DYNAMIC)
+                   .Precision(0)
+                   .ToString<SerializerJson>(SERIALIZER_JSON_NO_WHITESPACES) +
+               "\n";
       _text +=
-          SerializerConverter::FromObject(ea, SERIALIZER_FLAG_INCLUDE_DYNAMIC).Precision(2).ToString<SerializerJson>(SERIALIZER_JSON_NO_WHITESPACES);
+          SerializerConverter::FromObject(_eres).Precision(0).ToString<SerializerJson>(SERIALIZER_JSON_NO_WHITESPACES) +
+          "\n";
+      if (ea.Get<ENUM_LOG_LEVEL>(STRUCT_ENUM(EAParams, EA_PARAM_PROP_LOG_LEVEL)) >= V_DEBUG) {
+        // Print enabled strategies info.
+        for (DictStructIterator<long, Ref<Strategy>> _siter = ea.GetStrategies().Begin(); _siter.IsValid(); ++_siter) {
+          Strategy *_strat = _siter.Value().Ptr();
+          StgProcessResult _sres = _strat.GetProcessResult();
+          _text += StringFormat("%s@%d: %s\n", _strat.GetName(), _strat.Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF),
+                                 SerializerConverter::FromObject(_sres, SERIALIZER_FLAG_INCLUDE_DYNAMIC).Precision(2)
+                                     .ToString<SerializerJson>(SERIALIZER_JSON_NO_WHITESPACES));
+        }
+      }
       _text += ea.GetLogger().ToString();
       Comment(_text);
     }
