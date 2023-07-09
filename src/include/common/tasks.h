@@ -82,7 +82,10 @@ class EATasks {
         _cond_entry = TaskConditionEntry(EA_COND_ON_NEW_MONTH);
         _cond_type = COND_TYPE_EA;
         break;
-      /* Trade conditions not supported (yet).
+      case EA_ADV_COND_ORDERS_PROFIT_DBL_LOSS:
+        _cond_entry = TaskConditionEntry(TRADE_COND_ORDERS_PROFIT_DBL_LOSS);
+        _cond_type = COND_TYPE_TRADE;
+        break;
       case EA_ADV_COND_TRADE_IS_PEAK:
         _cond_entry = TaskConditionEntry(TRADE_COND_IS_PEAK);
         _cond_type = COND_TYPE_TRADE;
@@ -91,7 +94,6 @@ class EATasks {
         _cond_entry = TaskConditionEntry(TRADE_COND_IS_PIVOT);
         _cond_type = COND_TYPE_TRADE;
         break;
-      */
       case EA_ADV_COND_TRADE_EQUITY_GT_01PC:
         _cond_entry = TaskConditionEntry(TRADE_COND_ORDERS_PROFIT_GT_01PC);
         _cond_type = COND_TYPE_TRADE;
