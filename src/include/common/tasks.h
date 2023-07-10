@@ -15,6 +15,7 @@ class EATasks {
   bool AddTask(ENUM_EA_ADV_COND _cond, ENUM_EA_ADV_ACTION _action) {
     bool _result = true;
     string _symbol = ea.Get<string>(STRUCT_ENUM(EAParams, EA_PARAM_PROP_SYMBOL));
+    DataParamEntry _arg1;
     ENUM_ACTION_TYPE _action_type;
     ENUM_TASK_CONDITION_TYPE _cond_type;
     TaskActionEntry _action_entry;
@@ -124,6 +125,14 @@ class EATasks {
         break;
       case EA_ADV_COND_TRADE_EQUITY_LT_10PC:
         _cond_entry = TaskConditionEntry(TRADE_COND_ORDERS_PROFIT_LT_10PC);
+        _cond_type = COND_TYPE_TRADE;
+        break;
+      case EA_ADV_COND_TRADE_EQUITY_GT_RMARGIN:
+        _cond_entry = TaskConditionEntry(TRADE_COND_ORDERS_PROFIT_GT_RISK_MARGIN);
+        _cond_type = COND_TYPE_TRADE;
+        break;
+      case EA_ADV_COND_TRADE_EQUITY_LT_RMARGIN:
+        _cond_entry = TaskConditionEntry(TRADE_COND_ORDERS_PROFIT_LT_RISK_MARGIN);
         _cond_type = COND_TYPE_TRADE;
         break;
       case EA_ADV_COND_NONE:
