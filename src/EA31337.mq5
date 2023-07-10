@@ -288,6 +288,7 @@ bool InitEA() {
     _initiated &= _ea_tasks.AddTask(EA_Task2_If, EA_Task2_Then);
     _initiated &= _ea_tasks.AddTask(EA_Task3_If, EA_Task3_Then);
     _initiated &= _ea_tasks.AddTask(EA_Task4_If, EA_Task4_Then);
+    _initiated &= _ea_tasks.AddTask(EA_Task5_If, EA_Task5_Then);
   }
 #endif
   return _initiated;

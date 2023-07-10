@@ -65,6 +65,8 @@ input ENUM_EA_ADV_COND EA_Task3_If = EA_ADV_COND_TRADE_EQUITY_LT_05PC;          
 input ENUM_EA_ADV_ACTION EA_Task3_Then = EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND;      // 3: Task's action
 input ENUM_EA_ADV_COND EA_Task4_If = EA_ADV_COND_NONE;                             // 4: Task's condition
 input ENUM_EA_ADV_ACTION EA_Task4_Then = EA_ADV_ACTION_NONE;                       // 4: Task's action
+input ENUM_EA_ADV_COND EA_Task5_If = EA_ADV_COND_NONE;                             // 5: Task's condition
+input ENUM_EA_ADV_ACTION EA_Task5_Then = EA_ADV_ACTION_NONE;                       // 5: Task's action
 
 // input static string __EA_Order_Params__ = "-- EA's order params --";  // >>> EA's ORDERS <<<
 
