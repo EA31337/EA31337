@@ -82,9 +82,9 @@ input ENUM_EA_ADV_ACTION EA_Task1_Then = EA_ADV_ACTION_CLOSE_MOST_PROFIT;  // 1:
 input ENUM_EA_ADV_COND EA_Task2_If = EA_ADV_COND_TRADE_EQUITY_GT_05PC;     // 2: Task's condition
 input ENUM_EA_ADV_ACTION EA_Task2_Then = EA_ADV_ACTION_ORDERS_CLOSE_ALL;   // 2: Task's action
 input ENUM_EA_ADV_COND EA_Task3_If = EA_ADV_COND_TRADE_EQUITY_LT_05PC;     // 3: Task's condition
-input ENUM_EA_ADV_ACTION EA_Task3_Then = EA_ADV_ACTION_CLOSE_MOST_PROFIT;  // 3: Task's action
+input ENUM_EA_ADV_ACTION EA_Task3_Then = EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND_NOT;  // 3: Task's action
 input ENUM_EA_ADV_COND EA_Task4_If = EA_ADV_COND_EA_ON_NEW_WEEK;           // 4: Task's condition
-input ENUM_EA_ADV_ACTION EA_Task4_Then = EA_ADV_ACTION_CLOSE_MOST_PROFIT;  // 4: Task's action
+input ENUM_EA_ADV_ACTION EA_Task4_Then = EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND_NOT;  // 4: Task's action
 // input float EA_Task1_If_Arg = 0;                                 // 1: Task's condition argument
 // input float EA_Task1_Then_Arg = 0;                               // 1: Task's action argument
 
@@ -94,5 +94,5 @@ input string __Order_Params__ = "-- Orders' limits --";  // >>> ORDERS' LIMITS <
 input group "Orders' limits"
 #endif
 input float EA_OrderCloseLoss = 300;  // Close loss (in pips)
-input float EA_OrderCloseProfit = 0;  // Close profit (in pips)
+input float EA_OrderCloseProfit = 80; // Close profit (in pips)
 input int EA_OrderCloseTime = 0;      // Close time in mins (>0) or bars (<0)

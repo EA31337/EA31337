@@ -23,6 +23,8 @@ enum ENUM_EA_ADV_COND {
   EA_ADV_COND_EA_ON_NEW_DAY,            // On each day
   EA_ADV_COND_EA_ON_NEW_WEEK,           // On each week
   EA_ADV_COND_EA_ON_NEW_MONTH,          // On each month
+  EA_ADV_COND_ORDERS_IN_TREND,          // Active orders in trend
+  EA_ADV_COND_ORDERS_IN_TREND_NOT,      // Active orders not in trend
   EA_ADV_COND_ORDERS_PROFIT_DBL_LOSS,   // Orders profit doubles loss
   EA_ADV_COND_TRADE_EQUITY_GT_01PC,     // Equity > 1%
   EA_ADV_COND_TRADE_EQUITY_GT_02PC,     // Equity > 2%
@@ -37,7 +39,6 @@ enum ENUM_EA_ADV_COND {
   // EA_ADV_COND_ACC_EQUITY,         // Equity (in %)
   // EA_ADV_COND_ACC_MARGIN_FREE,    // Free margin (in %)
   // EA_ADV_COND_ACC_MARGIN_USED,    // Free margin (in %)
-  // EA_ADV_COND_ORDER_IN_PROFIT,      // Order (any) in profit
   EA_ADV_COND_TRADE_IS_PEAK,   // Profitable side is at peak
   EA_ADV_COND_TRADE_IS_PIVOT,  // Profitable side is at pivot
 };
