@@ -109,8 +109,9 @@ void OnTick() {
           Strategy *_strat = _siter.Value().Ptr();
           StgProcessResult _sres = _strat.GetProcessResult();
           _text += StringFormat("%s@%d: %s\n", _strat.GetName(), _strat.Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF),
-                                 SerializerConverter::FromObject(_sres, SERIALIZER_FLAG_INCLUDE_DYNAMIC).Precision(2)
-                                     .ToString<SerializerJson>(SERIALIZER_JSON_NO_WHITESPACES));
+                                SerializerConverter::FromObject(_sres, SERIALIZER_FLAG_INCLUDE_DYNAMIC)
+                                    .Precision(2)
+                                    .ToString<SerializerJson>(SERIALIZER_JSON_NO_WHITESPACES));
         }
       }
       _text += ea.GetLogger().ToString();
@@ -282,7 +283,7 @@ bool InitEA() {
     _initiated &= false;
   }
 #ifdef __advanced__
-  if (_initiated) {
+  if (_initiated && EA_Tasks_Enabled) {
     EATasks _ea_tasks(ea);
     _initiated &= _ea_tasks.AddTask(EA_Task1_If, EA_Task1_Then);
     _initiated &= _ea_tasks.AddTask(EA_Task2_If, EA_Task2_Then);
