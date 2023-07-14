@@ -283,13 +283,13 @@ bool InitEA() {
     _initiated &= false;
   }
 #ifdef __advanced__
-  if (_initiated && EA_Tasks_Enabled) {
+  if (_initiated && EA_Tasks_Filter != 0) {
     EATasks _ea_tasks(ea);
-    _initiated &= _ea_tasks.AddTask(EA_Task1_If, EA_Task1_Then);
-    _initiated &= _ea_tasks.AddTask(EA_Task2_If, EA_Task2_Then);
-    _initiated &= _ea_tasks.AddTask(EA_Task3_If, EA_Task3_Then);
-    _initiated &= _ea_tasks.AddTask(EA_Task4_If, EA_Task4_Then);
-    _initiated &= _ea_tasks.AddTask(EA_Task5_If, EA_Task5_Then);
+    _initiated &= METHOD(EA_Tasks_Filter, 0) ? _ea_tasks.AddTask(EA_Task1_If, EA_Task1_Then) : true;
+    _initiated &= METHOD(EA_Tasks_Filter, 1) ? _ea_tasks.AddTask(EA_Task2_If, EA_Task2_Then) : true;
+    _initiated &= METHOD(EA_Tasks_Filter, 2) ? _ea_tasks.AddTask(EA_Task3_If, EA_Task3_Then) : true;
+    _initiated &= METHOD(EA_Tasks_Filter, 3) ? _ea_tasks.AddTask(EA_Task4_If, EA_Task4_Then) : true;
+    _initiated &= METHOD(EA_Tasks_Filter, 4) ? _ea_tasks.AddTask(EA_Task5_If, EA_Task5_Then) : true;
   }
 #endif
   return _initiated;
