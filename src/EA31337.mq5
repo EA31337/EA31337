@@ -93,9 +93,12 @@ void OnDeinit(const int reason) { DeinitVars(); }
  */
 void OnTick() {
   EAProcessResult _eres = ea.ProcessTick();
-  if (_eres.stg_processed_periods > 0) {
+  if (_eres.stg_processed_periods >= 0) {
     if (EA_DisplayDetailsOnChart && (Terminal::IsVisualMode() || Terminal::IsRealtime())) {
       string _text = StringFormat("%s v%s by %s (%s)\n", ea_name, ea_version, ea_author, ea_link);
+      _text += StringFormat("%s: %s running on %s (ping=%dms)\n", Terminal::TerminalInfoString(TERMINAL_NAME),
+                            Terminal::WindowExpertName(), Terminal::TerminalInfoString(TERMINAL_COMPANY),
+                            Terminal::TerminalInfoInteger((ENUM_TERMINAL_INFO_INTEGER)TERMINAL_PING_LAST));
       _text += SerializerConverter::FromObject(ea, SERIALIZER_FLAG_INCLUDE_DYNAMIC)
                    .Precision(0)
                    .ToString<SerializerJson>(SERIALIZER_JSON_NO_WHITESPACES) +
