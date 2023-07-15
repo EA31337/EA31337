@@ -34,8 +34,8 @@ input group "Active strategies"
 #endif
 input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;         // Strategy on M1
 input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;         // Strategy on M5
-input ENUM_STRATEGY Strategy_M15 = STRAT_NONE;        // Strategy on M15
-input ENUM_STRATEGY Strategy_M30 = STRAT_NONE;        // Strategy on M30
+input ENUM_STRATEGY Strategy_M15 = STRAT_TMA_TRUE;    // Strategy on M15
+input ENUM_STRATEGY Strategy_M30 = STRAT_PINBAR;      // Strategy on M30
 input ENUM_STRATEGY Strategy_H1 = STRAT_HEIKEN_ASHI;  // Strategy on H1
 input ENUM_STRATEGY Strategy_H2 = STRAT_PINBAR;       // Strategy on H2
 input ENUM_STRATEGY Strategy_H3 = STRAT_TMA_TRUE;     // Strategy on H3
@@ -53,7 +53,7 @@ input ENUM_STRATEGY EA_Stops_M1 = STRAT_NONE;         // Stop loss on M1
 input ENUM_STRATEGY EA_Stops_M5 = STRAT_NONE;         // Stop loss on M5
 input ENUM_STRATEGY EA_Stops_M15 = STRAT_NONE;        // Stop loss on M15
 input ENUM_STRATEGY EA_Stops_M30 = STRAT_NONE;        // Stop loss on M30
-input ENUM_STRATEGY EA_Stops_H1 = STRAT_NONE;         // Stop loss on H1
+input ENUM_STRATEGY EA_Stops_H1 = STRAT_HEIKEN_ASHI;  // Stop loss on H1
 input ENUM_STRATEGY EA_Stops_H2 = STRAT_SAR;          // Stop loss on H2
 input ENUM_STRATEGY EA_Stops_H3 = STRAT_HEIKEN_ASHI;  // Stop loss on H3
 input ENUM_STRATEGY EA_Stops_H4 = STRAT_SAR;          // Stop loss on H4
@@ -77,7 +77,7 @@ input string __EA_Tasks__ = "-- EA's tasks --";  // >>> EA's TASKS <<<
 #else
 input group "EA's tasks"
 #endif
-input int EA_Tasks_Filter = 31;                                                    // Tasks' filter (0=None,1=1st,2=2nd,4=3rd,8=4th,16=5th,31=All)
+input int EA_Tasks_Filter = 0;                                                     // Tasks' filter (0=None,1=1st,2=2nd,4=3rd,8=4th,16=5th,31=All)
 input ENUM_EA_ADV_COND EA_Task1_If = EA_ADV_COND_TRADE_EQUITY_GT_05PC;             // 1: Task's condition
 input ENUM_EA_ADV_ACTION EA_Task1_Then = EA_ADV_ACTION_ORDERS_CLOSE_ALL;           // 1: Task's action
 input ENUM_EA_ADV_COND EA_Task2_If = EA_ADV_COND_TRADE_EQUITY_GT_RMARGIN;          // 2: Task's condition
@@ -95,5 +95,5 @@ input string __Order_Params__ = "-- Orders' limits --";  // >>> ORDERS' LIMITS <
 input group "Orders' limits"
 #endif
 input float EA_OrderCloseLoss = 300;   // Close loss (in pips)
-input float EA_OrderCloseProfit = 80;  // Close profit (in pips)
+input float EA_OrderCloseProfit = 120; // Close profit (in pips)
 input int EA_OrderCloseTime = 0;       // Close time in mins (>0) or bars (<0)
