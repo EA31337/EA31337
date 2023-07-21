@@ -33,9 +33,9 @@ input static string __Strategies_Active__ = "-- Active strategies --";  // >>> A
 input group "Active strategy"
 #endif
 input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;     // Strategy on M1
-input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;     // Strategy on M5
-input ENUM_STRATEGY Strategy_M15 = STRAT_AC;      // Strategy on M15
-input ENUM_STRATEGY Strategy_M30 = STRAT_NONE;    // Strategy on M30
+input ENUM_STRATEGY Strategy_M5 = STRAT_CCI;      // Strategy on M5
+input ENUM_STRATEGY Strategy_M15 = STRAT_OSMA;    // Strategy on M15
+input ENUM_STRATEGY Strategy_M30 = STRAT_INDICATOR; // Strategy on M30
 input ENUM_STRATEGY Strategy_H1 = STRAT_MFI;      // Strategy on H1
 input ENUM_STRATEGY Strategy_H2 = STRAT_ATR;      // Strategy on H2
 input ENUM_STRATEGY Strategy_H3 = STRAT_AC;       // Strategy on H3
