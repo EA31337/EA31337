@@ -280,9 +280,10 @@ bool InitEA() {
   ea.Set(TRADE_PARAM_MAX_SPREAD, EA_MaxSpread);
   ea.Set(TRADE_PARAM_RISK_MARGIN, EA_Risk_MarginMax);
   if (!ea.Get(STRUCT_ENUM(EAState, EA_STATE_FLAG_TRADE_ALLOWED))) {
-    ea.GetLogger().Error(
-        "Trading is not allowed for this symbol, please enable automated trading or check the settings!",
-        __FUNCTION_LINE__);
+    string _err_msg_tna =
+        "Trading is not allowed for this symbol, please enable automated trading or check the settings!";
+    ea.GetLogger().Error(_err_msg_tna, __FUNCTION_LINE__);
+    Alert(_err_msg_tna);
     _initiated &= false;
   }
 #ifdef __advanced__
