@@ -69,7 +69,7 @@ input group "Signal filters"
 #endif
 input int EA_SignalOpenFilterMethod = 68;   // Open(1=!BarO,2=Trend,4=PP,8=OppO,16=Peak,32=BetterO,64=InLoss)
 input int EA_SignalCloseFilterMethod = 96;  // Close(1=!BarO,2=!Trend,4=!PP,8=O>H,16=Peak,32=BetterO,64=InProfit)
-input int EA_SignalOpenFilterTime = 11;     // Time(1=CHGO,2=FR,4=HK,8=LON,16=NY,32=SY,64=TYJ,128=WGN) 64 or 120
+input int EA_SignalOpenFilterTime = 10;     // Time(1=CHGO,2=FR,4=HK,8=LON,16=NY,32=SY,64=TYJ,128=WGN)
 input int EA_SignalOpenStrategyFilter = 2;  // Strategy(0-EachSignal,1=FirstOnly,2=HourlyConfirmed)
 input int EA_TickFilterMethod = 32;         // Tick(1=PerMin,2=Peaks,4=PeaksMins,8=Uniq,16=MidBar,32=Open,64=10thBar)
 
@@ -97,4 +97,4 @@ input group "Orders' limits"
 #endif
 input float EA_OrderCloseLoss = 300;   // Close loss (in pips)
 input float EA_OrderCloseProfit = 120; // Close profit (in pips)
-input int EA_OrderCloseTime = 0;       // Close time in mins (>0) or bars (<0)
+input int EA_OrderCloseTime = -90;     // Close time in mins (>0) or bars (<0)
