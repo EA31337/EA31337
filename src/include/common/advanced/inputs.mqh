@@ -32,17 +32,18 @@ input static string __Strategies_Active__ = "-- Active strategies --";  // >>> A
 #else
 input group "Active strategies"
 #endif
-input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;         // Strategy on M1
-input ENUM_STRATEGY Strategy_M5 = STRAT_DEMA;         // Strategy on M5
-input ENUM_STRATEGY Strategy_M15 = STRAT_RSI;         // Strategy on M15
-input ENUM_STRATEGY Strategy_M30 = STRAT_PINBAR;      // Strategy on M30
-input ENUM_STRATEGY Strategy_H1 = STRAT_ALLIGATOR;    // Strategy on H1
-input ENUM_STRATEGY Strategy_H2 = STRAT_PINBAR;       // Strategy on H2
-input ENUM_STRATEGY Strategy_H3 = STRAT_RSI;          // Strategy on H3
-input ENUM_STRATEGY Strategy_H4 = STRAT_AMA;          // Strategy on H4
-input ENUM_STRATEGY Strategy_H6 = STRAT_AC;           // Strategy on H6
-input ENUM_STRATEGY Strategy_H8 = STRAT_CCI;          // Strategy on H8
-input ENUM_STRATEGY Strategy_H12 = STRAT_CHAIKIN;     // Strategy on H12
+input int EA_Strategy_Filter = 2047;                  // S-Filter(0=n/a,All=2047,1=M1,2=M5,4=M15,8=M30,16=H1,32=H2,64=H4)
+input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;         // Strategy on M1 (filter=1)
+input ENUM_STRATEGY Strategy_M5 = STRAT_DEMA;         // Strategy on M5 (filter=2)
+input ENUM_STRATEGY Strategy_M15 = STRAT_EWO;         // Strategy on M15 (filter=4)
+input ENUM_STRATEGY Strategy_M30 = STRAT_PINBAR;      // Strategy on M30 (filter=8)
+input ENUM_STRATEGY Strategy_H1 = STRAT_ALLIGATOR;    // Strategy on H1 (filter=16)
+input ENUM_STRATEGY Strategy_H2 = STRAT_PINBAR;       // Strategy on H2 (filter=32)
+input ENUM_STRATEGY Strategy_H3 = STRAT_RSI;          // Strategy on H3 (filter=64)
+input ENUM_STRATEGY Strategy_H4 = STRAT_AMA;          // Strategy on H4 (filter=128)
+input ENUM_STRATEGY Strategy_H6 = STRAT_AC;           // Strategy on H6 (filter=256)
+input ENUM_STRATEGY Strategy_H8 = STRAT_CCI;          // Strategy on H8 (filter=512)
+input ENUM_STRATEGY Strategy_H12 = STRAT_CHAIKIN;     // Strategy on H12 (filter=1024)
 
 #ifdef __MQL4__
 input static string __Strategies_Stops__ = "-- Strategies' stops --";  // >>> STRATEGIES' STOPS <<<
@@ -50,7 +51,7 @@ input static string __Strategies_Stops__ = "-- Strategies' stops --";  // >>> ST
 input group "Strategies' stops"
 #endif
 input ENUM_STRATEGY EA_Stops_M1 = STRAT_NONE;         // Stop loss on M1
-input ENUM_STRATEGY EA_Stops_M5 = STRAT_NONE;         // Stop loss on M5
+input ENUM_STRATEGY EA_Stops_M5 = STRAT_HEIKEN_ASHI;  // Stop loss on M5
 input ENUM_STRATEGY EA_Stops_M15 = STRAT_NONE;        // Stop loss on M15
 input ENUM_STRATEGY EA_Stops_M30 = STRAT_NONE;        // Stop loss on M30
 input ENUM_STRATEGY EA_Stops_H1 = STRAT_HEIKEN_ASHI;  // Stop loss on H1
