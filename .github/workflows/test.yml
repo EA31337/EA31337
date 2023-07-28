@@ -166,4 +166,4 @@ jobs:
           BtMonths: ${{ matrix.month }}
           BtYears: ${{ matrix.year }}
           TestExpert: EA31337-${{ matrix.mode }}
-          TestPeriod: M1
+          TestPeriod: M15
