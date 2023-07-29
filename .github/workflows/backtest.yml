@@ -85,6 +85,7 @@ jobs:
         run: echo '#define __cli__' > include/common/mode.h
 
       - name: Enables resource mode
+        if: matrix.mode2 != '__resource__'
         run: echo '#define __resource__' > include/common/mode.h
 
       - name: Enables Advanced mode
