@@ -50,7 +50,7 @@ input static string __Strategies_Stops__ = "-- Strategies' stops --";  // >>> ST
 #else
 input group "Strategies' stops"
 #endif
-input ENUM_STRATEGY EA_Stops_Strat = STRAT_AMA;  // Stop loss strategy
+input ENUM_STRATEGY EA_Stops_Strat = STRAT_SAR;  // Stop loss strategy
 input ENUM_TIMEFRAMES EA_Stops_Tf = PERIOD_D1;   // Stop loss timeframe
 
 #ifdef __MQL4__
