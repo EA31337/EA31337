@@ -27,7 +27,7 @@ jobs:
           - Rider
     steps:
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - name: Enables backtest mode
@@ -91,7 +91,7 @@ jobs:
         spread: [1, 10]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/download-artifact@v2
         with:
           name: EA31337-${{ matrix.mode }}
@@ -132,7 +132,7 @@ jobs:
         spread: [1, 10]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/download-artifact@v2
         with:
           name: EA31337-${{ matrix.mode }}
@@ -173,7 +173,7 @@ jobs:
         spread: [1, 10]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/download-artifact@v2
         with:
           name: EA31337-${{ matrix.mode }}
@@ -224,14 +224,14 @@ jobs:
           - 2021
       max-parallel: 1
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         if: github.event_name != 'pull_request'
         with:
           persist-credentials: false
           # Otherwise, you will failed to push refs to dest repo.
           fetch-depth: 0
           ref: ${{ github.ref }}
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         if: github.event_name == 'pull_request'
         with:
           persist-credentials: false
