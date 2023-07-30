@@ -116,6 +116,7 @@ jobs:
           OptFormatBrief: true
           OptFormatJson: true
           OptOptimize: true
+          OptTrace: ${{ runner.debug }}
           OptVerbose: true
           SetFile: ${{ github.workspace }}/sets/${{ matrix.setfile }}
           SetParams: ${{ steps.data.outputs.param }}

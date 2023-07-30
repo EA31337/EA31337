@@ -165,5 +165,7 @@ jobs:
           BtDigits: 5
           BtMonths: ${{ matrix.month }}
           BtYears: ${{ matrix.year }}
+          OptTrace: ${{ runner.debug }}
+          OptVerbose: true
           TestExpert: EA31337-${{ matrix.mode }}
           TestPeriod: M15
