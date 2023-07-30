@@ -48,7 +48,7 @@ jobs:
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
       - run: Get-Location
       - name: Upload indicator artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: indicators-other
           path: '**/*.ex?'
@@ -110,7 +110,7 @@ jobs:
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: EA31337-${{ matrix.mode }}(${{ matrix.mode2 }})
           path: '**/EA*.ex?'
@@ -139,7 +139,7 @@ jobs:
         with:
           submodules: 'recursive'
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: indicators-other
           path: .
@@ -185,7 +185,7 @@ jobs:
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: EA31337-${{ matrix.mode }}(${{ matrix.mode2 }})
           path: '**/EA*.ex?'
