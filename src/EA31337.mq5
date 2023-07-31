@@ -92,12 +92,31 @@ void OnDeinit(const int reason) { DeinitVars(); }
  * Invoked when a new tick for a symbol is received, to the chart of which the Expert Advisor is attached.
  */
 void OnTick() {
-  EAProcessResult _result = ea.ProcessTick();
-  if (_result.stg_processed_periods > 0) {
+  EAProcessResult _eres = ea.ProcessTick();
+  if (_eres.stg_processed_periods >= 0) {
     if (EA_DisplayDetailsOnChart && (Terminal::IsVisualMode() || Terminal::IsRealtime())) {
       string _text = StringFormat("%s v%s by %s (%s)\n", ea_name, ea_version, ea_author, ea_link);
+      _text += StringFormat("%s: %s running on %s (ping=%1.fms)\n", Terminal::TerminalInfoString(TERMINAL_NAME),
+                            Terminal::WindowExpertName(), Terminal::TerminalInfoString(TERMINAL_COMPANY),
+                            Terminal::TerminalInfoInteger((ENUM_TERMINAL_INFO_INTEGER)TERMINAL_PING_LAST) / 1000);
+      _text += SerializerConverter::FromObject(ea, SERIALIZER_FLAG_INCLUDE_DYNAMIC)
+                   .Precision(0)
+                   .ToString<SerializerJson>(SERIALIZER_JSON_NO_WHITESPACES) +
+               "\n";
       _text +=
-          SerializerConverter::FromObject(ea, SERIALIZER_FLAG_INCLUDE_DYNAMIC).Precision(2).ToString<SerializerJson>();
+          SerializerConverter::FromObject(_eres).Precision(0).ToString<SerializerJson>(SERIALIZER_JSON_NO_WHITESPACES) +
+          "\n";
+      if (ea.Get<ENUM_LOG_LEVEL>(STRUCT_ENUM(EAParams, EA_PARAM_PROP_LOG_LEVEL)) >= V_DEBUG) {
+        // Print enabled strategies info.
+        for (DictStructIterator<long, Ref<Strategy>> _siter = ea.GetStrategies().Begin(); _siter.IsValid(); ++_siter) {
+          Strategy *_strat = _siter.Value().Ptr();
+          StgProcessResult _sres = _strat.GetProcessResult();
+          _text += StringFormat("%s@%d: %s\n", _strat.GetName(), _strat.Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF),
+                                SerializerConverter::FromObject(_sres, SERIALIZER_FLAG_INCLUDE_DYNAMIC)
+                                    .Precision(2)
+                                    .ToString<SerializerJson>(SERIALIZER_JSON_NO_WHITESPACES));
+        }
+      }
       _text += ea.GetLogger().ToString();
       Comment(_text);
     }
@@ -261,17 +280,20 @@ bool InitEA() {
   ea.Set(TRADE_PARAM_MAX_SPREAD, EA_MaxSpread);
   ea.Set(TRADE_PARAM_RISK_MARGIN, EA_Risk_MarginMax);
   if (!ea.Get(STRUCT_ENUM(EAState, EA_STATE_FLAG_TRADE_ALLOWED))) {
-    ea.GetLogger().Error(
-        "Trading is not allowed for this symbol, please enable automated trading or check the settings!",
-        __FUNCTION_LINE__);
+    string _err_msg_tna =
+        "Trading is not allowed for this symbol, please enable automated trading or check the settings!";
+    ea.GetLogger().Error(_err_msg_tna, __FUNCTION_LINE__);
+    Alert(_err_msg_tna);
     _initiated &= false;
   }
 #ifdef __advanced__
-  if (_initiated) {
+  if (_initiated && EA_Tasks_Filter != 0) {
     EATasks _ea_tasks(ea);
-    _initiated &= _ea_tasks.AddTask(EA_Task1_If, EA_Task1_Then);
-    _initiated &= _ea_tasks.AddTask(EA_Task2_If, EA_Task2_Then);
-    _initiated &= _ea_tasks.AddTask(EA_Task3_If, EA_Task3_Then);
+    _initiated &= METHOD(EA_Tasks_Filter, 0) ? _ea_tasks.AddTask(EA_Task1_If, EA_Task1_Then) : true;
+    _initiated &= METHOD(EA_Tasks_Filter, 1) ? _ea_tasks.AddTask(EA_Task2_If, EA_Task2_Then) : true;
+    _initiated &= METHOD(EA_Tasks_Filter, 2) ? _ea_tasks.AddTask(EA_Task3_If, EA_Task3_Then) : true;
+    _initiated &= METHOD(EA_Tasks_Filter, 3) ? _ea_tasks.AddTask(EA_Task4_If, EA_Task4_Then) : true;
+    _initiated &= METHOD(EA_Tasks_Filter, 4) ? _ea_tasks.AddTask(EA_Task5_If, EA_Task5_Then) : true;
   }
 #endif
   return _initiated;
@@ -286,17 +308,17 @@ bool InitStrategies() {
   long _magic_no = EA_MagicNumber;
   ResetLastError();
   // Initialize strategies per timeframe.
-  EAStrategyAdd(Strategy_M1, 1 << M1);
-  EAStrategyAdd(Strategy_M5, 1 << M5);
-  EAStrategyAdd(Strategy_M15, 1 << M15);
-  EAStrategyAdd(Strategy_M30, 1 << M30);
-  EAStrategyAdd(Strategy_H1, 1 << H1);
-  EAStrategyAdd(Strategy_H2, 1 << H2);
-  EAStrategyAdd(Strategy_H3, 1 << H3);
-  EAStrategyAdd(Strategy_H4, 1 << H4);
-  EAStrategyAdd(Strategy_H6, 1 << H6);
-  EAStrategyAdd(Strategy_H8, 1 << H8);
-  EAStrategyAdd(Strategy_H12, 1 << H12);
+  _res &= METHOD(EA_Strategy_Filter, 0) ? EAStrategyAdd(Strategy_M1, 1 << M1) : true;
+  _res &= METHOD(EA_Strategy_Filter, 1) ? EAStrategyAdd(Strategy_M5, 1 << M5) : true;
+  _res &= METHOD(EA_Strategy_Filter, 2) ? EAStrategyAdd(Strategy_M15, 1 << M15) : true;
+  _res &= METHOD(EA_Strategy_Filter, 3) ? EAStrategyAdd(Strategy_M30, 1 << M30) : true;
+  _res &= METHOD(EA_Strategy_Filter, 4) ? EAStrategyAdd(Strategy_H1, 1 << H1) : true;
+  _res &= METHOD(EA_Strategy_Filter, 5) ? EAStrategyAdd(Strategy_H2, 1 << H2) : true;
+  _res &= METHOD(EA_Strategy_Filter, 6) ? EAStrategyAdd(Strategy_H3, 1 << H3) : true;
+  _res &= METHOD(EA_Strategy_Filter, 7) ? EAStrategyAdd(Strategy_H4, 1 << H4) : true;
+  _res &= METHOD(EA_Strategy_Filter, 8) ? EAStrategyAdd(Strategy_H6, 1 << H6) : true;
+  _res &= METHOD(EA_Strategy_Filter, 9) ? EAStrategyAdd(Strategy_H8, 1 << H8) : true;
+  _res &= METHOD(EA_Strategy_Filter, 10) ? EAStrategyAdd(Strategy_H12, 1 << H12) : true;
   // Update lot size.
   ea.Set(STRAT_PARAM_LS, EA_LotSize);
   // Override max spread values.

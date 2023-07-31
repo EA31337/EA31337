@@ -15,6 +15,7 @@ class EATasks {
   bool AddTask(ENUM_EA_ADV_COND _cond, ENUM_EA_ADV_ACTION _action) {
     bool _result = true;
     string _symbol = ea.Get<string>(STRUCT_ENUM(EAParams, EA_PARAM_PROP_SYMBOL));
+    DataParamEntry _arg1;
     ENUM_ACTION_TYPE _action_type;
     ENUM_TASK_CONDITION_TYPE _cond_type;
     TaskActionEntry _action_entry;
@@ -74,17 +75,26 @@ class EATasks {
         _cond_entry = TaskConditionEntry(EA_COND_ON_NEW_DAY);
         _cond_type = COND_TYPE_EA;
         break;
-      /* @todo: https://github.com/EA31337/EA31337-classes/issues/628
       case EA_ADV_COND_EA_ON_NEW_WEEK:
-        _cond_entry = ConditionEntry(EA_COND_ON_NEW_WEEK);
+        _cond_entry = TaskConditionEntry(EA_COND_ON_NEW_WEEK);
         _cond_type = COND_TYPE_EA;
         break;
-      */
       case EA_ADV_COND_EA_ON_NEW_MONTH:
         _cond_entry = TaskConditionEntry(EA_COND_ON_NEW_MONTH);
         _cond_type = COND_TYPE_EA;
         break;
-      /* Trade conditions not supported (yet).
+      case EA_ADV_COND_ORDERS_IN_TREND:
+        _cond_entry = TaskConditionEntry(TRADE_COND_ORDERS_IN_TREND);
+        _cond_type = COND_TYPE_TRADE;
+        break;
+      case EA_ADV_COND_ORDERS_IN_TREND_NOT:
+        _cond_entry = TaskConditionEntry(TRADE_COND_ORDERS_IN_TREND_NOT);
+        _cond_type = COND_TYPE_TRADE;
+        break;
+      case EA_ADV_COND_ORDERS_PROFIT_DBL_LOSS:
+        _cond_entry = TaskConditionEntry(TRADE_COND_ORDERS_PROFIT_DBL_LOSS);
+        _cond_type = COND_TYPE_TRADE;
+        break;
       case EA_ADV_COND_TRADE_IS_PEAK:
         _cond_entry = TaskConditionEntry(TRADE_COND_IS_PEAK);
         _cond_type = COND_TYPE_TRADE;
@@ -93,7 +103,6 @@ class EATasks {
         _cond_entry = TaskConditionEntry(TRADE_COND_IS_PIVOT);
         _cond_type = COND_TYPE_TRADE;
         break;
-      */
       case EA_ADV_COND_TRADE_EQUITY_GT_01PC:
         _cond_entry = TaskConditionEntry(TRADE_COND_ORDERS_PROFIT_GT_01PC);
         _cond_type = COND_TYPE_TRADE;
@@ -124,6 +133,14 @@ class EATasks {
         break;
       case EA_ADV_COND_TRADE_EQUITY_LT_10PC:
         _cond_entry = TaskConditionEntry(TRADE_COND_ORDERS_PROFIT_LT_10PC);
+        _cond_type = COND_TYPE_TRADE;
+        break;
+      case EA_ADV_COND_TRADE_EQUITY_GT_RMARGIN:
+        _cond_entry = TaskConditionEntry(TRADE_COND_ORDERS_PROFIT_GT_RISK_MARGIN);
+        _cond_type = COND_TYPE_TRADE;
+        break;
+      case EA_ADV_COND_TRADE_EQUITY_LT_RMARGIN:
+        _cond_entry = TaskConditionEntry(TRADE_COND_ORDERS_PROFIT_LT_RISK_MARGIN);
         _cond_type = COND_TYPE_TRADE;
         break;
       case EA_ADV_COND_NONE:

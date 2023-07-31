@@ -29,13 +29,13 @@ jobs:
         working-directory: src/indicators-other
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           path: Include/EA31337-classes
-          ref: v2.010
+          ref: v2.012
           repository: EA31337/EA31337-classes
       - name: Compile (build 2361)
         uses: fx31337/mql-compile-action@master
@@ -48,7 +48,7 @@ jobs:
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
       - run: Get-Location
       - name: Upload indicator artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: indicators-other
           path: '**/*.ex?'
@@ -73,11 +73,11 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: indicators-other
           path: .
@@ -128,7 +128,7 @@ jobs:
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: EA31337-${{ matrix.mode }}
           path: '**/EA*.ex?'
@@ -154,7 +154,7 @@ jobs:
 
     steps:
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: EA31337-${{ matrix.mode }}
 
@@ -165,5 +165,7 @@ jobs:
           BtDigits: 5
           BtMonths: ${{ matrix.month }}
           BtYears: ${{ matrix.year }}
+          OptTrace: ${{ runner.debug }}
+          OptVerbose: true
           TestExpert: EA31337-${{ matrix.mode }}
-          TestPeriod: M1
+          TestPeriod: M15

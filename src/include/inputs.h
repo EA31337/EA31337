@@ -41,7 +41,7 @@ extern string __EA_Risk_Params__ = "-- EA's risk management --";  // >>> EA's RI
 #else
 input group "EA's risk management"
 #endif
-input float EA_Risk_MarginMax = 1.2f;  // Max margin to risk (in %)
+input float EA_Risk_MarginMax = 1.8f;  // Max margin to risk (in %)
 
 #ifdef __MQL4__
 input string __EA_Trade_Params__ = "-- EA's trade parameters --";  // >>> EA's TRADE <<<
@@ -49,7 +49,7 @@ input string __EA_Trade_Params__ = "-- EA's trade parameters --";  // >>> EA's T
 input group "EA's trade parameters"
 #endif
 input double EA_LotSize = 0;        // Lot size (0 = auto)
-input float EA_MaxSpread = 3.1f;    // Max spread to trade (in pips, 0 to disable)
+input float EA_MaxSpread = 4.0f;    // Max spread to trade (in pips, 0 to disable)
 input uint EA_MagicNumber = 31337;  // Starting EA magic number
 
 #ifdef __MQL4__

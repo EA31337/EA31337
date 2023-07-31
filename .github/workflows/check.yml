@@ -10,11 +10,12 @@ jobs:
   Pre-commit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v1
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
         with:
           path: ~/.cache/pre-commit
           key: pre-commit|${{ hashFiles('.pre-commit-config.yaml') }}
+      - uses: actions/setup-python@v3
       - name: Installs shfmt
         run: >
           sudo install /dev/stdin /usr/local/bin/shfmt
@@ -22,7 +23,4 @@ jobs:
         env:
           # yamllint disable rule:line-length
           SHFMT_URL: https://github.com/mvdan/sh/releases/download/v3.1.1/shfmt_v3.1.1_linux_amd64
-      - uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-      - uses: pre-commit/action@v2.0.3
+      - uses: pre-commit/action@v3.0.0

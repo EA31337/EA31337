@@ -9,8 +9,46 @@ on:
 
 jobs:
 
-  Compile:
+  Compile-IndicatorsOther:
+    defaults:
+      run:
+        shell: powershell
+        working-directory: src/indicators-other
     runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - uses: actions/checkout@v3
+        with:
+          path: Include/EA31337-classes
+          ref: v2.012
+          repository: EA31337/EA31337-classes
+      - name: Compile (build 2361)
+        uses: fx31337/mql-compile-action@master
+        with:
+          include: .
+          mt-version: 5.0.0.2361
+          path: src/indicators-other/**/*.mq?
+          verbose: true
+      - name: List compiled files
+        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
+      - run: Get-Location
+      - name: Upload indicator artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: indicators-other
+          path: '**/*.ex?'
+
+  Compile-EA:
+
+    defaults:
+      run:
+        shell: powershell
+        working-directory: src
+    needs: [Compile-IndicatorsOther]
+    runs-on: windows-latest
+
     strategy:
       matrix:
         mode:
@@ -20,51 +58,74 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
 
+      - uses: actions/download-artifact@v3
+        with:
+          name: indicators-other
+          path: .
+
+      - name: List compiled files
+        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
+
+      - run: Get-Location
+
+      # @fixme: https://github.com/actions/upload-artifact/issues/87
+      - name: Link indicators
+        run: New-Item -ItemType SymbolicLink -Path "../indicators-other" -Target "indicators-other"
+
       - name: Enables CLI mode
-        run: echo '#define __cli__' > src/include/common/mode.h
-      - name: Enables backtest mode
-        run: echo '#define __backtest__' >> src/include/common/mode.h
+        run: echo '#define __cli__' > include/common/mode.h
+
+      - name: Enables resource mode
+        run: echo '#define __resource__' >> include/common/mode.h
+
       - name: Enables Advanced mode
         if: matrix.mode == 'Advanced'
-        run: echo '#define __advanced__' >> src/include/common/mode.h
+        run: echo '#define __advanced__' >> include/common/mode.h
+
       - name: Enables Rider mode
         if: matrix.mode == 'Rider'
-        run: echo '#define __rider__' >> src/include/common/mode.h
+        run: echo '#define __rider__' >> include/common/mode.h
 
       - name: Compiles EA (MQL4)
         uses: fx31337/mql-compile-action@master
         with:
-          path: src\EA31337.mq4
+          include: src
+          path: src/EA31337.mq4
           verbose: true
+
       - name: Compiles EA (MQL5)
         uses: fx31337/mql-compile-action@master
         with:
-          path: src\EA31337.mq5
+          include: src
+          path: src/EA31337.mq5
           verbose: true
+
       - name: Moves file (MQL4)
-        run: mv -v src\*.ex4 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex4"
+        run: mv -v *.ex4 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex4"
       - name: Moves file (MQL5)
-        run: mv -v src\*.ex5 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex5"
-      - name: Prints compiled files
+        run: mv -v *.ex5 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex5"
+
+      - name: List compiled files
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
-        shell: powershell
-      - name: Uploads artifacts
-        uses: actions/upload-artifact@v2
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.mode }}
-          path: '*.ex?'
+          name: EA31337-${{ matrix.mode }}
+          path: '**/EA*.ex?'
 
   Test:
+
     defaults:
       run:
         shell: bash
     env:
       TEST_NAME: ${{ matrix.mode }}_${{ matrix.test }}
-    needs: Compile
+    needs: Compile-EA
     runs-on: ubuntu-latest
 
     strategy:
@@ -86,23 +147,23 @@ jobs:
           - 2020_12
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
         with:
-          name: ${{ matrix.mode }}
+          name: EA31337-${{ matrix.mode }}
       - name: Clean older test results
         run: rm *.*
         working-directory: docker/tests/${{ matrix.mode }}/_results
       - run: docker-compose run $TEST_NAME
         working-directory: docker/tests/${{ matrix.mode }}
       - name: Uploads test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Results-${{ matrix.mode }}
           path: docker/tests/${{ matrix.mode }}/_results/*.*
       - name: Uploads test results (retry on failure)
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Results-${{ matrix.mode }}
           path: docker/tests/${{ matrix.mode }}/_results/*.*
@@ -123,21 +184,21 @@ jobs:
           - Rider
       max-parallel: 1
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         if: github.event_name != 'pull_request'
         with:
           persist-credentials: false
           # Otherwise, you will failed to push refs to dest repo.
           fetch-depth: 0
           ref: ${{ github.ref }}
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         if: github.event_name == 'pull_request'
         with:
           persist-credentials: false
           # Otherwise, you will failed to push refs to dest repo.
           fetch-depth: 0
           ref: refs/heads/${{ github.head_ref }}
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: Results-${{ matrix.mode }}
           path: docker/tests/${{ matrix.mode }}/_results

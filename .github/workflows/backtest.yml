@@ -19,13 +19,13 @@ jobs:
         working-directory: src/indicators-other
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           path: Include/EA31337-classes
-          ref: v2.010
+          ref: v2.012
           repository: EA31337/EA31337-classes
       - name: Compile (build 2361)
         uses: fx31337/mql-compile-action@master
@@ -38,7 +38,7 @@ jobs:
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
       - run: Get-Location
       - name: Upload indicator artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: indicators-other
           path: '**/*.ex?'
@@ -63,11 +63,11 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: indicators-other
           path: .
@@ -83,6 +83,10 @@ jobs:
 
       - name: Enables CLI mode
         run: echo '#define __cli__' > include/common/mode.h
+
+      - name: Enables resource mode
+        if: matrix.mode2 != '__resource__'
+        run: echo '#define __resource__' > include/common/mode.h
 
       - name: Enables Advanced mode
         if: matrix.mode == 'Advanced'
@@ -118,7 +122,7 @@ jobs:
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: EA31337-${{ matrix.mode }}
           path: '**/EA*.ex?'
@@ -144,8 +148,8 @@ jobs:
         spread: [1, 10]
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
         with:
           name: EA31337-${{ matrix.mode }}
       - name: Removes old results
@@ -156,14 +160,14 @@ jobs:
         # yamllint disable-line rule:line-length
         working-directory: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}
       - name: Uploads results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Results-${{ matrix.mode }}-${{ matrix.year }}
           # yamllint disable-line rule:line-length
           path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
       - name: Re-uploads results on failure
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Results-${{ matrix.mode }}-${{ matrix.year }}
           # yamllint disable-line rule:line-length
@@ -190,8 +194,8 @@ jobs:
         spread: [1, 10]
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
         with:
           name: EA31337-${{ matrix.mode }}
       - name: Removes old results
@@ -202,14 +206,14 @@ jobs:
         # yamllint disable-line rule:line-length
         working-directory: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}
       - name: Uploads results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Results-${{ matrix.mode }}-${{ matrix.year }}
           # yamllint disable-line rule:line-length
           path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
       - name: Re-uploads results on failure
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Results-${{ matrix.mode }}-${{ matrix.year }}
           # yamllint disable-line rule:line-length
@@ -236,8 +240,8 @@ jobs:
         spread: [1, 10]
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
         with:
           name: EA31337-${{ matrix.mode }}
       - name: Removes old results
@@ -248,14 +252,14 @@ jobs:
         # yamllint disable-line rule:line-length
         working-directory: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}
       - name: Uploads results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Results-${{ matrix.mode }}-${{ matrix.year }}
           # yamllint disable-line rule:line-length
           path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
       - name: Re-uploads results on failure
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Results-${{ matrix.mode }}-${{ matrix.year }}
           # yamllint disable-line rule:line-length
@@ -283,21 +287,21 @@ jobs:
           - 2021
       max-parallel: 1
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         if: github.event_name != 'pull_request'
         with:
           persist-credentials: false
           # Otherwise, you will failed to push refs to dest repo.
           fetch-depth: 0
           ref: ${{ github.ref }}
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         if: github.event_name == 'pull_request'
         with:
           persist-credentials: false
           # Otherwise, you will failed to push refs to dest repo.
           fetch-depth: 0
           ref: refs/heads/${{ github.head_ref }}
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: Results-${{ matrix.mode }}-${{ matrix.year }}
           # yamllint disable-line rule:line-length
