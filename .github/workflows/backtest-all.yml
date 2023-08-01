@@ -12,11 +12,44 @@ on:
 
 jobs:
 
-  Compile:
+  Compile-IndicatorsOther:
+    defaults:
+      run:
+        shell: powershell
+        working-directory: src/indicators-other
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - uses: actions/checkout@v3
+        with:
+          path: Include/EA31337-classes
+          ref: v2.013
+          repository: EA31337/EA31337-classes
+      - name: Compile (build 2361)
+        uses: fx31337/mql-compile-action@master
+        with:
+          include: .
+          mt-version: 5.0.0.2361
+          path: src/indicators-other/**/*.mq?
+          verbose: true
+      - name: List compiled files
+        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
+      - run: Get-Location
+      - name: Upload indicator artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: indicators-other
+          path: '**/*.ex?'
+
+  Compile-EA:
+
     defaults:
       run:
         shell: powershell
         working-directory: src
+    needs: [Compile-IndicatorsOther]
     runs-on: windows-latest
 
     strategy:
@@ -25,23 +58,34 @@ jobs:
           - Lite
           - Advanced
           - Rider
+        mode2:
+          - __resource__
+
     steps:
 
       - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
-      - name: Enables backtest mode
-        run: echo '#define __backtest__' > src/include/common/mode.h
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: indicators-other
+          path: .
 
       - name: List compiled files
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
 
       - run: Get-Location
 
+      # @fixme: https://github.com/actions/upload-artifact/issues/87
+      - name: Link indicators
+        run: New-Item -ItemType SymbolicLink -Path "../indicators-other" -Target "indicators-other"
+
       - name: Enables CLI mode
         run: echo '#define __cli__' > include/common/mode.h
 
       - name: Enables resource mode
+        if: matrix.mode2 != '__resource__'
         run: echo '#define __resource__' > include/common/mode.h
 
       - name: Enables Advanced mode
@@ -52,34 +96,42 @@ jobs:
         if: matrix.mode == 'Rider'
         run: echo '#define __rider__' >> include/common/mode.h
 
+      - name: Enables custom mode
+        run: echo '#define ${{ matrix.mode2 }}' >> include/common/mode.h
+
       - name: Compiles EA (MQL4)
         uses: fx31337/mql-compile-action@master
         with:
-          path: src\EA31337.mq4
+          include: src
+          path: src/EA31337.mq4
           verbose: true
+
       - name: Compiles EA (MQL5)
         uses: fx31337/mql-compile-action@master
         with:
-          path: src\EA31337.mq5
+          include: src
+          path: src/EA31337.mq5
           verbose: true
+
       - name: Moves file (MQL4)
-        run: mv -v src\*.ex4 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex4"
+        run: mv -v *.ex4 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex4"
       - name: Moves file (MQL5)
-        run: mv -v src\*.ex5 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex5"
-      - name: Prints compiled files
+        run: mv -v *.ex5 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex5"
+
+      - name: List compiled files
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
-        shell: powershell
-      - name: Uploads artifacts
+
+      - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: EA31337-${{ matrix.mode }}
-          path: '*.ex?'
+          path: '**/EA*.ex?'
 
   Backtest-Lite:
     defaults:
       run:
         shell: bash
-    needs: Compile
+    needs: Compile-EA
     runs-on: ubuntu-latest
 
     strategy:
@@ -120,7 +172,7 @@ jobs:
     defaults:
       run:
         shell: bash
-    needs: Compile
+    needs: Compile-EA
     runs-on: ubuntu-latest
 
     strategy:
@@ -161,7 +213,7 @@ jobs:
     defaults:
       run:
         shell: bash
-    needs: Compile
+    needs: Compile-EA
     runs-on: ubuntu-latest
 
     strategy:
