@@ -28,6 +28,12 @@ This project utilizes the following sub-projects:
 
 The source code is compatible with MQL4 and MQL5 and can run on MetaTrader 4 and 5.
 
+## Download
+
+To download this project with all dependencies, use the following Git command:
+
+    git clone --branch master --recursive https://github.com/EA31337/EA31337.git
+
 ## Usage
 
 You can freely use this project for education or research purposes.
