@@ -95,7 +95,7 @@ When using this EA for the trading purposes, please read the following tips:
 
 - Take your time to get familiar with the project and how it works.
 - Make sure you have tested EA on the demo account first (at least for few weeks).
-- It is advised to backtest your configuration before running on live account (see [Testing](#TESTING) section).
+- It is advised to backtest your configuration before running on live account (see [Testing](#Testing) section).
 - Choose your broker wisely to make sure EA will work as expected. For example:
   - Be aware of your broker spreads and commissions, otherwise high spreads can easily kill your account,
     no matter how good EA is.
