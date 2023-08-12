@@ -1,7 +1,7 @@
 {
-  "Time": "69",
+  "Time": "96",
   "Title": "Strategy Tester Report",
-  "EA Name": "EA31337-Rider-524f430431299175c7420f178be6b84c133f7035",
+  "EA Name": "EA31337-Rider-0979874e1c6f3abf3f422f19473d9c9afe95117c",
   "Build": "1382",
   "Symbol": "EURUSD (Euro vs US Dollar)",
   "Period": "1 Minute (M1)  2021.01.03 23:45 - 2021.12.30 23:59    (2021.01.01 - 2021.12.31)",
@@ -9,7 +9,7 @@
   "Initial deposit": "100000.00",
   "Spread": "1",
   "Modelling quality": "24.99%",
-  "Parameters": "__EA_Params__=&#34;&gt;&gt; EA31337 Rider v2.013 build 1690899810 &lt;&lt;&#34;; __Strategies_Active__=&#34;-- Active strategies --&#34;; EA_Strategy_Filter=2047; Strategy_M1=0; Strategy_M5=0; Strategy_M15=0; Strategy_M30=28; Strategy_H1=23; Strategy_H2=7; Strategy_H3=32; Strategy_H4=5; Strategy_H6=32; Strategy_H8=14; Strategy_H12=6; __Strategies_Stops__=&#34;-- Strategies&#39; stops --&#34;; EA_Stops_Strat=36; EA_Stops_Tf=1440; __EA_Tasks__=&#34;-- EA&#39;s tasks --&#34;; EA_Tasks_Filter=31; EA_Task1_If=9; EA_Task1_Then=3; EA_Task2_If=13; EA_Task2_Then=2; EA_Task3_If=13; EA_Task3_Then=6; EA_Task4_If=15; EA_Task4_Then=1; EA_Task5_If=0; EA_Task5_Then=0; __Signal_Filters__=&#34;-- Signal filters --&#34;; EA_SignalOpenFilterMethod=68; EA_SignalCloseFilterMethod=98; EA_SignalOpenFilterTime=11; EA_SignalOpenStrategyFilter=2; EA_TickFilterMethod=32; __EA_Risk_Params__=&#34;-- EA&#39;s risk management --&#34;; EA_Risk_MarginMax=1.79999995; __EA_Trade_Params__=&#34;-- EA&#39;s trade parameters --&#34;; EA_LotSize=0; EA_MaxSpread=4; EA_MagicNumber=31337; __Logging_Params__=&#34;-- EA&#39;s logging &amp; messaging --&#34;; VerboseLevel=1; EA_DisplayDetailsOnChart=true; ,",
+  "Parameters": "__EA_Params__=&#34;&gt;&gt; EA31337 Rider v2.013 build 1691874338 &lt;&lt;&#34;; __Strategies_Active__=&#34;-- Active strategies --&#34;; EA_Strategy_Filter=2047; Strategy_M1=0; Strategy_M5=0; Strategy_M15=0; Strategy_M30=28; Strategy_H1=23; Strategy_H2=7; Strategy_H3=32; Strategy_H4=5; Strategy_H6=32; Strategy_H8=14; Strategy_H12=6; __Strategies_Stops__=&#34;-- Strategies&#39; stops --&#34;; EA_Stops_Strat=36; EA_Stops_Tf=1440; __EA_Tasks__=&#34;-- EA&#39;s tasks --&#34;; EA_Tasks_Filter=31; EA_Task1_If=9; EA_Task1_Then=3; EA_Task2_If=13; EA_Task2_Then=2; EA_Task3_If=13; EA_Task3_Then=6; EA_Task4_If=15; EA_Task4_Then=1; EA_Task5_If=0; EA_Task5_Then=0; __Signal_Filters__=&#34;-- Signal filters --&#34;; EA_SignalOpenFilterMethod=68; EA_SignalCloseFilterMethod=98; EA_SignalOpenFilterTime=11; EA_SignalOpenStrategyFilter=2; EA_TickFilterMethod=32; __EA_Risk_Params__=&#34;-- EA&#39;s risk management --&#34;; EA_Risk_MarginMax=1.79999995; __EA_Trade_Params__=&#34;-- EA&#39;s trade parameters --&#34;; EA_LotSize=0; EA_MaxSpread=4; EA_MagicNumber=31337; __Logging_Params__=&#34;-- EA&#39;s logging &amp; messaging --&#34;; VerboseLevel=1; EA_DisplayDetailsOnChart=true; ,",
   "Bars in test": "364812",
   "Ticks modelled": "41698632",
   "Mismatched charts errors": "0",
