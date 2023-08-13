@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 
 // EA defines.
-#define ea_version "2.013.1"
+#define ea_version "2.013"
 #define ea_desc "Forex multi-strategy trading robot."
 #define ea_link "https://github.com/EA31337"
 #define ea_author "kenorb"
