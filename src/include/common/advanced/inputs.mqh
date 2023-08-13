@@ -32,7 +32,7 @@ input static string __Strategies_Active__ = "-- Active strategies --";  // >>> A
 #else
 input group "Active strategies"
 #endif
-input int EA_Strategy_Filter = 2047;                  // S-Filter(0=n/a,All=2047,1=M1,2=M5,4=M15,8=M30,16=H1,32=H2,64=H4)
+input int EA_Strategy_Filter = 2047;                  // S-Filter(0=n/a,All=2047,1=M1,2=M5,4=M15,8=M30,16=H1,32=H2,64=H3)
 input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;         // Strategy on M1 (filter=1)
 input ENUM_STRATEGY Strategy_M5 = STRAT_DEMA;         // Strategy on M5 (filter=2)
 input ENUM_STRATEGY Strategy_M15 = STRAT_EWO;         // Strategy on M15 (filter=4)
