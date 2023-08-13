@@ -3,7 +3,7 @@
   "program_type":"expert",
   "copyright"   :"2016-2023, EA31337 Ltd",
   "link"        :"https:\/\/github.com\/EA31337\/EA31337",
-  "version"     :"2.013",
+  "version"     :"2.013.1",
   "description" :"Forex multi-strategy trading robot",
   "icon"        :"resources\\favicon.ico",
   "optimize"    :"0",
