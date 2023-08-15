@@ -32,18 +32,18 @@ input static string __Strategies_Active__ = "-- Active strategies --";  // >>> A
 #else
 input group "Active strategy"
 #endif
-input int EA_Strategy_Filter = 2047;                // S-Filter(0=n/a,All=2047,1=M1,2=M5,4=M15,8=M30,16=H1,32=H2,64=H3)
-input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;       // Strategy on M1 (filter=1)
-input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;       // Strategy on M5 (filter=2)
-input ENUM_STRATEGY Strategy_M15 = STRAT_NONE;      // Strategy on M15 (filter=4)
-input ENUM_STRATEGY Strategy_M30 = STRAT_MOMENTUM;  // Strategy on M30 (filter=8)
-input ENUM_STRATEGY Strategy_H1 = STRAT_ICHIMOKU;   // Strategy on H1 (filter=16)
-input ENUM_STRATEGY Strategy_H2 = STRAT_ATR;        // Strategy on H2 (filter=32)
-input ENUM_STRATEGY Strategy_H3 = STRAT_PINBAR;     // Strategy on H3 (filter=64)
-input ENUM_STRATEGY Strategy_H4 = STRAT_AMA;        // Strategy on H4 (filter=128)
-input ENUM_STRATEGY Strategy_H6 = STRAT_PINBAR;     // Strategy on H6 (filter=256)
-input ENUM_STRATEGY Strategy_H8 = STRAT_CHAIKIN;    // Strategy on H8 (filter=512)
-input ENUM_STRATEGY Strategy_H12 = STRAT_ASI;       // Strategy on H12 (filter=1024)
+input int EA_Strategy_Filter = 2047;            // S-Filter(0=n/a,All=2047,1=M1,2=M5,4=M15,8=M30,16=H1,32=H2,64=H3)
+input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;   // Strategy on M1 (filter=1)
+input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;   // Strategy on M5 (filter=2)
+input ENUM_STRATEGY Strategy_M15 = STRAT_NONE;  // Strategy on M15 (filter=4)
+input ENUM_STRATEGY Strategy_M30 = STRAT_NONE;  // Strategy on M30 (filter=8)
+input ENUM_STRATEGY Strategy_H1 = STRAT_NONE;   // Strategy on H1 (filter=16)
+input ENUM_STRATEGY Strategy_H2 = STRAT_NONE;   // Strategy on H2 (filter=32)
+input ENUM_STRATEGY Strategy_H3 = STRAT_NONE;   // Strategy on H3 (filter=64)
+input ENUM_STRATEGY Strategy_H4 = STRAT_NONE;   // Strategy on H4 (filter=128)
+input ENUM_STRATEGY Strategy_H6 = STRAT_NONE;   // Strategy on H6 (filter=256)
+input ENUM_STRATEGY Strategy_H8 = STRAT_NONE;   // Strategy on H8 (filter=512)
+input ENUM_STRATEGY Strategy_H12 = STRAT_NONE;  // Strategy on H12 (filter=1024)
 
 #ifdef __MQL4__
 input static string __Strategies_Stops__ = "-- Strategies' stops --";  // >>> STRATEGIES' STOPS <<<
