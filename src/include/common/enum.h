@@ -1,10 +1,8 @@
 //+------------------------------------------------------------------+
-//|                                                           enum.h |
-//|                                 Copyright 2016-2022, EA31337 Ltd |
-//|                                       https://github.com/EA31337 |
+//|                                 Copyright 2016-2023, EA31337 Ltd |
+//|                                       https://ea31337.github.io/ |
 //+------------------------------------------------------------------+
 
-#ifdef __advanced__
 enum ENUM_EA_ADV_ACTION {
   EA_ADV_ACTION_NONE = 0,  // (None)
   // EA_ADV_ACTION_CLOSE_LEAST_LOSS,     // Close order with the least loss
@@ -42,4 +40,3 @@ enum ENUM_EA_ADV_COND {
   EA_ADV_COND_TRADE_IS_PEAK,   // Profitable side is at peak
   EA_ADV_COND_TRADE_IS_PIVOT,  // Profitable side is at pivot
 };
-#endif
