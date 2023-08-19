@@ -26,7 +26,7 @@ jobs:
     defaults:
       run:
         shell: powershell
-        working-directory: src/indicators-other
+        working-directory: src/indicators
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
@@ -42,7 +42,7 @@ jobs:
         with:
           include: .
           mt-version: 5.0.0.2361
-          path: src/indicators-other/**/*.mq?
+          path: src/indicators/**/*.mq?
           verbose: true
       - name: List compiled files
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
@@ -50,7 +50,7 @@ jobs:
       - name: Upload indicator artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: indicators-other
+          name: indicators
           path: '**/*.ex?'
 
   EA:
@@ -141,7 +141,7 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-          name: indicators-other
+          name: indicators
           path: .
 
       - name: List compiled files
@@ -151,7 +151,7 @@ jobs:
 
       # @fixme: https://github.com/actions/upload-artifact/issues/87
       - name: Link indicators
-        run: New-Item -ItemType SymbolicLink -Path "../indicators-other" -Target "indicators-other"
+        run: New-Item -ItemType SymbolicLink -Path "../indicators" -Target "indicators"
 
       - name: Enables CLI mode
         run: echo '#define __cli__' > include/common/mode.h

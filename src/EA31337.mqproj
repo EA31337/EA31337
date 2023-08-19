@@ -2756,43 +2756,43 @@
   [
     {
       "type":"indicator",
-      "path":"indicators-other\\Oscillator\\Elliott_Wave_Oscillator2.ex5",
+      "path":"indicators\\Other\\Oscillator\\Elliott_Wave_Oscillator2.ex5",
       "name":"",
       "relative_to_project":true
     },
     {
       "type":"indicator",
-      "path":"indicators-other\\Oscillator\\SVE_Bollinger_Bands.ex5",
+      "path":"indicators\\Other\\Oscillator\\SVE_Bollinger_Bands.ex5",
       "name":"",
       "relative_to_project":true
     },
     {
       "type":"indicator",
-      "path":"indicators-other\\PriceBands\\TMA+CG_mladen_NRP.ex5",
+      "path":"indicators\\Other\\PriceBands\\TMA+CG_mladen_NRP.ex5",
       "name":"",
       "relative_to_project":true
     },
     {
       "type":"indicator",
-      "path":"indicators-other\\Misc\\ATR_MA_Trend.ex5",
+      "path":"indicators\\Other\\Misc\\ATR_MA_Trend.ex5",
       "name":"",
       "relative_to_project":true
     },
     {
       "type":"indicator",
-      "path":"indicators-other\\PriceBands\\TMA_True.ex5",
+      "path":"indicators\\Other\\PriceBands\\TMA_True.ex5",
       "name":"",
       "relative_to_project":true
     },
     {
       "type":"indicator",
-      "path":"indicators-other\\PriceBands\\SAWA.ex5",
+      "path":"indicators\\Other\\PriceBands\\SAWA.ex5",
       "name":"",
       "relative_to_project":true
     },
     {
       "type":"indicator",
-      "path":"indicators-other\\Price\\SuperTrend.ex5",
+      "path":"indicators\\Other\\Price\\SuperTrend.ex5",
       "name":"",
       "relative_to_project":true
     }
