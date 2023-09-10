@@ -307,6 +307,12 @@ class EA31337 : public EA {
         return StrategyAdd<Stg_MA_Cross_Sup_Res>(_tfs, _magic_no, _stg);
       case STRAT_MACD:
         return StrategyAdd<Stg_MACD>(_tfs, _magic_no, _stg);
+      case STRAT_META_MIRROR:
+        return StrategyAdd<Stg_Meta_Mirror>(_tfs, _magic_no, _stg);
+      case STRAT_META_MULTI:
+        return StrategyAdd<Stg_Meta_Multi>(_tfs, _magic_no, _stg);
+      case STRAT_META_REVERSAL:
+        return StrategyAdd<Stg_Meta_Reversal>(_tfs, _magic_no, _stg);
       case STRAT_MFI:
         return StrategyAdd<Stg_MFI>(_tfs, _magic_no, _stg);
       case STRAT_MOMENTUM:
