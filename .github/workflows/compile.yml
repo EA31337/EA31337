@@ -24,37 +24,8 @@ jobs:
 
   Compile-Indicators-Common:
     uses: EA31337/EA31337-Indicators-Common/.github/workflows/compile.yml@dev
-  Compile-IndicatorsOther:
-    defaults:
-      run:
-        shell: powershell
-        working-directory: src/indicators
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: 'recursive'
-      - uses: actions/checkout@v3
-        with:
-          path: Include/EA31337-classes
-          ref: v3.000
-          repository: EA31337/EA31337-classes
-      - name: Compile (build 2361)
-        uses: fx31337/mql-compile-action@master
-        with:
-          include: .
-          mt-version: 5.0.0.2361
-          path: src/indicators/**/*.mq?
-          verbose: true
-      - name: List compiled files
-        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
-      - run: Get-Location
-      - name: Upload indicator artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: indicators
-          path: '**/*.ex?'
-
+  Compile-Indicators-Other:
+    uses: EA31337/EA31337-Indicators-Other/.github/workflows/compile.yml@dev
   EA:
 
     defaults:
@@ -123,7 +94,7 @@ jobs:
       run:
         shell: powershell
         working-directory: src
-    needs: [Compile-IndicatorsOther]
+    needs: [Compile-Indicators-Common, Compile-Indicators-Other]
     runs-on: windows-latest
 
     strategy:
