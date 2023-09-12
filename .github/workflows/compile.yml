@@ -23,7 +23,12 @@ on:
 jobs:
 
   Compile-Indicators-Common:
-    uses: EA31337/EA31337/src/indicators/Common/.github/workflows/compile.yml@dev-test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - uses: ./src/indicators/Common/.github/workflows/compile.yml@dev-test
   Compile-IndicatorsOther:
     defaults:
       run:
