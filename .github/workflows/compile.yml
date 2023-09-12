@@ -7,7 +7,7 @@ on:
     paths:
       - '**.h'
       - '**.mq?'
-      - .github/workflows/test.yml
+      - .github/workflows/compile.yml
       - src/*.mq?
       - src/*.mq[45h]
       - src/include/**
@@ -15,7 +15,7 @@ on:
     paths:
       - '**.h'
       - '**.mq?'
-      - .github/workflows/test.yml
+      - .github/workflows/compile.yml
       - src/*.mq?
       - src/*.mq[45h]
       - src/include/**
@@ -23,7 +23,7 @@ on:
 jobs:
 
   Compile-Indicators-Common:
-    uses: EA31337/EA31337/src/indicators/Common/.github/workflows/compile.yml@dev-test
+    uses: EA31337/EA31337-Indicators-Common/.github/workflows/compile.yml@dev
   Compile-IndicatorsOther:
     defaults:
       run:
