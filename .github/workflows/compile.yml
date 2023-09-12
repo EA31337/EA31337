@@ -22,6 +22,8 @@ on:
 
 jobs:
 
+  Compile-Indicators-Common:
+    uses: EA31337/EA31337/src/indicators/Common/.github/workflows/compile.yml@dev-test
   Compile-IndicatorsOther:
     defaults:
       run:
