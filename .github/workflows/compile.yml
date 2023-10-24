@@ -26,12 +26,14 @@ jobs:
     uses: EA31337/EA31337-Indicators-Common/.github/workflows/compile.yml@dev
   Compile-Indicators-Other:
     uses: EA31337/EA31337-Indicators-Other/.github/workflows/compile.yml@dev
-  EA:
+
+  Compile-EA:
 
     defaults:
       run:
         shell: powershell
         working-directory: src
+    needs: [Compile-Indicators-Common, Compile-Indicators-Other]
     runs-on: windows-latest
 
     strategy:
