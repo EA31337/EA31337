@@ -281,6 +281,8 @@ class EA31337 : public EA {
         return StrategyAdd<Stg_DEMA>(_tfs, _magic_no, _stg);
       case STRAT_DEMARKER:
         return StrategyAdd<Stg_DeMarker>(_tfs, _magic_no, _stg);
+      case STRAT_DPO:
+        return StrategyAdd<Stg_DPO>(_tfs, _magic_no, _stg);
       case STRAT_ENVELOPES:
         return StrategyAdd<Stg_Envelopes>(_tfs, _magic_no, _stg);
       case STRAT_EWO:
@@ -305,6 +307,10 @@ class EA31337 : public EA {
         return StrategyAdd<Stg_MA_Cross_Shift>(_tfs, _magic_no, _stg);
       case STRAT_MA_CROSS_SUP_RES:
         return StrategyAdd<Stg_MA_Cross_Sup_Res>(_tfs, _magic_no, _stg);
+      case STRAT_MA_CROSS_TIMEFRAME:
+        return StrategyAdd<Stg_MA_Cross_Timeframe>(_tfs, _magic_no, _stg);
+      case STRAT_MA_TREND:
+        return StrategyAdd<Stg_MA_Trend>(_tfs, _magic_no, _stg);
       case STRAT_MACD:
         return StrategyAdd<Stg_MACD>(_tfs, _magic_no, _stg);
       case STRAT_MFI:
@@ -323,10 +329,16 @@ class EA31337 : public EA {
         return StrategyAdd<Stg_Oscillator_Cross>(_tfs, _magic_no, _stg);
       case STRAT_OSCILLATOR_CROSS_SHIFT:
         return StrategyAdd<Stg_Oscillator_Cross_Shift>(_tfs, _magic_no, _stg);
+      case STRAT_OSCILLATOR_CROSS_TIMEFRAME:
+        return StrategyAdd<Stg_Oscillator_Cross_Timeframe>(_tfs, _magic_no, _stg);
       case STRAT_OSCILLATOR_CROSS_ZERO:
         return StrategyAdd<Stg_Oscillator_Cross_Zero>(_tfs, _magic_no, _stg);
+      case STRAT_OSCILLATOR_OVERLAY:
+        return StrategyAdd<Stg_Oscillator_Overlay>(_tfs, _magic_no, _stg);
       case STRAT_OSCILLATOR_RANGE:
         return StrategyAdd<Stg_Oscillator_Range>(_tfs, _magic_no, _stg);
+      case STRAT_OSCILLATOR_TREND:
+        return StrategyAdd<Stg_Oscillator_Trend>(_tfs, _magic_no, _stg);
       case STRAT_OSMA:
         return StrategyAdd<Stg_OsMA>(_tfs, _magic_no, _stg);
       case STRAT_PATTERN:
