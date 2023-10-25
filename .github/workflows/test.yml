@@ -53,17 +53,18 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-          name: indicators
-          path: .
+          name: indicators-common
+          path: src/Indicators/Common
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: indicators-other
+          path: src/Indicators/Other
 
       - name: List compiled files
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
 
       - run: Get-Location
-
-      # @fixme: https://github.com/actions/upload-artifact/issues/87
-      - name: Link indicators
-        run: New-Item -ItemType SymbolicLink -Path "../indicators" -Target "indicators"
 
       - name: Enables CLI mode
         run: echo '#define __cli__' > include/common/mode.h
