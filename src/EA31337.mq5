@@ -52,9 +52,9 @@
 #resource INDI_TMA_TRUE_PATH + MQL_EXT
 #resource INDI_SAWA_PATH + MQL_EXT
 #resource INDI_SUPERTREND_PATH + MQL_EXT
-#endif
-// Strategy resources.
+// Strategy resources (MQL5 only).
 #resource "\\include\\strategies-meta\\Meta_News\\data\\news2022.csv" as string MetaNewsData2022
+#endif
 #endif
 
 // Global variables.

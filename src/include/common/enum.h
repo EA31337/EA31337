@@ -130,7 +130,9 @@ enum ENUM_STRATEGY {
   STRAT_META_MIRROR,             // (Meta) Mirror
   STRAT_META_MULTI,              // (Meta) Multi
   STRAT_META_MULTI_CURRENCY,     // (Meta) Multi Currency
+#ifdef __MQL5__
   STRAT_META_NEWS,               // (Meta) News
+#endif
   STRAT_META_ORDER_LIMIT,        // (Meta) Order Limit
   STRAT_META_OSCILLATOR_FILTER,  // (Meta) Oscillator Filter
   STRAT_META_OSCILLATOR_SWITCH,  // (Meta) Oscillator Switch
