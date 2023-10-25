@@ -307,12 +307,6 @@ class EA31337 : public EA {
         return StrategyAdd<Stg_MA_Cross_Sup_Res>(_tfs, _magic_no, _stg);
       case STRAT_MACD:
         return StrategyAdd<Stg_MACD>(_tfs, _magic_no, _stg);
-      case STRAT_META_MIRROR:
-        return StrategyAdd<Stg_Meta_Mirror>(_tfs, _magic_no, _stg);
-      case STRAT_META_MULTI:
-        return StrategyAdd<Stg_Meta_Multi>(_tfs, _magic_no, _stg);
-      case STRAT_META_REVERSAL:
-        return StrategyAdd<Stg_Meta_Reversal>(_tfs, _magic_no, _stg);
       case STRAT_MFI:
         return StrategyAdd<Stg_MFI>(_tfs, _magic_no, _stg);
       case STRAT_MOMENTUM:
@@ -371,6 +365,75 @@ class EA31337 : public EA {
         return StrategyAdd<Stg_ZigZag>(_tfs, _magic_no, _stg);
       case STRAT_NONE:
         break;
+      // Meta strategies.
+      case STRAT_META_BEARS_BULLS:  // (Meta) Bears & Bulls
+        return StrategyAdd<Stg_Meta_Bears_Bulls>(_tfs, _magic_no, _stg);
+      case STRAT_META_DOUBLE:  // (Meta) Double
+        return StrategyAdd<Stg_Meta_Double>(_tfs, _magic_no, _stg);
+      case STRAT_META_CONDITIONS:  // (Meta) Conditions
+        return StrategyAdd<Stg_Meta_Conditions>(_tfs, _magic_no, _stg);
+      case STRAT_META_ENHANCE:  // (Meta) Enhance
+        return StrategyAdd<Stg_Meta_Enhance>(_tfs, _magic_no, _stg);
+      case STRAT_META_EQUITY:  // (Meta) Equity
+        return StrategyAdd<Stg_Meta_Equity>(_tfs, _magic_no, _stg);
+      case STRAT_META_FORMATION:  // (Meta) Formation
+        return StrategyAdd<Stg_Meta_Formation>(_tfs, _magic_no, _stg);
+      case STRAT_META_INTERVAL:  // (Meta) Interval
+        return StrategyAdd<Stg_Meta_Interval>(_tfs, _magic_no, _stg);
+      case STRAT_META_HEDGE:  // (Meta) Hedge
+        return StrategyAdd<Stg_Meta_Hedge>(_tfs, _magic_no, _stg);
+      case STRAT_META_LIMIT:  // (Meta) Limit
+        return StrategyAdd<Stg_Meta_Limit>(_tfs, _magic_no, _stg);
+      case STRAT_META_MA_CROSS:  // (Meta) MA Cross
+        return StrategyAdd<Stg_Meta_MA_Cross>(_tfs, _magic_no, _stg);
+      case STRAT_META_MARGIN:  // (Meta) Margin
+        return StrategyAdd<Stg_Meta_Margin>(_tfs, _magic_no, _stg);
+      case STRAT_META_MARTINGALE:  // (Meta) Martingale
+        return StrategyAdd<Stg_Meta_Martingale>(_tfs, _magic_no, _stg);
+      case STRAT_META_MIRROR:  // (Meta) Mirror
+        return StrategyAdd<Stg_Meta_Mirror>(_tfs, _magic_no, _stg);
+      case STRAT_META_MULTI:  // (Meta) Multi
+        return StrategyAdd<Stg_Meta_Multi>(_tfs, _magic_no, _stg);
+      case STRAT_META_MULTI_CURRENCY:  // (Meta) Multi Currency
+        return StrategyAdd<Stg_Meta_Multi_Currency>(_tfs, _magic_no, _stg);
+      case STRAT_META_NEWS:  // (Meta) News
+        return StrategyAdd<Stg_Meta_News>(_tfs, _magic_no, _stg);
+      case STRAT_META_ORDER_LIMIT:  // (Meta) Order Limit
+        return StrategyAdd<Stg_Meta_Order_Limit>(_tfs, _magic_no, _stg);
+      case STRAT_META_OSCILLATOR_FILTER:  // (Meta) Oscillator Filter
+        return StrategyAdd<Stg_Meta_Oscillator_Filter>(_tfs, _magic_no, _stg);
+      case STRAT_META_OSCILLATOR_SWITCH:  // (Meta) Oscillator Switch
+        return StrategyAdd<Stg_Meta_Oscillator_Switch>(_tfs, _magic_no, _stg);
+      case STRAT_META_PATTERN:  // (Meta) Pattern
+        return StrategyAdd<Stg_Meta_Pattern>(_tfs, _magic_no, _stg);
+      case STRAT_META_PIVOT:  // (Meta) Pivot
+        return StrategyAdd<Stg_Meta_Pivot>(_tfs, _magic_no, _stg);
+      case STRAT_META_PROFIT:  // (Meta) Profit
+        return StrategyAdd<Stg_Meta_Profit>(_tfs, _magic_no, _stg);
+      case STRAT_META_RESISTANCE:  // (Meta) Resistance
+        return StrategyAdd<Stg_Meta_Resistance>(_tfs, _magic_no, _stg);
+      case STRAT_META_REVERSAL:  // (Meta) Reversal
+        return StrategyAdd<Stg_Meta_Reversal>(_tfs, _magic_no, _stg);
+      case STRAT_META_RISK:  // (Meta) Risk
+        return StrategyAdd<Stg_Meta_Risk>(_tfs, _magic_no, _stg);
+      case STRAT_META_RSI:  // (Meta) RSI
+        return StrategyAdd<Stg_Meta_RSI>(_tfs, _magic_no, _stg);
+      case STRAT_META_SCALPER:  // (Meta) Scalper
+        return StrategyAdd<Stg_Meta_Scalper>(_tfs, _magic_no, _stg);
+      case STRAT_META_SIGNAL_SWITCH:  // (Meta) Signal Switch
+        return StrategyAdd<Stg_Meta_Signal_Switch>(_tfs, _magic_no, _stg);
+      case STRAT_META_SPREAD:  // (Meta) Spread
+        return StrategyAdd<Stg_Meta_Spread>(_tfs, _magic_no, _stg);
+      case STRAT_META_TIMEZONE:  // (Meta) Timezone
+        return StrategyAdd<Stg_Meta_Timezone>(_tfs, _magic_no, _stg);
+      case STRAT_META_TREND:  // (Meta) Trend
+        return StrategyAdd<Stg_Meta_Trend>(_tfs, _magic_no, _stg);
+      case STRAT_META_TRIO:  // (Meta) Trio
+        return StrategyAdd<Stg_Meta_Trio>(_tfs, _magic_no, _stg);
+      case STRAT_META_VOLATILITY:  // (Meta) Volatility
+        return StrategyAdd<Stg_Meta_Volatility>(_tfs, _magic_no, _stg);
+      case STRAT_META_WEEKDAY:  // (Meta) Weekday
+        return StrategyAdd<Stg_Meta_Weekday>(_tfs, _magic_no, _stg);
       default:
         SetUserError(ERR_INVALID_PARAMETER);
         break;
