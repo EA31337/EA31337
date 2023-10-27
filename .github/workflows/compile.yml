@@ -20,6 +20,10 @@ on:
       - src/*.mq[45h]
       - src/include/**
 
+env:
+  INDI_COMMON_WORKDIR: ${{ vars.INDI_COMMON_WORKDIR || 'src/indicators/Common' }}
+  INDI_OTHER_WORKDIR: ${{ vars.INDI_OTHER_WORKDIR || 'src/indicators/Other' }}
+
 jobs:
 
   Compile-Indicators-Common:
