@@ -222,6 +222,19 @@ bool InitStrategies() {
   int _magic_step = FINAL_ENUM_TIMEFRAMES_INDEX;
   long _magic_no = EA_MagicNumber;
   ResetLastError();
+#ifdef __elite__
+  // Initialize Elite strategy.
+  _res &= ea.StrategyAddToTfs(EA_Strategy1_Main, EA_Strategy1_Tf);
+  // Main Strategy 1 - Signal filters.
+  ea.Set(STRAT_PARAM_SOFM, EA_Strategy1_SignalOpenFilterMethod);
+  ea.Set(STRAT_PARAM_SCFM, EA_Strategy1_SignalCloseFilterMethod);
+  ea.Set(STRAT_PARAM_SOFT, EA_Strategy1_SignalOpenFilterTime);
+  ea.Set(STRAT_PARAM_TFM, EA_Strategy1_TickFilterMethod);
+  // Main Strategy 1 - Orders' limits.
+  ea.Set(STRAT_PARAM_OCL, EA_Strategy1_OrderCloseLoss);
+  ea.Set(STRAT_PARAM_OCP, EA_Strategy1_OrderCloseProfit);
+  ea.Set(STRAT_PARAM_OCT, EA_Strategy1_OrderCloseTime);
+#else
   // Initialize strategies per timeframe.
   _res &= METHOD(EA_Strategy_Filter, 0) ? ea.StrategyAddToTfs(Strategy_M1, 1 << M1) : true;
   _res &= METHOD(EA_Strategy_Filter, 1) ? ea.StrategyAddToTfs(Strategy_M5, 1 << M5) : true;
@@ -234,6 +247,7 @@ bool InitStrategies() {
   _res &= METHOD(EA_Strategy_Filter, 8) ? ea.StrategyAddToTfs(Strategy_H6, 1 << H6) : true;
   _res &= METHOD(EA_Strategy_Filter, 9) ? ea.StrategyAddToTfs(Strategy_H8, 1 << H8) : true;
   _res &= METHOD(EA_Strategy_Filter, 10) ? ea.StrategyAddToTfs(Strategy_H12, 1 << H12) : true;
+#endif
   // Update lot size.
   ea.Set(STRAT_PARAM_LS, EA_LotSize);
   // Override max spread values.

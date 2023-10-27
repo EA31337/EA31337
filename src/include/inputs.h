@@ -25,6 +25,9 @@
 // Include input params based on the EA mode.
 input string __EA_Params__ =
     ">> " + ea_name + " v" + ea_version + " build " + (string)(int)__DATETIME__ + " <<";  // >>> EA31337 <<<
+#ifdef __elite__
+#include "common/elite/inputs.mqh"
+#endif
 #ifdef __advanced__
 #ifdef __rider__
 #include "common/rider/inputs.mqh"
@@ -32,7 +35,9 @@ input string __EA_Params__ =
 #include "common/advanced/inputs.mqh"
 #endif
 #else
+#ifndef __elite__
 #include "common/lite/inputs.mqh"
+#endif
 #endif
 
 #ifdef __MQL4__

@@ -22,7 +22,9 @@
 #include "advanced/defines.h"
 #endif
 #else
+#ifndef __elite__
 #include "lite/defines.h"
+#endif
 #endif
 #ifdef __elite__
 #include "elite/defines.h"
