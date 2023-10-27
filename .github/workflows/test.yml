@@ -43,9 +43,9 @@ jobs:
     strategy:
       matrix:
         mode:
-          - Lite
           - Advanced
           - Elite
+          - Lite
           - Rider
         mode2:
           - __resource__
@@ -132,6 +132,7 @@ jobs:
         mode:
           - Lite
           - Advanced
+          - Elite
           - Rider
         month: [1, 2]
         year: [2020]
