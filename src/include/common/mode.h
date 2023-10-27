@@ -3,11 +3,12 @@
 //|                                       https://ea31337.github.io/ |
 //+------------------------------------------------------------------+
 
-// Main modes (Lite, Advanced or Rider).
+// Main modes (Lite, Advanced, Rider or Elite).
 // Uncomment the line to activate the version.
-// For Lite (default), leave both modes commented out.
-//#define __advanced__  // Enables advanced configuration.
-//#define __rider__  // Activates rider strategy.
+// For Lite (default), leave below modes commented out.
+//#define __advanced__  // Enables configuration for Advanced.
+//#define __rider__  // Enables configuration for Rider.
+//#define __elite__  // Enables configuration for Elite.
 
 // Enabled modes by default.
 //#define __config__  // Loads params from the config files.
@@ -22,5 +23,5 @@
 //#define __profiler__     // Activates profiler.
 //#define __property__     // Enables program properties.
 //#define __release__      // Enables release settings.
-//#define __resource__     // Enables resources.
+#define __resource__     // Enables resources.
 //#define __trace__        // Enables tracing.

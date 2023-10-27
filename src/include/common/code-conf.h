@@ -7,6 +7,11 @@
 //| Predefined code configurations.
 //+------------------------------------------------------------------+
 
+// Elite mode implies Advanced.
+#ifdef __elite__
+#define __input2__    // Enable param inputs level 2.
+#endif
+
 // Rider mode implies Advanced.
 #ifdef __rider__
 #define __advanced__

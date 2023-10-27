@@ -24,6 +24,9 @@
 #else
 #include "lite/defines.h"
 #endif
+#ifdef __elite__
+#include "elite/defines.h"
+#endif
 
 // Sets EA's log level based on the type of run.
 #ifdef __backtest__
