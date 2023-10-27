@@ -408,8 +408,11 @@ class EA31337 : public EA {
         return StrategyAdd<Stg_Meta_Multi>(_tfs, _magic_no, _stg);
       case STRAT_META_MULTI_CURRENCY:  // (Meta) Multi Currency
         return StrategyAdd<Stg_Meta_Multi_Currency>(_tfs, _magic_no, _stg);
+#ifdef __MQL5__
+      // Supported for MQL5 only.
       case STRAT_META_NEWS:  // (Meta) News
         return StrategyAdd<Stg_Meta_News>(_tfs, _magic_no, _stg);
+#endif
       case STRAT_META_ORDER_LIMIT:  // (Meta) Order Limit
         return StrategyAdd<Stg_Meta_Order_Limit>(_tfs, _magic_no, _stg);
       case STRAT_META_OSCILLATOR_FILTER:  // (Meta) Oscillator Filter
