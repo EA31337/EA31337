@@ -55,9 +55,9 @@
 
 // Indicator defines.
 #define INDI_ATR_MA_TREND_PATH "indicators\\Other\\Misc\\ATR_MA_Trend"
-#define INDI_EWO_OSC_PATH "indicators\\Other\\Oscillators\\Elliott_Wave_Oscillator2"
+#define INDI_EWO_OSC_PATH "indicators\\Other\\Oscillators\\Multi\\Elliott_Wave_Oscillator2"
 #define INDI_SAWA_PATH "indicators\\Other\\Price\\Range\\SAWA"
 #define INDI_SUPERTREND_PATH "indicators\\Other\\Price\\SuperTrend"
-#define INDI_SVEBB_PATH "indicators\\Other\\Oscillators\\SVE_Bollinger_Bands"
+#define INDI_SVEBB_PATH "indicators\\Other\\Oscillators\\Multi\\SVE_Bollinger_Bands"
 #define INDI_TMA_CG_PATH "indicators\\Other\\Price\\Range\\TMA+CG_mladen_NRP"
 #define INDI_TMA_TRUE_PATH "indicators\\Other\\Price\\Range\\TMA_True"
