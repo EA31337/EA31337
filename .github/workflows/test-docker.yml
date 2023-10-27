@@ -54,6 +54,7 @@ jobs:
         mode:
           - Lite
           - Advanced
+          - Elite
           - Rider
 
     steps:
@@ -85,6 +86,10 @@ jobs:
       - name: Enables Advanced mode
         if: matrix.mode == 'Advanced'
         run: echo '#define __advanced__' >> include/common/mode.h
+
+      - name: Enables Elite mode
+        if: matrix.mode == 'Elite'
+        run: echo '#define __elite__' >> include/common/mode.h
 
       - name: Enables Rider mode
         if: matrix.mode == 'Rider'
