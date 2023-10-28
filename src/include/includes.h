@@ -29,7 +29,12 @@
 #include "common/struct.h"
 
 // Strategy enums.
+#include "strategies-meta/enum.h"
 #include "strategies/enum.h"
+
+// Strategy managers.
+#include "common/manager-meta.h"  // Overrides the default one.
+#include "strategies/manager.h"
 
 // Main user inputs.
 #include "inputs.h"
