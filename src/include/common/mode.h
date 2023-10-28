@@ -10,8 +10,8 @@
 // #define __rider__  // Enables configuration for Rider.
 // #define __elite__  // Enables configuration for Elite.
 
-/* Enabled modes by default. */
-// #define __config__  // Loads params from the config files.
+/* Enables support for meta strategies. */
+#define __strategies_meta__  // Enables local meta strategies includes.
 
 /* Optional modes (Uncomment selected lines to enable specific mode). */
 // #define __backtest__     // For backtest only.

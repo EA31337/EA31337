@@ -153,4 +153,8 @@ enum ENUM_STRATEGY {
   STRAT_META_WEEKDAY,            // (Meta) Weekday
 };
 #define ENUM_STRATEGY_DEFINED
+enum ENUM_STRATEGY_META {
+  STRAT_META_NONE = 0,   // (None)
+};
+#define ENUM_STRATEGY_META_DEFINED
 
