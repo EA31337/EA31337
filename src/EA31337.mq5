@@ -95,7 +95,7 @@ int OnInit() {
     Alert(_err_msg_tna);
     _initiated &= false;
   }
-  if (!_initiated || GetLastError() > 0) {
+  if (!_initiated || _LastError > 0) {
     ea.GetLogger().Error("Error during initializing!", __FUNCTION_LINE__, Terminal::GetLastErrorText());
   }
   if (EA_DisplayDetailsOnChart) {
