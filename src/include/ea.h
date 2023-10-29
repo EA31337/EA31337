@@ -242,7 +242,7 @@ class EA31337 : public EA {
    */
   bool StrategyAddToTf(ENUM_STRATEGY _sid, ENUM_TIMEFRAMES _tf) {
     bool _result = true;
-    unsigned int _magic_no = EA_MagicNumber + _sid * FINAL_ENUM_TIMEFRAMES_INDEX;
+    unsigned int _magic_no = EA_MagicNumber + _sid * FINAL_ENUM_TIMEFRAMES_INDEX + ChartTf::TfToIndex(_tf);
     Ref<Strategy> _strat = StrategiesManager::StrategyInitByEnum(_sid, _tf);
 #ifdef __strategies_meta__
     if (!_strat.IsSet()) {
@@ -265,6 +265,31 @@ class EA31337 : public EA {
       SetUserError(ERR_INVALID_PARAMETER);
     }
     _result &= _strat.IsSet() || _sid == STRAT_NONE;
+    return _result;
+  }
+
+  /**
+   * Adds strategy to multiple timeframes.
+   *
+   * @param
+   *   _sid - strategy type
+   *   _tfs - timeframes to add strategy (using bitwise operation).
+   *
+   * Note:
+   *   Final magic number is going to be increased by timeframe index value.
+   *
+   * @see: ENUM_TIMEFRAMES_INDEX
+   *
+   * @return
+   *   Returns true if all strategies has been initialized correctly, otherwise false.
+   */
+  bool StrategyAddToTfs(ENUM_STRATEGY _sid, unsigned int _tfs) {
+    bool _result = true;
+    for (int _tfi = 0; _tfi < sizeof(int) * 8; ++_tfi) {
+      if ((_tfs & (1 << _tfi)) != 0) {
+        _result &= StrategyAddToTf(_sid, ChartTf::IndexToTf((ENUM_TIMEFRAMES_INDEX)_tfi));
+      }
+    }
     return _result;
   }
 

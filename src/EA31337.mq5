@@ -224,7 +224,7 @@ bool InitStrategies() {
   ResetLastError();
 #ifdef __elite__
   // Initialize Elite strategy.
-  _res &= ea.StrategyAddToTf(EA_Strategy1_Main, EA_Strategy1_Tf);
+  _res &= ea.StrategyAddToTfs(EA_Strategy1_Main, EA_Strategy1_Tf);
   // Main Strategy 1 - Signal filters.
   ea.Set(STRAT_PARAM_SOFM, EA_Strategy1_SignalOpenFilterMethod);
   ea.Set(STRAT_PARAM_SCFM, EA_Strategy1_SignalCloseFilterMethod);
