@@ -224,7 +224,7 @@ bool InitStrategies() {
   ResetLastError();
 #ifdef __elite__
   // Initialize Elite strategy.
-  _res &= ea.StrategyAddToTfs(EA_Strategy1_Main, EA_Strategy1_Tf);
+  _res &= ea.StrategyAddToTf(EA_Strategy1_Main, EA_Strategy1_Tf);
   // Main Strategy 1 - Signal filters.
   ea.Set(STRAT_PARAM_SOFM, EA_Strategy1_SignalOpenFilterMethod);
   ea.Set(STRAT_PARAM_SCFM, EA_Strategy1_SignalCloseFilterMethod);
@@ -236,17 +236,17 @@ bool InitStrategies() {
   ea.Set(STRAT_PARAM_OCT, EA_Strategy1_OrderCloseTime);
 #else
   // Initialize strategies per timeframe.
-  _res &= METHOD(EA_Strategy_Filter, 0) ? ea.StrategyAddToTfs(Strategy_M1, 1 << M1) : true;
-  _res &= METHOD(EA_Strategy_Filter, 1) ? ea.StrategyAddToTfs(Strategy_M5, 1 << M5) : true;
-  _res &= METHOD(EA_Strategy_Filter, 2) ? ea.StrategyAddToTfs(Strategy_M15, 1 << M15) : true;
-  _res &= METHOD(EA_Strategy_Filter, 3) ? ea.StrategyAddToTfs(Strategy_M30, 1 << M30) : true;
-  _res &= METHOD(EA_Strategy_Filter, 4) ? ea.StrategyAddToTfs(Strategy_H1, 1 << H1) : true;
-  _res &= METHOD(EA_Strategy_Filter, 5) ? ea.StrategyAddToTfs(Strategy_H2, 1 << H2) : true;
-  _res &= METHOD(EA_Strategy_Filter, 6) ? ea.StrategyAddToTfs(Strategy_H3, 1 << H3) : true;
-  _res &= METHOD(EA_Strategy_Filter, 7) ? ea.StrategyAddToTfs(Strategy_H4, 1 << H4) : true;
-  _res &= METHOD(EA_Strategy_Filter, 8) ? ea.StrategyAddToTfs(Strategy_H6, 1 << H6) : true;
-  _res &= METHOD(EA_Strategy_Filter, 9) ? ea.StrategyAddToTfs(Strategy_H8, 1 << H8) : true;
-  _res &= METHOD(EA_Strategy_Filter, 10) ? ea.StrategyAddToTfs(Strategy_H12, 1 << H12) : true;
+  _res &= METHOD(EA_Strategy_Filter, 0) ? ea.StrategyAddToTf(Strategy_M1, (ENUM_TIMEFRAMES)(1 << M1)) : true;
+  _res &= METHOD(EA_Strategy_Filter, 1) ? ea.StrategyAddToTf(Strategy_M5, (ENUM_TIMEFRAMES)(1 << M5)) : true;
+  _res &= METHOD(EA_Strategy_Filter, 2) ? ea.StrategyAddToTf(Strategy_M15, (ENUM_TIMEFRAMES)(1 << M15)) : true;
+  _res &= METHOD(EA_Strategy_Filter, 3) ? ea.StrategyAddToTf(Strategy_M30, (ENUM_TIMEFRAMES)(1 << M30)) : true;
+  _res &= METHOD(EA_Strategy_Filter, 4) ? ea.StrategyAddToTf(Strategy_H1, (ENUM_TIMEFRAMES)(1 << H1)) : true;
+  _res &= METHOD(EA_Strategy_Filter, 5) ? ea.StrategyAddToTf(Strategy_H2, (ENUM_TIMEFRAMES)(1 << H2)) : true;
+  _res &= METHOD(EA_Strategy_Filter, 6) ? ea.StrategyAddToTf(Strategy_H3, (ENUM_TIMEFRAMES)(1 << H3)) : true;
+  _res &= METHOD(EA_Strategy_Filter, 7) ? ea.StrategyAddToTf(Strategy_H4, (ENUM_TIMEFRAMES)(1 << H4)) : true;
+  _res &= METHOD(EA_Strategy_Filter, 8) ? ea.StrategyAddToTf(Strategy_H6, (ENUM_TIMEFRAMES)(1 << H6)) : true;
+  _res &= METHOD(EA_Strategy_Filter, 9) ? ea.StrategyAddToTf(Strategy_H8, (ENUM_TIMEFRAMES)(1 << H8)) : true;
+  _res &= METHOD(EA_Strategy_Filter, 10) ? ea.StrategyAddToTf(Strategy_H12, (ENUM_TIMEFRAMES)(1 << H12)) : true;
 #endif
   // Update lot size.
   ea.Set(STRAT_PARAM_LS, EA_LotSize);

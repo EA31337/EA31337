@@ -80,8 +80,11 @@ class StrategiesMetaManager {
         return StrategyInit<Stg_Meta_Multi>(_tf);
       case STRAT_META_MULTI_CURRENCY:  // (Meta) Multi Currency
         return StrategyInit<Stg_Meta_Multi_Currency>(_tf);
+#ifdef __MQL5__
+      // Supported for MQL5 only.
       case STRAT_META_NEWS:  // (Meta) News
         return StrategyInit<Stg_Meta_News>(_tf);
+#endif
       case STRAT_META_ORDER_LIMIT:  // (Meta) Order Limit
         return StrategyInit<Stg_Meta_Order_Limit>(_tf);
       case STRAT_META_OSCILLATOR_FILTER:  // (Meta) Oscillator Filter

@@ -240,220 +240,32 @@ class EA31337 : public EA {
   /**
    * Adds strategy to the given timeframe.
    */
-  bool StrategyAddToTfs(ENUM_STRATEGY _stg, int _tfs) {
-    unsigned int _magic_no = EA_MagicNumber + _stg * FINAL_ENUM_TIMEFRAMES_INDEX;
-    switch (_stg) {
-      case STRAT_AC:
-        return StrategyAdd<Stg_AC>(_tfs, _magic_no, _stg);
-      case STRAT_AD:
-        return StrategyAdd<Stg_AD>(_tfs, _magic_no, _stg);
-      case STRAT_ADX:
-        return StrategyAdd<Stg_ADX>(_tfs, _magic_no, _stg);
-      case STRAT_AMA:
-        return StrategyAdd<Stg_AMA>(_tfs, _magic_no, _stg);
-      case STRAT_ARROWS:
-        return StrategyAdd<Stg_Arrows>(_tfs, _magic_no, _stg);
-      case STRAT_ASI:
-        return StrategyAdd<Stg_ASI>(_tfs, _magic_no, _stg);
-      case STRAT_ATR:
-        return StrategyAdd<Stg_ATR>(_tfs, _magic_no, _stg);
-      case STRAT_ALLIGATOR:
-        return StrategyAdd<Stg_Alligator>(_tfs, _magic_no, _stg);
-      case STRAT_AWESOME:
-        return StrategyAdd<Stg_Awesome>(_tfs, _magic_no, _stg);
-#ifdef __MQL5__
-        // case STRAT_ATR_MA_TREND:
-        // return StrategyAdd<Stg_ATR_MA_Trend>(_tfs, _magic_no, _stg);
-#endif
-      case STRAT_BWMFI:
-        return StrategyAdd<Stg_BWMFI>(_tfs, _magic_no, _stg);
-      case STRAT_BANDS:
-        return StrategyAdd<Stg_Bands>(_tfs, _magic_no, _stg);
-      case STRAT_BEARS_POWER:
-        return StrategyAdd<Stg_BearsPower>(_tfs, _magic_no, _stg);
-      case STRAT_BULLS_POWER:
-        return StrategyAdd<Stg_BullsPower>(_tfs, _magic_no, _stg);
-      case STRAT_CCI:
-        return StrategyAdd<Stg_CCI>(_tfs, _magic_no, _stg);
-      case STRAT_CHAIKIN:
-        return StrategyAdd<Stg_Chaikin>(_tfs, _magic_no, _stg);
-      case STRAT_DEMA:
-        return StrategyAdd<Stg_DEMA>(_tfs, _magic_no, _stg);
-      case STRAT_DEMARKER:
-        return StrategyAdd<Stg_DeMarker>(_tfs, _magic_no, _stg);
-      case STRAT_DPO:
-        return StrategyAdd<Stg_DPO>(_tfs, _magic_no, _stg);
-      case STRAT_ENVELOPES:
-        return StrategyAdd<Stg_Envelopes>(_tfs, _magic_no, _stg);
-      case STRAT_EWO:
-        return StrategyAdd<Stg_ElliottWave>(_tfs, _magic_no, _stg);
-      case STRAT_FORCE:
-        return StrategyAdd<Stg_Force>(_tfs, _magic_no, _stg);
-      case STRAT_FRACTALS:
-        return StrategyAdd<Stg_Fractals>(_tfs, _magic_no, _stg);
-      case STRAT_GATOR:
-        return StrategyAdd<Stg_Gator>(_tfs, _magic_no, _stg);
-      case STRAT_HEIKEN_ASHI:
-        return StrategyAdd<Stg_HeikenAshi>(_tfs, _magic_no, _stg);
-      case STRAT_ICHIMOKU:
-        return StrategyAdd<Stg_Ichimoku>(_tfs, _magic_no, _stg);
-      case STRAT_INDICATOR:
-        return StrategyAdd<Stg_Indicator>(_tfs, _magic_no, _stg);
-      case STRAT_MA:
-        return StrategyAdd<Stg_MA>(_tfs, _magic_no, _stg);
-      case STRAT_MA_CROSS_PIVOT:
-        return StrategyAdd<Stg_MA_Cross_Pivot>(_tfs, _magic_no, _stg);
-      case STRAT_MA_CROSS_SHIFT:
-        return StrategyAdd<Stg_MA_Cross_Shift>(_tfs, _magic_no, _stg);
-      case STRAT_MA_CROSS_SUP_RES:
-        return StrategyAdd<Stg_MA_Cross_Sup_Res>(_tfs, _magic_no, _stg);
-      case STRAT_MA_CROSS_TIMEFRAME:
-        return StrategyAdd<Stg_MA_Cross_Timeframe>(_tfs, _magic_no, _stg);
-      case STRAT_MA_TREND:
-        return StrategyAdd<Stg_MA_Trend>(_tfs, _magic_no, _stg);
-      case STRAT_MACD:
-        return StrategyAdd<Stg_MACD>(_tfs, _magic_no, _stg);
-      case STRAT_MFI:
-        return StrategyAdd<Stg_MFI>(_tfs, _magic_no, _stg);
-      case STRAT_MOMENTUM:
-        return StrategyAdd<Stg_Momentum>(_tfs, _magic_no, _stg);
-      case STRAT_OBV:
-        return StrategyAdd<Stg_OBV>(_tfs, _magic_no, _stg);
-      case STRAT_OSCILLATOR:
-        return StrategyAdd<Stg_Oscillator>(_tfs, _magic_no, _stg);
-      case STRAT_OSCILLATOR_DIVERGENCE:
-        return StrategyAdd<Stg_Oscillator_Divergence>(_tfs, _magic_no, _stg);
-      case STRAT_OSCILLATOR_MULTI:
-        return StrategyAdd<Stg_Oscillator_Multi>(_tfs, _magic_no, _stg);
-      case STRAT_OSCILLATOR_CROSS:
-        return StrategyAdd<Stg_Oscillator_Cross>(_tfs, _magic_no, _stg);
-      case STRAT_OSCILLATOR_CROSS_SHIFT:
-        return StrategyAdd<Stg_Oscillator_Cross_Shift>(_tfs, _magic_no, _stg);
-      case STRAT_OSCILLATOR_CROSS_TIMEFRAME:
-        return StrategyAdd<Stg_Oscillator_Cross_Timeframe>(_tfs, _magic_no, _stg);
-      case STRAT_OSCILLATOR_CROSS_ZERO:
-        return StrategyAdd<Stg_Oscillator_Cross_Zero>(_tfs, _magic_no, _stg);
-      case STRAT_OSCILLATOR_OVERLAY:
-        return StrategyAdd<Stg_Oscillator_Overlay>(_tfs, _magic_no, _stg);
-      case STRAT_OSCILLATOR_RANGE:
-        return StrategyAdd<Stg_Oscillator_Range>(_tfs, _magic_no, _stg);
-      case STRAT_OSCILLATOR_TREND:
-        return StrategyAdd<Stg_Oscillator_Trend>(_tfs, _magic_no, _stg);
-      case STRAT_OSMA:
-        return StrategyAdd<Stg_OsMA>(_tfs, _magic_no, _stg);
-      case STRAT_PATTERN:
-        return StrategyAdd<Stg_Pattern>(_tfs, _magic_no, _stg);
-      case STRAT_PINBAR:
-        return StrategyAdd<Stg_Pinbar>(_tfs, _magic_no, _stg);
-      case STRAT_PIVOT:
-        return StrategyAdd<Stg_Pivot>(_tfs, _magic_no, _stg);
-      case STRAT_RSI:
-        return StrategyAdd<Stg_RSI>(_tfs, _magic_no, _stg);
-      case STRAT_RVI:
-        return StrategyAdd<Stg_RVI>(_tfs, _magic_no, _stg);
-      case STRAT_SAR:
-        return StrategyAdd<Stg_SAR>(_tfs, _magic_no, _stg);
-      // case STRAT_SAWA:
-      // return StrategyAdd<Stg_SAWA>(_tfs, _magic_no, _stg);
-      case STRAT_STDDEV:
-        return StrategyAdd<Stg_StdDev>(_tfs, _magic_no, _stg);
-      case STRAT_STOCHASTIC:
-        return StrategyAdd<Stg_Stochastic>(_tfs, _magic_no, _stg);
-#ifdef __MQL5__
-        // case STRAT_SUPERTREND:
-        // return StrategyAdd<Stg_SuperTrend>(_tfs, _magic_no, _stg);
-#endif
-      case STRAT_SVE_BB:
-        return StrategyAdd<Stg_SVE_Bollinger_Bands>(_tfs, _magic_no, _stg);
-      case STRAT_TMAT_SVEBB:
-        return StrategyAdd<Stg_TMAT_SVEBB>(_tfs, _magic_no, _stg);
-      // case STRAT_TMA_CG:
-      // return StrategyAdd<Stg_TMA_CG>(_tfs, _magic_no, _stg);
-      case STRAT_TMA_TRUE:
-        return StrategyAdd<Stg_TMA_True>(_tfs, _magic_no, _stg);
-      case STRAT_WPR:
-        return StrategyAdd<Stg_WPR>(_tfs, _magic_no, _stg);
-      case STRAT_ZIGZAG:
-        return StrategyAdd<Stg_ZigZag>(_tfs, _magic_no, _stg);
-      case STRAT_NONE:
-        break;
-      // Meta strategies.
-      case STRAT_META_BEARS_BULLS:  // (Meta) Bears & Bulls
-        return StrategyAdd<Stg_Meta_Bears_Bulls>(_tfs, _magic_no, _stg);
-      case STRAT_META_DOUBLE:  // (Meta) Double
-        return StrategyAdd<Stg_Meta_Double>(_tfs, _magic_no, _stg);
-      case STRAT_META_CONDITIONS:  // (Meta) Conditions
-        return StrategyAdd<Stg_Meta_Conditions>(_tfs, _magic_no, _stg);
-      case STRAT_META_ENHANCE:  // (Meta) Enhance
-        return StrategyAdd<Stg_Meta_Enhance>(_tfs, _magic_no, _stg);
-      case STRAT_META_EQUITY:  // (Meta) Equity
-        return StrategyAdd<Stg_Meta_Equity>(_tfs, _magic_no, _stg);
-      case STRAT_META_FORMATION:  // (Meta) Formation
-        return StrategyAdd<Stg_Meta_Formation>(_tfs, _magic_no, _stg);
-      case STRAT_META_INTERVAL:  // (Meta) Interval
-        return StrategyAdd<Stg_Meta_Interval>(_tfs, _magic_no, _stg);
-      case STRAT_META_HEDGE:  // (Meta) Hedge
-        return StrategyAdd<Stg_Meta_Hedge>(_tfs, _magic_no, _stg);
-      case STRAT_META_LIMIT:  // (Meta) Limit
-        return StrategyAdd<Stg_Meta_Limit>(_tfs, _magic_no, _stg);
-      case STRAT_META_MA_CROSS:  // (Meta) MA Cross
-        return StrategyAdd<Stg_Meta_MA_Cross>(_tfs, _magic_no, _stg);
-      case STRAT_META_MARGIN:  // (Meta) Margin
-        return StrategyAdd<Stg_Meta_Margin>(_tfs, _magic_no, _stg);
-      case STRAT_META_MARTINGALE:  // (Meta) Martingale
-        return StrategyAdd<Stg_Meta_Martingale>(_tfs, _magic_no, _stg);
-      case STRAT_META_MIRROR:  // (Meta) Mirror
-        return StrategyAdd<Stg_Meta_Mirror>(_tfs, _magic_no, _stg);
-      case STRAT_META_MULTI:  // (Meta) Multi
-        return StrategyAdd<Stg_Meta_Multi>(_tfs, _magic_no, _stg);
-      case STRAT_META_MULTI_CURRENCY:  // (Meta) Multi Currency
-        return StrategyAdd<Stg_Meta_Multi_Currency>(_tfs, _magic_no, _stg);
-#ifdef __MQL5__
-      // Supported for MQL5 only.
-      case STRAT_META_NEWS:  // (Meta) News
-        return StrategyAdd<Stg_Meta_News>(_tfs, _magic_no, _stg);
-#endif
-      case STRAT_META_ORDER_LIMIT:  // (Meta) Order Limit
-        return StrategyAdd<Stg_Meta_Order_Limit>(_tfs, _magic_no, _stg);
-      case STRAT_META_OSCILLATOR_FILTER:  // (Meta) Oscillator Filter
-        return StrategyAdd<Stg_Meta_Oscillator_Filter>(_tfs, _magic_no, _stg);
-      case STRAT_META_OSCILLATOR_SWITCH:  // (Meta) Oscillator Switch
-        return StrategyAdd<Stg_Meta_Oscillator_Switch>(_tfs, _magic_no, _stg);
-      case STRAT_META_PATTERN:  // (Meta) Pattern
-        return StrategyAdd<Stg_Meta_Pattern>(_tfs, _magic_no, _stg);
-      case STRAT_META_PIVOT:  // (Meta) Pivot
-        return StrategyAdd<Stg_Meta_Pivot>(_tfs, _magic_no, _stg);
-      case STRAT_META_PROFIT:  // (Meta) Profit
-        return StrategyAdd<Stg_Meta_Profit>(_tfs, _magic_no, _stg);
-      case STRAT_META_RESISTANCE:  // (Meta) Resistance
-        return StrategyAdd<Stg_Meta_Resistance>(_tfs, _magic_no, _stg);
-      case STRAT_META_REVERSAL:  // (Meta) Reversal
-        return StrategyAdd<Stg_Meta_Reversal>(_tfs, _magic_no, _stg);
-      case STRAT_META_RISK:  // (Meta) Risk
-        return StrategyAdd<Stg_Meta_Risk>(_tfs, _magic_no, _stg);
-      case STRAT_META_RSI:  // (Meta) RSI
-        return StrategyAdd<Stg_Meta_RSI>(_tfs, _magic_no, _stg);
-      case STRAT_META_SCALPER:  // (Meta) Scalper
-        return StrategyAdd<Stg_Meta_Scalper>(_tfs, _magic_no, _stg);
-      case STRAT_META_SIGNAL_SWITCH:  // (Meta) Signal Switch
-        return StrategyAdd<Stg_Meta_Signal_Switch>(_tfs, _magic_no, _stg);
-      case STRAT_META_SPREAD:  // (Meta) Spread
-        return StrategyAdd<Stg_Meta_Spread>(_tfs, _magic_no, _stg);
-      case STRAT_META_TIMEZONE:  // (Meta) Timezone
-        return StrategyAdd<Stg_Meta_Timezone>(_tfs, _magic_no, _stg);
-      case STRAT_META_TREND:  // (Meta) Trend
-        return StrategyAdd<Stg_Meta_Trend>(_tfs, _magic_no, _stg);
-      case STRAT_META_TRIO:  // (Meta) Trio
-        return StrategyAdd<Stg_Meta_Trio>(_tfs, _magic_no, _stg);
-      case STRAT_META_VOLATILITY:  // (Meta) Volatility
-        return StrategyAdd<Stg_Meta_Volatility>(_tfs, _magic_no, _stg);
-      case STRAT_META_WEEKDAY:  // (Meta) Weekday
-        return StrategyAdd<Stg_Meta_Weekday>(_tfs, _magic_no, _stg);
-      default:
-        SetUserError(ERR_INVALID_PARAMETER);
-        break;
+  bool StrategyAddToTf(ENUM_STRATEGY _sid, ENUM_TIMEFRAMES _tf) {
+    bool _result = true;
+    unsigned int _magic_no = EA_MagicNumber + _sid * FINAL_ENUM_TIMEFRAMES_INDEX;
+    Ref<Strategy> _strat = StrategiesManager::StrategyInitByEnum(_sid, _tf);
+#ifdef __strategies_meta__
+    if (!_strat.IsSet()) {
+      _strat = StrategiesMetaManager::StrategyInitByEnum((ENUM_STRATEGY_META)_sid, _tf);
     }
-    return _stg == STRAT_NONE;
+#endif
+    if (_strat.IsSet()) {
+      _strat.Ptr().Set<long>(STRAT_PARAM_ID, _magic_no);
+      _strat.Ptr().Set<ENUM_TIMEFRAMES>(STRAT_PARAM_TF, _tf);
+      _strat.Ptr().Set<int>(STRAT_PARAM_TYPE, _sid);
+      _strat.Ptr().OnInit();
+      if (!strats.KeyExists(_magic_no)) {
+        _result &= strats.Set(_magic_no, _strat);
+      } else {
+        logger.Error("Strategy adding conflict!", __FUNCTION_LINE__);
+        DebugBreak();
+      }
+      OnStrategyAdd(_strat.Ptr());
+    } else if (_sid != STRAT_NONE) {
+      SetUserError(ERR_INVALID_PARAMETER);
+    }
+    _result &= _strat.IsSet() || _sid == STRAT_NONE;
+    return _result;
   }
 
   /**
@@ -466,7 +278,7 @@ class EA31337 : public EA {
     }
     Strategy *_strat_stops = GetStrategyViaProp2<int, int>(STRAT_PARAM_TYPE, _enum_stg_stops, STRAT_PARAM_TF, _tf);
     if (!_strat_stops) {
-      _result &= StrategyAddToTfs(_enum_stg_stops, 1 << ChartTf::TfToIndex(_tf));
+      _result &= StrategyAddToTf(_enum_stg_stops, (ENUM_TIMEFRAMES)(1 << ChartTf::TfToIndex(_tf)));
       _strat_stops = GetStrategyViaProp2<int, int>(STRAT_PARAM_TYPE, _enum_stg_stops, STRAT_PARAM_TF, _tf);
       if (_strat_stops) {
         _strat_stops.Enabled(false);
