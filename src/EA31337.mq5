@@ -258,7 +258,7 @@ bool InitStrategies() {
   ea.Set(STRAT_PARAM_SCFM, EA_SignalCloseFilterMethod);
   ea.Set(STRAT_PARAM_SOFT, EA_SignalOpenFilterTime);
   ea.Set(STRAT_PARAM_TFM, EA_TickFilterMethod);
-  ea.Set(STRUCT_ENUM(EAParams, EA_PARAM_PROP_SIGNAL_FILTER), EA_SignalOpenStrategyFilter);
+  // ea.Set(STRUCT_ENUM(EAParams, EA_PARAM_PROP_SIGNAL_FILTER), EA_SignalOpenStrategyFilter); // @fixme
 #ifdef __rider__
   // Disables strategy defined order closures for Rider.
   ea.Set(STRAT_PARAM_OCL, 0);
