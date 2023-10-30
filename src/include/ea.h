@@ -245,7 +245,7 @@ class EA31337 : public EA {
     unsigned int _magic_no = EA_MagicNumber + _sid * FINAL_ENUM_TIMEFRAMES_INDEX + ChartTf::TfToIndex(_tf);
     Ref<Strategy> _strat = StrategiesManager::StrategyInitByEnum(_sid, _tf);
 #ifdef __strategies_meta__
-    if (!_strat.IsSet()) {
+    if (_sid != STRAT_NONE && !_strat.IsSet()) {
       _strat = StrategiesMetaManager::StrategyInitByEnum((ENUM_STRATEGY_META)_sid, _tf);
     }
 #endif
@@ -298,7 +298,7 @@ class EA31337 : public EA {
    */
   bool StrategyAddStops(Strategy *_strat = NULL, ENUM_STRATEGY _enum_stg_stops = STRAT_NONE, ENUM_TIMEFRAMES _tf = 0) {
     bool _result = true;
-    if (_enum_stg_stops == STRAT_NONE) {
+    if (_enum_stg_stops == STRAT_NONE || _strat == NULL) {
       return _result;
     }
     Strategy *_strat_stops = GetStrategyViaProp2<int, int>(STRAT_PARAM_TYPE, _enum_stg_stops, STRAT_PARAM_TF, _tf);
