@@ -33,7 +33,7 @@ input static string __Strategies_Active__ = "-- Main Strategy 1 - Main params --
 input group "Main Strategy 1 - Main params"
 #endif
 input ENUM_STRATEGY EA_Strategy1_Main = STRAT_META_MA_CROSS;                  // Strategy 1
-input int EA_Strategy1_Tf = M15B + M30B + H1B + H2B + H3B + H4B + H6B + H8B;  // Timeframe filter (0-65536)
+input int EA_Strategy1_Tfs = M15B + M30B + H1B + H2B + H3B + H4B + H6B + H8B;  // Timeframe filter (0-65536)
 
 #ifdef __MQL4__
 input string __Signal_Filters__ = "-- Main Strategy 1 - Signal filters --";  // >>> SIGNAL FILTERS <<<
