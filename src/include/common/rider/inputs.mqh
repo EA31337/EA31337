@@ -36,7 +36,7 @@ input int EA_Strategy_Filter = 2047;                 // S-Filter(0=n/a,All=2047,
 input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;        // Strategy on M1 (filter=1)
 input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;        // Strategy on M5 (filter=2)
 input ENUM_STRATEGY Strategy_M15 = STRAT_NONE;       // Strategy on M15 (filter=4)
-input ENUM_STRATEGY Strategy_M30 = STRAT_NONE;       // Strategy on M30 (filter=8)
+input ENUM_STRATEGY Strategy_M30 = STRAT_ZIGZAG;     // Strategy on M30 (filter=8)
 input ENUM_STRATEGY Strategy_H1 = STRAT_RSI;         // Strategy on H1 (filter=16)
 input ENUM_STRATEGY Strategy_H2 = STRAT_OSCILLATOR;  // Strategy on H2 (filter=32)
 input ENUM_STRATEGY Strategy_H3 = STRAT_NONE;        // Strategy on H3 (filter=64)
