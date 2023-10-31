@@ -40,10 +40,10 @@ input ENUM_STRATEGY Strategy_M30 = STRAT_ZIGZAG;     // Strategy on M30 (filter=
 input ENUM_STRATEGY Strategy_H1 = STRAT_RSI;         // Strategy on H1 (filter=16)
 input ENUM_STRATEGY Strategy_H2 = STRAT_OSCILLATOR;  // Strategy on H2 (filter=32)
 input ENUM_STRATEGY Strategy_H3 = STRAT_NONE;        // Strategy on H3 (filter=64)
-input ENUM_STRATEGY Strategy_H4 = STRAT_NONE;        // Strategy on H4 (filter=128)
-input ENUM_STRATEGY Strategy_H6 = STRAT_NONE;        // Strategy on H6 (filter=256)
-input ENUM_STRATEGY Strategy_H8 = STRAT_NONE;        // Strategy on H8 (filter=512)
-input ENUM_STRATEGY Strategy_H12 = STRAT_RVI;        // Strategy on H12 (filter=1024)
+input ENUM_STRATEGY Strategy_H4 = STRAT_MA_CROSS_SHIFT;  // Strategy on H4 (filter=128)
+input ENUM_STRATEGY Strategy_H6 = STRAT_NONE;            // Strategy on H6 (filter=256)
+input ENUM_STRATEGY Strategy_H8 = STRAT_NONE;            // Strategy on H8 (filter=512)
+input ENUM_STRATEGY Strategy_H12 = STRAT_RVI;            // Strategy on H12 (filter=1024)
 
 #ifdef __MQL4__
 input static string __Strategies_Stops__ = "-- Strategies' stops --";  // >>> STRATEGIES' STOPS <<<
