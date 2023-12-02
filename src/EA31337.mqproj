@@ -3040,6 +3040,61 @@
       "path":"include\\strategies-meta\\Meta_Weekday\\Stg_Meta_Weekday.mqh",
       "compile":false,
       "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\enum.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\common\\manager-meta.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\manager.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\MA_Cross_Candle\\Stg_MA_Cross_Candle.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Discrepancy\\Stg_Meta_Discrepancy.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_MA_Conditions\\Stg_Meta_MA_Conditions.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Odd_Period\\Stg_Meta_Odd_Period.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Oscillator_Conditions\\Stg_Meta_Oscillator_Conditions.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Price_Band\\Stg_Meta_Price_Band.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_SAR\\Stg_Meta_SAR.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Signal_Filter\\Stg_Meta_Signal_Filter.mqh",
+      "compile":false,
+      "relative_to_project":true
     }
   ],
 
@@ -3048,18 +3103,6 @@
     {
       "type":"indicator",
       "path":"indicators\\Other\\Misc\\ATR_MA_Trend.ex5",
-      "name":"",
-      "relative_to_project":true
-    },
-    {
-      "type":"indicator",
-      "path":"indicators\\Other\\Oscillators\\Elliott_Wave_Oscillator2.ex5",
-      "name":"",
-      "relative_to_project":true
-    },
-    {
-      "type":"indicator",
-      "path":"indicators\\Other\\Oscillators\\SVE_Bollinger_Bands.ex5",
       "name":"",
       "relative_to_project":true
     },
