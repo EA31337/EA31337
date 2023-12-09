@@ -151,6 +151,8 @@ enum ENUM_STRATEGY {
   STRAT_META_TRIO,               // (Meta) Trio
   STRAT_META_VOLATILITY,         // (Meta) Volatility
   STRAT_META_WEEKDAY,            // (Meta) Weekday
+  // New.
+  STRAT_META_DISCREPANCY,        // (Meta) Discrepancy
 };
 #define ENUM_STRATEGY_DEFINED
 enum ENUM_STRATEGY_META {

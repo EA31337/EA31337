@@ -52,6 +52,8 @@ class StrategiesMetaManager {
     switch (_sid) {
       case STRAT_META_BEARS_BULLS:  // (Meta) Bears & Bulls
         return StrategyInit<Stg_Meta_Bears_Bulls>(_tf);
+      case STRAT_META_DISCREPANCY:  // (Meta) Discrepancy
+        return StrategyInit<Stg_Meta_Discrepancy>(_tf);
       case STRAT_META_DOUBLE:  // (Meta) Double
         return StrategyInit<Stg_Meta_Double>(_tf);
       case STRAT_META_CONDITIONS:  // (Meta) Conditions
