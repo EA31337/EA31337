@@ -79,22 +79,22 @@ input string __EA_Tasks__ = "-- EA's tasks --";  // >>> EA's TASKS <<<
 input group "EA's tasks"
 #endif
 input int EA_Tasks_Filter = 31;  // Tasks' filter (0=None,1=1st,2=2nd,4=3rd,8=4th,16=5th,31=All)
-input ENUM_EA_ADV_COND EA_Task1_If = EA_ADV_COND_TRADE_EQUITY_GT_05PC;             // 1: Task's condition
-input ENUM_EA_ADV_ACTION EA_Task1_Then = EA_ADV_ACTION_ORDERS_CLOSE_ALL;           // 1: Task's action
-input ENUM_EA_ADV_COND EA_Task2_If = EA_ADV_COND_TRADE_EQUITY_GT_RMARGIN;          // 2: Task's condition
-input ENUM_EA_ADV_ACTION EA_Task2_Then = EA_ADV_ACTION_CLOSE_MOST_PROFIT;          // 2: Task's action
-input ENUM_EA_ADV_COND EA_Task3_If = EA_ADV_COND_TRADE_EQUITY_LT_05PC;             // 3: Task's condition
-input ENUM_EA_ADV_ACTION EA_Task3_Then = EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND_NOT;  // 3: Task's action
-input ENUM_EA_ADV_COND EA_Task4_If = EA_ADV_COND_EA_ON_NEW_DAY;                    // 4: Task's condition
-input ENUM_EA_ADV_ACTION EA_Task4_Then = EA_ADV_ACTION_ORDERS_CLOSE_IN_TREND_NOT;  // 4: Task's action
-input ENUM_EA_ADV_COND EA_Task5_If = EA_ADV_COND_NONE;                             // 5: Task's condition
-input ENUM_EA_ADV_ACTION EA_Task5_Then = EA_ADV_ACTION_NONE;                       // 5: Task's action
+input ENUM_EA_ADV_COND EA_Task1_If = EA_ADV_COND_TRADE_EQUITY_GT_05PC;     // 1: Task's condition
+input ENUM_EA_ADV_ACTION EA_Task1_Then = EA_ADV_ACTION_ORDERS_CLOSE_ALL;   // 1: Task's action
+input ENUM_EA_ADV_COND EA_Task2_If = EA_ADV_COND_TRADE_EQUITY_GT_RMARGIN;  // 2: Task's condition
+input ENUM_EA_ADV_ACTION EA_Task2_Then = EA_ADV_ACTION_CLOSE_MOST_PROFIT;  // 2: Task's action
+input ENUM_EA_ADV_COND EA_Task3_If = EA_ADV_COND_TRADE_EQUITY_LT_02PC;     // 3: Task's condition
+input ENUM_EA_ADV_ACTION EA_Task3_Then = EA_ADV_ACTION_CLOSE_MOST_PROFIT;  // 3: Task's action
+input ENUM_EA_ADV_COND EA_Task4_If = EA_ADV_COND_NONE;                     // 4: Task's condition
+input ENUM_EA_ADV_ACTION EA_Task4_Then = EA_ADV_ACTION_NONE;               // 4: Task's action
+input ENUM_EA_ADV_COND EA_Task5_If = EA_ADV_COND_NONE;                     // 5: Task's condition
+input ENUM_EA_ADV_ACTION EA_Task5_Then = EA_ADV_ACTION_NONE;               // 5: Task's action
 
 #ifdef __MQL4__
 input string __Order_Params__ = "-- Orders' limits --";  // >>> ORDERS' LIMITS <<<
 #else
 input group "Orders' limits"
 #endif
-input float EA_OrderCloseLoss = 300;    // Close loss (in pips)
+input float EA_OrderCloseLoss = 280;    // Close loss (in pips)
 input float EA_OrderCloseProfit = 120;  // Close profit (in pips)
-input int EA_OrderCloseTime = -90;      // Close time in mins (>0) or bars (<0)
+input int EA_OrderCloseTime = -80;      // Close time in mins (>0) or bars (<0)
