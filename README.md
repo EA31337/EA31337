@@ -6,7 +6,7 @@
 [![Status][gha-image-backtest-master]][gha-link-backtest-master]
 [![Discuss][gh-discuss-badge]][gh-discuss-link]
 [![Channel][tg-channel-image]][tg-channel-link]
-[![Twitter][twitter-image]][twitter-link]
+[![X][x-image]][x-link]
 [![License][license-image]][license-link]
 [![Edit][gh-edit-badge]][gh-edit-link]
 
@@ -263,8 +263,8 @@ NO REPRESENTATION IS BEING MADE THAN ANY ACCOUNT WILL OR IS LIKELY TO ACHIEVE PR
 [tg-channel-image]: https://img.shields.io/badge/Telegram-join-0088CC.svg?logo=telegram
 [tg-channel-link]: https://t.me/EA31337
 
-[twitter-image]: https://img.shields.io/badge/EA31337-Follow-1DA1F2.svg?logo=Twitter
-[twitter-link]: https://twitter.com/EA31337
+[x-image]: https://img.shields.io/badge/EA31337-Follow-1DA1F2.svg?logo=X
+[x-link]: https://x.com/EA31337
 
 [gh-discuss-badge]: https://img.shields.io/badge/Discussions-Q&A-blue.svg?logo=github
 [gh-discuss-link]: https://github.com/EA31337/EA31337/discussions
