@@ -26,9 +26,11 @@ env:
 
 jobs:
 
-  Compile-Indicators-Common:
+  compile-indicators-common:
+    name: Compile Indicators (Common)
     uses: EA31337/EA31337-Indicators-Common/.github/workflows/compile.yml@dev
-  Compile-Indicators-Other:
+  compile-indicators-other:
+    name: Compile Indicators (Other)
     uses: EA31337/EA31337-Indicators-Other/.github/workflows/compile.yml@dev
 
   Compile-EA:
@@ -37,7 +39,7 @@ jobs:
       run:
         shell: powershell
         working-directory: src
-    needs: [Compile-Indicators-Common, Compile-Indicators-Other]
+    needs: [compile-indicators-common, compile-indicators-other]
     runs-on: windows-latest
 
     strategy:
@@ -49,93 +51,22 @@ jobs:
           - Rider
         mode2:
           - __input__
-
-    steps:
-
-      - uses: actions/checkout@v3
-        with:
-          submodules: 'recursive'
-
-      - run: Get-Location
-
-      - name: Enables CLI mode
-        run: echo '#define __cli__' > include/common/mode.h
-
-      - name: Enables Advanced mode
-        if: matrix.mode == 'Advanced'
-        run: echo '#define __advanced__' >> include/common/mode.h
-
-      - name: Enables Elite mode
-        if: matrix.mode == 'Elite'
-        run: echo '#define __elite__' >> include/common/mode.h
-
-      - name: Enables Rider mode
-        if: matrix.mode == 'Rider'
-        run: echo '#define __rider__' >> include/common/mode.h
-
-      - name: Enables custom mode
-        run: echo '#define ${{ matrix.mode2 }}' >> include/common/mode.h
-
-      - name: Compiles EA (MQL4)
-        uses: fx31337/mql-compile-action@master
-        with:
-          include: src
-          path: src/EA31337.mq4
-          verbose: true
-
-      - name: Compiles EA (MQL5)
-        uses: fx31337/mql-compile-action@master
-        with:
-          include: src
-          path: src/EA31337.mq5
-          verbose: true
-
-      - name: List compiled files
-        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: EA31337-${{ matrix.mode }}(${{ matrix.mode2 }})
-          path: '**/EA*.ex?'
-
-  EA-Resource:
-
-    defaults:
-      run:
-        shell: powershell
-        working-directory: src
-    needs: [Compile-Indicators-Common, Compile-Indicators-Other]
-    runs-on: windows-latest
-
-    strategy:
-      matrix:
-        mode:
-          - Lite
-          - Advanced
-          - Elite
-          - Rider
-        mode2:
           - __resource__
+        version:
+          - 4
+          - 5
+      max-parallel: 2
 
     steps:
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
-          name: indicators-common
-          path: src/Indicators/Common
-
-      - uses: actions/download-artifact@v3
-        with:
-          name: indicators-other
-          path: src/Indicators/Other
-
-      - name: List compiled files
-        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
+          name: mt${{ matrix.version }}
+          path: .mt${{ matrix.version }}
 
       - run: Get-Location
 
@@ -168,7 +99,7 @@ jobs:
         uses: fx31337/mql-compile-action@master
         with:
           include: src
-          path: src/EA31337.mq5
+          path: src/EA31337.mq${{ matrix.version }}
           verbose: true
 
       - name: List compiled files
@@ -177,5 +108,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: EA31337-${{ matrix.mode }}(${{ matrix.mode2 }})
+          name: EA31337-${{ matrix.mode }}-ex${{ matrix.version }}(${{ matrix.mode2 }})
           path: '**/EA*.ex?'
