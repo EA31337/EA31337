@@ -34,15 +34,15 @@ input group "Active strategy"
 #endif
 input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;              // Strategy on M1 (filter=1)
 input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;              // Strategy on M5 (filter=2)
-input ENUM_STRATEGY Strategy_M15 = STRAT_NONE;             // Strategy on M15 (filter=4)
-input ENUM_STRATEGY Strategy_M30 = STRAT_NONE;             // Strategy on M30 (filter=8)
+input ENUM_STRATEGY Strategy_M15 = STRAT_META_TREND;       // Strategy on M15 (filter=4)
+input ENUM_STRATEGY Strategy_M30 = STRAT_MACD;             // Strategy on M30 (filter=8)
 input ENUM_STRATEGY Strategy_H1 = STRAT_OSCILLATOR_CROSS;  // Strategy on H1 (filter=16)
-input ENUM_STRATEGY Strategy_H2 = STRAT_INDICATOR;         // Strategy on H2 (filter=32)
+input ENUM_STRATEGY Strategy_H2 = STRAT_TMAT_SVEBB;        // Strategy on H2 (filter=32)
 input ENUM_STRATEGY Strategy_H3 = STRAT_META_SCALPER;      // Strategy on H3 (filter=64)
-input ENUM_STRATEGY Strategy_H4 = STRAT_META_TREND;        // Strategy on H4 (filter=128)
-input ENUM_STRATEGY Strategy_H6 = STRAT_META_RESISTANCE;   // Strategy on H6 (filter=256)
-input ENUM_STRATEGY Strategy_H8 = STRAT_META_BEARS_BULLS;  // Strategy on H8 (filter=512)
-input ENUM_STRATEGY Strategy_H12 = STRAT_META_PIVOT;       // Strategy on H12 (filter=1024)
+input ENUM_STRATEGY Strategy_H4 = STRAT_META_DOUBLE;       // Strategy on H4 (filter=128)
+input ENUM_STRATEGY Strategy_H6 = STRAT_TMAT_SVEBB;        // Strategy on H6 (filter=256)
+input ENUM_STRATEGY Strategy_H8 = STRAT_META_TIMEZONE;     // Strategy on H8 (filter=512)
+input ENUM_STRATEGY Strategy_H12 = STRAT_GATOR;            // Strategy on H12 (filter=1024)
 input int EA_Strategy_Filter = 2047;  // Filter(0=n/a,All=2047,1=M1,2=M5,4=M15,8=M30,16=H1,32=H2,64=H3)
 
 #ifdef __MQL4__

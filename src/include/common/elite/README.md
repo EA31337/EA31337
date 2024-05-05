@@ -16,10 +16,10 @@ graph TD
 ```mermaid
 graph TD
     EA[Elite v3.000] -->|Main| MD(Meta Double)
-    MD --> |S1| MM(Meta Margin)
-    MD --> |S2| MMC(Meta MA Cross)
+    MD --> |Strat1| MP(Meta Pivot)
+    MD --> |Strat2| MMC(Meta MA Cross)
 
-    MM --> |>80%| MV(Meta Volatility)
+    MM(Meta Margin) --> |>80%| MV(Meta Volatility)
     MM --> |50-80%| MAT(MA Trend)
     MM --> |20-50%| AMA
     MM --> |<20%| NA1(n/a)
@@ -28,10 +28,10 @@ graph TD
         MV --> |Strong| MAT(MA Trend)
         MV --> |Very strong| StdDev
 
-            MP --> |S1-R1| MR(Meta Resistance)
-            MP --> |S2-R2| RVI
-            MP --> |S3-R3| ASI
-            MP --> |S4-R4| MAT(MA Trend)
+            MP --> |S1/R1| MFI
+            MP --> |S2/R2| Envelopes
+            MP --> |S3/R3| OCS(Oscillator Cross Shift)
+            MP --> |S4/R4| MAT(MA Trend)
 
                 MR --> |S1| MC(Meta Conditions)
 
@@ -42,5 +42,9 @@ graph TD
     MMC --> |Main| MMG(Meta Martingale)
     MMC --> |On MA Cross| MAT(MA Trend)
 
-        MMG --> |Main| OsMA
+        MMG --> |Main| CCI
+
+    MOS --> |Type| ATR
+    MOS --> |Down| MMC(Meta MA Cross)
+    MOS --> |Up| MMG(Meta Martingale)
 ```
