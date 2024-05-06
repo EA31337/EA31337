@@ -107,8 +107,12 @@ class StrategiesMetaManager {
         return StrategyInit<Stg_Meta_Risk>(_tf);
       case STRAT_META_RSI:  // (Meta) RSI
         return StrategyInit<Stg_Meta_RSI>(_tf);
+      case STRAT_META_SAR:  // (Meta) SAR
+        return StrategyInit<Stg_Meta_SAR>(_tf);
       case STRAT_META_SCALPER:  // (Meta) Scalper
         return StrategyInit<Stg_Meta_Scalper>(_tf);
+      case STRAT_META_SIGNAL_FILTER:  // (Meta) Signal Filter
+        return StrategyInit<Stg_Meta_Signal_Filter>(_tf);
       case STRAT_META_SIGNAL_SWITCH:  // (Meta) Signal Switch
         return StrategyInit<Stg_Meta_Signal_Switch>(_tf);
       case STRAT_META_SPREAD:  // (Meta) Spread
