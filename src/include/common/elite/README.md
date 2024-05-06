@@ -15,36 +15,61 @@ graph TD
 
 ```mermaid
 graph TD
-    EA[Elite v3.000] -->|Main| MD(Meta Double)
-    MD --> |Strat1| MP(Meta Pivot)
-    MD --> |Strat2| MMC(Meta MA Cross)
+    EA[Elite v3.000] -->|Main| MEquity(Meta Equity)
 
-    MM(Meta Margin) --> |>80%| MV(Meta Volatility)
-    MM --> |50-80%| MAT(MA Trend)
-    MM --> |20-50%| AMA
-    MM --> |<20%| NA1(n/a)
+    MEquity --> |-5-5%| MI(Meta Interval)
+    MEquity --> |5-10%| MACSP(MA Cross Sup/Res)
+    MEquity --> |-5-10%| StdDev
+    MEquity --> |>10%| MOL(Meta Order Limit)
+    MEquity --> |<10%| StdDev
 
-        MV --> |Neutral| MP(Meta Pivot)
-        MV --> |Strong| MAT(MA Trend)
-        MV --> |Very strong| StdDev
+        MI --> |Main| MSS(Meta Signal Switch)
+        MI --> |Interval| Alligator
 
-            MP --> |S1/R1| MFI
-            MP --> |S2/R2| Envelopes
-            MP --> |S3/R3| OCS(Oscillator Cross Shift)
-            MP --> |S4/R4| MAT(MA Trend)
+            MSS -->|Main| MRSI(Meta RSI)
 
-                MR --> |S1| MC(Meta Conditions)
+                MRSI --> |Neutral| MT(Meta Trend)
+                MRSI --> |Peak| MMC(Meta MA Cross)
+                MRSI --> |Trend| MOS(Meta Oscillator Switch)
 
-                    MC --> |C1| AMA
-                    MC --> |C2| Awesome
-                    MC --> |C3| NA2(n/a)
+                    MT --> MSpread(Meta Spread)
 
-    MMC --> |Main| MMG(Meta Martingale)
-    MMC --> |On MA Cross| MAT(MA Trend)
+                        MSpread --> |1pip| DeMarker
+                        MSpread --> |1-2ps| DEMA
+                        MSpread --> |2-4p| OCS(Oscillator Cross Shift)
+                        MSpread --> |>4p| ASI
 
-        MMG --> |Main| CCI
+                MMC --> |Main| MMG(Meta Martingale)
+                MMC --> |MA Cross| MAT(MA Trend)
 
-    MOS --> |Type| ATR
-    MOS --> |Down| MMC(Meta MA Cross)
-    MOS --> |Up| MMG(Meta Martingale)
+                    MMG --> |Main| CCI
+
+    %% MM(Meta Margin) --> |>80%| MD(Meta Double)
+    %% MM --> |50-80%| MOL(Meta Order Limit)
+    %% MM --> |20-50%| AMA
+    %% MM --> |<20%| NA1(n/a)
+
+    %%     MD --> |Strat1| MP(Meta Pivot)
+    %%     MD --> |Strat2| MMC(Meta MA Cross)
+
+    %%     MOL --> |Strat| MAB(MA Breakout)
+
+    %%     MV --> |Neutral| MP(Meta Pivot)
+    %%     MV --> |Strong| MAT(MA Trend)
+    %%     MV --> |Very strong| StdDev
+
+    %%         MP --> |S1/R1| MCS(MA Cross Shift)
+    %%         MP --> |S2/R2| MACD
+    %%         MP --> |S3/R3| MC(Meta Conditions)
+    %%         MP --> |S4/R4| MAT(MA Trend)
+
+    %%             MRev(Meta Reverse) --> |S1| MC(Meta Conditions)
+
+    %%                 MC --> |C1-AtPeak| Gator
+    %%                 MC --> |C2-InPivot| Awesome
+    %%                 %%% MC --> |C3| NA2(n/a)
+
+    %% MOS --> |Type| ATR
+    %% MOS --> |Down| MMC(Meta MA Cross)
+    %% MOS --> |Up| MMG(Meta Martingale)
 ```
