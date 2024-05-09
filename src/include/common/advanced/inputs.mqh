@@ -37,7 +37,7 @@ input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;                     // Strategy on
 input ENUM_STRATEGY Strategy_M15 = STRAT_META_OSCILLATOR_SWITCH;  // Strategy on M15 (filter=4)
 input ENUM_STRATEGY Strategy_M30 = STRAT_META_CONDITIONS;         // Strategy on M30 (filter=8)
 input ENUM_STRATEGY Strategy_H1 = STRAT_META_PIVOT;               // Strategy on H1 (filter=16)
-input ENUM_STRATEGY Strategy_H2 = STRAT_META_OSCILLATOR_SWITCH;   // Strategy on H2 (filter=32)
+input ENUM_STRATEGY Strategy_H2 = STRAT_META_OSCILLATOR_FILTER;   // Strategy on H2 (filter=32)
 input ENUM_STRATEGY Strategy_H3 = STRAT_META_OSCILLATOR_SWITCH;   // Strategy on H3 (filter=64)
 input ENUM_STRATEGY Strategy_H4 = STRAT_ICHIMOKU;                 // Strategy on H4 (filter=128)
 input ENUM_STRATEGY Strategy_H6 = STRAT_META_TIMEZONE;            // Strategy on H6 (filter=256)
@@ -67,9 +67,9 @@ input string __Signal_Filters__ = "-- Signal filters --";  // >>> SIGNAL FILTERS
 #else
 input group "Signal filters"
 #endif
-input int EA_SignalOpenFilterMethod = 32;   // Open(1=!BarO,2=Trend,4=PP,8=OppO,16=Peak,32=BetterO,64=InLoss)
-input int EA_SignalCloseFilterMethod = 32;  // Close(1=!BarO,2=!Trend,4=!PP,8=O>H,16=Peak,32=BetterO,64=InProfit)
-input int EA_SignalOpenFilterTime = 3;      // Time(1=CHGO,2=FR,4=HK,8=LON,16=NY,32=SY,64=TYJ,128=WGN)
+input int EA_SignalOpenFilterMethod = 72;    // Open(1=!BarO,2=Trend,4=PP,8=OppO,16=Peak,32=BetterO,64=InLoss)
+input int EA_SignalCloseFilterMethod = -62;  // Close(1=!BarO,2=!Trend,4=!PP,8=O>H,16=Peak,32=BetterO,64=InProfit)
+input int EA_SignalOpenFilterTime = 3;       // Time(1=CHGO,2=FR,4=HK,8=LON,16=NY,32=SY,64=TYJ,128=WGN)
 // input int EA_SignalOpenStrategyFilter = 2;  // Strategy(0-EachSignal,1=FirstOnly,2=HourlyConfirmed) // @fixme
 input int EA_TickFilterMethod = 32;  // Tick(1=PerMin,2=Peaks,4=PeaksMins,8=Uniq,16=MidBar,32=Open,64=10thBar)
 
