@@ -35,12 +35,12 @@ input group "Active strategy"
 int EA_Strategy_Filter = 2047;                 // S-Filter(0=n/a,All=2047,1=M1,2=M5,4=M15,8=M30,16=H1,32=H2,64=H4)
 input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;  // Strategy on M1
 input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;  // Strategy on M5
-input ENUM_STRATEGY Strategy_M15 = STRAT_META_RESISTANCE;  // Strategy on M15
-input ENUM_STRATEGY Strategy_M30 = STRAT_META_TREND;       // Strategy on M30
-input ENUM_STRATEGY Strategy_H1 = STRAT_META_RSI;          // Strategy on H1
-input ENUM_STRATEGY Strategy_H2 = STRAT_META_VOLATILITY;   // Strategy on H2
-input ENUM_STRATEGY Strategy_H3 = STRAT_MOMENTUM;          // Strategy on H3
-input ENUM_STRATEGY Strategy_H4 = STRAT_META_CONDITIONS;   // Strategy on H4
-input ENUM_STRATEGY Strategy_H6 = STRAT_META_RSI;          // Strategy on H6
-input ENUM_STRATEGY Strategy_H8 = STRAT_META_RSI;          // Strategy on H8
-input ENUM_STRATEGY Strategy_H12 = STRAT_SAR;              // Strategy on H12
+input ENUM_STRATEGY Strategy_M15 = STRAT_META_SCALPER;    // Strategy on M15
+input ENUM_STRATEGY Strategy_M30 = STRAT_META_TREND;      // Strategy on M30
+input ENUM_STRATEGY Strategy_H1 = STRAT_META_RSI;         // Strategy on H1
+input ENUM_STRATEGY Strategy_H2 = STRAT_META_VOLATILITY;  // Strategy on H2
+input ENUM_STRATEGY Strategy_H3 = STRAT_MOMENTUM;         // Strategy on H3
+input ENUM_STRATEGY Strategy_H4 = STRAT_META_CONDITIONS;  // Strategy on H4
+input ENUM_STRATEGY Strategy_H6 = STRAT_META_RSI;         // Strategy on H6
+input ENUM_STRATEGY Strategy_H8 = STRAT_META_RSI;         // Strategy on H8
+input ENUM_STRATEGY Strategy_H12 = STRAT_SAR;             // Strategy on H12
