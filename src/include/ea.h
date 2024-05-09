@@ -298,12 +298,12 @@ class EA31337 : public EA {
    */
   bool StrategyAddStops(Strategy *_strat = NULL, ENUM_STRATEGY _enum_stg_stops = STRAT_NONE, ENUM_TIMEFRAMES _tf = 0) {
     bool _result = true;
-    if (_enum_stg_stops == STRAT_NONE || _strat == NULL) {
+    if (_enum_stg_stops == STRAT_NONE && _strat == NULL) {
       return _result;
     }
     Strategy *_strat_stops = GetStrategyViaProp2<int, int>(STRAT_PARAM_TYPE, _enum_stg_stops, STRAT_PARAM_TF, _tf);
     if (!_strat_stops) {
-      _result &= StrategyAddToTf(_enum_stg_stops, (ENUM_TIMEFRAMES)(1 << ChartTf::TfToIndex(_tf)));
+      _result &= StrategyAddToTf(_enum_stg_stops, _tf);
       _strat_stops = GetStrategyViaProp2<int, int>(STRAT_PARAM_TYPE, _enum_stg_stops, STRAT_PARAM_TF, _tf);
       if (_strat_stops) {
         _strat_stops.Enabled(false);
