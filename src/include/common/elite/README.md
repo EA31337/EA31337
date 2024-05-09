@@ -19,14 +19,16 @@ graph TD
 
     MEquity --> |-5-5%| MI(Meta Interval)
     MEquity --> |5-10%| MACSP(MA Cross Sup/Res)
-    MEquity --> |-5-10%| StdDev
-    MEquity --> |>10%| MOL(Meta Order Limit)
-    MEquity --> |<10%| StdDev
+    MEquity --> |-5-10%| DEMA
+    MEquity --> |>10%| Ichimoku
+    MEquity --> |<10%| Pattern
 
         MI --> |Main| MSS(Meta Signal Switch)
-        MI --> |Interval| Alligator
+        MI --> |OnInterval| Alligator
 
             MSS -->|Main| MRSI(Meta RSI)
+            MSS --> |Check| Chaikin
+            MSS --> |OnSignal| MMG(Meta Martingale)
 
                 MRSI --> |Neutral| MT(Meta Trend)
                 MRSI --> |Peak| MMC(Meta MA Cross)
@@ -42,7 +44,15 @@ graph TD
                 MMC --> |Main| MMG(Meta Martingale)
                 MMC --> |MA Cross| MAT(MA Trend)
 
-                    MMG --> |Main| CCI
+                    MMG --> |Main| MV(Meta Volatility)
+
+                        MV --> |Neutral| Stochastic
+                        MV --> |Strong| ATR
+                        MV --> |Very strong| DPO
+
+
+    %% MDouble --> |1st| MEquity(Meta Equity)
+    %% MDouble --> |2nd| MSS(Meta Signal Switch)
 
     %% MM(Meta Margin) --> |>80%| MD(Meta Double)
     %% MM --> |50-80%| MOL(Meta Order Limit)
@@ -53,10 +63,6 @@ graph TD
     %%     MD --> |Strat2| MMC(Meta MA Cross)
 
     %%     MOL --> |Strat| MAB(MA Breakout)
-
-    %%     MV --> |Neutral| MP(Meta Pivot)
-    %%     MV --> |Strong| MAT(MA Trend)
-    %%     MV --> |Very strong| StdDev
 
     %%         MP --> |S1/R1| MCS(MA Cross Shift)
     %%         MP --> |S2/R2| MACD
