@@ -40,11 +40,11 @@ input string __Signal_Filters__ = "-- Main Strategy 1 - Signal filters --";  // 
 #else
 input group "Main Strategy 1 - Signal filters"
 #endif
-input int EA_Strategy1_SignalOpenFilterMethod = 32;  // Open(1=!BarO,2=Trend,4=PP,8=OppO,16=Peak,32=BetterO,64=InLoss)
+input int EA_Strategy1_SignalOpenFilterMethod = -64;  // Open(1=!BarO,2=Trend,4=PP,8=OppO,16=Peak,32=BetterO,64=InLoss)
 input int EA_Strategy1_SignalCloseFilterMethod =
-    4;                                            // Close(1=!BarO,2=!Trend,4=!PP,8=O>H,16=Peak,32=BetterO,64=InProfit)
-input int EA_Strategy1_SignalOpenFilterTime = 0;  // Time(1=CHGO,2=FR,4=HK,8=LON,16=NY,32=SY,64=TYJ,128=WGN)
-int EA_Strategy1_SignalOpenStrategyFilter = 2;    // Strategy(0-EachSignal,1=FirstOnly,2=HourlyConfirmed)
+    12;                                            // Close(1=!BarO,2=!Trend,4=!PP,8=O>H,16=Peak,32=BetterO,64=InProfit)
+input int EA_Strategy1_SignalOpenFilterTime = 13;  // Time(1=CHGO,2=FR,4=HK,8=LON,16=NY,32=SY,64=TYJ,128=WGN)
+int EA_Strategy1_SignalOpenStrategyFilter = 2;     // Strategy(0-EachSignal,1=FirstOnly,2=HourlyConfirmed)
 input int EA_Strategy1_TickFilterMethod = 32;  // Tick(1=PerMin,2=Peaks,4=PeaksMins,8=Uniq,16=MidBar,32=Open,64=10thBar)
 
 #ifdef __MQL4__
