@@ -34,8 +34,8 @@ input group "Active strategies"
 #endif
 input ENUM_STRATEGY Strategy_M1 = STRAT_NONE;                     // Strategy on M1 (filter=1)
 input ENUM_STRATEGY Strategy_M5 = STRAT_NONE;                     // Strategy on M5 (filter=2)
-input ENUM_STRATEGY Strategy_M15 = STRAT_META_OSCILLATOR_SWITCH;  // Strategy on M15 (filter=4)
-input ENUM_STRATEGY Strategy_M30 = STRAT_META_CONDITIONS;         // Strategy on M30 (filter=8)
+input ENUM_STRATEGY Strategy_M15 = STRAT_META_TREND;              // Strategy on M15 (filter=4)
+input ENUM_STRATEGY Strategy_M30 = STRAT_META_TREND;              // Strategy on M30 (filter=8)
 input ENUM_STRATEGY Strategy_H1 = STRAT_META_PIVOT;               // Strategy on H1 (filter=16)
 input ENUM_STRATEGY Strategy_H2 = STRAT_META_OSCILLATOR_FILTER;   // Strategy on H2 (filter=32)
 input ENUM_STRATEGY Strategy_H3 = STRAT_META_OSCILLATOR_SWITCH;   // Strategy on H3 (filter=64)
