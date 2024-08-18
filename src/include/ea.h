@@ -181,9 +181,30 @@ class EA31337 : public EA {
         string _text = StringFormat("%s v%s by %s\n", Get<string>(STRUCT_ENUM(EAParams, EA_PARAM_PROP_NAME)),
                                     Get<string>(STRUCT_ENUM(EAParams, EA_PARAM_PROP_VER)),
                                     Get<string>(STRUCT_ENUM(EAParams, EA_PARAM_PROP_AUTHOR)));
+
         _text += SerializerConverter::FromObject(THIS_PTR, SERIALIZER_FLAG_INCLUDE_DYNAMIC)
-                     .Precision(2)
-                     .ToString<SerializerJson>();
+                     .Precision(0)
+                     .ToString<SerializerJson>(SERIALIZER_JSON_NO_WHITESPACES) +
+                 "\n";
+        /* @todo
+        _text +=
+            SerializerConverter::FromObject(_result).Precision(0).ToString<SerializerJson>(SERIALIZER_JSON_NO_WHITESPACES)
+        +
+            "\n";
+        */
+        if (Get<ENUM_LOG_LEVEL>(STRUCT_ENUM(EAParams, EA_PARAM_PROP_LOG_LEVEL)) >= V_DEBUG) {
+          // Print enabled strategies info.
+          for (DictStructIterator<long, Ref<Strategy>> _siter = ea.GetStrategies().Begin(); _siter.IsValid();
+               ++_siter) {
+            Strategy *_strat = _siter.Value().Ptr();
+            StgProcessResult _sres = _strat.GetProcessResult();
+            _text += StringFormat("%s@%d: %s\n", _strat.GetName(), _strat.Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF),
+                                  SerializerConverter::FromObject(_sres, SERIALIZER_FLAG_INCLUDE_DYNAMIC)
+                                      .Precision(2)
+                                      .ToString<SerializerJson>(SERIALIZER_JSON_NO_WHITESPACES));
+          }
+        }
+
         _text += logger.ToString();
         Comment(_text);
       }
