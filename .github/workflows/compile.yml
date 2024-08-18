@@ -28,7 +28,7 @@ jobs:
 
   compile-indicators-common:
     name: Compile Indicators (Common)
-    uses: EA31337/EA31337-Indicators-Common/.github/workflows/compile.yml@dev-v1.000
+    uses: EA31337/EA31337-Indicators-Common/.github/workflows/compile.yml@dev
     with:
       artifact_prefix: mt
       skip_cleanup: true
