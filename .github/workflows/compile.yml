@@ -161,4 +161,6 @@ jobs:
     steps:
       - uses: geekyeggo/delete-artifact@v5
         with:
-          name: mt*
+          name: |
+            ic[45]
+            io[45]
