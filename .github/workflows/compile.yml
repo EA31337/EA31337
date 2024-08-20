@@ -30,22 +30,24 @@ jobs:
     name: Compile Indicators (Common)
     uses: EA31337/EA31337-Indicators-Common/.github/workflows/compile.yml@dev
     with:
-      artifact_prefix: mt
+      artifact_prefix: mt-common-
       skip_cleanup: true
 
   compile-indicators-other:
     name: Compile Indicators (Other)
     uses: EA31337/EA31337-Indicators-Other/.github/workflows/compile.yml@dev
     with:
-      artifact_prefix: mt
+      artifact_prefix: mt-other-
       skip_cleanup: true
 
-  Compile-EA:
+  compile-ea:
 
     defaults:
       run:
         shell: powershell
         working-directory: src
+
+    name: Compile EA
     needs: [compile-indicators-common, compile-indicators-other]
     runs-on: windows-latest
 
@@ -72,7 +74,7 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: mt${{ matrix.version }}
+          name: mt-common-${{ matrix.version }}
           path: .mt${{ matrix.version }}
 
       - run: Get-Location
@@ -99,6 +101,7 @@ jobs:
         uses: fx31337/mql-compile-action@master
         with:
           include: src
+          mt-path: .${{ env.ARTIFACT_PREFIX }}${{ matrix.version }}
           path: src/EA31337.mq4
           verbose: true
 
@@ -106,8 +109,14 @@ jobs:
         uses: fx31337/mql-compile-action@master
         with:
           include: src
+          mt-path: .mt${{ matrix.version }}
           path: src/EA31337.mq${{ matrix.version }}
           verbose: true
+
+      - name: Moves file (MQL4)
+        run: mv -v *.ex4 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex4"
+      - name: Moves file (MQL5)
+        run: mv -v *.ex5 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex5"
 
       - name: List compiled files
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
@@ -117,3 +126,13 @@ jobs:
         with:
           name: EA31337-${{ matrix.mode }}-ex${{ matrix.version }}(${{ matrix.mode2 }})
           path: '**/EA*.ex?'
+
+  cleanup:
+    if: inputs.skip_cleanup != true
+    name: Clean-up
+    needs: [compile-ea]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: geekyeggo/delete-artifact@v5
+        with:
+          name: ${{ env.ARTIFACT_PREFIX }}*
