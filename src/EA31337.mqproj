@@ -3,10 +3,11 @@
   "program_type":"expert",
   "copyright"   :"2016-2023, EA31337 Ltd",
   "link"        :"https:\/\/github.com\/EA31337\/EA31337",
-  "version"     :"2.013",
+  "version"     :"3.000",
   "description" :"Forex multi-strategy trading robot",
   "icon"        :"resources\\favicon.ico",
-  "optimize"    :"0",
+  "cpu_architecture" :"0",
+  "optimize"    :"1",
   "fpzerocheck" :"1",
   "tester_no_cache":"0",
   "tester_everytick_calculate":"0",
@@ -16,2274 +17,3118 @@
   "files":
   [
     {
-      "path":".\\EA31337.mq5",
-      "compile":"true",
-      "relative_to_project":"true"
+      "path":"EA31337.mq5",
+      "compile":true,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\includes.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\includes.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\includes.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\includes.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\common\\mode.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\common\\mode.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\common\\code-conf.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\common\\code-conf.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\common\\define.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\common\\define.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\common\\enum.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\common\\enum.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\common\\property.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\common\\property.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\common\\advanced\\defines.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\common\\advanced\\defines.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Chart.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Chart.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Chart.enum.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Chart.enum.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Chart.struct.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Chart.struct.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Bar.struct.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Bar.struct.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Bar.enum.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Bar.enum.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\SerializerNode.enum.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\SerializerNode.enum.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Condition.enum.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Condition.enum.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Convert.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Convert.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Math.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Math.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Math.enum.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Math.enum.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Math.struct.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Math.struct.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\SymbolInfo.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\SymbolInfo.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Serializer.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Serializer.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\DictBase.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\DictBase.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\DictIteratorBase.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\DictIteratorBase.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\DictSlot.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\DictSlot.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Log.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Log.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Array.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Array.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\String.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\String.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Collection.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Collection.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Object.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Object.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Refs.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Refs.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Refs.struct.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Refs.struct.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\DateTime.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\DateTime.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\DateTime.enum.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\DateTime.enum.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\DateTime.struct.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\DateTime.struct.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Terminal.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Terminal.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\MQL4.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\MQL4.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Serializer.enum.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Serializer.enum.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\SerializerConverter.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\SerializerConverter.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\File.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\File.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\SerializerNode.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\SerializerNode.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\SerializerNodeIterator.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\SerializerNodeIterator.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\SerializerNodeParam.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\SerializerNodeParam.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Market.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Market.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Order.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Order.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Action.enum.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Action.enum.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Order.enum.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Order.enum.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Order.struct.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Order.struct.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\EA.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\EA.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Dict.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Dict.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Matrix.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Matrix.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\DictObject.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\DictObject.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\EA.enum.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\EA.enum.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\EA.struct.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\EA.struct.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Task.struct.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Task.struct.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Action.struct.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Action.struct.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Account.enum.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Account.enum.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicator.enum.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicator.enum.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Strategy.enum.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Strategy.enum.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Task.enum.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Task.enum.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Trade.enum.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Trade.enum.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Condition.struct.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Condition.struct.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicator.struct.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicator.struct.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\SerializerCsv.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\SerializerCsv.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\DictStruct.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\DictStruct.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\SerializerJson.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\SerializerJson.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Strategy.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Strategy.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicator.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicator.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\BufferStruct.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\BufferStruct.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\DrawIndicator.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\DrawIndicator.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Draw.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Draw.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Strategy.struct.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Strategy.struct.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Task.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Task.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Action.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Action.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Condition.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Condition.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Account.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Account.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Account.struct.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Account.struct.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Orders.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Orders.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\SummaryReport.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\SummaryReport.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Trade.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Trade.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Trade.struct.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Trade.struct.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Msg.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Msg.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_AC.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_AC.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_AD.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_AD.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_ADX.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_ADX.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_AO.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_AO.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_ATR.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_ATR.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_Alligator.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_Alligator.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_BWMFI.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_BWMFI.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_Bands.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_Bands.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_MA.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_MA.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_StdDev.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_StdDev.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_PriceFeeder.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_PriceFeeder.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_BearsPower.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_BearsPower.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_BullsPower.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_BullsPower.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_CCI.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_CCI.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_Price.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_Price.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_DEMA.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_DEMA.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_DeMarker.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_DeMarker.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_Envelopes.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_Envelopes.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_Force.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_Force.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_Fractals.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_Fractals.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_Gator.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_Gator.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_HeikenAshi.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_HeikenAshi.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_Ichimoku.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_Ichimoku.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_MACD.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_MACD.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_MFI.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_MFI.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_Momentum.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_Momentum.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_OBV.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_OBV.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_OsMA.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_OsMA.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_RSI.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_RSI.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_RVI.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_RVI.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_SAR.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_SAR.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_Stochastic.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_Stochastic.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_WPR.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_WPR.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_ZigZag.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_ZigZag.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\common\\struct.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\common\\struct.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\enum.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\enum.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\inputs.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\inputs.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\common\\advanced\\inputs.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\common\\advanced\\inputs.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\strategies.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\strategies.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\AC\\Stg_AC.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\AC\\Stg_AC.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\AC\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\AC\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\AC\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\AC\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\AC\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\AC\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\AC\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\AC\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\AC\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\AC\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\AC\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\AC\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\AC\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\AC\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\AD\\Stg_AD.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\AD\\Stg_AD.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\AD\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\AD\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\AD\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\AD\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\AD\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\AD\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\AD\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\AD\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\AD\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\AD\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\AD\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\AD\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\AD\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\AD\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ADX\\Stg_ADX.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ADX\\Stg_ADX.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ADX\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ADX\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ADX\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ADX\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ADX\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ADX\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ADX\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ADX\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ADX\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ADX\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ADX\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ADX\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ADX\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ADX\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ATR\\Stg_ATR.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ATR\\Stg_ATR.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ATR\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ATR\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ATR\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ATR\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ATR\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ATR\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ATR\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ATR\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ATR\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ATR\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ATR\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ATR\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ATR\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ATR\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Alligator\\Stg_Alligator.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Alligator\\Stg_Alligator.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Alligator\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Alligator\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Alligator\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Alligator\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Alligator\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Alligator\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Alligator\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Alligator\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Alligator\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Alligator\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Alligator\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Alligator\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Alligator\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Alligator\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Awesome\\Stg_Awesome.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Awesome\\Stg_Awesome.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Awesome\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Awesome\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Awesome\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Awesome\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Awesome\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Awesome\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Awesome\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Awesome\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Awesome\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Awesome\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Awesome\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Awesome\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Awesome\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Awesome\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\BWMFI\\Stg_BWMFI.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\BWMFI\\Stg_BWMFI.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\BWMFI\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\BWMFI\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\BWMFI\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\BWMFI\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\BWMFI\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\BWMFI\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\BWMFI\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\BWMFI\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\BWMFI\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\BWMFI\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\BWMFI\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\BWMFI\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\BWMFI\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\BWMFI\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Bands\\Stg_Bands.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Bands\\Stg_Bands.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Bands\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Bands\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Bands\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Bands\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Bands\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Bands\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Bands\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Bands\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Bands\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Bands\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Bands\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Bands\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Bands\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Bands\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\BearsPower\\Stg_BearsPower.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\BearsPower\\Stg_BearsPower.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\BearsPower\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\BearsPower\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\BearsPower\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\BearsPower\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\BearsPower\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\BearsPower\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\BearsPower\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\BearsPower\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\BearsPower\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\BearsPower\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\BearsPower\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\BearsPower\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\BearsPower\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\BearsPower\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\BullsPower\\Stg_BullsPower.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\BullsPower\\Stg_BullsPower.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\BullsPower\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\BullsPower\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\BullsPower\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\BullsPower\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\BullsPower\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\BullsPower\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\BullsPower\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\BullsPower\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\BullsPower\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\BullsPower\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\BullsPower\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\BullsPower\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\BullsPower\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\BullsPower\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\CCI\\Stg_CCI.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\CCI\\Stg_CCI.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\CCI\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\CCI\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\CCI\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\CCI\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\CCI\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\CCI\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\CCI\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\CCI\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\CCI\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\CCI\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\CCI\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\CCI\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\CCI\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\CCI\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\DEMA\\Stg_DEMA.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\DEMA\\Stg_DEMA.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\DEMA\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\DEMA\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\DEMA\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\DEMA\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\DEMA\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\DEMA\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\DEMA\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\DEMA\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\DEMA\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\DEMA\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\DEMA\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\DEMA\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\DEMA\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\DEMA\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\DeMarker\\Stg_DeMarker.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\DeMarker\\Stg_DeMarker.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\DeMarker\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\DeMarker\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\DeMarker\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\DeMarker\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\DeMarker\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\DeMarker\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\DeMarker\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\DeMarker\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\DeMarker\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\DeMarker\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\DeMarker\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\DeMarker\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\DeMarker\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\DeMarker\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ElliottWave\\Stg_ElliottWave.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ElliottWave\\Stg_ElliottWave.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ElliottWave\\Indi_ElliottWave.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ElliottWave\\Indi_ElliottWave.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ElliottWave\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ElliottWave\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ElliottWave\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ElliottWave\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ElliottWave\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ElliottWave\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ElliottWave\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ElliottWave\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ElliottWave\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ElliottWave\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ElliottWave\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ElliottWave\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ElliottWave\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ElliottWave\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Envelopes\\Stg_Envelopes.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Envelopes\\Stg_Envelopes.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Envelopes\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Envelopes\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Envelopes\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Envelopes\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Envelopes\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Envelopes\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Envelopes\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Envelopes\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Envelopes\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Envelopes\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Envelopes\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Envelopes\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Envelopes\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Envelopes\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Force\\Stg_Force.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Force\\Stg_Force.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Force\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Force\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Force\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Force\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Force\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Force\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Force\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Force\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Force\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Force\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Force\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Force\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Force\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Force\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Fractals\\Stg_Fractals.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Fractals\\Stg_Fractals.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Fractals\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Fractals\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Fractals\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Fractals\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Fractals\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Fractals\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Fractals\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Fractals\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Fractals\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Fractals\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Fractals\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Fractals\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Fractals\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Fractals\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Gator\\Stg_Gator.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Gator\\Stg_Gator.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Gator\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Gator\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Gator\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Gator\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Gator\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Gator\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Gator\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Gator\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Gator\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Gator\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Gator\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Gator\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Gator\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Gator\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\HeikenAshi\\Stg_HeikenAshi.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\HeikenAshi\\Stg_HeikenAshi.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\HeikenAshi\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\HeikenAshi\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\HeikenAshi\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\HeikenAshi\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\HeikenAshi\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\HeikenAshi\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\HeikenAshi\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\HeikenAshi\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\HeikenAshi\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\HeikenAshi\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\HeikenAshi\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\HeikenAshi\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\HeikenAshi\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\HeikenAshi\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Ichimoku\\Stg_Ichimoku.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Ichimoku\\Stg_Ichimoku.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Ichimoku\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Ichimoku\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Ichimoku\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Ichimoku\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Ichimoku\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Ichimoku\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Ichimoku\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Ichimoku\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Ichimoku\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Ichimoku\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Ichimoku\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Ichimoku\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Ichimoku\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Ichimoku\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\MA\\Stg_MA.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\MA\\Stg_MA.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\MA\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\MA\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\MA\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\MA\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\MA\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\MA\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\MA\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\MA\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\MA\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\MA\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\MA\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\MA\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\MA\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\MA\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\MACD\\Stg_MACD.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\MACD\\Stg_MACD.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\MACD\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\MACD\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\MACD\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\MACD\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\MACD\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\MACD\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\MACD\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\MACD\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\MACD\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\MACD\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\MACD\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\MACD\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\MACD\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\MACD\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\MFI\\Stg_MFI.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\MFI\\Stg_MFI.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\MFI\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\MFI\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\MFI\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\MFI\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\MFI\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\MFI\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\MFI\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\MFI\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\MFI\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\MFI\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\MFI\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\MFI\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\MFI\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\MFI\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Momentum\\Stg_Momentum.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Momentum\\Stg_Momentum.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Momentum\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Momentum\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Momentum\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Momentum\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Momentum\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Momentum\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Momentum\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Momentum\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Momentum\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Momentum\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Momentum\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Momentum\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Momentum\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Momentum\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\OBV\\Stg_OBV.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\OBV\\Stg_OBV.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\OBV\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\OBV\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\OBV\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\OBV\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\OBV\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\OBV\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\OBV\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\OBV\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\OBV\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\OBV\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\OBV\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\OBV\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\OBV\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\OBV\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\OSMA\\Stg_OSMA.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\OSMA\\Stg_OSMA.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\OSMA\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\OSMA\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\OSMA\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\OSMA\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\OSMA\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\OSMA\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\OSMA\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\OSMA\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\OSMA\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\OSMA\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\OSMA\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\OSMA\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\OSMA\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\OSMA\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\RSI\\Stg_RSI.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\RSI\\Stg_RSI.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\RSI\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\RSI\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\RSI\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\RSI\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\RSI\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\RSI\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\RSI\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\RSI\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\RSI\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\RSI\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\RSI\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\RSI\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\RSI\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\RSI\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\RVI\\Stg_RVI.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\RVI\\Stg_RVI.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\RVI\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\RVI\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\RVI\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\RVI\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\RVI\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\RVI\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\RVI\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\RVI\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\RVI\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\RVI\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\RVI\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\RVI\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\RVI\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\RVI\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\SAR\\Stg_SAR.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\SAR\\Stg_SAR.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\SAR\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\SAR\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\SAR\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\SAR\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\SAR\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\SAR\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\SAR\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\SAR\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\SAR\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\SAR\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\SAR\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\SAR\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\SAR\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\SAR\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\SAWA\\Stg_SAWA.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\SAWA\\Stg_SAWA.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\SAWA\\Indi_SAWA.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\SAWA\\Indi_SAWA.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\SAWA\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\SAWA\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\SAWA\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\SAWA\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\SAWA\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\SAWA\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\SAWA\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\SAWA\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\SAWA\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\SAWA\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\SAWA\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\SAWA\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\SAWA\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\SAWA\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\StdDev\\Stg_StdDev.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\StdDev\\Stg_StdDev.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\StdDev\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\StdDev\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\StdDev\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\StdDev\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\StdDev\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\StdDev\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\StdDev\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\StdDev\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\StdDev\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\StdDev\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\StdDev\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\StdDev\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\StdDev\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\StdDev\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Stochastic\\Stg_Stochastic.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Stochastic\\Stg_Stochastic.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Stochastic\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Stochastic\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Stochastic\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Stochastic\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Stochastic\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Stochastic\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Stochastic\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Stochastic\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Stochastic\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Stochastic\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Stochastic\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Stochastic\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Stochastic\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Stochastic\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\WPR\\Stg_WPR.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\WPR\\Stg_WPR.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\WPR\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\WPR\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\WPR\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\WPR\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\WPR\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\WPR\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\WPR\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\WPR\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\WPR\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\WPR\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\WPR\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\WPR\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\WPR\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\WPR\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ZigZag\\Stg_ZigZag.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ZigZag\\Stg_ZigZag.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ZigZag\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ZigZag\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ZigZag\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ZigZag\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ZigZag\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ZigZag\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ZigZag\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ZigZag\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ZigZag\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ZigZag\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ZigZag\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ZigZag\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\ZigZag\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\ZigZag\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\common\\lite\\defines.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\common\\lite\\defines.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\common\\lite\\inputs.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\common\\lite\\inputs.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\MQL5.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\MQL5.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\common\\rider\\defines.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\common\\rider\\defines.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\common\\rider\\inputs.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\common\\rider\\inputs.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Errors.enum.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Errors.enum.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\SymbolInfo.struct.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\SymbolInfo.struct.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Terminal.define.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Terminal.define.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Terminal.enum.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Terminal.enum.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Terminal.struct.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Terminal.struct.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\SerializerDict.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\SerializerDict.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\SymbolInfo.enum.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\SymbolInfo.enum.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Chart.define.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Chart.define.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Data.struct.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Data.struct.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Data.enum.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Data.enum.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Chart.struct.tf.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Chart.struct.tf.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\SymbolInfo.define.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\SymbolInfo.define.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicator.define.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicator.define.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Serializer.define.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Serializer.define.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Chart.struct.serialize.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Chart.struct.serialize.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Market.struct.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Market.struct.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Data.define.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Data.define.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Order.define.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Order.define.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicator.struct.serialize.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicator.struct.serialize.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Account.define.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Account.define.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\TMA_True\\Stg_TMA_True.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\TMA_True\\Stg_TMA_True.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\TMA_True\\Indi_TMA_True.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\TMA_True\\Indi_TMA_True.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\TMA_True\\config\\EURUSD_H1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\TMA_True\\config\\EURUSD_H1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\TMA_True\\config\\EURUSD_H4.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\TMA_True\\config\\EURUSD_H4.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\TMA_True\\config\\EURUSD_H8.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\TMA_True\\config\\EURUSD_H8.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\TMA_True\\config\\EURUSD_M1.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\TMA_True\\config\\EURUSD_M1.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\TMA_True\\config\\EURUSD_M15.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\TMA_True\\config\\EURUSD_M15.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\TMA_True\\config\\EURUSD_M30.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\TMA_True\\config\\EURUSD_M30.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\TMA_True\\config\\EURUSD_M5.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\TMA_True\\config\\EURUSD_M5.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Std.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Std.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\ISerializable.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\ISerializable.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\SymbolInfo.static.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\SymbolInfo.static.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\MqlTick.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\MqlTick.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\SerializerConversions.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\SerializerConversions.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\MiniMatrix.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\MiniMatrix.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\SerializerSqlite.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\SerializerSqlite.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Database.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Database.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicator.struct.signal.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicator.struct.signal.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Strategy.struct.pricestop.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Strategy.struct.pricestop.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Chart.struct.static.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Chart.struct.static.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Math.define.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Math.define.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\SymbolInfo.enum.symbols.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\SymbolInfo.enum.symbols.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\OrderQuery.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\OrderQuery.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\common\\funcs-adv.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\common\\funcs-adv.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Indi_Pattern.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Indi_Pattern.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Pattern.struct.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Pattern.struct.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Pattern.enum.h",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Pattern.enum.h",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\classes\\Indicators\\Special\\Indi_Math.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\classes\\Indicators\\Special\\Indi_Math.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\Pattern\\Stg_Pattern.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\Pattern\\Stg_Pattern.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\SVE_Bollinger_Bands\\Stg_SVE_Bollinger_Bands.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\SVE_Bollinger_Bands\\Stg_SVE_Bollinger_Bands.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\SVE_Bollinger_Bands\\Indi_SVE_Bollinger_Bands.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\SVE_Bollinger_Bands\\Indi_SVE_Bollinger_Bands.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\TMA_Band_SVE_True\\Stg_TMAT_SVEBB.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\TMA_Band_SVE_True\\Stg_TMAT_SVEBB.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\TMA_Band_SVE_True\\Indi_SVE_Bollinger_Bands.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\TMA_Band_SVE_True\\Indi_SVE_Bollinger_Bands.mqh",
+      "compile":false,
+      "relative_to_project":true
     },
     {
-      "path":".\\include\\strategies\\TMA_Band_SVE_True\\Indi_TMA_True.mqh",
-      "compile":"false",
-      "relative_to_project":"true"
+      "path":"include\\strategies\\TMA_Band_SVE_True\\Indi_TMA_True.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\ea.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Account\\Account.enum.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\SymbolInfo.struct.static.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicator.struct.cache.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Storage\\ValueStorage.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Storage\\Objects.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Dict.enum.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\DictSlotsRef.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Util.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Storage\\IValueStorage.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Storage\\ValueStorage.accessor.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Storage\\ValueStorage.indicator.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Storage\\ValueStorage.history.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Deal.enum.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Account\\Account.define.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Account\\Account.struct.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\IndicatorBase.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Storage\\ValueStorage.native.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Trade\\TradeSignal.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Trade\\TradeSignal.struct.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Trade\\TradeSignalManager.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Trade\\TradeSignalManager.struct.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Bitwise\\indicators.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Bitwise\\Indi_Candle.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Price\\Indi_Price.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Bitwise\\Indi_Pattern.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Price\\indicators.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Special\\indicators.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Special\\Indi_Custom.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\indicators.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_ADXW.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Storage\\ValueStorage.price.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Storage\\ObjectsCache.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Storage\\ValueStorage.spread.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Storage\\ValueStorage.tick_volume.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Storage\\ValueStorage.time.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Storage\\ValueStorage.volume.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_AMA.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_ASI.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Storage\\ValueStorage.all.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_AppliedPrice.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\OHLC\\Indi_OHLC.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_BWZT.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Storage\\Singleton.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_CHO.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_CHV.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_ColorBars.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_ColorCandlesDaily.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_ColorLine.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_CustomMovingAverage.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_Demo.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_DetrendedPrice.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_Drawer.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Redis.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Redis.struct.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Socket.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_Drawer.struct.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_FractalAdaptiveMA.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_Killzones.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_MassIndex.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_Pivot.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_PriceChannel.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_PriceVolumeTrend.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_RS.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_RateOfChange.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_TEMA.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_TRIX.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_UltimateOscillator.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_VIDYA.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_VROC.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_Volumes.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_WilliamsAD.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes\\Indicators\\Indi_ZigZagColor.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\includes.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\ADX\\include\\enum.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\AMA\\Stg_AMA.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\ASI\\Stg_ASI.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\ATR_MA_Trend\\Stg_ATR_MA_Trend.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\ATR_MA_Trend\\Indi_ATR_MA_Trend.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\Chaikin\\Stg_Chaikin.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\Indicator\\Stg_Indicator.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\Meta_Mirror\\Stg_Meta_Mirror.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\Meta_Multi\\Stg_Meta_Multi.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\Meta_Reversal\\Stg_Meta_Reversal.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\Pinbar\\Stg_Pinbar.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\Pivot\\Stg_Pivot.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\SuperTrend\\Stg_SuperTrend.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\SuperTrend\\Indi_SuperTrend.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\TMAT_SVEBB\\Stg_TMAT_SVEBB.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\TMAT_SVEBB\\Indi_SVE_Bollinger_Bands.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\TMAT_SVEBB\\Indi_TMA_True.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\TMA_CG\\Stg_TMA_CG.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\TMA_CG\\Indi_TMA_CG.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\common\\elite\\defines.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\common\\elite\\inputs.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\Arrows\\Stg_Arrows.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\Arrows\\Indi_ATR_MA_Slope.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\DPO\\Stg_DPO.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\MA_Breakout\\Stg_MA_Breakout.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\MA_Cross_Pivot\\Stg_MA_Cross_Pivot.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\MA_Cross_Shift\\Stg_MA_Cross_Shift.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\MA_Cross_Sup_Res\\Stg_MA_Cross_Sup_Res.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\MA_Cross_Timeframe\\Stg_MA_Cross_Timeframe.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\MA_Trend\\Stg_MA_Trend.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\Oscillator\\Stg_Oscillator.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\Oscillator_Cross\\Stg_Oscillator_Cross.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\Oscillator_Cross_Shift\\Stg_Oscillator_Cross_Shift.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\Oscillator_Cross_Timeframe\\Stg_Oscillator_Cross_Timeframe.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\Oscillator_Cross_Zero\\Stg_Oscillator_Cross_Zero.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\Oscillator_Divergence\\Stg_Oscillator_Divergence.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\Oscillator_Martingale\\Stg_Oscillator_Martingale.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\Oscillator_Multi\\Stg_Oscillator_Multi.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\Oscillator_Overlay\\Stg_Oscillator_Overlay.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\Oscillator_Range\\Stg_Oscillator_Range.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\Oscillator_Trend\\Stg_Oscillator_Trend.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\Retracement\\Stg_Retracement.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\includes.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Bears_Bulls\\Stg_Meta_Bears_Bulls.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Conditions\\Stg_Meta_Conditions.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Double\\Stg_Meta_Double.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Enhance\\Stg_Meta_Enhance.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Equity\\Stg_Meta_Equity.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Formation\\Stg_Meta_Formation.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Hedge\\Stg_Meta_Hedge.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Interval\\Stg_Meta_Interval.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Limit\\Stg_Meta_Limit.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_MA_Cross\\Stg_Meta_MA_Cross.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Margin\\Stg_Meta_Margin.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Martingale\\Stg_Meta_Martingale.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Mirror\\Stg_Meta_Mirror.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Multi\\Stg_Meta_Multi.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Multi_Currency\\Stg_Meta_Multi_Currency.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_News\\Stg_Meta_News.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Order_Limit\\Stg_Meta_Order_Limit.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Oscillator_Filter\\Stg_Meta_Oscillator_Filter.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Oscillator_Switch\\Stg_Meta_Oscillator_Switch.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Pattern\\Stg_Meta_Pattern.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Pivot\\Stg_Meta_Pivot.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Profit\\Stg_Meta_Profit.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Resistance\\Stg_Meta_Resistance.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Reversal\\Stg_Meta_Reversal.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Risk\\Stg_Meta_Risk.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_RSI\\Stg_Meta_RSI.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Scalper\\Stg_Meta_Scalper.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Signal_Switch\\Stg_Meta_Signal_Switch.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Spread\\Stg_Meta_Spread.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Timezone\\Stg_Meta_Timezone.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Trend\\Stg_Meta_Trend.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Trio\\Stg_Meta_Trio.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Volatility\\Stg_Meta_Volatility.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Weekday\\Stg_Meta_Weekday.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\enum.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\common\\manager-meta.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\manager.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies\\MA_Cross_Candle\\Stg_MA_Cross_Candle.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Discrepancy\\Stg_Meta_Discrepancy.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_MA_Conditions\\Stg_Meta_MA_Conditions.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Odd_Period\\Stg_Meta_Odd_Period.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Oscillator_Conditions\\Stg_Meta_Oscillator_Conditions.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Price_Band\\Stg_Meta_Price_Band.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_SAR\\Stg_Meta_SAR.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\strategies-meta\\Meta_Signal_Filter\\Stg_Meta_Signal_Filter.mqh",
+      "compile":false,
+      "relative_to_project":true
+    }
+  ],
+
+  "resources":
+  [
+    {
+      "type":"indicator",
+      "path":"indicators\\Other\\Misc\\ATR_MA_Trend.ex5",
+      "name":"",
+      "relative_to_project":true
+    },
+    {
+      "type":"indicator",
+      "path":"indicators\\Other\\Price\\Range\\TMA+CG_mladen_NRP.ex5",
+      "name":"",
+      "relative_to_project":true
+    },
+    {
+      "type":"indicator",
+      "path":"indicators\\Other\\Price\\Range\\TMA_True.ex5",
+      "name":"",
+      "relative_to_project":true
+    },
+    {
+      "type":"indicator",
+      "path":"indicators\\Other\\Price\\SuperTrend.ex5",
+      "name":"",
+      "relative_to_project":true
+    },
+    {
+      "type":"indicator",
+      "path":"indicators\\Other\\Price\\Range\\SAWA.ex5",
+      "name":"",
+      "relative_to_project":true
     }
   ]
 }

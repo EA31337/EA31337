@@ -6,173 +6,257 @@
 [![Status][gha-image-backtest-master]][gha-link-backtest-master]
 [![Discuss][gh-discuss-badge]][gh-discuss-link]
 [![Channel][tg-channel-image]][tg-channel-link]
-[![Twitter][twitter-image]][twitter-link]
+[![X][x-pimage]][x-plink]
+[![X][x-cimage]][x-clink]
 [![License][license-image]][license-link]
 [![Edit][gh-edit-badge]][gh-edit-link]
 
 ## Introduction
 
-EA31337 is an advanced trading robot for Forex markets written in MQL.
+EA31337 is an open-source automated trading system written in MQL.
 
 ## About the project
 
-The project aims to deliver fully working EA at the advanced level.
+It is an expert advisor (EA) for algorithmic and automated trading on the Forex
+markets.
 
-It implements algorithm for managing multiple strategies
-on different timeframes at once.
+The project aims to implement various technical analysis strategies and custom
+indicators for building trading systems.
 
-This project utilizes the following sub-projects:
+It provides a framework to develop, test, and automate trading strategies.
 
-- [EA31337 framework][gh-repo-classes]
-- [EA31337 strategies][gh-repo-strats]
+It uses features of MetaTrader 4 and 5 such as the built-in MQL programming
+language, backtesting, optimization, and automation for running trading robots.
 
-The source code is compatible with MQL4 and MQL5 and can run on MetaTrader 4 and 5.
+EA31337 is highly customizable and editable so traders can experiment with
+different combinations of technical indicators, risk management rules, money
+management plans, etc.
 
-## Download
+It is an ongoing open-source project on GitHub allowing community contributions
+and enhancements from coders and traders.
 
-To download this project with all dependencies, use the following Git command:
+The source code is compatible with MQL4 and MQL5 and can run on MetaTrader 4
+and 5.
 
-    git clone --branch master --recursive https://github.com/EA31337/EA31337.git
+So in summary, it is free middleware for building and executing automated
+algorithmic trading systems on Metatrader platform without needing to code
+everything from scratch. It is popular among retail traders and coding
+enthusiasts for researching and deploying automated forex trading strategies.
 
-## Usage
+## Important Considerations Before Use
 
-You can freely use this project for education or research purposes.
-If you're planning to use it for trading, please take care, as neither it is the holy grail or making money machine.
-So if you're looking to double your investment in a short period with few clicks, this is not what you're looking for,
-and most likely you won't find holy grail anywhere else.
+This open-source project is freely available for education and research
+purposes.
 
-To use this project most efficiently, you'll have to invest some time to understand how it works and how you can use it.
+While EA algorithm aims to detect optimal market conditions for entries, no
+automated process can be perfect or account for evolving future conditions.
 
-To learn more about the usage, please check the [Wiki pages](https://github.com/EA31337/EA31337/wiki).
+We strongly recommend taking time to backtest thoroughly first across different
+scenarios, and demo trade for several weeks (do not rush), to deeply understand
+understand functionality and performance before risking any capital. Caution is
+advised when forward testing or going live, as past results are no guarantee of
+future performance.
 
-## Features
+Trading performance can vary substantially based on the selection of trading
+instruments, account funding and leverage, brokerage conditions, account type,
+prevailing spreads, and overall market volatility.
 
-The EA provides the following out-of-box features:
+Therefore realistic expectations are important. If you are looking for
+guaranteed, quick returns without effort, this project is not for you - and
+you are unlikely to find that anywhere.
 
-- Dozens of trading strategies to choose from.
-- Support for multi-timeframe trading.
-- Risk and price stop management.
-- Plenty of user input parameters to adjust the settings.
-- Filtering system.
+To utilize this project efficiently, some investment of time is required to
+fully understand the logic, strategies, and customization options. Thoughtful
+effort spent learning can provide the knowledge to employ it successfully as
+part of a wise trading approach.
+
+There are no "magic button" solutions in trading. However, with sensible
+goals, hard work educating yourself, and risk management awareness - tools
+like this can assist skilled traders in developing their own methodologies.
+We invite you to explore the possibilities through self-directed research and
+simulated testing.
+
+Ongoing development continues to enhance EA's logic across long time
+horizons, but no automated system can be perfect or complete. There are
+always improvements to make and market dynamics shift over time.
+
+Time invested understanding this tool can provide the knowledge to combine
+validated concepts with your own evolving methodology when deploying for live
+trading.
+
+The most successful traders put in significant work to educate themselves on
+using tools like this properly. Testing and learning never stops. Technical
+skills, risk management, and realistic expectations are key.
+
+Effort and wisdom in application can aid skilled traders in combining
+validated concepts with their own evolving strategies.
+
+We aim to provide transparency and support education, and not to promise easy
+profits.
+
+The work required is up to the individual - as is the responsibility for
+results.
+
+It is up to traders to apply, analyze, backtest, refine, and automate their
+own defined strategies.
+
+We simply provide this project in good faith to support experienced traders
+on their ongoing journeys.
+
+### Key Best Practices
+
+Please read these recommended guidelines:
+
+- Invest time in understanding functionality before use.
+  [Test thoroughly](#testing).
+- Demo trade any new configuration for weeks before going live.
+- Rigorously backtest parameter changes prior to committing capital.
+- Choose a broker with steady, low spreads and no trade interventions.
+- Start small to evaluate performance holistically, then size wisely.
+- Closely monitor account with spreads above 2 pip spreads or high volatility.
+- Use a broker permitting micro lots and hedged positions.
+- Beware spreads widening and high volatility during Forex news events.
+- Run on a VPS (Virtual Private Server) for reliable 24/7 operation.
+- Ensure a stable, high-quality internet connection with low latency.
+  Slow network or short disruptions may significantly impact the performance.
+- Allow auto-position sizing to organically increase with account growth.
+- Stick to major and liquid symbols (e.g. EURUSD, EURGBP).
+- Do not increase any lot size or risk criteria if your tradings are going well.
+- While running on live, keep monitoring your account (e.g. for any
+  warnings/errors in the logs).
+- Stay patient for opportunities matching strategy conditions.
+
+## Documentation and usage
+
+Documentation can be found at the [wiki page][gh-wiki].
+
+### Customization
+
+The default parameters are optimized for EURUSD symbol pair. However, there are
+many adjustable inputs allowing customization across symbols.
+
+These configuration options are documented on [Input parameters wiki
+page][gh-wiki-inputs]. Modifications can optimize performance for alternate
+currency pairs when rigorously backtested.
+
+We strongly advise thorough demo testing or backtesting before attempting live
+trading with new settings. Each symbol and broker combination can behave
+differently. Optimize parameter changes carefully based on evidence from
+extensive simulations across diverse market conditions.
+
+Live execution should only be considered once the risk-adjusted profile proves
+robust during demo trading or backtesting. Please trade live at your own risk,
+only with full confidence in the strategy's integrity across settings,
+brokers, and pairs based on your own rigorous testing.
+
+### SET files
+
+The SET files represent the best performing input values found during
+pre-release optimization testing.
+
+The EA ships already with optimized parameter files tailored specifically for
+EURUSD trading. These SET files represent the best performing input values
+found during pre-release optimization testing.
+
+Each release could have slightly different parameters, so don't mix old SET
+files between different releases.
+
+Please use the SET files included with your downloaded release package rather
+than older versions. Optimization is performed before major updates, so
+parameters evolve across releases to adapt to changing market dynamics.
+
+## Key Capabilities
+
+This expert advisor provides a wide range of integrated trading functionality:
+
+- Numerous Strategies: Choose from dozens of pre-built algorithmic trading
+  strategies across various timeframes and technical indicators.
+- Risk Controls: Configure price and trade stop limits along with customizable
+  filters for opening or closing trades based on market conditions.
+- Tunable Parameters: Fine-tune behaviors by adjusting dozens of input settings
+  for elements like risk limits, position sizing, indicators, and more.
+
+### Filtering System
+
+The unique filtering system offers precise control over trade entry and exit
+timing. Filters can be configured around account metrics, chart data, market
+volatility, active orders, indicators like Moving Averages or RSI, and more.
+
+You are free to customize these filters using Advanced version of EA.
+
+### Risk Management
+
+Intelligent trade management utilizes indicators and rules to determine ideal
+times to take profits or close losing positions. The dynamic price stop system
+aids risk mitigation in rapidly moving markets.
 
 ### Strategies
 
-Each strategy can analyse market on different timeframes independently.
-The market analysis is based on popular technical indicators.
+Each EA's strategy includes self-contained algorithms that analyze the markets
+using popular technical indicators across multiple timeframes. Traders can
+mix-and-match strategies or code custom logic taking advantage of included
+functions and events.
 
-Feel free to write your own custom strategies.
+You are free to write your own custom strategies.
 
-### Risk management
+### Timeframe
 
-#### Price stop
+For the trading purposes, any timeframe can be used since EA reads data from
+multiple timeframes independently from the current chart.
 
-As part of the risk management, the EA's price stop algorithm decides
-when to close a trade with profit or to avoid further lose
-based on a specific market conditions such as technical indicator analysis.
+## Downloads
 
-### Filtering system
+### Releases
 
-The unique filtering system controls
-when to open or close the trades based on set of conditions.
-
-The filters can be based on account, chart, market, indicator, active orders
-and several other conditions.
-
-You are free to customize these filters using Advanced parameters.
-
-## Before you start
-
-### Using & Testing
-
-Please be strongly aware that combination of symbol pair, broker, their market gaps and market spreads
-can give completely results when trading variety of robots.
-
-The EA tries its best to detect the perfect conditions for its trading,
-however you need to backtest the robot first
-(or test it on demo account for several weeks), before going into deep waters.
-
-EA is continuing to improve each release,
-which takes a lot of effort across many months and years,
-but it is never going to be perfect.
-
-### Important tips
-
-When using this EA for the trading purposes, please read the following tips:
-
-- Take your time to get familiar with the project and how it works.
-- Make sure you have tested EA on the demo account first (at least for few weeks).
-- It is advised to backtest your configuration before running on live account (see [Testing](#testing) section).
-- Choose your broker wisely to make sure EA will work as expected. For example:
-  - Be aware of your broker spreads and commissions, otherwise high spreads can easily kill your account,
-    no matter how good EA is.
-  - Start with with the smaller deposit first (use account supporting micro lots, otherwise change your broker)
-    to test the broker, market and EA configuration as the whole.
-  - Do not use EA in accounts with spreads above 20 points (2 pips) without proper backtesting
-    or good results in the demo account, unless risking affordable minimum (micro lots).
-  - Be aware that some brokers dynamically sets very high spreads (over 100) when the market is volatile,
-    so best opportunity for EA could turn into the worse. In this case, you should blame broker, not EA.
-  - Do not use brokers which doesn't allow hedging positions. The EA has not been tested for it.
-  - Watch out for brokers who "steal" pips by closing orders at a price which is less favourable to you by 1-2 pips
-    which can reduce the profits made by EA.
-- It's recommended to use VPS in order to run EA reliabily (24/7) as often restarts of EA
-  or a trading terminal while trades are opened can drastically affect the expected results.
-- Ensure to provide a stable internet connection to achieve reliable operation of EA as slow network
-  or short disruptions may significantly impact the performance.
-- While running on live, keep monitoring your account (e.g. for any warnings/errors in the logs).
-- Do not increase any lot size or risk criteria if your tradings are going well.
-  The EA will automatically adjust it when needed based on your available balance.
-- Be aware that potential profits can be matter of weeks, not days, so please be patient.
-  The configuration could be right, but it's about finding a good opportunity.
-- Use major symbol pairs (such as EURUSD, GBPUSD, etc), the one which has been tested.
-
-For more important tips, refer to [Before you start][gh-wiki-start] wiki page.
-
-## Installation
+Compiled binaries can be downloaded from [GitHub's Release page][github-release-link].
 
 For installation steps, refer to [Installation][gh-wiki-installation] wiki page.
 
 ### Compilation
 
-For compilation steps, refer to [Compilation](https://github.com/EA31337/EA31337/wiki/Compilation) wiki page.
+To download the source code along with all dependencies, use the following Git command:
 
-## Configuration
+    git clone --branch master --recursive https://github.com/EA31337/EA31337.git
 
-The default settings has been optimized for EURUSD symbol pair.
+After cloning, place the EA31337 directory into the `Experts` folder located in
+your MetaTrader platform's MQL directory.
 
-There are many of adjustable inputs that you can set. These are documented in a separate provided file.
-
-If you planning to run EA on variety of symbol pairs,
-it is strongly advised that you should test it on the demo first,
-alternatively backtest and optimize the settings first.
-Only run EA on live at your own risk, when you're happy with the backtest or results on the demo account.
-
-### Timeframe
-
-For the trading purposes, any timeframe can be used since EA reads data from multiple timeframes
-independently from the current chart.
+For more detailed compilation steps, refer to [Compilation][gh-wiki-compile] wiki page.
 
 ## Testing
 
-### Backtesting
+### Backtesting & optimization
+
+It is recommended to use MetaTrader 5 platform for backtesting and optimization.
+
+Backtesting is the process of evaluating a trading strategy by applying it to
+historical market data. It allows traders to simulate how a strategy might have
+performed in the past across many market conditions.
+
+Optimization takes this one step further by systematically tweaking a
+strategy's parameters to determine which configurations may have produced the
+best historical results. The goal is to fine-tune inputs related to elements
+like risk, position sizing and strategy params to maximize a given performance
+metric.
+
+By combining an automated strategy with backtesting and optimization, traders
+can rigorously analyze huge amounts of market data efficiently. This provides
+statistical insights to build conviction in the strategy's edge while finding
+optimal inputs without putting capital at risk.
 
 Please be aware that backtesting cannot reliabily simulate the future outcome.
-
-Recommended platform for backtesting and optimization is MetaTrader 5 (not 4).
 
 The backtesting for MT4
 has been documented at [Backtesting using MT4][gh-wiki-backtest] wiki page.
 
-### SET Files
+## Related projects
 
-By default, EA provides the best known optimized settings for EURUSD symbol pair
-based on the performed optimization tests before each release.
+This project utilizes the following sub-projects:
 
-Each release has slightly different, so don't mix old SET files for new EA.
-
-## Documentation
-
-Documentation can be found at the [wiki page][gh-wiki].
-If you believe some information is outdated, you can propose new changes.
+- [EA31337 framework][gh-repo-classes]
+- [EA31337 indicators][gh-repo-indis]
+- [EA31337 strategies][gh-repo-strats]
+- [EA31337 strategies meta][gh-repo-strats-meta]
 
 ## Support
 
@@ -195,55 +279,64 @@ For simplified version, please read <https://tldrlegal.com/license/gnu-general-p
 
 ## Terms of Use
 
-By using EA31337, you understand and agree that we (company and author)
-are not be liable or responsible for any loss or damage due to any reason.
-Although every attempt has been made to assure accuracy,
-we do not give any express or implied warranty as to its accuracy.
-We do not accept any liability for error or omission.
+By using EA31337, you understand and agree that we (company and author) are not
+be liable or responsible for any loss or damage due to any reason.  Although
+every attempt has been made to assure accuracy, we do not give any express or
+implied warranty as to its accuracy.  We do not accept any liability for error
+or omission.
 
-You acknowledge that you are familiar with these risks
-and that you are solely responsible for the outcomes of your decisions.
-We accept no liability whatsoever for any direct or consequential loss arising from the use of this product.
-You understand and agree that past results are not necessarily indicative of future performance.
+You acknowledge that you are familiar with these risks and that you are solely
+responsible for the outcomes of your decisions.  We accept no liability
+whatsoever for any direct or consequential loss arising from the use of this
+product.  You understand and agree that past results are not necessarily
+indicative of future performance.
 
-Use of EA31337 trading robot serves as your acknowledgement and representation that you have read and understand
-these TERMS OF USE and that you agree to be bound by such Terms of Use ("License Agreement").
+Use of EA31337 trading robot serves as your acknowledgement and representation
+that you have read and understand these TERMS OF USE and that you agree to be
+bound by such Terms of Use ("License Agreement").
 
 ### Copyright information
 
-Copyright © 2016-2021 - EA31337 Ltd - All Rights Reserved
+Copyright © 2016-2024 - EA31337 Ltd - All Rights Reserved
 
 Author & Publisher: kenorb at EA31337 Ltd.
 
 ### Disclaimer and Risk Warnings
 
-Trading any financial market involves risk.
-All forms of trading carry a high level of risk so you should only speculate with money you can afford to lose.
-You can lose more than your initial deposit and stake.
-Please ensure your chosen method matches your investment objectives,
-familiarize yourself with the risks involved and if necessary seek independent advice.
+Trading any financial market involves risk.  All forms of trading carry a high
+level of risk so you should only speculate with money you can afford to lose.
+You can lose more than your initial deposit and stake.  Please ensure your
+chosen method matches your investment objectives, familiarize yourself with the
+risks involved and if necessary seek independent advice.
 
-NFA and CTFC Required Disclaimers:
-Trading in the Foreign Exchange market as well as in Futures Market and Options or in the Stock Market
-is a challenging opportunity where above average returns are available for educated and experienced investors
-who are willing to take above average risk.
-However, before deciding to participate in Foreign Exchange (FX) trading or in Trading Futures, Options or stocks,
-you should carefully consider your investment objectives, level of experience and risk appetite.
+NFA and CTFC Required Disclaimers: Trading in the Foreign Exchange market as
+well as in Futures Market and Options or in the Stock Market is a challenging
+opportunity where above average returns are available for educated and
+experienced investors who are willing to take above average risk.  However,
+before deciding to participate in Foreign Exchange (FX) trading or in Trading
+Futures, Options or stocks, you should carefully consider your investment
+objectives, level of experience and risk appetite.
+
 **Do not invest money you cannot afford to lose**.
 
-CFTC RULE 4.41 - HYPOTHETICAL OR SIMULATED PERFORMANCE RESULTS HAVE CERTAIN LIMITATIONS.
-UNLIKE AN ACTUAL PERFORMANCE RECORD, SIMULATED RESULTS DO NOT REPRESENT ACTUAL TRADING.
-ALSO, SINCE THE TRADES HAVE NOT BEEN EXECUTED, THE RESULTS MAY HAVE UNDER-OR-OVER COMPENSATED FOR THE IMPACT,
-IF ANY, OF CERTAIN MARKET FACTORS, SUCH AS LACK OF LIQUIDITY. SIMULATED TRADING PROGRAMS IN GENERAL
-ARE ALSO SUBJECT TO THE FACT THAT THEY ARE DESIGNED WITH THE BENEFIT OF HINDSIGHT.
-NO REPRESENTATION IS BEING MADE THAN ANY ACCOUNT WILL OR IS LIKELY TO ACHIEVE PROFIT OR LOSSES SIMILAR TO THOSE SHOWN.
+CFTC RULE 4.41 - HYPOTHETICAL OR SIMULATED PERFORMANCE RESULTS HAVE
+CERTAIN LIMITATIONS.  UNLIKE AN ACTUAL PERFORMANCE RECORD,
+SIMULATED RESULTS DO NOT REPRESENT ACTUAL TRADING.  ALSO, SINCE THE
+TRADES HAVE NOT BEEN EXECUTED, THE RESULTS MAY HAVE UNDER-OR-OVER
+COMPENSATED FOR THE IMPACT, IF ANY, OF CERTAIN MARKET FACTORS, SUCH
+AS LACK OF LIQUIDITY. SIMULATED TRADING PROGRAMS IN GENERAL ARE
+ALSO SUBJECT TO THE FACT THAT THEY ARE DESIGNED WITH THE BENEFIT OF
+HINDSIGHT.  NO REPRESENTATION IS BEING MADE THAN ANY ACCOUNT WILL
+OR IS LIKELY TO ACHIEVE PROFIT OR LOSSES SIMILAR TO THOSE SHOWN.
 
 <!-- Named links -->
 
 [gh-edit-badge]: https://img.shields.io/badge/GitHub-edit-purple.svg?logo=github
 [gh-edit-link]: https://github.dev/EA31337/EA31337
 [gh-wiki]: https://github.com/EA31337/EA31337/wiki
+[gh-wiki-compile]: https://github.com/EA31337/EA31337/wiki/Compilation
 [gh-wiki-start]: https://github.com/EA31337/EA31337/wiki/Before-you-start
+[gh-wiki-inputs]: https://github.com/EA31337/EA31337/wiki/Input-parameters
 [gh-wiki-installation]: https://github.com/EA31337/EA31337/wiki/Installation
 [gh-wiki-backtest]: https://github.com/EA31337/EA3133-Support/wiki/Backtesting-using-MT4
 
@@ -258,13 +351,17 @@ NO REPRESENTATION IS BEING MADE THAN ANY ACCOUNT WILL OR IS LIKELY TO ACHIEVE PR
 [gha-image-backtest-master]: https://github.com/EA31337/EA31337/workflows/Backtest/badge.svg?branch=master
 
 [gh-repo-classes]: https://github.com/EA31337/EA31337-classes
+[gh-repo-indis]: https://github.com/EA31337/EA31337-indicators
 [gh-repo-strats]: https://github.com/EA31337/EA31337-strategies
+[gh-repo-strats-meta]: https://github.com/EA31337/EA31337-strategies-meta
 
 [tg-channel-image]: https://img.shields.io/badge/Telegram-join-0088CC.svg?logo=telegram
 [tg-channel-link]: https://t.me/EA31337
 
-[twitter-image]: https://img.shields.io/badge/EA31337-Follow-1DA1F2.svg?logo=Twitter
-[twitter-link]: https://twitter.com/EA31337
+[x-cimage]: https://img.shields.io/badge/EA31337-Join-1DA1F2.svg?logo=X
+[x-clink]: https://twitter.com/i/communities/1700228512274174098
+[x-pimage]: https://img.shields.io/badge/EA31337-Follow-1DA1F2.svg?logo=X
+[x-plink]: https://x.com/EA31337
 
 [gh-discuss-badge]: https://img.shields.io/badge/Discussions-Q&A-blue.svg?logo=github
 [gh-discuss-link]: https://github.com/EA31337/EA31337/discussions

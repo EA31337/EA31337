@@ -4,12 +4,12 @@
 [submodule "strategies"]
 	path = src/include/strategies
 	url = https://github.com/EA31337/EA31337-strategies.git
+[submodule "strategies-meta"]
+	path = src/include/strategies-meta
+	url = https://github.com/EA31337/EA31337-strategies-meta.git
+[submodule "indicators"]
+	path = src/indicators
+	url = https://github.com/EA31337/EA31337-indicators.git
 [submodule "wiki"]
 	path = docs/wiki
 	url = https://github.com/EA31337/EA31337.wiki.git
-[submodule "indicators-common"]
-	path = src/indicators-common
-	url = https://github.com/EA31337/EA31337-indicators-common.git
-[submodule "indicators-other"]
-	path = src/indicators-other
-	url = https://github.com/EA31337/EA31337-indicators-other.git

@@ -1,11 +1,10 @@
 //+------------------------------------------------------------------+
-//|                                                         define.h |
 //|                                 Copyright 2016-2023, EA31337 Ltd |
-//|                                       https://github.com/EA31337 |
+//|                                       https://ea31337.github.io/ |
 //+------------------------------------------------------------------+
 
 // EA defines.
-#define ea_version "2.013"
+#define ea_version "3.000"
 #define ea_desc "Forex multi-strategy trading robot."
 #define ea_link "https://github.com/EA31337"
 #define ea_author "kenorb"
@@ -23,7 +22,12 @@
 #include "advanced/defines.h"
 #endif
 #else
+#ifndef __elite__
 #include "lite/defines.h"
+#endif
+#endif
+#ifdef __elite__
+#include "elite/defines.h"
 #endif
 
 // Sets EA's log level based on the type of run.
@@ -50,3 +54,12 @@
 #else
 #define STG_AD_INDI_FILE "\\Indicators\\Examples\\AD.ex5"
 #endif
+
+// Indicator defines.
+#define INDI_ATR_MA_TREND_PATH "indicators\\Other\\Misc\\ATR_MA_Trend"
+#define INDI_EWO_OSC_PATH "indicators\\Other\\Oscillators\\Multi\\Elliott_Wave_Oscillator2"
+#define INDI_SAWA_PATH "indicators\\Other\\Price\\Range\\SAWA"
+#define INDI_SUPERTREND_PATH "indicators\\Other\\Price\\SuperTrend"
+#define INDI_SVEBB_PATH "indicators\\Other\\Oscillators\\Multi\\SVE_Bollinger_Bands"
+#define INDI_TMA_CG_PATH "indicators\\Other\\Price\\Range\\TMA+CG_mladen_NRP"
+#define INDI_TMA_TRUE_PATH "indicators\\Other\\Price\\Range\\TMA_True"
