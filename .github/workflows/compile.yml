@@ -120,7 +120,10 @@ jobs:
           verbose: true
 
       - name: Moves file
-        run: mv -v *.ex4 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex?"
+        run: >-
+          mv -v
+          *.ex4
+          "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex${{ matrix.version }}"
 
       - name: List compiled files
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
