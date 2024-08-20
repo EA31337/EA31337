@@ -26,24 +26,42 @@ env:
 
 jobs:
 
-  Compile-Indicators-Common:
+  checkout:
+    name: Checkout
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Uploads source code
+        uses: actions/upload-artifact@v4
+        with:
+          name: ea-src
+          path: .
+
+  compile-indicators-common:
+    name: Compile Indicators (Common)
     uses: EA31337/EA31337-Indicators-Common/.github/workflows/compile.yml@dev
     with:
-      artifact_prefix: mt
-      skip_cleanup: true
-  Compile-Indicators-Other:
-    uses: EA31337/EA31337-Indicators-Other/.github/workflows/compile.yml@dev
-    with:
-      artifact_prefix: mt
+      artifact_prefix: ic
       skip_cleanup: true
 
-  Compile-EA:
+  compile-indicators-other:
+    name: Compile Indicators (Other)
+    uses: EA31337/EA31337-Indicators-Other/.github/workflows/compile.yml@dev
+    with:
+      artifact_prefix: io
+      skip_cleanup: true
+
+  compile-ea:
 
     defaults:
       run:
         shell: powershell
         working-directory: src
-    needs: [Compile-Indicators-Common, Compile-Indicators-Other]
+
+    name: Compile EA
+    needs: [checkout, compile-indicators-common, compile-indicators-other]
     runs-on: windows-latest
 
     strategy:
@@ -55,25 +73,38 @@ jobs:
           - Rider
         mode2:
           - __resource__
+        version:
+          - 4
+          - 5
+      max-parallel: 2
 
     steps:
 
-      - uses: actions/checkout@v3
+      - name: Download source code
+        uses: actions/download-artifact@v4
         with:
-          submodules: 'recursive'
+          name: ea-src
+          path: .
 
-      - uses: actions/download-artifact@v3
+      - name: Download Indicators Common
+        uses: actions/download-artifact@v4
         with:
-          name: indicators-common
-          path: src/Indicators/Common
+          merge-multiple: true
+          pattern: ic-indicators-common-ex?
+          path: ${{ env.INDI_COMMON_WORKDIR }}
 
-      - uses: actions/download-artifact@v3
+      - name: Download Indicators Other
+        uses: actions/download-artifact@v4
         with:
-          name: indicators-other
-          path: src/Indicators/Other
+          merge-multiple: true
+          pattern: io-indicators-other-ex?
+          path: ${{ env.INDI_OTHER_WORKDIR }}
 
-      - name: List compiled files
-        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
+      - name: Download platform
+        uses: actions/download-artifact@v4
+        with:
+          name: ic${{ matrix.version }}
+          path: .mt${{ matrix.version }}
 
       - run: Get-Location
 
@@ -95,24 +126,22 @@ jobs:
       - name: Enables custom mode
         run: echo '#define ${{ matrix.mode2 }}' >> include/common/mode.h
 
-      - name: Compiles EA (MQL4)
+      - name: List compiled files
+        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
+
+      - name: Compiles EA
         uses: fx31337/mql-compile-action@master
         with:
           include: src
-          path: src/EA31337.mq4
+          mt-path: .mt${{ matrix.version }}
+          path: src/EA31337.mq${{ matrix.version }}
           verbose: true
 
-      - name: Compiles EA (MQL5)
-        uses: fx31337/mql-compile-action@master
-        with:
-          include: src
-          path: src/EA31337.mq5
-          verbose: true
-
-      - name: Moves file (MQL4)
-        run: mv -v *.ex4 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex4"
-      - name: Moves file (MQL5)
-        run: mv -v *.ex5 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex5"
+      - name: Moves file
+        run: >-
+          mv -v
+          *.ex4
+          "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex${{ matrix.version }}"
 
       - name: List compiled files
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
@@ -123,13 +152,14 @@ jobs:
           name: EA31337-${{ matrix.mode }}
           path: '**/EA*.ex?'
 
-  Test:
+  test-ea:
 
     defaults:
       run:
         shell: bash
 
-    needs: Compile-EA
+    name: Test EA
+    needs: compile-ea
     runs-on: ubuntu-latest
 
     strategy:
@@ -140,8 +170,7 @@ jobs:
           - Advanced
           - Elite
           - Rider
-        month: [1, 2]
-        year: [2020]
+        year: [2022, 2024]
 
     steps:
 
@@ -152,11 +181,26 @@ jobs:
       - name: Test ${{ matrix.year }}.${{ matrix.month }}
         uses: fx31337/mql-tester-action@master
         with:
-          BtDeposit: 10000
-          BtDigits: 5
-          BtMonths: ${{ matrix.month }}
-          BtYears: ${{ matrix.year }}
-          OptTrace: ${{ runner.debug }}
-          OptVerbose: true
+          Login: ${{ secrets.MT5_LOGIN }}
+          Password: ${{ secrets.MT5_PASSWORD }}
+          Server: MetaQuotes-Demo
+          TestDeposit: 2000
           TestExpert: EA31337-${{ matrix.mode }}
-          TestPeriod: M15
+          TestFromDate: ${{ matrix.year }}.01.01
+          TestPeriod: M1
+          TestSymbol: EURUSD
+          TestToDate: ${{ matrix.year }}.01.14
+          UrlExpert: file://${{ github.workspace }}/EA31337-${{ matrix.mode }}.ex5
+          Version: 5
+
+  cleanup:
+    if: inputs.skip_cleanup != true
+    name: Clean-up
+    needs: [test-ea]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: geekyeggo/delete-artifact@v5
+        with:
+          name: |
+            ic[45]
+            io[45]
