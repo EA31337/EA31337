@@ -44,6 +44,7 @@ jobs:
     uses: EA31337/EA31337-Indicators-Common/.github/workflows/compile.yml@dev
     with:
       artifact_prefix: ic
+      checkout_branch: dev
       skip_cleanup: true
 
   compile-indicators-other:
@@ -51,6 +52,7 @@ jobs:
     uses: EA31337/EA31337-Indicators-Other/.github/workflows/compile.yml@dev
     with:
       artifact_prefix: io
+      checkout_branch: dev
       skip_cleanup: true
 
   compile-ea:
