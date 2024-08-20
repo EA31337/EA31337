@@ -141,7 +141,7 @@ jobs:
       - name: Moves file
         run: >-
           mv -v
-          *.ex4
+          *.ex${{ matrix.version }}
           "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex${{ matrix.version }}"
 
       - name: List compiled files
@@ -151,7 +151,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: EA31337-${{ matrix.mode }}-ex${{ matrix.version }}(${{ matrix.mode2 }})
-          path: '**/EA*.ex?'
+          path: src/EA*.ex?
 
   cleanup:
     if: inputs.skip_cleanup != true

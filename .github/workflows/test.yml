@@ -140,7 +140,7 @@ jobs:
       - name: Moves file
         run: >-
           mv -v
-          *.ex4
+          *.ex${{ matrix.version }}
           "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex${{ matrix.version }}"
 
       - name: List compiled files
@@ -150,7 +150,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: EA31337-${{ matrix.mode }}
-          path: '**/EA*.ex?'
+          path: src/EA*.ex?
 
   test-ea:
 
@@ -178,19 +178,23 @@ jobs:
         with:
           name: EA31337-${{ matrix.mode }}
 
-      - name: Test ${{ matrix.year }}.${{ matrix.month }}
+      - name: List compiled files
+        run: find . -name '*.ex?' -type f -print
+
+      - name: Test ${{ matrix.year }}
         uses: fx31337/mql-tester-action@master
         with:
           Login: ${{ secrets.MT5_LOGIN }}
           Password: ${{ secrets.MT5_PASSWORD }}
           Server: MetaQuotes-Demo
           TestDeposit: 2000
-          TestExpert: EA31337-${{ matrix.mode }}
+          TestExpert: EA31337-${{ matrix.mode }}-${{ github.sha }}
           TestFromDate: ${{ matrix.year }}.01.01
           TestPeriod: M1
           TestSymbol: EURUSD
           TestToDate: ${{ matrix.year }}.01.14
-          UrlExpert: file://${{ github.workspace }}/EA31337-${{ matrix.mode }}.ex5
+          # yamllint disable-line rule:line-length
+          UrlExpert: file://${{ github.workspace }}/EA31337-${{ matrix.mode }}-${{ github.sha }}.ex5
           Version: 5
 
   cleanup:
