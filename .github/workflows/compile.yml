@@ -26,6 +26,19 @@ env:
 
 jobs:
 
+  checkout:
+    name: Checkout
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Uploads source code
+        uses: actions/upload-artifact@v4
+        with:
+          name: ea-src
+          path: .
+
   compile-indicators-common:
     name: Compile Indicators (Common)
     uses: EA31337/EA31337-Indicators-Common/.github/workflows/compile.yml@dev
@@ -48,7 +61,7 @@ jobs:
         working-directory: src
 
     name: Compile EA
-    needs: [compile-indicators-common, compile-indicators-other]
+    needs: [checkout, compile-indicators-common, compile-indicators-other]
     runs-on: windows-latest
 
     strategy:
@@ -68,9 +81,10 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
-          submodules: 'recursive'
+          name: ea-src
+          path: .
 
       - uses: actions/download-artifact@v4
         with:
@@ -97,15 +111,7 @@ jobs:
       - name: Enables custom mode
         run: echo '#define ${{ matrix.mode2 }}' >> include/common/mode.h
 
-      - name: Compiles EA (MQL4)
-        uses: fx31337/mql-compile-action@master
-        with:
-          include: src
-          mt-path: .${{ env.ARTIFACT_PREFIX }}${{ matrix.version }}
-          path: src/EA31337.mq4
-          verbose: true
-
-      - name: Compiles EA (MQL5)
+      - name: Compiles EA
         uses: fx31337/mql-compile-action@master
         with:
           include: src
@@ -113,10 +119,8 @@ jobs:
           path: src/EA31337.mq${{ matrix.version }}
           verbose: true
 
-      - name: Moves file (MQL4)
-        run: mv -v *.ex4 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex4"
-      - name: Moves file (MQL5)
-        run: mv -v *.ex5 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex5"
+      - name: Moves file
+        run: mv -v *.ex4 "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex?"
 
       - name: List compiled files
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
