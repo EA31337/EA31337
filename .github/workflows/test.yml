@@ -196,6 +196,7 @@ jobs:
           # yamllint disable-line rule:line-length
           UrlExpert: file://${{ github.workspace }}/EA31337-${{ matrix.mode }}-${{ github.sha }}.ex5
           Version: 5
+    timeout-minutes: 30
 
   cleanup:
     if: inputs.skip_cleanup != true
@@ -208,3 +209,4 @@ jobs:
           name: |
             ic[45]
             io[45]
+    timeout-minutes: 5
