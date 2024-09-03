@@ -68,7 +68,7 @@ jobs:
         with:
           submodules: 'recursive'
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: indicators
           path: .
@@ -149,7 +149,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: EA31337-${{ matrix.mode }}
       - name: Removes old results
@@ -190,7 +190,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: EA31337-${{ matrix.mode }}
       - name: Removes old results
@@ -231,7 +231,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: EA31337-${{ matrix.mode }}
       - name: Removes old results
@@ -295,7 +295,7 @@ jobs:
           # Otherwise, you will failed to push refs to dest repo.
           fetch-depth: 0
           ref: refs/heads/${{ github.head_ref }}
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: Results-${{ matrix.mode }}-${{ matrix.year }}
           # yamllint disable-line rule:line-length
