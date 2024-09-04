@@ -2,3 +2,4 @@
 Language: Cpp
 BasedOnStyle: Google
 ColumnLimit: 120
+IndentPPDirectives: BeforeHash
