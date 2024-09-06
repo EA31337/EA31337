@@ -53,7 +53,13 @@
 #resource INDI_SAWA_PATH + MQL_EXT
 #resource INDI_SUPERTREND_PATH + MQL_EXT
 // Strategy resources (MQL5 only).
+#resource "\\include\\strategies-meta\\Meta_News\\data\\news2018.csv" as string MetaNewsData2018
+#resource "\\include\\strategies-meta\\Meta_News\\data\\news2019.csv" as string MetaNewsData2019
+#resource "\\include\\strategies-meta\\Meta_News\\data\\news2020.csv" as string MetaNewsData2020
+#resource "\\include\\strategies-meta\\Meta_News\\data\\news2021.csv" as string MetaNewsData2021
 #resource "\\include\\strategies-meta\\Meta_News\\data\\news2022.csv" as string MetaNewsData2022
+#resource "\\include\\strategies-meta\\Meta_News\\data\\news2023.csv" as string MetaNewsData2023
+#resource "\\include\\strategies-meta\\Meta_News\\data\\news2024.csv" as string MetaNewsData2024
 #endif
 #endif
 
