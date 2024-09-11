@@ -23,7 +23,14 @@
 #ifndef STRATEGIES_META_MANAGER_H
 #define STRATEGIES_META_MANAGER_H
 
+#ifndef DICT_MQH
+#include <EA31337-classes/DictStruct.mqh>
+#endif
+
 class StrategiesMetaManager {
+  // Cache of already created strategies.
+  static DictStruct<string, Ref<Strategy>> _strat_cache;
+  
  public:
   /**
    * Initialize strategy with the specific timeframe.
@@ -40,7 +47,7 @@ class StrategiesMetaManager {
   }
 
   /**
-   * Initialize strategy by enum type.
+   * Create or return cached strategy by enum type.
    *
    * @param
    *   _sid - Strategy type
@@ -49,6 +56,29 @@ class StrategiesMetaManager {
    *   Returns strategy pointer on successful initialization, otherwise NULL.
    */
   static Strategy* StrategyInitByEnum(ENUM_STRATEGY _sid, ENUM_TIMEFRAMES _tf = PERIOD_CURRENT) {
+    string key = IntegerToString((int)_sid) + "@" + IntegerToString((int)_tf);
+    
+    if (_strat_cache.KeyExists(key)) {
+      return _strat_cache[key].Ptr();
+    }
+    
+    Ref<Strategy> _strat = StrategyCreateByEnum(_sid, _tf);
+    
+    _strat_cache.Set(key, _strat);
+    
+    return _strat.Ptr();
+  }
+
+  /**
+   * Create strategy by enum type.
+   *
+   * @param
+   *   _sid - Strategy type
+   *
+   * @return
+   *   Returns strategy pointer on successful initialization, otherwise NULL.
+   */
+  static Strategy* StrategyCreateByEnum(ENUM_STRATEGY _sid, ENUM_TIMEFRAMES _tf = PERIOD_CURRENT) {
     switch (_sid) {
       case STRAT_META_BEARS_BULLS:  // (Meta) Bears & Bulls
         return StrategyInit<Stg_Meta_Bears_Bulls>(_tf);
@@ -148,5 +178,7 @@ class StrategiesMetaManager {
     return StrategyInitByEnum((ENUM_STRATEGY)_sid, _tf);
   }
 };
+
+DictStruct<string, Ref<Strategy>> StrategiesMetaManager::_strat_cache;
 
 #endif  // STRATEGIES_META_MANAGER_H
