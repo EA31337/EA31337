@@ -274,7 +274,7 @@ class EA31337 : public EA {
       _strat.Ptr().Set<long>(STRAT_PARAM_ID, _magic_no);
       _strat.Ptr().Set<ENUM_TIMEFRAMES>(STRAT_PARAM_TF, _tf);
       _strat.Ptr().Set<int>(STRAT_PARAM_TYPE, _sid);
-      _strat.Ptr().Init();
+      _strat.Ptr().OnInit();  // @fixme: GH-410: Change it to Init().
       if (!strats.KeyExists(_magic_no)) {
         _result &= strats.Set(_magic_no, _strat);
       } else {
