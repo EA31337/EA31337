@@ -3096,39 +3096,5 @@
       "compile":false,
       "relative_to_project":true
     }
-  ],
-
-  "resources":
-  [
-    {
-      "type":"indicator",
-      "path":"indicators\\Other\\Misc\\ATR_MA_Trend.ex5",
-      "name":"",
-      "relative_to_project":true
-    },
-    {
-      "type":"indicator",
-      "path":"indicators\\Other\\Price\\Range\\TMA+CG_mladen_NRP.ex5",
-      "name":"",
-      "relative_to_project":true
-    },
-    {
-      "type":"indicator",
-      "path":"indicators\\Other\\Price\\Range\\TMA_True.ex5",
-      "name":"",
-      "relative_to_project":true
-    },
-    {
-      "type":"indicator",
-      "path":"indicators\\Other\\Price\\SuperTrend.ex5",
-      "name":"",
-      "relative_to_project":true
-    },
-    {
-      "type":"indicator",
-      "path":"indicators\\Other\\Price\\Range\\SAWA.ex5",
-      "name":"",
-      "relative_to_project":true
-    }
   ]
 }
