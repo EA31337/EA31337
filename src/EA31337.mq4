@@ -18,5 +18,11 @@
 #resource INDI_SAWA_PATH + MQL_EXT
 // #resource INDI_SUPERTREND_PATH + MQL_EXT // @todo: Not supported in MT4.
 // Strategy resources (MQL4 workaround).
+string MetaNewsData2018 = "";
+string MetaNewsData2019 = "";
+string MetaNewsData2020 = "";
+string MetaNewsData2021 = "";
 string MetaNewsData2022 = "";
+string MetaNewsData2023 = "";
+string MetaNewsData2024 = "";
 #endif
