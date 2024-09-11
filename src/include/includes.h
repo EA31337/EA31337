@@ -33,7 +33,7 @@
 #include "strategies/enum.h"
 
 // Strategy managers.
-#include "common/manager-meta.h"  // Overrides the default one.
+#include "common/strategies-manager-meta.h"  // Overrides the default one.
 #include "strategies/manager.h"
 
 // Main user inputs.
