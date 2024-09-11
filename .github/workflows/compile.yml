@@ -84,27 +84,27 @@ jobs:
     steps:
 
       - name: Download source code
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v4
         with:
           name: ea-src
           path: .
 
       - name: Download Indicators Common
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v4
         with:
           merge-multiple: true
           pattern: ic-indicators-common-ex?
           path: ${{ env.INDI_COMMON_WORKDIR }}
 
       - name: Download Indicators Other
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v4
         with:
           merge-multiple: true
           pattern: io-indicators-other-ex?
           path: ${{ env.INDI_OTHER_WORKDIR }}
 
       - name: Download platform
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v4
         with:
           name: ic${{ matrix.version }}
           path: .mt${{ matrix.version }}
@@ -150,7 +150,7 @@ jobs:
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: EA31337-${{ matrix.mode }}-ex${{ matrix.version }}(${{ matrix.mode2 }})
           path: src/EA*.ex?

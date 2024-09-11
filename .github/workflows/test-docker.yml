@@ -35,7 +35,7 @@ jobs:
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
       - run: Get-Location
       - name: Upload indicator artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: indicators
           path: '**/*.ex?'
@@ -63,7 +63,7 @@ jobs:
         with:
           submodules: 'recursive'
 
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v4
         with:
           name: indicators
           path: .
@@ -118,7 +118,7 @@ jobs:
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: EA31337-${{ matrix.mode }}
           path: '**/EA*.ex?'
@@ -153,7 +153,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v4
         with:
           name: EA31337-${{ matrix.mode }}
       - name: Clean older test results
@@ -162,13 +162,13 @@ jobs:
       - run: docker-compose run $TEST_NAME
         working-directory: docker/tests/${{ matrix.mode }}
       - name: Uploads test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Results-${{ matrix.mode }}
           path: docker/tests/${{ matrix.mode }}/_results/*.*
       - name: Uploads test results (retry on failure)
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Results-${{ matrix.mode }}
           path: docker/tests/${{ matrix.mode }}/_results/*.*
@@ -203,7 +203,7 @@ jobs:
           # Otherwise, you will failed to push refs to dest repo.
           fetch-depth: 0
           ref: refs/heads/${{ github.head_ref }}
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v4
         with:
           name: Results-${{ matrix.mode }}
           path: docker/tests/${{ matrix.mode }}/_results

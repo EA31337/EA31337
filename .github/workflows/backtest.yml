@@ -38,7 +38,7 @@ jobs:
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
       - run: Get-Location
       - name: Upload indicator artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: indicators
           path: '**/*.ex?'
@@ -68,7 +68,7 @@ jobs:
         with:
           submodules: 'recursive'
 
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v4
         with:
           name: indicators
           path: .
@@ -127,7 +127,7 @@ jobs:
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: EA31337-${{ matrix.mode }}
           path: '**/EA*.ex?'
@@ -154,7 +154,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v4
         with:
           name: EA31337-${{ matrix.mode }}
       - name: Removes old results
@@ -165,14 +165,14 @@ jobs:
         # yamllint disable-line rule:line-length
         working-directory: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}
       - name: Uploads results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Results-${{ matrix.mode }}-${{ matrix.year }}
           # yamllint disable-line rule:line-length
           path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
       - name: Re-uploads results on failure
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Results-${{ matrix.mode }}-${{ matrix.year }}
           # yamllint disable-line rule:line-length
@@ -200,7 +200,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v4
         with:
           name: EA31337-${{ matrix.mode }}
       - name: Removes old results
@@ -211,14 +211,14 @@ jobs:
         # yamllint disable-line rule:line-length
         working-directory: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}
       - name: Uploads results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Results-${{ matrix.mode }}-${{ matrix.year }}
           # yamllint disable-line rule:line-length
           path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
       - name: Re-uploads results on failure
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Results-${{ matrix.mode }}-${{ matrix.year }}
           # yamllint disable-line rule:line-length
@@ -246,7 +246,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v4
         with:
           name: EA31337-${{ matrix.mode }}
       - name: Removes old results
@@ -257,14 +257,14 @@ jobs:
         # yamllint disable-line rule:line-length
         working-directory: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}
       - name: Uploads results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Results-${{ matrix.mode }}-${{ matrix.year }}
           # yamllint disable-line rule:line-length
           path: docker/backtest/${{ matrix.mode }}/all-yearly/${{ matrix.year }}/_results
       - name: Re-uploads results on failure
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Results-${{ matrix.mode }}-${{ matrix.year }}
           # yamllint disable-line rule:line-length
@@ -306,7 +306,7 @@ jobs:
           # Otherwise, you will failed to push refs to dest repo.
           fetch-depth: 0
           ref: refs/heads/${{ github.head_ref }}
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v4
         with:
           name: Results-${{ matrix.mode }}-${{ matrix.year }}
           # yamllint disable-line rule:line-length
