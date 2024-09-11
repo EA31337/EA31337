@@ -1,7 +1,7 @@
 {
   "platform"    :"mt5",
   "program_type":"expert",
-  "copyright"   :"2016-2023, EA31337 Ltd",
+  "copyright"   :"2016-2024, EA31337 Ltd",
   "link"        :"https:\/\/github.com\/EA31337\/EA31337",
   "version"     :"3.000",
   "description" :"Forex multi-strategy trading robot",
