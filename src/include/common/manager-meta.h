@@ -23,10 +23,6 @@
 #ifndef STRATEGIES_META_MANAGER_H
 #define STRATEGIES_META_MANAGER_H
 
-#ifndef DICT_MQH
-#include <EA31337-classes/DictStruct.mqh>
-#endif
-
 class StrategiesMetaManager {
   // Cache of already created strategies.
   static DictStruct<string, Ref<Strategy>> _strat_cache;
