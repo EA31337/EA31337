@@ -5,7 +5,7 @@
 	path = src/strategies
 	url = https://github.com/EA31337/EA31337-strategies.git
 [submodule "strategies-meta"]
-	path = src/include/strategies-meta
+	path = src/strategies-meta
 	url = https://github.com/EA31337/EA31337-strategies-meta.git
 [submodule "indicators"]
 	path = src/indicators

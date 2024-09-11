@@ -29,7 +29,7 @@
 #include "common/struct.h"
 
 // Strategy enums.
-#include "strategies-meta/enum.h"
+#include "../strategies-meta/enum.h"
 #include "../strategies/enum.h"
 
 // Strategy managers.
@@ -43,4 +43,4 @@
 INPUT_GROUP("Strategy parameters");  // >>> STRATEGIES <<<
 #include "../strategies/includes.h"
 INPUT_GROUP("Strategy meta parameters");  // >>> STRATEGIES META <<<
-#include "strategies-meta/includes.h"
+#include "../strategies-meta/includes.h"
