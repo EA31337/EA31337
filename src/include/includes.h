@@ -30,7 +30,7 @@
 
 // Strategy enums.
 #include "strategies-meta/enum.h"
-#include "strategies/enum.h"
+#include "../strategies/enum.h"
 
 // Strategy managers.
 #include "common/strategies-manager-meta.h"  // Overrides the default one.
@@ -41,6 +41,6 @@
 
 // Strategy includes.
 INPUT_GROUP("Strategy parameters");  // >>> STRATEGIES <<<
-#include "strategies/includes.h"
+#include "../strategies/includes.h"
 INPUT_GROUP("Strategy meta parameters");  // >>> STRATEGIES META <<<
 #include "strategies-meta/includes.h"
