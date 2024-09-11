@@ -34,7 +34,7 @@
 
 // Strategy managers.
 #include "common/strategies-manager-meta.h"  // Overrides the default one.
-#include "strategies/manager.h"
+#include "common/strategies-manager.h" // Overrides the default one.
 
 // Main user inputs.
 #include "inputs.h"

@@ -26,7 +26,7 @@
 class StrategiesMetaManager {
   // Cache of already created strategies.
   static DictStruct<string, Ref<Strategy>> _strat_cache;
-  
+
  public:
   /**
    * Initialize strategy with the specific timeframe.
@@ -53,15 +53,15 @@ class StrategiesMetaManager {
    */
   static Strategy* StrategyInitByEnum(ENUM_STRATEGY _sid, ENUM_TIMEFRAMES _tf = PERIOD_CURRENT) {
     string key = IntegerToString((int)_sid) + "@" + IntegerToString((int)_tf);
-    
+
     if (_strat_cache.KeyExists(key)) {
       return _strat_cache[key].Ptr();
     }
-    
+
     Ref<Strategy> _strat = StrategyCreateByEnum(_sid, _tf);
-    
+
     _strat_cache.Set(key, _strat);
-    
+
     return _strat.Ptr();
   }
 
