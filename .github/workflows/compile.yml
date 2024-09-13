@@ -19,6 +19,13 @@ on:
       - src/*.mq?
       - src/*.mq[45h]
       - src/include/**
+  workflow_call:
+    inputs:
+      skip_cleanup:
+        default: false
+        description: Whether to skip a clean-up job.
+        required: false
+        type: boolean
 
 env:
   INDI_COMMON_WORKDIR: ${{ vars.INDI_COMMON_WORKDIR || 'src/indicators/Common' }}
@@ -79,7 +86,7 @@ jobs:
         version:
           - 4
           - 5
-      max-parallel: 2
+      max-parallel: 8
 
     steps:
 
@@ -152,7 +159,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: EA31337-${{ matrix.mode }}-ex${{ matrix.version }}(${{ matrix.mode2 }})
+          name: EA31337-${{ matrix.mode }}(${{ matrix.mode2 }})-ex${{ matrix.version }}
           path: src/EA*.ex?
 
   cleanup:
