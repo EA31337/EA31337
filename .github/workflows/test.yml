@@ -11,6 +11,8 @@ on:
       - src/*.mq?
       - src/*.mq[45h]
       - src/include/**
+      - src/strategies
+      - src/strategies-meta
   push:
     paths:
       - '**.h'
@@ -19,6 +21,8 @@ on:
       - src/*.mq?
       - src/*.mq[45h]
       - src/include/**
+      - src/strategies
+      - src/strategies-meta
 
 env:
   INDI_COMMON_WORKDIR: ${{ vars.INDI_COMMON_WORKDIR || 'src/indicators/Common' }}
