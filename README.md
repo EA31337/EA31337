@@ -13,35 +13,46 @@
 
 ## Introduction
 
-EA31337 is an open-source automated trading system written in MQL.
+EA31337 is a free and open-source Forex autonomous trading robot
+designed for the MetaTrader 4 and 5 (MT4/MT5) platforms.
 
 ## About the project
 
-It is an expert advisor (EA) for algorithmic and automated trading on the Forex
-markets.
+The project consists of four variants of Expert Advisors (EAs):
+Lite, Advanced, Rider and Elite, each with a distinct approach
+to market analysis and trading strategy.
 
-The project aims to implement various technical analysis strategies and custom
-indicators for building trading systems.
+At its core, EA offers the simultaneous execution of hundreds of trading
+strategies across multiple timeframes analyzing the market
+based on the implemented technical indicators and trading conditions.
 
-It provides a framework to develop, test, and automate trading strategies.
+The aim is to implement a wide array of technical analysis strategies
+and custom indicators, facilitating the development of robust trading systems.
 
-It uses features of MetaTrader 4 and 5 such as the built-in MQL programming
-language, backtesting, optimization, and automation for running trading robots.
+EA31337 provides a comprehensive framework for traders
+to develop, test, and automate their trading strategies.
+It leverages the capabilities of MetaTrader platforms,
+including the MQL programming language, backtesting, optimization,
+and automation features for executing trading robots.
 
-EA31337 is highly customizable and editable so traders can experiment with
-different combinations of technical indicators, risk management rules, money
-management plans, etc.
+Traders can experiment with various combinations of technical indicators,
+risk management rules, and money management plans, tailoring the EA
+to their specific needs without needing to code everything from scratch.
 
-It is an ongoing open-source project on GitHub allowing community contributions
-and enhancements from coders and traders.
+The source code, compatible with both MQL4 and MQL5,
+allows for seamless operation on both MetaTrader 4 and 5 platforms.
+This compatibility makes robot a popular choice among retail traders
+and coding enthusiasts interested in researching and deploying
+automated Forex trading strategies.
 
-The source code is compatible with MQL4 and MQL5 and can run on MetaTrader 4
-and 5.
+It is an ongoing open-source project that invites contributions
+and enhancements from both coders and traders.
+This collaborative approach ensures continuous improvement
+and innovation in trading strategies.
 
-So in summary, it is free middleware for building and executing automated
-algorithmic trading systems on Metatrader platform without needing to code
-everything from scratch. It is popular among retail traders and coding
-enthusiasts for researching and deploying automated forex trading strategies.
+## Features
+
+See: [Features](https://github.com/EA31337/EA31337/wiki/Features).
 
 ## Important Considerations Before Use
 
