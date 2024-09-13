@@ -166,3 +166,4 @@ jobs:
           name: |
             ic[45]
             io[45]
+    timeout-minutes: 5
