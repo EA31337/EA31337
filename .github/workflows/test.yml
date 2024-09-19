@@ -84,6 +84,10 @@ jobs:
           UrlExpert: >-
             file://${{ github.workspace }}/EA31337-${{ matrix.mode }}-${{ github.sha }}.ex${{ matrix.version }}
           Version: 5
+
+      - if: ${{ failure() && runner.debug == '1' }}
+        uses: mxschmitt/action-tmate@v3
+
     timeout-minutes: 30
 
   cleanup:
