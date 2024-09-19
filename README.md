@@ -34,10 +34,6 @@ Read more: [About](https://github.com/EA31337/EA31337/wiki/About).
 
 See: [Features](https://github.com/EA31337/EA31337/wiki/Features).
 
-## Best practises
-
-See: [Best practices](https://github.com/EA31337/EA31337/wiki/Best-practices).
-
 ### Key Best Practices
 
 See: [Best practices](https://github.com/EA31337/EA31337/wiki/Best-practices).
