@@ -18,124 +18,33 @@ designed for the MetaTrader 4 and 5 (MT4/MT5) platforms.
 
 ## About the project
 
-The project consists of four variants of Expert Advisors (EAs):
-Lite, Advanced, Rider and Elite, each with a distinct approach
-to market analysis and trading strategy.
+EA31337 provides a comprehensive framework for traders to develop, test, and automate their trading strategies.
 
-At its core, EA offers the simultaneous execution of hundreds of trading
-strategies across multiple timeframes analyzing the market
-based on the implemented technical indicators and trading conditions.
+It leverages the capabilities of MetaTrader platforms, including the MQL
+programming language, backtesting, optimization, and automation features for
+executing trading robots.
 
-The aim is to implement a wide array of technical analysis strategies
-and custom indicators, facilitating the development of robust trading systems.
+The aim of the project is to implement a wide array of technical analysis
+strategies and custom indicators, facilitating the development of robust
+trading systems.
 
-EA31337 provides a comprehensive framework for traders
-to develop, test, and automate their trading strategies.
-It leverages the capabilities of MetaTrader platforms,
-including the MQL programming language, backtesting, optimization,
-and automation features for executing trading robots.
-
-Traders can experiment with various combinations of technical indicators,
-risk management rules, and money management plans, tailoring the EA
-to their specific needs without needing to code everything from scratch.
-
-The source code, compatible with both MQL4 and MQL5,
-allows for seamless operation on both MetaTrader 4 and 5 platforms.
-This compatibility makes robot a popular choice among retail traders
-and coding enthusiasts interested in researching and deploying
-automated Forex trading strategies.
-
-It is an ongoing open-source project that invites contributions
-and enhancements from both coders and traders.
-This collaborative approach ensures continuous improvement
-and innovation in trading strategies.
+Read more: [About](https://github.com/EA31337/EA31337/wiki/About).
 
 ## Features
 
 See: [Features](https://github.com/EA31337/EA31337/wiki/Features).
 
-## Important Considerations Before Use
+## Best practises
 
-This open-source project is freely available for education and research
-purposes.
-
-While EA algorithm aims to detect optimal market conditions for entries, no
-automated process can be perfect or account for evolving future conditions.
-
-We strongly recommend taking time to backtest thoroughly first across different
-scenarios, and demo trade for several weeks (do not rush), to deeply understand
-understand functionality and performance before risking any capital. Caution is
-advised when forward testing or going live, as past results are no guarantee of
-future performance.
-
-Trading performance can vary substantially based on the selection of trading
-instruments, account funding and leverage, brokerage conditions, account type,
-prevailing spreads, and overall market volatility.
-
-Therefore realistic expectations are important. If you are looking for
-guaranteed, quick returns without effort, this project is not for you - and
-you are unlikely to find that anywhere.
-
-To utilize this project efficiently, some investment of time is required to
-fully understand the logic, strategies, and customization options. Thoughtful
-effort spent learning can provide the knowledge to employ it successfully as
-part of a wise trading approach.
-
-There are no "magic button" solutions in trading. However, with sensible
-goals, hard work educating yourself, and risk management awareness - tools
-like this can assist skilled traders in developing their own methodologies.
-We invite you to explore the possibilities through self-directed research and
-simulated testing.
-
-Ongoing development continues to enhance EA's logic across long time
-horizons, but no automated system can be perfect or complete. There are
-always improvements to make and market dynamics shift over time.
-
-Time invested understanding this tool can provide the knowledge to combine
-validated concepts with your own evolving methodology when deploying for live
-trading.
-
-The most successful traders put in significant work to educate themselves on
-using tools like this properly. Testing and learning never stops. Technical
-skills, risk management, and realistic expectations are key.
-
-Effort and wisdom in application can aid skilled traders in combining
-validated concepts with their own evolving strategies.
-
-We aim to provide transparency and support education, and not to promise easy
-profits.
-
-The work required is up to the individual - as is the responsibility for
-results.
-
-It is up to traders to apply, analyze, backtest, refine, and automate their
-own defined strategies.
-
-We simply provide this project in good faith to support experienced traders
-on their ongoing journeys.
+See: [Best practices](https://github.com/EA31337/EA31337/wiki/Best-practices).
 
 ### Key Best Practices
 
-Please read these recommended guidelines:
+See: [Best practices](https://github.com/EA31337/EA31337/wiki/Best-practices).
 
-- Invest time in understanding functionality before use.
-  [Test thoroughly](#testing).
-- Demo trade any new configuration for weeks before going live.
-- Rigorously backtest parameter changes prior to committing capital.
-- Choose a broker with steady, low spreads and no trade interventions.
-- Start small to evaluate performance holistically, then size wisely.
-- Closely monitor account with spreads above 2 pip spreads or high volatility.
-- Use a broker permitting micro lots and hedged positions.
-- Beware spreads widening and high volatility during Forex news events.
-- Run on a VPS (Virtual Private Server) for reliable 24/7 operation.
-- Ensure a stable, high-quality internet connection with low latency.
-  Slow network or short disruptions may significantly impact the performance.
-- Allow auto-position sizing to organically increase with account growth.
-- Stick to major and liquid symbols (e.g. EURUSD, EURGBP).
-- Do not increase any lot size or risk criteria if your tradings are going well.
-- While running on live, keep monitoring your account (e.g. for any
-  warnings/errors in the logs).
-- Stay patient for opportunities matching strategy conditions.
+## Important Considerations Before Use
+
+See: [IMPORTANT NOTES](https://github.com/EA31337/EA31337/wiki/IMPORTANT-NOTES).
 
 ## Documentation and usage
 
@@ -271,9 +180,13 @@ This project utilizes the following sub-projects:
 
 ## Support
 
-- For help, open a [new discussion][gh-discuss-link] to ask questions.
+- For general help or ideas, open a [new discussion][gh-discuss-link] to ask questions.
 - For bugs/features, raise a [new issue at GitHub][gh-issues].
+
+## Social
+
 - Join our [Telegram channel][tg-channel-link] for news and discussion group for help.
+- Follow our [page at X][x-plink] or join our [X Community][x-clink].
 
 ## Legal
 
