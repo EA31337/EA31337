@@ -740,14 +740,14 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         bpower[index][i][ORDER_TYPE_SELL] = Indi_BearsPower::iBearsPower(symbol, tf, BearsPower_Period, BearsPower_Applied_Price, i + BearsPower_Shift);
       }
-      success = (bool)(bpower[index][CURR][ORDER_TYPE_BUY] || bpower[index][CURR][ORDER_TYPE_SELL]);
+      success = (bool)(bpower[index][CURR][ORDER_TYPE_BUY] > 0 || bpower[index][CURR][ORDER_TYPE_SELL] > 0);
       // Message("Bulls: " + bpower[index][CURR][ORDER_TYPE_BUY] + ", Bears: " + bpower[index][CURR][ORDER_TYPE_SELL]);
       break;
     case INDI_BULLS: // Calculates the Bulls Power and Bulls Power indicators.
       for (i = 0; i < FINAL_ENUM_INDICATOR_INDEX; i++) {
         bpower[index][i][ORDER_TYPE_BUY]  = Indi_BullsPower::iBullsPower(symbol, tf, BullsPower_Period, BullsPower_Applied_Price, i + BullsPower_Shift);
       }
-      success = (bool)(bpower[index][CURR][ORDER_TYPE_BUY] || bpower[index][CURR][ORDER_TYPE_SELL]);
+      success = (bool)(bpower[index][CURR][ORDER_TYPE_BUY] > 0 || bpower[index][CURR][ORDER_TYPE_SELL] > 0);
       // Message("Bulls: " + bpower[index][CURR][ORDER_TYPE_BUY] + ", Bears: " + bpower[index][CURR][ORDER_TYPE_SELL]);
       break;
     case INDI_BWMFI: // Calculates the Market Facilitation Index indicator.
@@ -832,7 +832,7 @@ bool UpdateIndicator(Chart *_chart, ENUM_INDICATOR_TYPE type) {
         }
         */
       }
-      success = (bool) ma_fast[index][CURR] || ma_medium[index][CURR] || ma_slow[index][CURR];
+      success = (bool) ma_fast[index][CURR] > 0 || ma_medium[index][CURR] > 0 || ma_slow[index][CURR] > 0;
       #ifdef __MQL4__
       if (VerboseDebug) PrintFormat("MA Fast M%d: %s", tf, Array::ArrToString2D(ma_fast, ",", Digits));
       if (VerboseDebug) PrintFormat("MA Medium M%d: %s", tf, Array::ArrToString2D(ma_medium, ",", Digits));
@@ -1760,9 +1760,9 @@ bool UpdateTrailingStops(Trade *_trade) {
   // Check result of executed orders.
   bool result = true;
   // New StopLoss/TakeProfit.
-  double prev_sl, prev_tp;
-  double new_sl, new_tp;
-  double trail_sl, trail_tp;
+  double prev_sl = 0.0, prev_tp = 0.0;
+  double new_sl = 0.0, new_tp = 0.0;
+  double trail_sl = 0.0, trail_tp = 0.0;
   int i, sid;
 
    // Check if bar time has been changed since last time.

@@ -23,7 +23,7 @@
 #endif
 
 // Includes version specific user input params.
-extern string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v" + ea_version + " --"; // >>> EA31337 <<<
+input string __EA_Parameters__ = "-- Input EA parameters for " + ea_name + " v" + ea_version + " --"; // >>> EA31337 <<<
 #ifdef __advanced__ // Include default input settings based on the mode.
   #ifdef __rider__
     #include "EA31337/rider/ea-input.mqh"
