@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                              EA31337 Libre - Forex trading robot |
-//|                                 Copyright 2016-2023, EA31337 Ltd |
+//|                                 Copyright 2016-2024, EA31337 Ltd |
 //|                                       https://ea31337.github.io/ |
 //+------------------------------------------------------------------+
 
@@ -274,7 +274,7 @@ class EA31337 : public EA {
       _strat.Ptr().Set<long>(STRAT_PARAM_ID, _magic_no);
       _strat.Ptr().Set<ENUM_TIMEFRAMES>(STRAT_PARAM_TF, _tf);
       _strat.Ptr().Set<int>(STRAT_PARAM_TYPE, _sid);
-      _strat.Ptr().OnInit();
+      _strat.Ptr().OnInit();  // @fixme: GH-410: Change it to Init().
       if (!strats.KeyExists(_magic_no)) {
         _result &= strats.Set(_magic_no, _strat);
       } else {

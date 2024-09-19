@@ -1,7 +1,7 @@
 {
   "platform"    :"mt5",
   "program_type":"expert",
-  "copyright"   :"2016-2023, EA31337 Ltd",
+  "copyright"   :"2016-2024, EA31337 Ltd",
   "link"        :"https:\/\/github.com\/EA31337\/EA31337",
   "version"     :"3.000",
   "description" :"Forex multi-strategy trading robot",
@@ -2652,482 +2652,633 @@
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\includes.h",
+      "path":"strategies-meta\\enum.h",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\ADX\\include\\enum.h",
+      "path":"strategies\\enum.h",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\AMA\\Stg_AMA.mqh",
+      "path":"include\\common\\strategies-manager-meta.h",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\ASI\\Stg_ASI.mqh",
+      "path":"include\\common\\strategies-manager.h",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\ATR_MA_Trend\\Stg_ATR_MA_Trend.mqh",
+      "path":"strategies\\includes.h",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\ATR_MA_Trend\\Indi_ATR_MA_Trend.mqh",
+      "path":"strategies\\AC\\Stg_AC.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\Chaikin\\Stg_Chaikin.mqh",
+      "path":"strategies\\AD\\Stg_AD.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\Indicator\\Stg_Indicator.mqh",
+      "path":"strategies\\ADX\\Stg_ADX.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\Meta_Mirror\\Stg_Meta_Mirror.mqh",
+      "path":"strategies\\ADX\\include\\enum.h",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\Meta_Multi\\Stg_Meta_Multi.mqh",
+      "path":"strategies\\AMA\\Stg_AMA.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\Meta_Reversal\\Stg_Meta_Reversal.mqh",
+      "path":"strategies\\ASI\\Stg_ASI.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\Pinbar\\Stg_Pinbar.mqh",
+      "path":"strategies\\ATR\\Stg_ATR.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\Pivot\\Stg_Pivot.mqh",
+      "path":"strategies\\ATR_MA_Trend\\Stg_ATR_MA_Trend.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\SuperTrend\\Stg_SuperTrend.mqh",
+      "path":"strategies\\ATR_MA_Trend\\Indi_ATR_MA_Trend.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\SuperTrend\\Indi_SuperTrend.mqh",
+      "path":"strategies\\Alligator\\Stg_Alligator.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\TMAT_SVEBB\\Stg_TMAT_SVEBB.mqh",
+      "path":"strategies\\Arrows\\Stg_Arrows.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\TMAT_SVEBB\\Indi_SVE_Bollinger_Bands.mqh",
+      "path":"strategies\\Arrows\\Indi_ATR_MA_Slope.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\TMAT_SVEBB\\Indi_TMA_True.mqh",
+      "path":"strategies\\Awesome\\Stg_Awesome.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\TMA_CG\\Stg_TMA_CG.mqh",
+      "path":"strategies\\BWMFI\\Stg_BWMFI.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\TMA_CG\\Indi_TMA_CG.mqh",
+      "path":"strategies\\Bands\\Stg_Bands.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\common\\elite\\defines.h",
+      "path":"strategies\\BearsPower\\Stg_BearsPower.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\common\\elite\\inputs.mqh",
+      "path":"strategies\\BullsPower\\Stg_BullsPower.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\Arrows\\Stg_Arrows.mqh",
+      "path":"strategies\\CCI\\Stg_CCI.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\Arrows\\Indi_ATR_MA_Slope.mqh",
+      "path":"strategies\\Chaikin\\Stg_Chaikin.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\DPO\\Stg_DPO.mqh",
+      "path":"strategies\\DEMA\\Stg_DEMA.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\MA_Breakout\\Stg_MA_Breakout.mqh",
+      "path":"strategies\\DPO\\Stg_DPO.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\MA_Cross_Pivot\\Stg_MA_Cross_Pivot.mqh",
+      "path":"strategies\\DeMarker\\Stg_DeMarker.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\MA_Cross_Shift\\Stg_MA_Cross_Shift.mqh",
+      "path":"strategies\\ElliottWave\\Stg_ElliottWave.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\MA_Cross_Sup_Res\\Stg_MA_Cross_Sup_Res.mqh",
+      "path":"strategies\\ElliottWave\\Indi_ElliottWave.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\MA_Cross_Timeframe\\Stg_MA_Cross_Timeframe.mqh",
+      "path":"strategies\\Envelopes\\Stg_Envelopes.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\MA_Trend\\Stg_MA_Trend.mqh",
+      "path":"strategies\\Force\\Stg_Force.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\Oscillator\\Stg_Oscillator.mqh",
+      "path":"strategies\\Fractals\\Stg_Fractals.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\Oscillator_Cross\\Stg_Oscillator_Cross.mqh",
+      "path":"strategies\\Gator\\Stg_Gator.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\Oscillator_Cross_Shift\\Stg_Oscillator_Cross_Shift.mqh",
+      "path":"strategies\\HeikenAshi\\Stg_HeikenAshi.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\Oscillator_Cross_Timeframe\\Stg_Oscillator_Cross_Timeframe.mqh",
+      "path":"strategies\\Ichimoku\\Stg_Ichimoku.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\Oscillator_Cross_Zero\\Stg_Oscillator_Cross_Zero.mqh",
+      "path":"strategies\\Indicator\\Stg_Indicator.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\Oscillator_Divergence\\Stg_Oscillator_Divergence.mqh",
+      "path":"strategies\\MA\\Stg_MA.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\Oscillator_Martingale\\Stg_Oscillator_Martingale.mqh",
+      "path":"strategies\\MACD\\Stg_MACD.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\Oscillator_Multi\\Stg_Oscillator_Multi.mqh",
+      "path":"strategies\\MA_Breakout\\Stg_MA_Breakout.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\Oscillator_Overlay\\Stg_Oscillator_Overlay.mqh",
+      "path":"strategies\\MA_Cross_Candle\\Stg_MA_Cross_Candle.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\Oscillator_Range\\Stg_Oscillator_Range.mqh",
+      "path":"strategies\\MA_Cross_Pivot\\Stg_MA_Cross_Pivot.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\Oscillator_Trend\\Stg_Oscillator_Trend.mqh",
+      "path":"strategies\\MA_Cross_Shift\\Stg_MA_Cross_Shift.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\Retracement\\Stg_Retracement.mqh",
+      "path":"strategies\\MA_Cross_Sup_Res\\Stg_MA_Cross_Sup_Res.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\includes.h",
+      "path":"strategies\\MA_Cross_Timeframe\\Stg_MA_Cross_Timeframe.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Bears_Bulls\\Stg_Meta_Bears_Bulls.mqh",
+      "path":"strategies\\MA_Trend\\Stg_MA_Trend.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Conditions\\Stg_Meta_Conditions.mqh",
+      "path":"strategies\\MFI\\Stg_MFI.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Double\\Stg_Meta_Double.mqh",
+      "path":"strategies\\Momentum\\Stg_Momentum.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Enhance\\Stg_Meta_Enhance.mqh",
+      "path":"strategies\\OBV\\Stg_OBV.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Equity\\Stg_Meta_Equity.mqh",
+      "path":"strategies\\OSMA\\Stg_OSMA.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Formation\\Stg_Meta_Formation.mqh",
+      "path":"strategies\\Oscillator\\Stg_Oscillator.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Hedge\\Stg_Meta_Hedge.mqh",
+      "path":"strategies\\Oscillator_Cross\\Oscillator_Cross\\Stg_Oscillator_Cross.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Interval\\Stg_Meta_Interval.mqh",
+      "path":"strategies\\Oscillator_Cross_Shift\\Stg_Oscillator_Cross_Shift.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Limit\\Stg_Meta_Limit.mqh",
+      "path":"strategies\\Oscillator_Cross_Timeframe\\Stg_Oscillator_Cross_Timeframe.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_MA_Cross\\Stg_Meta_MA_Cross.mqh",
+      "path":"strategies\\Oscillator_Cross_Zero\\Stg_Oscillator_Cross_Zero.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Margin\\Stg_Meta_Margin.mqh",
+      "path":"strategies\\Oscillator_Divergence\\Stg_Oscillator_Divergence.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Martingale\\Stg_Meta_Martingale.mqh",
+      "path":"strategies\\Oscillator_Martingale\\Stg_Oscillator_Martingale.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Mirror\\Stg_Meta_Mirror.mqh",
+      "path":"strategies\\Oscillator_Multi\\Stg_Oscillator_Multi.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Multi\\Stg_Meta_Multi.mqh",
+      "path":"strategies\\Oscillator_Overlay\\Stg_Oscillator_Overlay.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Multi_Currency\\Stg_Meta_Multi_Currency.mqh",
+      "path":"strategies\\Oscillator_Range\\Stg_Oscillator_Range.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_News\\Stg_Meta_News.mqh",
+      "path":"strategies\\Oscillator_Trend\\Stg_Oscillator_Trend.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Order_Limit\\Stg_Meta_Order_Limit.mqh",
+      "path":"strategies\\Pattern\\Stg_Pattern.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Oscillator_Filter\\Stg_Meta_Oscillator_Filter.mqh",
+      "path":"strategies\\Pinbar\\Stg_Pinbar.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Oscillator_Switch\\Stg_Meta_Oscillator_Switch.mqh",
+      "path":"strategies\\Pivot\\Stg_Pivot.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Pattern\\Stg_Meta_Pattern.mqh",
+      "path":"strategies\\RSI\\Stg_RSI.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Pivot\\Stg_Meta_Pivot.mqh",
+      "path":"strategies\\RVI\\Stg_RVI.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Profit\\Stg_Meta_Profit.mqh",
+      "path":"strategies\\Retracement\\Stg_Retracement.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Resistance\\Stg_Meta_Resistance.mqh",
+      "path":"strategies\\SAR\\Stg_SAR.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Reversal\\Stg_Meta_Reversal.mqh",
+      "path":"strategies\\SAWA\\Stg_SAWA.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Risk\\Stg_Meta_Risk.mqh",
+      "path":"strategies\\SAWA\\Indi_SAWA.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_RSI\\Stg_Meta_RSI.mqh",
+      "path":"strategies\\SVE_Bollinger_Bands\\Stg_SVE_Bollinger_Bands.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Scalper\\Stg_Meta_Scalper.mqh",
+      "path":"strategies\\SVE_Bollinger_Bands\\Indi_SVE_Bollinger_Bands.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Signal_Switch\\Stg_Meta_Signal_Switch.mqh",
+      "path":"strategies\\StdDev\\Stg_StdDev.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Spread\\Stg_Meta_Spread.mqh",
+      "path":"strategies\\Stochastic\\Stg_Stochastic.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Timezone\\Stg_Meta_Timezone.mqh",
+      "path":"strategies\\SuperTrend\\Stg_SuperTrend.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Trend\\Stg_Meta_Trend.mqh",
+      "path":"strategies\\SuperTrend\\Indi_SuperTrend.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Trio\\Stg_Meta_Trio.mqh",
+      "path":"strategies\\TMAT_SVEBB\\Stg_TMAT_SVEBB.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Volatility\\Stg_Meta_Volatility.mqh",
+      "path":"strategies\\TMAT_SVEBB\\Indi_SVE_Bollinger_Bands.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Weekday\\Stg_Meta_Weekday.mqh",
+      "path":"strategies\\TMAT_SVEBB\\Indi_TMA_True.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\enum.h",
+      "path":"strategies\\TMA_CG\\Stg_TMA_CG.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\common\\manager-meta.h",
+      "path":"strategies\\TMA_CG\\Indi_TMA_CG.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\manager.h",
+      "path":"strategies\\TMA_True\\Stg_TMA_True.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies\\MA_Cross_Candle\\Stg_MA_Cross_Candle.mqh",
+      "path":"strategies\\TMA_True\\Indi_TMA_True.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Discrepancy\\Stg_Meta_Discrepancy.mqh",
+      "path":"strategies\\WPR\\Stg_WPR.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_MA_Conditions\\Stg_Meta_MA_Conditions.mqh",
+      "path":"strategies\\ZigZag\\Stg_ZigZag.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Odd_Period\\Stg_Meta_Odd_Period.mqh",
+      "path":"strategies-meta\\includes.h",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Oscillator_Conditions\\Stg_Meta_Oscillator_Conditions.mqh",
+      "path":"strategies-meta\\Meta_Bears_Bulls\\Stg_Meta_Bears_Bulls.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Price_Band\\Stg_Meta_Price_Band.mqh",
+      "path":"strategies-meta\\Meta_Conditions\\Stg_Meta_Conditions.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_SAR\\Stg_Meta_SAR.mqh",
+      "path":"strategies-meta\\Meta_Discrepancy\\Stg_Meta_Discrepancy.mqh",
       "compile":false,
       "relative_to_project":true
     },
     {
-      "path":"include\\strategies-meta\\Meta_Signal_Filter\\Stg_Meta_Signal_Filter.mqh",
+      "path":"strategies-meta\\Meta_Double\\Stg_Meta_Double.mqh",
       "compile":false,
       "relative_to_project":true
-    }
-  ],
-
-  "resources":
-  [
+    },
+    {
+      "path":"strategies-meta\\Meta_Enhance\\Stg_Meta_Enhance.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Equity\\Stg_Meta_Equity.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Formation\\Stg_Meta_Formation.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Hedge\\Stg_Meta_Hedge.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Interval\\Stg_Meta_Interval.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Limit\\Stg_Meta_Limit.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_MA_Conditions\\Stg_Meta_MA_Conditions.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_MA_Cross\\Stg_Meta_MA_Cross.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Margin\\Stg_Meta_Margin.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Martingale\\Stg_Meta_Martingale.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Mirror\\Stg_Meta_Mirror.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Multi\\Stg_Meta_Multi.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Multi_Currency\\Stg_Meta_Multi_Currency.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_News\\Stg_Meta_News.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Odd_Period\\Stg_Meta_Odd_Period.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Order_Limit\\Stg_Meta_Order_Limit.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Oscillator_Conditions\\Stg_Meta_Oscillator_Conditions.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Oscillator_Filter\\Stg_Meta_Oscillator_Filter.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Oscillator_Switch\\Stg_Meta_Oscillator_Switch.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Pattern\\Stg_Meta_Pattern.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Pivot\\Stg_Meta_Pivot.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Price_Band\\Stg_Meta_Price_Band.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Profit\\Stg_Meta_Profit.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_RSI\\Stg_Meta_RSI.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Resistance\\Stg_Meta_Resistance.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Reversal\\Stg_Meta_Reversal.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Risk\\Stg_Meta_Risk.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_SAR\\Stg_Meta_SAR.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Scalper\\Stg_Meta_Scalper.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
     {
-      "type":"indicator",
-      "path":"indicators\\Other\\Misc\\ATR_MA_Trend.ex5",
-      "name":"",
+      "path":"strategies-meta\\Meta_Signal_Filter\\Stg_Meta_Signal_Filter.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Signal_Switch\\Stg_Meta_Signal_Switch.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Spread\\Stg_Meta_Spread.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"strategies-meta\\Meta_Timezone\\Stg_Meta_Timezone.mqh",
+      "compile":false,
       "relative_to_project":true
     },
     {
-      "type":"indicator",
-      "path":"indicators\\Other\\Price\\Range\\TMA+CG_mladen_NRP.ex5",
-      "name":"",
+      "path":"strategies-meta\\Meta_Trend\\Stg_Meta_Trend.mqh",
+      "compile":false,
       "relative_to_project":true
     },
     {
-      "type":"indicator",
-      "path":"indicators\\Other\\Price\\Range\\TMA_True.ex5",
-      "name":"",
+      "path":"strategies-meta\\Meta_Trio\\Stg_Meta_Trio.mqh",
+      "compile":false,
       "relative_to_project":true
     },
     {
-      "type":"indicator",
-      "path":"indicators\\Other\\Price\\SuperTrend.ex5",
-      "name":"",
+      "path":"strategies-meta\\Meta_Volatility\\Stg_Meta_Volatility.mqh",
+      "compile":false,
       "relative_to_project":true
     },
     {
-      "type":"indicator",
-      "path":"indicators\\Other\\Price\\Range\\SAWA.ex5",
-      "name":"",
+      "path":"strategies-meta\\Meta_Weekday\\Stg_Meta_Weekday.mqh",
+      "compile":false,
       "relative_to_project":true
     }
   ]

@@ -11,6 +11,8 @@ on:
       - src/*.mq?
       - src/*.mq[45h]
       - src/include/**
+      - src/strategies
+      - src/strategies-meta
   push:
     paths:
       - '**.h'
@@ -19,6 +21,15 @@ on:
       - src/*.mq?
       - src/*.mq[45h]
       - src/include/**
+      - src/strategies
+      - src/strategies-meta
+  workflow_call:
+    inputs:
+      skip_cleanup:
+        default: false
+        description: Whether to skip a clean-up job.
+        required: false
+        type: boolean
 
 env:
   INDI_COMMON_WORKDIR: ${{ vars.INDI_COMMON_WORKDIR || 'src/indicators/Common' }}
@@ -79,7 +90,7 @@ jobs:
         version:
           - 4
           - 5
-      max-parallel: 2
+      max-parallel: 8
 
     steps:
 
@@ -150,9 +161,9 @@ jobs:
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: EA31337-${{ matrix.mode }}-ex${{ matrix.version }}(${{ matrix.mode2 }})
+          name: EA31337-${{ matrix.mode }}(${{ matrix.mode2 }})-ex${{ matrix.version }}
           path: src/EA*.ex?
 
   cleanup:
@@ -166,3 +177,4 @@ jobs:
           name: |
             ic[45]
             io[45]
+    timeout-minutes: 5

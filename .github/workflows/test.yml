@@ -11,6 +11,8 @@ on:
       - src/*.mq?
       - src/*.mq[45h]
       - src/include/**
+      - src/strategies
+      - src/strategies-meta
   push:
     paths:
       - '**.h'
@@ -19,6 +21,8 @@ on:
       - src/*.mq?
       - src/*.mq[45h]
       - src/include/**
+      - src/strategies
+      - src/strategies-meta
 
 env:
   INDI_COMMON_WORKDIR: ${{ vars.INDI_COMMON_WORKDIR || 'src/indicators/Common' }}
@@ -26,139 +30,19 @@ env:
 
 jobs:
 
-  checkout:
-    name: Checkout
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Uploads source code
-        uses: actions/upload-artifact@v4
-        with:
-          name: ea-src
-          path: .
-
-  compile-indicators-common:
-    name: Compile Indicators (Common)
-    uses: EA31337/EA31337-Indicators-Common/.github/workflows/compile.yml@dev
-    with:
-      artifact_prefix: ic
-      skip_cleanup: true
-
-  compile-indicators-other:
-    name: Compile Indicators (Other)
-    uses: EA31337/EA31337-Indicators-Other/.github/workflows/compile.yml@dev
-    with:
-      artifact_prefix: io
-      skip_cleanup: true
-
   compile-ea:
-
-    defaults:
-      run:
-        shell: powershell
-        working-directory: src
-
     name: Compile EA
-    needs: [checkout, compile-indicators-common, compile-indicators-other]
-    runs-on: windows-latest
+    uses: ./.github/workflows/compile.yml
+    with:
+      skip_cleanup: true
 
-    strategy:
-      matrix:
-        mode:
-          - Advanced
-          - Elite
-          - Lite
-          - Rider
-        mode2:
-          - __resource__
-        version:
-          - 4
-          - 5
-      max-parallel: 2
-
-    steps:
-
-      - name: Download source code
-        uses: actions/download-artifact@v4
-        with:
-          name: ea-src
-          path: .
-
-      - name: Download Indicators Common
-        uses: actions/download-artifact@v4
-        with:
-          merge-multiple: true
-          pattern: ic-indicators-common-ex?
-          path: ${{ env.INDI_COMMON_WORKDIR }}
-
-      - name: Download Indicators Other
-        uses: actions/download-artifact@v4
-        with:
-          merge-multiple: true
-          pattern: io-indicators-other-ex?
-          path: ${{ env.INDI_OTHER_WORKDIR }}
-
-      - name: Download platform
-        uses: actions/download-artifact@v4
-        with:
-          name: ic${{ matrix.version }}
-          path: .mt${{ matrix.version }}
-
-      - run: Get-Location
-
-      - name: Enables CLI mode
-        run: echo '#define __cli__' > include/common/mode.h
-
-      - name: Enables Advanced mode
-        if: matrix.mode == 'Advanced'
-        run: echo '#define __advanced__' >> include/common/mode.h
-
-      - name: Enables Elite mode
-        if: matrix.mode == 'Elite'
-        run: echo '#define __elite__' >> include/common/mode.h
-
-      - name: Enables Rider mode
-        if: matrix.mode == 'Rider'
-        run: echo '#define __rider__' >> include/common/mode.h
-
-      - name: Enables custom mode
-        run: echo '#define ${{ matrix.mode2 }}' >> include/common/mode.h
-
-      - name: List compiled files
-        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
-
-      - name: Compiles EA
-        uses: fx31337/mql-compile-action@master
-        with:
-          include: src
-          mt-path: .mt${{ matrix.version }}
-          path: src/EA31337.mq${{ matrix.version }}
-          verbose: true
-
-      - name: Moves file
-        run: >-
-          mv -v
-          *.ex${{ matrix.version }}
-          "EA31337-${{ matrix.mode }}-${{ github.sha }}.ex${{ matrix.version }}"
-
-      - name: List compiled files
-        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: EA31337-${{ matrix.mode }}
-          path: src/EA*.ex?
-
-  test-ea:
+  test:
 
     defaults:
       run:
         shell: bash
 
-    name: Test EA
+    name: Test
     needs: compile-ea
     runs-on: ubuntu-latest
 
@@ -171,12 +55,15 @@ jobs:
           - Elite
           - Rider
         year: [2022, 2024]
+        version: [5]
+      max-parallel: 4
 
     steps:
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
-          name: EA31337-${{ matrix.mode }}
+          merge-multiple: true
+          name: EA31337-${{ matrix.mode }}(__resource__)-ex${{ matrix.version }}
 
       - name: List compiled files
         run: find . -name '*.ex?' -type f -print
@@ -194,13 +81,19 @@ jobs:
           TestSymbol: EURUSD
           TestToDate: ${{ matrix.year }}.01.14
           # yamllint disable-line rule:line-length
-          UrlExpert: file://${{ github.workspace }}/EA31337-${{ matrix.mode }}-${{ github.sha }}.ex5
+          UrlExpert: >-
+            file://${{ github.workspace }}/EA31337-${{ matrix.mode }}-${{ github.sha }}.ex${{ matrix.version }}
           Version: 5
+
+      - if: ${{ failure() && runner.debug == '1' }}
+        uses: mxschmitt/action-tmate@v3
+
+    timeout-minutes: 30
 
   cleanup:
     if: inputs.skip_cleanup != true
     name: Clean-up
-    needs: [test-ea]
+    needs: [test]
     runs-on: ubuntu-latest
     steps:
       - uses: geekyeggo/delete-artifact@v5
@@ -208,3 +101,4 @@ jobs:
           name: |
             ic[45]
             io[45]
+    timeout-minutes: 5

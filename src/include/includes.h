@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                  EA31337 - multi-strategy advanced trading robot |
-//|                                 Copyright 2016-2023, EA31337 Ltd |
+//|                                 Copyright 2016-2024, EA31337 Ltd |
 //|                                       https://ea31337.github.io/ |
 //+------------------------------------------------------------------+
 
@@ -29,18 +29,18 @@
 #include "common/struct.h"
 
 // Strategy enums.
-#include "strategies-meta/enum.h"
-#include "strategies/enum.h"
+#include "../strategies-meta/enum.h"
+#include "../strategies/enum.h"
 
 // Strategy managers.
-#include "common/manager-meta.h"  // Overrides the default one.
-#include "strategies/manager.h"
+#include "common/strategies-manager-meta.h"  // Overrides the default one.
+#include "common/strategies-manager.h" // Overrides the default one.
 
 // Main user inputs.
 #include "inputs.h"
 
 // Strategy includes.
 INPUT_GROUP("Strategy parameters");  // >>> STRATEGIES <<<
-#include "strategies/includes.h"
+#include "../strategies/includes.h"
 INPUT_GROUP("Strategy meta parameters");  // >>> STRATEGIES META <<<
-#include "strategies-meta/includes.h"
+#include "../strategies-meta/includes.h"

@@ -1,5 +1,5 @@
 //+------------------------------------------------------------------+
-//|                                 Copyright 2016-2023, EA31337 Ltd |
+//|                                 Copyright 2016-2024, EA31337 Ltd |
 //|                                       https://ea31337.github.io/ |
 //+------------------------------------------------------------------+
 
@@ -45,7 +45,7 @@ extern string __EA_Risk_Params__ = "-- EA's risk management --";  // >>> EA's RI
 #else
 input group "EA's risk management"
 #endif
-input float EA_Risk_MarginMax = 1.8f;  // Max margin to risk (in %)
+input float EA_Risk_MarginMax = 3.4f;  // Max margin to risk (in %)
 
 #ifdef __MQL4__
 input string __EA_Trade_Params__ = "-- EA's trade parameters --";  // >>> EA's TRADE <<<

@@ -53,7 +53,7 @@ jobs:
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: EA31337-${{ matrix.mode }}
           path: '*.ex?'
@@ -86,7 +86,7 @@ jobs:
       - name: Display outputs
         run: echo "${{ toJson(steps.get-sets.outputs) }}"
       - name: Upload sets
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: sets-${{ matrix.mode }}
           path: ${{ env.SETS_DIR }}
@@ -104,11 +104,11 @@ jobs:
         mode: [Advanced, Rider]
         setfile: [EA_Stops.set]
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: EA31337-${{ matrix.mode }}
           path: EA
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: sets-${{ matrix.mode }}
           path: sets
@@ -133,7 +133,7 @@ jobs:
           TestPeriod: M1
           TestReportName: Report-EA31337-${{ matrix.mode }}
       - name: Upload result files
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: results
           path: ./_results/*.*
@@ -158,7 +158,7 @@ jobs:
           persist-credentials: false
           # Otherwise, you will failed to push refs to dest repo.
           fetch-depth: 0
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: results
           path: .results
