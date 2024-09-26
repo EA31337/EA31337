@@ -1294,9 +1294,11 @@ bool CheckSpreadLimit(Strategy *_strat) {
 bool CloseOrder(ulong ticket_no = NULL, int reason_id = EMPTY, ENUM_MARKET_EVENT _market_event = C_EVENT_NONE, bool retry = true) {
   DEBUG_CHECKPOINT_ADD
   bool result = false;
+  err_code = ERR_NO_ERROR;
   if (ticket_no == NULL) {
     ticket_no = Order::OrderTicket();
   }
+  ResetLastError();
   if (!Order::OrderSelect(ticket_no, SELECT_BY_TICKET, MODE_TRADES)) {
     DEBUG_CHECKPOINT_POP
     Msg::ShowText(StringFormat("Error: Ticket No: %d; Message: %s", ticket_no, terminal.GetLastErrorText()),
