@@ -379,7 +379,9 @@ class EA31337 : public EA {
     string _symbol = _Symbol;
     _labels_sym.Set("symbol", _symbol);
     // @fixit Ask? Bid?
-    metrics.Ptr().SetValue("symbol", "tick_price", SymbolInfoStatic::GetTick(_Symbol).bid, _labels_sym);
+    MqlTick _tick = SymbolInfoStatic::GetTick(_Symbol);
+    metrics.Ptr().SetValue("symbol", "tick_price_bid", _tick.bid, _labels_sym);
+    metrics.Ptr().SetValue("symbol", "tick_price_ask", _tick.ask, _labels_sym);
 
     // TERMINAL.
     metrics.Ptr().SetValue("terminal", "cpu_cores", TerminalInfoInteger(TERMINAL_CPU_CORES));
