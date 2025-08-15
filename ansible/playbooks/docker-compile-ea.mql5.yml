@@ -22,7 +22,7 @@
           - python3-setuptools
         state: present
         update_cache: true
-      become: "{{ lookup('env', 'UID') | int != 0 }}"
+      become: true
 
   tasks:
     - name: Installs MT5 platform
