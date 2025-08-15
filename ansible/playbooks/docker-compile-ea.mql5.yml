@@ -13,9 +13,7 @@
       changed_when: false
 
     - name: Gather facts
-      become: "{{ lookup('env', 'UID') | int != 0 }}"
       ansible.builtin.setup:
-
     - name: Install Python packages for Ubuntu
       ansible.builtin.apt:
         name:
