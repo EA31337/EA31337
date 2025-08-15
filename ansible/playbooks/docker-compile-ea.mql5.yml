@@ -9,7 +9,7 @@
       ansible.builtin.raw: >-
         test -e "{{ ansible_python_interpreter }}"
         || (apt-get update && apt-get install -y python3 python3-pip)
-      become: "{{ lookup('env', 'UID') | int != 0 }}"
+      become: true
       changed_when: false
 
     - name: Gather facts
