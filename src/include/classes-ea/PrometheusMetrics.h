@@ -250,6 +250,11 @@ class PrometheusMetrics : public Dynamic {
   void SetValue(string _group_name, string _field_name, T value) {
     T _typed_value = T();
     ENUM_DATATYPE _field_type = CheckSchemaFieldCompatibility(_group_name, _field_name, GetType(_typed_value));
+    
+    if (_field_type == (ENUM_DATATYPE)-1) {
+      // Schema validation failed, don't set the value
+      return;
+    }
 
     PrometheusMetricsValue _value(_group_name, _field_name, _field_type);
     _value.value.Set(value);
