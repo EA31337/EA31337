@@ -1,0 +1,7 @@
+---
+all:
+  hosts:
+    ea31337-ubuntu-latest:
+      ansible_connection: docker
+      ansible_host: ea31337-ubuntu-latest
+      ansible_python_interpreter: /usr/bin/python3

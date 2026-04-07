@@ -29,6 +29,12 @@
 
 class EA31337 : public EA {
  protected:
+  // Prometheus metrics schema.
+  Ref<PrometheusSchema> metrics_schema;
+
+  // Last processed Tick() result.
+  EAProcessResult last_result;
+
   /**
    * Initialize EA.
    */
@@ -39,7 +45,78 @@ class EA31337 : public EA {
                 Get<string>(STRUCT_ENUM(EAParams, EA_PARAM_PROP_AUTHOR)));
     long _magic_no = EA_MagicNumber;
     ResetLastError();
+    InitMetricsSchema();
     return _initiated;
+  }
+
+  /**
+   * Initializes Prometheus metrics schema.
+   */
+  void InitMetricsSchema() {
+    metrics_schema = new PrometheusSchema();
+
+    // ACCOUNT.
+    metrics_schema.Ptr().AddGroup("account", "gauge", "Account details");
+    metrics_schema.Ptr().AddField("account", "balance", TYPE_DOUBLE);
+    metrics_schema.Ptr().AddField("account", "credit", TYPE_DOUBLE);
+    metrics_schema.Ptr().AddField("account", "equity", TYPE_DOUBLE);
+    metrics_schema.Ptr().AddField("account", "margin", TYPE_DOUBLE);
+    metrics_schema.Ptr().AddField("account", "margin_free", TYPE_DOUBLE);
+    metrics_schema.Ptr().AddField("account", "margin_level", TYPE_DOUBLE);
+    metrics_schema.Ptr().AddField("account", "profit", TYPE_DOUBLE);
+
+    // EA.
+    metrics_schema.Ptr().AddGroup("ea", "gauge", "EA Information");
+    metrics_schema.Ptr().AddField("ea", "risk_margin_max", TYPE_DOUBLE);
+    metrics_schema.Ptr().AddField("ea", "stg_processed_periods", TYPE_INT);
+    metrics_schema.Ptr().AddField("ea", "total_strategies_active", TYPE_INT);
+
+    // ORDER.
+    metrics_schema.Ptr().AddGroup("order", "gauge", "Order Information");
+    metrics_schema.Ptr().AddField("order", "order1_date_time", TYPE_DATETIME);
+    metrics_schema.Ptr().AddField("order", "order1_status", TYPE_STRING);
+    metrics_schema.Ptr().AddField("order", "order1_stop_loss", TYPE_DOUBLE);
+
+    // TRADE.
+    metrics_schema.Ptr().AddGroup("trade", "gauge", "Trade Information");
+    metrics_schema.Ptr().AddField("trade", "lot_size", TYPE_FLOAT);
+    metrics_schema.Ptr().AddLabel("trade", "lot_size", "strategy");
+    metrics_schema.Ptr().AddLabel("trade", "lot_size", "tf");
+    metrics_schema.Ptr().AddField("trade", "magic_no", TYPE_LONG);
+    metrics_schema.Ptr().AddLabel("trade", "magic_no", "strategy");
+    metrics_schema.Ptr().AddLabel("trade", "magic_no", "tf");
+    metrics_schema.Ptr().AddField("trade", "max_spread", TYPE_FLOAT);
+    metrics_schema.Ptr().AddLabel("trade", "max_spread", "strategy");
+    metrics_schema.Ptr().AddLabel("trade", "max_spread", "tf");
+
+    // STRATEGY.
+    metrics_schema.Ptr().AddGroup("strategy", "gauge", "Strategy Information");
+    metrics_schema.Ptr().AddField("strategy", "id", TYPE_INT);
+    metrics_schema.Ptr().AddLabel("strategy", "id", "strategy");
+    metrics_schema.Ptr().AddLabel("strategy", "id", "tf");
+    metrics_schema.Ptr().AddField("strategy", "lot_size", TYPE_DOUBLE);
+    metrics_schema.Ptr().AddLabel("strategy", "lot_size", "strategy");
+    metrics_schema.Ptr().AddLabel("strategy", "lot_size", "tf");
+
+    // SYMBOL.
+    metrics_schema.Ptr().AddGroup("symbol", "gauge", "Symbol Information");
+    metrics_schema.Ptr().AddField("symbol", "tick_price", TYPE_DOUBLE);
+    metrics_schema.Ptr().AddLabel("symbol", "tick_price", "symbol");
+
+    // TERMINAL.
+    metrics_schema.Ptr().AddGroup("terminal", "gauge", "Terminal Information");
+    metrics_schema.Ptr().AddField("terminal", "cpu_cores", TYPE_INT);
+    metrics_schema.Ptr().AddField("terminal", "datetime_time_current", TYPE_DATETIME);
+    metrics_schema.Ptr().AddField("terminal", "datetime_time_local", TYPE_DATETIME);
+    metrics_schema.Ptr().AddField("terminal", "datetime_time_trade_server", TYPE_INT);
+    metrics_schema.Ptr().AddField("terminal", "disk_space", TYPE_LONG);
+    metrics_schema.Ptr().AddField("terminal", "last_error", TYPE_STRING);
+    metrics_schema.Ptr().AddField("terminal", "memory_available", TYPE_LONG);
+    metrics_schema.Ptr().AddField("terminal", "memory_physical", TYPE_LONG);
+    metrics_schema.Ptr().AddField("terminal", "memory_total", TYPE_LONG);
+    metrics_schema.Ptr().AddField("terminal", "memory_used", TYPE_LONG);
+    metrics_schema.Ptr().AddField("terminal", "connected", TYPE_BOOL);
+    metrics_schema.Ptr().AddField("terminal", "ping_last", TYPE_INT);
   }
 
  public:
@@ -175,8 +252,8 @@ class EA31337 : public EA {
    * Invoked when a new tick for a symbol is received, to the chart of which the Expert Advisor is attached.
    */
   void OnTick(MqlTick &_tick) {
-    EAProcessResult _result = ProcessTick();
-    if (_result.stg_processed_periods > 0) {
+    last_result = ProcessTick();
+    if (last_result.stg_processed_periods > 0) {
       if (EA_DisplayDetailsOnChart && (Terminal::IsVisualMode() || Terminal::IsRealtime())) {
         string _text = StringFormat("%s v%s by %s\n", Get<string>(STRUCT_ENUM(EAParams, EA_PARAM_PROP_NAME)),
                                     Get<string>(STRUCT_ENUM(EAParams, EA_PARAM_PROP_VER)),
@@ -188,7 +265,7 @@ class EA31337 : public EA {
                  "\n";
         /* @todo
         _text +=
-            SerializerConverter::FromObject(_result).Precision(0).ToString<SerializerJson>(SERIALIZER_JSON_NO_WHITESPACES)
+            SerializerConverter::FromObject(last_result).Precision(0).ToString<SerializerJson>(SERIALIZER_JSON_NO_WHITESPACES)
         +
             "\n";
         */
@@ -209,6 +286,163 @@ class EA31337 : public EA {
         Comment(_text);
       }
     }
+  }
+
+  /**
+   * Executed when new time is started (like each minute).
+   */
+  void OnPeriod() override {
+    EA::OnPeriod();
+
+    if ((estate.Get<uint>(STRUCT_ENUM(EAState, EA_STATE_PROP_NEW_PERIODS)) & DATETIME_MINUTE) != 0) {
+      // New minute started.
+      if (EA_Export_Mode == EA_EXPORT_MODE_PROMETHEUS) {
+        // Export metrics to Prometheus.
+        WriteMetrics();
+      }
+    }
+  }
+
+  /**
+   * Writes current Prometheus metrics.
+   */
+  void WriteMetrics() {
+    DictStructIterator<long, Ref<Strategy>> _siter;
+
+    Ref<PrometheusMetrics> metrics = new PrometheusMetrics(metrics_schema.Ptr());
+
+    // Labels for "strategy" and "tf".
+    DictStruct<string, string> _labels_strat_tf;
+
+    // Labels for "symbol".
+    DictStruct<string, string> _labels_sym;
+
+    // ACCOUNT.
+    metrics.Ptr().SetValue("account", "balance", Account::AccountBalance());
+    metrics.Ptr().SetValue("account", "credit", Account::AccountCredit());
+    metrics.Ptr().SetValue("account", "equity", Account::AccountEquity());
+    metrics.Ptr().SetValue("account", "margin", Account::AccountMargin());
+    metrics.Ptr().SetValue("account", "margin_free", Account::AccountFreeMargin());
+
+    // @todo Should take value from Account class.
+    metrics.Ptr().SetValue("account", "margin_level", AccountInfoDouble(ACCOUNT_MARGIN_LEVEL));
+    metrics.Ptr().SetValue("account", "profit", AccountInfoDouble(ACCOUNT_PROFIT));
+
+    // EA.
+    metrics.Ptr().SetValue("ea", "risk_margin_max", Get<double>(STRUCT_ENUM(EAParams, EA_PARAM_PROP_RISK_MARGIN_MAX)));
+    metrics.Ptr().SetValue("ea", "stg_processed_periods", last_result.stg_processed_periods);
+    metrics.Ptr().SetValue("ea", "total_strategies_active", last_result.stg_processed);
+
+    // ORDER.
+    // @todo Aggregate information about orders.
+    // metrics.Ptr().SetValue("order", "order1_date_time", TYPE_DATETIME);
+    // metrics.Ptr().SetValue("order", "order1_status", TYPE_STRING);
+    // metrics.Ptr().SetValue("order", "order1_stop_loss", TYPE_DOUBLE);
+
+    // TRADE.
+    // Strategies.
+
+    /* @todo
+    Strategy *_strat = _siter.Value().Ptr();
+    string _strat_name;
+    string _strat_tf;
+
+    for (_siter = GetStrategies().Begin(); _siter.IsValid(); ++_siter) {
+      *_strat = _siter.Value().Ptr();
+      _strat_name = _strat.GetName();
+      _strat_tf = EnumToString(_strat.Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
+
+      _labels_strat_tf.Set("strategy", _strat_name);
+      _labels_strat_tf.Set("tf", _strat_tf);
+
+      metrics.Ptr().SetValue("strategy", "lot_size", _strat.sparams.Get<float>(STRAT_PARAM_LS), _labels_strat_tf);
+      metrics.Ptr().SetValue("strategy", "magic_no", _strat.sparams.Get<long>(STRAT_PARAM_ID), _labels_strat_tf);
+      metrics.Ptr().SetValue("strategy", "max_spread", _strat.sparams.Get<float>(STRAT_PARAM_MAX_SPREAD),
+                             _labels_strat_tf);
+    }
+
+    // STRATEGY.
+    for (_siter = GetStrategies().Begin(); _siter.IsValid(); ++_siter) {
+      _strat = _siter.Value().Ptr();
+      _strat_name = _strat.GetName();
+      _strat_tf = EnumToString(_strat.Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
+
+      _labels_strat_tf.Set("strategy", _strat_name);
+      _labels_strat_tf.Set("tf", _strat_tf);
+
+      metrics.Ptr().SetValue("strategy", "id", _strat.sparams.Get<long>(STRAT_PARAM_ID), _labels_strat_tf);
+      metrics.Ptr().SetValue("strategy", "lot_size", _strat.sparams.Get<float>(STRAT_PARAM_LS), _labels_strat_tf);
+    }
+    */
+
+    // SYMBOL.
+    string _symbol = _Symbol;
+    _labels_sym.Set("symbol", _symbol);
+    // @fixit Ask? Bid?
+    MqlTick _tick = SymbolInfoStatic::GetTick(_Symbol);
+    metrics.Ptr().SetValue("symbol", "tick_price_bid", _tick.bid, _labels_sym);
+    metrics.Ptr().SetValue("symbol", "tick_price_ask", _tick.ask, _labels_sym);
+
+    // TERMINAL.
+    metrics.Ptr().SetValue("terminal", "cpu_cores", TerminalInfoInteger(TERMINAL_CPU_CORES));
+    metrics.Ptr().SetValue("terminal", "datetime_time_current", TimeCurrent());
+    metrics.Ptr().SetValue("terminal", "datetime_time_local", TimeLocal());
+#ifdef __MQL4__
+    metrics.Ptr().SetValue("terminal", "datetime_time_trade_server", MarketInfo(Symbol(), MODE_TIME));
+#else
+    metrics.Ptr().SetValue("terminal", "datetime_time_trade_server", TimeTradeServer());
+#endif
+    metrics.Ptr().SetValue("terminal", "disk_space", TerminalInfoInteger(TERMINAL_DISK_SPACE));
+    metrics.Ptr().SetValue("terminal", "last_error", _LastError);
+    metrics.Ptr().SetValue("terminal", "memory_available", TerminalInfoInteger(TERMINAL_MEMORY_AVAILABLE));
+    metrics.Ptr().SetValue("terminal", "memory_physical", TerminalInfoInteger(TERMINAL_MEMORY_PHYSICAL));
+    metrics.Ptr().SetValue("terminal", "memory_total", TerminalInfoInteger(TERMINAL_MEMORY_TOTAL));
+    metrics.Ptr().SetValue("terminal", "memory_used", TerminalInfoInteger(TERMINAL_MEMORY_USED));
+    metrics.Ptr().SetValue("terminal", "connected", TerminalInfoInteger(TERMINAL_CONNECTED) != 0);
+    metrics.Ptr().SetValue("terminal", "ping_last", TerminalInfoInteger(TERMINAL_PING_LAST));
+
+    string _metrics_txt = metrics.Ptr().ToString();
+
+    Print(_metrics_txt);
+
+    SaveFile("metrics", _metrics_txt, true);
+    // @todo Change to the following line after merging dev--file-binary-write:
+    // File::SaveFile("metrics", _metrics_txt, true);
+  }
+
+  /**
+   * @todo Remove after merging dev--file-binary-write.
+   * Saves ANSI string into file.
+   */
+  static bool SaveFile(string path, string data, bool binary = false) {
+    ResetLastError();
+
+    int handle = FileOpen(path, FILE_WRITE | (binary ? FILE_BIN : FILE_TXT), "", CP_UTF8);
+
+    if (handle == INVALID_HANDLE) {
+      string terminalDataPath = TerminalInfoString(TERMINAL_DATA_PATH);
+#ifdef __MQL5__
+      string terminalSubfolder = "MQL5";
+#else
+      string terminalSubfolder = "MQL4";
+#endif
+      Print("Cannot open file \"", path, "\" for writing. Error code: ", GetLastError(),
+            ". Consider using path relative to \"" + terminalDataPath + "\\" + terminalSubfolder +
+                "\\Files\\\" as absolute paths may not work.");
+      return false;
+    }
+
+    if (binary) {
+      uchar buffer[];
+      StringToCharArray(data, buffer, 0, WHOLE_ARRAY, CP_UTF8);
+      FileWriteArray(handle, buffer, 0, ArraySize(buffer));
+    } else {
+      FileWriteString(handle, data);
+    }
+
+    FileClose(handle);
+
+    return GetLastError() == ERR_NO_ERROR;
   }
 
   /**

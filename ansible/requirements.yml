@@ -1,0 +1,21 @@
+# A file containing a list of collections to be installed.
+# Usage:
+# ansible-galaxy install -r requirements.yml
+---
+collections:
+  - name: community.general  # For unixy.
+roles:
+  - name: ea31337.metatrader
+    scm: git
+    src: https://github.com/EA31337/ansible-role-metatrader.git
+    version: dev
+
+  - name: ea31337.wine
+    scm: git
+    src: https://github.com/EA31337/ansible-role-wine.git
+    version: dev
+
+  - name: ea31337.xvfb
+    scm: git
+    src: https://github.com/EA31337/ansible-role-xvfb.git
+    version: dev

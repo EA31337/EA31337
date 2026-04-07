@@ -13,9 +13,13 @@
 #include "common/enum.h"
 
 // Includes class files.
+#include "classes/Account.mqh"
 #include "classes/Chart.mqh"
+#include "classes/DictStruct.mqh"
 #include "classes/EA.mqh"
+#include "classes/File.mqh"
 #include "classes/Msg.mqh"
+#include "classes/Std.h"
 #include "classes/Terminal.mqh"
 #include "classes/Trade.mqh"
 
@@ -24,6 +28,9 @@
 #include "classes/Indicators/Price/indicators.h"
 #include "classes/Indicators/Special/indicators.h"
 #include "classes/Indicators/indicators.h"
+
+// EA classes.
+#include "classes-ea/PrometheusMetrics.h"
 
 // EA structs.
 #include "common/struct.h"
@@ -34,7 +41,7 @@
 
 // Strategy managers.
 #include "common/strategies-manager-meta.h"  // Overrides the default one.
-#include "common/strategies-manager.h" // Overrides the default one.
+#include "common/strategies-manager.h"       // Overrides the default one.
 
 // Main user inputs.
 #include "inputs.h"

@@ -1,8 +1,8 @@
 {
   "platform"    :"mt5",
   "program_type":"expert",
-  "copyright"   :"2016-2024, EA31337 Ltd",
-  "link"        :"https:\/\/github.com\/EA31337\/EA31337",
+  "copyright"   :"2016-2025, EA31337 Ltd",
+  "link"        :"https:\/\/ea31337.github.io\/EA31337",
   "version"     :"3.000",
   "description" :"Forex multi-strategy trading robot",
   "icon"        :"resources\\favicon.ico",
@@ -3278,6 +3278,36 @@
     },
     {
       "path":"strategies-meta\\Meta_Weekday\\Stg_Meta_Weekday.mqh",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes-ea\\PrometheusMetrics.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes-ea\\PrometheusMetricsValue.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes-ea\\TypedValue.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes-ea\\PrometheusSchema.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes-ea\\PrometheusSchemaGroup.h",
+      "compile":false,
+      "relative_to_project":true
+    },
+    {
+      "path":"include\\classes-ea\\PrometheusSchemaField.h",
       "compile":false,
       "relative_to_project":true
     }

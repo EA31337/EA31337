@@ -61,6 +61,7 @@ input string __Logging_Params__ = "-- EA's logging & messaging --";  // >>> EA's
 #else
 input group "EA's logging & messaging"
 #endif
-input ENUM_LOG_LEVEL VerboseLevel = ea_log_level;  // Level of log verbosity
-input bool EA_DisplayDetailsOnChart = true;        // Display EA details on chart
+input ENUM_EA_EXPORT_MODE EA_Export_Mode = EA_EXPORT_MODE_NONE;  // Export mode
+input ENUM_LOG_LEVEL VerboseLevel = ea_log_level;             // Level of log verbosity
+input bool EA_DisplayDetailsOnChart = true;                   // Display EA details on chart
 // input bool WriteSummaryReport = true;                                           // Write summary report on finish

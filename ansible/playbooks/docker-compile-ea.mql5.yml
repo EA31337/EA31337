@@ -1,0 +1,30 @@
+---
+- name: Configure EA31337 container
+  hosts: ea31337-ubuntu-latest
+  gather_facts: false
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  pre_tasks:
+    - name: Install Python 3
+      ansible.builtin.raw: >-
+        test -e "{{ ansible_python_interpreter }}"
+        || (apt-get update && apt-get install -y python3 python3-pip)
+      become: true
+      changed_when: false
+
+    - name: Gather facts
+      ansible.builtin.setup:
+    - name: Install Python packages for Ubuntu
+      ansible.builtin.apt:
+        name:
+          - python3
+          - python3-pip
+          - python3-setuptools
+        state: present
+        update_cache: true
+      become: true
+
+  tasks:
+    - name: Installs MT5 platform
+      ansible.builtin.import_role:
+        name: ea31337.metatrader

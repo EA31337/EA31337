@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "*.mqh": "cpp"
+    },
+    "chat.tools.terminal.autoApprove": {
+        "git": true,
+        "printf": true,
+        "set": true,
+        "true": true
+    }
+}

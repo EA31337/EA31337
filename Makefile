@@ -2,16 +2,16 @@ SHELL:=/usr/bin/env bash
 
 .PHONY: all test compile-mql4 compile-mql5 requirements \
 		set-none set-testing \
-		set-lite set-advanced set-rider \
-		set-lite-release set-advanced-release set-rider-release \
-		set-lite-backtest set-advanced-backtest set-rider-backtest \
-		set-lite-optimize set-advanced-optimize set-rider-optimize \
+		set-lite set-advanced set-rider set-elite \
+		set-lite-release set-advanced-release set-rider-release set-elite-release \
+		set-lite-backtest set-advanced-backtest set-rider-backtest set-elite-backtest \
+		set-lite-optimize set-advanced-optimize set-rider-optimize set-elite-optimize \
 		clean clean-src clean-releases \
-		EA Lite Advanced Rider \
-		Release Lite-Release Advanced-Release Rider-Release \
-		Backtest Lite-Backtest Advanced-Backtest Rider-Backtest \
-		Optimize Lite-Optimize Advanced-Optimize Rider-Optimize \
-		All Lite-All Advanced-All Rider-All
+		EA Lite Advanced Rider Elite \
+		Release Lite-Release Advanced-Release Rider-Release Elite-Release \
+		Backtest Lite-Backtest Advanced-Backtest Rider-Backtest Elite-Backtest \
+		Optimize Lite-Optimize Advanced-Optimize Rider-Optimize Elite-Optimize \
+		All Lite-All Advanced-All Rider-All Elite-All
 
 MTE=metaeditor64.exe
 MTV=5.0.0.2361
@@ -34,24 +34,29 @@ requirements:
 Lite:				$(OUT)/$(EA)-Lite-%.ex4
 Advanced:			$(OUT)/$(EA)-Advanced-%.ex4
 Rider:				$(OUT)/$(EA)-Rider-%.ex4
+Elite:				$(OUT)/$(EA)-Elite-%.ex4
 
 Lite-Release: 			$(OUT)/$(EA)-Lite-Release-%.ex4
 Advanced-Release:		$(OUT)/$(EA)-Advanced-Release-%.ex4
 Rider-Release:			$(OUT)/$(EA)-Rider-Release-%.ex4
+Elite-Release:			$(OUT)/$(EA)-Elite-Release-%.ex4
 
 Lite-Backtest:			$(OUT)/$(EA)-Lite-Backtest-%.ex4
 Advanced-Backtest:		$(OUT)/$(EA)-Advanced-Backtest-%.ex4
 Rider-Backtest:			$(OUT)/$(EA)-Rider-Backtest-%.ex4
+Elite-Backtest:			$(OUT)/$(EA)-Elite-Backtest-%.ex4
 
 Lite-Optimize:			$(OUT)/$(EA)-Lite-Optimize-%.ex4
 Advanced-Optimize:		$(OUT)/$(EA)-Advanced-Optimize-%.ex4
 Rider-Optimize:			$(OUT)/$(EA)-Rider-Optimize-%.ex4
+Elite-Optimize:			$(OUT)/$(EA)-Elite-Optimize-%.ex4
 
 Lite-All:			Lite Lite-Release Lite-Backtest Lite-Optimize
 Advanced-All:			Advanced Advanced-Release Advanced-Backtest Advanced-Optimize
 Rider-All:			Rider Rider-Release Rider-Backtest Rider-Optimize
+Elite-All:			Elite Elite-Release Elite-Backtest Elite-Optimize
 
-All:				requirements $(MTE) Lite-All Advanced-All Rider-All
+All:				requirements $(MTE) Lite-All Advanced-All Rider-All Elite-All
 
 test: requirements set-mode $(MTE)
 	wine64 $(MTE) .exe /s /i:$(SRC) /mql4 $(MQL4)
@@ -83,6 +88,9 @@ set-advanced: set-none
 set-rider: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__rider__"
 
+set-elite: set-none
+	@$(MAKE) -f $(FILE) set-mode MODE="__elite__"
+
 set-lite-release: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__release__"
 
@@ -91,6 +99,9 @@ set-advanced-release: set-none
 
 set-rider-release: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__rider__"
+
+set-elite-release: set-none
+	@$(MAKE) -f $(FILE) set-mode MODE="__release__\|__elite__"
 
 set-lite-backtest: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__backtest__"
@@ -101,6 +112,9 @@ set-advanced-backtest: set-none
 set-rider-backtest: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__backtest__\|__rider__"
 
+set-elite-backtest: set-none
+	@$(MAKE) -f $(FILE) set-mode MODE="__backtest__\|__elite__"
+
 set-lite-optimize: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__optimize__"
 
@@ -109,6 +123,9 @@ set-advanced-optimize: set-none
 
 set-rider-optimize: set-none
 	@$(MAKE) -f $(FILE) set-mode MODE="__optimize__\|__rider__"
+
+set-elite-optimize: set-none
+	@$(MAKE) -f $(FILE) set-mode MODE="__optimize__\|__elite__"
 
 set-testing:
 	@$(MAKE) -f $(FILE) set-mode MODE="__testing__"
@@ -123,25 +140,29 @@ EA: $(MTE) \
 		clean-all \
 		$(OUT)/$(EA)-Lite-%.ex4 \
 		$(OUT)/$(EA)-Advanced-%.ex4 \
-		$(OUT)/$(EA)-Rider-%.ex4
+		$(OUT)/$(EA)-Rider-%.ex4 \
+		$(OUT)/$(EA)-Elite-%.ex4
 
 Release: $(MTE) \
 		clean-all \
 		$(OUT)/$(EA)-Lite-Release-%.ex4 \
 		$(OUT)/$(EA)-Advanced-Release-%.ex4 \
-		$(OUT)/$(EA)-Rider-Release-%.ex4
+		$(OUT)/$(EA)-Rider-Release-%.ex4 \
+		$(OUT)/$(EA)-Elite-Release-%.ex4
 
 Backtest: $(MTE) \
 		clean-all \
 		$(OUT)/$(EA)-Lite-Backtest-%.ex4 \
 		$(OUT)/$(EA)-Advanced-Backtest-%.ex4 \
-		$(OUT)/$(EA)-Rider-Backtest-%.ex4
+		$(OUT)/$(EA)-Rider-Backtest-%.ex4 \
+		$(OUT)/$(EA)-Elite-Backtest-%.ex4
 
 Optimize: $(MTE) \
 		clean-all \
 		$(OUT)/$(EA)-Lite-Optimize-%.ex4 \
 		$(OUT)/$(EA)-Advanced-Optimize-%.ex4 \
-		$(OUT)/$(EA)-Rider-Optimize-%.ex4
+		$(OUT)/$(EA)-Rider-Optimize-%.ex4 \
+		$(OUT)/$(EA)-Elite-Optimize-%.ex4
 
 compile-mql4: requirements $(MTE) $(SRC)/$(EA).mq4 $(SRC)/include/common/mode.h clean-src
 	file='$(MQL4)'; wine64 $(MTE) /log:CON /compile:"$${file//\//\\}" /inc:"$(SRC)" || true
@@ -169,6 +190,12 @@ $(OUT)/$(EA)-Rider-%.ex4: \
 		set-none
 		cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-$(VER).ex4"
 
+$(OUT)/$(EA)-Elite-%.ex4: \
+		set-elite \
+		compile-mql4 \
+		set-none
+		cp -v "$(EX4)" "$(OUT)/$(EA)-Elite-$(VER).ex4"
+
 $(OUT)/$(EA)-Lite-Release-%.ex4: \
 		set-lite-release \
 		compile-mql4 \
@@ -186,6 +213,12 @@ $(OUT)/$(EA)-Rider-Release-%.ex4: \
 		compile-mql4 \
 		set-none
 		cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-Release-$(VER).ex4"
+
+$(OUT)/$(EA)-Elite-Release-%.ex4: \
+		set-elite-release \
+		compile-mql4 \
+		set-none
+		cp -v "$(EX4)" "$(OUT)/$(EA)-Elite-Release-$(VER).ex4"
 
 $(OUT)/$(EA)-Lite-Backtest-%.ex4: \
 		set-lite-backtest \
@@ -205,6 +238,12 @@ $(OUT)/$(EA)-Rider-Backtest-%.ex4: \
 		set-none
 		cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-Backtest-$(VER).ex4"
 
+$(OUT)/$(EA)-Elite-Backtest-%.ex4: \
+		set-elite-backtest \
+		compile-mql4 \
+		set-none
+		cp -v "$(EX4)" "$(OUT)/$(EA)-Elite-Backtest-$(VER).ex4"
+
 $(OUT)/$(EA)-Lite-Optimize-%.ex4: \
 		set-lite-optimize \
 		compile-mql4 \
@@ -222,6 +261,12 @@ $(OUT)/$(EA)-Rider-Optimize-%.ex4: \
 		compile-mql4 \
 		set-none
 		cp -v "$(EX4)" "$(OUT)/$(EA)-Rider-Optimize-$(VER).ex4"
+
+$(OUT)/$(EA)-Elite-Optimize-%.ex4: \
+		set-elite-optimize \
+		compile-mql4 \
+		set-none
+		cp -v "$(EX4)" "$(OUT)/$(EA)-Elite-Optimize-$(VER).ex4"
 
 mt4-install:
 		install -v "$(EX4)" "$(shell find ~/.wine -name terminal.exe -execdir pwd ';' -quit)/MQL4/Experts"
