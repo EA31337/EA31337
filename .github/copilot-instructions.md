@@ -72,6 +72,7 @@ EA31337 project codebase is organized as follows:
   - EA31337.mq4: MQL4 implementation
   - EA31337.mq5: MQL5 implementation
   - include: Header files
+  - include/classes/CONTRIBUTING.md: Class-level contribution guidelines
 - scripts: Utility scripts
 - .markdownlint.yaml: Markdown linting rules
 - .pre-commit-config.yaml: Pre-commit hooks configuration
